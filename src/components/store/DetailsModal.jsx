@@ -53,7 +53,7 @@ export default function DetailsModal({ product, onClose }) {
 
         {product.details && (
           <div>
-            <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#1b140d", margin: "16px 0 10px" }}>
+            <h4 style={{ fontSize: "13px", fontWeight: "700", color: "#0A1628", margin: "16px 0 10px" }}>
               Key Features
             </h4>
             <ul style={{ margin: "0 0 18px", paddingLeft: "20px" }}>
@@ -66,19 +66,19 @@ export default function DetailsModal({ product, onClose }) {
           </div>
         )}
 
-        <div style={{ padding: "16px", background: "rgba(154,92,46,0.05)", borderRadius: "12px" }}>
-          <p style={{ margin: "0 0 8px", fontSize: "12px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase" }}>
+        <div style={{ padding: "16px", background: "rgba(0,136,204,0.05)", borderRadius: "12px" }}>
+          <p style={{ margin: "0 0 8px", fontSize: "12px", fontWeight: "700", color: "#005f99", textTransform: "uppercase" }}>
             Investment
           </p>
           <div style={{ display: "flex", gap: "16px" }}>
             <div>
-              <p style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: "800", color: "#1b140d" }}>
+              <p style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: "800", color: "#0A1628" }}>
                 ${product.setup_fee}
               </p>
               <p style={{ margin: 0, fontSize: "11px", color: "rgba(0,0,0,0.5)" }}>Setup</p>
             </div>
             <div>
-              <p style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: "800", color: "#9a5c2e" }}>
+              <p style={{ margin: "0 0 4px", fontSize: "18px", fontWeight: "800", color: "#005f99" }}>
                 ${product.monthly_fee}/mo
               </p>
               <p style={{ margin: 0, fontSize: "11px", color: "rgba(0,0,0,0.5)" }}>Monthly</p>

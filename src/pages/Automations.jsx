@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { ArrowRight, Zap, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { setPageMetadata } from "@/lib/seo";
+import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
+import MobileCallBar from "@/components/landing/MobileCallBar";
 
 const SERVICES = [
   {
@@ -314,40 +318,12 @@ export default function Automations() {
   }, []);
 
   return (
-    <div className="min-h-screen" style={{ background: "#f8fafc" }}>
-      {/* Header */}
-      <div
-        className="px-6 py-5 flex items-center justify-between"
-        style={{ background: "#ffffff", borderBottom: "1px solid rgba(10,22,40,0.08)" }}
-      >
-        <Link to="/" className="flex items-center gap-2">
-          <span style={{ display: "block", width: "180px", height: "54px", overflow: "hidden" }}>
-            <img
-              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
-              alt="ClientSurge Systems"
-              width="192"
-              height="48"
-              style={{
-                height: "96px",
-                width: "auto",
-                maxWidth: "none",
-                objectFit: "contain",
-                display: "block",
-                transform: "translate(-14px, -21px)",
-              }}
-            />
-          </span>
-        </Link>
-        <Link
-          to="/book"
-          className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white"
-          style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, #0050A0)` }}
-        >
-          Book Free Audit <ArrowRight className="w-4 h-4" />
-        </Link>
-      </div>
+    <DemoBookingProvider>
+      <div className="min-h-screen" style={{ background: "#f8fafc" }}>
+      <Navbar />
 
       {/* Hero */}
+      <main className="pt-[var(--cs-nav-height)]">
       <div className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
         <div
           className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest"
@@ -425,6 +401,10 @@ export default function Automations() {
           <p className="mt-5 text-xs text-slate-500">No credit card required · Typical setup time: 24–48 hours</p>
         </div>
       </div>
+      </main>
+      <Footer />
+      <MobileCallBar />
     </div>
+    </DemoBookingProvider>
   );
 }

@@ -46,12 +46,12 @@ export default function MobileCallBar() {
 
   return (
     <>
-      <div data-mobile-call-bar className="fixed bottom-0 inset-x-0 z-40 border-t border-primary/20 bg-background/95 backdrop-blur-sm md:hidden safe-area-bottom-bar">
-        <div className="px-3 py-2.5 flex gap-2" style={{ paddingBottom: "max(10px, env(safe-area-inset-bottom, 10px))" }}>
+      <div data-mobile-call-bar className="fixed bottom-0 inset-x-0 z-30 border-t border-primary/15 bg-background/90 backdrop-blur-md md:hidden safe-area-bottom-bar">
+        <div className="mx-auto flex max-w-[390px] gap-2 px-3 py-2" style={{ paddingBottom: "max(8px, env(safe-area-inset-bottom, 8px))" }}>
           <a
             href={`tel:${phoneNumber}`}
             onClick={() => trackCTA?.("mobile_call_bar_call")}
-            className="flex-1 flex items-center justify-center gap-2 rounded-full border border-primary/30 px-3 py-2.5 text-sm font-semibold text-primary"
+            className="flex min-w-0 flex-[0.9] items-center justify-center gap-1.5 rounded-full border border-primary/30 px-2.5 py-2 text-[12px] font-semibold text-primary"
             style={{ background: "rgba(0,174,239,0.07)" }}
           >
             <Phone className="w-4 h-4 flex-shrink-0" />
@@ -62,11 +62,10 @@ export default function MobileCallBar() {
               trackCTA?.("mobile_call_bar_book_demo");
               setShowModal(true);
             }}
-            className="flex-2 flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-bold text-white"
+            className="flex min-w-0 flex-[1.4] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-bold text-white"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
               boxShadow: "0 4px 14px rgba(0,174,239,0.4)",
-              flex: 2,
             }}
           >
             <CalendarCheck className="w-4 h-4 flex-shrink-0" />

@@ -33,7 +33,7 @@ function StoreSuspenseFallback({ minHeight = 240 }) {
         width: "100%",
         borderRadius: "18px",
         background:
-          "linear-gradient(90deg, rgba(0,174,239,0.07), rgba(255,255,255,0.86), rgba(154,92,46,0.07))",
+          "linear-gradient(90deg, rgba(0,174,239,0.08), rgba(255,255,255,0.9), rgba(0,95,153,0.08))",
         border: "1px solid rgba(0,136,204,0.12)"
       }}
     />
@@ -60,13 +60,13 @@ function StoreHumanFallbackCTA() {
       }}
     >
       <div style={{ maxWidth: "620px" }}>
-        <p style={{ fontSize: "13px", color: "rgba(27,20,13,0.55)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 6px" }}>
+        <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 6px" }}>
           Not sure what to pick?
         </p>
-        <p style={{ fontSize: "17px", color: "#1b140d", fontWeight: 800, margin: "0 0 4px" }}>
+        <p style={{ fontSize: "17px", color: "#0A1628", fontWeight: 800, margin: "0 0 4px" }}>
           Talk to a human before building your stack.
         </p>
-        <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.62)", margin: 0, lineHeight: 1.6 }}>
+        <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.62)", margin: 0, lineHeight: 1.6 }}>
           We will map the fastest path for your business and tell you which services are worth buying now.
         </p>
       </div>
@@ -219,7 +219,7 @@ function StoreInner() {
         minHeight: "100vh",
         fontFamily: "'Inter', sans-serif",
         position: "relative",
-        background: "linear-gradient(180deg, #fdfbf8 0%, #ffffff 42%, #fdfbf8 100%)"
+        background: "linear-gradient(180deg, #f7fbff 0%, #ffffff 42%, #f7fbff 100%)"
       }}>
       
       
@@ -227,8 +227,8 @@ function StoreInner() {
       <div style={{ position: "relative", zIndex: 2 }}>
         <style>{`
           .store-page nav {
-            background: rgba(253,251,248,0.85) !important;
-            border-bottom-color: rgba(154,92,46,0.14) !important;
+            background: rgba(247,251,255,0.9) !important;
+            border-bottom-color: rgba(0,136,204,0.14) !important;
             backdrop-filter: blur(22px) !important;
             -webkit-backdrop-filter: blur(22px) !important;
           }
@@ -285,7 +285,7 @@ function StoreInner() {
             inset: 0;
             border-radius: 8px;
             opacity: 0;
-            background: radial-gradient(ellipse at center, rgba(200,150,92,0.25) 0%, transparent 70%);
+            background: radial-gradient(ellipse at center, rgba(0,174,239,0.18) 0%, transparent 70%);
             transition: opacity 0.3s ease;
           }
           .ai-module-btn:hover::after { opacity: 1; }
@@ -356,6 +356,7 @@ function StoreInner() {
             .store-page .store-toolbar {
               flex-direction: column;
               align-items: stretch;
+              margin-bottom: 18px;
             }
             .store-page .store-searchWrap {
               max-width: none;
@@ -364,6 +365,15 @@ function StoreInner() {
               justify-content: flex-start;
               flex-direction: column;
               align-items: stretch;
+            }
+            .store-page .store-categories {
+              flex-wrap: nowrap;
+              overflow-x: auto;
+              padding-bottom: 4px;
+              scrollbar-width: none;
+            }
+            .store-page .store-categories::-webkit-scrollbar {
+              display: none;
             }
             .store-page .store-grid {
               grid-template-columns: 1fr;
@@ -415,7 +425,7 @@ function StoreInner() {
               <p
                 style={{
                   fontSize: "0.9rem",
-                  color: "rgba(27,20,13,0.72)",
+                  color: "rgba(10,22,40,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
                   margin: "0 auto 12px"
@@ -435,7 +445,7 @@ function StoreInner() {
                 borderRadius: "12px",
                 background: "rgba(255,255,255,0.4)",
                 border: "none",
-                borderBottom: "1px solid rgba(154,92,46,0.1)",
+                borderBottom: "1px solid rgba(0,136,204,0.12)",
                 boxShadow: "none",
                 fontSize: "12px"
               }}>
@@ -455,7 +465,7 @@ function StoreInner() {
                 <p
                 style={{
                   fontSize: "13px",
-                  color: "#1b140d",
+                  color: "#0A1628",
                   fontWeight: "600",
                   margin: "0 0 2px",
                   lineHeight: 1.4
@@ -485,8 +495,8 @@ function StoreInner() {
                   borderRadius: "14px",
                   padding: "14px 18px",
                   background: "#ffffff",
-                  border: "1.5px solid rgba(0,0,0,0.1)",
-                  boxShadow: "0 4px 14px rgba(0,0,0,0.07)",
+                  border: "1.5px solid rgba(0,136,204,0.14)",
+                  boxShadow: "0 8px 22px rgba(0,59,143,0.08)",
                   cursor: "default"
                 }}>
                 
@@ -504,10 +514,10 @@ function StoreInner() {
                     <Icon style={{ width: "18px", height: "18px", color: "#00AEEF" }} />
                   </div>
                   <div style={{ textAlign: "left" }}>
-                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#000000", margin: "0 0 2px" }}>
+                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#0A1628", margin: "0 0 2px" }}>
                       {val}
                     </p>
-                    <p style={{ fontSize: "10px", color: "rgba(27,20,13,0.6)", margin: 0, fontWeight: "600" }}>
+                    <p style={{ fontSize: "10px", color: "rgba(10,22,40,0.6)", margin: 0, fontWeight: "600" }}>
                       {label}
                     </p>
                   </div>
@@ -655,7 +665,7 @@ function StoreInner() {
                     background: "rgba(255,255,255,0.85)",
                     outline: "none",
                     boxSizing: "border-box",
-                    color: "#1b140d",
+                    color: "#0A1628",
                     boxShadow: "0 2px 8px rgba(0,136,204,0.07)"
                   }} />
                 
@@ -666,7 +676,7 @@ function StoreInner() {
                   style={{
                     fontSize: "12px",
                     fontWeight: "700",
-                    color: "rgba(27,20,13,0.55)",
+                    color: "rgba(10,22,40,0.55)",
                     letterSpacing: "0.08em",
                     textTransform: "uppercase"
                   }}>
@@ -698,7 +708,7 @@ function StoreInner() {
                       color:
                       activeCategory === category ?
                       "#ffffff" :
-                      "rgba(27,20,13,0.72)",
+                      "rgba(10,22,40,0.72)",
                       boxShadow:
                       activeCategory === category ?
                       "0 4px 14px rgba(0,174,239,0.35)" :
@@ -740,7 +750,7 @@ function StoreInner() {
               style={{
                 textAlign: "center",
                 padding: "48px",
-                color: "rgba(27,20,13,0.45)"
+                color: "rgba(10,22,40,0.45)"
               }}>
               
                 <p style={{ fontSize: "16px", fontWeight: "600" }}>

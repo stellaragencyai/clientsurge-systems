@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
-export default function IndustryHero({ image, eyebrow, headline, highlightedWord, sub, ctaLabel = "Book Your Free Demo", onBookDemo }) {
+export default function IndustryHero({ image, eyebrow, headline, highlightedWord, sub, subheadline, ctaLabel, cta, onBookDemo }) {
   // Split headline to highlight one word/phrase
   const headlineParts = highlightedWord
     ? headline.split(highlightedWord)
@@ -11,9 +11,11 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
     sizes: "100vw",
     quality: 80,
   });
+  const heroSub = sub || subheadline;
+  const primaryCta = ctaLabel || cta || "Book Your Free Demo";
 
   return (
-    <section className="relative overflow-hidden" style={{ minHeight: "100svh", display: "flex", alignItems: "center" }}>
+    <section className="relative overflow-hidden" style={{ minHeight: "min(760px, 86svh)", display: "flex", alignItems: "center" }}>
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -30,7 +32,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           className="absolute inset-0"
           style={{
             background:
-              "linear-gradient(105deg, rgba(10,7,3,0.82) 0%, rgba(10,7,3,0.68) 42%, rgba(10,7,3,0.38) 72%, rgba(10,7,3,0.18) 100%)",
+              "linear-gradient(105deg, rgba(6,14,28,0.78) 0%, rgba(6,14,28,0.62) 42%, rgba(6,14,28,0.36) 72%, rgba(6,14,28,0.18) 100%)",
           }}
         />
         {/* Bottom fade */}
@@ -43,7 +45,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
       </div>
 
       {/* Content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-10" style={{ paddingTop: "clamp(7rem, 18vw, 10rem)", paddingBottom: "clamp(5rem, 12vw, 8rem)" }}>
+      <div className="relative z-10 w-full max-w-7xl mx-auto px-5 md:px-10" style={{ paddingTop: "clamp(6.5rem, 14vw, 8.5rem)", paddingBottom: "clamp(4rem, 9vw, 6rem)" }}>
         <div style={{ maxWidth: "min(640px, 100%)" }}>
           {/* Eyebrow */}
           <div
@@ -67,14 +69,14 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           {/* Headline */}
           <h1
             className="font-display font-bold leading-[1.02] tracking-tight mb-6"
-            style={{ fontSize: "clamp(2.4rem, 5vw, 4.2rem)", color: "#fff" }}
+            style={{ fontSize: "clamp(2.2rem, 4.4vw, 3.7rem)", color: "#fff" }}
           >
             {highlightedWord && headlineParts.length === 2 ? (
               <>
                 {headlineParts[0]}
                 <span
                   style={{
-                    background: "linear-gradient(135deg, #f5d9a8 0%, #c8965c 50%, #f5d9a8 100%)",
+                    background: "linear-gradient(135deg, #e0f7ff 0%, #00AEEF 52%, #e0f7ff 100%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent",
                     backgroundClip: "text",
@@ -94,7 +96,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
             className="text-lg leading-relaxed mb-10"
             style={{ color: "rgba(255,255,255,0.82)", maxWidth: "520px" }}
           >
-            {sub}
+            {heroSub}
           </p>
 
           {/* CTAs */}
@@ -120,7 +122,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
                 touchAction: "manipulation",
               }}
             >
-              {ctaLabel}
+              {primaryCta}
               <ArrowRight style={{ width: "18px", height: "18px", flexShrink: 0 }} />
             </button>
 

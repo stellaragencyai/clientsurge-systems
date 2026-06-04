@@ -48,7 +48,7 @@ export default function StackValueCounter() {
         border: "1px solid rgba(255,255,255,0.22)",
         backdropFilter: "blur(20px)",
         WebkitBackdropFilter: "blur(20px)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 20px rgba(111,67,31,0.08)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.3), 0 4px 20px rgba(0,59,143,0.08)",
         display: "flex",
         alignItems: "center",
         justifyContent: "space-between",
@@ -58,28 +58,28 @@ export default function StackValueCounter() {
     >
       <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
         <div>
-          <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(154,92,46,0.7)", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>
+          <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(0,136,204,0.7)", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>
             Setup Total
           </p>
-          <p style={{ fontSize: "22px", fontWeight: "900", color: "#9a5c2e", margin: 0, lineHeight: 1.1, transition: "color 0.3s" }}>
+          <p style={{ fontSize: "22px", fontWeight: "900", color: "#005f99", margin: 0, lineHeight: 1.1, transition: "color 0.3s" }}>
             ${displaySetup}
           </p>
         </div>
-        <div style={{ width: "1px", height: "32px", background: "rgba(154,92,46,0.2)" }} />
+        <div style={{ width: "1px", height: "32px", background: "rgba(0,136,204,0.2)" }} />
         <div>
-          <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(154,92,46,0.7)", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>
+          <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(0,136,204,0.7)", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>
             Monthly
           </p>
-          <p style={{ fontSize: "22px", fontWeight: "900", color: "#9a5c2e", margin: 0, lineHeight: 1.1 }}>
-            ${displayMonthly}<span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(154,92,46,0.6)" }}>/mo</span>
+          <p style={{ fontSize: "22px", fontWeight: "900", color: "#005f99", margin: 0, lineHeight: 1.1 }}>
+            ${displayMonthly}<span style={{ fontSize: "12px", fontWeight: "600", color: "rgba(0,136,204,0.6)" }}>/mo</span>
           </p>
         </div>
-        <div style={{ width: "1px", height: "32px", background: "rgba(154,92,46,0.2)" }} />
+        <div style={{ width: "1px", height: "32px", background: "rgba(0,136,204,0.2)" }} />
         <div>
-          <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(154,92,46,0.7)", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>
+          <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(0,136,204,0.7)", textTransform: "uppercase", letterSpacing: "0.12em", margin: 0 }}>
             Services
           </p>
-          <p style={{ fontSize: "22px", fontWeight: "900", color: "#9a5c2e", margin: 0, lineHeight: 1.1 }}>
+          <p style={{ fontSize: "22px", fontWeight: "900", color: "#005f99", margin: 0, lineHeight: 1.1 }}>
             {items.length}
           </p>
         </div>
@@ -90,9 +90,9 @@ export default function StackValueCounter() {
           style={{
             fontSize: "11px",
             fontWeight: "600",
-            color: "#7a4825",
-            background: "rgba(154,92,46,0.1)",
-            border: "1px solid rgba(154,92,46,0.22)",
+            color: "#003B8F",
+            background: "rgba(0,136,204,0.1)",
+            border: "1px solid rgba(0,136,204,0.22)",
             borderRadius: "9999px",
             padding: "6px 14px",
           }}

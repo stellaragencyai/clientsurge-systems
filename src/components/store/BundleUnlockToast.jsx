@@ -49,7 +49,7 @@ export default function BundleUnlockToast() {
     <div
       style={{
         position: "fixed",
-        bottom: "24px",
+        bottom: "max(92px, calc(92px + env(safe-area-inset-bottom, 0px)))",
         left: "50%",
         transform: "translateX(-50%)",
         zIndex: 9999,
@@ -67,11 +67,11 @@ export default function BundleUnlockToast() {
         style={{
           borderRadius: "18px",
           padding: "12px 22px",
-          background: "rgba(255,255,255,0.18)",
-          backdropFilter: "blur(24px)",
-          WebkitBackdropFilter: "blur(24px)",
-          border: "1px solid rgba(255,255,255,0.35)",
-          boxShadow: "0 8px 32px rgba(111,67,31,0.18), inset 0 1px 0 rgba(255,255,255,0.6)",
+          background: "rgba(255,255,255,0.96)",
+          backdropFilter: "blur(18px)",
+          WebkitBackdropFilter: "blur(18px)",
+          border: "1px solid rgba(0,136,204,0.18)",
+          boxShadow: "0 12px 34px rgba(0,59,143,0.14), inset 0 1px 0 rgba(255,255,255,0.7)",
           display: "flex",
           alignItems: "center",
           gap: "10px",
@@ -81,16 +81,16 @@ export default function BundleUnlockToast() {
         {toast.type === "unlocked" ? (
           <>
             <span style={{ fontSize: "18px" }}>🎉</span>
-            <span style={{ fontSize: "13px", fontWeight: "700", color: "#1b140d" }}>
-              <span style={{ color: "#9a5c2e" }}>{toast.pkg.name}</span> unlocked — bundle pricing applied!
+            <span style={{ fontSize: "13px", fontWeight: "700", color: "#0A1628" }}>
+              <span style={{ color: "#005f99" }}>{toast.pkg.name}</span> unlocked — bundle pricing applied!
             </span>
           </>
         ) : (
           <>
             <span style={{ fontSize: "18px" }}>✦</span>
-            <span style={{ fontSize: "13px", fontWeight: "700", color: "#1b140d" }}>
-              Add just <span style={{ color: "#9a5c2e" }}>1 more service</span> → unlock{" "}
-              <span style={{ color: "#9a5c2e" }}>{toast.pkg.name}</span> &amp; save{" "}
+            <span style={{ fontSize: "13px", fontWeight: "700", color: "#0A1628" }}>
+              Add just <span style={{ color: "#005f99" }}>1 more service</span> → unlock{" "}
+              <span style={{ color: "#005f99" }}>{toast.pkg.name}</span> &amp; save{" "}
               <span style={{ color: "#16a34a" }}>${toast.monthlySavings}/mo</span>
             </span>
           </>

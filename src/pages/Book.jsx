@@ -4,6 +4,9 @@ import { Link } from 'react-router-dom';
 import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
+import Navbar from '@/components/landing/Navbar';
+import Footer from '@/components/landing/Footer';
+import { DemoBookingProvider } from '@/components/landing/DemoBookingContext';
 
 export default function Book() {
   useEffect(() => {
@@ -21,8 +24,11 @@ export default function Book() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-card to-background flex items-center justify-center px-6 py-12">
-      <div className="w-full max-w-4xl">
+    <DemoBookingProvider>
+      <div className="min-h-screen bg-gradient-to-br from-background via-card to-background">
+        <Navbar />
+        <main className="px-6 pb-16 pt-[calc(var(--cs-nav-height)+56px)]">
+      <div className="mx-auto w-full max-w-4xl">
         <div className="text-center mb-12">
           <h1 className="font-display text-3xl md:text-4xl font-semibold text-foreground mb-4">
             Book Your Free ClientSurge Automation Audit
@@ -130,8 +136,11 @@ export default function Book() {
           </div>
         </div>
       </div>
-      <MobileCallBar />
-    </div>
+        </main>
+        <Footer />
+        <MobileCallBar />
+      </div>
+    </DemoBookingProvider>
   );
 }
 

@@ -54,18 +54,18 @@ export default function BundleSavingsToast() {
     <div
       style={{
         position: "fixed",
-        bottom: "28px",
+        bottom: "max(92px, calc(92px + env(safe-area-inset-bottom, 0px)))",
         left: "50%",
         transform: `translateX(-50%) translateY(${visible ? "0" : "80px"})`,
         opacity: visible ? 1 : 0,
         transition: "all 0.4s cubic-bezier(0.34,1.56,0.64,1)",
         zIndex: 9999,
         pointerEvents: visible ? "auto" : "none",
-        background: "rgba(255,255,255,0.15)",
-        backdropFilter: "blur(24px)",
-        WebkitBackdropFilter: "blur(24px)",
-        border: "1px solid rgba(255,255,255,0.28)",
-        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.4), 0 8px 32px rgba(111,67,31,0.18)",
+        background: "rgba(255,255,255,0.96)",
+        backdropFilter: "blur(18px)",
+        WebkitBackdropFilter: "blur(18px)",
+        border: "1px solid rgba(0,136,204,0.18)",
+        boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7), 0 12px 34px rgba(0,59,143,0.14)",
         borderRadius: "999px",
         padding: "12px 24px",
         display: "flex",
@@ -75,9 +75,9 @@ export default function BundleSavingsToast() {
       }}
     >
       <span style={{ fontSize: "16px" }}>🎯</span>
-      <span style={{ fontSize: "13px", fontWeight: "600", color: "#1b140d" }}>
+      <span style={{ fontSize: "13px", fontWeight: "600", color: "#0A1628" }}>
         {toast.message}{" "}
-        <strong style={{ color: "#9a5c2e" }}>{toast.bundle}</strong>
+        <strong style={{ color: "#005f99" }}>{toast.bundle}</strong>
         {toast.savings > 0 && (
           <span style={{ color: "#16a34a", marginLeft: "6px" }}>
             — save ${toast.savings}
@@ -86,7 +86,7 @@ export default function BundleSavingsToast() {
       </span>
       <button
         onClick={() => setVisible(false)}
-        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(27,20,13,0.4)", fontSize: "14px", padding: "0 0 0 4px" }}
+        style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(10,22,40,0.42)", fontSize: "14px", padding: "0 0 0 4px" }}
       >
         ✕
       </button>

@@ -1,10 +1,10 @@
 import { useState } from "react";
 
 export default function FounderSection() {
-  const [photoUnavailable, setPhotoUnavailable] = useState(false);
+  const [photoUnavailable, setPhotoUnavailable] = useState(true);
 
   return (
-    <section className="py-24 md:py-32 px-6 bg-gradient-to-b from-card to-background">
+    <section className="py-16 md:py-20 px-6 bg-gradient-to-b from-card to-background">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-12">
           <p className="text-xs font-bold text-primary uppercase tracking-widest mb-3">Built by someone who actually gets it</p>

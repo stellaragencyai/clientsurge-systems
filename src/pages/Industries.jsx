@@ -22,9 +22,9 @@ const industries = [
   title: "Med Spas & Aesthetic Clinics",
   status: "Live",
   icon: HeartPulse,
-  accent: "text-rose-700",
-  accentBg: "bg-rose-50 border-rose-200",
-  ctaClass: "border-rose-300/60 bg-rose-50 text-rose-700 hover:bg-rose-100",
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
   "Our flagship industry page. See how we automate lead response, follow-up, and consultation booking for med spas and aesthetic clinics.",
   href: "/med-spa"
@@ -34,9 +34,9 @@ const industries = [
   title: "Dental & Orthodontics",
   status: "Live",
   icon: SmilePlus,
-  accent: "text-cyan-700",
-  accentBg: "bg-cyan-50 border-cyan-200",
-  ctaClass: "border-cyan-300/60 bg-cyan-50 text-cyan-700 hover:bg-cyan-100",
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
   "Best for practices that need faster response to new patient inquiries, missed-call text-back, and more booked consults.",
   href: "/dental"
@@ -46,9 +46,9 @@ const industries = [
   title: "Chiropractic & Physical Therapy",
   status: "Live",
   icon: Activity,
-  accent: "text-emerald-700",
-  accentBg: "bg-emerald-50 border-emerald-200",
-  ctaClass: "border-emerald-300/60 bg-emerald-50 text-emerald-700 hover:bg-emerald-100",
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
   "Built for practices that need more evaluations booked, cleaner follow-up, and less admin drag after the first inquiry.",
   href: "/chiropractic"
@@ -58,9 +58,9 @@ const industries = [
   title: "HVAC, Plumbing & Home Services",
   status: "Live",
   icon: Wrench,
-  accent: "text-sky-700",
-  accentBg: "bg-sky-50 border-sky-200",
-  ctaClass: "border-sky-300/60 bg-sky-50 text-sky-700 hover:bg-sky-100",
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
   "Ideal for service businesses losing jobs to missed calls, slow follow-up, and manual lead management.",
   href: "/hvac"
@@ -70,9 +70,9 @@ const industries = [
   title: "Roofing & Restoration",
   status: "Live",
   icon: Hammer,
-  accent: "text-amber-700",
-  accentBg: "bg-amber-50 border-amber-200",
-  ctaClass: "border-amber-300/60 bg-amber-50 text-amber-700 hover:bg-amber-100",
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
   "Designed for teams that need faster estimate response, better urgency handling, and more booked inspections.",
   href: "/roofing"
@@ -82,9 +82,9 @@ const industries = [
   title: "Contractors & Trades",
   status: "Live",
   icon: HardHat,
-  accent: "text-violet-700",
-  accentBg: "bg-violet-50 border-violet-200",
-  ctaClass: "border-violet-300/60 bg-violet-50 text-violet-700 hover:bg-violet-100",
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
   "Great for teams that need to respond quickly, follow up on quote requests, and convert more web leads into booked jobs.",
   href: "/contractors"
@@ -109,7 +109,7 @@ export default function Industries() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="text-center pr-2 pl-2 pt-24 pb-4" style={{ background: "linear-gradient(to bottom, hsl(40,8%,88%), hsl(0,0%,100%))" }}>
+      <section className="text-center pr-4 pl-4 pt-24 pb-8" style={{ background: "linear-gradient(to bottom, #f7fbff, #ffffff)" }}>
         <p className="text-xs font-semibold text-[#005f99] tracking-widest uppercase mb-4">Industries</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
           Automation for Appointment-Based Businesses
@@ -139,7 +139,7 @@ export default function Industries() {
                     <h2 className="font-display text-2xl font-semibold text-foreground">{industry.title}</h2>
                   </div>
                   <span
-                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide ${
+                    className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap ${
                     isLive ?
                     "bg-[#005f99]/10 text-[#005f99] border border-[#005f99]/25" :
                     "bg-muted text-muted-foreground border border-border"}`

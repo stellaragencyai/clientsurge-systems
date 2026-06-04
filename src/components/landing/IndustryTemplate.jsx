@@ -58,7 +58,7 @@ const INDUSTRY_HERO_FALLBACKS = {
   "med-spa": "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95&fit=crop&auto=format",
   dental: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1200&q=90&fit=crop&auto=format",
   chiropractic: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=90&fit=crop&auto=format",
-  hvac: "https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=1200&q=90&fit=crop&auto=format",
+  hvac: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=1200&q=90&fit=crop&auto=format",
   roofing: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=90&fit=crop&auto=format",
   contractors: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=90&fit=crop&auto=format",
 };
@@ -242,23 +242,23 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryAutomationUseCases industry={industry} />
 
         {blogLink && (
-          <section className="bg-[#07111f] px-4 py-12 md:px-6">
-            <div className="mx-auto max-w-5xl rounded-lg border border-white/10 bg-white/[0.05] p-6 md:p-8">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-cyan-300">
+          <section className="bg-primary/5 px-4 py-12 md:px-6">
+            <div className="mx-auto max-w-5xl rounded-lg border border-primary/15 bg-white p-6 shadow-sm md:p-8">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
                 Related launch guide
               </p>
               <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
-                  <h2 className="mb-2 text-2xl font-black leading-tight text-white md:text-3xl">
+                  <h2 className="mb-2 text-2xl font-black leading-tight text-foreground md:text-3xl">
                     {blogLink.title}
                   </h2>
-                  <p className="max-w-2xl text-sm leading-6 text-slate-300">
+                  <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
                     {blogLink.description}
                   </p>
                 </div>
                 <Link
                   to={blogLink.href}
-                  className="inline-flex min-h-11 items-center justify-center rounded-md bg-cyan-300 px-4 py-2 text-sm font-black text-slate-950 transition hover:bg-cyan-200"
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-black text-white shadow-sm transition hover:opacity-90"
                 >
                   Read guide
                 </Link>

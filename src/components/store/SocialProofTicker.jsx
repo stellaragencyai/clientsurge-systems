@@ -77,12 +77,12 @@ export default function SocialProofTicker() {
     >
       <div
         style={{
-          background: "linear-gradient(135deg, rgba(26,18,9,0.95) 0%, rgba(65,35,15,0.95) 100%)",
-          border: "1px solid rgba(200,150,92,0.3)",
+          background: "linear-gradient(135deg, rgba(10,22,40,0.95) 0%, rgba(65,35,15,0.95) 100%)",
+          border: "1px solid rgba(0,174,239,0.3)",
           borderRadius: "12px",
           padding: "14px 16px",
           backdropFilter: "blur(12px)",
-          boxShadow: "0 12px 32px rgba(0,0,0,0.3), 0 0 1px rgba(200,150,92,0.4)",
+          boxShadow: "0 12px 32px rgba(0,0,0,0.3), 0 0 1px rgba(0,174,239,0.4)",
           minWidth: "280px",
           display: "flex",
           alignItems: "center",
@@ -94,12 +94,12 @@ export default function SocialProofTicker() {
             width: "36px",
             height: "36px",
             borderRadius: "8px",
-            background: "linear-gradient(135deg, #9a5c2e, #c8965c)",
+            background: "linear-gradient(135deg, #005f99, #00AEEF)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
-            boxShadow: "0 4px 12px rgba(154,92,46,0.4)",
+            boxShadow: "0 4px 12px rgba(0,136,204,0.4)",
           }}
         >
           <ShoppingCart style={{ width: "18px", height: "18px", color: "#fff" }} />
@@ -123,7 +123,7 @@ export default function SocialProofTicker() {
             style={{
               margin: "0 0 2px",
               fontSize: "11px",
-              color: "rgba(200,150,92,0.9)",
+              color: "rgba(0,174,239,0.9)",
               whiteSpace: "nowrap",
               overflow: "hidden",
               textOverflow: "ellipsis",
@@ -135,7 +135,7 @@ export default function SocialProofTicker() {
             style={{
               margin: 0,
               fontSize: "10px",
-              color: "rgba(200,150,92,0.6)",
+              color: "rgba(0,174,239,0.6)",
               fontWeight: "600",
             }}
           >
@@ -150,14 +150,14 @@ export default function SocialProofTicker() {
             border: "none",
             cursor: "pointer",
             padding: "4px",
-            color: "rgba(200,150,92,0.7)",
+            color: "rgba(0,174,239,0.7)",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
             flexShrink: 0,
           }}
-          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(200,150,92,1)")}
-          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(200,150,92,0.7)")}
+          onMouseEnter={(e) => (e.currentTarget.style.color = "rgba(0,174,239,1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.color = "rgba(0,174,239,0.7)")}
         >
           <X style={{ width: "14px", height: "14px" }} />
         </button>

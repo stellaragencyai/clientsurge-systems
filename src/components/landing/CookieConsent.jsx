@@ -68,10 +68,10 @@ export default function CookieConsent() {
 
   return (
     <div
-      className="fixed left-3 right-auto z-50 max-w-[300px] md:left-5"
+      className="fixed left-3 right-auto z-50 max-w-[300px] md:left-5 md:max-w-[280px]"
       style={{
         bottom: offsetForMobileCallBar
-          ? "max(96px, calc(96px + env(safe-area-inset-bottom, 0px)))"
+          ? "max(88px, calc(88px + env(safe-area-inset-bottom, 0px)))"
           : "max(16px, calc(16px + env(safe-area-inset-bottom, 0px)))",
       }}
       aria-live="polite"
@@ -79,7 +79,7 @@ export default function CookieConsent() {
       aria-label="Cookie preferences"
     >
       <div 
-        className="rounded-xl shadow-lg border backdrop-blur-md p-3 space-y-2"
+        className="rounded-lg shadow-lg border backdrop-blur-md p-2.5 space-y-2 md:p-3"
         style={{
           background: 'rgba(255,255,255,0.95)',
           borderColor: 'rgba(0,0,0,0.1)',
@@ -88,7 +88,7 @@ export default function CookieConsent() {
       >
         {/* Header with close */}
         <div className="flex items-start justify-between gap-3">
-          <h3 className="font-semibold text-xs text-foreground">Cookie Preferences</h3>
+          <h3 className="font-semibold text-[11px] text-foreground md:text-xs">Cookie Preferences</h3>
           <button
             onClick={handleDismiss}
             className="text-muted-foreground hover:text-foreground transition-colors flex-shrink-0"
@@ -99,8 +99,8 @@ export default function CookieConsent() {
         </div>
 
         {/* Message */}
-        <p className="text-[11px] text-muted-foreground leading-relaxed">
-          We use cookies to enhance your experience and analyze site traffic. By continuing to use this site, you agree to our{' '}
+        <p className="text-[10px] text-muted-foreground leading-relaxed md:text-[11px]">
+          We use cookies to improve the site and measure traffic. By continuing, you agree to our{' '}
           <a 
             href="/privacy-policy"
             className="font-medium text-primary hover:text-primary/80 transition-colors"
@@ -110,16 +110,16 @@ export default function CookieConsent() {
           .
         </p>
         {/* Actions */}
-        <div className="flex gap-2 pt-1">
+        <div className="flex gap-2 pt-0.5">
           <button
             onClick={handleDecline}
-            className="flex-1 px-3 py-1.5 text-[11px] font-medium text-muted-foreground hover:text-foreground border border-border rounded-lg transition-colors"
+            className="flex-1 px-3 py-1.5 text-[10px] font-medium text-muted-foreground hover:text-foreground border border-border rounded-md transition-colors md:text-[11px]"
           >
             Decline
           </button>
           <button
             onClick={handleAccept}
-            className="flex-1 px-3 py-1.5 text-[11px] font-medium text-white rounded-lg transition-all"
+            className="flex-1 px-3 py-1.5 text-[10px] font-medium text-white rounded-md transition-all md:text-[11px]"
             style={{
               background: 'linear-gradient(135deg,#0088cc 0%,#00aaff 100%)',
               boxShadow: '0 4px 12px rgba(0,170,255,0.25)'

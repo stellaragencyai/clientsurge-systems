@@ -33,9 +33,9 @@ export default function InteractiveStackBuilder() {
           justifyContent: "center",
           padding: "24px",
           borderRadius: "18px",
-          border: "1.5px solid rgba(154,92,46,0.15)",
+          border: "1.5px solid rgba(0,136,204,0.15)",
           background:
-            "linear-gradient(135deg, rgba(26,18,9,0.3) 0%, rgba(200,150,92,0.06) 100%)",
+            "linear-gradient(135deg, rgba(10,22,40,0.3) 0%, rgba(0,174,239,0.06) 100%)",
           backdropFilter: "blur(12px)",
           WebkitBackdropFilter: "blur(12px)",
         }}
@@ -70,10 +70,10 @@ export default function InteractiveStackBuilder() {
                   transformOrigin: "bottom center",
                   transformStyle: "preserve-3d",
                   background:
-                    "linear-gradient(135deg, rgba(255,248,240,0.86), rgba(241,224,202,0.78))",
+                    "linear-gradient(135deg, rgba(247,251,255,0.86), rgba(241,224,202,0.78))",
                   borderRadius: "12px",
                   padding: "12px 16px",
-                  border: "1px solid rgba(154,92,46,0.16)",
+                  border: "1px solid rgba(0,136,204,0.16)",
                   boxShadow: `0 ${4 + index * 2}px ${12 + index * 3}px rgba(0,0,0,0.08)`,
                   transition: "all 0.3s ease",
                 }}
@@ -87,7 +87,7 @@ export default function InteractiveStackBuilder() {
                   }}
                 >
                   <span
-                    style={{ fontSize: "12px", fontWeight: "600", color: "#1a1209" }}
+                    style={{ fontSize: "12px", fontWeight: "600", color: "#0A1628" }}
                   >
                     {item.icon} {item.name}
                   </span>
@@ -99,7 +99,7 @@ export default function InteractiveStackBuilder() {
                       border: "none",
                       cursor: "pointer",
                       padding: "2px",
-                      color: "rgba(26,18,9,0.4)",
+                      color: "rgba(10,22,40,0.4)",
                     }}
                   >
                     <Trash2 style={{ width: "12px", height: "12px" }} />
@@ -108,7 +108,7 @@ export default function InteractiveStackBuilder() {
                 <div
                   style={{
                     fontSize: "10px",
-                    color: "rgba(26,18,9,0.58)",
+                    color: "rgba(10,22,40,0.58)",
                     marginTop: "4px",
                   }}
                 >
@@ -124,7 +124,7 @@ export default function InteractiveStackBuilder() {
       <div
         style={{
           background: "rgba(255,255,255,0.82)",
-          border: "1.5px solid rgba(154,92,46,0.16)",
+          border: "1.5px solid rgba(0,136,204,0.16)",
           borderRadius: "18px",
           padding: "20px",
           display: "flex",
@@ -138,7 +138,7 @@ export default function InteractiveStackBuilder() {
           style={{
             fontSize: "14px",
             fontWeight: "700",
-            color: "#1a1209",
+            color: "#0A1628",
             margin: 0,
           }}
         >
@@ -148,19 +148,19 @@ export default function InteractiveStackBuilder() {
         <div
           style={{
             borderRadius: "12px",
-            border: "1px solid rgba(154,92,46,0.14)",
-            background: "rgba(154,92,46,0.06)",
+            border: "1px solid rgba(0,136,204,0.14)",
+            background: "rgba(0,136,204,0.06)",
             padding: "12px 14px",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
-            <Package2 style={{ width: "14px", height: "14px", color: "#9a5c2e" }} />
+            <Package2 style={{ width: "14px", height: "14px", color: "#005f99" }} />
             <p
               style={{
                 margin: 0,
                 fontSize: "13px",
                 fontWeight: "700",
-                color: "#1a1209",
+                color: "#0A1628",
               }}
             >
               {getPackageDisplayLabel(pricingSummary)}
@@ -170,7 +170,7 @@ export default function InteractiveStackBuilder() {
             style={{
               margin: "6px 0 0",
               fontSize: "11px",
-              color: "rgba(26,18,9,0.55)",
+              color: "rgba(10,22,40,0.55)",
             }}
           >
             {pricingSummary.package_offer
@@ -185,14 +185,14 @@ export default function InteractiveStackBuilder() {
               display: "flex",
               justifyContent: "space-between",
               paddingBottom: "8px",
-              borderBottom: "1px solid rgba(154,92,46,0.1)",
+              borderBottom: "1px solid rgba(0,136,204,0.1)",
             }}
           >
-            <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.55)" }}>
+            <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.55)" }}>
               Setup total
             </span>
             <span
-              style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}
+              style={{ fontSize: "13px", fontWeight: "700", color: "#0A1628" }}
             >
               ${formatCurrency(pricingSummary.total_setup)}
             </span>
@@ -203,28 +203,28 @@ export default function InteractiveStackBuilder() {
               display: "flex",
               justifyContent: "space-between",
               paddingBottom: "8px",
-              borderBottom: "1px solid rgba(154,92,46,0.1)",
+              borderBottom: "1px solid rgba(0,136,204,0.1)",
             }}
           >
-            <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.55)" }}>
+            <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.55)" }}>
               Monthly total
             </span>
             <span
-              style={{ fontSize: "16px", fontWeight: "800", color: "#9a5c2e" }}
+              style={{ fontSize: "16px", fontWeight: "800", color: "#005f99" }}
             >
               ${formatCurrency(pricingSummary.total_monthly)}/mo
             </span>
           </div>
 
           <div style={{ display: "flex", justifyContent: "space-between", gap: "12px" }}>
-            <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.55)" }}>
+            <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.55)" }}>
               A la carte comparison
             </span>
             <span
               style={{
                 fontSize: "11px",
                 fontWeight: "700",
-                color: "rgba(26,18,9,0.7)",
+                color: "rgba(10,22,40,0.7)",
                 textAlign: "right",
               }}
             >
@@ -259,7 +259,7 @@ export default function InteractiveStackBuilder() {
             <p
               style={{
                 fontSize: "11px",
-                color: "rgba(26,18,9,0.55)",
+                color: "rgba(10,22,40,0.55)",
                 margin: 0,
               }}
             >
@@ -292,7 +292,7 @@ export default function InteractiveStackBuilder() {
           <p
             style={{
               fontSize: "10px",
-              color: "rgba(26,18,9,0.5)",
+              color: "rgba(10,22,40,0.5)",
               margin: 0,
             }}
           >

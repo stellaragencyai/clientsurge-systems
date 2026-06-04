@@ -33,17 +33,17 @@ export default function ProductCard({ product }) {
           display: flex;
           flex-direction: column;
           gap: 12px;
-          background: rgba(255,255,255,0.93);
-          border: 2px solid rgba(0,0,0,0.85);
-          box-shadow: 0 4px 18px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.3);
+          background: rgba(255,255,255,0.96);
+          border: 1.5px solid rgba(0,136,204,0.2);
+          box-shadow: 0 12px 34px rgba(0,59,143,0.08), inset 0 1px 0 rgba(255,255,255,0.65);
           cursor: pointer;
           transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
           min-height: 340px;
           overflow: visible;
         }
         .pcard:hover {
-          border-color: rgba(0,0,0,1);
-          box-shadow: 0 8px 28px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.4);
+          border-color: rgba(0,136,204,0.42);
+          box-shadow: 0 18px 42px rgba(0,59,143,0.13), inset 0 1px 0 rgba(255,255,255,0.75);
           transform: translateY(-3px);
         }
         .pcard.in-cart {
@@ -60,7 +60,7 @@ export default function ProductCard({ product }) {
           right: 14px;
           font-size: 9px;
           font-weight: 700;
-          color: rgba(154,92,46,0.35);
+          color: rgba(0,95,153,0.45);
           letter-spacing: 0.1em;
           text-transform: uppercase;
           opacity: 0;
@@ -88,7 +88,7 @@ export default function ProductCard({ product }) {
           border: 1px solid rgba(0,174,239,0.15);
           font-size: 10px;
           font-weight: 600;
-          color: rgba(27,20,13,0.72);
+          color: rgba(10,22,40,0.72);
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
@@ -115,7 +115,7 @@ export default function ProductCard({ product }) {
         .see-more-btn {
           background: none;
           border: none;
-          color: #9a5c2e;
+          color: #005f99;
           font-size: 10px;
           font-weight: 700;
           cursor: pointer;
@@ -126,11 +126,11 @@ export default function ProductCard({ product }) {
           transition: color 0.2s ease;
         }
         .see-more-btn:hover {
-          color: #c8965c;
+          color: #0088CC;
         }
         .price-highlight-box {
           background: #ffffff;
-          border: 1px solid rgba(0,0,0,0.1);
+          border: 1px solid rgba(0,136,204,0.14);
           border-radius: 14px;
           padding: 12px 14px;
           text-align: center;
@@ -143,7 +143,7 @@ export default function ProductCard({ product }) {
           gap: 4px;
           font-size: 24px;
           font-weight: 900;
-          color: #000000;
+          color: #0A1628;
           line-height: 1;
           margin-bottom: 4px;
         }
@@ -201,7 +201,7 @@ export default function ProductCard({ product }) {
 
         {/* Title */}
         <div>
-          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#1b140d", margin: "0 0 3px", lineHeight: 1.2 }}>
+          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0A1628", margin: "0 0 3px", lineHeight: 1.2 }}>
             {product.name}
           </h2>
           <p style={{ fontSize: "9px", color: "rgba(0,174,239,0.8)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
@@ -210,7 +210,7 @@ export default function ProductCard({ product }) {
         </div>
 
         {/* Description */}
-        <p style={{ fontSize: "12px", color: "rgba(27,20,13,0.62)", lineHeight: 1.65, margin: 0, flex: 1 }}>
+        <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.64)", lineHeight: 1.65, margin: 0, flex: 1 }}>
           {product.description}
         </p>
 
@@ -248,14 +248,14 @@ export default function ProductCard({ product }) {
             <motion.button
               onClick={toggle}
               whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
-              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 8px 20px rgba(120,70,20,0.38)" }}
+              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 8px 20px rgba(0,59,143,0.38)" }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               style={{
                 width: "100%",
                 borderRadius: "9999px", padding: "1px",
-                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "#ffffff",
-                border: inCart ? "none" : "1.5px solid rgba(0,0,0,0.12)", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 2px 8px rgba(0,0,0,0.08)",
+                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#00AEEF,#003B8F)",
+                border: "none", cursor: "pointer",
+                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 6px 16px rgba(0,136,204,0.18)",
               }}
             >
               <span className="product-card-cta-label" style={{
@@ -263,7 +263,7 @@ export default function ProductCard({ product }) {
                 width: "100%",
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
                 background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "#ffffff",
-                color: inCart ? "#fff" : "#111", fontWeight: "700", whiteSpace: "nowrap",
+                color: inCart ? "#fff" : "#005f99", fontWeight: "700", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
                 {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}

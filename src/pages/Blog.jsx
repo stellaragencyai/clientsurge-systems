@@ -1,6 +1,10 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
+import MobileCallBar from "@/components/landing/MobileCallBar";
 
 const posts = [
   {
@@ -551,11 +555,11 @@ function BlogIndex() {
   return (
     <BlogShell>
       <div className="mx-auto max-w-3xl">
-        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-cyan-300">Launch guides</p>
-        <h1 className="mb-4 text-4xl font-black leading-tight text-white md:text-5xl">
+        <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Launch guides</p>
+        <h1 className="mb-4 text-4xl font-black leading-tight text-foreground md:text-5xl">
           AI lead response guides for local service businesses
         </h1>
-        <p className="mb-8 max-w-2xl text-base leading-7 text-slate-300">
+        <p className="mb-8 max-w-2xl text-base leading-7 text-muted-foreground">
           Practical ClientSurge playbooks on missed-call recovery, AI lead follow-up, booking automation, and niche-specific response systems.
         </p>
         <div className="mb-6 flex gap-2 overflow-x-auto pb-2" aria-label="Filter blog guides by topic">
@@ -568,8 +572,8 @@ function BlogIndex() {
                 onClick={() => setActiveTopic(filter.label)}
                 className={`shrink-0 rounded-full border px-4 py-2 text-sm font-bold transition ${
                   selected
-                    ? "border-cyan-200 bg-cyan-200 text-slate-950"
-                    : "border-white/10 bg-white/[0.04] text-slate-300 hover:border-cyan-300/40 hover:text-cyan-100"
+                    ? "border-primary bg-primary text-white shadow-sm"
+                    : "border-primary/15 bg-white text-muted-foreground hover:border-primary/40 hover:text-primary"
                 }`}
                 aria-pressed={selected}
               >
@@ -583,16 +587,16 @@ function BlogIndex() {
             <Link
               key={post.slug}
               to={`/blog/${post.slug}`}
-              className="block rounded-lg border border-white/10 bg-white/[0.04] p-5 transition hover:border-cyan-300/45 hover:bg-white/[0.07]"
+              className="block rounded-lg border border-primary/12 bg-white p-5 shadow-sm transition hover:-translate-y-0.5 hover:border-primary/35 hover:shadow-md"
             >
               <div className="mb-3 flex flex-wrap items-center gap-2">
-                <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-200">{post.tag}</span>
-                <span className="text-xs text-slate-500">{post.date}</span>
-                <span className="text-xs text-slate-500">Target: {post.keyword}</span>
+                <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{post.tag}</span>
+                <span className="text-xs text-muted-foreground">{post.date}</span>
+                <span className="text-xs text-muted-foreground">Target: {post.keyword}</span>
               </div>
-              <h2 className="mb-2 text-xl font-extrabold leading-snug text-white">{post.title}</h2>
-              <p className="mb-4 text-sm leading-6 text-slate-300">{post.description}</p>
-              <span className="text-sm font-semibold text-cyan-200">Read guide</span>
+              <h2 className="mb-2 text-xl font-extrabold leading-snug text-foreground">{post.title}</h2>
+              <p className="mb-4 text-sm leading-6 text-muted-foreground">{post.description}</p>
+              <span className="text-sm font-semibold text-primary">Read guide</span>
             </Link>
           ))}
         </div>
@@ -623,22 +627,22 @@ function BlogArticle({ post }) {
   return (
     <BlogShell>
       <article className="mx-auto max-w-3xl">
-        <Link to="/blog" className="mb-8 inline-flex text-sm font-semibold text-cyan-200 hover:text-cyan-100">
+        <Link to="/blog" className="mb-8 inline-flex text-sm font-semibold text-primary hover:text-primary/80">
           Back to blog
         </Link>
         <div className="mb-4 flex flex-wrap items-center gap-2">
-          <span className="rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1 text-xs font-bold text-cyan-200">{post.tag}</span>
-          <span className="text-xs text-slate-500">{post.date}</span>
-          <span className="text-xs text-slate-500">Target: {post.keyword}</span>
+          <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{post.tag}</span>
+          <span className="text-xs text-muted-foreground">{post.date}</span>
+          <span className="text-xs text-muted-foreground">Target: {post.keyword}</span>
         </div>
-        <h1 className="mb-5 text-4xl font-black leading-tight text-white md:text-5xl">{post.title}</h1>
-        <p className="mb-8 text-lg leading-8 text-slate-300">{post.description}</p>
+        <h1 className="mb-5 text-4xl font-black leading-tight text-foreground md:text-5xl">{post.title}</h1>
+        <p className="mb-8 text-lg leading-8 text-muted-foreground">{post.description}</p>
 
-        <div className="mb-10 rounded-lg border border-white/10 bg-white/[0.04] p-5">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-slate-400">Useful next steps</p>
+        <div className="mb-10 rounded-lg border border-primary/12 bg-white p-5 shadow-sm">
+          <p className="mb-3 text-sm font-bold uppercase tracking-[0.18em] text-muted-foreground">Useful next steps</p>
           <div className="flex flex-wrap gap-3">
             {post.links.map((link) => (
-              <Link key={link.href} to={link.href} className="rounded-md border border-white/10 px-3 py-2 text-sm font-semibold text-slate-200 hover:border-cyan-300/40 hover:text-cyan-100">
+              <Link key={link.href} to={link.href} className="rounded-full border border-primary/20 bg-white px-4 py-2 text-sm font-semibold text-primary hover:bg-primary/5">
                 {link.label}
               </Link>
             ))}
@@ -648,30 +652,30 @@ function BlogArticle({ post }) {
         <div className="space-y-8">
           {post.sections.map((section) => (
             <section key={section.heading}>
-              <h2 className="mb-3 text-2xl font-extrabold text-white">{section.heading}</h2>
-              <p className="text-base leading-8 text-slate-300">{section.body}</p>
+              <h2 className="mb-3 text-2xl font-extrabold text-foreground">{section.heading}</h2>
+              <p className="text-base leading-8 text-muted-foreground">{section.body}</p>
             </section>
           ))}
         </div>
 
         <section className="mt-12">
-          <h2 className="mb-5 text-2xl font-extrabold text-white">FAQ</h2>
+          <h2 className="mb-5 text-2xl font-extrabold text-foreground">FAQ</h2>
           <div className="space-y-3">
             {post.faqs.map(([question, answer]) => (
-              <div key={question} className="rounded-lg border border-white/10 bg-white/[0.04] p-5">
-                <h3 className="mb-2 text-base font-bold text-white">{question}</h3>
-                <p className="text-sm leading-6 text-slate-300">{answer}</p>
+              <div key={question} className="rounded-lg border border-primary/12 bg-white p-5 shadow-sm">
+                <h3 className="mb-2 text-base font-bold text-foreground">{question}</h3>
+                <p className="text-sm leading-6 text-muted-foreground">{answer}</p>
               </div>
             ))}
           </div>
         </section>
 
-        <div className="mt-12 rounded-lg border border-cyan-300/25 bg-cyan-300/10 p-6">
-          <h2 className="mb-3 text-2xl font-extrabold text-white">Ready to inspect your lead path?</h2>
-          <p className="mb-5 text-sm leading-6 text-slate-300">
+        <div className="mt-12 rounded-lg border border-primary/20 bg-primary/5 p-6">
+          <h2 className="mb-3 text-2xl font-extrabold text-foreground">Ready to inspect your lead path?</h2>
+          <p className="mb-5 text-sm leading-6 text-muted-foreground">
             ClientSurge audits where leads go cold, then maps the automation stack that fits your package, team, and launch readiness.
           </p>
-          <Link to={post.cta.href} className="inline-flex rounded-md bg-cyan-300 px-4 py-2 text-sm font-black text-slate-950 hover:bg-cyan-200">
+          <Link to={post.cta.href} className="inline-flex rounded-full bg-primary px-5 py-3 text-sm font-black text-white shadow-sm hover:opacity-90">
             {post.cta.label}
           </Link>
         </div>
@@ -682,9 +686,16 @@ function BlogArticle({ post }) {
 
 function BlogShell({ children }) {
   return (
-    <div className="min-h-screen bg-[#0A0F1E] px-5 py-16">
-      {children}
-    </div>
+    <DemoBookingProvider>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <main className="px-5 pb-16 pt-[calc(var(--cs-nav-height)+48px)]">
+          {children}
+        </main>
+        <Footer />
+        <MobileCallBar />
+      </div>
+    </DemoBookingProvider>
   );
 }
 

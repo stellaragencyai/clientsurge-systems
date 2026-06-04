@@ -159,8 +159,8 @@ export default function CartSidebar() {
           right: 0,
           bottom: 0,
           width: "min(430px, 100vw)",
-          background: "linear-gradient(180deg, #fdfbf8 0%, #f6efe5 100%)",
-          borderLeft: "1px solid rgba(154,92,46,0.14)",
+          background: "linear-gradient(180deg, #f7fbff 0%, #ffffff 100%)",
+          borderLeft: "1px solid rgba(0,136,204,0.16)",
           boxShadow: "-20px 0 60px rgba(0,0,0,0.18)",
           zIndex: 101,
           display: "flex",
@@ -174,24 +174,24 @@ export default function CartSidebar() {
             alignItems: "center",
             justifyContent: "space-between",
             padding: "20px 22px",
-            borderBottom: "1px solid rgba(154,92,46,0.1)",
+            borderBottom: "1px solid rgba(0,136,204,0.12)",
             background: "rgba(255,255,255,0.56)",
             backdropFilter: "blur(12px)",
           }}
         >
           <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
             <ShoppingCart
-              style={{ width: "20px", height: "20px", color: "#9a5c2e" }}
+              style={{ width: "20px", height: "20px", color: "#0088CC" }}
             />
             <span
-              style={{ fontWeight: "700", fontSize: "16px", color: "#1a1209" }}
+              style={{ fontWeight: "700", fontSize: "16px", color: "#0A1628" }}
             >
               Your AI Stack
             </span>
             {items.length > 0 ? (
               <span
                 style={{
-                  background: "#9a5c2e",
+                  background: "#0088CC",
                   color: "#fff",
                   borderRadius: "9999px",
                   width: "20px",
@@ -216,7 +216,7 @@ export default function CartSidebar() {
               padding: "4px",
             }}
           >
-            <X style={{ width: "20px", height: "20px", color: "#7b6b5d" }} />
+            <X style={{ width: "20px", height: "20px", color: "rgba(10,22,40,0.58)" }} />
           </button>
         </div>
 
@@ -225,17 +225,17 @@ export default function CartSidebar() {
             <div style={{ textAlign: "center", padding: "36px 16px 24px" }}>
               <div style={{
                 width: "56px", height: "56px", borderRadius: "16px",
-                background: "linear-gradient(135deg, rgba(154,92,46,0.1), rgba(200,150,92,0.05))",
-                border: "1px solid rgba(154,92,46,0.14)",
+                background: "linear-gradient(135deg, rgba(0,174,239,0.1), rgba(0,59,143,0.05))",
+                border: "1px solid rgba(0,136,204,0.14)",
                 display: "flex", alignItems: "center", justifyContent: "center",
                 margin: "0 auto 14px",
               }}>
-                <ShoppingCart style={{ width: "26px", height: "26px", color: "#9a5c2e", opacity: 0.6 }} />
+                <ShoppingCart style={{ width: "26px", height: "26px", color: "#0088CC", opacity: 0.72 }} />
               </div>
-              <p style={{ fontSize: "14px", fontWeight: "700", color: "#1a1209", margin: "0 0 6px" }}>
+              <p style={{ fontSize: "14px", fontWeight: "700", color: "#0A1628", margin: "0 0 6px" }}>
                 Your stack is empty
               </p>
-              <p style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)", marginBottom: "20px", lineHeight: 1.5 }}>
+              <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.5)", marginBottom: "20px", lineHeight: 1.5 }}>
                 Add services from the catalog below to get started.
               </p>
               {/* Top 3 popular nudges */}
@@ -247,14 +247,14 @@ export default function CartSidebar() {
                 <div key={s.name} style={{
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "10px 12px", marginBottom: "6px", borderRadius: "12px",
-                  background: "rgba(255,255,255,0.7)", border: "1px solid rgba(154,92,46,0.1)",
+                  background: "rgba(255,255,255,0.78)", border: "1px solid rgba(0,136,204,0.12)",
                   cursor: "pointer",
                 }} onClick={() => setCartOpen(false)}>
                   <span style={{ fontSize: "13px" }}>{s.icon} {s.name}</span>
-                  <span style={{ fontSize: "11px", color: "#9a5c2e", fontWeight: "700" }}>{s.price}</span>
+                  <span style={{ fontSize: "11px", color: "#005f99", fontWeight: "700" }}>{s.price}</span>
                 </div>
               ))}
-              <p style={{ fontSize: "11px", color: "rgba(26,18,9,0.35)", marginTop: "10px" }}>
+              <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.36)", marginTop: "10px" }}>
                 Click a service above to browse
               </p>
             </div>
@@ -268,10 +268,10 @@ export default function CartSidebar() {
                   animate={{ opacity: 1, x: 0, scale: 1 }}
                   exit={{ opacity: 0, x: 40, scale: 0.92 }}
                   transition={{ type: "spring", stiffness: 320, damping: 30, delay: idx * 0.05 }}
-                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(154,92,46,0.13)" }}
+                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,59,143,0.12)" }}
                   style={{
                     background: "rgba(255,255,255,0.8)",
-                    border: "1px solid rgba(154,92,46,0.1)",
+                    border: "1px solid rgba(0,136,204,0.12)",
                     borderRadius: "16px",
                     padding: "14px 16px",
                     display: "flex",
@@ -286,7 +286,7 @@ export default function CartSidebar() {
                       style={{
                         fontSize: "13px",
                         fontWeight: "700",
-                        color: "#1a1209",
+                        color: "#0A1628",
                         margin: "0 0 3px",
                         whiteSpace: "nowrap",
                         overflow: "hidden",
@@ -298,7 +298,7 @@ export default function CartSidebar() {
                     <p
                       style={{
                         fontSize: "11px",
-                        color: "rgba(26,18,9,0.54)",
+                        color: "rgba(10,22,40,0.56)",
                         margin: 0,
                       }}
                     >
@@ -307,7 +307,7 @@ export default function CartSidebar() {
                     <p
                       style={{
                         fontSize: "10px",
-                        color: "rgba(26,18,9,0.38)",
+                        color: "rgba(10,22,40,0.4)",
                         margin: "3px 0 0",
                       }}
                     >
@@ -345,10 +345,10 @@ export default function CartSidebar() {
                   </p>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
                     <div style={{ minWidth: 0 }}>
-                      <p style={{ margin: "0 0 3px", fontSize: "13px", fontWeight: "800", color: "#1a1209" }}>
+                      <p style={{ margin: "0 0 3px", fontSize: "13px", fontWeight: "800", color: "#0A1628" }}>
                         {suggestedAddon.icon} {suggestedAddon.name}
                       </p>
-                      <p style={{ margin: 0, fontSize: "11px", color: "rgba(26,18,9,0.58)" }}>
+                      <p style={{ margin: 0, fontSize: "11px", color: "rgba(10,22,40,0.58)" }}>
                         Complements your current stack - ${suggestedAddon.monthly_fee}/mo
                       </p>
                     </div>
@@ -378,8 +378,8 @@ export default function CartSidebar() {
               <div
                 style={{
                   borderRadius: "14px",
-                  background: "rgba(154,92,46,0.06)",
-                  border: "1px solid rgba(154,92,46,0.1)",
+                  background: "rgba(0,174,239,0.06)",
+                  border: "1px solid rgba(0,136,204,0.12)",
                   padding: "12px 14px",
                 }}
               >
@@ -387,7 +387,7 @@ export default function CartSidebar() {
                   style={{
                     fontSize: "13px",
                     fontWeight: "600",
-                    color: "rgba(26,18,9,0.68)",
+                    color: "rgba(10,22,40,0.68)",
                     margin: 0,
                   }}
                 >
@@ -418,7 +418,7 @@ export default function CartSidebar() {
                     style={{
                       fontSize: "11px",
                       fontWeight: "700",
-                      color: "rgba(26,18,9,0.55)",
+                      color: "rgba(10,22,40,0.55)",
                       textTransform: "uppercase",
                       letterSpacing: "0.08em",
                       display: "block",
@@ -438,7 +438,7 @@ export default function CartSidebar() {
                     style={{
                       width: "100%",
                       borderRadius: "12px",
-                      border: "1.5px solid rgba(154,92,46,0.18)",
+                      border: "1.5px solid rgba(0,136,204,0.18)",
                       padding: "11px 14px",
                       fontSize: "13px",
                       background: "rgba(255,255,255,0.86)",
@@ -455,11 +455,11 @@ export default function CartSidebar() {
                     type="checkbox"
                     checked={smsConsent}
                     onChange={(e) => setSmsConsent(e.target.checked)}
-                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#9a5c2e", width: "14px", height: "14px" }}
+                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#0088CC", width: "14px", height: "14px" }}
                   />
-                  <span style={{ fontSize: "11px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5 }}>
+                  <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.62)", lineHeight: 1.5 }}>
                     I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
-                    <a href="/privacy-policy" target="_blank" style={{ color: "#9a5c2e", fontWeight: "600" }}>Privacy Policy</a>
+                    <a href="/privacy-policy" target="_blank" style={{ color: "#005f99", fontWeight: "600" }}>Privacy Policy</a>
                   </span>
                 </label>
               )}
@@ -484,7 +484,7 @@ export default function CartSidebar() {
           <div
             style={{
               padding: "16px 20px 18px",
-              borderTop: "1px solid rgba(154,92,46,0.1)",
+              borderTop: "1px solid rgba(0,136,204,0.12)",
               background: "rgba(255,255,255,0.7)",
               backdropFilter: "blur(12px)",
             }}
@@ -493,7 +493,7 @@ export default function CartSidebar() {
               style={{
                 borderRadius: "16px",
                 background: "rgba(255,255,255,0.74)",
-                border: "1px solid rgba(154,92,46,0.1)",
+                border: "1px solid rgba(0,136,204,0.12)",
                 padding: "14px 14px 12px",
                 marginBottom: "14px",
               }}
@@ -505,28 +505,28 @@ export default function CartSidebar() {
                   marginBottom: "6px",
                 }}
               >
-                <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>
+                <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)" }}>
                   One-time setup total
                 </span>
                 <span
                   style={{
                     fontSize: "13px",
                     fontWeight: "700",
-                    color: "#1a1209",
+                    color: "#0A1628",
                   }}
                 >
                   ${totalSetup}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.5)" }}>
+                <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)" }}>
                   Monthly total
                 </span>
                 <span
                   style={{
                     fontSize: "14px",
                     fontWeight: "800",
-                    color: "#9a5c2e",
+                    color: "#005f99",
                   }}
                 >
                   ${totalMonthly}/mo
@@ -616,7 +616,7 @@ export default function CartSidebar() {
                     border: "none",
                     cursor: "pointer",
                     fontSize: "12px",
-                    color: "rgba(26,18,9,0.46)",
+                    color: "rgba(10,22,40,0.48)",
                     textDecoration: "underline",
                   }}
                 >
@@ -629,12 +629,12 @@ export default function CartSidebar() {
               style={{
                 textAlign: "center",
                 fontSize: "10px",
-                color: "rgba(26,18,9,0.38)",
+                color: "rgba(10,22,40,0.4)",
                 marginTop: "10px",
               }}
             >
               Secured by Stripe · Cancel anytime ·{" "}
-              <a href="/terms" target="_blank" style={{ color: "rgba(26,18,9,0.45)", textDecoration: "underline" }}>
+              <a href="/terms" target="_blank" style={{ color: "rgba(10,22,40,0.48)", textDecoration: "underline" }}>
                 Refund Policy
               </a>
             </p>

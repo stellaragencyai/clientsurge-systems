@@ -5,6 +5,10 @@
 import { useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { setPageMetadata } from "@/lib/seo";
+import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
+import MobileCallBar from "@/components/landing/MobileCallBar";
 
 const LEGAL_CONTENT = {
   privacy: {
@@ -65,23 +69,18 @@ export default function LegalPage({ fixedType, canonicalPath }) {
   }), [canonicalPath, content.title, type]);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#ffffff" }}>
-      {/* #12: simple branded navbar */}
-      <nav style={{ borderBottom: "1px solid rgba(10,22,40,0.08)", padding: "16px 24px", display: "flex", alignItems: "center", gap: 12 }}>
-        <a href="/" style={{ textDecoration: "none", display: "flex", alignItems: "center", gap: 8 }}>
-          <span style={{ fontSize: 20, fontWeight: 900, color: "#0A1628", letterSpacing: "-0.02em" }}>ClientSurge</span>
-          <span style={{ fontSize: 11, fontWeight: 700, color: "#00D4FF", background: "rgba(0,212,255,0.1)", border: "1px solid rgba(0,212,255,0.2)", padding: "2px 8px", borderRadius: 9999 }}>Systems</span>
-        </a>
-        <span style={{ flex: 1 }} />
-        <a href="/automations" style={{ color: "rgba(10,22,40,0.64)", fontSize: 13, textDecoration: "none" }}>Automations</a>
-        <a href="/book" style={{ color: "rgba(10,22,40,0.64)", fontSize: 13, textDecoration: "none", marginLeft: 16 }}>Book Audit</a>
-      </nav>
-      <div style={{ maxWidth: 720, margin: "0 auto", padding: "48px 24px 80px" }}>
+    <DemoBookingProvider>
+      <div style={{ minHeight: "100vh", background: "#ffffff" }}>
+        <Navbar />
+        <main style={{ maxWidth: 760, margin: "0 auto", padding: "calc(var(--cs-nav-height) + 48px) 24px 80px" }}>
         <p style={{ color: "rgba(10,22,40,0.45)", fontSize: 11, marginBottom: 8 }}>Last updated: {content.updated}</p>
         <h1 style={{ color: "#0A1628", fontSize: 32, fontWeight: 900, margin: "0 0 32px" }}>{content.title}</h1>
         <div style={{ color: "rgba(10,22,40,0.72)", fontSize: 14, lineHeight: 1.9 }}
           dangerouslySetInnerHTML={{ __html: content.body }} />
+        </main>
+        <Footer />
+        <MobileCallBar />
       </div>
-    </div>
+    </DemoBookingProvider>
   );
 }

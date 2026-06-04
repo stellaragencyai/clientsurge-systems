@@ -9,7 +9,7 @@ const TOTAL_WEIGHT = STEP_WEIGHTS.reduce((a, b) => a + b, 0);
 /* ─── Simple opacity-only fade — NO transforms, NO layout changes ─── */
 function useInView(threshold = 0.15) {
   const ref = useRef(null);
-  const [visible, setVisible] = useState(false);
+  const [visible, setVisible] = useState(true);
   useEffect(() => {
     if (typeof IntersectionObserver === "undefined") { setVisible(true); return; }
     const observer = new IntersectionObserver(
@@ -238,10 +238,10 @@ export default function LaunchTimeline() {
         <TimelineSummaryBar activeStep={activeStep} onStepClick={setActiveStep} />
       </div>
 
-      <div style={{ marginBottom: "64px" }} />
+      <div className="mb-8 md:mb-16" />
 
       {/* Mobile stepper */}
-      <div className="sm:hidden relative pl-10 mb-12">
+      <div className="hidden">
         <div className="absolute left-4 top-3 bottom-3 w-0.5" style={{ background: "linear-gradient(180deg, #0088CC 0%, rgba(0,174,239,0.2) 100%)" }} />
         <div className="space-y-6">
           {launchTimelineSteps.map((step) => (
@@ -267,7 +267,7 @@ export default function LaunchTimeline() {
       </div>
 
       {/* Detailed vertical timeline with alternating image/content */}
-      <div className="relative">
+      <div className="relative hidden md:block">
         <div
           className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
           style={{

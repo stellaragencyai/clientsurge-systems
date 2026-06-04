@@ -101,7 +101,7 @@ export default function ServiceComparisonModal({ onClose }) {
           width: "100%",
           maxHeight: "90vh",
           overflow: "auto",
-          border: "1px solid rgba(154,92,46,0.15)",
+          border: "1px solid rgba(0,136,204,0.15)",
           boxShadow: "0 20px 60px rgba(0,0,0,0.25)",
         }}
         onClick={(event) => event.stopPropagation()}
@@ -119,7 +119,7 @@ export default function ServiceComparisonModal({ onClose }) {
               margin: 0,
               fontSize: "24px",
               fontWeight: "800",
-              color: "#1b140d",
+              color: "#0A1628",
               fontFamily: "'Playfair Display', serif",
             }}
           >
@@ -137,7 +137,7 @@ export default function ServiceComparisonModal({ onClose }) {
               justifyContent: "center",
             }}
           >
-            <X style={{ width: "24px", height: "24px", color: "#9a5c2e" }} />
+            <X style={{ width: "24px", height: "24px", color: "#005f99" }} />
           </button>
         </div>
 
@@ -145,7 +145,7 @@ export default function ServiceComparisonModal({ onClose }) {
           style={{
             overflowX: "auto",
             borderRadius: "12px",
-            border: "1px solid rgba(154,92,46,0.15)",
+            border: "1px solid rgba(0,136,204,0.15)",
           }}
         >
           <table
@@ -159,7 +159,7 @@ export default function ServiceComparisonModal({ onClose }) {
               <tr
                 style={{
                   background:
-                    "linear-gradient(135deg, rgba(154,92,46,0.08) 0%, rgba(200,150,92,0.04) 100%)",
+                    "linear-gradient(135deg, rgba(0,136,204,0.08) 0%, rgba(0,174,239,0.04) 100%)",
                 }}
               >
                 {[
@@ -177,8 +177,8 @@ export default function ServiceComparisonModal({ onClose }) {
                       padding: "14px 16px",
                       textAlign: index === 0 ? "left" : "center",
                       fontWeight: "700",
-                      color: "#1b140d",
-                      borderBottom: "2px solid rgba(154,92,46,0.2)",
+                      color: "#0A1628",
+                      borderBottom: "2px solid rgba(0,136,204,0.2)",
                       cursor: "pointer",
                       userSelect: "none",
                       whiteSpace: "nowrap",
@@ -214,10 +214,10 @@ export default function ServiceComparisonModal({ onClose }) {
                   key={service.name}
                   style={{
                     background:
-                      index % 2 === 0 ? "#ffffff" : "rgba(154,92,46,0.02)",
+                      index % 2 === 0 ? "#ffffff" : "rgba(0,136,204,0.02)",
                     borderBottom:
                       index < sortedData.length - 1
-                        ? "1px solid rgba(154,92,46,0.08)"
+                        ? "1px solid rgba(0,136,204,0.08)"
                         : "none",
                   }}
                 >
@@ -225,7 +225,7 @@ export default function ServiceComparisonModal({ onClose }) {
                     style={{
                       padding: "14px 16px",
                       fontWeight: "700",
-                      color: "#1b140d",
+                      color: "#0A1628",
                     }}
                   >
                     {service.name}
