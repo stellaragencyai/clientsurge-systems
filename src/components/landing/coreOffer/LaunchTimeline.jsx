@@ -1,7 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
-import { useDemoBooking } from "@/components/landing/DemoBookingContext";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 const STEP_WEIGHTS = [1, 0.5, 0.5, 2.5, 0.5];
@@ -175,7 +174,6 @@ function StepRow({ step, idx }) {
 
 export default function LaunchTimeline() {
   const [activeStep, setActiveStep] = useState(0);
-  const { openDemoBooking } = useDemoBooking();
 
   return (
     <div className="mt-16 md:mt-20">
@@ -264,6 +262,24 @@ export default function LaunchTimeline() {
                 <p className="text-xs mt-0.5" style={{ color: "rgba(0,174,239,0.9)" }}>{step.duration}</p>
               </div>
             </div>
+          ))}
+        </div>
+      </div>
+
+      {/* Detailed vertical timeline with alternating image/content */}
+      <div className="relative">
+        <div
+          className="absolute left-6 md:left-1/2 top-0 w-0.5 hidden md:block pointer-events-none"
+          style={{
+            bottom: "-120px",
+            background: "linear-gradient(180deg, #0088CC 0%, #00AEEF 50%, rgba(0,174,239,0.6) 100%)",
+            transform: "translateX(-50%)",
+          }}
+        />
+
+        <div className="space-y-10 md:space-y-20 relative z-10">
+          {launchTimelineSteps.map((step, idx) => (
+            <StepRow key={step.id} step={step} idx={idx} />
           ))}
         </div>
       </div>
