@@ -1,7 +1,16 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" class="no-js">
   <head>
     <meta charset="UTF-8" />
+    <script>
+      document.documentElement.classList.remove("no-js");
+      document.documentElement.classList.add("js");
+      window.setTimeout(function () {
+        if (document.querySelector("#root > .static-fallback")) {
+          document.documentElement.classList.add("app-fallback-visible");
+        }
+      }, 6000);
+    </script>
     <link rel="dns-prefetch" href="//fonts.googleapis.com" />
     <link rel="dns-prefetch" href="//fonts.gstatic.com" />
     <link rel="dns-prefetch" href="https://api.stripe.com" />
@@ -220,6 +229,10 @@
         color: #0f172a;
         font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
         line-height: 1.65;
+      }
+
+      html.js:not(.app-fallback-visible) #root > .static-fallback {
+        display: none !important;
       }
 
       .static-shell {
