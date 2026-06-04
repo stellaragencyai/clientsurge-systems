@@ -14,7 +14,10 @@ test("homepage below-fold groups mount with stable document height", () => {
 
 test("homepage keeps the first viewport direct and defers framer-heavy sections", () => {
   assert.match(homeSource, /<Hero \/>/);
-  assert.match(homeSource, /<HomepageConversionContent \/>/);
+  assert.match(homeSource, /<Hero \/>\s*<LazyHomepageSection[\s\S]*<Industries \/>/);
+  assert.doesNotMatch(homeSource, /<HomepageConversionContent \/>/);
+  assert.doesNotMatch(homeSource, /<SixAutomationSystems \/>/);
+  assert.doesNotMatch(homeSource, /<ProofBeforeLaunch \/>/);
   assert.match(homeSource, /<LazyHomepageSection[\s\S]*<CoreOffer \/>/);
   assert.match(homeSource, /<LazyHomepageSection[\s\S]*<FAQ \/>/);
 });
