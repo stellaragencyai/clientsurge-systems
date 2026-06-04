@@ -78,7 +78,7 @@ export default function Footer() {
           <div style={{ textAlign: "center", marginBottom: "28px" }}>
             <p style={{ fontSize: "10px", fontWeight: "800", color: "rgba(255,255,255,0.82)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 6px" }}>Our Full System Stack</p>
             <h3 style={{ fontSize: "clamp(18px,3vw,26px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
-              Every automation you need to convert more leads — done for you.
+              Every automation you need to convert more leads, done for you.
             </h3>
           </div>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "12px", justifyContent: "center" }}>
@@ -184,7 +184,7 @@ export default function Footer() {
         {/* Bottom bar */}
         <div style={{ marginTop: "48px", paddingTop: "24px", borderTop: "1px solid rgba(0,174,239,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px" }}>
           <div style={{ display: "flex", alignItems: "center", gap: "20px", flexWrap: "wrap" }}>
-            <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.68)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
+            <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.68)" }}>Copyright {new Date().getFullYear()} ClientSurge Systems</span>
             <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")} style={{ fontSize: "12px", color: "rgba(10,22,40,0.68)", textDecoration: "none" }}
               onMouseEnter={(e) => e.currentTarget.style.color = "#005f99"}
               onMouseLeave={(e) => e.currentTarget.style.color = "rgba(10,22,40,0.68)"}>

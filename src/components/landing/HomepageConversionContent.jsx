@@ -97,7 +97,7 @@ export default function HomepageConversionContent() {
             Websites, voice agents, and follow-up automation built for local service revenue.
           </motion.h2>
           <motion.p variants={revealItem} className="mt-5 text-base md:text-lg text-muted-foreground leading-relaxed">
-            ClientSurge Systems is the front end of a larger lead conversion engine. We build high-converting business websites and connect them to AI-powered response, phone, booking, and workflow automations so local service companies can capture more demand without adding front-desk headcount.
+            ClientSurge Systems is the front end of a larger lead conversion engine. We build high-converting business websites and connect them to AI-powered phone response, booking, follow-up, and workflow automations so local service companies can capture more demand without adding front-desk headcount.
           </motion.p>
         </motion.div>
 
@@ -171,7 +171,7 @@ export default function HomepageConversionContent() {
             viewport={{ once: true, amount: 0.28 }}
             transition={{ duration: 0.7, ease: premiumEase }}
           >
-            <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border border-primary/15 bg-primary/10">
+            <div className="inline-flex h-11 w-11 items-center justify-center rounded-lg border border-primary/15 bg-primary/10">
               <Bot className="h-5 w-5 text-primary" aria-hidden="true" />
             </div>
             <h2 className="mt-5 font-display text-2xl md:text-4xl font-bold tracking-tight text-foreground">
@@ -192,7 +192,7 @@ export default function HomepageConversionContent() {
                 to="/automations"
                 className="inline-flex items-center justify-center rounded-full border border-primary/25 bg-white px-5 py-3 text-sm font-bold text-primary hover:bg-primary/5 focus:outline-none focus:ring-2 focus:ring-primary"
               >
-                View AI Automations
+                View All AI Automations
               </Link>
             </div>
           </motion.div>

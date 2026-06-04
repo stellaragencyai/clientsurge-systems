@@ -20,10 +20,10 @@ export default function FinalCTA() {
             You&apos;re Already Getting Leads. <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Schedule a free 15-minute strategy call. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation — no obligation.
+            Schedule a free 15-minute strategy call. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation - no obligation.
           </p>
 
-          {/* Projection stats — clearly framed as targets not guarantees */}
+          {/* Projection stats - clearly framed as targets not guarantees */}
           <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
             {[
             { value: "3", label: "core conversion workflows" },
@@ -43,7 +43,7 @@ export default function FinalCTA() {
           </p>
 
 
-          {/* How the demo works — 3 steps */}
+          {/* How the demo works - 3 steps */}
           <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-left">
             {[
               { step: "01", title: "Book a 15-min slot", body: "Pick a time that works. No sales pressure, no fluff." },

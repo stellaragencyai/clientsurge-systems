@@ -75,7 +75,7 @@ const ALA_CARTE = CANONICAL_SERVICE_PRODUCTS.map((product) => ({
   Icon: SERVICE_ICONS[product.service_key] || Sparkles,
   name: product.name,
   desc: product.description,
-  price: `${formatMoney(product.setup_fee)} setup · ${formatMoney(product.monthly_fee)}/mo`,
+  price: `${formatMoney(product.setup_fee)} setup - ${formatMoney(product.monthly_fee)}/mo`,
   link: "/store",
 }));
 

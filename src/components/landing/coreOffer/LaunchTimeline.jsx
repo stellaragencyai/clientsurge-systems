@@ -182,7 +182,7 @@ export default function LaunchTimeline() {
         Launch Plan Confirmed After Onboarding
       </p>
       <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
-        Our Process — Start To Launch
+        Our Process - Start To Launch
       </h3>
       <p className="text-center text-sm text-muted-foreground mb-10">
         Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.

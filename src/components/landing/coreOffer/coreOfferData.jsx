@@ -205,7 +205,7 @@ export const launchTimelineSteps = [
       "Explore 12+ automation services in the AI Store",
       "Watch 2-3 minute demo videos for each automation",
       "See exactly what each service does and when it runs",
-      "Build your custom stack—only pay for what you need",
+      "Build your custom stack - only pay for what you need",
     ],
   },
   {
@@ -220,7 +220,7 @@ export const launchTimelineSteps = [
       "Sign up with email and password in 60 seconds",
       "Add your selected automations to cart",
       "Review total setup fee and monthly cost",
-      "Pay securely via Stripe—done",
+      "Pay securely via Stripe - done",
     ],
   },
   {
@@ -250,7 +250,7 @@ export const launchTimelineSteps = [
       "Automated setup connects your integrations",
       "Your messaging and automation logic configured instantly",
       "All follow-up sequences and booking flows activated",
-      "You don't have to do anything—we handle it all",
+      "You don't have to do anything - we handle it all",
     ],
   },
   {

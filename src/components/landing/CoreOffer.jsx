@@ -28,7 +28,7 @@ function CoreOfferHeader() {
         <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.6))" }} />
       </div>
 
-      {/* Title — forced single line via whitespace-nowrap on desktop */}
+      {/* Title */}
       <h2 className="font-bold tracking-tight leading-none text-foreground"
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
         How The{" "}
@@ -45,7 +45,7 @@ function CoreOfferHeader() {
         <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.45))" }} />
       </div>
 
-      {/* Subheadline — tighter, more editorial */}
+      {/* Subheadline */}
       <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
         {coreOfferSectionConfig.subheadline}
       </p>
@@ -56,7 +56,7 @@ function CoreOfferHeader() {
 
 }
 
-// CoreOfferHeader is already placed first inside the section — no change needed to section wrapper
+// CoreOfferHeader is already placed first inside the section wrapper.
 
 function SystemCard({ system, selected, onSelect, onAddToStack }) {
   const Icon = iconMap[system.icon];

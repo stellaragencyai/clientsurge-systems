@@ -170,7 +170,7 @@ export default function ChatBubble() {
                       className="mt-2 block w-full text-center text-xs font-bold py-1.5 rounded-xl text-white"
                       style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
                     >
-                      Open Booking Form →
+                      Open Booking Form
                     </button>
                   )}
                 </div>
@@ -230,7 +230,7 @@ export default function ChatBubble() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask anything…"
+              placeholder="Ask anything..."
               disabled={loading || cooldown}
               className="flex-1 text-sm bg-transparent outline-none text-foreground placeholder:text-muted-foreground"
             />
@@ -259,7 +259,7 @@ export default function ChatBubble() {
               className="text-[11px] font-bold px-3 py-1 rounded-full text-white"
               style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
             >
-              Make the Leap →
+              Make the Leap
             </button>
           </div>
         </div>
