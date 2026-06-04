@@ -4,9 +4,9 @@ import test from "node:test";
 
 const storeSource = readFileSync("src/pages/Store.jsx", "utf8");
 
-test("guided Store mode shows non-coming-soon products when no industry is selected", () => {
+test("Store defaults to the full automation catalog when no industry is selected", () => {
   assert.match(storeSource, /const \[selectedIndustry, setSelectedIndustry\] = useState\(null\);/);
-  assert.match(storeSource, /const \[pathMode, setPathMode\] = useState\("guided"\);/);
+  assert.match(storeSource, /const \[pathMode, setPathMode\] = useState\("explore"\);/);
 
   const guidedModeIndex = storeSource.indexOf('if (pathMode === "guided")');
   const returnIndex = storeSource.indexOf("return results;", guidedModeIndex);
@@ -19,7 +19,8 @@ test("guided Store mode shows non-coming-soon products when no industry is selec
   assert.match(guidedModeBlock, /if \(selectedIndustry\) \{/);
   assert.match(guidedModeBlock, /recommendedServices\?\.map\(\(s\) => s\.name\)/);
   assert.match(guidedModeBlock, /results = results\.filter\(\(p\) => recommendedNames\.has\(p\.name\)\)\.slice\(0, 6\);/);
-  assert.match(guidedModeBlock, /if \(!selectedIndustry\) \{/);
-  assert.match(guidedModeBlock, /results = results\.filter\(\(product\) => !product\.coming_soon\);/);
-  assert.match(storeSource, /No industry selected in guided mode/);
+  assert.doesNotMatch(guidedModeBlock, /if \(!selectedIndustry\) \{/);
+  assert.doesNotMatch(guidedModeBlock, /results = results\.filter\(\(product\) => !product\.coming_soon\);/);
+  assert.match(storeSource, /No services available — try 'Explore All'/);
+  assert.match(storeSource, /No services match your search/);
 });

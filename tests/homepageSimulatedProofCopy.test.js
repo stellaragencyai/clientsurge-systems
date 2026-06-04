@@ -6,8 +6,9 @@ const socialProofToasts = readFileSync("src/components/landing/SocialProofToasts
 const liveAutomationFeed = readFileSync("src/components/landing/LiveAutomationFeed.jsx", "utf8");
 
 test("simulated social proof does not present fake customers as real activity", () => {
-  assert.match(socialProofToasts, /Example: \{current\.scenario\}/);
-  assert.match(socialProofToasts, /lead follow-up simulated|workflow previewed|checkout path previewed/);
+  assert.match(socialProofToasts, /Preview: \{current\.scenario\}/);
+  assert.match(socialProofToasts, /lead follow-up preview|workflow preview|checkout path preview/);
+  assert.match(socialProofToasts, />preview</);
   assert.doesNotMatch(socialProofToasts, /just booked a demo|signed up today/);
   assert.doesNotMatch(socialProofToasts, /Mike R\.|Sarah M\.|David L\.|Jessica T\.|Carlos B\.|Amy W\./);
 });

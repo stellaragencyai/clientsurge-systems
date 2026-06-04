@@ -8,11 +8,12 @@ const industryHero = readFileSync("src/components/industry/IndustryHero.jsx", "u
 const heroSection = readFileSync("src/components/landing/HeroSection.jsx", "utf8");
 
 test("cookie consent stays compact on mobile first viewport", () => {
-  assert.match(cookieConsent, /left-3 right-auto/);
+  assert.match(cookieConsent, /left-3 right-3/);
+  assert.match(cookieConsent, /sm:right-auto/);
   assert.match(cookieConsent, /max-w-\[300px\]/);
-  assert.match(cookieConsent, /"max\(16px, calc\(16px \+ env\(safe-area-inset-bottom, 0px\)\)\)"/);
+  assert.match(cookieConsent, /"max\(12px, calc\(12px \+ env\(safe-area-inset-bottom, 0px\)\)\)"/);
   assert.doesNotMatch(cookieConsent, /Cookie categories/);
-  assert.doesNotMatch(cookieConsent, /sm:block/);
+  assert.doesNotMatch(cookieConsent, /hidden sm:block/);
   assert.doesNotMatch(cookieConsent, /fixed left-6 z-50 max-w-sm/);
 });
 
