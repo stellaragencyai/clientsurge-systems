@@ -318,19 +318,20 @@ export default function CoreOffer() {
           </button>
         </motion.div>
 
-        {/* 2-col layout: vertical timeline + iPhone SMS demo */}
-        <div className="flex flex-col lg:flex-row gap-10 lg:gap-12 items-start">
-          <div className="flex-1 min-w-0">
-            <VerticalTimeline
-              selectedSystemId={selectedSystemId}
-              onSystemSelect={setSelectedSystemId}
-              onBookDemo={() => setShowBookingModal(true)} />
-          </div>
-          <div className="core-offer-phone lg:sticky lg:top-24 flex-shrink-0 flex flex-col items-center self-start w-full lg:w-auto">
+        {/* Centered iPhone SMS demo */}
+        <div className="mt-8 md:mt-10 flex justify-center">
+          <div className="core-offer-phone w-full max-w-[320px] flex flex-col items-center">
             <Suspense fallback={<div style={{ width: 300, height: 560 }} />}>
               <HeroSMSDemo />
             </Suspense>
           </div>
+        </div>
+
+        <div className="mt-10 md:mt-12 max-w-5xl mx-auto">
+          <VerticalTimeline
+            selectedSystemId={selectedSystemId}
+            onSystemSelect={setSelectedSystemId}
+            onBookDemo={() => setShowBookingModal(true)} />
         </div>
         
         <LaunchTimeline />
