@@ -347,7 +347,9 @@ export default function Industries() {
         </p>
       </div>
 
-      <div className="w-full max-w-[92rem] mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10" style={{ overflowX: "hidden" }}>
+      <div
+        className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10"
+        style={{ overflowX: "hidden" }}>
         {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
@@ -365,7 +367,7 @@ export default function Industries() {
             type="button"
             aria-label={industry.name}
             aria-pressed={isSelected}
-            className="group relative block overflow-hidden h-[15.5rem] sm:h-[19.5rem] md:h-[29rem] lg:h-[30.5rem] text-left"
+            className="group relative block overflow-hidden min-h-[100svh] md:min-h-[50svh] text-left"
             onClick={() => handleIndustrySelect(industry.id)}
             onMouseEnter={() => setHoveredIndustryId(industry.id)}
             onMouseLeave={() => setHoveredIndustryId("")}
@@ -393,7 +395,7 @@ export default function Industries() {
                 width="600"
                 height="442"
                 className="absolute inset-0 h-full w-full object-cover"
-                style={{ filter: "saturate(0.86) contrast(1.04) brightness(0.82)" }} />
+                style={{ filter: "saturate(1) contrast(1.03) brightness(0.98)" }} />
               
               {/* Unique per-industry SVG texture pattern */}
               {industryPatterns[industry.id]}
@@ -403,8 +405,8 @@ export default function Industries() {
                 className="absolute inset-0"
                 style={{
                   background: highlighted ?
-                  `linear-gradient(to bottom, rgba(0,35,82,0.18) 0%, ${accent.soft} 42%, rgba(0,22,54,0.82) 100%)` :
-                  `linear-gradient(to bottom, rgba(0,35,82,0.18) 0%, rgba(0,80,160,0.24) 38%, rgba(0,22,54,0.78) 100%)`
+                  "linear-gradient(to bottom, rgba(3,7,18,0.02) 0%, rgba(3,7,18,0.08) 50%, rgba(3,7,18,0.58) 100%)" :
+                  "linear-gradient(to bottom, rgba(3,7,18,0.01) 0%, rgba(3,7,18,0.06) 50%, rgba(3,7,18,0.54) 100%)"
                 }} />
               
 
@@ -413,9 +415,9 @@ export default function Industries() {
                 style={{
                   borderColor: isSelected ? accent.color : highlighted ? accent.color : "rgba(255,255,255,0.08)",
                   boxShadow: isSelected ?
-                  `inset 0 0 0 1px ${accent.soft}, inset 0 0 36px ${accent.soft}, 0 0 0 2px ${accent.glow}, 0 0 28px ${accent.glow}` :
+                  `inset 0 0 0 1px ${accent.soft}, 0 0 0 2px ${accent.glow}` :
                   highlighted ?
-                  `inset 0 0 0 1px ${accent.soft}, inset 0 0 28px ${accent.soft}, 0 0 0 2px ${accent.glow}, 0 0 22px ${accent.glow}` :
+                  `inset 0 0 0 1px ${accent.soft}, 0 0 0 2px ${accent.glow}` :
                   "none"
                 }} />
               {isSelected && (
@@ -444,8 +446,8 @@ export default function Industries() {
                     fontSize: "18px",
                     fontWeight: "700",
                     lineHeight: 1.3,
-                    color: accent.color,
-                    textShadow: "0 1px 12px rgba(0,0,0,0.72), 0 0 18px rgba(0,0,0,0.34)",
+                    color: "#ffffff",
+                    textShadow: "0 1px 12px rgba(0,0,0,0.76)",
                     margin: 0
                   }}>
                   
