@@ -53,6 +53,7 @@ self.addEventListener("fetch", (event) => {
 export const HOMEPAGE_MOTION_HEADER = "x-clientsurge-homepage-motion";
 export const HOMEPAGE_MOTION_STYLE_ID = "clientsurge-edge-cinematic-motion";
 export const HOMEPAGE_ORDER_STYLE_ID = "clientsurge-edge-homepage-order";
+export const HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID = "clientsurge-edge-phone-alignment";
 export const TRUST_SECURITY_STYLE_ID = "clientsurge-edge-trust-security";
 export const TRUST_SECURITY_SECTION_ID = "clientsurge-trust-security";
 
@@ -319,7 +320,85 @@ export const HOMEPAGE_ORDER_SCRIPT = `<script>
 })();
 </script>`;
 
-export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}`;
+export const HOMEPAGE_PHONE_ALIGNMENT_STYLE = `<style id="${HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID}">
+#services .clientsurge-edge-phone-centered-row {
+  display: block !important;
+}
+#services .clientsurge-edge-phone-centered-row > .core-offer-phone {
+  width: 100% !important;
+  max-width: 320px !important;
+  margin: clamp(2rem, 4vw, 2.75rem) auto 0 !important;
+  position: relative !important;
+  left: auto !important;
+  right: auto !important;
+  justify-content: center !important;
+}
+#services .clientsurge-edge-phone-centered-row > .clientsurge-edge-timeline-row {
+  max-width: 64rem !important;
+  margin: clamp(2.25rem, 4vw, 3rem) auto 0 !important;
+  min-width: 0 !important;
+}
+</style>`;
+
+export const HOMEPAGE_PHONE_ALIGNMENT_SCRIPT = `<script>
+(() => {
+  const mark = (status) => {
+    document.documentElement.setAttribute("data-clientsurge-phone-alignment", status);
+  };
+
+  const applyPhoneAlignment = () => {
+    const services = document.querySelector("#services");
+    const phone = services?.querySelector(".core-offer-phone");
+    const row = phone?.parentElement;
+    if (!services || !phone || !row) {
+      mark("waiting");
+      return false;
+    }
+
+    const timeline = Array.from(row.children).find((child) => child !== phone);
+    row.classList.add("clientsurge-edge-phone-centered-row");
+    phone.classList.remove("lg:sticky", "lg:top-24", "self-start", "lg:w-auto");
+    phone.classList.add("w-full", "max-w-[320px]", "items-center");
+    if (row.firstElementChild !== phone) {
+      row.insertBefore(phone, row.firstElementChild);
+    }
+
+    if (timeline) {
+      timeline.classList.add("clientsurge-edge-timeline-row");
+    }
+
+    const rect = phone.getBoundingClientRect();
+    const delta = Math.round(rect.left + rect.width / 2 - window.innerWidth / 2);
+    mark("applied:" + delta);
+    return Math.abs(delta) <= 12;
+  };
+
+  if (applyPhoneAlignment()) return;
+
+  let attempts = 0;
+  const observer = new MutationObserver(() => {
+    attempts += 1;
+    if (applyPhoneAlignment() || attempts > 180) observer.disconnect();
+  });
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+
+  const interval = window.setInterval(() => {
+    attempts += 1;
+    if (applyPhoneAlignment() || attempts > 180) {
+      window.clearInterval(interval);
+      observer.disconnect();
+    }
+  }, 250);
+
+  window.setTimeout(() => {
+    window.clearInterval(interval);
+    observer.disconnect();
+    applyPhoneAlignment();
+  }, 45000);
+})();
+</script>`;
+
+export const HOMEPAGE_MOTION_INJECTION = `${HOMEPAGE_MOTION_STYLE}${HOMEPAGE_ORDER_STYLE}${HOMEPAGE_PHONE_ALIGNMENT_STYLE}${HOMEPAGE_MOTION_SCRIPT}${HOMEPAGE_ORDER_SCRIPT}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}`;
 
 export const TRUST_SECURITY_STYLE = `<style id="${TRUST_SECURITY_STYLE_ID}">
 #${TRUST_SECURITY_SECTION_ID} {
@@ -576,6 +655,16 @@ export function injectHomepageMotion(html) {
     nextHtml = nextHtml.includes("</body>")
       ? nextHtml.replace("</body>", `${HOMEPAGE_ORDER_SCRIPT}</body>`)
       : `${nextHtml}${HOMEPAGE_ORDER_SCRIPT}`;
+  }
+
+  if (!nextHtml.includes(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${HOMEPAGE_PHONE_ALIGNMENT_STYLE}</head>`)
+      : `${HOMEPAGE_PHONE_ALIGNMENT_STYLE}${nextHtml}`;
+
+    nextHtml = nextHtml.includes("</body>")
+      ? nextHtml.replace("</body>", `${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}</body>`)
+      : `${nextHtml}${HOMEPAGE_PHONE_ALIGNMENT_SCRIPT}`;
   }
 
   if (!nextHtml.includes(TRUST_SECURITY_STYLE_ID)) {

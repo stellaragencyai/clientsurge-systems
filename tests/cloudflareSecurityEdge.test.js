@@ -12,6 +12,9 @@ import worker, {
   HOMEPAGE_ORDER_SCRIPT,
   HOMEPAGE_ORDER_STYLE,
   HOMEPAGE_ORDER_STYLE_ID,
+  HOMEPAGE_PHONE_ALIGNMENT_SCRIPT,
+  HOMEPAGE_PHONE_ALIGNMENT_STYLE,
+  HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID,
   injectHomepageMotion,
   isSensitivePath,
   originRequestFor,
@@ -159,10 +162,12 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
     assert.match(response.headers.get("cache-control") || "", /no-store/);
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
+    assert.match(body, new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID));
     assert.match(body, /ambient-sweep/);
     assert.match(body, /headline-sheen/);
     assert.match(body, /dashboard-float-scan/);
     assert.match(body, /data-clientsurge-homepage-order/);
+    assert.match(body, /data-clientsurge-phone-alignment/);
     assert.doesNotMatch(body, /checklist-cascade/);
     assert.doesNotMatch(body, /cta-energy/);
     assert.match(body, /MutationObserver/);
@@ -190,8 +195,10 @@ test("Cloudflare homepage motion injection is scoped and idempotent", () => {
   assert.equal(injectHomepageMotion(injected), injected);
   assert.equal((injected.match(new RegExp(HOMEPAGE_MOTION_STYLE_ID, "g")) || []).length, 1);
   assert.equal((injected.match(new RegExp(HOMEPAGE_ORDER_STYLE_ID, "g")) || []).length, 1);
+  assert.equal((injected.match(new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID, "g")) || []).length, 1);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_MOTION_STYLE_ID), true);
   assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_ORDER_STYLE_ID), true);
+  assert.equal(HOMEPAGE_MOTION_INJECTION.includes(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID), true);
 });
 
 test("Cloudflare homepage injection adds the trust and security section before the footer", () => {
@@ -230,6 +237,17 @@ test("Cloudflare homepage order patch removes only sections between hero and ind
   assert.match(HOMEPAGE_ORDER_SCRIPT, /node\.remove\(\)/);
   assert.match(HOMEPAGE_ORDER_SCRIPT, /\.security-priority, #clientsurge-trust-security/);
   assert.match(HOMEPAGE_ORDER_SCRIPT, /insertBefore\(trust, footer\)/);
+});
+
+test("Cloudflare homepage phone alignment patch centers the SMS demo row", () => {
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_STYLE, /#services \.clientsurge-edge-phone-centered-row/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_STYLE, /max-width: 320px/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_STYLE, /margin: clamp\(2rem, 4vw, 2\.75rem\) auto 0/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /document\.querySelector\("#services"\)/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /\.core-offer-phone/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /insertBefore\(phone, row\.firstElementChild\)/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /data-clientsurge-phone-alignment/);
+  assert.match(HOMEPAGE_PHONE_ALIGNMENT_SCRIPT, /Math\.abs\(delta\) <= 12/);
 });
 
 test("production security verifier checks the Cloudflare security layer probe", () => {
