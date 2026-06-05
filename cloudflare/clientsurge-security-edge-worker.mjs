@@ -1205,14 +1205,19 @@ export const DEMO_BOOKING_MODAL_PATCH_SCRIPT = `<script id="${DEMO_BOOKING_MODAL
   }
   function patchBookPage() {
     if (window.location.pathname.toLowerCase() !== "/book") return;
-    if (document.querySelector("[data-clientsurge-book-scheduler]")) return;
-    var root = document.querySelector("#root") || document.body;
-    var target = root.querySelector("main") || root.firstElementChild || root;
+    var existing = document.querySelector("[data-clientsurge-book-scheduler]");
+    if (existing) {
+      if (!existing.offsetParent && existing.parentElement !== document.body) {
+        document.body.insertBefore(existing, document.body.firstChild);
+      }
+      wireForm(existing.querySelector("[data-clientsurge-audit-form]"), null);
+      return;
+    }
     var section = document.createElement("div");
     section.innerHTML = bookSchedulerMarkup();
     var scheduler = section.firstElementChild;
     if (!scheduler) return;
-    target.insertBefore(scheduler, target.firstChild);
+    document.body.insertBefore(scheduler, document.body.firstChild);
     wireForm(scheduler.querySelector("[data-clientsurge-audit-form]"), null);
   }
   function patchPublicAuditLanguage() {

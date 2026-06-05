@@ -439,6 +439,7 @@ test("Cloudflare static HTML injection patches stale demo booking modal behavior
   assert.match(injected, /utm_campaign/);
   assert.match(injected, /document\.referrer/);
   assert.match(injected, /data-clientsurge-book-scheduler/);
+  assert.match(injected, /document\.body\.insertBefore\(scheduler, document\.body\.firstChild\)/);
   assert.match(injected, /cloudflare_audit_scheduler_fallback/);
   assert.match(injected, /\[class\*="max-w-4xl"\] iframe/);
   assert.match(injected, /staleWrappers/);
