@@ -170,6 +170,7 @@ export default function Footer() {
           background: #ffffff;
           border-top: 1px solid rgba(0, 174, 239, 0.12);
           color: #0a1628;
+          padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
         .cs-footer,
@@ -179,6 +180,13 @@ export default function Footer() {
 
         .cs-footer a {
           text-decoration: none;
+        }
+
+        .cs-footer a:focus-visible,
+        .cs-footer button:focus-visible {
+          outline: 2px solid #00AEEF;
+          outline-offset: 3px;
+          box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.18);
         }
 
         .cs-footer-accent {
@@ -548,7 +556,7 @@ export default function Footer() {
           }
 
           .cs-footer-main {
-            padding: 34px 0 24px;
+            padding: 34px 0 max(24px, calc(24px + env(safe-area-inset-bottom, 0px)));
           }
 
           .cs-footer-brand {
@@ -592,6 +600,10 @@ export default function Footer() {
           .cs-footer-status {
             justify-content: space-between;
             width: 100%;
+          }
+
+          .cs-footer-status {
+            align-items: center;
           }
         }
 

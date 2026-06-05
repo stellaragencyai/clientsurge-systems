@@ -149,8 +149,8 @@ img { max-width: 100%; height: auto; }
 @media (max-width: 640px) { .timeline-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; } }
 @media (max-width: 380px) { .timeline-grid { grid-template-columns: 1fr !important; } }
 
-/* FIX 4 — Bottom padding for sticky bar */
-@media (max-width: 768px) { #root > div { padding-bottom: 80px; } }
+/* FIX 4 — Bottom padding for sticky bar and iOS home indicator */
+@media (max-width: 768px) { #root > div { padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom, 0px))); } }
 
 /* FIX 7 — Pricing cards mobile stacking */
 @media (max-width: 768px) { .pricing-cards { flex-direction: column !important; align-items: center !important; } }

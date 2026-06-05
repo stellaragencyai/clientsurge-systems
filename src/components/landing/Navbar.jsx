@@ -196,6 +196,12 @@ export default function Navbar() {
   const handleLogoClick = (e) => {
     e.preventDefault();
     trackCTA("nav_logo", "navbar");
+    setOpen(false);
+    setIndustriesOpen(false);
+    if (location.pathname === "/" && location.hash === "") {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      return;
+    }
     navigate("/");
   };
 

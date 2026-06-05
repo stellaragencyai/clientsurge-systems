@@ -45,13 +45,13 @@ const services = [
 ];
 
 const industries = [
-  "roofing",
-  "HVAC",
-  "dental",
-  "med spa",
-  "chiropractic",
-  "contractors",
-  "home services",
+  { label: "roofing", href: "/roofing" },
+  { label: "HVAC", href: "/hvac" },
+  { label: "dental", href: "/dental" },
+  { label: "med spa", href: "/med-spa" },
+  { label: "chiropractic", href: "/chiropractic" },
+  { label: "contractors", href: "/contractors" },
+  { label: "home services", href: "/hvac" },
 ];
 
 const steps = [
@@ -110,15 +110,21 @@ export default function HomepageConversionContent() {
           viewport={{ once: true, amount: 0.2 }}
         >
           {industries.map((industry, index) => (
-            <motion.span
-              key={industry}
-              className="rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary"
+            <motion.div
+              key={industry.label}
               variants={revealItem}
               whileHover={{ y: -3, scale: 1.04 }}
               transition={{ duration: 0.32, delay: index * 0.01 }}
             >
-              {industry}
-            </motion.span>
+              <Link
+                to={industry.href}
+                aria-label={`View ${industry.label} automation systems`}
+                onClick={() => window.scrollTo({ top: 0, left: 0, behavior: "auto" })}
+                className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+              >
+                {industry.label}
+              </Link>
+            </motion.div>
           ))}
         </motion.div>
 

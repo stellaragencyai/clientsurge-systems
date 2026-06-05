@@ -19,3 +19,11 @@ test("navbar keeps compact navigation through iPad landscape widths", () => {
   assert.match(navbar, /background: "rgba\(255,255,255,0\.10\)"/);
   assert.doesNotMatch(navbar, /className="hidden lg:flex items-center gap-6 absolute/);
 });
+
+test("navbar logo scrolls to the top when already on the homepage", () => {
+  assert.match(navbar, /const location = useLocation\(\);/);
+  assert.match(navbar, /if \(location\.pathname === "\/" && location\.hash === ""\)/);
+  assert.match(navbar, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "smooth" \}\);/);
+  assert.match(navbar, /setOpen\(false\);/);
+  assert.match(navbar, /setIndustriesOpen\(false\);/);
+});
