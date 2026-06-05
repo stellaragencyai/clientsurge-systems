@@ -9,6 +9,7 @@ import worker, {
   DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID,
   EDGE_HEALTH_HEADER,
   EDGE_HEALTH_PATH,
+  EDGE_ROUTE_METADATA_HEADER,
   HEADER_TRANSPARENCY_STYLE,
   HEADER_TRANSPARENCY_STYLE_ID,
   HOMEPAGE_MOTION_HEADER,
@@ -213,6 +214,34 @@ test("Cloudflare security edge worker proxies application traffic to the Base44 
   assert.equal(originUrl.search, "?plan=starter");
 });
 
+test("Cloudflare security edge worker repairs route head metadata to canonical ClientSurge values", () => {
+  const source = `<!doctype html><html><head>
+    <title>About | ClientSurge Systems</title>
+    <meta content="About on ClientSurge Systems. Premium AI-driven automation systems built to increase bookings, recover missed ." name="description"/>
+    <meta content="noindex, follow" name="robots"/>
+    <meta content="https://grinning-apex-flow-growth.base44.app/about" property="og:url"/>
+    <meta content="About | ClientSurge Systems" property="og:title"/>
+    <meta content="About on ClientSurge Systems. Premium AI-driven automation systems built to increase bookings, recover missed ." property="og:description"/>
+    <meta content="https://grinning-apex-flow-growth.base44.app/about" property="twitter:url"/>
+    <meta content="About | ClientSurge Systems" property="twitter:title"/>
+    <meta content="About on ClientSurge Systems. Premium AI-driven automation systems built to increase bookings, recover missed ." property="twitter:description"/>
+    <link href="https://grinning-apex-flow-growth.base44.app/about" rel="canonical"/>
+  </head><body></body></html>`;
+
+  const aboutHtml = repairPublicRouteMetadata(source, "/about");
+  assert.match(aboutHtml, /<title>About ClientSurge Systems \| AI Automation for Local Businesses<\/title>/);
+  assert.match(aboutHtml, /<meta name="description" content="Learn how ClientSurge Systems combines conversion-focused websites, AI voice agents, lead follow-up, booking automation, and recovery workflows for local service businesses\." \/>/);
+  assert.match(aboutHtml, /<meta name="robots" content="index,follow" \/>/);
+  assert.match(aboutHtml, /<link rel="canonical" href="https:\/\/clientsurgesystems\.com\/about" \/>/);
+  assert.match(aboutHtml, /<meta property="og:title" content="About ClientSurge Systems \| AI Automation for Local Businesses" \/>/);
+  assert.match(aboutHtml, /<meta property="twitter:url" content="https:\/\/clientsurgesystems\.com\/about" \/>/);
+
+  const loginHtml = repairPublicRouteMetadata(source, "/login");
+  assert.match(loginHtml, /<title>Client Login \| ClientSurge Systems<\/title>/);
+  assert.match(loginHtml, /<meta name="robots" content="noindex,nofollow" \/>/);
+  assert.match(loginHtml, /<link rel="canonical" href="https:\/\/clientsurgesystems\.com\/login" \/>/);
+});
+
 test("Cloudflare security edge worker injects the simplified homepage cinematic motion hooks", async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response("<!doctype html><html><head><title>ClientSurge</title></head><body><main id=\"root\"></main></body></html>", {
@@ -226,6 +255,7 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get(HOMEPAGE_MOTION_HEADER), "edge-v1");
+    assert.equal(response.headers.get(EDGE_ROUTE_METADATA_HEADER), "edge-v1");
     assert.equal(response.headers.get(STATIC_FALLBACK_PAINT_GUARD_HEADER), "edge-v1");
     assert.match(response.headers.get("cache-control") || "", /no-store/);
     assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID));

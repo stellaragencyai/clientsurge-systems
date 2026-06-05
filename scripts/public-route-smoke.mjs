@@ -71,6 +71,10 @@ function extractInlineRouteScript(html) {
   return `(function () {${match[1]}})();`;
 }
 
+function hasInlineLiteral(html, variableName) {
+  return new RegExp(`var\\s+${variableName}\\s*=`).test(html);
+}
+
 function simulateStaticRouteSignals({ html, route }) {
   const canonical = createAttributeNode({ href: "https://clientsurgesystems.com/" });
   const description = createAttributeNode({ content: "" });
@@ -178,15 +182,15 @@ async function checkRoute(route) {
     failures.push("route appears to be serving a not-found shell");
   }
 
-  if (!html.includes("var routeMap =")) {
+  if (!hasInlineLiteral(html, "routeMap")) {
     failures.push("route metadata script missing routeMap literal");
   }
 
-  if (!html.includes("var aliases =")) {
+  if (!hasInlineLiteral(html, "aliases")) {
     failures.push("route metadata script missing aliases literal");
   }
 
-  if (!html.includes("var noindexPrefixes =")) {
+  if (!hasInlineLiteral(html, "noindexPrefixes")) {
     failures.push("route metadata script missing noindexPrefixes literal");
   }
 

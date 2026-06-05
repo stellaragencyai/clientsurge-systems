@@ -15,6 +15,7 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
+import { scrollToTop } from "@/lib/scroll";
 
 const industries = [
 {
@@ -94,6 +95,12 @@ const industries = [
 export default function Industries() {
   const [showBookingModal, setShowBookingModal] = useState(false);
 
+  const handleIndustryNavigation = (event, href) => {
+    event.preventDefault();
+    scrollToTop();
+    window.location.assign(href);
+  };
+
   useEffect(() => {
     return setPageMetadata({
       title: "Industries We Serve | ClientSurge Systems",
@@ -153,6 +160,7 @@ export default function Industries() {
                 {isLive ?
                 <a
                   href={industry.href}
+                  onClick={(event) => handleIndustryNavigation(event, industry.href)}
                   className={`inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors ${industry.ctaClass}`}>
                   
                     Explore this industry

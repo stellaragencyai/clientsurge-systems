@@ -896,6 +896,7 @@ export const TRUST_SECURITY_CLIENT_JS = TRUST_SECURITY_SCRIPT
 export const TRUST_SECURITY_SCRIPT_TAG = `<script src="${TRUST_SECURITY_SCRIPT_PATH}"></script>`;
 
 export const TRUST_SECURITY_INJECTION = `${TRUST_SECURITY_STYLE}${TRUST_SECURITY_SCRIPT_TAG}`;
+export const EDGE_ROUTE_HEAD_HEADER = "x-clientsurge-edge-route-head";
 
 export const GLOBAL_SECURITY_HEADERS = {
   "Content-Security-Policy": [
@@ -1184,6 +1185,7 @@ function upsertHeadTag(html, pattern, tag) {
 
 export function repairPublicRouteMetadata(html, pathname = "/") {
   const meta = resolvePublicRouteMetadata(pathname);
+  const robots = isNoindexRoutePath(meta.canonicalPath) ? "noindex,nofollow" : "index,follow";
   const title = escapeHtmlAttribute(meta.title);
   const description = escapeHtmlAttribute(meta.description);
   const canonicalUrl = escapeHtmlAttribute(meta.canonicalUrl);
@@ -1194,6 +1196,11 @@ export function repairPublicRouteMetadata(html, pathname = "/") {
     nextHtml,
     /<meta\b(?=[^>]*\bname=["']description["'])[^>]*>/i,
     `<meta name="description" content="${description}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bname=["']robots["'])[^>]*>/i,
+    `<meta name="robots" content="${robots}" />`
   );
   nextHtml = upsertHeadTag(
     nextHtml,

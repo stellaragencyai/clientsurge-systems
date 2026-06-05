@@ -6,11 +6,12 @@
  */
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
+import { scrollToTop } from "@/lib/scroll";
 
 const INDUSTRIES = [
   {
     key: "med-spa",
-    route: "/industries/med-spa",
+    route: "/med-spa",
     icon: "✨",
     label: "Med Spa",
     accent: "#00D4FF",
@@ -19,7 +20,7 @@ const INDUSTRIES = [
   },
   {
     key: "dental",
-    route: "/industries/dental",
+    route: "/dental",
     icon: "🦷",
     label: "Dental",
     accent: "#00FFB3",
@@ -28,7 +29,7 @@ const INDUSTRIES = [
   },
   {
     key: "tanning",
-    route: "/industries/tanning",
+    route: "/industries",
     icon: "☀️",
     label: "Tanning Salon",
     accent: "#F59E0B",
@@ -37,7 +38,7 @@ const INDUSTRIES = [
   },
   {
     key: "hvac",
-    route: "/industries/hvac",
+    route: "/hvac",
     icon: "❄️",
     label: "HVAC",
     accent: "#A78BFA",
@@ -46,7 +47,7 @@ const INDUSTRIES = [
   },
   {
     key: "roofing",
-    route: "/industries/roofing",
+    route: "/roofing",
     icon: "🏠",
     label: "Roofing",
     accent: "#FB923C",
@@ -55,7 +56,7 @@ const INDUSTRIES = [
   },
   {
     key: "contractors",
-    route: "/industries/contractors",
+    route: "/contractors",
     icon: "🔨",
     label: "Contractors",
     accent: "#34D399",
@@ -80,10 +81,14 @@ export function IndustriesHero() {
 
 export function IndustriesGrid() {
   const navigate = useNavigate();
+  const handleIndustryNavigation = (route) => {
+    scrollToTop();
+    navigate(route);
+  };
   return (
     <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(280px,1fr))", gap: 16, maxWidth: 960, margin: "0 auto", padding: "0 20px 80px" }}>
       {INDUSTRIES.map((ind, i) => (
-        <motion.div key={ind.key} onClick={() => navigate(ind.route)}
+        <motion.div key={ind.key} onClick={() => handleIndustryNavigation(ind.route)}
           initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }} transition={{ delay: i * 0.07, duration: 0.4 }}
           whileHover={{ scale: 1.02, y: -2 }}

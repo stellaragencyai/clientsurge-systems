@@ -4,6 +4,12 @@ import crypto from "node:crypto";
 import http from "node:http";
 import https from "node:https";
 
+import {
+  extractLinkHref,
+  extractMetaContent,
+  extractTitle,
+} from "./sharedHtmlAudit.js";
+
 const defaultBaseUrl = process.env.CLIENTSURGE_RAW_HTML_AUDIT_BASE_URL || "https://clientsurgesystems.com";
 const baseUrlArg = process.argv.find((arg) => arg.startsWith("--base-url="));
 const baseUrl = new URL(baseUrlArg ? baseUrlArg.split("=").slice(1).join("=") : defaultBaseUrl);
@@ -56,10 +62,6 @@ function requestHtml(url) {
   });
 }
 
-function extractMeta(html, regex) {
-  return html.match(regex)?.[1] || "";
-}
-
 function normalizeHtml(html) {
   return html
     .replace(/<script[\s\S]*?<\/script>/gi, "")
@@ -80,10 +82,10 @@ async function inspectRoute(route) {
     route,
     url: url.href,
     http_status: response.statusCode,
-    title: extractMeta(html, /<title>(.*?)<\/title>/i),
-    canonical: extractMeta(html, /<link rel="canonical" href="([^"]+)"/i),
-    robots: extractMeta(html, /<meta name="robots" content="([^"]+)"/i),
-    description: extractMeta(html, /<meta name="description" content="([^"]+)"/i),
+    title: extractTitle(html),
+    canonical: extractLinkHref(html, "canonical"),
+    robots: extractMetaContent(html, "robots"),
+    description: extractMetaContent(html, "description"),
     normalized_sha256: fingerprint(html),
     html_bytes: Buffer.byteLength(html, "utf8"),
   };
