@@ -5,6 +5,8 @@ import { readFileSync } from "node:fs";
 import worker, {
   ANONYMOUS_USER_ME_HEADER,
   applySecurityHeaders,
+  DEMO_BOOKING_MODAL_PATCH_HEADER,
+  DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID,
   EDGE_HEALTH_HEADER,
   EDGE_HEALTH_PATH,
   HEADER_TRANSPARENCY_STYLE,
@@ -31,6 +33,8 @@ import worker, {
   isPrivateRoutePath,
   originRequestFor,
   PRIVATE_ROUTE_BLOCK_HEADER,
+  injectDemoBookingModalPatch,
+  repairStaleDemoBookingModalAsset,
   repairPublicRouteMetadata,
   SENSITIVE_HEADERS,
   SERVICE_WORKER_JS,
@@ -290,6 +294,49 @@ test("Cloudflare static HTML injection repairs public route metadata and canonic
   assert.match(repaired, /<meta property="og:url" content="https:\/\/clientsurgesystems\.com\/store" \/>/);
   assert.match(repaired, /Compare ClientSurge packages, automation systems/);
   assert.doesNotMatch(repaired, /grinning-apex-flow-growth\.base44\.app/);
+});
+
+test("Cloudflare static HTML injection patches stale demo booking modal behavior", () => {
+  const html = "<html><head></head><body><div id=\"root\"></div></body></html>";
+  const injected = injectDemoBookingModalPatch(html);
+
+  assert.match(injected, new RegExp(DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID));
+  assert.match(injected, /submitContactInquiry/);
+  assert.match(injected, /Request your free audit/);
+  assert.match(injected, /ClientSurge Systems Demo/);
+  assert.equal(injectDemoBookingModalPatch(injected), injected);
+});
+
+test("Cloudflare asset rewrite strips stale rickroll demo URL", () => {
+  const staleAsset = 'const Bh="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0";';
+  const repaired = repairStaleDemoBookingModalAsset(staleAsset);
+
+  assert.doesNotMatch(repaired, /dQw4w9WgXcQ/);
+  assert.match(repaired, /about:blank#clientsurge-audit-form/);
+  assert.equal(repairStaleDemoBookingModalAsset("const ok = true;"), "const ok = true;");
+});
+
+test("Cloudflare worker rewrites stale demo modal JavaScript assets", async () => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(
+    'const Bh="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0";',
+    {
+      status: 200,
+      headers: { "Content-Type": "application/javascript; charset=utf-8" },
+    }
+  );
+
+  try {
+    const response = await worker.fetch(new Request("https://clientsurgesystems.com/assets/index-old.js"));
+    const body = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get(DEMO_BOOKING_MODAL_PATCH_HEADER), "asset-v1");
+    assert.doesNotMatch(body, /dQw4w9WgXcQ/);
+    assert.match(body, /about:blank#clientsurge-audit-form/);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
 });
 
 test("Cloudflare static HTML injection makes the header and nav menus transparent", () => {

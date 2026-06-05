@@ -16,6 +16,8 @@ export const TRUST_SECURITY_SCRIPT_PATH = "/.well-known/clientsurge-trust-securi
 export const EDGE_ROUTE_METADATA_HEADER = "x-clientsurge-route-metadata";
 export const PRIVATE_ROUTE_BLOCK_HEADER = "x-clientsurge-private-route-block";
 export const ANONYMOUS_USER_ME_HEADER = "x-clientsurge-anonymous-user-me";
+export const DEMO_BOOKING_MODAL_PATCH_HEADER = "x-clientsurge-demo-modal-patch";
+export const DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID = "clientsurge-stale-demo-modal-patch";
 
 export const SECURITY_TXT = `Contact: mailto:system@clientsurgesystems.com
 Preferred-Languages: en
@@ -1022,6 +1024,135 @@ export function injectStaticFallbackPaintGuard(html) {
   return nextHtml;
 }
 
+export const DEMO_BOOKING_MODAL_PATCH_SCRIPT = `<script id="${DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID}">
+(function(){
+  if (window.__clientsurgeStaleDemoModalPatch) return;
+  window.__clientsurgeStaleDemoModalPatch = true;
+  var endpoint = "/api/functions/submitContactInquiry";
+  function closeModal(wrapper) {
+    var overlay = wrapper && wrapper.parentElement;
+    var backdrop = overlay && overlay.firstElementChild;
+    if (backdrop && backdrop !== wrapper && typeof backdrop.click === "function") {
+      backdrop.click();
+    } else if (overlay) {
+      overlay.remove();
+      document.body.classList.remove("nav-open");
+      document.body.style.removeProperty("--scroll-lock-top");
+    }
+  }
+  function modalMarkup() {
+    return [
+      '<button type="button" data-clientsurge-audit-close aria-label="Close audit request form" style="position:absolute;right:12px;top:12px;z-index:2;width:42px;height:42px;border-radius:999px;border:0;background:#0f172a;color:#fff;font-size:24px;line-height:1;cursor:pointer">x</button>',
+      '<div data-clientsurge-audit-form-shell style="display:grid;grid-template-columns:minmax(0,.92fr) minmax(0,1.08fr);max-height:calc(100svh - 32px);overflow:auto;border-radius:18px;background:#fff;box-shadow:0 28px 80px rgba(0,0,0,.35)">',
+      '<section style="background:#020617;color:#fff;padding:32px">',
+      '<p style="margin:0 0 12px;color:#7dd3fc;font:700 12px/1.2 system-ui;text-transform:uppercase;letter-spacing:.18em">Free Automation Audit</p>',
+      '<h2 style="margin:0;font:700 34px/1.05 system-ui;color:#fff">Find the lead leaks costing you booked jobs.</h2>',
+      '<p style="margin:18px 0 0;color:#cbd5e1;font:400 15px/1.6 system-ui">Send the request here and ClientSurge will review your follow-up, booking, and missed-call path before the walkthrough.</p>',
+      '<ul style="margin:28px 0 0;padding:0;list-style:none;color:#e2e8f0;font:500 15px/1.5 system-ui;display:grid;gap:14px">',
+      '<li>Lead capture and missed-call response review</li>',
+      '<li>Fastest AI automation opportunities for your business type</li>',
+      '<li>Plain-English next steps with no placeholder video detours</li>',
+      '</ul>',
+      '<div style="margin-top:28px;padding:16px;border:1px solid rgba(255,255,255,.12);border-radius:14px;background:rgba(255,255,255,.06);font:600 14px/1.6 system-ui">',
+      '<a style="color:#fff;text-decoration:none;display:block" href="tel:+16025843227">(602) 584-3227</a>',
+      '<a style="color:#fff;text-decoration:none;display:block;margin-top:6px" href="mailto:support@clientsurgesystems.com">support@clientsurgesystems.com</a>',
+      '</div>',
+      '</section>',
+      '<section style="padding:32px">',
+      '<form action="/contact" method="post" data-clientsurge-audit-form style="display:grid;gap:14px">',
+      '<div><h3 style="margin:0;color:#020617;font:700 28px/1.15 system-ui">Request your free audit</h3><p style="margin:8px 0 0;color:#475569;font:400 15px/1.5 system-ui">This form feeds the ClientSurge lead workflow directly.</p></div>',
+      '<input name="website_url" autocomplete="off" tabindex="-1" aria-hidden="true" style="display:none;position:absolute;left:-9999px" />',
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">Full name<input name="full_name" required autocomplete="name" style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 14px;font:400 16px system-ui;color:#020617"></label><label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">Email<input name="email" type="email" required autocomplete="email" style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 14px;font:400 16px system-ui;color:#020617"></label></div>',
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">Phone<input name="phone" type="tel" autocomplete="tel" style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 14px;font:400 16px system-ui;color:#020617"></label><label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">Business<input name="business_name" autocomplete="organization" style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 14px;font:400 16px system-ui;color:#020617"></label></div>',
+      '<div style="display:grid;grid-template-columns:1fr 1fr;gap:12px"><label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">Industry<input name="business_type" placeholder="Dental, roofing, med spa..." style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 14px;font:400 16px system-ui;color:#020617"></label><label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">Website<input name="business_website_url" type="url" placeholder="https://" autocomplete="url" style="min-height:48px;border:1px solid #cbd5e1;border-radius:10px;padding:0 14px;font:400 16px system-ui;color:#020617"></label></div>',
+      '<label style="display:grid;gap:6px;color:#475569;font:700 12px/1.2 system-ui;text-transform:uppercase">What should we review?<textarea name="message" required style="min-height:112px;border:1px solid #cbd5e1;border-radius:10px;padding:12px 14px;font:400 16px/1.45 system-ui;color:#020617;resize:vertical">I would like a free automation audit for my business.</textarea></label>',
+      '<p data-clientsurge-status role="status" style="min-height:20px;margin:0;color:#b91c1c;font:600 13px/1.4 system-ui"></p>',
+      '<button type="submit" style="min-height:50px;border:0;border-radius:999px;background:#00aeef;color:#fff;font:800 16px system-ui;cursor:pointer">Send audit request</button>',
+      '</form>',
+      '</section>',
+      '</div>',
+      '<style>@media(max-width:760px){[data-clientsurge-audit-form-shell]{grid-template-columns:1fr!important}[data-clientsurge-audit-form] [style*="grid-template-columns:1fr 1fr"]{grid-template-columns:1fr!important}}</style>'
+    ].join("");
+  }
+  function patchWrapper(wrapper) {
+    if (!wrapper || wrapper.dataset.clientsurgeAuditPatched === "true") return;
+    wrapper.dataset.clientsurgeAuditPatched = "true";
+    wrapper.innerHTML = modalMarkup();
+    var closeButton = wrapper.querySelector("[data-clientsurge-audit-close]");
+    if (closeButton) closeButton.addEventListener("click", function(){ closeModal(wrapper); });
+    var form = wrapper.querySelector("[data-clientsurge-audit-form]");
+    var status = wrapper.querySelector("[data-clientsurge-status]");
+    if (!form) return;
+    form.addEventListener("submit", function(event) {
+      event.preventDefault();
+      status.textContent = "";
+      var payload = Object.fromEntries(new FormData(form).entries());
+      payload.business_type = payload.business_type || "Free Automation Audit";
+      if (!payload.full_name || !payload.email || !payload.message) {
+        status.textContent = "Please complete your name, email, and review notes.";
+        return;
+      }
+      var button = form.querySelector('button[type="submit"]');
+      if (button) { button.disabled = true; button.textContent = "Sending request"; }
+      fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload)
+      }).then(function(response) {
+        return response.json().catch(function(){ return {}; }).then(function(body){ return { response: response, body: body }; });
+      }).then(function(result) {
+        if (!result.response.ok || result.body.success === false || (result.body.data && result.body.data.success === false)) {
+          throw new Error("submit failed");
+        }
+        form.innerHTML = '<div style="min-height:360px;display:grid;place-items:center;text-align:center"><div><div style="width:64px;height:64px;border-radius:999px;background:#dcfce7;color:#16a34a;display:grid;place-items:center;margin:0 auto 18px;font-size:32px">OK</div><h3 style="margin:0;color:#020617;font:700 28px system-ui">Audit request sent</h3><p style="margin:12px auto 0;max-width:360px;color:#475569;font:400 15px/1.6 system-ui">We have your details. Expect a direct follow-up with practical next steps for your lead flow.</p><button type="button" data-clientsurge-audit-close-success style="margin-top:22px;min-height:44px;border:1px solid #cbd5e1;border-radius:999px;background:#fff;color:#020617;font:700 14px system-ui;padding:0 18px;cursor:pointer">Back to site</button></div></div>';
+        var successClose = form.querySelector("[data-clientsurge-audit-close-success]");
+        if (successClose) successClose.addEventListener("click", function(){ closeModal(wrapper); });
+      }).catch(function() {
+        status.innerHTML = 'We could not send automatically. Please call <a href="tel:+16025843227">(602) 584-3227</a> or email <a href="mailto:support@clientsurgesystems.com">support@clientsurgesystems.com</a>.';
+      }).finally(function() {
+        if (button) { button.disabled = false; button.textContent = "Send audit request"; }
+      });
+    });
+  }
+  function scan() {
+    var frames = document.querySelectorAll('iframe[title="ClientSurge Systems Demo"],iframe[src*="dQw4w9WgXcQ"],iframe[src*="clientsurge-audit-form"]');
+    frames.forEach(function(frame) {
+      var wrapper = frame.closest(".relative.w-full.max-w-4xl.z-50") || frame.closest("[class*='max-w-4xl']");
+      patchWrapper(wrapper);
+    });
+  }
+  scan();
+  var observer = new MutationObserver(scan);
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  window.setTimeout(function(){ observer.disconnect(); }, 90000);
+})();
+</script>`;
+
+export function injectDemoBookingModalPatch(html) {
+  if (!html || html.includes(DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID)) {
+    return html;
+  }
+  return html.includes("</body>")
+    ? html.replace("</body>", `${DEMO_BOOKING_MODAL_PATCH_SCRIPT}\n</body>`)
+    : `${html}\n${DEMO_BOOKING_MODAL_PATCH_SCRIPT}`;
+}
+
+export function repairStaleDemoBookingModalAsset(source) {
+  if (!source || !source.includes("dQw4w9WgXcQ")) {
+    return source;
+  }
+  return source.replace(
+    /https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ\?autoplay=1&rel=0/g,
+    "about:blank#clientsurge-audit-form"
+  );
+}
+
+function shouldRepairStaleDemoBookingModalAsset(request, url, response) {
+  if (request.method !== "GET") return false;
+  if (!url.pathname.startsWith("/assets/")) return false;
+  return (response.headers.get("content-type") || "").includes("javascript");
+}
+
 function escapeHtmlAttribute(value = "") {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -1331,11 +1462,27 @@ export default {
     const originResponse = await fetch(originRequestFor(request, url));
     const headers = applySecurityHeaders(new Headers(originResponse.headers), url.pathname);
 
+    if (shouldRepairStaleDemoBookingModalAsset(request, url, originResponse)) {
+      const source = await originResponse.text();
+      const repaired = repairStaleDemoBookingModalAsset(source);
+      if (repaired !== source) {
+        headers.set(DEMO_BOOKING_MODAL_PATCH_HEADER, "asset-v1");
+        headers.set("Cache-Control", "no-store, max-age=0");
+      }
+      return new Response(repaired, {
+        status: originResponse.status,
+        statusText: originResponse.statusText,
+        headers,
+      });
+    }
+
     if (shouldInjectStaticFallbackPaintGuard(request, originResponse)) {
       let html = repairPublicRouteMetadata(await originResponse.text(), url.pathname);
+      html = injectDemoBookingModalPatch(html);
       html = injectStaticFallbackPaintGuard(html);
       headers.set(STATIC_FALLBACK_PAINT_GUARD_HEADER, "edge-v1");
       headers.set(EDGE_ROUTE_METADATA_HEADER, "edge-v1");
+      headers.set(DEMO_BOOKING_MODAL_PATCH_HEADER, "edge-v1");
       headers.set("Cache-Control", "no-store, max-age=0");
 
       if (shouldInjectHomepageMotion(request, url, originResponse)) {
