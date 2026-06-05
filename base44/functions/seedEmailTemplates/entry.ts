@@ -12,6 +12,129 @@ Deno.serve(async (req) => {
 
     const templates = [
       {
+        name: "Roofing Lead-Response Audit Sequence",
+        campaign_type: "outreach_audit",
+        for_intent: "not_contacted",
+        for_industries: ["roofing"],
+        status: "active",
+        landing_page_url: "https://clientsurgesystems.com/roofing",
+        steps: [
+          {
+            order: 1,
+            subject_template: "{{business}}: missed roof calls are expensive",
+            body_template: `Hi {{name}},
+
+Roofing teams lose high-intent jobs when storm-season calls, estimate requests, and insurance follow-ups sit too long.
+
+ClientSurge checks whether your intake is catching roof repair and replacement leads before they call the next contractor.
+
+Want a quick roofing lead-response audit?
+https://clientsurgesystems.com/roofing
+
+The ClientSurge Team`,
+            delay_hours: 0,
+            type: "main",
+          },
+          {
+            order: 2,
+            subject_template: "Following up on {{business}} roofing leads",
+            body_template: `Hi {{name}},
+
+Quick follow-up: if roof replacement or storm-damage inquiries wait until the next business day, the homeowner may already have booked another contractor.
+
+We can review the intake path for {{business}} and point out the fastest wins.
+
+https://clientsurgesystems.com/roofing
+
+The ClientSurge Team`,
+            delay_hours: 72,
+            type: "followup",
+          },
+        ],
+      },
+      {
+        name: "HVAC Lead-Response Audit Sequence",
+        campaign_type: "outreach_audit",
+        for_intent: "not_contacted",
+        for_industries: ["hvac"],
+        status: "active",
+        landing_page_url: "https://clientsurgesystems.com/hvac",
+        steps: [
+          {
+            order: 1,
+            subject_template: "{{business}}: after-hours HVAC leads should not go cold",
+            body_template: `Hi {{name}},
+
+HVAC demand spikes after hours, on weekends, and during heat or cold snaps. Slow callbacks can turn urgent repair leads into lost bookings.
+
+ClientSurge audits whether your intake is capturing emergency repair, replacement, and maintenance leads quickly enough.
+
+Want a quick HVAC lead-response audit?
+https://clientsurgesystems.com/hvac
+
+The ClientSurge Team`,
+            delay_hours: 0,
+            type: "main",
+          },
+          {
+            order: 2,
+            subject_template: "Quick HVAC intake note for {{business}}",
+            body_template: `Hi {{name}},
+
+A lot of HVAC revenue is won or lost in the first few minutes after a service request. That is especially true for emergency repair and replacement calls.
+
+We can audit where {{business}} may be losing speed in the handoff.
+
+https://clientsurgesystems.com/hvac
+
+The ClientSurge Team`,
+            delay_hours: 72,
+            type: "followup",
+          },
+        ],
+      },
+      {
+        name: "Dental New-Patient Audit Sequence",
+        campaign_type: "outreach_audit",
+        for_intent: "not_contacted",
+        for_industries: ["dental"],
+        status: "active",
+        landing_page_url: "https://clientsurgesystems.com/dental",
+        steps: [
+          {
+            order: 1,
+            subject_template: "{{business}}: new patient inquiries need faster follow-up",
+            body_template: `Hi {{name}},
+
+Dental offices lose new patient opportunities when implant, emergency, and hygiene inquiries are not followed up quickly or consistently.
+
+ClientSurge audits whether your practice is turning web forms and missed calls into booked consults.
+
+Want a quick dental lead-response audit?
+https://clientsurgesystems.com/dental
+
+The ClientSurge Team`,
+            delay_hours: 0,
+            type: "main",
+          },
+          {
+            order: 2,
+            subject_template: "New patient follow-up for {{business}}",
+            body_template: `Hi {{name}},
+
+If a patient asks about emergency care, implants, or hygiene availability and does not hear back quickly, the next office on the search page often wins.
+
+We can review the response path for {{business}} and show the biggest booking gaps.
+
+https://clientsurgesystems.com/dental
+
+The ClientSurge Team`,
+            delay_hours: 72,
+            type: "followup",
+          },
+        ],
+      },
+      {
         name: "Case Study Sequence (Uncertain)",
         campaign_type: "case_study",
         for_intent: "uncertain",

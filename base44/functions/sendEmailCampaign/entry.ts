@@ -21,6 +21,7 @@ const BATCH_SIZE = 25;
 const MAX_LEADS = 5000;
 const MAX_SAFE_TEST_RECIPIENTS = 50;
 const DEFAULT_FOLLOW_UP_DAYS = 3;
+const RECENT_CONTACT_WINDOW_DAYS = 14;
 const TERMINAL_SUPPRESSION_STATUSES = new Set(["Closed", "Won", "Lost"]);
 
 function normalizeToken(value) {
@@ -59,6 +60,26 @@ function isSuppressed(lead) {
   if (TERMINAL_SUPPRESSION_STATUSES.has(lead.status) || TERMINAL_SUPPRESSION_STATUSES.has(lead.crm_stage)) return true;
   if (lead.outreach_status === "do_not_contact") return true;
   return false;
+}
+
+function hasUsableWebsite(lead) {
+  return Boolean(lead.website || lead.business_website || lead.domain);
+}
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function parseDate(value) {
+  const timestamp = Date.parse(value || "");
+  return Number.isFinite(timestamp) ? timestamp : null;
+}
+
+function wasRecentlyContacted(lead, windowDays = RECENT_CONTACT_WINDOW_DAYS) {
+  const timestamp = parseDate(lead.last_contacted_at) || parseDate(lead.last_contacted_date);
+  if (!timestamp) return false;
+  const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
+  return timestamp >= cutoff;
 }
 
 function getSuppressionReason(lead) {
@@ -223,17 +244,34 @@ Deno.serve(async (req) => {
       }, { status: 400 });
     }
 
-    // Get all leads with email
+    // Get leads, segment them, and exclude unsafe recipients before capping the batch.
     const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", MAX_LEADS);
-    const matchingLeads = (allLeads || []).filter(lead => {
-      if (!lead.email) return false;
-      return matchesFilters(lead, campaign.segment_filters);
-    });
-    const suppressedLeads = matchingLeads.filter(isSuppressed);
+    const matchingLeads = (allLeads || []).filter(lead => matchesFilters(lead, campaign.segment_filters));
+    const missingEmailLeads = matchingLeads.filter((lead) => !lead.email);
+    const leadsWithEmail = matchingLeads.filter((lead) => lead.email);
+    const missingWebsiteLeads = leadsWithEmail.filter((lead) => !hasUsableWebsite(lead));
+    const leadsWithRequiredFields = leadsWithEmail.filter(hasUsableWebsite);
+    const suppressedLeads = leadsWithRequiredFields.filter(isSuppressed);
+    const unsuppressedLeads = leadsWithRequiredFields.filter((lead) => !isSuppressed(lead));
+    const recentlyContactedLeads = unsuppressedLeads.filter(wasRecentlyContacted);
+    const dedupeReadyLeads = unsuppressedLeads.filter((lead) => !wasRecentlyContacted(lead));
+    const duplicateEmails = new Set();
+    const seenEmails = new Set();
+    const dedupedLeads = [];
+
+    for (const lead of dedupeReadyLeads) {
+      const email = normalizeEmail(lead.email);
+      if (!email) continue;
+      if (seenEmails.has(email)) {
+        duplicateEmails.add(email);
+        continue;
+      }
+      seenEmails.add(email);
+      dedupedLeads.push(lead);
+    }
+
     const recipientLimit = getRecipientLimit(campaign);
-    const eligibleLeads = matchingLeads
-      .filter((lead) => !isSuppressed(lead))
-      .slice(0, recipientLimit);
+    const eligibleLeads = dedupedLeads.slice(0, recipientLimit);
 
     if (preview_only) {
       const suppressionReasons = suppressedLeads.reduce((acc, lead) => {
@@ -246,6 +284,10 @@ Deno.serve(async (req) => {
         preview: true,
         matching_count: matchingLeads.length,
         suppressed_count: suppressedLeads.length,
+        missing_email_count: missingEmailLeads.length,
+        missing_website_count: missingWebsiteLeads.length,
+        duplicate_excluded_count: duplicateEmails.size,
+        recently_contacted_count: recentlyContactedLeads.length,
         suppression_reasons: suppressionReasons,
         max_recipients: recipientLimit,
         recipient_count: eligibleLeads.length,
