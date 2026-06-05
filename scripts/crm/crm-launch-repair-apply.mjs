@@ -7,7 +7,8 @@ const APP_ID = "69dc4a79656fdba136d413d3";
 const API_ROOT = `https://base44.app/api/apps/${APP_ID}`;
 const IMPORT_SOURCE = "lead_dashboard_5378_2026_05_29";
 const PAGE_SIZE = 5000;
-const CONCURRENCY = 8;
+const DEFAULT_CONCURRENCY = 2;
+const DEFAULT_MAX_RETRIES = 8;
 
 function parseArgs() {
   return {
@@ -15,6 +16,8 @@ function parseArgs() {
     confirmBackup: process.argv.includes("--confirm-backup"),
     dedupeMark: process.argv.includes("--dedupe-mark"),
     limit: Number(process.argv.find((arg) => arg.startsWith("--limit="))?.split("=")[1] || 0),
+    concurrency: Number(process.argv.find((arg) => arg.startsWith("--concurrency="))?.split("=")[1] || DEFAULT_CONCURRENCY),
+    maxRetries: Number(process.argv.find((arg) => arg.startsWith("--max-retries="))?.split("=")[1] || DEFAULT_MAX_RETRIES),
   };
 }
 
@@ -89,6 +92,27 @@ function shouldPatch(current, next) {
   return (current ?? "") !== (next ?? "");
 }
 
+function dedupePatchNeeded(row = {}, patch = {}) {
+  if (patch.dedupe_status === "keeper") {
+    const currentMerged = new Set(Array.isArray(row.dedupe_merged_ids) ? row.dedupe_merged_ids : []);
+    const nextMerged = Array.isArray(patch.dedupe_merged_ids) ? patch.dedupe_merged_ids : [];
+    return row.dedupe_status !== "keeper" || nextMerged.some((id) => !currentMerged.has(id));
+  }
+
+  if (patch.dedupe_status === "duplicate_candidate") {
+    return (
+      row.dedupe_status !== "duplicate_candidate" ||
+      row.dedupe_duplicate_of !== patch.dedupe_duplicate_of ||
+      row.dedupe_group_key !== patch.dedupe_group_key ||
+      row.crm_stage !== patch.crm_stage ||
+      row.outreach_status !== patch.outreach_status ||
+      row.do_not_contact !== true
+    );
+  }
+
+  return Object.entries(patch).some(([field, value]) => shouldPatch(row[field], value));
+}
+
 function buildBackfillPatch(lead) {
   const inferred = inferIndustry(lead);
   const patch = {
@@ -131,11 +155,17 @@ function groupBy(rows, keyFn) {
 }
 
 function buildDedupePlans(rows) {
+  const activeRows = rows.filter(
+    (lead) => lead.dedupe_status !== "duplicate_candidate" &&
+      !lead.dedupe_duplicate_of &&
+      lead.crm_stage !== "Lost" &&
+      lead.outreach_status !== "do_not_contact"
+  );
   const groups = [
-    ...groupBy(rows, (lead) => normalizeEmail(lead.email)).map(([key, group]) => ({ type: "email", key, group })),
-    ...groupBy(rows, (lead) => normalizePhone(lead.phone)).map(([key, group]) => ({ type: "phone", key, group })),
-    ...groupBy(rows, (lead) => normalizeDomain(lead.website_url || lead.website)).map(([key, group]) => ({ type: "website", key, group })),
-    ...groupBy(rows, (lead) => {
+    ...groupBy(activeRows, (lead) => normalizeEmail(lead.email)).map(([key, group]) => ({ type: "email", key, group })),
+    ...groupBy(activeRows, (lead) => normalizePhone(lead.phone)).map(([key, group]) => ({ type: "phone", key, group })),
+    ...groupBy(activeRows, (lead) => normalizeDomain(lead.website_url || lead.website)).map(([key, group]) => ({ type: "website", key, group })),
+    ...groupBy(activeRows, (lead) => {
       const business = normalizeBusinessName(lead.business_name);
       const city = clean(lead.city).toLowerCase();
       const state = clean(lead.state).toLowerCase();
@@ -149,7 +179,10 @@ function buildDedupePlans(rows) {
 
   for (const candidate of groups) {
     if (candidate.manualReview) continue;
-    const sorted = [...candidate.group].sort((a, b) => {
+    const keeperPool = candidate.group.filter(
+      (lead) => lead.dedupe_status !== "duplicate_candidate" && !lead.dedupe_duplicate_of && lead.crm_stage !== "Lost"
+    );
+    const sorted = [...(keeperPool.length > 0 ? keeperPool : candidate.group)].sort((a, b) => {
       const diff = completenessScore(b) - completenessScore(a);
       if (diff) return diff;
       return new Date(b.updated_date || b.created_date || 0) - new Date(a.updated_date || a.created_date || 0);
@@ -157,7 +190,7 @@ function buildDedupePlans(rows) {
     const keeper = sorted[0];
     if (!keeper?.id) continue;
     if (!keeperMergedIds.has(keeper.id)) keeperMergedIds.set(keeper.id, new Set(keeper.dedupe_merged_ids || []));
-    for (const dupe of sorted.slice(1)) {
+    for (const dupe of candidate.group.filter((lead) => lead.id !== keeper.id)) {
       if (!dupe.id || dupe.order_id || dupe.client_id || dupe.crm_stage === "Won") continue;
       keeperMergedIds.get(keeper.id).add(dupe.id);
       if (duplicatePatches.has(dupe.id)) continue;
@@ -229,26 +262,45 @@ async function getAccessToken() {
   return refreshed.accessToken;
 }
 
-async function apiFetch(pathname, { method = "GET", body } = {}) {
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
+
+async function apiFetch(pathname, { method = "GET", body, maxRetries = DEFAULT_MAX_RETRIES } = {}) {
   const token = await getAccessToken();
-  const response = await fetch(`${API_ROOT}${pathname}`, {
-    method,
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "X-App-Id": APP_ID,
-    },
-    body: body ? JSON.stringify(body) : undefined,
-  });
-  const text = await response.text();
-  let payload = text;
-  try {
-    payload = text ? JSON.parse(text) : null;
-  } catch {
-    // Keep raw body for diagnostics.
+
+  for (let attempt = 0; attempt <= maxRetries; attempt += 1) {
+    const response = await fetch(`${API_ROOT}${pathname}`, {
+      method,
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+        "X-App-Id": APP_ID,
+      },
+      body: body ? JSON.stringify(body) : undefined,
+    });
+    const text = await response.text();
+    let payload = text;
+    try {
+      payload = text ? JSON.parse(text) : null;
+    } catch {
+      // Keep raw body for diagnostics.
+    }
+    if (response.ok) return payload;
+
+    const retryable = response.status === 429 || response.status >= 500;
+    if (!retryable || attempt === maxRetries) {
+      throw new Error(`${method} ${pathname} failed ${response.status}: ${JSON.stringify(payload).slice(0, 500)}`);
+    }
+
+    const retryAfter = Number(response.headers.get("retry-after") || 0);
+    const backoffMs = retryAfter > 0
+      ? retryAfter * 1000
+      : Math.min(30000, 1000 * 2 ** attempt) + Math.floor(Math.random() * 500);
+    await sleep(backoffMs);
   }
-  if (!response.ok) throw new Error(`${method} ${pathname} failed ${response.status}: ${JSON.stringify(payload).slice(0, 500)}`);
-  return payload;
+
+  throw new Error(`${method} ${pathname} failed after retries`);
 }
 
 async function fetchAllLeads() {
@@ -261,9 +313,9 @@ async function fetchAllLeads() {
   return rows;
 }
 
-async function runLimited(items, worker) {
+async function runLimited(items, concurrency, worker) {
   let index = 0;
-  const workers = Array.from({ length: CONCURRENCY }, async () => {
+  const workers = Array.from({ length: Math.max(1, concurrency) }, async () => {
     while (index < items.length) {
       const current = items[index++];
       await worker(current);
@@ -284,10 +336,17 @@ async function main() {
     .map((lead) => ({ id: lead.id, patch: buildBackfillPatch(lead) }))
     .filter((plan) => Object.keys(plan.patch).length > 0);
   const dedupe = buildDedupePlans(rows);
+  const rowById = new Map(rows.map((row) => [row.id, row]));
+  const dedupeKeeperPatches = dedupe.keeperPatches.filter(({ id, patch }) => {
+    return dedupePatchNeeded(rowById.get(id), patch);
+  });
+  const dedupeDupePatches = dedupe.dupePatches.filter(({ id, patch }) => {
+    return dedupePatchNeeded(rowById.get(id), patch);
+  });
 
   const selectedBackfill = args.limit > 0 ? backfillPlans.slice(0, args.limit) : backfillPlans;
-  const selectedKeeperPatches = args.limit > 0 ? dedupe.keeperPatches.slice(0, args.limit) : dedupe.keeperPatches;
-  const selectedDupePatches = args.limit > 0 ? dedupe.dupePatches.slice(0, args.limit) : dedupe.dupePatches;
+  const selectedKeeperPatches = args.limit > 0 ? dedupeKeeperPatches.slice(0, args.limit) : dedupeKeeperPatches;
+  const selectedDupePatches = args.limit > 0 ? dedupeDupePatches.slice(0, args.limit) : dedupeDupePatches;
 
   const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
   const outputDir = path.resolve("private-data", "crm-launch-repair", timestamp);
@@ -295,8 +354,8 @@ async function main() {
   await writeFile(path.join(outputDir, "leads-backup.json"), JSON.stringify(rows, null, 2));
   await writeFile(path.join(outputDir, "backfill-apply-plan.json"), JSON.stringify(backfillPlans, null, 2));
   await writeFile(path.join(outputDir, "dedupe-mark-plan.json"), JSON.stringify({
-    keeperPatches: dedupe.keeperPatches,
-    dupePatches: dedupe.dupePatches,
+    keeperPatches: dedupeKeeperPatches,
+    dupePatches: dedupeDupePatches,
   }, null, 2));
 
   let backfillApplied = 0;
@@ -304,17 +363,17 @@ async function main() {
   let dedupeDuplicateApplied = 0;
 
   if (args.apply) {
-    await runLimited(selectedBackfill, async ({ id, patch }) => {
-      await apiFetch(`/entities/Leads/${id}`, { method: "PUT", body: patch });
+    await runLimited(selectedBackfill, args.concurrency, async ({ id, patch }) => {
+      await apiFetch(`/entities/Leads/${id}`, { method: "PUT", body: patch, maxRetries: args.maxRetries });
       backfillApplied++;
     });
     if (args.dedupeMark) {
-      await runLimited(selectedKeeperPatches, async ({ id, patch }) => {
-        await apiFetch(`/entities/Leads/${id}`, { method: "PUT", body: patch });
+      await runLimited(selectedKeeperPatches, args.concurrency, async ({ id, patch }) => {
+        await apiFetch(`/entities/Leads/${id}`, { method: "PUT", body: patch, maxRetries: args.maxRetries });
         dedupeKeeperApplied++;
       });
-      await runLimited(selectedDupePatches, async ({ id, patch }) => {
-        await apiFetch(`/entities/Leads/${id}`, { method: "PUT", body: patch });
+      await runLimited(selectedDupePatches, args.concurrency, async ({ id, patch }) => {
+        await apiFetch(`/entities/Leads/${id}`, { method: "PUT", body: patch, maxRetries: args.maxRetries });
         dedupeDuplicateApplied++;
       });
     }
@@ -336,8 +395,8 @@ async function main() {
     },
     dedupe: {
       duplicate_groups: dedupe.groups.length,
-      keeper_marks_planned: dedupe.keeperPatches.length,
-      duplicate_marks_planned: dedupe.dupePatches.length,
+      keeper_marks_planned: dedupeKeeperPatches.length,
+      duplicate_marks_planned: dedupeDupePatches.length,
       keeper_marks_applied: dedupeKeeperApplied,
       duplicate_marks_applied: dedupeDuplicateApplied,
       destructive_delete_used: false,
