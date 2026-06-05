@@ -6,6 +6,8 @@ import worker, {
   applySecurityHeaders,
   EDGE_HEALTH_HEADER,
   EDGE_HEALTH_PATH,
+  HEADER_TRANSPARENCY_STYLE,
+  HEADER_TRANSPARENCY_STYLE_ID,
   HOMEPAGE_MOTION_HEADER,
   HOMEPAGE_MOTION_INJECTION,
   HOMEPAGE_MOTION_STYLE_ID,
@@ -174,6 +176,7 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
     assert.match(response.headers.get("cache-control") || "", /no-store/);
     assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID));
     assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID));
+    assert.match(body, new RegExp(HEADER_TRANSPARENCY_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID));
@@ -211,9 +214,22 @@ test("Cloudflare static fallback paint guard is scoped to HTML and idempotent", 
   const injected = injectStaticFallbackPaintGuard("<html><head></head><body><div id=\"root\"><main class=\"static-fallback\"></main></div></body></html>");
   assert.match(injected, new RegExp(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID));
   assert.match(injected, new RegExp(STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID));
+  assert.match(injected, new RegExp(HEADER_TRANSPARENCY_STYLE_ID));
   assert.match(injected, /html\.js:not\(\.app-fallback-visible\) #root > \.static-fallback/);
+  assert.match(injected, /nav\[aria-label="Main navigation"\]/);
   assert.match(injected, /classList\.add\("app-fallback-visible"\)/);
   assert.equal(injectStaticFallbackPaintGuard(injected), injected);
+});
+
+test("Cloudflare static HTML injection makes the header and nav menus transparent", () => {
+  assert.match(HEADER_TRANSPARENCY_STYLE, new RegExp(HEADER_TRANSPARENCY_STYLE_ID));
+  assert.match(HEADER_TRANSPARENCY_STYLE, /nav\[aria-label="Main navigation"\]/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /background: rgba\(255, 255, 255, 0\.10\) !important/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /blur\(7px\) saturate\(1\.1\)/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /box-shadow: none !important/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /\[role="menu"\]\[aria-label="Industries"\]/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /Open navigation menu/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /Close navigation menu/);
 });
 
 test("Cloudflare homepage motion injection is scoped and idempotent", () => {

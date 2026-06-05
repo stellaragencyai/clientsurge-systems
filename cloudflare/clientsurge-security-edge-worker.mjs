@@ -54,6 +54,7 @@ export const HOMEPAGE_MOTION_HEADER = "x-clientsurge-homepage-motion";
 export const STATIC_FALLBACK_PAINT_GUARD_HEADER = "x-clientsurge-static-fallback-guard";
 export const STATIC_FALLBACK_PAINT_GUARD_STYLE_ID = "clientsurge-static-fallback-paint-guard";
 export const STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID = "clientsurge-static-fallback-guard-script";
+export const HEADER_TRANSPARENCY_STYLE_ID = "clientsurge-edge-header-transparency";
 export const HOMEPAGE_MOTION_STYLE_ID = "clientsurge-edge-cinematic-motion";
 export const HOMEPAGE_ORDER_STYLE_ID = "clientsurge-edge-homepage-order";
 export const HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID = "clientsurge-edge-phone-alignment";
@@ -78,6 +79,40 @@ export const STATIC_FALLBACK_PAINT_GUARD_SCRIPT = `<script id="${STATIC_FALLBACK
   }, 6000);
 })();
 </script>`;
+
+export const HEADER_TRANSPARENCY_STYLE = `<style id="${HEADER_TRANSPARENCY_STYLE_ID}">
+nav[aria-label="Main navigation"] {
+  background: rgba(255, 255, 255, 0.10) !important;
+  -webkit-backdrop-filter: blur(7px) saturate(1.1) !important;
+  backdrop-filter: blur(7px) saturate(1.1) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.22) !important;
+  box-shadow: none !important;
+}
+nav[aria-label="Main navigation"]:has([aria-expanded="true"]) {
+  background: rgba(255, 255, 255, 0.22) !important;
+}
+nav[aria-label="Main navigation"] [role="menu"][aria-label="Industries"] {
+  background: rgba(255, 255, 255, 0.24) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.12) !important;
+  backdrop-filter: blur(8px) saturate(1.12) !important;
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+}
+nav[aria-label="Main navigation"] button[aria-label="Open navigation menu"],
+nav[aria-label="Main navigation"] button[aria-label="Close navigation menu"] {
+  background: rgba(255, 255, 255, 0.25) !important;
+  -webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
+  backdrop-filter: blur(6px) saturate(1.1) !important;
+  box-shadow: none !important;
+  border-color: rgba(255, 255, 255, 0.34) !important;
+}
+nav[aria-label="Main navigation"] > div.xl\\:hidden {
+  background: rgba(255, 255, 255, 0.24) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(1.12) !important;
+  backdrop-filter: blur(8px) saturate(1.12) !important;
+  border-color: rgba(255, 255, 255, 0.25) !important;
+}
+</style>`;
 
 export const HOMEPAGE_MOTION_STYLE = `<style id="${HOMEPAGE_MOTION_STYLE_ID}">
 @keyframes csEdgeAmbientSweep {
@@ -923,6 +958,12 @@ export function injectStaticFallbackPaintGuard(html) {
     nextHtml = nextHtml.includes("</head>")
       ? nextHtml.replace("</head>", `${STATIC_FALLBACK_PAINT_GUARD_SCRIPT}</head>`)
       : `${STATIC_FALLBACK_PAINT_GUARD_SCRIPT}${nextHtml}`;
+  }
+
+  if (!nextHtml.includes(HEADER_TRANSPARENCY_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${HEADER_TRANSPARENCY_STYLE}</head>`)
+      : `${HEADER_TRANSPARENCY_STYLE}${nextHtml}`;
   }
 
   return nextHtml;
