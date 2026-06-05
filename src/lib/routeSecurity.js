@@ -1,4 +1,10 @@
-const routePath = (...segments) => `/${segments.join("/")}`;
+import {
+  ADMIN_ROUTE_PREFIXES,
+  AUTHENTICATED_ROUTE_PREFIXES,
+  INTERNAL_ROUTE_PREFIXES,
+  NOINDEX_ROUTE_PREFIXES,
+  PUBLIC_ROUTE_PATHS,
+} from "./publicRouteMetadata.js";
 
 export const ROUTE_ACCESS = {
   PUBLIC: "public",
@@ -7,82 +13,11 @@ export const ROUTE_ACCESS = {
   INTERNAL: "internal",
 };
 
-export const PUBLIC_ROUTES = [
-  "/",
-  "/store",
-  "/order-success",
-  "/med-spa",
-  "/dental",
-  "/hvac",
-  "/roofing",
-  "/contractors",
-  "/chiropractic",
-  "/lead-capture-automation",
-  "/missed-call-text-back",
-  "/ai-lead-follow-up",
-  "/appointment-booking-automation",
-  "/review-automation",
-  "/customer-reactivation",
-  "/start",
-  "/book",
-  "/book-demo",
-  "/industries",
-  "/pricing",
-  "/faq",
-  "/our-system",
-  "/testimonials",
-  "/privacy-policy",
-  "/terms",
-  "/login",
-  "/success",
-  "/legal",
-  "/contact",
-  "/blog",
-  "/about",
-  "/automations",
-  "/leads/capture",
-  "/thank-you",
-];
-
-export const AUTHENTICATED_ROUTES = [
-  "/client-portal",
-  "/client-dashboard",
-  "/onboarding",
-  "/setup",
-  "/setup/credentials",
-  "/setup/status",
-];
-
-export const ADMIN_ROUTES = [
-  "/admin",
-  "/admin/leads",
-  "/admin/automations",
-  "/admin/onboarding",
-  "/admin/install-guide",
-  "/admin/ai-sales",
-  "/admin/performance-wars",
-  "/dashboard",
-  "/admin-settings",
-  "/lead-intelligence",
-  "/sam",
-  "/medspa-dashboard",
-];
-
-export const INTERNAL_ROUTES = [
-  "/motion-lab",
-  "/setup/preview",
-  "/admin/AIStatusDashboard",
-];
-
-export const NOINDEX_PREFIXES = [
-  ...AUTHENTICATED_ROUTES,
-  ...ADMIN_ROUTES,
-  ...INTERNAL_ROUTES,
-  "/order-success",
-  "/success",
-  "/thank-you",
-  "/login",
-];
+export const PUBLIC_ROUTES = PUBLIC_ROUTE_PATHS;
+export const AUTHENTICATED_ROUTES = AUTHENTICATED_ROUTE_PREFIXES;
+export const ADMIN_ROUTES = ADMIN_ROUTE_PREFIXES;
+export const INTERNAL_ROUTES = INTERNAL_ROUTE_PREFIXES;
+export const NOINDEX_PREFIXES = NOINDEX_ROUTE_PREFIXES;
 
 function normalize(pathname = "/") {
   const value = String(pathname || "/").split("?")[0].split("#")[0].toLowerCase();
@@ -131,5 +66,3 @@ export const routeSecurityMap = {
   admin: ADMIN_ROUTES,
   internal: INTERNAL_ROUTES,
 };
-
-export { routePath };

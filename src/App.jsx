@@ -19,6 +19,10 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
 import { installGa4 } from "@/lib/ga4";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import {
+  APP_SHELL_PUBLIC_PATHS,
+  LEGACY_REDIRECTS as PUBLIC_ROUTE_REDIRECTS,
+} from "@/lib/publicRouteMetadata";
 import { shouldNoindexRoute } from "@/lib/routeSecurity";
 import { scrollToTop } from "@/lib/scroll";
 
@@ -56,74 +60,12 @@ const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 
-const PUBLIC_PATHS = [
-  "/",
-  "/store",
-  "/order-success",
-  "/med-spa",
-  "/dental",
-  "/hvac",
-  "/roofing",
-  "/contractors",
-  "/chiropractic",
-  "/lead-capture-automation",
-  "/missed-call-text-back",
-  "/ai-lead-follow-up",
-  "/appointment-booking-automation",
-  "/review-automation",
-  "/customer-reactivation",
-  "/start",
-  "/book",
-  "/book-demo",
-  "/industries",
-  "/pricing",
-  "/faq",
-  "/our-system",
-  "/testimonials",
-  "/privacy-policy",
-  "/terms",
-  "/login",
-  "/success",
-  "/legal",
-      "/contact",
-      "/blog",
-  "/about",
-  "/automations",
-  "/leads/capture",
-  "/onboarding",
-  "/setup/preview",
-  // test/preview routes removed
-];
+const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
 const routePath = (...segments) => `/${segments.join("/")}`;
 const dynamicParam = (name) => `:${name}`;
 
-const LEGACY_REDIRECTS = [
-  { from: routePath("Blog"), to: routePath("blog") },
-  { from: routePath("IndustriesPage"), to: routePath("industries") },
-  { from: routePath("IndustryTemplate"), to: routePath("industries") },
-  { from: routePath("Roofing"), to: routePath("roofing") },
-  { from: routePath("HVAC"), to: routePath("hvac") },
-  { from: routePath("Dental"), to: routePath("dental") },
-  { from: routePath("MedSpa"), to: routePath("med-spa") },
-  { from: routePath("Chiropractic"), to: routePath("chiropractic") },
-  { from: routePath("Contractors"), to: routePath("contractors") },
-  { from: routePath("industries", "roofing"), to: routePath("roofing") },
-  { from: routePath("industries", "hvac"), to: routePath("hvac") },
-  { from: routePath("industries", "dental"), to: routePath("dental") },
-  { from: routePath("industries", "med-spa"), to: routePath("med-spa") },
-  { from: routePath("industries", "chiropractic"), to: routePath("chiropractic") },
-  { from: routePath("industries", "contractors"), to: routePath("contractors") },
-  { from: routePath("Dashboard"), to: routePath("admin") },
-  { from: routePath("AdminSettings"), to: routePath("admin") },
-  { from: routePath("AdminLeadDetail"), to: `${routePath("admin")}?tab=leads` },
-  { from: routePath("LeadIntelligence"), to: routePath("admin") },
-  { from: routePath("Sam"), to: routePath("admin") },
-  { from: routePath("MedSpaDashboard"), to: routePath("admin") },
-  { from: routePath("WebsiteSpecPreview"), to: routePath("admin") },
-  { from: routePath("legal", "privacy"), to: routePath("privacy-policy") },
-  { from: routePath("legal", "terms"), to: routePath("terms") },
-];
+const LEGACY_REDIRECTS = PUBLIC_ROUTE_REDIRECTS.map(([from, to]) => ({ from, to }));
 
 const AUTOMATION_SERVICE_ROUTES = [
   routePath("lead-capture-automation"),
