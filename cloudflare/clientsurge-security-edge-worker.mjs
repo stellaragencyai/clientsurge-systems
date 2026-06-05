@@ -1115,7 +1115,7 @@ export const DEMO_BOOKING_MODAL_PATCH_SCRIPT = `<script id="${DEMO_BOOKING_MODAL
     });
   }
   function scan() {
-    var frames = document.querySelectorAll('iframe[title="ClientSurge Systems Demo"],iframe[src*="dQw4w9WgXcQ"],iframe[src*="clientsurge-audit-form"]');
+    var frames = document.querySelectorAll('iframe[title="ClientSurge Systems Demo"],iframe[src*="clientsurge-audit-form"]');
     frames.forEach(function(frame) {
       var wrapper = frame.closest(".relative.w-full.max-w-4xl.z-50") || frame.closest("[class*='max-w-4xl']");
       patchWrapper(wrapper);
