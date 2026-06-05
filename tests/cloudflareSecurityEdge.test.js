@@ -440,6 +440,8 @@ test("Cloudflare static HTML injection patches stale demo booking modal behavior
   assert.match(injected, /document\.referrer/);
   assert.match(injected, /data-clientsurge-book-scheduler/);
   assert.match(injected, /cloudflare_audit_scheduler_fallback/);
+  assert.match(injected, /\[class\*="max-w-4xl"\] iframe/);
+  assert.match(injected, /What happens during the Free Automation Audit/);
   assert.match(injected, /ClientSurge Systems Demo/);
   assert.equal(injectDemoBookingModalPatch(injected), injected);
 });

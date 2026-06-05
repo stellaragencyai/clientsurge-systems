@@ -1215,13 +1215,25 @@ export const DEMO_BOOKING_MODAL_PATCH_SCRIPT = `<script id="${DEMO_BOOKING_MODAL
     target.insertBefore(scheduler, target.firstChild);
     wireForm(scheduler.querySelector("[data-clientsurge-audit-form]"), null);
   }
+  function patchPublicAuditLanguage() {
+    Array.from(document.querySelectorAll("button,a,h1,h2,h3,p,span,li")).forEach(function(node) {
+      if (!node || node.children.length > 0) return;
+      var text = (node.textContent || "").trim();
+      if (!text) return;
+      var nextText = text
+        .replace(/What happens on the demo call\\?/gi, "What happens during the Free Automation Audit?")
+        .replace(/demo call/gi, "Free Automation Audit");
+      if (nextText !== text) node.textContent = nextText;
+    });
+  }
   function scan() {
-    var frames = document.querySelectorAll('iframe[title="ClientSurge Systems Demo"],iframe[src*="clientsurge-audit-form"]');
+    var frames = document.querySelectorAll('iframe[title="ClientSurge Systems Demo"],iframe[src*="clientsurge-audit-form"],.relative.w-full.max-w-4xl.z-50 iframe,[class*="max-w-4xl"] iframe');
     frames.forEach(function(frame) {
       var wrapper = frame.closest(".relative.w-full.max-w-4xl.z-50") || frame.closest("[class*='max-w-4xl']");
       patchWrapper(wrapper);
     });
     patchBookPage();
+    patchPublicAuditLanguage();
   }
   scan();
   var observer = new MutationObserver(scan);
