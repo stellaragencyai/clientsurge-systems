@@ -51,4 +51,7 @@ test("deduplicateLeads entry runs against canonical Leads, not legacy SpaLead", 
   assert.match(entry, /entities\.Leads/);
   assert.doesNotMatch(entry, /entities\.SpaLead/);
   assert.match(entry, /dry_run = true/);
+  assert.doesNotMatch(entry, /entities\.Leads\.delete/);
+  assert.match(entry, /dedupe_status: "merged_duplicate"/);
+  assert.match(entry, /do_not_contact: true/);
 });

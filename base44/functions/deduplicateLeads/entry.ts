@@ -2,7 +2,8 @@ import { secureJson } from "../_shared/response.ts";
 /**
  * deduplicateLeads - #167/#506
  * Runs dedup on canonical Leads records.
- * Merges by phone hash or normalized phone number, keeps highest lead_score, removes duplicates.
+ * Merges by phone hash or normalized phone number and keeps the highest lead_score.
+ * Duplicate rows are marked/suppressed, not deleted, so launch data remains reversible.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
@@ -38,6 +39,7 @@ Deno.serve(async (req) => {
       });
 
       if (!dry_run) {
+        const markedAt = new Date().toISOString();
         let keeperNotes = keeper.notes || "";
         const mergedIds = new Set(keeper.dedupe_merged_ids || []);
         for (const dupe of dupes) {
@@ -51,9 +53,22 @@ Deno.serve(async (req) => {
 
           await base44.asServiceRole.entities.Leads.update(keeper.id, {
             notes: mergedNotes,
+            dedupe_status: "keeper",
             dedupe_merged_ids: [...mergedIds],
           }).catch(() => {});
-          await base44.asServiceRole.entities.Leads.delete(dupe.id).catch(() => {});
+          await base44.asServiceRole.entities.Leads.update(dupe.id, {
+            crm_stage: "Lost",
+            outreach_status: "do_not_contact",
+            do_not_contact: true,
+            dedupe_status: "merged_duplicate",
+            dedupe_duplicate_of: keeper.id,
+            dedupe_group_key: group[0]?.phone_hash ? `hash:${group[0].phone_hash}` : `phone:${group[0]?.phone || ""}`,
+            dedupe_marked_at: markedAt,
+            notes: [
+              dupe.notes || "",
+              `[Deduped ${markedAt}]: non-destructively marked duplicate of ${keeper.id}`,
+            ].filter(Boolean).join("\n"),
+          }).catch(() => {});
           merged++;
         }
       }

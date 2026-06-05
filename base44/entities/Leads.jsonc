@@ -369,6 +369,36 @@
       "type": "string",
       "title": "Deduplication Key"
     },
+    "dedupe_status": {
+      "type": "string",
+      "title": "Deduplication Status",
+      "enum": [
+        "unique",
+        "keeper",
+        "duplicate_candidate",
+        "merged_duplicate",
+        "manual_review"
+      ]
+    },
+    "dedupe_duplicate_of": {
+      "type": "string",
+      "title": "Duplicate Of Lead ID"
+    },
+    "dedupe_group_key": {
+      "type": "string",
+      "title": "Deduplication Group Key"
+    },
+    "dedupe_merged_ids": {
+      "type": "array",
+      "title": "Merged Duplicate Lead IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "dedupe_marked_at": {
+      "type": "string",
+      "title": "Deduplication Marked At"
+    },
     "import_source": {
       "type": "string",
       "title": "Import Source"
