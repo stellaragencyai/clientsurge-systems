@@ -82,35 +82,35 @@ export const STATIC_FALLBACK_PAINT_GUARD_SCRIPT = `<script id="${STATIC_FALLBACK
 
 export const HEADER_TRANSPARENCY_STYLE = `<style id="${HEADER_TRANSPARENCY_STYLE_ID}">
 nav[aria-label="Main navigation"] {
-  background: rgba(255, 255, 255, 0.10) !important;
-  -webkit-backdrop-filter: blur(7px) saturate(1.1) !important;
-  backdrop-filter: blur(7px) saturate(1.1) !important;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.06) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(1.05) !important;
+  backdrop-filter: blur(3px) saturate(1.05) !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.16) !important;
   box-shadow: none !important;
 }
 nav[aria-label="Main navigation"]:has([aria-expanded="true"]) {
-  background: rgba(255, 255, 255, 0.22) !important;
+  background: rgba(255, 255, 255, 0.12) !important;
 }
 nav[aria-label="Main navigation"] [role="menu"][aria-label="Industries"] {
-  background: rgba(255, 255, 255, 0.24) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(1.12) !important;
-  backdrop-filter: blur(8px) saturate(1.12) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(1.05) !important;
+  backdrop-filter: blur(3px) saturate(1.05) !important;
   box-shadow: none !important;
-  border-color: rgba(255, 255, 255, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
 }
 nav[aria-label="Main navigation"] button[aria-label="Open navigation menu"],
 nav[aria-label="Main navigation"] button[aria-label="Close navigation menu"] {
-  background: rgba(255, 255, 255, 0.25) !important;
-  -webkit-backdrop-filter: blur(6px) saturate(1.1) !important;
-  backdrop-filter: blur(6px) saturate(1.1) !important;
+  background: rgba(255, 255, 255, 0.14) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(1.05) !important;
+  backdrop-filter: blur(3px) saturate(1.05) !important;
   box-shadow: none !important;
-  border-color: rgba(255, 255, 255, 0.34) !important;
+  border-color: rgba(255, 255, 255, 0.24) !important;
 }
 nav[aria-label="Main navigation"] > div.xl\\:hidden {
-  background: rgba(255, 255, 255, 0.24) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(1.12) !important;
-  backdrop-filter: blur(8px) saturate(1.12) !important;
-  border-color: rgba(255, 255, 255, 0.25) !important;
+  background: rgba(255, 255, 255, 0.10) !important;
+  -webkit-backdrop-filter: blur(3px) saturate(1.05) !important;
+  backdrop-filter: blur(3px) saturate(1.05) !important;
+  border-color: rgba(255, 255, 255, 0.18) !important;
 }
 </style>`;
 

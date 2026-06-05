@@ -205,10 +205,10 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: scrolled || open ? "rgba(255,255,255,0.22)" : "rgba(255,255,255,0.10)",
-        backdropFilter: "blur(7px) saturate(1.1)",
-        WebkitBackdropFilter: "blur(7px) saturate(1.1)",
-        borderBottom: "1px solid rgba(255,255,255,0.22)",
+        background: scrolled || open ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.06)",
+        backdropFilter: "blur(3px) saturate(1.05)",
+        WebkitBackdropFilter: "blur(3px) saturate(1.05)",
+        borderBottom: "1px solid rgba(255,255,255,0.16)",
         boxShadow: "none",
         overflow: "visible",
       }}>
@@ -318,9 +318,9 @@ export default function Navbar() {
                 role="menu"
                 aria-label="Industries"
                 style={{
-                  background: "rgba(255,255,255,0.24)",
-                  backdropFilter: "blur(8px) saturate(1.12)",
-                  WebkitBackdropFilter: "blur(8px) saturate(1.12)",
+                  background: "rgba(255,255,255,0.10)",
+                  backdropFilter: "blur(3px) saturate(1.05)",
+                  WebkitBackdropFilter: "blur(3px) saturate(1.05)",
                   boxShadow: "none"
                 }}>
                   <div className="grid grid-cols-2 gap-2">
@@ -351,7 +351,7 @@ export default function Navbar() {
               trackCTA("login", "navbar");
               setShowLoginModal(true);
             }}
-            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/30 hover:border-primary/40 bg-background/20 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
+            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
             Login
           </button>
           <button
@@ -370,7 +370,7 @@ export default function Navbar() {
         </div>
 
         <button
-          className="xl:hidden w-10 h-10 rounded-full border bg-background/25 backdrop-blur-sm flex items-center justify-center text-foreground shadow-sm"
+          className="xl:hidden w-10 h-10 rounded-full border bg-background/15 backdrop-blur-[3px] flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
           style={{ borderColor: "rgba(0,136,204,0.22)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
@@ -387,9 +387,9 @@ export default function Navbar() {
           className="xl:hidden border-b border-white/25 px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50"
           style={{
             paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
-            background: "rgba(255,255,255,0.24)",
-            backdropFilter: "blur(8px) saturate(1.12)",
-            WebkitBackdropFilter: "blur(8px) saturate(1.12)",
+            background: "rgba(255,255,255,0.10)",
+            backdropFilter: "blur(3px) saturate(1.05)",
+            WebkitBackdropFilter: "blur(3px) saturate(1.05)",
           }}>
           {sectionLinks.map((link) =>
           link.isPage ?

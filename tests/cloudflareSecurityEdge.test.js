@@ -224,8 +224,9 @@ test("Cloudflare static fallback paint guard is scoped to HTML and idempotent", 
 test("Cloudflare static HTML injection makes the header and nav menus transparent", () => {
   assert.match(HEADER_TRANSPARENCY_STYLE, new RegExp(HEADER_TRANSPARENCY_STYLE_ID));
   assert.match(HEADER_TRANSPARENCY_STYLE, /nav\[aria-label="Main navigation"\]/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /background: rgba\(255, 255, 255, 0\.06\) !important/);
   assert.match(HEADER_TRANSPARENCY_STYLE, /background: rgba\(255, 255, 255, 0\.10\) !important/);
-  assert.match(HEADER_TRANSPARENCY_STYLE, /blur\(7px\) saturate\(1\.1\)/);
+  assert.match(HEADER_TRANSPARENCY_STYLE, /blur\(3px\) saturate\(1\.05\)/);
   assert.match(HEADER_TRANSPARENCY_STYLE, /box-shadow: none !important/);
   assert.match(HEADER_TRANSPARENCY_STYLE, /\[role="menu"\]\[aria-label="Industries"\]/);
   assert.match(HEADER_TRANSPARENCY_STYLE, /Open navigation menu/);
