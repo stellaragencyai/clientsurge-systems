@@ -173,8 +173,8 @@ export default function SetupStatus() {
                 <a href="/client-portal?tab=support" style={{ color: "#7DD3FC", fontSize: 13, fontWeight: 600, textDecoration: "none" }}>
                   Open portal support chat
                 </a>
-                <a href="tel:+16025874608" style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, textDecoration: "none" }}>
-                  Call (602) 587-4608
+                <a href="tel:+16025843227" style={{ color: "rgba(255,255,255,0.85)", fontSize: 13, textDecoration: "none" }}>
+                  Call (602) 584-3227
                 </a>
                 <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 11, margin: 0 }}>
                   If you already have portal access, the support tab is the fastest way to keep the thread attached to your project.

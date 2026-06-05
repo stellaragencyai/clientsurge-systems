@@ -334,7 +334,7 @@ function AssetUploader({ project, onUploaded }) {
         {/* Existing files count */}
         {(project?.files?.length || 0) > 0 && (
           <p style={{ marginTop: "12px", fontSize: "12px", color: "rgba(10,22,40,0.4)", textAlign: "center" }}>
-            {project.files.length} asset{project.files.length !== 1 ? "s" : ""} uploaded total · <a href="#" onClick={e => { e.preventDefault(); }} style={{ color: "#0088CC" }}>view in Files tab</a>
+            {project.files.length} asset{project.files.length !== 1 ? "s" : ""} uploaded total · <button type="button" onClick={() => window.dispatchEvent(new CustomEvent("clientsurge:portal-open-files"))} style={{ color: "#0088CC", background: "none", border: "none", padding: 0, font: "inherit", cursor: "pointer" }}>view in Files tab</button>
           </p>
         )}
       </div>

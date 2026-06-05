@@ -459,7 +459,7 @@ export default function CartSidebar() {
                   />
                   <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.62)", lineHeight: 1.5 }}>
                     I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
-                    <a href="/privacy-policy" target="_blank" style={{ color: "#005f99", fontWeight: "600" }}>Privacy Policy</a>
+                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: "#005f99", fontWeight: "600" }}>Privacy Policy</a>
                   </span>
                 </label>
               )}
@@ -634,7 +634,7 @@ export default function CartSidebar() {
               }}
             >
               Secured by Stripe · Cancel anytime ·{" "}
-              <a href="/terms" target="_blank" style={{ color: "rgba(10,22,40,0.48)", textDecoration: "underline" }}>
+              <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(10,22,40,0.48)", textDecoration: "underline" }}>
                 Refund Policy
               </a>
             </p>

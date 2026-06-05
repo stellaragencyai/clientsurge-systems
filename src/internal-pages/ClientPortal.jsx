@@ -116,6 +116,12 @@ export default function ClientPortal() {
     init();
   }, []);
 
+  useEffect(() => {
+    const openFilesTab = () => setActiveTab("files");
+    window.addEventListener("clientsurge:portal-open-files", openFilesTab);
+    return () => window.removeEventListener("clientsurge:portal-open-files", openFilesTab);
+  }, []);
+
   const refreshProject = async () => {
     if (!user) return;
     try {
