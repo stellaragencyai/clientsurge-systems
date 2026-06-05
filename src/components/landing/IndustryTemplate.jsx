@@ -13,6 +13,7 @@ import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
 import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import { forceScrollToTop } from "@/lib/scroll";
 import { buildIndustryJsonLd } from "@/utils/industryJsonLd";
 
 const INDUSTRY_SEO = {
@@ -128,6 +129,8 @@ function IndustryTemplateInner({ industrySlug }) {
   const theme = INDUSTRY_THEME[industrySlug] || INDUSTRY_THEME.default;
   const demoBooking = useDemoBooking();
   const notFound = !industry;
+
+  useEffect(() => forceScrollToTop(), [industrySlug]);
 
   useEffect(() => {
     if (!industry) return;

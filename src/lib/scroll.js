@@ -39,5 +39,28 @@ export function scrollToSection(hash, delay = 0) {
  * Scroll to the top of the page instantly (for route changes).
  */
 export function scrollToTop() {
-  window.scrollTo({ top: 0, left: 0, behavior: "instant" });
+  window.scrollTo({ top: 0, left: 0, behavior: "auto" });
+  document.documentElement.scrollTop = 0;
+  document.body.scrollTop = 0;
+}
+
+/**
+ * Re-assert the top position across the browser's route/layout settling window.
+ * Returns a cleanup function for React effects.
+ */
+export function forceScrollToTop({ delays = [0, 50, 150, 350, 700] } = {}) {
+  if (typeof window === "undefined" || typeof document === "undefined") {
+    return () => {};
+  }
+
+  const run = () => scrollToTop();
+  run();
+
+  const frameId = window.requestAnimationFrame(run);
+  const timers = delays.map((delay) => window.setTimeout(run, delay));
+
+  return () => {
+    window.cancelAnimationFrame(frameId);
+    timers.forEach((timerId) => window.clearTimeout(timerId));
+  };
 }

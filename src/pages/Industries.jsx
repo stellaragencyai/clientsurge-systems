@@ -15,7 +15,7 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
-import { scrollToTop } from "@/lib/scroll";
+import { forceScrollToTop } from "@/lib/scroll";
 
 const industries = [
 {
@@ -97,7 +97,7 @@ export default function Industries() {
 
   const handleIndustryNavigation = (event, href) => {
     event.preventDefault();
-    scrollToTop();
+    forceScrollToTop();
     window.location.assign(href);
   };
 

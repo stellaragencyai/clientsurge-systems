@@ -6,7 +6,7 @@
  */
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
-import { scrollToTop } from "@/lib/scroll";
+import { forceScrollToTop } from "@/lib/scroll";
 
 const INDUSTRIES = [
   {
@@ -82,7 +82,7 @@ export function IndustriesHero() {
 export function IndustriesGrid() {
   const navigate = useNavigate();
   const handleIndustryNavigation = (route) => {
-    scrollToTop();
+    forceScrollToTop();
     navigate(route);
   };
   return (

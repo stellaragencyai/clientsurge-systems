@@ -24,7 +24,7 @@ import {
   LEGACY_REDIRECTS as PUBLIC_ROUTE_REDIRECTS,
 } from "@/lib/publicRouteMetadata";
 import { shouldNoindexRoute } from "@/lib/routeSecurity";
-import { scrollToTop } from "@/lib/scroll";
+import { forceScrollToTop } from "@/lib/scroll";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -116,9 +116,9 @@ function ScrollToTop() {
   useEffect(() => {
     // Don't scroll to top if navigating to a hash anchor
     if (!location.hash) {
-      scrollToTop();
+      return forceScrollToTop();
     }
-  }, [location.pathname]);
+  }, [location.hash, location.key, location.pathname]);
   return null;
 }
 
