@@ -1,6 +1,7 @@
 import { TRUST_SECURITY_WEBP_BASE64 } from "./trust-security-assets.mjs";
 import { buildRobotsTxt, buildSitemapXml } from "../src/lib/siteDocuments.js";
 import {
+  NOINDEX_ROUTE_PREFIXES,
   PUBLIC_ROUTE_METADATA,
   STATIC_ROUTE_ALIASES,
 } from "../src/lib/publicRouteMetadata.js";
@@ -956,6 +957,14 @@ export function isPrivateRoutePath(pathname) {
   return PRIVATE_ROUTE_PATTERNS.some((pattern) => pattern.test(normalized));
 }
 
+export function isNoindexRoutePath(pathname) {
+  const normalized = normalizePathnameLower(pathname);
+  return NOINDEX_ROUTE_PREFIXES.some((prefix) => {
+    const routePrefix = normalizePathnameLower(prefix);
+    return normalized === routePrefix || normalized.startsWith(`${routePrefix}/`);
+  });
+}
+
 export function isSensitivePath(pathname) {
   return isPrivateRoutePath(pathname);
 }
@@ -969,6 +978,10 @@ export function applySecurityHeaders(headers, pathname) {
     for (const [name, value] of Object.entries(SENSITIVE_HEADERS)) {
       headers.set(name, value);
     }
+  } else if (isNoindexRoutePath(pathname)) {
+    headers.set("X-Robots-Tag", "noindex, nofollow");
+  } else {
+    headers.delete("X-Robots-Tag");
   }
 
   return headers;

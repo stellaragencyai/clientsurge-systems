@@ -26,6 +26,7 @@ import worker, {
   HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID,
   injectHomepageMotion,
   isAnonymousUserMeRequest,
+  isNoindexRoutePath,
   isSensitivePath,
   isPrivateRoutePath,
   originRequestFor,
@@ -75,6 +76,14 @@ test("Cloudflare security edge worker identifies sensitive app routes", () => {
   for (const path of ["/", "/store", "/book", "/contact", "/roofing", "/login", "/start"]) {
     assert.equal(isSensitivePath(path), false, `${path} should stay public`);
   }
+
+  for (const path of ["/login", "/order-success", "/success", "/thank-you"]) {
+    assert.equal(isNoindexRoutePath(path), true, `${path} should be noindex`);
+  }
+
+  for (const path of ["/", "/store", "/book", "/contact", "/roofing", "/start"]) {
+    assert.equal(isNoindexRoutePath(path), false, `${path} should be indexable`);
+  }
 });
 
 test("Cloudflare security edge worker blocks private route aliases before Base44", async () => {
@@ -119,10 +128,14 @@ test("Cloudflare security edge worker applies required public and sensitive head
   );
   assert.ok(publicHeaders.get("permissions-policy"));
   assert.ok(publicHeaders.get("cross-origin-opener-policy"));
+  assert.equal(publicHeaders.get("x-robots-tag"), null);
 
   const sensitiveHeaders = applySecurityHeaders(new Headers(), "/client-portal");
   assert.match(sensitiveHeaders.get("x-robots-tag") || "", /noindex/);
   assert.match(sensitiveHeaders.get("cache-control") || "", /no-store/);
+
+  const loginHeaders = applySecurityHeaders(new Headers(), "/login");
+  assert.equal(loginHeaders.get("x-robots-tag"), "noindex, nofollow");
 });
 
 test("Cloudflare security edge worker serves canonical security.txt at the edge", async () => {
