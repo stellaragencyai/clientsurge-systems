@@ -72,11 +72,27 @@ test("launch blog articles have routes, sitemap entries, and schema hooks", () =
 });
 
 test("sitemap prioritizes canonical public marketing pages", () => {
-  for (const route of ["/automations", "/industries", "/roofing", "/hvac", "/dental", "/med-spa", "/chiropractic", "/contractors", "/book", "/contact", "/blog", "/privacy-policy"]) {
+  for (const route of [
+    "/start",
+    "/store",
+    "/automations",
+    "/industries",
+    "/roofing",
+    "/hvac",
+    "/dental",
+    "/med-spa",
+    "/chiropractic",
+    "/contractors",
+    "/book",
+    "/contact",
+    "/blog",
+    "/privacy-policy",
+    "/terms",
+  ]) {
     assert.match(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
   }
   for (const route of getAutomationRoutes()) {
-    assert.doesNotMatch(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
+    assert.match(sitemap, new RegExp(`https://clientsurgesystems\\.com${route}`));
   }
 });
 
