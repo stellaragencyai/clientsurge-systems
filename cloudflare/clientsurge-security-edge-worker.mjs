@@ -1,4 +1,5 @@
 import { TRUST_SECURITY_WEBP_BASE64 } from "./trust-security-assets.mjs";
+import { buildRobotsTxt, buildSitemapXml } from "../src/lib/siteDocuments.js";
 
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
@@ -1063,6 +1064,22 @@ function edgeHealthResponse() {
   }), { status: 200, headers });
 }
 
+function robotsTxtResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "text/plain; charset=utf-8",
+    "Cache-Control": "public, max-age=3600",
+  }), "/robots.txt");
+  return new Response(buildRobotsTxt(), { status: 200, headers });
+}
+
+function sitemapXmlResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "application/xml; charset=utf-8",
+    "Cache-Control": "public, max-age=3600",
+  }), "/sitemap.xml");
+  return new Response(buildSitemapXml(), { status: 200, headers });
+}
+
 function serviceWorkerResponse() {
   const headers = applySecurityHeaders(new Headers({
     "Content-Type": "text/javascript; charset=utf-8",
@@ -1117,6 +1134,14 @@ export default {
 
     if (url.pathname === "/.well-known/security.txt") {
       return securityTxtResponse();
+    }
+
+    if (url.pathname === "/robots.txt") {
+      return robotsTxtResponse();
+    }
+
+    if (url.pathname === "/sitemap.xml") {
+      return sitemapXmlResponse();
     }
 
     if (url.pathname === EDGE_HEALTH_PATH) {
