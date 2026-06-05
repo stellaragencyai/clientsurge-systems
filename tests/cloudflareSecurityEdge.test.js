@@ -429,8 +429,17 @@ test("Cloudflare static HTML injection patches stale demo booking modal behavior
   const injected = injectDemoBookingModalPatch(html);
 
   assert.match(injected, new RegExp(DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID));
-  assert.match(injected, /submitContactInquiry/);
-  assert.match(injected, /Request your free audit/);
+  assert.match(injected, /scheduleDemoBooking/);
+  assert.doesNotMatch(injected, /submitContactInquiry/);
+  assert.match(injected, /Book your Free Automation Audit/);
+  assert.match(injected, /scheduled_date/);
+  assert.match(injected, /scheduled_time/);
+  assert.match(injected, /consent_given/);
+  assert.match(injected, /source_page/);
+  assert.match(injected, /utm_campaign/);
+  assert.match(injected, /document\.referrer/);
+  assert.match(injected, /data-clientsurge-book-scheduler/);
+  assert.match(injected, /cloudflare_audit_scheduler_fallback/);
   assert.match(injected, /ClientSurge Systems Demo/);
   assert.equal(injectDemoBookingModalPatch(injected), injected);
 });
