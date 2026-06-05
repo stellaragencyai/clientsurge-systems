@@ -92,7 +92,7 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
               <ArrowRight style={{ width: "18px", height: "18px" }} />
             </span>
           </button>
-          <p className="text-xs text-muted-foreground mt-3">Free demo - Month-to-month after setup - Launch timing depends on onboarding and provider access</p>
+          <p className="text-xs text-muted-foreground mt-3">Free audit - Month-to-month after setup - Launch timing depends on onboarding and provider access</p>
         </div>
       </div>
     </section>

@@ -2,10 +2,18 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
+function labelForIndustry(industrySlug = '', industry = '') {
+  const combined = `${industrySlug} ${industry}`.toLowerCase();
+  if (combined.includes('dental') || combined.includes('orthodont')) return 'Dental Automation Audit';
+  if (combined.includes('roof')) return 'Roofing Automation Audit';
+  if (combined.includes('hvac')) return 'HVAC Automation Audit';
+  return 'Free Automation Audit';
+}
+
 Deno.serve(async (req) => {
   try {
     createClientFromRequest(req);
-    const { full_name, business_name, email, phone, scheduled_date, scheduled_time, biggest_issue, industry } = await req.json();
+    const { full_name, business_name, email, phone, scheduled_date, scheduled_time, biggest_issue, industry, industry_slug, industry_tags, source_page, business_website_url } = await req.json();
 
     if (!full_name || !email || !scheduled_date || !scheduled_time) {
       return secureJson({ error: 'Missing required fields' }, { status: 400 });
@@ -28,12 +36,14 @@ Deno.serve(async (req) => {
     const [hour, minute] = scheduled_time.split(':');
     const h = parseInt(hour, 10);
     const formattedTime = `${h > 12 ? h - 12 : h}:${minute} ${h >= 12 ? 'PM' : 'AM'}`;
+    const auditLabel = labelForIndustry(industry_slug, industry);
+    const industryTagsText = Array.isArray(industry_tags) ? industry_tags.filter(Boolean).join(', ') : '';
 
     const emailBody = `<!DOCTYPE html>
 <html>
 <body style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; color: #333;">
   <div style="background: #1a1510; padding: 24px; border-radius: 12px 12px 0 0; text-align: center;">
-    <h1 style="color: #c8965c; margin: 0; font-size: 22px;">New Demo Booked</h1>
+    <h1 style="color: #c8965c; margin: 0; font-size: 22px;">New ${auditLabel} Booked</h1>
   </div>
   <div style="background: #fff; padding: 32px; border: 1px solid #e5e7eb; border-top: none; border-radius: 0 0 12px 12px;">
     <div style="background: #fdf8f0; border-left: 4px solid #c8965c; padding: 16px; margin-bottom: 24px; border-radius: 4px;">
@@ -46,6 +56,10 @@ Deno.serve(async (req) => {
       <tr><td style="padding: 6px 0; color: #666;">Email</td><td style="padding: 6px 0;"><a href="mailto:${email}">${email}</a></td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Phone</td><td style="padding: 6px 0;"><a href="tel:${phone}">${phone || 'Not provided'}</a></td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Industry</td><td style="padding: 6px 0;">${industry || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">CRM Tag</td><td style="padding: 6px 0;">${industry_slug || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">Industry Tags</td><td style="padding: 6px 0;">${industryTagsText || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">Website</td><td style="padding: 6px 0;">${business_website_url || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">Source Page</td><td style="padding: 6px 0;">${source_page || 'Not provided'}</td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Challenge</td><td style="padding: 6px 0;">${biggest_issue || 'Not provided'}</td></tr>
     </table>
     <p style="margin-top: 24px; font-size: 13px; color: #888;">Add this to your calendar and prepare for their specific challenge.</p>
@@ -62,7 +76,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: 'ClientSurge Systems <system@clientsurgesystems.com>',
         to: [adminEmail],
-        subject: `New Demo: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
+        subject: `New ${auditLabel}: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
         html: emailBody,
       }),
     });

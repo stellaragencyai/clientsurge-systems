@@ -27,7 +27,7 @@ Deno.serve(async (req) => {
     } catch (_) {}
 
     const firstName = (full_name || 'there').split(' ')[0];
-    const message = `Hi ${firstName}! ✅ Your ClientSurge demo is confirmed for ${friendlyDate} at ${scheduled_time} (AZ time). Nolan will call you directly at this number — keep it handy! Questions before then? Just reply here. Reply STOP to opt out.`;
+    const message = `Hi ${firstName}! Your ClientSurge Free Automation Audit is confirmed for ${friendlyDate} at ${scheduled_time} (AZ time). Nolan will call you directly at this number. Questions before then? Just reply here. Reply STOP to opt out.`;
 
     const response = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',

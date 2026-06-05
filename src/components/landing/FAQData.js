@@ -35,13 +35,13 @@ export const FAQ_ITEMS = [
     category: "pricing",
   },
   {
-    q: "What happens on the demo call?",
+    q: "What happens during the Free Automation Audit?",
     a: "We spend 30 minutes understanding your business, your lead volume, and where bookings may be leaking. Then we show the system we would build, the assumptions behind it, and the proof steps needed before go-live.",
     category: "integration",
   },
   {
     q: "Will this actually work for my specific business?",
-    a: "If you generate leads but lose conversions due to slow follow-up, the system is likely relevant. We specialize in appointment-based industries and tailor every setup to your actual lead flow. On your demo call, we identify the gaps and tell you upfront if the fit is weak.",
+    a: "If you generate leads but lose conversions due to slow follow-up, the system is likely relevant. We specialize in appointment-based industries and tailor every setup to your actual lead flow. During your audit, we identify the gaps and tell you upfront if the fit is weak.",
     category: "integration",
   },
   {
@@ -56,7 +56,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "Can you integrate this with my current booking system?",
-    a: "Usually, yes. We review your current booking and follow-up tools during the demo, confirm what can be connected cleanly, and recommend the simplest setup path for your business.",
+    a: "Usually, yes. We review your current booking and follow-up tools during the audit, confirm what can be connected cleanly, and recommend the simplest setup path for your business.",
     category: "integration",
   },
   {

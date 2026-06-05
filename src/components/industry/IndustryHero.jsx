@@ -12,7 +12,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
     quality: 80,
   });
   const heroSub = sub || subheadline;
-  const primaryCta = ctaLabel || cta || "Book Your Free Demo";
+  const primaryCta = ctaLabel || cta || "Book Your Free Audit";
 
   return (
     <section className="relative overflow-hidden" style={{ minHeight: "min(760px, 86svh)", display: "flex", alignItems: "center" }}>
