@@ -26,6 +26,8 @@ function parseArgs(argv) {
     profileDir: resolve(repoRoot, ".base44-publish-profile"),
     timeoutMs: 120000,
     verifyUrl: "",
+    verifyWaitMs: 90000,
+    verifyPollMs: 5000,
     showBrowser: false,
     dryRun: false,
     summary: false,
@@ -37,6 +39,8 @@ function parseArgs(argv) {
     else if (arg === "--profile-dir") args.profileDir = resolve(argv[++i] || args.profileDir);
     else if (arg === "--timeout-ms") args.timeoutMs = Number(argv[++i] || args.timeoutMs);
     else if (arg === "--verify-url") args.verifyUrl = argv[++i] || "";
+    else if (arg === "--verify-wait-ms") args.verifyWaitMs = Number(argv[++i] || args.verifyWaitMs);
+    else if (arg === "--verify-poll-ms") args.verifyPollMs = Number(argv[++i] || args.verifyPollMs);
     else if (arg === "--show-browser") args.showBrowser = true;
     else if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--summary") args.summary = true;
@@ -58,6 +62,8 @@ Options:
   --profile-dir DIR   Persistent browser profile with Base44 login cookies.
   --timeout-ms MS     Navigation timeout.
   --verify-url URL    Live URL to fetch after deploy.
+  --verify-wait-ms MS How long to poll for the live signal to change after deploy.
+  --verify-poll-ms MS Poll interval while waiting for the live signal to change.
   --show-browser      Open a visible browser, useful for first-time login.
   --summary           Print a compact JSON result without the full app payload.
   --dry-run           Verify auth and print the deploy endpoint without POSTing.`);
@@ -161,6 +167,63 @@ function buildSummary({ ok, appId, beforeSignal, deployResult, afterSignal }) {
   };
 }
 
+function signalsMatch(beforeSignal, afterSignal) {
+  if (!beforeSignal || !afterSignal) return false;
+  return (
+    beforeSignal.asset === afterSignal.asset &&
+    beforeSignal.hasProductionAppId === afterSignal.hasProductionAppId &&
+    beforeSignal.hasDonorAppId === afterSignal.hasDonorAppId
+  );
+}
+
+async function waitForLiveSignalChange({
+  verifyUrl,
+  beforeSignal,
+  waitMs,
+  pollMs,
+}) {
+  if (!verifyUrl) {
+    return {
+      changed: false,
+      attempts: 0,
+      elapsedMs: 0,
+      finalSignal: null,
+      reason: "verify_url_missing",
+    };
+  }
+
+  const startedAt = Date.now();
+  let attempts = 0;
+  let finalSignal = null;
+
+  do {
+    if (attempts > 0) {
+      await new Promise((resolvePromise) => setTimeout(resolvePromise, pollMs));
+    }
+
+    attempts += 1;
+    finalSignal = await fetchLiveSignal(verifyUrl);
+
+    if (!signalsMatch(beforeSignal, finalSignal)) {
+      return {
+        changed: true,
+        attempts,
+        elapsedMs: Date.now() - startedAt,
+        finalSignal,
+        reason: "signal_changed",
+      };
+    }
+  } while (Date.now() - startedAt < waitMs);
+
+  return {
+    changed: false,
+    attempts,
+    elapsedMs: Date.now() - startedAt,
+    finalSignal,
+    reason: "timeout_waiting_for_signal_change",
+  };
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const appId = args.appId || readBase44AppId();
@@ -180,9 +243,21 @@ async function main() {
 
   const cliDeployResult = await postDeployWithBearer(appId, cliAccessToken);
   if (cliDeployResult?.ok) {
-    await new Promise((resolvePromise) => setTimeout(resolvePromise, 5000));
-    const afterSignal = await fetchLiveSignal(args.verifyUrl);
-    const result = { ok: true, appId, beforeSignal, deployResult: cliDeployResult, afterSignal };
+    const verification = await waitForLiveSignalChange({
+      verifyUrl: args.verifyUrl,
+      beforeSignal,
+      waitMs: args.verifyWaitMs,
+      pollMs: args.verifyPollMs,
+    });
+    const afterSignal = verification.finalSignal;
+    const result = {
+      ok: true,
+      appId,
+      beforeSignal,
+      deployResult: cliDeployResult,
+      verification,
+      afterSignal,
+    };
     console.log(JSON.stringify(args.summary ? buildSummary(result) : result, null, 2));
     return;
   }
@@ -225,9 +300,14 @@ async function main() {
       throw new Error(`Base44 deploy endpoint failed with HTTP ${deployResult.status}: ${JSON.stringify(deployResult.body)}`);
     }
 
-    await page.waitForTimeout(5000);
-    const afterSignal = await fetchLiveSignal(args.verifyUrl);
-    const result = { ok: true, appId, beforeSignal, deployResult, afterSignal };
+    const verification = await waitForLiveSignalChange({
+      verifyUrl: args.verifyUrl,
+      beforeSignal,
+      waitMs: args.verifyWaitMs,
+      pollMs: args.verifyPollMs,
+    });
+    const afterSignal = verification.finalSignal;
+    const result = { ok: true, appId, beforeSignal, deployResult, verification, afterSignal };
     console.log(JSON.stringify(args.summary ? buildSummary(result) : result, null, 2));
   } finally {
     await context.close();
