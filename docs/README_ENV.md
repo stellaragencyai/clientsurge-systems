@@ -9,8 +9,10 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 
 | Variable | Used By | Description |
 |---|---|---|
-| `STRIPE_SECRET_KEY` | Stripe checkout, billing, customer portal | Live server-side Stripe key (`sk_live_...`). |
-| `STRIPE_LIVE_SECRET_KEY` | Stripe live override paths | Optional explicit live key; keep server-side only. |
+| `STRIPE_MODE` | Stripe checkout, billing, customer portal, health checks | Required explicit mode: `live` for launch, `test` for staging/local. |
+| `STRIPE_LIVE_SECRET_KEY` | Stripe live checkout, billing, customer portal | Required live server-side Stripe key (`sk_live_...`) when `STRIPE_MODE=live`; keep server-side only. |
+| `STRIPE_TEST_SECRET_KEY` | Stripe test checkout, billing, customer portal | Preferred test server-side key (`sk_test_...`) when `STRIPE_MODE=test`. |
+| `STRIPE_SECRET_KEY` | Legacy/local Stripe fallback | Supported only as a local/test fallback. Do not rely on this for production live mode. |
 | `STRIPE_PUBLISHABLE_KEY` | Stripe frontend checkout | Matching public Stripe key (`pk_live_...`). |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook handlers | Canonical webhook signing secret (`whsec_...`). |
 | `RESEND_API_KEY` | Email functions and health checks | Resend API key (`re_...`). |

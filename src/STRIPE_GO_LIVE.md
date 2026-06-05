@@ -36,10 +36,14 @@ Those wrappers still exist for compatibility, but Stripe should not actively del
 - [ ] All product prices created in live Stripe
 - [ ] Stripe account identity verification complete
 - [ ] Bank account connected and verified
+- [ ] Payout schedule confirmed
+- [ ] Statement descriptor confirmed
 - [ ] Business address and tax info set in Stripe Dashboard
-- [ ] `STRIPE_SECRET_KEY` is live
-- [ ] `STRIPE_PUBLISHABLE_KEY` is live
-- [ ] `STRIPE_WEBHOOK_SECRET` matches the canonical endpoint only
+- [ ] `STRIPE_MODE=live`
+- [ ] `STRIPE_LIVE_SECRET_KEY` is set and starts with `sk_live_`
+- [ ] `STRIPE_PUBLISHABLE_KEY` is live and matches the live Stripe account
+- [ ] `STRIPE_WEBHOOK_SECRET` matches the canonical live endpoint only
+- [ ] `STRIPE_TEST_SECRET_KEY` and `STRIPE_TEST_WEBHOOK_SECRET` are staging/test only
 
 ## End-to-End Test Required Before Real Payments
 

@@ -1,11 +1,10 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import Stripe from 'npm:stripe@14.21.0';
 import { resolveClientPortalAccess } from '../_shared/portalOwnership.js';
-
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', { apiVersion: '2024-06-20' });
+import { getStripeClient, safeStripeError } from "../_shared/stripeInit.js";
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
   try {
     if (req.method !== 'POST') {
       return secureJson({ error: 'Method not allowed' }, { status: 405 });
@@ -52,6 +51,22 @@ Deno.serve(async (req) => {
       return secureJson({ error: 'This invoice is not linked to Stripe yet.' }, { status: 409 });
     }
 
+    let stripe;
+    try {
+      ({ stripe } = getStripeClient());
+    } catch (error) {
+      const safeError = safeStripeError(error);
+      console.error('[createInvoicePaymentLink] Stripe is not configured', {
+        requestId,
+        invoice_id,
+        code: safeError.code,
+      });
+      return secureJson(
+        { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+        { status: safeError.status }
+      );
+    }
+
     // Always re-fetch from Stripe to avoid stale/expired cached links
     const stripeInvoice = await stripe.invoices.retrieve(invoice.stripe_invoice_id);
     const paymentLink = stripeInvoice.hosted_invoice_url || stripeInvoice.invoice_pdf || null;
@@ -69,9 +84,18 @@ Deno.serve(async (req) => {
       payment_link: paymentLink,
       invoice_id,
       amount: invoice.amount_outstanding || invoice.amount,
+      request_id: requestId,
     });
   } catch (error) {
-    console.error('[createInvoicePaymentLink] Error creating payment link:', error);
-    return secureJson({ error: error.message }, { status: 500 });
+    const safeError = safeStripeError(error, 'Unable to create an invoice payment link. Please contact support.');
+    console.error('[createInvoicePaymentLink] Error creating payment link', {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

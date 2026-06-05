@@ -1,10 +1,9 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import Stripe from 'npm:stripe@14.21.0';
-
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), { apiVersion: '2023-10-16' });
+import { getStripeClient, safeStripeError } from "../_shared/stripeInit.js";
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -25,14 +24,37 @@ Deno.serve(async (req) => {
       return secureJson({ error: 'No Stripe customer found. Please contact support.' }, { status: 404 });
     }
 
+    let stripe;
+    try {
+      ({ stripe } = getStripeClient());
+    } catch (error) {
+      const safeError = safeStripeError(error);
+      console.error('[getStripeCustomerPortalUrl] Stripe is not configured', {
+        requestId,
+        code: safeError.code,
+      });
+      return secureJson(
+        { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+        { status: safeError.status }
+      );
+    }
+
     const session = await stripe.billingPortal.sessions.create({
       customer: stripeCustomerId,
       return_url: return_url || 'https://app.base44.com',
     });
 
-    return secureJson({ url: session.url });
+    return secureJson({ url: session.url, request_id: requestId });
   } catch (error) {
-    console.error('[getStripeCustomerPortalUrl] Stripe portal error:', error);
-    return secureJson({ error: error.message }, { status: 500 });
+    const safeError = safeStripeError(error, 'Unable to open the billing portal. Please contact support.');
+    console.error('[getStripeCustomerPortalUrl] Stripe portal error', {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

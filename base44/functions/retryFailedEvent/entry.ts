@@ -10,8 +10,10 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
+import { getStripeSecretKey, safeStripeError } from "../_shared/stripeInit.js";
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -109,14 +111,27 @@ Deno.serve(async (req) => {
     // --- Stripe event re-invoke (via stripeWebhookOrders) ---
     else if (evt.provider === 'stripe') {
       // Re-fetch the Stripe event and re-process
-      const STRIPE_KEY = Deno.env.get('STRIPE_SECRET_KEY');
-      if (!STRIPE_KEY) return secureJson({ error: 'STRIPE_SECRET_KEY not configured' }, { status: 500 });
+      let stripeKey;
+      try {
+        stripeKey = getStripeSecretKey();
+      } catch (error) {
+        const safeError = safeStripeError(error);
+        console.error('[retryFailedEvent] Stripe is not configured', {
+          requestId,
+          event_id,
+          code: safeError.code,
+        });
+        return secureJson(
+          { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+          { status: safeError.status }
+        );
+      }
 
       const stripeEventId = evt.provider_message_id;
       if (!stripeEventId) return secureJson({ error: 'No Stripe event ID stored — cannot retry' }, { status: 400 });
 
       const stripeRes = await stripeFetch(`https://api.stripe.com/v1/events/${stripeEventId}`, {
-        headers: { 'Authorization': `Bearer ${STRIPE_KEY}` },
+        headers: { 'Authorization': `Bearer ${stripeKey}` },
       });
       if (!stripeRes.ok) {
         const err = await stripeRes.json();
@@ -149,7 +164,15 @@ Deno.serve(async (req) => {
     return secureJson({ success: true, result: retryResult });
 
   } catch (error) {
-    console.error('[retryFailedEvent] Error:', error);
-    return secureJson({ error: error.message }, { status: 500 });
+    const safeError = safeStripeError(error, 'Unable to retry this event. Please contact support.');
+    console.error('[retryFailedEvent] Error', {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

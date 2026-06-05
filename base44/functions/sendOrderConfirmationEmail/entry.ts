@@ -45,7 +45,8 @@ Deno.serve(async (req) => {
       return secureJson({ error: "RESEND_API_KEY missing" }, { status: 500 });
     }
     const from = formatFromAddress(Deno.env.get("RESEND_FROM_EMAIL"));
-    const replyTo = Deno.env.get("ADMIN_EMAIL") || "system@clientsurgesystems.com";
+    const supportEmail = Deno.env.get("RESEND_REPLY_TO_SUPPORT") || Deno.env.get("SUPPORT_EMAIL") || "support@clientsurgesystems.com";
+    const replyTo = Deno.env.get("ADMIN_EMAIL") || supportEmail;
 
     const customerEmail = order.customer_email || "";
     if (!customerEmail) {
@@ -96,7 +97,7 @@ Deno.serve(async (req) => {
       "",
       `Open Client Portal: ${portalUrl}`,
       "",
-      "Questions? Reply to this email and our team will help.",
+      `Questions? Reply to this email or contact ${supportEmail} and our team will help.`,
     ].join("\n");
 
     const html = `
@@ -118,7 +119,7 @@ Deno.serve(async (req) => {
           <p style="margin:0 0 8px;font-size:14px;line-height:1.6;color:#1E3A8A;">Your order has been recorded and linked into our install workflow. You'll receive your portal access and setup guidance as that workflow progresses.</p>
           <a href="${portalUrl}" style="display:inline-block;margin-top:8px;background:#0F172A;color:#FFFFFF;padding:12px 20px;border-radius:999px;text-decoration:none;font-weight:700;font-size:14px;">Open Client Portal</a>
         </div>
-        <p style="margin:0;font-size:13px;line-height:1.6;color:#64748B;">Questions? Reply to this email and our team will help.</p>
+        <p style="margin:0;font-size:13px;line-height:1.6;color:#64748B;">Questions? Reply to this email or contact <a href="mailto:${supportEmail}" style="color:#0369A1;text-decoration:none;font-weight:700;">${supportEmail}</a> and our team will help.</p>
       </div>
     `;
 
@@ -142,10 +143,9 @@ Deno.serve(async (req) => {
       const body = await response.text();
       console.error("[sendOrderConfirmationEmail] Resend request failed", {
         status: response.status,
-        body,
         from,
         reply_to: replyTo,
-        to: customerEmail,
+        order_id,
       });
       throw new Error(`Resend request failed: ${response.status} ${body}`);
     }

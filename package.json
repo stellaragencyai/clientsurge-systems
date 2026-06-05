@@ -8,7 +8,7 @@
     "build": "vite build",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
-    "test": "npm run test:node && npm run test:deno",
+    "test": "node scripts/run-tests.mjs",
     "test:node": "node --test",
     "test:deno": "deno test --allow-env --no-check base44/functions/__tests__/*.deno.ts",
     "release:base44": "pwsh -File scripts/release-base44.ps1",
@@ -50,6 +50,7 @@
     "load-test:leads": "node scripts/load-test-lead-submissions.mjs",
     "verify:lead-load": "node scripts/load-test-lead-submissions.mjs --self-test",
     "verify:admin-load": "node scripts/verify-admin-load-budget.mjs",
+    "email:safe-test": "node scripts/email/safe-email-test-harness.mjs",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
   },

@@ -9,8 +9,10 @@ Never commit real secret values to source control.
 
 | Variable | Description | Notes |
 |---|---|---|
-| `STRIPE_SECRET_KEY` | Server-side Stripe secret key. | Use `sk_live_...` in production and `sk_test_...` only in staging/local. |
-| `STRIPE_LIVE_SECRET_KEY` | Optional explicit live Stripe key override. | Some billing paths prefer this before `STRIPE_SECRET_KEY`. |
+| `STRIPE_MODE` | Explicit Stripe runtime mode. | Required in production. Use `live` for launch; use `test` for staging/local. |
+| `STRIPE_LIVE_SECRET_KEY` | Live server-side Stripe secret key. | Required when `STRIPE_MODE=live`; must start with `sk_live_...`. |
+| `STRIPE_TEST_SECRET_KEY` | Test server-side Stripe secret key. | Preferred when `STRIPE_MODE=test`; must not be a live key. |
+| `STRIPE_SECRET_KEY` | Legacy/test fallback server-side Stripe secret key. | Supported for local/test fallback only. Do not rely on this for production live mode. |
 | `STRIPE_PUBLISHABLE_KEY` | Client-side Stripe publishable key. | Use the matching `pk_live_...` or `pk_test_...` key for the environment. |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret. | Required for the canonical Stripe webhook endpoint. |
 | `RESEND_API_KEY` | Resend API key. | Required for email sends and email health checks. |
@@ -96,7 +98,7 @@ These are for local scripts and should not be required in Base44 production unle
 
 ## Switching To Live Mode
 
-1. Set Stripe live keys: `STRIPE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET`.
+1. Set `STRIPE_MODE=live`, `STRIPE_LIVE_SECRET_KEY`, `STRIPE_PUBLISHABLE_KEY`, and `STRIPE_WEBHOOK_SECRET`.
 2. Confirm `APP_URL=https://clientsurgesystems.com`.
 3. Confirm Resend domain authentication and `RESEND_FROM_EMAIL`.
 4. Confirm Twilio number ownership, SMS webhook URLs, and A2P 10DLC registration.
@@ -111,6 +113,8 @@ For local dev, create a `.env.local` file and never commit it:
 
 ```env
 STRIPE_SECRET_KEY=sk_test_...
+STRIPE_MODE=test
+STRIPE_TEST_SECRET_KEY=sk_test_...
 STRIPE_PUBLISHABLE_KEY=pk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 RESEND_API_KEY=re_...

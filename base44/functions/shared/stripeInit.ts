@@ -4,13 +4,21 @@
  */
 import { verifyStripeSignature } from "./stripeWebhookSignatureVerifier.ts";
 import { stripeFetch } from "../_shared/providerFetch.js";
+import { getStripeSecretKey } from "../_shared/stripeInit.js";
 
 export { verifyStripeSignature };
+export {
+  assertStripeConfigured,
+  getStripeClient,
+  getStripeMode,
+  getStripeSecretKey,
+  safeStripeError,
+  StripeConfigurationError,
+  STRIPE_API_VERSION,
+} from "../_shared/stripeInit.js";
 
 export function getStripeKey(): string {
-  const key = Deno.env.get("STRIPE_SECRET_KEY");
-  if (!key) throw new Error("STRIPE_SECRET_KEY not set");
-  return key;
+  return getStripeSecretKey();
 }
 
 export async function stripeRequest(path: string, body?: string, method = "POST"): Promise<any> {

@@ -1,4 +1,5 @@
 import { secureJson } from "../_shared/response.ts";
+import { getStripeClient as getConfiguredStripeClient } from "../_shared/stripeInit.js";
 /**
  * Inlined Stripe payment webhook for Base44 legacy runtime.
  * This embeds the canonical handler so the deployed legacy endpoint can verify
@@ -33,18 +34,6 @@ async function initializePaidOrderInstallPipeline({ base44, order }) {
     createdEvents: [],
   };
 }
-function getStripeSecretKey() {
-  try {
-    return (
-      Deno.env.get("STRIPE_LIVE_SECRET_KEY") ||
-      Deno.env.get("STRIPE_SECRET_KEY") ||
-      ""
-    );
-  } catch {
-    return "";
-  }
-}
-
 function getWebhookSecrets() {
   try {
     return [
@@ -62,13 +51,11 @@ async function getBase44Client(req) {
 }
 
 async function getStripeClient() {
-  const stripeSecretKey = getStripeSecretKey();
-  if (!stripeSecretKey) {
+  try {
+    return getConfiguredStripeClient().stripe;
+  } catch {
     return null;
   }
-
-  const { default: Stripe } = await import("npm:stripe@14");
-  return new Stripe(stripeSecretKey);
 }
 
 function cleanString(value) {

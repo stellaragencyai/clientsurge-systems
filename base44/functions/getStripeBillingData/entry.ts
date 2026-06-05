@@ -5,11 +5,47 @@ import { secureJson } from "../_shared/response.ts";
  * Falls back to internal Invoice entity records if no Stripe customer found.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import Stripe from 'npm:stripe@14.21.0';
+import { getStripeClient, safeStripeError } from "../_shared/stripeInit.js";
 
-const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY'), { apiVersion: '2023-10-16' });
+async function buildInternalBillingFallback(base44, user, message = null) {
+  const project = (await base44.asServiceRole.entities.ClientProject.filter({ client_email: user.email }))?.[0];
+  const internalInvoices = project
+    ? await base44.asServiceRole.entities.Invoice.filter({ project_id: project.id }, '-created_date', 50)
+    : [];
+
+  return {
+    success: true,
+    source: 'internal',
+    message,
+    subscriptions: [],
+    invoices: (internalInvoices || []).map(inv => ({
+      id: inv.id,
+      number: inv.invoice_number || `INV-${inv.id.slice(-6).toUpperCase()}`,
+      description: inv.description || 'Service Invoice',
+      amount_due: (inv.amount || 0) * 100,
+      amount_paid: inv.payment_status === 'paid' ? (inv.amount || 0) * 100 : 0,
+      currency: 'usd',
+      status: inv.payment_status || 'draft',
+      created: inv.issue_date ? Math.floor(new Date(inv.issue_date).getTime() / 1000) : null,
+      due_date: inv.due_date ? Math.floor(new Date(inv.due_date).getTime() / 1000) : null,
+      hosted_invoice_url: inv.payment_link || null,
+      invoice_pdf: inv.pdf_url || null,
+      period_start: null,
+      period_end: null,
+    })),
+    summary: {
+      has_stripe: false,
+      total_invoices: internalInvoices?.length || 0,
+      total_outstanding: (internalInvoices || [])
+        .filter(i => i.payment_status !== 'paid')
+        .reduce((s, i) => s + (i.amount || 0), 0),
+      unpaid_count: (internalInvoices || []).filter(i => i.payment_status !== 'paid').length,
+    },
+  };
+}
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
@@ -24,46 +60,50 @@ Deno.serve(async (req) => {
 
     // If no Stripe customer, fall back to internal invoice entity
     if (!stripeCustomerId) {
-      const project = (await base44.asServiceRole.entities.ClientProject.filter({ client_email: user.email }))?.[0];
-      const internalInvoices = project
-        ? await base44.asServiceRole.entities.Invoice.filter({ project_id: project.id }, '-created_date', 50)
-        : [];
+      return secureJson(await buildInternalBillingFallback(base44, user));
+    }
 
-      return secureJson({
-        success: true,
-        source: 'internal',
-        subscriptions: [],
-        invoices: (internalInvoices || []).map(inv => ({
-          id: inv.id,
-          number: inv.invoice_number || `INV-${inv.id.slice(-6).toUpperCase()}`,
-          description: inv.description || 'Service Invoice',
-          amount_due: (inv.amount || 0) * 100,
-          amount_paid: inv.payment_status === 'paid' ? (inv.amount || 0) * 100 : 0,
-          currency: 'usd',
-          status: inv.payment_status || 'draft',
-          created: inv.issue_date ? Math.floor(new Date(inv.issue_date).getTime() / 1000) : null,
-          due_date: inv.due_date ? Math.floor(new Date(inv.due_date).getTime() / 1000) : null,
-          hosted_invoice_url: inv.payment_link || null,
-          invoice_pdf: inv.pdf_url || null,
-          period_start: null,
-          period_end: null,
-        })),
-        summary: {
-          has_stripe: false,
-          total_invoices: internalInvoices?.length || 0,
-          total_outstanding: (internalInvoices || [])
-            .filter(i => i.payment_status !== 'paid')
-            .reduce((s, i) => s + (i.amount || 0), 0),
-          unpaid_count: (internalInvoices || []).filter(i => i.payment_status !== 'paid').length,
-        },
+    let stripe;
+    try {
+      ({ stripe } = getStripeClient());
+    } catch (error) {
+      const safeError = safeStripeError(error);
+      console.error('[getStripeBillingData] Stripe is not configured', {
+        requestId,
+        code: safeError.code,
       });
+      return secureJson(
+        await buildInternalBillingFallback(
+          base44,
+          user,
+          'Stripe billing is not configured. Showing internal billing records.'
+        )
+      );
     }
 
     // Live Stripe data
-    const [subscriptionsRes, invoicesRes] = await Promise.all([
-      stripe.subscriptions.list({ customer: stripeCustomerId, limit: 10, expand: ['data.default_payment_method'] }),
-      stripe.invoices.list({ customer: stripeCustomerId, limit: 50 }),
-    ]);
+    let subscriptionsRes;
+    let invoicesRes;
+    try {
+      [subscriptionsRes, invoicesRes] = await Promise.all([
+        stripe.subscriptions.list({ customer: stripeCustomerId, limit: 10, expand: ['data.default_payment_method'] }),
+        stripe.invoices.list({ customer: stripeCustomerId, limit: 50 }),
+      ]);
+    } catch (error) {
+      const safeError = safeStripeError(error);
+      console.error('[getStripeBillingData] Stripe billing fetch failed', {
+        requestId,
+        code: safeError.code,
+        message: safeError.internalMessage,
+      });
+      return secureJson(
+        await buildInternalBillingFallback(
+          base44,
+          user,
+          'Stripe billing is temporarily unavailable. Showing internal billing records.'
+        )
+      );
+    }
 
     const subscriptions = subscriptionsRes.data.map(sub => {
       const pm = sub.default_payment_method;
@@ -124,7 +164,15 @@ Deno.serve(async (req) => {
     });
 
   } catch (error) {
-    console.error('[getStripeBillingData] error:', error);
-    return secureJson({ error: error.message }, { status: 500 });
+    const safeError = safeStripeError(error, 'Unable to load billing data. Please contact support.');
+    console.error('[getStripeBillingData] error', {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

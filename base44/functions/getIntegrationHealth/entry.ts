@@ -2,6 +2,7 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
+import { getStripeSecretKey, safeStripeError } from "../_shared/stripeInit.js";
 
 async function pingTwilio() {
   const sid = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -27,8 +28,13 @@ async function pingResend() {
 }
 
 async function pingStripe() {
-  const key = Deno.env.get('STRIPE_SECRET_KEY') || Deno.env.get('STRIPE_LIVE_SECRET_KEY');
-  if (!key) return { ok: false, error: 'STRIPE_SECRET_KEY not set' };
+  let key;
+  try {
+    key = getStripeSecretKey();
+  } catch (e) {
+    const safeError = safeStripeError(e);
+    return { ok: false, error: safeError.userMessage, code: safeError.code };
+  }
   try {
     const res = await stripeFetch('https://api.stripe.com/v1/balance', {
       headers: { 'Authorization': `Bearer ${key}` },
@@ -137,6 +143,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[getIntegrationHealth] Error:", error);
-    return secureJson({ error: error.message || "Failed to load integration health" }, { status: 500 });
+    return secureJson({ error: "Failed to load integration health" }, { status: 500 });
   }
 });

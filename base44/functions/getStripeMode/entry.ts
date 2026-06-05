@@ -1,15 +1,9 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { secureJson } from "../_shared/response.ts";
-
-function resolveStripeSecret() {
-  return (
-    Deno.env.get("STRIPE_LIVE_SECRET_KEY") ||
-    Deno.env.get("STRIPE_SECRET_KEY") ||
-    ""
-  ).trim();
-}
+import { getStripeMode, safeStripeError } from "../_shared/stripeInit.js";
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me().catch(() => null);
@@ -18,17 +12,22 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
-    const stripeSecret = resolveStripeSecret();
-    const livemode = stripeSecret.startsWith("sk_live_");
-    const mode = livemode ? "live" : stripeSecret.startsWith("sk_test_") ? "test" : "unknown";
+    const stripeMode = getStripeMode();
 
     return secureJson({
       success: true,
-      mode,
-      livemode,
-      configured: Boolean(stripeSecret),
+      ...stripeMode,
     });
   } catch (error) {
-    return secureJson({ error: error.message }, { status: 500 });
+    const safeError = safeStripeError(error, "Unable to determine Stripe mode. Please contact support.");
+    console.error("[getStripeMode] error", {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

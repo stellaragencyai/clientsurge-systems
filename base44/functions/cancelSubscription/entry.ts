@@ -6,8 +6,10 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { stripeFetch } from "../_shared/providerFetch.js";
+import { getStripeSecretKey, safeStripeError, StripeConfigurationError } from "../_shared/stripeInit.js";
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
   try {
     const base44 = createClientFromRequest(req);
     const { order_id, reason } = await req.json();
@@ -16,20 +18,40 @@ Deno.serve(async (req) => {
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
 
-    const stripeKey = Deno.env.get("STRIPE_SECRET_KEY");
     let stripeCancelled = false;
 
     // Cancel at period end on Stripe
-    if (stripeKey && order.stripe_subscription_id) {
-      const stripeRes = await stripeFetch(`https://api.stripe.com/v1/subscriptions/${order.stripe_subscription_id}`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${stripeKey}`, "Content-Type": "application/x-www-form-urlencoded" },
-          body: "cancel_at_period_end=true",
+    if (order.stripe_subscription_id) {
+      let stripeKey = "";
+      try {
+        stripeKey = getStripeSecretKey();
+      } catch (error) {
+        if (!(error instanceof StripeConfigurationError)) {
+          throw error;
         }
-      );
-      const stripeData = await stripeRes.json();
-      stripeCancelled = stripeData?.cancel_at_period_end === true;
+        const safeError = safeStripeError(error);
+        console.error("[cancelSubscription] Stripe is not configured", {
+          requestId,
+          order_id,
+          code: safeError.code,
+        });
+        return secureJson(
+          { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+          { status: safeError.status }
+        );
+      }
+
+      if (stripeKey) {
+        const stripeRes = await stripeFetch(`https://api.stripe.com/v1/subscriptions/${order.stripe_subscription_id}`,
+          {
+            method: "POST",
+            headers: { Authorization: `Bearer ${stripeKey}`, "Content-Type": "application/x-www-form-urlencoded" },
+            body: "cancel_at_period_end=true",
+          }
+        );
+        const stripeData = await stripeRes.json();
+        stripeCancelled = stripeData?.cancel_at_period_end === true;
+      }
     }
 
     // Update order
@@ -80,6 +102,15 @@ Stripe cancel_at_period_end: ${stripeCancelled}`,
 
     return secureJson({ success: true, order_id, cancel_at_period_end: stripeCancelled });
   } catch (err: any) {
-    return secureJson({ error: err.message }, { status: 500 });
+    const safeError = safeStripeError(err, "Unable to cancel the subscription. Please contact support.");
+    console.error("[cancelSubscription] error", {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

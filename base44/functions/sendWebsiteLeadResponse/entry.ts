@@ -287,7 +287,7 @@ Or just reply to this email with any questions.
 
           results.sms_sent = true;
           console.log(
-            `[sendWebsiteLeadResponse] SMS sent to ${lead.id}: ${lead.phone_number}`
+            `[sendWebsiteLeadResponse] SMS sent for lead ${lead.id}`
           );
         } else {
           console.log(
@@ -385,7 +385,7 @@ Or just reply to this email with any questions.
 
           results.email_sent = true;
           console.log(
-            `[sendWebsiteLeadResponse] Email sent to ${lead.id}: ${lead.email}`
+            `[sendWebsiteLeadResponse] Email sent for lead ${lead.id}`
           );
         } else {
           console.log(
