@@ -15,6 +15,7 @@ test("navbar keeps compact navigation through iPad landscape widths", () => {
   assert.match(navbar, /className="hidden xl:flex items-center gap-6 absolute left-1\/2 -translate-x-1\/2"/);
   assert.match(navbar, /className="hidden xl:flex items-center gap-3 shrink-0"/);
   assert.match(navbar, /className="xl:hidden w-10 h-10 rounded-full/);
-  assert.match(navbar, /className="xl:hidden bg-background border-b/);
+  assert.match(navbar, /className="xl:hidden border-b border-white\/25/);
+  assert.match(navbar, /background: "rgba\(255,255,255,0\.10\)"/);
   assert.doesNotMatch(navbar, /className="hidden lg:flex items-center gap-6 absolute/);
 });
