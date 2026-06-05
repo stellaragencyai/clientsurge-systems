@@ -19,8 +19,8 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
 import { installGa4 } from "@/lib/ga4";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+import { shouldNoindexRoute } from "@/lib/routeSecurity";
 import { scrollToTop } from "@/lib/scroll";
-import { setPageMetadata } from "@/lib/seo";
 
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
@@ -30,6 +30,7 @@ const Book = lazy(() => import("./pages/Book"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Industries = lazy(() => import("./pages/Industries"));
 const Blog = lazy(() => import("./pages/Blog"));
+const Login = lazy(() => import("./pages/Login"));
 const Store = lazy(() => import("./pages/Store"));
 const IndustryTemplate = lazy(() => import("./components/landing/IndustryTemplate"));
 const About = lazy(() => import("./pages/About"));
@@ -92,27 +93,6 @@ const PUBLIC_PATHS = [
   "/onboarding",
   "/setup/preview",
   // test/preview routes removed
-];
-
-const NOINDEX_PREFIXES = [
-  "/admin",
-  "/adminleaddetail",
-  "/adminsettings",
-  "/dashboard",
-  "/client-portal",
-  "/client-dashboard",
-  "/industrytemplate",
-  "/lead-intelligence",
-  "/medspa-dashboard",
-  "/notfound",
-  "/sam",
-  "/success",
-  "/setup",
-  "/thank-you",
-  "/onboarding",
-  "/order-success",
-  "/websitespecpreview",
-  "/leads",
 ];
 
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -211,18 +191,12 @@ function AppInner() {
   return null;
 }
 
-// SectionRedirect — preserve the intended home anchor for lazy-mounted sections.
-function SectionRedirect({ hash }) {
+// Redirect section aliases to the homepage hash without giving them their own metadata.
+function HashRedirect({ hash }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const cleanupMetadata = setPageMetadata({
-      title: "ClientSurge Systems | AI Lead Response and Booking Automation",
-      description: "Done-for-you automation that helps appointment-based businesses respond faster, follow up consistently, and book more appointments.",
-      canonicalPath: "/",
-    });
-    navigate(`/${hash}`, { replace: true });
-    return cleanupMetadata;
+    navigate({ pathname: "/", hash }, { replace: true });
   }, [hash, navigate]);
 
   return null;
@@ -274,10 +248,7 @@ function RouteIndexingGuard() {
     if (!robotsMeta) return;
 
     const previous = robotsMeta.getAttribute("content") || "index,follow";
-    const pathname = location.pathname.toLowerCase();
-    const shouldNoindex = NOINDEX_PREFIXES.some(
-      (prefix) => pathname === prefix || pathname.startsWith(`${prefix}/`)
-    );
+    const shouldNoindex = shouldNoindexRoute(location.pathname);
 
     robotsMeta.setAttribute(
       "content",
@@ -355,13 +326,13 @@ const AuthenticatedApp = () => {
       <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
       <Route path="/industries" element={<LazyRoute Component={Industries} />} />
-      <Route path={routePath("pricing")} element={<SectionRedirect hash="#pricing" />} />
-      <Route path={routePath("faq")} element={<SectionRedirect hash="#faq" />} />
-      <Route path={routePath("our-system")} element={<SectionRedirect hash="#services" />} />
-      <Route path={routePath("testimonials")} element={<SectionRedirect hash="#testimonials" />} />
+      <Route path={routePath("pricing")} element={<HashRedirect hash="pricing" />} />
+      <Route path={routePath("faq")} element={<HashRedirect hash="faq" />} />
+      <Route path={routePath("our-system")} element={<HashRedirect hash="services" />} />
+      <Route path={routePath("testimonials")} element={<HashRedirect hash="testimonials" />} />
       <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy-policy" />} />
       <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
-      <Route path="/login" element={<Navigate to="/client-portal" replace />} />
+      <Route path="/login" element={<LazyRoute Component={Login} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />

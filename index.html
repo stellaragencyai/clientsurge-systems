@@ -138,6 +138,16 @@
             title: "ClientSurge Blog | AI Automation for Local Service Businesses",
             description: "Guides on missed-call recovery, AI lead follow-up, AI voice agents, local service business automation, conversion systems, and booking automation."
           },
+          "/store": {
+            key: "store",
+            title: "AI Automation Store | ClientSurge Systems",
+            description: "Compare ClientSurge packages, automation systems, and done-for-you launch options for local service businesses."
+          },
+          "/start": {
+            key: "start",
+            title: "Start Your AI Automation Audit | ClientSurge Systems",
+            description: "Begin the guided ClientSurge audit flow to review lead response, follow-up, and booking gaps in your service business."
+          },
           "/industries": {
             key: "industries",
             title: "Industries We Help | ClientSurge Systems",
@@ -178,6 +188,11 @@
             title: "Privacy Policy | ClientSurge Systems",
             description: "Read the ClientSurge Systems privacy policy, including what data we collect, how data is used, cookies, third-party services, and contact information."
           },
+          "/terms": {
+            key: "terms",
+            title: "Terms of Service | ClientSurge Systems",
+            description: "Review the ClientSurge Systems terms governing service access, billing, platform usage, and customer responsibilities."
+          },
           "/login": {
             key: "login",
             title: "Client Login | ClientSurge Systems",
@@ -195,15 +210,49 @@
           "/Chiropractic": "/chiropractic",
           "/Contractors": "/contractors",
           "/legal/privacy": "/privacy-policy",
-          "/legal/terms": "/terms"
+          "/legal/terms": "/terms",
+          "/pricing": "/",
+          "/faq": "/",
+          "/our-system": "/",
+          "/testimonials": "/"
         };
+        var noindexPrefixes = [
+          "/login",
+          "/client-portal",
+          "/client-dashboard",
+          "/onboarding",
+          "/setup",
+          "/setup/credentials",
+          "/setup/status",
+          "/setup/preview",
+          "/admin",
+          "/admin/leads",
+          "/admin/automations",
+          "/admin/onboarding",
+          "/admin/install-guide",
+          "/admin/ai-sales",
+          "/admin/performance-wars",
+          "/dashboard",
+          "/admin-settings",
+          "/lead-intelligence",
+          "/sam",
+          "/medspa-dashboard",
+          "/motion-lab",
+          "/order-success",
+          "/success",
+          "/thank-you"
+        ];
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         var canonicalPath = aliases[path] || path;
         var meta = routeMap[canonicalPath] || routeMap["/"];
         var canonicalUrl = "https://clientsurgesystems.com" + canonicalPath;
+        var robotsContent = noindexPrefixes.some(function (prefix) {
+          return canonicalPath === prefix || canonicalPath.indexOf(prefix + "/") === 0;
+        }) ? "noindex,nofollow" : "index,follow";
         document.documentElement.setAttribute("data-static-route", meta.key);
         document.title = meta.title;
         var description = document.querySelector('meta[name="description"]');
+        var robots = document.querySelector('meta[name="robots"]');
         var canonical = document.querySelector('link[rel="canonical"]');
         var ogUrl = document.querySelector('meta[property="og:url"]');
         var ogTitle = document.querySelector('meta[property="og:title"]');
@@ -212,6 +261,7 @@
         var twitterTitle = document.querySelector('meta[property="twitter:title"]');
         var twitterDescription = document.querySelector('meta[property="twitter:description"]');
         if (description) description.setAttribute("content", meta.description);
+        if (robots) robots.setAttribute("content", robotsContent);
         if (canonical) canonical.setAttribute("href", canonicalUrl);
         if (ogUrl) ogUrl.setAttribute("content", canonicalUrl);
         if (ogTitle) ogTitle.setAttribute("content", meta.title);

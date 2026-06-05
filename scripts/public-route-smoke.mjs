@@ -8,6 +8,11 @@ const baseUrlArg = process.argv.find((arg) => arg.startsWith("--base-url="));
 const baseUrl = new URL(baseUrlArg ? baseUrlArg.split("=").slice(1).join("=") : defaultBaseUrl);
 
 const routes = [
+  "/",
+  "/start",
+  "/store",
+  "/about",
+  "/blog",
   "/roofing",
   "/hvac",
   "/dental",
@@ -18,6 +23,7 @@ const routes = [
   "/automations",
   "/contact",
   "/book",
+  "/login",
 ];
 
 async function checkRoute(route) {
