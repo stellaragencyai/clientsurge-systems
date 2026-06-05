@@ -15,14 +15,23 @@ export function LazyProductGrid({ products = [], renderCard, className = "" }) {
   useEffect(() => {
     // #41: show skeleton for 300ms then reveal
     const skeletonTimer = setTimeout(() => setSkeletonDone(true), 300);
+    const failOpenTimer = setTimeout(() => setVisible(true), 900);
+
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return () => {
+        clearTimeout(skeletonTimer);
+        clearTimeout(failOpenTimer);
+      };
+    }
 
     // #10: intersection observer for lazy rendering
     const observer = new IntersectionObserver(
       ([entry]) => { if (entry.isIntersecting) { setVisible(true); observer.disconnect(); } },
-      { rootMargin: "200px" }
+      { rootMargin: "800px 0px" }
     );
     if (ref.current) observer.observe(ref.current);
-    return () => { clearTimeout(skeletonTimer); observer.disconnect(); };
+    return () => { clearTimeout(skeletonTimer); clearTimeout(failOpenTimer); observer.disconnect(); };
   }, []);
 
   const pulse = {
@@ -46,7 +55,7 @@ export function LazyProductGrid({ products = [], renderCard, className = "" }) {
   }
 
   if (!visible) {
-    return <div ref={ref} style={{ minHeight: 200 }} />;
+    return <div ref={ref} className={className} style={{ minHeight: 220 }} />;
   }
 
   return (

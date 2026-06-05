@@ -14,7 +14,9 @@ test("store defers large product grids with the intersection-observer grid", () 
 
 test("lazy product grid preserves store grid styling and waits for viewport entry", () => {
   assert.match(enhancementSource, /new IntersectionObserver/);
-  assert.match(enhancementSource, /rootMargin: "200px"/);
+  assert.match(enhancementSource, /rootMargin: "800px 0px"/);
+  assert.match(enhancementSource, /failOpenTimer/);
+  assert.match(enhancementSource, /typeof IntersectionObserver === "undefined"/);
   assert.match(enhancementSource, /className=\{className\}/);
   assert.match(enhancementSource, /products\.map\(\(p, i\) => renderCard\(p, i\)\)/);
 });

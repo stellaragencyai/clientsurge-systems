@@ -1,5 +1,9 @@
 import { TRUST_SECURITY_WEBP_BASE64 } from "./trust-security-assets.mjs";
 import { buildRobotsTxt, buildSitemapXml } from "../src/lib/siteDocuments.js";
+import {
+  PUBLIC_ROUTE_METADATA,
+  STATIC_ROUTE_ALIASES,
+} from "../src/lib/publicRouteMetadata.js";
 
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
@@ -8,6 +12,9 @@ const BASE44_ORIGIN_HOST = "grinning-apex-flow-growth.base44.app";
 export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
 export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 export const TRUST_SECURITY_SCRIPT_PATH = "/.well-known/clientsurge-trust-security.js";
+export const EDGE_ROUTE_METADATA_HEADER = "x-clientsurge-route-metadata";
+export const PRIVATE_ROUTE_BLOCK_HEADER = "x-clientsurge-private-route-block";
+export const ANONYMOUS_USER_ME_HEADER = "x-clientsurge-anonymous-user-me";
 
 export const SECURITY_TXT = `Contact: mailto:system@clientsurgesystems.com
 Preferred-Languages: en
@@ -909,16 +916,48 @@ export const SENSITIVE_HEADERS = {
   "Cache-Control": "no-store",
 };
 
+const PRIVATE_ROUTE_PATTERNS = [
+  /^\/admin(?:\/|$)/,
+  /^\/admindashboard(?:\/|$)/,
+  /^\/adminleads(?:\/|$)/,
+  /^\/admininstallguide(?:\/|$)/,
+  /^\/adminsettings(?:\/|$)/,
+  /^\/adminleaddetail(?:\/|$)/,
+  /^\/aistatusdashboard(?:\/|$)/,
+  /^\/dashboard(?:\/|$)/,
+  /^\/client-portal(?:\/|$)/,
+  /^\/clientportal(?:\/|$)/,
+  /^\/client-dashboard(?:\/|$)/,
+  /^\/clientdashboard(?:\/|$)/,
+  /^\/onboarding(?:\/|$)/,
+  /^\/setup(?:\/|$)/,
+  /^\/businesssetup(?:\/|$)/,
+  /^\/credentialssetup(?:\/|$)/,
+  /^\/setupstatus(?:\/|$)/,
+  /^\/websitepreview(?:\/|$)/,
+  /^\/websitespecpreview(?:\/|$)/,
+  /^\/motion-lab(?:\/|$)/,
+  /^\/motionlab(?:\/|$)/,
+  /^\/performancewars(?:\/|$)/,
+];
+
+function normalizePathname(pathname = "/") {
+  const value = String(pathname || "/").split("?")[0].split("#")[0];
+  const normalized = value.length > 1 && value.endsWith("/") ? value.slice(0, -1) : value;
+  return normalized || "/";
+}
+
+function normalizePathnameLower(pathname = "/") {
+  return normalizePathname(pathname).toLowerCase();
+}
+
+export function isPrivateRoutePath(pathname) {
+  const normalized = normalizePathnameLower(pathname);
+  return PRIVATE_ROUTE_PATTERNS.some((pattern) => pattern.test(normalized));
+}
+
 export function isSensitivePath(pathname) {
-  return (
-    pathname === "/admin" ||
-    pathname.startsWith("/admin/") ||
-    pathname === "/onboarding" ||
-    pathname === "/motion-lab" ||
-    pathname === "/client-portal" ||
-    pathname === "/setup/preview" ||
-    pathname.startsWith("/setup/preview/")
-  );
+  return isPrivateRoutePath(pathname);
 }
 
 export function applySecurityHeaders(headers, pathname) {
@@ -966,6 +1005,87 @@ export function injectStaticFallbackPaintGuard(html) {
       ? nextHtml.replace("</head>", `${HEADER_TRANSPARENCY_STYLE}</head>`)
       : `${HEADER_TRANSPARENCY_STYLE}${nextHtml}`;
   }
+
+  return nextHtml;
+}
+
+function escapeHtmlAttribute(value = "") {
+  return String(value)
+    .replace(/&/g, "&amp;")
+    .replace(/"/g, "&quot;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
+function resolvePublicRouteMetadata(pathname = "/") {
+  const normalized = normalizePathname(pathname);
+  const aliasTarget = STATIC_ROUTE_ALIASES[normalized] || STATIC_ROUTE_ALIASES[normalized.toLowerCase()];
+  const canonicalPath = aliasTarget || normalized;
+  const exactMeta = PUBLIC_ROUTE_METADATA[canonicalPath] || PUBLIC_ROUTE_METADATA[canonicalPath.toLowerCase()];
+  const meta = exactMeta || (canonicalPath.startsWith("/blog/") ? PUBLIC_ROUTE_METADATA["/blog"] : PUBLIC_ROUTE_METADATA["/"]);
+  return {
+    canonicalPath,
+    canonicalUrl: `${CANONICAL_ORIGIN}${canonicalPath === "/" ? "/" : canonicalPath}`,
+    title: meta.title,
+    description: meta.description,
+  };
+}
+
+function upsertHeadTag(html, pattern, tag) {
+  if (pattern.test(html)) {
+    return html.replace(pattern, tag);
+  }
+  return html.includes("</head>") ? html.replace("</head>", `${tag}\n</head>`) : `${tag}\n${html}`;
+}
+
+export function repairPublicRouteMetadata(html, pathname = "/") {
+  const meta = resolvePublicRouteMetadata(pathname);
+  const title = escapeHtmlAttribute(meta.title);
+  const description = escapeHtmlAttribute(meta.description);
+  const canonicalUrl = escapeHtmlAttribute(meta.canonicalUrl);
+  let nextHtml = html.replace(/https:\/\/grinning-apex-flow-growth\.base44\.app/gi, CANONICAL_ORIGIN);
+
+  nextHtml = upsertHeadTag(nextHtml, /<title>[\s\S]*?<\/title>/i, `<title>${title}</title>`);
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bname=["']description["'])[^>]*>/i,
+    `<meta name="description" content="${description}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<link\b(?=[^>]*\brel=["']canonical["'])[^>]*>/i,
+    `<link rel="canonical" href="${canonicalUrl}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bproperty=["']og:url["'])[^>]*>/i,
+    `<meta property="og:url" content="${canonicalUrl}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bproperty=["']og:title["'])[^>]*>/i,
+    `<meta property="og:title" content="${title}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bproperty=["']og:description["'])[^>]*>/i,
+    `<meta property="og:description" content="${description}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bproperty=["']twitter:url["'])[^>]*>/i,
+    `<meta property="twitter:url" content="${canonicalUrl}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bproperty=["']twitter:title["'])[^>]*>/i,
+    `<meta property="twitter:title" content="${title}" />`
+  );
+  nextHtml = upsertHeadTag(
+    nextHtml,
+    /<meta\b(?=[^>]*\bproperty=["']twitter:description["'])[^>]*>/i,
+    `<meta property="twitter:description" content="${description}" />`
+  );
 
   return nextHtml;
 }
@@ -1080,6 +1200,17 @@ function sitemapXmlResponse() {
   return new Response(buildSitemapXml(), { status: 200, headers });
 }
 
+function privateRouteBlockedResponse(pathname) {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "text/html; charset=utf-8",
+    [PRIVATE_ROUTE_BLOCK_HEADER]: "edge-v1",
+  }), pathname);
+  return new Response(
+    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow,noarchive\"><title>ClientSurge Login Required</title></head><body><main><h1>Login required</h1><p>This ClientSurge area is private.</p><p><a href=\"/login\">Go to client login</a></p></main></body></html>",
+    { status: 403, headers }
+  );
+}
+
 function serviceWorkerResponse() {
   const headers = applySecurityHeaders(new Headers({
     "Content-Type": "text/javascript; charset=utf-8",
@@ -1124,12 +1255,35 @@ export function originRequestFor(request, url = new URL(request.url)) {
   return new Request(originUrl.toString(), request);
 }
 
+export function isAnonymousUserMeRequest(request, url = new URL(request.url)) {
+  if (request.method !== "GET") return false;
+  if (!/\/api\/apps\/[^/]+\/entities\/User\/me\/?$/.test(url.pathname)) return false;
+  return !request.headers.get("authorization") && !request.headers.get("cookie");
+}
+
+function anonymousUserMeResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Content-Type": "application/json; charset=utf-8",
+    "Cache-Control": "no-store",
+    [ANONYMOUS_USER_ME_HEADER]: "edge-v1",
+  }), "/login");
+  return new Response("null", { status: 200, headers });
+}
+
 export default {
   async fetch(request) {
     const url = new URL(request.url);
 
     if (url.protocol === "http:" || url.hostname === ALTERNATE_HOST) {
       return canonicalRedirect(url);
+    }
+
+    if (isPrivateRoutePath(url.pathname)) {
+      return privateRouteBlockedResponse(url.pathname);
+    }
+
+    if (isAnonymousUserMeRequest(request, url)) {
+      return anonymousUserMeResponse();
     }
 
     if (url.pathname === "/.well-known/security.txt") {
@@ -1165,8 +1319,10 @@ export default {
     const headers = applySecurityHeaders(new Headers(originResponse.headers), url.pathname);
 
     if (shouldInjectStaticFallbackPaintGuard(request, originResponse)) {
-      let html = injectStaticFallbackPaintGuard(await originResponse.text());
+      let html = repairPublicRouteMetadata(await originResponse.text(), url.pathname);
+      html = injectStaticFallbackPaintGuard(html);
       headers.set(STATIC_FALLBACK_PAINT_GUARD_HEADER, "edge-v1");
+      headers.set(EDGE_ROUTE_METADATA_HEADER, "edge-v1");
       headers.set("Cache-Control", "no-store, max-age=0");
 
       if (shouldInjectHomepageMotion(request, url, originResponse)) {

@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import worker, {
+  ANONYMOUS_USER_ME_HEADER,
   applySecurityHeaders,
   EDGE_HEALTH_HEADER,
   EDGE_HEALTH_PATH,
@@ -24,8 +25,12 @@ import worker, {
   HOMEPAGE_PHONE_ALIGNMENT_STYLE,
   HOMEPAGE_PHONE_ALIGNMENT_STYLE_ID,
   injectHomepageMotion,
+  isAnonymousUserMeRequest,
   isSensitivePath,
+  isPrivateRoutePath,
   originRequestFor,
+  PRIVATE_ROUTE_BLOCK_HEADER,
+  repairPublicRouteMetadata,
   SENSITIVE_HEADERS,
   SERVICE_WORKER_JS,
   SECURITY_TXT,
@@ -62,13 +67,45 @@ function read(path) {
 }
 
 test("Cloudflare security edge worker identifies sensitive app routes", () => {
-  for (const path of ["/admin", "/admin/leads", "/onboarding", "/setup/preview/security-check", "/motion-lab", "/client-portal"]) {
+  for (const path of ["/admin", "/admin/leads", "/AdminDashboard", "/ClientDashboard", "/CredentialsSetup", "/SetupStatus", "/BusinessSetup", "/onboarding", "/setup/preview/security-check", "/motion-lab", "/MotionLab", "/client-portal"]) {
     assert.equal(isSensitivePath(path), true, `${path} should be sensitive`);
+    assert.equal(isPrivateRoutePath(path), true, `${path} should be private`);
   }
 
-  for (const path of ["/", "/store", "/book", "/contact", "/roofing"]) {
+  for (const path of ["/", "/store", "/book", "/contact", "/roofing", "/login", "/start"]) {
     assert.equal(isSensitivePath(path), false, `${path} should stay public`);
   }
+});
+
+test("Cloudflare security edge worker blocks private route aliases before Base44", async () => {
+  for (const path of ["/ClientDashboard", "/AdminDashboard", "/CredentialsSetup", "/SetupStatus", "/BusinessSetup", "/setup/status", "/MotionLab"]) {
+    const response = await worker.fetch(new Request(`https://clientsurgesystems.com${path}`));
+    const body = await response.text();
+
+    assert.equal(response.status, 403, `${path} should fail closed`);
+    assert.equal(response.headers.get(PRIVATE_ROUTE_BLOCK_HEADER), "edge-v1");
+    assert.match(response.headers.get("x-robots-tag") || "", /noindex/);
+    assert.match(response.headers.get("cache-control") || "", /no-store/);
+    assert.match(body, /Login required/);
+  }
+});
+
+test("Cloudflare security edge worker suppresses anonymous public User/me noise", async () => {
+  const anonymousRequest = new Request(
+    "https://clientsurgesystems.com/api/apps/69dc4a79656fdba136d413d3/entities/User/me"
+  );
+  const authenticatedRequest = new Request(
+    "https://clientsurgesystems.com/api/apps/69dc4a79656fdba136d413d3/entities/User/me",
+    { headers: { cookie: "base44_session=example" } }
+  );
+
+  assert.equal(isAnonymousUserMeRequest(anonymousRequest), true);
+  assert.equal(isAnonymousUserMeRequest(authenticatedRequest), false);
+
+  const response = await worker.fetch(anonymousRequest);
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get(ANONYMOUS_USER_ME_HEADER), "edge-v1");
+  assert.equal(await response.text(), "null");
 });
 
 test("Cloudflare security edge worker applies required public and sensitive headers", () => {
@@ -219,6 +256,27 @@ test("Cloudflare static fallback paint guard is scoped to HTML and idempotent", 
   assert.match(injected, /nav\[aria-label="Main navigation"\]/);
   assert.match(injected, /classList\.add\("app-fallback-visible"\)/);
   assert.equal(injectStaticFallbackPaintGuard(injected), injected);
+});
+
+test("Cloudflare static HTML injection repairs public route metadata and canonical host", () => {
+  const staleHtml = [
+    "<html><head>",
+    "<title>Store | Base44</title>",
+    '<meta name="description" content="Store on ClientSurge Systems. Premium AI-driven automation systems built to increase bookings, recover missed ." />',
+    '<link rel="canonical" href="https://grinning-apex-flow-growth.base44.app/store" />',
+    '<meta property="og:url" content="https://grinning-apex-flow-growth.base44.app/store" />',
+    '<meta property="og:title" content="Store | ClientSurge Systems" />',
+    '<meta property="og:description" content="old" />',
+    '<meta property="twitter:url" content="https://grinning-apex-flow-growth.base44.app/store" />',
+    "</head><body></body></html>",
+  ].join("");
+  const repaired = repairPublicRouteMetadata(staleHtml, "/store");
+
+  assert.match(repaired, /<title>AI Automation Store \| ClientSurge Systems<\/title>/);
+  assert.match(repaired, /<link rel="canonical" href="https:\/\/clientsurgesystems\.com\/store" \/>/);
+  assert.match(repaired, /<meta property="og:url" content="https:\/\/clientsurgesystems\.com\/store" \/>/);
+  assert.match(repaired, /Compare ClientSurge packages, automation systems/);
+  assert.doesNotMatch(repaired, /grinning-apex-flow-growth\.base44\.app/);
 });
 
 test("Cloudflare static HTML injection makes the header and nav menus transparent", () => {

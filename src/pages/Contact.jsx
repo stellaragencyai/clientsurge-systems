@@ -258,7 +258,7 @@ export default function Contact() {
                 </motion.div>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-4" noValidate>
+              <form action="/contact" method="post" onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <h3 className="font-display text-xl font-semibold text-foreground mb-2">Send a Message</h3>
 
                 {errors.submit && (
