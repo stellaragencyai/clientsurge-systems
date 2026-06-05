@@ -27,6 +27,38 @@ const INDUSTRIES = [
   "Other",
 ];
 
+function normalizeIndustrySlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function getPageAttribution() {
+  if (typeof window === "undefined") {
+    return {
+      source_page: "/book",
+      utm_source: "",
+      utm_medium: "",
+      utm_campaign: "",
+      utm_content: "",
+      referrer: "",
+    };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  return {
+    source_page: window.location.pathname || "/book",
+    utm_source: params.get("utm_source") || "",
+    utm_medium: params.get("utm_medium") || "",
+    utm_campaign: params.get("utm_campaign") || "",
+    utm_content: params.get("utm_content") || "",
+    referrer: document.referrer || "",
+  };
+}
+
 export default function DemoBookingInline({ prefillIndustry = "" }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
@@ -82,6 +114,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     setSubmitWarnings([]);
     try {
       const res = await base44.functions.invoke("scheduleDemoBooking", {
+        ...getPageAttribution(),
         full_name: `${form.first_name} ${form.last_name}`,
         first_name: form.first_name,
         last_name: form.last_name,
@@ -89,7 +122,11 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         email: form.email,
         phone: form.phone,
         website: form.website,
+        business_website_url: form.website,
         industry: form.industry,
+        business_type: form.industry,
+        industry_slug: normalizeIndustrySlug(form.industry),
+        service_interest: "automation_audit",
         biggest_issue: form.biggest_issue,
         website_url: form.website_url,
         scheduled_date: scheduling.date,
@@ -114,7 +151,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           <CheckCircle2 className="w-8 h-8 text-green-400" />
         </div>
         <h3 className="text-xl font-semibold text-white mb-2">You're all set.</h3>
-        <p className="text-sm text-white/50">Nolan will confirm your demo within 24 hours.</p>
+        <p className="text-sm text-white/50">Nolan will confirm your audit request within 24 hours.</p>
         {submitWarnings.length > 0 && (
           <p className="mt-3 text-xs text-amber-300 max-w-sm">
             Your booking was saved, but one or more follow-up actions still need review.
@@ -238,7 +275,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50"
           style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
         >
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule Demo <ArrowRight className="w-4 h-4" /></>}
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule Audit <ArrowRight className="w-4 h-4" /></>}
         </button>
       </div>
       <p className="text-center text-xs text-white/60">No spam. No pressure. Just a tailored walkthrough of your business.</p>
