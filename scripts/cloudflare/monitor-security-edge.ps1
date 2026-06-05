@@ -58,6 +58,15 @@ function Test-RouteBypassFailure {
     )
 }
 
+function Test-CloudflareChallengeFailure {
+    param([string]$Text)
+
+    return (
+        $Text -match 'Routing diagnostic: cloudflare_managed_challenge' -or
+        $Text -match 'Cloudflare is serving a managed challenge'
+    )
+}
+
 if (-not (Test-Path $RepoPath)) {
     throw "RepoPath does not exist: $RepoPath"
 }
@@ -97,6 +106,20 @@ catch {
     $releaseText = $_.Exception.Message
     $postReleaseVerify = Invoke-Captured 'npm run verify:production-security' -AllowFailure
     $postReleaseVerifyText = $postReleaseVerify.Output -join "`n"
+    if (Test-CloudflareChallengeFailure $postReleaseVerifyText) {
+        $routeDiagnosis = Invoke-Captured 'npm run cloudflare:security:diagnose-route -- --json' -AllowFailure
+        Write-State -Status 'cloudflare_challenge' -Message 'Wrangler is authenticated and deploy was attempted, but Cloudflare is serving a managed challenge before normal public page/document responses. Inspect WAF/Bot/Rulesets for clientsurgesystems.com and allow launch verification/public document routes.' -Details @{
+            verify_before = $verify.Output -join "`n"
+            verify_after = $postReleaseVerifyText
+            release_error = $releaseText
+            wrangler = $whoamiText
+            route_diagnosis_exit_code = $routeDiagnosis.ExitCode
+            route_diagnosis = $routeDiagnosis.Output -join "`n"
+        }
+        Write-Warning "Cloudflare managed challenge is blocking production verification after deploy. Check Cloudflare WAF/Bot/Rulesets for clientsurgesystems.com; the current Wrangler token cannot inspect those resources."
+        exit 0
+    }
+
     if (Test-RouteBypassFailure $postReleaseVerifyText) {
         $routeDiagnosis = Invoke-Captured 'npm run cloudflare:security:diagnose-route -- --json' -AllowFailure
         Write-State -Status 'route_bypassed' -Message 'Wrangler is authenticated and deploy was attempted, but production traffic is still missing Worker security headers. Public DNS/orange-to-orange or custom-domain routing is likely bypassing the zone Worker route for clientsurgesystems.com.' -Details @{

@@ -220,7 +220,7 @@ function isTaskOverlapResult(task) {
 }
 
 function isClassifiedCloudflareMonitorState(status) {
-  return ["route_bypassed", "auth_required"].includes(status || "");
+  return ["route_bypassed", "auth_required", "cloudflare_challenge"].includes(status || "");
 }
 
 function getCloudflareState(repoPath, liveSecurity) {
@@ -367,6 +367,8 @@ function evaluate(report) {
 
   if (cloudflareStatus === "auth_required" || !report.cloudflare.authenticated) {
     warnings.push("Cloudflare edge release is waiting on Wrangler authentication.");
+  } else if (cloudflareStatus === "cloudflare_challenge") {
+    warnings.push("External Cloudflare managed challenge: Worker is authenticated/deployed, but WAF/Bot/Rulesets are challenging public production verification before normal page/document responses.");
   } else if (cloudflareStatus === "route_bypassed") {
     warnings.push("External Cloudflare route bypass: Worker is authenticated/deployed, but live production traffic is missing edge security headers; inspect DNS/proxy/custom-domain routing for orange-to-orange bypass.");
   } else if (cloudflareStatus && !["verified", "released"].includes(cloudflareStatus)) {

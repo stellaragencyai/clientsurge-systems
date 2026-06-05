@@ -90,6 +90,11 @@ function getHeader(headers, name) {
   return headersToObject(headers)[name.toLowerCase()] || "";
 }
 
+function isCloudflareManagedChallengeHeader(value = "") {
+  const text = String(value || "").toLowerCase();
+  return text.includes("challenges.cloudflare.com") || text.includes("cf-chl");
+}
+
 function createCheck({ id, target, status, severity = "fail", message, details = {} }) {
   return { id, target, status, severity, message, details };
 }
@@ -285,11 +290,27 @@ async function resolveHostAddresses(hostname) {
 async function buildRoutingDiagnostics({ canonical, checks }) {
   const host = new URL(canonical).hostname;
   const addresses = await resolveHostAddresses(host);
+  const cloudflareChallengeHeaders = checks.filter((check) =>
+    check.id === "header:content-security-policy" &&
+    isCloudflareManagedChallengeHeader(check.details?.value)
+  );
   const missingWorkerHeaders = checks.some((check) =>
     check.status === "fail" &&
     ["header:content-security-policy", "header:permissions-policy", "header:cross-origin-opener-policy"].includes(check.id)
   );
   const cloudflareAnycastAddresses = addresses.filter(isCloudflareAnycastAddress);
+
+  if (cloudflareChallengeHeaders.length > 0) {
+    return {
+      status: "cloudflare_managed_challenge",
+      message:
+        "Cloudflare is serving a managed challenge before the public page response. Inspect WAF/Bot/Rulesets for clientsurgesystems.com and allow launch verification or public document routes without bypassing the Worker health probe.",
+      host,
+      addresses,
+      cloudflare_anycast_addresses: cloudflareAnycastAddresses,
+      challenge_targets: cloudflareChallengeHeaders.map((check) => check.target),
+    };
+  }
 
   if (!missingWorkerHeaders) {
     return {

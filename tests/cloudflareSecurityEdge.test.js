@@ -64,6 +64,7 @@ import {
   evaluateEdgeHealthProbe,
   isCloudflareAnycastAddress,
   TRANSFORM_FALLBACK_HEADER,
+  verifyProductionSecurity,
 } from "../scripts/verify-production-security.mjs";
 import {
   diagnoseRouteBypass,
@@ -634,6 +635,49 @@ test("production security verifier accepts Cloudflare transform fallback when Wo
   assert.match(pass.message, /transform fallback is active/);
 });
 
+test("production security verifier classifies Cloudflare managed challenge responses", async () => {
+  const challengeHeaders = {
+    "content-type": "text/html; charset=UTF-8",
+    "content-security-policy": "default-src 'none'; script-src https://challenges.cloudflare.com; base-uri 'self'",
+    "x-content-type-options": "nosniff",
+    "referrer-policy": "same-origin",
+    "permissions-policy": "camera=()",
+    "cross-origin-opener-policy": "same-origin",
+  };
+
+  const report = await verifyProductionSecurity({
+    fetchImpl: async (url, options = {}) => {
+      const target = String(url);
+      if (target.includes("www.clientsurgesystems.com") || target.startsWith("http://")) {
+        return new Response("", {
+          status: 301,
+          headers: { location: "https://clientsurgesystems.com/" },
+        });
+      }
+      if (target.includes(EDGE_HEALTH_PATH)) {
+        return Response.json({ ok: true }, { headers: { [EDGE_HEALTH_HEADER]: "active" } });
+      }
+      if (target.endsWith("/admin/") || target.includes("/onboarding") || target.includes("/setup/preview") || target.includes("/motion-lab") || target.includes("/client-portal")) {
+        return new Response("", {
+          status: 403,
+          headers: { "x-robots-tag": "noindex", "cache-control": "no-store" },
+        });
+      }
+      if (target.endsWith("/robots.txt") || target.endsWith("/sitemap.xml") || target.endsWith("/.well-known/security.txt")) {
+        return new Response("https://clientsurgesystems.com", { status: 200 });
+      }
+      assert.equal(options.redirect, "follow");
+      return new Response("<title>Just a moment...</title>", {
+        status: 403,
+        headers: challengeHeaders,
+      });
+    },
+  });
+
+  assert.equal(report.diagnostics.routing.status, "cloudflare_managed_challenge");
+  assert.deepEqual(report.diagnostics.routing.challenge_targets, ["https://clientsurgesystems.com/"]);
+});
+
 test("Cloudflare transform fallback rule mirrors Worker security headers", () => {
   const [globalRule, sensitiveRule] = buildSecurityHeaderRules("clientsurgesystems.com");
 
@@ -674,6 +718,8 @@ test("Cloudflare security release and monitor scripts keep auth and verification
   assert.match(monitor, /npx wrangler whoami/);
   assert.match(monitor, /auth_required/);
   assert.match(monitor, /route_bypassed/);
+  assert.match(monitor, /cloudflare_challenge/);
+  assert.match(monitor, /Test-CloudflareChallengeFailure/);
   assert.match(monitor, /orange-to-orange/);
   assert.match(monitor, /edge-probe:\(worker\|security-layer\)/);
   assert.match(monitor, /Test-RouteBypassFailure/);
