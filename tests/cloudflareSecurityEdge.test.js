@@ -1,6 +1,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
+import vm from "node:vm";
 
 import worker, {
   ANONYMOUS_USER_ME_HEADER,
@@ -41,6 +42,7 @@ import worker, {
   PUBLIC_NAV_POLISH_STYLE_ID,
   repairStaleDemoBookingModalAsset,
   repairPublicRouteMetadata,
+  repairStaticRouteMetadataScript,
   SENSITIVE_HEADERS,
   SERVICE_WORKER_JS,
   SECURITY_TXT,
@@ -74,6 +76,53 @@ import {
 
 function read(path) {
   return readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+}
+
+function evaluateStaticRouteScript(html, route) {
+  const match = html.match(/<script>\s*\(function \(\) \{([\s\S]*?)\}\)\(\);\s*<\/script>/i);
+  assert.ok(match, "static route metadata script should exist");
+
+  const nodes = {
+    description: { value: "", setAttribute(_name, value) { this.value = value; } },
+    robots: { value: "index,follow", setAttribute(_name, value) { this.value = value; } },
+    canonical: { value: "", setAttribute(_name, value) { this.value = value; } },
+    ogTitle: { value: "", setAttribute(_name, value) { this.value = value; } },
+  };
+  const documentElement = {
+    attrs: new Map(),
+    setAttribute(name, value) { this.attrs.set(name, value); },
+    getAttribute(name) { return this.attrs.get(name); },
+  };
+  const document = {
+    title: "",
+    documentElement,
+    querySelector(selector) {
+      return {
+        'meta[name="description"]': nodes.description,
+        'meta[name="robots"]': nodes.robots,
+        'link[rel="canonical"]': nodes.canonical,
+        'meta[property="og:url"]': { setAttribute() {} },
+        'meta[property="og:title"]': nodes.ogTitle,
+        'meta[property="og:description"]': { setAttribute() {} },
+        'meta[property="twitter:url"]': { setAttribute() {} },
+        'meta[property="twitter:title"]': { setAttribute() {} },
+        'meta[property="twitter:description"]': { setAttribute() {} },
+      }[selector] || null;
+    },
+  };
+
+  vm.runInNewContext(`(function () {${match[1]}})();`, {
+    window: { location: { pathname: route } },
+    document,
+  });
+
+  return {
+    title: document.title,
+    robots: nodes.robots.value,
+    canonical: nodes.canonical.value,
+    routeKey: documentElement.getAttribute("data-static-route"),
+    ogTitle: nodes.ogTitle.value,
+  };
 }
 
 test("Cloudflare security edge worker identifies sensitive app routes", () => {
@@ -331,6 +380,48 @@ test("Cloudflare static HTML injection repairs public route metadata and canonic
   assert.match(repaired, /<meta property="og:url" content="https:\/\/clientsurgesystems\.com\/store" \/>/);
   assert.match(repaired, /Compare ClientSurge packages, automation systems/);
   assert.doesNotMatch(repaired, /grinning-apex-flow-growth\.base44\.app/);
+});
+
+test("Cloudflare static HTML injection repairs stale inline route metadata script", () => {
+  const staleHtml = [
+    "<html><head>",
+    "<title>Home</title>",
+    '<meta name="description" content="old" />',
+    '<meta name="robots" content="index,follow" />',
+    '<link rel="canonical" href="https://clientsurgesystems.com/" />',
+    '<meta property="og:title" content="old" />',
+    "<script>",
+    "(function () {",
+    "var routeMap = { \"/\": { key: \"home\", title: \"Home\", description: \"old\" } };",
+    "var aliases = {};",
+    "var path = window.location.pathname.replace(/\\/+$/, \"\") || \"/\";",
+    "var canonicalPath = aliases[path] || path;",
+    "var meta = routeMap[canonicalPath] || routeMap[\"/\"];",
+    "document.documentElement.setAttribute(\"data-static-route\", meta.key);",
+    "document.title = meta.title;",
+    "})();",
+    "</script>",
+    "</head><body></body></html>",
+  ].join("");
+  const repaired = repairStaticRouteMetadataScript(staleHtml);
+
+  assert.match(repaired, /var noindexPrefixes = \[/);
+  assert.match(repaired, /"\/store"/);
+  assert.match(repaired, /"\/start"/);
+
+  const store = evaluateStaticRouteScript(repaired, "/store");
+  assert.equal(store.routeKey, "store");
+  assert.equal(store.title, "AI Automation Store | ClientSurge Systems");
+  assert.equal(store.canonical, "https://clientsurgesystems.com/store");
+  assert.equal(store.robots, "index,follow");
+
+  const start = evaluateStaticRouteScript(repaired, "/start");
+  assert.equal(start.routeKey, "start");
+  assert.equal(start.title, "Start Your AI Automation Audit | ClientSurge Systems");
+
+  const login = evaluateStaticRouteScript(repaired, "/login");
+  assert.equal(login.routeKey, "login");
+  assert.equal(login.robots, "noindex,nofollow");
 });
 
 test("Cloudflare static HTML injection patches stale demo booking modal behavior", () => {

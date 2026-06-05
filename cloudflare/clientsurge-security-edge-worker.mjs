@@ -1272,6 +1272,52 @@ function upsertHeadTag(html, pattern, tag) {
   return html.includes("</head>") ? html.replace("</head>", `${tag}\n</head>`) : `${tag}\n${html}`;
 }
 
+function buildStaticRouteMetadataScript() {
+  return `<script>
+   (function () {
+        var routeMap = ${JSON.stringify(PUBLIC_ROUTE_METADATA, null, 10)};
+        var aliases = ${JSON.stringify(STATIC_ROUTE_ALIASES, null, 10)};
+        var noindexPrefixes = ${JSON.stringify(NOINDEX_ROUTE_PREFIXES, null, 10)};
+        var path = window.location.pathname.replace(/\\/+$/, "") || "/";
+        var canonicalPath = aliases[path] || aliases[path.toLowerCase()] || path;
+        var meta = routeMap[canonicalPath] || routeMap[canonicalPath.toLowerCase()] || (canonicalPath.indexOf("/blog/") === 0 ? routeMap["/blog"] : routeMap["/"]);
+        var canonicalUrl = "https://clientsurgesystems.com" + (canonicalPath === "/" ? "/" : canonicalPath);
+        var robotsContent = noindexPrefixes.some(function (prefix) {
+          return canonicalPath === prefix || canonicalPath.indexOf(prefix + "/") === 0;
+        }) ? "noindex,nofollow" : "index,follow";
+        document.documentElement.setAttribute("data-static-route", meta.key);
+        document.title = meta.title;
+        var description = document.querySelector('meta[name="description"]');
+        var robots = document.querySelector('meta[name="robots"]');
+        var canonical = document.querySelector('link[rel="canonical"]');
+        var ogUrl = document.querySelector('meta[property="og:url"]');
+        var ogTitle = document.querySelector('meta[property="og:title"]');
+        var ogDescription = document.querySelector('meta[property="og:description"]');
+        var twitterUrl = document.querySelector('meta[property="twitter:url"]');
+        var twitterTitle = document.querySelector('meta[property="twitter:title"]');
+        var twitterDescription = document.querySelector('meta[property="twitter:description"]');
+        if (description) description.setAttribute("content", meta.description);
+        if (robots) robots.setAttribute("content", robotsContent);
+        if (canonical) canonical.setAttribute("href", canonicalUrl);
+        if (ogUrl) ogUrl.setAttribute("content", canonicalUrl);
+        if (ogTitle) ogTitle.setAttribute("content", meta.title);
+        if (ogDescription) ogDescription.setAttribute("content", meta.description);
+        if (twitterUrl) twitterUrl.setAttribute("content", canonicalUrl);
+        if (twitterTitle) twitterTitle.setAttribute("content", meta.title);
+        if (twitterDescription) twitterDescription.setAttribute("content", meta.description);
+      })();
+  </script>`;
+}
+
+export function repairStaticRouteMetadataScript(html) {
+  const scriptPattern = /<script>\s*\(function \(\) \{\s*var routeMap = [\s\S]*?\}\)\(\);\s*<\/script>/i;
+  const script = buildStaticRouteMetadataScript();
+  if (scriptPattern.test(html)) {
+    return html.replace(scriptPattern, script);
+  }
+  return html.includes("</head>") ? html.replace("</head>", `${script}\n</head>`) : `${script}\n${html}`;
+}
+
 export function repairPublicRouteMetadata(html, pathname = "/") {
   const meta = resolvePublicRouteMetadata(pathname);
   const robots = isNoindexRoutePath(meta.canonicalPath) ? "noindex,nofollow" : "index,follow";
@@ -1327,7 +1373,7 @@ export function repairPublicRouteMetadata(html, pathname = "/") {
     `<meta property="twitter:description" content="${description}" />`
   );
 
-  return nextHtml;
+  return repairStaticRouteMetadataScript(nextHtml);
 }
 
 export function injectHomepageMotion(html) {
