@@ -15,7 +15,7 @@ export const CANONICAL_TIER_SERVICE_MAP: Record<string, string[]> = {
     "nurture_sequence_14d",
     "ai_booking_agent",
   ],
-  elite_system: [
+  pro_system: [
     "instant_lead_response",
     "missed_call_text_back",
     "nurture_sequence_14d",
@@ -30,10 +30,10 @@ const PACKAGE_KEY_ALIASES: Record<string, string> = {
   starter_system: "starter_system",
   growth: "growth_system",
   growth_system: "growth_system",
-  elite: "elite_system",
-  elite_system: "elite_system",
-  pro: "elite_system",
-  pro_system: "elite_system",
+  elite: "pro_system",
+  elite_system: "pro_system",
+  pro: "pro_system",
+  pro_system: "pro_system",
 };
 
 export function normalizePackageKey(packageKey: string): string {

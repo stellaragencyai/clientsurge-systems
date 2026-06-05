@@ -630,6 +630,35 @@ async function createCommunicationEvent(base44, event) {
   return base44.asServiceRole.entities.CommunicationEvent.create(event);
 }
 
+async function ensureLegacyInstallChecklist(base44, order) {
+  const functions = base44?.asServiceRole?.functions || base44?.functions;
+  if (!functions?.invoke || !order?.id) {
+    return { skipped: true };
+  }
+
+  try {
+    return await functions.invoke("initializeInstallOS", { order_id: order.id });
+  } catch (error) {
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        order,
+        provider: "internal",
+        event_type: "workflow_triggered",
+        status: "failed",
+        subject: "Legacy install checklist initialization failed",
+        message_body: error instanceof Error ? error.message : String(error),
+        error_message: error instanceof Error ? error.message : String(error),
+        metadata: {
+          order_id: order.id,
+          function_name: "initializeInstallOS",
+        },
+      })
+    );
+    return { failed: true };
+  }
+}
+
 function createTransitionValidation(serviceKey, entries = []) {
   const filteredEntries = entries.filter((entry) => entry?.field && entry?.label);
 
@@ -1218,7 +1247,12 @@ async function resolveClientRecord(base44, order) {
   });
 
   if (existing) {
-    return existing;
+    await base44.asServiceRole.entities.Client.update(existing.id, {
+      lead_id: existing.lead_id || order.lead_id || order.crm_lead_id || "",
+      crm_lead_id: existing.crm_lead_id || order.crm_lead_id || order.lead_id || "",
+      website_lead_id: existing.website_lead_id || order.website_lead_id || "",
+    }).catch(() => null);
+    return base44.asServiceRole.entities.Client.get(existing.id);
   }
 
   return base44.asServiceRole.entities.Client.create({
@@ -1226,6 +1260,9 @@ async function resolveClientRecord(base44, order) {
     business_name: order.business_name,
     email: order.customer_email,
     phone: order.customer_phone || "",
+    lead_id: order.lead_id || order.crm_lead_id || "",
+    crm_lead_id: order.crm_lead_id || order.lead_id || "",
+    website_lead_id: order.website_lead_id || "",
     status: "Onboarding",
   });
 }
@@ -1381,6 +1418,9 @@ async function resolveOnboardingClientRecord(base44, order, client, clientProjec
       client_id: existing.client_id || client.id,
       client_project_id: existing.client_project_id || clientProject.id,
       order_id: existing.order_id || order.id,
+      lead_id: existing.lead_id || order.lead_id || order.crm_lead_id || "",
+      crm_lead_id: existing.crm_lead_id || order.crm_lead_id || order.lead_id || "",
+      website_lead_id: existing.website_lead_id || order.website_lead_id || "",
       ...onboardingPatch,
     });
     return base44.asServiceRole.entities.OnboardingClient.get(existing.id);
@@ -1396,6 +1436,9 @@ async function resolveOnboardingClientRecord(base44, order, client, clientProjec
     client_id: client.id,
     client_project_id: clientProject.id,
     order_id: order.id,
+    lead_id: order.lead_id || order.crm_lead_id || "",
+    crm_lead_id: order.crm_lead_id || order.lead_id || "",
+    website_lead_id: order.website_lead_id || "",
     ...onboardingPatch,
   });
 }
@@ -1725,6 +1768,11 @@ export async function initializePaidOrderInstallPipeline({
       install_configuration: installConfigurationWithHandoff,
     },
     now,
+  });
+  await ensureLegacyInstallChecklist(base44, {
+    ...updatedOrder,
+    items: initializedItems,
+    install_configuration: installConfigurationWithHandoff,
   });
 
   const events = [];

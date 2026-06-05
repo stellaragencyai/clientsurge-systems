@@ -28,9 +28,13 @@ Deno.serve(async (req) => {
     }
 
     // 2. Update lead status to Booked
+    const now = new Date().toISOString();
     await base44.asServiceRole.entities.Leads.update(lead_id, {
       status: "Booked",
-      booked_at: new Date().toISOString(),
+      crm_stage: "Audit Booked",
+      outreach_status: "booked",
+      booked_at: now,
+      last_activity_at: now,
     });
 
     // 3. Create confirmation event

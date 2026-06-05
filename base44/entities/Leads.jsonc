@@ -11,6 +11,10 @@
       "type": "string",
       "title": "Full Name"
     },
+    "owner_contact_name": {
+      "type": "string",
+      "title": "Owner / Contact Name"
+    },
     "business_name": {
       "type": "string",
       "title": "Business Name"
@@ -27,6 +31,18 @@
       "type": "string",
       "title": "Business Type"
     },
+    "industry": {
+      "type": "string",
+      "title": "Industry"
+    },
+    "city": {
+      "type": "string",
+      "title": "City"
+    },
+    "state": {
+      "type": "string",
+      "title": "State"
+    },
     "problem": {
       "type": "string",
       "title": "Biggest Problem"
@@ -34,6 +50,17 @@
     "source": {
       "type": "string",
       "title": "Lead Source"
+    },
+    "source_page": {
+      "type": "string",
+      "title": "Source Page"
+    },
+    "source_history": {
+      "type": "array",
+      "title": "Source Attribution History",
+      "items": {
+        "type": "string"
+      }
     },
     "utm_source": {
       "type": "string",
@@ -62,6 +89,10 @@
     "website_lead_id": {
       "type": "string",
       "title": "Linked Website Lead ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Linked Won Order ID"
     },
     "consent_given": {
       "type": "boolean",
@@ -106,6 +137,52 @@
       ],
       "default": "New"
     },
+    "crm_stage": {
+      "type": "string",
+      "title": "CRM Stage",
+      "enum": [
+        "Not Contacted",
+        "Contacted",
+        "Opened / Clicked",
+        "Replied",
+        "Audit Booked",
+        "Audit Completed",
+        "Proposal Sent",
+        "Won Pending Payment",
+        "Won",
+        "Lost",
+        "Follow Up Later"
+      ],
+      "default": "Not Contacted"
+    },
+    "outreach_status": {
+      "type": "string",
+      "title": "Outreach Status",
+      "enum": [
+        "not_contacted",
+        "contacted",
+        "replied",
+        "booked",
+        "do_not_contact",
+        "bounced"
+      ],
+      "default": "not_contacted"
+    },
+    "do_not_contact": {
+      "type": "boolean",
+      "title": "Do Not Contact",
+      "default": false
+    },
+    "email_unsubscribed": {
+      "type": "boolean",
+      "title": "Email Unsubscribed",
+      "default": false
+    },
+    "email_bounced": {
+      "type": "boolean",
+      "title": "Email Bounced",
+      "default": false
+    },
     "lead_score": {
       "type": "number",
       "title": "Lead Score (0-100)",
@@ -148,9 +225,17 @@
       "type": "string",
       "title": "Last Contacted At"
     },
+    "last_contacted_date": {
+      "type": "string",
+      "title": "Last Contacted Date"
+    },
     "next_follow_up_at": {
       "type": "string",
       "title": "Next Follow-Up At"
+    },
+    "follow_up_date": {
+      "type": "string",
+      "title": "Follow-Up Date"
     },
     "booking_link_sent_at": {
       "type": "string",
@@ -159,6 +244,56 @@
     "booked_at": {
       "type": "string",
       "title": "Booked At"
+    },
+    "last_outreach_campaign_id": {
+      "type": "string",
+      "title": "Last Outreach Campaign ID"
+    },
+    "last_outreach_subject": {
+      "type": "string",
+      "title": "Last Outreach Subject"
+    },
+    "landing_page_url": {
+      "type": "string",
+      "title": "Last Outreach Landing Page"
+    },
+    "page_submitted_from": {
+      "type": "string",
+      "title": "Page Submitted From"
+    },
+    "package_interest": {
+      "type": "string",
+      "title": "Package Interest"
+    },
+    "payment_source": {
+      "type": "string",
+      "title": "Payment Source",
+      "enum": [
+        "stripe",
+        "manual_payment",
+        "invoice_pending",
+        "order_required"
+      ]
+    },
+    "manual_payment_recorded_at": {
+      "type": "string",
+      "title": "Manual Payment Recorded At"
+    },
+    "manual_payment_recorded_by": {
+      "type": "string",
+      "title": "Manual Payment Recorded By"
+    },
+    "onboarding_blocked_reason": {
+      "type": "string",
+      "title": "Onboarding Blocked Reason"
+    },
+    "crm_tag": {
+      "type": "string",
+      "title": "CRM Tag"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
     },
     "reply_sentiment": {
       "type": "string",
@@ -207,12 +342,44 @@
       "type": "string",
       "title": "Business Website URL"
     },
+    "website_url": {
+      "type": "string",
+      "title": "Website URL"
+    },
     "industry_tags": {
       "type": "array",
       "items": {
         "type": "string"
       },
       "title": "Industry Tags (enriched)"
+    },
+    "normalized_email": {
+      "type": "string",
+      "title": "Normalized Email"
+    },
+    "normalized_phone": {
+      "type": "string",
+      "title": "Normalized Phone"
+    },
+    "normalized_business_name": {
+      "type": "string",
+      "title": "Normalized Business Name"
+    },
+    "dedupe_key": {
+      "type": "string",
+      "title": "Deduplication Key"
+    },
+    "import_source": {
+      "type": "string",
+      "title": "Import Source"
+    },
+    "import_batch_id": {
+      "type": "string",
+      "title": "Import Batch ID"
+    },
+    "last_activity_at": {
+      "type": "string",
+      "title": "Last Activity At"
     },
     "company_size": {
       "type": "string",

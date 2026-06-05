@@ -14,6 +14,18 @@
       "type": "string",
       "title": "Customer Phone"
     },
+    "lead_id": {
+      "type": "string",
+      "title": "Linked CRM Lead ID"
+    },
+    "crm_lead_id": {
+      "type": "string",
+      "title": "Linked CRM Lead ID"
+    },
+    "website_lead_id": {
+      "type": "string",
+      "title": "Linked Website Lead ID"
+    },
     "business_name": {
       "type": "string",
       "title": "Business Name"
@@ -258,6 +270,7 @@
         "enum": [
           "starter_system",
           "growth_system",
+          "pro_system",
           "elite_system"
         ],
       "description": "Package type selected by user from store/quiz (null if custom selection)"
@@ -268,6 +281,7 @@
         "enum": [
           "starter_system",
           "growth_system",
+          "pro_system",
           "elite_system"
         ],
       "description": "Auto-detected package type based on purchased services (null if individual services)"
@@ -281,6 +295,23 @@
         "failed"
       ],
       "default": "pending"
+    },
+    "payment_source": {
+      "type": "string",
+      "title": "Payment Source",
+      "enum": [
+        "stripe",
+        "manual_payment",
+        "invoice_pending"
+      ]
+    },
+    "manual_payment_recorded_at": {
+      "type": "string",
+      "title": "Manual Payment Recorded At"
+    },
+    "manual_payment_recorded_by": {
+      "type": "string",
+      "title": "Manual Payment Recorded By"
     },
     "pipeline_status": {
       "type": "string",

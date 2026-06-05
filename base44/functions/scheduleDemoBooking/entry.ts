@@ -35,15 +35,65 @@ async function optimisticLockSlot(base44, scheduled_date, scheduled_time) {
 const MAX_FIELD_LENGTH = 500;
 const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
 const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const LEAD_SOURCE = 'website';
-const INTAKE_TYPE = 'demo_booking';
+const LEAD_SOURCE = 'landing_page';
+const INTAKE_TYPE = 'audit_booking';
+const DEFAULT_AUDIT_SUCCESS_MESSAGE = 'Free Automation Audit scheduled successfully';
 
 function sanitizeString(value: unknown, fallback = '') {
   if (typeof value !== 'string') return fallback;
   return value.replace(/[<>]/g, '').trim().slice(0, MAX_FIELD_LENGTH);
 }
 
+function normalizeIndustrySlug(value: unknown) {
+  return sanitizeString(value)
+    .toLowerCase()
+    .replace(/&/g, 'and')
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+}
+
+function inferIndustrySlug(payload: Record<string, unknown>) {
+  const explicit = normalizeIndustrySlug(payload.industry_slug);
+  if (explicit) return explicit;
+
+  const combined = normalizeIndustrySlug(`${payload.industry || ''} ${payload.business_type || ''}`);
+  if (combined.includes('roof')) return 'roofing';
+  if (combined.includes('hvac')) return 'hvac';
+  if (combined.includes('dental') || combined.includes('dentist') || combined.includes('orthodont')) return 'dental';
+  if (combined.includes('med_spa') || combined.includes('aesthetic')) return 'med_spa';
+  if (combined.includes('chiropractic') || combined.includes('physical_therapy')) return 'chiropractic';
+  if (combined.includes('contractor')) return 'contractors';
+  return combined;
+}
+
+function normalizeIndustryTags(value: unknown, industrySlug = '') {
+  const tags = Array.isArray(value)
+    ? value.map((entry) => normalizeIndustrySlug(entry)).filter(Boolean)
+    : [];
+  if (industrySlug) tags.push(industrySlug, `${industrySlug}_landing_page`);
+  if (industrySlug === 'roofing') tags.push('free_roofing_automation_audit');
+  if (industrySlug === 'hvac') tags.push('free_hvac_automation_audit', 'missed_call_text_back', 'after_hours_lead_capture');
+  if (industrySlug === 'dental') tags.push('free_dental_automation_audit');
+  return [...new Set(tags)];
+}
+
+function leadScoreForIndustry(industrySlug: string) {
+  if (industrySlug === 'roofing') return 75;
+  if (industrySlug === 'hvac') return 72;
+  if (industrySlug === 'dental') return 70;
+  return 50;
+}
+
+function auditNameForIndustry(industrySlug = '') {
+  if (industrySlug === 'roofing') return 'Roofing Automation Audit';
+  if (industrySlug === 'dental') return 'Dental Automation Audit';
+  if (industrySlug === 'hvac') return 'HVAC Automation Audit';
+  return 'Automation Audit';
+}
+
 function normalizePayload(payload: Record<string, unknown>) {
+  const industry = sanitizeString(payload.industry || payload.business_type, 'General') || 'General';
+  const industry_slug = inferIndustrySlug({ ...payload, industry });
   return {
     full_name: sanitizeString(payload.full_name),
     business_name: sanitizeString(payload.business_name),
@@ -53,8 +103,23 @@ function normalizePayload(payload: Record<string, unknown>) {
     scheduled_time: sanitizeString(payload.scheduled_time),
     monthly_leads: sanitizeString(payload.monthly_leads),
     biggest_issue: sanitizeString(payload.biggest_issue),
-    industry: sanitizeString(payload.industry, 'General') || 'General',
+    industry,
+    industry_slug,
+    industry_tags: normalizeIndustryTags(payload.industry_tags, industry_slug),
+    service_interest: sanitizeString(payload.service_interest, 'automation_audit') || 'automation_audit',
+    source: sanitizeString(payload.source, LEAD_SOURCE) || LEAD_SOURCE,
+    source_page: sanitizeString(payload.source_page, '/book') || '/book',
+    business_website_url: sanitizeString(payload.business_website_url || payload.website),
+    website: sanitizeString(payload.website || payload.business_website_url),
     website_url: sanitizeString(payload.website_url),
+    utm_source: sanitizeString(payload.utm_source),
+    utm_medium: sanitizeString(payload.utm_medium),
+    utm_campaign: sanitizeString(payload.utm_campaign),
+    utm_content: sanitizeString(payload.utm_content),
+    referrer: sanitizeString(payload.referrer),
+    consent_given: payload.consent_given === true,
+    consent_source: sanitizeString(payload.consent_source),
+    consent_text_version: sanitizeString(payload.consent_text_version),
   };
 }
 
@@ -135,18 +200,47 @@ function isRecentDuplicate(existingLead: Record<string, unknown>, payload: Retur
 }
 
 function buildLeadPayload(payload: ReturnType<typeof normalizePayload>) {
+  const now = new Date().toISOString();
+  const score = leadScoreForIndustry(payload.industry_slug);
   return {
     full_name: payload.full_name,
+    owner_contact_name: payload.full_name,
     business_name: payload.business_name,
     email: payload.email,
     phone: payload.phone,
     business_type: payload.industry,
-    problem: payload.biggest_issue || payload.monthly_leads || 'Scheduling demo',
-    source: LEAD_SOURCE,
+    industry: payload.industry_slug || payload.industry,
+    problem: payload.biggest_issue || payload.monthly_leads || 'Free Automation Audit booking',
+    source: payload.source || LEAD_SOURCE,
+    source_page: payload.source_page,
+    source_history: [payload.source || LEAD_SOURCE, payload.source_page ? `page:${payload.source_page}` : ''].filter(Boolean),
     intake_type: INTAKE_TYPE,
     status: 'Booked',
-    booking_link_sent_at: new Date().toISOString(),
-    booked_at: new Date().toISOString(),
+    crm_stage: 'Audit Booked',
+    outreach_status: 'booked',
+    booking_link_sent_at: now,
+    booked_at: now,
+    last_activity_at: now,
+    website: payload.business_website_url || payload.website,
+    website_url: payload.business_website_url || payload.website,
+    page_submitted_from: payload.source_page,
+    package_interest: payload.service_interest,
+    crm_tag: payload.industry_slug,
+    industry_tags: payload.industry_tags,
+    assigned_agent_name: payload.industry_slug ? `sales_rep_${payload.industry_slug}` : undefined,
+    assigned_at: now,
+    lead_score: score,
+    activation_priority: score >= 70 ? 'High' : 'Medium',
+    lead_category: score >= 70 ? 'High-Value' : 'Standard',
+    utm_source: payload.utm_source,
+    utm_medium: payload.utm_medium,
+    utm_campaign: payload.utm_campaign,
+    utm_content: payload.utm_content,
+    requested_channels: ['sms', 'email'],
+    consent_given: payload.consent_given,
+    consent_given_at: payload.consent_given ? now : undefined,
+    consent_source: payload.consent_source,
+    consent_text_version: payload.consent_text_version,
   };
 }
 
@@ -250,6 +344,7 @@ Deno.serve(async (req) => {
     }
 
     const leadPayload = buildLeadPayload(payload);
+    const auditName = auditNameForIndustry(payload.industry_slug);
     let lead;
 
     if (existingLead) {
@@ -265,10 +360,11 @@ Deno.serve(async (req) => {
       event_type: 'lead_created',
       provider: 'internal',
       status: 'processed',
-      subject: existingLead ? 'Demo booking updated existing lead' : 'Demo booking created lead',
-      message_body: `Demo booking recorded for ${payload.full_name} from ${payload.business_name}`,
+      subject: existingLead ? `Free ${auditName} booking updated existing lead` : `Free ${auditName} booking created lead`,
+      message_body: `Free ${auditName} booking recorded for ${payload.full_name} from ${payload.business_name}`,
       metadata: {
-        source: LEAD_SOURCE,
+        source: payload.source || LEAD_SOURCE,
+        source_page: payload.source_page,
         intake_type: INTAKE_TYPE,
         action: existingLead ? 'updated' : 'created',
         scheduled_date: payload.scheduled_date,
@@ -287,8 +383,8 @@ Deno.serve(async (req) => {
         eventTypeSuccess: 'email_sent' as const,
         eventTypeFailure: 'email_failed' as const,
         provider: 'internal' as const,
-        subject: `Demo confirmation for ${payload.full_name}`,
-        message: `Demo confirmation email for ${payload.scheduled_date} ${payload.scheduled_time}`,
+        subject: `Free ${auditName} confirmation for ${payload.full_name}`,
+        message: `Free ${auditName} confirmation email for ${payload.scheduled_date} ${payload.scheduled_time}`,
         run: () =>
           base44.functions.invoke('sendDemoConfirmationEmail', {
             email: payload.email,
@@ -296,6 +392,8 @@ Deno.serve(async (req) => {
             business_name: payload.business_name,
             scheduled_date: payload.scheduled_date,
             scheduled_time: payload.scheduled_time,
+            industry: payload.industry,
+            industry_slug: payload.industry_slug,
           }),
       },
       {
@@ -304,8 +402,8 @@ Deno.serve(async (req) => {
         eventTypeSuccess: 'email_sent' as const,
         eventTypeFailure: 'email_failed' as const,
         provider: 'internal' as const,
-        subject: `Demo prep email for ${payload.full_name}`,
-        message: `Demo prep email for ${payload.scheduled_date} ${payload.scheduled_time}`,
+        subject: `Free ${auditName} prep email for ${payload.full_name}`,
+        message: `Free ${auditName} prep email for ${payload.scheduled_date} ${payload.scheduled_time}`,
         run: () =>
           base44.functions.invoke('sendDemoPrepEmail', {
             email: payload.email,
@@ -313,6 +411,8 @@ Deno.serve(async (req) => {
             business_name: payload.business_name,
             scheduled_date: payload.scheduled_date,
             scheduled_time: payload.scheduled_time,
+            industry: payload.industry,
+            industry_slug: payload.industry_slug,
           }),
       },
       {
@@ -321,8 +421,8 @@ Deno.serve(async (req) => {
         eventTypeSuccess: 'sms_sent' as const,
         eventTypeFailure: 'sms_failed' as const,
         provider: 'twilio' as const,
-        subject: `Demo SMS confirmation for ${payload.full_name}`,
-        message: `Demo SMS confirmation for ${payload.scheduled_date} ${payload.scheduled_time}`,
+        subject: `Free ${auditName} SMS confirmation for ${payload.full_name}`,
+        message: `Free ${auditName} SMS confirmation for ${payload.scheduled_date} ${payload.scheduled_time}`,
         run: () =>
           base44.functions.invoke('sendDemoConfirmationSMS', {
             phone: payload.phone,
@@ -337,8 +437,8 @@ Deno.serve(async (req) => {
         eventTypeSuccess: 'email_sent' as const,
         eventTypeFailure: 'email_failed' as const,
         provider: 'internal' as const,
-        subject: `Admin demo notification for ${payload.business_name}`,
-        message: `Admin demo notification for ${payload.full_name} (${payload.business_name})`,
+        subject: `Admin ${auditName} booking notification for ${payload.business_name}`,
+        message: `Admin ${auditName} booking notification for ${payload.full_name} (${payload.business_name})`,
         run: () =>
           base44.functions.invoke('sendAdminDemoNotification', {
             full_name: payload.full_name,
@@ -350,6 +450,10 @@ Deno.serve(async (req) => {
             monthly_leads: payload.monthly_leads,
             biggest_issue: payload.biggest_issue,
             industry: payload.industry,
+            industry_slug: payload.industry_slug,
+            industry_tags: payload.industry_tags,
+            source_page: payload.source_page,
+            business_website_url: payload.business_website_url || payload.website,
           }),
       },
       {
@@ -363,8 +467,8 @@ Deno.serve(async (req) => {
         run: () =>
           base44.functions.invoke('createDemoCalendarEvent', {
             lead_id: lead.id,
-            title: `Demo: ${payload.business_name} - ${payload.full_name}`,
-            description: `Demo Booking\n\nBusiness: ${payload.business_name}\nIndustry: ${payload.industry}\nContact: ${payload.full_name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nMonthly Leads: ${payload.monthly_leads}\nChallenge: ${payload.biggest_issue}`,
+            title: `Free ${auditName}: ${payload.business_name} - ${payload.full_name}`,
+            description: `Free ${auditName} Booking\n\nBusiness: ${payload.business_name}\nIndustry: ${payload.industry}\nIndustry Slug: ${payload.industry_slug || 'Not provided'}\nIndustry Tags: ${payload.industry_tags.join(', ') || 'Not provided'}\nWebsite: ${payload.business_website_url || payload.website || 'Not provided'}\nSource Page: ${payload.source_page}\nContact: ${payload.full_name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nMonthly Leads: ${payload.monthly_leads}\nChallenge: ${payload.biggest_issue}`,
             start_time: bookingDateTime,
             duration_minutes: 15,
           }),
@@ -385,7 +489,8 @@ Deno.serve(async (req) => {
           message_body: effect.message,
           metadata: {
             effect: effect.name,
-            source: LEAD_SOURCE,
+            source: payload.source || LEAD_SOURCE,
+            source_page: payload.source_page,
             intake_type: INTAKE_TYPE,
           },
         });
@@ -404,7 +509,8 @@ Deno.serve(async (req) => {
           error_message: message,
           metadata: {
             effect: effect.name,
-            source: LEAD_SOURCE,
+            source: payload.source || LEAD_SOURCE,
+            source_page: payload.source_page,
             intake_type: INTAKE_TYPE,
           },
         });
@@ -414,11 +520,13 @@ Deno.serve(async (req) => {
     return secureJson({
       success: true,
       lead_id: lead.id,
-      message: 'Demo scheduled successfully',
+      message: payload.industry_slug ? `Free ${auditName} scheduled successfully` : DEFAULT_AUDIT_SUCCESS_MESSAGE,
+      industry_slug: payload.industry_slug,
+      industry_tags: payload.industry_tags,
       warnings,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to schedule demo';
+    const message = error instanceof Error ? error.message : 'Failed to schedule Free Automation Audit';
     return secureJson({ error: message }, { status: error.status || 500 });
   }
 });

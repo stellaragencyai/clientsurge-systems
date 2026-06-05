@@ -1,28 +1,25 @@
 import { secureJson } from "./secureJson.js";
 import { initializePaidOrderInstallPipeline } from "./installPipeline.js";
-import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
+import { getPackageOffer, normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
 import { buildAppUrl } from "./appUrl.js";
 import { resendFetch } from "./resendFetch.js";
-
-function getStripeSecretKey() {
-  try {
-    return (
-      Deno.env.get("STRIPE_LIVE_SECRET_KEY") ||
-      Deno.env.get("STRIPE_SECRET_KEY") ||
-      ""
-    );
-  } catch {
-    return "";
-  }
-}
+import {
+  getStripeClient as getConfiguredStripeClient,
+  getStripeMode,
+} from "./stripeInit.js";
 
 function getWebhookSecrets() {
   try {
-    return [
-      Deno.env.get("STRIPE_WEBHOOK_SECRET") || "",
-      Deno.env.get("STRIPE_TEST_WEBHOOK_SECRET") || "",
-    ].filter(Boolean);
+    const stripeMode = getStripeMode().mode;
+    if (stripeMode === "test") {
+      return [
+        Deno.env.get("STRIPE_TEST_WEBHOOK_SECRET") || "",
+        Deno.env.get("STRIPE_WEBHOOK_SECRET") || "",
+      ].filter(Boolean);
+    }
+
+    return [Deno.env.get("STRIPE_WEBHOOK_SECRET") || ""].filter(Boolean);
   } catch {
     return [];
   }
@@ -34,13 +31,11 @@ async function getBase44Client(req) {
 }
 
 async function getStripeClient() {
-  const stripeSecretKey = getStripeSecretKey();
-  if (!stripeSecretKey) {
+  try {
+    return getConfiguredStripeClient().stripe;
+  } catch {
     return null;
   }
-
-  const { default: Stripe } = await import("npm:stripe@14");
-  return new Stripe(stripeSecretKey);
 }
 
 function cleanString(value) {
@@ -276,6 +271,95 @@ async function resolveOrderFromPaymentIntent(base44, paymentIntent) {
   ).catch(() => []);
 
   return byEmail?.[0] || null;
+}
+
+async function resolveLeadForWonOrder(base44, order) {
+  const leadsEntity = base44?.asServiceRole?.entities?.Leads;
+  if (!leadsEntity?.get || !leadsEntity?.filter) {
+    return null;
+  }
+
+  const directLeadId = cleanString(order?.lead_id || order?.crm_lead_id);
+  if (directLeadId) {
+    const direct = await leadsEntity.get(directLeadId).catch(() => null);
+    if (direct) {
+      return direct;
+    }
+  }
+
+  const customerEmail = cleanString(order?.customer_email).toLowerCase();
+  if (customerEmail) {
+    const matches = await leadsEntity.filter(
+      { email: customerEmail },
+      "-created_date",
+      10
+    ).catch(() => []);
+    const exact = (matches || []).find((lead) =>
+      cleanString(lead.email).toLowerCase() === customerEmail &&
+      (!order?.business_name ||
+        cleanString(lead.business_name).toLowerCase() === cleanString(order.business_name).toLowerCase())
+    );
+    if (exact || matches?.[0]) {
+      return exact || matches[0];
+    }
+  }
+
+  const customerPhone = cleanString(order?.customer_phone);
+  if (customerPhone) {
+    const matches = await leadsEntity.filter(
+      { phone: customerPhone },
+      "-created_date",
+      10
+    ).catch(() => []);
+    if (matches?.[0]) {
+      return matches[0];
+    }
+  }
+
+  return null;
+}
+
+async function markLeadWonForOrder(base44, order, { eventId, source, now }) {
+  const lead = await resolveLeadForWonOrder(base44, order);
+  if (!lead?.id) {
+    return null;
+  }
+
+  const packageInterest =
+    cleanString(order?.pricing_summary?.package_name) ||
+    cleanString(order?.activation_package_name) ||
+    cleanString(order?.plan_type) ||
+    cleanString(order?.package_type);
+
+  const updatedLead = await base44.asServiceRole.entities.Leads.update(lead.id, {
+    status: "Closed",
+    crm_stage: "Won",
+    outreach_status: "booked",
+    package_interest: packageInterest,
+    last_activity_at: now,
+    order_id: order.id,
+  });
+
+  await createCommunicationEvent(
+    base44,
+    buildCommunicationEvent({
+      provider: "internal",
+      channel: "internal",
+      eventType: "status_update",
+      providerMessageId: `lead_won:${eventId}:${lead.id}`,
+      subject: "Lead marked Won from Stripe payment",
+      messageBody: `Lead ${lead.id} marked Won after paid order ${order.id}.`,
+      order,
+      metadata: {
+        source,
+        lead_id: lead.id,
+        order_id: order.id,
+        crm_stage: "Won",
+      },
+    })
+  );
+
+  return updatedLead;
 }
 
 export async function ensurePortalInvite(base44, order) {
@@ -562,9 +646,12 @@ export async function processCheckoutSessionCompleted({
   const packageKey = normalizePackageKey(
     order.pricing_summary?.package_key ||
       session?.metadata?.package_key ||
+      session?.metadata?.package_type ||
+      session?.metadata?.selected_package_type ||
       order.selected_package_type ||
       order.package_type
   );
+  const packageOffer = getPackageOffer(packageKey);
   const orderPatch = {
     stripe_event_id: event.id,
     stripe_session_id: cleanString(session?.id) || initialized.order.stripe_session_id,
@@ -574,6 +661,7 @@ export async function processCheckoutSessionCompleted({
     selected_package_type: packageKey || initialized.order.selected_package_type,
     package_type: packageKey || initialized.order.package_type,
     plan_type:
+      packageOffer?.name ||
       initialized.order.pricing_summary?.package_name ||
       initialized.order.plan_type ||
       initialized.order.business_name,
@@ -584,6 +672,11 @@ export async function processCheckoutSessionCompleted({
     initialized.order.id,
     orderPatch
   );
+  const wonLead = await markLeadWonForOrder(base44, updatedOrder, {
+    eventId: event.id,
+    source,
+    now,
+  });
 
   const portalInvite = await ensurePortalInvite(base44, updatedOrder);
   await ensureConfirmationEmail(
@@ -607,6 +700,7 @@ export async function processCheckoutSessionCompleted({
         event_type: event.type,
         stripe_session_id: session?.id || "",
         stripe_subscription_id: subscriptionId,
+        won_lead_id: wonLead?.id || null,
       },
     })
   );

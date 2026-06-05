@@ -163,7 +163,11 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   );
 
   assertEquals(invited.length, 1);
-  assertEquals(invoked.length, 3);
+  assertEquals(invoked.length, 4);
+  assertEquals(
+    invoked.map((entry) => entry.name).sort().join(","),
+    "initializeInstallOS,sendAdminPurchaseNotification,sendOrderConfirmationEmail,sendSMS",
+  );
   const confirmationInvoke = invoked.find((entry) => entry.name === "sendOrderConfirmationEmail");
   assert(confirmationInvoke);
   assertEquals(confirmationInvoke.payload.order_id, "order_1");
@@ -189,5 +193,5 @@ Deno.test("checkout.session.completed processing is idempotent across legacy wra
   assertEquals(secondResult.success, true);
   assertEquals(secondResult.duplicate, true);
   assertEquals(invited.length, 1);
-  assertEquals(invoked.length, 3);
+  assertEquals(invoked.length, 4);
 });

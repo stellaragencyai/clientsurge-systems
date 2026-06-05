@@ -21,6 +21,9 @@ test("DemoBookingModal submits a real audit request instead of a placeholder vid
   assert.doesNotMatch(modalSource, /dQw4w9WgXcQ/);
   assert.doesNotMatch(modalSource, /<iframe/);
   assert.doesNotMatch(modalSource, /DEMO_VIDEO_URL/);
-  assert.match(modalSource, /base44\.functions\.invoke\("submitLeadCapture"/);
-  assert.match(modalSource, /<form action="\/contact" method="post" onSubmit=\{handleSubmit\}/);
+  assert.match(modalSource, /base44\.functions\.invoke\("scheduleDemoBooking"/);
+  assert.match(modalSource, /base44\.functions\.invoke\("getBookedDemoSlots"/);
+  assert.match(modalSource, /scheduled_date: form\.scheduled_date/);
+  assert.match(modalSource, /scheduled_time: form\.scheduled_time/);
+  assert.match(modalSource, /<form action="\/book" method="post" onSubmit=\{handleSubmit\}/);
 });

@@ -11,6 +11,19 @@ const LEAD_STATUSES = [
   "Booked",
   "Closed",
 ];
+const CRM_STAGES = [
+  "Not Contacted",
+  "Contacted",
+  "Opened / Clicked",
+  "Replied",
+  "Audit Booked",
+  "Audit Completed",
+  "Proposal Sent",
+  "Won Pending Payment",
+  "Won",
+  "Lost",
+  "Follow Up Later",
+];
 const STAGE_GROUPS = ["new", "working", "qualified", "booked", "closed"];
 
 export function getLeadPipelineError(error, fallback) {
@@ -33,11 +46,22 @@ function deriveStageGroup(status) {
   return "new";
 }
 
+function deriveCrmStage(lead) {
+  if (CRM_STAGES.includes(lead.crm_stage)) return lead.crm_stage;
+  if (lead.status === "Closed") return "Won";
+  if (lead.status === "Booked") return "Audit Booked";
+  if (lead.status === "Replied" || lead.status === "Qualified" || lead.status === "Booking Prompt Sent") return "Replied";
+  if (lead.status === "Contacted") return "Contacted";
+  return "Not Contacted";
+}
+
 function normalizeLead(lead) {
   const stageGroup = lead.stage_group || deriveStageGroup(lead.status);
   return {
     ...lead,
     stage_group: stageGroup,
+    crm_stage: deriveCrmStage(lead),
+    industry: lead.industry || lead.business_type || lead.niche || "",
     intake_type: lead.intake_type || "legacy",
     source: lead.source || "unknown",
     actionability: lead.actionability || [],
@@ -73,6 +97,16 @@ function matchesFilter(lead, filters = {}) {
   if (filters.stage_group && filters.stage_group !== "all" && lead.stage_group !== filters.stage_group) return false;
   if (filters.priority && filters.priority !== "all" && lead.activation_priority !== filters.priority) return false;
   if (filters.segment && filters.segment !== "all" && !(lead.actionability || []).includes(filters.segment)) return false;
+  if (filters.industry && filters.industry !== "all") {
+    const requested = String(filters.industry).trim().toLowerCase();
+    const tokens = [
+      lead.industry,
+      lead.business_type,
+      lead.niche,
+      ...(Array.isArray(lead.industry_tags) ? lead.industry_tags : []),
+    ].map((value) => String(value || "").trim().toLowerCase()).filter(Boolean);
+    if (!tokens.some((token) => token === requested || token.includes(requested) || requested.includes(token))) return false;
+  }
 
   return true;
 }
@@ -102,9 +136,11 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
       filtered_leads: filtered.length,
       actionable_leads: filtered.filter((lead) => lead.status !== "Closed").length,
       status_counts: countBy(normalized, "status"),
+      crm_stage_counts: countBy(normalized, "crm_stage"),
       stage_counts: countBy(normalized, "stage_group"),
       source_counts: countBy(normalized, "source"),
       intake_counts: countBy(normalized, "intake_type"),
+      industry_counts: countBy(normalized, "industry"),
       segment_counts: {},
       recommended_offer_counts: {},
       recent_imports: [],
@@ -125,10 +161,12 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
     },
     filter_options: {
       statuses: LEAD_STATUSES,
+      crm_stages: CRM_STAGES,
       stage_groups: STAGE_GROUPS,
       intake_types: Object.keys(countBy(normalized, "intake_type")).sort(),
       segments: [],
       sources: Object.keys(countBy(normalized, "source")).sort(),
+      industries: Object.keys(countBy(normalized, "industry")).sort(),
     },
     data_window: {
       direct_entity_fallback: true,
@@ -228,6 +266,18 @@ export async function saveLeadStatus({ lead_id, status, note = "" }) {
   const response = await base44.functions.invoke("updateLeadStatus", {
     lead_id,
     status,
+    note,
+  });
+
+  return response?.data || {};
+}
+
+export async function bridgeCrmWon({ lead_id, package_key, payment_source, follow_up_date = "", note = "" }) {
+  const response = await base44.functions.invoke("crmWonBridge", {
+    lead_id,
+    package_key,
+    payment_source,
+    follow_up_date,
     note,
   });
 

@@ -17,8 +17,80 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 
-const BATCH_SIZE = 50; // Resend recommends batching
+const BATCH_SIZE = 25;
 const MAX_LEADS = 5000;
+const MAX_SAFE_TEST_RECIPIENTS = 50;
+const DEFAULT_FOLLOW_UP_DAYS = 3;
+const TERMINAL_SUPPRESSION_STATUSES = new Set(["Closed", "Won", "Lost"]);
+
+function normalizeToken(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function toArray(value) {
+  return Array.isArray(value) ? value : [];
+}
+
+function hasIndustrySegmentation(filters = {}) {
+  return toArray(filters.industries).length > 0 || toArray(filters.tags).length > 0;
+}
+
+function leadIndustryTokens(lead) {
+  return [
+    lead.industry,
+    lead.business_type,
+    lead.niche,
+    ...toArray(lead.industry_tags),
+  ].map(normalizeToken).filter(Boolean);
+}
+
+function matchesIndustry(lead, industries = []) {
+  if (!industries.length) return true;
+  const requested = industries.map(normalizeToken).filter(Boolean);
+  const leadTokens = leadIndustryTokens(lead);
+  return requested.some((industry) =>
+    leadTokens.some((token) => token === industry || token.includes(industry) || industry.includes(token))
+  );
+}
+
+function isSuppressed(lead) {
+  if (lead.do_not_contact || lead.dnc || lead.email_unsubscribed || lead.unsubscribed) return true;
+  if (lead.email_bounced || lead.bounced || lead.hard_bounced) return true;
+  if (TERMINAL_SUPPRESSION_STATUSES.has(lead.status) || TERMINAL_SUPPRESSION_STATUSES.has(lead.crm_stage)) return true;
+  if (lead.outreach_status === "do_not_contact") return true;
+  return false;
+}
+
+function getSuppressionReason(lead) {
+  if (lead.do_not_contact || lead.dnc || lead.outreach_status === "do_not_contact") return "do_not_contact";
+  if (lead.email_unsubscribed || lead.unsubscribed) return "unsubscribed";
+  if (lead.email_bounced || lead.bounced || lead.hard_bounced) return "bounced";
+  if (TERMINAL_SUPPRESSION_STATUSES.has(lead.status) || TERMINAL_SUPPRESSION_STATUSES.has(lead.crm_stage)) return "closed_won_lost";
+  return "";
+}
+
+function getRecipientLimit(campaign) {
+  const requested = Number(campaign?.max_recipients ?? campaign?.segment_filters?.max_recipients ?? MAX_SAFE_TEST_RECIPIENTS);
+  if (!Number.isFinite(requested) || requested < 1) return MAX_SAFE_TEST_RECIPIENTS;
+  return Math.min(Math.floor(requested), MAX_SAFE_TEST_RECIPIENTS);
+}
+
+function followUpDateIso(campaign) {
+  const days = Number(campaign?.follow_up_days ?? DEFAULT_FOLLOW_UP_DAYS);
+  const safeDays = Number.isFinite(days) && days > 0 && days <= 14 ? days : DEFAULT_FOLLOW_UP_DAYS;
+  const date = new Date();
+  date.setUTCDate(date.getUTCDate() + safeDays);
+  return date.toISOString();
+}
+
+function appendEmailCompliance(html, text, unsubscribeEmail) {
+  const unsubscribeLine = `\n\nTo unsubscribe, reply "unsubscribe" or email ${unsubscribeEmail}.`;
+  const htmlFooter = `<p style="margin-top:24px;color:#667085;font-size:12px;line-height:1.5">To unsubscribe, reply "unsubscribe" or email <a href="mailto:${unsubscribeEmail}?subject=Unsubscribe">${unsubscribeEmail}</a>.</p>`;
+  return {
+    html: html ? `${html}${htmlFooter}` : undefined,
+    text: text ? `${text}${unsubscribeLine}` : unsubscribeLine.trim(),
+  };
+}
 
 function matchesFilters(lead, filters) {
   if (!filters) return true;
@@ -27,6 +99,9 @@ function matchesFilters(lead, filters) {
     return false;
   }
   if (filters.sources?.length > 0 && !filters.sources.includes(lead.source)) {
+    return false;
+  }
+  if (!matchesIndustry(lead, filters.industries || [])) {
     return false;
   }
   if (filters.lead_score_min != null && (lead.lead_score || 0) < filters.lead_score_min) {
@@ -53,7 +128,7 @@ function personalizeContent(content, lead) {
     .replace(/{email}/g, lead.email || "");
 }
 
-async function sendViaResend(to, subject, html, text, fromEmail, resendKey, campaignId, recipientId) {
+async function sendViaResend(to, subject, html, text, fromEmail, resendKey, campaignId, recipientId, unsubscribeEmail) {
   // Add tracking pixel for opens
   const trackingPixel = `<img src="https://clientsurge.base44.app/api/track/open/${campaignId}/${recipientId}" width="1" height="1" style="display:none" />`;
   const htmlWithTracking = html ? `${html}${trackingPixel}` : undefined;
@@ -73,6 +148,8 @@ async function sendViaResend(to, subject, html, text, fromEmail, resendKey, camp
       headers: {
         "X-Campaign-ID": campaignId,
         "X-Recipient-ID": recipientId,
+        "List-Unsubscribe": `<mailto:${unsubscribeEmail}?subject=Unsubscribe>`,
+        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
       },
     }),
   });
@@ -123,28 +200,60 @@ Deno.serve(async (req) => {
     const settings = settingsRecords?.[0] || {};
     
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const fromEmail = settings.resend_from_email || "noreply@clientsurge.com";
+    const fromEmail =
+      settings.resend_from_email ||
+      Deno.env.get("RESEND_FROM_LEADS") ||
+      "support@clientsurgesystems.com";
+    const unsubscribeEmail = settings.unsubscribe_email || settings.support_email || "support@clientsurgesystems.com";
 
     if (!preview_only && !resendKey) {
       return secureJson({ error: "RESEND_API_KEY not configured" }, { status: 500 });
     }
 
+    if (!hasIndustrySegmentation(campaign.segment_filters || {})) {
+      return secureJson({
+        error: "Industry segmentation is required before previewing or sending. Choose Roofing, HVAC, Dental, or another explicit industry segment.",
+      }, { status: 400 });
+    }
+
+    const requestedLimit = Number(campaign?.max_recipients ?? campaign?.segment_filters?.max_recipients ?? MAX_SAFE_TEST_RECIPIENTS);
+    if (!preview_only && requestedLimit > MAX_SAFE_TEST_RECIPIENTS) {
+      return secureJson({
+        error: `Campaign test batches are capped at ${MAX_SAFE_TEST_RECIPIENTS} recipients. Lower max_recipients before sending.`,
+      }, { status: 400 });
+    }
+
     // Get all leads with email
     const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", MAX_LEADS);
-    const eligibleLeads = (allLeads || []).filter(lead => {
+    const matchingLeads = (allLeads || []).filter(lead => {
       if (!lead.email) return false;
       return matchesFilters(lead, campaign.segment_filters);
     });
+    const suppressedLeads = matchingLeads.filter(isSuppressed);
+    const recipientLimit = getRecipientLimit(campaign);
+    const eligibleLeads = matchingLeads
+      .filter((lead) => !isSuppressed(lead))
+      .slice(0, recipientLimit);
 
     if (preview_only) {
+      const suppressionReasons = suppressedLeads.reduce((acc, lead) => {
+        const reason = getSuppressionReason(lead) || "other";
+        acc[reason] = (acc[reason] || 0) + 1;
+        return acc;
+      }, {});
       return secureJson({
         success: true,
         preview: true,
+        matching_count: matchingLeads.length,
+        suppressed_count: suppressedLeads.length,
+        suppression_reasons: suppressionReasons,
+        max_recipients: recipientLimit,
         recipient_count: eligibleLeads.length,
         sample_recipients: eligibleLeads.slice(0, 5).map(l => ({
           name: l.full_name,
           email: l.email,
           status: l.status,
+          industry: l.business_type || l.industry || toArray(l.industry_tags)[0] || "",
         })),
       });
     }
@@ -164,6 +273,7 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.entities.EmailCampaign.update(campaign_id, {
       status: "sending",
       total_recipients: eligibleLeads.length,
+      suppressed_recipients: suppressedLeads.length,
     });
 
     let sent = 0;
@@ -200,18 +310,22 @@ Deno.serve(async (req) => {
           const personalizedSubject = personalizeContent(campaign.subject, lead);
           const personalizedHtml = personalizeContent(campaign.body_html, lead);
           const personalizedText = personalizeContent(campaign.body_text, lead);
+          const compliantContent = appendEmailCompliance(personalizedHtml, personalizedText, unsubscribeEmail);
 
           // Send email
           const messageId = await sendViaResend(
             lead.email,
             personalizedSubject,
-            personalizedHtml,
-            personalizedText,
+            compliantContent.html,
+            compliantContent.text,
             fromEmail,
             resendKey,
             campaign_id,
-            recipient.id
+            recipient.id,
+            unsubscribeEmail
           );
+
+          const nextFollowUpAt = followUpDateIso(campaign);
 
           // Update recipient record
           await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
@@ -219,6 +333,19 @@ Deno.serve(async (req) => {
             sent_at: new Date().toISOString(),
             resend_message_id: messageId,
             error_message: undefined,
+          });
+
+          await base44.asServiceRole.entities.Leads.update(lead.id, {
+            status: lead.status === "New" ? "Contacted" : lead.status,
+            crm_stage: lead.crm_stage === "Not Contacted" || !lead.crm_stage ? "Contacted" : lead.crm_stage,
+            outreach_status: "contacted",
+            last_contacted_at: new Date().toISOString(),
+            last_contacted_date: new Date().toISOString(),
+            next_follow_up_at: nextFollowUpAt,
+            follow_up_date: nextFollowUpAt,
+            last_outreach_campaign_id: campaign_id,
+            last_outreach_subject: personalizedSubject,
+            landing_page_url: campaign.landing_page_url || "",
           });
 
           // Log communication event
@@ -231,20 +358,27 @@ Deno.serve(async (req) => {
             status: "sent",
             subject: personalizedSubject,
             message_body: personalizedText || personalizedHtml?.substring(0, 500),
-            metadata_json: JSON.stringify({ campaign_id, recipient_id: recipient.id }),
+            metadata_json: JSON.stringify({
+              campaign_id,
+              recipient_id: recipient.id,
+              outreach: true,
+              landing_page_url: campaign.landing_page_url || "",
+              next_follow_up_at: nextFollowUpAt,
+              industry_segment: campaign.segment_filters?.industries || campaign.segment_filters?.tags || [],
+            }),
           });
 
           sent++;
         } catch (err) {
           failed++;
-          errors.push({ email: lead.email, error: err.message });
+          errors.push({ lead_id: lead.id, error: err.message });
           if (recipient?.id) {
             await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
               status: "failed",
               error_message: err.message,
             }).catch(() => null);
           }
-          console.error(`[sendEmailCampaign] sendEmailCampaign error for ${lead.email}:`, err.message);
+          console.error(`[sendEmailCampaign] sendEmailCampaign error for lead ${lead.id}:`, err.message);
         }
       }
 

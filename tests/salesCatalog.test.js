@@ -86,12 +86,12 @@ test("pricing summary preserves add-ons outside matched package", () => {
 
 test("stored pricing summary keeps package and discount visibility for admin", () => {
   const summary = buildPricingSummaryForProducts(
-    getPackageServices("elite_system").map((service) => service.product_id)
+    getPackageServices("pro_system").map((service) => service.product_id)
   );
   const stored = buildStoredPricingSummary(summary.priced_items);
 
-  assert.equal(stored.package_key, "elite_system");
-  assert.equal(stored.package_name, "Elite System");
+  assert.equal(stored.package_key, "pro_system");
+  assert.equal(stored.package_name, "Pro System");
   assert.equal(stored.package_stripe_product_id, "prod_UReW1LmsVbn4BZ");
   assert.equal(stored.package_setup_price_id, "price_1TSlDYBVGjsISdG0l2rHzet1");
   assert.equal(stored.package_monthly_price_id, "price_1TSlDXBVGjsISdG0Abdx85z3");
@@ -99,6 +99,39 @@ test("stored pricing summary keeps package and discount visibility for admin", (
   assert.equal(stored.total_monthly, 1997);
   assert.equal(stored.setup_discount_total, -615);
   assert.equal(stored.monthly_discount_total, -1395);
+});
+
+test("legacy elite_system package key remains backward compatible with Pro", () => {
+  assert.equal(getPackageOffer("elite_system")?.package_key, "pro_system");
+  assert.equal(getPackageOffer("Elite System")?.name, "Pro System");
+  assert.deepEqual(
+    getPackageServices("elite_system").map((service) => service.product_id),
+    getPackageServices("pro_system").map((service) => service.product_id)
+  );
+});
+
+test("legacy elite_system Stripe override key still works for Pro", () => {
+  process.env[PACKAGE_STRIPE_OVERRIDE_ENV] = JSON.stringify({
+    elite_system: {
+      stripe_product_id: "prod_test_pro_legacy",
+      setup_price_id: "price_test_pro_setup_legacy",
+      monthly_price_id: "price_test_pro_monthly_legacy",
+    },
+  });
+
+  try {
+    const summary = buildPricingSummaryForProducts(
+      getPackageServices("pro_system").map((service) => service.product_id)
+    );
+
+    assert.deepEqual(resolvePackageStripeIds(summary.package_offer), {
+      stripe_product_id: "prod_test_pro_legacy",
+      setup_price_id: "price_test_pro_setup_legacy",
+      monthly_price_id: "price_test_pro_monthly_legacy",
+    });
+  } finally {
+    delete process.env[PACKAGE_STRIPE_OVERRIDE_ENV];
+  }
 });
 
 test("package checkout uses the live Stripe package price ids", () => {

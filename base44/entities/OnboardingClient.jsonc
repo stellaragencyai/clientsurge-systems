@@ -18,6 +18,18 @@
       "type": "string",
       "title": "Email"
     },
+    "crm_lead_id": {
+      "type": "string",
+      "title": "Linked CRM Lead ID"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Linked Lead ID"
+    },
+    "website_lead_id": {
+      "type": "string",
+      "title": "Linked Website Lead ID"
+    },
     "website": {
       "type": "string",
       "title": "Website"
@@ -29,6 +41,17 @@
     "industry": {
       "type": "string",
       "title": "Industry"
+    },
+    "package_purchased": {
+      "type": "string",
+      "title": "Package Purchased"
+    },
+    "automation_services_selected": {
+      "type": "array",
+      "title": "Automation Services Selected",
+      "items": {
+        "type": "string"
+      }
     },
     "services": {
       "type": "string",
@@ -55,6 +78,26 @@
     "lead_sources": {
       "type": "string",
       "title": "Lead Sources (comma separated)"
+    },
+    "current_crm_stack": {
+      "type": "string",
+      "title": "Current CRM / Tool Stack"
+    },
+    "google_business_profile_access": {
+      "type": "string",
+      "title": "Google Business Profile Access Instructions"
+    },
+    "website_access_instructions": {
+      "type": "string",
+      "title": "Website Access Instructions"
+    },
+    "twilio_phone_requirements": {
+      "type": "string",
+      "title": "Twilio / Phone Requirements"
+    },
+    "email_domain_access_requirements": {
+      "type": "string",
+      "title": "Email / Domain Access Requirements"
     },
     "twilio_number": {
       "type": "string",

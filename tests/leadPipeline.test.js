@@ -4,9 +4,11 @@ import assert from "node:assert/strict";
 import {
   applyLeadImport,
   buildLeadPipelineSnapshot,
+  CRM_STAGES,
   enrichLeadForPipeline,
   LEAD_PIPELINE_MAX_FETCH,
   listLeadReactivationTargets,
+  normalizeCrmStage,
   prepareLeadImport,
 } from "../base44/functions/_shared/leadPipeline.js";
 
@@ -398,4 +400,89 @@ test("buildLeadPipelineSnapshot handles a 5000+ lead dashboard page with rich fi
   assert.equal(snapshot.filter_options.sources.includes("csv_import"), true);
   assert.equal(snapshot.filter_options.stage_groups.includes("booked"), true);
   assert.equal(snapshot.summary.activation_segments.length >= 7, true);
+});
+
+test("CRM stage model covers launch pipeline stages and supports industry segmentation", () => {
+  assert.deepEqual(CRM_STAGES, [
+    "Not Contacted",
+    "Contacted",
+    "Opened / Clicked",
+    "Replied",
+    "Audit Booked",
+    "Audit Completed",
+    "Proposal Sent",
+    "Won Pending Payment",
+    "Won",
+    "Lost",
+    "Follow Up Later",
+  ]);
+  assert.equal(normalizeCrmStage("opened_clicked"), "Opened / Clicked");
+  assert.equal(normalizeCrmStage("booked"), "Audit Booked");
+
+  const snapshot = buildLeadPipelineSnapshot({
+    leads: [
+      {
+        id: "roofing_lead",
+        created_date: "2026-06-01T00:00:00.000Z",
+        full_name: "Riley Roofing",
+        business_name: "Riley Roofing",
+        email: "roofing@example.com",
+        phone: "+16025550101",
+        business_type: "roofing",
+        industry: "roofing",
+        industry_tags: ["roofing", "free_roofing_automation_audit"],
+        problem: "Needs storm lead follow-up",
+        status: "New",
+        crm_stage: "Not Contacted",
+        lead_score: 75,
+      },
+      {
+        id: "hvac_lead",
+        created_date: "2026-06-01T00:00:00.000Z",
+        full_name: "Hayden HVAC",
+        business_name: "Hayden HVAC",
+        email: "hvac@example.com",
+        phone: "+16025550102",
+        business_type: "hvac",
+        industry: "hvac",
+        industry_tags: ["hvac", "free_hvac_automation_audit"],
+        problem: "Needs emergency call response",
+        status: "Contacted",
+        crm_stage: "Contacted",
+        lead_score: 72,
+      },
+      {
+        id: "dental_lead",
+        created_date: "2026-06-01T00:00:00.000Z",
+        full_name: "Dana Dental",
+        business_name: "Dana Dental",
+        email: "dental@example.com",
+        phone: "+16025550103",
+        business_type: "dental",
+        industry: "dental",
+        industry_tags: ["dental", "free_dental_automation_audit"],
+        problem: "Needs appointment recovery",
+        status: "Replied",
+        crm_stage: "Replied",
+        lead_score: 70,
+      },
+    ],
+    filters: { industry: "hvac" },
+    limit: 10,
+    now: "2026-06-05T12:00:00.000Z",
+  });
+
+  assert.equal(snapshot.summary.total_leads, 3);
+  assert.equal(snapshot.summary.crm_stage_counts["Not Contacted"], 1);
+  assert.equal(snapshot.summary.crm_stage_counts.Contacted, 1);
+  assert.equal(snapshot.summary.crm_stage_counts.Replied, 1);
+  assert.equal(snapshot.summary.industry_counts.roofing, 1);
+  assert.equal(snapshot.summary.industry_counts.hvac, 1);
+  assert.equal(snapshot.summary.industry_counts.dental, 1);
+  assert.equal(snapshot.pagination.total_filtered, 1);
+  assert.equal(snapshot.leads[0].id, "hvac_lead");
+  assert.deepEqual(snapshot.filter_options.crm_stages, CRM_STAGES);
+  assert.ok(snapshot.filter_options.industries.includes("roofing"));
+  assert.ok(snapshot.filter_options.industries.includes("hvac"));
+  assert.ok(snapshot.filter_options.industries.includes("dental"));
 });

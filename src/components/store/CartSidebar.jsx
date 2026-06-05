@@ -14,6 +14,33 @@ const COMPLEMENTARY_SERVICES = {
   lead_reactivation: ["nurture_sequence_14d", "instant_lead_response", "review_request"],
 };
 
+const CHECKOUT_ATTRIBUTION_KEY = "clientsurge:checkout-lead-attribution";
+
+function readCheckoutLeadAttribution() {
+  if (typeof window === "undefined") {
+    return {};
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const fromUrl = {
+    lead_id: params.get("lead_id") || "",
+    crm_lead_id: params.get("crm_lead_id") || params.get("lead_id") || "",
+    website_lead_id: params.get("website_lead_id") || "",
+  };
+
+  const hasUrlAttribution = Object.values(fromUrl).some(Boolean);
+  if (hasUrlAttribution) {
+    sessionStorage.setItem(CHECKOUT_ATTRIBUTION_KEY, JSON.stringify(fromUrl));
+    return fromUrl;
+  }
+
+  try {
+    return JSON.parse(sessionStorage.getItem(CHECKOUT_ATTRIBUTION_KEY) || "{}") || {};
+  } catch {
+    return {};
+  }
+}
+
 export default function CartSidebar() {
   const {
     items,
@@ -21,6 +48,7 @@ export default function CartSidebar() {
     addItem,
     cartOpen,
     setCartOpen,
+    pricingSummary,
     totalSetup,
     totalMonthly,
   } = useCart();
@@ -44,6 +72,7 @@ export default function CartSidebar() {
 
   const suggestedAddon = useMemo(() => {
     if (!items.length) return null;
+    if (pricingSummary?.package_offer) return null;
 
     const selectedProductIds = new Set(items.map((item) => item.product_id));
     const selectedServiceKeys = new Set(items.map((item) => item.service_key).filter(Boolean));
@@ -65,9 +94,36 @@ export default function CartSidebar() {
       ) ||
       null
     );
-  }, [items]);
+  }, [items, pricingSummary]);
+
+  const checkoutBlocker = useMemo(() => {
+    if (!items.length) return "";
+
+    const packageOffer = pricingSummary?.package_offer;
+    if (!packageOffer) {
+      return "Live checkout requires a Starter, Growth, or Pro package. Choose a complete package before continuing.";
+    }
+
+    const selectedServiceKeys = new Set(pricingSummary.selected_service_keys || []);
+    const packageServiceKeys = new Set(packageOffer.included_service_keys || []);
+    const hasExactPackageServices =
+      selectedServiceKeys.size === packageServiceKeys.size &&
+      [...packageServiceKeys].every((serviceKey) => selectedServiceKeys.has(serviceKey));
+
+    if (!hasExactPackageServices || (pricingSummary.add_on_service_keys || []).length > 0) {
+      return "Add-on checkout is not enabled yet. Remove extra services or choose one package before continuing.";
+    }
+
+    return "";
+  }, [items.length, pricingSummary]);
 
   const handleCheckout = async () => {
+    if (checkoutBlocker) {
+      setError(checkoutBlocker);
+      setStep("cart");
+      return;
+    }
+
     if (!form.name || !form.email || !form.business) {
       setError("Please fill in all required fields.");
       return;
@@ -95,12 +151,16 @@ export default function CartSidebar() {
     }
 
     try {
+      const leadAttribution = readCheckoutLeadAttribution();
       const response = await base44.functions.invoke("createCheckoutSession", {
         items,
         customer_name: form.name,
         customer_email: form.email,
         customer_phone: form.phone,
         business_name: form.business,
+        lead_id: leadAttribution.lead_id || leadAttribution.crm_lead_id || "",
+        crm_lead_id: leadAttribution.crm_lead_id || leadAttribution.lead_id || "",
+        website_lead_id: leadAttribution.website_lead_id || "",
         success_url: `${window.location.origin}/client-portal?session_id={CHECKOUT_SESSION_ID}&new=1`, // #309: redirect to portal post-checkout,
         cancel_url: `${window.location.origin}/store`,
       });
@@ -372,6 +432,19 @@ export default function CartSidebar() {
                   </div>
                 </div>
               )}
+              {error || checkoutBlocker ? (
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#d14343",
+                    fontWeight: "600",
+                    lineHeight: 1.55,
+                    margin: "8px 2px 0",
+                  }}
+                >
+                  {error || checkoutBlocker}
+                </p>
+              ) : null}
             </div>
           ) : (
             <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
@@ -536,7 +609,15 @@ export default function CartSidebar() {
 
             {step === "cart" ? (
               <button
-                onClick={() => setStep("info")}
+                onClick={() => {
+                  if (checkoutBlocker) {
+                    setError(checkoutBlocker);
+                    return;
+                  }
+                  setError("");
+                  setStep("info");
+                }}
+                disabled={Boolean(checkoutBlocker)}
                 style={{
                     width: "100%",
                     borderRadius: "9999px",
@@ -544,7 +625,8 @@ export default function CartSidebar() {
                     background:
                       "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
                     border: "none",
-                    cursor: "pointer",
+                    cursor: checkoutBlocker ? "not-allowed" : "pointer",
+                    opacity: checkoutBlocker ? 0.72 : 1,
                     boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
                   }}
                 >

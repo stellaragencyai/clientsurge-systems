@@ -6,6 +6,79 @@ import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
+const TIME_SLOTS = [
+  { value: "09:00", label: "9:00 AM" },
+  { value: "09:30", label: "9:30 AM" },
+  { value: "10:00", label: "10:00 AM" },
+  { value: "10:30", label: "10:30 AM" },
+  { value: "11:00", label: "11:00 AM" },
+  { value: "11:30", label: "11:30 AM" },
+  { value: "14:00", label: "2:00 PM" },
+  { value: "14:30", label: "2:30 PM" },
+  { value: "15:00", label: "3:00 PM" },
+  { value: "15:30", label: "3:30 PM" },
+  { value: "16:00", label: "4:00 PM" },
+  { value: "16:30", label: "4:30 PM" },
+];
+
+const AUDIT_COPY = {
+  roofing: {
+    eyebrow: "Free Roofing Automation Audit",
+    heading: "Find the missed calls and quote requests costing you roofing jobs.",
+    intro: "Send the request here and ClientSurge will review your storm lead, missed-call, quote follow-up, and estimate booking path before the walkthrough.",
+    checkOne: "Roofing lead capture and missed-call recovery review",
+    checkTwo: "Instant storm, quote, and estimate request response gaps",
+    defaultMessage: "I would like a free roofing automation audit for my roofing business.",
+    serviceInterest: "roofing_automation_audit",
+    tag: "free_roofing_automation_audit",
+    consentSource: "roofing_audit_modal",
+    success: "We have your roofing details and selected audit time. Expect confirmation with practical next steps for missed calls, quote requests, and booked estimates.",
+    formIntro: "Choose a time and send roofing-specific context into the ClientSurge booking workflow.",
+    submitLabel: "Book roofing audit",
+  },
+  dental: {
+    eyebrow: "Free Dental Automation Audit",
+    heading: "Find the missed new-patient calls and appointment requests your front desk cannot chase.",
+    intro: "Send the request here and ClientSurge will review your dental lead capture, missed-call text-back, appointment request, and patient follow-up path before the walkthrough.",
+    checkOne: "Dental new-patient lead capture and missed-call review",
+    checkTwo: "Front desk overload, booking handoff, and follow-up gaps",
+    defaultMessage: "I would like a free dental automation audit for my dental practice.",
+    serviceInterest: "dental_automation_audit",
+    tag: "free_dental_automation_audit",
+    consentSource: "dental_audit_modal",
+    success: "We have your dental practice details and selected audit time. Expect confirmation with practical next steps for missed calls, new-patient appointment requests, and follow-up.",
+    formIntro: "Choose a time and send dental-specific context into the ClientSurge booking workflow.",
+    submitLabel: "Book dental audit",
+  },
+  hvac: {
+    eyebrow: "Free HVAC Automation Audit",
+    heading: "Find the missed calls, emergency calls, and after-hours AC repair leads costing you HVAC jobs.",
+    intro: "Send the request here and ClientSurge will review your missed-call text-back, instant lead response, service appointment booking, seasonal surge, and after-hours lead capture path before the walkthrough.",
+    checkOne: "HVAC missed-call text-back and emergency lead response review",
+    checkTwo: "Service appointment booking, dispatch handoff, and seasonal surge gaps",
+    defaultMessage: "I would like a free HVAC automation audit for my heating and cooling business.",
+    serviceInterest: "hvac_automation_audit",
+    tag: "free_hvac_automation_audit",
+    consentSource: "hvac_audit_modal",
+    success: "We have your HVAC details and selected audit time. Expect confirmation with practical next steps for missed calls, emergency service leads, and booked appointments.",
+    formIntro: "Choose a time and send HVAC-specific context into the ClientSurge booking workflow.",
+    submitLabel: "Book HVAC audit",
+  },
+  default: {
+    eyebrow: "Free Automation Audit",
+    heading: "Find the lead leaks costing you booked jobs.",
+    intro: "Send the request here and ClientSurge will review your current follow-up, booking, and missed-call path before the walkthrough.",
+    checkOne: "Lead capture and missed-call response review",
+    checkTwo: "Fastest automation opportunities for your business type",
+    defaultMessage: "I would like a free automation audit for my business.",
+    serviceInterest: "automation_audit",
+    tag: "free_automation_audit",
+    consentSource: "audit_modal",
+    success: "We have your details and selected audit time. Expect confirmation with practical next steps for your lead flow.",
+    formIntro: "Choose a time and send context into the ClientSurge booking workflow.",
+    submitLabel: "Book Free Automation Audit",
+  },
+};
 
 const initialForm = {
   full_name: "",
@@ -23,6 +96,8 @@ const initialForm = {
   utm_campaign: "",
   utm_content: "",
   referrer: "",
+  scheduled_date: "",
+  scheduled_time: "",
 };
 
 function normalizeIndustrySlug(value) {
@@ -36,18 +111,20 @@ function normalizeIndustrySlug(value) {
 
 export default function DemoBookingModal({ isOpen = true, onClose, prefillIndustry = "", industrySlug = "" }) {
   const resolvedIndustrySlug = industrySlug || normalizeIndustrySlug(prefillIndustry);
-  const isRoofingAudit = resolvedIndustrySlug === "roofing";
+  const auditCopy = AUDIT_COPY[resolvedIndustrySlug] || AUDIT_COPY.default;
   const [form, setForm] = useState(() => ({
     ...initialForm,
     business_type: prefillIndustry,
     industry_slug: resolvedIndustrySlug,
     message: prefillIndustry
-      ? `I would like a free ${isRoofingAudit ? "roofing " : ""}automation audit for my ${prefillIndustry} business.`
-      : "I would like a free automation audit for my business.",
+      ? auditCopy.defaultMessage
+      : AUDIT_COPY.default.defaultMessage,
   }));
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [bookedSlots, setBookedSlots] = useState([]);
+  const [loadingSlots, setLoadingSlots] = useState(false);
 
   useEffect(() => {
     if (!isOpen) {
@@ -76,8 +153,28 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
   }, [isOpen, prefillIndustry, resolvedIndustrySlug]);
 
   const canSubmit = useMemo(() => {
-    return Boolean(form.full_name.trim() && EMAIL_REGEX.test(form.email.trim()) && form.message.trim() && form.consent_given);
-  }, [form.consent_given, form.email, form.full_name, form.message]);
+    return Boolean(
+      form.full_name.trim() &&
+        EMAIL_REGEX.test(form.email.trim()) &&
+        form.phone.trim() &&
+        form.business_name.trim() &&
+        form.business_type.trim() &&
+        form.message.trim() &&
+        form.scheduled_date &&
+        form.scheduled_time &&
+        form.consent_given
+    );
+  }, [
+    form.business_name,
+    form.business_type,
+    form.consent_given,
+    form.email,
+    form.full_name,
+    form.message,
+    form.phone,
+    form.scheduled_date,
+    form.scheduled_time,
+  ]);
 
   if (!isOpen || typeof document === "undefined") {
     return null;
@@ -96,15 +193,33 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
       nextErrors.email = "Enter a valid email";
     }
 
-    if (form.phone.trim()) {
+    if (!form.phone.trim()) {
+      nextErrors.phone = "Required";
+    } else {
       const digits = form.phone.replace(/\D/g, "");
       if (!PHONE_REGEX.test(form.phone) || digits.length < 10) {
         nextErrors.phone = "Enter a valid phone number";
       }
     }
 
+    if (!form.business_name.trim()) {
+      nextErrors.business_name = "Required";
+    }
+
+    if (!form.business_type.trim()) {
+      nextErrors.business_type = "Required";
+    }
+
     if (!form.message.trim()) {
       nextErrors.message = "Required";
+    }
+
+    if (!form.scheduled_date) {
+      nextErrors.scheduled_date = "Choose a date";
+    }
+
+    if (!form.scheduled_time) {
+      nextErrors.scheduled_time = "Choose a time";
     }
 
     return nextErrors;
@@ -114,6 +229,25 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
     const { name, value } = event.target;
     setForm((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
+  };
+
+  const handleDateChange = async (event) => {
+    const value = event.target.value;
+    setForm((current) => ({ ...current, scheduled_date: value, scheduled_time: "" }));
+    setErrors((current) => ({ ...current, scheduled_date: undefined, scheduled_time: undefined, submit: undefined }));
+    setBookedSlots([]);
+
+    if (!value) return;
+
+    setLoadingSlots(true);
+    try {
+      const result = await base44.functions.invoke("getBookedDemoSlots", { date: value });
+      setBookedSlots(result?.data?.booked_times || []);
+    } catch {
+      setBookedSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
   };
 
   const handleSubmit = async (event) => {
@@ -133,42 +267,44 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
       const industryTags = [
         effectiveIndustrySlug,
         effectiveIndustrySlug ? `${effectiveIndustrySlug}_landing_page` : "",
-        isRoofingAudit ? "free_roofing_automation_audit" : "free_automation_audit",
+        auditCopy.tag,
       ].filter(Boolean);
-      const result = await base44.functions.invoke("submitLeadCapture", {
+      const result = await base44.functions.invoke("scheduleDemoBooking", {
         email: form.email.trim().toLowerCase(),
         full_name: form.full_name.trim(),
         phone: form.phone.trim(),
         business_name: form.business_name.trim(),
-        business_type: form.business_type.trim() || (isRoofingAudit ? "Roofing & Restoration" : "Free Automation Audit"),
+        business_type: form.business_type.trim() || prefillIndustry || "Free Automation Audit",
+        industry: form.business_type.trim() || prefillIndustry || "Free Automation Audit",
         industry_slug: effectiveIndustrySlug,
-        industry_tags: industryTags,
-        service_interest: isRoofingAudit ? "roofing_automation_audit" : "automation_audit",
-        problem: form.message.trim(),
-        message: form.message.trim(),
+        service_interest: auditCopy.serviceInterest,
+        biggest_issue: form.message.trim(),
         source: "landing_page",
         source_page: currentPath || "/book",
-        requested_channels: ["sms", "email"],
         consent_given: form.consent_given === true,
-        consent_source: isRoofingAudit ? "roofing_audit_modal" : "audit_modal",
+        consent_source: auditCopy.consentSource,
         consent_text_version: "audit_modal_explicit_checkbox_v1",
+        scheduled_date: form.scheduled_date,
+        scheduled_time: form.scheduled_time,
         business_website_url: form.business_website_url.trim(),
+        website: form.business_website_url.trim(),
         website_url: form.website_url,
         utm_source: form.utm_source,
         utm_medium: form.utm_medium,
         utm_campaign: form.utm_campaign,
         utm_content: form.utm_content,
         referrer: form.referrer,
+        industry_tags: industryTags,
       });
 
       if (!result?.data?.success) {
-        throw new Error(result?.data?.error || "Audit request failed");
+        throw new Error(result?.data?.error || "Audit booking failed");
       }
 
       setSuccess(true);
     } catch (error) {
       setErrors({
-        submit: "We could not send the request automatically. Please call or email us directly.",
+        submit: "We could not book the audit automatically. Please call or email us directly.",
       });
     } finally {
       setLoading(false);
@@ -207,25 +343,23 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
         <div className="grid max-h-[calc(100svh-32px)] overflow-y-auto rounded-2xl bg-white shadow-2xl md:grid-cols-[0.92fr_1.08fr]">
           <div className="bg-slate-950 p-6 text-white md:p-8">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#7dd3fc]">
-              {isRoofingAudit ? "Free Roofing Automation Audit" : "Free Automation Audit"}
+              {auditCopy.eyebrow}
             </p>
             <h2 className="font-display text-3xl font-semibold leading-tight md:text-4xl">
-              {isRoofingAudit ? "Find the missed calls and quote requests costing you roofing jobs." : "Find the lead leaks costing you booked jobs."}
+              {auditCopy.heading}
             </h2>
             <p className="mt-4 text-sm leading-6 text-slate-300">
-              {isRoofingAudit
-                ? "Send the request here and ClientSurge will review your storm lead, missed-call, quote follow-up, and estimate booking path before the walkthrough."
-                : "Send the request here and ClientSurge will review your current follow-up, booking, and missed-call path before the walkthrough."}
+              {auditCopy.intro}
             </p>
 
             <div className="mt-7 space-y-4 text-sm text-slate-200">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00aeef]" />
-                <span>{isRoofingAudit ? "Roofing lead capture and missed-call recovery review" : "Lead capture and missed-call response review"}</span>
+                <span>{auditCopy.checkOne}</span>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00aeef]" />
-                <span>{isRoofingAudit ? "Instant storm, quote, and estimate request response gaps" : "Fastest automation opportunities for your business type"}</span>
+                <span>{auditCopy.checkTwo}</span>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00aeef]" />
@@ -254,11 +388,9 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
                   <CheckCircle2 className="h-8 w-8 text-emerald-600" />
                 </div>
-                <h3 className="text-2xl font-semibold text-slate-950">Audit request sent</h3>
+                <h3 className="text-2xl font-semibold text-slate-950">Audit booked</h3>
                 <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
-                  {isRoofingAudit
-                    ? "We have your roofing details. Expect a direct follow-up with practical next steps for missed calls, quote requests, and booked estimates."
-                    : "We have your details. Expect a direct follow-up with practical next steps for your lead flow."}
+                  {auditCopy.success}
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <a
@@ -277,13 +409,11 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 </div>
               </div>
             ) : (
-              <form action="/contact" method="post" onSubmit={handleSubmit} className="space-y-4" noValidate>
+              <form action="/book" method="post" onSubmit={handleSubmit} className="space-y-4" noValidate>
                 <div>
-                  <h3 className="text-2xl font-semibold text-slate-950">Request your free audit</h3>
+                  <h3 className="text-2xl font-semibold text-slate-950">Book your free audit</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    {isRoofingAudit
-                      ? "This form feeds the ClientSurge lead workflow with roofing-specific routing."
-                      : "This form feeds the ClientSurge lead workflow directly."}
+                    {auditCopy.formIntro}
                   </p>
                 </div>
 
@@ -349,6 +479,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                       className={inputClass}
                       autoComplete="tel"
                       inputMode="tel"
+                      required
                       aria-invalid={Boolean(errors.phone)}
                     />
                     {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
@@ -362,7 +493,10 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                       onChange={handleChange}
                       className={inputClass}
                       autoComplete="organization"
+                      required
+                      aria-invalid={Boolean(errors.business_name)}
                     />
+                    {errors.business_name && <p className="mt-1 text-xs text-red-600">{errors.business_name}</p>}
                   </div>
                 </div>
 
@@ -376,8 +510,11 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                       onChange={handleChange}
                       className={inputClass}
                       placeholder="Dental, roofing, med spa..."
+                      required
+                      aria-invalid={Boolean(errors.business_type)}
                     />
                     <input type="hidden" name="industry_slug" value={form.industry_slug} />
+                    {errors.business_type && <p className="mt-1 text-xs text-red-600">{errors.business_type}</p>}
                   </div>
                   <div>
                     <label htmlFor="demo-business-website" className={labelClass}>Website</label>
@@ -408,6 +545,50 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                   {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
                 </div>
 
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="demo-scheduled-date" className={labelClass}>Audit date</label>
+                    <input
+                      id="demo-scheduled-date"
+                      name="scheduled_date"
+                      type="date"
+                      value={form.scheduled_date}
+                      min={new Date().toISOString().split("T")[0]}
+                      onChange={handleDateChange}
+                      className={inputClass}
+                      required
+                      aria-invalid={Boolean(errors.scheduled_date)}
+                    />
+                    {errors.scheduled_date && <p className="mt-1 text-xs text-red-600">{errors.scheduled_date}</p>}
+                  </div>
+                  <div>
+                    <label htmlFor="demo-scheduled-time" className={labelClass}>
+                      Audit time {loadingSlots && <span className="normal-case tracking-normal text-slate-400">Loading...</span>}
+                    </label>
+                    <select
+                      id="demo-scheduled-time"
+                      name="scheduled_time"
+                      value={form.scheduled_time}
+                      onChange={handleChange}
+                      disabled={!form.scheduled_date || loadingSlots}
+                      className={inputClass}
+                      required
+                      aria-invalid={Boolean(errors.scheduled_time)}
+                    >
+                      <option value="">{form.scheduled_date ? "Choose a time" : "Choose a date first"}</option>
+                      {TIME_SLOTS.map(({ value, label }) => {
+                        const booked = bookedSlots.includes(value);
+                        return (
+                          <option key={value} value={value} disabled={booked}>
+                            {label}{booked ? " - Booked" : ""}
+                          </option>
+                        );
+                      })}
+                    </select>
+                    {errors.scheduled_time && <p className="mt-1 text-xs text-red-600">{errors.scheduled_time}</p>}
+                  </div>
+                </div>
+
                 <label className="flex items-start gap-2.5 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
                   <input
                     type="checkbox"
@@ -419,7 +600,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                     className="mt-0.5 h-4 w-4 rounded accent-[#00aeef]"
                   />
                   <span>
-                    I agree to receive automated SMS and email messages from ClientSurge Systems about my audit request.
+                    I agree to receive automated SMS and email messages from ClientSurge Systems about my audit booking.
                     Msg and data rates may apply. Reply <strong>STOP</strong> to opt out. See our{" "}
                     <a href="/privacy-policy" className="underline hover:text-slate-950">Privacy Policy</a>
                     {" "}and{" "}
@@ -435,11 +616,11 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                   {loading ? (
                     <>
                       <Loader2 className="h-5 w-5 animate-spin" />
-                      Sending request
+                      Booking audit
                     </>
                   ) : (
                     <>
-                      {isRoofingAudit ? "Send roofing audit request" : "Send audit request"}
+                      {auditCopy.submitLabel}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}

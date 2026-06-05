@@ -11,8 +11,13 @@ Deno.serve(async (req) => {
     }
 
     if (lead_id) {
+      const now = new Date().toISOString();
       await base44.asServiceRole.entities.Leads.update(lead_id, {
-        booked_at: new Date().toISOString(),
+        status: "Booked",
+        crm_stage: "Audit Booked",
+        outreach_status: "booked",
+        booked_at: now,
+        last_activity_at: now,
       });
     }
 

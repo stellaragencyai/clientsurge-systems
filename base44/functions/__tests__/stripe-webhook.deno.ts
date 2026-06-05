@@ -48,4 +48,15 @@ Deno.test("canonical package selection matches current service bundles", async (
     ])?.package_key,
     "growth_system"
   );
+  assertEquals(
+    getBestPackageOfferForServiceKeys([
+      "instant_lead_response",
+      "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+      "lead_reactivation",
+      "review_request",
+    ])?.package_key,
+    "pro_system"
+  );
 });

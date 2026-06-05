@@ -26,6 +26,15 @@ test("scheduleDemoBooking enforces date availability and optimistic slot locks b
   assert.ok(firstLock < ensureRequest, "expected optimistic lock before creating the DemoRequest");
 });
 
+test("scheduleDemoBooking stamps audit booking CRM status and source attribution", () => {
+  assert.match(scheduleDemoBooking, /const INTAKE_TYPE = 'audit_booking'/);
+  assert.match(scheduleDemoBooking, /crm_stage:\s*'Audit Booked'/);
+  assert.match(scheduleDemoBooking, /outreach_status:\s*'booked'/);
+  assert.match(scheduleDemoBooking, /source_page: payload\.source_page/);
+  assert.match(scheduleDemoBooking, /business_website_url/);
+  assert.match(scheduleDemoBooking, /Free Automation Audit scheduled successfully/);
+});
+
 test("demoBookingGuard entry reuses the shared booking-date guard", () => {
   assert.match(demoBookingGuard, /from "\.\.\/shared\/demoBookingGuard\.ts"/);
   assert.doesNotMatch(demoBookingGuard, /getUTCDay/);

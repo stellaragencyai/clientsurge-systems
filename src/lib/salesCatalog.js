@@ -302,8 +302,9 @@ export const PACKAGE_DEFINITIONS = [
     highlight: true,
   },
   {
-    package_key: "elite_system",
-    name: "Elite System",
+    package_key: "pro_system",
+    legacy_package_keys: ["elite_system"],
+    name: "Pro System",
     fit: "Best for teams that want the full response, reactivation, and review stack.",
     description: "The complete AI automation bundle — every service, fully managed.",
     stripe_product_id: "prod_UReW1LmsVbn4BZ",
@@ -329,12 +330,12 @@ export const PACKAGE_KEY_ALIASES = {
   growth: "growth_system",
   "growth system": "growth_system",
   growth_system: "growth_system",
-  elite: "elite_system",
-  "elite system": "elite_system",
-  elite_system: "elite_system",
-  pro: "elite_system",
-  "pro system": "elite_system",
-  pro_system: "elite_system",
+  elite: "pro_system",
+  "elite system": "pro_system",
+  elite_system: "pro_system",
+  pro: "pro_system",
+  "pro system": "pro_system",
+  pro_system: "pro_system",
 };
 
 const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";
@@ -386,7 +387,10 @@ export function resolvePackageStripeIds(packageOffer) {
   }
 
   const overrides = getPackageStripeOverrides();
-  const override = overrides[packageOffer.package_key] || null;
+  const legacyOverrideKey = (packageOffer.legacy_package_keys || []).find(
+    (legacyKey) => overrides[legacyKey]
+  );
+  const override = overrides[packageOffer.package_key] || overrides[legacyOverrideKey] || null;
 
   if (override) {
     const hasCompleteOverride =
@@ -550,6 +554,7 @@ export function getPackageOfferByName(packageName) {
 
   return (
     PACKAGE_OFFERS.find((offer) => offer.name.toLowerCase() === normalizedName) ||
+    getPackageOffer(normalizedName) ||
     null
   );
 }
@@ -756,7 +761,7 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
   const packageStripeIds = resolvePackageStripeIds(packageOffer);
 
   if (!packageStripeIds.setup_price_id || !packageStripeIds.monthly_price_id) {
-    throw new Error("Live checkout currently requires a Starter, Growth, or Elite package bundle.");
+    throw new Error("Live checkout currently requires a Starter, Growth, or Pro package bundle.");
   }
 
   if (addOnServiceKeys.length > 0) {

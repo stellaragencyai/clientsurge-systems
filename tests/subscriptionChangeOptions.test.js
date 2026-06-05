@@ -19,7 +19,8 @@ test("subscription change options mark the current package from subscription pla
 });
 
 test("subscription change helpers normalize project plan names and resolve order id", () => {
-  assert.equal(getCurrentPackageKey({ project: { plan: "Elite System" } }), "elite_system");
+  assert.equal(getCurrentPackageKey({ project: { plan: "Elite System" } }), "pro_system");
+  assert.equal(getCurrentPackageKey({ project: { plan: "Pro System" } }), "pro_system");
   assert.equal(
     getSubscriptionChangeOrderId({
       project: { latest_order_id: "order_from_project" },

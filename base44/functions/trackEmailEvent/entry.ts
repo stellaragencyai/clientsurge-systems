@@ -151,6 +151,33 @@ Deno.serve(async (req) => {
     // Update recipient record
     await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, updates);
 
+    if (recipient.lead_id) {
+      const leadPatch = {};
+      if (eventType === "email.opened" || eventType === "email.clicked") {
+        leadPatch.crm_stage = "Opened / Clicked";
+        leadPatch.outreach_status = "contacted";
+        leadPatch.last_activity_at = now;
+      }
+      if (eventType === "email.clicked") {
+        leadPatch.ai_intent = "pricing_interest";
+      }
+      if (eventType === "email.bounced") {
+        leadPatch.email_bounced = true;
+        leadPatch.outreach_status = "bounced";
+        leadPatch.last_activity_at = now;
+      }
+      if (eventType === "email.complained" || eventType === "email.unsubscribed") {
+        leadPatch.email_unsubscribed = true;
+        leadPatch.do_not_contact = true;
+        leadPatch.outreach_status = "do_not_contact";
+        leadPatch.last_activity_at = now;
+      }
+
+      if (Object.keys(leadPatch).length > 0) {
+        await base44.asServiceRole.entities.Leads.update(recipient.lead_id, leadPatch).catch(() => null);
+      }
+    }
+
     // Update campaign aggregate metrics
     const finalCampaignId = recipient.campaign_id || campaignId;
     if (finalCampaignId) {

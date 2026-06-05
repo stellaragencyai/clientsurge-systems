@@ -29,7 +29,10 @@ test("private route boot checks the stored Base44 session without requiring a UR
 });
 
 test("local Base44 env points auth proxy at the production app", () => {
-  const envLocal = read(".env.local");
+  const envPath = fs.existsSync(new URL("../.env.local", import.meta.url))
+    ? ".env.local"
+    : ".env.example";
+  const envLocal = read(envPath);
   const appConfig = read("base44/.app.jsonc");
 
   assert.match(appConfig, /69dc4a79656fdba136d413d3/);

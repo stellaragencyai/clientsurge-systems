@@ -16,15 +16,68 @@ export const LEAD_STATUSES = [
   "Closed",
 ];
 
+export const CRM_STAGES = [
+  "Not Contacted",
+  "Contacted",
+  "Opened / Clicked",
+  "Replied",
+  "Audit Booked",
+  "Audit Completed",
+  "Proposal Sent",
+  "Won Pending Payment",
+  "Won",
+  "Lost",
+  "Follow Up Later",
+];
+
 export const LEAD_STATUS_ALIASES = {
   new: "New",
+  not_contacted: "New",
   contacted: "Contacted",
+  opened_clicked: "Contacted",
+  opened: "Contacted",
+  clicked: "Contacted",
   replied: "Replied",
+  responded: "Replied",
   qualified: "Qualified",
   booking_prompt_sent: "Booking Prompt Sent",
   bookingpromptsent: "Booking Prompt Sent",
+  audit_booked: "Booked",
   booked: "Booked",
+  audit_completed: "Booked",
+  proposal_sent: "Qualified",
+  won_pending_payment: "Qualified",
+  won: "Closed",
+  lost: "Closed",
+  follow_up_later: "Contacted",
   closed: "Closed",
+};
+
+export const CRM_STAGE_ALIASES = {
+  new: "Not Contacted",
+  not_contacted: "Not Contacted",
+  contacted: "Contacted",
+  opened: "Opened / Clicked",
+  clicked: "Opened / Clicked",
+  opened_clicked: "Opened / Clicked",
+  replied: "Replied",
+  responded: "Replied",
+  qualified: "Replied",
+  booking_prompt_sent: "Replied",
+  bookingpromptsent: "Replied",
+  booked: "Audit Booked",
+  audit_booked: "Audit Booked",
+  audit_completed: "Audit Completed",
+  proposal_sent: "Proposal Sent",
+  won_pending_payment: "Won Pending Payment",
+  pending_payment: "Won Pending Payment",
+  payment_pending: "Won Pending Payment",
+  won: "Won",
+  client: "Won",
+  closed: "Won",
+  lost: "Lost",
+  rejected: "Lost",
+  follow_up_later: "Follow Up Later",
 };
 
 export const LEAD_STAGE_GROUPS = {
@@ -187,6 +240,31 @@ function normalizeLeadStatus(value) {
   return LEAD_STATUS_ALIASES[toSlug(raw)] || "New";
 }
 
+export function normalizeCrmStage(value, fallbackStatus = "") {
+  const raw = cleanString(value);
+  if (CRM_STAGES.includes(raw)) {
+    return raw;
+  }
+
+  const alias = CRM_STAGE_ALIASES[toSlug(raw)];
+  if (alias) {
+    return alias;
+  }
+
+  return CRM_STAGE_ALIASES[toSlug(fallbackStatus)] || "Not Contacted";
+}
+
+export function crmStageToLeadStatus(stage, fallbackStatus = "New") {
+  const normalizedStage = normalizeCrmStage(stage, fallbackStatus);
+  if (normalizedStage === "Not Contacted") return "New";
+  if (normalizedStage === "Contacted" || normalizedStage === "Opened / Clicked" || normalizedStage === "Follow Up Later") return "Contacted";
+  if (normalizedStage === "Replied") return "Replied";
+  if (normalizedStage === "Audit Booked" || normalizedStage === "Audit Completed") return "Booked";
+  if (normalizedStage === "Proposal Sent" || normalizedStage === "Won Pending Payment") return "Qualified";
+  if (normalizedStage === "Won" || normalizedStage === "Lost") return "Closed";
+  return normalizeLeadStatus(fallbackStatus);
+}
+
 function normalizeLeadSource(value) {
   const slug = toSlug(value);
   return slug || "imported";
@@ -230,9 +308,11 @@ export function normalizeImportedLeadRow(row, { importSource = "manual_import" }
   const phone = normalizePhone(getFieldValue(row, ["phone", "phone_number", "mobile", "mobile_phone"]));
   const normalizedBusinessName = normalizeBusinessName(businessName);
   const status = normalizeLeadStatus(getFieldValue(row, ["status", "stage", "pipeline_status"]));
+  const crmStage = normalizeCrmStage(getFieldValue(row, ["crm_stage", "stage", "pipeline_stage"]), status);
   const source = normalizeLeadSource(getFieldValue(row, ["source", "lead_source", "channel"]) || importSource);
   const intakeType = normalizeLeadIntakeType(getFieldValue(row, ["intake_type", "intake", "form_type"]));
   const businessType = cleanString(getFieldValue(row, ["business_type", "industry", "vertical"])) || "unknown";
+  const industry = cleanString(getFieldValue(row, ["industry", "business_type", "niche", "vertical"])) || businessType;
   const problem = cleanString(getFieldValue(row, ["problem", "notes", "pain_point", "need"])) || "Imported lead";
   const leadScore = clampScore(getFieldValue(row, ["lead_score", "score", "priority_score"]));
   const createdDate = normalizeDateString(getFieldValue(row, ["created_date", "created_at", "lead_created_at"])) || new Date().toISOString();
@@ -250,13 +330,20 @@ export function normalizeImportedLeadRow(row, { importSource = "manual_import" }
     email,
     phone,
     business_type: businessType,
+    industry,
+    city: cleanString(getFieldValue(row, ["city"])),
+    state: cleanString(getFieldValue(row, ["state"])),
     problem,
     source,
+    source_history: [source || importSource].filter(Boolean),
     intake_type: intakeType,
     status,
+    crm_stage: crmStage,
     lead_score: leadScore,
     last_contacted_at: lastContactedAt || undefined,
+    last_contacted_date: lastContactedAt || undefined,
     next_follow_up_at: nextFollowUpAt || undefined,
+    follow_up_date: nextFollowUpAt || undefined,
     booking_link_sent_at: bookingLinkSentAt || undefined,
     booked_at: bookedAt || undefined,
     ai_intent: aiIntent,
@@ -597,7 +684,7 @@ function determineRecommendedServiceKeys(lead, segments) {
 
 function determineRecommendedPackage(serviceKeys, primaryServiceKey) {
   if (serviceKeys.includes("lead_reactivation")) {
-    return getPackageOffer("elite_system");
+    return getPackageOffer("pro_system");
   }
 
   if (
@@ -856,6 +943,7 @@ export function enrichLeadForPipeline(lead, now = new Date().toISOString()) {
     normalized_phone: normalizePhone(lead.normalized_phone || lead.phone),
     normalized_business_name: normalizeBusinessName(lead.normalized_business_name || lead.business_name),
     status: normalizeLeadStatus(lead.status),
+    crm_stage: normalizeCrmStage(lead.crm_stage, lead.status),
     source: normalizeLeadSource(lead.source),
     intake_type: normalizeLeadIntakeType(lead.intake_type),
     lead_score: clampScore(lead.lead_score),
@@ -955,6 +1043,7 @@ function applyLeadFilters(records, filters = {}) {
   const stageGroup = cleanString(filters.stage_group);
   const segment = cleanString(filters.segment);
   const priority = cleanString(filters.priority);
+  const industry = cleanString(filters.industry || filters.business_type);
 
   return records.filter((record) => {
     if (!recordMatchesLead(record, search)) {
@@ -983,6 +1072,18 @@ function applyLeadFilters(records, filters = {}) {
 
     if (priority && priority !== "all" && record.activation_priority !== priority) {
       return false;
+    }
+
+    if (industry && industry !== "all") {
+      const requested = toSlug(industry);
+      const tokens = [
+        record.industry,
+        record.business_type,
+        ...(Array.isArray(record.industry_tags) ? record.industry_tags : []),
+      ].map(toSlug).filter(Boolean);
+      if (!tokens.some((token) => token === requested || token.includes(requested) || requested.includes(token))) {
+        return false;
+      }
     }
 
     return true;
@@ -1026,9 +1127,11 @@ export function buildLeadPipelineSnapshot({
   const page = filtered.slice(boundedOffset, boundedOffset + boundedLimit);
 
   const statusCounts = {};
+  const crmStageCounts = {};
   const stageCounts = {};
   const sourceCounts = {};
   const intakeCounts = {};
+  const industryCounts = {};
   const segmentCounts = {
     reactivation: 0,
     nurture: 0,
@@ -1042,15 +1145,18 @@ export function buildLeadPipelineSnapshot({
   const recommendedOfferCounts = {
     starter_system: 0,
     growth_system: 0,
+    pro_system: 0,
     elite_system: 0,
     single_service: 0,
   };
 
   for (const lead of enriched) {
     incrementCounter(statusCounts, lead.status);
+    incrementCounter(crmStageCounts, lead.crm_stage);
     incrementCounter(stageCounts, lead.stage_group);
     incrementCounter(sourceCounts, lead.source || "unknown");
     incrementCounter(intakeCounts, lead.intake_type || "legacy");
+    incrementCounter(industryCounts, lead.industry || lead.business_type || "unknown");
 
     if (lead.automation_segments.reactivation_eligible) {
       segmentCounts.reactivation += 1;
@@ -1159,9 +1265,11 @@ export function buildLeadPipelineSnapshot({
       filtered_leads: filtered.length,
       actionable_leads: enriched.filter((lead) => lead.actionable).length,
       status_counts: statusCounts,
+      crm_stage_counts: crmStageCounts,
       stage_counts: stageCounts,
       source_counts: sourceCounts,
       intake_counts: intakeCounts,
+      industry_counts: industryCounts,
       segment_counts: segmentCounts,
       outreach_counts: outreachCounts,
       recommended_offer_counts: recommendedOfferCounts,
@@ -1186,10 +1294,12 @@ export function buildLeadPipelineSnapshot({
     },
     filter_options: {
       statuses: LEAD_STATUSES,
+      crm_stages: CRM_STAGES,
       stage_groups: ["new", "working", "qualified", "booked", "closed"],
       intake_types: LEAD_INTAKE_TYPES,
       segments: ACTIONABILITY_SEGMENTS,
       sources: Object.keys(sourceCounts).sort(),
+      industries: Object.keys(industryCounts).sort(),
     },
   };
 }
