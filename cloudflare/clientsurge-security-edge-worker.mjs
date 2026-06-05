@@ -1216,21 +1216,34 @@ export const DEMO_BOOKING_MODAL_PATCH_SCRIPT = `<script id="${DEMO_BOOKING_MODAL
     wireForm(scheduler.querySelector("[data-clientsurge-audit-form]"), null);
   }
   function patchPublicAuditLanguage() {
-    Array.from(document.querySelectorAll("button,a,h1,h2,h3,p,span,li")).forEach(function(node) {
-      if (!node || node.children.length > 0) return;
-      var text = (node.textContent || "").trim();
-      if (!text) return;
-      var nextText = text
+    var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
+      acceptNode: function(node) {
+        var parent = node.parentElement;
+        if (!parent || /^(SCRIPT|STYLE|NOSCRIPT|TEXTAREA|INPUT)$/i.test(parent.tagName)) {
+          return NodeFilter.FILTER_REJECT;
+        }
+        return /demo call/i.test(node.nodeValue || "") ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_SKIP;
+      }
+    });
+    var node;
+    while ((node = walker.nextNode())) {
+      node.nodeValue = node.nodeValue
         .replace(/What happens on the demo call\\?/gi, "What happens during the Free Automation Audit?")
         .replace(/demo call/gi, "Free Automation Audit");
-      if (nextText !== text) node.textContent = nextText;
-    });
+    }
   }
   function scan() {
     var frames = document.querySelectorAll('iframe[title="ClientSurge Systems Demo"],iframe[src*="clientsurge-audit-form"],.relative.w-full.max-w-4xl.z-50 iframe,[class*="max-w-4xl"] iframe');
     frames.forEach(function(frame) {
       var wrapper = frame.closest(".relative.w-full.max-w-4xl.z-50") || frame.closest("[class*='max-w-4xl']");
       patchWrapper(wrapper);
+    });
+    var staleWrappers = document.querySelectorAll(".relative.w-full.max-w-4xl.z-50,[class*='max-w-4xl'][class*='z-50']");
+    staleWrappers.forEach(function(wrapper) {
+      var text = wrapper.textContent || "";
+      if (/Free Automation Audit/i.test(text) && (/Send the request here/i.test(text) || /Audit request sent/i.test(text) || /Plain-English next steps/i.test(text))) {
+        patchWrapper(wrapper);
+      }
     });
     patchBookPage();
     patchPublicAuditLanguage();
