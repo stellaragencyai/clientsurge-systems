@@ -19,7 +19,7 @@ import { buildIndustryJsonLd } from "@/utils/industryJsonLd";
 const INDUSTRY_SEO = {
   roofing: {
     title: "Roofing Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
-    h1: "AI Automation Systems for Roofing Companies in Phoenix & Scottsdale",
+    h1: "Get More Roofing Leads Booked Before Competitors Reply",
     description:
       "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, insurance and storm-damage inquiry routing, and old estimate reactivation.",
   },
@@ -175,7 +175,7 @@ function IndustryTemplateInner({ industrySlug }) {
           subheadline={seo?.description || industry.hero.subheadline}
           image={industry.hero.image || INDUSTRY_HERO_FALLBACKS[industrySlug] || INDUSTRY_HERO_FALLBACKS.contractors}
           cta={industry.hero.cta}
-          onBookDemo={() => demoBooking?.openDemoBooking?.()}
+          onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
         />
 
         {/* Pain Stats Bar */}
@@ -288,7 +288,7 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryResults
           metrics={industry.metrics}
           testimonial={industry.testimonial}
-          onBookDemo={() => demoBooking?.openDemoBooking?.()}
+          onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
         />
 
         {/* FAQ */}

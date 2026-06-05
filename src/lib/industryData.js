@@ -438,9 +438,9 @@ export const INDUSTRIES = {
     
     hero: {
       eyebrow: "For Roofing & Restoration Contractors",
-      headline: "Turn Storm Damage Leads Into Closed Estimates",
-      subheadline: "Roofing leads are weather-triggered and time-sensitive. After a storm, homeowners call 5 contractors. Respond first, you get the estimate. Respond slow, you get nothing.",
-      cta: "See How Roofing Companies Use This",
+      headline: "Get More Roofing Leads Booked Before Competitors Reply",
+      subheadline: "ClientSurge helps roofing companies recover missed calls, answer storm and quote requests fast, follow up automatically, and turn more estimate requests into booked jobs.",
+      cta: "Free Roofing Automation Audit",
     },
 
     painStats: [

@@ -33,8 +33,21 @@ function createLocalPreviewClient() {
   const functionCollection = new Proxy(
     {},
     {
-      get() {
-        return async () => null;
+      get(_target, prop) {
+        if (prop === "invoke") {
+          return async (functionName, payload = {}) => ({
+            data: {
+              success: true,
+              local_preview: true,
+              function_name: functionName,
+              lead_id: "local-preview-lead",
+              crm_lead_id: "local-preview-crm-lead",
+              payload,
+            },
+          });
+        }
+
+        return async () => ({ data: { success: true, local_preview: true } });
       },
     }
   );

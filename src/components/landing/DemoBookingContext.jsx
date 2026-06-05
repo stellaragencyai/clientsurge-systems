@@ -8,6 +8,7 @@ export function DemoBookingProvider({ children }) {
   const [modalState, setModalState] = useState({
     open: false,
     prefillIndustry: "",
+    industrySlug: "",
   });
 
   const value = useMemo(
@@ -18,12 +19,14 @@ export function DemoBookingProvider({ children }) {
           open: true,
           prefillIndustry:
             options.prefillIndustry || selectedIndustry?.name || "",
+          industrySlug: options.industrySlug || selectedIndustry?.id || "",
         });
       },
       closeDemoBooking: () =>
         setModalState({
           open: false,
           prefillIndustry: "",
+          industrySlug: "",
         }),
     }),
     []
@@ -38,9 +41,11 @@ export function DemoBookingProvider({ children }) {
             setModalState({
               open: false,
               prefillIndustry: "",
+              industrySlug: "",
             })
           }
           prefillIndustry={modalState.prefillIndustry}
+          industrySlug={modalState.industrySlug}
         />
       )}
     </DemoBookingContext.Provider>

@@ -25,6 +25,44 @@ function normalizeRequestedChannels(value: unknown) {
   return [...new Set(value.map((entry) => cleanString(entry).toLowerCase()).filter(Boolean))];
 }
 
+function normalizeIndustrySlug(value: unknown) {
+  return cleanString(value)
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+function inferIndustrySlug(body: Record<string, unknown>) {
+  const explicit = normalizeIndustrySlug(body.industry_slug);
+  if (explicit) return explicit;
+
+  const businessType = normalizeIndustrySlug(body.business_type || body.niche);
+  if (businessType.includes("roof")) return "roofing";
+  if (businessType.includes("hvac")) return "hvac";
+  if (businessType.includes("dental")) return "dental";
+  if (businessType.includes("med_spa") || businessType.includes("aesthetic")) return "med_spa";
+  if (businessType.includes("chiropractic")) return "chiropractic";
+  if (businessType.includes("contractor")) return "contractors";
+  return businessType;
+}
+
+function normalizeIndustryTags(value: unknown, industrySlug = "") {
+  const rawTags = Array.isArray(value) ? value : [];
+  const tags = rawTags.map((entry) => normalizeIndustrySlug(entry)).filter(Boolean);
+  if (industrySlug) tags.push(industrySlug);
+  if (industrySlug === "roofing") {
+    tags.push("roofing_landing_page", "free_roofing_automation_audit");
+  }
+  if (industrySlug === "hvac") {
+    tags.push("hvac_landing_page", "free_hvac_automation_audit");
+  }
+  if (industrySlug === "dental") {
+    tags.push("dental_landing_page", "free_dental_automation_audit");
+  }
+  return [...new Set(tags)];
+}
+
 function normalizeUtmParams(body: Record<string, unknown>) {
   return {
     utm_source: cleanString(body.utm_source),
@@ -35,15 +73,63 @@ function normalizeUtmParams(body: Record<string, unknown>) {
   };
 }
 
+function leadScoreForIndustry(industrySlug: string) {
+  if (industrySlug === "roofing") return 75;
+  if (industrySlug === "hvac") return 72;
+  if (industrySlug === "dental") return 70;
+  return 50;
+}
+
+function mergeSourceHistory(existing: unknown, nextSource: string, pageSubmittedFrom = "") {
+  const values = Array.isArray(existing) ? existing : [];
+  return [
+    ...new Set(
+      [
+        ...values,
+        nextSource,
+        pageSubmittedFrom ? `page:${pageSubmittedFrom}` : "",
+      ].map((entry) => cleanString(entry)).filter(Boolean)
+    ),
+  ];
+}
+
+async function findExistingCrmLead(base44: any, { email, phone }: { email: string; phone: string }) {
+  if (email) {
+    const matches = await base44.asServiceRole.entities.Leads.filter({ email }, "-created_date", 5).catch(() => []);
+    if (matches?.length === 1) return matches[0];
+  }
+
+  if (phone) {
+    const matches = await base44.asServiceRole.entities.Leads.filter({ phone }, "-created_date", 5).catch(() => []);
+    if (matches?.length === 1) return matches[0];
+  }
+
+  return null;
+}
+
 async function createCrmLeadFromWebsiteLead(base44: any, lead: any) {
-  return base44.asServiceRole.entities.Leads.create({
+  const industrySlug = normalizeIndustrySlug(lead.industry_slug || lead.business_type);
+  const now = new Date().toISOString();
+  const existing = await findExistingCrmLead(base44, {
+    email: normalizeEmail(lead.email),
+    phone: normalizePhone(lead.phone_number),
+  });
+  const score = leadScoreForIndustry(industrySlug);
+  const industryTags = normalizeIndustryTags(lead.industry_tags, industrySlug);
+  const payload = {
     full_name: lead.full_name || lead.first_name || "Unknown",
+    owner_contact_name: lead.full_name || lead.first_name || "Unknown",
     business_name: lead.business_name || "Not provided",
     email: lead.email || "",
     phone: lead.phone_number || "",
     business_type: lead.business_type || "Not specified",
+    industry: industrySlug || lead.business_type || "Not specified",
+    website: lead.business_website_url || "",
+    website_url: lead.business_website_url || "",
     problem: lead.problem || lead.message || "Website submission",
-    source: lead.source || "website_form",
+    source: existing?.source || lead.source || "website_form",
+    source_page: lead.source_page || "",
+    source_history: mergeSourceHistory(existing?.source_history, lead.source || "website_form", lead.source_page || ""),
     utm_source: lead.utm_source || "",
     utm_medium: lead.utm_medium || "",
     utm_campaign: lead.utm_campaign || "",
@@ -55,13 +141,60 @@ async function createCrmLeadFromWebsiteLead(base44: any, lead: any) {
     consent_ip: lead.consent_ip || lead.ip_address || "",
     consent_source: lead.consent_source || "",
     consent_text_version: lead.consent_text_version || "",
-    status: "New",
-    lead_score: 50,
-    activation_priority: "Medium",
+    status: existing?.status || "New",
+    crm_stage: existing?.crm_stage || "Not Contacted",
+    lead_score: Math.max(Number(existing?.lead_score) || 0, score),
+    activation_priority: score >= 70 ? "High" : "Medium",
+    lead_category: score >= 70 ? "High-Value" : "Standard",
     intake_type: "lead_capture",
     website_lead_id: lead.id,
-    assigned_at: new Date().toISOString(),
-  });
+    industry_tags: [...new Set([...(Array.isArray(existing?.industry_tags) ? existing.industry_tags : []), ...industryTags])],
+    assigned_agent_name: industrySlug ? `sales_rep_${industrySlug}` : undefined,
+    assigned_at: existing?.assigned_at || now,
+    page_submitted_from: lead.source_page || "",
+    package_interest: lead.service_interest || "",
+    crm_tag: industrySlug || "",
+    notes: [existing?.notes, lead.message || lead.problem].filter(Boolean).join("\n\n").trim(),
+    normalized_email: normalizeEmail(lead.email),
+    normalized_phone: normalizePhone(lead.phone_number),
+    last_activity_at: now,
+  };
+
+  if (existing?.id) {
+    return base44.asServiceRole.entities.Leads.update(existing.id, payload);
+  }
+
+  return base44.asServiceRole.entities.Leads.create(payload);
+}
+
+async function invokeInitialWebsiteLeadResponse(base44: any, leadId: string, consentGiven: boolean) {
+  if (!consentGiven) {
+    return { attempted: false, skipped: true, reason: "consent_not_given" };
+  }
+
+  try {
+    const result = await base44.asServiceRole.functions.invoke("sendWebsiteLeadResponse", {
+      lead_id: leadId,
+      source: "submitLeadCapture",
+    });
+    return { attempted: true, success: result?.success !== false };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : String(error);
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      context_id: leadId,
+      context_type: "website_lead",
+      channel: "internal",
+      direction: "internal",
+      event_type: "workflow_triggered",
+      provider: "sendWebsiteLeadResponse",
+      status: "failed",
+      subject: "Initial website lead response failed",
+      message_body: message,
+      error_message: message,
+      metadata_json: JSON.stringify({ source: "submitLeadCapture" }),
+    }).catch(() => null);
+    return { attempted: true, success: false, error: message };
+  }
 }
 
 async function invokeAutomationOrchestrator(
@@ -185,17 +318,22 @@ Deno.serve(async (req) => {
     const now = new Date().toISOString();
     const consentGiven = body.consent_given === true;
     const utmParams = normalizeUtmParams(body);
+    const industrySlug = inferIndustrySlug(body);
+    const industryTags = normalizeIndustryTags(body.industry_tags, industrySlug);
     const lead = await base44.asServiceRole.entities.WebsiteLead.create({
       full_name: cleanString(body.full_name),
       first_name: cleanString(body.first_name || body.full_name?.split?.(" ")?.[0]),
       business_name: cleanString(body.business_name),
       business_type: cleanString(body.business_type || body.niche),
+      business_website_url: cleanString(body.business_website_url || body.website),
+      industry_slug: industrySlug,
+      industry_tags: industryTags,
       email,
       phone_number: phone,
-      service_interest: cleanString(body.service_interest || "demo_request"),
+      service_interest: cleanString(body.service_interest || (industrySlug ? `${industrySlug}_automation_audit` : "demo_request")),
       message: cleanString(body.message || body.problem || ""),
       problem: cleanString(body.problem || body.message || ""),
-      source: body.source || "website_form",
+      source: cleanString(body.source || "website_form"),
       ...utmParams,
       lead_status: "new",
       dedup_key: buildDedupKey({ email, phone }),
@@ -219,6 +357,7 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
       crm_lead_id: crmLead.id,
     }).catch(() => {});
+    const initialResponse = await invokeInitialWebsiteLeadResponse(base44, lead.id, consentGiven);
     await invokeAutomationOrchestrator(base44, {
       leadId: crmLead.id,
       triggerEvent: "new_website_lead",
@@ -228,6 +367,9 @@ Deno.serve(async (req) => {
       success: true,
       lead_id: lead.id,
       crm_lead_id: crmLead.id,
+      industry_slug: industrySlug,
+      industry_tags: industryTags,
+      initial_response: initialResponse,
       deduplicated: false,
     });
   } catch (error) {

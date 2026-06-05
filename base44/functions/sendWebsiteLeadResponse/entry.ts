@@ -45,7 +45,7 @@ async function sendSMS(base44, lead, messageBody, fromNumber) {
   return { success: true, messageId: result.sid };
 }
 
-async function sendEmail(base44, lead, subject, body, fromEmail) {
+async function sendEmail(base44, lead, subject, body, fromEmail, replyToEmail) {
   const resendKey = Deno.env.get("RESEND_API_KEY");
 
   if (!resendKey) {
@@ -62,7 +62,8 @@ async function sendEmail(base44, lead, subject, body, fromEmail) {
       "Idempotency-Key": idempotencyKey,
     },
     body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurgesystems.com",
+      from: fromEmail || "support@clientsurgesystems.com",
+      reply_to: replyToEmail || "nolan@clientsurgesystems.com",
       to: lead.email,
       subject,
       text: body,
@@ -85,6 +86,17 @@ function renderTemplate(template, lead) {
     .replace(/{full_name}/g, lead.full_name || "there")
     .replace(/{service_interest}/g, lead.service_interest || "our services")
     .replace(/{business_name}/g, Deno.env.get("DEFAULT_BUSINESS_NAME") || "us");
+}
+
+function getIndustryKey(lead) {
+  const tags = Array.isArray(lead.industry_tags) ? lead.industry_tags : [];
+  const values = [lead.industry_slug, lead.business_type, lead.service_interest, ...tags]
+    .filter(Boolean)
+    .map((value) => String(value).toLowerCase());
+  if (values.some((value) => value.includes("roof"))) return "roofing";
+  if (values.some((value) => value.includes("hvac") || value.includes("heating") || value.includes("air_condition"))) return "hvac";
+  if (values.some((value) => value.includes("dental") || value.includes("orthodont"))) return "dental";
+  return "general";
 }
 
 async function checkAlreadySent(base44, leadId, messageType) {
@@ -157,14 +169,69 @@ Deno.serve(async (req) => {
     const fromNumber =
       settings.twilio_from_number || Deno.env.get("TWILIO_PHONE_NUMBER");
     const fromEmail =
-      settings.resend_from_email || Deno.env.get("RESEND_FROM_EMAIL") ||
-      "noreply@clientsurgesystems.com";
+      Deno.env.get("RESEND_FROM_LEADS") ||
+      settings.resend_from_email ||
+      Deno.env.get("SUPPORT_EMAIL") ||
+      "support@clientsurgesystems.com";
+    const replyToEmail =
+      Deno.env.get("RESEND_REPLY_TO_LEADS") ||
+      Deno.env.get("ADMIN_EMAIL") ||
+      "nolan@clientsurgesystems.com";
     const bookingLink = settings.booking_link_default || "";
 
-    const templates = {
-      sms: `Hey {first_name}, thanks for reaching out about {service_interest}. We got your message and will be in touch shortly. Need help faster? Book a time: ${bookingLink}`,
-      email_subject: "Got your request — here's the next step",
-      email_body: `Hey {first_name},
+    const industryTemplates = {
+      roofing: {
+        sms: `Hey {first_name}, we got your roofing automation audit request. We'll review missed calls, storm and quote requests, follow-up gaps, and estimate booking. Want the fastest next step? Book here: ${bookingLink}`,
+        email_subject: "Your roofing automation audit request is in",
+        email_body: `Hey {first_name},
+
+Thanks for requesting a roofing automation audit.
+
+We will review the places roofing companies usually lose booked jobs: missed calls during storms, slow quote-request response, estimate follow-up gaps, and booking friction.
+
+The fastest way to move forward is to book a quick call here:
+${bookingLink}
+
+Or reply to this email with your current lead sources and estimate booking process.
+
+- ClientSurge Systems`,
+      },
+      hvac: {
+        sms: `Hey {first_name}, we got your HVAC automation audit request. We'll review missed emergency calls, service booking, quote follow-up, and seasonal demand gaps. Fastest next step: ${bookingLink}`,
+        email_subject: "Your HVAC automation audit request is in",
+        email_body: `Hey {first_name},
+
+Thanks for requesting an HVAC automation audit.
+
+We will review where HVAC teams typically lose jobs: missed emergency calls, slow tune-up follow-up, estimate delays, and booking friction during busy weather windows.
+
+The fastest way to move forward is to book a quick call here:
+${bookingLink}
+
+Or reply to this email with your current call volume, service area, and follow-up process.
+
+- ClientSurge Systems`,
+      },
+      dental: {
+        sms: `Hey {first_name}, we got your dental automation audit request. We'll review new-patient inquiries, missed calls, consult booking, and treatment-plan follow-up. Fastest next step: ${bookingLink}`,
+        email_subject: "Your dental automation audit request is in",
+        email_body: `Hey {first_name},
+
+Thanks for requesting a dental automation audit.
+
+We will review where dental practices typically lose new-patient opportunities: missed calls, slow front-desk callbacks, consult booking gaps, and treatment-plan follow-up.
+
+The fastest way to move forward is to book a quick call here:
+${bookingLink}
+
+Or reply to this email with your current new-patient intake and follow-up process.
+
+- ClientSurge Systems`,
+      },
+      general: {
+        sms: `Hey {first_name}, thanks for reaching out about {service_interest}. We got your message and will be in touch shortly. Need help faster? Book a time: ${bookingLink}`,
+        email_subject: "Got your request - here's the next step",
+        email_body: `Hey {first_name},
 
 Thanks for reaching out to {business_name} about {service_interest}.
 
@@ -176,7 +243,9 @@ ${bookingLink}
 Or just reply to this email with any questions.
 
 – {business_name}`,
+      },
     };
+    const templates = industryTemplates[getIndustryKey(lead)] || industryTemplates.general;
 
     const results = {
       sms_sent: false,
@@ -292,7 +361,8 @@ Or just reply to this email with any questions.
             lead,
             subject,
             body,
-            fromEmail
+            fromEmail,
+            replyToEmail
           );
 
           await base44.asServiceRole.entities.CommunicationEvent.create({

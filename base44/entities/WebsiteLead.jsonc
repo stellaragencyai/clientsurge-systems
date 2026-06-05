@@ -32,6 +32,21 @@
       "type": "string",
       "title": "Business Type"
     },
+    "business_website_url": {
+      "type": "string",
+      "title": "Business Website URL"
+    },
+    "industry_slug": {
+      "type": "string",
+      "title": "Industry Slug"
+    },
+    "industry_tags": {
+      "type": "array",
+      "title": "Industry Tags",
+      "items": {
+        "type": "string"
+      }
+    },
     "service_interest": {
       "type": "string",
       "title": "Service Interest"

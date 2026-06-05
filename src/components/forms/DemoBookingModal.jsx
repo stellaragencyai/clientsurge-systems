@@ -16,6 +16,8 @@ const initialForm = {
   message: "",
   business_website_url: "",
   website_url: "",
+  consent_given: false,
+  industry_slug: "",
   utm_source: "",
   utm_medium: "",
   utm_campaign: "",
@@ -23,12 +25,24 @@ const initialForm = {
   referrer: "",
 };
 
-export default function DemoBookingModal({ isOpen = true, onClose, prefillIndustry = "" }) {
+function normalizeIndustrySlug(value) {
+  return String(value || "")
+    .trim()
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+}
+
+export default function DemoBookingModal({ isOpen = true, onClose, prefillIndustry = "", industrySlug = "" }) {
+  const resolvedIndustrySlug = industrySlug || normalizeIndustrySlug(prefillIndustry);
+  const isRoofingAudit = resolvedIndustrySlug === "roofing";
   const [form, setForm] = useState(() => ({
     ...initialForm,
     business_type: prefillIndustry,
+    industry_slug: resolvedIndustrySlug,
     message: prefillIndustry
-      ? `I would like a free automation audit for my ${prefillIndustry} business.`
+      ? `I would like a free ${isRoofingAudit ? "roofing " : ""}automation audit for my ${prefillIndustry} business.`
       : "I would like a free automation audit for my business.",
   }));
   const [errors, setErrors] = useState({});
@@ -52,17 +66,18 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
     setForm((current) => ({
       ...current,
       business_type: current.business_type || prefillIndustry,
+      industry_slug: current.industry_slug || resolvedIndustrySlug,
       utm_source: params.get("utm_source") || "",
       utm_medium: params.get("utm_medium") || "",
       utm_campaign: params.get("utm_campaign") || "",
       utm_content: params.get("utm_content") || "",
       referrer: document.referrer || "",
     }));
-  }, [isOpen, prefillIndustry]);
+  }, [isOpen, prefillIndustry, resolvedIndustrySlug]);
 
   const canSubmit = useMemo(() => {
-    return Boolean(form.full_name.trim() && EMAIL_REGEX.test(form.email.trim()) && form.message.trim());
-  }, [form.email, form.full_name, form.message]);
+    return Boolean(form.full_name.trim() && EMAIL_REGEX.test(form.email.trim()) && form.message.trim() && form.consent_given);
+  }, [form.consent_given, form.email, form.full_name, form.message]);
 
   if (!isOpen || typeof document === "undefined") {
     return null;
@@ -113,12 +128,37 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
     setLoading(true);
 
     try {
-      const result = await base44.functions.invoke("submitContactInquiry", {
-        ...form,
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+      const effectiveIndustrySlug = form.industry_slug || normalizeIndustrySlug(form.business_type);
+      const industryTags = [
+        effectiveIndustrySlug,
+        effectiveIndustrySlug ? `${effectiveIndustrySlug}_landing_page` : "",
+        isRoofingAudit ? "free_roofing_automation_audit" : "free_automation_audit",
+      ].filter(Boolean);
+      const result = await base44.functions.invoke("submitLeadCapture", {
         email: form.email.trim().toLowerCase(),
         full_name: form.full_name.trim(),
+        phone: form.phone.trim(),
+        business_name: form.business_name.trim(),
+        business_type: form.business_type.trim() || (isRoofingAudit ? "Roofing & Restoration" : "Free Automation Audit"),
+        industry_slug: effectiveIndustrySlug,
+        industry_tags: industryTags,
+        service_interest: isRoofingAudit ? "roofing_automation_audit" : "automation_audit",
+        problem: form.message.trim(),
         message: form.message.trim(),
-        business_type: form.business_type.trim() || "Free Automation Audit",
+        source: "landing_page",
+        source_page: currentPath || "/book",
+        requested_channels: ["sms", "email"],
+        consent_given: form.consent_given === true,
+        consent_source: isRoofingAudit ? "roofing_audit_modal" : "audit_modal",
+        consent_text_version: "audit_modal_explicit_checkbox_v1",
+        business_website_url: form.business_website_url.trim(),
+        website_url: form.website_url,
+        utm_source: form.utm_source,
+        utm_medium: form.utm_medium,
+        utm_campaign: form.utm_campaign,
+        utm_content: form.utm_content,
+        referrer: form.referrer,
       });
 
       if (!result?.data?.success) {
@@ -167,24 +207,25 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
         <div className="grid max-h-[calc(100svh-32px)] overflow-y-auto rounded-2xl bg-white shadow-2xl md:grid-cols-[0.92fr_1.08fr]">
           <div className="bg-slate-950 p-6 text-white md:p-8">
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-[#7dd3fc]">
-              Free Automation Audit
+              {isRoofingAudit ? "Free Roofing Automation Audit" : "Free Automation Audit"}
             </p>
             <h2 className="font-display text-3xl font-semibold leading-tight md:text-4xl">
-              Find the lead leaks costing you booked jobs.
+              {isRoofingAudit ? "Find the missed calls and quote requests costing you roofing jobs." : "Find the lead leaks costing you booked jobs."}
             </h2>
             <p className="mt-4 text-sm leading-6 text-slate-300">
-              Send the request here and ClientSurge will review your current follow-up,
-              booking, and missed-call path before the walkthrough.
+              {isRoofingAudit
+                ? "Send the request here and ClientSurge will review your storm lead, missed-call, quote follow-up, and estimate booking path before the walkthrough."
+                : "Send the request here and ClientSurge will review your current follow-up, booking, and missed-call path before the walkthrough."}
             </p>
 
             <div className="mt-7 space-y-4 text-sm text-slate-200">
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00aeef]" />
-                <span>Lead capture and missed-call response review</span>
+                <span>{isRoofingAudit ? "Roofing lead capture and missed-call recovery review" : "Lead capture and missed-call response review"}</span>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00aeef]" />
-                <span>Fastest AI automation opportunities for your business type</span>
+                <span>{isRoofingAudit ? "Instant storm, quote, and estimate request response gaps" : "Fastest automation opportunities for your business type"}</span>
               </div>
               <div className="flex items-start gap-3">
                 <CheckCircle2 className="mt-0.5 h-5 w-5 flex-shrink-0 text-[#00aeef]" />
@@ -215,7 +256,9 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 </div>
                 <h3 className="text-2xl font-semibold text-slate-950">Audit request sent</h3>
                 <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
-                  We have your details. Expect a direct follow-up with practical next steps for your lead flow.
+                  {isRoofingAudit
+                    ? "We have your roofing details. Expect a direct follow-up with practical next steps for missed calls, quote requests, and booked estimates."
+                    : "We have your details. Expect a direct follow-up with practical next steps for your lead flow."}
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <a
@@ -238,7 +281,9 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 <div>
                   <h3 className="text-2xl font-semibold text-slate-950">Request your free audit</h3>
                   <p className="mt-2 text-sm leading-6 text-slate-600">
-                    A real request form feeds the ClientSurge lead workflow directly.
+                    {isRoofingAudit
+                      ? "This form feeds the ClientSurge lead workflow with roofing-specific routing."
+                      : "This form feeds the ClientSurge lead workflow directly."}
                   </p>
                 </div>
 
@@ -332,6 +377,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                       className={inputClass}
                       placeholder="Dental, roofing, med spa..."
                     />
+                    <input type="hidden" name="industry_slug" value={form.industry_slug} />
                   </div>
                   <div>
                     <label htmlFor="demo-business-website" className={labelClass}>Website</label>
@@ -362,6 +408,25 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                   {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
                 </div>
 
+                <label className="flex items-start gap-2.5 rounded-lg border border-slate-200 bg-slate-50 p-3 text-xs leading-relaxed text-slate-600">
+                  <input
+                    type="checkbox"
+                    name="consent_given"
+                    checked={form.consent_given}
+                    onChange={(event) => setForm((current) => ({ ...current, consent_given: event.target.checked }))}
+                    disabled={loading}
+                    required
+                    className="mt-0.5 h-4 w-4 rounded accent-[#00aeef]"
+                  />
+                  <span>
+                    I agree to receive automated SMS and email messages from ClientSurge Systems about my audit request.
+                    Msg and data rates may apply. Reply <strong>STOP</strong> to opt out. See our{" "}
+                    <a href="/privacy-policy" className="underline hover:text-slate-950">Privacy Policy</a>
+                    {" "}and{" "}
+                    <a href="/terms" className="underline hover:text-slate-950">Terms</a>.
+                  </span>
+                </label>
+
                 <button
                   type="submit"
                   disabled={loading || !canSubmit}
@@ -374,7 +439,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                     </>
                   ) : (
                     <>
-                      Send audit request
+                      {isRoofingAudit ? "Send roofing audit request" : "Send audit request"}
                       <ArrowRight className="h-5 w-5" />
                     </>
                   )}
