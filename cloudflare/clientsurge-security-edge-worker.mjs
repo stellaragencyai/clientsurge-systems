@@ -1158,8 +1158,8 @@ function shouldRepairStaleDemoBookingModalAsset(request, url, response) {
 }
 
 export const PUBLIC_NAV_POLISH_STYLE = `<style id="${PUBLIC_NAV_POLISH_STYLE_ID}">
-footer.cs-footer{padding-bottom:env(safe-area-inset-bottom,0px)}
-footer.cs-footer a:focus-visible,footer.cs-footer button:focus-visible{outline:2px solid #00AEEF;outline-offset:3px;box-shadow:0 0 0 4px rgba(0,174,239,.18)}
+footer{padding-bottom:env(safe-area-inset-bottom,0px)}
+footer a:focus-visible,footer button:focus-visible{outline:2px solid #00AEEF;outline-offset:3px;box-shadow:0 0 0 4px rgba(0,174,239,.18)}
 @media (max-width:768px){#root>div{padding-bottom:max(80px,calc(80px + env(safe-area-inset-bottom,0px)))}}
 @media (max-width:700px){footer.cs-footer .cs-footer-main{padding-bottom:max(24px,calc(24px + env(safe-area-inset-bottom,0px)))}}
 </style>`;

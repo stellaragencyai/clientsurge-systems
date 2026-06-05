@@ -350,7 +350,8 @@ test("Cloudflare static HTML injection patches public nav and mobile footer poli
 
   assert.match(injected, new RegExp(PUBLIC_NAV_POLISH_STYLE_ID));
   assert.match(injected, new RegExp(PUBLIC_NAV_POLISH_SCRIPT_ID));
-  assert.match(injected, /footer\.cs-footer\{padding-bottom:env\(safe-area-inset-bottom,0px\)\}/);
+  assert.match(injected, /footer\{padding-bottom:env\(safe-area-inset-bottom,0px\)\}/);
+  assert.match(injected, /footer a:focus-visible,footer button:focus-visible/);
   assert.match(injected, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "smooth" \}\)/);
   assert.match(injected, /"home services": "\/hvac"/);
   assert.match(injected, /dataset\.clientsurgeIndustryHref = sameOrigin\(target\)/);
