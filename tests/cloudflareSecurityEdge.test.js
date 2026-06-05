@@ -35,6 +35,10 @@ import worker, {
   originRequestFor,
   PRIVATE_ROUTE_BLOCK_HEADER,
   injectDemoBookingModalPatch,
+  injectPublicNavPolish,
+  PUBLIC_NAV_POLISH_HEADER,
+  PUBLIC_NAV_POLISH_SCRIPT_ID,
+  PUBLIC_NAV_POLISH_STYLE_ID,
   repairStaleDemoBookingModalAsset,
   repairPublicRouteMetadata,
   SENSITIVE_HEADERS,
@@ -257,9 +261,12 @@ test("Cloudflare security edge worker injects the simplified homepage cinematic 
     assert.equal(response.headers.get(HOMEPAGE_MOTION_HEADER), "edge-v1");
     assert.equal(response.headers.get(EDGE_ROUTE_METADATA_HEADER), "edge-v1");
     assert.equal(response.headers.get(STATIC_FALLBACK_PAINT_GUARD_HEADER), "edge-v1");
+    assert.equal(response.headers.get(PUBLIC_NAV_POLISH_HEADER), "edge-v1");
     assert.match(response.headers.get("cache-control") || "", /no-store/);
     assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_STYLE_ID));
     assert.match(body, new RegExp(STATIC_FALLBACK_PAINT_GUARD_SCRIPT_ID));
+    assert.match(body, new RegExp(PUBLIC_NAV_POLISH_STYLE_ID));
+    assert.match(body, new RegExp(PUBLIC_NAV_POLISH_SCRIPT_ID));
     assert.match(body, new RegExp(HEADER_TRANSPARENCY_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_MOTION_STYLE_ID));
     assert.match(body, new RegExp(HOMEPAGE_ORDER_STYLE_ID));
@@ -335,6 +342,19 @@ test("Cloudflare static HTML injection patches stale demo booking modal behavior
   assert.match(injected, /Request your free audit/);
   assert.match(injected, /ClientSurge Systems Demo/);
   assert.equal(injectDemoBookingModalPatch(injected), injected);
+});
+
+test("Cloudflare static HTML injection patches public nav and mobile footer polish while Base44 is stale", () => {
+  const html = "<html><head></head><body><div id=\"root\"></div></body></html>";
+  const injected = injectPublicNavPolish(html);
+
+  assert.match(injected, new RegExp(PUBLIC_NAV_POLISH_STYLE_ID));
+  assert.match(injected, new RegExp(PUBLIC_NAV_POLISH_SCRIPT_ID));
+  assert.match(injected, /footer\.cs-footer\{padding-bottom:env\(safe-area-inset-bottom,0px\)\}/);
+  assert.match(injected, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "smooth" \}\)/);
+  assert.match(injected, /"home services": "\/hvac"/);
+  assert.match(injected, /dataset\.clientsurgeIndustryHref = sameOrigin\(target\)/);
+  assert.equal(injectPublicNavPolish(injected), injected);
 });
 
 test("Cloudflare asset rewrite strips stale rickroll demo URL", () => {

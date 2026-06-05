@@ -18,6 +18,9 @@ export const PRIVATE_ROUTE_BLOCK_HEADER = "x-clientsurge-private-route-block";
 export const ANONYMOUS_USER_ME_HEADER = "x-clientsurge-anonymous-user-me";
 export const DEMO_BOOKING_MODAL_PATCH_HEADER = "x-clientsurge-demo-modal-patch";
 export const DEMO_BOOKING_MODAL_PATCH_SCRIPT_ID = "clientsurge-stale-demo-modal-patch";
+export const PUBLIC_NAV_POLISH_HEADER = "x-clientsurge-public-nav-polish";
+export const PUBLIC_NAV_POLISH_STYLE_ID = "clientsurge-public-nav-polish-style";
+export const PUBLIC_NAV_POLISH_SCRIPT_ID = "clientsurge-public-nav-polish-script";
 
 export const SECURITY_TXT = `Contact: mailto:system@clientsurgesystems.com
 Preferred-Languages: en
@@ -1154,6 +1157,92 @@ function shouldRepairStaleDemoBookingModalAsset(request, url, response) {
   return (response.headers.get("content-type") || "").includes("javascript");
 }
 
+export const PUBLIC_NAV_POLISH_STYLE = `<style id="${PUBLIC_NAV_POLISH_STYLE_ID}">
+footer.cs-footer{padding-bottom:env(safe-area-inset-bottom,0px)}
+footer.cs-footer a:focus-visible,footer.cs-footer button:focus-visible{outline:2px solid #00AEEF;outline-offset:3px;box-shadow:0 0 0 4px rgba(0,174,239,.18)}
+@media (max-width:768px){#root>div{padding-bottom:max(80px,calc(80px + env(safe-area-inset-bottom,0px)))}}
+@media (max-width:700px){footer.cs-footer .cs-footer-main{padding-bottom:max(24px,calc(24px + env(safe-area-inset-bottom,0px)))}}
+</style>`;
+
+export const PUBLIC_NAV_POLISH_SCRIPT = `<script id="${PUBLIC_NAV_POLISH_SCRIPT_ID}">
+(function(){
+  if (window.__clientsurgePublicNavPolish) return;
+  window.__clientsurgePublicNavPolish = true;
+  var routes = {
+    "roofing": "/roofing",
+    "hvac": "/hvac",
+    "dental": "/dental",
+    "med spa": "/med-spa",
+    "chiropractic": "/chiropractic",
+    "contractors": "/contractors",
+    "home services": "/hvac"
+  };
+  function sameOrigin(path) {
+    return window.location.origin + path;
+  }
+  function patchLogo() {
+    var logo = document.querySelector('nav img[alt="ClientSurge Systems"]');
+    var trigger = logo && logo.closest("button,a");
+    if (!trigger || trigger.dataset.clientsurgeLogoTop === "true") return;
+    trigger.dataset.clientsurgeLogoTop = "true";
+    trigger.addEventListener("click", function(event) {
+      if (window.location.pathname === "/" && !window.location.hash) {
+        event.preventDefault();
+        event.stopImmediatePropagation();
+        window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      }
+    }, true);
+  }
+  function linkForChip(node) {
+    var label = (node.textContent || "").trim().toLowerCase();
+    return routes[label] || null;
+  }
+  function patchIndustryChips() {
+    var section = document.querySelector('[aria-labelledby="ai-automation-overview"]');
+    var group = section && section.querySelector('[aria-label="Industries served"]');
+    if (!group) return;
+    Array.from(group.children).forEach(function(child) {
+      if (child.dataset.clientsurgeIndustryChip === "true" || child.querySelector("a[href]")) return;
+      var target = linkForChip(child);
+      if (!target) return;
+      var anchor = document.createElement("a");
+      anchor.href = target;
+      anchor.setAttribute("aria-label", "View " + child.textContent.trim() + " automation systems");
+      anchor.className = "inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-xs font-semibold text-primary transition-colors hover:bg-primary/10 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2";
+      anchor.textContent = child.textContent.trim();
+      anchor.addEventListener("click", function(){ window.scrollTo({ top: 0, left: 0, behavior: "auto" }); });
+      child.textContent = "";
+      child.appendChild(anchor);
+      child.dataset.clientsurgeIndustryChip = "true";
+      child.dataset.clientsurgeIndustryHref = sameOrigin(target);
+    });
+  }
+  function run() {
+    patchLogo();
+    patchIndustryChips();
+  }
+  run();
+  var observer = new MutationObserver(run);
+  observer.observe(document.documentElement, { childList: true, subtree: true });
+  window.setTimeout(function(){ observer.disconnect(); }, 90000);
+})();
+</script>`;
+
+export function injectPublicNavPolish(html) {
+  let nextHtml = html;
+  if (!nextHtml.includes(PUBLIC_NAV_POLISH_STYLE_ID)) {
+    nextHtml = nextHtml.includes("</head>")
+      ? nextHtml.replace("</head>", `${PUBLIC_NAV_POLISH_STYLE}</head>`)
+      : `${PUBLIC_NAV_POLISH_STYLE}${nextHtml}`;
+  }
+  if (!nextHtml.includes(PUBLIC_NAV_POLISH_SCRIPT_ID)) {
+    nextHtml = nextHtml.includes("</body>")
+      ? nextHtml.replace("</body>", `${PUBLIC_NAV_POLISH_SCRIPT}\n</body>`)
+      : `${nextHtml}\n${PUBLIC_NAV_POLISH_SCRIPT}`;
+  }
+  return nextHtml;
+}
+
 function escapeHtmlAttribute(value = "") {
   return String(value)
     .replace(/&/g, "&amp;")
@@ -1486,10 +1575,12 @@ export default {
     if (shouldInjectStaticFallbackPaintGuard(request, originResponse)) {
       let html = repairPublicRouteMetadata(await originResponse.text(), url.pathname);
       html = injectDemoBookingModalPatch(html);
+      html = injectPublicNavPolish(html);
       html = injectStaticFallbackPaintGuard(html);
       headers.set(STATIC_FALLBACK_PAINT_GUARD_HEADER, "edge-v1");
       headers.set(EDGE_ROUTE_METADATA_HEADER, "edge-v1");
       headers.set(DEMO_BOOKING_MODAL_PATCH_HEADER, "edge-v1");
+      headers.set(PUBLIC_NAV_POLISH_HEADER, "edge-v1");
       headers.set("Cache-Control", "no-store, max-age=0");
 
       if (shouldInjectHomepageMotion(request, url, originResponse)) {
