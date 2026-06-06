@@ -1,0 +1,153 @@
+{
+  "name": "WebsiteSpec",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "package_key": {
+      "type": "string",
+      "title": "Package Key",
+      "enum": [
+        "starter",
+        "growth",
+        "elite"
+      ]
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry"
+    },
+    "pages": {
+      "type": "array",
+      "title": "Pages",
+      "items": {
+        "type": "object",
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "sections": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "copy": {
+            "type": "object",
+            "properties": {
+              "hero_headline": {
+                "type": "string"
+              },
+              "hero_subheading": {
+                "type": "string"
+              },
+              "cta_text": {
+                "type": "string"
+              },
+              "proof_points": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "body_paragraphs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "title": "Brand Assets",
+      "properties": {
+        "business_name": {
+          "type": "string"
+        },
+        "tagline": {
+          "type": "string"
+        },
+        "logo_url": {
+          "type": "string"
+        },
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "fonts": {
+          "type": "object",
+          "properties": {
+            "heading": {
+              "type": "string"
+            },
+            "body": {
+              "type": "string"
+            }
+          }
+        },
+        "tone_of_voice": {
+          "type": "string",
+          "enum": [
+            "professional",
+            "warm",
+            "energetic"
+          ]
+        },
+        "target_audience": {
+          "type": "string"
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "approved",
+        "building",
+        "live"
+      ],
+      "default": "draft"
+    },
+    "revision_requested": {
+      "type": "boolean",
+      "title": "Revision Requested",
+      "default": false
+    },
+    "revision_notes": {
+      "type": "string",
+      "title": "Revision Notes"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    },
+    "built_at": {
+      "type": "string",
+      "title": "Built At",
+      "format": "date-time"
+    },
+    "ai_generated": {
+      "type": "boolean",
+      "title": "AI Copy Generated",
+      "default": false
+    }
+  },
+  "required": [
+    "order_id",
+    "package_key",
+    "industry"
+  ]
+}

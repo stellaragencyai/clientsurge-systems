@@ -17,11 +17,6 @@
       "title": "Service Key",
       "description": "Which service this webhook is for"
     },
-    "client_project_id": {
-      "type": "string",
-      "title": "Client Project ID",
-      "description": "Canonical project this webhook is allowed to route into"
-    },
     "webhook_url": {
       "type": "string",
       "title": "Webhook URL",
@@ -92,14 +87,6 @@
       ],
       "default": "active"
     },
-    "signature_algorithm": {
-      "type": "string",
-      "title": "Signature Algorithm",
-      "enum": [
-        "hmac_sha256"
-      ],
-      "default": "hmac_sha256"
-    },
     "last_triggered_at": {
       "type": "string",
       "title": "Last Triggered At"
@@ -121,27 +108,5 @@
   "required": [
     "source_name",
     "service_key"
-  ],
-  "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "read": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "update": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
-  }
+  ]
 }

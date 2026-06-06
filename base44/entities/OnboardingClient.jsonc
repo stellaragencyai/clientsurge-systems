@@ -18,18 +18,6 @@
       "type": "string",
       "title": "Email"
     },
-    "crm_lead_id": {
-      "type": "string",
-      "title": "Linked CRM Lead ID"
-    },
-    "lead_id": {
-      "type": "string",
-      "title": "Linked Lead ID"
-    },
-    "website_lead_id": {
-      "type": "string",
-      "title": "Linked Website Lead ID"
-    },
     "website": {
       "type": "string",
       "title": "Website"
@@ -41,17 +29,6 @@
     "industry": {
       "type": "string",
       "title": "Industry"
-    },
-    "package_purchased": {
-      "type": "string",
-      "title": "Package Purchased"
-    },
-    "automation_services_selected": {
-      "type": "array",
-      "title": "Automation Services Selected",
-      "items": {
-        "type": "string"
-      }
     },
     "services": {
       "type": "string",
@@ -78,26 +55,6 @@
     "lead_sources": {
       "type": "string",
       "title": "Lead Sources (comma separated)"
-    },
-    "current_crm_stack": {
-      "type": "string",
-      "title": "Current CRM / Tool Stack"
-    },
-    "google_business_profile_access": {
-      "type": "string",
-      "title": "Google Business Profile Access Instructions"
-    },
-    "website_access_instructions": {
-      "type": "string",
-      "title": "Website Access Instructions"
-    },
-    "twilio_phone_requirements": {
-      "type": "string",
-      "title": "Twilio / Phone Requirements"
-    },
-    "email_domain_access_requirements": {
-      "type": "string",
-      "title": "Email / Domain Access Requirements"
     },
     "twilio_number": {
       "type": "string",
@@ -137,50 +94,9 @@
       ],
       "default": "Onboarding"
     },
-    "pipeline_status": {
-      "type": "string",
-      "title": "Canonical Install Pipeline Status"
-    },
     "generated_messages": {
       "type": "string",
       "title": "AI Generated Messages (JSON)"
-    },
-    "activation_package_tier": {
-      "type": "string",
-      "title": "Activation Package Tier"
-    },
-    "activation_package_key": {
-      "type": "string",
-      "title": "Activation Package Key"
-    },
-    "package_service_keys": {
-      "type": "array",
-      "title": "Package Service Keys",
-      "items": {
-        "type": "string"
-      }
-    },
-    "onboarding_required_fields": {
-      "type": "array",
-      "title": "Onboarding Required Fields",
-      "items": {
-        "type": "string"
-      }
-    },
-    "onboarding_missing_fields": {
-      "type": "array",
-      "title": "Onboarding Missing Fields",
-      "items": {
-        "type": "string"
-      }
-    },
-    "next_onboarding_question": {
-      "type": "string",
-      "title": "Next Onboarding Question"
-    },
-    "package_activation_context": {
-      "type": "object",
-      "title": "Package Activation Context"
     },
     "notes": {
       "type": "string",
@@ -230,6 +146,90 @@
       "type": "boolean",
       "title": "Step 9: Went Live",
       "default": false
+    },
+    "crm_lead_id": {
+      "type": "string",
+      "title": "Linked CRM Lead ID"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Linked Lead ID"
+    },
+    "website_lead_id": {
+      "type": "string",
+      "title": "Linked Website Lead ID"
+    },
+    "package_purchased": {
+      "type": "string",
+      "title": "Package Purchased"
+    },
+    "automation_services_selected": {
+      "type": "array",
+      "title": "Automation Services Selected",
+      "items": {
+        "type": "string"
+      }
+    },
+    "current_crm_stack": {
+      "type": "string",
+      "title": "Current CRM / Tool Stack"
+    },
+    "google_business_profile_access": {
+      "type": "string",
+      "title": "Google Business Profile Access Instructions"
+    },
+    "website_access_instructions": {
+      "type": "string",
+      "title": "Website Access Instructions"
+    },
+    "twilio_phone_requirements": {
+      "type": "string",
+      "title": "Twilio / Phone Requirements"
+    },
+    "email_domain_access_requirements": {
+      "type": "string",
+      "title": "Email / Domain Access Requirements"
+    },
+    "pipeline_status": {
+      "type": "string",
+      "title": "Canonical Install Pipeline Status"
+    },
+    "activation_package_tier": {
+      "type": "string",
+      "title": "Activation Package Tier"
+    },
+    "activation_package_key": {
+      "type": "string",
+      "title": "Activation Package Key"
+    },
+    "package_service_keys": {
+      "type": "array",
+      "title": "Package Service Keys",
+      "items": {
+        "type": "string"
+      }
+    },
+    "onboarding_required_fields": {
+      "type": "array",
+      "title": "Onboarding Required Fields",
+      "items": {
+        "type": "string"
+      }
+    },
+    "onboarding_missing_fields": {
+      "type": "array",
+      "title": "Onboarding Missing Fields",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_onboarding_question": {
+      "type": "string",
+      "title": "Next Onboarding Question"
+    },
+    "package_activation_context": {
+      "type": "object",
+      "title": "Package Activation Context"
     }
   },
   "required": [
@@ -237,41 +237,5 @@
     "owner_name",
     "email",
     "phone"
-  ],
-  "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "read": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "data.email": "{{user.email}}"
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "data.email": "{{user.email}}"
-        }
-      ]
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
-  }
+  ]
 }

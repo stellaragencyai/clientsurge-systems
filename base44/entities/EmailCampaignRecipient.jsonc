@@ -70,10 +70,6 @@
       "type": "string",
       "title": "Error Message"
     },
-    "suppression_reason": {
-      "type": "string",
-      "title": "Suppression Reason"
-    },
     "open_count": {
       "type": "number",
       "title": "Open Count",

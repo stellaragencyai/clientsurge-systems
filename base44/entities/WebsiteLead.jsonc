@@ -66,7 +66,8 @@
         "website_form",
         "contact_page",
         "pricing_page",
-        "landing_page"
+        "landing_page",
+        "elevenlabs_sarah_ai_receptionist"
       ],
       "default": "website_form"
     },
@@ -270,6 +271,71 @@
       "type": "string",
       "title": "Archived At",
       "format": "date-time"
+    },
+    "city_or_service_area": {
+      "type": "string",
+      "title": "City Or Service Area"
+    },
+    "website_url": {
+      "type": "string",
+      "title": "Website URL"
+    },
+    "interested_service": {
+      "type": "string",
+      "title": "Interested Service"
+    },
+    "current_lead_source": {
+      "type": "string",
+      "title": "Current Lead Source"
+    },
+    "desired_monthly_clients": {
+      "type": "string",
+      "title": "Desired Monthly Clients"
+    },
+    "current_marketing_spend_status": {
+      "type": "string",
+      "title": "Current Marketing Spend Status"
+    },
+    "capacity_to_handle_more_leads": {
+      "type": "string",
+      "title": "Capacity To Handle More Leads"
+    },
+    "timeline": {
+      "type": "string",
+      "title": "Timeline"
+    },
+    "sms_permission": {
+      "type": "boolean",
+      "title": "SMS Permission",
+      "default": false
+    },
+    "caller_type": {
+      "type": "string",
+      "title": "Caller Type"
+    },
+    "lead_quality": {
+      "type": "string",
+      "title": "Lead Quality"
+    },
+    "follow_up_priority": {
+      "type": "string",
+      "title": "Follow-Up Priority"
+    },
+    "call_summary": {
+      "type": "string",
+      "title": "Call Summary"
+    },
+    "transcript": {
+      "type": "string",
+      "title": "Transcript"
+    },
+    "call_sid": {
+      "type": "string",
+      "title": "Call SID"
+    },
+    "conversation_id": {
+      "type": "string",
+      "title": "Conversation ID"
     }
   },
   "required": [],

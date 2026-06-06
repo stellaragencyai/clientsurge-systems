@@ -23,18 +23,6 @@
       "type": "string",
       "title": "Phone Number"
     },
-    "crm_lead_id": {
-      "type": "string",
-      "title": "Linked CRM Lead ID"
-    },
-    "lead_id": {
-      "type": "string",
-      "title": "Linked Lead ID"
-    },
-    "website_lead_id": {
-      "type": "string",
-      "title": "Linked Website Lead ID"
-    },
     "website": {
       "type": "string",
       "title": "Website URL"
@@ -42,21 +30,6 @@
     "social_media": {
       "type": "string",
       "title": "Instagram / Social Media Links"
-    },
-    "industry": {
-      "type": "string",
-      "title": "Industry"
-    },
-    "package_purchased": {
-      "type": "string",
-      "title": "Package Purchased"
-    },
-    "automation_services_selected": {
-      "type": "array",
-      "items": {
-        "type": "string"
-      },
-      "title": "Automation Services Selected"
     },
     "services": {
       "type": "array",
@@ -71,10 +44,6 @@
         "type": "string"
       },
       "title": "Lead Sources"
-    },
-    "current_crm_stack": {
-      "type": "string",
-      "title": "Current CRM / Tool Stack"
     },
     "current_process": {
       "type": "string",
@@ -136,29 +105,9 @@
       "type": "string",
       "title": "Access / Login Information"
     },
-    "google_business_profile_access": {
-      "type": "string",
-      "title": "Google Business Profile Access Instructions"
-    },
-    "website_access_instructions": {
-      "type": "string",
-      "title": "Website Access Instructions"
-    },
-    "twilio_phone_requirements": {
-      "type": "string",
-      "title": "Twilio / Phone Requirements"
-    },
-    "email_domain_access_requirements": {
-      "type": "string",
-      "title": "Email / Domain Access Requirements"
-    },
     "goals": {
       "type": "string",
       "title": "Success Goals"
-    },
-    "notes": {
-      "type": "string",
-      "title": "Internal Setup Notes"
     },
     "status": {
       "type": "string",
@@ -177,6 +126,57 @@
         "type": "string"
       },
       "title": "Tags"
+    },
+    "crm_lead_id": {
+      "type": "string",
+      "title": "Linked CRM Lead ID"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Linked Lead ID"
+    },
+    "website_lead_id": {
+      "type": "string",
+      "title": "Linked Website Lead ID"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry"
+    },
+    "package_purchased": {
+      "type": "string",
+      "title": "Package Purchased"
+    },
+    "automation_services_selected": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Automation Services Selected"
+    },
+    "current_crm_stack": {
+      "type": "string",
+      "title": "Current CRM / Tool Stack"
+    },
+    "google_business_profile_access": {
+      "type": "string",
+      "title": "Google Business Profile Access Instructions"
+    },
+    "website_access_instructions": {
+      "type": "string",
+      "title": "Website Access Instructions"
+    },
+    "twilio_phone_requirements": {
+      "type": "string",
+      "title": "Twilio / Phone Requirements"
+    },
+    "email_domain_access_requirements": {
+      "type": "string",
+      "title": "Email / Domain Access Requirements"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Internal Setup Notes"
     }
   },
   "required": [

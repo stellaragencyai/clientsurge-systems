@@ -33,7 +33,7 @@
       "enum": [
         "Starter System",
         "Growth System",
-        "Elite System"
+        "Pro System"
       ],
       "default": "Starter System"
     },
@@ -44,7 +44,7 @@
         "None",
         "Starter System",
         "Growth System",
-        "Elite System"
+        "Pro System"
       ],
       "default": "None"
     },
@@ -148,15 +148,6 @@
       "type": "string",
       "title": "Go-Live Date"
     },
-    "nps_score": {
-      "type": "integer",
-      "title": "NPS Score"
-    },
-    "nps_responded_at": {
-      "type": "string",
-      "title": "NPS Responded At",
-      "format": "date-time"
-    },
     "deadlines": {
       "type": "array",
       "items": {
@@ -236,63 +227,11 @@
       "type": "boolean",
       "title": "Onboarding Wizard Completed",
       "default": false
-    },
-    "quick_start_completed": {
-      "type": "boolean",
-      "title": "Quick Start Completed",
-      "default": false
-    },
-    "quick_start_completed_at": {
-      "type": "string",
-      "title": "Quick Start Completed At",
-      "format": "date-time"
     }
   },
   "required": [
     "client_email",
     "client_name",
     "business_name"
-  ],
-  "rls": {
-    "create": {
-      "user_condition": {
-        "role": "admin"
-      }
-    },
-    "read": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "data.client_email": "{{user.email}}"
-        },
-        {
-          "data.contact_email": "{{user.email}}"
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "data.client_email": "{{user.email}}"
-        },
-        {
-          "data.contact_email": "{{user.email}}"
-        }
-      ]
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
-  }
+  ]
 }
