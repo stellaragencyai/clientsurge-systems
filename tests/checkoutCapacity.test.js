@@ -62,3 +62,34 @@ test("checkout capacity gate ignores closed orders", () => {
     true
   );
 });
+
+test("checkout capacity gate ignores stale pending orders without a Stripe session", () => {
+  const staleCreatedDate = new Date(
+    Date.now() - __testing.STALE_PENDING_WITHOUT_SESSION_MS - 60_000
+  ).toISOString();
+
+  assert.equal(
+    __testing.isActiveCheckoutOrder({
+      order_status: "pending_payment",
+      payment_status: "pending",
+      created_date: staleCreatedDate,
+    }),
+    false
+  );
+});
+
+test("checkout capacity gate ignores stale pending orders after hosted checkout expiry", () => {
+  const staleCreatedDate = new Date(
+    Date.now() - __testing.STALE_PENDING_WITH_SESSION_MS - 60_000
+  ).toISOString();
+
+  assert.equal(
+    __testing.isActiveCheckoutOrder({
+      order_status: "pending_payment",
+      payment_status: "pending",
+      created_date: staleCreatedDate,
+      stripe_session_id: "cs_live_example",
+    }),
+    false
+  );
+});

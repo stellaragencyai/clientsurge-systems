@@ -11,6 +11,7 @@ import {
 
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
+  let createdOrderId = null;
   try {
     let stripeContext;
     try {
@@ -125,6 +126,7 @@ Deno.serve(async (req) => {
       package_type: pricingSummary.package_offer?.package_key || null,
       plan_type: packageLabel,
     });
+    createdOrderId = order.id;
 
     const line_items = buildStripeLineItemsForPricingSummary(pricingSummary);
 
@@ -196,6 +198,19 @@ Deno.serve(async (req) => {
 
     return secureJson({ url: session.url, session_id: session.id, request_id: requestId });
   } catch (error) {
+    if (createdOrderId) {
+      try {
+        const failedMessage = error instanceof Error ? error.message : String(error);
+        await createClientFromRequest(req).asServiceRole.entities.Order.update(createdOrderId, {
+          payment_status: "failed",
+          order_status: "failed",
+          pipeline_error: failedMessage,
+          notes: `Checkout session creation failed: ${failedMessage}`,
+        });
+      } catch {
+        // Preserve the original Stripe error response even if order cleanup fails.
+      }
+    }
     const safeError = safeStripeError(error, "Checkout failed. Please try again or contact support.");
     console.error("[createCheckoutSession] Checkout error", {
       requestId,

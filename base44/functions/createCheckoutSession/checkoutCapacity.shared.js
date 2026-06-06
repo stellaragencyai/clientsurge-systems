@@ -13,6 +13,9 @@ const CLOSED_PAYMENT_STATUSES = new Set([
   "failed",
 ]);
 
+const STALE_PENDING_WITH_SESSION_MS = 36 * 60 * 60 * 1000;
+const STALE_PENDING_WITHOUT_SESSION_MS = 30 * 60 * 1000;
+
 function parseCapacityLimit(value) {
   if (value === undefined || value === null || String(value).trim() === "") {
     return null;
@@ -26,7 +29,23 @@ function isActiveCheckoutOrder(order) {
   const orderStatus = String(order?.order_status || "").toLowerCase();
   const paymentStatus = String(order?.payment_status || "").toLowerCase();
 
-  return !CLOSED_ORDER_STATUSES.has(orderStatus) && !CLOSED_PAYMENT_STATUSES.has(paymentStatus);
+  if (CLOSED_ORDER_STATUSES.has(orderStatus) || CLOSED_PAYMENT_STATUSES.has(paymentStatus)) {
+    return false;
+  }
+
+  if (orderStatus === "pending_payment" && paymentStatus === "pending") {
+    const createdAtMs = Date.parse(order?.created_date || "");
+    if (Number.isFinite(createdAtMs)) {
+      const maxAgeMs = order?.stripe_session_id
+        ? STALE_PENDING_WITH_SESSION_MS
+        : STALE_PENDING_WITHOUT_SESSION_MS;
+      if (Date.now() - createdAtMs > maxAgeMs) {
+        return false;
+      }
+    }
+  }
+
+  return true;
 }
 
 export async function getActiveCheckoutOrderCount(base44) {
@@ -70,4 +89,6 @@ export async function assertCheckoutCapacityAvailable({
 export const __testing = {
   isActiveCheckoutOrder,
   parseCapacityLimit,
+  STALE_PENDING_WITH_SESSION_MS,
+  STALE_PENDING_WITHOUT_SESSION_MS,
 };

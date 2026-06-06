@@ -514,16 +514,18 @@ function enrichPackage(definition) {
   const included_services = definition.included_service_keys
     .map((serviceKey) => SERVICE_BY_KEY[serviceKey])
     .filter(Boolean);
-  const compare_at_setup = sum(included_services.map((service) => service.setup_fee));
-  const compare_at_monthly = sum(included_services.map((service) => service.monthly_fee));
+  const compareAtSetupFromServices = sum(included_services.map((service) => service.setup_fee));
+  const compareAtMonthlyFromServices = sum(included_services.map((service) => service.monthly_fee));
+  const compare_at_setup = Math.max(compareAtSetupFromServices, definition.setup_total);
+  const compare_at_monthly = Math.max(compareAtMonthlyFromServices, definition.monthly_total);
 
   return {
     ...definition,
     included_services,
     compare_at_setup,
     compare_at_monthly,
-    setup_savings: compare_at_setup - definition.setup_total,
-    monthly_savings: compare_at_monthly - definition.monthly_total,
+    setup_savings: Math.max(0, compare_at_setup - definition.setup_total),
+    monthly_savings: Math.max(0, compare_at_monthly - definition.monthly_total),
     features: included_services.map((service) => service.name),
   };
 }
@@ -689,22 +691,30 @@ export function buildPricingSummaryForProducts(items = []) {
     const packageShare = packagePricing[product.product_id];
     const actualSetup = packageShare ? packageShare.setup_fee : product.setup_fee;
     const actualMonthly = packageShare ? packageShare.monthly_fee : product.monthly_fee;
+    const compareAtSetupFee = Math.max(product.setup_fee, actualSetup);
+    const compareAtMonthlyFee = Math.max(product.monthly_fee, actualMonthly);
 
     return {
       ...product,
-      compare_at_setup_fee: product.setup_fee,
-      compare_at_monthly_fee: product.monthly_fee,
+      compare_at_setup_fee: compareAtSetupFee,
+      compare_at_monthly_fee: compareAtMonthlyFee,
       setup_fee: actualSetup,
       monthly_fee: actualMonthly,
-      setup_discount_fee: packageShare ? packageShare.setup_discount_fee : 0,
-      monthly_discount_fee: packageShare ? packageShare.monthly_discount_fee : 0,
+      setup_discount_fee: Math.max(0, compareAtSetupFee - actualSetup),
+      monthly_discount_fee: Math.max(0, compareAtMonthlyFee - actualMonthly),
       source_package_key: packageServiceKeys.has(product.service_key) ? packageOffer.package_key : null,
       source_package_name: packageServiceKeys.has(product.service_key) ? packageOffer.name : null,
     };
   });
 
-  const total_setup_before_discount = fromCents(sum(products.map((product) => toCents(product.setup_fee))));
-  const total_monthly_before_discount = fromCents(sum(products.map((product) => toCents(product.monthly_fee))));
+  const total_setup_before_discount = Math.max(
+    fromCents(sum(products.map((product) => toCents(product.setup_fee)))),
+    packageOffer?.compare_at_setup || 0
+  );
+  const total_monthly_before_discount = Math.max(
+    fromCents(sum(products.map((product) => toCents(product.monthly_fee)))),
+    packageOffer?.compare_at_monthly || 0
+  );
   const total_setup = fromCents(sum(priced_items.map((product) => toCents(product.setup_fee))));
   const total_monthly = fromCents(sum(priced_items.map((product) => toCents(product.monthly_fee))));
   const add_on_services = priced_items.filter((product) => !packageServiceKeys.has(product.service_key));
@@ -721,8 +731,8 @@ export function buildPricingSummaryForProducts(items = []) {
     total_monthly_before_discount,
     total_setup,
     total_monthly,
-    setup_discount_total: total_setup_before_discount - total_setup,
-    monthly_discount_total: total_monthly_before_discount - total_monthly,
+    setup_discount_total: Math.max(0, total_setup_before_discount - total_setup),
+    monthly_discount_total: Math.max(0, total_monthly_before_discount - total_monthly),
   };
 }
 

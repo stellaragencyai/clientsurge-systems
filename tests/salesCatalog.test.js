@@ -69,7 +69,7 @@ test("pricing summary matches best package when selected services align", () => 
   assert.equal(summary.total_setup, 1297);
   assert.equal(summary.total_monthly, 997);
   assert.equal(summary.setup_discount_total, 91);
-  assert.equal(summary.monthly_discount_total, -559);
+  assert.equal(summary.monthly_discount_total, 0);
 });
 
 test("pricing summary preserves add-ons outside matched package", () => {
@@ -97,8 +97,8 @@ test("stored pricing summary keeps package and discount visibility for admin", (
   assert.equal(stored.package_monthly_price_id, "price_1TSlDXBVGjsISdG0Abdx85z3");
   assert.equal(stored.total_setup, 2497);
   assert.equal(stored.total_monthly, 1997);
-  assert.equal(stored.setup_discount_total, -615);
-  assert.equal(stored.monthly_discount_total, -1395);
+  assert.equal(stored.setup_discount_total, 0);
+  assert.equal(stored.monthly_discount_total, 0);
 });
 
 test("legacy elite_system package key remains backward compatible with Pro", () => {
@@ -256,5 +256,9 @@ test("package pricing math stays internally consistent", () => {
       Number(summary.priced_items.reduce((sum, item) => sum + item.monthly_fee, 0).toFixed(2)),
       offer.monthly_total
     );
+    assert.ok(summary.total_setup_before_discount >= summary.total_setup);
+    assert.ok(summary.total_monthly_before_discount >= summary.total_monthly);
+    assert.ok(summary.setup_discount_total >= 0);
+    assert.ok(summary.monthly_discount_total >= 0);
   }
 });
