@@ -63,7 +63,7 @@ function stableFunctionConfig(name, donorConfig) {
   const config = {
     ...(donorConfig && typeof donorConfig === "object" ? donorConfig : {}),
     name,
-    entry: "entry.ts",
+    entry: donorConfig?.entry || "entry.ts",
   };
   return `${JSON.stringify(config, null, 2)}\n`;
 }

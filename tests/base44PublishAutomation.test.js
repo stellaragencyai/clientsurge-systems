@@ -102,7 +102,8 @@ test("Base44 function metadata is complete for every source entry", () => {
     const relName = path.relative(functionsRoot, functionDir).split(path.sep).join("/");
     const metadata = JSON.parse(read(path.relative(repoRoot, metadataPath).replaceAll("\\", "/")));
     assert.equal(metadata.name, relName);
-    assert.equal(metadata.entry, "entry.ts");
+    assert.match(metadata.entry, /^(entry|main)\.ts$/);
+    assert.equal(existsSync(path.join(functionDir, metadata.entry)), true);
   }
 
   assert.deepEqual(missing, []);
