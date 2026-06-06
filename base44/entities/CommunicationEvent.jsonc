@@ -84,6 +84,7 @@
         "booking_simulation_created",
         "booking_created",
         "lead_reactivation_batch_completed",
+        "portal_login",
         "review_request_trigger_simulated",
         "workflow_triggered",
         "status_update",

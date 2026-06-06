@@ -62,6 +62,15 @@
       "type": "string",
       "title": "Default Booking Link"
     },
+    "allowed_admin_ips": {
+      "type": "array",
+      "title": "Allowed Admin IPs",
+      "description": "Optional admin panel IP allowlist. Empty means no IP allowlist is configured.",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
     "webhook_enabled": {
       "type": "boolean",
       "title": "Webhooks Enabled",

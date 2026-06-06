@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { twilioFetch } from "../_shared/providerFetch.js";
 
 function secureJson(data = {}, init = {}) {
   return new Response(JSON.stringify(data), {
@@ -55,7 +56,7 @@ async function sendTwilioSms(args) {
   if (!from) throw new Error("Twilio business phone is not configured");
   const params = new URLSearchParams({ To: to, From: from, Body: body });
   if (statusCallbackUrl) params.set("StatusCallback", statusCallbackUrl);
-  const res = await fetch("https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json", {
+  const res = await twilioFetch("https://api.twilio.com/2010-04-01/Accounts/" + accountSid + "/Messages.json", {
     method: "POST",
     headers: {
       Authorization: "Basic " + btoa(accountSid + ":" + authToken),

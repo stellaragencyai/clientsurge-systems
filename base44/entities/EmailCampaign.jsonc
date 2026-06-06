@@ -40,6 +40,29 @@
       "type": "string",
       "title": "Scheduled Send Time"
     },
+    "max_recipients": {
+      "type": "number",
+      "title": "Maximum Test Recipients",
+      "default": 25
+    },
+    "follow_up_days": {
+      "type": "number",
+      "title": "Follow-Up Delay Days",
+      "default": 3
+    },
+    "landing_page_url": {
+      "type": "string",
+      "title": "Landing Page URL"
+    },
+    "industry_sequence": {
+      "type": "string",
+      "title": "Industry Sequence",
+      "enum": [
+        "roofing",
+        "hvac",
+        "dental"
+      ]
+    },
     "sent_at": {
       "type": "string",
       "title": "Sent At"
@@ -60,6 +83,12 @@
             "type": "string"
           }
         },
+        "industries": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
         "lead_score_min": {
           "type": "number"
         },
@@ -71,12 +100,20 @@
           "items": {
             "type": "string"
           }
+        },
+        "max_recipients": {
+          "type": "number"
         }
       }
     },
     "total_recipients": {
       "type": "number",
       "title": "Total Recipients",
+      "default": 0
+    },
+    "suppressed_recipients": {
+      "type": "number",
+      "title": "Suppressed Recipients",
       "default": 0
     },
     "total_sent": {
