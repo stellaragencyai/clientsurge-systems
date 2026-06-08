@@ -21,7 +21,7 @@ export default function MobileBottomNav() {
           bottom: 0;
           left: 0;
           right: 0;
-          border-top: 1px solid rgba(154,92,46,0.12);
+          border-top: 1px solid rgba(0,136,204,0.12);
           background: rgba(255,255,255,0.98);
           backdrop-filter: blur(12px);
           -webkit-backdrop-filter: blur(12px);
@@ -52,7 +52,7 @@ export default function MobileBottomNav() {
                 border: "none",
                 background: "transparent",
                 cursor: "pointer",
-                color: isActive ? "#9a5c2e" : "rgba(27,20,13,0.5)",
+                color: isActive ? "#0088CC" : "rgba(27,20,13,0.5)",
                 transition: "color 0.2s ease",
               }}
             >

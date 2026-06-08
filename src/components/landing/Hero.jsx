@@ -249,10 +249,8 @@ export default function Hero() {
           inset: 0,
           pointerEvents: "none"
         }}>
-        <motion.div
+        <div
           className="landing-hero__ambientSweep"
-          animate={reduceMotion ? undefined : { x: ["-22%", "16%", "-22%"], opacity: [0.54, 0.92, 0.54] }}
-          transition={{ duration: 8.8, repeat: Infinity, ease: "easeInOut" }}
           style={{
             position: "absolute",
             top: "-18%",
@@ -261,8 +259,7 @@ export default function Hero() {
             height: "86%",
             borderRadius: "999px",
             background:
-              "radial-gradient(circle at center, rgba(0,174,239,0.18) 0%, rgba(0,157,255,0.08) 34%, transparent 70%)",
-            filter: "blur(28px)"
+              "radial-gradient(circle at center, rgba(0,174,239,0.12) 0%, rgba(0,157,255,0.05) 34%, transparent 70%)",
           }}
         />
         
@@ -380,19 +377,16 @@ export default function Hero() {
             gridColumn: "2"
           }}>
           
-          <motion.div
+          <div
             aria-hidden="true"
             className="landing-hero__visualGlow"
-            animate={reduceMotion ? undefined : { scale: [0.96, 1.06, 0.96], opacity: [0.78, 1, 0.78] }}
-            transition={{ duration: 5.6, repeat: Infinity, ease: "easeInOut" }}
             style={{
               position: "absolute",
               width: "90%",
               height: "62%",
               borderRadius: "36px",
               background:
-              "radial-gradient(circle at center, rgba(0,174,239,0.18) 0%, rgba(0,157,255,0.08) 38%, transparent 72%)",
-              filter: "blur(36px)",
+              "radial-gradient(circle at center, rgba(0,174,239,0.14) 0%, rgba(0,157,255,0.06) 38%, transparent 72%)",
               transform: "translateY(-2%)"
             }} />
           

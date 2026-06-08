@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
@@ -162,6 +162,12 @@ function LiveIndicator({ lastUpdated, onRefresh, isRefreshing }) {
 }
 
 export default function ClientDashboard() {
+  useLayoutEffect(() => {
+    const robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute("content", "noindex,nofollow");
+    return () => { if (robots) robots.setAttribute("content", "index,follow"); };
+  }, []);
+
   const [portalData, setPortalData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -256,8 +262,8 @@ export default function ClientDashboard() {
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "hsl(var(--background))" }}>
         <Navbar />
 
-        <main style={{ flex: 1, paddingTop: "72px" }}>
-          <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(16px,4vw,32px)" }}>
+        <main id="main-content" style={{ flex: 1, paddingTop: "76px" }}>
+          <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(20px,4vw,40px)" }}>
 
             {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={() => fetchPortal(false)} /> : (
               <>
@@ -297,12 +303,12 @@ export default function ClientDashboard() {
                     {/* All service cards — Responsive layout */}
                     <div style={{
                       display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 320px), 1fr))",
+                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
                       gap: "16px",
                       marginBottom: "80px",
                     }}>
                       {activeServices.map((service, idx) => (
-                        <ResponsiveServiceCard key={idx} service={service} />
+                        <ResponsiveServiceCard key={service.serviceKey || idx} service={service} />
                       ))}
                     </div>
 

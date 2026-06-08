@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect } from "react";
+import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { LogOut, LayoutDashboard } from "lucide-react";
 import SetupProgressHub from "../components/portal/SetupProgressHub";
@@ -71,6 +71,13 @@ const TABS = [
 TABS.splice(1, 0, { id: "order-status", label: "Order Status" });
 
 export default function ClientPortal() {
+  // Prevent search engines from indexing private portal
+  useLayoutEffect(() => {
+    const robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute("content", "noindex,nofollow");
+    return () => { if (robots) robots.setAttribute("content", "index,follow"); };
+  }, []);
+
   const [user, setUser] = useState(null);
   const [project, setProject] = useState(null);
   const [portalOrder, setPortalOrder] = useState(null);
@@ -223,7 +230,7 @@ export default function ClientPortal() {
       )}
 
       {/* Top bar */}
-      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 md:px-6 h-16 flex items-center justify-between" role="banner">
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -282,17 +289,19 @@ export default function ClientPortal() {
       <PaymentFailedBanner subscription={subscription} order={portalOrder} />
 
       {/* Tabs — horizontally scrollable on mobile */}
-      <div className="border-b border-border bg-background px-6 overflow-x-auto relative">
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10" />
-        <div className="max-w-4xl mx-auto flex gap-1 min-w-max">
+      <div className="border-b border-border bg-background px-4 md:px-6 overflow-x-auto relative" role="tablist" aria-label="Portal sections">
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10" aria-hidden="true" />
+        <div className="max-w-4xl mx-auto flex gap-0.5 min-w-max">
           {TABS.map(tab => (
             <button
               key={tab.id}
+              role="tab"
+              aria-selected={activeTab === tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`px-4 py-4 text-sm font-semibold border-b-2 transition-all whitespace-nowrap ${
+              className={`px-3 md:px-4 py-3.5 text-xs md:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap min-h-[44px] ${
                 activeTab === tab.id
                   ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground"
+                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
               }`}
             >
               {tab.label}
@@ -302,7 +311,7 @@ export default function ClientPortal() {
       </div>
 
       {/* Content */}
-      <div className="max-w-4xl mx-auto px-6 py-8">
+      <main id="main-content" className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 portal-tab-content">
         {activeTab === "quickstart" && (
           <QuickStartInline
             project={project}
@@ -384,7 +393,7 @@ export default function ClientPortal() {
         {activeTab === "settings" && (
           <PortalSettings project={project} user={user} onUpdated={refreshProject} />
         )}
-      </div>
+      </main>
     </div>
   );
 }

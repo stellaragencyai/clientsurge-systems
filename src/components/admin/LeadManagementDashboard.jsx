@@ -110,19 +110,19 @@ function renderActionabilityChips(lead) {
 
 function SummaryCard({ label, value, helper, tone = "default" }) {
   const tones = {
-    default: "bg-white text-foreground",
-    blue: "bg-blue-50 text-blue-900",
-    green: "bg-green-50 text-green-900",
-    amber: "bg-amber-50 text-amber-900",
-    purple: "bg-purple-50 text-purple-900",
-    emerald: "bg-emerald-50 text-emerald-900",
+    default: "bg-card text-foreground border-border",
+    blue: "bg-blue-50 text-blue-900 border-blue-200",
+    green: "bg-green-50 text-green-900 border-green-200",
+    amber: "bg-amber-50 text-amber-900 border-amber-200",
+    purple: "bg-purple-50 text-purple-900 border-purple-200",
+    emerald: "bg-emerald-50 text-emerald-900 border-emerald-200",
   };
 
   return (
-    <div className={`rounded-xl border border-border p-4 ${tones[tone]}`}>
+    <div className={`rounded-xl border p-4 min-h-[90px] flex flex-col justify-between ${tones[tone]}`}>
       <p className="text-xs font-semibold uppercase tracking-wide opacity-75">{label}</p>
-      <p className="mt-2 text-3xl font-bold">{value}</p>
-      {helper ? <p className="mt-2 text-xs opacity-80">{helper}</p> : null}
+      <p className="mt-2 text-2xl md:text-3xl font-bold tabular-nums">{value ?? 0}</p>
+      {helper ? <p className="mt-1 text-xs opacity-70 leading-snug">{helper}</p> : null}
     </div>
   );
 }
@@ -137,7 +137,7 @@ function ConversionFunnelChart({ summary }) {
   };
 
   return (
-    <div className="rounded-xl border border-border bg-white p-4">
+    <div className="rounded-xl border border-border bg-card p-4">
       <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h3 className="text-lg font-semibold text-foreground">Conversion Funnel</h3>
@@ -439,7 +439,7 @@ export default function LeadManagementDashboard({
   const offerMix = snapshot.summary.recommended_offer_counts || {};
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6" role="main" aria-label="Lead Management Dashboard">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <h2 className="text-2xl font-semibold text-foreground">Lead Pipeline</h2>
@@ -626,7 +626,7 @@ export default function LeadManagementDashboard({
         </div>
 
         <div className="space-y-6">
-          <div className="rounded-xl border border-border bg-white p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <div className="mb-4 flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" />
               <h3 className="text-lg font-semibold text-foreground">Activation Segments</h3>
@@ -654,7 +654,7 @@ export default function LeadManagementDashboard({
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-white p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <div className="mb-4 flex items-center gap-2">
               <BrainCircuit className="h-4 w-4 text-primary" />
               <h3 className="text-lg font-semibold text-foreground">Recommended Offer Mix</h3>
@@ -690,7 +690,7 @@ export default function LeadManagementDashboard({
       </div>
 
       {importOpen ? (
-        <div className="rounded-xl border border-border bg-white p-6 space-y-4">
+        <div className="rounded-xl border border-border bg-card p-6 space-y-4">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
               <h3 className="text-lg font-semibold text-foreground">Structured Lead Import</h3>
@@ -800,7 +800,7 @@ export default function LeadManagementDashboard({
         </div>
       ) : null}
 
-      <div className="rounded-xl border border-border bg-white p-4 space-y-4">
+      <div className="rounded-xl border border-border bg-card p-4 space-y-4">
           <BulkActionToolbar
             selectedIds={Array.from(selectedIds)}
             leads={leads}
@@ -964,7 +964,7 @@ export default function LeadManagementDashboard({
                     <th className="px-4 py-3 text-right font-semibold text-foreground">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-border bg-white">
+                <tbody className="divide-y divide-border bg-card">
                   {loading ? (
                     <tr>
                       <td colSpan={7} className="px-4 py-10 text-center text-muted-foreground">
@@ -1123,7 +1123,7 @@ export default function LeadManagementDashboard({
       )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
-          <div className="rounded-xl border border-border bg-white p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <h3 className="text-lg font-semibold text-foreground">Recent Imports</h3>
             <div className="mt-4 space-y-3">
               {(snapshot.summary.recent_imports || []).length ? (
@@ -1144,7 +1144,7 @@ export default function LeadManagementDashboard({
             </div>
           </div>
 
-          <div className="rounded-xl border border-border bg-white p-4">
+          <div className="rounded-xl border border-border bg-card p-4">
             <div className="mb-4 flex items-center gap-2">
               <MessageSquareText className="h-4 w-4 text-primary" />
               <h3 className="text-lg font-semibold text-foreground">Recent Lead Movement</h3>

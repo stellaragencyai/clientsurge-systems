@@ -3,7 +3,7 @@ import { Building2, CalendarCheck, ShieldCheck, TrendingUp, Zap } from "lucide-r
 import FollowUpTimeline from "./visuals/FollowUpTimeline";
 import { motion } from "framer-motion";
 
-function useCountUp(value, inView, duration = 1400) {
+function useCountUp(value, inView, duration = 1800) {
   const [count, setCount] = useState(typeof value === "number" ? 1 : value);
 
   useEffect(() => {

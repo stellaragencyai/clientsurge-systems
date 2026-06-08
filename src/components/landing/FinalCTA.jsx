@@ -9,14 +9,14 @@ export default function FinalCTA() {
 
   return (
     <>
-      <section id="book-demo" className="nebula-cta pt-10 pb-24 md:pb-32 px-6 relative overflow-hidden">
+      <section id="book-demo" className="nebula-cta pt-10 pb-24 md:pb-32 px-6 relative overflow-hidden" aria-labelledby="final-cta-heading">
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
             Ready to Start?
           </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 id="final-cta-heading" className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
             You&apos;re Already Getting Leads. <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">

@@ -84,7 +84,7 @@ export default function FAQ() {
               >
                 <AccordionItem
                   value={`faq-${idx}`}
-                  className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-all duration-300"
+                  className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-colors duration-200"
                   style={{
                     background: "rgba(255,255,255,0.75)",
                     backdropFilter: "blur(16px)",

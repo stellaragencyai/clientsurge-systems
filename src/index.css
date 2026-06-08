@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -5,7 +7,7 @@
 @layer base {
   :root {
     --font-inter: 'Inter', sans-serif;
-    --font-display: 'Bebas Neue', sans-serif;
+    --font-display: 'Montserrat', sans-serif;
     --font-titles: 'Montserrat', sans-serif;
 
     /* ClientSurge Electric Blue Theme */
@@ -143,7 +145,32 @@ html, body {
 h1, h2, h3 { overflow-wrap: break-word; word-break: break-word; }
 
 /* FIX 10 — Image overflow prevention */
-img { max-width: 100%; height: auto; }
+img { max-width: 100%; height: auto; display: block; }
+
+/* Global animation performance: use will-change only on actively animating elements */
+[data-cinematic-animation] {
+  will-change: transform;
+}
+
+/* Reduce expensive glow filters on mobile */
+@media (max-width: 768px) {
+  [style*="filter: blur"] {
+    filter: none !important;
+  }
+  .landing-hero__visualGlow {
+    display: none !important;
+  }
+}
+
+/* Dashboard card min-heights for layout stability */
+.dashboard-metric-card {
+  min-height: 120px;
+}
+
+/* Portal tab min-height to prevent layout shifts */
+.portal-tab-content {
+  min-height: 400px;
+}
 
 /* FIX 2 — Timeline 4-col grid */
 @media (max-width: 640px) { .timeline-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; } }

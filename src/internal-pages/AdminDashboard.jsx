@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect } from 'react';
+import { lazy, Suspense, useState, useEffect, useLayoutEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -124,7 +124,6 @@ const NAV_GROUPS = [
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
-      { id: 'audit-log', label: 'Audit Log', icon: Activity },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
       { id: 'settings', label: 'Settings', icon: Settings },
@@ -143,6 +142,13 @@ function getActiveTabFromSearch(search) {
 }
 
 export default function AdminDashboard() {
+  // Prevent search engines from indexing admin panel
+  useLayoutEffect(() => {
+    const robots = document.querySelector('meta[name="robots"]');
+    if (robots) robots.setAttribute("content", "noindex,nofollow");
+    return () => { if (robots) robots.setAttribute("content", "index,follow"); };
+  }, []);
+
   const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();

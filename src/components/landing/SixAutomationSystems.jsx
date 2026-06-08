@@ -50,9 +50,10 @@ export default function SixAutomationSystems() {
               <motion.div
                 key={automation.slug}
                 variants={revealItem}
-                whileHover={{ y: -5, scale: 1.01 }}
-                transition={{ duration: 0.25, ease: premiumEase }}
+                whileHover={{ y: -4 }}
+                transition={{ duration: 0.2, ease: "easeOut" }}
                 className="relative"
+                style={{ willChange: "transform" }}
               >
                 <motion.span
                   aria-hidden="true"

@@ -70,10 +70,10 @@ export default function Testimonials() {
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
               }}
               whileHover={{
-                y: -6,
-                boxShadow: "0 18px 48px rgba(0,174,239,0.18), 0 0 0 1.5px rgba(0,174,239,0.45), inset 0 1px 0 rgba(255,255,255,0.9)",
+                y: -4,
+                boxShadow: "0 12px 32px rgba(0,174,239,0.14), inset 0 1px 0 rgba(255,255,255,0.9)",
               }}
-              transition={{ type: "spring", stiffness: 320, damping: 26 }}
+              transition={{ duration: 0.2, ease: "easeOut" }}
               style={{
                 background: "linear-gradient(135deg, rgba(240,249,255,0.72) 0%, rgba(224,242,254,0.55) 100%)",
                 backdropFilter: "blur(18px)",
