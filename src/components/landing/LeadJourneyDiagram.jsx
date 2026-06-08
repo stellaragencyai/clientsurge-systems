@@ -1,460 +1,252 @@
-import { motion } from "framer-motion";
 import { useState } from "react";
-import {
-  PhoneIncoming,
-  MessageSquare,
-  Clock,
-  UserCheck,
-  CalendarCheck,
-  Star,
-  ArrowDown,
-  CheckCircle2,
-  Zap,
-} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Phone, MessageSquare, Zap, Calendar, Star, CheckCircle2, ArrowRight, ChevronDown } from "lucide-react";
 
-const STEPS = [
+const steps = [
   {
     id: 1,
-    icon: PhoneIncoming,
-    title: "Lead Comes In",
-    subtitle: "< 0 seconds",
-    description:
-      "A prospect calls, texts, fills a form, or clicks an ad. The trigger fires instantly — 24/7, including evenings and weekends.",
-    tag: "Trigger",
-    tagColor: "#0088CC",
-    smsPreview: null,
-    color: "#0088CC",
-    bg: "rgba(0,136,204,0.08)",
-    border: "rgba(0,136,204,0.22)",
+    icon: Phone,
+    label: "Missed Call",
+    color: "#EF4444",
+    bgLight: "rgba(239,68,68,0.08)",
+    border: "rgba(239,68,68,0.25)",
+    title: "Lead calls — you miss it",
+    detail: "A prospect calls your business number. No answer. Without automation, they move on to a competitor.",
+    sms: null,
   },
   {
     id: 2,
     icon: MessageSquare,
-    title: "Instant SMS Fires",
-    subtitle: "< 90 seconds",
-    description:
-      "Before any competitor can respond, your lead receives a personalized SMS with your business name and a direct booking link.",
-    tag: "Automation",
-    tagColor: "#00AEEF",
-    smsPreview:
-      'Hi [Name], thanks for reaching out to [Business]! We\'d love to help. Reply here or book directly: [link]. — [Team]',
+    label: "Instant SMS",
     color: "#00AEEF",
-    bg: "rgba(0,174,239,0.08)",
-    border: "rgba(0,174,239,0.22)",
+    bgLight: "rgba(0,174,239,0.08)",
+    border: "rgba(0,174,239,0.28)",
+    title: "AI texts back in under 60s",
+    detail: "ClientSurge detects the missed call and fires a personalized SMS within 60 seconds, keeping the lead warm.",
+    sms: { from: "ClientSurge AI", text: "Hi! Sorry we missed your call — I'm the AI assistant for [Business]. Are you still looking for help today?" },
   },
   {
     id: 3,
-    icon: Clock,
-    title: "Smart Follow-Up Sequence",
-    subtitle: "2 min → 1 hr → 24 hr",
-    description:
-      "If they don't reply, the system follows up automatically at timed intervals — SMS then email — until there's a response or they opt out.",
-    tag: "Nurture",
-    tagColor: "#006BB0",
-    smsPreview:
-      "Just checking in — did you get a chance to look at our booking link? We have availability this week. 📅",
-    color: "#006BB0",
-    bg: "rgba(0,107,176,0.08)",
-    border: "rgba(0,107,176,0.22)",
+    icon: Zap,
+    label: "Lead Replies",
+    color: "#8B5CF6",
+    bgLight: "rgba(139,92,246,0.08)",
+    border: "rgba(139,92,246,0.25)",
+    title: "They reply — AI qualifies instantly",
+    detail: "The lead replies with their need. The AI reads it, qualifies the intent, and moves them to the next step.",
+    sms: { from: "Lead", text: "Yes! I need a quote for my HVAC system — it stopped working this morning." },
   },
   {
     id: 4,
-    icon: UserCheck,
-    title: "Lead Qualified by AI",
-    subtitle: "Instant classification",
-    description:
-      "When the lead replies, AI reads intent — pricing interest, booking readiness, objections — and routes them to the right next step.",
-    tag: "AI",
-    tagColor: "#003B8F",
-    smsPreview: null,
-    color: "#003B8F",
-    bg: "rgba(0,59,143,0.07)",
-    border: "rgba(0,59,143,0.2)",
+    icon: Calendar,
+    label: "Booking Link",
+    color: "#10B981",
+    bgLight: "rgba(16,185,129,0.08)",
+    border: "rgba(16,185,129,0.25)",
+    title: "AI sends booking link",
+    detail: "Based on the lead's reply, the AI sends a direct booking link for a consultation. No human required.",
+    sms: { from: "ClientSurge AI", text: "Got it — sounds urgent! Here's a link to book your HVAC consultation today: [bookinglink.com/hvac] 🗓️" },
   },
   {
     id: 5,
-    icon: CalendarCheck,
-    title: "Booking Confirmed",
-    subtitle: "Automated",
-    description:
-      "The system sends a booking link, confirms the appointment, and schedules a reminder SMS/email 24 hours and 1 hour before the appointment.",
-    tag: "Booking",
-    tagColor: "#0077B6",
-    smsPreview:
-      "✅ You're confirmed for [Date] at [Time] with [Business]! We'll send a reminder before your appointment.",
-    color: "#0077B6",
-    bg: "rgba(0,119,182,0.08)",
-    border: "rgba(0,119,182,0.22)",
+    icon: Star,
+    label: "Review Request",
+    color: "#F59E0B",
+    bgLight: "rgba(245,158,11,0.08)",
+    border: "rgba(245,158,11,0.25)",
+    title: "After service — review requested",
+    detail: "Post-appointment, the system automatically sends a review request to build your online reputation.",
+    sms: { from: "ClientSurge AI", text: "Thanks for choosing us! We'd love your feedback — click here to leave a quick Google review ⭐" },
   },
   {
     id: 6,
-    icon: Star,
-    title: "Review Request Sent",
-    subtitle: "After appointment",
-    description:
-      "After the job or appointment is complete, the system automatically requests a Google review — turning happy clients into new leads.",
-    tag: "Reputation",
-    tagColor: "#F59E0B",
-    smsPreview:
-      "Hope everything went great! Would you mind leaving us a quick review? It helps our small business a lot: [review link] ⭐",
-    color: "#F59E0B",
-    bg: "rgba(245,158,11,0.08)",
-    border: "rgba(245,158,11,0.22)",
+    icon: CheckCircle2,
+    label: "Booked & Live",
+    color: "#003B8F",
+    bgLight: "rgba(0,59,143,0.08)",
+    border: "rgba(0,59,143,0.25)",
+    title: "Appointment confirmed — revenue recovered",
+    detail: "What was a missed call is now a confirmed booking, a happy client, and a 5-star review — fully automated.",
+    sms: null,
   },
 ];
 
-function SMSBubble({ text }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: 20 }}
-      animate={{ opacity: 1, x: 0 }}
-      transition={{ duration: 0.4, delay: 0.2 }}
-      className="mt-4 rounded-2xl rounded-tl-sm px-4 py-3 text-xs leading-relaxed text-white/95 max-w-xs"
-      style={{
-        background: "linear-gradient(135deg, #0088CC 0%, #006BB0 100%)",
-        boxShadow: "0 4px 16px rgba(0,136,204,0.3)",
-        fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-        letterSpacing: "0.01em",
-      }}
-    >
-      {text}
-      <div className="mt-1.5 text-right opacity-60 text-[10px]">✓✓ Delivered</div>
-    </motion.div>
-  );
-}
+export default function LeadJourneyDiagram() {
+  const [activeStep, setActiveStep] = useState(2);
 
-function StepCard({ step, isActive, onClick, index }) {
-  const Icon = step.icon;
+  const current = steps[activeStep];
+  const Icon = current.icon;
+
   return (
-    <motion.button
-      type="button"
-      onClick={() => onClick(step.id)}
-      initial={{ opacity: 0, y: 24 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-40px" }}
-      transition={{ duration: 0.5, delay: index * 0.07 }}
-      whileHover={{ y: -3 }}
-      className="w-full text-left relative"
-    >
-      <div
-        className="relative rounded-2xl p-5 transition-all duration-300 cursor-pointer"
-        style={{
-          background: isActive ? step.bg : "rgba(255,255,255,0.9)",
-          border: isActive
-            ? `2px solid ${step.border}`
-            : "1.5px solid rgba(0,0,0,0.07)",
-          boxShadow: isActive
-            ? `0 8px 32px ${step.color}22, 0 2px 8px rgba(0,0,0,0.06)`
-            : "0 2px 12px rgba(0,0,0,0.05)",
-        }}
-      >
-        {/* Step number + tag row */}
-        <div className="flex items-center justify-between mb-3">
-          <div
-            className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-            style={{
-              background: isActive ? step.color : "rgba(0,136,204,0.1)",
-              transition: "background 0.3s",
-            }}
-          >
-            <Icon
-              className="w-4.5 h-4.5"
-              style={{ color: isActive ? "#fff" : step.color, width: "18px", height: "18px" }}
-            />
-          </div>
-          <span
-            className="text-[10px] font-black uppercase tracking-[0.16em] px-2.5 py-1 rounded-full"
-            style={{
-              background: `${step.color}15`,
-              color: step.color,
-              border: `1px solid ${step.color}30`,
-            }}
-          >
-            {step.tag}
-          </span>
+    <section id="lead-journey" className="px-4 py-16 md:px-6 md:py-24" style={{ background: "linear-gradient(180deg, #f8fbff 0%, #ffffff 100%)" }}>
+      <div className="mx-auto max-w-6xl">
+        {/* Header */}
+        <div className="text-center mb-12">
+          <p className="mb-3 text-[11px] font-bold uppercase tracking-[0.28em]" style={{ color: "#005f99" }}>
+            Lead Journey Diagram
+          </p>
+          <h2 className="font-bold text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(1.75rem, 4vw, 2.75rem)" }}>
+            From Missed Call to Booked Appointment
+          </h2>
+          <p className="mt-4 text-base text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+            Every step automated. No manual follow-up required. See exactly how a lead moves through the ClientSurge system.
+          </p>
         </div>
 
-        {/* Title */}
-        <h3 className="text-sm font-bold text-slate-900 leading-tight mb-0.5">
-          {step.title}
-        </h3>
-        <p className="text-[11px] font-semibold mb-2" style={{ color: step.color }}>
-          {step.subtitle}
-        </p>
-        <p className="text-xs text-slate-500 leading-relaxed">{step.description}</p>
+        {/* Step pills */}
+        <div className="flex flex-wrap justify-center gap-2 mb-10">
+          {steps.map((step, i) => {
+            const StepIcon = step.icon;
+            const isActive = i === activeStep;
+            return (
+              <button
+                key={step.id}
+                onClick={() => setActiveStep(i)}
+                className="inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-bold transition-all duration-200"
+                style={{
+                  background: isActive ? step.bgLight : "rgba(15,23,42,0.04)",
+                  border: `1.5px solid ${isActive ? step.border : "rgba(15,23,42,0.08)"}`,
+                  color: isActive ? step.color : "rgba(15,23,42,0.55)",
+                  boxShadow: isActive ? `0 4px 16px ${step.bgLight}` : "none",
+                }}
+              >
+                <StepIcon style={{ width: 13, height: 13 }} />
+                {step.label}
+              </button>
+            );
+          })}
+        </div>
 
-        {/* SMS preview when active */}
-        {isActive && step.smsPreview && <SMSBubble text={step.smsPreview} />}
-
-        {/* Active indicator dot */}
-        {isActive && (
-          <div
-            className="absolute top-4 right-4 w-2 h-2 rounded-full"
-            style={{ background: step.color, boxShadow: `0 0 6px ${step.color}` }}
-          />
-        )}
-      </div>
-    </motion.button>
-  );
-}
-
-function ConnectorArrow({ color }) {
-  return (
-    <div className="flex justify-center my-1">
-      <motion.div
-        animate={{ y: [0, 4, 0] }}
-        transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
-      >
-        <ArrowDown className="w-5 h-5" style={{ color: color || "#0088CC", opacity: 0.5 }} />
-      </motion.div>
-    </div>
-  );
-}
-
-function TimelineRail() {
-  return (
-    <div
-      className="hidden lg:block absolute left-1/2 top-8 bottom-8 -translate-x-1/2 w-px pointer-events-none"
-      style={{
-        background:
-          "linear-gradient(to bottom, rgba(0,136,204,0.18), rgba(0,174,239,0.38), rgba(0,59,143,0.18))",
-      }}
-    />
-  );
-}
-
-export default function LeadJourneyDiagram() {
-  const [activeStep, setActiveStep] = useState(1);
-
-  const handleClick = (id) => {
-    setActiveStep((prev) => (prev === id ? null : id));
-  };
-
-  return (
-    <section
-      id="lead-journey"
-      className="px-4 py-16 md:px-6 md:py-24 overflow-hidden"
-      style={{ background: "#f8fbff" }}
-    >
-      <div className="max-w-7xl mx-auto">
-        {/* Header */}
-        <motion.div
-          className="text-center max-w-3xl mx-auto mb-14"
-          initial={{ opacity: 0, y: 24 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.55 }}
-        >
-          <div className="inline-flex items-center gap-2 mb-4">
-            <div className="h-px w-8" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.6))" }} />
-            <p className="text-[11px] font-black uppercase tracking-[0.3em]" style={{ color: "#0088CC" }}>
-              What happens after a lead comes in
-            </p>
-            <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.6))" }} />
-          </div>
-          <h2
-            className="font-bold tracking-tight leading-tight text-slate-900 mb-4"
-            style={{ fontSize: "clamp(1.75rem, 4vw, 3rem)", fontFamily: "Montserrat, sans-serif" }}
-          >
-            From First Contact to{" "}
-            <span style={{ color: "#00AEEF" }}>Booked Appointment</span>
-            <br />in Under 90 Seconds
-          </h2>
-          <p className="text-base text-slate-500 leading-relaxed max-w-2xl mx-auto">
-            Click any step to see exactly what your lead receives — and when. Every message is automated, personalized, and sent without any manual effort from your team.
-          </p>
-        </motion.div>
-
-        {/* 2-col layout: steps + visual panel */}
-        <div className="grid grid-cols-1 lg:grid-cols-[1fr_400px] gap-10 lg:gap-16 items-start">
-          {/* Step Cards */}
+        {/* Main diagram */}
+        <div className="grid gap-6 lg:grid-cols-[1fr_1.1fr]">
+          {/* Left: step flow */}
           <div className="relative">
+            {/* Connector line */}
+            <div
+              className="absolute left-5 top-6 bottom-6 w-0.5 hidden md:block"
+              style={{ background: "linear-gradient(180deg, rgba(0,174,239,0.15) 0%, rgba(0,174,239,0.5) 50%, rgba(0,59,143,0.2) 100%)" }}
+            />
             <div className="space-y-3">
-              {STEPS.map((step, index) => (
-                <div key={step.id}>
-                  <StepCard
-                    step={step}
-                    isActive={activeStep === step.id}
-                    onClick={handleClick}
-                    index={index}
-                  />
-                  {index < STEPS.length - 1 && (
-                    <ConnectorArrow color={step.color} />
-                  )}
-                </div>
-              ))}
+              {steps.map((step, i) => {
+                const StepIcon = step.icon;
+                const isActive = i === activeStep;
+                const isPast = i < activeStep;
+                return (
+                  <motion.button
+                    key={step.id}
+                    onClick={() => setActiveStep(i)}
+                    className="w-full text-left"
+                    whileHover={{ x: 2 }}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <div
+                      className="flex items-center gap-4 rounded-xl px-4 py-3 transition-all duration-200"
+                      style={{
+                        background: isActive ? step.bgLight : isPast ? "rgba(16,185,129,0.04)" : "transparent",
+                        border: `1px solid ${isActive ? step.border : isPast ? "rgba(16,185,129,0.15)" : "transparent"}`,
+                      }}
+                    >
+                      <div
+                        className="flex-shrink-0 w-10 h-10 rounded-full flex items-center justify-center relative z-10"
+                        style={{
+                          background: isActive ? step.color : isPast ? "#10B981" : "rgba(15,23,42,0.06)",
+                          boxShadow: isActive ? `0 4px 16px ${step.bgLight}` : "none",
+                        }}
+                      >
+                        {isPast && !isActive ? (
+                          <CheckCircle2 style={{ width: 18, height: 18, color: "#fff" }} />
+                        ) : (
+                          <StepIcon style={{ width: 18, height: 18, color: isActive ? "#fff" : "rgba(15,23,42,0.35)" }} />
+                        )}
+                      </div>
+                      <div className="min-w-0 flex-1">
+                        <p
+                          className="text-sm font-bold leading-snug"
+                          style={{ color: isActive ? step.color : isPast ? "#10B981" : "rgba(15,23,42,0.5)" }}
+                        >
+                          {step.label}
+                        </p>
+                        <p className="text-xs text-muted-foreground truncate">{step.title}</p>
+                      </div>
+                      {isActive && <ChevronDown style={{ width: 14, height: 14, color: step.color, flexShrink: 0 }} />}
+                    </div>
+                  </motion.button>
+                );
+              })}
             </div>
           </div>
 
-          {/* Right Panel — sticky visual */}
-          <div className="lg:sticky lg:top-28 self-start">
+          {/* Right: active step detail */}
+          <AnimatePresence mode="wait">
             <motion.div
               key={activeStep}
               initial={{ opacity: 0, y: 12 }}
               animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.4 }}
-              className="rounded-3xl overflow-hidden"
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.3, ease: "easeOut" }}
+              className="rounded-2xl border p-6 md:p-8"
               style={{
-                background: "#ffffff",
-                border: "1.5px solid rgba(0,136,204,0.14)",
-                boxShadow: "0 24px 64px rgba(0,59,143,0.10), 0 4px 16px rgba(0,0,0,0.06)",
+                background: current.bgLight,
+                border: `1.5px solid ${current.border}`,
+                boxShadow: `0 16px 48px ${current.bgLight}`,
               }}
             >
-              {/* Panel header */}
-              <div
-                className="px-6 py-5"
-                style={{
-                  background:
-                    "linear-gradient(135deg, rgba(0,136,204,0.06) 0%, rgba(0,174,239,0.04) 100%)",
-                  borderBottom: "1px solid rgba(0,136,204,0.1)",
-                }}
-              >
-                <div className="flex items-center gap-3 mb-2">
-                  <div
-                    className="w-8 h-8 rounded-xl flex items-center justify-center"
-                    style={{
-                      background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-                      boxShadow: "0 4px 12px rgba(0,136,204,0.3)",
-                    }}
-                  >
-                    <Zap className="w-4 h-4 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">ClientSurge</p>
-                    <p className="text-sm font-bold text-slate-800">Lead Journey Timeline</p>
-                  </div>
+              <div className="flex items-center gap-3 mb-5">
+                <div
+                  className="w-12 h-12 rounded-2xl flex items-center justify-center"
+                  style={{ background: current.color, boxShadow: `0 6px 20px ${current.bgLight}` }}
+                >
+                  <Icon style={{ width: 22, height: 22, color: "#fff" }} />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black uppercase tracking-[0.22em]" style={{ color: current.color }}>
+                    Step {current.id} of {steps.length}
+                  </p>
+                  <h3 className="text-lg font-bold text-foreground leading-snug">{current.title}</h3>
                 </div>
               </div>
 
-              {/* Steps summary list */}
-              <div className="p-5 space-y-2">
-                {STEPS.map((step) => {
-                  const Icon = step.icon;
-                  const isActive = activeStep === step.id;
-                  const isPast = step.id < (activeStep || 0);
-                  return (
-                    <motion.button
-                      key={step.id}
-                      type="button"
-                      onClick={() => handleClick(step.id)}
-                      className="w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-left transition-all"
-                      style={{
-                        background: isActive
-                          ? `${step.color}12`
-                          : "transparent",
-                        border: isActive
-                          ? `1.5px solid ${step.color}35`
-                          : "1.5px solid transparent",
-                      }}
-                    >
-                      <div
-                        className="w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{
-                          background: isPast
-                            ? "#22c55e"
-                            : isActive
-                            ? step.color
-                            : "rgba(0,0,0,0.06)",
-                        }}
-                      >
-                        {isPast ? (
-                          <CheckCircle2 className="w-3.5 h-3.5 text-white" />
-                        ) : (
-                          <Icon
-                            style={{
-                              width: "14px",
-                              height: "14px",
-                              color: isActive ? "#fff" : "#94a3b8",
-                            }}
-                          />
-                        )}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <p
-                          className="text-xs font-semibold truncate"
-                          style={{
-                            color: isActive ? step.color : isPast ? "#22c55e" : "#64748b",
-                          }}
-                        >
-                          {step.title}
-                        </p>
-                      </div>
-                      <span
-                        className="text-[10px] font-semibold flex-shrink-0"
-                        style={{ color: isActive ? step.color : "#94a3b8" }}
-                      >
-                        {step.subtitle}
-                      </span>
-                    </motion.button>
-                  );
-                })}
-              </div>
+              <p className="text-sm leading-7 text-muted-foreground mb-6">{current.detail}</p>
 
-              {/* Active step detail */}
-              {activeStep && (() => {
-                const step = STEPS.find((s) => s.id === activeStep);
-                if (!step) return null;
-                const Icon = step.icon;
-                return (
-                  <motion.div
-                    key={`detail-${activeStep}`}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35 }}
-                    className="mx-4 mb-4 rounded-2xl p-4"
-                    style={{
-                      background: step.bg,
-                      border: `1.5px solid ${step.border}`,
-                    }}
+              {current.sms && (
+                <div className="rounded-xl border border-white/60 bg-white p-4 space-y-3 shadow-sm">
+                  <p className="text-[10px] font-black uppercase tracking-[0.2em] text-slate-400 mb-2">Live SMS Preview</p>
+                  <div
+                    className={`max-w-xs rounded-2xl px-4 py-3 text-sm font-medium shadow-sm ${
+                      current.sms.from === "Lead"
+                        ? "bg-slate-100 text-slate-800 mr-auto"
+                        : "ml-auto text-white"
+                    }`}
+                    style={current.sms.from !== "Lead" ? { background: "linear-gradient(135deg, #0088CC, #003B8F)" } : {}}
                   >
-                    <div className="flex items-center gap-2 mb-2">
-                      <Icon style={{ width: "14px", height: "14px", color: step.color }} />
-                      <span
-                        className="text-[10px] font-black uppercase tracking-widest"
-                        style={{ color: step.color }}
-                      >
-                        Step {step.id} — {step.tag}
-                      </span>
-                    </div>
-                    <p className="text-xs font-semibold text-slate-800 mb-1">{step.title}</p>
-                    <p className="text-xs text-slate-500 leading-relaxed">{step.description}</p>
-                    {step.smsPreview && (
-                      <div
-                        className="mt-3 rounded-xl px-3 py-2.5 text-xs text-white leading-relaxed"
-                        style={{
-                          background: "linear-gradient(135deg, #0088CC, #003B8F)",
-                          fontSize: "11px",
-                        }}
-                      >
-                        {step.smsPreview}
-                      </div>
-                    )}
-                  </motion.div>
-                );
-              })()}
+                    <p className="text-[10px] font-bold mb-1 opacity-60">{current.sms.from}</p>
+                    {current.sms.text}
+                  </div>
+                </div>
+              )}
 
-              {/* Bottom CTA */}
-              <div
-                className="px-5 py-4 text-center"
-                style={{ borderTop: "1px solid rgba(0,136,204,0.1)" }}
-              >
-                <p className="text-[11px] text-slate-400 mb-3">
-                  This entire flow runs without your team lifting a finger.
-                </p>
-                <a
-                  href="/book"
-                  className="inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-xs font-bold text-white"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
-                    boxShadow: "0 4px 14px rgba(0,136,204,0.35)",
-                  }}
-                >
-                  See It For Your Business →
-                </a>
+              {/* Navigation */}
+              <div className="flex items-center gap-3 mt-6">
+                {activeStep > 0 && (
+                  <button
+                    onClick={() => setActiveStep(activeStep - 1)}
+                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs font-semibold border border-border bg-white text-foreground hover:bg-muted transition-colors"
+                  >
+                    ← Previous
+                  </button>
+                )}
+                {activeStep < steps.length - 1 && (
+                  <button
+                    onClick={() => setActiveStep(activeStep + 1)}
+                    className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-bold text-white transition-all"
+                    style={{ background: current.color }}
+                  >
+                    Next Step <ArrowRight style={{ width: 13, height: 13 }} />
+                  </button>
+                )}
               </div>
             </motion.div>
-          </div>
+          </AnimatePresence>
         </div>
       </div>
     </section>

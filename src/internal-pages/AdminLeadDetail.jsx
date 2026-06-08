@@ -142,27 +142,27 @@ export default function AdminLeadDetail() {
 
   return (
     <AdminShell title={lead.full_name} activeId="leads">
-    <div className="space-y-8">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center gap-4 mb-6">
+      <div className="flex items-center gap-4 mb-4">
         <button
           onClick={() => navigate("/admin?tab=leads")}
-          className="flex items-center gap-1.5 p-2 hover:bg-muted rounded-lg transition-colors text-sm text-muted-foreground hover:text-foreground"
+          className="flex items-center gap-1.5 p-2 hover:bg-muted rounded-xl transition-colors text-sm text-muted-foreground hover:text-foreground"
         >
           <ArrowLeft className="w-4 h-4" /> Back to Leads
         </button>
         <div>
-          <h1 className="text-3xl font-semibold text-foreground">
+          <h1 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
             {lead.full_name}
           </h1>
-          <p className="text-muted-foreground">{lead.business_name}</p>
+          <p className="text-sm text-muted-foreground">{lead.business_name}</p>
         </div>
       </div>
 
       {/* Info Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div className="bg-white rounded-lg border border-border p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="bg-card rounded-2xl border border-border p-6">
+          <h3 className="text-base font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
             Contact Information
           </h3>
           <div className="space-y-3">
@@ -217,8 +217,8 @@ export default function AdminLeadDetail() {
           </div>
         </div>
 
-        <div className="bg-white rounded-lg border border-border p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Details</h3>
+        <div className="bg-card rounded-2xl border border-border p-6">
+          <h3 className="text-base font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>Details</h3>
           <div className="space-y-3">
             <div>
               <p className="text-xs text-muted-foreground uppercase font-semibold">

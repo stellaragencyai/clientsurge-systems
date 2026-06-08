@@ -1,5 +1,6 @@
 import { useEffect } from "react";
 import { Link } from "react-router-dom";
+// Typography normalized to Montserrat headings + Inter body (cinematic brand theme)
 import { Zap, Users, Target, CheckCircle2 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -28,11 +29,11 @@ export default function About() {
         className="py-20 px-6 text-center"
         style={{ background: "linear-gradient(180deg, rgba(0,174,239,0.07) 0%, hsl(var(--card)) 52%, hsl(var(--background)) 100%)" }}
       >
-        <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Our Story</p>
-        <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] mb-3" style={{ color: "#005f99" }}>Our Story</p>
+        <h1 className="font-bold tracking-tight text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(2rem, 5vw, 3.25rem)", lineHeight: 1.08 }}>
           About ClientSurge Systems
         </h1>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+        <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
           We build done-for-you AI automation systems that help local service businesses respond faster, follow up smarter, and book more appointments — without adding more work to their plate.
         </p>
       </section>
@@ -44,7 +45,7 @@ export default function About() {
           {/* What we do */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground mb-4">What We Do</h2>
+              <h2 className="font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>What We Do</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 ClientSurge Systems is an AI-powered lead automation platform built specifically for service businesses — med spas, dental offices, HVAC companies, roofers, chiropractors, and contractors. We automate the most critical part of your business: what happens the moment a new lead reaches out.
               </p>
@@ -77,7 +78,7 @@ export default function About() {
 
           {/* Who it's for */}
           <div>
-            <h2 className="font-display text-2xl font-semibold text-foreground mb-4">Who It's For</h2>
+            <h2 className="font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>Who It's For</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
               ClientSurge Systems is built for local service business owners who are tired of watching leads fall through the cracks. If your team is manually following up with inquiries, playing phone tag, or losing potential clients to faster-responding competitors, our platform was designed for you.
             </p>
@@ -91,7 +92,7 @@ export default function About() {
 
           {/* Who builds it */}
           <div className="p-8 rounded-2xl border border-primary/20 bg-primary/5">
-            <h2 className="font-display text-2xl font-semibold text-foreground mb-4">Who Builds It</h2>
+            <h2 className="font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>Who Builds It</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
               ClientSurge Systems is founded and operated out of Phoenix, Arizona. Our team combines deep expertise in AI automation, business operations, and service industry workflows. We don't just build software — we build systems we'd want running in our own businesses.
             </p>

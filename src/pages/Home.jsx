@@ -18,6 +18,8 @@ const FounderSection = lazy(() => import("../components/landing/FounderSection")
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
+const LeadJourneyDiagram = lazy(() => import("../components/landing/LeadJourneyDiagram"));
+const AIDashboardPreview = lazy(() => import("../components/landing/AIDashboardPreview"));
 
 import {
   getFAQSchema,
@@ -130,6 +132,10 @@ export default function Home() {
           <SectionBreak />
         </LazyHomepageSection>
         <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
+          <LeadJourneyDiagram />
+          <SectionBreak />
+          <AIDashboardPreview />
+          <SectionBreak />
           <CoreOffer />
           <SectionBreak />
           <Pricing />
