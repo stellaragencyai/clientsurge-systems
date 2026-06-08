@@ -190,6 +190,16 @@ export default function Navbar() {
     setOpen(false);
     setIndustriesOpen(false);
 
+    // If already on homepage, scroll directly instead of re-navigating
+    if (location.pathname === "/" && href.startsWith("#")) {
+      const id = href.slice(1);
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+    }
+
     navigate(`/${href}`);
   };
 

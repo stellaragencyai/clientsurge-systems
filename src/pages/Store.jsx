@@ -782,10 +782,10 @@ function StoreInner() {
             <BundleSavingsToast />
           </Suspense>
            <CartSidebar />
-           <Footer />
            <Suspense fallback={<StoreSuspenseFallback minHeight={96} />}>
              <SocialProofTicker />
            </Suspense>
+           <Footer />
            {showComparison &&
           <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
                <ServiceComparisonModal onClose={() => setShowComparison(false)} />
@@ -806,4 +806,3 @@ export default function Store() {
     </DemoBookingProvider>);
 
 }
-
