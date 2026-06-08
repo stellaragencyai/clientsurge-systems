@@ -338,8 +338,8 @@ function PricingCard({ plan, selectedIndustry }) {
       }}
       animate={
         isHovered
-          ? { rotateY: 6, rotateX: -2, scale: 1.03 }
-          : { rotateY: 0, rotateX: 0, scale: 1 }
+          ? { y: -6, scale: 1.02 }
+          : { y: 0, scale: 1 }
       }
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseEnter={() => setIsHovered(true)}

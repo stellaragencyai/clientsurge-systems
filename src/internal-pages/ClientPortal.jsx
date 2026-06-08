@@ -223,7 +223,7 @@ export default function ClientPortal() {
       )}
 
       {/* Top bar */}
-      <div className="sticky top-0 z-40 bg-white/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
+      <div className="sticky top-0 z-40 bg-background/80 backdrop-blur-xl border-b border-border px-6 h-16 flex items-center justify-between">
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
@@ -282,8 +282,8 @@ export default function ClientPortal() {
       <PaymentFailedBanner subscription={subscription} order={portalOrder} />
 
       {/* Tabs — horizontally scrollable on mobile */}
-      <div className="border-b border-border bg-white px-6 overflow-x-auto relative">
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white to-transparent z-10" />
+      <div className="border-b border-border bg-background px-6 overflow-x-auto relative">
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10" />
         <div className="max-w-4xl mx-auto flex gap-1 min-w-max">
           {TABS.map(tab => (
             <button

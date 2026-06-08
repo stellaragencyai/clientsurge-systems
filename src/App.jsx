@@ -47,6 +47,7 @@ const AutomationServicePage = lazy(() => import("./internal-pages/AutomationServ
 const OrderSuccess = lazy(() => import("./internal-pages/OrderSuccess"));
 const BusinessSetup = lazy(() => import("./internal-pages/BusinessSetup"));
 const ThankYou = lazy(() => import("./internal-pages/ThankYou"));
+const ClientSetupLookup = lazy(() => import("./pages/ClientSetupLookup"));
 const CredentialsSetup = lazy(() => import("./internal-pages/CredentialsSetup"));
 const SetupStatus = lazy(() => import("./internal-pages/SetupStatus"));
 const WebsitePreview = lazy(() => import("./internal-pages/WebsitePreview"));
@@ -299,6 +300,7 @@ const AuthenticatedApp = () => {
         <Route key={route} path={route} element={<LazyRoute Component={Component} />} />
       ))}
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
+      <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
 
       <Route
         element={

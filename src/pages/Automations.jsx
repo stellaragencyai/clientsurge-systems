@@ -204,8 +204,7 @@ function ServiceCard({ service }) {
       >
         {/* Video thumbnail */}
         <div
-          className="relative overflow-hidden cursor-pointer"
-          style={{ height: "210px" }}
+          className="relative overflow-hidden cursor-pointer aspect-video"
           onClick={() => setShowVideo(true)}
         >
           <img
@@ -213,6 +212,7 @@ function ServiceCard({ service }) {
             alt={service.title}
             width="640"
             height="360"
+            loading="lazy"
             className="w-full h-full object-cover transition-transform duration-500"
             style={{ transform: hovered ? "scale(1.05)" : "scale(1)" }}
           />
@@ -335,9 +335,7 @@ export default function Automations() {
           className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          AI Automation Systems for
-          <br />
-          <span style={{ color: BRAND.color }}>Local Service Businesses</span>
+          AI Automation Systems for <span style={{ color: BRAND.color }}>Local Service Businesses</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
           ClientSurge installs automation systems that capture, follow up with, qualify, book, and reactivate leads so fewer local service opportunities fall through the cracks.
@@ -352,7 +350,7 @@ export default function Automations() {
             <span
               key={b.text}
               className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs"
-              style={{ background: "rgba(0,136,204,0.07)", border: "1px solid rgba(0,136,204,0.18)", color: "#0050A0" }}
+              style={{ background: "rgba(0,136,204,0.07)", border: "1px solid rgba(0,136,204,0.18)", color: "hsl(var(--primary))" }}
             >
               {b.icon} {b.text}
             </span>

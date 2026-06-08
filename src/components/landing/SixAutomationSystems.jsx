@@ -15,7 +15,7 @@ const ICONS = {
 
 export default function SixAutomationSystems() {
   return (
-    <section id="six-automations" className="px-4 py-12 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
+    <section id="six-automations" className="px-4 py-12 md:px-6 md:py-20 bg-background">
       <div className="mx-auto max-w-7xl">
         <motion.div
           className="mb-8 md:mb-10 max-w-3xl"
@@ -25,7 +25,7 @@ export default function SixAutomationSystems() {
           viewport={{ once: true, amount: 0.3 }}
         >
           <motion.p variants={revealItem} className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
-            The core offer
+            THE CORE OFFER
           </motion.p>
           <motion.h2 variants={revealItem} className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl">
             The 6 ClientSurge Automation Systems

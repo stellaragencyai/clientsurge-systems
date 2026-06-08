@@ -47,7 +47,7 @@ export default function Testimonials() {
         <div className="max-w-2xl mx-auto text-center mb-16">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Launch Scenarios</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Launch Outcomes This System Is Built To Create
+            Launch Outcomes This System Is Built to Create
           </h2>
           <p className="mt-5 text-sm leading-6 text-muted-foreground">
             Illustrative examples based on the installed workflows. Verified customer case studies can replace these after launch proof.

@@ -342,13 +342,13 @@ export default function Contact() {
                       className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                     >
                       <option value="">Select one...</option>
-                      <option>Med Spas & Aesthetic Clinics</option>
-                      <option>Dental & Orthodontics</option>
-                      <option>Chiropractic & Physical Therapy</option>
-                      <option>HVAC, Plumbing & Home Services</option>
-                      <option>Roofing & Restoration</option>
-                      <option>Contractors & Trades</option>
-                      <option>Other</option>
+                      <option value="med_spa">Med Spas & Aesthetic Clinics</option>
+                      <option value="dental">Dental & Orthodontics</option>
+                      <option value="chiropractic">Chiropractic & Physical Therapy</option>
+                      <option value="hvac">HVAC, Plumbing & Home Services</option>
+                      <option value="roofing">Roofing & Restoration</option>
+                      <option value="contractors">Contractors & Trades</option>
+                      <option value="other">Other</option>
                     </select>
                   </div>
                 </div>
@@ -380,10 +380,7 @@ export default function Contact() {
                   </span>
                 </button>
                 <p className="text-center text-xs text-muted-foreground">
-                  No spam. No pressure. Just a thoughtful reply from our team.
-                </p>
-                <p className="text-center text-xs text-muted-foreground mt-1">
-                  We respect your privacy. See our{" "}
+                  No spam. No pressure. We respect your privacy —{" "}
                   <a href="/privacy-policy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
                 </p>
               </form>

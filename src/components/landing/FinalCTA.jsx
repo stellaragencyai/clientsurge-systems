@@ -111,11 +111,10 @@ export default function FinalCTA() {
               </span>
             </button>
             <a
-              href="/book"
-              onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
+              href="/contact"
+              onClick={() => trackCTA("lead_leakage_contact", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
-              
-              Get a Free Lead Leakage Audit
+              Ask a Question First
             </a>
           </div>
         </div>

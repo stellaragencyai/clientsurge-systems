@@ -37,6 +37,8 @@ import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
 import AuditLogPanel from '../components/admin/AuditLogPanel';
+import AutomationTrackingPanel from '../components/admin/AutomationTrackingPanel';
+import SiteRefinementChecklist from '../components/admin/SiteRefinementChecklist';
 import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
@@ -87,6 +89,8 @@ const NAV_GROUPS = [
       { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
+      { id: 'automation-tracking', label: 'Automation Tracking', icon: Activity },
+      { id: 'site-refinement', label: 'Site Refinement', icon: Wand2 },
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
@@ -233,6 +237,8 @@ export default function AdminDashboard() {
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;
+      case 'automation-tracking': return <AutomationTrackingPanel />;
+      case 'site-refinement': return <SiteRefinementChecklist />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
@@ -435,10 +441,10 @@ function OverviewDashboard({ onNavigate }) {
   const offerCounts = snapshot.summary.recommended_offer_counts || {};
 
   const stats = [
-    { label: 'Total Leads', value: totalLeads, color: 'bg-blue-50 text-blue-700', tab: 'leads' },
-    { label: 'New Today', value: newToday, color: 'bg-green-50 text-green-700', tab: 'leads' },
-    { label: 'Follow-Up Due', value: snapshot.summary.segment_counts?.follow_up || 0, color: 'bg-purple-50 text-purple-700', tab: 'leads' },
-    { label: 'Awaiting Close', value: snapshot.summary.segment_counts?.awaiting_close || 0, color: 'bg-emerald-50 text-emerald-700', tab: 'leads' },
+    { label: 'Total Leads', value: totalLeads, color: 'bg-primary/8 text-primary', tab: 'leads' },
+    { label: 'New Today', value: newToday, color: 'bg-emerald-500/10 text-emerald-700', tab: 'leads' },
+    { label: 'Follow-Up Due', value: snapshot.summary.segment_counts?.follow_up || 0, color: 'bg-violet-500/10 text-violet-700', tab: 'leads' },
+    { label: 'Awaiting Close', value: snapshot.summary.segment_counts?.awaiting_close || 0, color: 'bg-amber-500/10 text-amber-700', tab: 'leads' },
   ];
 
   return (
@@ -489,7 +495,7 @@ function OverviewDashboard({ onNavigate }) {
                       <p className="text-sm font-semibold text-foreground">#{index + 1} {lead.full_name}</p>
                       <p className="text-xs text-muted-foreground">{lead.business_name}</p>
                     </div>
-                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground">
+                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
                       {lead.activation_priority}
                     </span>
                   </div>
@@ -526,7 +532,7 @@ function OverviewDashboard({ onNavigate }) {
                   <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground">{helper}</p>
                 </div>
-                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground flex-shrink-0">{offerCounts[key] || 0}</span>
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary flex-shrink-0">{offerCounts[key] || 0}</span>
               </button>
             ))}
           </div>
@@ -593,10 +599,10 @@ function OverviewDashboard({ onNavigate }) {
                   </p>
                 </div>
                 <span className={`px-2.5 py-1 rounded text-xs font-semibold ${
-                  lead.status === 'Booked' ? 'bg-green-100 text-green-800' :
-                  lead.status === 'Qualified' ? 'bg-purple-100 text-purple-800' :
-                  lead.status === 'Contacted' ? 'bg-blue-100 text-blue-800' :
-                  'bg-gray-100 text-gray-800'
+                  lead.status === 'Booked' ? 'bg-emerald-500/10 text-emerald-700' :
+                  lead.status === 'Qualified' ? 'bg-violet-500/10 text-violet-700' :
+                  lead.status === 'Contacted' ? 'bg-primary/10 text-primary' :
+                  'bg-muted text-muted-foreground'
                 }`}>
                   {lead.status}
                 </span>
@@ -626,7 +632,7 @@ function OverviewDashboard({ onNavigate }) {
                   <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground">{helper}</p>
                 </div>
-                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground flex-shrink-0">{snapshot.summary.segment_counts?.[key] || 0}</span>
+                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary flex-shrink-0">{snapshot.summary.segment_counts?.[key] || 0}</span>
               </button>
             ))}
           </div>

@@ -34,8 +34,8 @@ function LoadingState() {
       }}>
         <Loader2 style={{ width: "28px", height: "28px", color: "#00AEEF", animation: "spin 1s linear infinite" }} />
       </div>
-      <p style={{ fontSize: "15px", fontWeight: "600", color: "#0A1628", margin: "0 0 4px" }}>Loading your dashboard…</p>
-      <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.5)", margin: 0 }}>Fetching your installation status</p>
+      <p style={{ fontSize: "15px", fontWeight: "600", color: "hsl(var(--foreground))", margin: "0 0 4px" }}>Loading your dashboard…</p>
+      <p style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))", margin: 0 }}>Fetching your installation status</p>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </div>
   );
@@ -67,7 +67,7 @@ function EmptyState() {
   return (
     <div style={{
       borderRadius: "20px", textAlign: "center", padding: "60px 32px",
-      background: "#ffffff", border: "1px solid rgba(0,174,239,0.12)",
+      background: "hsl(var(--card))", border: "1px solid rgba(0,174,239,0.12)",
       boxShadow: "0 4px 24px rgba(0,59,143,0.07)",
     }}>
       <div style={{
@@ -238,7 +238,7 @@ export default function ClientDashboard() {
   if (!loading && !portalData && !error) {
     return (
       <DemoBookingProvider>
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#ffffff" }}>
+        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "hsl(var(--background))" }}>
           <div style={{ textAlign: "center", padding: "48px 24px" }}>
             <p style={{ fontSize: "20px", fontWeight: "700", color: "#0A1628", marginBottom: "8px" }}>Something went wrong</p>
             <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.55)", marginBottom: "24px" }}>We could not load your dashboard. Please refresh or contact support.</p>
@@ -253,7 +253,7 @@ export default function ClientDashboard() {
     <DemoBookingProvider>
       <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
       <MobileBottomNav />
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "#ffffff" }}>
+      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "hsl(var(--background))" }}>
         <Navbar />
 
         <main style={{ flex: 1, paddingTop: "72px" }}>

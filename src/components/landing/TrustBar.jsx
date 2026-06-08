@@ -4,7 +4,7 @@ import FollowUpTimeline from "./visuals/FollowUpTimeline";
 import { motion } from "framer-motion";
 
 function useCountUp(value, inView, duration = 1400) {
-  const [count, setCount] = useState(value);
+  const [count, setCount] = useState(typeof value === "number" ? 1 : value);
 
   useEffect(() => {
     if (!inView || typeof value !== "number") {
@@ -138,7 +138,7 @@ export default function TrustBar() {
   return (
     <section
       ref={ref}
-      className="pt-16 md:pt-24 pb-24 md:pb-32 bg-gradient-to-b from-card via-background to-slate-50/30 border-y border-primary/8"
+      className="pt-16 md:pt-24 pb-24 md:pb-32 bg-gradient-to-b from-card via-background to-background/60 border-y border-primary/10"
     >
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-10">

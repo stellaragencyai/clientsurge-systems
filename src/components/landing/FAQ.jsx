@@ -52,7 +52,7 @@ export default function FAQ() {
             autoCapitalize="off"
             spellCheck="false"
             aria-label="Search FAQs"
-            className="w-full px-4 py-2.5 rounded-lg border border-border bg-white/50 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
+            className="w-full px-4 py-2.5 rounded-lg border border-border bg-card/80 backdrop-blur-sm focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 text-sm"
           />
         </div>
 
@@ -93,10 +93,10 @@ export default function FAQ() {
                     boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
                   }}
                 >
-                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus:outline-none focus:ring-2 focus:ring-primary focus:rounded min-h-[48px] border-b border-border/20 last:border-b-0">
+                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus-visible:outline-none min-h-[48px] border-b border-border/20 last:border-b-0">
                     {faq.q}
                   </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 word-wrap break-words">
+                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 break-words overflow-wrap-anywhere">
                     <div style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
                       <p>{faq.a}</p>
                     </div>
