@@ -47,6 +47,8 @@ import SniperDashboard from '../components/admin/SniperDashboard';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
+import GlobalAutomationToggle from '../components/admin/GlobalAutomationToggle';
+import SimulateLeadButton from '../components/admin/SimulateLeadButton';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -261,6 +263,7 @@ export default function AdminDashboard() {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
           <p className="text-sm text-muted-foreground">Internal testing tools. Admin only.</p>
+          <SimulateLeadButton />
           <QaCustomerPanel />
         </div>
       );
@@ -456,6 +459,9 @@ function OverviewDashboard({ onNavigate }) {
   return (
     <div className="space-y-8">
       <AdminAICommandBar />
+
+      {/* Global automation master switch */}
+      <GlobalAutomationToggle />
 
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>

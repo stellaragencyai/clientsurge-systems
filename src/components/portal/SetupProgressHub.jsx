@@ -5,6 +5,9 @@ import {
   MessageCircle, Send, ChevronDown, ChevronUp
 } from "lucide-react";
 import OnboardingTracker from "./OnboardingTracker";
+import SetupVideoGuide from "./SetupVideoGuide";
+import AutomationStatusExplainer from "./AutomationStatusExplainer";
+import GuaranteeCard from "./GuaranteeCard";
 
 // ─── STEP CONFIG ────────────────────────────────────────────────────────────
 const STEPS = [
@@ -547,10 +550,30 @@ export default function SetupProgressHub({ project, order, user }) {
 
   if (!projectState) return null;
 
+  // Determine current install status for contextual explainer
+  const installStatus = order?.pipeline_status || order?.order_status || null;
+  const displayStatus = {
+    "pending_payment": "Paid",
+    "paid_setup_in_progress": "Ready for Install",
+    "partially_live": "Configuring",
+    "fully_live": "Live",
+  }[installStatus] || installStatus || "Ready for Install";
+
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
       <OnboardingTracker project={projectState} order={order} />
+
+      {/* Contextual status explainer */}
+      {order && <AutomationStatusExplainer status={displayStatus} serviceName="Your System Status" />}
+
       <ProgressSection project={projectState} />
+
+      {/* Setup video guides */}
+      <SetupVideoGuide />
+
+      {/* 30-day guarantee reassurance during setup */}
+      <GuaranteeCard compact />
+
       <AssetUploader project={projectState} onUploaded={() => {}} />
       <InlineChat project={projectState} user={user} />
     </div>

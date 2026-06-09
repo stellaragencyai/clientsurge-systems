@@ -13,6 +13,7 @@ import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
+import AbandonedCartBanner from "@/components/store/AbandonedCartBanner";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -782,6 +783,7 @@ function StoreInner() {
             <BundleSavingsToast />
           </Suspense>
            <CartSidebar />
+           <AbandonedCartBanner />
            <Suspense fallback={<StoreSuspenseFallback minHeight={96} />}>
              <SocialProofTicker />
            </Suspense>

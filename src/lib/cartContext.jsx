@@ -2,14 +2,30 @@ import { createContext, useContext, useState, useCallback, useMemo, useEffect } 
 import { buildPricingSummaryForProducts, normalizeSelectedProducts } from "./salesCatalog.js";
 
 const CART_STORAGE_KEY = "clientsurge:cart";
+const CART_LS_KEY = "clientsurge:cart:persistent";
+const CART_EXPIRY_HOURS = 48;
 const CartContext = createContext(null);
 
 function loadPersistedCart() {
+  // First try sessionStorage (current session)
   try {
     const raw = sessionStorage.getItem(CART_STORAGE_KEY);
+    if (raw) {
+      const parsed = JSON.parse(raw);
+      if (Array.isArray(parsed) && parsed.length) return parsed;
+    }
+  } catch {}
+  // Fall back to localStorage (cross-session recovery)
+  try {
+    const raw = localStorage.getItem(CART_LS_KEY);
     if (!raw) return [];
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    const { items, savedAt } = JSON.parse(raw);
+    const ageHours = (Date.now() - savedAt) / 1000 / 3600;
+    if (ageHours > CART_EXPIRY_HOURS) {
+      localStorage.removeItem(CART_LS_KEY);
+      return [];
+    }
+    return Array.isArray(items) ? items : [];
   } catch {
     return [];
   }
@@ -19,10 +35,17 @@ export function CartProvider({ children }) {
   const [items, setItems] = useState(() => loadPersistedCart());
   const [cartOpen, setCartOpen] = useState(false);
 
-  // Persist to sessionStorage on every change
+  // Persist to both sessionStorage and localStorage on every change
   useEffect(() => {
     try {
       sessionStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+    } catch {}
+    try {
+      if (items.length > 0) {
+        localStorage.setItem(CART_LS_KEY, JSON.stringify({ items, savedAt: Date.now() }));
+      } else {
+        localStorage.removeItem(CART_LS_KEY);
+      }
     } catch {}
   }, [items]);
 

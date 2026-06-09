@@ -16,6 +16,7 @@ import {
 } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
+import PricingBillingClarity from "./PricingBillingClarity";
 
 function SimpleCheck() {
   return (
@@ -451,9 +452,12 @@ function PricingCard({ plan, selectedIndustry }) {
               </>
             )}
           </a>
-          <p className="text-center text-[11px] text-muted-foreground mt-1">
-            {plan.monthly}/mo begins 30 days after go-live
-          </p>
+          {/* Billing clarity micro-copy */}
+          <PricingBillingClarity
+            setupFee={Number((plan.setup || "0").replace(/[^0-9]/g, ""))}
+            monthlyFee={Number((plan.monthly || "0").replace(/[^0-9]/g, ""))}
+            packageName={plan.name}
+          />
         </div>
       </div>
     </motion.div>

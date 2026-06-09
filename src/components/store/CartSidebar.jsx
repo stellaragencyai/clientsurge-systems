@@ -4,6 +4,7 @@ import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
 import { base44 } from "@/api/base44Client";
 import { AI_PRODUCTS } from "@/lib/aiProducts";
+import VoiceAgentUpsell from "./VoiceAgentUpsell";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 
 const COMPLEMENTARY_SERVICES = {
@@ -390,6 +391,9 @@ export default function CartSidebar() {
                 </motion.div>
               ))}
               </AnimatePresence>
+              {/* Voice Agent upsell — shown when user has a package but no voice add-on */}
+              <VoiceAgentUpsell cartItems={items} onAdd={addItem} />
+
               {suggestedAddon && (
                 <div
                   style={{

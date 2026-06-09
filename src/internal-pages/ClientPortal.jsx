@@ -26,6 +26,8 @@ import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
 import SystemStatusBadge from "../components/portal/SystemStatusBadge";
 import OrderTracker from "../components/landing/OrderTracker";
+import OnboardingMissingAssetsBanner from "../components/portal/OnboardingMissingAssetsBanner";
+import EmptyStateDashboard from "../components/portal/EmptyStateDashboard";
 
 const RevenueMetricsPanel = lazy(() => import("../components/portal/RevenueMetricsPanel"));
 const WeeklyReports = lazy(() => import("../components/portal/WeeklyReports"));
@@ -288,6 +290,11 @@ export default function ClientPortal() {
       {/* Payment Failed Banner */}
       <PaymentFailedBanner subscription={subscription} order={portalOrder} />
 
+      {/* Missing assets banner — shown if onboarding is incomplete */}
+      <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4">
+        <OnboardingMissingAssetsBanner project={project} onNavigate={setActiveTab} />
+      </div>
+
       {/* Tabs — horizontally scrollable on mobile */}
       <div className="border-b border-border bg-background px-4 md:px-6 overflow-x-auto relative" role="tablist" aria-label="Portal sections">
         <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10" aria-hidden="true" />
@@ -338,7 +345,7 @@ export default function ClientPortal() {
           </div>
         )}
         {activeTab === "metrics" && (
-          <LeadFlowDashboard />
+          <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />
         )}
         {activeTab === "tasks" && (
           <TasksDashboard project={project} />

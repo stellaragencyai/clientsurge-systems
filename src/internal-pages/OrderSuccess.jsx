@@ -3,6 +3,8 @@ import { CheckCircle2, ArrowRight } from "lucide-react";
 import { Link } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
+import PostPurchaseWhatNext from "@/components/portal/PostPurchaseWhatNext";
+import GuaranteeCard from "@/components/portal/GuaranteeCard";
 
 // Prevent search engines from indexing the order success page
 const noIndexMeta = document.querySelector('meta[name="robots"]');
@@ -157,6 +159,16 @@ export default function OrderSuccess() {
               )}
             </div>
           )}
+
+          {/* Post-purchase roadmap */}
+          <div style={{ marginBottom: "24px" }}>
+            <PostPurchaseWhatNext />
+          </div>
+
+          {/* 30-day guarantee */}
+          <div style={{ marginBottom: "24px" }}>
+            <GuaranteeCard />
+          </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
             <Link

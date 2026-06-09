@@ -11,6 +11,7 @@ import {
   XCircle, ChevronDown, ChevronUp, BadgeCheck, AlertTriangle,
   ArrowRight,
 } from 'lucide-react';
+import GuaranteeCard from './GuaranteeCard';
 
 // ─── helpers ────────────────────────────────────────────────────────────────
 
@@ -652,6 +653,9 @@ export default function BillingDashboard({ project, order, subscription, onSubsc
           </div>
         )}
       </div>
+
+      {/* ── 30-day guarantee reassurance ──────────────────────── */}
+      <GuaranteeCard />
 
       {/* ── Help callout ──────────────────────────────────────── */}
       <div className="rounded-xl border border-border bg-muted/30 p-5 space-y-2">

@@ -13,8 +13,16 @@ export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
 
-  const categories = ["all", "setup", "pricing", "integration", "support"];
-  const categoryLabels = { all: "All", setup: "Getting Started", pricing: "Pricing", integration: "Integrations", support: "Support" };
+  const categories = ["all", "setup", "pricing", "integration", "support", "billing", "compliance"];
+  const categoryLabels = {
+    all: "All Topics",
+    setup: "Getting Started",
+    pricing: "Pricing & Packages",
+    integration: "Integrations",
+    support: "Support",
+    billing: "Billing & Cancellation",
+    compliance: "SMS Compliance",
+  };
 
   const filtered = FAQ_ITEMS.filter((item) => {
     const matchesSearch = item.q.toLowerCase().includes(search.toLowerCase()) || 
