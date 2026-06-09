@@ -30,28 +30,45 @@ export default function IndustryResults({ metrics, testimonial, onBookDemo }) {
 
         {testimonial && (
           <div
-            className="rounded-lg px-6 py-7 md:px-8 md:py-8 mb-10 relative overflow-hidden"
+            className="rounded-2xl px-6 py-7 md:px-8 md:py-8 mb-10 relative overflow-hidden"
             style={{
               background: "linear-gradient(135deg, #003B8F 0%, #006BB0 46%, #00AEEF 100%)",
               boxShadow: "0 18px 48px rgba(0,59,143,0.22)",
             }}
           >
             <div
-              className="absolute top-4 left-6 text-6xl font-black leading-none select-none pointer-events-none"
-              style={{ color: "rgba(255,255,255,0.12)" }}
+              className="absolute top-4 left-6 text-7xl font-black leading-none select-none pointer-events-none"
+              style={{ color: "rgba(255,255,255,0.1)", fontFamily: "Georgia, serif" }}
             >
               "
             </div>
-            <p className="text-white text-base md:text-xl font-medium leading-relaxed mb-5 relative z-10">
+            {/* 5 stars */}
+            <div className="flex gap-1 mb-4 relative z-10">
+              {[...Array(5)].map((_, i) => (
+                <span key={i} style={{ color: "#fbbf24", fontSize: "16px" }}>★</span>
+              ))}
+            </div>
+            <p className="text-white text-base md:text-xl font-medium leading-relaxed mb-6 relative z-10">
               "{testimonial.quote}"
             </p>
             <div className="flex items-center gap-3 relative z-10">
-              <div
-                className="w-10 h-10 rounded-full flex items-center justify-center font-black text-sm"
-                style={{ background: "rgba(255,255,255,0.2)", color: "#fff" }}
-              >
-                {testimonial.name.charAt(0)}
-              </div>
+              {testimonial.image ? (
+                <img
+                  src={testimonial.image}
+                  alt={testimonial.name}
+                  width="44"
+                  height="44"
+                  className="rounded-full object-cover flex-shrink-0"
+                  style={{ width: "44px", height: "44px", border: "2px solid rgba(255,255,255,0.3)" }}
+                />
+              ) : (
+                <div
+                  className="w-11 h-11 rounded-full flex items-center justify-center font-black text-sm flex-shrink-0"
+                  style={{ background: "rgba(255,255,255,0.2)", color: "#fff" }}
+                >
+                  {testimonial.name.charAt(0)}
+                </div>
+              )}
               <div>
                 <p className="text-white font-bold text-sm">{testimonial.name}</p>
                 <p className="text-white/70 text-xs">{testimonial.business}</p>

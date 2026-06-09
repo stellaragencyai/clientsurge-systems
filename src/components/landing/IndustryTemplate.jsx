@@ -10,6 +10,15 @@ import IndustrySMSDemo from "../industry/IndustrySMSDemo";
 import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
 import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
+import IndustryTrustBar from "../industry/IndustryTrustBar";
+import IndustryComparisonGrid from "../industry/IndustryComparisonGrid";
+import IndustryLeadJourney from "../industry/IndustryLeadJourney";
+import IndustryROICalculator from "../industry/IndustryROICalculator";
+import IndustrySpeedGauge from "../industry/IndustrySpeedGauge";
+import IndustryPersonaCard from "../industry/IndustryPersonaCard";
+import IndustryIntegrationStrip from "../industry/IndustryIntegrationStrip";
+import IndustryMetricRings from "../industry/IndustryMetricRings";
+import IndustryNoShowSection from "../industry/IndustryNoShowSection";
 import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
@@ -176,10 +185,15 @@ function IndustryTemplateInner({ industrySlug }) {
           image={industry.hero.image || INDUSTRY_HERO_FALLBACKS[industrySlug] || INDUSTRY_HERO_FALLBACKS.contractors}
           cta={industry.hero.cta}
           onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
+          painStats={industry.painStats}
+          industrySlug={industrySlug}
         />
 
         {/* Pain Stats Bar */}
         <IndustryPainBar stats={industry.painStats} />
+
+        {/* Trust Bar — compliance & integration badges */}
+        <IndustryTrustBar industry={industrySlug} />
 
         {/* Problem/Solution Section (industry-tailored) */}
         <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
@@ -244,6 +258,21 @@ function IndustryTemplateInner({ industrySlug }) {
 
         <IndustryAutomationUseCases industry={industry} />
 
+        {/* Lead Journey Map */}
+        <IndustryLeadJourney industry={industrySlug} />
+
+        {/* Day-in-the-life comparison grid */}
+        <IndustryComparisonGrid industry={industrySlug} />
+
+        {/* Speed to Lead Gauge */}
+        <IndustrySpeedGauge industry={industrySlug} />
+
+        {/* ROI Calculator */}
+        <IndustryROICalculator industry={industrySlug} />
+
+        {/* AI Persona Card */}
+        <IndustryPersonaCard industry={industrySlug} />
+
         {blogLink && (
           <section className="bg-primary/5 px-4 py-12 md:px-6">
             <div className="mx-auto max-w-5xl rounded-lg border border-primary/15 bg-white p-6 shadow-sm md:p-8">
@@ -270,6 +299,9 @@ function IndustryTemplateInner({ industrySlug }) {
           </section>
         )}
 
+        {/* No-Show Prevention */}
+        <IndustryNoShowSection industry={industrySlug} />
+
         {/* SMS Demo */}
         <IndustrySMSDemo
           businessName={industry.smsDemo.businessName}
@@ -284,12 +316,18 @@ function IndustryTemplateInner({ industrySlug }) {
           accentColor={theme.accent}
         />
 
-        {/* Results/Metrics */}
+        {/* Animated Metric Rings */}
+        <IndustryMetricRings industry={industrySlug} />
+
+        {/* Results/Metrics + Testimonial */}
         <IndustryResults
           metrics={industry.metrics}
           testimonial={industry.testimonial}
           onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
         />
+
+        {/* Integration Strip */}
+        <IndustryIntegrationStrip industry={industrySlug} />
 
         {/* FAQ */}
         <IndustryFAQ faqs={industry.faqs} />

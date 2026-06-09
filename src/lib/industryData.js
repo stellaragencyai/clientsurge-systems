@@ -23,9 +23,9 @@ export const INDUSTRIES = {
 
     // Industry pain stats
     painStats: [
-      { icon: "⏱️", value: "47%", label: "of leads go dark if not contacted within 5 min" },
-      { icon: "📱", value: "3x", label: "more conversions with guided booking flow" },
-      { icon: "💰", value: "$800-2000", label: "avg revenue per appointment lost to no-show follow-up" },
+      { icon: "⏱️", value: "47%", label: "of leads go dark if not contacted within 5 min", shortLabel: "Leads lost in 5 min" },
+      { icon: "📱", value: "3x", label: "more conversions with guided booking flow", shortLabel: "More conversions" },
+      { icon: "💰", value: "$800-2000", label: "avg revenue per appointment lost to no-show follow-up", shortLabel: "Lost per no-show" },
     ],
 
     // Problem/solution cards
@@ -132,9 +132,9 @@ export const INDUSTRIES = {
     },
 
     painStats: [
-      { icon: "📞", value: "40%", label: "of dental calls go unanswered during busy hours" },
-      { icon: "📅", value: "2x", label: "more confirmed appointments with instant response" },
-      { icon: "🦷", value: "$200-500", label: "avg revenue per missed patient intake" },
+      { icon: "📞", value: "40%", label: "of dental calls go unanswered during busy hours", shortLabel: "Calls unanswered" },
+      { icon: "📅", value: "2x", label: "more confirmed appointments with instant response", shortLabel: "More appointments" },
+      { icon: "🦷", value: "$200-500", label: "avg revenue per missed patient intake", shortLabel: "Lost per missed call" },
     ],
 
     problems: [
@@ -236,9 +236,9 @@ export const INDUSTRIES = {
     },
 
     painStats: [
-      { icon: "⏱️", value: "55%", label: "of chiro inquiries go unanswered during clinic hours" },
-      { icon: "📊", value: "4x", label: "better conversion with instant pricing & availability" },
-      { icon: "💵", value: "$150-300", label: "avg first visit value lost per missed lead" },
+      { icon: "⏱️", value: "55%", label: "of chiro inquiries go unanswered during clinic hours", shortLabel: "Inquiries unanswered" },
+      { icon: "📊", value: "4x", label: "better conversion with instant pricing & availability", shortLabel: "Conversion lift" },
+      { icon: "💵", value: "$150-300", label: "avg first visit value lost per missed lead", shortLabel: "Lost per missed lead" },
     ],
 
     problems: [
@@ -340,9 +340,9 @@ export const INDUSTRIES = {
     },
 
     painStats: [
-      { icon: "🚨", value: "73%", label: "of emergency HVAC calls go to whoever answers first" },
-      { icon: "📲", value: "5-7 more", label: "service calls per week from instant response" },
-      { icon: "💰", value: "$400-1200", label: "avg service revenue lost per missed call" },
+      { icon: "🚨", value: "73%", label: "of emergency HVAC calls go to whoever answers first", shortLabel: "First responder wins" },
+      { icon: "📲", value: "5-7 more", label: "service calls per week from instant response", shortLabel: "Extra weekly calls" },
+      { icon: "💰", value: "$400-1200", label: "avg service revenue lost per missed call", shortLabel: "Lost per missed call" },
     ],
 
     problems: [
@@ -444,9 +444,9 @@ export const INDUSTRIES = {
     },
 
     painStats: [
-      { icon: "⛈️", value: "60%", label: "of storm-damaged roofs get estimates from fastest responder" },
-      { icon: "📋", value: "2x", label: "more estimates from faster response time" },
-      { icon: "💵", value: "$3,000-8,000", label: "avg roofing job value lost per missed lead" },
+      { icon: "⛈️", value: "60%", label: "of storm-damaged roofs get estimates from fastest responder", shortLabel: "First estimator wins" },
+      { icon: "📋", value: "2x", label: "more estimates from faster response time", shortLabel: "More estimates" },
+      { icon: "💵", value: "$3,000-8,000", label: "avg roofing job value lost per missed lead", shortLabel: "Lost per missed lead" },
     ],
 
     problems: [
@@ -548,9 +548,9 @@ export const INDUSTRIES = {
     },
 
     painStats: [
-      { icon: "🏗️", value: "50%", label: "of project inquiries go to the fastest responder" },
-      { icon: "📞", value: "4x", label: "faster response = 3-4 more jobs per month" },
-      { icon: "💰", value: "$2,000-10,000", label: "avg project value lost per missed lead" },
+      { icon: "🏗️", value: "50%", label: "of project inquiries go to the fastest responder", shortLabel: "First responder wins" },
+      { icon: "📞", value: "4x", label: "faster response = 3-4 more jobs per month", shortLabel: "More jobs/month" },
+      { icon: "💰", value: "$2,000-10,000", label: "avg project value lost per missed lead", shortLabel: "Lost per missed lead" },
     ],
 
     problems: [

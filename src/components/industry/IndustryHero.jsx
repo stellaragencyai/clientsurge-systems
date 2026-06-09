@@ -1,7 +1,8 @@
 import { ArrowRight } from "lucide-react";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
+import { FloatingStatBadges, ScrollIndicator } from "./IndustryHeroEnhancements";
 
-export default function IndustryHero({ image, eyebrow, headline, highlightedWord, sub, subheadline, ctaLabel, cta, onBookDemo }) {
+export default function IndustryHero({ image, eyebrow, headline, highlightedWord, sub, subheadline, ctaLabel, cta, onBookDemo, painStats, industrySlug }) {
   // Split headline to highlight one word/phrase
   const headlineParts = highlightedWord
     ? headline.split(highlightedWord)
@@ -15,7 +16,7 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
   const primaryCta = ctaLabel || cta || "Book Your Free Audit";
 
   return (
-    <section className="relative overflow-hidden" style={{ minHeight: "min(760px, 86svh)", display: "flex", alignItems: "center" }}>
+    <section className="relative overflow-hidden" style={{ minHeight: "min(760px, 100svh)", display: "flex", alignItems: "center" }}>
       {/* Full-bleed background image */}
       <div className="absolute inset-0 z-0">
         <img
@@ -154,8 +155,14 @@ export default function IndustryHero({ image, eyebrow, headline, highlightedWord
           <p className="mt-5 text-xs font-medium" style={{ color: "rgba(255,255,255,0.5)" }}>
             No contracts · Live in 5–7 days · Done for you
           </p>
+
+          {/* Floating pain stat badges */}
+          {painStats && <FloatingStatBadges stats={painStats} />}
         </div>
       </div>
+
+      {/* Scroll indicator */}
+      <ScrollIndicator />
     </section>
   );
 }

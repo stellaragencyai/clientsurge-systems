@@ -3,6 +3,7 @@ import { ChevronDown } from "lucide-react";
 
 export default function IndustryFAQ({ faqs }) {
   const [open, setOpen] = useState(null);
+  if (!faqs || !faqs.length) return null;
 
   return (
     <section className="px-4 py-14 md:px-6 md:py-20" style={{ overflowX: "hidden", background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)" }}>
@@ -32,8 +33,9 @@ export default function IndustryFAQ({ faqs }) {
             >
               <button
                 type="button"
-                className="w-full flex items-center justify-between px-6 py-5 text-left"
+                className="w-full flex items-center justify-between px-6 py-5 text-left focus:outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 rounded-2xl"
                 onClick={() => setOpen(open === i ? null : i)}
+                aria-expanded={open === i}
               >
                 <span className="text-sm font-semibold text-foreground pr-4">{faq.q}</span>
                 <ChevronDown
