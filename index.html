@@ -6,6 +6,8 @@
       document.documentElement.classList.remove("no-js");
       document.documentElement.classList.add("js");
       window.setTimeout(function () {
+        // Never trigger the static fallback inside an iframe (e.g. the visual editor)
+        if (window.self !== window.top) return;
         if (document.querySelector("#root > .static-fallback")) {
           document.documentElement.classList.add("app-fallback-visible");
         }
@@ -56,7 +58,7 @@
     <meta name="twitter:image" content="https://clientsurgesystems.com/og-image.png" />
     <link rel="canonical" href="https://clientsurgesystems.com/" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https: https://assets.calendly.com https://calendly.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; frame-src https://calendly.com https://assets.calendly.com;" />
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https: http:; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; frame-src 'self' https: http:; connect-src 'self' https: wss: ws: http:;" />
     <script type="application/ld+json" data-schema-id="static-homepage">
       {
         "@context": "https://schema.org",
