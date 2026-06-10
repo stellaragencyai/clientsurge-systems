@@ -146,6 +146,16 @@ Deno.serve(async (req) => {
     }).catch(() => null);
     tasks.push("admin_notification_queued");
 
+    // Step 6: Fire AI Brain Installer (non-blocking) — handles steps 5–10:
+    //   creates AutomationJobs, applies default config, runs test lead,
+    //   marks services Live, finalizes ClientProject, writes AuditLog
+    base44.asServiceRole.functions.invoke("aiBrainInstaller", {
+      order_id,
+    }).catch(err => {
+      console.error("[postPaymentOrchestrator] aiBrainInstaller invoke failed (non-blocking)", { error: err.message });
+    });
+    tasks.push("ai_brain_installer_queued");
+
     console.log("[postPaymentOrchestrator] Complete", { order_id, tasks });
     return json({ success: true, order_id, tasks });
 
