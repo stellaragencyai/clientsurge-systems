@@ -53,7 +53,7 @@ function LazyHomepageSection({ children, fallback }) {
 }
 
 export default function Home() {
-  useHomepageWhiteCanvas();
+  // useHomepageWhiteCanvas(); // Disabled — preserves premium electric-blue theme
   const location = useLocation();
   useEffect(() => {
     if (!location.hash) {

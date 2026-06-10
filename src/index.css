@@ -397,38 +397,16 @@ html {
 }
 
 body {
-  background: #ffffff;
+  background: hsl(var(--background));
   transition: background 0.6s ease;
 }
 
-body.homepage-white-canvas {
-  background: #ffffff !important;
+/* Fix 5: Premium background safe-default — prevents flat white fallback under any class override */
+body:not(.homepage-white-canvas) {
+  background: hsl(var(--background));
 }
 
-body.homepage-white-canvas::before {
-  display: none !important;
-}
-
-body.homepage-white-canvas .nebula-bg::before,
-body.homepage-white-canvas .nebula-faq,
-body.homepage-white-canvas .nebula-cta,
-body.homepage-white-canvas .nebula-hero,
-body.homepage-white-canvas .nebula-pricing,
-body.homepage-white-canvas .nebula-testimonials,
-body.homepage-white-canvas .nebula-problem,
-body.homepage-white-canvas [class*="from-card"][class*="to-background"] {
-  background: #ffffff !important;
-  background-image: none !important;
-}
-
-body.homepage-white-canvas .landing-hero__ambient {
-  display: none !important;
-}
-
-body.homepage-white-canvas .landing-hero__visualGlow {
-  background: radial-gradient(circle at center, rgba(0,174,239,0.16) 0%, rgba(0,157,255,0.08) 34%, transparent 74%) !important;
-  filter: blur(30px) !important;
-}
+/* Fix 2: White-canvas overrides removed — premium electric-blue theme always active */
 
 /* ============================================
    IDEA 1: NEBULA BACKGROUND GRADIENTS

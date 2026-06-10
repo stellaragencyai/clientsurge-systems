@@ -287,6 +287,12 @@
         display: none !important;
       }
 
+      /* Fix 4: Unconditionally hide fallback inside visual editors / iframes */
+      html.js .static-fallback,
+      body.editor-active .static-fallback {
+        display: none !important;
+      }
+
       .static-shell {
         width: min(1120px, calc(100% - 32px));
         margin: 0 auto;
