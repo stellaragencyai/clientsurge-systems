@@ -27,10 +27,10 @@ export default function About() {
       {/* Hero */}
       <section
         className="py-20 px-6 text-center"
-        style={{ background: "linear-gradient(180deg, rgba(0,174,239,0.07) 0%, hsl(var(--card)) 52%, hsl(var(--background)) 100%)" }}
+        style={{ background: "radial-gradient(ellipse 90% 60% at 50% 0%, rgba(0,174,239,0.12) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 80%, rgba(0,59,143,0.07) 0%, transparent 55%), hsl(var(--background))", paddingTop: "calc(var(--cs-nav-height) + 3rem)" }}
       >
-        <p className="text-[11px] font-bold uppercase tracking-[0.28em] mb-3" style={{ color: "#005f99" }}>Our Story</p>
-        <h1 className="font-bold tracking-tight text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(2rem, 5vw, 3.25rem)", lineHeight: 1.08 }}>
+        <p className="text-[11px] font-bold uppercase tracking-[0.28em] mb-3" style={{ color: "hsl(var(--primary))" }}>Our Story</p>
+        <h1 className="font-bold tracking-tight text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(2rem, 5vw, 3.25rem)", lineHeight: 1.08, fontWeight: 900, letterSpacing: "-0.025em", textWrap: "balance" }}>
           About ClientSurge Systems
         </h1>
         <p className="text-muted-foreground text-lg max-w-2xl mx-auto leading-relaxed">
@@ -63,8 +63,8 @@ export default function About() {
                 { icon: Users, title: "Done For You", desc: "We configure, test, and launch everything — you just approve." },
                 { icon: CheckCircle2, title: "Measured Launches", desc: "Every workflow is tested against clear response and booking goals." },
               ].map(({ icon: Icon, title, desc }) => (
-                <div key={title} className="flex items-start gap-4 p-4 rounded-xl border border-border bg-card">
-                  <div className="w-9 h-9 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
+                <div key={title} className="flex items-start gap-4 p-4 rounded-xl bg-card" style={{ border: "1px solid rgba(0,174,239,0.18)", boxShadow: "0 4px 16px rgba(0,174,239,0.06)" }}>
+                  <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.28)", boxShadow: "0 0 12px rgba(0,174,239,0.15)" }}>
                     <Icon className="w-4 h-4 text-primary" />
                   </div>
                   <div>
@@ -91,7 +91,7 @@ export default function About() {
           </div>
 
           {/* Who builds it */}
-          <div className="p-8 rounded-2xl border border-primary/20 bg-primary/5">
+          <div className="p-8 rounded-2xl" style={{ border: "1px solid rgba(0,174,239,0.22)", background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,174,239,0.08) 0%, transparent 60%), rgba(0,174,239,0.04)", boxShadow: "0 8px 32px rgba(0,59,143,0.08)" }}>
             <h2 className="font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif", fontSize: "clamp(1.5rem, 3vw, 2rem)" }}>Who Builds It</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
               ClientSurge Systems is founded and operated out of Phoenix, Arizona. Our team combines deep expertise in AI automation, business operations, and service industry workflows. We don't just build software — we build systems we'd want running in our own businesses.

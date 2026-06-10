@@ -333,10 +333,10 @@ export const INDUSTRIES = {
     routePath: "/hvac",
     
     hero: {
-      eyebrow: "For HVAC, Plumbing & Trades",
-      headline: "Never Miss a Service Call Again",
+      eyebrow: "HVAC & Home Services",
+      headline: "Every Service Call Answered. Every Job Booked.",
       subheadline: "Home service leads are urgent and time-sensitive. Miss the call, and they call your competitor. Instant SMS turns missed calls into booked service appointments.",
-      cta: "See How Service Companies Use This",
+      cta: "Free HVAC Automation Audit",
     },
 
     painStats: [
@@ -386,7 +386,7 @@ export const INDUSTRIES = {
 
     smsDemo: {
       businessName: "Rapid Response HVAC",
-      initialMessage: "[Missed call from homeowner]",
+      initialMessage: "Hi, my AC is out and it's 110°F inside. Can someone come today?",
       automatedResponse: "Hi! We saw your missed call. 🔧 Rapid Response HVAC here. We can send a technician TODAY for emergency AC repair. Service call is $89. Available 2-5 PM or 6-9 PM. Which works?",
       leadReply: "2 PM today works!",
       confirmationMessage: "Booked! Technician arriving 2-2:30 PM today. Here's your address confirmation & tech details: [info]. Thanks! ⏱️",
@@ -446,7 +446,7 @@ export const INDUSTRIES = {
     painStats: [
       { icon: "⛈️", value: "60%", label: "of storm-damaged roofs get estimates from fastest responder", shortLabel: "First estimator wins" },
       { icon: "📋", value: "2x", label: "more estimates from faster response time", shortLabel: "More estimates" },
-      { icon: "💵", value: "$3,000-8,000", label: "avg roofing job value lost per missed lead", shortLabel: "Lost per missed lead" },
+      { icon: "💵", value: "$3K–$8K", label: "avg roofing job value lost per missed lead", shortLabel: "Lost per missed lead" },
     ],
 
     problems: [
@@ -542,15 +542,15 @@ export const INDUSTRIES = {
     
     hero: {
       eyebrow: "For General Contractors & Trades",
-      headline: "Land More Jobs, Faster Response, Higher Closing Rate",
-      subheadline: "General contractors live on word-of-mouth and quick turnaround. Respond to estimates in 60 seconds, and you win. Slow down, and your competitor does.",
-      cta: "See How Contractors Use This",
+      headline: "The Job Goes to the Contractor Who Responds First.",
+      subheadline: "While you're on-site, our AI answers every call, qualifies every lead, and books the estimate — so you close the job before you even get home.",
+      cta: "Book Your Free Contractor Audit",
     },
 
     painStats: [
       { icon: "🏗️", value: "50%", label: "of project inquiries go to the fastest responder", shortLabel: "First responder wins" },
       { icon: "📞", value: "4x", label: "faster response = 3-4 more jobs per month", shortLabel: "More jobs/month" },
-      { icon: "💰", value: "$2,000-10,000", label: "avg project value lost per missed lead", shortLabel: "Lost per missed lead" },
+      { icon: "💰", value: "$5K avg", label: "project value lost per missed lead inquiry", shortLabel: "Lost per missed lead" },
     ],
 
     problems: [

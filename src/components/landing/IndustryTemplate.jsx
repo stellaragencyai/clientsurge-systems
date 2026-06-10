@@ -65,12 +65,18 @@ const INDUSTRY_SEO = {
 };
 
 const INDUSTRY_HERO_FALLBACKS = {
-  "med-spa": "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95&fit=crop&auto=format",
-  dental: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1200&q=90&fit=crop&auto=format",
-  chiropractic: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=90&fit=crop&auto=format",
-  hvac: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=1200&q=90&fit=crop&auto=format",
-  roofing: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=90&fit=crop&auto=format",
-  contractors: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=90&fit=crop&auto=format",
+  // Med Spa — clean, luminous aesthetic clinic interior, luxury feel
+  "med-spa": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600&q=90&fit=crop&auto=format",
+  // Dental — warm, modern, friendly dental practice interior (not tools)
+  dental: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=1600&q=90&fit=crop&auto=format",
+  // Chiropractic — clean, bright modern wellness/PT clinic
+  chiropractic: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=1600&q=90&fit=crop&auto=format",
+  // HVAC — professional service van / modern mechanical equipment, high-contrast
+  hvac: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop&auto=format",
+  // Roofing — dramatic aerial shot, keep best existing image but upgrade resolution
+  roofing: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=90&fit=crop&auto=format",
+  // Contractors — premium finished modern home/architectural result photo
+  contractors: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1600&q=90&fit=crop&auto=format",
 };
 
 const INDUSTRY_BLOG_LINKS = {
@@ -192,11 +198,17 @@ function IndustryTemplateInner({ industrySlug }) {
         {/* Pain Stats Bar */}
         <IndustryPainBar stats={industry.painStats} />
 
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.35) 30%, rgba(0,174,239,0.55) 50%, rgba(0,174,239,0.35) 70%, transparent 100%)", margin: "0" }} />
+
         {/* Trust Bar — compliance & integration badges */}
         <IndustryTrustBar industry={industrySlug} />
 
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
+
         {/* Problem/Solution Section (industry-tailored) */}
-        <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
+        <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,174,239,0.06) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(0,59,143,0.04) 0%, transparent 60%), hsl(var(--background))" }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-10">
               <p className="text-xs font-semibold text-primary tracking-[0.18em] uppercase mb-4">
@@ -214,9 +226,9 @@ function IndustryTemplateInner({ industrySlug }) {
                   <div
                     className="rounded-lg px-5 py-5 border relative overflow-hidden flex items-start gap-3"
                     style={{
-                      background: "linear-gradient(180deg, #ffffff 0%, #fff7f7 100%)",
-                      border: "1px solid rgba(185,28,28,0.18)",
-                      boxShadow: "0 8px 24px rgba(185,28,28,0.05)",
+                      background: "linear-gradient(180deg, #ffffff 0%, #fff1f1 100%)",
+                      border: "1px solid rgba(185,28,28,0.25)",
+                      boxShadow: "0 8px 24px rgba(185,28,28,0.07)",
                     }}
                   >
                     <div className="w-9 h-9 rounded-lg bg-red-50 border border-red-200/80 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -258,6 +270,9 @@ function IndustryTemplateInner({ industrySlug }) {
 
         <IndustryAutomationUseCases industry={industry} />
 
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
+
         {/* Lead Journey Map */}
         <IndustryLeadJourney industry={industrySlug} />
 
@@ -274,25 +289,46 @@ function IndustryTemplateInner({ industrySlug }) {
         <IndustryPersonaCard industry={industrySlug} />
 
         {blogLink && (
-          <section className="bg-primary/5 px-4 py-12 md:px-6">
-            <div className="mx-auto max-w-5xl rounded-lg border border-primary/15 bg-white p-6 shadow-sm md:p-8">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                Related launch guide
+          <section className="px-4 py-12 md:px-6">
+            <div
+              className="mx-auto max-w-5xl rounded-2xl p-6 md:p-10"
+              style={{
+                background: "linear-gradient(135deg, #060e1c 0%, #0a1a3a 50%, #071428 100%)",
+                border: "1px solid rgba(0,174,239,0.22)",
+                boxShadow: "0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(0,174,239,0.12)",
+              }}
+            >
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#00AEEF" }}>
+                Related Launch Guide
               </p>
               <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
-                  <h2 className="mb-2 text-2xl font-black leading-tight text-foreground md:text-3xl">
+                  <h2 className="mb-2 text-2xl font-black leading-tight md:text-3xl" style={{ color: "#ffffff", fontFamily: "Montserrat, sans-serif", letterSpacing: "-0.02em" }}>
                     {blogLink.title}
                   </h2>
-                  <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                  <p className="max-w-2xl text-sm leading-6" style={{ color: "rgba(255,255,255,0.62)" }}>
                     {blogLink.description}
                   </p>
                 </div>
                 <Link
                   to={blogLink.href}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-black text-white shadow-sm transition hover:opacity-90"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    minHeight: "44px",
+                    padding: "0 24px",
+                    borderRadius: "9999px",
+                    background: "linear-gradient(135deg, #0088CC 0%, #006BB0 46%, #003B8F 100%)",
+                    color: "#ffffff",
+                    fontSize: "0.875rem",
+                    fontWeight: "800",
+                    textDecoration: "none",
+                    boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
+                    whiteSpace: "nowrap",
+                  }}
                 >
-                  Read guide
+                  Read Guide
                 </Link>
               </div>
             </div>
