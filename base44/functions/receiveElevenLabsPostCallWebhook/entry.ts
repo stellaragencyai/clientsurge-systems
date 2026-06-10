@@ -1,4 +1,3 @@
-import { secureJson } from "../_shared/response.ts";
 /**
  * receiveElevenLabsPostCallWebhook — USE CASE #4
  * PUBLIC WEBHOOK: ElevenLabs post-call event handler
@@ -25,6 +24,13 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import crypto from 'node:crypto';
 
+function secureJson(data, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { 'Content-Type': 'application/json', 'X-Frame-Options': 'DENY', ...(init.headers || {}) },
+  });
+}
+
 function normalizePhone(phone) {
   if (!phone) return null;
   const digits = phone.replace(/\D/g, '');
@@ -48,17 +54,27 @@ Deno.serve(async (req) => {
   const rawBody = await req.text();
 
   // ── Validate ElevenLabs webhook signature ─────────────────────────────
+  // SECURITY: Signature validation is mandatory when the secret is configured.
+  // Requests without a valid signature are rejected to prevent payload injection.
   const webhookSecret = Deno.env.get('ELEVENLABS_WEBHOOK_SECRET');
   if (webhookSecret) {
     const signature = req.headers.get('ElevenLabs-Signature') || req.headers.get('X-ElevenLabs-Signature') || '';
-    if (signature) {
-      const computed = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
-      if (`sha256=${computed}` !== signature) {
-        console.warn('[receiveElevenLabsPostCallWebhook] Invalid signature — rejected');
-        return secureJson({ error: 'Forbidden' }, { status: 403 });
-      }
-    } else {
-      console.warn('[receiveElevenLabsPostCallWebhook] No ElevenLabs-Signature header — proceeding without validation');
+    if (!signature) {
+      console.warn('[receiveElevenLabsPostCallWebhook] Missing ElevenLabs-Signature header — rejected');
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
+    }
+    const computed = crypto.createHmac('sha256', webhookSecret).update(rawBody).digest('hex');
+    if (`sha256=${computed}` !== signature) {
+      console.warn('[receiveElevenLabsPostCallWebhook] Invalid signature — rejected');
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
+    }
+  } else {
+    // Secret not configured: fall back to shared HMAC secret check
+    const hmacSecret = Deno.env.get('ELEVENLABS_WEBHOOK_HMAC_SECRET');
+    const providedSecret = req.headers.get('X-Webhook-Secret') || req.headers.get('Authorization') || '';
+    if (!hmacSecret || providedSecret !== hmacSecret) {
+      console.warn('[receiveElevenLabsPostCallWebhook] No webhook secret configured or secret mismatch — rejected');
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
   }
 

@@ -1,14 +1,36 @@
-import { secureJson } from "../_shared/response.ts";
 /**
  * Apply Automation Rules
  * Checks all active rules and fires actions when conditions match
+ * Requires admin authentication.
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
+function secureJson(data, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY", ...(init.headers || {}) },
+  });
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+
+    // Auth gate: must be an authenticated admin user
+    let user;
+    try {
+      user = await base44.auth.me();
+    } catch {
+      return secureJson({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (!user) {
+      return secureJson({ error: "Unauthorized" }, { status: 401 });
+    }
+    if (user.role !== "admin") {
+      return secureJson({ error: "Forbidden" }, { status: 403 });
+    }
+
     const { project_id, lead_id, trigger_type } = await req.json();
 
     if (!project_id) {
