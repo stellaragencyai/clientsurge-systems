@@ -21,6 +21,7 @@ export default function MedSpaDemoModal({ onClose }) {
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitWarnings, setSubmitWarnings] = useState([]);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -33,22 +34,40 @@ export default function MedSpaDemoModal({ onClose }) {
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    if (fieldErrors[e.target.name]) setFieldErrors((prev) => { const next = {...prev}; delete next[e.target.name]; return next; });
   };
 
   const handleSchedulingChange = (e) => {
     setScheduling((s) => ({ ...s, [e.target.name]: e.target.value }));
+    if (fieldErrors[e.target.name]) setFieldErrors((prev) => { const next = {...prev}; delete next[e.target.name]; return next; });
   };
 
   const handleStep1Submit = (e) => {
     e.preventDefault();
-    if (form.full_name && form.business_name && form.email && form.phone) {
-      setStep(2);
+    const errors = {};
+    if (!form.full_name.trim()) errors.full_name = "Full name is required";
+    if (!form.business_name.trim()) errors.business_name = "Business name is required";
+    if (!form.email.trim()) errors.email = "Email is required";
+    else if (!/\S+@\S+\.\S+/.test(form.email)) errors.email = "Enter a valid email address";
+    if (!form.phone.trim()) errors.phone = "Phone number is required";
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
     }
+    setFieldErrors({});
+    setStep(2);
   };
 
   const handleStep2Submit = async (e) => {
     e.preventDefault();
-    if (!scheduling.date || !scheduling.time) return;
+    const errors = {};
+    if (!scheduling.date) errors.date = "Please select a date";
+    if (!scheduling.time) errors.time = "Please select a time";
+    if (Object.keys(errors).length > 0) {
+      setFieldErrors(errors);
+      return;
+    }
+    setFieldErrors({});
 
     setSaving(true);
     setSubmitWarnings([]);
@@ -166,8 +185,9 @@ export default function MedSpaDemoModal({ onClose }) {
                   required
                   autoComplete="name"
                   placeholder="Jane Smith"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${fieldErrors.full_name ? "border-destructive ring-1 ring-destructive/30" : "border-input"}`}
                 />
+                {fieldErrors.full_name && <p className="text-xs text-destructive mt-1">{fieldErrors.full_name}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Business Name *</label>
@@ -178,8 +198,9 @@ export default function MedSpaDemoModal({ onClose }) {
                   required
                   autoComplete="organization"
                   placeholder="Glow Med Spa"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${fieldErrors.business_name ? "border-destructive ring-1 ring-destructive/30" : "border-input"}`}
                 />
+                {fieldErrors.business_name && <p className="text-xs text-destructive mt-1">{fieldErrors.business_name}</p>}
               </div>
             </div>
 
@@ -194,8 +215,9 @@ export default function MedSpaDemoModal({ onClose }) {
                   required
                   autoComplete="email"
                   placeholder="jane@glowspa.com"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${fieldErrors.email ? "border-destructive ring-1 ring-destructive/30" : "border-input"}`}
                 />
+                {fieldErrors.email && <p className="text-xs text-destructive mt-1">{fieldErrors.email}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Phone *</label>
@@ -208,8 +230,9 @@ export default function MedSpaDemoModal({ onClose }) {
                   autoComplete="tel"
                   inputMode="tel"
                   placeholder="(555) 000-0000"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${fieldErrors.phone ? "border-destructive ring-1 ring-destructive/30" : "border-input"}`}
                 />
+                {fieldErrors.phone && <p className="text-xs text-destructive mt-1">{fieldErrors.phone}</p>}
               </div>
             </div>
 
@@ -265,8 +288,9 @@ export default function MedSpaDemoModal({ onClose }) {
                 min={new Date().toISOString().split('T')[0]}
                 onChange={handleSchedulingChange}
                 required
-                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${fieldErrors.date ? "border-destructive ring-1 ring-destructive/30" : "border-input"}`}
               />
+              {fieldErrors.date && <p className="text-xs text-destructive mt-1">{fieldErrors.date}</p>}
             </div>
 
             <div>
@@ -276,7 +300,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 value={scheduling.time}
                 onChange={handleSchedulingChange}
                 required
-                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${fieldErrors.time ? "border-destructive ring-1 ring-destructive/30" : "border-input"}`}
               >
                 <option value="">Choose a time...</option>
                 <option value="09:00">9:00 AM</option>
@@ -292,6 +316,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 <option value="16:00">4:00 PM</option>
                 <option value="16:30">4:30 PM</option>
               </select>
+              {fieldErrors.time && <p className="text-xs text-destructive mt-1">{fieldErrors.time}</p>}
             </div>
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
