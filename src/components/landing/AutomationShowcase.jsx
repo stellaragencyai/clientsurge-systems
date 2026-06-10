@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Phone, MessageSquare, Calendar, Star, RefreshCw, Zap, CheckCircle, Clock, ArrowRight } from "lucide-react";
+import { Phone, MessageSquare, Calendar, Star, RefreshCw, Zap, CheckCircle2, Clock, ArrowRight } from "lucide-react";
 
 const WORKFLOWS = [
   {
@@ -280,7 +280,7 @@ export default function AutomationShowcase() {
                   "Admin notified with full context",
                 ].map((point, i) => (
                   <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", marginBottom: "10px" }}>
-                    <CheckCircle size={15} style={{ color: active.color, flexShrink: 0, marginTop: "1px" }} />
+                    <CheckCircle2 size={15} style={{ color: active.color, flexShrink: 0, marginTop: "1px" }} />
                     <span style={{ fontSize: "13px", color: "hsl(var(--foreground))", lineHeight: 1.5 }}>{point}</span>
                   </div>
                 ))}
