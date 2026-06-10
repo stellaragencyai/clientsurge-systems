@@ -1,552 +1,366 @@
-import { useState, useEffect, useRef } from "react";
-import {
-  ArrowRight, Zap, PhoneMissed, MailCheck, CalendarCheck, Star, Repeat2,
-  FileInput, Brain, MessageSquare, Mail, Clock, CheckCircle,
-  Send, RotateCcw, AlertCircle, DollarSign } from
-"lucide-react";
+import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { Phone, MessageSquare, Calendar, Star, RefreshCw, Zap, CheckCircle, Clock, ArrowRight } from "lucide-react";
 
-const BRAND_COLOR = "#00D4FF";
-
-const AUTOMATIONS = [
-{
-  id: "instant-lead-response",
-  icon: Zap,
-  title: "Instant Lead Response",
-  tagline: "Reply to every new lead in under 60 seconds — automatically.",
-  description:
-  "The moment a lead fills out a form, calls, or submits online — your AI fires a personalized SMS and email within 60 seconds. No manual work. No missed opportunities.",
-  before: "Leads wait hours for a reply — most go cold",
-  after: "Every lead hears from you before any competitor",
-  stat: "Fast response path ready for every captured lead",
-  steps: [
-  { icon: FileInput, label: "Lead submits form", sub: "Web, Facebook, or referral" },
-  { icon: Brain, label: "AI scores & classifies", sub: "<2 sec routing" },
-  { icon: Zap, label: "Personalized SMS fires", sub: "Within 60 seconds" },
-  { icon: Mail, label: "Confirmation email sent", sub: "With booking link" },
-  { icon: CheckCircle, label: "Lead engaged", sub: "Before any competitor" }]
-
-},
-{
-  id: "missed-call-textback",
-  icon: PhoneMissed,
-  title: "Missed Call Text-Back",
-  tagline: "Every missed call gets an instant follow-up text.",
-  description:
-  "When a call goes unanswered, the system automatically texts the caller back within seconds. Your leads get a response even when you're on another job.",
-  before: "Missed calls = lost revenue, no follow-up ever happens",
-  after: "Every missed call gets a text back in under 60 seconds",
-  stat: "Missed callers get routed back into a booking path",
-  steps: [
-  { icon: PhoneMissed, label: "Call goes unanswered", sub: "Any time, any day" },
-  { icon: AlertCircle, label: "System detects missed call", sub: "Webhook fires instantly" },
-  { icon: MessageSquare, label: "Text-back sent in 60s", sub: "\"We missed you! Book here\"" },
-  { icon: RotateCcw, label: "Follow-up sequence starts", sub: "2 min → 1 hr → 24 hr" },
-  { icon: CalendarCheck, label: "Lead books appointment", sub: "Recovered revenue" }]
-
-},
-{
-  id: "nurture-sequence",
-  icon: MailCheck,
-  title: "14-Day Nurture Sequence",
-  tagline: "Automated follow-up that keeps leads warm for 2 weeks.",
-  description:
-  "A multi-touch SMS + email sequence that runs on autopilot for 14 days. Each message is personalized to the lead's industry and behavior — warming them until they're ready to book.",
-  before: "1 follow-up attempt, then the lead is forgotten forever",
-  after: "14 days of automated touchpoints convert cold leads",
-  stat: "Multi-touch follow-up keeps unbooked leads active",
-  steps: [
-  { icon: FileInput, label: "New lead enters sequence", sub: "Day 0 — instant welcome" },
-  { icon: MessageSquare, label: "Day 1 SMS touchpoint", sub: "Personalized to industry" },
-  { icon: Mail, label: "Day 3 email follow-up", sub: "Case study or testimonial" },
-  { icon: RotateCcw, label: "Days 5–14 — 6 more steps", sub: "SMS + email alternating" },
-  { icon: CalendarCheck, label: "Lead books or opts out", sub: "Sequence auto-stops on reply" }]
-
-},
-{
-  id: "ai-booking-agent",
-  icon: CalendarCheck,
-  title: "AI Booking Agent",
-  tagline: "Turns conversations into confirmed appointments.",
-  description:
-  "When a lead signals intent to book, the AI takes over — sends the booking link, follows up if they don't click, and confirms the appointment automatically.",
-  before: "\"Interested\" leads fall through because no one follows up",
-  after: "AI detects booking intent and closes the appointment automatically",
-  stat: "Booking intent gets a clear next step automatically",
-  steps: [
-  { icon: MessageSquare, label: "Lead signals booking intent", sub: "\"I want to book\" or similar" },
-  { icon: Brain, label: "AI detects intent", sub: "Classification fires instantly" },
-  { icon: Send, label: "Booking link sent via SMS", sub: "Personalized CTA message" },
-  { icon: Clock, label: "Reminder if no click in 2h", sub: "Automatic nudge" },
-  { icon: CheckCircle, label: "Appointment confirmed", sub: "Confirmation + calendar invite" }]
-
-},
-{
-  id: "review-request",
-  icon: Star,
-  title: "Review Request Automation",
-  tagline: "Automatically request 5-star reviews after every appointment.",
-  description:
-  "After a job is done, the system sends a perfectly-timed review request via SMS. Happy customers leave reviews. You build social proof on autopilot.",
-  before: "Happy clients leave — you never ask for a review",
-  after: "Every completed appointment triggers a perfectly-timed review ask",
-  stat: "Review requests fire after completed appointments",
-  steps: [
-  { icon: CheckCircle, label: "Appointment marked complete", sub: "Trigger event fires" },
-  { icon: Clock, label: "Wait 30–60 minutes", sub: "Configurable delay" },
-  { icon: Star, label: "Review request SMS sent", sub: "Google or platform link" },
-  { icon: Mail, label: "Email follow-up at 24h", sub: "If SMS not clicked" },
-  { icon: Star, label: "5-star review received", sub: "Reputation grows passively" }]
-
-},
-{
-  id: "lead-reactivation",
-  icon: Repeat2,
-  title: "Lead Reactivation",
-  tagline: "Wake up cold leads and turn them into paying clients.",
-  description:
-  "Old leads who never booked get a targeted re-engagement campaign. A single reactivation blast can recover thousands in dormant revenue.",
-  before: "Old leads sit ignored — dormant revenue never recovered",
-  after: "A targeted re-engagement campaign wakes up dormant leads",
-  stat: "Reactivation value depends on dormant lead volume and offer strength",
-  steps: [
-  { icon: Clock, label: "Lead dormant 14–60 days", sub: "Daily scan detects it" },
-  { icon: Brain, label: "Reactivation tier assigned", sub: "14d / 30d / 60d offer" },
-  { icon: MessageSquare, label: "Special offer SMS sent", sub: "\"20% off — limited time\"" },
-  { icon: Mail, label: "Email follow-up at 24h", sub: "If SMS unanswered" },
-  { icon: DollarSign, label: "Dormant lead re-engaged", sub: "Offer timing depends on list quality" }]
-
-}];
-
-
-// Accent colors per automation
-const AUTOMATION_ACCENTS = [
-  "#00AEEF", // Instant Lead — electric blue
-  "#f97316", // Missed Call — orange
-  "#a855f7", // Nurture — purple
-  "#10b981", // Booking — emerald
-  "#f59e0b", // Review — amber
-  "#ef4444", // Reactivation — red
+const WORKFLOWS = [
+  {
+    id: "missed_call",
+    icon: Phone,
+    label: "Missed Call Recovery",
+    color: "#00AEEF",
+    bg: "rgba(0,174,239,0.08)",
+    border: "rgba(0,174,239,0.22)",
+    scenario: "Roofing company misses a call at 6:47 PM",
+    steps: [
+      { time: "0s", from: "system", text: "Missed call detected from (602) 555-0182", type: "event" },
+      { time: "12s", from: "ai", text: "Hey! Sorry we missed your call — we're wrapping up a job. I'm Jordan with Desert Roofing. What can we help you with?", type: "sms" },
+      { time: "2m", from: "lead", text: "Hi yes my roof is leaking after the storm last night, pretty urgent", type: "sms" },
+      { time: "2m 14s", from: "ai", text: "Totally understand — storm damage is stressful. We have emergency slots tomorrow morning. Can I get you booked for a free inspection?", type: "sms" },
+      { time: "3m", from: "lead", text: "Yes please, 8am works", type: "sms" },
+      { time: "3m 8s", from: "system", text: "Appointment booked — 8:00 AM inspection. Admin notified.", type: "event" },
+    ],
+  },
+  {
+    id: "lead_followup",
+    icon: MessageSquare,
+    label: "AI Lead Follow-Up",
+    color: "#006BB0",
+    bg: "rgba(0,107,176,0.08)",
+    border: "rgba(0,107,176,0.22)",
+    scenario: "New form submission from med spa website",
+    steps: [
+      { time: "0s", from: "system", text: "New lead: Sarah M. — interested in 'Botox consultation'", type: "event" },
+      { time: "45s", from: "ai", text: "Hi Sarah! Thanks for reaching out to Luxe Med Spa. I'd love to get you set up for a complimentary Botox consultation. Do mornings or afternoons work better for you?", type: "email" },
+      { time: "4h", from: "system", text: "No reply — follow-up sequence triggered", type: "event" },
+      { time: "4h 5m", from: "ai", text: "Hey Sarah — just following up! Our consultations fill up fast. We have openings this Thursday & Friday. Want me to hold a spot?", type: "sms" },
+      { time: "4h 22m", from: "lead", text: "Friday at 2pm would be perfect!", type: "sms" },
+      { time: "4h 23m", from: "system", text: "Lead status → Booked. Confirmation email sent.", type: "event" },
+    ],
+  },
+  {
+    id: "booking",
+    icon: Calendar,
+    label: "Appointment Booking",
+    color: "#0052A5",
+    bg: "rgba(0,82,165,0.08)",
+    border: "rgba(0,82,165,0.22)",
+    scenario: "HVAC company booking an emergency service call",
+    steps: [
+      { time: "0s", from: "lead", text: "My AC stopped working, it's 108 degrees outside, I need someone today", type: "sms" },
+      { time: "8s", from: "ai", text: "Oh no — that's an emergency in this heat! I'm checking our emergency slots right now...", type: "sms" },
+      { time: "22s", from: "ai", text: "Great news — we have a tech available at 1:30 PM today. Can I get your address to confirm?", type: "sms" },
+      { time: "1m", from: "lead", text: "4821 W Cactus Rd, Phoenix", type: "sms" },
+      { time: "1m 12s", from: "ai", text: "Confirmed! Tech arrives 1:30 PM. You'll get a text when they're 30 min away. Anything else I should tell the tech?", type: "sms" },
+      { time: "1m 40s", from: "system", text: "Job scheduled. Tech notified. Reminder set for 1:00 PM.", type: "event" },
+    ],
+  },
+  {
+    id: "review",
+    icon: Star,
+    label: "Review Requests",
+    color: "#F59E0B",
+    bg: "rgba(245,158,11,0.08)",
+    border: "rgba(245,158,11,0.22)",
+    scenario: "Dental practice requesting a review post-visit",
+    steps: [
+      { time: "0s", from: "system", text: "Appointment completed: Mark T. — cleaning & whitening", type: "event" },
+      { time: "2h", from: "ai", text: "Hi Mark! Hope your smile is feeling great after today's visit. Dr. Chen and the team would really appreciate a quick Google review — it takes 30 seconds and helps other families find us! 😊", type: "sms" },
+      { time: "2h 18m", from: "lead", text: "Of course, happy to!", type: "sms" },
+      { time: "2h 19m", from: "ai", text: "You're amazing, thank you! Here's the direct link: g.page/sunrisedental/review ⭐", type: "sms" },
+      { time: "2h 45m", from: "system", text: "5-star review posted on Google. Review count: 127 → 128", type: "event" },
+    ],
+  },
+  {
+    id: "reactivation",
+    icon: RefreshCw,
+    label: "Lead Reactivation",
+    color: "#8B5CF6",
+    bg: "rgba(139,92,246,0.08)",
+    border: "rgba(139,92,246,0.22)",
+    scenario: "Reactivating a 90-day cold chiropractic lead",
+    steps: [
+      { time: "0s", from: "system", text: "Dormant lead identified: Tom R. — last contact 91 days ago, never booked", type: "event" },
+      { time: "9:02 AM", from: "ai", text: "Hey Tom — it's been a while since you reached out about back pain. Wanted to check in: how are you feeling? We're running a new patient special this month.", type: "sms" },
+      { time: "9:31 AM", from: "lead", text: "Honestly still struggling, I just kept putting it off", type: "sms" },
+      { time: "9:31 AM", from: "ai", text: "Totally get it — let's finally get you in. I can book you for a free consultation + assessment, no commitment. Tuesday or Wednesday work?", type: "sms" },
+      { time: "9:48 AM", from: "lead", text: "Tuesday at 4pm works", type: "sms" },
+      { time: "9:49 AM", from: "system", text: "Cold lead reactivated → Booked. Revenue recovered: $180 new patient value.", type: "event" },
+    ],
+  },
 ];
 
-// Vertical card-based pipeline selector
-function PipelineStrip({ activeId, onSelect }) {
-  return (
-    <div className="w-full mb-10 md:mb-12">
-      {/* Desktop: vertical card list on left, content on right — but here we do horizontal pills row */}
-      <div className="flex flex-col gap-2">
-        {AUTOMATIONS.map((a, i) => {
-          const isActive = a.id === activeId;
-          const Icon = a.icon;
-          const accent = AUTOMATION_ACCENTS[i];
-          return (
-            <motion.button
-              key={a.id}
-              type="button"
-              onClick={() => onSelect(a.id)}
-              whileHover={{ x: isActive ? 0 : 4 }}
-              transition={{ type: "spring", stiffness: 400, damping: 28 }}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "14px",
-                padding: "14px 18px",
-                borderRadius: "14px",
-                border: isActive ? `1.5px solid ${accent}40` : "1.5px solid rgba(0,0,0,0.07)",
-                background: isActive
-                  ? `linear-gradient(135deg, ${accent}12 0%, ${accent}06 100%)`
-                  : "rgba(255,255,255,0.6)",
-                cursor: "pointer",
-                textAlign: "left",
-                width: "100%",
-                position: "relative",
-                overflow: "hidden",
-                boxShadow: isActive
-                  ? `0 4px 20px ${accent}22, inset 0 1px 0 rgba(255,255,255,0.6)`
-                  : "0 1px 4px rgba(0,0,0,0.05)",
-                transition: "background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease",
-              }}>
+function StepBubble({ step, index, isVisible }) {
+  const isEvent = step.type === "event";
+  const isLead = step.from === "lead";
+  const isAI = step.from === "ai";
 
-              {/* Left accent bar */}
-              <div style={{
-                position: "absolute",
-                left: 0, top: 0, bottom: 0,
-                width: isActive ? "4px" : "0px",
-                background: `linear-gradient(to bottom, ${accent}, ${accent}88)`,
-                borderRadius: "14px 0 0 14px",
-                transition: "width 0.25s ease",
-              }} />
-
-              {/* Icon badge */}
-              <div style={{
-                width: 40, height: 40, borderRadius: 12, flexShrink: 0,
-                display: "flex", alignItems: "center", justifyContent: "center",
-                background: isActive ? `${accent}20` : "rgba(0,0,0,0.05)",
-                border: isActive ? `1.5px solid ${accent}40` : "1.5px solid rgba(0,0,0,0.08)",
-                boxShadow: isActive ? `0 0 12px ${accent}40` : "none",
-                transition: "all 0.25s ease",
-              }}>
-                <Icon style={{ width: 18, height: 18, color: isActive ? accent : "rgba(0,0,0,0.4)" }} />
-              </div>
-
-              {/* Text */}
-              <div className="flex-1 min-w-0">
-                <p style={{
-                  fontSize: "13px",
-                  fontWeight: isActive ? 700 : 600,
-                  color: isActive ? "#0a1628" : "rgba(0,0,0,0.55)",
-                  margin: 0,
-                  lineHeight: 1.2,
-                  transition: "color 0.2s ease",
-                }}>{a.title}</p>
-                <p style={{
-                  fontSize: "11px",
-                  color: isActive ? "rgba(0,0,0,0.5)" : "rgba(0,0,0,0.35)",
-                  margin: "2px 0 0",
-                  lineHeight: 1.3,
-                  transition: "color 0.2s ease",
-                  overflow: "hidden",
-                  whiteSpace: "nowrap",
-                  textOverflow: "ellipsis",
-                }}>{a.tagline}</p>
-              </div>
-
-              {/* Step number */}
-              <div style={{
-                flexShrink: 0,
-                width: 24, height: 24, borderRadius: "50%",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                background: isActive ? accent : "rgba(0,0,0,0.06)",
-                fontSize: "10px",
-                fontWeight: 800,
-                color: isActive ? "#fff" : "rgba(0,0,0,0.35)",
-                transition: "all 0.25s ease",
-              }}>{i + 1}</div>
-            </motion.button>
-          );
-        })}
-      </div>
-      <p className="text-center text-[11px] mt-5 tracking-wide text-muted-foreground">
-        One connected pipeline — each system hands off to the next
-      </p>
-    </div>
-  );
-}
-
-// Flow diagram with dark glassmorphism treatment
-function AnimatedFlowDiagram({ automation, accent }) {
-  const [visibleStep, setVisibleStep] = useState(-1);
-  const intervalRef = useRef(null);
-
-  useEffect(() => {
-    setVisibleStep(-1);
-    const startDelay = setTimeout(() => {
-      setVisibleStep(0);
-      intervalRef.current = setInterval(() => {
-        setVisibleStep((prev) => {
-          if (prev >= automation.steps.length - 1) {
-            clearInterval(intervalRef.current);
-            return prev;
-          }
-          return prev + 1;
-        });
-      }, 650);
-    }, 200);
-    return () => {
-      clearTimeout(startDelay);
-      clearInterval(intervalRef.current);
-    };
-  }, [automation.id]);
-
-  return (
-    <div
-      className="rounded-2xl p-6 flex flex-col gap-4 h-full"
-      style={{
-        background: "linear-gradient(150deg, #0d1f3c 0%, #0a1a30 50%, #07121f 100%)",
-        border: `1px solid ${accent}30`,
-        boxShadow: `0 8px 40px rgba(0,0,0,0.4), 0 0 0 1px ${accent}18, inset 0 1px 0 rgba(255,255,255,0.06)`,
-      }}>
-
-      {/* Header */}
-      <div className="flex items-center gap-3">
-        <div style={{
-          width: 8, height: 8, borderRadius: "50%",
-          background: accent,
-          boxShadow: `0 0 10px ${accent}`,
-          animation: "flowPulse 2s ease-in-out infinite",
-        }} />
-        <p style={{ fontSize: "11px", fontWeight: 800, color: accent, textTransform: "uppercase", letterSpacing: "0.22em", margin: 0 }}>
-          Live Flow
-        </p>
-      </div>
-
-      <div className="flex flex-col gap-0" style={{ position: "relative" }}>
-        {automation.steps.map((step, i) => {
-          const Icon = step.icon;
-          const isVisible = i <= visibleStep;
-          const isActive = i === visibleStep;
-          const isLast = i === automation.steps.length - 1;
-
-          return (
-            <div key={i} className="flex items-stretch gap-3">
-              {/* Left column: icon + animated line */}
-              <div className="flex flex-col items-center" style={{ width: 38 }}>
-                <motion.div
-                  initial={{ scale: 0, opacity: 0 }}
-                  animate={isVisible ? { scale: 1, opacity: 1 } : { scale: 0.6, opacity: 0.2 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 22 }}
-                  style={{
-                    width: 38, height: 38, borderRadius: 11,
-                    display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-                    background: isVisible ? `${accent}20` : "rgba(255,255,255,0.04)",
-                    border: `1.5px solid ${isVisible ? `${accent}50` : "rgba(255,255,255,0.08)"}`,
-                    boxShadow: isActive ? `0 0 18px ${accent}50` : "none",
-                    position: "relative",
-                  }}>
-                  <Icon style={{ width: 16, height: 16, color: isVisible ? accent : "rgba(255,255,255,0.2)" }} />
-                  {isActive && (
-                    <motion.div
-                      style={{
-                        position: "absolute", inset: -4, borderRadius: 15,
-                        border: `1.5px solid ${accent}`,
-                        opacity: 0,
-                      }}
-                      animate={{ opacity: [0, 0.7, 0], scale: [0.9, 1.2, 0.9] }}
-                      transition={{ duration: 1, repeat: 2 }} />
-                  )}
-                </motion.div>
-
-                {/* Animated line connector */}
-                {!isLast && (
-                  <div style={{ width: 2, flex: 1, minHeight: 18, position: "relative", margin: "3px 0", overflow: "hidden" }}>
-                    <motion.div
-                      style={{
-                        position: "absolute", top: 0, left: 0, right: 0,
-                        background: `linear-gradient(to bottom, ${accent}, ${accent}40)`,
-                        borderRadius: 2,
-                      }}
-                      initial={{ height: "0%" }}
-                      animate={i < visibleStep ? { height: "100%" } : { height: "0%" }}
-                      transition={{ duration: 0.4, ease: "easeOut" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "rgba(255,255,255,0.05)", borderRadius: 2 }} />
-                  </div>
-                )}
-              </div>
-
-              {/* Text */}
-              <motion.div
-                className="pb-3 pt-1"
-                initial={{ opacity: 0, x: -10 }}
-                animate={isVisible ? { opacity: 1, x: 0 } : { opacity: 0.15, x: -6 }}
-                transition={{ duration: 0.3, ease: "easeOut" }}>
-                <p style={{ fontSize: "13px", fontWeight: 600, color: "rgba(255,255,255,0.92)", margin: 0, lineHeight: 1.3 }}>{step.label}</p>
-                <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.42)", margin: "2px 0 0" }}>{step.sub}</p>
-              </motion.div>
-            </div>
-          );
-        })}
-      </div>
-      <style>{`@keyframes flowPulse { 0%,100%{opacity:1;transform:scale(1)} 50%{opacity:0.5;transform:scale(0.8)} }`}</style>
-    </div>
-  );
-}
-
-// Before/After card
-function BeforeAfterStat({ automation }) {
-  const [hovered, setHovered] = useState(false);
-  return (
-    <div
-      className="rounded-2xl p-6 flex flex-col justify-between gap-5"
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      style={{
-        background: "hsl(var(--card))",
-        border: "1px solid hsl(var(--border))",
-        boxShadow: hovered
-          ? "0 12px 40px rgba(0,136,204,0.15), 0 0 0 1px rgba(0,136,204,0.2)"
-          : "0 4px 16px rgba(0,0,0,0.08)",
-        transform: hovered ? "translateY(-4px) scale(1.01)" : "translateY(0) scale(1)",
-        transition: "transform 0.3s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.3s ease",
-      }}>
-      <div className="space-y-3">
-        <div className="rounded-xl p-3.5" style={{ background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.15)" }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#dc2626" }}>Before</p>
-          <p className="text-sm leading-relaxed text-muted-foreground">{automation.before}</p>
-        </div>
-        <div className="rounded-xl p-3.5" style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.18)" }}>
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: "#16a34a" }}>After</p>
-          <p className="text-sm font-medium leading-relaxed text-foreground">{automation.after}</p>
-        </div>
-      </div>
-      <div>
-        <div
-          className="rounded-xl p-3.5 mb-4"
-          style={{ background: `rgba(0,136,204,0.06)`, border: `1px solid rgba(0,136,204,0.18)` }}>
-          
-          <p className="text-[10px] font-black uppercase tracking-[0.18em] mb-1" style={{ color: BRAND_COLOR }}>
-            Typical Result
-          </p>
-          <p className="text-sm font-bold text-foreground">{automation.stat}</p>
-          <p className="text-[11px] mt-1 text-muted-foreground">Based on system capabilities — individual results vary.</p>
-        </div>
-        <a
-          href="/store"
-          className="w-full inline-flex items-center justify-center gap-2 text-sm font-bold px-5 py-3 rounded-xl transition-all"
-          style={{
-            background: "linear-gradient(135deg, #003B8F 0%, #0055CC 50%, #0088CC 100%)",
-            color: "#ffffff",
-            border: "1px solid rgba(0,212,255,0.25)",
-            boxShadow: "0 4px 18px rgba(0,59,143,0.5)",
-          }}
-          onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,59,143,0.7)"; e.currentTarget.style.transform = "scale(1.02)"; }}
-          onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 4px 18px rgba(0,59,143,0.5)"; e.currentTarget.style.transform = "scale(1)"; }}>
-          
-          Get This System <ArrowRight className="w-4 h-4" />
-        </a>
-      </div>
-    </div>);
-
-}
-
-// Ripple effect component
-function RippleEffect({ color, onDone }) {
   return (
     <motion.div
+      initial={{ opacity: 0, y: 12 }}
+      animate={isVisible ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+      transition={{ duration: 0.35, delay: index * 0.18, ease: [0.22, 1, 0.36, 1] }}
       style={{
-        position: "absolute",
-        inset: 0,
-        borderRadius: "inherit",
-        background: `radial-gradient(circle, ${color}40 0%, ${color}00 70%)`,
-        pointerEvents: "none",
-        zIndex: 10
+        display: "flex",
+        flexDirection: isLead ? "row-reverse" : "row",
+        alignItems: "flex-start",
+        gap: "8px",
+        marginBottom: "10px",
+        justifyContent: isEvent ? "center" : undefined,
       }}
-      initial={{ opacity: 1, scale: 0.5 }}
-      animate={{ opacity: 0, scale: 2.5 }}
-      transition={{ duration: 0.55, ease: "easeOut" }}
-      onAnimationComplete={onDone} />);
-
-
+    >
+      {isEvent ? (
+        <div style={{
+          display: "flex", alignItems: "center", gap: "6px",
+          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)",
+          borderRadius: "999px", padding: "4px 12px", fontSize: "11px",
+          color: "rgba(255,255,255,0.55)", fontWeight: 600,
+        }}>
+          <Zap size={10} style={{ color: "#00AEEF" }} />
+          {step.text}
+          <span style={{ color: "rgba(255,255,255,0.3)", marginLeft: "4px" }}>{step.time}</span>
+        </div>
+      ) : (
+        <>
+          {isAI && (
+            <div style={{
+              width: "26px", height: "26px", borderRadius: "50%", flexShrink: 0, marginTop: "2px",
+              background: "linear-gradient(135deg, #00AEEF, #006BB0)",
+              display: "flex", alignItems: "center", justifyContent: "center",
+              fontSize: "10px", fontWeight: 800, color: "#fff",
+            }}>AI</div>
+          )}
+          <div style={{ maxWidth: "76%" }}>
+            <div style={{
+              borderRadius: isLead ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
+              padding: "8px 13px",
+              background: isLead ? "rgba(255,255,255,0.12)" : "rgba(0,174,239,0.18)",
+              border: isLead ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,174,239,0.3)",
+              fontSize: "12px", lineHeight: 1.5,
+              color: isLead ? "rgba(255,255,255,0.85)" : "#e0f4ff",
+            }}>
+              {step.type === "email" && (
+                <span style={{ display: "block", fontSize: "9px", fontWeight: 700, color: "#00AEEF", marginBottom: "4px", textTransform: "uppercase", letterSpacing: "0.06em" }}>Email</span>
+              )}
+              {step.text}
+            </div>
+            <div style={{ fontSize: "10px", color: "rgba(255,255,255,0.3)", marginTop: "3px", textAlign: isLead ? "right" : "left", paddingLeft: isAI ? "4px" : 0, paddingRight: isLead ? "4px" : 0 }}>
+              {step.time}
+            </div>
+          </div>
+        </>
+      )}
+    </motion.div>
+  );
 }
 
 export default function AutomationShowcase() {
-  const [activeId, setActiveId] = useState(AUTOMATIONS[0].id);
-  const [rippleKey, setRippleKey] = useState(null);
-  const active = AUTOMATIONS.find((a) => a.id === activeId);
-  const activeIndex = AUTOMATIONS.findIndex((a) => a.id === activeId);
-  const accent = AUTOMATION_ACCENTS[activeIndex];
-
-  const handleSelect = (id) => {
-    if (id === activeId) return;
-    setRippleKey(id + Date.now());
-    setActiveId(id);
-  };
+  const [activeId, setActiveId] = useState("missed_call");
+  const active = WORKFLOWS.find(w => w.id === activeId);
+  const Icon = active.icon;
 
   return (
-    <section className="py-20 md:py-28 overflow-hidden" style={{ position: "relative" }}>
-      <div className="max-w-7xl mx-auto px-4 sm:px-6" style={{ position: "relative", zIndex: 1 }}>
+    <section
+      id="automation-showcase"
+      style={{
+        padding: "clamp(4rem, 8vw, 6rem) clamp(1.5rem, 5vw, 4rem)",
+        background: "linear-gradient(180deg, hsl(var(--background)) 0%, hsl(210,60%,97%) 50%, hsl(var(--background)) 100%)",
+        position: "relative",
+        overflow: "hidden",
+      }}
+    >
+      {/* Background glow */}
+      <div aria-hidden="true" style={{
+        position: "absolute", top: "10%", left: "50%", transform: "translateX(-50%)",
+        width: "80%", height: "60%", borderRadius: "999px",
+        background: "radial-gradient(ellipse at center, rgba(0,174,239,0.06) 0%, transparent 70%)",
+        pointerEvents: "none",
+      }} />
 
+      <div style={{ maxWidth: "1200px", margin: "0 auto", position: "relative" }}>
         {/* Header */}
-        <div className="text-center mb-14">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-4" style={{ color: BRAND_COLOR }}>
-            The Complete System
-          </p>
-          <h2
-            className="font-bold tracking-tight leading-tight"
-            style={{ fontSize: "clamp(2rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
-            One System.{" "}
-            <span style={{
-              background: "linear-gradient(135deg, #0088CC, #003B8F)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}>
-              Six Automations.
-            </span>{" "}
-            Zero Leads Lost.
+        <div style={{ textAlign: "center", marginBottom: "clamp(2rem, 4vw, 3rem)" }}>
+          <span style={{
+            display: "inline-flex", alignItems: "center", gap: "6px",
+            background: "rgba(0,174,239,0.1)", border: "1px solid rgba(0,174,239,0.25)",
+            borderRadius: "999px", padding: "5px 14px", fontSize: "12px",
+            fontWeight: 700, color: "#006BB0", letterSpacing: "0.07em", textTransform: "uppercase",
+            marginBottom: "16px",
+          }}>
+            <Zap size={12} /> Live Workflow Demos
+          </span>
+          <h2 style={{
+            fontSize: "clamp(1.75rem, 4vw, 2.75rem)", fontWeight: 800, lineHeight: 1.1,
+            color: "hsl(var(--foreground))", marginBottom: "14px",
+            fontFamily: "var(--font-display)",
+          }}>
+            See Exactly How the AI Handles{" "}
+            <span style={{ color: "#006BB0" }}>Real Conversations</span>
           </h2>
-          <p className="mt-4 text-base md:text-lg max-w-2xl mx-auto leading-relaxed text-muted-foreground">
-            Select any automation to see exactly how it works and what it changes for your business.
+          <p style={{ fontSize: "clamp(0.95rem, 2vw, 1.05rem)", color: "hsl(var(--muted-foreground))", maxWidth: "560px", margin: "0 auto" }}>
+            These are actual conversation flows — not mockups. This is how the system responds the moment a lead comes in.
           </p>
         </div>
 
-        {/* Main layout: left rail (selector) + right panel (detail) */}
-        <div className="grid md:grid-cols-[340px_1fr] gap-8 items-start">
-
-          {/* Left: Vertical card selector */}
-          <PipelineStrip activeId={activeId} onSelect={handleSelect} />
-
-          {/* Right: Detail panel */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={activeId}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              exit={{ opacity: 0, x: -10 }}
-              transition={{ duration: 0.3, ease: "easeOut" }}
-              className="flex flex-col gap-5">
-
-              {/* Hero bar */}
-              <div
-                className="rounded-2xl p-6 flex items-center gap-4"
+        {/* Tab switcher */}
+        <div style={{
+          display: "flex", flexWrap: "wrap", gap: "8px", justifyContent: "center", marginBottom: "2rem",
+        }}>
+          {WORKFLOWS.map(w => {
+            const WIcon = w.icon;
+            const isActive = w.id === activeId;
+            return (
+              <button
+                key={w.id}
+                onClick={() => setActiveId(w.id)}
                 style={{
-                  background: `linear-gradient(135deg, #0a1628 0%, #0d1f40 50%, #0a1830 100%)`,
-                  border: `1px solid ${accent}35`,
-                  boxShadow: `0 8px 40px rgba(0,0,0,0.35), 0 0 0 1px ${accent}15, inset 0 1px 0 rgba(255,255,255,0.05)`,
-                  position: "relative",
-                  overflow: "hidden",
-                }}>
-
-                {/* Accent glow blob */}
-                <div style={{
-                  position: "absolute", top: "-30%", right: "-10%",
-                  width: "200px", height: "200px", borderRadius: "50%",
-                  background: `radial-gradient(circle, ${accent}25 0%, transparent 70%)`,
-                  pointerEvents: "none",
-                }} />
-
-                {rippleKey && <RippleEffect key={rippleKey} color={accent} onDone={() => setRippleKey(null)} />}
-
-                <motion.div
-                  key={activeId + "-icon"}
-                  initial={{ scale: 0.5, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 20 }}
-                  style={{
-                    width: 52, height: 52, borderRadius: 16, flexShrink: 0,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    background: `${accent}25`,
-                    border: `1.5px solid ${accent}50`,
-                    boxShadow: `0 0 20px ${accent}40`,
-                    position: "relative", zIndex: 2,
-                  }}>
-                  <active.icon style={{ width: 24, height: 24, color: accent }} />
-                </motion.div>
-
-                <div className="flex-1 min-w-0" style={{ position: "relative", zIndex: 2 }}>
-                  <h3 className="text-xl md:text-2xl font-bold leading-tight" style={{ color: "#ffffff" }}>{active.title}</h3>
-                  <p style={{ color: "rgba(255,255,255,0.65)", fontSize: "13px", marginTop: 2 }}>{active.tagline}</p>
-                </div>
-                <div className="hidden sm:flex flex-col items-end flex-shrink-0" style={{ position: "relative", zIndex: 2 }}>
-                  <span style={{
-                    fontSize: "10px", fontWeight: 800, color: accent,
-                    textTransform: "uppercase", letterSpacing: "0.15em",
-                    background: `${accent}18`, border: `1px solid ${accent}35`,
-                    padding: "3px 10px", borderRadius: "999px",
-                  }}>
-                    Step {activeIndex + 1} of 6
-                  </span>
-                </div>
-              </div>
-
-              {/* 2-col: flow + before/after */}
-              <div className="grid sm:grid-cols-2 gap-5">
-                <AnimatedFlowDiagram automation={active} accent={accent} key={activeId} />
-                <BeforeAfterStat automation={active} />
-              </div>
-            </motion.div>
-          </AnimatePresence>
+                  display: "inline-flex", alignItems: "center", gap: "7px",
+                  padding: "9px 18px", borderRadius: "999px", cursor: "pointer",
+                  fontSize: "13px", fontWeight: 700, transition: "all 180ms ease",
+                  border: isActive ? `1.5px solid ${w.color}` : "1.5px solid hsl(var(--border))",
+                  background: isActive ? w.bg : "transparent",
+                  color: isActive ? w.color : "hsl(var(--muted-foreground))",
+                  boxShadow: isActive ? `0 0 18px ${w.color}22` : "none",
+                }}
+              >
+                <WIcon size={14} />
+                {w.label}
+              </button>
+            );
+          })}
         </div>
+
+        {/* Main demo panel */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeId}
+            initial={{ opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "clamp(1rem, 3vw, 2rem)",
+              alignItems: "start",
+            }}
+          >
+            {/* Left: context + outcome */}
+            <div style={{
+              background: "hsl(var(--card))", borderRadius: "20px",
+              border: "1px solid hsl(var(--border))", padding: "clamp(1.5rem, 3vw, 2rem)",
+            }}>
+              <div style={{
+                width: "48px", height: "48px", borderRadius: "14px",
+                background: active.bg, border: `1px solid ${active.border}`,
+                display: "flex", alignItems: "center", justifyContent: "center", marginBottom: "16px",
+              }}>
+                <Icon size={22} style={{ color: active.color }} />
+              </div>
+              <h3 style={{ fontSize: "1.25rem", fontWeight: 800, color: "hsl(var(--foreground))", marginBottom: "8px" }}>
+                {active.label}
+              </h3>
+              <p style={{ fontSize: "0.875rem", color: "hsl(var(--muted-foreground))", marginBottom: "20px", lineHeight: 1.6 }}>
+                <strong style={{ color: "hsl(var(--foreground))" }}>Scenario:</strong> {active.scenario}
+              </p>
+
+              <div style={{ borderTop: "1px solid hsl(var(--border))", paddingTop: "20px" }}>
+                <p style={{ fontSize: "11px", fontWeight: 700, color: "hsl(var(--muted-foreground))", textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: "12px" }}>What Happens</p>
+                {[
+                  "Lead detected instantly — no manual checking",
+                  "AI responds within seconds, 24/7",
+                  "Conversation handled until booking confirmed",
+                  "Admin notified with full context",
+                ].map((point, i) => (
+                  <div key={i} style={{ display: "flex", gap: "10px", alignItems: "flex-start", marginBottom: "10px" }}>
+                    <CheckCircle size={15} style={{ color: active.color, flexShrink: 0, marginTop: "1px" }} />
+                    <span style={{ fontSize: "13px", color: "hsl(var(--foreground))", lineHeight: 1.5 }}>{point}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div style={{
+                marginTop: "20px", padding: "14px 16px", borderRadius: "12px",
+                background: active.bg, border: `1px solid ${active.border}`,
+                display: "flex", alignItems: "center", gap: "10px",
+              }}>
+                <Clock size={14} style={{ color: active.color, flexShrink: 0 }} />
+                <span style={{ fontSize: "12px", fontWeight: 600, color: active.color }}>
+                  Average response time: <strong>8–45 seconds</strong>, even at 2am
+                </span>
+              </div>
+
+              <a
+                href="/book"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "8px", marginTop: "20px",
+                  padding: "11px 22px", borderRadius: "999px", textDecoration: "none",
+                  background: `linear-gradient(135deg, ${active.color}, #006BB0)`,
+                  color: "#fff", fontSize: "13px", fontWeight: 700,
+                  boxShadow: `0 4px 16px ${active.color}33`,
+                }}
+              >
+                Get This System Built For You <ArrowRight size={14} />
+              </a>
+            </div>
+
+            {/* Right: phone/chat mockup */}
+            <div style={{
+              borderRadius: "24px", overflow: "hidden",
+              background: "linear-gradient(160deg, #0d1f3c 0%, #071535 60%, #04101f 100%)",
+              boxShadow: "0 24px 60px rgba(0,0,0,0.28), inset 0 1px 0 rgba(255,255,255,0.07)",
+              padding: "0",
+              minHeight: "420px",
+            }}>
+              {/* Mock phone top bar */}
+              <div style={{
+                background: "rgba(0,0,0,0.4)", padding: "12px 18px",
+                display: "flex", alignItems: "center", justifyContent: "space-between",
+                borderBottom: "1px solid rgba(255,255,255,0.07)",
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                  <div style={{ width: "8px", height: "8px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 6px #4ade80" }} />
+                  <span style={{ fontSize: "11px", fontWeight: 700, color: "rgba(255,255,255,0.7)" }}>AI SYSTEM — LIVE</span>
+                </div>
+                <span style={{ fontSize: "10px", color: "rgba(255,255,255,0.35)" }}>{active.label}</span>
+              </div>
+
+              {/* Scenario badge */}
+              <div style={{ padding: "12px 18px 0" }}>
+                <div style={{
+                  background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.08)",
+                  borderRadius: "8px", padding: "8px 12px", fontSize: "11px",
+                  color: "rgba(255,255,255,0.5)", lineHeight: 1.4,
+                }}>
+                  <span style={{ color: active.color, fontWeight: 700 }}>Trigger: </span>{active.scenario}
+                </div>
+              </div>
+
+              {/* Chat messages */}
+              <div style={{ padding: "16px 18px 20px" }}>
+                {active.steps.map((step, i) => (
+                  <StepBubble key={i} step={step} index={i} isVisible={true} />
+                ))}
+              </div>
+            </div>
+          </motion.div>
+        </AnimatePresence>
+
+        {/* Bottom trust note */}
+        <p style={{
+          textAlign: "center", marginTop: "2rem", fontSize: "13px",
+          color: "hsl(var(--muted-foreground))",
+        }}>
+          All workflows are installed and configured for your business — not templates you have to set up yourself.
+        </p>
       </div>
+
+      <style>{`
+        @media (max-width: 768px) {
+          #automation-showcase > div > div:last-of-type > div:last-child {
+            grid-template-columns: 1fr !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

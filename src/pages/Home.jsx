@@ -8,9 +8,17 @@ import Footer from "../components/landing/Footer";
 import SecurityPriority from "../components/landing/SecurityPriority";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
-import DeferredSection from "../components/performance/DeferredSection";
 
-// All sections below the fold are code-split AND viewport-deferred
+import {
+  getFAQSchema,
+  getLocalBusinessSchema,
+  getOrganizationSchema,
+  getServiceSchema,
+  getWebsiteSchema,
+} from "../components/SEO/SchemaMarkup";
+import { setJsonLd, setPageMetadata } from "@/lib/seo";
+
+// Lazy-loaded below-fold sections
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
@@ -22,119 +30,104 @@ const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 const LeadJourneyDiagram = lazy(() => import("../components/landing/LeadJourneyDiagram"));
 const AIDashboardPreview = lazy(() => import("../components/landing/AIDashboardPreview"));
+const AutomationShowcase = lazy(() => import("../components/landing/AutomationShowcase"));
 
-import {
-  getFAQSchema,
-  getLocalBusinessSchema,
-  getOrganizationSchema,
-  getServiceSchema,
-  getWebsiteSchema,
-} from "../components/SEO/SchemaMarkup";
-import { setJsonLd, setPageMetadata } from "@/lib/seo";
+const SectionFallback = () => <SectionSkeleton />;
+const LargeFallback = () => <LargeSectionSkeleton />;
 
 export default function Home() {
   const location = useLocation();
 
-  // Smooth scroll to hash anchors
   useEffect(() => {
     if (!location.hash) return undefined;
-
     const id = decodeURIComponent(location.hash.slice(1));
     let attempts = 0;
     let timeoutId;
-
     const scrollToHashTarget = () => {
       const target = document.getElementById(id);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
-      if (attempts < 24) {
-        attempts += 1;
-        timeoutId = window.setTimeout(scrollToHashTarget, 125);
-      }
+      if (target) { target.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
+      if (attempts < 24) { attempts += 1; timeoutId = window.setTimeout(scrollToHashTarget, 125); }
     };
-
     timeoutId = window.setTimeout(scrollToHashTarget, 0);
     return () => window.clearTimeout(timeoutId);
   }, [location.hash]);
 
-  // SEO metadata
   useEffect(() => {
-    let cleanupMetadata = () => {};
-    let cleanupOrg = () => {};
-    let cleanupBusiness = () => {};
-    let cleanupService = () => {};
-    let cleanupWebsite = () => {};
-    let cleanupFaq = () => {};
-
+    let cleanups = [];
     try {
-      cleanupMetadata = setPageMetadata({
-        title: "AI Automation Systems for Local Leads | ClientSurge Systems",
-        description:
-          "Six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
-        canonicalPath: "/",
-        ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
-        ogDescription:
-          "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
-      });
-      cleanupOrg = setJsonLd("organization", getOrganizationSchema());
-      cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema());
-      cleanupService = setJsonLd("service", getServiceSchema());
-      cleanupWebsite = setJsonLd("website", getWebsiteSchema());
-      cleanupFaq = setJsonLd("faq", getFAQSchema(FAQ_ITEMS));
+      cleanups = [
+        setPageMetadata({
+          title: "AI Automation Systems for Local Leads | ClientSurge Systems",
+          description: "Six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
+          canonicalPath: "/",
+          ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
+          ogDescription: "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
+        }),
+        setJsonLd("organization", getOrganizationSchema()),
+        setJsonLd("local-business", getLocalBusinessSchema()),
+        setJsonLd("service", getServiceSchema()),
+        setJsonLd("website", getWebsiteSchema()),
+        setJsonLd("faq", getFAQSchema(FAQ_ITEMS)),
+      ];
     } catch (error) {
       console.error("Homepage SEO bootstrap failed:", error);
     }
-
-    return () => {
-      cleanupFaq();
-      cleanupService();
-      cleanupBusiness();
-      cleanupOrg();
-      cleanupWebsite();
-      cleanupMetadata();
-    };
+    return () => cleanups.forEach(fn => fn && fn());
   }, []);
 
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
         <Navbar />
-
-        {/* Hero is above fold — loads immediately, no Suspense wrapper */}
         <Hero />
 
-        {/* Industries + TrustBar: defer mounting until near viewport */}
-        <DeferredSection minHeight="300px" fallback={<SectionSkeleton />}>
+        <Suspense fallback={<SectionFallback />}>
           <Industries />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+        <Suspense fallback={<SectionFallback />}>
           <TrustBar />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
-        </DeferredSection>
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
 
-        {/* Mid-page heavy sections */}
-        <DeferredSection minHeight="600px" fallback={<LargeSectionSkeleton />}>
+        <Suspense fallback={<LargeFallback />}>
           <LeadJourneyDiagram />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
-          <AIDashboardPreview />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
-          <CoreOffer />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
-          <Pricing />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
-        </DeferredSection>
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
 
-        {/* Bottom sections */}
-        <DeferredSection minHeight="400px" fallback={<SectionSkeleton />}>
+        <Suspense fallback={<LargeFallback />}>
+          <AutomationShowcase />
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+
+        <Suspense fallback={<LargeFallback />}>
+          <AIDashboardPreview />
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+        <Suspense fallback={<LargeFallback />}>
+          <CoreOffer />
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+        <Suspense fallback={<LargeFallback />}>
+          <Pricing />
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+
+        <Suspense fallback={<SectionFallback />}>
           <FAQ />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+        <Suspense fallback={<SectionFallback />}>
           <FounderSection />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+        <Suspense fallback={<SectionFallback />}>
           <Testimonials />
-          <Suspense fallback={null}><SectionBreak /></Suspense>
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+        <Suspense fallback={<SectionFallback />}>
           <FinalCTA />
-        </DeferredSection>
+        </Suspense>
 
         <SecurityPriority />
         <Footer />
