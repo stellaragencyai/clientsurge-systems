@@ -198,6 +198,26 @@ function IndustryTemplateInner({ industrySlug }) {
         {/* Pain Stats Bar */}
         <IndustryPainBar stats={industry.painStats} />
 
+        {/* Roofing-only: Storm Season Urgency Badge */}
+        {industrySlug === "roofing" && (
+          <div className="px-4 md:px-6" style={{ marginTop: "-8px", marginBottom: "4px" }}>
+            <div className="max-w-6xl mx-auto flex justify-center">
+              <div
+                className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.14em]"
+                style={{
+                  background: "linear-gradient(135deg, rgba(180,35,25,0.10) 0%, rgba(220,60,40,0.07) 100%)",
+                  border: "1px solid rgba(200,50,30,0.28)",
+                  color: "#b91c1c",
+                  boxShadow: "0 4px 14px rgba(180,35,25,0.10)",
+                }}
+              >
+                <span style={{ fontSize: "15px" }}>⛈️</span>
+                Storm Season: Most roofing leads are won in the first 10 minutes — automate before the next hail event
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Cinematic section divider */}
         <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.35) 30%, rgba(0,174,239,0.55) 50%, rgba(0,174,239,0.35) 70%, transparent 100%)", margin: "0" }} />
 
@@ -335,8 +355,14 @@ function IndustryTemplateInner({ industrySlug }) {
           </section>
         )}
 
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
+
         {/* No-Show Prevention */}
         <IndustryNoShowSection industry={industrySlug} />
+
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
 
         {/* SMS Demo */}
         <IndustrySMSDemo
@@ -352,6 +378,9 @@ function IndustryTemplateInner({ industrySlug }) {
           accentColor={theme.accent}
         />
 
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
+
         {/* Animated Metric Rings */}
         <IndustryMetricRings industry={industrySlug} />
 
@@ -362,8 +391,14 @@ function IndustryTemplateInner({ industrySlug }) {
           onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
         />
 
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
+
         {/* Integration Strip */}
         <IndustryIntegrationStrip industry={industrySlug} />
+
+        {/* Cinematic section divider */}
+        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
 
         {/* FAQ */}
         <IndustryFAQ faqs={industry.faqs} />

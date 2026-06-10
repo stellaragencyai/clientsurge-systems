@@ -6,7 +6,7 @@ export default function IndustryFAQ({ faqs }) {
   if (!faqs || !faqs.length) return null;
 
   return (
-    <section className="px-4 py-14 md:px-6 md:py-20" style={{ overflowX: "hidden", background: "linear-gradient(180deg, #ffffff 0%, #f7fbff 100%)" }}>
+    <section className="px-4 py-14 md:px-6 md:py-20" style={{ overflowX: "hidden", background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,174,239,0.07) 0%, transparent 60%), radial-gradient(ellipse 55% 50% at 15% 80%, rgba(0,59,143,0.05) 0%, transparent 55%), linear-gradient(180deg, #f4f9ff 0%, #eef6ff 100%)" }}>
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-10">
           <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">FAQ</p>
