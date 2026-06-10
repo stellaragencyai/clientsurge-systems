@@ -8,7 +8,7 @@
       window.setTimeout(function () {
         // Never trigger the static fallback inside an iframe (e.g. the visual editor)
         if (window.self !== window.top) return;
-        if (document.querySelector("#root > .static-fallback")) {
+        if (document.querySelector(".static-fallback")) {
           document.documentElement.classList.add("app-fallback-visible");
         }
       }, 6000);
@@ -283,7 +283,7 @@
         line-height: 1.65;
       }
 
-      #root > .static-fallback {
+      .static-fallback {
         display: none !important;
       }
 
