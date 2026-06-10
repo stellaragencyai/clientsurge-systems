@@ -6,8 +6,14 @@
       document.documentElement.classList.remove("no-js");
       document.documentElement.classList.add("js");
       window.setTimeout(function () {
-        // Never trigger the static fallback inside an iframe (e.g. the visual editor)
-        if (window.self !== window.top) return;
+        // Safely detect iframe context — window.top access throws SecurityError in cross-origin sandboxed iframes (e.g. visual editor)
+        var isFrame = false;
+        try {
+          isFrame = window.self !== window.top;
+        } catch (e) {
+          isFrame = true; // Blocked access confirms we're inside a cross-origin iframe
+        }
+        if (isFrame) return; // Never trigger fallback inside visual editor
         if (document.querySelector(".static-fallback")) {
           document.documentElement.classList.add("app-fallback-visible");
         }

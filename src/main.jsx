@@ -3,9 +3,11 @@ import ReactDOM from 'react-dom/client'
 import App from '@/App.jsx'
 import '@/index.css'
 
-// Fix 3: Physically remove static fallback from DOM immediately on React boot
+// Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
-if (staticFallback) staticFallback.remove();
+if (staticFallback) {
+  staticFallback.style.display = 'none';
+}
 
 const app = <App />
 
