@@ -248,6 +248,8 @@ export default function Navbar() {
               width="240"
               height="72"
               decoding="async"
+              fetchpriority="high"
+              loading="eager"
               style={{
                 height: "clamp(80px, 9.5vw, 112px)",
                 width: "auto",

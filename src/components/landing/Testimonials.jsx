@@ -108,7 +108,7 @@ export default function Testimonials() {
 
               <div className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
                 <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">Workflow preview</p>
-                "{testimonial.quote}"
+                &ldquo;{testimonial.quote}&rdquo;
               </div>
 
               <div className="flex items-center gap-4">

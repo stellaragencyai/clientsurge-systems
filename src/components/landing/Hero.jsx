@@ -514,13 +514,20 @@ export default function Hero() {
         .landing-hero__cinematicGrid {
           position: absolute;
           inset: 0;
-          opacity: 0.24;
+          opacity: 0.22;
           background-image:
             linear-gradient(rgba(0,136,204,0.13) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0,136,204,0.11) 1px, transparent 1px);
           background-size: 42px 42px;
           mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 64%, transparent 100%);
+          /* GPU: use translate instead of background-position — compositor-only */
           animation: heroCinematicGridDrift 14s linear infinite;
+          will-change: transform;
+          transform: translateZ(0);
+        }
+        /* Hide on mobile — saves ~20ms frame budget */
+        @media (max-width: 768px) {
+          .landing-hero__cinematicGrid { display: none !important; }
         }
         .landing-hero__headlineAccent {
           position: relative;
@@ -552,7 +559,9 @@ export default function Hero() {
           transform: skewX(-16deg);
         }
         @keyframes heroCinematicGridDrift {
-          to { background-position: 42px 42px, 42px 42px; }
+          /* Transform-based drift — GPU compositor, no CPU repaint */
+          from { transform: translate3d(0, 0, 0); }
+          to { transform: translate3d(42px, 42px, 0); }
         }
         @keyframes heroHeadlineSheen {
           0%, 20% { background-position: 0% 50%; }

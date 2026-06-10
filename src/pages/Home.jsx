@@ -8,7 +8,9 @@ import Footer from "../components/landing/Footer";
 import SecurityPriority from "../components/landing/SecurityPriority";
 import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
+import DeferredSection from "../components/performance/DeferredSection";
 
+// All sections below the fold are code-split AND viewport-deferred
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
@@ -30,35 +32,12 @@ import {
 } from "../components/SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
-function useHomepageWhiteCanvas() {
-  useEffect(() => {
-    if (typeof document === "undefined") {
-      return undefined;
-    }
-
-    document.body.classList.add("homepage-white-canvas");
-    document.documentElement.style.setProperty("--scroll-bg-from", "hsl(0, 0%, 100%)");
-    document.documentElement.style.setProperty("--scroll-bg-to", "hsl(0, 0%, 100%)");
-
-    return () => {
-      document.body.classList.remove("homepage-white-canvas");
-      document.documentElement.style.removeProperty("--scroll-bg-from");
-      document.documentElement.style.removeProperty("--scroll-bg-to");
-    };
-  }, []);
-}
-
-function LazyHomepageSection({ children, fallback }) {
-  return <Suspense fallback={fallback}>{children}</Suspense>;
-}
-
 export default function Home() {
-  // useHomepageWhiteCanvas(); // Disabled — preserves premium electric-blue theme
   const location = useLocation();
+
+  // Smooth scroll to hash anchors
   useEffect(() => {
-    if (!location.hash) {
-      return undefined;
-    }
+    if (!location.hash) return undefined;
 
     const id = decodeURIComponent(location.hash.slice(1));
     let attempts = 0;
@@ -70,7 +49,6 @@ export default function Home() {
         target.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
-
       if (attempts < 24) {
         attempts += 1;
         timeoutId = window.setTimeout(scrollToHashTarget, 125);
@@ -81,6 +59,7 @@ export default function Home() {
     return () => window.clearTimeout(timeoutId);
   }, [location.hash]);
 
+  // SEO metadata
   useEffect(() => {
     let cleanupMetadata = () => {};
     let cleanupOrg = () => {};
@@ -93,7 +72,7 @@ export default function Home() {
       cleanupMetadata = setPageMetadata({
         title: "AI Automation Systems for Local Leads | ClientSurge Systems",
         description:
-          "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
+          "Six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
         canonicalPath: "/",
         ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
         ogDescription:
@@ -122,34 +101,41 @@ export default function Home() {
     <DemoBookingProvider>
       <div className="min-h-screen">
         <Navbar />
+
+        {/* Hero is above fold — loads immediately, no Suspense wrapper */}
         <Hero />
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
+
+        {/* Industries + TrustBar: defer mounting until near viewport */}
+        <DeferredSection minHeight="300px" fallback={<SectionSkeleton />}>
           <Industries />
-          <SectionBreak />
-        </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <TrustBar />
-          <SectionBreak />
-        </LazyHomepageSection>
-        <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
+          <Suspense fallback={null}><SectionBreak /></Suspense>
+        </DeferredSection>
+
+        {/* Mid-page heavy sections */}
+        <DeferredSection minHeight="600px" fallback={<LargeSectionSkeleton />}>
           <LeadJourneyDiagram />
-          <SectionBreak />
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <AIDashboardPreview />
-          <SectionBreak />
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <CoreOffer />
-          <SectionBreak />
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <Pricing />
-          <SectionBreak />
-        </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <Suspense fallback={null}><SectionBreak /></Suspense>
+        </DeferredSection>
+
+        {/* Bottom sections */}
+        <DeferredSection minHeight="400px" fallback={<SectionSkeleton />}>
           <FAQ />
-          <SectionBreak />
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <FounderSection />
-          <SectionBreak />
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <Testimonials />
-          <SectionBreak />
+          <Suspense fallback={null}><SectionBreak /></Suspense>
           <FinalCTA />
-        </LazyHomepageSection>
+        </DeferredSection>
+
         <SecurityPriority />
         <Footer />
         <ChatBubble />

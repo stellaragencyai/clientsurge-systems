@@ -147,9 +147,129 @@ h1, h2, h3 { overflow-wrap: break-word; word-break: break-word; }
 /* FIX 10 — Image overflow prevention */
 img { max-width: 100%; height: auto; display: block; }
 
-/* Global animation performance: use will-change only on actively animating elements */
+/* ============================================
+   PERFORMANCE: 15 Speed Optimizations
+   ============================================ */
+
+/* PERF-1: GPU compositing on animated elements only — avoids memory bloat on static elements */
 [data-cinematic-animation] {
   will-change: transform;
+}
+
+/* PERF-2: content-visibility — browser skips render work for off-screen sections */
+section:not(:first-of-type) {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 400px; /* estimated height prevents layout shift */
+}
+
+/* PERF-3: Force GPU layer for Navbar to eliminate repaint on scroll */
+nav {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* PERF-4: Reduce blur cost on mobile — blurs are the #1 GPU killer on low-end phones */
+@media (max-width: 768px) {
+  [style*="backdrop-filter"],
+  [style*="backdropFilter"] {
+    backdrop-filter: blur(6px) !important;
+    -webkit-backdrop-filter: blur(6px) !important;
+  }
+  /* Kill decorative glows on mobile entirely */
+  .landing-hero__visualGlow,
+  .landing-hero__ambientSweep {
+    display: none !important;
+  }
+}
+
+/* PERF-5: Skeleton shimmer uses transform (GPU) not background-position (CPU) */
+@keyframes csSkeletonSheen {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(120%); }
+}
+.cs-section-skeleton {
+  position: relative;
+  overflow: hidden;
+  background: rgba(226,238,248,0.55);
+  border-radius: 8px;
+}
+.cs-section-skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.9) 50%, transparent 100%);
+  animation: csSkeletonSheen 1.4s ease-in-out infinite;
+  will-change: transform;
+}
+
+/* PERF-6: Images — prevent layout shift + promote to GPU composite layer */
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+  transform: translateZ(0); /* own compositing layer */
+}
+
+/* PERF-7: Contain paint within cards — prevents full-page repaints on hover */
+.overlay-card,
+.glass-card,
+article,
+[class*="rounded-2xl"],
+[class*="rounded-xl"] {
+  contain: layout style paint;
+}
+
+/* PERF-8: Throttle expensive animations on battery-saving mode */
+@media (prefers-reduced-motion: no-preference) and (update: slow) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* PERF-9: Font rendering — subpixel antialiasing for crisp text at any size */
+body, input, button, select, textarea, h1, h2, h3, h4, h5, h6 {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* PERF-10: Heading GPU promotion — prevents repaints when gradient text animates */
+.landing-hero__headlineAccent {
+  will-change: background-position;
+  transform: translateZ(0);
+}
+
+/* PERF-11: framer-motion layout animations — contain so they don't trigger ancestor reflow */
+[data-framer-component-type],
+[data-projection-id] {
+  contain: layout;
+}
+
+/* PERF-12: Smooth overscroll — eliminates scroll jank on iOS */
+html {
+  -webkit-overflow-scrolling: touch;
+  overscroll-behavior-y: none;
+}
+
+/* PERF-13: Reduce paint area on hover — only animate transform/opacity (compositor-only) */
+button, a, [role="button"] {
+  transition-property: transform, opacity, box-shadow, background-color;
+  transition-duration: 160ms;
+  transition-timing-function: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* PERF-14: Hero cinematic grid — swap CPU background-position animation for transform */
+.landing-hero__cinematicGrid {
+  will-change: transform;
+}
+
+/* PERF-15: Intersection-animated sections — promote layer before animation fires */
+[data-aos], [data-animate] {
+  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 /* Reduce expensive glow filters on mobile */

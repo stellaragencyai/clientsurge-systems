@@ -33,7 +33,10 @@
     <link rel="preconnect" href="https://checkout.stripe.com" crossorigin />
     <link rel="preconnect" href="https://api.twilio.com" crossorigin />
     <link rel="preconnect" href="https://api.resend.com" crossorigin />
+    <!-- PERF: Preload critical above-fold font subset so text renders immediately -->
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" />
+    <!-- PERF: Preload hero logo (LCP element) -->
+    <link rel="preload" as="image" href="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png" fetchpriority="high" />
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Montserrat:wght@600;700;800&display=swap" />
     <link rel="alternate" hreflang="en-US" href="https://clientsurgesystems.com/" />
     <link rel="icon" type="image/svg+xml" href="/pwa-icon.svg" />
