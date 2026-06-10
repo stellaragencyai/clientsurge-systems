@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Phone, MessageSquare, Calendar, Star, RefreshCw, Zap, CheckCircle, Clock, ArrowRight } from "lucide-react";
 
@@ -155,8 +155,16 @@ function StepBubble({ step, index, isVisible }) {
 
 export default function AutomationShowcase() {
   const [activeId, setActiveId] = useState("missed_call");
+  const [isMobile, setIsMobile] = useState(false);
   const active = WORKFLOWS.find(w => w.id === activeId);
   const Icon = active.icon;
+
+  useEffect(() => {
+    const check = () => setIsMobile(window.innerWidth < 768);
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
 
   return (
     <section
@@ -239,7 +247,7 @@ export default function AutomationShowcase() {
             transition={{ duration: 0.3, ease: [0.22, 1, 0.36, 1] }}
             style={{
               display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              gridTemplateColumns: isMobile ? "1fr" : "1fr 1fr",
               gap: "clamp(1rem, 3vw, 2rem)",
               alignItems: "start",
             }}
@@ -354,13 +362,6 @@ export default function AutomationShowcase() {
         </p>
       </div>
 
-      <style>{`
-        @media (max-width: 768px) {
-          #automation-showcase > div > div:last-of-type > div:last-child {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
     </section>
   );
 }

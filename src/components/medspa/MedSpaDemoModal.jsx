@@ -321,7 +321,20 @@ export default function MedSpaDemoModal({ onClose }) {
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
               <p className="text-xs text-muted-foreground">
-                <strong>Demo confirmed:</strong> {scheduling.date && scheduling.date.split('-').slice(1).concat(scheduling.date.split('-')[0]).join('/')} at {scheduling.time || 'TBD'}
+                <strong>Demo confirmed:</strong>{" "}
+                {scheduling.date
+                  ? (() => { const [y,m,d] = scheduling.date.split('-'); return `${m}/${d}/${y}`; })()
+                  : "No date selected"
+                }{" "}at{" "}
+                {scheduling.time
+                  ? (() => {
+                      const [h, min] = scheduling.time.split(':').map(Number);
+                      const ampm = h >= 12 ? 'PM' : 'AM';
+                      const h12 = h % 12 || 12;
+                      return `${h12}:${String(min).padStart(2,'0')} ${ampm}`;
+                    })()
+                  : "No time selected"
+                }
               </p>
             </div>
 
