@@ -49,6 +49,7 @@ import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 import GlobalAutomationToggle from '../components/admin/GlobalAutomationToggle';
 import SimulateLeadButton from '../components/admin/SimulateLeadButton';
+import AIBrainBackfillPanel from '../components/admin/AIBrainBackfillPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -264,6 +265,7 @@ export default function AdminDashboard() {
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
           <p className="text-sm text-muted-foreground">Internal testing tools. Admin only.</p>
           <SimulateLeadButton />
+          <AIBrainBackfillPanel />
           <QaCustomerPanel />
         </div>
       );
