@@ -1,47 +1,29 @@
-import { secureJson } from "../_shared/response.ts";
 /**
- * calculateLeadScore
- *
- * Can be called two ways:
- *   1. Entity automation payload: { event: { entity_id }, data: { ...leadFields } }
- *   2. Manual/frontend call:      { lead_id: "abc123" }
- *
- * Scoring model (additive, capped at 100):
- *   Status           up to 30 pts
- *   Recency          up to 20 pts
- *   Outbound comms   up to 25 pts
- *   Inbound replies  up to 15 pts
- *   Last contact     up to 10 pts
- *   Email engagement up to 15 pts  (opens + clicks from EmailCampaignRecipient)
- *   Reply sentiment  up to 15 pts
- *   Enrichment bonus up to 10 pts
- *
- * After scoring, writes back:
- *   - lead_score        (0–100 int)
- *   - activation_priority ("Hot" | "High" | "Medium" | "Low")
+ * calculateLeadScore — self-contained (no _shared imports)
  */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-// Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
+  });
+}
+
 function constantTimeEqual(left, right) {
   if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
   let mismatch = 0;
-  for (let index = 0; index < left.length; index += 1) {
-    mismatch |= left.charCodeAt(index) ^ right.charCodeAt(index);
-  }
+  for (let i = 0; i < left.length; i++) mismatch |= left.charCodeAt(i) ^ right.charCodeAt(i);
   return mismatch === 0;
 }
-function getBearerToken(req) {
-  const authorization = req.headers.get("authorization") || "";
-  const [scheme, token] = authorization.split(/\s+/, 2);
-  if (scheme?.toLowerCase() !== "bearer" || !token) return "";
-  return token.trim();
-}
+
 function allowAnonymousAutomation(req) {
-  const configuredSecret = Deno.env.get("AUTOMATION_SHARED_SECRET");
-  if (!configuredSecret) return true;
-  const candidateSecret = req.headers.get("x-automation-secret") || getBearerToken(req);
-  return constantTimeEqual(candidateSecret || "", configuredSecret);
+  const secret = Deno.env.get("AUTOMATION_SHARED_SECRET");
+  if (!secret) return true;
+  const auth = req.headers.get("authorization") || "";
+  const [scheme, token] = auth.split(/\s+/, 2);
+  const candidate = (scheme?.toLowerCase() === "bearer" ? token : "") || req.headers.get("x-automation-secret") || "";
+  return constantTimeEqual(candidate.trim(), secret);
 }
 
 const STATUS_SCORE = {
@@ -115,53 +97,36 @@ function activationPriority(score, lead) {
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== "POST") {
-      return secureJson({ error: "Method not allowed" }, { status: 405 });
-    }
+    if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
 
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
     const isAutomationPayload = !!(body?.event?.entity_id || body?.data?.id);
 
-    // Auth check — allow automation (no user) or admin
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
-    if (user && user.role !== "admin") {
-      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
-    }
+    if (user && user.role !== "admin") return json({ error: "Forbidden: Admin only" }, 403);
     if (!user && (!isAutomationPayload || !allowAnonymousAutomation(req))) {
-      return secureJson({ error: "Forbidden: Trusted automation only" }, { status: 403 });
+      return json({ error: "Forbidden: Trusted automation only" }, 403);
     }
 
-    // Support both entity automation payload and direct call
     const leadId = body?.lead_id || body?.event?.entity_id || body?.data?.id || null;
+    if (!leadId) return json({ error: "Missing lead_id" }, 400);
 
-    if (!leadId) {
-      return secureJson({ error: "Missing lead_id" }, { status: 400 });
-    }
-
-    // Fetch lead + communication events + email engagement in parallel
     const [leadList, events, emailRecipients] = await Promise.all([
       base44.asServiceRole.entities.Leads.filter({ id: leadId }),
       base44.asServiceRole.entities.CommunicationEvent.filter({ lead_id: leadId }),
       base44.asServiceRole.entities.EmailCampaignRecipient.filter({ lead_id: leadId }),
     ]);
 
-    if (!leadList?.length) {
-      return secureJson({ error: "Lead not found" }, { status: 404 });
-    }
-
+    if (!leadList?.length) return json({ error: "Lead not found" }, 404);
     const lead = leadList[0];
 
-    // Tally communication events
     const outbound = (events || []).filter((e) => e.direction === "outbound").length;
     const inbound = (events || []).filter((e) => e.direction === "inbound").length;
-
-    // Tally email engagement
     const totalOpens = (emailRecipients || []).reduce((s, r) => s + (r.open_count || 0), 0);
     const totalClicks = (emailRecipients || []).reduce((s, r) => s + (r.click_count || 0), 0);
 
-    // Compute score
     const breakdown = {
       status:       STATUS_SCORE[lead.status] ?? 5,
       recency:      recencyScore(daysSince(lead.created_date)),
@@ -177,7 +142,6 @@ Deno.serve(async (req) => {
     const finalScore = Math.min(100, Math.max(1, rawScore));
     const priority = activationPriority(finalScore, lead);
 
-    // Persist only if changed (avoids infinite automation loops)
     const scoreChanged = lead.lead_score !== finalScore;
     const priorityChanged = lead.activation_priority !== priority;
 
@@ -188,18 +152,10 @@ Deno.serve(async (req) => {
       });
     }
 
-    console.log(`[calculateLeadScore] ${lead.full_name} → score=${finalScore} priority=${priority}`, breakdown);
-
-    return secureJson({
-      success: true,
-      lead_id: leadId,
-      score: finalScore,
-      activation_priority: priority,
-      changed: scoreChanged || priorityChanged,
-      breakdown,
-    });
+    console.log(`[calculateLeadScore] ${lead.full_name} → score=${finalScore} priority=${priority}`);
+    return json({ success: true, lead_id: leadId, score: finalScore, activation_priority: priority, changed: scoreChanged || priorityChanged, breakdown });
   } catch (error) {
-    console.error("[calculateLeadScore] calculateLeadScore error:", error);
-    return secureJson({ error: error.message }, { status: 500 });
+    console.error("[calculateLeadScore] error:", error);
+    return json({ error: error.message }, 500);
   }
 });

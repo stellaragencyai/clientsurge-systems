@@ -1,64 +1,102 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+/**
+ * sendLeadConfirmationEmail — self-contained (no _shared imports)
+ * Sends a confirmation email to a new Leads record via Resend.
+ */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
+  });
+}
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
     const base44 = createClientFromRequest(req);
-    const { lead_id } = await req.json();
+    const body = await req.json().catch(() => ({}));
 
-    if (!lead_id) {
-      return secureJson({ error: 'lead_id required' }, { status: 400 });
+    const lead_id = body?.lead_id || body?.event?.entity_id || body?.data?.id;
+    if (!lead_id) return json({ error: "lead_id required" }, 400);
+
+    const leads = await base44.asServiceRole.entities.Leads.filter({ id: lead_id });
+    if (!leads?.length) return json({ error: "Lead not found" }, 404);
+    const lead = leads[0];
+
+    if (!lead.email) {
+      console.log(`[sendLeadConfirmationEmail] No email on lead ${lead_id} — skipped`);
+      return json({ success: false, reason: "No email address on lead" });
     }
 
-    const lead = await base44.entities.Lead.get(lead_id);
-    if (!lead) {
-      return secureJson({ error: 'Lead not found' }, { status: 404 });
-    }
+    const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1).catch(() => []);
+    const adminSettings = settings?.[0] || {};
 
-    const settings = await base44.asServiceRole.entities.AdminSettings.list();
-    const adminSettings = settings.length > 0 ? settings[0] : null;
+    const bookingLink = adminSettings?.booking_link_default || Deno.env.get("DEFAULT_BOOKING_LINK") || "";
+    const firstName = (lead.full_name || "there").split(" ")[0];
 
-    const templateContent = adminSettings?.email_confirmation_template || 
-      `Hi {{full_name}},\n\nThanks for reaching out. We received your inquiry and will be in touch shortly.\n\nYou can also book a demo here: {{booking_link}}\n\nBest regards,\nThe ClientSurge Systems Team`;
+    const templateContent = adminSettings?.email_confirmation_template ||
+      `Hi ${firstName},\n\nThanks for reaching out to us! We received your inquiry and a member of our team will be in touch shortly.\n\n${bookingLink ? `You can also book a call here: ${bookingLink}\n\n` : ""}Best regards,\nThe ClientSurge Systems Team`;
 
     const emailBody = templateContent
-      .replace('{{full_name}}', lead.name)
-      .replace('{{booking_link}}', adminSettings?.booking_link_default || '');
+      .replace(/\{\{full_name\}\}/g, lead.full_name || "there")
+      .replace(/\{\{first_name\}\}/g, firstName)
+      .replace(/\{\{booking_link\}\}/g, bookingLink);
 
-    // Create communication event
-    const event = await base44.entities.CommunicationEvent.create({
-      lead_id: lead_id,
-      channel: 'email',
-      direction: 'outbound',
-      event_type: 'email_sent',
-      provider: 'resend',
-      status: 'sent',
-      subject: 'We received your inquiry',
-      message_body: emailBody,
-    });
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurgesystems.com";
 
-    // Try to send via Resend integration if configured
-    try {
-      await base44.integrations.Core.SendEmail({
-        to: lead.email,
-        subject: 'We received your inquiry',
-        body: emailBody,
-        from_name: 'ClientSurge Systems',
-      });
-    } catch (err) {
-      console.log('[sendLeadConfirmationEmail] Email send failed:', err.message);
-      await base44.entities.CommunicationEvent.update(event.id, {
-        status: 'failed',
-        error_message: err.message,
-      });
+    if (!resendKey) {
+      console.error("[sendLeadConfirmationEmail] RESEND_API_KEY not set");
+      return json({ error: "RESEND_API_KEY not configured" }, 500);
     }
 
-    return secureJson({
-      success: true,
-      event_id: event.id,
+    let eventStatus = "sent";
+    let providerId = null;
+    let errorMsg = null;
+
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: fromEmail.includes("@") && !fromEmail.includes("<") ? `ClientSurge Systems <${fromEmail}>` : fromEmail,
+        to: lead.email,
+        subject: "We received your inquiry",
+        text: emailBody,
+      }),
     });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      errorMsg = err?.message || `Resend HTTP ${res.status}`;
+      eventStatus = "failed";
+      console.error("[sendLeadConfirmationEmail] Resend error:", errorMsg);
+    } else {
+      const data = await res.json().catch(() => ({}));
+      providerId = data?.id || null;
+      console.log(`[sendLeadConfirmationEmail] Sent to ${lead.email} — id: ${providerId}`);
+    }
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id,
+      channel: "email",
+      direction: "outbound",
+      event_type: "email_sent",
+      provider: "resend",
+      status: eventStatus,
+      subject: "We received your inquiry",
+      message_body: emailBody.slice(0, 500),
+      provider_message_id: providerId,
+      error_message: errorMsg,
+    }).catch(() => null);
+
+    return json({ success: eventStatus === "sent", event_status: eventStatus, provider_message_id: providerId, error: errorMsg });
   } catch (error) {
-    console.error('[sendLeadConfirmationEmail] Error:', error);
-    return secureJson({ error: error.message }, { status: 500 });
+    console.error("[sendLeadConfirmationEmail] error:", error);
+    return json({ error: error.message }, 500);
   }
 });

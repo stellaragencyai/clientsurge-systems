@@ -1,10 +1,15 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+/**
+ * routeLeadToIndustryAgent — self-contained (no _shared imports)
+ */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-// ─────────────────────────────────────────────
-// INDUSTRY → AGENT ROUTING MAP
-// Maps industry_key to agent config
-// ─────────────────────────────────────────────
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
+  });
+}
+
 const INDUSTRY_AGENT_MAP = {
   med_spa: {
     agent_name: "sales_rep_med_spa",
@@ -59,49 +64,33 @@ function detectIndustry(lead) {
     }
   }
 
-  return {
-    industry_key: "general",
-    agent_name: "sales_rep_general",
-    rep_name: "Nolan",
-    industry_label: "General",
-  };
+  return { industry_key: "general", agent_name: "sales_rep_general", rep_name: "Nolan", industry_label: "General" };
 }
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
+
     const base44 = createClientFromRequest(req);
-    const { lead_id } = await req.json();
+    const { lead_id } = await req.json().catch(() => ({}));
 
-    if (!lead_id) {
-      return secureJson({ error: 'lead_id required' }, { status: 400 });
-    }
+    if (!lead_id) return json({ error: "lead_id required" }, 400);
 
-    // Fetch the lead
     const leads = await base44.asServiceRole.entities.Leads.filter({ id: lead_id });
-    if (!leads || leads.length === 0) {
-      return secureJson({ error: 'Lead not found' }, { status: 404 });
-    }
+    if (!leads?.length) return json({ error: "Lead not found" }, 404);
 
     const lead = leads[0];
     const routing = detectIndustry(lead);
 
-    console.log(`[routeLeadToIndustryAgent] Lead: ${lead.full_name} | Industry: ${routing.industry_key} | Agent: ${routing.agent_name} | Rep: ${routing.rep_name}`);
+    console.log(`[routeLeadToIndustryAgent] Lead: ${lead.full_name} | Industry: ${routing.industry_key} | Agent: ${routing.agent_name}`);
 
-    // Update the lead with the assigned agent name
     await base44.asServiceRole.entities.Leads.update(lead_id, {
       assigned_agent_name: routing.agent_name,
     });
 
-    return secureJson({
-      success: true,
-      lead_id,
-      industry_key: routing.industry_key,
-      agent_name: routing.agent_name,
-      rep_name: routing.rep_name,
-      industry_label: routing.industry_label,
-    });
+    return json({ success: true, lead_id, industry_key: routing.industry_key, agent_name: routing.agent_name, rep_name: routing.rep_name, industry_label: routing.industry_label });
   } catch (error) {
-    console.error('[routeLeadToIndustryAgent] Error:', error.message);
-    return secureJson({ error: error.message }, { status: 500 });
+    console.error("[routeLeadToIndustryAgent] error:", error.message);
+    return json({ error: error.message }, 500);
   }
 });

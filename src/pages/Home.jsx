@@ -31,6 +31,7 @@ const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 const LeadJourneyDiagram = lazy(() => import("../components/landing/LeadJourneyDiagram"));
 const AIDashboardPreview = lazy(() => import("../components/landing/AIDashboardPreview"));
 const AutomationShowcase = lazy(() => import("../components/landing/AutomationShowcase"));
+const WhyChooseUs = lazy(() => import("../components/landing/WhyChooseUs"));
 
 const SectionFallback = () => <SectionSkeleton />;
 const LargeFallback = () => <LargeSectionSkeleton />;
@@ -110,6 +111,11 @@ export default function Home() {
         <Suspense fallback={null}><SectionBreak /></Suspense>
         <Suspense fallback={<LargeFallback />}>
           <Pricing />
+        </Suspense>
+        <Suspense fallback={null}><SectionBreak /></Suspense>
+
+        <Suspense fallback={<SectionFallback />}>
+          <WhyChooseUs />
         </Suspense>
         <Suspense fallback={null}><SectionBreak /></Suspense>
 
