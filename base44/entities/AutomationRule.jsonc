@@ -53,10 +53,8 @@
             ]
           },
           "value": {
-            "type": [
-              "string",
-              "number"
-            ]
+            "type": "string",
+            "description": "Comparison value. Store numeric or range values as strings for Base44 schema compatibility."
           }
         }
       },

@@ -1270,13 +1270,18 @@ export function injectDemoBookingModalPatch(html) {
 }
 
 export function repairStaleDemoBookingModalAsset(source) {
-  if (!source || !source.includes("dQw4w9WgXcQ")) {
+  if (!source) {
     return source;
   }
-  return source.replace(
-    /https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ\?autoplay=1&rel=0/g,
-    "about:blank#clientsurge-audit-form"
-  );
+  return source
+    .replace(
+      /https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ\?autoplay=1&rel=0/g,
+      "about:blank#clientsurge-audit-form"
+    )
+    .replace(
+      '"med-spa","dental","hvac","roofing","chiropractic","contractors"',
+      '"med-spa","dental","hvac","plumbing","roofing","chiropractic","contractors"'
+    );
 }
 
 function shouldRepairStaleDemoBookingModalAsset(request, url, response) {
@@ -1299,6 +1304,7 @@ export const PUBLIC_NAV_POLISH_SCRIPT = `<script id="${PUBLIC_NAV_POLISH_SCRIPT_
   var routes = {
     "roofing": "/roofing",
     "hvac": "/hvac",
+    "plumbing": "/plumbing",
     "dental": "/dental",
     "med spa": "/med-spa",
     "chiropractic": "/chiropractic",

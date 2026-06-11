@@ -460,16 +460,23 @@ test("Cloudflare static HTML injection patches public nav and mobile footer poli
   assert.match(injected, /footer a:focus-visible,footer button:focus-visible/);
   assert.match(injected, /window\.scrollTo\(\{ top: 0, left: 0, behavior: "smooth" \}\)/);
   assert.match(injected, /"home services": "\/hvac"/);
+  assert.match(injected, /"plumbing": "\/plumbing"/);
   assert.match(injected, /dataset\.clientsurgeIndustryHref = sameOrigin\(target\)/);
   assert.equal(injectPublicNavPolish(injected), injected);
 });
 
-test("Cloudflare asset rewrite strips stale rickroll demo URL", () => {
+test("Cloudflare asset rewrite strips stale rickroll demo URL and restores plumbing route", () => {
   const staleAsset = 'const Bh="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=1&rel=0";';
   const repaired = repairStaleDemoBookingModalAsset(staleAsset);
 
   assert.doesNotMatch(repaired, /dQw4w9WgXcQ/);
   assert.match(repaired, /about:blank#clientsurge-audit-form/);
+
+  const staleRoutes = 'const lm=["med-spa","dental","hvac","roofing","chiropractic","contractors"];';
+  const repairedRoutes = repairStaleDemoBookingModalAsset(staleRoutes);
+
+  assert.match(repairedRoutes, /"med-spa","dental","hvac","plumbing","roofing","chiropractic","contractors"/);
+  assert.doesNotMatch(repairedRoutes, /"med-spa","dental","hvac","roofing","chiropractic","contractors"/);
   assert.equal(repairStaleDemoBookingModalAsset("const ok = true;"), "const ok = true;");
 });
 
