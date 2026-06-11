@@ -4,7 +4,7 @@
  * Manual SMS send panel (#175).
  * Conversion funnel chart (#177).
  */
-import { useEffect, useState, useRef } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { SpaLead } from "@/api/entities";
 import { base44 } from "@/api/base44Client";
 
@@ -124,8 +124,8 @@ export default function AdminLeadsTable() {
           </thead>
           <tbody>
             {leads.slice(0, 50).map((l) => (
-              <>
-                <tr key={l.id} style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
+              <React.Fragment key={l.id}>
+                <tr style={{ borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
                   <td style={{ color: "#fff", padding: "10px 12px", fontWeight: 500 }}>{l.business_name}</td>
                   <td style={{ color: "rgba(255,255,255,0.6)", padding: "10px 12px" }}>{l.phone}</td>
                   <td style={{ padding: "10px 12px" }}>
@@ -142,9 +142,9 @@ export default function AdminLeadsTable() {
                   </td>
                 </tr>
                 {smsTarget?.id === l.id && (
-                  <tr key={`sms-${l.id}`}><td colSpan={5} style={{ padding: "0 12px 12px" }}><ManualSmsSender lead={l} onClose={() => setSmsTarget(null)} /></td></tr>
+                  <tr><td colSpan={5} style={{ padding: "0 12px 12px" }}><ManualSmsSender lead={l} onClose={() => setSmsTarget(null)} /></td></tr>
                 )}
-              </>
+              </React.Fragment>
             ))}
           </tbody>
         </table>
