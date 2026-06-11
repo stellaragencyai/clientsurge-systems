@@ -26,7 +26,7 @@ export const SIX_AUTOMATIONS = [
     ],
     before: "Callers hit voicemail, hang up, or call the next competitor.",
     after: "Missed callers receive an instant reply and stay in your pipeline.",
-    industries: ["HVAC", "Roofing", "Dental", "Med spas", "Contractors", "Chiropractic"],
+    industries: ["HVAC", "Plumbing", "Roofing", "Dental", "Med spas", "Contractors", "Chiropractic"],
   },
   {
     id: "lead-capture",
@@ -53,7 +53,7 @@ export const SIX_AUTOMATIONS = [
     ],
     before: "Leads arrive in separate inboxes, spreadsheets, voicemail, ad platforms, and staff notes.",
     after: "Every lead is captured, tagged, routed, and ready for follow-up inside one system.",
-    industries: ["Med spas", "Dental offices", "HVAC companies", "Roofers", "Contractors", "Chiropractors"],
+    industries: ["Med spas", "Dental offices", "HVAC companies", "Plumbers", "Roofers", "Contractors", "Chiropractors"],
   },
   {
     id: "ai-follow-up",
@@ -80,7 +80,7 @@ export const SIX_AUTOMATIONS = [
     ],
     before: "Staff follow up once or twice, then leads disappear.",
     after: "Every lead gets a consistent sequence until there is a clear outcome.",
-    industries: ["Med spas", "Dental", "Chiropractic", "HVAC", "Roofing", "Contractors"],
+    industries: ["Med spas", "Dental", "Chiropractic", "HVAC", "Plumbing", "Roofing", "Contractors"],
   },
   {
     id: "appointment-booking",
@@ -107,7 +107,7 @@ export const SIX_AUTOMATIONS = [
     ],
     before: "Warm leads need manual scheduling and many fall out before confirming.",
     after: "The system guides them to a time, confirms the booking, and sends reminders.",
-    industries: ["Dental", "Med spas", "Chiropractic", "HVAC", "Roofing", "Contractors"],
+    industries: ["Dental", "Med spas", "Chiropractic", "HVAC", "Plumbing", "Roofing", "Contractors"],
   },
   {
     id: "review-reputation",
@@ -134,7 +134,7 @@ export const SIX_AUTOMATIONS = [
     ],
     before: "Review requests are manual, forgotten, or sent too late.",
     after: "Happy customers get a clean review request at the right moment.",
-    industries: ["HVAC", "Roofing", "Dental", "Med spas", "Chiropractic", "Contractors"],
+    industries: ["HVAC", "Plumbing", "Roofing", "Dental", "Med spas", "Chiropractic", "Contractors"],
   },
   {
     id: "reactivation",
@@ -161,7 +161,7 @@ export const SIX_AUTOMATIONS = [
     ],
     before: "Old leads and past customers sit untouched in the CRM.",
     after: "The system brings back qualified opportunities with targeted follow-up.",
-    industries: ["HVAC", "Roofing", "Med spas", "Dental", "Chiropractic", "Contractors"],
+    industries: ["HVAC", "Plumbing", "Roofing", "Med spas", "Dental", "Chiropractic", "Contractors"],
   },
 ];
 
@@ -197,6 +197,14 @@ export const INDUSTRY_AUTOMATION_USE_CASES = {
     "Booked service call receives confirmation, reminder, and calendar sync.",
     "Completed repair triggers a review request.",
     "Seasonal tune-up list receives a reactivation campaign.",
+  ],
+  plumbing: [
+    "Emergency leak, drain, or water heater inquiry is captured with urgency and service-area context.",
+    "Missed homeowner call receives an instant text-back before they call another plumber.",
+    "Repair request receives AI follow-up until the homeowner replies, books, or opts out.",
+    "Dispatch-ready lead gets confirmation, reminders, and the right handoff context.",
+    "Completed plumbing job triggers a review request.",
+    "Old estimates and maintenance opportunities receive targeted win-back follow-up.",
   ],
   roofing: [
     "Storm damage inquiry is captured with roof issue, location, and inspection need.",

@@ -16,7 +16,7 @@ test("active industry template injects LocalBusiness JSON-LD per industry page",
 });
 
 test("industry JSON-LD covers active industry slugs with LocalBusiness schema", () => {
-  for (const slug of ["med-spa", "dental", "chiropractic", "hvac", "roofing", "contractors"]) {
+  for (const slug of ["med-spa", "dental", "chiropractic", "hvac", "plumbing", "roofing", "contractors"]) {
     const schema = buildIndustryJsonLd(slug);
 
     assert.equal(schema["@context"], "https://schema.org");
@@ -34,8 +34,8 @@ test("active industry pages set unique local SEO titles", () => {
     (match) => match[1]
   );
 
-  assert.equal(titleMatches.length, 6);
-  assert.equal(new Set(titleMatches).size, 6);
+  assert.equal(titleMatches.length, 7);
+  assert.equal(new Set(titleMatches).size, 7);
 
   for (const title of titleMatches) {
     assert.match(title, /Phoenix & Scottsdale/);

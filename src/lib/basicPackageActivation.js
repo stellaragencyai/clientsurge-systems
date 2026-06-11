@@ -271,7 +271,7 @@ export function buildBasicPackageActivationBrief(intake = {}) {
   const install_configuration = buildBasicPackageInstallConfiguration(intake);
 
   return {
-    package_key: "basic_website_plus_two_automations",
+    package_key: "starter_system",
     package_name: "Website Redesign + Instant Lead Response + Missed Call Text-Back",
     service_keys: BASIC_PACKAGE_SERVICE_KEYS,
     validation,
@@ -298,7 +298,7 @@ export function buildGrowthPackageActivationBrief(intake = {}) {
   });
 
   return {
-    package_key: "growth_website_plus_four_automations",
+    package_key: "growth_system",
     package_name: "Website Redesign + Instant Response + Missed Call + 14-Day Nurture + AI Booking Agent",
     service_keys: GROWTH_PACKAGE_SERVICE_KEYS,
     validation,
@@ -327,7 +327,7 @@ export function buildProPackageActivationBrief(intake = {}) {
   });
 
   return {
-    package_key: "pro_website_plus_six_automations",
+    package_key: "pro_system",
     package_name: "Website Redesign + Full Six-Automation Stack",
     service_keys: PRO_PACKAGE_SERVICE_KEYS,
     validation,

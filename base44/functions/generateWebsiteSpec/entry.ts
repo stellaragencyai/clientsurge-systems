@@ -38,7 +38,7 @@ function starterSpec(brand: any, industry: string): Page[] {
       { type: "problem", copy_blocks: { headline: "Still missing leads while you're working?", body: "Every unanswered call or form is a customer going to your competitor." } },
       { type: "solution", copy_blocks: { headline: "We automate your lead response", body: "Two AI systems working for you 24/7: instant response and missed call text-back." } },
       { type: "automations_overview", automations: ["Instant Lead Response", "Missed Call Text-Back"] },
-      { type: "lead_capture_form", cta: "Get My Free Demo" },
+      { type: "lead_capture_form", cta: "Free Automation Audit" },
     ],
   }];
 }
@@ -52,7 +52,7 @@ function growthSpec(brand: any, industry: string): Page[] {
         { type: "hero", copy_blocks: { headline: `The AI Growth System for ${brand.business_name}`, subheadline: "4 AI automations. More bookings. Less manual work." }, cta: "See How It Works" },
         { type: "automations_overview", automations: ["Instant Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"] },
         { type: "testimonials" },
-        { type: "lead_capture_form", cta: "Book a Free Demo" },
+        { type: "lead_capture_form", cta: "Free Automation Audit" },
       ],
     },
     {

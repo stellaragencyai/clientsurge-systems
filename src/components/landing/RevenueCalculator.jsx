@@ -140,7 +140,7 @@ export default function RevenueCalculator() {
 
               <a href="/book">
                 <Button className="rounded-full w-full font-semibold gap-2 h-12">
-                  Stop the Leak - Make the Leap
+                  Stop the Leak - Free Automation Audit
                   <ArrowRight className="w-4 h-4" />
                 </Button>
               </a>

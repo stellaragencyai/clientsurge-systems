@@ -69,7 +69,7 @@ export default function MedSpaNavBar() {
               fontSize: "0.75rem",
             }}
           >
-            Book Demo
+            Free Automation Audit
           </span>
         </button>
       </nav>

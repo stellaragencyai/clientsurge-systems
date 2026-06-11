@@ -1,18 +1,15 @@
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-
-function secureJson(data, init = {}) {
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers: { "Content-Type": "application/json", ...(init.headers || {}) },
-  });
-}
+import { secureJson } from "../_shared/response.ts";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { resendFetch } from "../_shared/resendFetch.js";
+import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
+import { getStripeSecretKey, safeStripeError } from "../_shared/stripeInit.js";
 
 async function pingTwilio() {
   const sid = Deno.env.get('TWILIO_ACCOUNT_SID');
   const token = Deno.env.get('TWILIO_AUTH_TOKEN');
   if (!sid || !token) return { ok: false, error: 'Credentials not configured' };
   try {
-    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+    const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
       headers: { 'Authorization': 'Basic ' + btoa(`${sid}:${token}`) },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -23,7 +20,7 @@ async function pingResend() {
   const key = Deno.env.get('RESEND_API_KEY');
   if (!key) return { ok: false, error: 'RESEND_API_KEY not set' };
   try {
-    const res = await fetch('https://api.resend.com/domains', {
+    const res = await resendFetch('https://api.resend.com/domains', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -31,10 +28,15 @@ async function pingResend() {
 }
 
 async function pingStripe() {
-  const key = Deno.env.get('STRIPE_SECRET_KEY') || Deno.env.get('STRIPE_LIVE_SECRET_KEY');
-  if (!key) return { ok: false, error: 'Stripe key not configured' };
+  let key;
   try {
-    const res = await fetch('https://api.stripe.com/v1/balance', {
+    key = getStripeSecretKey();
+  } catch (e) {
+    const safeError = safeStripeError(e);
+    return { ok: false, error: safeError.userMessage, code: safeError.code };
+  }
+  try {
+    const res = await stripeFetch('https://api.stripe.com/v1/balance', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -49,6 +51,7 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Admin access required" }, { status: 403 });
     }
 
+    // Parallel: settings, events, live pings
     const [settingsRecords, events, twilioResult, resendResult, stripeResult] = await Promise.all([
       base44.asServiceRole.entities.AdminSettings.list(null, 1),
       base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 100),

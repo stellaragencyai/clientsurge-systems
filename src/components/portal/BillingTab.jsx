@@ -226,7 +226,7 @@ export default function BillingTab({ order }) {
         ))}
       </div>
 
-      {packageOffer?.package_key !== "elite_system" ? (
+      {packageOffer?.package_key !== "pro_system" ? (
         <div
           style={{
             marginTop: 20,

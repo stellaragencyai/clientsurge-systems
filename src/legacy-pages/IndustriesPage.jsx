@@ -46,6 +46,15 @@ const INDUSTRIES = [
     stat: "60% faster dispatch",
   },
   {
+    key: "plumbing",
+    route: "/plumbing",
+    icon: "🚰",
+    label: "Plumbing",
+    accent: "#22D3EE",
+    cta: "Emergency leaks, drain calls, and water heater requests need faster response.",
+    stat: "Urgent lead capture",
+  },
+  {
     key: "roofing",
     route: "/roofing",
     icon: "🏠",

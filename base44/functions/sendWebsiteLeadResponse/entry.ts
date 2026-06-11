@@ -95,7 +95,9 @@ function getIndustryKey(lead) {
     .map((value) => String(value).toLowerCase());
   if (values.some((value) => value.includes("roof"))) return "roofing";
   if (values.some((value) => value.includes("hvac") || value.includes("heating") || value.includes("air_condition"))) return "hvac";
+  if (values.some((value) => value.includes("plumb") || value.includes("drain") || value.includes("water_heater"))) return "plumbing";
   if (values.some((value) => value.includes("dental") || value.includes("orthodont"))) return "dental";
+  if (values.some((value) => value.includes("med_spa") || value.includes("med-spa") || value.includes("aesthetic"))) return "med_spa";
   return "general";
 }
 
@@ -225,6 +227,38 @@ The fastest way to move forward is to book a quick call here:
 ${bookingLink}
 
 Or reply to this email with your current new-patient intake and follow-up process.
+
+- ClientSurge Systems`,
+      },
+      med_spa: {
+        sms: `Hey {first_name}, we got your med spa automation audit request. We'll review consult requests, aesthetic treatment inquiries, missed DMs/calls, booking handoff, and nurture gaps. Fastest next step: ${bookingLink}`,
+        email_subject: "Your med spa automation audit request is in",
+        email_body: `Hey {first_name},
+
+Thanks for requesting a med spa automation audit.
+
+We will review where aesthetic clinics typically lose bookings: missed consult requests, slow treatment-inquiry response, DM/call handoff gaps, and nurture before the appointment.
+
+The fastest way to move forward is to book a quick call here:
+${bookingLink}
+
+Or reply to this email with your current lead sources, services, and booking handoff process.
+
+- ClientSurge Systems`,
+      },
+      plumbing: {
+        sms: `Hey {first_name}, we got your plumbing automation audit request. We'll review emergency leak calls, drain and water heater inquiries, missed-call recovery, after-hours capture, and dispatch handoff. Fastest next step: ${bookingLink}`,
+        email_subject: "Your plumbing automation audit request is in",
+        email_body: `Hey {first_name},
+
+Thanks for requesting a plumbing automation audit.
+
+We will review where plumbing companies typically lose urgent jobs: missed emergency calls, slow drain or water heater follow-up, after-hours capture gaps, and dispatch handoff friction.
+
+The fastest way to move forward is to book a quick call here:
+${bookingLink}
+
+Or reply to this email with your current service area, dispatch process, and highest-priority plumbing calls.
 
 - ClientSurge Systems`,
       },

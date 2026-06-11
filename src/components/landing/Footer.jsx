@@ -21,7 +21,7 @@ const navColumns = [
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/#faq" },
       { label: "Blog", href: "/blog" },
-      { label: "Book Free Audit", href: "/book" },
+      { label: "Free Automation Audit", href: "/book" },
     ],
   },
   {
@@ -31,6 +31,7 @@ const navColumns = [
       { label: "Dental & Orthodontics", href: "/dental" },
       { label: "Chiropractic & PT", href: "/chiropractic" },
       { label: "HVAC & Home Services", href: "/hvac" },
+      { label: "Plumbing & Drain Services", href: "/plumbing" },
       { label: "Roofing & Restoration", href: "/roofing" },
       { label: "Contractors & Trades", href: "/contractors" },
     ],

@@ -81,6 +81,7 @@ const INDUSTRY_ROUTE_SLUGS = [
   "med-spa",
   "dental",
   "hvac",
+  "plumbing",
   "roofing",
   "chiropractic",
   "contractors",

@@ -45,8 +45,9 @@ const REQUIRED_BY_SERVICE = {
 };
 
 const TIER_SERVICE_MAP = {
-  starter_system: ["instant_lead_response", "ai_booking_agent"],
+  starter_system: ["instant_lead_response", "missed_call_text_back"],
   growth_system:  ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
+  pro_system:     ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent", "lead_reactivation", "review_request"],
   elite_system:   ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent", "lead_reactivation", "review_request"],
 };
 

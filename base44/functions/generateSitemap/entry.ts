@@ -13,6 +13,7 @@ const ROUTES = [
   { path: "/med-spa", changefreq: "monthly", priority: "0.8" },
   { path: "/dental", changefreq: "monthly", priority: "0.8" },
   { path: "/hvac", changefreq: "monthly", priority: "0.8" },
+  { path: "/plumbing", changefreq: "monthly", priority: "0.8" },
   { path: "/roofing", changefreq: "monthly", priority: "0.8" },
   { path: "/chiropractic", changefreq: "monthly", priority: "0.8" },
   { path: "/contractors", changefreq: "monthly", priority: "0.8" },

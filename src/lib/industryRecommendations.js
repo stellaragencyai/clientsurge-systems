@@ -11,7 +11,7 @@ const INDUSTRY_CONFIG = [
     id: "med-spa",
     name: "Med Spas & Aesthetic Clinics",
     shortName: "Med Spas",
-    recommendedPackageKey: "elite_system",
+    recommendedPackageKey: "pro_system",
     priorityServiceKeys: [
       "instant_lead_response",
       "ai_booking_agent",
@@ -54,7 +54,7 @@ const INDUSTRY_CONFIG = [
     id: "dental",
     name: "Dental & Orthodontics",
     shortName: "Dental",
-    recommendedPackageKey: "elite_system",
+    recommendedPackageKey: "pro_system",
     priorityServiceKeys: [
       "instant_lead_response",
       "nurture_sequence_14d",
@@ -171,7 +171,7 @@ const INDUSTRY_CONFIG = [
     id: "roofing",
     name: "Roofing & Restoration",
     shortName: "Roofing",
-    recommendedPackageKey: "elite_system",
+    recommendedPackageKey: "pro_system",
     priorityServiceKeys: [
       "instant_lead_response",
       "lead_reactivation",

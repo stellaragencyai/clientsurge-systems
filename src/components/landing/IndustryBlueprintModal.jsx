@@ -284,7 +284,7 @@ export default function IndustryBlueprintModal({ industry, onClose }) {
                 fontSize: "13px",
               }}
             >
-              Make the Leap to See Live Setup
+              Start Your Free Automation Audit
             </span>
           </button>
         </div>

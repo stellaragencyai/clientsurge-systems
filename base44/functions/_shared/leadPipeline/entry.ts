@@ -27,8 +27,8 @@ function getRecommendedOffer(lead) {
 
   if (score >= 75 || status === "Booked" || status === "Qualified") {
     return {
-      package_key: "elite_system",
-      package_name: "Elite System",
+      package_key: "pro_system",
+      package_name: "Pro System",
       primary_service_name: "Full-Stack Automation",
     };
   }
@@ -43,7 +43,7 @@ function getRecommendedOffer(lead) {
     return {
       package_key: "starter_system",
       package_name: "Starter System",
-      primary_service_name: "Response + Booking",
+      primary_service_name: "Response + Missed Call",
     };
   }
   return {
@@ -86,7 +86,7 @@ export function buildLeadPipelineSnapshot({ leads, events, filters = {}, limit =
   }
 
   // ── Recommended offer counts ──
-  const recommended_offer_counts = { starter_system: 0, growth_system: 0, elite_system: 0, single_service: 0 };
+  const recommended_offer_counts = { starter_system: 0, growth_system: 0, pro_system: 0, elite_system: 0, single_service: 0 };
   for (const lead of leads) {
     const offer = getRecommendedOffer(lead);
     if (offer.package_key in recommended_offer_counts) {

@@ -7,13 +7,34 @@ function labelForIndustry(industrySlug = '', industry = '') {
   if (combined.includes('dental') || combined.includes('orthodont')) return 'Dental Automation Audit';
   if (combined.includes('roof')) return 'Roofing Automation Audit';
   if (combined.includes('hvac')) return 'HVAC Automation Audit';
+  if (combined.includes('med_spa') || combined.includes('med-spa') || combined.includes('aesthetic')) return 'Med Spa Automation Audit';
+  if (combined.includes('plumb')) return 'Plumbing Automation Audit';
   return 'Free Automation Audit';
 }
 
 Deno.serve(async (req) => {
   try {
     createClientFromRequest(req);
-    const { full_name, business_name, email, phone, scheduled_date, scheduled_time, biggest_issue, industry, industry_slug, industry_tags, source_page, business_website_url } = await req.json();
+    const {
+      full_name,
+      business_name,
+      email,
+      phone,
+      scheduled_date,
+      scheduled_time,
+      biggest_issue,
+      industry,
+      industry_slug,
+      crm_tag,
+      industry_tags,
+      source_page,
+      business_website_url,
+      utm_source,
+      utm_medium,
+      utm_campaign,
+      utm_content,
+      referrer,
+    } = await req.json();
 
     if (!full_name || !email || !scheduled_date || !scheduled_time) {
       return secureJson({ error: 'Missing required fields' }, { status: 400 });
@@ -56,10 +77,15 @@ Deno.serve(async (req) => {
       <tr><td style="padding: 6px 0; color: #666;">Email</td><td style="padding: 6px 0;"><a href="mailto:${email}">${email}</a></td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Phone</td><td style="padding: 6px 0;"><a href="tel:${phone}">${phone || 'Not provided'}</a></td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Industry</td><td style="padding: 6px 0;">${industry || 'Not provided'}</td></tr>
-      <tr><td style="padding: 6px 0; color: #666;">CRM Tag</td><td style="padding: 6px 0;">${industry_slug || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">CRM Tag</td><td style="padding: 6px 0;">${crm_tag || industry_slug || 'Not provided'}</td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Industry Tags</td><td style="padding: 6px 0;">${industryTagsText || 'Not provided'}</td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Website</td><td style="padding: 6px 0;">${business_website_url || 'Not provided'}</td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Source Page</td><td style="padding: 6px 0;">${source_page || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">UTM Source</td><td style="padding: 6px 0;">${utm_source || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">UTM Medium</td><td style="padding: 6px 0;">${utm_medium || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">UTM Campaign</td><td style="padding: 6px 0;">${utm_campaign || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">UTM Content</td><td style="padding: 6px 0;">${utm_content || 'Not provided'}</td></tr>
+      <tr><td style="padding: 6px 0; color: #666;">Referrer</td><td style="padding: 6px 0;">${referrer || 'Not provided'}</td></tr>
       <tr><td style="padding: 6px 0; color: #666;">Challenge</td><td style="padding: 6px 0;">${biggest_issue || 'Not provided'}</td></tr>
     </table>
     <p style="margin-top: 24px; font-size: 13px; color: #888;">Add this to your calendar and prepare for their specific challenge.</p>

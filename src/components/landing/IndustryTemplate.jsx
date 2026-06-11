@@ -10,15 +10,6 @@ import IndustrySMSDemo from "../industry/IndustrySMSDemo";
 import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
 import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
-import IndustryTrustBar from "../industry/IndustryTrustBar";
-import IndustryComparisonGrid from "../industry/IndustryComparisonGrid";
-import IndustryLeadJourney from "../industry/IndustryLeadJourney";
-import IndustryROICalculator from "../industry/IndustryROICalculator";
-import IndustrySpeedGauge from "../industry/IndustrySpeedGauge";
-import IndustryPersonaCard from "../industry/IndustryPersonaCard";
-import IndustryIntegrationStrip from "../industry/IndustryIntegrationStrip";
-import IndustryMetricRings from "../industry/IndustryMetricRings";
-import IndustryNoShowSection from "../industry/IndustryNoShowSection";
 import { getIndustryBySlug } from "@/lib/industryData";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
@@ -34,21 +25,27 @@ const INDUSTRY_SEO = {
   },
   hvac: {
     title: "HVAC Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
-    h1: "AI Automation Systems for HVAC Companies in Phoenix & Scottsdale",
+    h1: "Book More HVAC Service Calls During Peak Demand",
     description:
       "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service-call reminders, and maintenance plan automation.",
   },
+  plumbing: {
+    title: "Plumbing Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
+    h1: "Turn Urgent Plumbing Calls Into Booked Dispatches Faster",
+    description:
+      "AI automation for plumbing companies: emergency leak calls, drain repair requests, water heater inquiries, missed-call recovery, after-hours lead capture, and dispatch handoff.",
+  },
   dental: {
     title: "Dental Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
-    h1: "AI Automation Systems for Dental Practices in Phoenix & Scottsdale",
+    h1: "Turn More New Patient Inquiries Into Confirmed Appointments",
     description:
       "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation.",
   },
   "med-spa": {
     title: "Med Spa Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
-    h1: "AI Automation Systems for Med Spas in Phoenix & Scottsdale",
+    h1: "Book More Med Spa Consults Before Leads Go Cold",
     description:
-      "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation.",
+      "AI automation for med spas: consultation requests, aesthetic treatment inquiries, missed DMs and calls, booking handoff, lead nurture, and old inquiry reactivation.",
   },
   chiropractic: {
     title: "Chiropractic Automation Systems in Phoenix & Scottsdale | ClientSurge Systems",
@@ -65,18 +62,13 @@ const INDUSTRY_SEO = {
 };
 
 const INDUSTRY_HERO_FALLBACKS = {
-  // Med Spa — clean, luminous aesthetic clinic interior, luxury feel
-  "med-spa": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=1600&q=90&fit=crop&auto=format",
-  // Dental — warm, modern, friendly dental practice interior (not tools)
-  dental: "https://images.unsplash.com/photo-1606811841689-23dfddce3e95?w=1600&q=90&fit=crop&auto=format",
-  // Chiropractic — clean, bright modern wellness/PT clinic
-  chiropractic: "https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=1600&q=90&fit=crop&auto=format",
-  // HVAC — professional service van / modern mechanical equipment, high-contrast
-  hvac: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1600&q=90&fit=crop&auto=format",
-  // Roofing — dramatic aerial shot, keep best existing image but upgrade resolution
-  roofing: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1600&q=90&fit=crop&auto=format",
-  // Contractors — premium finished modern home/architectural result photo
-  contractors: "https://images.unsplash.com/photo-1503387762-592deb58ef4e?w=1600&q=90&fit=crop&auto=format",
+  "med-spa": "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95&fit=crop&auto=format",
+  dental: "https://images.unsplash.com/photo-1588776814546-1ffcf47267a5?w=1200&q=90&fit=crop&auto=format",
+  chiropractic: "https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=1200&q=90&fit=crop&auto=format",
+  hvac: "https://images.unsplash.com/photo-1621905252507-b35492cc74b4?w=1200&q=90&fit=crop&auto=format",
+  plumbing: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=90&fit=crop&auto=format",
+  roofing: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=90&fit=crop&auto=format",
+  contractors: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=90&fit=crop&auto=format",
 };
 
 const INDUSTRY_BLOG_LINKS = {
@@ -99,6 +91,11 @@ const INDUSTRY_BLOG_LINKS = {
     href: "/blog/hvac-missed-call-text-back",
     title: "HVAC missed call text-back guide",
     description: "Protect urgent repair calls and seasonal demand with approved text-back, routing, and duplicate-suppression proof.",
+  },
+  plumbing: {
+    href: "/blog/hvac-missed-call-text-back",
+    title: "Missed-call text-back guide for urgent home-service leads",
+    description: "Use the HVAC guide as the current source-backed missed-call workflow reference while plumbing-specific production proof is pending.",
   },
   roofing: {
     href: "/blog/roofing-lead-response-automation",
@@ -191,44 +188,13 @@ function IndustryTemplateInner({ industrySlug }) {
           image={industry.hero.image || INDUSTRY_HERO_FALLBACKS[industrySlug] || INDUSTRY_HERO_FALLBACKS.contractors}
           cta={industry.hero.cta}
           onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
-          painStats={industry.painStats}
-          industrySlug={industrySlug}
         />
 
         {/* Pain Stats Bar */}
         <IndustryPainBar stats={industry.painStats} />
 
-        {/* Roofing-only: Storm Season Urgency Badge */}
-        {industrySlug === "roofing" && (
-          <div className="px-4 md:px-6" style={{ marginTop: "-8px", marginBottom: "4px" }}>
-            <div className="max-w-6xl mx-auto flex justify-center">
-              <div
-                className="inline-flex items-center gap-2 rounded-full px-5 py-2 text-xs font-bold uppercase tracking-[0.14em]"
-                style={{
-                  background: "linear-gradient(135deg, rgba(180,35,25,0.10) 0%, rgba(220,60,40,0.07) 100%)",
-                  border: "1px solid rgba(200,50,30,0.28)",
-                  color: "#b91c1c",
-                  boxShadow: "0 4px 14px rgba(180,35,25,0.10)",
-                }}
-              >
-                <span style={{ fontSize: "15px" }}>⛈️</span>
-                Storm Season: Most roofing leads are won in the first 10 minutes — automate before the next hail event
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.35) 30%, rgba(0,174,239,0.55) 50%, rgba(0,174,239,0.35) 70%, transparent 100%)", margin: "0" }} />
-
-        {/* Trust Bar — compliance & integration badges */}
-        <IndustryTrustBar industry={industrySlug} />
-
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
-
         {/* Problem/Solution Section (industry-tailored) */}
-        <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "radial-gradient(ellipse 80% 60% at 50% 30%, rgba(0,174,239,0.06) 0%, transparent 65%), radial-gradient(ellipse 60% 50% at 20% 80%, rgba(0,59,143,0.04) 0%, transparent 60%), hsl(var(--background))" }}>
+        <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-10">
               <p className="text-xs font-semibold text-primary tracking-[0.18em] uppercase mb-4">
@@ -246,9 +212,9 @@ function IndustryTemplateInner({ industrySlug }) {
                   <div
                     className="rounded-lg px-5 py-5 border relative overflow-hidden flex items-start gap-3"
                     style={{
-                      background: "linear-gradient(180deg, #ffffff 0%, #fff1f1 100%)",
-                      border: "1px solid rgba(185,28,28,0.25)",
-                      boxShadow: "0 8px 24px rgba(185,28,28,0.07)",
+                      background: "linear-gradient(180deg, #ffffff 0%, #fff7f7 100%)",
+                      border: "1px solid rgba(185,28,28,0.18)",
+                      boxShadow: "0 8px 24px rgba(185,28,28,0.05)",
                     }}
                   >
                     <div className="w-9 h-9 rounded-lg bg-red-50 border border-red-200/80 flex items-center justify-center flex-shrink-0 mt-0.5">
@@ -290,79 +256,31 @@ function IndustryTemplateInner({ industrySlug }) {
 
         <IndustryAutomationUseCases industry={industry} />
 
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
-
-        {/* Lead Journey Map */}
-        <IndustryLeadJourney industry={industrySlug} />
-
-        {/* Day-in-the-life comparison grid */}
-        <IndustryComparisonGrid industry={industrySlug} />
-
-        {/* Speed to Lead Gauge */}
-        <IndustrySpeedGauge industry={industrySlug} />
-
-        {/* ROI Calculator */}
-        <IndustryROICalculator industry={industrySlug} />
-
-        {/* AI Persona Card */}
-        <IndustryPersonaCard industry={industrySlug} />
-
         {blogLink && (
-          <section className="px-4 py-12 md:px-6">
-            <div
-              className="mx-auto max-w-5xl rounded-2xl p-6 md:p-10"
-              style={{
-                background: "linear-gradient(135deg, #060e1c 0%, #0a1a3a 50%, #071428 100%)",
-                border: "1px solid rgba(0,174,239,0.22)",
-                boxShadow: "0 20px 60px rgba(0,0,0,0.3), inset 0 1px 0 rgba(0,174,239,0.12)",
-              }}
-            >
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#00AEEF" }}>
-                Related Launch Guide
+          <section className="bg-primary/5 px-4 py-12 md:px-6">
+            <div className="mx-auto max-w-5xl rounded-lg border border-primary/15 bg-white p-6 shadow-sm md:p-8">
+              <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                Related launch guide
               </p>
               <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
                 <div>
-                  <h2 className="mb-2 text-2xl font-black leading-tight md:text-3xl" style={{ color: "#ffffff", fontFamily: "Montserrat, sans-serif", letterSpacing: "-0.02em" }}>
+                  <h2 className="mb-2 text-2xl font-black leading-tight text-foreground md:text-3xl">
                     {blogLink.title}
                   </h2>
-                  <p className="max-w-2xl text-sm leading-6" style={{ color: "rgba(255,255,255,0.62)" }}>
+                  <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
                     {blogLink.description}
                   </p>
                 </div>
                 <Link
                   to={blogLink.href}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    minHeight: "44px",
-                    padding: "0 24px",
-                    borderRadius: "9999px",
-                    background: "linear-gradient(135deg, #0088CC 0%, #006BB0 46%, #003B8F 100%)",
-                    color: "#ffffff",
-                    fontSize: "0.875rem",
-                    fontWeight: "800",
-                    textDecoration: "none",
-                    boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-                    whiteSpace: "nowrap",
-                  }}
+                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-black text-white shadow-sm transition hover:opacity-90"
                 >
-                  Read Guide
+                  Read guide
                 </Link>
               </div>
             </div>
           </section>
         )}
-
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
-
-        {/* No-Show Prevention */}
-        <IndustryNoShowSection industry={industrySlug} />
-
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
 
         {/* SMS Demo */}
         <IndustrySMSDemo
@@ -378,27 +296,13 @@ function IndustryTemplateInner({ industrySlug }) {
           accentColor={theme.accent}
         />
 
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
-
-        {/* Animated Metric Rings */}
-        <IndustryMetricRings industry={industrySlug} />
-
-        {/* Results/Metrics + Testimonial */}
+        {/* Results/Metrics */}
         <IndustryResults
           metrics={industry.metrics}
           testimonial={industry.testimonial}
+          finalCta={industry.hero.cta}
           onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
         />
-
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
-
-        {/* Integration Strip */}
-        <IndustryIntegrationStrip industry={industrySlug} />
-
-        {/* Cinematic section divider */}
-        <div aria-hidden="true" style={{ height: "1px", background: "linear-gradient(90deg, transparent 0%, rgba(0,174,239,0.3) 30%, rgba(0,174,239,0.5) 50%, rgba(0,174,239,0.3) 70%, transparent 100%)" }} />
 
         {/* FAQ */}
         <IndustryFAQ faqs={industry.faqs} />

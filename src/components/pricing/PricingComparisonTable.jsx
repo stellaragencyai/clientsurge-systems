@@ -15,14 +15,15 @@ const SERVICE_NAMES = Array.from(
 );
 
 const PRICING_PLANS = PACKAGE_OFFERS.map((offer) => ({
-  name: offer.name,
+  name: offer.customer_facing_name || offer.name,
+  internalName: offer.name,
   subtitle: offer.badge || offer.fit,
   price: formatMoney(offer.monthly_total),
   billing: "/month",
   setup: `${formatMoney(offer.setup_total)} setup`,
   description: offer.description,
   services: new Set(offer.included_services.map((service) => service.name)),
-  cta: "Get Started",
+  cta: "Free Automation Audit",
   highlighted: Boolean(offer.highlight),
 }));
 
@@ -69,6 +70,9 @@ export default function PricingComparisonTable() {
                       <h3 className="font-display text-2xl font-bold text-foreground mb-1">
                         {plan.name}
                       </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {plan.internalName}
+                      </p>
                       <p className="text-sm text-muted-foreground">
                         {plan.description}
                       </p>

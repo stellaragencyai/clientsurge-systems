@@ -6,6 +6,7 @@ import { secureJson } from "../_shared/response.ts";
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 
 Deno.serve(async (req) => {
   try {
@@ -30,6 +31,35 @@ Deno.serve(async (req) => {
     if (!campaign || campaign.status !== "active") {
       console.log(`[SendEmailDrip] Campaign not active, skipping`);
       return secureJson({ success: false, message: "Campaign not active" }, { status: 409 });
+    }
+
+    const sendGate = getEmailOutreachGate("email drip campaign");
+    if (!sendGate.ok) {
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        lead_id,
+        channel: "email",
+        direction: "outbound",
+        event_type: "email_blocked",
+        provider: "resend",
+        status: "blocked",
+        subject: `Email drip step ${step_number} blocked`,
+        message_body: sendGate.reason,
+        metadata_json: JSON.stringify({
+          campaign_id,
+          step_number,
+          reason: "deliverability_gate",
+          proof_status: sendGate.proof_status,
+          requires_owner_action: true,
+        }),
+      });
+
+      return secureJson({
+        success: false,
+        email_sent: false,
+        error: "Email drip campaign sending is blocked until deliverability proof is complete.",
+        reason: sendGate.reason,
+        proof_status: sendGate.proof_status,
+      }, { status: 403 });
     }
 
     // 2. Get step data

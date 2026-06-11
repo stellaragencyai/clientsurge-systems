@@ -1,6 +1,7 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
+import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 
 Deno.serve(async (req) => {
   try {
@@ -40,21 +41,57 @@ Deno.serve(async (req) => {
     // Send via Resend if configured
     let emailResult = null;
     if (adminSettings.resend_enabled && Deno.env.get('RESEND_API_KEY')) {
-      const resendResponse = await resendFetch('https://api.resend.com/emails', {
+      const sendGate = getEmailOutreachGate('direct follow-up email');
+      if (!sendGate.ok) {
+        await base44.entities.CommunicationEvent.create({
+          lead_id: job.lead_id,
+          channel: 'email',
+          direction: 'outbound',
+          event_type: 'email_blocked',
+          provider: 'resend',
+          status: 'blocked',
+          subject,
+          message_body: body,
+          error_message: sendGate.reason,
+          metadata_json: JSON.stringify({
+            automation_job_id,
+            follow_up_type,
+            proof_status: sendGate.proof_status,
+            requires_owner_action: true,
+          }),
+        });
+
+        return secureJson({
+          success: false,
+          email_sent: false,
+          error: 'Follow-up email blocked until deliverability proof is complete.',
+          reason: sendGate.reason,
+          proof_status: sendGate.proof_status,
+        }, { status: 403 });
+      }
+
+      const resendEmailResult = await resendFetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: adminSettings.resend_from_email || 'noreply@resend.dev',
+          from: getApprovedEmailSender(adminSettings, { preferLeads: true }),
           to: lead.email,
           subject,
           html: `<p>${body}</p>`,
         }),
       });
 
-      emailResult = await resendsecureJson();
+      emailResult = await resendEmailResult.json().catch(() => ({}));
+      if (!resendEmailResult.ok) {
+        emailResult = {
+          error: {
+            message: emailResult?.message || `Resend error ${resendEmailResult.status}`,
+          },
+        };
+      }
     }
 
     // Create communication event

@@ -4,19 +4,19 @@ import { Link } from "react-router-dom";
 import { getPackageOffer, normalizePackageKey } from "@/lib/salesCatalog";
 
 const PLANS = {
-  starter: {
-    name: "Starter System",
-    price: "$695 Setup + $197/month",
-    includes: "Includes: Instant Lead Response + AI Booking Agent",
+  starter_system: {
+    name: "Starter",
+    price: "$797 Setup + $497/month",
+    includes: "Includes: Instant Lead Response + Missed Call Text-Back",
   },
-  growth: {
-    name: "Growth System",
-    price: "$1,195 Setup + $349/month",
+  growth_system: {
+    name: "Growth",
+    price: "$1,297 Setup + $997/month",
     includes: "Includes: Instant Lead Response, Missed Call Text-Back, 14-Day Nurture Sequence + AI Booking Agent",
   },
-  elite: {
-    name: "Elite System",
-    price: "$1,495 Setup + $469/month",
+  pro_system: {
+    name: "Pro",
+    price: "$2,497 Setup + $1,997/month",
     includes: "Includes: All 6 Automations — fully built and live",
   },
 };
@@ -87,7 +87,7 @@ export default function ThankYou() {
   const packageOffer = getPackageOffer(planKey);
   const plan =
     (packageOffer && {
-      name: packageOffer.name,
+      name: packageOffer.customer_facing_name || packageOffer.name,
       price: `$${packageOffer.setup_total} Setup + $${packageOffer.monthly_total}/month`,
       includes: `Includes: ${packageOffer.included_services.map((service) => service.name).join(", ")}`,
     }) ||

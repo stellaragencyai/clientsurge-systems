@@ -405,7 +405,7 @@ Return a JSON object with:
                 onClick={() => setShowDemoModal(true)}
                 className="text-sm font-semibold flex items-center gap-1.5 text-primary hover:underline focus:outline-none"
               >
-                Make the Leap
+                Free Automation Audit
                 <ArrowRight className="w-3.5 h-3.5" />
               </button>
             )}

@@ -31,6 +31,7 @@ const AUDIT_COPY = {
     defaultMessage: "I would like a free roofing automation audit for my roofing business.",
     serviceInterest: "roofing_automation_audit",
     tag: "free_roofing_automation_audit",
+    crmTag: "roofing_lead",
     consentSource: "roofing_audit_modal",
     success: "We have your roofing details and selected audit time. Expect confirmation with practical next steps for missed calls, quote requests, and booked estimates.",
     formIntro: "Choose a time and send roofing-specific context into the ClientSurge booking workflow.",
@@ -45,6 +46,7 @@ const AUDIT_COPY = {
     defaultMessage: "I would like a free dental automation audit for my dental practice.",
     serviceInterest: "dental_automation_audit",
     tag: "free_dental_automation_audit",
+    crmTag: "dental_lead",
     consentSource: "dental_audit_modal",
     success: "We have your dental practice details and selected audit time. Expect confirmation with practical next steps for missed calls, new-patient appointment requests, and follow-up.",
     formIntro: "Choose a time and send dental-specific context into the ClientSurge booking workflow.",
@@ -59,10 +61,41 @@ const AUDIT_COPY = {
     defaultMessage: "I would like a free HVAC automation audit for my heating and cooling business.",
     serviceInterest: "hvac_automation_audit",
     tag: "free_hvac_automation_audit",
+    crmTag: "hvac_lead",
     consentSource: "hvac_audit_modal",
     success: "We have your HVAC details and selected audit time. Expect confirmation with practical next steps for missed calls, emergency service leads, and booked appointments.",
     formIntro: "Choose a time and send HVAC-specific context into the ClientSurge booking workflow.",
     submitLabel: "Book HVAC audit",
+  },
+  med_spa: {
+    eyebrow: "Free Med Spa Automation Audit",
+    heading: "Find the missed consult requests and booking gaps costing you med spa revenue.",
+    intro: "Send the request here and ClientSurge will review your consult capture, instant response, follow-up, and booking handoff path before the walkthrough.",
+    checkOne: "Med spa consultation capture and missed-call review",
+    checkTwo: "Treatment inquiry, package lead, and follow-up gaps",
+    defaultMessage: "I would like a free med spa automation audit for my med spa.",
+    serviceInterest: "med_spa_automation_audit",
+    tag: "free_med_spa_automation_audit",
+    crmTag: "med_spa_lead",
+    consentSource: "med_spa_audit_modal",
+    success: "We have your med spa details and selected audit time. Expect confirmation with practical next steps for consult requests, lead follow-up, and booking handoff.",
+    formIntro: "Choose a time and send med-spa-specific context into the ClientSurge booking workflow.",
+    submitLabel: "Book med spa audit",
+  },
+  plumbing: {
+    eyebrow: "Free Plumbing Automation Audit",
+    heading: "Find the missed calls and urgent service requests costing you plumbing jobs.",
+    intro: "Send the request here and ClientSurge will review your missed-call text-back, emergency lead response, dispatch handoff, and service booking path before the walkthrough.",
+    checkOne: "Plumbing missed-call and emergency response review",
+    checkTwo: "Service appointment booking, dispatch, and follow-up gaps",
+    defaultMessage: "I would like a free plumbing automation audit for my plumbing business.",
+    serviceInterest: "plumbing_automation_audit",
+    tag: "free_plumbing_automation_audit",
+    crmTag: "plumbing_lead",
+    consentSource: "plumbing_audit_modal",
+    success: "We have your plumbing details and selected audit time. Expect confirmation with practical next steps for missed calls, urgent service requests, and booked jobs.",
+    formIntro: "Choose a time and send plumbing-specific context into the ClientSurge booking workflow.",
+    submitLabel: "Book plumbing audit",
   },
   default: {
     eyebrow: "Free Automation Audit",
@@ -73,6 +106,7 @@ const AUDIT_COPY = {
     defaultMessage: "I would like a free automation audit for my business.",
     serviceInterest: "automation_audit",
     tag: "free_automation_audit",
+    crmTag: "automation_audit_lead",
     consentSource: "audit_modal",
     success: "We have your details and selected audit time. Expect confirmation with practical next steps for your lead flow.",
     formIntro: "Choose a time and send context into the ClientSurge booking workflow.",
@@ -110,7 +144,7 @@ function normalizeIndustrySlug(value) {
 }
 
 export default function DemoBookingModal({ isOpen = true, onClose, prefillIndustry = "", industrySlug = "" }) {
-  const resolvedIndustrySlug = industrySlug || normalizeIndustrySlug(prefillIndustry);
+  const resolvedIndustrySlug = normalizeIndustrySlug(industrySlug || prefillIndustry);
   const auditCopy = AUDIT_COPY[resolvedIndustrySlug] || AUDIT_COPY.default;
   const [form, setForm] = useState(() => ({
     ...initialForm,
@@ -159,6 +193,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
         form.phone.trim() &&
         form.business_name.trim() &&
         form.business_type.trim() &&
+        form.business_website_url.trim() &&
         form.message.trim() &&
         form.scheduled_date &&
         form.scheduled_time &&
@@ -167,6 +202,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
   }, [
     form.business_name,
     form.business_type,
+    form.business_website_url,
     form.consent_given,
     form.email,
     form.full_name,
@@ -210,6 +246,10 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
       nextErrors.business_type = "Required";
     }
 
+    if (!form.business_website_url.trim()) {
+      nextErrors.business_website_url = "Required";
+    }
+
     if (!form.message.trim()) {
       nextErrors.message = "Required";
     }
@@ -220,6 +260,10 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
 
     if (!form.scheduled_time) {
       nextErrors.scheduled_time = "Choose a time";
+    }
+
+    if (form.consent_given !== true) {
+      nextErrors.consent_given = "Consent is required";
     }
 
     return nextErrors;
@@ -267,6 +311,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
       const industryTags = [
         effectiveIndustrySlug,
         effectiveIndustrySlug ? `${effectiveIndustrySlug}_landing_page` : "",
+        auditCopy.crmTag,
         auditCopy.tag,
       ].filter(Boolean);
       const result = await base44.functions.invoke("scheduleDemoBooking", {
@@ -278,6 +323,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
         industry: form.business_type.trim() || prefillIndustry || "Free Automation Audit",
         industry_slug: effectiveIndustrySlug,
         service_interest: auditCopy.serviceInterest,
+        crm_tag: auditCopy.crmTag,
         biggest_issue: form.message.trim(),
         source: "landing_page",
         source_page: currentPath || "/book",
@@ -410,6 +456,9 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 <h3 className="text-2xl font-semibold text-slate-950">Audit booked</h3>
                 <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
                   {auditCopy.success}
+                </p>
+                <p className="mt-3 max-w-sm text-xs leading-5 text-slate-500">
+                  Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <a
@@ -546,7 +595,10 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                       className={inputClass}
                       placeholder="https://"
                       autoComplete="url"
+                      required
+                      aria-invalid={Boolean(errors.business_website_url)}
                     />
+                    {errors.business_website_url && <p className="mt-1 text-xs text-red-600">{errors.business_website_url}</p>}
                   </div>
                 </div>
 
@@ -613,7 +665,10 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                     type="checkbox"
                     name="consent_given"
                     checked={form.consent_given}
-                    onChange={(event) => setForm((current) => ({ ...current, consent_given: event.target.checked }))}
+                    onChange={(event) => {
+                      setForm((current) => ({ ...current, consent_given: event.target.checked }));
+                      setErrors((current) => ({ ...current, consent_given: undefined, submit: undefined }));
+                    }}
                     disabled={loading}
                     required
                     className="mt-0.5 h-4 w-4 rounded accent-[#00aeef]"
@@ -626,6 +681,7 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                     <a href="/terms" className="underline hover:text-slate-950">Terms</a>.
                   </span>
                 </label>
+                {errors.consent_given && <p className="mt-1 text-xs text-red-600">{errors.consent_given}</p>}
 
                 <button
                   type="submit"

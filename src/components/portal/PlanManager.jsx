@@ -4,26 +4,33 @@ import { CheckCircle2, ArrowRight, Loader2, CircleAlert } from "lucide-react";
 
 const PLANS = [
   {
-    name: "Starter System",
-    monthly: "$197/mo",
-    features: ["Instant lead response", "AI booking handoff"],
+    name: "Starter",
+    internalName: "Starter System",
+    monthly: "$497/mo",
+    features: ["Instant lead response", "Missed-call text-back"],
   },
   {
-    name: "Growth System",
-    monthly: "$349/mo",
+    name: "Growth",
+    internalName: "Growth System",
+    monthly: "$997/mo",
     badge: "Most Popular",
     features: ["Starter + missed-call text-back", "14-day nurture sequence"],
   },
   {
-    name: "Elite System",
-    monthly: "$469/mo",
+    name: "Pro",
+    internalName: "Pro System",
+    monthly: "$1,997/mo",
     features: ["Growth + lead reactivation", "Review request automation"],
   },
 ];
 
 const PLAN_RANK = {
   "Starter System": 1,
+  Starter: 1,
   "Growth System": 2,
+  Growth: 2,
+  "Pro System": 3,
+  Pro: 3,
   "Elite System": 3,
 };
 
@@ -86,7 +93,7 @@ export default function PlanManager({ project, subscription, onUpdated }) {
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
         {PLANS.map((plan) => {
-          const isCurrent = plan.name === currentPlan;
+          const isCurrent = plan.name === currentPlan || plan.internalName === currentPlan;
           const isSelected = plan.name === selected;
           return (
             <button
@@ -131,7 +138,7 @@ export default function PlanManager({ project, subscription, onUpdated }) {
             </p>
           </div>
           <button
-            onClick={() => submitRequest(selected)}
+            onClick={() => submitRequest(PLANS.find((plan) => plan.name === selected)?.internalName || selected)}
             disabled={saving}
             className="flex items-center gap-2 px-5 py-2 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-50"
             style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}

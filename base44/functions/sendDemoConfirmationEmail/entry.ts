@@ -25,11 +25,27 @@ function formatAZTime(isoStr: string): string {
 }
 
 function auditCopyForIndustry(industrySlug = "") {
+  if (industrySlug === "med_spa" || industrySlug === "med-spa") {
+    return {
+      subjectPrefix: "Med Spa Automation Audit confirmed",
+      heading: "Your Med Spa Automation Audit is confirmed",
+      body: "Nolan will call you at the number you provided. The audit takes about 15 minutes, and we will review consult requests, aesthetic treatment inquiries, missed DMs and calls, booking handoff, and nurture before the appointment.",
+    };
+  }
+
+  if (industrySlug === "plumbing") {
+    return {
+      subjectPrefix: "Plumbing Automation Audit confirmed",
+      heading: "Your Plumbing Automation Audit is confirmed",
+      body: "Nolan will call you at the number you provided. The audit takes about 15 minutes, and we will review emergency leak calls, drain repair requests, water heater inquiries, missed-call recovery, after-hours capture, and dispatch handoff.",
+    };
+  }
+
   if (industrySlug === "dental") {
     return {
       subjectPrefix: "Dental Automation Audit confirmed",
       heading: "Your Dental Automation Audit is confirmed",
-      body: "Nolan will call you at the number you provided. The audit takes about 15 minutes, and we will review missed new-patient calls, appointment request routing, front desk overload, website lead capture, and patient follow-up.",
+      body: "Nolan will call you at the number you provided for your dental automation audit. The audit takes about 15 minutes, and we will review missed new-patient calls, appointment request routing, front desk overload, website lead capture, and patient follow-up.",
     };
   }
 
@@ -37,7 +53,7 @@ function auditCopyForIndustry(industrySlug = "") {
     return {
       subjectPrefix: "Roofing Automation Audit confirmed",
       heading: "Your Roofing Automation Audit is confirmed",
-      body: "Nolan will call you at the number you provided. The audit takes about 15 minutes, and we will review missed calls, quote requests, estimate follow-up, and booked inspection handoff.",
+      body: "Nolan will call you at the number you provided for your roofing automation audit. The audit takes about 15 minutes, and we will review missed calls, quote requests, estimate follow-up, and booked inspection handoff.",
     };
   }
 

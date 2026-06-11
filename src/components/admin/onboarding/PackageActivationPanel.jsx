@@ -16,9 +16,17 @@ const SERVICE_META = {
 };
 
 const PACKAGE_SERVICES = {
-  starter_system: ["instant_lead_response", "ai_booking_agent"],
+  starter_system: ["instant_lead_response", "missed_call_text_back"],
   growth_system: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
+  pro_system: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent", "lead_reactivation", "review_request"],
   elite_system: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent", "lead_reactivation", "review_request"],
+};
+
+const PACKAGE_LABELS = {
+  starter_system: "Starter",
+  growth_system: "Growth",
+  pro_system: "Pro",
+  elite_system: "Pro",
 };
 
 export default function PackageActivationPanel({ order }) {
@@ -36,7 +44,7 @@ export default function PackageActivationPanel({ order }) {
     ? (PACKAGE_SERVICES[packageKey] || [])
     : (order.items || []).map((item) => item.service_key).filter(Boolean);
   const packageLabel = packageKey
-    ? packageKey.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
+    ? PACKAGE_LABELS[packageKey] || packageKey.replace(/_/g, " ").replace(/\b\w/g, (char) => char.toUpperCase())
     : "Custom Bundle";
 
   const allLive = services.length > 0 && services.every((serviceKey) => {

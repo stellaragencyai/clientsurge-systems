@@ -21,6 +21,7 @@ const NAV_GROUPS = [
     items: [
       { id: "overview",         label: "Overview",          icon: LayoutDashboard, path: "/admin" },
       { id: "leads",            label: "Leads",             icon: Users,           path: "/admin", tab: "leads" },
+      { id: "crm-health",       label: "CRM Health",        icon: ShieldCheck,     path: "/admin", tab: "crm-health" },
       { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
       { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
       { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },

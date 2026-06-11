@@ -25,6 +25,7 @@ import { secureJson } from "../_shared/response.ts";
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
@@ -80,7 +81,7 @@ async function sendResendEmail(to, subject, body, fromEmail) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
+      from: fromEmail,
       to,
       subject,
       text: body,
@@ -215,7 +216,7 @@ Deno.serve(async (req) => {
     // BUILD MESSAGE CONTENT
     // ─────────────────────────────────────────────────────────
     const now = new Date().toISOString();
-    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurge.com";
+    const fromEmail = getApprovedEmailSender({}, { preferLeads: true });
 
     const smsBodies = [
       `Hi ${customer_name.split(" ")[0]}, we'd love your feedback! Share your experience with ${business_name}: ${google_review_link}`,
@@ -302,6 +303,30 @@ ${business_name} Team`;
 
     if (preferred_channel === "email" || preferred_channel === "both") {
       try {
+        const sendGate = getEmailOutreachGate("review request email");
+        if (!sendGate.ok) {
+          emailError = sendGate.reason;
+          await base44.asServiceRole.entities.CommunicationEvent.create({
+            channel: "email",
+            direction: "outbound",
+            event_type: "review_request",
+            provider: "resend",
+            status: "blocked",
+            subject: emailSubject,
+            message_body: emailBody,
+            error_message: emailError,
+            metadata_json: JSON.stringify({
+              customer_name,
+              customer_email,
+              business_name,
+              timestamp: now,
+              proof_status: sendGate.proof_status,
+              requires_owner_action: true,
+            }),
+          });
+          throw new Error(sendGate.reason);
+        }
+
         emailId = await sendResendEmail(
           customer_email,
           emailSubject,

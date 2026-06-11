@@ -19,6 +19,7 @@ function formatMoney(amount) {
 const PACKAGE_MODE_MAP = {
   starter_system: "instant_response",
   growth_system: "instant_plus_nurture",
+  pro_system: "full_automation",
   elite_system: "full_automation",
 };
 

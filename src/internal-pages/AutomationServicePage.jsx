@@ -170,7 +170,7 @@ function AutomationServicePageInner() {
               className="mt-8 inline-flex min-h-12 items-center justify-center gap-2 rounded-full bg-white px-6 text-sm font-bold transition-transform hover:-translate-y-0.5"
               style={{ color: "#003B8F" }}
             >
-              Make the Leap
+              Free Automation Audit
               <ArrowRight className="h-4 w-4" />
             </button>
           </div>

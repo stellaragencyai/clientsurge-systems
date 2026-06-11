@@ -38,13 +38,16 @@ test("public store catalog exposes all 12 offers while checkout stays canonical"
 test("package offers map directly to canonical service bundles", () => {
   const starter = getPackageOffer("starter_system");
   const growth = getPackageOffer("growth_system");
+  const pro = getPackageOffer("pro_system");
 
   assert.ok(starter);
+  assert.equal(starter.customer_facing_name, "Starter");
   assert.deepEqual(starter.included_service_keys, [
     "instant_lead_response",
     "missed_call_text_back",
   ]);
   assert.ok(growth);
+  assert.equal(growth.customer_facing_name, "Growth");
   assert.deepEqual(
     growth.included_service_keys,
     [
@@ -57,6 +60,9 @@ test("package offers map directly to canonical service bundles", () => {
   assert.equal(growth.setup_total, 1297);
   assert.equal(growth.monthly_total, 997);
   assert.equal(growth.stripe_product_id, "prod_UReWhZsWks1HuA");
+  assert.ok(pro);
+  assert.equal(pro.customer_facing_name, "Pro");
+  assert.equal(pro.package_key, "pro_system");
 });
 
 test("pricing summary matches best package when selected services align", () => {

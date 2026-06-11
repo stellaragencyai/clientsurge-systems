@@ -9,7 +9,7 @@ import { secureJson } from "../_shared/response.ts";
  *  Step 4 — Day 10 : Actionable tip (speed-to-lead)
  *  Step 5 — Day 14 : Case study #2 (different industry)
  *  Step 6 — Day 18 : Testimonial #2 + social proof
- *  Step 7 — Day 23 : Tip + soft offer (free demo)
+ *  Step 7 — Day 23 : Tip + soft offer (Free Automation Audit)
  *  Step 8 — Day 30 : Final CTA — book or lose the spot
  *
  * Auto-stops when lead reaches Booked or Closed.
@@ -55,6 +55,7 @@ function allowAnonymousAutomation(req) {
 }
 
 const STOP_STATUSES = ["Booked", "Closed"];
+const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
 
 const STEPS = [
   { num: 1, field: "step1", daysRequired: 0,  theme: "welcome" },
@@ -209,6 +210,37 @@ function daysSince(isoDate) {
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60 * 60 * 24);
 }
 
+function getApprovedCampaignSender(settings = {}) {
+  return (
+    settings.resend_from_email ||
+    Deno.env.get("RESEND_FROM_LEADS") ||
+    Deno.env.get("RESEND_FROM_EMAIL") ||
+    Deno.env.get("SUPPORT_EMAIL") ||
+    "support@clientsurgesystems.com"
+  );
+}
+
+function getCampaignSendGate() {
+  const campaignEnabled = String(Deno.env.get("EMAIL_CAMPAIGN_ENABLED") || "").trim().toLowerCase() === "true";
+  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
+
+  if (!campaignEnabled) {
+    return {
+      ok: false,
+      reason: "EMAIL_CAMPAIGN_ENABLED must be true before nurture campaign sends.",
+      proof_status: proofStatus || "missing",
+    };
+  }
+  if (!PROOF_READY_VALUES.has(proofStatus)) {
+    return {
+      ok: false,
+      reason: "EMAIL_DELIVERABILITY_PROOF_STATUS must be verified before nurture campaign sends.",
+      proof_status: proofStatus || "missing",
+    };
+  }
+  return { ok: true, proof_status: proofStatus };
+}
+
 async function sendEmail(to, subject, html, resendKey, fromEmail) {
   const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
@@ -256,13 +288,29 @@ Deno.serve(async (req) => {
     const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
     const settings = settingsRecords?.[0] || {};
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    const fromEmail = settings.resend_from_email || "noreply@clientsurge.com";
+    const fromEmail = getApprovedCampaignSender(settings);
     const resendReady = !!(resendKey && settings.resend_enabled);
 
     if (!resendReady) {
       return secureJson(
         { success: false, error: "Resend not configured. Enable Resend in Admin Settings." },
         { status: 503 }
+      );
+    }
+
+    const sendGate = getCampaignSendGate();
+    if (!sendGate.ok) {
+      return secureJson(
+        {
+          success: false,
+          error: "Nurture campaign sending is blocked until deliverability proof is complete.",
+          email_sent: false,
+          safe_to_continue: false,
+          requires_owner_action: true,
+          reason: sendGate.reason,
+          proof_status: sendGate.proof_status,
+        },
+        { status: 403 }
       );
     }
 

@@ -19,6 +19,7 @@ import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
+const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
 
 const STEPS = [
   { key: "day1", hoursRequired: 24,  sentAtField: "day1_sent_at", statusField: "day1_status" },
@@ -37,6 +38,37 @@ function renderTemplate(template, lead, bookingLink) {
     .replace(/{business_name}/g, lead.business_name || "us")
     .replace(/{booking_link}/g, bookingLink || "")
     .replace(/{date}/g, new Date().toLocaleDateString());
+}
+
+function getApprovedCampaignSender(settings = {}) {
+  return (
+    settings.resend_from_email ||
+    Deno.env.get("RESEND_FROM_LEADS") ||
+    Deno.env.get("RESEND_FROM_EMAIL") ||
+    Deno.env.get("SUPPORT_EMAIL") ||
+    "support@clientsurgesystems.com"
+  );
+}
+
+function getCampaignSendGate() {
+  const campaignEnabled = String(Deno.env.get("EMAIL_CAMPAIGN_ENABLED") || "").trim().toLowerCase() === "true";
+  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
+
+  if (!campaignEnabled) {
+    return {
+      ok: false,
+      reason: "EMAIL_CAMPAIGN_ENABLED must be true before drip campaign email fallback sends.",
+      proof_status: proofStatus || "missing",
+    };
+  }
+  if (!PROOF_READY_VALUES.has(proofStatus)) {
+    return {
+      ok: false,
+      reason: "EMAIL_DELIVERABILITY_PROOF_STATUS must be verified before drip campaign email fallback sends.",
+      proof_status: proofStatus || "missing",
+    };
+  }
+  return { ok: true, proof_status: proofStatus };
 }
 
 async function sendSMS(phone, body, accountSid, authToken, fromNumber) {
@@ -65,7 +97,7 @@ async function sendEmail(to, subject, body, resendKey, fromEmail) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
+      from: fromEmail,
       to,
       subject,
       text: body,
@@ -109,8 +141,9 @@ Deno.serve(async (req) => {
     const twilioReady = !!(accountSid && authToken && fromNumber && settings.twilio_enabled);
 
     const resendKey   = Deno.env.get("RESEND_API_KEY");
-    const fromEmail   = settings.resend_from_email || "noreply@clientsurge.com";
+    const fromEmail   = getApprovedCampaignSender(settings);
     const resendReady = !!(resendKey && settings.resend_enabled);
+    const sendGate = getCampaignSendGate();
 
     // Support both generic drip templates and missed-call-specific ones
     const templateMap = {
@@ -199,6 +232,25 @@ Deno.serve(async (req) => {
 
           // Fallback to email if SMS failed or no phone
           if (!sent && resendReady && lead.email) {
+            if (!sendGate.ok) {
+              await base44.asServiceRole.entities.CommunicationEvent.create({
+                lead_id: lead.id,
+                direction: "outbound",
+                event_type: "email_blocked",
+                provider: "resend",
+                status: "blocked",
+                subject: `Drip ${step.key} - automated follow-up`,
+                body: sendGate.reason,
+                metadata: {
+                  campaign_id: campaign.id,
+                  channel: "email",
+                  proof_status: sendGate.proof_status,
+                  requires_owner_action: true,
+                },
+              });
+              results.skipped++;
+              continue;
+            }
             try {
               await sendEmail(
                 lead.email,

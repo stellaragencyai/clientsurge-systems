@@ -50,7 +50,7 @@ export default function About() {
                 ClientSurge Systems is an AI-powered lead automation platform built specifically for service businesses — med spas, dental offices, HVAC companies, roofers, chiropractors, and contractors. We automate the most critical part of your business: what happens the moment a new lead reaches out.
               </p>
               <p className="text-muted-foreground leading-relaxed mb-4">
-                Most service businesses lose 60–80% of their leads simply because no one follows up fast enough. Our system changes that. Within 90 seconds of a new inquiry, your lead receives a personalized SMS response. Missed a call? They get a text-back automatically. No reply in 24 hours? The system follows up again — so you never lose a booking opportunity to silence.
+                Many service businesses lose opportunities when calls, forms, and follow-up wait too long. ClientSurge closes those gaps with approved response workflows: new inquiries can receive a timely SMS response, missed callers can get a text-back, and unanswered leads can enter a controlled follow-up path so fewer booking opportunities disappear into silence.
               </p>
               <p className="text-muted-foreground leading-relaxed">
                 We combine SMS automation, email sequences, AI booking assistance, review request flows, and lead reactivation into a single done-for-you system. You get your time back. Your leads get instant attention. And your calendar fills up faster.

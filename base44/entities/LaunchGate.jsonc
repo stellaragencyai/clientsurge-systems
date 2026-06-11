@@ -1,0 +1,155 @@
+{
+  "name": "LaunchGate",
+  "type": "object",
+  "properties": {
+    "gate_key": {
+      "type": "string",
+      "title": "Gate Key"
+    },
+    "gate_name": {
+      "type": "string",
+      "title": "Gate Name"
+    },
+    "section_label": {
+      "type": "string",
+      "title": "Section Label"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "locked",
+        "blocked",
+        "partial",
+        "ready_for_proof",
+        "proof_running",
+        "proof_failed",
+        "proof_passed",
+        "approved",
+        "waived"
+      ],
+      "default": "locked"
+    },
+    "severity": {
+      "type": "string",
+      "title": "Severity",
+      "enum": [
+        "advisory",
+        "launch_blocker",
+        "critical_blocker"
+      ],
+      "default": "launch_blocker"
+    },
+    "completion_percent": {
+      "type": "number",
+      "title": "Completion Percent",
+      "default": 0
+    },
+    "proof_percent": {
+      "type": "number",
+      "title": "Proof Percent",
+      "default": 0
+    },
+    "required_categories": {
+      "type": "array",
+      "title": "Required Categories",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_tasks": {
+      "type": "array",
+      "title": "Required Tasks",
+      "items": {
+        "type": "string"
+      }
+    },
+    "required_proofs": {
+      "type": "array",
+      "title": "Required Proofs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "current_blocker": {
+      "type": "string",
+      "title": "Current Blocker"
+    },
+    "next_action": {
+      "type": "string",
+      "title": "Next Action"
+    },
+    "approval_required": {
+      "type": "boolean",
+      "title": "Approval Required",
+      "default": false
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    },
+    "waived_by": {
+      "type": "string",
+      "title": "Waived By"
+    },
+    "waived_at": {
+      "type": "string",
+      "title": "Waived At",
+      "format": "date-time"
+    },
+    "waiver_reason": {
+      "type": "string",
+      "title": "Waiver Reason"
+    },
+    "last_checked_at": {
+      "type": "string",
+      "title": "Last Checked At",
+      "format": "date-time"
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary"
+    },
+    "unlock_condition_summary": {
+      "type": "string",
+      "title": "Unlock Condition Summary"
+    },
+    "last_verdict": {
+      "type": "string",
+      "title": "Last Verdict"
+    }
+  },
+  "required": [
+    "gate_key",
+    "gate_name",
+    "status",
+    "severity"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

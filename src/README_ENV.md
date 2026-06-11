@@ -17,6 +17,8 @@ Never commit real secret values to source control.
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret. | Required for the canonical Stripe webhook endpoint. |
 | `RESEND_API_KEY` | Resend API key. | Required for email sends and email health checks. |
 | `RESEND_FROM_EMAIL` | Verified sender email. | Must be on a verified Resend domain before production launch. |
+| `RESEND_FROM_LEADS` | Verified lead/audit sender email. | Used by website lead confirmations and campaign sender fallback. |
+| `RESEND_REPLY_TO_LEADS` | Monitored lead reply-to email. | Used when customers reply to audit confirmations or admin lead alerts. |
 | `TWILIO_ACCOUNT_SID` | Twilio Account SID. | Required for SMS and voice workflows. |
 | `TWILIO_AUTH_TOKEN` | Twilio auth token. | Required for Twilio API calls and webhook signature validation. |
 | `TWILIO_PHONE_NUMBER` | Twilio outbound phone number in E.164 format. | Must be registered for US commercial SMS before launch. |
@@ -24,6 +26,8 @@ Never commit real secret values to source control.
 | `ADMIN_EMAIL` | Primary admin email. | Used as fallback reply-to / admin recipient. |
 | `ADMIN_NOTIFICATION_EMAIL` | Admin alert recipient. | Used by lead/order/digest/credentials alerts. |
 | `AUTOMATION_SHARED_SECRET` | Shared secret for internal automation endpoints. | Use a random high-entropy value. |
+| `EMAIL_DELIVERABILITY_PROOF_STATUS` | Email send proof gate. | Non-test direct sends and campaign sends require `verified`, `passed`, or `production_verified`. |
+| `EMAIL_CAMPAIGN_ENABLED` | Campaign send enable flag. | Keep `false` until deliverability, unsubscribe, and suppression proof is complete. |
 
 ---
 
@@ -51,6 +55,8 @@ Never commit real secret values to source control.
 | `DEFAULT_BOOKING_LINK` | Fallback booking URL. | Used by booking/follow-up workflows. |
 | `DEFAULT_BUSINESS_NAME` | Fallback business name in templates. | Defaults in code should not be treated as production configuration. |
 | `ADMIN_NOTIFICATION_PHONE` | Admin phone for voice/SMS notification workflows. | E.164 format. |
+| `TEST_EMAIL_RECIPIENT` | Safe test email recipient. | Must be exactly one approved test inbox. |
+| `EMAIL_TEST_MODE` | Safe email test mode. | Must be `true` for the safe harness or direct `[TEST]` sends to `TEST_EMAIL_RECIPIENT`. |
 | `CLIENTSURGE_CHECKOUT_CAPACITY_LIMIT` | Optional checkout capacity gate. | Leave unset for no capacity cap. |
 | `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` | Optional package Stripe ID override map. | Staging/test only; each package override must include product, setup price, and monthly price IDs or checkout fails closed. Do not set in production. |
 | `EXTERNAL_WEBHOOK_URL` | Optional outbound CRM/automation webhook target. | External delivery should be configured deliberately. |

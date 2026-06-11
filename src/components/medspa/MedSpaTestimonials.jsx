@@ -140,7 +140,7 @@ export default function MedSpaTestimonials() {
             e.currentTarget.style.boxShadow = "0 4px 18px rgba(120,70,20,0.35)";
           }}>
             <span style={{display:"flex",alignItems:"center",gap:"8px",height:"48px",padding:"0 32px",borderRadius:"9999px",background:"linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",color:"#f5e6d0",fontWeight:"700",fontSize:"1rem",textShadow:"0 1px 2px rgba(0,0,0,0.3)"}}>
-              Book Your Free Demo
+              Book Your Free Automation Audit
             </span>
           </button>
           {showModal && <MedSpaDemoModal onClose={() => setShowModal(false)} />}

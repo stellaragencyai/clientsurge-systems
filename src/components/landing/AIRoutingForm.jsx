@@ -14,7 +14,7 @@ const industries = [
 ];
 
 const routeMap = {
-  book: { href: "/book", label: "Make the Leap" },
+  book: { href: "/book", label: "Free Automation Audit" },
   med_spa: { href: "/med-spa", label: "See the Med Spa Page" },
   industries: { href: "/industries", label: "Explore Industries" },
   contact: { href: "/contact", label: "Talk to Our Team" },

@@ -79,6 +79,7 @@ test("sitemap prioritizes canonical public marketing pages", () => {
     "/industries",
     "/roofing",
     "/hvac",
+    "/plumbing",
     "/dental",
     "/med-spa",
     "/chiropractic",
@@ -106,7 +107,7 @@ test("homepage and industry pages surface the six-automation architecture", () =
 });
 
 test("every active industry has six mapped automation use cases", () => {
-  for (const slug of ["med-spa", "dental", "chiropractic", "hvac", "roofing", "contractors"]) {
+  for (const slug of ["med-spa", "dental", "chiropractic", "hvac", "plumbing", "roofing", "contractors"]) {
     assert.equal(getIndustryAutomationUseCases(slug).length, 6, `${slug} should map all six automations`);
   }
 });

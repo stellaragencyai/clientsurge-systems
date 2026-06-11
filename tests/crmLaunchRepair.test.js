@@ -39,6 +39,8 @@ test("checkout carries CRM lead attribution into order, client, and onboarding r
 test("audit and proposal stages are accepted by CRM status update path", () => {
   const leadPipeline = read("base44/functions/_shared/leadPipeline.js");
   const updateLeadStatus = read("base44/functions/updateLeadStatus/entry.ts");
+  const crmWonBridge = read("base44/functions/_shared/crmWonBridge.js");
+  const crmWonBridgeEntry = read("base44/functions/crmWonBridge/entry.ts");
 
   assert.match(leadPipeline, /"Audit Completed"/);
   assert.match(leadPipeline, /"Proposal Sent"/);
@@ -47,6 +49,11 @@ test("audit and proposal stages are accepted by CRM status update path", () => {
   assert.match(updateLeadStatus, /payload\?\.status \? normalizeCrmStage\(payload\.status, payload\.status\) : ""/);
   assert.match(updateLeadStatus, /buildWonPendingPaymentPatch/);
   assert.match(updateLeadStatus, /won_pending_payment_order_required/);
+  assert.match(crmWonBridge, /resolvePaidOrderForLead/);
+  assert.match(crmWonBridge, /bridgeCrmWonToPayment/);
+  assert.match(crmWonBridge, /invoice_pending/);
+  assert.match(crmWonBridge, /manual_payment/);
+  assert.match(crmWonBridgeEntry, /requireAdminUser/);
   assert.match(updateLeadStatus, /buildLeadStatusEvent/);
   assert.match(updateLeadStatus, /CommunicationEvent\.create/);
 });

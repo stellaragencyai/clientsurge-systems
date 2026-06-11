@@ -114,7 +114,7 @@ function StepModal({ activeStep, onClose, onBook }) {
                 ))}
               </div>
               <button onClick={onBook} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-semibold text-white transition-all hover:-translate-y-0.5" style={{ background: "linear-gradient(135deg, #3b82f6, #6366f1)", boxShadow: "0 8px 24px rgba(59,130,246,0.3)" }}>
-                Make the Leap <ArrowRight className="h-4 w-4" />
+                Free Automation Audit <ArrowRight className="h-4 w-4" />
               </button>
             </div>
           </div>

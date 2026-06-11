@@ -24,6 +24,7 @@ const industryLinks = [
 { label: "Dental & Orthodontics", href: "/dental", live: true },
 { label: "Chiropractic & Physical Therapy", href: "/chiropractic", live: true },
 { label: "HVAC, Plumbing & Home Services", href: "/hvac", live: true },
+{ label: "Plumbing & Drain Services", href: "/plumbing", live: true },
 { label: "Roofing & Restoration", href: "/roofing", live: true },
 { label: "Contractors & Trades", href: "/contractors", live: true }];
 
@@ -190,16 +191,6 @@ export default function Navbar() {
     setOpen(false);
     setIndustriesOpen(false);
 
-    // If already on homepage, scroll directly instead of re-navigating
-    if (location.pathname === "/" && href.startsWith("#")) {
-      const id = href.slice(1);
-      const target = document.getElementById(id);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        return;
-      }
-    }
-
     navigate(`/${href}`);
   };
 
@@ -248,8 +239,6 @@ export default function Navbar() {
               width="240"
               height="72"
               decoding="async"
-              fetchpriority="high"
-              loading="eager"
               style={{
                 height: "clamp(80px, 9.5vw, 112px)",
                 width: "auto",
@@ -382,7 +371,7 @@ export default function Navbar() {
             onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.4)"}
             className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
             <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "6px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
-              Book Free Audit
+              Free Automation Audit
             </span>
           </button>
         </div>

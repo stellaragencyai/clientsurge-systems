@@ -36,8 +36,8 @@ test("index head exposes a launch-ready social preview image", () => {
   assert.match(indexHtml, /<meta property="og:image" content="https:\/\/[^"]+"/);
   assert.match(indexHtml, /<meta property="og:image:width" content="1200"/);
   assert.match(indexHtml, /<meta property="og:image:height" content="630"/);
-  assert.match(indexHtml, /<meta property="twitter:card" content="summary_large_image"/);
-  assert.match(indexHtml, /<meta property="twitter:image" content="https:\/\/[^"]+"/);
+  assert.match(indexHtml, /<meta (?:name|property)="twitter:card" content="summary_large_image"/);
+  assert.match(indexHtml, /<meta (?:name|property)="twitter:image" content="https:\/\/[^"]+"/);
 });
 
 test("css does not block rendering with Google Font imports", () => {

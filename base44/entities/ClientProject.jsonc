@@ -48,6 +48,90 @@
       ],
       "default": "None"
     },
+    "client_project_status": {
+      "type": "string",
+      "title": "Fulfillment Project Status",
+      "enum": [
+        "Payment Received",
+        "Onboarding Pending",
+        "Access Requested",
+        "Access Verified",
+        "Setup In Progress",
+        "QA In Progress",
+        "Awaiting Client Approval",
+        "Go-Live Scheduled",
+        "Live",
+        "Monitoring",
+        "Monthly Support",
+        "Blocked",
+        "Paused",
+        "Canceled"
+      ],
+      "default": "Payment Received"
+    },
+    "support_priority": {
+      "type": "string",
+      "title": "Support Priority",
+      "enum": [
+        "Urgent",
+        "High",
+        "Normal",
+        "Low"
+      ],
+      "default": "Normal"
+    },
+    "support_status": {
+      "type": "string",
+      "title": "Support Status",
+      "enum": [
+        "No Open Issues",
+        "Open",
+        "Waiting On Client",
+        "Waiting On Provider",
+        "Monitoring",
+        "Resolved"
+      ],
+      "default": "No Open Issues"
+    },
+    "qa_status": {
+      "type": "string",
+      "title": "QA Status",
+      "enum": [
+        "Not Started",
+        "In Progress",
+        "Passed",
+        "Failed",
+        "Blocked"
+      ],
+      "default": "Not Started"
+    },
+    "client_approval_status": {
+      "type": "string",
+      "title": "Client Approval Status",
+      "enum": [
+        "Not Requested",
+        "Requested",
+        "Approved",
+        "Changes Requested",
+        "Blocked"
+      ],
+      "default": "Not Requested"
+    },
+    "monitoring_status": {
+      "type": "string",
+      "title": "Post-Launch Monitoring Status",
+      "enum": [
+        "Not Started",
+        "Day 1",
+        "Day 2",
+        "Day 3",
+        "Day 7",
+        "Monthly Support",
+        "Blocked",
+        "Complete"
+      ],
+      "default": "Not Started"
+    },
     "step_onboarding": {
       "type": "string",
       "enum": [

@@ -1,0 +1,4 @@
+{
+  "name": "recoverStripeOrders",
+  "entry": "entry.ts"
+}

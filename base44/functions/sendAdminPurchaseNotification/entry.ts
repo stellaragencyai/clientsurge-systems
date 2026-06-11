@@ -12,7 +12,16 @@ Deno.serve(async (req) => {
     const body = await req.json();
     const { order_id, customer_name, package_key, setup_fee, monthly_rate, customer_email } = body;
 
-    const tierLabels = { starter: "Starter", growth: "Growth", elite: "Elite" };
+    const tierLabels = {
+      starter: "Starter",
+      starter_system: "Starter",
+      growth: "Growth",
+      growth_system: "Growth",
+      elite: "Pro",
+      elite_system: "Pro",
+      pro: "Pro",
+      pro_system: "Pro",
+    };
     const tier = tierLabels[package_key] || package_key || "Unknown";
     const setup = setup_fee ? `$${Number(setup_fee).toLocaleString()}` : "N/A";
     const monthly = monthly_rate ? `$${Number(monthly_rate).toLocaleString()}/mo` : "N/A";

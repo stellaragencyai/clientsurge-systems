@@ -14,11 +14,11 @@ const QUICK_QUESTIONS = [
 
 function getWelcomeMessage() {
   const path = typeof window !== "undefined" ? window.location.pathname : "/";
-  if (path.includes("med-spa")) return "👋 Hey! Curious how ClientSurge works for med spas? I can walk you through exactly what we build — or set you up with a free demo!";
+  if (path.includes("med-spa")) return "👋 Hey! Curious how ClientSurge works for med spas? I can walk you through exactly what we build — or set you up with a free automation audit!";
   if (path.includes("dental")) return "👋 Hey! I can show you how we help dental practices book more consults on autopilot. Ask me anything!";
   if (path.includes("store")) return "👋 Hey! Need help picking the right services for your business? I can help you build the right stack.";
   if (path.includes("pricing")) return "👋 Hey! Questions about pricing? I can break down which plan fits your situation best.";
-  return "👋 Hey! I'm the ClientSurge AI assistant. Ask me anything about automating your lead follow-up — or I can get you set up with a free demo!";
+  return "👋 Hey! I'm the ClientSurge AI assistant. Ask me anything about automating your lead follow-up — or I can get you set up with a free automation audit!";
 }
 
 export default function ChatBubble() {
@@ -70,7 +70,7 @@ export default function ChatBubble() {
         messages: newMessages.slice(1), // skip welcome
       });
 
-      const reply = res.data?.reply || "Sorry, I had trouble with that. Want to book a demo instead?";
+      const reply = res.data?.reply || "Sorry, I had trouble with that. Want to start a free automation audit instead?";
 
       if (reply.includes("[TRIGGER_BOOKING]")) {
         setMessages((prev) => [
@@ -89,7 +89,7 @@ export default function ChatBubble() {
     } catch {
       setMessages((prev) => [
         ...prev,
-        { role: "assistant", content: "Hmm, I hit a snag. You can always book a free demo and we'll answer everything live!" },
+        { role: "assistant", content: "Hmm, I hit a snag. You can always start a free automation audit and we'll answer everything live!" },
       ]);
     } finally {
       setLoading(false);
@@ -259,7 +259,7 @@ export default function ChatBubble() {
               className="text-[11px] font-bold px-3 py-1 rounded-full text-white"
               style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
             >
-              Make the Leap
+              Free Automation Audit
             </button>
           </div>
         </div>

@@ -1,7 +1,11 @@
-import { PACKAGE_OFFERS, PUBLIC_STORE_PRODUCTS } from "@/lib/salesCatalog";
+import {
+  PACKAGE_OFFERS,
+  PUBLIC_STORE_PRODUCTS,
+  getPackageOffer,
+} from "@/lib/salesCatalog";
 
 function byKey(packageKey) {
-  return PACKAGE_OFFERS.find((offer) => offer.package_key === packageKey) || null;
+  return getPackageOffer(packageKey);
 }
 
 export const CANONICAL_PRICING = {
@@ -24,9 +28,15 @@ export const CANONICAL_PRICING = {
     monthly_rate: byKey("growth_system").monthly_total,
     services: byKey("growth_system").included_service_keys.length,
   },
+  pro_system: byKey("pro_system") && {
+    setup_fee: byKey("pro_system").setup_total,
+    monthly_rate: byKey("pro_system").monthly_total,
+    services: byKey("pro_system").included_service_keys.length,
+  },
   elite_system: byKey("elite_system") && {
     setup_fee: byKey("elite_system").setup_total,
     monthly_rate: byKey("elite_system").monthly_total,
     services: byKey("elite_system").included_service_keys.length,
+    legacy_alias_for: "pro_system",
   },
 };

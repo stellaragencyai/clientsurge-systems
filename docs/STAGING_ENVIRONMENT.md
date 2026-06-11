@@ -33,7 +33,7 @@ VITE_BASE44_APP_BASE_URL=<base44 test/preview app url>
 APP_URL=<staging or local url>
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_... from test-mode webhook or Stripe CLI forwarding
-STRIPE_PACKAGE_PRICE_OVERRIDES_JSON={"starter_system":{"stripe_product_id":"prod_UYhtwNW8eVqQdI","setup_price_id":"price_1TZaTKBVGjsISdG0FYZuolxJ","monthly_price_id":"price_1TZaTLBVGjsISdG0dj7Y62fu"},"growth_system":{"stripe_product_id":"prod_UYhtW1TiATAaSS","setup_price_id":"price_1TZaTLBVGjsISdG0OLeOUdAH","monthly_price_id":"price_1TZaTMBVGjsISdG0FlG2VVWG"},"elite_system":{"stripe_product_id":"prod_UYhtICcoNgWC9d","setup_price_id":"price_1TZaTMBVGjsISdG0TtdrSHRP","monthly_price_id":"price_1TZaTNBVGjsISdG0t7w5I7gM"}}
+STRIPE_PACKAGE_PRICE_OVERRIDES_JSON={"starter_system":{"stripe_product_id":"prod_UYhtwNW8eVqQdI","setup_price_id":"price_1TZaTKBVGjsISdG0FYZuolxJ","monthly_price_id":"price_1TZaTLBVGjsISdG0dj7Y62fu"},"growth_system":{"stripe_product_id":"prod_UYhtW1TiATAaSS","setup_price_id":"price_1TZaTLBVGjsISdG0OLeOUdAH","monthly_price_id":"price_1TZaTMBVGjsISdG0FlG2VVWG"},"pro_system":{"stripe_product_id":"prod_UYhtICcoNgWC9d","setup_price_id":"price_1TZaTMBVGjsISdG0TtdrSHRP","monthly_price_id":"price_1TZaTNBVGjsISdG0t7w5I7gM"}}
 RESEND_API_KEY=<test-safe key or restricted key>
 RESEND_FROM_EMAIL=<verified test sender>
 TWILIO_ACCOUNT_SID=<test/sandbox account sid>
@@ -45,7 +45,7 @@ TELEGRAM_BOT_TOKEN=<test bot token, if Telegram staging alerts are enabled>
 
 Never commit actual values. Use Base44 environment settings or local ignored env files.
 
-`STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` contains Stripe resource IDs, not secrets. Use it only in staging/test environments so checkout sessions point at Stripe test-mode prices while production keeps the live catalog IDs baked into the default source catalog. Each package override must include `stripe_product_id`, `setup_price_id`, and `monthly_price_id`; malformed JSON or partial package overrides fail closed instead of mixing test and live Stripe IDs.
+`STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` contains Stripe resource IDs, not secrets. Use it only in staging/test environments so checkout sessions point at Stripe test-mode prices while production keeps the live catalog IDs baked into the default source catalog. Each package override must include `stripe_product_id`, `setup_price_id`, and `monthly_price_id`; malformed JSON or partial package overrides fail closed instead of mixing test and live Stripe IDs. Legacy `elite_system` override keys still resolve to Pro for backward compatibility, but current staging examples should use `pro_system`.
 
 ## QA Data Rules
 

@@ -52,13 +52,24 @@ function normalizeIndustrySlug(value: unknown) {
     .replace(/^_+|_+$/g, '');
 }
 
+function canonicalIndustrySlug(value: unknown) {
+  const slug = normalizeIndustrySlug(value);
+  if (slug.includes('roof')) return 'roofing';
+  if (slug.includes('hvac')) return 'hvac';
+  if (slug.includes('plumb')) return 'plumbing';
+  if (slug.includes('dental') || slug.includes('dentist') || slug.includes('orthodont')) return 'dental';
+  if (slug.includes('med_spa') || slug.includes('aesthetic')) return 'med_spa';
+  return slug;
+}
+
 function inferIndustrySlug(payload: Record<string, unknown>) {
-  const explicit = normalizeIndustrySlug(payload.industry_slug);
+  const explicit = canonicalIndustrySlug(payload.industry_slug);
   if (explicit) return explicit;
 
-  const combined = normalizeIndustrySlug(`${payload.industry || ''} ${payload.business_type || ''}`);
+  const combined = canonicalIndustrySlug(`${payload.industry || ''} ${payload.business_type || ''}`);
   if (combined.includes('roof')) return 'roofing';
   if (combined.includes('hvac')) return 'hvac';
+  if (combined.includes('plumb')) return 'plumbing';
   if (combined.includes('dental') || combined.includes('dentist') || combined.includes('orthodont')) return 'dental';
   if (combined.includes('med_spa') || combined.includes('aesthetic')) return 'med_spa';
   if (combined.includes('chiropractic') || combined.includes('physical_therapy')) return 'chiropractic';
@@ -71,9 +82,11 @@ function normalizeIndustryTags(value: unknown, industrySlug = '') {
     ? value.map((entry) => normalizeIndustrySlug(entry)).filter(Boolean)
     : [];
   if (industrySlug) tags.push(industrySlug, `${industrySlug}_landing_page`);
-  if (industrySlug === 'roofing') tags.push('free_roofing_automation_audit');
-  if (industrySlug === 'hvac') tags.push('free_hvac_automation_audit', 'missed_call_text_back', 'after_hours_lead_capture');
-  if (industrySlug === 'dental') tags.push('free_dental_automation_audit');
+  if (industrySlug === 'roofing') tags.push('roofing_lead', 'free_roofing_automation_audit');
+  if (industrySlug === 'hvac') tags.push('hvac_lead', 'free_hvac_automation_audit', 'missed_call_text_back', 'after_hours_lead_capture');
+  if (industrySlug === 'dental') tags.push('dental_lead', 'free_dental_automation_audit');
+  if (industrySlug === 'med_spa') tags.push('med_spa_lead', 'free_med_spa_automation_audit');
+  if (industrySlug === 'plumbing') tags.push('plumbing_lead', 'free_plumbing_automation_audit', 'missed_call_text_back', 'emergency_service_request');
   return [...new Set(tags)];
 }
 
@@ -81,6 +94,8 @@ function leadScoreForIndustry(industrySlug: string) {
   if (industrySlug === 'roofing') return 75;
   if (industrySlug === 'hvac') return 72;
   if (industrySlug === 'dental') return 70;
+  if (industrySlug === 'med_spa') return 73;
+  if (industrySlug === 'plumbing') return 72;
   return 50;
 }
 
@@ -88,7 +103,21 @@ function auditNameForIndustry(industrySlug = '') {
   if (industrySlug === 'roofing') return 'Roofing Automation Audit';
   if (industrySlug === 'dental') return 'Dental Automation Audit';
   if (industrySlug === 'hvac') return 'HVAC Automation Audit';
+  if (industrySlug === 'med_spa') return 'Med Spa Automation Audit';
+  if (industrySlug === 'plumbing') return 'Plumbing Automation Audit';
   return 'Automation Audit';
+}
+
+function crmTagForIndustry(industrySlug = '', fallback = '') {
+  const canonical = canonicalIndustrySlug(industrySlug || fallback);
+  const tags: Record<string, string> = {
+    roofing: 'roofing_lead',
+    hvac: 'hvac_lead',
+    dental: 'dental_lead',
+    med_spa: 'med_spa_lead',
+    plumbing: 'plumbing_lead',
+  };
+  return tags[canonical] || sanitizeString(fallback, 'automation_audit_lead') || 'automation_audit_lead';
 }
 
 function normalizePayload(payload: Record<string, unknown>) {
@@ -117,6 +146,7 @@ function normalizePayload(payload: Record<string, unknown>) {
     utm_campaign: sanitizeString(payload.utm_campaign),
     utm_content: sanitizeString(payload.utm_content),
     referrer: sanitizeString(payload.referrer),
+    crm_tag: crmTagForIndustry(industry_slug, payload.crm_tag as string),
     consent_given: payload.consent_given === true,
     consent_source: sanitizeString(payload.consent_source),
     consent_text_version: sanitizeString(payload.consent_text_version),
@@ -128,6 +158,10 @@ function validatePayload(payload: ReturnType<typeof normalizePayload>) {
 
   if (!payload.full_name) errors.push('Full name is required');
   if (!payload.business_name) errors.push('Business name is required');
+  if (!payload.industry || payload.industry === 'General') errors.push('Industry is required');
+  if (!payload.business_website_url && !payload.website) errors.push('Website is required');
+  if (!payload.biggest_issue) errors.push('What should we review is required');
+  if (payload.consent_given !== true) errors.push('Consent is required');
 
   if (!payload.email) {
     errors.push('Email is required');
@@ -189,6 +223,26 @@ function parseBookingDateTime(date: string, time: string) {
   return bookingDate.toISOString();
 }
 
+function mergeSourceHistory(
+  payload: ReturnType<typeof normalizePayload>,
+  existingLead: Record<string, unknown> | null = null
+) {
+  const previous = Array.isArray(existingLead?.source_history)
+    ? existingLead.source_history
+    : typeof existingLead?.source_history === 'string'
+      ? [existingLead.source_history]
+      : [];
+  const current = [
+    payload.source || LEAD_SOURCE,
+    payload.source_page ? `page:${payload.source_page}` : '',
+    payload.utm_source ? `utm_source:${payload.utm_source}` : '',
+    payload.utm_campaign ? `utm_campaign:${payload.utm_campaign}` : '',
+    payload.referrer ? `referrer:${payload.referrer}` : '',
+  ].filter(Boolean);
+
+  return [...new Set([...previous, ...current])];
+}
+
 function isRecentDuplicate(existingLead: Record<string, unknown>, payload: ReturnType<typeof normalizePayload>) {
   const createdDate = typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
   const isWithinWindow = createdDate > 0 && Date.now() - createdDate < DUPLICATE_WINDOW_MS;
@@ -199,7 +253,10 @@ function isRecentDuplicate(existingLead: Record<string, unknown>, payload: Retur
   return isWithinWindow && sameBusiness;
 }
 
-function buildLeadPayload(payload: ReturnType<typeof normalizePayload>) {
+function buildLeadPayload(
+  payload: ReturnType<typeof normalizePayload>,
+  existingLead: Record<string, unknown> | null = null
+) {
   const now = new Date().toISOString();
   const score = leadScoreForIndustry(payload.industry_slug);
   return {
@@ -213,7 +270,7 @@ function buildLeadPayload(payload: ReturnType<typeof normalizePayload>) {
     problem: payload.biggest_issue || payload.monthly_leads || 'Free Automation Audit booking',
     source: payload.source || LEAD_SOURCE,
     source_page: payload.source_page,
-    source_history: [payload.source || LEAD_SOURCE, payload.source_page ? `page:${payload.source_page}` : ''].filter(Boolean),
+    source_history: mergeSourceHistory(payload, existingLead),
     intake_type: INTAKE_TYPE,
     status: 'Booked',
     crm_stage: 'Audit Booked',
@@ -225,7 +282,8 @@ function buildLeadPayload(payload: ReturnType<typeof normalizePayload>) {
     website_url: payload.business_website_url || payload.website,
     page_submitted_from: payload.source_page,
     package_interest: payload.service_interest,
-    crm_tag: payload.industry_slug,
+    service_interest: payload.service_interest,
+    crm_tag: payload.crm_tag,
     industry_tags: payload.industry_tags,
     assigned_agent_name: payload.industry_slug ? `sales_rep_${payload.industry_slug}` : undefined,
     assigned_at: now,
@@ -343,7 +401,7 @@ Deno.serve(async (req) => {
       existingLead = phoneMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, payload)) || null;
     }
 
-    const leadPayload = buildLeadPayload(payload);
+    const leadPayload = buildLeadPayload(payload, existingLead);
     const auditName = auditNameForIndustry(payload.industry_slug);
     let lead;
 
@@ -451,8 +509,14 @@ Deno.serve(async (req) => {
             biggest_issue: payload.biggest_issue,
             industry: payload.industry,
             industry_slug: payload.industry_slug,
+            crm_tag: payload.crm_tag,
             industry_tags: payload.industry_tags,
             source_page: payload.source_page,
+            utm_source: payload.utm_source,
+            utm_medium: payload.utm_medium,
+            utm_campaign: payload.utm_campaign,
+            utm_content: payload.utm_content,
+            referrer: payload.referrer,
             business_website_url: payload.business_website_url || payload.website,
           }),
       },

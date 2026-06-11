@@ -44,6 +44,12 @@ const INDUSTRY_CONFIG = {
     serviceType: "HVAC Contractor Automation",
     areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Mesa, AZ", "Chandler, AZ", "Tempe, AZ"],
   },
+  plumbing: {
+    name: "Plumbing Contractor AI Automation - ClientSurge Systems",
+    description: "AI lead response, missed-call recovery, and dispatch handoff automation for plumbing companies in Phoenix & Scottsdale, AZ.",
+    serviceType: "Plumbing Contractor Automation",
+    areaServed: ["Phoenix, AZ", "Scottsdale, AZ", "Mesa, AZ", "Chandler, AZ", "Tempe, AZ"],
+  },
   roofing: {
     name: "Roofing Contractor AI Automation — ClientSurge Systems",
     description: "AI lead capture and instant response for roofing contractors in the Phoenix metropolitan area.",

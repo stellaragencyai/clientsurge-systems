@@ -119,7 +119,7 @@ function DemoCard({ eyebrow, icon: Icon, title, body, badge, highlighted, href, 
                 textShadow: "0 1px 2px rgba(0,0,0,0.3)",
               }}
             >
-              Make the Leap
+              Free Automation Audit
               <ArrowRight className="w-3.5 h-3.5" />
             </span>
           </button>
@@ -131,7 +131,7 @@ function DemoCard({ eyebrow, icon: Icon, title, body, badge, highlighted, href, 
             className="inline-flex items-center justify-center gap-2 w-full h-10 rounded-full border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
             style={{ textDecoration: "none" }}
           >
-            {external ? "Watch Demo" : "Make the Leap"}
+            {external ? "Watch Demo" : "Free Automation Audit"}
             <ArrowRight className="w-3.5 h-3.5" />
           </a>
         )}

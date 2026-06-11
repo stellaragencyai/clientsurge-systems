@@ -92,7 +92,7 @@ const TRACKED_INSTALL_SERVICES_BY_KEY = Object.fromEntries(
 const PACKAGE_ACTIVATION_DEFINITIONS = {
   basic: {
     package_tier: "basic",
-    package_key: "basic_website_plus_two_automations",
+    package_key: "starter_system",
     package_name: "Website Redesign + Instant Lead Response + Missed Call Text-Back",
     plan: "Starter System",
     service_keys: ["instant_lead_response", "missed_call_text_back"],
@@ -107,7 +107,7 @@ const PACKAGE_ACTIVATION_DEFINITIONS = {
   },
   growth: {
     package_tier: "growth",
-    package_key: "growth_website_plus_four_automations",
+    package_key: "growth_system",
     package_name: "Website Redesign + Four-Automation Growth Stack",
     plan: "Growth System",
     service_keys: [
@@ -130,7 +130,7 @@ const PACKAGE_ACTIVATION_DEFINITIONS = {
   },
   pro: {
     package_tier: "pro",
-    package_key: "pro_website_plus_six_automations",
+    package_key: "pro_system",
     package_name: "Website Redesign + Full Six-Automation Stack",
     plan: "Pro System",
     service_keys: [
@@ -2204,6 +2204,16 @@ async function handleInstallPipelineRequest(req: Request) {
     }
 
     if (action === "initialize") {
+      if (order.payment_status !== "paid") {
+        return secureJson(
+          {
+            error: "Install pipeline can only initialize paid/manual-paid orders.",
+            code: "install_pipeline_requires_paid_order",
+          },
+          { status: 409 }
+        );
+      }
+
       const result = await initializePaidOrderInstallPipeline({
         base44,
         order,

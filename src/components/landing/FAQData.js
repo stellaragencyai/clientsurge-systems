@@ -31,7 +31,7 @@ export const FAQ_ITEMS = [
   },
   {
     q: "How much does it cost?",
-    a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Elite - depending on your lead volume and goals. See our Pricing section for full details.",
+    a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Pro - depending on your lead volume and goals. See our Pricing section for full details.",
     category: "pricing",
   },
   {

@@ -7,7 +7,7 @@
 export const CANONICAL_TIER_SERVICE_MAP: Record<string, string[]> = {
   starter_system: [
     "instant_lead_response",
-    "ai_booking_agent",
+    "missed_call_text_back",
   ],
   growth_system: [
     "instant_lead_response",

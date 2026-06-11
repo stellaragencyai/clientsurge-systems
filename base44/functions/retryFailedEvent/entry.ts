@@ -1,154 +1,178 @@
+import { secureJson } from "../_shared/response.ts";
 /**
- * retryFailedEvent — Admin-only. Retries a failed CommunicationEvent.
- * Self-contained — no local imports.
+ * retryFailedEvent
+ * Re-processes a failed CommunicationEvent by replaying the underlying action.
+ * Supports: sms (Twilio), email (Resend), stripe (re-invoke stripeWebhookOrders)
+ *
+ * Payload: { event_id: string }
  */
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
-  });
-}
-
-function normalizePhone(phone) {
-  if (!phone) return null;
-  const digits = String(phone).replace(/\D/g, "");
-  if (digits.length === 10) return `+1${digits}`;
-  if (digits.length === 11 && digits[0] === "1") return `+${digits}`;
-  if (digits.length > 7) return `+${digits}`;
-  return null;
-}
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
+import { appendSmsOptOut } from "../_shared/smsOptOut.js";
+import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
+import { getStripeSecretKey, safeStripeError } from "../_shared/stripeInit.js";
 
 Deno.serve(async (req) => {
-  const base44 = createClientFromRequest(req);
-
-  // Admin-only
-  let user = null;
+  const requestId = crypto.randomUUID();
   try {
-    user = await base44.auth.me();
-  } catch {
-    return json({ error: "Unauthorized" }, 401);
-  }
-  if (!user || user.role !== "admin") {
-    return json({ error: "Admin access required" }, 403);
-  }
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    if (!user || user.role !== 'admin') {
+      return secureJson({ error: 'Admin access required' }, { status: 403 });
+    }
 
-  let body = {};
-  try {
-    body = await req.json();
-  } catch {
-    return json({ error: "Invalid JSON body" }, 400);
-  }
+    const { event_id } = await req.json().catch(() => ({}));
+    if (!event_id) return secureJson({ error: 'Missing event_id' }, { status: 400 });
 
-  const { event_id } = body;
-  if (!event_id) return json({ error: "event_id required" }, 400);
+    // Load the failed event
+    const events = await base44.asServiceRole.entities.CommunicationEvent.filter({ id: event_id });
+    const evt = events?.[0];
+    if (!evt) return secureJson({ error: 'Event not found' }, { status: 404 });
+    if (evt.status !== 'failed') return secureJson({ error: 'Event is not in failed status' }, { status: 400 });
 
-  // Load the event
-  const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
-    { id: event_id }, "-created_date", 1
-  ).catch(() => []);
-  const evt = events?.[0];
-  if (!evt) return json({ error: "Event not found" }, 404);
-  if (evt.status !== "failed") {
-    return json({ error: `Event status is '${evt.status}' — only 'failed' events can be retried` }, 400);
-  }
+    console.log(`[retryFailedEvent] Retrying event ${event_id} — provider: ${evt.provider}, channel: ${evt.channel}`);
 
-  console.log("[retryFailedEvent] Retrying", { event_id, channel: evt.channel, provider: evt.provider });
-
-  try {
     let retryResult = null;
 
-    // SMS retry via Twilio
-    if (evt.channel === "sms" && evt.provider === "twilio") {
-      const TWILIO_SID = Deno.env.get("TWILIO_ACCOUNT_SID");
-      const TWILIO_TOKEN = Deno.env.get("TWILIO_AUTH_TOKEN");
-      const TWILIO_FROM = Deno.env.get("TWILIO_PHONE_NUMBER") || Deno.env.get("TWILIO_FROM_NUMBER");
+    // --- SMS retry via Twilio ---
+    if (evt.channel === 'sms' && evt.provider === 'twilio') {
+      const TWILIO_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
+      const TWILIO_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
+      const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER');
 
       if (!TWILIO_SID || !TWILIO_TOKEN || !TWILIO_FROM) {
-        return json({ error: "Twilio credentials not configured" }, 500);
+        return secureJson({ error: 'Twilio credentials not configured' }, { status: 500 });
       }
 
+      // Get phone from lead if linked
       let toPhone = null;
       if (evt.lead_id) {
-        const leads = await base44.asServiceRole.entities.Leads.filter({ id: evt.lead_id }, "-created_date", 1).catch(() => []);
+        const leads = await base44.asServiceRole.entities.Leads.filter({ id: evt.lead_id });
         toPhone = leads?.[0]?.phone;
       }
       if (!toPhone && evt.metadata_json) {
         try { toPhone = JSON.parse(evt.metadata_json)?.to; } catch {}
       }
-      const normalizedPhone = normalizePhone(toPhone);
-      if (!normalizedPhone) return json({ error: "Cannot determine valid destination phone number" }, 400);
+      if (!toPhone) return secureJson({ error: 'Cannot determine destination phone number' }, { status: 400 });
 
-      const messageBody = evt.message_body;
-      if (!messageBody) return json({ error: "No message body to retry" }, 400);
+      const body = evt.message_body;
+      if (!body) return secureJson({ error: 'No message body to retry' }, { status: 400 });
 
-      const auth = btoa(`${TWILIO_SID}:${TWILIO_TOKEN}`);
-      const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
-        method: "POST",
-        headers: { "Authorization": `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
-        body: new URLSearchParams({ From: TWILIO_FROM, To: normalizedPhone, Body: messageBody }).toString(),
+      const formData = new URLSearchParams({ From: TWILIO_FROM, To: toPhone, Body: appendSmsOptOut(body) });
+      const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${TWILIO_SID}/Messages.json`, {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Basic ' + btoa(`${TWILIO_SID}:${TWILIO_TOKEN}`),
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: formData,
       });
       const data = await res.json();
-      if (!res.ok || data.error_code) throw new Error(`Twilio error: ${data.message} (code: ${data.error_code})`);
-      retryResult = { provider_message_id: data.sid, status: "sent", to: normalizedPhone };
+      if (!res.ok) throw new Error(`Twilio error: ${data.message}`);
+      retryResult = { provider_message_id: data.sid, status: 'sent' };
     }
 
-    // Email retry via Resend
-    else if (evt.channel === "email") {
-      const RESEND_KEY = Deno.env.get("RESEND_API_KEY");
-      const RESEND_FROM = Deno.env.get("RESEND_FROM_EMAIL");
-      if (!RESEND_KEY || !RESEND_FROM) return json({ error: "Resend credentials not configured" }, 500);
+    // --- Email retry via Resend ---
+    else if (evt.channel === 'email' && evt.provider === 'resend') {
+      const RESEND_KEY = Deno.env.get('RESEND_API_KEY');
+      const RESEND_FROM = Deno.env.get('RESEND_FROM_EMAIL');
+      if (!RESEND_KEY || !RESEND_FROM) {
+        return secureJson({ error: 'Resend credentials not configured' }, { status: 500 });
+      }
 
       let toEmail = null;
       if (evt.lead_id) {
-        const leads = await base44.asServiceRole.entities.Leads.filter({ id: evt.lead_id }, "-created_date", 1).catch(() => []);
+        const leads = await base44.asServiceRole.entities.Leads.filter({ id: evt.lead_id });
         toEmail = leads?.[0]?.email;
-      }
-      if (!toEmail && evt.order_id) {
-        const orders = await base44.asServiceRole.entities.Order.filter({ id: evt.order_id }, "-created_date", 1).catch(() => []);
-        toEmail = orders?.[0]?.customer_email;
       }
       if (!toEmail && evt.metadata_json) {
         try { toEmail = JSON.parse(evt.metadata_json)?.to; } catch {}
       }
-      if (!toEmail) return json({ error: "Cannot determine destination email" }, 400);
+      if (!toEmail) return secureJson({ error: 'Cannot determine destination email' }, { status: 400 });
 
-      const res = await fetch("https://api.resend.com/emails", {
-        method: "POST",
-        headers: { "Authorization": `Bearer ${RESEND_KEY}`, "Content-Type": "application/json" },
+      const res = await resendFetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${RESEND_KEY}`,
+          'Content-Type': 'application/json',
+        },
         body: JSON.stringify({
           from: RESEND_FROM,
           to: [toEmail],
-          subject: evt.subject || "(No subject)",
-          html: evt.message_body || "(No content)",
+          subject: evt.subject || '(No subject)',
+          html: evt.message_body || '(No content)',
         }),
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(`Resend error: ${data.message || res.status}`);
-      retryResult = { provider_message_id: data.id, status: "sent", to: toEmail };
+      if (!res.ok) throw new Error(`Resend error: ${data.message}`);
+      retryResult = { provider_message_id: data.id, status: 'sent' };
+    }
+
+    // --- Stripe event re-invoke (via stripeWebhookOrders) ---
+    else if (evt.provider === 'stripe') {
+      // Re-fetch the Stripe event and re-process
+      let stripeKey;
+      try {
+        stripeKey = getStripeSecretKey();
+      } catch (error) {
+        const safeError = safeStripeError(error);
+        console.error('[retryFailedEvent] Stripe is not configured', {
+          requestId,
+          event_id,
+          code: safeError.code,
+        });
+        return secureJson(
+          { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+          { status: safeError.status }
+        );
+      }
+
+      const stripeEventId = evt.provider_message_id;
+      if (!stripeEventId) return secureJson({ error: 'No Stripe event ID stored — cannot retry' }, { status: 400 });
+
+      const stripeRes = await stripeFetch(`https://api.stripe.com/v1/events/${stripeEventId}`, {
+        headers: { 'Authorization': `Bearer ${stripeKey}` },
+      });
+      if (!stripeRes.ok) {
+        const err = await stripeRes.json();
+        throw new Error(`Stripe fetch error: ${err.error?.message}`);
+      }
+
+      // Call stripeWebhookOrders via SDK — can't re-sign, so log it
+      console.log(`[retryFailedEvent] Stripe event ${stripeEventId} fetched — manual reprocess required via Stripe Dashboard > Webhooks > Resend`);
+      retryResult = {
+        status: 'manual_required',
+        message: `Stripe webhook re-signing not possible from backend. Use Stripe Dashboard → Developers → Webhooks → "Resend" to replay event ${stripeEventId}.`,
+        stripe_event_id: stripeEventId,
+      };
     }
 
     else {
-      return json({ error: `No retry strategy for channel=${evt.channel} provider=${evt.provider}` }, 400);
+      return secureJson({ error: `No retry strategy for channel=${evt.channel} provider=${evt.provider}` }, { status: 400 });
     }
 
-    // Update event status
-    await base44.asServiceRole.entities.CommunicationEvent.update(event_id, {
-      status: "sent",
-      provider_message_id: retryResult.provider_message_id || evt.provider_message_id,
-      error_message: null,
-    }).catch(() => null);
+    // Update the event status
+    if (retryResult?.status === 'sent') {
+      await base44.asServiceRole.entities.CommunicationEvent.update(event_id, {
+        status: 'sent',
+        provider_message_id: retryResult.provider_message_id || evt.provider_message_id,
+        error_message: null,
+      });
+    }
 
-    console.log("[retryFailedEvent] Retry successful", { event_id, result: retryResult });
-    return json({ success: true, event_id, result: retryResult });
+    console.log(`[retryFailedEvent] Done. Result:`, retryResult);
+    return secureJson({ success: true, result: retryResult });
 
-  } catch (err) {
-    console.error("[retryFailedEvent] Retry failed", { event_id, error: err.message });
-    // Log the retry attempt failure but keep status as failed
-    await base44.asServiceRole.entities.CommunicationEvent.update(event_id, {
-      error_message: `Retry failed at ${new Date().toISOString()}: ${err.message}`,
-    }).catch(() => null);
-    return json({ error: err.message, event_id }, 500);
+  } catch (error) {
+    const safeError = safeStripeError(error, 'Unable to retry this event. Please contact support.');
+    console.error('[retryFailedEvent] Error', {
+      requestId,
+      code: safeError.code,
+      message: safeError.internalMessage,
+    });
+    return secureJson(
+      { error: safeError.userMessage, code: safeError.code, request_id: requestId },
+      { status: safeError.status }
+    );
   }
 });

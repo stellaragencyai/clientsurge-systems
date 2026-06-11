@@ -102,7 +102,7 @@ This task verifies the entire missed call recovery automation from initial call 
 
 1. **From time of SMS receipt, wait ~8 more minutes** (total ~10 min from missed call)
 2. Check your email inbox for:
-   - **From:** RESEND_FROM_EMAIL (e.g., noreply@clientsurge.com)
+   - **From:** RESEND_FROM_EMAIL (e.g., support@clientsurgesystems.com)
    - **Subject:** "Most people ask us this"
    - **Body:** Mentions pricing, availability, same-day service + booking link
 3. **Note receipt time:** [__:__:__ AM/PM]

@@ -2,10 +2,20 @@ import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 import { resendFetch } from "../_shared/resendFetch.js";
 
+function prepFocusForIndustry(industrySlug = '') {
+  const slug = String(industrySlug || '').toLowerCase();
+  if (slug === 'roofing') return 'storm leads, roof repair leads, quote requests, missed inspection requests, and estimate follow-up';
+  if (slug === 'hvac') return 'after-hours AC/heating leads, emergency calls, appointment booking, seasonal demand spikes, and maintenance plan opportunities';
+  if (slug === 'dental') return 'new-patient calls, appointment requests, front desk overload, recall/follow-up, and missed patient inquiries';
+  if (slug === 'med_spa' || slug === 'med-spa') return 'consultation requests, aesthetic treatment inquiries, missed DMs/calls, booking handoff, and lead nurture';
+  if (slug === 'plumbing') return 'emergency leaks, drain repair, water heater calls, urgent missed calls, and dispatch handoff expectations';
+  return 'lead capture, follow-up, booking handoff, and missed-call recovery';
+}
+
 Deno.serve(async (req) => {
   try {
     createClientFromRequest(req);
-    const { email, full_name, business_name, scheduled_date, scheduled_time } = await req.json();
+    const { email, full_name, business_name, scheduled_date, scheduled_time, industry_slug } = await req.json();
 
     if (!email || !full_name || !scheduled_date || !scheduled_time) {
       return secureJson({ error: 'Missing required fields' }, { status: 400 });
@@ -21,6 +31,7 @@ Deno.serve(async (req) => {
     const [hour, minute] = scheduled_time.split(':');
     const h = parseInt(hour, 10);
     const formattedTime = `${h > 12 ? h - 12 : h}:${minute} ${h >= 12 ? 'PM' : 'AM'} (Arizona Time)`;
+    const prepFocus = prepFocusForIndustry(industry_slug);
 
     const resendApiKey = Deno.env.get('RESEND_API_KEY');
 
@@ -43,9 +54,10 @@ Deno.serve(async (req) => {
         <li>Your current booking link or scheduling process</li>
         <li>A rough sense of how many leads you receive in a typical month</li>
         <li>The biggest bottleneck you want fixed first for ${business_name || 'your business'}</li>
+        <li>Any notes about ${prepFocus}</li>
       </ol>
     </div>
-    <p>We will use that information to tailor the audit, show the fastest automation wins, and make the next steps as specific to your business as possible.</p>
+    <p>We will use that information to tailor the audit around ${prepFocus}, then make the next steps as specific to your business as possible.</p>
     <p style="margin-top: 24px;">See you soon,<br/><strong>The ClientSurge Systems Team</strong></p>
     <p style="font-size: 12px; color: #999; margin-top: 24px;">Need help before the call? Reply to this email or call <a href="tel:+16025843227">(602) 584-3227</a></p>
   </div>

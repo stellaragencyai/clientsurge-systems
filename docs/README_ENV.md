@@ -17,6 +17,8 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook handlers | Canonical webhook signing secret (`whsec_...`). |
 | `RESEND_API_KEY` | Email functions and health checks | Resend API key (`re_...`). |
 | `RESEND_FROM_EMAIL` | Email functions | Verified sender on an authenticated Resend domain. |
+| `RESEND_FROM_LEADS` | Website lead confirmations, campaign sender fallback | Verified sender for public lead/audit confirmations. |
+| `RESEND_REPLY_TO_LEADS` | Lead confirmations and admin alerts | Monitored reply-to inbox for lead replies. |
 | `TWILIO_ACCOUNT_SID` | SMS/voice functions | Twilio account SID (`AC...`). |
 | `TWILIO_AUTH_TOKEN` | SMS/voice functions and webhook validation | Twilio auth token. |
 | `TWILIO_PHONE_NUMBER` | SMS/voice sends | Provisioned Twilio number in E.164 format. |
@@ -24,6 +26,8 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 | `ADMIN_EMAIL` | Admin notifications and reply-to fallback | Primary admin email. |
 | `ADMIN_NOTIFICATION_EMAIL` | Alerts, digests, credential notices | Operational alert recipient. |
 | `AUTOMATION_SHARED_SECRET` | Internal automation endpoints | Random high-entropy shared secret. |
+| `EMAIL_DELIVERABILITY_PROOF_STATUS` | Direct/campaign email send gates | Must be `verified`, `passed`, or `production_verified` before non-test direct or campaign sends. |
+| `EMAIL_CAMPAIGN_ENABLED` | `sendEmailCampaign` | Must be `true` before campaign sends; keep `false` until DNS/provider/unsubscribe/suppression proof is complete. |
 
 ## Webhook / Provider Secrets
 
@@ -47,6 +51,8 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 | `DEFAULT_BOOKING_LINK` | Booking and follow-up templates | Fallback scheduling URL. |
 | `DEFAULT_BUSINESS_NAME` | SMS/email templates | Fallback business name. |
 | `ADMIN_NOTIFICATION_PHONE` | Voice briefing / admin SMS paths | Admin phone in E.164 format. |
+| `TEST_EMAIL_RECIPIENT` | Safe email test harness | Single approved test inbox only. Do not set to a customer or prospect recipient. |
+| `EMAIL_TEST_MODE` | Safe email test harness and direct safe-test sends | Must be `true` for local safe test sends; keep `false` in ordinary production operation. |
 | `CLIENTSURGE_CHECKOUT_CAPACITY_LIMIT` | Checkout capacity guard | Optional numeric capacity cap. |
 | `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` | Staging Stripe checkout proof | Optional staging/test-only JSON map for package product/setup/monthly test price IDs. Each package override must include product, setup price, and monthly price IDs or checkout fails closed. Do not set in production. |
 | `EXTERNAL_WEBHOOK_URL` | CRM / automation handoff | Preferred outbound webhook target. |

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Building2,
+  Droplets,
   Heart,
   Home,
   MapPin,
@@ -48,6 +49,14 @@ const industryPatterns = {
         <rect x="9" y="9" width="6" height="6" fill="white"/>
       </pattern></defs>
       <rect width="100%" height="100%" fill="url(#pat-hvac)"/>
+    </svg>
+  ),
+  "plumbing": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-plumbing" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+        <path d="M15 3 C22 12 25 17 25 22 A10 10 0 0 1 5 22 C5 17 8 12 15 3Z" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-plumbing)"/>
     </svg>
   ),
   "roofing": (
@@ -116,7 +125,7 @@ const industries = [
   id: "hvac",
   routePath: "/hvac",
   icon: Wrench,
-  name: "HVAC, Plumbing & Home Services",
+  name: "HVAC & Heating/Cooling",
   accent: {
     color: "#0284c7",
     soft: "rgba(2,132,199,0.18)",
@@ -125,6 +134,20 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95"
+},
+{
+  id: "plumbing",
+  routePath: "/plumbing",
+  icon: Droplets,
+  name: "Plumbing & Drain Services",
+  accent: {
+    color: "#0891b2",
+    soft: "rgba(8,145,178,0.18)",
+    glow: "rgba(8,145,178,0.28)",
+    iconBg: "rgba(8,145,178,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=95"
 },
 {
   id: "roofing",
