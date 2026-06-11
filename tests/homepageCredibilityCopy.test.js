@@ -68,7 +68,7 @@ test("homepage launch copy uses proof-oriented language instead", () => {
   assert.match(copy, /proof steps required before go-live/);
   assert.match(copy, /launch timeline confirmed after onboarding/);
   assert.match(copy, /Actual results depend on lead volume/);
-  assert.match(copy, /Performance is reviewed after launch/);
+  assert.match(copy, /After launch, the system is reviewed against response speed/i);
   assert.match(copy, /Illustrative flow showing the automation path/);
 });
 
