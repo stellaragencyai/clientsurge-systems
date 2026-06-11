@@ -477,6 +477,17 @@ test("Cloudflare asset rewrite strips stale rickroll demo URL and restores plumb
 
   assert.match(repairedRoutes, /"med-spa","dental","hvac","plumbing","roofing","chiropractic","contractors"/);
   assert.doesNotMatch(repairedRoutes, /"med-spa","dental","hvac","roofing","chiropractic","contractors"/);
+
+  const staleIndustryChunk = 'const Le={hvac:{id:"hvac"},roofing:{id:"roofing"}};function Fe(s){return Le[s]||null}';
+  const repairedIndustryChunk = repairStaleDemoBookingModalAsset(staleIndustryChunk);
+
+  assert.match(repairedIndustryChunk, /plumbing:\{id:"plumbing"/);
+  assert.match(repairedIndustryChunk, /name:"Plumbing & Drain Services"/);
+  assert.match(repairedIndustryChunk, /roofing:\{id:"roofing"/);
+  assert.equal(
+    repairStaleDemoBookingModalAsset(repairedIndustryChunk),
+    repairedIndustryChunk
+  );
   assert.equal(repairStaleDemoBookingModalAsset("const ok = true;"), "const ok = true;");
 });
 
