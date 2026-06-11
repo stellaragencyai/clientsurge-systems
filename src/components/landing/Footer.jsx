@@ -4,11 +4,11 @@ import { useNavigate } from "react-router-dom";
 
 const AUTOMATIONS = [
   { label: "AI Voice Agents", desc: "AI phone receptionist for inbound lead capture.", href: "/automations", icon: Headphones },
-  { label: "Missed Call Text-Back", desc: "Recover missed calls automatically.", href: "/missed-call-text-back", icon: Phone },
-  { label: "Instant Lead Response", desc: "Reply to every lead in under 60 seconds.", href: "/lead-capture-automation", icon: Zap },
-  { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/appointment-booking-automation", icon: Calendar },
-  { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/customer-reactivation", icon: RefreshCw },
-  { label: "Review Request System", desc: "Auto-request reviews after every appointment.", href: "/review-automation", icon: Star },
+  { label: "Missed Call Text-Back", desc: "Recover missed calls automatically.", href: "/automations", icon: Phone },
+  { label: "Instant Lead Response", desc: "Reply to every lead in under 60 seconds.", href: "/automations", icon: Zap },
+  { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/automations", icon: Calendar },
+  { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/automations", icon: RefreshCw },
+  { label: "Review Request System", desc: "Auto-request reviews after every appointment.", href: "/automations", icon: Star },
 ];
 
 const navColumns = [
@@ -106,8 +106,6 @@ export default function Footer() {
               alt="ClientSurge Systems"
               width="240"
               height="60"
-              loading="lazy"
-              decoding="async"
             />
           </div>
           <p>

@@ -349,28 +349,9 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
 
       setSuccess(true);
     } catch (error) {
-      const msg = error?.message || "";
-      const isSlotConflict = msg.toLowerCase().includes("slot") || msg.toLowerCase().includes("taken") || msg.toLowerCase().includes("no more slots");
-      const isRateLimit = msg.toLowerCase().includes("wait");
       setErrors({
-        submit: isSlotConflict
-          ? msg
-          : isRateLimit
-          ? msg
-          : "We could not book the audit automatically. Please call or email us directly.",
-        ...(isSlotConflict ? { scheduled_time: "This time slot was just taken — please choose another." } : {}),
+        submit: "We could not book the audit automatically. Please call or email us directly.",
       });
-      // If slot conflict, reload booked slots for the selected date so UI reflects reality
-      if (isSlotConflict && form.scheduled_date) {
-        setForm((current) => ({ ...current, scheduled_time: "" }));
-        setBookedSlots([]);
-        try {
-          const r = await base44.functions.invoke("getBookedDemoSlots", { date: form.scheduled_date });
-          setBookedSlots(r?.data?.booked_times || []);
-        } catch {
-          // silent — user will just need to pick again
-        }
-      }
     } finally {
       setLoading(false);
     }

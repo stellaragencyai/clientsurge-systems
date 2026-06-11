@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
         }, { status: 403 });
       }
 
-      const resendEmailResult = await resendFetch('https://api.resend.com/emails', {
+      const resendResponse = await resendFetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
@@ -84,11 +84,16 @@ Deno.serve(async (req) => {
         }),
       });
 
-      emailResult = await resendEmailResult.json().catch(() => ({}));
-      if (!resendEmailResult.ok) {
+      const resendPayload = await resendResponse.text();
+      try {
+        emailResult = resendPayload ? JSON.parse(resendPayload) : {};
+      } catch {
+        emailResult = {};
+      }
+      if (!resendResponse.ok) {
         emailResult = {
           error: {
-            message: emailResult?.message || `Resend error ${resendEmailResult.status}`,
+            message: emailResult?.message || `Resend error ${resendResponse.status}`,
           },
         };
       }

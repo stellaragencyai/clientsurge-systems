@@ -136,7 +136,7 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      <section className="px-6 pb-12 pt-[calc(var(--cs-nav-height)+28px)] text-center md:pb-14 md:pt-[calc(var(--cs-nav-height)+42px)]" style={{ background: "radial-gradient(ellipse 90% 60% at 50% 0%, rgba(0,174,239,0.12) 0%, transparent 62%), radial-gradient(ellipse 50% 40% at 80% 90%, rgba(0,59,143,0.06) 0%, transparent 50%), hsl(var(--background))" }}>
+      <section className="px-6 pb-12 pt-[calc(var(--cs-nav-height)+28px)] text-center md:pb-14 md:pt-[calc(var(--cs-nav-height)+42px)]" style={{ background: "linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background)))" }}>
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Get In Touch</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
           Contact ClientSurge Systems
@@ -153,7 +153,7 @@ export default function Contact() {
               <h2 className="font-display text-2xl font-semibold text-foreground mb-6">Contact Information</h2>
               <div className="space-y-5">
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.28)", boxShadow: "0 0 14px rgba(0,174,239,0.14)" }}>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
                     <Mail className="w-4 h-4 text-primary" />
                   </div>
                   <div>
@@ -164,7 +164,7 @@ export default function Contact() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.28)", boxShadow: "0 0 14px rgba(0,174,239,0.14)" }}>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
                     <Phone className="w-4 h-4 text-primary" />
                   </div>
                   <div>
@@ -175,7 +175,7 @@ export default function Contact() {
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <div className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.28)", boxShadow: "0 0 14px rgba(0,174,239,0.14)" }}>
+                  <div className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center flex-shrink-0">
                     <MapPin className="w-4 h-4 text-primary" />
                   </div>
                   <div>
@@ -186,7 +186,7 @@ export default function Contact() {
               </div>
             </div>
 
-            <div className="p-5 rounded-xl md:p-6" style={{ border: "1px solid rgba(0,174,239,0.22)", background: "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(0,174,239,0.08) 0%, transparent 65%), rgba(0,174,239,0.04)", boxShadow: "0 4px 20px rgba(0,59,143,0.08)" }}>
+            <div className="p-5 rounded-lg border border-primary/20 bg-primary/5 md:p-6">
               <p className="text-sm font-semibold text-foreground mb-2">Prefer a live walkthrough?</p>
               <p className="text-xs text-muted-foreground mb-4 leading-relaxed">
                 Skip the form and book a free automation audit. We&apos;ll review your current lead flow and show the fastest practical automation wins.
@@ -203,7 +203,7 @@ export default function Contact() {
             </div>
           </div>
 
-          <div className="bg-card rounded-2xl p-6 md:p-8" style={{ border: "1px solid rgba(0,174,239,0.18)", boxShadow: "0 8px 32px rgba(0,59,143,0.07), inset 0 1px 0 rgba(0,174,239,0.06)" }}>
+          <div className="bg-card rounded-lg border border-border p-6 shadow-sm md:p-8">
             {success ? (
               <motion.div
                 className="flex flex-col items-center text-center py-8"
@@ -342,13 +342,13 @@ export default function Contact() {
                       className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary transition"
                     >
                       <option value="">Select one...</option>
-                      <option value="med_spa">Med Spas & Aesthetic Clinics</option>
-                      <option value="dental">Dental & Orthodontics</option>
-                      <option value="chiropractic">Chiropractic & Physical Therapy</option>
-                      <option value="hvac">HVAC, Plumbing & Home Services</option>
-                      <option value="roofing">Roofing & Restoration</option>
-                      <option value="contractors">Contractors & Trades</option>
-                      <option value="other">Other</option>
+                      <option>Med Spas & Aesthetic Clinics</option>
+                      <option>Dental & Orthodontics</option>
+                      <option>Chiropractic & Physical Therapy</option>
+                      <option>HVAC, Plumbing & Home Services</option>
+                      <option>Roofing & Restoration</option>
+                      <option>Contractors & Trades</option>
+                      <option>Other</option>
                     </select>
                   </div>
                 </div>
@@ -380,7 +380,10 @@ export default function Contact() {
                   </span>
                 </button>
                 <p className="text-center text-xs text-muted-foreground">
-                  No spam. No pressure. We respect your privacy —{" "}
+                  No spam. No pressure. Just a thoughtful reply from our team.
+                </p>
+                <p className="text-center text-xs text-muted-foreground mt-1">
+                  We respect your privacy. See our{" "}
                   <a href="/privacy-policy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
                 </p>
               </form>

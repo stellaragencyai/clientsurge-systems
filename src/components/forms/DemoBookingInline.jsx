@@ -120,7 +120,6 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
   const handleDateChange = async (e) => {
     const value = e.target.value;
     setScheduling({ date: value, time: "" });
-    setErrors((err) => ({ ...err, scheduling: undefined }));
     if (!value) return;
     setLoadingSlots(true);
     try {
@@ -300,12 +299,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         </label>
         <select
           value={scheduling.time}
-          name="scheduled_time"
-          onChange={(e) => {
-            const val = e.target.value;
-            setScheduling((s) => ({ ...s, time: val }));
-            setErrors((err) => ({ ...err, scheduling: undefined }));
-          }}
+          onChange={(e) => setScheduling((s) => ({ ...s, time: e.target.value }))}
           disabled={!scheduling.date || loadingSlots}
           className={`${inputCls("scheduling")} disabled:opacity-40 cursor-pointer`}
         >
@@ -322,8 +316,8 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         </button>
         <button
           type="submit"
-          disabled={saving || !scheduling.date || !scheduling.time}
-          className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50 disabled:cursor-not-allowed"
+          disabled={saving}
+          className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50"
           style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
         >
           {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule Audit <ArrowRight className="w-4 h-4" /></>}
@@ -333,3 +327,5 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     </form>
   );
 }
+
+

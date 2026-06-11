@@ -165,7 +165,6 @@ export const LEGACY_REDIRECTS = [
 
 export const PUBLIC_ROUTE_PATHS = [
   "/",
-  "/index.html", // Ensure visual editor preview loaders bypass route protection
   "/store",
   "/order-success",
   "/med-spa",

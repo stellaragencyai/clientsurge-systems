@@ -16,7 +16,6 @@ import {
 } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
-import PricingBillingClarity from "./PricingBillingClarity";
 
 function SimpleCheck() {
   return (
@@ -320,8 +319,8 @@ function PricingCard({ plan, selectedIndustry }) {
           : plan.highlight
           ? "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,250,255,0.92) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(243,250,255,0.78) 100%)",
-        backdropFilter: "none",
-        WebkitBackdropFilter: "none",
+        backdropFilter: plan.highlight ? "blur(20px)" : "blur(14px)",
+        WebkitBackdropFilter: plan.highlight ? "blur(20px)" : "blur(14px)",
         border: plan.highlight
           ? isHovered
             ? "2px solid rgba(0,174,239,0.7)"
@@ -340,10 +339,10 @@ function PricingCard({ plan, selectedIndustry }) {
       }}
       animate={
         isHovered
-          ? { y: -4 }
-          : { y: 0 }
+          ? { rotateY: 6, rotateX: -2, scale: 1.03 }
+          : { rotateY: 0, rotateX: 0, scale: 1 }
       }
-      transition={{ duration: 0.2, ease: "easeOut" }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
@@ -381,6 +380,14 @@ function PricingCard({ plan, selectedIndustry }) {
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
             {plan.name}
           </h3>
+          {/* Badge label shown once inline, floating badge shown above card */}
+          {isRecommended && selectedIndustry?.shortName ? (
+            <p className="text-xs font-bold text-primary mb-2">
+              Recommended for {selectedIndustry.shortName}
+            </p>
+          ) : plan.badge ? (
+            <p className="text-xs font-bold text-primary mb-2">{plan.badge}</p>
+          ) : null}
           <p className="text-xs font-semibold text-foreground/70 leading-snug">
             {plan.internalName} - {plan.fit}
           </p>
@@ -453,12 +460,9 @@ function PricingCard({ plan, selectedIndustry }) {
               </>
             )}
           </a>
-          {/* Billing clarity micro-copy */}
-          <PricingBillingClarity
-            setupFee={Number((plan.setup || "0").replace(/[^0-9]/g, ""))}
-            monthlyFee={Number((plan.monthly || "0").replace(/[^0-9]/g, ""))}
-            packageName={plan.name}
-          />
+          <p className="text-center text-[11px] text-muted-foreground mt-1">
+            {plan.monthly}/mo begins 30 days after go-live
+          </p>
         </div>
       </div>
     </motion.div>

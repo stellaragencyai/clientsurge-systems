@@ -385,18 +385,16 @@ const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";
 
 function readPackageStripeOverrideConfig() {
   try {
-    const deno = globalThis["Deno"];
-    if (deno?.env?.get) {
-      return deno.env.get(PACKAGE_STRIPE_OVERRIDE_ENV) || "";
+    if (typeof Deno !== "undefined" && Deno?.env?.get) {
+      return Deno.env.get(PACKAGE_STRIPE_OVERRIDE_ENV) || "";
     }
   } catch {
     // Browser builds and restricted runtimes do not expose Deno.env.
   }
 
   try {
-    const proc = globalThis["process"];
-    if (proc?.env) {
-      return proc.env[PACKAGE_STRIPE_OVERRIDE_ENV] || "";
+    if (typeof process !== "undefined" && process?.env) {
+      return process.env[PACKAGE_STRIPE_OVERRIDE_ENV] || "";
     }
   } catch {
     // Frontend bundles may not expose process.env.
