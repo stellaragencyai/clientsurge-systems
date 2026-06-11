@@ -1,6 +1,5 @@
 import { CheckCircle2, X } from "lucide-react";
-import { useDemoBooking } from "../landing/DemoBookingContext";
-import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import { PACKAGE_OFFERS, getPackageStorePath } from "@/lib/salesCatalog";
 
 function formatMoney(amount) {
   return `$${Number(amount || 0).toLocaleString()}`;
@@ -17,23 +16,18 @@ const SERVICE_NAMES = Array.from(
 const PRICING_PLANS = PACKAGE_OFFERS.map((offer) => ({
   name: offer.customer_facing_name || offer.name,
   internalName: offer.name,
+  packageKey: offer.package_key,
   subtitle: offer.badge || offer.fit,
   price: formatMoney(offer.monthly_total),
   billing: "/month",
   setup: `${formatMoney(offer.setup_total)} setup`,
   description: offer.description,
   services: new Set(offer.included_services.map((service) => service.name)),
-  cta: "Free Automation Audit",
+  cta: "Review Package",
   highlighted: Boolean(offer.highlight),
 }));
 
 export default function PricingComparisonTable() {
-  const demoBooking = useDemoBooking();
-
-  const handleCTA = () => {
-    demoBooking?.openDemoBooking?.();
-  };
-
   return (
     <section className="py-20 px-6 bg-background">
       <div className="max-w-7xl mx-auto">
@@ -95,8 +89,8 @@ export default function PricingComparisonTable() {
                       </p>
                     </div>
 
-                    <button
-                      onClick={handleCTA}
+                    <a
+                      href={getPackageStorePath(plan.packageKey)}
                       className={`w-full mt-6 py-3 px-4 rounded-full font-bold text-sm transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 ${
                         plan.highlighted
                           ? "bg-gradient-to-r from-primary to-primary/80 text-white hover:shadow-lg hover:scale-105"
@@ -104,7 +98,7 @@ export default function PricingComparisonTable() {
                       }`}
                     >
                       {plan.cta}
-                    </button>
+                    </a>
                   </th>
                 ))}
               </tr>

@@ -13,6 +13,7 @@ import {
 } from "@/lib/industryRecommendations";
 import {
   PACKAGE_OFFERS,
+  getPackageStorePath,
 } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
@@ -35,12 +36,6 @@ function SimpleCheck() {
     </svg>
   );
 }
-
-const STRIPE_LINKS = {
-  starter_system: "/store",
-  growth_system: "/store",
-  pro_system: "/store",
-};
 
 const plans = PACKAGE_OFFERS.map((offer) => ({
   name: offer.customer_facing_name || offer.name,
@@ -441,7 +436,7 @@ function PricingCard({ plan, selectedIndustry }) {
 
         <div className="flex flex-col gap-1">
           <a
-            href={STRIPE_LINKS[plan.packageKey] || "/store"}
+            href={getPackageStorePath(plan.packageKey)}
             className={
               plan.highlight
                 ? "w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none"

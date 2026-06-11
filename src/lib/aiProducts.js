@@ -9,6 +9,7 @@ export {
   formatCurrency,
   getPackageDisplayLabel,
   getPackageOffer,
+  getPackageStorePath,
   getPackageServices,
   getServiceProductById,
   getServiceProductByKey,

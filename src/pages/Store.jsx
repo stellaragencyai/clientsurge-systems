@@ -13,6 +13,7 @@ import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
+import { useSearchParams } from "react-router-dom";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -96,11 +97,128 @@ function StoreHumanFallbackCTA() {
   );
 }
 
+function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
+  return (
+    <section
+      aria-label={`${packageOffer.customer_facing_name || packageOffer.name} package review`}
+      style={{
+        marginBottom: "22px",
+        borderRadius: "28px",
+        border: "1px solid rgba(0,136,204,0.16)",
+        background: "linear-gradient(135deg, rgba(0,174,239,0.10), rgba(255,255,255,0.96), rgba(0,59,143,0.06))",
+        boxShadow: "0 18px 48px rgba(0,59,143,0.08)",
+        padding: "24px",
+      }}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", flexWrap: "wrap", alignItems: "flex-start" }}>
+        <div style={{ maxWidth: "720px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#0088CC", margin: "0 0 8px" }}>
+            Package Review
+          </p>
+          <h2 style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", lineHeight: 1.1, color: "#0A1628", fontWeight: 800, margin: "0 0 8px" }}>
+            {packageOffer.customer_facing_name || packageOffer.name} is loaded and ready to buy
+          </h2>
+          <p style={{ fontSize: "14px", lineHeight: 1.7, color: "rgba(10,22,40,0.68)", margin: "0 0 14px" }}>
+            {packageOffer.description} Review what is included, then continue straight into the package checkout flow.
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "14px" }}>
+            {packageOffer.included_services.map((service) => (
+              <span
+                key={service.product_id}
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "6px",
+                  borderRadius: "999px",
+                  padding: "8px 12px",
+                  background: "rgba(255,255,255,0.88)",
+                  border: "1px solid rgba(0,136,204,0.14)",
+                  fontSize: "12px",
+                  fontWeight: 700,
+                  color: "#0A1628",
+                }}
+              >
+                <span aria-hidden="true">{service.icon}</span>
+                {service.name}
+              </span>
+            ))}
+          </div>
+          <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)", margin: 0 }}>
+            One-time setup fee plus monthly service. No long-term contracts. Cancel anytime.
+          </p>
+        </div>
+
+        <div
+          style={{
+            minWidth: "260px",
+            flex: "0 0 280px",
+            borderRadius: "22px",
+            padding: "18px",
+            background: "#ffffff",
+            border: "1px solid rgba(0,136,204,0.14)",
+            boxShadow: "0 12px 30px rgba(0,59,143,0.07)",
+          }}
+        >
+          <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(10,22,40,0.45)", margin: "0 0 10px" }}>
+            Checkout Summary
+          </p>
+          <div style={{ marginBottom: "14px" }}>
+            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.56)", margin: "0 0 2px" }}>One-time setup</p>
+            <p style={{ fontSize: "26px", fontWeight: 900, color: "#0A1628", margin: 0 }}>${packageOffer.setup_total.toLocaleString()}</p>
+          </div>
+          <div style={{ marginBottom: "18px" }}>
+            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.56)", margin: "0 0 2px" }}>Monthly service</p>
+            <p style={{ fontSize: "26px", fontWeight: 900, color: "#005f99", margin: 0 }}>${packageOffer.monthly_total.toLocaleString()}<span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(10,22,40,0.48)" }}>/mo</span></p>
+          </div>
+          <button
+            type="button"
+            onClick={onContinue}
+            style={{
+              width: "100%",
+              minHeight: "48px",
+              borderRadius: "999px",
+              border: "none",
+              background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+              color: "#fff",
+              fontSize: "14px",
+              fontWeight: 800,
+              cursor: "pointer",
+              boxShadow: "0 10px 24px rgba(0,174,239,0.25)",
+              marginBottom: "10px",
+            }}
+          >
+            Continue to Checkout
+          </button>
+          <button
+            type="button"
+            onClick={onBrowseAll}
+            style={{
+              width: "100%",
+              minHeight: "42px",
+              borderRadius: "999px",
+              border: "1px solid rgba(0,136,204,0.16)",
+              background: "rgba(255,255,255,0.9)",
+              color: "#005f99",
+              fontSize: "13px",
+              fontWeight: 700,
+              cursor: "pointer",
+            }}
+          >
+            Browse All Services Instead
+          </button>
+        </div>
+      </div>
+    </section>
+  );
+}
+
 function StoreInner() {
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
   const searchDebounce = useRef(null);
+  const appliedPackageKeyRef = useRef(null);
 
   const handleSearchChange = useCallback((val) => {
     setSearchInput(val);
@@ -110,7 +228,12 @@ function StoreInner() {
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [showComparison, setShowComparison] = useState(false);
   const [pathMode, setPathMode] = useState("explore");
-  const { items, setCartOpen, totalSetup, totalMonthly } = useCart();
+  const { items, setCartOpen, totalSetup, totalMonthly, replaceItems } = useCart();
+  const requestedPackageKey = searchParams.get("package");
+  const selectedPackageOffer = useMemo(
+    () => getPackageOffer(requestedPackageKey),
+    [requestedPackageKey]
+  );
 
   useEffect(() => {
     const cleanupMeta = setPageMetadata({
@@ -156,6 +279,21 @@ function StoreInner() {
       window.removeEventListener("clientsurge:industry-selected", syncIndustry);
     };
   }, []);
+
+  useEffect(() => {
+    if (!selectedPackageOffer) {
+      appliedPackageKeyRef.current = null;
+      return;
+    }
+
+    if (appliedPackageKeyRef.current === selectedPackageOffer.package_key) {
+      return;
+    }
+
+    replaceItems(selectedPackageOffer.included_services);
+    setPathMode("guided");
+    appliedPackageKeyRef.current = selectedPackageOffer.package_key;
+  }, [replaceItems, selectedPackageOffer]);
 
   const filtered = useMemo(() => {
     const recommendedKeys = new Set(
@@ -407,8 +545,8 @@ function StoreInner() {
                   color: "hsl(var(--foreground))",
                   marginBottom: "8px"
                 }}>
-                
-                Build Your{" "}
+
+                {selectedPackageOffer ? "Review Your" : "Build Your"}{" "}
                 <span
                 style={{
                   background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
@@ -418,7 +556,9 @@ function StoreInner() {
                   filter: "drop-shadow(0 0 18px rgba(0,174,239,0.4))"
                 }}>
 
-                AI-Powered Business
+                {selectedPackageOffer
+                  ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} Package`
+                  : "AI-Powered Business"}
                 </span>
               </h1>
 
@@ -431,8 +571,9 @@ function StoreInner() {
                   margin: "0 auto 12px"
                 }}>
                 
-                Pick the services you need, add them to your cart, and we handle
-                the setup. Your automations go live in 5 to 7 business days.
+                {selectedPackageOffer
+                  ? "Your package is preloaded for a faster self-serve checkout. Review what is included, then continue straight into the purchase flow."
+                  : "Pick the services you need, add them to your cart, and we handle the setup. Your automations go live in 5 to 7 business days."}
               </p>
             </div>
 
@@ -612,7 +753,18 @@ function StoreInner() {
               margin: "0 auto",
               padding: "0 24px 24px"
             }}>
-            
+            {selectedPackageOffer ? (
+              <PackageReviewBanner
+                packageOffer={selectedPackageOffer}
+                onContinue={() => setCartOpen(true)}
+                onBrowseAll={() => {
+                  const nextParams = new URLSearchParams(searchParams);
+                  nextParams.delete("package");
+                  setSearchParams(nextParams, { replace: true });
+                  setPathMode("explore");
+                }}
+              />
+            ) : null}
 
 
             <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
