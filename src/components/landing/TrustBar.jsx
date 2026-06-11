@@ -1,6 +1,5 @@
 import { useEffect, useRef, useState } from "react";
-import { Building2, CalendarCheck, ShieldCheck, TrendingUp, Zap } from "lucide-react";
-import FollowUpTimeline from "./visuals/FollowUpTimeline";
+import { CalendarCheck, ShieldCheck, TimerReset, Zap } from "lucide-react";
 import { motion } from "framer-motion";
 
 function useCountUp(value, inView, duration = 1800) {
@@ -34,36 +33,27 @@ function useCountUp(value, inView, duration = 1800) {
 const items = [
   {
     icon: Zap,
-    label: "Your leads hear from you before competitors do",
+    label: "Fast first response",
     display: "Under 60 sec",
     animatedValue: null,
     story:
-      "The moment a lead calls or submits a form, they get an instant response — even after business hours.",
-  },
-  {
-    icon: TrendingUp,
-    label: "Target booking lift",
-    display: "More booked leads",
-    animatedValue: 3,
-    suffix: " workflows",
-    story:
-      "The system is designed around three conversion moments: response, follow-up, and booking handoff.",
+      "New web leads get an immediate response path so fewer prospects bounce to the next company before your team can engage.",
   },
   {
     icon: CalendarCheck,
-    label: "Launch setup target",
-    display: "24–48 hours",
+    label: "Launch target",
+    display: "5-7 business days",
     animatedValue: null,
     story:
-      "We handle the build and launch prep, then confirm the real timeline during onboarding based on required integrations.",
+      "The site, routing, and automation setup are built for a fast go-live without dragging you through a long custom implementation cycle.",
   },
   {
-    icon: Building2,
-    label: "Measurement window",
+    icon: TimerReset,
+    label: "Review window",
     display: "30-day review",
     animatedValue: null,
     story:
-      "Performance is reviewed after launch against response speed, booked leads, recovered calls, and follow-up completion.",
+      "After launch, the system is reviewed against response speed, follow-up completion, missed-call recovery, and booked-lead movement.",
   },
   {
     icon: ShieldCheck,
@@ -71,7 +61,7 @@ const items = [
     display: "Month-to-month",
     animatedValue: null,
     story:
-      "The offer stays simple: no long lock-in and no need to add extra staff before you see improvement.",
+      "The offer stays simple: no long-term lock-in and no need to add extra staff before you see whether the system is working.",
   },
 ];
 
@@ -81,31 +71,39 @@ function StatCard({ item, index, inView }) {
   const statText =
     typeof item.animatedValue === "number" ? `${count}${item.suffix || ""}` : item.display;
 
-  const isHighlighted = index === 1;
-  
+  const isHighlighted = index === 0;
+
   return (
     <motion.article
       className="relative rounded-lg border border-border text-left shadow-sm"
-      aria-label={`${statText} — ${item.label}`}
+      aria-label={`${statText} - ${item.label}`}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: "-60px" }}
       transition={{ duration: 0.55, delay: index * 0.1, ease: [0.22, 1, 0.36, 1] }}
       style={{
         background: "hsl(var(--card))",
-        minHeight: "clamp(140px, 20vw, 190px)",
-        padding: "clamp(14px, 3vw, 20px)",
+        minHeight: "clamp(165px, 22vw, 210px)",
+        padding: "clamp(16px, 3vw, 22px)",
         display: "flex",
         flexDirection: "column",
         justifyContent: "space-between",
-        boxShadow: isHighlighted ? "0 0 20px rgba(0,174,239,0.2), 0 6px 22px rgba(0,0,0,0.06)" : "0 6px 22px rgba(0,0,0,0.06)",
+        boxShadow: isHighlighted
+          ? "0 0 20px rgba(0,174,239,0.18), 0 6px 22px rgba(0,0,0,0.06)"
+          : "0 6px 22px rgba(0,0,0,0.06)",
       }}
     >
-      <div className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3" style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}>
+      <div
+        className="w-10 h-10 rounded-lg bg-primary/10 border border-primary/15 flex items-center justify-center shadow-sm mb-3"
+        style={isHighlighted ? { boxShadow: "0 0 12px rgba(0,174,239,0.3)" } : {}}
+      >
         <Icon className="w-[17px] h-[17px] text-primary" />
       </div>
       <div>
-        <p className="font-display text-xl font-semibold text-foreground leading-tight" style={isHighlighted ? { fontSize: "1.35rem" } : {}}>
+        <p
+          className="font-display text-xl font-semibold text-foreground leading-tight"
+          style={isHighlighted ? { fontSize: "1.35rem" } : {}}
+        >
           {statText}
         </p>
         <p className="text-[10px] uppercase tracking-[0.18em] text-primary/80 mt-1 mb-2">
@@ -142,20 +140,21 @@ export default function TrustBar() {
     >
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-10">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">By The Numbers</p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
             What You Can Expect
+          </p>
+          <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground">
+            Clear Commitments. Cleaner Buying Decision.
           </h2>
+          <p className="mt-4 max-w-3xl mx-auto text-sm md:text-base text-foreground/65 leading-relaxed">
+            This section should reduce doubt fast. It gives buyers a simple read on
+            response speed, launch pace, review cadence, and how the engagement is structured.
+          </p>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
           {items.map((item, index) => (
             <StatCard key={item.label} item={item} index={index} inView={inView} />
           ))}
-        </div>
-
-        {/* Follow-Up Timeline Visual */}
-        <div className="mt-12 flex justify-center">
-          <FollowUpTimeline />
         </div>
       </div>
     </section>
