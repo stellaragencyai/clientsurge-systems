@@ -1269,11 +1269,13 @@ export function injectDemoBookingModalPatch(html) {
     : `${html}\n${DEMO_BOOKING_MODAL_PATCH_SCRIPT}`;
 }
 
+const STALE_PLUMBING_INDUSTRY_TEMPLATE_ENTRY = 'plumbing:{id:"plumbing",name:"Plumbing & Drain Services",shortName:"Plumbing Companies",slug:"plumbing",routePath:"/plumbing",hero:{eyebrow:"For Plumbing Companies",headline:"Turn Urgent Plumbing Calls Into Booked Dispatches Faster",subheadline:"ClientSurge helps plumbing teams recover missed emergency leak calls, drain repair requests, water heater inquiries, after-hours calls, and fast-dispatch expectations before homeowners call the next company.",cta:"Free Plumbing Automation Audit"},painStats:[{icon:"🚰",value:"Urgent",label:"leak and water-heater leads usually choose the fastest responder"},{icon:"📞",value:"24/7",label:"after-hours calls need capture even when dispatch is busy"},{icon:"🧰",value:"Dispatch",label:"source, service type, and urgency must reach the right person fast"}],problems:[{problem:"Homeowner has an emergency leak and reaches voicemail",stat:"Urgent jobs often go to whoever responds first",solution:"Instant missed-call text-back captures the issue and urgency",result:"Lead stays in your pipeline"},{problem:"Drain repair inquiry sits in a website form",stat:"Slow follow-up makes price shoppers move on",solution:"Automated response asks service type, address, and best dispatch window",result:"Cleaner qualification"},{problem:"Water heater calls need fast next steps",stat:"Replacement and repair requests need context before dispatch",solution:"AI collects symptoms, age, photos, and timing needs",result:"Better handoff"},{problem:"After-hours calls stack up while techs are in the field",stat:"Manual callbacks miss the highest-intent window",solution:"After-hours capture routes urgent requests and starts follow-up",result:"24/7 capture"},{problem:"Booked service calls need confirmation",stat:"No-shows waste dispatch time",solution:"Confirmation and reminder sequence keeps homeowners aligned",result:"Cleaner schedule"},{problem:"Old estimates and maintenance opportunities go quiet",stat:"Dormant plumbing leads need relevant reactivation",solution:"Win-back follow-up revives prior quotes and seasonal maintenance",result:"More second chances"}],smsDemo:{businessName:"Rapid Flow Plumbing",initialMessage:"[Missed call from homeowner]",automatedResponse:"Hi, Rapid Flow Plumbing here. Sorry we missed you. Is this for an emergency leak, drain repair, or water heater issue? Reply with the issue and ZIP code so we can route the fastest next step.",leadReply:"Emergency leak under kitchen sink in 85282.",confirmationMessage:"Got it. We are flagging this as urgent and sending your details to dispatch. If water is actively running, shut off the nearest valve if safe. We will follow up with availability next."},metrics:[{value:"60 sec",label:"target response window for urgent plumbing inquiries"},{value:"Dispatch",label:"handoff context for leak, drain, and water heater calls"},{value:"5-7 days",label:"setup target after onboarding and provider access"}],testimonial:{type:"readiness",label:"Launch proof boundary",quote:"Use this page for controlled traffic only after plumbing source tracking, notification delivery, and safe live confirmation proof are completed.",name:"ClientSurge Launch Checklist",business:"No customer case study claimed for this page"},faqs:[{q:"Can the system separate emergency leaks from routine plumbing requests?",a:"Yes. The intake flow can ask for issue type, urgency, location, and dispatch timing so urgent leads are flagged differently from routine requests."},{q:"Does it work after hours?",a:"Yes. The campaign path is designed to capture after-hours calls and form fills, then route the context according to your approved dispatch rules."},{q:"Can it handle drain repair and water heater inquiries?",a:"Yes. Messaging can be tailored around leaks, drains, water heaters, clogs, fixture repair, and other service categories you approve during onboarding."},{q:"Will it send real SMS or email during local testing?",a:"No. Local/source testing should use mocks or source review only. Live delivery requires a separate production-safe test approval."},{q:"What should we bring to the plumbing automation audit?",a:"Bring current lead sources, dispatch hours, emergency handling rules, service areas, and the plumbing services you want prioritized first."}]}';
+
 export function repairStaleDemoBookingModalAsset(source) {
   if (!source) {
     return source;
   }
-  return source
+  let nextSource = source
     .replace(
       /https:\/\/www\.youtube\.com\/embed\/dQw4w9WgXcQ\?autoplay=1&rel=0/g,
       "about:blank#clientsurge-audit-form"
@@ -1282,6 +1284,18 @@ export function repairStaleDemoBookingModalAsset(source) {
       '"med-spa","dental","hvac","roofing","chiropractic","contractors"',
       '"med-spa","dental","hvac","plumbing","roofing","chiropractic","contractors"'
     );
+
+  if (
+    !nextSource.includes('plumbing:{id:"plumbing"') &&
+    nextSource.includes('},roofing:{id:"roofing"')
+  ) {
+    nextSource = nextSource.replace(
+      '},roofing:{id:"roofing"',
+      `},${STALE_PLUMBING_INDUSTRY_TEMPLATE_ENTRY},roofing:{id:"roofing"`
+    );
+  }
+
+  return nextSource;
 }
 
 function shouldRepairStaleDemoBookingModalAsset(request, url, response) {
