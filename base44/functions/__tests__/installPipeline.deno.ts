@@ -9,7 +9,7 @@ Deno.test("Starter package exposes the canonical two-service bundle", async () =
 
   assertEquals(services.length, 2);
   assertEquals(services.includes("instant_lead_response"), true);
-  assertEquals(services.includes("ai_booking_agent"), true);
+  assertEquals(services.includes("missed_call_text_back"), true);
 });
 
 Deno.test("Growth package exposes the canonical four-service bundle", async () => {
@@ -21,7 +21,7 @@ Deno.test("Growth package exposes the canonical four-service bundle", async () =
   assertEquals(services.includes("nurture_sequence_14d"), true);
 });
 
-Deno.test("Elite package exposes the canonical six-service bundle", async () => {
+Deno.test("Pro package exposes the canonical six-service bundle and accepts the legacy Elite alias", async () => {
   const { getServicesForTier } = await import("../shared/tierServiceMap.ts");
   const services = getServicesForTier("elite_system");
 

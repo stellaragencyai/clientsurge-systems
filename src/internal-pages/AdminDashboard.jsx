@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useLayoutEffect } from 'react';
+import { lazy, Suspense, useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
@@ -13,6 +13,8 @@ import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipeli
 import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
+import CrmHealthDashboard from '../components/admin/CrmHealthDashboard';
+import LaunchGatesPanel from '../components/admin/LaunchGatesPanel';
 import CommunicationTemplates from '../components/admin/CommunicationTemplates';
 import IntegrationHealth from '../components/admin/IntegrationHealth';
 import ClientProjectsPanel from '../components/admin/ClientProjectsPanel';
@@ -37,8 +39,6 @@ import TaskBoardPanel from '../components/admin/TaskBoardPanel';
 import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
 import AuditLogPanel from '../components/admin/AuditLogPanel';
-import AutomationTrackingPanel from '../components/admin/AutomationTrackingPanel';
-import SiteRefinementChecklist from '../components/admin/SiteRefinementChecklist';
 import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
@@ -47,9 +47,6 @@ import SniperDashboard from '../components/admin/SniperDashboard';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
-import GlobalAutomationToggle from '../components/admin/GlobalAutomationToggle';
-import SimulateLeadButton from '../components/admin/SimulateLeadButton';
-import AIBrainBackfillPanel from '../components/admin/AIBrainBackfillPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -80,6 +77,8 @@ const NAV_GROUPS = [
     items: [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
       { id: 'leads', label: 'Leads', icon: Users },
+      { id: 'crm-health', label: 'CRM Health', icon: ShieldCheck },
+      { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
       { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
@@ -92,8 +91,6 @@ const NAV_GROUPS = [
       { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
-      { id: 'automation-tracking', label: 'Automation Tracking', icon: Activity },
-      { id: 'site-refinement', label: 'Site Refinement', icon: Wand2 },
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
@@ -145,13 +142,6 @@ function getActiveTabFromSearch(search) {
 }
 
 export default function AdminDashboard() {
-  // Prevent search engines from indexing admin panel
-  useLayoutEffect(() => {
-    const robots = document.querySelector('meta[name="robots"]');
-    if (robots) robots.setAttribute("content", "noindex,nofollow");
-    return () => { if (robots) robots.setAttribute("content", "index,follow"); };
-  }, []);
-
   const { user, isLoadingAuth } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -229,6 +219,8 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'leads': return <LeadManagementDashboard />;
+      case 'crm-health': return <CrmHealthDashboard />;
+      case 'launch-gates': return <LaunchGatesPanel />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'templates': return <CommunicationTemplates />;
       case 'health': return <IntegrationHealth />;
@@ -246,8 +238,6 @@ export default function AdminDashboard() {
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;
-      case 'automation-tracking': return <AutomationTrackingPanel />;
-      case 'site-refinement': return <SiteRefinementChecklist />;
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
@@ -264,8 +254,6 @@ export default function AdminDashboard() {
         <div className="space-y-4">
           <h2 className="text-2xl font-semibold text-foreground">QA Tools</h2>
           <p className="text-sm text-muted-foreground">Internal testing tools. Admin only.</p>
-          <SimulateLeadButton />
-          <AIBrainBackfillPanel />
           <QaCustomerPanel />
         </div>
       );
@@ -452,18 +440,15 @@ function OverviewDashboard({ onNavigate }) {
   const offerCounts = snapshot.summary.recommended_offer_counts || {};
 
   const stats = [
-    { label: 'Total Leads', value: totalLeads, color: 'bg-primary/8 text-primary', tab: 'leads' },
-    { label: 'New Today', value: newToday, color: 'bg-emerald-500/10 text-emerald-700', tab: 'leads' },
-    { label: 'Follow-Up Due', value: snapshot.summary.segment_counts?.follow_up || 0, color: 'bg-violet-500/10 text-violet-700', tab: 'leads' },
-    { label: 'Awaiting Close', value: snapshot.summary.segment_counts?.awaiting_close || 0, color: 'bg-amber-500/10 text-amber-700', tab: 'leads' },
+    { label: 'Total Leads', value: totalLeads, color: 'bg-blue-50 text-blue-700', tab: 'leads' },
+    { label: 'New Today', value: newToday, color: 'bg-green-50 text-green-700', tab: 'leads' },
+    { label: 'Follow-Up Due', value: snapshot.summary.segment_counts?.follow_up || 0, color: 'bg-purple-50 text-purple-700', tab: 'leads' },
+    { label: 'Awaiting Close', value: snapshot.summary.segment_counts?.awaiting_close || 0, color: 'bg-emerald-50 text-emerald-700', tab: 'leads' },
   ];
 
   return (
     <div className="space-y-8">
       <AdminAICommandBar />
-
-      {/* Global automation master switch */}
-      <GlobalAutomationToggle />
 
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
@@ -509,7 +494,7 @@ function OverviewDashboard({ onNavigate }) {
                       <p className="text-sm font-semibold text-foreground">#{index + 1} {lead.full_name}</p>
                       <p className="text-xs text-muted-foreground">{lead.business_name}</p>
                     </div>
-                    <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary">
+                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground">
                       {lead.activation_priority}
                     </span>
                   </div>
@@ -532,11 +517,11 @@ function OverviewDashboard({ onNavigate }) {
           <h3 className="text-lg font-semibold text-foreground mb-4">Offer Mix</h3>
           <div className="space-y-3">
             {[
-              { key: 'starter_system', label: 'Starter', helper: 'Response + booking fit' },
+              { key: 'starter_system', label: 'Starter', helper: 'Response + missed-call fit' },
               { key: 'growth_system', label: 'Growth', helper: 'Response + nurture fit' },
-              { key: 'elite_system', label: 'Elite', helper: 'Full-stack fit' },
+              { key: 'pro_system', legacyKey: 'elite_system', label: 'Pro', helper: 'Full-stack fit' },
               { key: 'single_service', label: 'Single Service', helper: 'One clear first-service fit' },
-            ].map(({ key, label, helper }) => (
+            ].map(({ key, legacyKey, label, helper }) => (
               <button
                 key={key}
                 onClick={() => onNavigate('leads')}
@@ -546,7 +531,9 @@ function OverviewDashboard({ onNavigate }) {
                   <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground">{helper}</p>
                 </div>
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary flex-shrink-0">{offerCounts[key] || 0}</span>
+                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground flex-shrink-0">
+                  {(offerCounts[key] || 0) + (legacyKey ? offerCounts[legacyKey] || 0 : 0)}
+                </span>
               </button>
             ))}
           </div>
@@ -613,10 +600,10 @@ function OverviewDashboard({ onNavigate }) {
                   </p>
                 </div>
                 <span className={`px-2.5 py-1 rounded text-xs font-semibold ${
-                  lead.status === 'Booked' ? 'bg-emerald-500/10 text-emerald-700' :
-                  lead.status === 'Qualified' ? 'bg-violet-500/10 text-violet-700' :
-                  lead.status === 'Contacted' ? 'bg-primary/10 text-primary' :
-                  'bg-muted text-muted-foreground'
+                  lead.status === 'Booked' ? 'bg-green-100 text-green-800' :
+                  lead.status === 'Qualified' ? 'bg-purple-100 text-purple-800' :
+                  lead.status === 'Contacted' ? 'bg-blue-100 text-blue-800' :
+                  'bg-gray-100 text-gray-800'
                 }`}>
                   {lead.status}
                 </span>
@@ -646,7 +633,7 @@ function OverviewDashboard({ onNavigate }) {
                   <p className="text-sm font-medium text-foreground">{label}</p>
                   <p className="text-xs text-muted-foreground">{helper}</p>
                 </div>
-                <span className="rounded-full bg-primary/10 px-2.5 py-1 text-xs font-semibold text-primary flex-shrink-0">{snapshot.summary.segment_counts?.[key] || 0}</span>
+                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground flex-shrink-0">{snapshot.summary.segment_counts?.[key] || 0}</span>
               </button>
             ))}
           </div>

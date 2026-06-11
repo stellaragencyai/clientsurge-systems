@@ -36,6 +36,26 @@ function normalizeIndustrySlug(value) {
     .replace(/^_+|_+$/g, "");
 }
 
+function canonicalIndustrySlug(value) {
+  const slug = normalizeIndustrySlug(value);
+  if (slug.includes("roof")) return "roofing";
+  if (slug.includes("hvac")) return "hvac";
+  if (slug.includes("plumb")) return "plumbing";
+  if (slug.includes("dental") || slug.includes("orthodont")) return "dental";
+  if (slug.includes("med_spa") || slug.includes("aesthetic")) return "med_spa";
+  return slug;
+}
+
+function crmTagForIndustry(slug) {
+  return {
+    roofing: "roofing_lead",
+    hvac: "hvac_lead",
+    plumbing: "plumbing_lead",
+    dental: "dental_lead",
+    med_spa: "med_spa_lead",
+  }[slug] || "automation_audit_lead";
+}
+
 function getPageAttribution() {
   if (typeof window === "undefined") {
     return {
@@ -64,6 +84,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
   const [form, setForm] = useState({
     first_name: "", last_name: "", business_name: "", email: "",
     phone: "", website: "", industry: prefillIndustry, biggest_issue: "", website_url: "",
+    consent_given: false,
   });
   const [scheduling, setScheduling] = useState({ date: "", time: "" });
   const [saving, setSaving] = useState(false);
@@ -88,6 +109,10 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     else if (!validateEmail(form.email)) errs.email = "Invalid email";
     if (!form.phone.trim()) errs.phone = "Required";
     else if (!validatePhone(form.phone)) errs.phone = "Invalid phone";
+    if (!form.industry.trim()) errs.industry = "Required";
+    if (!form.website.trim()) errs.website = "Required";
+    if (!form.biggest_issue.trim()) errs.biggest_issue = "Required";
+    if (form.consent_given !== true) errs.consent_given = "Required";
     setErrors(errs);
     if (Object.keys(errs).length === 0) setStep(2);
   };
@@ -114,6 +139,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     setSaving(true);
     setSubmitWarnings([]);
     try {
+      const industrySlug = canonicalIndustrySlug(form.industry);
       const res = await base44.functions.invoke("scheduleDemoBooking", {
         ...getPageAttribution(),
         full_name: `${form.first_name} ${form.last_name}`,
@@ -126,9 +152,13 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         business_website_url: form.website,
         industry: form.industry,
         business_type: form.industry,
-        industry_slug: normalizeIndustrySlug(form.industry),
+        industry_slug: industrySlug,
+        crm_tag: crmTagForIndustry(industrySlug),
         service_interest: "automation_audit",
         biggest_issue: form.biggest_issue,
+        consent_given: form.consent_given === true,
+        consent_source: "book_inline_scheduler",
+        consent_text_version: "audit_inline_explicit_checkbox_v1",
         website_url: form.website_url,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
@@ -153,6 +183,9 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         </div>
         <h3 className="text-xl font-semibold text-white mb-2">You're all set.</h3>
         <p className="text-sm text-white/50">Nolan will confirm your audit request within 24 hours.</p>
+        <p className="mt-3 text-xs text-white/45 max-w-sm">
+          Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.
+        </p>
         {submitWarnings.length > 0 && (
           <p className="mt-3 text-xs text-amber-300 max-w-sm">
             Your booking was saved, but one or more follow-up actions still need review.
@@ -190,7 +223,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           <input name="business_name" value={form.business_name} onChange={set} placeholder="My Business" className={inputCls("business_name")} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Industry</label>
+          <label className="block text-xs font-semibold text-white/60 mb-1">Industry *</label>
           <select name="industry" value={form.industry} onChange={set} className={`${inputCls("industry")} cursor-pointer`}>
             <option value="">Select...</option>
             {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
@@ -207,11 +240,11 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Website</label>
+          <label className="block text-xs font-semibold text-white/60 mb-1">Website *</label>
           <input name="website" value={form.website} onChange={set} placeholder="https://mybusiness.com" className={inputCls("website")} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Biggest challenge right now?</label>
+          <label className="block text-xs font-semibold text-white/60 mb-1">Biggest challenge right now? *</label>
           <select name="biggest_issue" value={form.biggest_issue} onChange={set} className={`${inputCls("biggest_issue")} cursor-pointer`}>
             <option value="">Select one...</option>
             <option value="Slow response time">Slow response time</option>
@@ -220,6 +253,18 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
             <option value="Low booking conversions">Low booking conversions</option>
           </select>
         </div>
+        <label className={`flex items-start gap-2.5 rounded-xl border px-3 py-2 text-xs leading-relaxed text-white/60 ${errors.consent_given ? "border-red-500" : "border-white/10"}`}>
+          <input
+            type="checkbox"
+            checked={form.consent_given}
+            onChange={(e) => {
+              setForm((f) => ({ ...f, consent_given: e.target.checked }));
+              setErrors((current) => ({ ...current, consent_given: undefined }));
+            }}
+            className="mt-0.5 h-4 w-4 rounded accent-amber-500"
+          />
+          <span>I agree to receive automated SMS and email messages from ClientSurge Systems about my audit booking. Reply STOP to opt out.</span>
+        </label>
         {Object.keys(errors).length > 0 && (
           <p className="text-xs text-red-400">Please fill in all required fields.</p>
         )}

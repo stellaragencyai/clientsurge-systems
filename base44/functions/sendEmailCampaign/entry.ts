@@ -23,6 +23,7 @@ const MAX_SAFE_TEST_RECIPIENTS = 50;
 const DEFAULT_FOLLOW_UP_DAYS = 3;
 const RECENT_CONTACT_WINDOW_DAYS = 14;
 const TERMINAL_SUPPRESSION_STATUSES = new Set(["Closed", "Won", "Lost"]);
+const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
 
 function normalizeToken(value) {
   return String(value || "").trim().toLowerCase();
@@ -70,6 +71,19 @@ function normalizeEmail(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function maskEmail(value) {
+  const email = normalizeEmail(value);
+  if (!email || !email.includes("@")) return "";
+  const [local, domain] = email.split("@");
+  return `${local.slice(0, 1) || "*"}***@${domain}`;
+}
+
+function maskPhone(value) {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  return `***-***-${digits.slice(-4).padStart(4, "*")}`;
+}
+
 function parseDate(value) {
   const timestamp = Date.parse(value || "");
   return Number.isFinite(timestamp) ? timestamp : null;
@@ -94,6 +108,28 @@ function getRecipientLimit(campaign) {
   const requested = Number(campaign?.max_recipients ?? campaign?.segment_filters?.max_recipients ?? MAX_SAFE_TEST_RECIPIENTS);
   if (!Number.isFinite(requested) || requested < 1) return MAX_SAFE_TEST_RECIPIENTS;
   return Math.min(Math.floor(requested), MAX_SAFE_TEST_RECIPIENTS);
+}
+
+function getCampaignSendGate() {
+  const campaignEnabled = String(Deno.env.get("EMAIL_CAMPAIGN_ENABLED") || "").trim().toLowerCase() === "true";
+  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
+  const proofReady = PROOF_READY_VALUES.has(proofStatus);
+
+  if (!campaignEnabled) {
+    return {
+      ok: false,
+      reason: "EMAIL_CAMPAIGN_ENABLED must be true before campaign sends.",
+      proof_status: proofStatus || "missing",
+    };
+  }
+  if (!proofReady) {
+    return {
+      ok: false,
+      reason: "EMAIL_DELIVERABILITY_PROOF_STATUS must be verified before campaign sends.",
+      proof_status: proofStatus || "missing",
+    };
+  }
+  return { ok: true, proof_status: proofStatus };
 }
 
 function followUpDateIso(campaign) {
@@ -231,6 +267,20 @@ Deno.serve(async (req) => {
       return secureJson({ error: "RESEND_API_KEY not configured" }, { status: 500 });
     }
 
+    if (!preview_only) {
+      const sendGate = getCampaignSendGate();
+      if (!sendGate.ok) {
+        return secureJson({
+          error: "Campaign sending is blocked until deliverability proof is complete.",
+          email_sent: false,
+          safe_to_continue: false,
+          requires_owner_action: true,
+          reason: sendGate.reason,
+          proof_status: sendGate.proof_status,
+        }, { status: 403 });
+      }
+    }
+
     if (!hasIndustrySegmentation(campaign.segment_filters || {})) {
       return secureJson({
         error: "Industry segmentation is required before previewing or sending. Choose Roofing, HVAC, Dental, or another explicit industry segment.",
@@ -292,8 +342,9 @@ Deno.serve(async (req) => {
         max_recipients: recipientLimit,
         recipient_count: eligibleLeads.length,
         sample_recipients: eligibleLeads.slice(0, 5).map(l => ({
-          name: l.full_name,
-          email: l.email,
+          label: l.business_name || "Masked lead",
+          email_masked: maskEmail(l.email),
+          phone_masked: maskPhone(l.phone),
           status: l.status,
           industry: l.business_type || l.industry || toArray(l.industry_tags)[0] || "",
         })),

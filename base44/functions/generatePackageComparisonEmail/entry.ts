@@ -17,7 +17,7 @@ const TIER_BENEFITS = {
   },
   growth: {
     current: ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"],
-    upgrade_to: "Elite",
+    upgrade_to: "Pro",
     missing: ["Review Request AI", "Reactivation Campaign"],
     upgrade_cost: 1000, // $1997/mo - $997/mo
     cta: "Unlock Full Suite",

@@ -62,7 +62,7 @@ export default function PageNotFound() {
             }}
           >
             <CalendarCheck className="w-4 h-4" />
-            Book Free Demo
+            Free Automation Audit
           </button>
         </div>
 

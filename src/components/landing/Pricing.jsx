@@ -40,11 +40,12 @@ function SimpleCheck() {
 const STRIPE_LINKS = {
   starter_system: "/store",
   growth_system: "/store",
-  elite_system: "/store",
+  pro_system: "/store",
 };
 
 const plans = PACKAGE_OFFERS.map((offer) => ({
-  name: offer.name,
+  name: offer.customer_facing_name || offer.name,
+  internalName: offer.name,
   packageKey: offer.package_key,
   fit: offer.fit,
   desc: offer.description,
@@ -381,7 +382,7 @@ function PricingCard({ plan, selectedIndustry }) {
             {plan.name}
           </h3>
           <p className="text-xs font-semibold text-foreground/70 leading-snug">
-            {plan.fit}
+            {plan.internalName} - {plan.fit}
           </p>
         </div>
 

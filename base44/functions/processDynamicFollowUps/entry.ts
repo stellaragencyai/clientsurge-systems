@@ -11,6 +11,7 @@ import { secureJson } from "../_shared/response.ts";
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
@@ -86,6 +87,19 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
         }
       }
     } else if (channel === CHANNELS.EMAIL) {
+      const sendGate = getEmailOutreachGate("dynamic email follow-up");
+      if (!sendGate.ok) {
+        console.warn(`[processDynamicFollowUps] Email follow-up blocked: ${sendGate.reason}`);
+        return {
+          sent: false,
+          messageId: null,
+          channel,
+          blocked: true,
+          error: sendGate.reason,
+          proofStatus: sendGate.proof_status,
+        };
+      }
+
       const template = templates[`step${stepNumber}_email`] || `Hi {first_name}, just wanted to follow up on {service_interest}. Let me know if you have any questions!`;
       const body = template
         .replace(/{first_name}/g, lead.first_name || "there")
@@ -101,7 +115,7 @@ async function sendFollowUp(base44, lead, channel, stepNumber, templates) {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurge.com",
+            from: getApprovedEmailSender({}, { preferLeads: true }),
             to: lead.email,
             subject: `Follow-up on your interest`,
             text: body,
@@ -235,6 +249,25 @@ Deno.serve(async (req) => {
 
           results.sent++;
         } else {
+          await base44.asServiceRole.entities.CommunicationEvent.create({
+            context_id: lead.id,
+            context_type: "website_lead",
+            channel: nextChannel,
+            direction: "outbound",
+            event_type: result.blocked ? "email_blocked" : `${nextChannel}_failed`,
+            provider: nextChannel === CHANNELS.SMS ? "twilio" : "resend",
+            status: result.blocked ? "blocked" : "failed",
+            subject: `Dynamic follow-up attempt ${stepNumber}`,
+            error_message: result.error || null,
+            metadata_json: JSON.stringify({
+              step: stepNumber,
+              channel: nextChannel,
+              engagement_score: engagementScore,
+              cadence_mode: lead.cadence_mode,
+              proof_status: result.proofStatus || null,
+              requires_owner_action: Boolean(result.blocked),
+            }),
+          });
           results.failed++;
         }
 

@@ -247,7 +247,7 @@ export default function Contact() {
                     onClick={() => setShowBookingModal(true)}
                     className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
                   >
-                    Prefer to book a demo instead?
+                    Prefer to start a free automation audit instead?
                   </button>
                   <a
                     href="mailto:support@clientsurgesystems.com"

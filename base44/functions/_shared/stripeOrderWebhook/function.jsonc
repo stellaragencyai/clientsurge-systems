@@ -1,0 +1,4 @@
+{
+  "name": "_shared/stripeOrderWebhook",
+  "entry": "entry.ts"
+}

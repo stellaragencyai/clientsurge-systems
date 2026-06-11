@@ -1,129 +1,100 @@
-/**
- * sendEmail — Sends email via Resend. Self-contained, no local imports.
- * Logs CommunicationEvent on success and failure.
- */
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { secureJson } from "../_shared/response.ts";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resendFetch } from "../_shared/resendFetch.js";
 
-function json(data, status = 200) {
-  return new Response(JSON.stringify(data), {
-    status,
-    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
-  });
+const CLIENTSURGE_DOMAIN = "clientsurgesystems.com";
+const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
+
+function env(name) {
+  return String(Deno.env.get(name) || "").trim();
+}
+
+function isSafeTestSend(email, subject) {
+  return Boolean(
+    env("EMAIL_TEST_MODE").toLowerCase() === "true" &&
+    env("TEST_EMAIL_RECIPIENT") &&
+    email.trim().toLowerCase() === env("TEST_EMAIL_RECIPIENT").toLowerCase() &&
+    String(subject || "").startsWith("[TEST]")
+  );
+}
+
+function deliverabilityProofReady() {
+  return PROOF_READY_VALUES.has(env("EMAIL_DELIVERABILITY_PROOF_STATUS").toLowerCase());
+}
+
+function senderAddress() {
+  return (
+    env("RESEND_FROM_LEADS") ||
+    env("RESEND_FROM_EMAIL") ||
+    env("SUPPORT_EMAIL") ||
+    `support@${CLIENTSURGE_DOMAIN}`
+  );
 }
 
 Deno.serve(async (req) => {
-  let body = {};
   try {
-    body = await req.json();
-  } catch {
-    return json({ error: "Invalid JSON body" }, 400);
-  }
+    const { email, subject, body, leadId } = await req.json();
 
-  const { to, email, subject, html, body: textBody, lead_id, order_id, context_type, context_id } = body;
-  const recipient = to || email;
+    if (!email || !subject || !body) {
+      return secureJson({ error: 'Email, subject, and body required' }, { status: 400 });
+    }
 
-  if (!recipient || !subject) {
-    return json({ error: "to and subject are required" }, 400);
-  }
+    const apiKey = Deno.env.get('RESEND_API_KEY');
+    if (!apiKey) {
+      return secureJson({
+        error: 'Resend API key not configured',
+        email_sent: false,
+        email_warning: "Email provider not configured",
+        safe_to_continue: false,
+        requires_owner_action: true,
+      }, { status: 500 });
+    }
 
-  const htmlContent = html || (textBody ? `<p>${String(textBody).replace(/\n/g, "<br>")}</p>` : null);
-  if (!htmlContent) {
-    return json({ error: "html or body content is required" }, 400);
-  }
+    if (!isSafeTestSend(email, subject) && !deliverabilityProofReady()) {
+      return secureJson({
+        error: "Direct email sending is blocked until deliverability proof is complete or an explicit [TEST] send targets TEST_EMAIL_RECIPIENT.",
+        email_sent: false,
+        safe_to_continue: false,
+        requires_owner_action: true,
+        proof_status: env("EMAIL_DELIVERABILITY_PROOF_STATUS") || "missing",
+      }, { status: 403 });
+    }
 
-  const apiKey = Deno.env.get("RESEND_API_KEY");
-  const fromEmail = Deno.env.get("RESEND_FROM_EMAIL");
-
-  if (!apiKey) {
-    console.error("[sendEmail] RESEND_API_KEY not configured");
-    return json({ error: "Email provider not configured: missing RESEND_API_KEY" }, 500);
-  }
-  if (!fromEmail) {
-    console.error("[sendEmail] RESEND_FROM_EMAIL not configured");
-    return json({ error: "Email provider not configured: missing RESEND_FROM_EMAIL" }, 500);
-  }
-
-  const base44 = createClientFromRequest(req);
-
-  try {
-    const response = await fetch("https://api.resend.com/emails", {
-      method: "POST",
+    const response = await resendFetch('https://api.resend.com/emails', {
+      method: 'POST',
       headers: {
-        "Authorization": `Bearer ${apiKey}`,
-        "Content-Type": "application/json",
+        'Authorization': `Bearer ${apiKey}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: fromEmail,
-        to: Array.isArray(recipient) ? recipient : [recipient],
+        from: `ClientSurge Systems <${senderAddress()}>`,
+        reply_to: env("RESEND_REPLY_TO_LEADS") || env("ADMIN_EMAIL") || `nolan@${CLIENTSURGE_DOMAIN}`,
+        to: email,
         subject,
-        html: htmlContent,
+        html: body,
       }),
     });
 
     const data = await response.json();
 
     if (!response.ok) {
-      const errorMessage = data?.message || data?.error || `Resend API error ${response.status}`;
-      console.error("[sendEmail] Resend API rejected request", {
-        status: response.status,
-        error: errorMessage,
-        to: recipient,
-        subject,
-      });
-
-      await base44.asServiceRole.entities.CommunicationEvent.create({
-        lead_id: lead_id || null,
-        order_id: order_id || null,
-        context_type: context_type || null,
-        context_id: context_id || null,
-        channel: "email",
-        direction: "outbound",
-        event_type: "email_failed",
-        provider: "resend",
-        status: "failed",
-        subject,
-        message_body: htmlContent?.substring(0, 500),
-        error_message: errorMessage,
-        metadata_json: JSON.stringify({ to: recipient, resend_status: response.status }),
-      }).catch(() => null);
-
-      return json({ error: "Failed to send email", details: errorMessage, resend_status: response.status }, 500);
+      return secureJson({ error: 'Failed to send email', details: data }, { status: 500 });
     }
 
-    console.log("[sendEmail] Email sent successfully", { message_id: data.id, to: recipient, subject });
+    // Log email in database
+    const base44 = createClientFromRequest(req);
+    if (leadId) {
+      await base44.entities.Emails.create({
+        lead_id: leadId,
+        email_address: email,
+        subject,
+        body,
+        status: 'sent',
+      });
+    }
 
-    await base44.asServiceRole.entities.CommunicationEvent.create({
-      lead_id: lead_id || null,
-      order_id: order_id || null,
-      context_type: context_type || null,
-      context_id: context_id || null,
-      channel: "email",
-      direction: "outbound",
-      event_type: "email_sent",
-      provider: "resend",
-      status: "sent",
-      subject,
-      message_body: htmlContent?.substring(0, 500),
-      provider_message_id: data.id,
-      metadata_json: JSON.stringify({ to: recipient, resend_message_id: data.id }),
-    }).catch(() => null);
-
-    return json({ success: true, message_id: data.id });
-
-  } catch (err) {
-    console.error("[sendEmail] Unexpected error", { error: err.message, to: recipient });
-    await base44.asServiceRole.entities.CommunicationEvent.create({
-      lead_id: lead_id || null,
-      order_id: order_id || null,
-      channel: "email",
-      direction: "outbound",
-      event_type: "email_failed",
-      provider: "resend",
-      status: "failed",
-      subject,
-      error_message: err.message,
-      metadata_json: JSON.stringify({ to: recipient }),
-    }).catch(() => null);
-    return json({ error: err.message }, 500);
+    return secureJson({ success: true, emailId: data.id });
+  } catch (error) {
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

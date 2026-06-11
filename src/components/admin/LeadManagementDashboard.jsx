@@ -673,8 +673,8 @@ export default function LeadManagementDashboard({
                 tone="green"
               />
               <SummaryCard
-                label="Elite"
-                value={offerMix.elite_system || 0}
+                label="Pro"
+                value={(offerMix.pro_system || 0) + (offerMix.elite_system || 0)}
                 helper="Leads best matched to the full stack."
                 tone="purple"
               />

@@ -178,12 +178,12 @@ Return a concise audit as JSON with:
                     onClick={demoBooking.openDemoBooking}
                     className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                   >
-                    Make the Leap
+                    Free Automation Audit
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 ) : (
                   <Link to="/book" className="inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors">
-                    Make the Leap
+                    Free Automation Audit
                     <ArrowRight className="w-4 h-4" />
                   </Link>
                 )}

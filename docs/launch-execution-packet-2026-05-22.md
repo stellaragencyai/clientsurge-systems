@@ -16,10 +16,10 @@ Latest continuation check: the local Base44 CLI is linked to app `69dc4a79656fdb
 
 ## Evidence Already In Hand
 
-- Local checkout catalog defaults to live Starter/Growth/Elite Stripe package IDs.
+- Local checkout catalog defaults to live Starter/Growth/Pro Stripe package IDs.
 - Staging can override package Stripe IDs with `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON`.
 - Override parsing fails closed for malformed JSON or partial package definitions.
-- Stripe test mode has Starter/Growth/Elite package products and setup/monthly prices.
+- Stripe test mode has Starter/Growth/Pro package products and setup/monthly prices.
 - Base44 remote function auditability is restored: `base44 functions list` returns 237 functions.
 - Base44 production app ID remains `69dc4a79656fdba136d413d3`.
 - Current production app still needs a confirmed backend/entity publish workflow because earlier Backend Platform deploy commands were rejected for this app type.
@@ -51,7 +51,7 @@ Set these only in the intended staging/test Base44 environment:
 ```text
 STRIPE_SECRET_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=<test webhook secret or Stripe CLI forwarding secret>
-STRIPE_PACKAGE_PRICE_OVERRIDES_JSON={"starter_system":{"stripe_product_id":"prod_UYhtwNW8eVqQdI","setup_price_id":"price_1TZaTKBVGjsISdG0FYZuolxJ","monthly_price_id":"price_1TZaTLBVGjsISdG0dj7Y62fu"},"growth_system":{"stripe_product_id":"prod_UYhtW1TiATAaSS","setup_price_id":"price_1TZaTLBVGjsISdG0OLeOUdAH","monthly_price_id":"price_1TZaTMBVGjsISdG0FlG2VVWG"},"elite_system":{"stripe_product_id":"prod_UYhtICcoNgWC9d","setup_price_id":"price_1TZaTMBVGjsISdG0TtdrSHRP","monthly_price_id":"price_1TZaTNBVGjsISdG0t7w5I7gM"}}
+STRIPE_PACKAGE_PRICE_OVERRIDES_JSON={"starter_system":{"stripe_product_id":"prod_UYhtwNW8eVqQdI","setup_price_id":"price_1TZaTKBVGjsISdG0FYZuolxJ","monthly_price_id":"price_1TZaTLBVGjsISdG0dj7Y62fu"},"growth_system":{"stripe_product_id":"prod_UYhtW1TiATAaSS","setup_price_id":"price_1TZaTLBVGjsISdG0OLeOUdAH","monthly_price_id":"price_1TZaTMBVGjsISdG0FlG2VVWG"},"pro_system":{"stripe_product_id":"prod_UYhtICcoNgWC9d","setup_price_id":"price_1TZaTMBVGjsISdG0TtdrSHRP","monthly_price_id":"price_1TZaTNBVGjsISdG0t7w5I7gM"}}
 ```
 
 `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` is not a secret by itself, but it is environment-routing config. Do not set it on production unless intentionally forcing production checkout to test-mode Stripe IDs.

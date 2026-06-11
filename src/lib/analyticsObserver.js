@@ -21,7 +21,7 @@ function trackBase44Event(payload, label) {
  * Call this once in your main app initialization
  * 
  * Usage in HTML:
- * <button data-track="nav-book-demo">Book Demo</button>
+ * <button data-track="nav-free-automation-audit">Free Automation Audit</button>
  * <a href="/pricing" data-track="hero-pricing-link">See Pricing</a>
  * 
  * Auto-fired event names will include [section]-[component]-[action]

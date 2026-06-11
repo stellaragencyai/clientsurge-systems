@@ -1,11 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-
-function secureJson(data, init = {}) {
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers: { "Content-Type": "application/json", ...(init.headers || {}) },
-  });
-}
+import { secureJson } from "../_shared/response.ts";
+import { loadAdminSettings } from "../_shared/adminSettings.js";
 
 Deno.serve(async (req) => {
   try {
@@ -15,8 +10,7 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Admin access required", code: "FORBIDDEN" }, { status: 403 });
     }
 
-    const records = await base44.asServiceRole.entities.AdminSettings.list(null, 1);
-    const settings = records?.[0] || {};
+    const { settings } = await loadAdminSettings(base44);
 
     return secureJson({ success: true, settings });
   } catch (error) {

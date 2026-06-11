@@ -90,14 +90,14 @@ export default function BeforeAfter() {
         <div className="text-center mt-12">
           <button
             onClick={() => demoBooking?.openDemoBooking?.()}
-            aria-label="See this system in action — book a free demo"
+            aria-label="See this system in action — start a free automation audit"
             className="inline-flex items-center gap-2 font-bold text-sm px-8 py-4 rounded-full text-white"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #00AEEF 100%)",
               boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
             }}
           >
-            See This System in Action — Free Demo
+            See This System in Action — Free Audit
           </button>
           <p className="mt-3 text-xs text-muted-foreground">15 minutes · no obligation · built for your industry</p>
         </div>

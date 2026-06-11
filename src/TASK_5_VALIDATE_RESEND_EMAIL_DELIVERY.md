@@ -24,7 +24,7 @@ This task validates that Resend (email service provider) is correctly sending em
 ## PREREQUISITES
 
 ✓ RESEND_API_KEY set in secrets  
-✓ RESEND_FROM_EMAIL set in secrets (e.g., noreply@clientsurge.com)  
+✓ RESEND_FROM_EMAIL set in secrets (e.g., support@clientsurgesystems.com)  
 ✓ Access to Resend dashboard (https://resend.com/emails)  
 ✓ Test email addresses (both valid and invalid)  
 ✓ Tasks 3–4 running (will generate email data)

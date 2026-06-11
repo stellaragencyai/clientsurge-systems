@@ -19,12 +19,12 @@
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"],
       "service_count": 4
     },
-    "elite": {
+    "pro": {
       "monthly_fee": 1997,
       "setup_fee": 2497,
-      "label": "Elite",
-      "stripe_price_id_monthly": "price_elite_monthly",
-      "stripe_price_id_setup": "price_elite_setup",
+      "label": "Pro",
+      "stripe_price_id_monthly": "price_pro_monthly",
+      "stripe_price_id_setup": "price_pro_setup",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking", "Review Request AI", "Reactivation Campaign"],
       "service_count": 6
     }

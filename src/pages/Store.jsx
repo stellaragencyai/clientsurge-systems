@@ -8,7 +8,7 @@ import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
-import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import { getPackageOffer } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
@@ -133,10 +133,10 @@ function StoreInner() {
       // Check if quiz routed here with a package key
       const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
       if (quizPackage) {
-        const pkg = PACKAGE_OFFERS.find((p) => p.package_key === quizPackage);
+        const pkg = getPackageOffer(quizPackage);
         if (pkg) {
           setSelectedIndustry({
-            shortName: pkg.name,
+            shortName: pkg.customer_facing_name || pkg.name,
             recommendedPackage: pkg,
             recommendedServiceKeys: pkg.included_service_keys,
             recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
@@ -479,7 +479,7 @@ function StoreInner() {
 
             <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
-              { label: "AI Services Available", val: "12", Icon: LayoutGrid },
+              { label: "Catalog Offers Available", val: "12", Icon: LayoutGrid },
               { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
               { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck }].
               map(({ label, val, Icon }, idx) =>

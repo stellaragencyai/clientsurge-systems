@@ -42,6 +42,7 @@ function inferIndustrySlug(body: Record<string, unknown>) {
   if (businessType.includes("hvac")) return "hvac";
   if (businessType.includes("dental")) return "dental";
   if (businessType.includes("med_spa") || businessType.includes("aesthetic")) return "med_spa";
+  if (businessType.includes("plumb")) return "plumbing";
   if (businessType.includes("chiropractic")) return "chiropractic";
   if (businessType.includes("contractor")) return "contractors";
   return businessType;
@@ -52,13 +53,19 @@ function normalizeIndustryTags(value: unknown, industrySlug = "") {
   const tags = rawTags.map((entry) => normalizeIndustrySlug(entry)).filter(Boolean);
   if (industrySlug) tags.push(industrySlug);
   if (industrySlug === "roofing") {
-    tags.push("roofing_landing_page", "free_roofing_automation_audit");
+    tags.push("roofing_landing_page", "roofing_lead", "free_roofing_automation_audit");
   }
   if (industrySlug === "hvac") {
-    tags.push("hvac_landing_page", "free_hvac_automation_audit");
+    tags.push("hvac_landing_page", "hvac_lead", "free_hvac_automation_audit");
   }
   if (industrySlug === "dental") {
-    tags.push("dental_landing_page", "free_dental_automation_audit");
+    tags.push("dental_landing_page", "dental_lead", "free_dental_automation_audit");
+  }
+  if (industrySlug === "med_spa") {
+    tags.push("med_spa_landing_page", "med_spa_lead", "free_med_spa_automation_audit");
+  }
+  if (industrySlug === "plumbing") {
+    tags.push("plumbing_landing_page", "plumbing_lead", "free_plumbing_automation_audit");
   }
   return [...new Set(tags)];
 }
@@ -77,7 +84,18 @@ function leadScoreForIndustry(industrySlug: string) {
   if (industrySlug === "roofing") return 75;
   if (industrySlug === "hvac") return 72;
   if (industrySlug === "dental") return 70;
+  if (industrySlug === "med_spa") return 70;
+  if (industrySlug === "plumbing") return 72;
   return 50;
+}
+
+function crmTagForIndustry(industrySlug: string) {
+  if (industrySlug === "roofing") return "roofing_lead";
+  if (industrySlug === "hvac") return "hvac_lead";
+  if (industrySlug === "dental") return "dental_lead";
+  if (industrySlug === "med_spa") return "med_spa_lead";
+  if (industrySlug === "plumbing") return "plumbing_lead";
+  return industrySlug || "";
 }
 
 function mergeSourceHistory(existing: unknown, nextSource: string, pageSubmittedFrom = "") {
@@ -153,7 +171,7 @@ async function createCrmLeadFromWebsiteLead(base44: any, lead: any) {
     assigned_at: existing?.assigned_at || now,
     page_submitted_from: lead.source_page || "",
     package_interest: lead.service_interest || "",
-    crm_tag: industrySlug || "",
+    crm_tag: lead.crm_tag || crmTagForIndustry(industrySlug),
     notes: [existing?.notes, lead.message || lead.problem].filter(Boolean).join("\n\n").trim(),
     normalized_email: normalizeEmail(lead.email),
     normalized_phone: normalizePhone(lead.phone_number),

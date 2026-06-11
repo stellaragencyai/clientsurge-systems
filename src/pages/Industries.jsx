@@ -7,6 +7,7 @@ import {
   SmilePlus,
   Activity,
   Wrench,
+  Droplets,
   Hammer,
   HardHat,
 } from "lucide-react";
@@ -56,15 +57,27 @@ const industries = [
 },
 {
   id: "hvac",
-  title: "HVAC, Plumbing & Home Services",
+  title: "HVAC & Heating/Cooling",
   status: "Live",
   icon: Wrench,
   accent: "text-[#005f99]",
   accentBg: "bg-primary/10 border-primary/20",
   ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
-  "Ideal for service businesses losing jobs to missed calls, slow follow-up, and manual lead management.",
+  "Ideal for HVAC teams losing jobs to emergency missed calls, seasonal spikes, slow follow-up, and manual booking handoffs.",
   href: "/hvac"
+},
+{
+  id: "plumbing",
+  title: "Plumbing & Drain Services",
+  status: "Live",
+  icon: Droplets,
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
+  description:
+  "Built for plumbing teams that need faster response to emergency leaks, drain repair, water heater calls, and dispatch handoff.",
+  href: "/plumbing"
 },
 {
   id: "roofing",
@@ -172,7 +185,7 @@ export default function Industries() {
                   onClick={() => setShowBookingModal(true)}
                   className="inline-flex items-center gap-2 rounded-full border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
                   
-                    Make the Leap
+                    Free Automation Audit
                     <ArrowRight className="w-4 h-4" />
                   </button>
                 }

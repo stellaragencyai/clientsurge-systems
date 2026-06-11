@@ -1,0 +1,146 @@
+{
+  "name": "LaunchApproval",
+  "type": "object",
+  "properties": {
+    "approval_id": {
+      "type": "string",
+      "title": "Approval ID"
+    },
+    "gate_key": {
+      "type": "string",
+      "title": "Gate Key"
+    },
+    "action_type": {
+      "type": "string",
+      "title": "Action Type",
+      "enum": [
+        "production_deploy",
+        "real_campaign_send",
+        "crm_dedupe_merge_delete",
+        "stripe_live_action",
+        "dns_change",
+        "base44_production_env_change",
+        "real_customer_email",
+        "checkout_payment_logic_change",
+        "provider_credential_change",
+        "auth_security_behavior_change",
+        "manual_gate_approval",
+        "manual_gate_waiver"
+      ]
+    },
+    "action_title": {
+      "type": "string",
+      "title": "Action Title"
+    },
+    "action_summary": {
+      "type": "string",
+      "title": "Action Summary"
+    },
+    "risk_level": {
+      "type": "string",
+      "title": "Risk Level",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "high"
+    },
+    "requested_by": {
+      "type": "string",
+      "title": "Requested By"
+    },
+    "requested_at": {
+      "type": "string",
+      "title": "Requested At",
+      "format": "date-time"
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "requested",
+        "approved",
+        "denied",
+        "expired",
+        "revoked",
+        "waived"
+      ],
+      "default": "requested"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    },
+    "linked_github_issue": {
+      "type": "string",
+      "title": "Linked GitHub Issue"
+    },
+    "linked_google_drive_proof": {
+      "type": "string",
+      "title": "Linked Google Drive Proof"
+    },
+    "linked_base44_record": {
+      "type": "string",
+      "title": "Linked Base44 Record"
+    },
+    "expires_at": {
+      "type": "string",
+      "title": "Expires At",
+      "format": "date-time"
+    },
+    "revoked_at": {
+      "type": "string",
+      "title": "Revoked At",
+      "format": "date-time"
+    },
+    "revoked_by": {
+      "type": "string",
+      "title": "Revoked By"
+    },
+    "revocation_reason": {
+      "type": "string",
+      "title": "Revocation Reason"
+    }
+  },
+  "required": [
+    "approval_id",
+    "gate_key",
+    "action_type",
+    "action_title",
+    "risk_level",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

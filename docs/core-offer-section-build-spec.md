@@ -57,7 +57,7 @@ export const coreOfferSectionConfig = {
     type: "scroll",
   },
   secondaryCta: {
-    label: "Book Your Free Demo",
+    label: "Free Automation Audit",
     target: "demo-modal",
     type: "modal",
   },

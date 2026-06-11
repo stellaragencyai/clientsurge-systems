@@ -9,6 +9,7 @@ import { secureJson } from "../_shared/response.ts";
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
 const FOLLOW_UP_STEPS = [
@@ -156,7 +157,7 @@ async function sendEmail(base44, lead, subject, body, fromEmail, stepKey) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
+      from: fromEmail,
       to: lead.email,
       subject,
       text: body,
@@ -226,8 +227,7 @@ Deno.serve(async (req) => {
     const fromNumber =
       settings.twilio_from_number ||
       Deno.env.get("TWILIO_PHONE_NUMBER");
-    const fromEmail =
-      settings.resend_from_email || "noreply@clientsurge.com";
+    const fromEmail = getApprovedEmailSender(settings, { preferLeads: true });
     const bookingLink = settings.booking_link_default || "";
 
     // Hard-coded templates (can be overridden by AdminSettings if added)
@@ -385,6 +385,31 @@ Deno.serve(async (req) => {
 
             // Send EMAIL steps
             if (stepConfig.channel === "email") {
+              const sendGate = getEmailOutreachGate("missed-call email follow-up");
+              if (!sendGate.ok) {
+                await base44.asServiceRole.entities.CommunicationEvent.create(
+                  buildMissedCallEvent({
+                    lead: freshLead,
+                    stepConfig,
+                    channel: "email",
+                    direction: "outbound",
+                    event_type: "email_blocked",
+                    provider: "resend",
+                    status: "blocked",
+                    subject: `Missed-call email step ${stepConfig.step} blocked`,
+                    message_body: sendGate.reason,
+                    metadata: {
+                      intended_channel: "email",
+                      reason: "deliverability_gate",
+                      proof_status: sendGate.proof_status,
+                      requires_owner_action: true,
+                    },
+                  })
+                );
+                results.skipped++;
+                continue;
+              }
+
               if (!freshLead.email) {
                 console.log(
                   `[processMissedCallFollowUps] No email for lead ${lead.id} at step ${stepConfig.step}`

@@ -7,7 +7,7 @@ Generated for the pre-Stripe-proof launch push. This kit focuses on public websi
 Status: Repo-side campaign kit ready; external provider proof still required.
 
 Current frontend and catalog signals:
-- Public package prices are Starter System at $797 setup and $497/month, Growth System at $1,297 setup and $997/month, and Elite System at $2,497 setup and $1,997/month.
+- Public package prices are Starter at $797 setup and $497/month, Growth at $1,297 setup and $997/month, and Pro at $2,497 setup and $1,997/month.
 - The public store still exposes smaller self-serve component prices for individual services, but canonical package checkout uses the package price IDs in `src/lib/salesCatalog.js`.
 - SEO/conversion audit is currently 9/10. The only failing check is a real GA4 measurement ID.
 - Resend send paths exist through the canonical CommunicationOutbox. Production still needs sender-domain proof and safe delivery/bounce evidence before large-volume email.
@@ -63,8 +63,8 @@ High-intent routes:
 Catalog assertions:
 - Starter: 2 automations, $797 setup, $497/month.
 - Growth: 4 automations, $1,297 setup, $997/month.
-- Elite: 6 automations, $2,497 setup, $1,997/month.
-- Avoid calling Elite "Pro System" in public checkout surfaces.
+- Pro: 6 automations, $2,497 setup, $1,997/month.
+- Treat Elite only as a legacy alias for Pro when reading old records or staging override keys.
 - Avoid promising unsupported launch timing. Use "done-for-you setup" or "ready fast" unless a specific SLA has been operationally approved.
 
 ## Launch Positioning
@@ -76,9 +76,9 @@ Audience:
 Local service businesses that already get inquiries but lose revenue through slow response, missed calls, inconsistent follow-up, weak booking handoff, stale lead lists, or low review volume.
 
 Offer ladder:
-- Starter System: respond fast and recover missed calls.
-- Growth System: add nurture and booking handoff for active lead flow.
-- Elite System: add old-lead reactivation and review requests for the full recovery stack.
+- Starter: respond fast and recover missed calls.
+- Growth: add nurture and booking handoff for active lead flow.
+- Pro: add old-lead reactivation and review requests for the full recovery stack.
 
 Primary CTA:
 Book an Automation Audit.
@@ -94,7 +94,7 @@ Approved no-code deals:
 - Founder Launch Audit: free workflow audit for qualified local businesses.
 - First 10 Launch Slots: priority onboarding queue for the first 10 approved businesses.
 - Message Review Bonus: launch customers get one extra message-review pass before go-live.
-- Reactivation Preview: Elite prospects get a manual estimate of dormant-lead recovery potential.
+- Reactivation Preview: Pro prospects get a manual estimate of dormant-lead recovery potential.
 
 Deals requiring checkout/coupon support before public promotion:
 - Setup-fee discount.
@@ -131,9 +131,9 @@ Launch-page support:
 | 1 | Blog: Missed call text-back systems explained | missed call text back service | View Starter |
 | 2 | Blog: The 14-day follow-up sequence local service businesses need | automated lead follow up service business | View Growth |
 | 2 | Industry page refresh: Med spas | med spa lead follow up automation | Book an audit |
-| 3 | Blog: How to reactivate old leads without sounding desperate | old lead reactivation campaign | View Elite |
+| 3 | Blog: How to reactivate old leads without sounding desperate | old lead reactivation campaign | View Pro |
 | 3 | Industry page refresh: Roofing or dental | industry-specific automation | Book an audit |
-| 4 | Blog: Review request automation without review gating | review request automation local business | View Elite |
+| 4 | Blog: Review request automation without review gating | review request automation local business | View Pro |
 | 4 | Comparison page draft | AI automation agency for local businesses | Book an audit |
 
 ## Email Launch Campaign
@@ -159,7 +159,7 @@ Preview: Slow replies, missed calls, and inconsistent follow-up are fixable syst
 CTA: See the six automations.
 
 Email 3 - Package clarity
-Subject: Starter, Growth, or Elite?
+Subject: Starter, Growth, or Pro?
 Preview: A simple way to choose the right automation system for your current lead flow.
 CTA: View packages.
 
@@ -185,7 +185,7 @@ CTA: Open the brochure or book an audit.
 
 Email 3 - Package fit
 Subject: Which automation stack fits your lead flow?
-CTA: View Starter/Growth/Elite.
+CTA: View Starter/Growth/Pro.
 
 Email 4 - Breakup
 Subject: Should I close the loop?

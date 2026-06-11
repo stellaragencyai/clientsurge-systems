@@ -71,7 +71,7 @@ function scoreAnswers(answers) {
 
   if (score <= 3) return "starter_system";
   if (score <= 6) return "growth_system";
-  return "elite_system";
+  return "pro_system";
 }
 
 function getRecommendationReason(answers) {
@@ -239,7 +239,7 @@ function ResultStep({ packageKey, answers, onGoToStore, onBookDemo }) {
           onClick={onBookDemo}
           className="w-full h-12 rounded-full border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
         >
-          Book a Free Demo Instead
+          Start a Free Automation Audit Instead
         </button>
       </div>
     </div>

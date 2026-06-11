@@ -26,6 +26,7 @@ const SITEMAP_SECTIONS = [
     "/med-spa",
     "/dental",
     "/hvac",
+    "/plumbing",
     "/roofing",
     "/chiropractic",
     "/contractors",

@@ -355,7 +355,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 {saving ? (
                   <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</>
                 ) : (
-                  <>Schedule Demo <ArrowRight className="w-4 h-4" /></>
+                  <>Free Automation Audit <ArrowRight className="w-4 h-4" /></>
                 )}
               </button>
             </div>

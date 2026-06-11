@@ -273,8 +273,22 @@ export const PACKAGE_DEFINITIONS = [
   {
     package_key: "starter_system",
     name: "Starter System",
+    customer_facing_name: "Starter",
+    internal_label: "Starter System",
     fit: "Best for businesses that need instant response and missed-call recovery first.",
     description: "Start with immediate website lead response plus automatic missed-call text-back.",
+    checkout_eligibility: "checkout_enabled",
+    checkout_enabled: true,
+    ai_voice_agent_status: "optional_add_on_owner_confirmation_required",
+    owner_confirmation_flags: [
+      "OWNER_CONFIRMATION_REQUIRED: final owner approval of live pricing",
+      "OWNER_CONFIRMATION_REQUIRED: AI voice agent packaging",
+    ],
+    metadata: {
+      current_public_package: true,
+      package_family: "controlled_launch",
+      sales_position: "entry response and missed-call recovery package",
+    },
     stripe_product_id: "prod_UReWMpnZsCnfcL",
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
@@ -285,8 +299,22 @@ export const PACKAGE_DEFINITIONS = [
   {
     package_key: "growth_system",
     name: "Growth System",
+    customer_facing_name: "Growth",
+    internal_label: "Growth System",
     fit: "Best for steady lead flow that needs response, recovery, nurture, and booking.",
     description: "The core response and nurture stack for businesses actively converting inbound demand.",
+    checkout_eligibility: "checkout_enabled",
+    checkout_enabled: true,
+    ai_voice_agent_status: "optional_add_on_owner_confirmation_required",
+    owner_confirmation_flags: [
+      "OWNER_CONFIRMATION_REQUIRED: final owner approval of live pricing",
+      "OWNER_CONFIRMATION_REQUIRED: AI voice agent packaging",
+    ],
+    metadata: {
+      current_public_package: true,
+      package_family: "controlled_launch",
+      sales_position: "core response, nurture, and booking package",
+    },
     stripe_product_id: "prod_UReWhZsWks1HuA",
     setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
     monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
@@ -305,8 +333,23 @@ export const PACKAGE_DEFINITIONS = [
     package_key: "pro_system",
     legacy_package_keys: ["elite_system"],
     name: "Pro System",
+    customer_facing_name: "Pro",
+    internal_label: "Pro System",
     fit: "Best for teams that want the full response, reactivation, and review stack.",
     description: "The complete AI automation bundle — every service, fully managed.",
+    checkout_eligibility: "checkout_enabled",
+    checkout_enabled: true,
+    ai_voice_agent_status: "optional_add_on_owner_confirmation_required",
+    owner_confirmation_flags: [
+      "OWNER_CONFIRMATION_REQUIRED: final owner approval of live pricing",
+      "OWNER_CONFIRMATION_REQUIRED: AI voice agent packaging",
+    ],
+    metadata: {
+      current_public_package: true,
+      package_family: "controlled_launch",
+      sales_position: "full response, reactivation, and review package",
+      legacy_public_name: "Elite",
+    },
     stripe_product_id: "prod_UReW1LmsVbn4BZ",
     setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
     monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
@@ -526,6 +569,12 @@ function enrichPackage(definition) {
   return {
     ...definition,
     included_services,
+    optional_service_keys: CANONICAL_SERVICE_PRODUCTS.filter(
+      (service) => !definition.included_service_keys.includes(service.service_key)
+    ).map((service) => service.service_key),
+    optional_services: CANONICAL_SERVICE_PRODUCTS.filter(
+      (service) => !definition.included_service_keys.includes(service.service_key)
+    ),
     compare_at_setup,
     compare_at_monthly,
     setup_savings: Math.max(0, compare_at_setup - definition.setup_total),

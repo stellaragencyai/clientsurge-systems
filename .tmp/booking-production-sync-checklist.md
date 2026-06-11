@@ -88,7 +88,7 @@
 - [x] Verify live production after deploy
 
 ## Phase 7 - Approved Test Booking
-- [ ] Prepare exact test data
+- [x] Prepare exact test data
 - [ ] Wait for explicit approval
 - [ ] Submit approved production test booking
 - [ ] Verify CRM record
@@ -127,4 +127,15 @@
 - Live payloads captured required fields: name, email, phone, business, website, industry, issue, date/time, consent, source page, UTM where supplied, and referrer.
 - Mobile homepage CTA opened the scheduler after cookie dismissal with date/time/consent visible.
 - Remaining non-booking console/network issue: homepage Unsplash image blocked by ORB.
+- Proposed production test data prepared for approval:
+  - full name: ClientSurge Production Test
+  - email: USER_TO_CONFIRM
+  - phone: USER_TO_CONFIRM
+  - business name: ClientSurge Production Test
+  - website: https://clientsurgesystems.com
+  - industry/source: HVAC via `/hvac`
+  - issue/message: APPROVED PRODUCTION TEST BOOKING - safe to delete after verification.
+  - date/time: 2026-06-12 at 10:30 AM Phoenix time
+  - consent: checked
+  - UTM: `utm_source=codex&utm_medium=production_test&utm_campaign=booking_verification`
 - This checklist is a progress artifact and should not be included in the app release unless explicitly requested.

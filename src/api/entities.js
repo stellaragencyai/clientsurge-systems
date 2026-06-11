@@ -7,6 +7,8 @@ import { base44 } from "@/api/base44Client";
 export const AutomationJob = base44.entities.AutomationJob;
 export const ClientOnboarding = base44.entities.OnboardingClient;
 export const DemoRequest = base44.entities.DemoRequest;
+export const LaunchApproval = base44.entities.LaunchApproval;
+export const LaunchGate = base44.entities.LaunchGate;
 export const SpaLead = base44.entities.Leads;
 export const SupportMessage = base44.entities.SupportMessage;
 export const WebsiteLead = base44.entities.WebsiteLead;
@@ -15,6 +17,8 @@ export default {
   AutomationJob,
   ClientOnboarding,
   DemoRequest,
+  LaunchApproval,
+  LaunchGate,
   SpaLead,
   SupportMessage,
   WebsiteLead,

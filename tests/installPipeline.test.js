@@ -419,7 +419,7 @@ test("purchase onboarding handoff detects pro package and first missing intake f
   const handoff = buildPurchaseOnboardingHandoff({ order: normalizedOrder });
 
   assert.equal(handoff.package_tier, "pro");
-  assert.equal(handoff.package_key, "pro_website_plus_six_automations");
+  assert.equal(handoff.package_key, "pro_system");
   assert.equal(handoff.service_keys.length, 6);
   assert.equal(handoff.next_missing_field, "business_hours");
   assert.equal(handoff.next_question, "What are the client's normal business hours?");

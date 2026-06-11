@@ -22,9 +22,9 @@ const trustItems = [
   },
   {
     image: "/trust-security/verified-seal.webp",
-    title: "Verified & Trusted",
-    body: "Our platform and automation systems are trusted by local service businesses that rely on fast follow-up.",
-    alt: "Verified trust seal",
+    title: "Implementation Reviewed",
+    body: "Every launch should be reviewed against approved workflows, provider setup, and customer-data handling before traffic is scaled.",
+    alt: "Implementation review seal",
   },
   {
     image: "/trust-security/gdpr-compliant.webp",

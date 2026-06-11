@@ -16,16 +16,16 @@ export const INDUSTRIES = {
     // Hero section
     hero: {
       eyebrow: "For Aesthetic Clinics",
-      headline: "Stop Losing Booking Leads to Slow Response Times",
-      subheadline: "AI-powered instant response and follow-up turns inquiry floods into booked appointments. Most aesthetic leads go cold in 5 minutes — we keep them hot.",
-      cta: "See Your Instant Response System",
+      headline: "Book More Med Spa Consults Before Leads Go Cold",
+      subheadline: "ClientSurge helps med spas respond to consultation requests, aesthetic treatment inquiries, missed DMs and calls, and booking handoffs before high-intent leads drift away.",
+      cta: "Free Med Spa Automation Audit",
     },
 
     // Industry pain stats
     painStats: [
-      { icon: "⏱️", value: "47%", label: "of leads go dark if not contacted within 5 min", shortLabel: "Leads lost in 5 min" },
-      { icon: "📱", value: "3x", label: "more conversions with guided booking flow", shortLabel: "More conversions" },
-      { icon: "💰", value: "$800-2000", label: "avg revenue per appointment lost to no-show follow-up", shortLabel: "Lost per no-show" },
+      { icon: "⏱️", value: "47%", label: "of leads go dark if not contacted within 5 min" },
+      { icon: "📱", value: "3x", label: "more conversions with guided booking flow" },
+      { icon: "💰", value: "$800-2000", label: "avg revenue per appointment lost to no-show follow-up" },
     ],
 
     // Problem/solution cards
@@ -79,17 +79,18 @@ export const INDUSTRIES = {
 
     // Metrics/results
     metrics: [
-      { value: "82%", label: "of booking inquiries responded to in under 60 sec" },
-      { value: "3 more", label: "bookings per week from faster responses" },
-      { value: "5-7 business", label: "days for full system setup and go-live" },
+      { value: "60 sec", label: "target response window for consult and treatment inquiries" },
+      { value: "14-day", label: "nurture path for unbooked consult requests" },
+      { value: "5-7 business", label: "days for setup after onboarding and provider access" },
     ],
 
-    // Testimonial
+    // Credibility note, not a customer testimonial.
     testimonial: {
-      quote: "We were losing leads to competitors simply because we couldn't pick up the phone fast enough. Within the first week, we had 12 extra booked appointments. This system pays for itself.",
-      name: "Dr. Sarah Chen",
-      business: "Luminous Aesthetics, Phoenix AZ",
-      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop",
+      type: "readiness",
+      label: "Launch proof boundary",
+      quote: "Use this page for controlled traffic only after source tracking, notification delivery, and safe live confirmation proof are completed.",
+      name: "ClientSurge Launch Checklist",
+      business: "No customer case study claimed for this page",
     },
 
     // FAQ section
@@ -112,7 +113,7 @@ export const INDUSTRIES = {
       },
       {
         q: "How long until we see results?",
-        a: "Most of our aesthetic clients see 3-5 extra bookings in the first week. Full ROI typically appears by week 3-4.",
+        a: "Local setup can be completed quickly once provider access, services, booking rules, and compliance copy are confirmed. Production lift must be measured after a controlled launch.",
       },
     ],
   },
@@ -126,15 +127,15 @@ export const INDUSTRIES = {
     
     hero: {
       eyebrow: "For Dental Offices",
-      headline: "Turn Appointment Calls Into Confirmed Bookings",
-      subheadline: "Dental practices lose 40% of potential patients to poor response times. Our AI answers every call, texts back missed calls, and guides patients straight to your booking page.",
-      cta: "See How Dental Practices Use This",
+      headline: "Turn More New Patient Inquiries Into Confirmed Appointments",
+      subheadline: "ClientSurge helps dental teams capture new patient calls, appointment requests, missed front desk inquiries, recall opportunities, and follow-up tasks before patients move on.",
+      cta: "Free Dental Automation Audit",
     },
 
     painStats: [
-      { icon: "📞", value: "40%", label: "of dental calls go unanswered during busy hours", shortLabel: "Calls unanswered" },
-      { icon: "📅", value: "2x", label: "more confirmed appointments with instant response", shortLabel: "More appointments" },
-      { icon: "🦷", value: "$200-500", label: "avg revenue per missed patient intake", shortLabel: "Lost per missed call" },
+      { icon: "📞", value: "40%", label: "of dental calls go unanswered during busy hours" },
+      { icon: "📅", value: "2x", label: "more confirmed appointments with instant response" },
+      { icon: "🦷", value: "$200-500", label: "avg revenue per missed patient intake" },
     ],
 
     problems: [
@@ -185,16 +186,17 @@ export const INDUSTRIES = {
     },
 
     metrics: [
-      { value: "68%", label: "of inquiries responded to in under 60 sec" },
-      { value: "3 more", label: "confirmed appointments per week" },
-      { value: "5-7 business", label: "days to full setup and go-live" },
+      { value: "60 sec", label: "target response window for new-patient inquiries" },
+      { value: "Recall", label: "follow-up path for unscheduled patients and treatment plans" },
+      { value: "5-7 business", label: "days for setup after onboarding and provider access" },
     ],
 
     testimonial: {
-      quote: "We were turning away patients during peak hours. Now our AI answers every call, texts back missed calls, and confirms appointments 24/7. We've added 15 new patients in month one.",
-      name: "Dr. Marcus Rodriguez",
-      business: "Bright Smile Dental, Austin TX",
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop",
+      type: "readiness",
+      label: "Launch proof boundary",
+      quote: "Use this page for controlled traffic only after dental-specific source tracking, notification delivery, and safe live confirmation proof are completed.",
+      name: "ClientSurge Launch Checklist",
+      business: "No customer case study claimed for this page",
     },
 
     faqs: [
@@ -216,7 +218,7 @@ export const INDUSTRIES = {
       },
       {
         q: "How much does it cost?",
-        a: "Starting at $497/month. Most dental offices see ROI within 2 weeks.",
+        a: "The safest next step is a free dental automation audit. Pricing depends on the launch scope, integrations, and provider access needed for the practice.",
       },
     ],
   },
@@ -236,9 +238,9 @@ export const INDUSTRIES = {
     },
 
     painStats: [
-      { icon: "⏱️", value: "55%", label: "of chiro inquiries go unanswered during clinic hours", shortLabel: "Inquiries unanswered" },
-      { icon: "📊", value: "4x", label: "better conversion with instant pricing & availability", shortLabel: "Conversion lift" },
-      { icon: "💵", value: "$150-300", label: "avg first visit value lost per missed lead", shortLabel: "Lost per missed lead" },
+      { icon: "⏱️", value: "55%", label: "of chiro inquiries go unanswered during clinic hours" },
+      { icon: "📊", value: "4x", label: "better conversion with instant pricing & availability" },
+      { icon: "💵", value: "$150-300", label: "avg first visit value lost per missed lead" },
     ],
 
     problems: [
@@ -327,22 +329,22 @@ export const INDUSTRIES = {
 
   "hvac": {
     id: "hvac",
-    name: "HVAC, Plumbing & Home Services",
-    shortName: "Home Services",
+    name: "HVAC & Heating/Cooling Contractors",
+    shortName: "HVAC Companies",
     slug: "hvac",
     routePath: "/hvac",
     
     hero: {
-      eyebrow: "HVAC & Home Services",
-      headline: "Every Service Call Answered. Every Job Booked.",
-      subheadline: "Home service leads are urgent and time-sensitive. Miss the call, and they call your competitor. Instant SMS turns missed calls into booked service appointments.",
+      eyebrow: "For HVAC Contractors",
+      headline: "Book More HVAC Service Calls During Peak Demand",
+      subheadline: "ClientSurge helps HVAC teams respond to after-hours AC and heating leads, emergency calls, seasonal demand spikes, appointment requests, and maintenance plan opportunities faster.",
       cta: "Free HVAC Automation Audit",
     },
 
     painStats: [
-      { icon: "🚨", value: "73%", label: "of emergency HVAC calls go to whoever answers first", shortLabel: "First responder wins" },
-      { icon: "📲", value: "5-7 more", label: "service calls per week from instant response", shortLabel: "Extra weekly calls" },
-      { icon: "💰", value: "$400-1200", label: "avg service revenue lost per missed call", shortLabel: "Lost per missed call" },
+      { icon: "🚨", value: "73%", label: "of emergency HVAC calls go to whoever answers first" },
+      { icon: "📲", value: "5-7 more", label: "service calls per week from instant response" },
+      { icon: "💰", value: "$400-1200", label: "avg service revenue lost per missed call" },
     ],
 
     problems: [
@@ -386,23 +388,24 @@ export const INDUSTRIES = {
 
     smsDemo: {
       businessName: "Rapid Response HVAC",
-      initialMessage: "Hi, my AC is out and it's 110°F inside. Can someone come today?",
+      initialMessage: "[Missed call from homeowner]",
       automatedResponse: "Hi! We saw your missed call. 🔧 Rapid Response HVAC here. We can send a technician TODAY for emergency AC repair. Service call is $89. Available 2-5 PM or 6-9 PM. Which works?",
       leadReply: "2 PM today works!",
       confirmationMessage: "Booked! Technician arriving 2-2:30 PM today. Here's your address confirmation & tech details: [info]. Thanks! ⏱️",
     },
 
     metrics: [
-      { value: "85%", label: "of calls responded to in under 2 minutes" },
-      { value: "5-7 more", label: "service calls per week" },
-      { value: "5-7 days", label: "to full setup and go-live" },
+      { value: "2 min", label: "target response window for emergency service inquiries" },
+      { value: "Seasonal", label: "surge handling for AC and heating demand spikes" },
+      { value: "5-7 days", label: "setup target after onboarding and provider access" },
     ],
 
     testimonial: {
-      quote: "We were losing 30-40% of emergency calls to competitors because we couldn't pick up. Now our AI answers every call instantly, books the appointment, and sends reminders. Revenue jumped 28% in month one.",
-      name: "Tom Bradley",
-      business: "Rapid Response HVAC, Denver CO",
-      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop",
+      type: "readiness",
+      label: "Launch proof boundary",
+      quote: "Use this page for controlled traffic only after HVAC source tracking, notification delivery, and safe live confirmation proof are completed.",
+      name: "ClientSurge Launch Checklist",
+      business: "No customer case study claimed for this page",
     },
 
     faqs: [
@@ -429,6 +432,111 @@ export const INDUSTRIES = {
     ],
   },
 
+  "plumbing": {
+    id: "plumbing",
+    name: "Plumbing & Drain Services",
+    shortName: "Plumbing Companies",
+    slug: "plumbing",
+    routePath: "/plumbing",
+
+    hero: {
+      eyebrow: "For Plumbing Companies",
+      headline: "Turn Urgent Plumbing Calls Into Booked Dispatches Faster",
+      subheadline: "ClientSurge helps plumbing teams recover missed emergency leak calls, drain repair requests, water heater inquiries, after-hours calls, and fast-dispatch expectations before homeowners call the next company.",
+      cta: "Free Plumbing Automation Audit",
+    },
+
+    painStats: [
+      { icon: "🚰", value: "Urgent", label: "leak and water-heater leads usually choose the fastest responder" },
+      { icon: "📞", value: "24/7", label: "after-hours calls need capture even when dispatch is busy" },
+      { icon: "🧰", value: "Dispatch", label: "source, service type, and urgency must reach the right person fast" },
+    ],
+
+    problems: [
+      {
+        problem: "Homeowner has an emergency leak and reaches voicemail",
+        stat: "Urgent jobs often go to whoever responds first",
+        solution: "Instant missed-call text-back captures the issue and urgency",
+        result: "Lead stays in your pipeline",
+      },
+      {
+        problem: "Drain repair inquiry sits in a website form",
+        stat: "Slow follow-up makes price shoppers move on",
+        solution: "Automated response asks service type, address, and best dispatch window",
+        result: "Cleaner qualification",
+      },
+      {
+        problem: "Water heater calls need fast next steps",
+        stat: "Replacement and repair requests need context before dispatch",
+        solution: "AI collects symptoms, age, photos, and timing needs",
+        result: "Better handoff",
+      },
+      {
+        problem: "After-hours calls stack up while techs are in the field",
+        stat: "Manual callbacks miss the highest-intent window",
+        solution: "After-hours capture routes urgent requests and starts follow-up",
+        result: "24/7 capture",
+      },
+      {
+        problem: "Booked service calls need confirmation",
+        stat: "No-shows waste dispatch time",
+        solution: "Confirmation and reminder sequence keeps homeowners aligned",
+        result: "Cleaner schedule",
+      },
+      {
+        problem: "Old estimates and maintenance opportunities go quiet",
+        stat: "Dormant plumbing leads need relevant reactivation",
+        solution: "Win-back follow-up revives prior quotes and seasonal maintenance",
+        result: "More second chances",
+      },
+    ],
+
+    smsDemo: {
+      businessName: "Rapid Flow Plumbing",
+      initialMessage: "[Missed call from homeowner]",
+      automatedResponse: "Hi, Rapid Flow Plumbing here. Sorry we missed you. Is this for an emergency leak, drain repair, or water heater issue? Reply with the issue and ZIP code so we can route the fastest next step.",
+      leadReply: "Emergency leak under kitchen sink in 85282.",
+      confirmationMessage: "Got it. We are flagging this as urgent and sending your details to dispatch. If water is actively running, shut off the nearest valve if safe. We will follow up with availability next.",
+    },
+
+    metrics: [
+      { value: "60 sec", label: "target response window for urgent plumbing inquiries" },
+      { value: "Dispatch", label: "handoff context for leak, drain, and water heater calls" },
+      { value: "5-7 days", label: "setup target after onboarding and provider access" },
+    ],
+
+    testimonial: {
+      type: "readiness",
+      label: "Launch proof boundary",
+      quote: "Use this page for controlled traffic only after plumbing source tracking, notification delivery, and safe live confirmation proof are completed.",
+      name: "ClientSurge Launch Checklist",
+      business: "No customer case study claimed for this page",
+    },
+
+    faqs: [
+      {
+        q: "Can the system separate emergency leaks from routine plumbing requests?",
+        a: "Yes. The intake flow can ask for issue type, urgency, location, and dispatch timing so urgent leads are flagged differently from routine requests.",
+      },
+      {
+        q: "Does it work after hours?",
+        a: "Yes. The campaign path is designed to capture after-hours calls and form fills, then route the context according to your approved dispatch rules.",
+      },
+      {
+        q: "Can it handle drain repair and water heater inquiries?",
+        a: "Yes. Messaging can be tailored around leaks, drains, water heaters, clogs, fixture repair, and other service categories you approve during onboarding.",
+      },
+      {
+        q: "Will it send real SMS or email during local testing?",
+        a: "No. Local/source testing should use mocks or source review only. Live delivery requires a separate production-safe test approval.",
+      },
+      {
+        q: "What should we bring to the plumbing automation audit?",
+        a: "Bring current lead sources, dispatch hours, emergency handling rules, service areas, and the plumbing services you want prioritized first.",
+      },
+    ],
+  },
+
   "roofing": {
     id: "roofing",
     name: "Roofing & Restoration",
@@ -439,14 +547,14 @@ export const INDUSTRIES = {
     hero: {
       eyebrow: "For Roofing & Restoration Contractors",
       headline: "Get More Roofing Leads Booked Before Competitors Reply",
-      subheadline: "ClientSurge helps roofing companies recover missed calls, answer storm and quote requests fast, follow up automatically, and turn more estimate requests into booked jobs.",
+      subheadline: "ClientSurge helps roofing companies recover missed calls, answer storm and roof repair quote requests fast, follow up automatically, and turn more estimate requests into booked jobs.",
       cta: "Free Roofing Automation Audit",
     },
 
     painStats: [
-      { icon: "⛈️", value: "60%", label: "of storm-damaged roofs get estimates from fastest responder", shortLabel: "First estimator wins" },
-      { icon: "📋", value: "2x", label: "more estimates from faster response time", shortLabel: "More estimates" },
-      { icon: "💵", value: "$3K–$8K", label: "avg roofing job value lost per missed lead", shortLabel: "Lost per missed lead" },
+      { icon: "⛈️", value: "60%", label: "of storm-damaged roofs get estimates from fastest responder" },
+      { icon: "📋", value: "2x", label: "more estimates from faster response time" },
+      { icon: "💵", value: "$3,000-8,000", label: "avg roofing job value lost per missed lead" },
     ],
 
     problems: [
@@ -497,16 +605,17 @@ export const INDUSTRIES = {
     },
 
     metrics: [
-      { value: "91%", label: "of inquiries responded to in under 5 minutes" },
-      { value: "2 more", label: "estimates closed per week" },
-      { value: "5-7 business", label: "days to setup and go-live" },
+      { value: "5 min", label: "target response window for storm and quote inquiries" },
+      { value: "Inspection", label: "handoff path from request to booked roof inspection" },
+      { value: "5-7 business", label: "days to setup after onboarding and provider access" },
     ],
 
     testimonial: {
-      quote: "During hail season, we get crushed with calls. Our AI answers every single one, qualifies them, and books the estimate. We closed 14 jobs that would have gone to competitors. Game changer.",
-      name: "Rick Mitchell",
-      business: "StormPro Roofing, Oklahoma City OK",
-      image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop",
+      type: "readiness",
+      label: "Launch proof boundary",
+      quote: "Use this page for controlled traffic only after roofing source tracking, notification delivery, and safe live confirmation proof are completed.",
+      name: "ClientSurge Launch Checklist",
+      business: "No customer case study claimed for this page",
     },
 
     faqs: [
@@ -542,15 +651,15 @@ export const INDUSTRIES = {
     
     hero: {
       eyebrow: "For General Contractors & Trades",
-      headline: "The Job Goes to the Contractor Who Responds First.",
-      subheadline: "While you're on-site, our AI answers every call, qualifies every lead, and books the estimate — so you close the job before you even get home.",
-      cta: "Book Your Free Contractor Audit",
+      headline: "Land More Jobs, Faster Response, Higher Closing Rate",
+      subheadline: "General contractors live on word-of-mouth and quick turnaround. Respond to estimates in 60 seconds, and you win. Slow down, and your competitor does.",
+      cta: "See How Contractors Use This",
     },
 
     painStats: [
-      { icon: "🏗️", value: "50%", label: "of project inquiries go to the fastest responder", shortLabel: "First responder wins" },
-      { icon: "📞", value: "4x", label: "faster response = 3-4 more jobs per month", shortLabel: "More jobs/month" },
-      { icon: "💰", value: "$5K avg", label: "project value lost per missed lead inquiry", shortLabel: "Lost per missed lead" },
+      { icon: "🏗️", value: "50%", label: "of project inquiries go to the fastest responder" },
+      { icon: "📞", value: "4x", label: "faster response = 3-4 more jobs per month" },
+      { icon: "💰", value: "$2,000-10,000", label: "avg project value lost per missed lead" },
     ],
 
     problems: [

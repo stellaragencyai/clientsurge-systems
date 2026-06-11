@@ -47,6 +47,14 @@ test("backend updates CRM tracking and compliance headers", () => {
   assert.doesNotMatch(sendEmailCampaign, /errors\.push\(\{\s*email:/);
 });
 
+test("campaign sends fail closed until deliverability proof is verified", () => {
+  assert.match(sendEmailCampaign, /EMAIL_CAMPAIGN_ENABLED/);
+  assert.match(sendEmailCampaign, /EMAIL_DELIVERABILITY_PROOF_STATUS/);
+  assert.match(sendEmailCampaign, /Campaign sending is blocked until deliverability proof is complete/);
+  assert.match(sendEmailCampaign, /requires_owner_action:\s*true/);
+  assert.match(sendEmailCampaign, /PROOF_READY_VALUES/);
+});
+
 test("schemas expose campaign and CRM tracking fields", () => {
   assert.match(emailCampaignSchema, /"max_recipients"/);
   assert.match(emailCampaignSchema, /"follow_up_days"/);

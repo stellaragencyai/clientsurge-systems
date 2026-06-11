@@ -22,6 +22,7 @@ const routes = [
   "/blog",
   "/roofing",
   "/hvac",
+  "/plumbing",
   "/dental",
   "/med-spa",
   "/chiropractic",
@@ -105,9 +106,9 @@ function simulateStaticRouteSignals({ html, route }) {
         'meta[property="og:url"]': ogUrl,
         'meta[property="og:title"]': ogTitle,
         'meta[property="og:description"]': ogDescription,
-        'meta[property="twitter:url"]': twitterUrl,
-        'meta[property="twitter:title"]': twitterTitle,
-        'meta[property="twitter:description"]': twitterDescription,
+        'meta[name="twitter:url"]': twitterUrl,
+        'meta[name="twitter:title"]': twitterTitle,
+        'meta[name="twitter:description"]': twitterDescription,
       };
       return nodes[selector] || null;
     },

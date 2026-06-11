@@ -100,7 +100,7 @@ const posts = [
       ["What is AI lead follow-up automation?", "It is a workflow that uses automation and AI-assisted routing to respond to, nurture, and move leads toward the right next step."],
       ["How many follow-ups should a lead receive?", "It depends on the business and consent rules, but every sequence should have clear limits and stop when the lead replies or books."],
       ["Does AI write every message from scratch?", "It should not need to. The safest launch approach uses controlled templates with AI assistance for classification and routing."],
-      ["Which package is best for a small team?", "Starter usually fits basic response gaps. Growth or Elite fits teams with more lead sources, reactivation needs, and reporting requirements."],
+      ["Which package is best for a small team?", "Starter usually fits basic response gaps. Growth or Pro fits teams with more lead sources, reactivation needs, and reporting requirements."],
     ],
   },
   {
@@ -114,7 +114,7 @@ const posts = [
     cta: { label: "View the med spa system", href: "/med-spa?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=med_spa_lead_response_automation" },
     links: [
       { label: "Med spa system", href: "/med-spa" },
-      { label: "Book a demo", href: "/book" },
+      { label: "Free Automation Audit", href: "/book" },
       { label: "Compare packages", href: "/store" },
     ],
     sections: [
@@ -163,7 +163,7 @@ const posts = [
     links: [
       { label: "Dental system", href: "/dental" },
       { label: "Compare packages", href: "/store" },
-      { label: "Book a demo", href: "/book" },
+      { label: "Free Automation Audit", href: "/book" },
     ],
     sections: [
       {
@@ -196,7 +196,7 @@ const posts = [
       ["Can this handle emergency dental calls?", "It can identify emergency language and route the lead quickly, but the practice should define the exact escalation language and response path."],
       ["Does it integrate with dental scheduling software?", "Scheduling integration depends on the practice stack. The launch-safe path is to start with response, intake, and routing before deeper scheduler automation."],
       ["Will it text every missed caller?", "It should only text within the business-approved rules, consent boundaries, and compliance language."],
-      ["Which package fits a dental office?", "Starter can cover basic missed-call response. Growth or Elite fits practices that want multi-source follow-up, reactivation, and reporting."],
+      ["Which package fits a dental office?", "Starter can cover basic missed-call response. Growth or Pro fits practices that want multi-source follow-up, reactivation, and reporting."],
     ],
   },
   {
@@ -340,7 +340,7 @@ const posts = [
       ["Can roofing automation handle storm leads?", "Yes. It can prioritize storm-related inquiries and collect context, while the business controls inspection and insurance language."],
       ["Can homeowners send photos?", "That depends on the approved channel setup, but photo request language can be part of the intake path."],
       ["Does it work for commercial roofing?", "The structure can work, but commercial intake and qualification rules should be configured separately."],
-      ["Which package fits roofing?", "Growth or Elite usually fits roofers that handle multiple lead sources, storm surges, and estimate reactivation."],
+      ["Which package fits roofing?", "Growth or Pro usually fits roofers that handle multiple lead sources, storm surges, and estimate reactivation."],
     ],
   },
   {
@@ -381,7 +381,7 @@ const posts = [
       {
         heading: "Package fit",
         body:
-          "Starter can support a simple booking path. Growth adds stronger follow-up and source coverage. Elite fits teams that need deeper routing, reporting, and operational review.",
+          "Starter can support a simple booking path. Growth adds stronger follow-up and source coverage. Pro fits teams that need deeper routing, reporting, and operational review.",
       },
     ],
     faqs: [
@@ -443,9 +443,9 @@ const posts = [
     slug: "automation-package-comparison",
     tag: "Pricing",
     date: "May 2026",
-    title: "Starter vs Growth vs Elite: Choosing the Right Automation Stack",
+    title: "Starter vs Growth vs Pro: Choosing the Right Automation Stack",
     description:
-      "A package-fit guide for choosing between ClientSurge Starter, Growth, and Elite based on lead volume, channels, follow-up needs, and launch readiness.",
+      "A package-fit guide for choosing between ClientSurge Starter, Growth, and Pro based on lead volume, channels, follow-up needs, and launch readiness.",
     keyword: "AI automation package pricing",
     cta: { label: "Compare packages", href: "/store?utm_source=organic&utm_medium=blog&utm_campaign=clientsurge_launch_2026_05&utm_content=automation_package_comparison" },
     links: [
@@ -470,9 +470,9 @@ const posts = [
           "Growth fits teams with multiple lead sources, recurring follow-up gaps, booking needs, and enough inbound activity to benefit from stronger automation and visibility.",
       },
       {
-        heading: "Elite fit",
+        heading: "Pro fit",
         body:
-          "Elite fits businesses that want deeper implementation, broader automation coverage, advanced routing, reactivation, and a more hands-on operating system around the funnel.",
+          "Pro fits businesses that want deeper implementation, broader automation coverage, advanced routing, reactivation, and a more hands-on operating system around the funnel.",
       },
       {
         heading: "How to choose honestly",
@@ -483,7 +483,7 @@ const posts = [
     faqs: [
       ["Which package should a new business choose?", "Starter is usually the safest first step if lead volume is still low or the business only needs basic response coverage."],
       ["When does Growth make sense?", "Growth makes sense when there are multiple lead sources, follow-up gaps, and enough activity to justify a fuller automation workflow."],
-      ["Who needs Elite?", "Elite fits teams that want more complete funnel coverage, reactivation, reporting, and deeper operational support."],
+      ["Who needs Pro?", "Pro fits teams that want more complete funnel coverage, reactivation, reporting, and deeper operational support."],
       ["Are the packages fixed forever?", "No. The practical path is to start with the right current fit and expand when the workflow proves value."],
     ],
   },

@@ -31,6 +31,9 @@
         "missed_call_text_back",
         "nurture_sequence_14d",
         "ai_booking_agent",
+        "daily_lead_digest",
+        "inbound_sms_assistant",
+        "ai_voice_receptionist",
         "lead_reactivation",
         "review_request"
       ]

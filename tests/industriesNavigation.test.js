@@ -12,7 +12,7 @@ test("live industries page forces a top reset before navigating to live industry
   assert.match(industriesPageSource, /window\.location\.assign\(href\)/);
   assert.match(industriesPageSource, /forceScrollToTop\(\);/);
 
-  for (const href of ["/med-spa", "/dental", "/chiropractic", "/hvac", "/roofing", "/contractors"]) {
+  for (const href of ["/med-spa", "/dental", "/chiropractic", "/hvac", "/plumbing", "/roofing", "/contractors"]) {
     assert.match(industriesPageSource, new RegExp(`href:\\s*"${href.replace("/", "\\/")}"`));
   }
 });
@@ -31,13 +31,14 @@ test("legacy industries grid uses canonical live industry routes instead of nest
   assert.match(legacyIndustriesPageSource, /handleIndustryNavigation/);
   assert.match(legacyIndustriesPageSource, /forceScrollToTop\(\);/);
 
-  for (const route of ["/med-spa", "/dental", "/hvac", "/roofing", "/contractors"]) {
+  for (const route of ["/med-spa", "/dental", "/hvac", "/plumbing", "/roofing", "/contractors"]) {
     assert.match(legacyIndustriesPageSource, new RegExp(`route:\\s*"${route.replace("/", "\\/")}"`));
   }
 
   assert.doesNotMatch(legacyIndustriesPageSource, /route:\s*"\/industries\/med-spa"/);
   assert.doesNotMatch(legacyIndustriesPageSource, /route:\s*"\/industries\/dental"/);
   assert.doesNotMatch(legacyIndustriesPageSource, /route:\s*"\/industries\/hvac"/);
+  assert.doesNotMatch(legacyIndustriesPageSource, /route:\s*"\/industries\/plumbing"/);
   assert.doesNotMatch(legacyIndustriesPageSource, /route:\s*"\/industries\/roofing"/);
   assert.doesNotMatch(legacyIndustriesPageSource, /route:\s*"\/industries\/contractors"/);
 });

@@ -1,5 +1,10 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import {
+  AdminOnboardingAttachError,
+  attachAdminOnboardingToOrder,
+} from "../_shared/adminOnboardingAttach.js";
 
 Deno.serve(async (req) => {
   try {
@@ -8,40 +13,23 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!user || user.role !== "admin") {
-      return secureJson({ error: "Admin access required" }, { status: 403 });
-    }
+    await requireAdminUser(base44);
 
     const payload = await req.json().catch(() => ({}));
-    const { onboarding_client_id, order_id } = payload || {};
+    const result = await attachAdminOnboardingToOrder({ base44, payload });
 
-    if (!onboarding_client_id || !order_id) {
-      return secureJson({ error: "onboarding_client_id and order_id are required" }, { status: 400 });
+    return secureJson(result);
+  } catch (error) {
+    if (error instanceof AuthGuardError || error instanceof AdminOnboardingAttachError) {
+      return secureJson(
+        {
+          error: error.message,
+          code: error.code,
+        },
+        { status: error.status || 400 }
+      );
     }
 
-    const [client, order] = await Promise.all([
-      base44.asServiceRole.entities.OnboardingClient.get(onboarding_client_id).catch(() => null),
-      base44.asServiceRole.entities.Order.get(order_id).catch(() => null),
-    ]);
-
-    if (!client) return secureJson({ error: "Onboarding client not found" }, { status: 404 });
-    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
-
-    // Link order to onboarding client
-    await base44.asServiceRole.entities.Order.update(order_id, {
-      onboarding_client_id,
-    });
-
-    // Update onboarding client with order reference
-    const updatedClient = await base44.asServiceRole.entities.OnboardingClient.update(onboarding_client_id, {
-      order_id,
-    });
-
-    console.log(`[attachAdminOnboardingOrder] Linked order ${order_id} to onboarding client ${onboarding_client_id}`);
-
-    return secureJson({ success: true, onboarding_client: updatedClient, order_id });
-  } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to attach admin onboarding";
     return secureJson({ error: message }, { status: 500 });
   }

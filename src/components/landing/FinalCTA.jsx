@@ -1,269 +1,126 @@
 import { useState } from "react";
+import StardustOverlay from "./StardustOverlay";
 import { ArrowRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import DemoBookingModal from "@/components/forms/DemoBookingModal";
-
-const BADGES = [
-  "No contracts",
-  "Live in 48 hrs",
-  "Done-for-you",
-  "30-day guarantee",
-];
 
 export default function FinalCTA() {
   const [showBookingModal, setShowBookingModal] = useState(false);
 
   return (
     <>
-      <section
-        id="book-demo"
-        aria-labelledby="final-cta-heading"
-        style={{
-          position: "relative",
-          overflow: "hidden",
-          background: "#040d1a",
-          padding: "clamp(4rem, 8vw, 7rem) clamp(1.5rem, 5vw, 4rem)",
-        }}
-      >
-        {/* Deep radial blue glow — centre */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            background:
-              "radial-gradient(ellipse 70% 60% at 50% 60%, rgba(0,110,200,0.38) 0%, rgba(0,60,140,0.18) 38%, transparent 72%)",
-          }}
-        />
+      <section id="book-demo" className="nebula-cta pt-10 pb-24 md:pb-32 px-6 relative overflow-hidden">
+        <StardustOverlay seed={13} opacity={0.6} />
 
-        {/* Subtle star-dot texture */}
-        <div
-          aria-hidden="true"
-          style={{
-            position: "absolute",
-            inset: 0,
-            pointerEvents: "none",
-            backgroundImage:
-              "radial-gradient(circle, rgba(255,255,255,0.07) 1px, transparent 1px)",
-            backgroundSize: "36px 36px",
-            opacity: 0.55,
-          }}
-        />
-
-        {/* Content */}
-        <div
-          style={{
-            position: "relative",
-            zIndex: 2,
-            maxWidth: "780px",
-            margin: "0 auto",
-            textAlign: "center",
-          }}
-        >
-          {/* Eyebrow */}
-          <p
-            style={{
-              margin: "0 0 18px",
-              fontSize: "11px",
-              fontWeight: 800,
-              letterSpacing: "0.2em",
-              textTransform: "uppercase",
-              color: "#4fc3f7",
-            }}
-          >
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
             Ready to Start?
           </p>
-
-          {/* Headline */}
-          <h2
-            id="final-cta-heading"
-            style={{
-              margin: "0 0 8px",
-              fontFamily: "Montserrat, system-ui, sans-serif",
-              fontSize: "clamp(2rem, 5vw, 3.2rem)",
-              fontWeight: 800,
-              lineHeight: 1.1,
-              color: "#ffffff",
-            }}
-          >
-            You&apos;re Already Getting Leads.
+          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
+            You&apos;re Already Getting Leads. <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
           </h2>
-          <h2
-            style={{
-              margin: "0 0 24px",
-              fontFamily: "Montserrat, system-ui, sans-serif",
-              fontSize: "clamp(2rem, 5vw, 3.2rem)",
-              fontWeight: 800,
-              lineHeight: 1.1,
-              background: "linear-gradient(90deg, #29b6f6 0%, #0288d1 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-            }}
-          >
-            Let&apos;s Convert Every One.
-          </h2>
-
-          {/* Body */}
-          <p
-            style={{
-              margin: "0 auto 20px",
-              maxWidth: "520px",
-              fontSize: "clamp(0.9rem, 2vw, 1rem)",
-              lineHeight: 1.65,
-              color: "rgba(255,255,255,0.62)",
-            }}
-          >
-            Book a free 15-minute strategy call. We&apos;ll map exactly where your
-            business is leaking bookings and show you what the system looks like
-            for your specific situation.
+          <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
+            Schedule a free 15-minute strategy call. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation - no obligation.
           </p>
 
-          {/* Bold social proof line */}
-          <p
-            style={{
-              margin: "0 0 6px",
-              fontSize: "0.875rem",
-              fontWeight: 700,
-              color: "rgba(255,255,255,0.88)",
-            }}
-          >
-            Most clients are live in 48 hours. No contracts. No fluff.
-          </p>
-          <p
-            style={{
-              margin: "0 0 22px",
-              fontSize: "0.75rem",
-              color: "rgba(255,255,255,0.36)",
-            }}
-          >
-            Free 15-minute call &middot; no commitment required &middot; live in 24–48 hours
+          {/* Projection stats - clearly framed as targets not guarantees */}
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
+            {[
+            { value: "3", label: "core conversion workflows" },
+            { value: "< 90s", label: "target first response time" },
+            { value: "30 days", label: "first performance review" }].
+            map((stat) =>
+            <div key={stat.label} className="flex flex-col items-center">
+                <span className="font-display text-3xl font-black text-foreground">
+                  {stat.value}
+                </span>
+                <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
+              </div>
+            )}
+          </div>
+          <p className="mt-3 text-xs text-muted-foreground/60 italic">
+            Targets are based on system design. Actual results depend on lead volume, offer, industry, and provider readiness.
           </p>
 
-          {/* Badge pills */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              justifyContent: "center",
-              gap: "8px",
-              marginBottom: "28px",
-            }}
-          >
-            {BADGES.map((label) => (
-              <span
-                key={label}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  padding: "5px 14px",
-                  borderRadius: "999px",
-                  border: "1px solid rgba(255,255,255,0.14)",
-                  background: "rgba(255,255,255,0.06)",
-                  color: "rgba(255,255,255,0.78)",
-                  fontSize: "12px",
-                  fontWeight: 600,
-                }}
-              >
-                <span
-                  style={{
-                    width: "6px",
-                    height: "6px",
-                    borderRadius: "50%",
-                    background: "#29b6f6",
-                    flexShrink: 0,
-                  }}
-                />
-                {label}
-              </span>
+
+          {/* How the demo works - 3 steps */}
+          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-left">
+            {[
+              { step: "01", title: "Book a 15-min slot", body: "Pick a time that works. No sales pressure, no fluff." },
+              { step: "02", title: "We map your lead flow", body: "We show you exactly where bookings are leaking in your current setup." },
+              { step: "03", title: "See your system live", body: "We show the AI workflow for your industry and the proof steps required before go-live." },
+            ].map((item) => (
+              <div key={item.step} className="flex flex-col gap-2">
+                <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
+                <p className="font-semibold text-foreground text-sm">{item.title}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">{item.body}</p>
+              </div>
             ))}
           </div>
 
-          {/* Buttons */}
-          <div
-            style={{
-              display: "flex",
-              flexWrap: "wrap",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "12px",
-            }}
-          >
-            {/* Primary CTA */}
+          <p className="mt-6 text-xs text-muted-foreground/60">
+            Free 15-minute call - no commitment required - launch timeline confirmed after onboarding
+          </p>
+        </div>
+
+        <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <button
               type="button"
               onClick={() => {
                 trackCTA("book_your_free_demo", "final_cta");
                 setShowBookingModal(true);
               }}
+              className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                height: "52px",
-                padding: "0 32px",
-                borderRadius: "999px",
+                borderRadius: "8px",
+                padding: "2px",
+                background:
+                "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
+                boxShadow: "0 12px 28px rgba(0,88,160,0.24)",
                 border: "none",
                 cursor: "pointer",
-                background: "linear-gradient(135deg, #0288d1 0%, #01579b 100%)",
-                color: "#ffffff",
-                fontSize: "0.9375rem",
-                fontWeight: 700,
-                boxShadow: "0 0 32px rgba(2,136,209,0.55), 0 4px 14px rgba(0,0,0,0.3)",
-                transition: "box-shadow 0.2s ease, transform 0.2s ease",
+                textDecoration: "none"
               }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 48px rgba(2,136,209,0.75), 0 6px 20px rgba(0,0,0,0.35)";
-                e.currentTarget.style.transform = "translateY(-1px)";
+              onMouseEnter={(event) => {
+                event.currentTarget.style.boxShadow =
+                "0 16px 40px rgba(0,174,239,0.36), 0 6px 18px rgba(0,59,143,0.18)";
               }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 32px rgba(2,136,209,0.55), 0 4px 14px rgba(0,0,0,0.3)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              Get Your Free Audit
-              <ArrowRight style={{ width: "18px", height: "18px" }} />
+              onMouseLeave={(event) => {
+                event.currentTarget.style.boxShadow =
+                "0 12px 28px rgba(0,88,160,0.24)";
+              }}>
+              
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  height: "56px",
+                  padding: "0 40px",
+                  borderRadius: "6px",
+                  background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
+                  color: "#ffffff",
+                  fontWeight: "700",
+                  fontSize: "1rem",
+                  textShadow: "0 1px 2px rgba(0,0,0,0.2)"
+                }}>
+                
+                Book Your Free Automation Audit
+                <ArrowRight className="w-5 h-5" />
+              </span>
             </button>
-
-            {/* Secondary CTA */}
             <a
-              href="/contact"
-              onClick={() => trackCTA("lead_leakage_contact", "final_cta")}
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                justifyContent: "center",
-                height: "52px",
-                padding: "0 28px",
-                borderRadius: "999px",
-                border: "1px solid rgba(255,255,255,0.22)",
-                background: "rgba(255,255,255,0.07)",
-                color: "rgba(255,255,255,0.82)",
-                fontSize: "0.9375rem",
-                fontWeight: 600,
-                textDecoration: "none",
-                transition: "background 0.2s ease, border-color 0.2s ease",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.12)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.38)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.07)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
-              }}
-            >
-              Free Lead Audit
+              href="/book"
+              onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
+              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
+              
+              Get a Free Lead Leakage Audit
             </a>
           </div>
         </div>
       </section>
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
+    </>);
 
-      {showBookingModal && (
-        <DemoBookingModal onClose={() => setShowBookingModal(false)} />
-      )}
-    </>
-  );
 }

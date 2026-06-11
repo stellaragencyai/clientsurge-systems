@@ -5,6 +5,8 @@
  * Called by entity automation on OnboardingSubmission create/update.
  */
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { secureJson } from "../_shared/response.ts";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const ADMIN_PORTAL_URL = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
@@ -20,17 +22,17 @@ Deno.serve(async (req) => {
 
     // Only fire on completed status
     if (status && status !== "completed" && event?.type !== "create") {
-      return Response.json({ skipped: true, reason: "Status not completed" });
+      return secureJson({ skipped: true, reason: "Status not completed" });
     }
 
     if (!RESEND_API_KEY) {
       console.error("[notifyOnboardingComplete] RESEND_API_KEY not set");
-      return Response.json({ error: "Email provider not configured" }, { status: 500 });
+      return secureJson({ error: "Email provider not configured" }, { status: 500 });
     }
 
     if (!ADMIN_NOTIFICATION_EMAIL) {
       console.error("[notifyOnboardingComplete] ADMIN_NOTIFICATION_EMAIL not set");
-      return Response.json({ error: "Admin email not configured" }, { status: 500 });
+      return secureJson({ error: "Admin email not configured" }, { status: 500 });
     }
 
     const adminTrackingUrl = `${ADMIN_PORTAL_URL}/admin?tab=automation-tracking`;
@@ -88,7 +90,7 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const emailRes = await fetch("https://api.resend.com/emails", {
+    const emailRes = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         "Authorization": `Bearer ${RESEND_API_KEY}`,
@@ -106,7 +108,7 @@ Deno.serve(async (req) => {
     if (!emailRes.ok) {
       const errText = await emailRes.text();
       console.error("[notifyOnboardingComplete] Resend error:", errText);
-      return Response.json({ error: "Email send failed", detail: errText }, { status: 500 });
+      return secureJson({ error: "Email send failed", detail: errText }, { status: 500 });
     }
 
     // Log the event
@@ -122,10 +124,10 @@ Deno.serve(async (req) => {
     }).catch(() => {});
 
     console.log(`[notifyOnboardingComplete] Notification sent to ${ADMIN_NOTIFICATION_EMAIL} for ${business_name || client_email}`);
-    return Response.json({ success: true, notified: ADMIN_NOTIFICATION_EMAIL });
+    return secureJson({ success: true, notified: ADMIN_NOTIFICATION_EMAIL });
 
   } catch (error) {
     console.error("[notifyOnboardingComplete] Error:", error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

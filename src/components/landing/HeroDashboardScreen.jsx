@@ -316,7 +316,7 @@ function ScreenContent({ industry, fading, cardVisible }) {
           onMouseDown={e => e.currentTarget.style.transform="scale(0.96)"}
           onMouseUp={e => e.currentTarget.style.transform="scale(1)"}
           onMouseLeave={e => e.currentTarget.style.transform="scale(1)"}>
-          Make the Leap
+          Free Automation Audit
           <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M3 8h10M9 4l4 4-4 4" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>
         </button>
         <div style={{ height:"1px", background:"rgba(255,255,255,0.08)", borderRadius:"1px", margin:"2px 0" }}/>

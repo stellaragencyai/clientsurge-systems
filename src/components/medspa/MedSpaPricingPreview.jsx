@@ -51,7 +51,7 @@ export default function MedSpaPricingPreview() {
               </p>
               <button onClick={() => setShowModal(true)} style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer" }}>
                 <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.9rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-                  Book Your Free Demo
+                  Book Your Free Automation Audit
                   <ArrowRight className="w-4 h-4" />
                 </span>
               </button>
@@ -73,7 +73,7 @@ export default function MedSpaPricingPreview() {
           </p>
           <button onClick={() => setShowModal(true)} style={{ display: "inline-block", borderRadius: "9999px", padding: "2px", background: "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)", boxShadow: "0 4px 18px rgba(120,70,20,0.35)", border: "none", cursor: "pointer" }}>
             <span style={{ display: "flex", alignItems: "center", gap: "8px", height: "48px", padding: "0 28px", borderRadius: "9999px", background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", color: "#f5e6d0", fontWeight: "700", fontSize: "0.9rem", textShadow: "0 1px 2px rgba(0,0,0,0.3)" }}>
-              Book Your Free Demo
+              Book Your Free Automation Audit
               <ArrowRight className="w-4 h-4" />
             </span>
           </button>

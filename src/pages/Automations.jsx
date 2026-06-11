@@ -165,7 +165,7 @@ function VideoPlaceholder({ service, onClose }) {
             </div>
             <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>{service.title}</h3>
             <p className="text-sm text-white/60 max-w-md mb-6">
-              Full walkthrough video coming soon. Book a live demo to see this system in action with a real-world example from your industry.
+              Review this workflow during your free automation audit with a real-world example from your industry.
             </p>
             <Link
               to="/book"
@@ -308,7 +308,7 @@ function ServiceCard({ service }) {
 export default function Automations() {
   useEffect(() => {
     return setPageMetadata({
-      title: "AI Automation Systems for Local Service Businesses | ClientSurge",
+      title: "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
       description:
         "ClientSurge installs AI automation systems that capture, follow up with, qualify, book, and reactivate leads for local service businesses.",
       canonicalPath: "/automations",
@@ -387,13 +387,13 @@ export default function Automations() {
               className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-white transition-colors shadow-lg"
               style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
             >
-              Get Your Free Audit <ArrowRight className="w-5 h-5" />
+              Free Automation Audit <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/book"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground border-2 border-border hover:border-primary/40 transition-colors"
             >
-              Book a Live Demo
+              Book a Free Automation Audit
             </Link>
           </div>
           <p className="mt-5 text-xs text-muted-foreground">No credit card required · Typical setup time: 24–48 hours</p>

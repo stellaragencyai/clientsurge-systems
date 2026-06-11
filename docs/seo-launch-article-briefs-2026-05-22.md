@@ -181,7 +181,7 @@ Key points:
 
 CTA:
 
-- View the med spa system or book a demo.
+- View the med spa system or start a free automation audit.
 
 Internal links:
 

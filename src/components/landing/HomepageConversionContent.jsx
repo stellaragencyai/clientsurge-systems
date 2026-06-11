@@ -47,6 +47,7 @@ const services = [
 const industries = [
   { label: "roofing", href: "/roofing" },
   { label: "HVAC", href: "/hvac" },
+  { label: "plumbing", href: "/plumbing" },
   { label: "dental", href: "/dental" },
   { label: "med spa", href: "/med-spa" },
   { label: "chiropractic", href: "/chiropractic" },

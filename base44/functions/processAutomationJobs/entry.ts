@@ -10,6 +10,7 @@ import { secureJson } from "../_shared/response.ts";
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 import {
@@ -87,7 +88,7 @@ async function sendResendEmail(to, subject, body, fromEmail) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurge.com",
+      from: fromEmail,
       to,
       subject,
       text: body,
@@ -157,7 +158,7 @@ Deno.serve(async (req) => {
     };
 
     const now = new Date().toISOString();
-    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurge.com";
+    const fromEmail = getApprovedEmailSender({}, { preferLeads: true });
 
     // ─────────────────────────────────────────────────────────
     // STEP 2: Process each job
@@ -227,6 +228,10 @@ Deno.serve(async (req) => {
           }
 
           try {
+            if (job.job_type === "reactivation_email") {
+              const sendGate = getEmailOutreachGate("reactivation email");
+              if (!sendGate.ok) throw new Error(sendGate.reason);
+            }
             const emailSubject = metadata.subject || "We miss you!";
             const emailBody =
               metadata.body || "We'd love to work with you again. Get in touch!";
