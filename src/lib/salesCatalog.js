@@ -631,6 +631,11 @@ export function getPackageOffer(packageKey) {
   return PACKAGE_OFFERS.find((offer) => offer.package_key === normalizedKey) || null;
 }
 
+export function getPackageStorePath(packageKey) {
+  const normalizedKey = normalizePackageKey(packageKey);
+  return normalizedKey ? `/store?package=${encodeURIComponent(normalizedKey)}` : "/store";
+}
+
 export function getBestPackageOfferForServiceKeys(serviceKeys = []) {
   const selectedProducts = serviceKeys
     .map((serviceKey) => getServiceProductByKey(serviceKey))
