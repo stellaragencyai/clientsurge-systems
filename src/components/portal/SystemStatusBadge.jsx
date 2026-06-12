@@ -19,31 +19,20 @@ export default function SystemStatusBadge({ project }) {
 
   const loadStatus = async () => {
     try {
-      const events = await base44.entities.CommunicationEvent.filter(
-        { client_project_id: project.id },
-        "-created_date",
-        10
-      );
+      const response = await base44.functions.invoke("getClientPortalProjectActivity", {
+        section: "status",
+        limit: 10,
+      });
+      const systemStatus = response?.system_status;
 
-      if (!events || events.length === 0) {
-        setStatus("slow");
+      if (!systemStatus?.status) {
+        setStatus(null);
         setLastActivity(null);
         return;
       }
 
-      const latest = events[0];
-      setLastActivity(latest.created_date);
-
-      const recentFailures = events.filter(e => e.status === "failed").length;
-      const hoursSinceLast = (Date.now() - new Date(latest.created_date).getTime()) / (1000 * 60 * 60);
-
-      if (recentFailures >= 3) {
-        setStatus("issue");
-      } else if (hoursSinceLast > 72) {
-        setStatus("slow");
-      } else {
-        setStatus("active");
-      }
+      setStatus(systemStatus.status);
+      setLastActivity(systemStatus.last_activity || null);
     } catch {
       setStatus(null);
     } finally {

@@ -178,12 +178,11 @@ export default function PortalTimeline({ order, project }) {
     if (!order?.id) { setLoadingEvents(false); return; }
     const load = async () => {
       try {
-        const results = await base44.entities.CommunicationEvent.filter(
-          { order_id: order.id },
-          "-created_date",
-          20
-        );
-        setEvents(results || []);
+        const response = await base44.functions.invoke("getClientPortalProjectActivity", {
+          section: "timeline",
+          limit: 20,
+        });
+        setEvents(response?.events || []);
       } catch {
         setEvents([]);
       } finally {
@@ -191,18 +190,6 @@ export default function PortalTimeline({ order, project }) {
       }
     };
     load();
-
-    // Real-time updates
-    const unsub = base44.entities.CommunicationEvent.subscribe((evt) => {
-      if (evt.data?.order_id === order.id) {
-        setEvents(prev => {
-          if (evt.type === "create") return [evt.data, ...prev].slice(0, 20);
-          if (evt.type === "update") return prev.map(e => e.id === evt.id ? evt.data : e);
-          return prev;
-        });
-      }
-    });
-    return unsub;
   }, [order?.id]);
 
   const hasUpcomingTasks = services.some(s => s.install_status !== "Live" && STAGE_ORDER.indexOf(s.install_status) < STAGE_ORDER.length - 1);

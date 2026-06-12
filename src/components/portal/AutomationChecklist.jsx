@@ -31,27 +31,11 @@ export default function AutomationChecklist({ order_id }) {
     let mounted = true;
     (async () => {
       try {
-        const [records, stepRecords] = await Promise.all([
-          base44.entities.AutomationChecklist.filter({ order_id }, "-created_date", 100),
-          base44.entities.AutomationChecklistStep.filter({ order_id }, "step_order", 500),
-        ]);
-
-        const stepsByChecklist = new Map();
-        for (const step of stepRecords || []) {
-          const current = stepsByChecklist.get(step.automation_checklist_id) || [];
-          current.push(step);
-          stepsByChecklist.set(step.automation_checklist_id, current);
-        }
-
-        const normalized = (records || []).map((record) => ({
-          ...record,
-          steps: (stepsByChecklist.get(record.id) || []).sort(
-            (a, b) => (a.step_order || 0) - (b.step_order || 0)
-          ),
-        }));
-
+        const response = await base44.functions.invoke("getClientPortalProjectActivity", {
+          section: "checklist",
+        });
         if (mounted) {
-          setChecklists(normalized);
+          setChecklists(response?.checklists || []);
         }
       } catch {
         if (mounted) {
