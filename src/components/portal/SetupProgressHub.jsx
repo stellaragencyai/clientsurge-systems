@@ -183,23 +183,22 @@ function AssetUploader({ project, onUploaded }) {
     try {
       for (const file of Array.from(files)) {
         const { file_url } = await base44.integrations.Core.UploadFile({ file });
-        const newFile = {
-          id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
-          name: file.name,
+        const result = await base44.functions.invoke("clientPortalProjectFiles", {
           file_url,
           file_type: file.type,
+          name: file.name,
           category,
-          uploaded_at: new Date().toISOString(),
           note: note.trim() || null,
-        };
-        const existing = project?.files || [];
-        await base44.entities.ClientProject.update(project.id, {
-          files: [...existing, newFile],
         });
-        setRecent(r => [newFile, ...r].slice(0, 3));
+        const newFile = result?.file;
+        if (newFile) {
+          setRecent(r => [newFile, ...r].slice(0, 3));
+        }
+        if (result?.project) {
+          onUploaded?.(result.project);
+        }
       }
       setNote("");
-      onUploaded?.();
     } catch (err) {
       console.error("Upload error:", err);
     } finally {
@@ -574,7 +573,7 @@ export default function SetupProgressHub({ project, order, user }) {
       {/* 30-day guarantee reassurance during setup */}
       <GuaranteeCard compact />
 
-      <AssetUploader project={projectState} onUploaded={() => {}} />
+      <AssetUploader project={projectState} onUploaded={setProjectState} />
       <InlineChat project={projectState} user={user} />
     </div>
   );
