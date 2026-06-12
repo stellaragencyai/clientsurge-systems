@@ -357,12 +357,16 @@ function InlineChat({ project, user }) {
 
   const loadMessages = async () => {
     try {
-      const msgs = await base44.entities.SupportMessage.filter({ project_id: project.id }, "created_date", 50);
+      const res = await base44.functions.invoke("clientPortalSupportMessages", { action: "load" });
+      const msgs = res.data?.messages || [];
       setMessages(msgs);
-      const newUnread = msgs.filter(m => m.role === "admin" && !m.read).length;
-      setUnread(newUnread);
+      setUnread(res.data?.unread_admin || 0);
+    } catch {
+      setMessages([]);
+      setUnread(0);
+    } finally {
       setLoading(false);
-    } catch { setLoading(false); }
+    }
   };
 
   useEffect(() => {
@@ -374,26 +378,22 @@ function InlineChat({ project, user }) {
   useEffect(() => {
     if (open) {
       bottomRef.current?.scrollIntoView({ behavior: "smooth" });
-      // mark admin messages read
-      messages.filter(m => m.role === "admin" && !m.read).forEach(m =>
-        base44.entities.SupportMessage.update(m.id, { read: true })
-      );
-      setUnread(0);
+      if (unread > 0) {
+        base44.functions.invoke("clientPortalSupportMessages", { action: "mark_read" })
+          .then(() => setUnread(0))
+          .catch(() => {});
+      }
     }
-  }, [open, messages]);
+  }, [open, messages, unread]);
 
   const sendMessage = async (text) => {
     if (!text.trim() || sending) return;
     const content = text.trim();
     setInput("");
     setSending(true);
-    await base44.entities.SupportMessage.create({
-      project_id: project.id,
-      sender_email: user?.email,
-      sender_name: user?.full_name || user?.email,
-      role: "client",
+    await base44.functions.invoke("clientPortalSupportMessages", {
+      action: "send",
       message: content,
-      read: false,
     });
     setSending(false);
     loadMessages();

@@ -10,13 +10,16 @@ export default function SupportChat({ project, user }) {
   const bottomRef = useRef(null);
 
   const loadMessages = async () => {
-    const msgs = await base44.entities.SupportMessage.filter({ project_id: project.id }, "created_date", 100);
-    setMessages(msgs);
-    setLoading(false);
-
-    msgs
-      .filter((m) => m.role === "admin" && !m.read)
-      .forEach((m) => base44.entities.SupportMessage.update(m.id, { read: true }));
+    try {
+      const res = await base44.functions.invoke("clientPortalSupportMessages", { action: "load" });
+      const msgs = res.data?.messages || [];
+      setMessages(msgs);
+      if ((res.data?.unread_admin || 0) > 0) {
+        await base44.functions.invoke("clientPortalSupportMessages", { action: "mark_read" });
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   useEffect(() => {
@@ -31,13 +34,9 @@ export default function SupportChat({ project, user }) {
 
   const requestCall = async () => {
     setSending(true);
-    await base44.entities.SupportMessage.create({
-      project_id: project.id,
-      sender_email: user.email,
-      sender_name: user.full_name || user.email,
-      role: "client",
+    await base44.functions.invoke("clientPortalSupportMessages", {
+      action: "send",
       message: "📞 CALLBACK REQUEST: Please give me a call when you have a moment. Thank you!",
-      read: false,
     });
     setSending(false);
     loadMessages();
@@ -50,13 +49,9 @@ export default function SupportChat({ project, user }) {
     setInput("");
     setSending(true);
 
-    await base44.entities.SupportMessage.create({
-      project_id: project.id,
-      sender_email: user.email,
-      sender_name: user.full_name || user.email,
-      role: "client",
+    await base44.functions.invoke("clientPortalSupportMessages", {
+      action: "send",
       message: text,
-      read: false,
     });
 
     setSending(false);
