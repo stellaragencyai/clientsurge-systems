@@ -4,6 +4,7 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import MotionSection from "@/components/motion/MotionSection";
+import CampaignBanner from "@/components/campaign/CampaignBanner";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import SecurityPriority from "../components/landing/SecurityPriority";
@@ -153,6 +154,7 @@ export default function Home() {
             <div id="six-automations" aria-hidden="true" />
             <CoreOffer />
             <SectionBreak />
+            <CampaignBanner />
             <Pricing />
             <SectionBreak />
           </LazyHomepageSection>

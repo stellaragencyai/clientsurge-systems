@@ -4,6 +4,7 @@ import { ChevronDown, Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
+import LaunchCountdownTimer from "@/components/campaign/LaunchCountdownTimer";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { BUTTON_TEXT } from "@/lib/constants";
@@ -355,6 +356,7 @@ export default function Navbar() {
         </div>
 
         <div className="hidden xl:flex items-center gap-3 shrink-0">
+          <LaunchCountdownTimer />
           <button
             onClick={() => {
               trackCTA("login", "navbar");
