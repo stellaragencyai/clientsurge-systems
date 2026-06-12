@@ -6,7 +6,6 @@ import { trackCTA } from '@/lib/analytics';
 import MobileCallBar from '@/components/landing/MobileCallBar';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import { DemoBookingProvider } from '@/components/landing/DemoBookingContext';
 import DemoBookingInline from '@/components/forms/DemoBookingInline';
 
 export default function Book() {
@@ -25,8 +24,7 @@ export default function Book() {
   }, []);
 
   return (
-    <DemoBookingProvider>
-      <div className="book-page min-h-screen bg-gradient-to-br from-background via-card to-background">
+    <div className="book-page min-h-screen bg-gradient-to-br from-background via-card to-background">
         <Navbar />
         <main className="px-4 pb-32 pt-[calc(var(--cs-nav-height)+28px)] md:px-6 md:pb-20 md:pt-[calc(var(--cs-nav-height)+44px)]">
           <div className="mx-auto w-full max-w-6xl">
@@ -467,8 +465,7 @@ export default function Book() {
             }
           }
         `}</style>
-      </div>
-    </DemoBookingProvider>
+    </div>
   );
 }
 
