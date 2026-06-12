@@ -37,6 +37,24 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Compare ClientSurge automation packages, setup pricing, monthly management, and what is included for local service businesses.",
   },
+  "/faq": {
+    key: "faq",
+    title: "Frequently Asked Questions | ClientSurge Systems",
+    description:
+      "Answers about ClientSurge setup, pricing, integrations, support, billing, cancellation, and SMS compliance.",
+  },
+  "/our-system": {
+    key: "our-system",
+    title: "Our System | ClientSurge Systems",
+    description:
+      "See how the ClientSurge system captures leads, follows up faster, recovers missed calls, books appointments, and reactivates old opportunities.",
+  },
+  "/testimonials": {
+    key: "testimonials",
+    title: "Launch Scenarios & Testimonials | ClientSurge Systems",
+    description:
+      "See the launch scenarios, workflow outcomes, and proof-oriented testimonial framing ClientSurge uses for med spas, HVAC, dental, and local service businesses.",
+  },
   "/blog": {
     key: "blog",
     title: "ClientSurge Blog | AI Automation for Local Service Businesses",
@@ -146,9 +164,6 @@ export const STATIC_ROUTE_ALIASES = {
   "/Contractors": "/contractors",
   "/legal/privacy": "/privacy-policy",
   "/legal/terms": "/terms",
-  "/faq": "/",
-  "/our-system": "/",
-  "/testimonials": "/",
 };
 
 export const LEGACY_REDIRECTS = [

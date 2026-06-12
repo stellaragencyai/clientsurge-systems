@@ -34,6 +34,9 @@ import Home from "./pages/Home";
 const Start = lazy(() => import("./pages/Start"));
 const Book = lazy(() => import("./pages/Book"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
+const FAQPage = lazy(() => import("./pages/FAQPage"));
+const OurSystemPage = lazy(() => import("./pages/OurSystemPage"));
+const TestimonialsPage = lazy(() => import("./pages/TestimonialsPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Industries = lazy(() => import("./pages/Industries"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -281,9 +284,9 @@ const AuthenticatedApp = () => {
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
       <Route path="/industries" element={<LazyRoute Component={Industries} />} />
       <Route path={routePath("pricing")} element={<LazyRoute Component={PricingPage} />} />
-      <Route path={routePath("faq")} element={<HashRedirect hash="faq" />} />
-      <Route path={routePath("our-system")} element={<HashRedirect hash="services" />} />
-      <Route path={routePath("testimonials")} element={<HashRedirect hash="testimonials" />} />
+      <Route path={routePath("faq")} element={<LazyRoute Component={FAQPage} />} />
+      <Route path={routePath("our-system")} element={<LazyRoute Component={OurSystemPage} />} />
+      <Route path={routePath("testimonials")} element={<LazyRoute Component={TestimonialsPage} />} />
       <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy-policy" />} />
       <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
       <Route path="/login" element={<LazyRoute Component={Login} />} />

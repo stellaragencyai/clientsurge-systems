@@ -69,7 +69,7 @@ function AutomationServicePageInner() {
                   <ArrowRight className="h-4 w-4" />
                 </button>
                 <Link
-                  to="/#services"
+                  to="/our-system"
                   className="inline-flex min-h-12 items-center justify-center rounded-full border px-6 text-sm font-bold no-underline"
                   style={{ borderColor: "rgba(0,174,239,0.22)", color: "#0088CC" }}
                 >
