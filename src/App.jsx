@@ -86,6 +86,8 @@ const INDUSTRY_ROUTE_SLUGS = [
   "roofing",
   "chiropractic",
   "contractors",
+  "real-estate",
+  "personal-injury",
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [

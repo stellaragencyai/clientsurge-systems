@@ -7,7 +7,9 @@ import {
   Home,
   MapPin,
   Sparkles,
-  Wrench } from
+  Wrench,
+  Scale,
+  KeyRound } from
 "lucide-react";
 import { motion } from "framer-motion";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from
@@ -74,6 +76,25 @@ const industryPatterns = {
         <line x1="30" y1="0" x2="0" y2="30" stroke="white" strokeWidth="1"/>
       </pattern></defs>
       <rect width="100%" height="100%" fill="url(#pat-contractors)"/>
+    </svg>
+  ),
+  "real-estate": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-realestate" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+        <rect x="6" y="16" width="28" height="20" fill="none" stroke="white" strokeWidth="1"/>
+        <polygon points="4,16 20,4 36,16" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-realestate)"/>
+    </svg>
+  ),
+  "personal-injury": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-law" x="0" y="0" width="34" height="34" patternUnits="userSpaceOnUse">
+        <line x1="17" y1="2" x2="17" y2="32" stroke="white" strokeWidth="1"/>
+        <line x1="6" y1="10" x2="28" y2="10" stroke="white" strokeWidth="1"/>
+        <ellipse cx="17" cy="32" rx="8" ry="2" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-law)"/>
     </svg>
   ),
 };
@@ -176,6 +197,34 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
+},
+{
+  id: "real-estate",
+  routePath: "/real-estate",
+  icon: KeyRound,
+  name: "Real Estate Agents",
+  accent: {
+    color: "#10b981",
+    soft: "rgba(16,185,129,0.18)",
+    glow: "rgba(16,185,129,0.28)",
+    iconBg: "rgba(16,185,129,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=95"
+},
+{
+  id: "personal-injury",
+  routePath: "/personal-injury",
+  icon: Scale,
+  name: "Personal Injury Law",
+  accent: {
+    color: "#8b5cf6",
+    soft: "rgba(139,92,246,0.18)",
+    glow: "rgba(139,92,246,0.28)",
+    iconBg: "rgba(139,92,246,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
 }];
 
 

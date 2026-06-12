@@ -59,6 +59,18 @@ const INDUSTRY_SEO = {
     description:
       "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.",
   },
+  "real-estate": {
+    title: "Real Estate Lead Automation | ClientSurge Systems",
+    h1: "Respond to Buyer & Seller Leads Before Any Competitor Does",
+    description:
+      "AI automation for real estate agents: instant response to Zillow and portal leads, showing scheduling, missed-call recovery, open house follow-up, and listing consultation booking.",
+  },
+  "personal-injury": {
+    title: "Personal Injury Law Firm Automation | ClientSurge Systems",
+    h1: "Sign More Cases With 24/7 AI Intake Before Leads Call Another Firm",
+    description:
+      "AI automation for personal injury law firms: 24/7 intake, instant accident inquiry response, case pre-screening, missed-call recovery, and retainer follow-up.",
+  },
 };
 
 const INDUSTRY_HERO_FALLBACKS = {
@@ -69,6 +81,8 @@ const INDUSTRY_HERO_FALLBACKS = {
   plumbing: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=90&fit=crop&auto=format",
   roofing: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=90&fit=crop&auto=format",
   contractors: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=90&fit=crop&auto=format",
+  "real-estate": "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=95&fit=crop&auto=format",
+  "personal-injury": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95&fit=crop&auto=format",
 };
 
 const INDUSTRY_BLOG_LINKS = {

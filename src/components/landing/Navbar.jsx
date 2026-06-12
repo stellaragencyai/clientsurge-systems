@@ -26,7 +26,9 @@ const industryLinks = [
 { label: "HVAC, Plumbing & Home Services", href: "/hvac", live: true },
 { label: "Plumbing & Drain Services", href: "/plumbing", live: true },
 { label: "Roofing & Restoration", href: "/roofing", live: true },
-{ label: "Contractors & Trades", href: "/contractors", live: true }];
+{ label: "Contractors & Trades", href: "/contractors", live: true },
+{ label: "Real Estate Agents", href: "/real-estate", live: true },
+{ label: "Personal Injury Law", href: "/personal-injury", live: true }];
 
 
 const SAFE_SECTION_HASHES = new Set([
