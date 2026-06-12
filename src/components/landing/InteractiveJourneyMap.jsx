@@ -149,7 +149,7 @@ export default function InteractiveJourneyMap() {
           Click any step to learn more about what happens
         </p>
         <a
-          href="#pricing"
+          href="/pricing"
           style={{
             display: "inline-flex",
             alignItems: "center",

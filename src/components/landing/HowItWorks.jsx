@@ -142,10 +142,10 @@ export default function HowItWorks() {
         <div className="text-center">
           <p className="text-foreground mb-3">Want to see how this would fit your business?</p>
           <a
-            href="#pricing"
+            href="/pricing"
             className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            See plans and pricing below
+            See plans and pricing
           </a>
         </div>
       </div>
