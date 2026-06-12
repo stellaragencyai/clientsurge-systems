@@ -106,6 +106,8 @@ export default function Footer() {
               alt="ClientSurge Systems"
               width="240"
               height="60"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           <p>
