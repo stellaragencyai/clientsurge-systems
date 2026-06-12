@@ -290,7 +290,8 @@ export default function QuickStartInline({ project, onComplete }) {
     setError('');
     setSaving(true);
     try {
-      await base44.entities.ClientProject.update(project.id, {
+      await base44.functions.invoke('saveQuickStartConfig', {
+        project_id: project.id,
         business_name: data.business_name,
         industry: data.industry,
         phone: data.phone,
@@ -303,9 +304,6 @@ export default function QuickStartInline({ project, onComplete }) {
         response_speed: data.response_speed,
         customer_questions: data.customer_questions,
         quick_start_completed: true,
-      });
-      await base44.functions.invoke('saveQuickStartConfig', {
-        project_id: project.id,
         twilio_number: data.twilio_number,
         sms_template: data.sms_template,
         missed_call_sms_template: data.missed_call_sms,

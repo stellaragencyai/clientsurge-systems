@@ -403,8 +403,8 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
     setError('');
     setSaving(true);
     try {
-      // Persist all collected data to the client project
-      await base44.entities.ClientProject.update(project.id, {
+      await base44.functions.invoke('saveQuickStartConfig', {
+        project_id: project.id,
         business_name: data.business_name,
         industry: data.industry,
         phone: data.phone,
@@ -417,10 +417,6 @@ export default function QuickStartWizard({ project, onComplete, onDismiss }) {
         response_speed: data.response_speed,
         customer_questions: data.customer_questions,
         quick_start_completed: true,
-      });
-      // Persist SMS/Email settings via admin settings
-      await base44.functions.invoke('saveQuickStartConfig', {
-        project_id: project.id,
         twilio_number: data.twilio_number,
         sms_template: data.sms_template,
         missed_call_sms_template: data.missed_call_sms,

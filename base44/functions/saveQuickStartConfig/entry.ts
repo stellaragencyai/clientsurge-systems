@@ -1,5 +1,6 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
 
 Deno.serve(async (req) => {
   try {
@@ -10,6 +11,17 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const {
       project_id,
+      business_name,
+      industry,
+      phone,
+      website,
+      brand_voice,
+      business_hours,
+      booking_link,
+      calendar_system,
+      requires_consultation,
+      response_speed,
+      customer_questions,
       twilio_number,
       sms_template,
       missed_call_sms_template,
@@ -18,41 +30,45 @@ Deno.serve(async (req) => {
       email_confirmation_template,
     } = body;
 
-    if (!project_id) return secureJson({ error: 'project_id required' }, { status: 400 });
+    const access = await resolveClientPortalAccess({
+      base44,
+      userEmail: user.email,
+    });
 
-    // Verify user owns this project
-    const projects = await base44.asServiceRole.entities.ClientProject.filter({ id: project_id });
-    const project = projects?.[0];
-    if (!project) return secureJson({ error: 'Project not found' }, { status: 404 });
-    if (project.client_email !== user.email && user.role !== 'admin') {
+    if (access.status !== "resolved" || !access.project?.id) {
       return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Get or create AdminSettings record
-    const settings = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
-    const existing = settings?.[0];
-
-    const updates = {};
-    if (twilio_number)              updates.twilio_from_number = twilio_number;
-    if (sms_template)               updates.sms_template = sms_template;
-    if (missed_call_sms_template)   updates.missed_call_sms_template = missed_call_sms_template;
-    if (resend_from_email)          updates.resend_from_email = resend_from_email;
-    if (lead_notification_email)    updates.lead_notification_email = lead_notification_email;
-    if (email_confirmation_template) updates.email_confirmation_template = email_confirmation_template;
-
-    if (existing) {
-      await base44.asServiceRole.entities.AdminSettings.update(existing.id, updates);
-    } else {
-      await base44.asServiceRole.entities.AdminSettings.create(updates);
+    if (project_id && project_id !== access.project.id) {
+      return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
-    // Also stamp the project
-    await base44.asServiceRole.entities.ClientProject.update(project_id, {
+    const updates = {
       quick_start_completed: true,
-    });
+    };
 
-    console.log(`[saveQuickStartConfig] Quick start config saved for project ${project_id} by ${user.email}`);
-    return secureJson({ success: true });
+    if (business_name !== undefined) updates.business_name = business_name || "";
+    if (industry !== undefined) updates.industry = industry || "";
+    if (phone !== undefined) updates.phone = phone || "";
+    if (website !== undefined) updates.website = website || "";
+    if (brand_voice !== undefined) updates.brand_voice = brand_voice || "";
+    if (business_hours !== undefined) updates.business_hours = business_hours || "";
+    if (booking_link !== undefined) updates.booking_link = booking_link || "";
+    if (calendar_system !== undefined) updates.calendar_system = calendar_system || "";
+    if (requires_consultation !== undefined) updates.requires_consultation = requires_consultation || "";
+    if (response_speed !== undefined) updates.response_speed = response_speed || "";
+    if (customer_questions !== undefined) updates.customer_questions = customer_questions || "";
+    if (twilio_number !== undefined) updates.twilio_number = twilio_number || "";
+    if (sms_template !== undefined) updates.sms_template = sms_template || "";
+    if (missed_call_sms_template !== undefined) updates.missed_call_sms_template = missed_call_sms_template || "";
+    if (resend_from_email !== undefined) updates.resend_from_email = resend_from_email || "";
+    if (lead_notification_email !== undefined) updates.lead_notification_email = lead_notification_email || "";
+    if (email_confirmation_template !== undefined) updates.email_confirmation_template = email_confirmation_template || "";
+
+    const updatedProject = await base44.asServiceRole.entities.ClientProject.update(access.project.id, updates);
+
+    console.log(`[saveQuickStartConfig] Quick start config saved for project ${access.project.id} by ${user.email}`);
+    return secureJson({ success: true, project: updatedProject });
   } catch (error) {
     console.error('[saveQuickStartConfig] saveQuickStartConfig error:', error);
     return secureJson({ error: error.message }, { status: 500 });
