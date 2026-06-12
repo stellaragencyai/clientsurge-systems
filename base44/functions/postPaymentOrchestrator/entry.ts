@@ -121,19 +121,17 @@ Deno.serve(async (req) => {
     }).catch(() => null);
     tasks.push("order_confirmation_event_logged");
 
-    // Step 4: Fire order confirmation email (non-blocking)
-    base44.asServiceRole.functions.invoke("sendOrderConfirmationEmail", {
+    // Step 4: Fire deployment confirmation email (replaces demo confirmation)
+    base44.asServiceRole.functions.invoke("sendDeploymentConfirmationEmail", {
       order_id,
       customer_email: order.customer_email,
       customer_name: order.customer_name,
-      business_name: order.business_name,
-      plan_name: order.pricing_summary?.package_name || order.plan_type,
-      total_setup: order.total_setup,
-      total_monthly: order.total_monthly,
+      package_name: order.pricing_summary?.package_name || order.plan_type,
+      package_key: order.package_type || order.selected_package_type || "starter_system",
     }).catch(err => {
-      console.error("[postPaymentOrchestrator] sendOrderConfirmationEmail failed (non-blocking)", { error: err.message });
+      console.error("[postPaymentOrchestrator] sendDeploymentConfirmationEmail failed (non-blocking)", { error: err.message });
     });
-    tasks.push("order_confirmation_email_queued");
+    tasks.push("deployment_confirmation_email_queued");
 
     // Step 5: Fire admin purchase notification (non-blocking)
     base44.asServiceRole.functions.invoke("sendAdminPurchaseNotification", {
