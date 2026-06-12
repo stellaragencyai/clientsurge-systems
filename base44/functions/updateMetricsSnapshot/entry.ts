@@ -1,246 +1,172 @@
-import { secureJson } from "../_shared/response.ts";
 /**
- * Update Metrics Snapshot - runs hourly
- * Aggregates all lead/booking data into easy-to-read metrics
+ * updateMetricsSnapshot — Hourly aggregation of metrics for client dashboards.
+ *
+ * Runs every 60 minutes via scheduled automation.
+ * Aggregates CommunicationEvent, Lead, AutomationChecklist, and integration health data.
+ * Writes a new MetricsSnapshot record for each active order/project.
  */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY" },
+  });
+}
 
 Deno.serve(async (req) => {
+  if (req.method !== "POST") {
+    return json({ error: "POST required" }, 405);
+  }
+
+  const base44 = createClientFromRequest(req);
+  const results = {};
+
   try {
-    const base44 = createClientFromRequest(req);
-    const { project_id, period = "today" } = await req.json();
-
-    if (!project_id) {
-      return secureJson({ error: "project_id required" }, { status: 400 });
-    }
-
-    console.log(`[Metrics] Updating snapshot for ${period}`);
-
-    const { startDate, endDate } = getPeriodRange(period);
-
-    // Get all leads in period
-    const leads = await base44.asServiceRole.entities.Leads.filter({}, "-created_date", 5000);
-    const leadsInPeriod = leads.filter((l) => {
-      const created = new Date(l.created_date);
-      return created >= startDate && created <= endDate;
-    });
-
-    // Get all events for these leads
-    const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
-      {},
+    // Get all active orders (payment_status = "paid")
+    const activeOrders = await base44.asServiceRole.entities.Order.filter(
+      { payment_status: "paid" },
       "-created_date",
-      10000
-    );
-    const leadIds = new Set(leadsInPeriod.map((l) => l.id));
-    const eventsInPeriod = events.filter((e) => leadIds.has(e.lead_id));
+      100
+    ).catch(() => []);
 
-    // Calculate metrics
-    const metrics = {
-      leads_captured: leadsInPeriod.length,
-      leads_responded: new Set(
-        eventsInPeriod.filter((e) => e.direction === "inbound").map((e) => e.lead_id)
-      ).size,
-      leads_booked: leadsInPeriod.filter((l) => l.status === "Booked").length,
-      avg_response_time_minutes: calculateAvgResponseTime(eventsInPeriod),
-      booking_rate_percent: calculateBookingRate(leadsInPeriod),
-      response_rate_percent:
-        leadsInPeriod.length > 0
-          ? Math.round(
-              (new Set(
-                eventsInPeriod
-                  .filter((e) => e.direction === "inbound")
-                  .map((e) => e.lead_id)
-              ).size /
-                leadsInPeriod.length) *
-                100
-            )
-          : 0,
-      sla_misses: calculateSLAMisses(leadsInPeriod, eventsInPeriod),
-      churn_risk_count: leadsInPeriod.filter(
-        (l) => l.activation_priority === "High" && l.status === "Booked"
-      ).length,
-      automations_fired: eventsInPeriod.filter(
-        (e) => e.event_type.includes("automation")
-      ).length,
-      ai_decisions_made: eventsInPeriod.length, // Placeholder
-    };
+    console.log(`[updateMetricsSnapshot] Processing ${activeOrders.length} active orders`);
 
-    // Generate alerts
-    const alerts = generateAlerts(metrics);
+    for (const order of activeOrders) {
+      const orderId = order.id;
+      const businessName = order.business_name || "Unknown";
+      const clientProjectId = order.client_project_id;
 
-    // Find top closer
-    const closers = await base44.asServiceRole.entities.Leads.filter(
-      { status: "Booked" },
-      "-created_date",
-      5000
-    );
-    const topCloser = getTopCloser(closers.filter((l) => leadIds.has(l.id)));
+      // ── Aggregate leads captured ──────────────────────────────────────
+      const leads = await base44.asServiceRole.entities.WebsiteLead.filter(
+        { },
+        "-created_date",
+        500
+      ).catch(() => []);
 
-    // Save snapshot
-    await base44.asServiceRole.entities.MetricsSnapshot.create({
-      project_id,
-      period,
-      snapshot_date: new Date().toISOString(),
-      leads_captured: metrics.leads_captured,
-      leads_responded: metrics.leads_responded,
-      response_rate_percent: metrics.response_rate_percent,
-      avg_response_time_minutes: metrics.avg_response_time_minutes,
-      leads_booked: metrics.leads_booked,
-      booking_rate_percent: metrics.booking_rate_percent,
-      revenue_booked: 0, // Would calculate from booked leads
-      top_closer: topCloser?.assigned_to,
-      top_closer_rate: topCloser?.rate,
-      sla_misses: metrics.sla_misses,
-      churn_risk_count: metrics.churn_risk_count,
-      automations_fired: metrics.automations_fired,
-      ai_decisions_made: metrics.ai_decisions_made,
-      alerts,
-    });
+      const leadsCapturedTotal = leads.length;
+      const leadsLast24h = leads.filter(l => {
+        const created = new Date(l.created_date);
+        const now = new Date();
+        const diffHours = (now - created) / (1000 * 60 * 60);
+        return diffHours <= 24;
+      }).length;
 
-    console.log(`[Metrics] ✅ Snapshot saved`);
+      const leadsResponded = leads.filter(l =>
+        l.reply_status === "responded" || l.booking_status === "booked"
+      ).length;
 
-    return secureJson({
-      success: true,
-      project_id,
-      period,
-      metrics,
-      alerts,
-    });
-  } catch (error) {
-    console.error("[Metrics] Error:", error.message);
-    return secureJson(
-      { error: error.message, success: false },
-      { status: 500 }
-    );
-  }
-});
+      // ── Aggregate communications ──────────────────────────────────────
+      const comms = await base44.asServiceRole.entities.CommunicationEvent.filter(
+        { order_id: orderId },
+        "-created_date",
+        500
+      ).catch(() => []);
 
-function getPeriodRange(period) {
-  const now = new Date();
-  let startDate;
+      const smsSentCount = comms.filter(c => c.channel === "sms" && c.status === "sent").length;
+      const emailsSentCount = comms.filter(c => c.channel === "email" && c.status === "sent").length;
+      const automationsTriggeredToday = comms.filter(c => {
+        const created = new Date(c.created_date);
+        const now = new Date();
+        const diffHours = (now - created) / (1000 * 60 * 60);
+        return c.event_type?.includes("triggered") && diffHours <= 24;
+      }).length;
 
-  switch (period) {
-    case "today":
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-      break;
-    case "this_week":
-      const d = new Date(now);
-      d.setDate(now.getDate() - now.getDay());
-      startDate = d;
-      break;
-    case "this_month":
-      startDate = new Date(now.getFullYear(), now.getMonth(), 1);
-      break;
-    case "all_time":
-      startDate = new Date("2020-01-01");
-      break;
-    default:
-      startDate = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-  }
+      // ── Aggregate automation checklists ───────────────────────────────
+      const checklists = await base44.asServiceRole.entities.AutomationChecklist.filter(
+        { order_id: orderId },
+        "-created_date",
+        100
+      ).catch(() => []);
 
-  return { startDate, endDate: now };
-}
+      const automationsActive = checklists.filter(c => c.status === "active").length;
 
-function calculateAvgResponseTime(events) {
-  const responsePairs = [];
-  events.forEach((e) => {
-    if (e.direction === "outbound") {
-      const reply = events.find(
-        (r) =>
-          r.lead_id === e.lead_id &&
-          r.direction === "inbound" &&
-          new Date(r.created_date) > new Date(e.created_date)
-      );
-      if (reply) {
-        const minutes = Math.round(
-          (new Date(reply.created_date) - new Date(e.created_date)) / 60000
-        );
-        responsePairs.push(minutes);
+      // ── Integration health ────────────────────────────────────────────
+      const integrationHealth = {
+        twilio: order.install_configuration?.shared?.twilio_business_phone ? "healthy" : "inactive",
+        resend: order.install_configuration?.services?.instant_lead_response ? "healthy" : "inactive",
+        booking: order.install_configuration?.services?.ai_booking_agent?.booking_link ? "healthy" : "inactive",
+      };
+
+      const integrationsHealthy = Object.entries(integrationHealth)
+        .filter(([_, status]) => status === "healthy")
+        .map(([name, _]) => name);
+
+      const integrationsFailed = Object.entries(integrationHealth)
+        .filter(([_, status]) => status === "error")
+        .map(([name, _]) => name);
+
+      // ── Service status map ───────────────────────────────────────────
+      const serviceStatuses = {};
+      (order.items || []).forEach(item => {
+        if (item.service_key) {
+          serviceStatuses[item.service_key] = item.install_status?.toLowerCase() || "unknown";
+        }
+      });
+
+      // ── System health ────────────────────────────────────────────────
+      const systemHealthStatus =
+        integrationsFailed.length > 0 ? "degraded" :
+        order.pipeline_error ? "error" : "healthy";
+
+      // ── Revenue (from order totals) ──────────────────────────────────
+      const revenueMtd = order.total_monthly || 0;
+
+      // ── Create snapshot ──────────────────────────────────────────────
+      const snapshot = await base44.asServiceRole.entities.MetricsSnapshot.create({
+        order_id: orderId,
+        client_project_id: clientProjectId,
+        business_name: businessName,
+        snapshot_date: new Date().toISOString(),
+        leads_captured_total: leadsCapturedTotal,
+        leads_captured_this_period: leadsLast24h,
+        leads_responded: leadsResponded,
+        automations_active: automationsActive,
+        automations_triggered_today: automationsTriggeredToday,
+        sms_sent_count: smsSentCount,
+        emails_sent_count: emailsSentCount,
+        bookings_created_total: 0, // Would need booking entity to calc properly
+        bookings_created_today: 0,
+        system_health_status: systemHealthStatus,
+        integrations_healthy: integrationsHealthy,
+        integrations_failed: integrationsFailed,
+        service_statuses: serviceStatuses,
+        revenue_mtd: revenueMtd,
+        metadata: JSON.stringify({
+          total_communications: comms.length,
+          order_status: order.order_status,
+          pipeline_status: order.pipeline_status,
+        }),
+      }).catch(err => {
+        console.warn(`[updateMetricsSnapshot] Failed to create snapshot for ${orderId}:`, err.message);
+        return null;
+      });
+
+      if (snapshot) {
+        results[orderId] = {
+          success: true,
+          snapshot_id: snapshot.id,
+          metrics: {
+            leads_total: leadsCapturedTotal,
+            leads_24h: leadsLast24h,
+            automations_active: automationsActive,
+            sms_sent: smsSentCount,
+            health: systemHealthStatus,
+          },
+        };
       }
     }
-  });
 
-  return responsePairs.length > 0
-    ? Math.round(
-        responsePairs.reduce((a, b) => a + b, 0) / responsePairs.length
-      )
-    : null;
-}
+    console.log(`[updateMetricsSnapshot] ✅ Complete`, { orders_processed: Object.keys(results).length });
 
-function calculateBookingRate(leads) {
-  if (leads.length === 0) return 0;
-  const booked = leads.filter((l) => l.status === "Booked").length;
-  return Math.round((booked / leads.length) * 100);
-}
-
-function calculateSLAMisses(leads, events) {
-  let misses = 0;
-  leads.forEach((lead) => {
-    const firstOutbound = events.find(
-      (e) => e.lead_id === lead.id && e.direction === "outbound"
-    );
-    const created = new Date(lead.created_date);
-    if (firstOutbound) {
-      const responseTime = Math.round(
-        (new Date(firstOutbound.created_date) - created) / 60000
-      );
-      if (responseTime > 60) misses++; // 60 min SLA
-    }
-  });
-  return misses;
-}
-
-function generateAlerts(metrics) {
-  const alerts = [];
-
-  if (metrics.response_rate_percent < 80) {
-    alerts.push({
-      type: "yellow",
-      message: `Low response rate: ${metrics.response_rate_percent}% (target: 90%+)`,
+    return json({
+      success: true,
+      orders_processed: Object.keys(results).length,
+      results,
     });
+
+  } catch (err) {
+    console.error("[updateMetricsSnapshot] Fatal error:", err.message);
+    return json({ success: false, error: err.message }, 500);
   }
-
-  if (metrics.sla_misses > 0) {
-    alerts.push({
-      type: "red",
-      message: `${metrics.sla_misses} leads missed SLA`,
-    });
-  }
-
-  if (metrics.leads_booked > 5) {
-    alerts.push({
-      type: "green",
-      message: `🎉 Record bookings: ${metrics.leads_booked}`,
-    });
-  }
-
-  if (metrics.churn_risk_count > 0) {
-    alerts.push({
-      type: "yellow",
-      message: `${metrics.churn_risk_count} customers at churn risk`,
-    });
-  }
-
-  return alerts;
-}
-
-function getTopCloser(leads) {
-  const closers = {};
-  leads.forEach((l) => {
-    closers[l.assigned_to] = (closers[l.assigned_to] || 0) + 1;
-  });
-
-  let topEmail = null;
-  let topCount = 0;
-  Object.entries(closers).forEach(([email, count]) => {
-    if (count > topCount) {
-      topEmail = email;
-      topCount = count;
-    }
-  });
-
-  return topEmail
-    ? { assigned_to: topEmail, rate: Math.round((topCount / leads.length) * 100) }
-    : null;
-}
+});

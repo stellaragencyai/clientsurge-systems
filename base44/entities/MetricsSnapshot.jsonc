@@ -2,119 +2,113 @@
   "name": "MetricsSnapshot",
   "type": "object",
   "properties": {
-    "description": {
+    "order_id": {
       "type": "string",
-      "title": "Description",
-      "maxLength": 1000
+      "title": "Order ID"
     },
-    "project_id": {
+    "client_project_id": {
       "type": "string",
-      "title": "Project ID"
+      "title": "Client Project ID"
     },
-    "period": {
+    "business_name": {
       "type": "string",
-      "title": "Period",
-      "enum": [
-        "today",
-        "this_week",
-        "this_month",
-        "all_time"
-      ],
-      "description": "Time period for these metrics"
+      "title": "Business Name"
     },
     "snapshot_date": {
       "type": "string",
-      "title": "Snapshot Date"
+      "title": "Snapshot Date",
+      "format": "date-time"
     },
-    "leads_captured": {
+    "leads_captured_total": {
       "type": "number",
-      "title": "Leads Captured",
+      "title": "Total Leads Captured",
+      "default": 0
+    },
+    "leads_captured_this_period": {
+      "type": "number",
+      "title": "Leads Captured This Period (24h)",
       "default": 0
     },
     "leads_responded": {
       "type": "number",
-      "title": "Leads Responded To",
+      "title": "Leads Responded",
       "default": 0
     },
-    "response_rate_percent": {
+    "automations_active": {
       "type": "number",
-      "title": "Response Rate (%)",
+      "title": "Active Automations",
       "default": 0
     },
-    "avg_response_time_minutes": {
+    "automations_triggered_today": {
       "type": "number",
-      "title": "Avg Response Time (minutes)"
-    },
-    "leads_booked": {
-      "type": "number",
-      "title": "Leads Booked",
+      "title": "Automations Triggered Today",
       "default": 0
     },
-    "booking_rate_percent": {
+    "sms_sent_count": {
       "type": "number",
-      "title": "Booking Rate (%)",
+      "title": "SMS Messages Sent",
       "default": 0
     },
-    "revenue_booked": {
+    "emails_sent_count": {
       "type": "number",
-      "title": "Revenue Booked",
+      "title": "Emails Sent",
       "default": 0
     },
-    "top_closer": {
+    "bookings_created_total": {
+      "type": "number",
+      "title": "Total Bookings Created",
+      "default": 0
+    },
+    "bookings_created_today": {
+      "type": "number",
+      "title": "Bookings Created Today",
+      "default": 0
+    },
+    "system_health_status": {
       "type": "string",
-      "title": "Top Closer (Email)"
+      "title": "System Health Status",
+      "enum": [
+        "healthy",
+        "degraded",
+        "error"
+      ],
+      "default": "healthy"
     },
-    "top_closer_rate": {
-      "type": "number",
-      "title": "Top Closer Close Rate (%)"
-    },
-    "sla_misses": {
-      "type": "number",
-      "title": "SLA Misses",
-      "default": 0,
-      "description": "Leads not responded to within SLA"
-    },
-    "churn_risk_count": {
-      "type": "number",
-      "title": "Churn Risk Count",
-      "default": 0,
-      "description": "Customers flagged as churn risk"
-    },
-    "automations_fired": {
-      "type": "number",
-      "title": "Automations Fired",
-      "default": 0
-    },
-    "ai_decisions_made": {
-      "type": "number",
-      "title": "AI Decisions Made",
-      "default": 0
-    },
-    "alerts": {
+    "integrations_healthy": {
       "type": "array",
+      "title": "Healthy Integrations",
       "items": {
-        "type": "object",
-        "properties": {
-          "type": {
-            "type": "string",
-            "enum": [
-              "red",
-              "yellow",
-              "green"
-            ]
-          },
-          "message": {
-            "type": "string"
-          }
-        }
+        "type": "string"
       },
-      "title": "Current Alerts",
-      "description": "Red/yellow/green alerts"
+      "default": []
+    },
+    "integrations_failed": {
+      "type": "array",
+      "title": "Failed Integrations",
+      "items": {
+        "type": "string"
+      },
+      "default": []
+    },
+    "service_statuses": {
+      "type": "object",
+      "title": "Service Status Map",
+      "description": "Maps service_key to status (active/inactive/error)",
+      "additionalProperties": true
+    },
+    "revenue_mtd": {
+      "type": "number",
+      "title": "Revenue Month-to-Date",
+      "default": 0
+    },
+    "metadata": {
+      "type": "string",
+      "title": "Additional Metadata"
     }
   },
   "required": [
-    "project_id",
-    "period",
+    "order_id",
+    "business_name",
     "snapshot_date"
   ]
 }
