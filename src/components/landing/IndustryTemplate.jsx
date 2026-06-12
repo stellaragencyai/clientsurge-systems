@@ -3,6 +3,7 @@ import { Link, useParams } from "react-router-dom";
 import { CheckCircle2, XCircle } from "lucide-react";
 import { DemoBookingProvider, useDemoBooking } from "./DemoBookingContext";
 import Navbar from "./Navbar";
+import LaunchAnnouncementBanner from "@/components/campaign/LaunchAnnouncementBanner";
 import Footer from "./Footer";
 import IndustryHero from "../industry/IndustryHero";
 import IndustryPainBar from "../industry/IndustryPainBar";
@@ -192,6 +193,7 @@ function IndustryTemplateInner({ industrySlug }) {
   return (
     <div className="industry-page" style={{ minHeight: "100vh", display: "flex", flexDirection: "column", "--industry-accent": theme.accent, "--industry-accent-dark": theme.accentDark }}>
       <Navbar />
+      <LaunchAnnouncementBanner />
 
       <main style={{ flex: 1 }}>
         {/* Hero Section */}

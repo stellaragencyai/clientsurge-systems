@@ -89,3 +89,39 @@ export const skeletonPulseVariants = {
     },
   },
 };
+
+/**
+ * CinematicReveal: Premium fade-in for section headers
+ */
+export const cinematicRevealVariants = {
+  hidden: {
+    opacity: 0,
+    y: 30,
+  },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: {
+      duration: MOTION_CONFIG.duration.slow,
+      ease: MOTION_CONFIG.easing.premium,
+    },
+  },
+};
+
+/**
+ * CinematicSectionVariants: Full section fade-in
+ */
+export const cinematicSectionVariants = {
+  hidden: {
+    opacity: 0,
+  },
+  visible: {
+    opacity: 1,
+    transition: {
+      duration: MOTION_CONFIG.duration.slow,
+      ease: MOTION_CONFIG.easing.smooth,
+      staggerChildren: 0.08,
+      delayChildren: 0,
+    },
+  },
+};

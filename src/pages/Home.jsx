@@ -4,6 +4,7 @@ import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import MotionSection from "@/components/motion/MotionSection";
+import LaunchAnnouncementBanner from "@/components/campaign/LaunchAnnouncementBanner";
 import CampaignBanner from "@/components/campaign/CampaignBanner";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
@@ -135,6 +136,7 @@ export default function Home() {
     <DemoBookingProvider>
       <div className="min-h-screen">
         <Navbar />
+        <LaunchAnnouncementBanner />
         <Hero />
         <MotionSection>
           <LazyHomepageSection fallback={<SectionSkeleton />}>
@@ -142,24 +144,26 @@ export default function Home() {
             <SectionBreak />
           </LazyHomepageSection>
         </MotionSection>
-        <MotionSection delay={0.1}>
+        <MotionSection delay={0.05}>
           <LazyHomepageSection fallback={<SectionSkeleton />}>
             <TrustBar />
             <SectionBreak />
           </LazyHomepageSection>
         </MotionSection>
-        <MotionSection delay={0.2}>
+        <MotionSection delay={0.1}>
           <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
             <div id="problem-solution" aria-hidden="true" />
             <div id="six-automations" aria-hidden="true" />
             <CoreOffer />
             <SectionBreak />
-            <CampaignBanner />
+            <div data-campaign-section>
+              <CampaignBanner />
+            </div>
             <Pricing />
             <SectionBreak />
           </LazyHomepageSection>
         </MotionSection>
-        <MotionSection delay={0.3}>
+        <MotionSection delay={0.15}>
           <LazyHomepageSection fallback={<SectionSkeleton />}>
             <FAQ />
             <SectionBreak />

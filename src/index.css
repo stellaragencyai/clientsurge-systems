@@ -150,7 +150,7 @@ img { max-width: 100%; height: auto; }
 @media (max-width: 380px) { .timeline-grid { grid-template-columns: 1fr !important; } }
 
 /* FIX 4 — Bottom padding for sticky bar and iOS home indicator */
-@media (max-width: 768px) { #root > div { padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom, 0px))); } }
+@media (max-width: 768px) { #root > div { padding-bottom: max(80px, calc(80px + env(safe-area-inset-bottom, 0px))); padding-top: var(--cs-announcement-height); } }
 
 /* FIX 7 — Pricing cards mobile stacking */
 @media (max-width: 768px) { .pricing-cards { flex-direction: column !important; align-items: center !important; } }
@@ -168,7 +168,8 @@ img { max-width: 100%; height: auto; }
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
   --cs-nav-height: 76px;
-  --cs-anchor-offset: calc(var(--cs-nav-height) + 24px);
+  --cs-announcement-height: 48px;
+  --cs-anchor-offset: calc(var(--cs-nav-height) + var(--cs-announcement-height) + 24px);
   --cs-floating-bottom: max(20px, calc(20px + var(--sab)));
 }
 .safe-top    { padding-top: max(12px, var(--sat)); }
