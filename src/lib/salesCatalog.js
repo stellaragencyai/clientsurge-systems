@@ -384,26 +384,9 @@ export const PACKAGE_KEY_ALIASES = {
 const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";
 
 function readPackageStripeOverrideConfig() {
-  // eslint-disable-next-line no-undef
-  if (typeof Deno !== "undefined" && typeof Deno === "object" && Deno?.env?.get) {
-    try {
-      // eslint-disable-next-line no-undef
-      return Deno.env.get(PACKAGE_STRIPE_OVERRIDE_ENV) || "";
-    } catch {
-      // Restricted runtime.
-    }
-  }
-
-  // eslint-disable-next-line no-undef
-  if (typeof process !== "undefined" && typeof process === "object" && process?.env) {
-    try {
-      // eslint-disable-next-line no-undef
-      return process.env[PACKAGE_STRIPE_OVERRIDE_ENV] || "";
-    } catch {
-      // Frontend bundles may not expose process.env.
-    }
-  }
-
+  // This function intentionally returns empty string in the browser.
+  // Server-side runtimes (Deno/Node) that need this config call it via
+  // backend functions where environment variables are available.
   return "";
 }
 
