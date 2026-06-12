@@ -12,25 +12,6 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LeadScoreCard from "./LeadScoreCard";
-import LeadBulkToolbar from "./LeadBulkToolbar";
-
-import { useRef, useEffect as useLayoutEffect } from "react";
-
-function SelectAllCheckbox({ allSelected, someSelected, onToggle }) {
-  const ref = useRef(null);
-  useLayoutEffect(() => {
-    if (ref.current) ref.current.indeterminate = someSelected;
-  }, [someSelected]);
-  return (
-    <input
-      ref={ref}
-      type="checkbox"
-      checked={allSelected}
-      onChange={onToggle}
-      className="w-4 h-4 accent-primary rounded cursor-pointer"
-    />
-  );
-}
 
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700",
@@ -69,25 +50,15 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   );
 }
 
-function LeadRow({ lead, selected, onToggle }) {
+function LeadRow({ lead }) {
   const daysSinceContact = lead.last_contacted_at
     ? Math.floor((Date.now() - new Date(lead.last_contacted_at)) / 86400000)
     : null;
 
   return (
     <div
-      className={`flex items-start gap-3 py-3 border-b border-border last:border-0 transition-colors rounded-lg px-2 -mx-2 ${selected ? "bg-primary/5" : "hover:bg-muted/40"}`}
+      className="flex items-start gap-3 py-3 border-b border-border last:border-0 transition-colors rounded-lg px-2 -mx-2 hover:bg-muted/40"
     >
-      {/* Checkbox */}
-      <div className="flex-shrink-0 pt-0.5">
-        <input
-          type="checkbox"
-          checked={selected}
-          onChange={() => onToggle(lead.id)}
-          className="w-4 h-4 accent-primary rounded cursor-pointer"
-        />
-      </div>
-
       {/* Status dot */}
       <div className="flex-shrink-0 w-8 h-8 rounded-full bg-muted flex items-center justify-center mt-0.5">
         <div className={`w-3 h-3 rounded-full ${STATUS_DOT[lead.status] || "bg-blue-400"}`} />
@@ -124,7 +95,6 @@ export default function LeadActivityFeed() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [selected, setSelected] = useState(new Set());
 
   const loadLeads = useCallback(async () => {
     setLoading(true);
@@ -141,32 +111,7 @@ export default function LeadActivityFeed() {
 
   useEffect(() => { loadLeads(); }, [loadLeads]);
 
-  // Selection helpers
-  const toggleOne = (id) => setSelected(prev => {
-    const next = new Set(prev);
-    next.has(id) ? next.delete(id) : next.add(id);
-    return next;
-  });
-
   const recentLeads = [...leads].sort((a, b) => new Date(b.updated_date) - new Date(a.updated_date)).slice(0, 30);
-  const allPageIds = recentLeads.map(l => l.id);
-  const allSelected = allPageIds.length > 0 && allPageIds.every(id => selected.has(id));
-  const someSelected = allPageIds.some(id => selected.has(id)) && !allSelected;
-
-  const toggleAll = () => {
-    if (allSelected) {
-      setSelected(prev => { const next = new Set(prev); allPageIds.forEach(id => next.delete(id)); return next; });
-    } else {
-      setSelected(prev => { const next = new Set(prev); allPageIds.forEach(id => next.add(id)); return next; });
-    }
-  };
-
-  const selectedIds = [...selected];
-
-  const handleBulkDone = (action) => {
-    setSelected(new Set());
-    loadLeads();
-  };
 
   // Stats
   const total = leads.length;
@@ -272,9 +217,7 @@ export default function LeadActivityFeed() {
               <div>
                 <h3 className="font-semibold text-foreground">Recent Lead Activity</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  {selectedIds.length > 0
-                    ? `${selectedIds.length} lead${selectedIds.length > 1 ? "s" : ""} selected`
-                    : "Most recently updated leads in your pipeline"}
+                  Most recently updated leads in your pipeline
                 </p>
               </div>
               <button
@@ -287,14 +230,6 @@ export default function LeadActivityFeed() {
               </button>
             </div>
 
-            {/* Select-all header row */}
-            <div className="flex items-center gap-3 pb-2 mb-1 border-b border-border">
-              <SelectAllCheckbox allSelected={allSelected} someSelected={someSelected} onToggle={toggleAll} />
-              <span className="text-xs font-semibold text-muted-foreground">
-                {allSelected ? "Deselect all" : "Select all"}
-              </span>
-            </div>
-
             {recentLeads.length === 0 ? (
               <p className="text-sm text-muted-foreground py-4">No recent activity yet.</p>
             ) : (
@@ -303,8 +238,6 @@ export default function LeadActivityFeed() {
                   <LeadRow
                     key={lead.id}
                     lead={lead}
-                    selected={selected.has(lead.id)}
-                    onToggle={toggleOne}
                   />
                 ))}
               </div>
@@ -337,15 +270,6 @@ export default function LeadActivityFeed() {
             </div>
           </div>
         </>
-      )}
-
-      {/* Floating bulk action toolbar */}
-      {selectedIds.length > 0 && (
-        <LeadBulkToolbar
-          selectedIds={selectedIds}
-          onClear={() => setSelected(new Set())}
-          onDone={handleBulkDone}
-        />
       )}
     </div>
   );
