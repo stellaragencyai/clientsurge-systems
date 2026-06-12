@@ -6,13 +6,17 @@
  */
 
 export const BUTTON_TEXT = {
-  BOOK_DEMO: "Free Automation Audit",
-  BOOK_DEMO_SHORT: "Free Automation Audit",
-  GET_STARTED: "Get Started",
+  BOOK_DEMO: "Deploy Automation",
+  BOOK_DEMO_SHORT: "Deploy Automation",
+  GET_STARTED: "Activate System",
   VIEW_PRICING: "View Pricing",
-  SCHEDULE_DEMO: "Free Automation Audit",
+  SCHEDULE_DEMO: "Start Setup",
   WATCH_DEMO: "See How It Works",
-  SEE_IN_ACTION: "See this in action",
+  SEE_IN_ACTION: "Get Instant Access",
+  DEPLOY_AUTOMATION: "Deploy Automation",
+  ACTIVATE_SYSTEM: "Activate System",
+  START_SETUP: "Start Setup",
+  GET_INSTANT_ACCESS: "Get Instant Access",
 };
 
 export const BUTTON_STYLES = {

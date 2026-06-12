@@ -144,15 +144,57 @@ Deno.serve(async (req) => {
     }).catch(() => null);
     tasks.push("admin_notification_queued");
 
-    // Step 6: Fire AI Brain Installer (non-blocking) — handles steps 5–10:
-    //   creates AutomationJobs, applies default config, runs test lead,
-    //   marks services Live, finalizes ClientProject, writes AuditLog
+    // Step 6: Fire AI Brain Installer (non-blocking) — handles core deployment
     base44.asServiceRole.functions.invoke("aiBrainInstaller", {
       order_id,
     }).catch(err => {
       console.error("[postPaymentOrchestrator] aiBrainInstaller invoke failed (non-blocking)", { error: err.message });
     });
     tasks.push("ai_brain_installer_queued");
+
+    // Step 7: Credential ingestion (Step 8 of 21)
+    base44.asServiceRole.functions.invoke("automatedCredentialIngestion", {
+      order_id,
+    }).catch(err => {
+      console.error("[postPaymentOrchestrator] Credential ingestion queued (non-blocking)", { error: err.message });
+    });
+    tasks.push("credential_ingestion_queued");
+
+    // Step 8: AI-generated business config (Step 9 of 21)
+    base44.asServiceRole.functions.invoke("aiGenerateBusinessConfig", {
+      order_id,
+    }).catch(err => {
+      console.error("[postPaymentOrchestrator] AI config generation queued (non-blocking)", { error: err.message });
+    });
+    tasks.push("ai_config_generation_queued");
+
+    // Step 9: Auto-trigger lead pulse (Step 10 of 21)
+    base44.asServiceRole.functions.invoke("autoTriggerLeadPulse", {
+      order_id,
+    }).catch(err => {
+      console.error("[postPaymentOrchestrator] Lead pulse queued (non-blocking)", { error: err.message });
+    });
+    tasks.push("lead_pulse_queued");
+
+    // Step 10: Health monitoring + billing recovery will run on schedules
+    // Step 11: Review loop automation (Step 12 of 21) — triggered per appointment
+    // Step 12: Lead reactivation (Step 13 of 21) — triggered daily
+    // Step 13: Voice receptionist provisioning (Step 16 of 21)
+    base44.asServiceRole.functions.invoke("aiVoiceReceptionistProvisioning", {
+      order_id,
+    }).catch(err => {
+      console.error("[postPaymentOrchestrator] Voice receptionist queued (non-blocking)", { error: err.message });
+    });
+    tasks.push("voice_receptionist_queued");
+
+    // Step 14: Weekly digest + self-healing will run on schedules
+    // Step 15: Launch readiness gate (Step 21 of 21) — final verification before go-live
+    base44.asServiceRole.functions.invoke("autoScalingLaunchReadinessGate", {
+      order_id,
+    }).catch(err => {
+      console.error("[postPaymentOrchestrator] Launch readiness gate queued (non-blocking)", { error: err.message });
+    });
+    tasks.push("launch_readiness_gate_queued");
 
     console.log("[postPaymentOrchestrator] Complete", { order_id, tasks });
     return json({ success: true, order_id, tasks });

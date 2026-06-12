@@ -63,7 +63,7 @@ export default function OrderSuccess() {
             className="font-display"
             style={{ fontSize: "2.2rem", fontWeight: "800", color: "#1a1209", marginBottom: "12px" }}
           >
-            You're All Set!
+            Your AI Brain is Deploying
           </h1>
           <p
             style={{
@@ -73,8 +73,7 @@ export default function OrderSuccess() {
               marginBottom: "32px",
             }}
           >
-            Your payment was successful. Our team has been notified and will begin your setup review shortly.
-            You'll receive a confirmation email and can track progress in your client portal.
+            Payment confirmed. Your automations are now being provisioned remotely. Track real-time deployment progress in your client portal—setup complete in 4–6 hours.
           </p>
 
           <div
@@ -100,10 +99,10 @@ export default function OrderSuccess() {
               What Happens Next
             </p>
             {[
-              { step: "1", text: "You'll receive an order confirmation email within minutes." },
-              { step: "2", text: "Our team reviews your paid order and starts the canonical setup workflow." },
-              { step: "3", text: "Each purchased service moves through configuration, testing, and live review inside our admin workspace." },
-              { step: "4", text: "Your client portal reflects the real paid-order setup status as services are verified." },
+              { step: "1", text: "Deployment briefing email arrives (credentials, timeline, next steps)." },
+              { step: "2", text: "AI Brain auto-generates your business config (SMS templates, email sequences, booking logic)." },
+              { step: "3", text: "Services deploy in parallel: Twilio SMS, email routing, lead capture webhooks, voice AI." },
+              { step: "4", text: "Watch real-time status in your dashboard—go-live confirmation within 4–6 hours." },
             ].map((entry) => (
               <div
                 key={entry.step}
@@ -180,9 +179,9 @@ export default function OrderSuccess() {
                 borderRadius: "9999px",
                 padding: "2px",
                 background:
-                  "linear-gradient(135deg,#a0714f 0%,#c8965c 30%,#f5d9a8 50%,#c8965c 70%,#7a4f2e 100%)",
+                  "linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%)",
                 textDecoration: "none",
-                boxShadow: "0 4px 18px rgba(120,70,20,0.3)",
+                boxShadow: "0 4px 18px rgba(0,174,239,0.3)",
               }}
             >
               <span
@@ -193,13 +192,13 @@ export default function OrderSuccess() {
                   height: "48px",
                   padding: "0 28px",
                   borderRadius: "9999px",
-                  background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)",
-                  color: "#f5e6d0",
+                  background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+                  color: "#ffffff",
                   fontWeight: "700",
                   fontSize: "14px",
                 }}
               >
-                Go to Client Portal <ArrowRight style={{ width: "14px", height: "14px" }} />
+                Get Instant Access <ArrowRight style={{ width: "14px", height: "14px" }} />
               </span>
             </Link>
             <Link
