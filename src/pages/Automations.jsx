@@ -392,10 +392,10 @@ export default function Automations() {
               Free Automation Audit <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/book"
+              to="/store"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground border-2 border-border hover:border-primary/40 transition-colors"
             >
-              Book a Free Automation Audit
+              Browse the AI Store
             </Link>
           </div>
           <p className="mt-5 text-xs text-muted-foreground">No credit card required · Typical setup time: 24–48 hours</p>

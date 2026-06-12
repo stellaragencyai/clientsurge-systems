@@ -26,7 +26,7 @@ export default function About() {
       {/* Hero */}
       <section
         className="py-20 px-6 text-center"
-        style={{ background: "linear-gradient(180deg, rgba(0,174,239,0.08) 0%, rgba(248,251,255,0.96) 52%, hsl(var(--background)) 100%)" }}
+        style={{ background: "linear-gradient(180deg, rgba(0,174,239,0.07) 0%, hsl(var(--background)) 100%)" }}
       >
         <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Our Story</p>
         <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">

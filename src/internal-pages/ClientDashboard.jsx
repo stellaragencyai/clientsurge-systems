@@ -1,7 +1,6 @@
 import { useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
-import Navbar from "@/components/landing/Navbar";
-import Footer from "@/components/landing/Footer";
+import { Link } from "react-router-dom";
 import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
 import DashboardMetricsBar from "@/components/dashboard/DashboardMetricsBar";
 import ResponsiveServiceCard from "@/components/dashboard/ResponsiveServiceCard";
@@ -260,9 +259,16 @@ export default function ClientDashboard() {
       <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
       <MobileBottomNav />
       <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "hsl(var(--background))" }}>
-        <Navbar />
+        {/* Minimal dashboard topbar — not the public marketing Navbar */}
+        <header style={{ position: "sticky", top: 0, zIndex: 50, height: "60px", background: "rgba(255,255,255,0.96)", borderBottom: "1px solid rgba(0,174,239,0.1)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 clamp(16px,4vw,40px)" }}>
+          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
+            <img src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png" alt="ClientSurge Systems" height="32" style={{ height: "32px", width: "auto" }} />
+          </Link>
+          <span style={{ fontSize: "12px", fontWeight: "700", color: "rgba(10,22,40,0.45)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Client Dashboard</span>
+          <a href="mailto:support@clientsurgesystems.com" style={{ fontSize: "12px", fontWeight: "600", color: "#0088CC", textDecoration: "none" }}>Need help?</a>
+        </header>
 
-        <main id="main-content" style={{ flex: 1, paddingTop: "76px" }}>
+        <main id="main-content" style={{ flex: 1, paddingTop: "0" }}>
           <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(20px,4vw,40px)" }}>
 
             {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={() => fetchPortal(false)} /> : (
@@ -320,7 +326,13 @@ export default function ClientDashboard() {
           </div>
         </main>
 
-        <Footer />
+        <footer style={{ padding: "20px clamp(16px,4vw,40px)", borderTop: "1px solid rgba(0,174,239,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
+          <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.4)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
+          <div style={{ display: "flex", gap: "16px" }}>
+            <Link to="/privacy-policy" style={{ fontSize: "11px", color: "rgba(10,22,40,0.45)", textDecoration: "none" }}>Privacy</Link>
+            <Link to="/terms" style={{ fontSize: "11px", color: "rgba(10,22,40,0.45)", textDecoration: "none" }}>Terms</Link>
+          </div>
+        </footer>
       </div>
       <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </DemoBookingProvider>

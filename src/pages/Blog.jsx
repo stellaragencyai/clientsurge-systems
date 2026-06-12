@@ -600,7 +600,6 @@ function BlogIndex() {
               <div className="mb-3 flex flex-wrap items-center gap-2">
                 <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{post.tag}</span>
                 <span className="text-xs text-muted-foreground">{post.date}</span>
-                <span className="text-xs text-muted-foreground">Target: {post.keyword}</span>
               </div>
               <h2 className="mb-2 text-xl font-extrabold leading-snug text-foreground">{post.title}</h2>
               <p className="mb-4 text-sm leading-6 text-muted-foreground">{post.description}</p>
@@ -641,7 +640,6 @@ function BlogArticle({ post }) {
         <div className="mb-4 flex flex-wrap items-center gap-2">
           <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{post.tag}</span>
           <span className="text-xs text-muted-foreground">{post.date}</span>
-          <span className="text-xs text-muted-foreground">Target: {post.keyword}</span>
         </div>
         <h1 className="mb-5 text-4xl font-black leading-tight text-foreground md:text-5xl">{post.title}</h1>
         <p className="mb-8 text-lg leading-8 text-muted-foreground">{post.description}</p>
