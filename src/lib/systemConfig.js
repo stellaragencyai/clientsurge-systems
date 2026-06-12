@@ -10,7 +10,7 @@ export const coreOfferSectionConfig = {
     "You do not need eight separate tools. We set up one system that works together for you.",
   primaryCta: {
     label: "See Plans And Pricing",
-    href: "#pricing",
+    href: "/pricing",
   },
   secondaryCta: {
     label: "Free Automation Audit",
