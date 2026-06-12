@@ -69,16 +69,6 @@ function StatCard({ icon: Icon, label, value, sub, color }) {
   );
 }
 
-function formatDate(iso) {
-  if (!iso) return "";
-  const d = new Date(iso);
-  const diffDays = Math.floor((Date.now() - d) / 86400000);
-  if (diffDays === 0) return "Today";
-  if (diffDays === 1) return "Yesterday";
-  if (diffDays < 7) return `${diffDays}d ago`;
-  return d.toLocaleDateString("en-US", { month: "short", day: "numeric" });
-}
-
 function LeadRow({ lead, selected, onToggle }) {
   const daysSinceContact = lead.last_contacted_at
     ? Math.floor((Date.now() - new Date(lead.last_contacted_at)) / 86400000)
@@ -130,7 +120,7 @@ function LeadRow({ lead, selected, onToggle }) {
   );
 }
 
-export default function LeadActivityFeed({ project }) {
+export default function LeadActivityFeed() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -140,21 +130,14 @@ export default function LeadActivityFeed({ project }) {
     setLoading(true);
     setError("");
     try {
-      const data = project?.client_email
-        ? await base44.entities.Leads.filter({ created_by: project.client_email }, "-updated_date", 100)
-        : await base44.entities.Leads.list("-updated_date", 100);
-      setLeads(data || []);
+      const res = await base44.functions.invoke("getClientPortalLeads", { limit: 200 });
+      setLeads(res.data?.leads || []);
     } catch {
-      try {
-        const data = await base44.entities.Leads.list("-updated_date", 100);
-        setLeads(data || []);
-      } catch {
-        setError("Unable to load lead activity right now.");
-      }
+      setError("Unable to load lead activity right now.");
     } finally {
       setLoading(false);
     }
-  }, [project?.client_email]);
+  }, []);
 
   useEffect(() => { loadLeads(); }, [loadLeads]);
 

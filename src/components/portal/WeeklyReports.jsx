@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   BarChart3, Mail, RefreshCw, Loader2, CheckCircle2,
@@ -139,33 +139,44 @@ function PipelineChart({ leads }) {
 
 export default function WeeklyReports({ project }) {
   const [leads, setLeads] = useState([]);
+  const [summary, setSummary] = useState({ total: 0, new_this_week: 0, qualified: 0, booked: 0 });
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
 
+  const loadLeads = useCallback(async () => {
+    if (!project?.id) {
+      setLeads([]);
+      setSummary({ total: 0, new_this_week: 0, qualified: 0, booked: 0 });
+      setLoading(false);
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+    try {
+      const res = await base44.functions.invoke("getClientPortalLeads", { limit: 500 });
+      setLeads(res.data?.leads || []);
+      setSummary(res.data?.summary || { total: 0, new_this_week: 0, qualified: 0, booked: 0 });
+    } catch {
+      setLeads([]);
+      setSummary({ total: 0, new_this_week: 0, qualified: 0, booked: 0 });
+      setError("Unable to load report data right now.");
+    } finally {
+      setLoading(false);
+    }
+  }, [project?.id]);
+
   useEffect(() => {
-    const loadLeads = async () => {
-      try {
-        const data = await base44.entities.Leads.filter(
-          { created_by: project.client_email }, "-created_date", 500
-        );
-        setLeads(data || []);
-      } catch {
-        setLeads([]);
-      } finally {
-        setLoading(false);
-      }
-    };
-    if (project?.client_email) loadLeads();
-    else setLoading(false);
-  }, [project?.client_email]);
+    loadLeads();
+  }, [loadLeads]);
 
   const weekStart = new Date();
   weekStart.setDate(weekStart.getDate() - 7);
-  const newThisWeek = leads.filter(l => new Date(l.created_date) >= weekStart).length;
-  const booked = leads.filter(l => l.status === "Booked").length;
-  const qualified = leads.filter(l => l.status === "Qualified").length;
+  const newThisWeek = summary.new_this_week || 0;
+  const booked = summary.booked || 0;
+  const qualified = summary.qualified || 0;
 
   const handleSendReport = async () => {
     setSending(true);
@@ -195,15 +206,24 @@ export default function WeeklyReports({ project }) {
             Summary of your lead pipeline and system build progress for the last 7 days.
           </p>
         </div>
-        <button
-          onClick={handleSendReport}
-          disabled={sending}
-          className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60"
-          style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
-        >
-          {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
-          {sending ? "Sending…" : "Email Report to Me"}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={loadLeads}
+            disabled={loading}
+            className="px-4 py-2.5 rounded-lg border border-border text-sm font-medium text-foreground hover:bg-muted transition flex items-center gap-2"
+          >
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          </button>
+          <button
+            onClick={handleSendReport}
+            disabled={sending}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-bold text-white transition-all disabled:opacity-60"
+            style={{ background: "linear-gradient(135deg,#6b3f1f,#9a5c2e)" }}
+          >
+            {sending ? <Loader2 className="w-4 h-4 animate-spin" /> : <Mail className="w-4 h-4" />}
+            {sending ? "Sending…" : "Email Report to Me"}
+          </button>
+        </div>
       </div>
 
       {sent && (
@@ -235,7 +255,7 @@ export default function WeeklyReports({ project }) {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <StatCard icon={Users} label="Total Leads" value={leads.length} sub="All time" color="blue" />
+            <StatCard icon={Users} label="Total Leads" value={summary.total || leads.length} sub="All time" color="blue" />
             <StatCard icon={TrendingUp} label="New This Week" value={newThisWeek} sub="Last 7 days" color="purple" />
             <StatCard icon={BarChart3} label="Qualified" value={qualified} sub="High-intent" color="amber" />
             <StatCard icon={CheckCircle2} label="Booked" value={booked} sub="Appointments" color="green" />
