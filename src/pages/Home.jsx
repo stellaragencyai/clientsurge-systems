@@ -143,6 +143,8 @@ export default function Home() {
           <SectionBreak />
         </LazyHomepageSection>
         <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
+          <div id="problem-solution" aria-hidden="true" />
+          <div id="six-automations" aria-hidden="true" />
           <CoreOffer />
           <SectionBreak />
           <Pricing />

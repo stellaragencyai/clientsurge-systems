@@ -1,3 +1,5 @@
+import { SIX_AUTOMATIONS } from "./sixAutomations.js";
+
 export const PUBLIC_ROUTE_METADATA = {
   "/": {
     key: "home",
@@ -113,6 +115,16 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "ClientSurge Systems client login for existing customers accessing their portal and automation dashboard.",
   },
+  ...Object.fromEntries(
+    SIX_AUTOMATIONS.map((automation) => [
+      automation.routePath,
+      {
+        key: automation.slug,
+        title: `${automation.title} | ClientSurge Systems`,
+        description: `${automation.summary} See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack.`,
+      },
+    ])
+  ),
 };
 
 export const STATIC_ROUTE_ALIASES = {
