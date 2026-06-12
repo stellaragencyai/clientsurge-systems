@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
+import MotionSection from "@/components/motion/MotionSection";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import SecurityPriority from "../components/landing/SecurityPriority";
@@ -134,31 +135,39 @@ export default function Home() {
       <div className="min-h-screen">
         <Navbar />
         <Hero />
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <Industries />
-          <SectionBreak />
-        </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <TrustBar />
-          <SectionBreak />
-        </LazyHomepageSection>
-        <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
-          <div id="problem-solution" aria-hidden="true" />
-          <div id="six-automations" aria-hidden="true" />
-          <CoreOffer />
-          <SectionBreak />
-          <Pricing />
-          <SectionBreak />
-        </LazyHomepageSection>
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <FAQ />
-          <SectionBreak />
-          <FounderSection />
-          <SectionBreak />
-          <Testimonials />
-          <SectionBreak />
-          <FinalCTA />
-        </LazyHomepageSection>
+        <MotionSection>
+          <LazyHomepageSection fallback={<SectionSkeleton />}>
+            <Industries />
+            <SectionBreak />
+          </LazyHomepageSection>
+        </MotionSection>
+        <MotionSection delay={0.1}>
+          <LazyHomepageSection fallback={<SectionSkeleton />}>
+            <TrustBar />
+            <SectionBreak />
+          </LazyHomepageSection>
+        </MotionSection>
+        <MotionSection delay={0.2}>
+          <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
+            <div id="problem-solution" aria-hidden="true" />
+            <div id="six-automations" aria-hidden="true" />
+            <CoreOffer />
+            <SectionBreak />
+            <Pricing />
+            <SectionBreak />
+          </LazyHomepageSection>
+        </MotionSection>
+        <MotionSection delay={0.3}>
+          <LazyHomepageSection fallback={<SectionSkeleton />}>
+            <FAQ />
+            <SectionBreak />
+            <FounderSection />
+            <SectionBreak />
+            <Testimonials />
+            <SectionBreak />
+            <FinalCTA />
+          </LazyHomepageSection>
+        </MotionSection>
         <SecurityPriority />
         <Footer />
         <ChatBubble />
