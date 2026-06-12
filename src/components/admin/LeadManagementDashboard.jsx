@@ -34,6 +34,7 @@ import { parseLeadImportRows } from "@/lib/leadImportParser";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
 import BulkActionToolbar from "./BulkActionToolbar";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -1109,17 +1110,19 @@ export default function LeadManagementDashboard({
       </div>
 
       {drawerLead && (
-        <LeadCRMDrawer
-          lead={drawerLead}
-          onClose={() => setDrawerLead(null)}
-          onLeadUpdated={(updated) => {
-            setDrawerLead(updated);
-            setSnapshot((prev) => ({
-              ...prev,
-              leads: prev.leads.map((l) => l.id === updated.id ? { ...l, ...updated } : l),
-            }));
-          }}
-        />
+        <ErrorBoundary>
+          <LeadCRMDrawer
+            lead={drawerLead}
+            onClose={() => setDrawerLead(null)}
+            onLeadUpdated={(updated) => {
+              setDrawerLead(updated);
+              setSnapshot((prev) => ({
+                ...prev,
+                leads: prev.leads.map((l) => l.id === updated.id ? { ...l, ...updated } : l),
+              }));
+            }}
+          />
+        </ErrorBoundary>
       )}
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">

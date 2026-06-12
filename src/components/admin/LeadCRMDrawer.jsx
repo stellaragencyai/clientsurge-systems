@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useNavigate } from "react-router-dom";
 import {
   X, Save, CheckCircle, AlertCircle, Loader2, Trash2,
   MessageSquare, StickyNote, ChevronRight, PhoneCall, RotateCcw, Zap, MessageCircle
@@ -41,6 +42,7 @@ function Toast({ message, type }) {
 }
 
 export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("status");
   const [currentStatus, setCurrentStatus] = useState(lead.status);
   const [statusLoading, setStatusLoading] = useState(false);
@@ -489,13 +491,13 @@ export default function LeadCRMDrawer({ lead, onClose, onLeadUpdated }) {
 
         {/* Footer */}
         <div className="px-5 py-3 border-t border-border bg-muted/10 flex-shrink-0">
-          <a
-            href={`/admin/leads/${lead.id}`}
+          <button
+            onClick={() => { onClose(); navigate(`/admin/leads/${lead.id}`); }}
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl border border-border text-sm font-medium text-foreground hover:bg-muted transition-colors"
           >
             Open Full Lead Detail
             <ChevronRight className="w-4 h-4" />
-          </a>
+          </button>
         </div>
       </div>
 
