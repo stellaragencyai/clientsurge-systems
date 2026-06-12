@@ -127,11 +127,10 @@ function ScrollToTop() {
 
 function AppInner() {
   useEffect(() => {
-    // Initialize auto-tracking after React mounts — safe for SSR/pre-render
-    if (typeof window !== "undefined") {
-      installGa4();
-      initializeAnalyticsObserver();
-    }
+    if (typeof window === "undefined") return;
+    if (window.location.hostname.includes("preview-sandbox")) return;
+    installGa4();
+    initializeAnalyticsObserver();
   }, []);
   return null;
 }
@@ -210,6 +209,8 @@ function RouteIndexingGuard() {
 
 function PublicCookieConsent() {
   const location = useLocation();
+  // Never render in the Base44 visual editor sandbox — the module request itself gets blocked
+  if (typeof window !== "undefined" && window.location.hostname.includes("preview-sandbox")) return null;
   if (!isPublicPath(location.pathname)) return null;
   return (
     <Suspense fallback={null}>
