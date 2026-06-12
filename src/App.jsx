@@ -33,6 +33,7 @@ import Home from "./pages/Home";
 
 const Start = lazy(() => import("./pages/Start"));
 const Book = lazy(() => import("./pages/Book"));
+const PricingPage = lazy(() => import("./pages/PricingPage"));
 const Contact = lazy(() => import("./pages/Contact"));
 const Industries = lazy(() => import("./pages/Industries"));
 const Blog = lazy(() => import("./pages/Blog"));
@@ -279,7 +280,7 @@ const AuthenticatedApp = () => {
       <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
       <Route path="/industries" element={<LazyRoute Component={Industries} />} />
-      <Route path={routePath("pricing")} element={<HashRedirect hash="pricing" />} />
+      <Route path={routePath("pricing")} element={<LazyRoute Component={PricingPage} />} />
       <Route path={routePath("faq")} element={<HashRedirect hash="faq" />} />
       <Route path={routePath("our-system")} element={<HashRedirect hash="services" />} />
       <Route path={routePath("testimonials")} element={<HashRedirect hash="testimonials" />} />

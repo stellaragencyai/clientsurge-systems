@@ -15,7 +15,7 @@ import { useAuth } from "@/lib/AuthContext";
 const sectionLinks = [
 { label: "Automations", href: "/automations", isPage: true },
 { label: "Store", href: "/store", isPage: true },
-{ label: "Pricing", href: "#pricing" },
+{ label: "Pricing", href: "/pricing", isPage: true },
 { label: "About", href: "/about", isPage: true },
 { label: "Contact", href: "/contact", isPage: true }];
 

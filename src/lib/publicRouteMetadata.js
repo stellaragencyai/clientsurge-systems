@@ -31,6 +31,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Contact ClientSurge Systems about AI voice agents, lead capture, missed-call recovery, booking automation, and local service business automation.",
   },
+  "/pricing": {
+    key: "pricing",
+    title: "Pricing | ClientSurge Systems",
+    description:
+      "Compare ClientSurge automation packages, setup pricing, monthly management, and what is included for local service businesses.",
+  },
   "/blog": {
     key: "blog",
     title: "ClientSurge Blog | AI Automation for Local Service Businesses",
@@ -140,7 +146,6 @@ export const STATIC_ROUTE_ALIASES = {
   "/Contractors": "/contractors",
   "/legal/privacy": "/privacy-policy",
   "/legal/terms": "/terms",
-  "/pricing": "/",
   "/faq": "/",
   "/our-system": "/",
   "/testimonials": "/",

@@ -41,7 +41,7 @@ export default function FAQ() {
            Frequently Asked Questions
           </h2>
           <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base">
-            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="/#pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
+            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="/pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
           </p>
           <div className="mt-8 border-t border-border/40" />
         </div>
