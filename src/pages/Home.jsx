@@ -30,18 +30,23 @@ import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 function useHomepageWhiteCanvas() {
   useEffect(() => {
-    if (typeof document === "undefined") {
+    if (typeof document === "undefined" || !document.body || !document.documentElement) {
       return undefined;
     }
-
-    document.body.classList.add("homepage-white-canvas");
-    document.documentElement.style.setProperty("--scroll-bg-from", "hsl(0, 0%, 100%)");
-    document.documentElement.style.setProperty("--scroll-bg-to", "hsl(0, 0%, 100%)");
-
+    try {
+      document.body.classList.add("homepage-white-canvas");
+      document.documentElement.style.setProperty("--scroll-bg-from", "hsl(0, 0%, 100%)");
+      document.documentElement.style.setProperty("--scroll-bg-to", "hsl(0, 0%, 100%)");
+    } catch (_e) {
+      return undefined;
+    }
     return () => {
-      document.body.classList.remove("homepage-white-canvas");
-      document.documentElement.style.removeProperty("--scroll-bg-from");
-      document.documentElement.style.removeProperty("--scroll-bg-to");
+      try {
+        if (!document.body || !document.documentElement) return;
+        document.body.classList.remove("homepage-white-canvas");
+        document.documentElement.style.removeProperty("--scroll-bg-from");
+        document.documentElement.style.removeProperty("--scroll-bg-to");
+      } catch (_e) {}
     };
   }, []);
 }
@@ -80,6 +85,8 @@ export default function Home() {
   }, [location.hash]);
 
   useEffect(() => {
+    if (typeof document === "undefined" || !document.head) return () => {};
+
     let cleanupMetadata = () => {};
     let cleanupOrg = () => {};
     let cleanupBusiness = () => {};
@@ -87,32 +94,26 @@ export default function Home() {
     let cleanupWebsite = () => {};
     let cleanupFaq = () => {};
 
-    try {
-      cleanupMetadata = setPageMetadata({
-        title: "AI Automation Systems for Local Leads | ClientSurge Systems",
-        description:
-          "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
-        canonicalPath: "/",
-        ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
-        ogDescription:
-          "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
-      });
-      cleanupOrg = setJsonLd("organization", getOrganizationSchema());
-      cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema());
-      cleanupService = setJsonLd("service", getServiceSchema());
-      cleanupWebsite = setJsonLd("website", getWebsiteSchema());
-      cleanupFaq = setJsonLd("faq", getFAQSchema(FAQ_ITEMS));
-    } catch (error) {
-      console.error("Homepage SEO bootstrap failed:", error);
-    }
+    try { cleanupMetadata = setPageMetadata({
+      title: "AI Automation Systems for Local Leads | ClientSurge Systems",
+      description: "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
+      canonicalPath: "/",
+      ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
+      ogDescription: "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
+    }); } catch (_e) {}
+    try { cleanupOrg = setJsonLd("organization", getOrganizationSchema()); } catch (_e) {}
+    try { cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema()); } catch (_e) {}
+    try { cleanupService = setJsonLd("service", getServiceSchema()); } catch (_e) {}
+    try { cleanupWebsite = setJsonLd("website", getWebsiteSchema()); } catch (_e) {}
+    try { cleanupFaq = setJsonLd("faq", getFAQSchema(FAQ_ITEMS)); } catch (_e) {}
 
     return () => {
-      cleanupFaq();
-      cleanupService();
-      cleanupBusiness();
-      cleanupOrg();
-      cleanupWebsite();
-      cleanupMetadata();
+      try { cleanupFaq(); } catch (_e) {}
+      try { cleanupService(); } catch (_e) {}
+      try { cleanupBusiness(); } catch (_e) {}
+      try { cleanupOrg(); } catch (_e) {}
+      try { cleanupWebsite(); } catch (_e) {}
+      try { cleanupMetadata(); } catch (_e) {}
     };
   }, []);
 
