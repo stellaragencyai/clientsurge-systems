@@ -11,7 +11,9 @@ import {
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
-import CookieConsent from "@/components/landing/CookieConsent";
+const CookieConsent = lazy(() =>
+  import("@/components/landing/CookieConsent").catch(() => ({ default: () => null }))
+);
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
@@ -208,7 +210,12 @@ function RouteIndexingGuard() {
 
 function PublicCookieConsent() {
   const location = useLocation();
-  return isPublicPath(location.pathname) ? <CookieConsent /> : null;
+  if (!isPublicPath(location.pathname)) return null;
+  return (
+    <Suspense fallback={null}>
+      <CookieConsent />
+    </Suspense>
+  );
 }
 
 function AuthRedirectFallback() {

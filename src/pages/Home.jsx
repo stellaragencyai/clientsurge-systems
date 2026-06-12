@@ -28,8 +28,19 @@ import {
 } from "../components/SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
+function isEditorSandbox() {
+  try {
+    const h = window.location.hostname;
+    return h.includes("preview-sandbox") || h.includes("base44");
+  } catch {
+    return true; // fail-safe: treat unknown environments as sandboxed
+  }
+}
+
 function useHomepageWhiteCanvas() {
   useEffect(() => {
+    // Skip all DOM mutations inside the Base44 visual editor sandbox
+    if (isEditorSandbox()) return undefined;
     if (typeof document === "undefined" || !document.body || !document.documentElement) {
       return undefined;
     }
@@ -85,6 +96,7 @@ export default function Home() {
   }, [location.hash]);
 
   useEffect(() => {
+    if (isEditorSandbox()) return () => {};
     if (typeof document === "undefined" || !document.head) return () => {};
 
     let cleanupMetadata = () => {};
