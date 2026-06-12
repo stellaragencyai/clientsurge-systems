@@ -49,38 +49,51 @@ export function buildBreadcrumbSchema({ canonicalPath = "/", title = "" }) {
   };
 }
 
+function getHead() {
+  return (typeof document !== "undefined" && document.head) ? document.head : null;
+}
+
 function ensureMeta(attribute, key) {
+  const head = getHead();
+  if (!head) return { setAttribute: () => {} };
+
   const selector =
     attribute === "name"
       ? `meta[name="${key}"]`
       : `meta[property="${key}"]`;
 
-  let element = document.head.querySelector(selector);
+  let element = head.querySelector(selector);
   if (!element) {
     element = document.createElement("meta");
     element.setAttribute(attribute, key);
-    document.head.appendChild(element);
+    head.appendChild(element);
   }
   return element;
 }
 
 function ensureCanonical() {
-  let element = document.head.querySelector('link[rel="canonical"]');
+  const head = getHead();
+  if (!head) return { setAttribute: () => {} };
+
+  let element = head.querySelector('link[rel="canonical"]');
   if (!element) {
     element = document.createElement("link");
     element.setAttribute("rel", "canonical");
-    document.head.appendChild(element);
+    head.appendChild(element);
   }
   return element;
 }
 
 function ensureJsonLd(id) {
-  let element = document.head.querySelector(`script[data-schema-id="${id}"]`);
+  const head = getHead();
+  if (!head) return { textContent: "", remove: () => {} };
+
+  let element = head.querySelector(`script[data-schema-id="${id}"]`);
   if (!element) {
     element = document.createElement("script");
     element.type = "application/ld+json";
     element.dataset.schemaId = id;
-    document.head.appendChild(element);
+    head.appendChild(element);
   }
   return element;
 }
@@ -94,22 +107,25 @@ export function setPageMetadata({
   ogImage = DEFAULT_OG_IMAGE,
   robots = "index,follow",
 }) {
+  const head = getHead();
+  if (!head) return () => {};
+
   const previous = {
     title: document.title,
-    description: document.head.querySelector('meta[name="description"]')?.getAttribute("content") || "",
-    robots: document.head.querySelector('meta[name="robots"]')?.getAttribute("content") || "",
-    canonical: document.head.querySelector('link[rel="canonical"]')?.getAttribute("href") || "",
-    ogTitle: document.head.querySelector('meta[property="og:title"]')?.getAttribute("content") || "",
+    description: head.querySelector('meta[name="description"]')?.getAttribute("content") || "",
+    robots: head.querySelector('meta[name="robots"]')?.getAttribute("content") || "",
+    canonical: head.querySelector('link[rel="canonical"]')?.getAttribute("href") || "",
+    ogTitle: head.querySelector('meta[property="og:title"]')?.getAttribute("content") || "",
     ogDescription:
-      document.head.querySelector('meta[property="og:description"]')?.getAttribute("content") || "",
-    ogUrl: document.head.querySelector('meta[property="og:url"]')?.getAttribute("content") || "",
-    ogImage: document.head.querySelector('meta[property="og:image"]')?.getAttribute("content") || "",
+      head.querySelector('meta[property="og:description"]')?.getAttribute("content") || "",
+    ogUrl: head.querySelector('meta[property="og:url"]')?.getAttribute("content") || "",
+    ogImage: head.querySelector('meta[property="og:image"]')?.getAttribute("content") || "",
     twitterTitle:
-      document.head.querySelector('meta[name="twitter:title"]')?.getAttribute("content") || "",
+      head.querySelector('meta[name="twitter:title"]')?.getAttribute("content") || "",
     twitterDescription:
-      document.head.querySelector('meta[name="twitter:description"]')?.getAttribute("content") || "",
+      head.querySelector('meta[name="twitter:description"]')?.getAttribute("content") || "",
     twitterImage:
-      document.head.querySelector('meta[name="twitter:image"]')?.getAttribute("content") || "",
+      head.querySelector('meta[name="twitter:image"]')?.getAttribute("content") || "",
   };
 
   const canonicalUrl = `https://clientsurgesystems.com${canonicalPath}`;
