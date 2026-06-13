@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState, memo } from "react";
 import { motion } from "framer-motion";
 import {
   ArrowRight,
@@ -37,22 +37,26 @@ function SimpleCheck() {
   );
 }
 
-const plans = PACKAGE_OFFERS.map((offer) => ({
-  name: offer.customer_facing_name || offer.name,
-  internalName: offer.name,
-  packageKey: offer.package_key,
-  fit: offer.fit,
-  desc: offer.description,
-  setup: `$${Number(offer.setup_total || 0).toLocaleString()}`,
-  monthly: `$${Number(offer.monthly_total || 0).toLocaleString()}`,
-  features: offer.included_services.map((service) => service.name),
-  badge: offer.badge || null,
-  highlight: Boolean(offer.highlight),
-}));
-
 export default function Pricing() {
   const demoBooking = useDemoBooking();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
+
+  const plans = useMemo(
+    () =>
+      PACKAGE_OFFERS.map((offer) => ({
+        name: offer.customer_facing_name || offer.name,
+        internalName: offer.name,
+        packageKey: offer.package_key,
+        fit: offer.fit,
+        desc: offer.description,
+        setup: `$${Number(offer.setup_total || 0).toLocaleString()}`,
+        monthly: `$${Number(offer.monthly_total || 0).toLocaleString()}`,
+        features: offer.included_services.map((service) => service.name),
+        badge: offer.badge || null,
+        highlight: Boolean(offer.highlight),
+      })),
+    []
+  );
 
   useEffect(() => {
     if (typeof window === "undefined") {
@@ -297,7 +301,7 @@ export default function Pricing() {
   );
 }
 
-function PricingCard({ plan, selectedIndustry }) {
+const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
   const [isHovered, setIsHovered] = useState(false);
   const isRecommended =
     selectedIndustry?.recommendedPackage?.name === plan.name;
@@ -314,8 +318,6 @@ function PricingCard({ plan, selectedIndustry }) {
           : plan.highlight
           ? "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,250,255,0.92) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(243,250,255,0.78) 100%)",
-        backdropFilter: plan.highlight ? "blur(20px)" : "blur(14px)",
-        WebkitBackdropFilter: plan.highlight ? "blur(20px)" : "blur(14px)",
         border: plan.highlight
           ? isHovered
             ? "2px solid rgba(0,174,239,0.7)"
@@ -330,12 +332,11 @@ function PricingCard({ plan, selectedIndustry }) {
           : isHovered
           ? "0 14px 36px rgba(0,174,239,0.12), inset 0 1px 0 rgba(255,255,255,0.85)"
           : "0 6px 22px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.6)",
-        perspective: "1200px",
       }}
       animate={
         isHovered
-          ? { rotateY: 6, rotateX: -2, scale: 1.03 }
-          : { rotateY: 0, rotateX: 0, scale: 1 }
+          ? { scale: 1.03 }
+          : { scale: 1 }
       }
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
       onMouseEnter={() => setIsHovered(true)}
@@ -375,7 +376,6 @@ function PricingCard({ plan, selectedIndustry }) {
           <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
             {plan.name}
           </h3>
-          {/* Badge label shown once inline, floating badge shown above card */}
           {isRecommended && selectedIndustry?.shortName ? (
             <p className="text-xs font-bold text-primary mb-2">
               Recommended for {selectedIndustry.shortName}
@@ -421,16 +421,17 @@ function PricingCard({ plan, selectedIndustry }) {
 
         <ul className="space-y-2.5 md:space-y-3.5 flex-1 mb-7 md:mb-9">
           {plan.features.map((feature, index) => (
-            <li
-              key={feature}
-              className={`flex items-start gap-3 ${index > 3 ? "feature-list-extra" : ""}`}
-              style={{
-                animation: `slideIn 0.5s ease-out ${index * 0.05}s both`,
-              }}
-            >
-              <SimpleCheck />
-              <span className="text-sm text-foreground/75">{feature}</span>
-            </li>
+            index <= 3 ? (
+              <li key={feature} className="flex items-start gap-3">
+                <SimpleCheck />
+                <span className="text-sm text-foreground/75">{feature}</span>
+              </li>
+            ) : (
+              <li key={feature} className="hidden sm:flex items-start gap-3">
+                <SimpleCheck />
+                <span className="text-sm text-foreground/75">{feature}</span>
+              </li>
+            )
           ))}
         </ul>
 
@@ -462,4 +463,4 @@ function PricingCard({ plan, selectedIndustry }) {
       </div>
     </motion.div>
   );
-}
+});
