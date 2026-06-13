@@ -1,4 +1,3 @@
-import { motion } from "framer-motion";
 import { useDemoBooking } from "./DemoBookingContext";
 import StardustOverlay from "./StardustOverlay";
 
@@ -54,26 +53,17 @@ export default function Testimonials() {
           </p>
         </div>
 
-        <motion.div
-          className="grid md:grid-cols-3 gap-6"
-          variants={{ visible: { transition: { staggerChildren: 0.12 } } }}
-          initial="hidden"
-          whileInView="visible"
-          viewport={{ once: true, margin: "-80px" }}
-        >
-          {testimonials.map((testimonial) => (
-            <motion.article
+        {/* CSS-only staggered fade-in — no GPU compositing overhead */}
+        <div className="testimonial-grid grid md:grid-cols-3 gap-6">
+          {testimonials.map((testimonial, idx) => (
+            <article
               key={testimonial.name}
-              className="flex flex-col rounded-2xl p-6"
-              variants={{
-                hidden: { opacity: 0, y: 36 },
-                visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
-              }}
-              transition={{ duration: 0.5, ease: "easeOut" }}
+              className="flex flex-col rounded-2xl p-6 testimonial-card"
               style={{
                 background: "rgba(240,249,255,0.95)",
                 border: "1.5px solid rgba(0,174,239,0.22)",
                 boxShadow: "0 4px 24px rgba(0,174,239,0.07)",
+                animationDelay: `${idx * 120}ms`,
               }}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
@@ -118,9 +108,9 @@ export default function Testimonials() {
                   <p className="text-xs text-muted-foreground">{testimonial.businessType}</p>
                 </div>
               </div>
-            </motion.article>
+            </article>
           ))}
-        </motion.div>
+        </div>
 
         <div className="text-center mt-16 pt-10 border-t border-border">
           <p className="text-lg font-semibold text-foreground mb-4">
@@ -130,7 +120,7 @@ export default function Testimonials() {
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
               style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
               Plan My System
@@ -138,7 +128,7 @@ export default function Testimonials() {
           ) : (
             <a
               href="/book"
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white"
+              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
               style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
             >
               Plan My System
@@ -146,6 +136,16 @@ export default function Testimonials() {
           )}
         </div>
       </div>
+
+      <style>{`
+        .testimonial-card {
+          animation: fadeInUp 0.6s ease-out both;
+        }
+        @keyframes fadeInUp {
+          from { opacity: 0; transform: translateY(24px); }
+          to   { opacity: 1; transform: translateY(0); }
+        }
+      `}</style>
     </section>
   );
 }

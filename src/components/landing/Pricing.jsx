@@ -17,24 +17,8 @@ import {
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
 
-function SimpleCheck() {
-  return (
-    <svg
-      className="w-4 h-4 flex-shrink-0 mt-0.5"
-      viewBox="0 0 24 24"
-      fill="none"
-    >
-      <circle cx="12" cy="12" r="10" stroke="#22c55e" strokeWidth="2" />
-      <path
-        d="M8 12l3 3 5-5"
-        stroke="#22c55e"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
+import PageCheckIcon from "@/components/ui/PageCheckIcon";
+function SimpleCheck() { return <PageCheckIcon />; }
 
 export default function Pricing() {
   const demoBooking = useDemoBooking();
@@ -412,8 +396,8 @@ const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
             href={getPackageStorePath(plan.packageKey)}
             className={
               plan.highlight
-                ? "w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none"
-                : "w-full inline-flex items-center justify-center gap-2 h-12 rounded-lg border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors"
+                ? "w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
+                : "w-full inline-flex items-center justify-center gap-2 h-12 rounded-lg border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
             }
           >
             {plan.highlight ? (

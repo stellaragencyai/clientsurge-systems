@@ -1,34 +1,43 @@
-import { useEffect, useState } from "react";
-import { motion, useSpring } from "framer-motion";
+/**
+ * Thin scroll progress indicator at the top of the page (#24).
+ * Uses a passive scroll listener + CSS transform for 60fps performance.
+ */
+import { useEffect, useRef } from "react";
 
 export default function ScrollProgressBar() {
-  const [progress, setProgress] = useState(0);
-  const springProgress = useSpring(progress, { stiffness: 200, damping: 30, mass: 0.5 });
+  const barRef = useRef(null);
 
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollTop = window.scrollY;
+    const bar = barRef.current;
+    if (!bar) return;
+
+    const onScroll = () => {
+      const scrollTop = window.scrollY || document.documentElement.scrollTop;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrolled = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      setProgress(scrolled);
+      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
+      bar.style.transform = `scaleX(${progress})`;
     };
 
-    window.addEventListener("scroll", handleScroll, { passive: true });
-    return () => window.removeEventListener("scroll", handleScroll);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 h-1 z-[49]"
+    <div
+      ref={barRef}
+      aria-hidden="true"
       style={{
-        background: "linear-gradient(90deg, #00AEEF 0%, #009DFF 50%, #003B8F 100%)",
-        width: springProgress,
-        scaleX: 1,
+        position: "fixed",
+        top: 0,
+        left: 0,
+        right: 0,
+        height: "3px",
+        background: "linear-gradient(90deg, #00AEEF, #009DFF, #003B8F)",
         transformOrigin: "left",
+        transform: "scaleX(0)",
+        zIndex: 9999,
+        pointerEvents: "none",
       }}
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      transition={{ opacity: { duration: 0.3 } }}
     />
   );
 }

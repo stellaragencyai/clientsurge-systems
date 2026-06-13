@@ -7,6 +7,7 @@ import LaunchAnnouncementBanner from "@/components/campaign/LaunchAnnouncementBa
 import CampaignBanner from "@/components/campaign/CampaignBanner";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
+import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
@@ -134,6 +135,7 @@ export default function Home() {
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
+        <ScrollProgressBar />
         <Navbar />
         <LaunchAnnouncementBanner />
         <Hero />

@@ -1,5 +1,4 @@
-import { useState } from "react";
-import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import {
   Accordion,
   AccordionContent,
@@ -7,11 +6,19 @@ import {
   AccordionTrigger } from
 "@/components/ui/accordion";
 import { FAQ_ITEMS } from "./FAQData";
+import { useLocation } from "react-router-dom";
 
 
 export default function FAQ() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("all");
+  const location = useLocation();
+
+  // Reset search/filter when navigating away and back (#25)
+  useEffect(() => {
+    setSearch("");
+    setCategory("all");
+  }, [location.pathname]);
 
   const categories = ["all", "setup", "pricing", "integration", "support", "billing", "compliance"];
   const categoryLabels = {
@@ -84,33 +91,25 @@ export default function FAQ() {
         {filtered.length > 0 ? (
           <Accordion type="single" collapsible className="space-y-3">
             {filtered.map((faq, idx) => (
-              <motion.div
+              <AccordionItem
                 key={idx}
-                initial={{ opacity: 0, y: 20, scale: 0.97 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                transition={{ type: "spring", stiffness: 280, damping: 28, delay: idx * 0.05 }}
+                value={`faq-${idx}`}
+                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-colors duration-200"
+                style={{
+                  background: "rgba(255,255,255,0.90)",
+                  border: "1.5px solid rgba(200,205,215,0.55)",
+                  boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
+                }}
               >
-                <AccordionItem
-                  value={`faq-${idx}`}
-                  className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-colors duration-200"
-                  style={{
-                    background: "rgba(255,255,255,0.75)",
-                    backdropFilter: "blur(16px)",
-                    WebkitBackdropFilter: "blur(16px)",
-                    border: "1.5px solid rgba(200,205,215,0.55)",
-                    boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
-                  }}
-                >
-                  <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus-visible:outline-none min-h-[48px] border-b border-border/20 last:border-b-0">
-                    {faq.q}
-                  </AccordionTrigger>
-                  <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 break-words overflow-wrap-anywhere">
-                    <div style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
-                      <p>{faq.a}</p>
-                    </div>
-                  </AccordionContent>
-                </AccordionItem>
-              </motion.div>
+                <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus-visible:outline-none min-h-[48px] border-b border-border/20 last:border-b-0">
+                  {faq.q}
+                </AccordionTrigger>
+                <AccordionContent className="text-sm text-foreground/80 leading-relaxed pb-5 break-words overflow-wrap-anywhere">
+                  <div style={{ wordWrap: "break-word", overflowWrap: "break-word" }}>
+                    <p>{faq.a}</p>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
             ))}
           </Accordion>
         ) : (
