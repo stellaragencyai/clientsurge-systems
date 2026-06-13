@@ -11,7 +11,6 @@ import {
   Scale,
   KeyRound } from
 "lucide-react";
-import { motion } from "framer-motion";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from
 "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
@@ -312,7 +311,7 @@ export default function Industries() {
           });
 
           return (
-            <motion.button
+            <button
             key={industry.id}
             type="button"
             aria-label={industry.name}
@@ -323,8 +322,6 @@ export default function Industries() {
             onMouseLeave={() => setHoveredIndustryId("")}
             onFocus={() => setHoveredIndustryId(industry.id)}
             onBlur={() => setHoveredIndustryId("")}
-              animate={isSelected ? { scale: [1, 1.04, 1.02], zIndex: 2 } : { scale: 1, zIndex: 1 }}
-              transition={{ type: "spring", stiffness: 400, damping: 18 }}
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
@@ -335,6 +332,7 @@ export default function Industries() {
                 background: "transparent",
                 cursor: "pointer",
                 position: "relative",
+                zIndex: isSelected ? 2 : 1,
               }}>
               
               <img
@@ -424,7 +422,7 @@ export default function Industries() {
                   background: `linear-gradient(to right, ${accent.color}, #ffffff, ${accent.color})`
                 }} />
               
-            </motion.button>);
+            </button>);
 
         })}
       </div>

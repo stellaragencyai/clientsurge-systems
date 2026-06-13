@@ -3,13 +3,12 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
-import MotionSection from "@/components/motion/MotionSection";
 import LaunchAnnouncementBanner from "@/components/campaign/LaunchAnnouncementBanner";
 import CampaignBanner from "@/components/campaign/CampaignBanner";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import SecurityPriority from "../components/landing/SecurityPriority";
-import { LargeSectionSkeleton, SectionSkeleton } from "../components/landing/SkeletonLoader";
+import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
@@ -138,42 +137,45 @@ export default function Home() {
         <Navbar />
         <LaunchAnnouncementBanner />
         <Hero />
-        <MotionSection>
-          <LazyHomepageSection fallback={<SectionSkeleton />}>
-            <Industries />
-            <SectionBreak />
-          </LazyHomepageSection>
-        </MotionSection>
-        <MotionSection delay={0.05}>
-          <LazyHomepageSection fallback={<SectionSkeleton />}>
-            <TrustBar />
-            <SectionBreak />
-          </LazyHomepageSection>
-        </MotionSection>
-        <MotionSection delay={0.1}>
-          <LazyHomepageSection fallback={<LargeSectionSkeleton />}>
-            <div id="problem-solution" aria-hidden="true" />
-            <div id="six-automations" aria-hidden="true" />
-            <CoreOffer />
-            <SectionBreak />
-            <div data-campaign-section>
-              <CampaignBanner />
-            </div>
-            <Pricing />
-            <SectionBreak />
-          </LazyHomepageSection>
-        </MotionSection>
-        <MotionSection delay={0.15}>
-          <LazyHomepageSection fallback={<SectionSkeleton />}>
-            <FAQ />
-            <SectionBreak />
-            <FounderSection />
-            <SectionBreak />
-            <Testimonials />
-            <SectionBreak />
-            <FinalCTA />
-          </LazyHomepageSection>
-        </MotionSection>
+
+        {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <Industries />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <TrustBar />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="problem-solution" aria-hidden="true" />
+          <div id="six-automations" aria-hidden="true" />
+          <CoreOffer />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div data-campaign-section>
+            <CampaignBanner />
+          </div>
+          <Pricing />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <FAQ />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <FounderSection />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <Testimonials />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <FinalCTA />
+        </LazyHomepageSection>
+
         <SecurityPriority />
         <Footer />
         <ChatBubble />

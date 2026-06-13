@@ -1,7 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense, lazy } from "react";
 import { ArrowRight, ShoppingCart } from "lucide-react";
-import { motion } from "framer-motion";
-import { Suspense, lazy } from "react";
 import DemoBookingModal from "../forms/DemoBookingModal";
 const HeroSMSDemo = lazy(() => import("./HeroSMSDemo"));
 import {
@@ -61,12 +59,12 @@ function CoreOfferHeader() {
 function SystemCard({ system, selected, onSelect, onAddToStack }) {
   const Icon = iconMap[system.icon];
   return (
-    <motion.button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={() => onSelect(system.id)}
-      whileHover={{ y: -2 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
-      className="w-full text-left rounded-[20px] overflow-hidden transition-all duration-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      onKeyDown={(e) => e.key === "Enter" && onSelect(system.id)}
+      className="w-full text-left rounded-[20px] overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
         background: "rgba(255,255,255,0.82)",
         border: selected ? "1.5px solid rgba(0,174,239,0.4)" : "1px solid rgba(148, 163, 184, 0.18)",
@@ -74,7 +72,6 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
         "0 12px 32px rgba(0,174,239,0.15)" :
         "0 8px 22px rgba(15, 23, 42, 0.05)"
       }}>
-      
       <div className="px-5 md:px-6 pt-5 pb-3 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.82)" }}>
         <div className="flex-1 min-w-0">
           <p className="text-[11px] font-black uppercase tracking-[0.2em]" style={{ color: "rgba(0,174,239,0.85)" }}>
@@ -82,13 +79,11 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
           </p>
           <p className="mt-1 text-sm font-semibold text-foreground leading-snug">{system.title}</p>
         </div>
-        <motion.div
-          animate={selected ? { scale: 1.1 } : { scale: 1 }}
-          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0"
-          style={{ background: "linear-gradient(135deg,#0088CC,#00AEEF)", boxShadow: "0 2px 8px rgba(0,174,239,0.3)" }}>
-          
+        <div
+          className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-transform duration-200"
+          style={{ background: "linear-gradient(135deg,#0088CC,#00AEEF)", boxShadow: "0 2px 8px rgba(0,174,239,0.3)", transform: selected ? "scale(1.1)" : "scale(1)" }}>
           <Icon className="w-4 h-4 text-white" />
-        </motion.div>
+        </div>
       </div>
       <div className="px-5 pb-3">
         <p className="text-sm leading-relaxed text-foreground/75">{system.shortDescription}</p>
@@ -101,43 +96,33 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
             onAddToStack(system.id);
           }}
           className="flex-1 py-2 px-3 bg-gradient-to-r from-primary/10 to-primary/5 border border-primary/20 rounded-lg text-xs font-semibold text-primary hover:from-primary/15 hover:to-primary/10 transition flex items-center justify-center gap-1">
-          
           <ShoppingCart className="w-3 h-3" /> Add
         </button>
       </div>
-    </motion.button>);
-
+    </div>);
 }
 
 function SystemGroupList({ selectedSystemId, onSelect, onAddToStack }) {
   return (
     <div className="mt-12 md:mt-14 space-y-10 md:space-y-12">
       {systemGroups.map((group) =>
-      <motion.div
-        key={group.id}
-        transition={{ duration: 0.5 }}>
-        
+      <div key={group.id}>
           <div className="flex items-center gap-4 mb-4 md:mb-5">
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
             <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase whitespace-nowrap">{group.label}</p>
             <div className="h-px flex-1 bg-gradient-to-r from-transparent via-primary/25 to-transparent" />
           </div>
           <div className="grid grid-cols-1 gap-5">
-            {group.systems.map((systemId, idx) =>
-          <motion.div
-            key={systemId}
-            transition={{ duration: 0.4, delay: idx * 0.1 }}>
-            
-                <SystemCard
-              system={systemsById[systemId]}
-              selected={selectedSystemId === systemId}
-              onSelect={onSelect}
-              onAddToStack={onAddToStack} />
-            
-              </motion.div>
-          )}
+            {group.systems.map((systemId) =>
+              <SystemCard
+                key={systemId}
+                system={systemsById[systemId]}
+                selected={selectedSystemId === systemId}
+                onSelect={onSelect}
+                onAddToStack={onAddToStack} />
+            )}
           </div>
-        </motion.div>
+        </div>
       )}
     </div>);
 
@@ -336,21 +321,7 @@ export default function CoreOffer() {
       <div className="max-w-6xl mx-auto relative z-10 pt-10">
         <CoreOfferHeader />
         
-        {/* Stack Builder Button */}
-        <motion.div
-          className="mt-8 flex justify-center"
-          transition={{ delay: 0.3 }}>
-          
-          <button
-            onClick={() => setStackBuilderOpen(true)} className="inline-flex items-center gap-2 px-6 py-3 rounded-lg bg-primary/10 border border-primary/25 text-primary font-semibold text-sm hover:bg-primary/15 transition hidden">
-
-            
-            <ShoppingCart className="w-4 h-4" />
-            {Object.keys(stackItems).length > 0 ?
-            `Build Stack (${Object.values(stackItems).reduce((a, b) => a + b, 0)} items)` :
-            "Build Your Ideal Stack"}
-          </button>
-        </motion.div>
+        {/* Stack Builder Button — hidden by design */}
 
         {/* Centered iPhone SMS demo */}
         <div className="mt-8 md:mt-10 flex justify-center">

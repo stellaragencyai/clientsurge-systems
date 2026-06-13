@@ -69,17 +69,11 @@ export default function Testimonials() {
                 hidden: { opacity: 0, y: 36 },
                 visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.22, 1, 0.36, 1] } },
               }}
-              whileHover={{
-                y: -4,
-                boxShadow: "0 12px 32px rgba(0,174,239,0.14), inset 0 1px 0 rgba(255,255,255,0.9)",
-              }}
-              transition={{ duration: 0.2, ease: "easeOut" }}
+              transition={{ duration: 0.5, ease: "easeOut" }}
               style={{
-                background: "linear-gradient(135deg, rgba(240,249,255,0.72) 0%, rgba(224,242,254,0.55) 100%)",
-                backdropFilter: "blur(18px)",
-                WebkitBackdropFilter: "blur(18px)",
+                background: "rgba(240,249,255,0.95)",
                 border: "1.5px solid rgba(0,174,239,0.22)",
-                boxShadow: "0 4px 24px rgba(0,174,239,0.07), inset 0 1px 0 rgba(255,255,255,0.75)",
+                boxShadow: "0 4px 24px rgba(0,174,239,0.07)",
               }}
             >
               <div className="mb-4 flex items-center justify-between gap-3">
