@@ -1,5 +1,4 @@
 import { useEffect, useMemo, useState, memo } from "react";
-import { motion } from "framer-motion";
 import {
   ArrowRight,
   CheckCircle2,
@@ -286,15 +285,10 @@ export default function Pricing() {
           position: relative;
           z-index: 1;
         }
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(-12px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
+        .pricing-card:hover {
+          border-color: rgba(0,174,239,0.45) !important;
+          box-shadow: 0 14px 36px rgba(0,174,239,0.12), inset 0 1px 0 rgba(255,255,255,0.85) !important;
+          transform: translateY(-2px);
         }
       `}</style>
     </section>
@@ -302,54 +296,32 @@ export default function Pricing() {
 }
 
 const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
-  const [isHovered, setIsHovered] = useState(false);
   const isRecommended =
     selectedIndustry?.recommendedPackage?.name === plan.name;
 
   return (
-    <motion.div
-      className={`pricing-card relative flex flex-col rounded-lg transition-all duration-300 ${
+    <div
+      className={`pricing-card relative flex flex-col rounded-lg ${
         plan.highlight ? "highlight-glow" : ""
-      } ${isHovered && plan.highlight ? "highlight-hover" : ""}`}
+      }`}
       style={{
         overflow: "visible",
-        background: isHovered
-          ? "linear-gradient(135deg, rgba(255,255,255,1) 0%, rgba(230,245,255,0.95) 100%)"
-          : plan.highlight
+        background: plan.highlight
           ? "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(240,250,255,0.92) 100%)"
           : "linear-gradient(135deg, rgba(255,255,255,0.92) 0%, rgba(243,250,255,0.78) 100%)",
         border: plan.highlight
-          ? isHovered
-            ? "2px solid rgba(0,174,239,0.7)"
-            : "2px solid rgba(0,174,239,0.38)"
-          : isHovered
-          ? "2px solid rgba(0,174,239,0.4)"
+          ? "2px solid rgba(0,174,239,0.38)"
           : "1.5px solid rgba(0,174,239,0.15)",
         boxShadow: plan.highlight
-          ? isHovered
-            ? "0 24px 64px rgba(0,174,239,0.22), 0 0 24px rgba(0,174,239,0.18), inset 0 1px 0 rgba(255,255,255,0.9)"
-            : "0 12px 40px rgba(0,174,239,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
-          : isHovered
-          ? "0 14px 36px rgba(0,174,239,0.12), inset 0 1px 0 rgba(255,255,255,0.85)"
+          ? "0 12px 40px rgba(0,174,239,0.14), inset 0 1px 0 rgba(255,255,255,0.8)"
           : "0 6px 22px rgba(0,0,0,0.05), inset 0 1px 0 rgba(255,255,255,0.6)",
       }}
-      animate={
-        isHovered
-          ? { scale: 1.03 }
-          : { scale: 1 }
-      }
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={() => setIsHovered(false)}
     >
       {plan.highlight ? (
         <div
           className="absolute inset-0 rounded-lg pointer-events-none"
           style={{
-            boxShadow: isHovered
-              ? "0 0 0 1px rgba(0,174,239,0.45), 0 0 48px rgba(0,174,239,0.18)"
-              : "0 0 0 1px rgba(0,174,239,0.25), 0 0 30px rgba(0,174,239,0.08)",
-            transition: "box-shadow 0.35s ease",
+            boxShadow: "0 0 0 1px rgba(0,174,239,0.25), 0 0 30px rgba(0,174,239,0.08)",
             borderRadius: "inherit",
           }}
         />
@@ -461,6 +433,6 @@ const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
           </p>
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 });
