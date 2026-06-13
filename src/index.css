@@ -44,15 +44,15 @@
     --sidebar-border: 199 40% 88%;
     --sidebar-ring: 199 100% 47%;
 
-    /* Electric Glow system — locked to ClientSurge logo blue #00C8FF */
-    --cs-electric: #00C8FF;
-    --cs-electric-deep: #0099CC;
-    --cs-electric-navy: #0066AA;
-    --cs-glow-sm: 0 0 14px rgba(0, 200, 255, 0.45);
-    --cs-glow-md: 0 0 28px rgba(0, 200, 255, 0.55);
-    --cs-glow-lg: 0 8px 40px rgba(0, 200, 255, 0.65);
-    --cs-gradient: linear-gradient(135deg, #00C8FF 0%, #0099CC 50%, #0066AA 100%);
-    --cs-gradient-soft: linear-gradient(135deg, rgba(0,200,255,0.12) 0%, rgba(0,102,170,0.06) 100%);
+    /* Electric Glow system — ClientSurge logo blue #009FD4 */
+    --cs-electric: #009FD4;
+    --cs-electric-deep: #007AAA;
+    --cs-electric-navy: #005580;
+    --cs-glow-sm: 0 0 14px rgba(0, 159, 212, 0.45);
+    --cs-glow-md: 0 0 28px rgba(0, 159, 212, 0.55);
+    --cs-glow-lg: 0 8px 40px rgba(0, 159, 212, 0.65);
+    --cs-gradient: linear-gradient(135deg, #009FD4 0%, #007AAA 50%, #005580 100%);
+    --cs-gradient-soft: linear-gradient(135deg, rgba(0,159,212,0.12) 0%, rgba(0,85,128,0.06) 100%);
   }
 
 }

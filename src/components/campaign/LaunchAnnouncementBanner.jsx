@@ -45,7 +45,7 @@ export default function LaunchAnnouncementBanner() {
         left: 0,
         right: 0,
         zIndex: 40,
-        background: "linear-gradient(90deg, #00C8FF 0%, #00AEEF 50%, #00C8FF 100%)",
+        background: "linear-gradient(90deg, #009FD4 0%, #00AEEF 50%, #009FD4 100%)",
         backgroundSize: "200% 100%",
         animation: "bannerGradient 6s ease-in-out infinite",
         borderBottom: "1px solid rgba(0,174,239,0.5)",
