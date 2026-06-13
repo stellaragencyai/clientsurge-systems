@@ -4,6 +4,9 @@ import {
   CheckCircle2,
   ShieldCheck,
   Wallet,
+  Zap,
+  TrendingUp,
+  Crown,
 } from "lucide-react";
 import { useDemoBooking } from "./DemoBookingContext";
 import {
@@ -16,9 +19,22 @@ import {
 } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
-
 import PageCheckIcon from "@/components/ui/PageCheckIcon";
+
 function SimpleCheck() { return <PageCheckIcon />; }
+
+// Maps package key → tier icon component
+const TIER_ICONS = {
+  starter_system: Zap,
+  growth_system: TrendingUp,
+  pro_system: Crown,
+};
+
+// Maps package key → previous plan name for incremental phrasing
+const PREVIOUS_PLAN = {
+  growth_system: "Starter",
+  pro_system: "Growth",
+};
 
 export default function Pricing() {
   const demoBooking = useDemoBooking();
@@ -272,7 +288,30 @@ export default function Pricing() {
         .pricing-card:hover {
           border-color: rgba(0,174,239,0.45) !important;
           box-shadow: 0 14px 36px rgba(0,174,239,0.12), inset 0 1px 0 rgba(255,255,255,0.85) !important;
-          transform: translateY(-2px);
+          transform: translateY(-4px);
+        }
+        .tier-icon-wrap {
+          width: 52px;
+          height: 52px;
+          border-radius: 14px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin-bottom: 14px;
+          flex-shrink: 0;
+        }
+        .incremental-divider {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin-bottom: 10px;
+        }
+        .incremental-divider::before,
+        .incremental-divider::after {
+          content: "";
+          flex: 1;
+          height: 1px;
+          background: rgba(0,174,239,0.15);
         }
       `}</style>
     </section>
@@ -282,6 +321,13 @@ export default function Pricing() {
 const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
   const isRecommended =
     selectedIndustry?.recommendedPackage?.name === plan.name;
+
+  const TierIcon = TIER_ICONS[plan.packageKey] || Zap;
+  const previousPlanName = PREVIOUS_PLAN[plan.packageKey] || null;
+
+  // Split features: first 2 are "base" always shown; rest are incremental additions
+  const baseFeatures = plan.features.slice(0, 2);
+  const addedFeatures = plan.features.slice(2);
 
   return (
     <div
@@ -311,13 +357,15 @@ const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
         />
       ) : null}
 
+      {/* Floating badge — "Most Popular" or industry recommendation */}
       {plan.badge || isRecommended ? (
         <div className="pricing-badge-float" style={{ zIndex: 30 }}>
           <span
-            className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-lg tracking-wide shadow-xl"
+            className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full tracking-wide shadow-xl"
             style={{
               background:
                 "linear-gradient(135deg, #00AEEF 0%, #009DFF 50%, #003B8F 100%)",
+              boxShadow: "0 4px 14px rgba(0,174,239,0.45)",
             }}
           >
             {isRecommended
@@ -328,28 +376,40 @@ const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
       ) : null}
 
       <div className="p-5 opacity-100 flex flex-col flex-1 md:p-8 lg:p-10 relative z-10">
-        <div className="mb-7">
-          <h3 className="font-display text-2xl font-semibold text-foreground mb-2">
-            {plan.name}
-          </h3>
-          {isRecommended && selectedIndustry?.shortName ? (
-            <p className="text-xs font-bold text-primary mb-2">
-              Recommended for {selectedIndustry.shortName}
-            </p>
-          ) : plan.badge ? (
-            <p className="text-xs font-bold text-primary mb-2">{plan.badge}</p>
-          ) : null}
-          <p className="text-xs font-semibold text-foreground/70 leading-snug">
-            {plan.internalName} - {plan.fit}
-          </p>
+
+        {/* Tier Icon */}
+        <div
+          className="tier-icon-wrap"
+          style={{
+            background: plan.highlight
+              ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
+              : plan.packageKey === "pro_system"
+              ? "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)"
+              : "rgba(0,174,239,0.10)",
+            boxShadow: plan.highlight
+              ? "0 4px 16px rgba(0,174,239,0.35)"
+              : plan.packageKey === "pro_system"
+              ? "0 4px 16px rgba(124,58,237,0.25)"
+              : "none",
+          }}
+        >
+          <TierIcon
+            className="w-6 h-6"
+            style={{
+              color: plan.highlight || plan.packageKey === "pro_system"
+                ? "#ffffff"
+                : "#0088CC",
+            }}
+          />
         </div>
 
-        <div className="mb-5 text-xs text-muted-foreground leading-relaxed px-3 py-2 rounded-xl bg-primary/5 border border-primary/10">
-          {plan.highlight
-            ? "Built for teams that need the full response, booking, review, and reactivation workflow."
-            : plan.packageKey === "starter_system"
-            ? "The entry bundle focused on speed-to-lead and booking handoff."
-            : "Built for teams that need broader recovery and follow-up coverage."}
+        <div className="mb-5">
+          <h3 className="font-display text-2xl font-semibold text-foreground mb-1">
+            {plan.name}
+          </h3>
+          <p className="text-xs font-semibold text-foreground/70 leading-snug">
+            {plan.fit}
+          </p>
         </div>
 
         <div className="mb-7 pb-7 border-b border-border">
@@ -362,56 +422,113 @@ const PricingCard = memo(function PricingCard({ plan, selectedIndustry }) {
             </span>
             <span className="text-sm text-muted-foreground mb-2">/month</span>
           </div>
-          <p className="text-xs text-muted-foreground mb-3">
+          <p className="text-xs text-muted-foreground mb-1">
             {plan.setup} one-time setup
           </p>
-          <p className="text-xs text-muted-foreground text-left">
-            One-time setup fee plus monthly service. No long-term contracts.
-            Cancel anytime.
+          <p className="text-xs text-muted-foreground">
+            No long-term contracts. Cancel anytime.
           </p>
         </div>
 
-        <p className="text-sm text-muted-foreground leading-relaxed mb-7">
-          {plan.desc}
-        </p>
-
-        <ul className="space-y-2.5 md:space-y-3.5 flex-1 mb-7 md:mb-9">
-          {plan.features.map((feature, index) => (
-            index <= 3 ? (
-              <li key={feature} className="flex items-start gap-3">
-                <SimpleCheck />
-                <span className="text-sm text-foreground/75">{feature}</span>
+        {/* Feature list — incremental "Everything in X, plus:" structure */}
+        <ul className="space-y-2.5 md:space-y-3 flex-1 mb-7 md:mb-9">
+          {previousPlanName ? (
+            <>
+              {/* Incremental phrasing header */}
+              <li className="incremental-divider">
+                <span className="text-[11px] font-bold text-primary whitespace-nowrap tracking-wide uppercase">
+                  Everything in {previousPlanName}, plus:
+                </span>
               </li>
-            ) : (
-              <li key={feature} className="hidden sm:flex items-start gap-3">
-                <SimpleCheck />
-                <span className="text-sm text-foreground/75">{feature}</span>
-              </li>
-            )
-          ))}
+              {addedFeatures.map((feature, index) => (
+                index <= 1 ? (
+                  <li key={feature} className="flex items-start gap-3">
+                    <SimpleCheck />
+                    <span className="text-sm text-foreground/75">{feature}</span>
+                  </li>
+                ) : (
+                  <li key={feature} className="hidden sm:flex items-start gap-3">
+                    <SimpleCheck />
+                    <span className="text-sm text-foreground/75">{feature}</span>
+                  </li>
+                )
+              ))}
+              {/* Show base features smaller below the fold */}
+              {baseFeatures.map((feature) => (
+                <li key={feature} className="hidden sm:flex items-start gap-3 opacity-60">
+                  <SimpleCheck />
+                  <span className="text-sm text-foreground/65">{feature}</span>
+                </li>
+              ))}
+            </>
+          ) : (
+            // Starter — no previous plan, just list all features
+            plan.features.map((feature, index) => (
+              index <= 3 ? (
+                <li key={feature} className="flex items-start gap-3">
+                  <SimpleCheck />
+                  <span className="text-sm text-foreground/75">{feature}</span>
+                </li>
+              ) : (
+                <li key={feature} className="hidden sm:flex items-start gap-3">
+                  <SimpleCheck />
+                  <span className="text-sm text-foreground/75">{feature}</span>
+                </li>
+              )
+            ))
+          )}
         </ul>
 
+        {/* CTA — tiered button intensity */}
         <div className="flex flex-col gap-1">
-          <a
-            href={getPackageStorePath(plan.packageKey)}
-            className={
-              plan.highlight
-                ? "w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
-                : "w-full inline-flex items-center justify-center gap-2 h-12 rounded-lg border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
-            }
-          >
-            {plan.highlight ? (
+          {plan.highlight ? (
+            /* Growth (highlight) — strongest gradient CTA */
+            <a
+              href={getPackageStorePath(plan.packageKey)}
+              className="w-full shiny-cta-btn focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
+            >
               <span className="shiny-cta-inner w-full flex items-center justify-center gap-2 h-12 rounded-lg font-semibold text-sm">
-                Get Started - {plan.setup} Today
+                Get Started — {plan.setup} Today
                 <ArrowRight className="w-4 h-4" />
               </span>
-            ) : (
-              <>
-                Get Started - {plan.setup} Today
-                <ArrowRight className="w-4 h-4" />
-              </>
-            )}
+            </a>
+          ) : plan.packageKey === "pro_system" ? (
+            /* Pro — solid filled button, purple-to-blue gradient */
+            <a
+              href={getPackageStorePath(plan.packageKey)}
+              className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-lg text-sm font-semibold text-white transition-all focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2 hover:-translate-y-0.5"
+              style={{
+                background: "linear-gradient(135deg, #0088CC 0%, #005f99 100%)",
+                boxShadow: "0 4px 14px rgba(0,136,204,0.28)",
+              }}
+            >
+              Get Started — {plan.setup} Today
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          ) : (
+            /* Starter — ghost/outlined button */
+            <a
+              href={getPackageStorePath(plan.packageKey)}
+              className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-lg border border-primary/25 bg-white/80 text-sm font-semibold text-primary hover:bg-primary/5 transition-colors focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
+            >
+              Get Started — {plan.setup} Today
+              <ArrowRight className="w-4 h-4" />
+            </a>
+          )}
+
+          {/* Secondary "or" divider + consult link */}
+          <div className="flex items-center gap-2 my-1">
+            <div className="flex-1 h-px bg-border" />
+            <span className="text-[10px] text-muted-foreground font-medium uppercase tracking-widest">or</span>
+            <div className="flex-1 h-px bg-border" />
+          </div>
+          <a
+            href="/book"
+            className="w-full inline-flex items-center justify-center h-9 rounded-lg text-xs font-semibold text-muted-foreground hover:text-primary transition-colors"
+          >
+            Book a free strategy call
           </a>
+
           <p className="text-center text-[11px] text-muted-foreground mt-1">
             {plan.monthly}/mo begins 30 days after go-live
           </p>
