@@ -1,9 +1,6 @@
-import { lazy, Suspense, useState } from "react";
-import { motion, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
+import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
 import { premiumEase } from "@/components/landing/PremiumHomepageMotion";
-
-
-const HeroDashboardScreen = lazy(() => import("./HeroDashboardScreen"));
 
 const heroCopyReveal = {
   hidden: { opacity: 0, y: 28 },
@@ -13,8 +10,8 @@ const heroCopyReveal = {
     transition: {
       duration: 0.74,
       ease: premiumEase,
-      staggerChildren: 0.08,
-      delayChildren: 0.08,
+      staggerChildren: 0.1,
+      delayChildren: 0.1,
     },
   },
 };
@@ -28,553 +25,309 @@ const heroRevealItem = {
   },
 };
 
-function HeroDashboardStaticPreview({ onActivate }) {
-  const reduceMotion = useReducedMotion();
-
-  return (
-    <motion.button
-      type="button"
-      className="hero-dashboard-static-preview"
-      data-cinematic-animation="dashboard-float-scan"
-      aria-label="Preview ClientSurge automation dashboard"
-      onClick={onActivate}
-      onFocus={onActivate}
-      onPointerEnter={onActivate}
-      initial={reduceMotion ? false : { opacity: 0, y: 34, rotateX: 4 }}
-      animate={reduceMotion ? undefined : { opacity: 1, y: [0, -8, 0], rotateX: 0 }}
-      transition={{
-        opacity: { duration: 0.74, ease: premiumEase, delay: 0.18 },
-        y: { duration: 6.5, repeat: Infinity, ease: "easeInOut" },
-        rotateX: { duration: 0.74, ease: premiumEase, delay: 0.18 },
-      }}
-      whileHover={reduceMotion ? undefined : { y: -10, scale: 1.015 }}
-      style={{
-        position: "relative",
-        width: "100%",
-        maxWidth: "640px",
-        padding: "14px",
-        border: "none",
-        borderRadius: "30px",
-        background: "linear-gradient(160deg, #3a3a3e 0%, #1e1e21 48%, #171719 100%)",
-        boxShadow: "0 34px 90px rgba(0,0,0,0.34), inset 0 1px 0 rgba(255,255,255,0.08)",
-        cursor: "pointer",
-        textAlign: "left"
-      }}
-    >
-      <div
-        style={{
-          overflow: "hidden",
-          borderRadius: "20px",
-          background: "linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 24%, #071535 58%, #061028 100%)",
-          minHeight: "440px",
-          color: "#ffffff",
-          fontFamily: "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-          position: "relative"
-        }}
-      >
-        <motion.span
-          aria-hidden="true"
-          className="hero-dashboard-static-preview__scan"
-          animate={reduceMotion ? undefined : { x: ["-140%", "150%"], opacity: [0, 1, 0] }}
-          transition={{ duration: 3.8, repeat: Infinity, repeatDelay: 1.8, ease: "easeInOut" }}
-        />
-        <div
-          style={{
-            height: "32px",
-            background: "rgba(0,0,0,0.45)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 18px",
-            fontSize: "12px",
-            fontWeight: 700
-          }}
-        >
-          <span>9:41 AM</span>
-          <span style={{ fontSize: "11px", color: "rgba(255,255,255,0.76)" }}>71%</span>
-        </div>
-
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "1fr 190px",
-            gap: "16px",
-            padding: "34px 18px 18px",
-            minHeight: "420px"
-          }}
-        >
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", justifyContent: "center" }}>
-            <span
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                alignSelf: "flex-start",
-                borderRadius: "999px",
-                padding: "5px 12px",
-                background: "rgba(0,174,239,0.16)",
-                border: "1px solid rgba(0,174,239,0.36)",
-                color: "#66d9ff",
-                fontSize: "10px",
-                fontWeight: 800,
-                letterSpacing: "0.1em"
-              }}
-            >
-              SPEED TO LEAD
-            </span>
-            <h2
-              style={{
-                margin: 0,
-                maxWidth: "320px",
-                fontSize: "clamp(1.3rem, 2.9vw, 2rem)",
-                lineHeight: 1.1,
-                fontWeight: 800,
-                letterSpacing: "-0.02em"
-              }}
-            >
-              AI follow-up visible from capture to booking.
-            </h2>
-            <p
-              style={{
-                margin: 0,
-                maxWidth: "300px",
-                fontSize: "12px",
-                lineHeight: 1.6,
-                color: "rgba(255,255,255,0.66)"
-              }}
-            >
-              Illustrative flow showing the automation path from new lead to booked appointment.
-            </p>
-            <div style={{ display: "flex", flexWrap: "wrap", gap: "6px", maxWidth: "330px" }}>
-              {["Lead captured", "SMS sent", "Booking link shared"].map((label) => (
-                <span
-                  key={label}
-                  style={{
-                    borderRadius: "999px",
-                    padding: "5px 9px",
-                    background: "rgba(255,255,255,0.08)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    color: "rgba(255,255,255,0.78)",
-                    fontSize: "10px",
-                    fontWeight: 700
-                  }}
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
-          </div>
-
-          <div
-            style={{
-              alignSelf: "center",
-              borderRadius: "18px",
-              padding: "14px",
-              background: "rgba(255,255,255,0.13)",
-              border: "1px solid rgba(255,255,255,0.18)",
-              boxShadow: "0 12px 32px rgba(0,0,0,0.24)"
-            }}
-          >
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "12px" }}>
-              <div>
-                <p style={{ margin: 0, fontSize: "10px", fontWeight: 800 }}>Lead Conversion</p>
-                <p style={{ margin: "2px 0 0", fontSize: "9px", color: "rgba(255,255,255,0.52)" }}>Live workflow</p>
-              </div>
-              <span style={{ color: "#4ade80", fontSize: "9px", fontWeight: 800 }}>LIVE</span>
-            </div>
-            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px", marginBottom: "12px" }}>
-              {[["Leads", "24"], ["Booked", "18"]].map(([label, value]) => (
-                <div key={label} style={{ borderRadius: "10px", padding: "8px", background: "rgba(255,255,255,0.09)" }}>
-                  <p style={{ margin: "0 0 3px", fontSize: "8px", color: "rgba(255,255,255,0.5)", fontWeight: 700 }}>{label}</p>
-                  <p style={{ margin: 0, fontSize: "22px", lineHeight: 1, fontWeight: 900 }}>{value}</p>
-                </div>
-              ))}
-            </div>
-            {["New lead", "AI reply", "Appointment booked"].map((label, index) => (
-              <div key={label} style={{ display: "flex", alignItems: "center", gap: "8px", marginTop: index === 0 ? 0 : "8px" }}>
-                <span style={{ width: "12px", height: "12px", borderRadius: "999px", background: index < 2 ? "#00AEEF" : "#4ade80" }} />
-                <span style={{ fontSize: "10px", fontWeight: 700, color: "rgba(255,255,255,0.82)" }}>{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div
-          style={{
-            margin: "0 auto 12px",
-            width: "46px",
-            height: "5px",
-            borderRadius: "999px",
-            background: "rgba(255,255,255,0.28)"
-          }}
-        />
-      </div>
-    </motion.button>
-  );
-}
-
-function DeferredHeroDashboard() {
-  const [isInteractive, setIsInteractive] = useState(false);
-
-  if (!isInteractive) {
-    return <HeroDashboardStaticPreview onActivate={() => setIsInteractive(true)} />;
-  }
-
-  return (
-    <Suspense fallback={<HeroDashboardStaticPreview onActivate={() => {}} />}>
-      <HeroDashboardScreen />
-    </Suspense>
-  );
-}
-
-
 export default function Hero() {
   const reduceMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end start"],
+  });
+
+  // Parallax: background moves at 40% of scroll speed (slower = depth)
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
 
   return (
     <section
+      ref={sectionRef}
       className="landing-hero"
       style={{
         position: "relative",
-        overflow: "visible",
-        background: "#ffffff",
-        paddingBottom: "clamp(2.25rem, 4vw, 3.5rem)"
-      }}>
+        overflow: "hidden",
+        minHeight: "92svh",
+        display: "flex",
+        alignItems: "center",
+      }}
+    >
+      {/* ── Parallax background layer ── */}
+      {/* To use a real photo: replace `background` with `backgroundImage: "url('YOUR_URL')"` */}
+      <motion.div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: "-20%",
+          y: reduceMotion ? 0 : bgY,
+          willChange: "transform",
+          background: "linear-gradient(160deg, #0a1628 0%, #0d2447 30%, #071535 60%, #050e22 100%)",
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          zIndex: 0,
+        }}
+      />
 
+      {/* ── Dark overlay for text readability ── */}
       <div
         aria-hidden="true"
-        className="landing-hero__ambient"
-        data-cinematic-animation="ambient-sweep"
         style={{
           position: "absolute",
           inset: 0,
-          pointerEvents: "none"
-        }}>
-        <div
-          className="landing-hero__ambientSweep"
-          style={{
-            position: "absolute",
-            top: "-18%",
-            left: "-18%",
-            width: "62%",
-            height: "86%",
-            borderRadius: "999px",
-            background:
-              "radial-gradient(circle at center, rgba(0,174,239,0.12) 0%, rgba(0,157,255,0.05) 34%, transparent 70%)",
-          }}
-        />
-        
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-            "radial-gradient(circle at 18% 20%, rgba(0,174,239,0.08) 0%, transparent 30%), radial-gradient(circle at 72% 22%, rgba(0,157,255,0.08) 0%, transparent 24%), radial-gradient(circle at 78% 56%, rgba(0,59,143,0.06) 0%, transparent 32%)"
-          }} />
-        
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-            "linear-gradient(to right, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.94) 40%, rgba(255,255,255,0.68) 60%, rgba(255,255,255,0.2) 100%)"
-          }} />
-        
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            background:
-            "linear-gradient(to bottom, rgba(255,255,255,0.18) 0%, transparent 28%, rgba(255,255,255,0.34) 100%)"
-          }} />
-        <div className="landing-hero__cinematicGrid" />
-        
-      </div>
+          background: "linear-gradient(to bottom, rgba(5,14,34,0.72) 0%, rgba(5,14,34,0.55) 50%, rgba(5,14,34,0.80) 100%)",
+          zIndex: 1,
+        }}
+      />
 
+      {/* ── Subtle blue radial glow ── */}
+      <div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: 0,
+          background: "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(0,174,239,0.18) 0%, transparent 65%)",
+          zIndex: 1,
+          pointerEvents: "none",
+        }}
+      />
+
+      {/* ── Cinematic grid overlay ── */}
+      <div aria-hidden="true" className="landing-hero__cinematicGrid" style={{ zIndex: 1 }} />
+
+      {/* ── Content ── */}
       <div
         className="landing-hero__inner"
         style={{
           position: "relative",
           zIndex: 2,
-          maxWidth: "1400px",
+          width: "100%",
+          maxWidth: "900px",
           margin: "0 auto",
-          padding: "clamp(6rem, 9vw, 8rem) clamp(1.5rem, 5vw, 4rem) clamp(2.5rem, 5vw, 4rem)",
-          display: "grid",
-          gridTemplateColumns: "1fr 1fr",
-          gap: "clamp(32px, 5vw, 64px)",
+          padding: "clamp(7rem, 12vw, 10rem) clamp(1.5rem, 5vw, 3rem) clamp(4rem, 7vw, 6rem)",
+          display: "flex",
+          flexDirection: "column",
           alignItems: "center",
-          minHeight: "76svh"
-        }}>
-        
+          textAlign: "center",
+        }}
+      >
         <motion.div
-          className="landing-hero__copy"
-          data-cinematic-animation="headline-sheen"
           initial={reduceMotion ? false : "hidden"}
           animate={reduceMotion ? undefined : "visible"}
           variants={heroCopyReveal}
-          style={{ gridColumn: "1", marginBottom: "0px", textAlign: "left", maxWidth: "100%", position: "relative", zIndex: 10 }}
+          style={{ width: "100%" }}
         >
+          {/* Badge */}
+          <motion.div variants={heroRevealItem} style={{ marginBottom: "20px", display: "flex", justifyContent: "center" }}>
+            <span style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: "7px",
+              borderRadius: "999px",
+              padding: "6px 16px",
+              background: "rgba(0,174,239,0.15)",
+              border: "1px solid rgba(0,174,239,0.35)",
+              color: "#66d9ff",
+              fontSize: "11px",
+              fontWeight: 800,
+              letterSpacing: "0.12em",
+              textTransform: "uppercase",
+            }}>
+              <span style={{
+                width: "6px",
+                height: "6px",
+                borderRadius: "999px",
+                background: "#00AEEF",
+                display: "inline-block",
+                animation: "heroPulse 2s infinite",
+              }} />
+              AI Growth Systems for Local Businesses
+            </span>
+          </motion.div>
 
-
+          {/* Headline */}
           <motion.h1
             className="landing-hero__headline"
             variants={heroRevealItem}
             style={{
               fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-              fontSize: "clamp(2.2rem, 4.5vw, 3.35rem)",
-              fontWeight: "700",
-              lineHeight: 1.03,
-              letterSpacing: "0",
-              color: "hsl(var(--foreground))",
-              marginBottom: "16px"
-            }}>
-            
-            AI Automation Systems for Faster Local Bookings{" "}
-            <span
-              className="landing-hero__headlineAccent"
-              style={{ display: "inline" }}>
-              
-              and Recovered Revenue
+              fontSize: "clamp(2.4rem, 5.5vw, 3.75rem)",
+              fontWeight: "800",
+              lineHeight: 1.05,
+              letterSpacing: "-0.02em",
+              color: "#ffffff",
+              margin: "0",
+            }}
+          >
+            We Build the AI Growth Engines{" "}
+            <span className="landing-hero__headlineAccent">
+              That Turn Your Website Into a Booking Machine.
             </span>
           </motion.h1>
 
-          {/* Visual enhancement: shimmer divider under headline */}
+          {/* Beam divider */}
           <motion.div
             aria-hidden="true"
             className="landing-hero__headlineBeam"
             variants={heroRevealItem}
+            style={{ margin: "18px auto 22px" }}
           />
 
-
+          {/* Sub-headline */}
           <motion.p
             className="landing-hero__body"
             variants={heroRevealItem}
             style={{
-              fontSize: "clamp(0.95rem, 2.2vw, 1.05rem)",
-              color: "rgba(10,22,40,0.76)",
-              lineHeight: 1.55,
-              maxWidth: "540px",
-              margin: "0 0 18px"
-            }}>
-            
-            ClientSurge installs the website, CRM handoff, and six AI workflows that capture leads, recover missed calls, follow up, book appointments, request reviews, and reactivate old opportunities.
+              fontSize: "clamp(1rem, 2.2vw, 1.15rem)",
+              color: "rgba(255,255,255,0.72)",
+              lineHeight: 1.65,
+              maxWidth: "660px",
+              margin: "0 auto 32px",
+            }}
+          >
+            Don't just launch a website. We install the complete automation stack that captures every lead, recovers every missed call, and books appointments for you 24/7.
           </motion.p>
-        </motion.div>
 
-        <motion.div
-          className="landing-hero__visualWrap"
-          initial={reduceMotion ? false : { opacity: 0, x: 32 }}
-          animate={reduceMotion ? undefined : { opacity: 1, x: 0 }}
-          transition={{ duration: 0.84, delay: 0.26, ease: premiumEase }}
-          style={{
-            position: "relative",
-            minHeight: "450px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            gridColumn: "2"
-          }}>
-          
-          <div
-            aria-hidden="true"
-            className="landing-hero__visualGlow"
+          {/* CTAs */}
+          <motion.div
+            variants={heroRevealItem}
+            style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}
+          >
+            <a
+              href="/book"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                height: "52px",
+                padding: "0 28px",
+                borderRadius: "8px",
+                background: "linear-gradient(135deg, #009FD4 0%, #007AAA 100%)",
+                color: "#ffffff",
+                fontWeight: "800",
+                fontSize: "0.95rem",
+                textDecoration: "none",
+                boxShadow: "0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)",
+                transition: "box-shadow 0.3s ease, transform 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 44px rgba(0,159,212,0.8), 0 8px 24px rgba(0,159,212,0.55)";
+                e.currentTarget.style.transform = "translateY(-2px)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)";
+                e.currentTarget.style.transform = "translateY(0)";
+              }}
+            >
+              Get Your Free Automation Audit
+            </a>
+            <a
+              href="/store"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                height: "52px",
+                padding: "0 28px",
+                borderRadius: "8px",
+                background: "rgba(255,255,255,0.08)",
+                border: "1px solid rgba(255,255,255,0.22)",
+                color: "#ffffff",
+                fontWeight: "700",
+                fontSize: "0.95rem",
+                textDecoration: "none",
+                transition: "background 0.3s ease, border-color 0.3s ease",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.14)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.38)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
+              }}
+            >
+              View Systems &amp; Pricing
+            </a>
+          </motion.div>
+
+          {/* Social proof strip */}
+          <motion.div
+            variants={heroRevealItem}
             style={{
-              position: "absolute",
-              width: "90%",
-              height: "62%",
-              borderRadius: "36px",
-              background:
-              "radial-gradient(circle at center, rgba(0,174,239,0.14) 0%, rgba(0,157,255,0.06) 38%, transparent 72%)",
-              transform: "translateY(-2%)"
-            }} />
-          
-
-
-
-          {/* Dashboard visual */}
-          <DeferredHeroDashboard />
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-          
+              marginTop: "44px",
+              display: "flex",
+              gap: "36px",
+              justifyContent: "center",
+              flexWrap: "wrap",
+            }}
+          >
+            {[
+              { value: "6", label: "AI Automations Installed" },
+              { value: "24/7", label: "Lead Response Coverage" },
+              { value: "48hr", label: "Average Go-Live Time" },
+            ].map(({ value, label }) => (
+              <div key={label} style={{ textAlign: "center" }}>
+                <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#ffffff", lineHeight: 1 }}>{value}</div>
+                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.50)", marginTop: "5px", fontWeight: 600, letterSpacing: "0.04em" }}>{label}</div>
+              </div>
+            ))}
+          </motion.div>
         </motion.div>
       </div>
 
       <style>{`
-        /* Tablet and below — single column, centered */
-        @media (max-width: 1024px) {
-          .landing-hero__inner {
-            grid-template-columns: 1fr !important;
-            gap: 32px !important;
-            min-height: auto !important;
-            padding-top: clamp(5.25rem, 11vw, 6.75rem) !important;
-          }
-          .landing-hero__visualWrap {
-            display: flex !important;
-            grid-column: 1 !important;
-            min-height: 360px !important;
-          }
-          .landing-hero__copy {
-            max-width: 100% !important;
-            text-align: center !important;
-            grid-column: 1 !important;
-          }
-        }
-
-        /* Hide tablet mock on small screens */
-        @media (max-width: 720px) {
-          .landing-hero__visualWrap {
-            display: none !important;
-          }
-          .landing-hero__headline {
-            font-size: clamp(2rem, 7.5vw, 2.75rem) !important;
-            line-height: 1.02 !important;
-            letter-spacing: 0 !important;
-            max-width: 680px !important;
-            margin-left: auto !important;
-            margin-right: auto !important;
-            overflow-wrap: normal !important;
-            text-wrap: balance !important;
-          }
-          .landing-hero__body {
-            font-size: 0.98rem !important;
-            line-height: 1.55 !important;
-          }
-        }
-
-        /* iPhone SE (375px) and smaller */
-        @media (max-width: 390px) {
-          .landing-hero__inner {
-            padding-left: 1rem !important;
-            padding-right: 1rem !important;
-          }
-          .landing-hero__headline {
-            font-size: clamp(1.8rem, 8vw, 2.25rem) !important;
-            max-width: 22rem !important;
-          }
-          .landing-hero__body {
-            font-size: 0.95rem !important;
-          }
-        }
-
-        /* iPhone SE specific (320px) */
-        @media (max-width: 360px) {
-          .landing-hero__headline {
-            font-size: 1.65rem !important;
-            letter-spacing: 0 !important;
-          }
-        }
         .landing-hero__cinematicGrid {
           position: absolute;
           inset: 0;
-          opacity: 0.22;
+          opacity: 0.14;
           background-image:
-            linear-gradient(rgba(0,136,204,0.13) 1px, transparent 1px),
-            linear-gradient(90deg, rgba(0,136,204,0.11) 1px, transparent 1px);
+            linear-gradient(rgba(0,174,239,0.18) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,174,239,0.15) 1px, transparent 1px);
           background-size: 42px 42px;
           mask-image: linear-gradient(to bottom, transparent 0%, black 22%, black 64%, transparent 100%);
-          /* GPU: use translate instead of background-position — compositor-only */
           animation: heroCinematicGridDrift 14s linear infinite;
           will-change: transform;
           transform: translateZ(0);
         }
-        /* Hide on mobile — saves ~20ms frame budget */
         @media (max-width: 768px) {
           .landing-hero__cinematicGrid { display: none !important; }
         }
         .landing-hero__headlineAccent {
-          position: relative;
-          color: var(--cs-electric) !important;
-          text-shadow: 0 0 18px rgba(0, 174, 239, 0.55), 0 0 40px rgba(0, 174, 239, 0.25);
+          display: block;
+          color: #66d9ff !important;
+          text-shadow: 0 0 24px rgba(0, 174, 239, 0.6), 0 0 50px rgba(0, 174, 239, 0.28);
         }
         .landing-hero__headlineBeam {
-          width: min(420px, 72vw);
+          width: min(480px, 80vw);
           height: 2px;
-          margin: -2px 0 18px;
           border-radius: 999px;
-          background: linear-gradient(90deg, rgba(0,174,239,0.05), rgba(0,174,239,0.62), rgba(0,59,143,0.18), rgba(0,174,239,0.05));
-          box-shadow: 0 0 22px rgba(0,174,239,0.26);
-          transform-origin: left;
+          background: linear-gradient(90deg, rgba(0,174,239,0.05), rgba(0,174,239,0.7), rgba(0,59,143,0.2), rgba(0,174,239,0.05));
+          box-shadow: 0 0 22px rgba(0,174,239,0.35);
           animation: heroHeadlineBeam 3.4s ease-in-out infinite;
         }
-        .hero-dashboard-static-preview__scan {
-          position: absolute;
-          inset: 14px;
-          z-index: 2;
-          border-radius: 20px;
-          pointer-events: none;
-          background: linear-gradient(105deg, transparent 0%, rgba(255,255,255,0.16) 44%, rgba(0,174,239,0.42) 50%, rgba(255,255,255,0.12) 56%, transparent 100%);
-          mix-blend-mode: screen;
-          transform: skewX(-16deg);
-        }
         @keyframes heroCinematicGridDrift {
-          /* Transform-based drift — GPU compositor, no CPU repaint */
           from { transform: translate3d(0, 0, 0); }
           to { transform: translate3d(42px, 42px, 0); }
-        }
-        @keyframes heroHeadlineSheen {
-          0%, 20% { background-position: 0% 50%; }
-          64%, 100% { background-position: 100% 50%; }
         }
         @keyframes heroHeadlineBeam {
           0%, 100% { opacity: 0.5; transform: scaleX(0.72); }
           50% { opacity: 1; transform: scaleX(1); }
         }
+        @keyframes heroPulse {
+          0%, 100% { opacity: 1; }
+          50% { opacity: 0.45; }
+        }
+        @media (max-width: 640px) {
+          .landing-hero__inner {
+            padding-left: 1.25rem !important;
+            padding-right: 1.25rem !important;
+          }
+          .landing-hero__headline {
+            font-size: clamp(2rem, 8vw, 2.6rem) !important;
+          }
+        }
         @media (prefers-reduced-motion: reduce) {
           .landing-hero__cinematicGrid,
-          .landing-hero__headlineAccent,
           .landing-hero__headlineBeam {
             animation: none !important;
           }
-          .hero-dashboard-static-preview__scan {
-            display: none !important;
-          }
         }
       `}</style>
-    </section>);
-
+    </section>
+  );
 }
