@@ -25,6 +25,7 @@ const NAV_GROUPS = [
       { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
       { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
       { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
+      { id: "onboarding-pipeline", label: "Onboarding Pipeline", icon: LayoutDashboard, path: "/admin/onboarding-pipeline" },
     ],
   },
   {

@@ -227,12 +227,32 @@ const industries = [
 }];
 
 
+const FILTER_TAGS = [
+  { id: "all", label: "All Industries" },
+  { id: "health", label: "Health & Medical" },
+  { id: "home", label: "Home Services" },
+  { id: "professional", label: "Professional" },
+];
+
+const INDUSTRY_TAGS = {
+  "med-spa": "health",
+  "dental": "health",
+  "chiro-pt": "health",
+  "hvac": "home",
+  "plumbing": "home",
+  "roofing": "home",
+  "contractors": "home",
+  "real-estate": "professional",
+  "personal-injury": "professional",
+};
+
 export default function Industries() {
   const sectionRef = useRef(null);
   const navigate = useNavigate();
   const [sectionVisible, setSectionVisible] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [hoveredIndustryId, setHoveredIndustryId] = useState("");
+  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -277,13 +297,17 @@ export default function Industries() {
     navigate(industry.routePath);
   };
 
+  const filteredIndustries = activeFilter === "all"
+    ? industries
+    : industries.filter(i => INDUSTRY_TAGS[i.id] === activeFilter);
+
   return (
     <section
       id="industries"
       ref={sectionRef}
       className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
       
-      <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-14">
+      <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-10">
         <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
           Choose Your Industry
         </p>
@@ -294,12 +318,29 @@ export default function Industries() {
         <p className="mt-4 text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
           Click your industry and we will show you the AI service stack we would recommend first, why it fits, and which pieces are available now versus by review.
         </p>
+
+        {/* Filter pills */}
+        <div className="flex flex-wrap justify-center gap-2 mt-6 pb-4">
+          {FILTER_TAGS.map(f => (
+            <button
+              key={f.id}
+              onClick={() => setActiveFilter(f.id)}
+              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+                activeFilter === f.id
+                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
+                  : "bg-background/80 text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+              }`}
+            >
+              {f.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       <div
         className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10"
         style={{ overflowX: "hidden" }}>
-        {industries.map((industry, index) => {
+        {filteredIndustries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
           const isSelected = selectedIndustryId === industry.id;

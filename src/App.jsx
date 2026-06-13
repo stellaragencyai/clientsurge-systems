@@ -65,6 +65,8 @@ const AISalesCommandCenter = lazy(() => import("./internal-pages/AISalesCommandC
 const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
+const Library = lazy(() => import("./pages/Library"));
+const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipeline"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -294,6 +296,7 @@ const AuthenticatedApp = () => {
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
       <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />
+      <Route path="/library" element={<LazyRoute Component={Library} />} />
       <Route
         path="/store"
         element={<LazyRoute Component={Store} />}
@@ -360,6 +363,7 @@ const AuthenticatedApp = () => {
           { route: routePath("admin", "ai-sales"), Component: AISalesCommandCenter },
           { route: routePath("admin", "AIStatusDashboard"), caseSensitive: true, element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("admin", "performance-wars"), Component: PerformanceWars },
+          { route: routePath("admin", "onboarding-pipeline"), Component: OnboardingPipeline },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}

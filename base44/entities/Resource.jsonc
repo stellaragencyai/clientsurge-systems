@@ -1,0 +1,79 @@
+{
+  "type": "object",
+  "name": "Resource",
+  "properties": {
+    "title": {
+      "type": "string",
+      "title": "Title"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 500
+    },
+    "category": {
+      "type": "string",
+      "title": "Category",
+      "enum": [
+        "Guide",
+        "Template",
+        "Checklist",
+        "Case Study",
+        "Playbook",
+        "Script"
+      ],
+      "default": "Guide"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry",
+      "enum": [
+        "All Industries",
+        "Med Spa",
+        "Dental",
+        "Chiropractic",
+        "HVAC",
+        "Roofing",
+        "Contractors",
+        "Real Estate",
+        "Personal Injury",
+        "Plumbing"
+      ],
+      "default": "All Industries"
+    },
+    "file_url": {
+      "type": "string",
+      "title": "File URL"
+    },
+    "thumbnail_url": {
+      "type": "string",
+      "title": "Thumbnail Image URL"
+    },
+    "is_gated": {
+      "type": "boolean",
+      "title": "Requires Email to Download",
+      "default": true
+    },
+    "is_published": {
+      "type": "boolean",
+      "title": "Published",
+      "default": false
+    },
+    "download_count": {
+      "type": "integer",
+      "title": "Download Count",
+      "default": 0
+    },
+    "tags": {
+      "type": "array",
+      "title": "Tags",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "required": [
+    "title",
+    "category"
+  ]
+}
