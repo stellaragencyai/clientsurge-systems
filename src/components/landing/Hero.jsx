@@ -331,10 +331,7 @@ export default function Hero() {
             AI Automation Systems for Faster Local Bookings{" "}
             <span
               className="landing-hero__headlineAccent"
-              style={{
-                color: "#006BB0",
-                display: "inline"
-              }}>
+              style={{ display: "inline" }}>
               
               and Recovered Revenue
             </span>
@@ -531,13 +528,8 @@ export default function Hero() {
         }
         .landing-hero__headlineAccent {
           position: relative;
-          background-image: linear-gradient(105deg, #33A1F4 0%, #55BEFF 35%, #7DCCFF 50%, #33A1F4 68%, #55BEFF 100%);
-          background-size: 260% 100%;
-          -webkit-background-clip: text;
-          background-clip: text;
-          color: transparent !important;
-          animation: heroHeadlineSheen 4.8s ease-in-out infinite;
-          filter: drop-shadow(0 0 8px rgba(85, 190, 255, 0.7)) drop-shadow(0 0 20px rgba(51, 161, 244, 0.4));
+          color: #00AEEF !important;
+          text-shadow: 0 0 18px rgba(0, 174, 239, 0.55), 0 0 40px rgba(0, 174, 239, 0.25);
         }
         .landing-hero__headlineBeam {
           width: min(420px, 72vw);
