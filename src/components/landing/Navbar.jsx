@@ -371,8 +371,11 @@ export default function Navbar() {
               trackCTA("book_free_audit", "navbar");
               setShowBookingModal(true);
             }}
-            className="cs-btn-primary hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
-            <span className="cs-btn-primary-inner" style={{ height: "36px", padding: "0 16px", gap: "6px", fontSize: "0.75rem" }}>
+            className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded"
+            style={{ display: "inline-block", borderRadius: "8px", padding: "2px", background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 50%, #00AEEF 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 0 14px rgba(0,174,239,0.5), 0 4px 14px rgba(0,174,239,0.35)", border: "none", cursor: "pointer", transition: "box-shadow 0.3s ease, transform 0.3s ease" }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 0 28px rgba(0,174,239,0.7), 0 8px 24px rgba(0,174,239,0.5)"}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 0 14px rgba(0,174,239,0.5), 0 4px 14px rgba(0,174,239,0.35)"}>
+            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "6px", background: "linear-gradient(135deg, #00AEEF 0%, #0099DD 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.75rem", textShadow: "0 1px 3px rgba(0,0,0,0.15)" }}>
               Free Automation Audit
             </span>
           </button>
