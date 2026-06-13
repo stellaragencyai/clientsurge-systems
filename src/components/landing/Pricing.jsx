@@ -120,9 +120,9 @@ export default function Pricing() {
               key={text}
               className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border"
               style={{
-                background: "rgba(0,174,239,0.07)",
-                borderColor: "rgba(0,174,239,0.2)",
-                color: "rgba(0,80,160,0.85)",
+                background: "rgba(0,174,239,0.08)",
+                borderColor: "rgba(0,174,239,0.28)",
+                color: "#005f99",
               }}
             >
               <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {text}
@@ -253,26 +253,17 @@ export default function Pricing() {
           display: inline-block;
           border-radius: 8px;
           padding: 2px;
-          background: linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%);
-          box-shadow: 0 4px 18px rgba(0, 174, 239, 0.4), 0 1px 4px rgba(0, 0, 0, 0.1);
+          background: var(--cs-gradient);
+          background-size: 200% 100%;
+          animation: rotateBorderGlow 4s ease-in-out infinite;
+          box-shadow: var(--cs-glow-sm);
           transition: box-shadow 0.3s ease, transform 0.3s ease;
           cursor: pointer;
           border: none;
           position: relative;
         }
-        .shiny-cta-btn::after {
-          content: "";
-          position: absolute;
-          top: 0;
-          left: -100%;
-          width: 100%;
-          height: 100%;
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-          border-radius: 8px;
-          pointer-events: none;
-        }
         .shiny-cta-btn:hover {
-          box-shadow: 0 8px 32px rgba(0, 174, 239, 0.6), 0 2px 8px rgba(0, 0, 0, 0.15);
+          box-shadow: var(--cs-glow-lg);
           transform: translateY(-2px);
         }
         .shiny-cta-inner {

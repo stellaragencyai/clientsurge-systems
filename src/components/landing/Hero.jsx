@@ -528,7 +528,7 @@ export default function Hero() {
         }
         .landing-hero__headlineAccent {
           position: relative;
-          color: #00AEEF !important;
+          color: var(--cs-electric) !important;
           text-shadow: 0 0 18px rgba(0, 174, 239, 0.55), 0 0 40px rgba(0, 174, 239, 0.25);
         }
         .landing-hero__headlineBeam {

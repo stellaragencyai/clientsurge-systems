@@ -121,7 +121,7 @@ export default function Testimonials() {
               type="button"
               onClick={demoBooking.openDemoBooking}
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
-              style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
+              style={{ background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-md)" }}
             >
               Plan My System
             </button>
@@ -129,7 +129,7 @@ export default function Testimonials() {
             <a
               href="/book"
               className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
-              style={{ background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", boxShadow: "0 4px 18px rgba(0,174,239,0.4)" }}
+              style={{ background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-md)" }}
             >
               Plan My System
             </a>

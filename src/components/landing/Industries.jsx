@@ -308,7 +308,7 @@ export default function Industries() {
       className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
       
       <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-10">
-        <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
+        <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3" style={{ color: "var(--cs-electric)" }}>
           Choose Your Industry
         </p>
         <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
@@ -327,9 +327,10 @@ export default function Industries() {
               onClick={() => setActiveFilter(f.id)}
               className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
                 activeFilter === f.id
-                  ? "bg-primary text-primary-foreground border-primary shadow-sm"
-                  : "bg-background/80 text-muted-foreground border-border hover:border-primary/40 hover:text-foreground"
+                  ? "text-white border-transparent shadow-sm"
+                  : "bg-background/80 text-muted-foreground border-border hover:text-foreground"
               }`}
+            style={activeFilter === f.id ? { background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-sm)" } : { borderColor: "rgba(0,174,239,0.22)" }}
             >
               {f.label}
             </button>

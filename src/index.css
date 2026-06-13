@@ -8,27 +8,28 @@
     --font-display: 'Bebas Neue', sans-serif;
     --font-titles: 'Montserrat', sans-serif;
 
-    /* ClientSurge Electric Blue Theme */
+    /* ClientSurge Electric Blue Theme — unified to #00AEEF */
     --background: 210 100% 99%;
     --foreground: 220 80% 10%;
     --card: 210 60% 98%;
     --card-foreground: 220 80% 10%;
     --popover: 0 0% 100%;
     --popover-foreground: 220 80% 10%;
-    --primary: 201 100% 32%;
+    /* Primary locked to #00AEEF — hsl(199, 100%, 47%) */
+    --primary: 199 100% 47%;
     --primary-foreground: 0 0% 100%;
     --secondary: 210 60% 95%;
     --secondary-foreground: 220 80% 10%;
     --muted: 210 50% 96%;
     --muted-foreground: 215 25% 40%;
-    --accent: 201 100% 32%;
+    --accent: 199 100% 47%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-    --border: 210 40% 88%;
-    --input: 210 40% 88%;
-    --ring: 201 100% 32%;
-    --chart-1: 201 100% 32%;
+    --border: 199 40% 88%;
+    --input: 199 40% 88%;
+    --ring: 199 100% 47%;
+    --chart-1: 199 100% 47%;
     --chart-2: 217 100% 40%;
     --chart-3: 220 80% 20%;
     --chart-4: 199 80% 65%;
@@ -36,12 +37,22 @@
     --radius: 0.5rem;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 220 80% 10%;
-    --sidebar-primary: 201 100% 32%;
+    --sidebar-primary: 199 100% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 60% 95%;
     --sidebar-accent-foreground: 220 80% 10%;
-    --sidebar-border: 210 40% 88%;
+    --sidebar-border: 199 40% 88%;
     --sidebar-ring: 199 100% 47%;
+
+    /* Electric Glow system — derived from #00AEEF */
+    --cs-electric: #00AEEF;
+    --cs-electric-deep: #006BB0;
+    --cs-electric-navy: #003B8F;
+    --cs-glow-sm: 0 0 14px rgba(0, 174, 239, 0.35);
+    --cs-glow-md: 0 0 28px rgba(0, 174, 239, 0.45);
+    --cs-glow-lg: 0 8px 40px rgba(0, 174, 239, 0.55);
+    --cs-gradient: linear-gradient(135deg, #00AEEF 0%, #006BB0 50%, #003B8F 100%);
+    --cs-gradient-soft: linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,59,143,0.06) 100%);
   }
 
 }
@@ -94,21 +105,81 @@ a[role="button"],
 
 /* Rotating Border Glow Animation for Premium CTAs */
 @keyframes rotateBorderGlow {
-  0% {
-    background-position: 0% 50%;
-  }
-  50% {
-    background-position: 100% 50%;
-  }
-  100% {
-    background-position: 0% 50%;
-  }
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
 .rotating-border-glow {
   position: relative;
   background-size: 200% 200%;
   animation: rotateBorderGlow 3s ease-in-out infinite;
+}
+
+/* ============================================
+   CLIENTSURGE ELECTRIC GLOW — GLOBAL UTILITIES
+   All blue UI elements derive from #00AEEF
+   ============================================ */
+
+/* Unified gradient CTA button wrapper */
+.cs-btn-primary {
+  display: inline-block;
+  border-radius: 8px;
+  padding: 2px;
+  background: var(--cs-gradient);
+  background-size: 200% 100%;
+  animation: rotateBorderGlow 4s ease-in-out infinite;
+  box-shadow: var(--cs-glow-sm);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+  border: none;
+  cursor: pointer;
+}
+.cs-btn-primary:hover {
+  box-shadow: var(--cs-glow-lg);
+  transform: translateY(-2px);
+}
+.cs-btn-primary-inner {
+  background: linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%);
+  border-radius: 6px;
+  color: #ffffff;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Electric accent text glow — for hero/section headlines */
+.cs-text-electric {
+  color: #00AEEF !important;
+  text-shadow: 0 0 18px rgba(0, 174, 239, 0.55), 0 0 40px rgba(0, 174, 239, 0.25);
+}
+
+/* Electric border + glow — for cards, badges, panels */
+.cs-border-electric {
+  border-color: rgba(0, 174, 239, 0.35) !important;
+  box-shadow: 0 0 0 1px rgba(0, 174, 239, 0.15), var(--cs-glow-sm);
+}
+
+/* Subtle electric fill — for badge backgrounds, tinted sections */
+.cs-fill-electric {
+  background: rgba(0, 174, 239, 0.09);
+  border: 1px solid rgba(0, 174, 239, 0.22);
+}
+
+/* Glow underline beam — decorative element under headings */
+.cs-beam {
+  width: min(420px, 72vw);
+  height: 2px;
+  border-radius: 999px;
+  background: linear-gradient(90deg, rgba(0,174,239,0.05), rgba(0,174,239,0.72), rgba(0,59,143,0.18), rgba(0,174,239,0.05));
+  box-shadow: 0 0 22px rgba(0,174,239,0.3);
+  animation: csBeamPulse 3.4s ease-in-out infinite;
+}
+
+@keyframes csBeamPulse {
+  0%, 100% { opacity: 0.55; transform: scaleX(0.76); }
+  50% { opacity: 1; transform: scaleX(1); }
 }
 
 /* Enhanced focus ring for CTAs */

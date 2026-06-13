@@ -371,11 +371,8 @@ export default function Navbar() {
               trackCTA("book_free_audit", "navbar");
               setShowBookingModal(true);
             }}
-            style={{ display: "inline-block", borderRadius: "8px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", transition: "box-shadow 0.3s ease, transform 0.3s ease", border: "none", cursor: "pointer" }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)"}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.4)"}
-            className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
-            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "6px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.75rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
+            className="cs-btn-primary hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded">
+            <span className="cs-btn-primary-inner" style={{ height: "36px", padding: "0 16px", gap: "6px", fontSize: "0.75rem" }}>
               Free Automation Audit
             </span>
           </button>
@@ -434,7 +431,7 @@ export default function Navbar() {
           )}
 
           <div className="pt-2 border-t border-border">
-            <p className="text-[11px] font-semibold uppercase tracking-widest text-primary mb-2" style={{ color: "#00AEEF" }}>Industries</p>
+            <p className="text-[11px] font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--cs-electric)" }}>Industries</p>
             <div className="space-y-1">
               {industryLinks.map((item) =>
               <button
@@ -467,9 +464,8 @@ export default function Navbar() {
               setOpen(false);
               setShowBookingModal(true);
             }}
-            style={{ display: "block", borderRadius: "8px", padding: "2px", background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)", boxShadow: "0 4px 14px rgba(0,174,239,0.4)", border: "none", cursor: "pointer", width: "100%" }}>
-            
-            <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", borderRadius: "6px", background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)", color: "#ffffff", fontWeight: "600", fontSize: "0.875rem", textShadow: "0 1px 2px rgba(0,0,0,0.2)" }}>
+            className="cs-btn-primary" style={{ width: "100%", display: "block" }}>
+            <span className="cs-btn-primary-inner" style={{ height: "40px", gap: "6px", fontSize: "0.875rem" }}>
               {BUTTON_TEXT.BOOK_DEMO}
             </span>
           </button>
