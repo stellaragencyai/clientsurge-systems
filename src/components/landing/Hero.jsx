@@ -531,12 +531,13 @@ export default function Hero() {
         }
         .landing-hero__headlineAccent {
           position: relative;
-          background-image: linear-gradient(105deg, #006BB0 0%, #006BB0 35%, #00AEEF 50%, #003B8F 68%, #006BB0 100%);
+          background-image: linear-gradient(105deg, #33A1F4 0%, #55BEFF 35%, #7DCCFF 50%, #33A1F4 68%, #55BEFF 100%);
           background-size: 260% 100%;
           -webkit-background-clip: text;
           background-clip: text;
           color: transparent !important;
           animation: heroHeadlineSheen 4.8s ease-in-out infinite;
+          filter: drop-shadow(0 0 8px rgba(85, 190, 255, 0.7)) drop-shadow(0 0 20px rgba(51, 161, 244, 0.4));
         }
         .landing-hero__headlineBeam {
           width: min(420px, 72vw);
