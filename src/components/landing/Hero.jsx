@@ -1,27 +1,31 @@
 import { useRef } from "react";
 import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
-import { premiumEase } from "@/components/landing/PremiumHomepageMotion";
 
+// Refinement #4: Custom spring cubic-bezier — eliminates mechanical browser defaults
+const springEase = [0.34, 1.56, 0.64, 1];
+const smoothEase = [0.25, 0.46, 0.45, 0.94];
+
+// Refinement #3: Stagger tightened to 80ms for rhythmic discovery feel
 const heroCopyReveal = {
   hidden: { opacity: 0, y: 28 },
   visible: {
     opacity: 1,
     y: 0,
     transition: {
-      duration: 0.74,
-      ease: premiumEase,
-      staggerChildren: 0.1,
-      delayChildren: 0.1,
+      duration: 0.72,
+      ease: smoothEase,
+      staggerChildren: 0.08,
+      delayChildren: 0.12,
     },
   },
 };
 
 const heroRevealItem = {
-  hidden: { opacity: 0, y: 22 },
+  hidden: { opacity: 0, y: 24 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.58, ease: premiumEase },
+    transition: { duration: 0.56, ease: smoothEase },
   },
 };
 
@@ -36,6 +40,9 @@ export default function Hero() {
 
   // Parallax: background moves at 40% of scroll speed (slower = depth)
   const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
+  // Refinement #1: Scroll-driven content fade — hero content fades+scales out as user scrolls
+  const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+  const contentScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.94]);
 
   return (
     <section
@@ -45,6 +52,7 @@ export default function Hero() {
         position: "relative",
         overflow: "hidden",
         minHeight: "92svh",
+        width: "100%",
         display: "flex",
         alignItems: "center",
       }}
@@ -55,7 +63,9 @@ export default function Hero() {
         aria-hidden="true"
         style={{
           position: "absolute",
-          inset: "-20%",
+          inset: "-25%",
+          left: "-5%",
+          right: "-5%",
           y: reduceMotion ? 0 : bgY,
           willChange: "transform",
           background: "linear-gradient(160deg, #0a1628 0%, #0d2447 30%, #071535 60%, #050e22 100%)",
@@ -88,11 +98,16 @@ export default function Hero() {
         }}
       />
 
+      {/* Refinement #2: Orbital glow orbs — living, breathing atmosphere */}
+      <div aria-hidden="true" className="hero-orb hero-orb-1" />
+      <div aria-hidden="true" className="hero-orb hero-orb-2" />
+      <div aria-hidden="true" className="hero-orb hero-orb-3" />
+
       {/* ── Cinematic grid overlay ── */}
       <div aria-hidden="true" className="landing-hero__cinematicGrid" style={{ zIndex: 1 }} />
 
-      {/* ── Content ── */}
-      <div
+      {/* ── Content — Refinement #1: scroll-driven opacity+scale ── */}
+      <motion.div
         className="landing-hero__inner"
         style={{
           position: "relative",
@@ -105,6 +120,8 @@ export default function Hero() {
           flexDirection: "column",
           alignItems: "center",
           textAlign: "center",
+          opacity: reduceMotion ? 1 : contentOpacity,
+          scale: reduceMotion ? 1 : contentScale,
         }}
       >
         <motion.div
@@ -189,30 +206,34 @@ export default function Hero() {
             variants={heroRevealItem}
             style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}
           >
+            {/* Refinement #6: Glow-border pulsing CTA + #7: depress on click */}
             <a
               href="/book"
+              className="hero-primary-cta"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
                 height: "52px",
-                padding: "0 28px",
-                borderRadius: "8px",
-                background: "linear-gradient(135deg, #009FD4 0%, #007AAA 100%)",
+                padding: "0 30px",
+                borderRadius: "10px",
+                background: "linear-gradient(135deg, #009FD4 0%, #007AAA 60%, #005E90 100%)",
                 color: "#ffffff",
                 fontWeight: "800",
                 fontSize: "0.95rem",
                 textDecoration: "none",
-                boxShadow: "0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)",
-                transition: "box-shadow 0.3s ease, transform 0.3s ease",
+                boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)",
+                transition: "box-shadow 0.28s cubic-bezier(0.34,1.56,0.64,1), transform 0.28s cubic-bezier(0.34,1.56,0.64,1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 44px rgba(0,159,212,0.8), 0 8px 24px rgba(0,159,212,0.55)";
-                e.currentTarget.style.transform = "translateY(-2px)";
+                e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 44px rgba(0,159,212,0.8), 0 8px 28px rgba(0,159,212,0.55)";
+                e.currentTarget.style.transform = "translateY(-3px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)";
+                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = "translateY(-1px) scale(0.98)"; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = "translateY(-3px) scale(1)"; }}
             >
               Get Your Free Automation Audit
             </a>
@@ -268,7 +289,7 @@ export default function Hero() {
             ))}
           </motion.div>
         </motion.div>
-      </div>
+      </motion.div>
 
       <style>{`
         .landing-hero__cinematicGrid {
@@ -323,9 +344,62 @@ export default function Hero() {
         }
         @media (prefers-reduced-motion: reduce) {
           .landing-hero__cinematicGrid,
-          .landing-hero__headlineBeam {
+          .landing-hero__headlineBeam,
+          .hero-orb {
             animation: none !important;
           }
+        }
+        /* Refinement #2: Orbital glow orbs */
+        .hero-orb {
+          position: absolute;
+          border-radius: 50%;
+          pointer-events: none;
+          filter: blur(72px);
+          will-change: transform, opacity;
+          z-index: 1;
+        }
+        .hero-orb-1 {
+          width: 520px; height: 520px;
+          background: radial-gradient(circle, rgba(0,174,239,0.14) 0%, transparent 70%);
+          top: -10%; left: -8%;
+          animation: orbDrift1 18s ease-in-out infinite;
+        }
+        .hero-orb-2 {
+          width: 380px; height: 380px;
+          background: radial-gradient(circle, rgba(0,59,143,0.16) 0%, transparent 70%);
+          bottom: 0%; right: -5%;
+          animation: orbDrift2 24s ease-in-out infinite;
+        }
+        .hero-orb-3 {
+          width: 260px; height: 260px;
+          background: radial-gradient(circle, rgba(0,174,239,0.10) 0%, transparent 70%);
+          top: 40%; left: 60%;
+          animation: orbDrift3 20s ease-in-out infinite;
+        }
+        @keyframes orbDrift1 {
+          0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.8; }
+          33% { transform: translate(40px, 30px) scale(1.08); opacity: 1; }
+          66% { transform: translate(-20px, 50px) scale(0.95); opacity: 0.7; }
+        }
+        @keyframes orbDrift2 {
+          0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.7; }
+          40% { transform: translate(-50px, -30px) scale(1.1); opacity: 0.9; }
+          70% { transform: translate(30px, -50px) scale(0.92); opacity: 0.6; }
+        }
+        @keyframes orbDrift3 {
+          0%, 100% { transform: translate(0, 0) scale(1); opacity: 0.5; }
+          50% { transform: translate(-40px, 20px) scale(1.15); opacity: 0.8; }
+        }
+        /* Refinement #6: Glow border pulse on primary CTA */
+        .hero-primary-cta {
+          animation: heroCtaGlowPulse 3s ease-in-out infinite;
+        }
+        @keyframes heroCtaGlowPulse {
+          0%, 100% { box-shadow: 0 0 0 1px rgba(0,174,239,0.5), 0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35); }
+          50% { box-shadow: 0 0 0 2px rgba(0,174,239,0.75), 0 0 40px rgba(0,159,212,0.7), 0 6px 24px rgba(0,159,212,0.5); }
+        }
+        .hero-primary-cta:hover {
+          animation: none;
         }
       `}</style>
     </section>
