@@ -663,6 +663,131 @@ body::after {
 }
 
 /* ============================================
+   REFINEMENT #11: FLUID HEADING SCALING
+   clamp(min, preferred, max) across all levels
+   ============================================ */
+h1 {
+  font-size: clamp(2.25rem, 5.5vw, 4rem);
+  line-height: 1.05;
+  letter-spacing: -0.025em; /* Refinement #12 */
+}
+h2 {
+  font-size: clamp(1.75rem, 4vw, 3rem);
+  line-height: 1.1;
+  letter-spacing: -0.02em; /* Refinement #12 */
+}
+h3 {
+  font-size: clamp(1.25rem, 2.8vw, 2rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em; /* Refinement #12 */
+}
+h4 {
+  font-size: clamp(1.05rem, 2vw, 1.4rem);
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+/* Refinement #12: Small uppercase labels get positive tracking */
+.text-xs,
+[class*="uppercase"][class*="tracking"],
+.label-sm,
+.eyebrow {
+  letter-spacing: 0.1em;
+}
+
+/* Refinement #21: Constrain body paragraph line length for editorial readability */
+p {
+  max-width: 65ch;
+}
+/* Reset for UI layout paragraphs — flex/grid children, buttons, etc. */
+.no-prose p,
+nav p,
+footer p,
+[class*="flex"] > p,
+[class*="grid"] > p,
+button p,
+td p,
+.w-full p {
+  max-width: none;
+}
+
+/* ============================================
+   REFINEMENT #15: GLASSMORPHISM POLISH
+   Stronger blur, lower white fill
+   ============================================ */
+.glass-card {
+  background: rgba(255, 255, 255, 0.07) !important;
+  backdrop-filter: blur(20px) saturate(1.6) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(1.6) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.11) !important;
+}
+
+/* ============================================
+   REFINEMENT #24: REDUCED MOTION COMPLIANCE SWEEP
+   Covers every custom animation class/keyframe
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  /* Hero orbs + CTA pulse + beam + grid drift */
+  .hero-orb,
+  .hero-primary-cta,
+  .landing-hero__cinematicGrid,
+  .landing-hero__headlineBeam,
+  .cs-beam,
+  /* Campaign / countdown */
+  .rotating-border-glow,
+  .cs-btn-primary,
+  /* Skeletons */
+  .cs-section-skeleton,
+  /* Body grain (fixed overlay — fine to keep but stops animation) */
+  body::after,
+  /* SVG stroke draws */
+  .svg-draw-line,
+  .clip-path-reveal,
+  /* Nebula / body background pseudo */
+  body::before {
+    animation: none !important;
+    transition: none !important;
+  }
+
+  /* Framer Motion — disable all transforms */
+  [data-framer-motion],
+  [style*="will-change"] {
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
+
+/* ============================================
+   REFINEMENT #25: SHADOW LAYERING ON PRICING/FEATURE CARDS
+   Multi-layer shadows for depth + electric accent glow
+   ============================================ */
+.pricing-card,
+.feature-card,
+[class*="pricing-card"],
+[class*="feature-card"] {
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.04),
+    0 4px 8px rgba(0,0,0,0.06),
+    0 12px 24px rgba(0,0,0,0.08);
+  transition: box-shadow 0.32s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.pricing-card:hover,
+.feature-card:hover,
+[class*="pricing-card"]:hover,
+[class*="feature-card"]:hover {
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.05),
+    0 8px 20px rgba(0,0,0,0.09),
+    0 24px 48px rgba(0,0,0,0.11),
+    0 0 0 1px rgba(0,174,239,0.10),
+    0 0 32px rgba(0,174,239,0.08);
+  transform: translateY(-3px);
+}
+
+/* ============================================
    PREMIUM WHITESPACE — more breathing room
    ============================================ */
 
