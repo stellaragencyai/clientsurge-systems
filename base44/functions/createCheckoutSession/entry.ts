@@ -42,6 +42,7 @@ Deno.serve(async (req) => {
       website_lead_id,
       success_url,
       cancel_url,
+      deploy_immediately,
     } = await req.json();
 
     const requestedProductIds = Array.isArray(product_ids) && product_ids.length
@@ -152,6 +153,7 @@ Deno.serve(async (req) => {
       plan_type: packageLabel,
       package_stripe_product_id: pricingSummary.package_offer?.stripe_product_id || "",
       request_id: requestId,
+      deploy_immediately: deploy_immediately ? "true" : "false",
     };
 
     const session = await stripe.checkout.sessions.create({

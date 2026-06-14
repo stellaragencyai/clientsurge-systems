@@ -114,12 +114,15 @@ async function handleCheckoutSessionCompleted(base44, session, stripeEvent) {
     return { handled: false, reason: "missing_order_id" };
   }
 
+  const isFastTrack = session.metadata?.deploy_immediately === "true";
+
   safeLog("[stripeOrderWebhook] checkout.session.completed", {
     session_id: session.id,
     order_id: orderId,
     stripe_event_id: stripeEvent.id,
     customer_email: session.customer_email,
     livemode: stripeEvent.livemode,
+    fast_track: isFastTrack,
   });
 
   await base44.asServiceRole.entities.Order.update(orderId, {
@@ -131,7 +134,7 @@ async function handleCheckoutSessionCompleted(base44, session, stripeEvent) {
     subscription_id: session.subscription || undefined,
     stripe_event_id: stripeEvent.id,
     billing_status: "active",
-    pipeline_status: "Paid",
+    pipeline_status: "Configuring",
     subscription_status: session.subscription ? "active" : undefined,
   }).catch((err) => {
     safeError("[stripeOrderWebhook] Failed to update Order after checkout", {
@@ -141,22 +144,67 @@ async function handleCheckoutSessionCompleted(base44, session, stripeEvent) {
     });
   });
 
-  // Fire the post-payment orchestrator non-blocking
-  base44.asServiceRole.functions.invoke("postPaymentOrchestrator", {
-    order_id: orderId,
-    stripe_session_id: session.id,
-    stripe_event_id: stripeEvent.id,
-    customer_email: session.customer_email,
-    stripe_customer_id: session.customer,
-    stripe_subscription_id: session.subscription,
-  }).catch((err) => {
-    safeError("[stripeOrderWebhook] postPaymentOrchestrator invoke failed (non-blocking)", {
-      error: err.message,
+  // Fast-track: immediate AI config + installer
+  if (isFastTrack) {
+    safeLog("[stripeOrderWebhook] Triggering fast-track deployment", {
       order_id: orderId,
+      stripe_event_id: stripeEvent.id,
     });
-  });
 
-  return { handled: true, order_id: orderId };
+    // 1. Generate AI business config first
+    base44.asServiceRole.functions.invoke("aiGenerateBusinessConfig", {
+      order_id: orderId,
+    }).catch((err) => {
+      safeError("[stripeOrderWebhook] aiGenerateBusinessConfig invoke failed", {
+        error: err.message,
+        order_id: orderId,
+      });
+    });
+
+    // 2. Trigger AI brain installer
+    base44.asServiceRole.functions.invoke("aiBrainInstaller", {
+      order_id: orderId,
+    }).catch((err) => {
+      safeError("[stripeOrderWebhook] aiBrainInstaller invoke failed", {
+        error: err.message,
+        order_id: orderId,
+      });
+    });
+
+    // 3. Log fast-track event
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      order_id: orderId,
+      channel: "internal",
+      direction: "system",
+      event_type: "install_initialized",
+      provider: "internal",
+      status: "processed",
+      subject: "Self-Service Activation Triggered",
+      message_body: `Fast-track order ${orderId} successfully initiated AI provisioning.`,
+      metadata_json: JSON.stringify({
+        order_id: orderId,
+        stripe_event_id: stripeEvent.id,
+        deployment_type: "fast_track",
+      }),
+    }).catch(() => null);
+  } else {
+    // Standard flow: post-payment orchestrator
+    base44.asServiceRole.functions.invoke("postPaymentOrchestrator", {
+      order_id: orderId,
+      stripe_session_id: session.id,
+      stripe_event_id: stripeEvent.id,
+      customer_email: session.customer_email,
+      stripe_customer_id: session.customer,
+      stripe_subscription_id: session.subscription,
+    }).catch((err) => {
+      safeError("[stripeOrderWebhook] postPaymentOrchestrator invoke failed (non-blocking)", {
+        error: err.message,
+        order_id: orderId,
+      });
+    });
+  }
+
+  return { handled: true, order_id: orderId, fast_track: isFastTrack };
 }
 
 async function handleInvoicePaid(base44, invoice, stripeEvent) {
