@@ -379,7 +379,6 @@ export default function Industries() {
                 zIndex: isSelected ? 2 : 1,
               }}>
               
-              {/* Task #3: Accessible SVG alt text for all decorative icons */}
               <img
                 {...imageProps}
                 alt={`${industry.name} service illustration`}
