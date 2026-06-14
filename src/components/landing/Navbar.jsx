@@ -357,7 +357,14 @@ export default function Navbar() {
         </div>
 
         <div className="hidden xl:flex items-center gap-3 shrink-0">
-          <LaunchCountdownTimer />
+          <button
+            onClick={() => {
+              trackCTA("demo_client_login", "navbar");
+              navigate("/client-portal");
+            }}
+            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
+            Demo Client
+          </button>
           <button
             onClick={() => {
               trackCTA("login", "navbar");
