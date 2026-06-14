@@ -11,6 +11,7 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
   const currentIndex = stages.findIndex((s) => s.key === installStatus);
   const isComplete = installStatus === "Live";
   const isError = installStatus === "Error";
+  const isActive = currentIndex >= 0 && currentIndex < stages.length;
 
   return (
     <div className="w-full bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/15 rounded-lg p-6 mb-6">

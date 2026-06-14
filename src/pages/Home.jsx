@@ -3,8 +3,7 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
-import LaunchAnnouncementBanner from "@/components/campaign/LaunchAnnouncementBanner";
-import CampaignBanner from "@/components/campaign/CampaignBanner";
+
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
@@ -17,7 +16,7 @@ const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 const Pricing = lazy(() => import("../components/landing/Pricing"));
-const FounderSection = lazy(() => import("../components/landing/FounderSection"));
+
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
@@ -137,7 +136,6 @@ export default function Home() {
       <div className="min-h-screen">
         <ScrollProgressBar />
         <Navbar />
-        <LaunchAnnouncementBanner />
         <Hero />
 
         {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
@@ -156,18 +154,11 @@ export default function Home() {
         </LazyHomepageSection>
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div data-campaign-section>
-            <CampaignBanner />
-          </div>
           <Pricing />
         </LazyHomepageSection>
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <FAQ />
-        </LazyHomepageSection>
-
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <FounderSection />
         </LazyHomepageSection>
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>
