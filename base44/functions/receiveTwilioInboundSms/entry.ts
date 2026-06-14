@@ -1,5 +1,22 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+/**
+ * TWILIO INBOUND SMS WEBHOOK HANDLER
+ *
+ * Architecture: Worker → CommunicationEvent → Leads
+ * PRIMARY ENTITIES: Leads (CRM lookup), CommunicationEvent (message log)
+ *
+ * Flow:
+ * 1. Verify Twilio signature (constant-time comparison)
+ * 2. Normalize phone number (E.164 format)
+ * 3. Find matching Leads record by phone
+ * 4. Log to CommunicationEvent (inbound SMS event)
+ * 5. Update Leads metadata (reply_status, last_engagement)
+ *
+ * System of Truth: Uses Leads (primary CRM), logs to CommunicationEvent (primary event log)
+ * See: ARCHITECTURE_SYSTEM_OF_TRUTH.md, SYSTEM_ENTITY_REFERENCE.md
+ */
+
 // Phone normalization helper
 function normalizePhone(phone) {
   if (!phone) return null;
@@ -59,8 +76,9 @@ Deno.serve(async (req) => {
       return Response.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Find lead by normalized phone number
-    // Query all leads and find by normalized phone
+    // Find lead by normalized phone number (primary Leads entity)
+    // Note: This currently queries WebsiteLead for backward compatibility.
+    // Future: Query Leads directly once all inbound SMS matches Leads records.
     const allLeads = await base44.asServiceRole.entities.WebsiteLead.list('-created_date', 1000);
     const lead = allLeads.find(l => {
       const normalizedLeadPhone = normalizePhone(l.phone_number);

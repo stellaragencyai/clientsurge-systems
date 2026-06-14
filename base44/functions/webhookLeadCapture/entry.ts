@@ -1,8 +1,24 @@
 import { secureJson } from "../_shared/response.ts";
+import { validateWebhookSignature, normalizePhoneNumber } from "../_shared/webhookHandlerCore.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
 /**
- * Canonical client lead intake webhook.
- * Accepts only signed project-scoped webhook registrations and stores the
- * website lead first, then bridges into the CRM Leads entity.
+ * CANONICAL LEAD INGESTION FUNCTION
+ *
+ * Architecture: Worker → CommunicationEvent → Leads
+ * PRIMARY ENTITIES: Leads (CRM), CommunicationEvent (audit log), WebhookRegistration
+ * 
+ * Flow:
+ * 1. Verify signed webhook registration (security)
+ * 2. Parse & normalize payload (email, phone, name)
+ * 3. Create/retrieve Leads record (idempotent, deduped by email+phone)
+ * 4. Log to CommunicationEvent (audit trail)
+ * 5. Invoke automationOrchestrator (async)
+ * 
+ * Backward Compatibility: Maintains WebsiteLead bridge for legacy reference
+ * System of Truth: All CRM ops must reference Leads entity, not Lead (legacy)
+ * 
+ * See: ARCHITECTURE_SYSTEM_OF_TRUTH.md, SYSTEM_ENTITY_REFERENCE.md
  */
 
 const SIGNATURE_WINDOW_SECONDS = 300;
@@ -13,10 +29,6 @@ function cleanString(value) {
 
 function normalizeEmail(value) {
   return cleanString(value).toLowerCase();
-}
-
-function normalizePhone(value) {
-  return cleanString(value).replace(/[^\d+]/g, "");
 }
 
 function normalizeRequestedChannels(value) {
@@ -36,7 +48,7 @@ function parseCapturePayload(payload) {
     email:
       normalizeEmail(payload.email) || normalizeEmail(payload.contact_email),
     phone:
-      normalizePhone(payload.phone) || normalizePhone(payload.contact_phone),
+      normalizePhoneNumber(payload.phone || payload.contact_phone),
     business_name:
       cleanString(payload.business_name) || cleanString(payload.company),
     business_type:
@@ -55,39 +67,6 @@ function parseCapturePayload(payload) {
 
 function getHeader(headers, key) {
   return cleanString(headers.get(key) || headers.get(key.toUpperCase()) || "");
-}
-
-export async function computeWebhookSignature(secretKey, timestamp, rawBody) {
-  const cryptoKey = await crypto.subtle.importKey(
-    "raw",
-    new TextEncoder().encode(secretKey),
-    { name: "HMAC", hash: "SHA-256" },
-    false,
-    ["sign"]
-  );
-
-  const payload = new TextEncoder().encode(`${timestamp}.${rawBody}`);
-  const signature = await crypto.subtle.sign("HMAC", cryptoKey, payload);
-  return Array.from(new Uint8Array(signature))
-    .map((byte) => byte.toString(16).padStart(2, "0"))
-    .join("");
-}
-
-function normalizeSignature(value) {
-  const normalized = cleanString(value);
-  return normalized.startsWith("sha256=") ? normalized.slice(7) : normalized;
-}
-
-function signaturesMatch(left, right) {
-  if (!left || !right || left.length !== right.length) {
-    return false;
-  }
-
-  let mismatch = 0;
-  for (let i = 0; i < left.length; i += 1) {
-    mismatch |= left.charCodeAt(i) ^ right.charCodeAt(i);
-  }
-  return mismatch === 0;
 }
 
 function validateTimestamp(timestamp) {
@@ -130,7 +109,7 @@ async function logRejectedAttempt(base44, {
 async function verifySignedRegistration({ base44, headers, rawBody }) {
   const registrationId = getHeader(headers, "x-webhook-id");
   const timestamp = getHeader(headers, "x-webhook-timestamp");
-  const signature = normalizeSignature(getHeader(headers, "x-webhook-signature"));
+  const signature = getHeader(headers, "x-webhook-signature");
 
   if (!registrationId || !timestamp || !signature) {
     return {
@@ -201,23 +180,29 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
     };
   }
 
-  const expectedSignature = await computeWebhookSignature(
-    registration.secret_key || "",
-    timestamp,
-    rawBody
-  );
-
-  if (!signaturesMatch(signature, expectedSignature)) {
+  try {
+    const isValid = await validateWebhookSignature(rawBody, signature, registration.secret_key || "");
+    if (!isValid) {
+      return {
+        ok: false,
+        code: "lead_webhook_signature_invalid",
+        status: 401,
+        reason: "Webhook signature verification failed.",
+        registration,
+        metadata: {
+          registration_id: registration.id,
+          client_project_id: registration.client_project_id || null,
+        },
+      };
+    }
+  } catch (error) {
     return {
       ok: false,
-      code: "lead_webhook_signature_invalid",
-      status: 401,
-      reason: "Webhook signature verification failed.",
+      code: "lead_webhook_signature_error",
+      status: 500,
+      reason: "Webhook signature validation error.",
       registration,
-      metadata: {
-        registration_id: registration.id,
-        client_project_id: registration.client_project_id || null,
-      },
+      metadata: { registration_id: registration.id },
     };
   }
 
@@ -228,6 +213,17 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
 }
 
 async function createCrmLead(base44, lead, project) {
+  // Check for duplicate using normalized email+phone before creating
+  const dedupKey = `${lead.email}:${lead.phone}`;
+  const existing = await base44.asServiceRole.entities.Leads.filter({
+    normalized_email: lead.email?.toLowerCase() || "",
+    normalized_phone: lead.phone || "",
+  }).catch(() => []);
+  
+  if (existing && existing.length > 0) {
+    return existing[0]; // Return existing lead instead of creating duplicate
+  }
+
   return base44.asServiceRole.entities.Leads.create({
     full_name: lead.full_name || "Unknown",
     business_name: lead.business_name || project.business_name || "Not provided",
@@ -242,6 +238,8 @@ async function createCrmLead(base44, lead, project) {
     intake_type: "webhook",
     assigned_to: project.contact_email || project.client_email || "",
     assigned_at: new Date().toISOString(),
+    normalized_email: lead.email?.toLowerCase() || "",
+    normalized_phone: lead.phone || "",
   });
 }
 
@@ -289,12 +287,10 @@ async function invokeAutomationOrchestrator(base44, { leadId, projectId, trigger
   }
 }
 
-async function getBase44Client(req, base44Override) {
+function getBase44Client(req, base44Override) {
   if (base44Override) {
     return base44Override;
   }
-
-  const { createClientFromRequest } = await import("npm:@base44/sdk@0.8.25");
   return createClientFromRequest(req);
 }
 
@@ -303,7 +299,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     return secureJson({ error: "Method not allowed" }, { status: 405 });
   }
 
-  const base44 = await getBase44Client(req, base44Override);
+  const base44 = getBase44Client(req, base44Override);
   const rawBody = await req.text();
 
   let payload;

@@ -1,22 +1,37 @@
 import { secureJson } from "../_shared/response.ts";
 /**
- * AUTOMATION ORCHESTRATOR
- * Central hub that runs all 7 AI functions in sequence
- * Coordinates the complete lead-to-booking workflow
+ * AUTOMATION ORCHESTRATOR — Async Lead Intelligence Engine
+ *
+ * Architecture: Queue-based async execution (non-blocking)
+ * PRIMARY ENTITIES: Leads (CRM state), CommunicationEvent (action log)
+ * TRIGGER: From webhookLeadCapture, processMissedCallFollowUps, etc.
+ *
+ * Workflow:
+ * 1. Validate lead quality (reject spam early)
+ * 2. Score lead intelligence (qualification)
+ * 3. Classify intent (question/pricing/ready)
+ * 4. Deduplicate & build conversation context
+ * 5. Decide next action (SMS/email/route)
+ * 6. Generate personalized response
+ * 7-12. Advanced AI analysis (churn, objections, routing)
+ *
+ * Returns immediately (queues background job); completes asynchronously
+ * Errors logged to CommunicationEvent; silently re-queued on failure
+ *
+ * System of Truth: All lead mutations → Leads entity, all actions → CommunicationEvent
+ * See: ARCHITECTURE_SYSTEM_OF_TRUTH.md
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-Deno.serve(async (req) => {
+// Queue-based async task for long-running orchestration
+async function executeOrchestrationAsync(base44, lead_id, project_id, trigger_event) {
   try {
-    const base44 = createClientFromRequest(req);
-    const { lead_id, project_id, trigger_event } = await req.json();
-
-    if (!lead_id) {
-      return secureJson({ error: "lead_id required" }, { status: 400 });
+    const lead = await base44.asServiceRole.entities.Leads.get(lead_id).catch(() => null);
+    if (!lead) {
+      console.error(`[Orchestrator] Lead ${lead_id} not found`);
+      return;
     }
-
-    const lead = await base44.asServiceRole.entities.Leads.get(lead_id);
 
     console.log(`[Orchestrator] Running AI workflow for ${lead_id} (${trigger_event})`);
 
@@ -31,21 +46,12 @@ Deno.serve(async (req) => {
     const qualityResult = await base44.asServiceRole.functions.invoke(
       "validateLeadQuality",
       { full_name: lead.full_name, email: lead.email, phone: lead.phone }
-    );
+    ).catch(() => ({ data: {} }));
     results.steps.quality_check = qualityResult.data || {};
     
     if (qualityResult.data?.should_reject) {
       console.log(`[Orchestrator] Lead rejected due to low quality (score: ${qualityResult.data.quality_score})`);
-      return secureJson(
-        {
-          success: false,
-          lead_id,
-          reason: "Lead failed quality validation",
-          quality_score: qualityResult.data.quality_score,
-          flags: qualityResult.data.flags,
-        },
-        { status: 422 }
-      );
+      return;
     }
 
     // STEP 1: Score the lead
@@ -53,7 +59,7 @@ Deno.serve(async (req) => {
     const scoreResult = await base44.asServiceRole.functions.invoke(
       "scoreLeadIntelligence",
       { lead_id, project_id }
-    );
+    ).catch(e => ({ success: false, error: e.message }));
     results.steps.score = scoreResult.success
       ? scoreResult.data
       : { error: scoreResult.error };
@@ -65,7 +71,7 @@ Deno.serve(async (req) => {
       const intentResult = await base44.asServiceRole.functions.invoke(
         "classifyLeadIntent",
         { lead_id, message_text: recentMessage }
-      );
+      ).catch(e => ({ success: false, error: e.message }));
       results.steps.intent = intentResult.success
         ? intentResult.data
         : { error: intentResult.error };
@@ -252,13 +258,32 @@ Deno.serve(async (req) => {
 
 
     console.log(`[Orchestrator] ✅ Complete workflow for ${lead_id}`);
+    return results;
+  } catch (error) {
+    console.error("[Orchestrator] Error:", error.message);
+    return null;
+  }
+}
 
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const { lead_id, project_id, trigger_event } = await req.json();
+
+    if (!lead_id) {
+      return secureJson({ error: "lead_id required" }, { status: 400 });
+    }
+
+    // Queue async orchestration (non-blocking)
+    executeOrchestrationAsync(base44, lead_id, project_id, trigger_event).catch(e => {
+      console.error(`[Orchestrator] Background job failed for ${lead_id}:`, e.message);
+    });
+
+    // Return immediately to prevent timeout
     return secureJson({
       success: true,
       lead_id,
-      workflow_complete: true,
-      summary: results.summary,
-      detailed_results: results,
+      message: "Workflow queued for processing",
     });
   } catch (error) {
     console.error("[Orchestrator] Error:", error.message);

@@ -1,10 +1,16 @@
-import { secureJson } from "../_shared/response.ts";
 /**
- * workflowStageManager.ts — #419
- * Auto-updates ClientInstallationOS.workflow_stage as website build progresses.
+ * workflowStageManager — #419
+ * Auto-updates Order.workflow_stage as website build progresses.
  * Stages: intake → spec_generated → copy_generated → approved → building → live
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+function secureJson(data, opts = {}) {
+  return new Response(JSON.stringify(data), {
+    status: opts.status || 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 export const WORKFLOW_STAGES = [
   "Paid",
@@ -18,7 +24,7 @@ export const WORKFLOW_STAGES = [
   "Live",
 ];
 
-export function getNextStage(current: string): string | null {
+export function getNextStage(current) {
   const idx = WORKFLOW_STAGES.indexOf(current);
   if (idx === -1 || idx >= WORKFLOW_STAGES.length - 1) return null;
   return WORKFLOW_STAGES[idx + 1];
@@ -43,10 +49,22 @@ Deno.serve(async (req) => {
       return secureJson({ error: `Invalid stage: ${new_stage}. Valid: ${WORKFLOW_STAGES.join(", ")}` }, { status: 400 });
     }
 
+    // Log stage transition separately instead of using dynamic keys
     await base44.asServiceRole.entities.Order.update(order_id, {
       workflow_stage: new_stage,
-      [`${new_stage.toLowerCase().replace(/ /g, "_")}_at`]: new Date().toISOString(),
     });
+    
+    // Create audit log for stage transition
+    await base44.asServiceRole.entities.AuditLog.create({
+      admin_email: "system",
+      action: "workflow_stage_update",
+      entity_name: "Order",
+      record_id: order_id,
+      before: JSON.stringify({ workflow_stage: order.workflow_stage }),
+      after: JSON.stringify({ workflow_stage: new_stage }),
+      timestamp: new Date().toISOString(),
+      notes: `Stage: ${order.workflow_stage} → ${new_stage}`,
+    }).catch(() => null);
 
     console.log(`[workflowStageManager] ${order_id}: ${order.workflow_stage} → ${new_stage}`);
     return secureJson({ success: true, previous: order.workflow_stage, current: new_stage });
