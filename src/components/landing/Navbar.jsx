@@ -11,30 +11,13 @@ import { BUTTON_TEXT } from "@/lib/constants";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
+import { SITE_CONFIG } from "@/lib/siteConfig";
+
+const sectionLinks = SITE_CONFIG.navigation.sections;
+const solutionsLinks = SITE_CONFIG.navigation.solutions;
+const industryLinks = SITE_CONFIG.industries;
 
 
-const sectionLinks = [
-  { label: "Pricing", href: "/pricing", isPage: true },
-  { label: "Contact", href: "/contact", isPage: true },
-];
-
-const solutionsLinks = [
-{ label: "Automations", href: "/automations", isPage: true },
-{ label: "Store", href: "/store", isPage: true },
-{ label: "Pricing", href: "/pricing", isPage: true }
-];
-
-
-const industryLinks = [
-{ label: "Med Spas & Aesthetic Clinics", href: "/med-spa", live: true },
-{ label: "Dental & Orthodontics", href: "/dental", live: true },
-{ label: "Chiropractic & Physical Therapy", href: "/chiropractic", live: true },
-{ label: "HVAC, Plumbing & Home Services", href: "/hvac", live: true },
-{ label: "Plumbing & Drain Services", href: "/plumbing", live: true },
-{ label: "Roofing & Restoration", href: "/roofing", live: true },
-{ label: "Contractors & Trades", href: "/contractors", live: true },
-{ label: "Real Estate Agents", href: "/real-estate", live: true },
-{ label: "Personal Injury Law", href: "/personal-injury", live: true }];
 
 
 const SAFE_SECTION_HASHES = new Set([

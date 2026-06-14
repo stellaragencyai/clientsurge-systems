@@ -74,6 +74,8 @@ const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 const routePath = (...segments) => `/${segments.join("/")}`;
 const dynamicParam = (name) => `:${name}`;
 
+// Legacy redirect rules for old URL paths — review quarterly for removal
+// DEPRECATED: Remove redirects that haven't been hit in >30 days
 const LEGACY_REDIRECTS = PUBLIC_ROUTE_REDIRECTS.map(([from, to]) => ({ from, to }));
 
 const AUTOMATION_SERVICE_ROUTES = [

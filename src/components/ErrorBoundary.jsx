@@ -1,4 +1,5 @@
 import { Component } from "react";
+import { logError } from "./errorLogging";
 
 export default class ErrorBoundary extends Component {
   constructor(props) {
@@ -12,6 +13,8 @@ export default class ErrorBoundary extends Component {
 
   componentDidCatch(error, info) {
     console.error("[ErrorBoundary] Caught error:", error, info);
+    // Log to centralized error logging system
+    logError(error, { errorInfo: info, boundaryComponent: true });
   }
 
   render() {
