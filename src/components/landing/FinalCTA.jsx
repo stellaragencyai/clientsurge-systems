@@ -14,34 +14,14 @@ export default function FinalCTA() {
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
-            Ready to Start?
+            Ready to Transform Your Lead Flow?
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            You&apos;re Already Getting Leads. <span className="text-primary">Let&apos;s Make Sure You&apos;re Converting Them.</span>
+            Book Your Free <span className="text-primary">Automation Audit</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Schedule a free 15-minute strategy call. We will map out exactly where your business is leaking bookings and show you what an AI lead conversion system would look like for your specific situation - no obligation.
+            Schedule a free 15-minute strategy call to see exactly where your business is leaking bookings and how AI automation can fix it.
           </p>
-
-          {/* Projection stats - clearly framed as targets not guarantees */}
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-6 md:gap-10">
-            {[
-            { value: "3", label: "core conversion workflows" },
-            { value: "< 90s", label: "target first response time" },
-            { value: "30 days", label: "first performance review" }].
-            map((stat) =>
-            <div key={stat.label} className="flex flex-col items-center">
-                <span className="font-display text-3xl font-black text-foreground">
-                  {stat.value}
-                </span>
-                <span className="text-xs text-muted-foreground font-medium mt-0.5">{stat.label}</span>
-              </div>
-            )}
-          </div>
-          <p className="mt-3 text-xs text-muted-foreground/60 italic">
-            Targets are based on system design. Actual results depend on lead volume, offer, industry, and provider readiness.
-          </p>
-
 
           {/* How the demo works - 3 steps */}
           <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-left">
