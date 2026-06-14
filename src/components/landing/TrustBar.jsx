@@ -136,7 +136,7 @@ export default function TrustBar() {
   return (
     <section
       ref={ref}
-      className="pt-16 md:pt-24 pb-24 md:pb-32 bg-gradient-to-b from-card via-background to-background/60 border-y border-primary/10"
+      className="pt-14 md:pt-16 pb-14 md:pb-20 bg-gradient-to-b from-card via-background to-background/60 border-y border-primary/10"
     >
       <div className="max-w-6xl mx-auto px-6">
         <div className="text-center mb-10">

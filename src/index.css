@@ -737,9 +737,9 @@ td p,
   }
 }
 
-/* Refinement #10: Increased whitespace between sections — signals premium confidence */
+/* Section spacing — sections manage their own padding */
 section + section {
-  margin-top: clamp(24px, 4vw, 48px);
+  margin-top: 0;
 }
 
 .industry-page section + section {

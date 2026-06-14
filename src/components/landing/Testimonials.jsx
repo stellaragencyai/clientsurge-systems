@@ -40,7 +40,7 @@ const testimonials = [
 export default function Testimonials() {
   const demoBooking = useDemoBooking();
   return (
-    <section id="testimonials" className="nebula-testimonials py-32 md:py-44 px-6 relative overflow-hidden">
+    <section id="testimonials" className="nebula-testimonials py-16 md:py-24 px-6 relative overflow-hidden">
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">

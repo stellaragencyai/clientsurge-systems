@@ -172,7 +172,7 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
 function CoreOfferCTA({ onBookDemo }) {
   return (
     <div
-      className="relative mt-10 mb-20 mx-auto flex max-w-4xl flex-col items-center overflow-hidden rounded-lg border border-primary/15 px-6 py-8 text-center shadow-sm md:mt-12 md:mb-24 md:px-10 md:py-10"
+      className="relative mt-10 mb-4 mx-auto flex max-w-4xl flex-col items-center overflow-hidden rounded-lg border border-primary/15 px-6 py-8 text-center shadow-sm md:mt-12 md:mb-6 md:px-10 md:py-10"
       style={{
         background: "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(232,246,255,0.78) 100%)",
         boxShadow: "0 22px 56px rgba(0,88,160,0.1)",
@@ -309,7 +309,7 @@ export default function CoreOffer() {
   return (
     <section
       id="services"
-      className="pt-12 md:pt-20 pb-24 md:pb-36 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative overflow-hidden"
+      className="pt-12 md:pt-16 pb-6 md:pb-8 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative"
       style={{ overflowX: "hidden" }}>
       
       <div

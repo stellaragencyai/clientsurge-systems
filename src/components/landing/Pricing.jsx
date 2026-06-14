@@ -59,7 +59,7 @@ export default function Pricing() {
   return (
     <section
       id="pricing"
-      className="nebula-pricing pt-14 md:pt-28 pb-24 md:pb-40 px-6 overflow-visible"
+      className="nebula-pricing pt-10 md:pt-14 pb-16 md:pb-24 px-6 overflow-visible"
     >
       <div className="max-w-7xl mx-auto">
         <div className="max-w-3xl mx-auto text-center mb-12">
