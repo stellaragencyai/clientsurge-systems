@@ -216,24 +216,24 @@ export default function Hero() {
                 height: "52px",
                 padding: "0 30px",
                 borderRadius: "10px",
-                background: "linear-gradient(135deg, #009FD4 0%, #007AAA 60%, #005E90 100%)",
+                background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
                 color: "#ffffff",
                 fontWeight: "800",
                 fontSize: "0.95rem",
                 textDecoration: "none",
-                boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)",
+                boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38), 0 4px 12px rgba(0,159,212,0.3)",
                 transition: "box-shadow 0.28s cubic-bezier(0.34,1.56,0.64,1), transform 0.28s cubic-bezier(0.34,1.56,0.64,1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 44px rgba(0,159,212,0.8), 0 8px 28px rgba(0,159,212,0.55)";
-                e.currentTarget.style.transform = "translateY(-3px)";
+                e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)";
+                e.currentTarget.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 28px rgba(0,159,212,0.55), 0 4px 16px rgba(0,159,212,0.35)";
+                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38), 0 4px 12px rgba(0,159,212,0.3)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
               onMouseDown={(e) => { e.currentTarget.style.transform = "translateY(-1px) scale(0.98)"; }}
-              onMouseUp={(e) => { e.currentTarget.style.transform = "translateY(-3px) scale(1)"; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = "translateY(-2px) scale(1)"; }}
             >
               Get Your Free Automation Audit
             </a>

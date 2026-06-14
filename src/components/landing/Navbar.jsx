@@ -371,13 +371,20 @@ export default function Navbar() {
               trackCTA("book_free_audit", "navbar");
               setShowBookingModal(true);
             }}
-            className="hidden md:inline-block focus:ring-2 focus:ring-primary focus:outline-none rounded"
-            style={{ display: "inline-block", borderRadius: "8px", padding: "2px", background: "linear-gradient(135deg, #009FD4 0%, #00AEEF 50%, #009FD4 100%)", backgroundSize: "200% 100%", animation: "rotateBorderGlow 4s ease-in-out infinite", boxShadow: "0 0 16px rgba(0,159,212,0.6), 0 4px 16px rgba(0,159,212,0.4)", border: "none", cursor: "pointer", transition: "box-shadow 0.3s ease, transform 0.3s ease" }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 0 30px rgba(0,159,212,0.8), 0 8px 24px rgba(0,159,212,0.6)"}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 0 16px rgba(0,159,212,0.6), 0 4px 16px rgba(0,159,212,0.4)"}>
-            <span style={{ display: "flex", alignItems: "center", gap: "6px", height: "36px", padding: "0 16px", borderRadius: "6px", background: "linear-gradient(135deg, #009FD4 0%, #007AAA 100%)", color: "#ffffff", fontWeight: "700", fontSize: "0.75rem", textShadow: "0 1px 3px rgba(0,0,0,0.15)" }}>
-              Free Automation Audit
-            </span>
+            className="hidden md:inline-flex items-center focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-2"
+            style={{
+              background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+              color: "#ffffff",
+              fontWeight: "800",
+              fontSize: "0.875rem",
+              boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38)",
+              border: "none",
+              cursor: "pointer",
+              transition: "box-shadow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)"
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"}
+            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38)"}>
+            Free Automation Audit
           </button>
         </div>
 
