@@ -35,6 +35,10 @@ import Home from "./pages/Home";
 const Start = lazy(() => import("./pages/Start"));
 const Book = lazy(() => import("./pages/Book"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
+const ProductLanding = lazy(() => import("./pages/ProductLanding"));
+const ProductPricing = lazy(() => import("./pages/ProductPricing"));
+const ProductSignup = lazy(() => import("./pages/ProductSignup"));
+const ClientDashboardEntry = lazy(() => import("./pages/ClientDashboardEntry"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const OurSystemPage = lazy(() => import("./pages/OurSystemPage"));
 const TestimonialsPage = lazy(() => import("./pages/TestimonialsPage"));
@@ -288,11 +292,13 @@ const AuthenticatedAppWithTenant = () => {
       ))}
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
+      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
+      <Route path="/pricing" element={<LazyRoute Component={ProductPricing} />} />
+      <Route path="/signup" element={<LazyRoute Component={ProductSignup} />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
       <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
       <Route path="/industries" element={<LazyRoute Component={Industries} />} />
-      <Route path={routePath("pricing")} element={<LazyRoute Component={PricingPage} />} />
       <Route path={routePath("faq")} element={<LazyRoute Component={FAQPage} />} />
       <Route path={routePath("our-system")} element={<LazyRoute Component={OurSystemPage} />} />
       <Route path={routePath("testimonials")} element={<LazyRoute Component={TestimonialsPage} />} />
@@ -334,6 +340,7 @@ const AuthenticatedAppWithTenant = () => {
         {[
           { route: routePath("client-portal"), Component: ClientPortal },
           { route: routePath("client-dashboard"), Component: ClientDashboard },
+          { route: routePath("dashboard-entry"), Component: ClientDashboardEntry },
         ].map(({ route, Component }) => (
           <Route
             key={route}
