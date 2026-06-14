@@ -88,6 +88,11 @@ export default function Hero() {
       {/* ── Cinematic grid overlay ── */}
       <div aria-hidden="true" className="landing-hero__cinematicGrid" style={{ zIndex: 3 }} />
 
+      {/* ── Atmospheric glow orbs ── */}
+      <div aria-hidden="true" className="hero-orb hero-orb-1" />
+      <div aria-hidden="true" className="hero-orb hero-orb-2" />
+      <div aria-hidden="true" className="hero-orb hero-orb-3" />
+
       {/* ── Content ── */}
       <motion.div
         className="landing-hero__inner"
@@ -154,7 +159,7 @@ export default function Hero() {
               letterSpacing: "-0.03em",
               color: "#ffffff",
               margin: "0",
-              textShadow: "0 2px 32px rgba(0,0,0,0.5)",
+              textShadow: "0 4px 24px rgba(0,0,0,0.3)",
             }}
           >
             We Build the AI Growth Engines{" "}
@@ -179,7 +184,7 @@ export default function Hero() {
               fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
               fontSize: "clamp(1.05rem, 2.4vw, 1.22rem)",
               color: "rgba(220,235,255,0.88)",
-              lineHeight: 1.75,
+              lineHeight: "clamp(1.55, 1.75, 1.8)",
               maxWidth: "680px",
               margin: "0 auto 40px",
               fontWeight: "400",
@@ -206,7 +211,7 @@ export default function Hero() {
                 borderRadius: "10px",
                 background: "linear-gradient(135deg, #00AEEF 0%, #0099d4 40%, #0088CC 100%)",
                 color: "#ffffff",
-                fontWeight: "800",
+                fontWeight: "700",
                 fontSize: "0.95rem",
                 textDecoration: "none",
                 boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 24px rgba(0,174,239,0.5), 0 4px 16px rgba(0,159,212,0.4)",
@@ -266,6 +271,8 @@ export default function Hero() {
               gap: "16px",
               justifyContent: "center",
               flexWrap: "wrap",
+              position: "relative",
+              zIndex: 5,
             }}
           >
             {[
@@ -296,7 +303,7 @@ export default function Hero() {
         .landing-hero__cinematicGrid {
           position: absolute;
           inset: 0;
-          opacity: 0.14;
+          opacity: 0.22;
           background-image:
             linear-gradient(rgba(0,174,239,0.18) 1px, transparent 1px),
             linear-gradient(90deg, rgba(0,174,239,0.15) 1px, transparent 1px);
@@ -400,7 +407,7 @@ export default function Hero() {
           50% { box-shadow: 0 0 0 2px rgba(0,174,239,0.75), 0 0 40px rgba(0,159,212,0.7), 0 6px 24px rgba(0,159,212,0.5); }
         }
         .hero-primary-cta:hover {
-          animation: none;
+          animation-play-state: paused;
         }
       `}</style>
     </section>
