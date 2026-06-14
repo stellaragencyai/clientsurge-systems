@@ -219,7 +219,9 @@ export default function Navbar() {
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       return;
     }
+    // Reset to home and smooth scroll to top
     navigate("/");
+    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }), 0);
   };
 
   return (
