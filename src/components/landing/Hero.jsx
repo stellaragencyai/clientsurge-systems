@@ -59,44 +59,7 @@ export default function Hero() {
     >
       {/* ── Parallax background layer ── */}
       {/* To use a real photo: replace `background` with `backgroundImage: "url('YOUR_URL')"` */}
-      <motion.div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: "-25%",
-          left: "-5%",
-          right: "-5%",
-          y: reduceMotion ? 0 : bgY,
-          willChange: "transform",
-          background: "linear-gradient(160deg, #0a1628 0%, #0d2447 30%, #071535 60%, #050e22 100%)",
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          zIndex: 0,
-        }}
-      />
 
-      {/* ── Dark overlay for text readability ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "linear-gradient(to bottom, rgba(5,14,34,0.72) 0%, rgba(5,14,34,0.55) 50%, rgba(5,14,34,0.80) 100%)",
-          zIndex: 1,
-        }}
-      />
-
-      {/* ── Subtle blue radial glow ── */}
-      <div
-        aria-hidden="true"
-        style={{
-          position: "absolute",
-          inset: 0,
-          background: "radial-gradient(ellipse 70% 60% at 50% 40%, rgba(0,174,239,0.18) 0%, transparent 65%)",
-          zIndex: 1,
-          pointerEvents: "none",
-        }}
-      />
 
       {/* Refinement #2: Orbital glow orbs — living, breathing atmosphere */}
       <div aria-hidden="true" className="hero-orb hero-orb-1" />
