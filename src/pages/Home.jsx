@@ -39,37 +39,13 @@ function isEditorSandbox() {
   }
 }
 
-function useHomepageWhiteCanvas() {
-  useEffect(() => {
-    // Skip all DOM mutations inside the Base44 visual editor sandbox
-    if (isEditorSandbox()) return undefined;
-    if (typeof document === "undefined" || !document.body || !document.documentElement) {
-      return undefined;
-    }
-    try {
-      document.body.classList.add("homepage-white-canvas");
-      document.documentElement.style.setProperty("--scroll-bg-from", "hsl(0, 0%, 100%)");
-      document.documentElement.style.setProperty("--scroll-bg-to", "hsl(0, 0%, 100%)");
-    } catch (_e) {
-      return undefined;
-    }
-    return () => {
-      try {
-        if (!document.body || !document.documentElement) return;
-        document.body.classList.remove("homepage-white-canvas");
-        document.documentElement.style.removeProperty("--scroll-bg-from");
-        document.documentElement.style.removeProperty("--scroll-bg-to");
-      } catch (_e) {}
-    };
-  }, []);
-}
+
 
 function LazyHomepageSection({ children, fallback }) {
   return <Suspense fallback={fallback}>{children}</Suspense>;
 }
 
 export default function Home() {
-  useHomepageWhiteCanvas();
   const location = useLocation();
   useEffect(() => {
     if (!location.hash) {
