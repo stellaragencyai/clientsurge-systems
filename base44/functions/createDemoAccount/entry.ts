@@ -4,18 +4,20 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Verify caller is an admin
     const user = await base44.auth.me();
     if (!user || user.role !== 'admin') {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    await base44.users.inviteUser("democlient@clientsurge.com", "user");
+    const body = await req.json().catch(() => ({}));
+    const email = body.email || "support@clientsurgesystems.com";
+
+    await base44.users.inviteUser(email, "user");
 
     return Response.json({
       success: true,
-      message: "Demo client account invited. Check democlient@clientsurge.com for the invite email to set a password.",
-      email: "democlient@clientsurge.com",
+      message: `Invite sent to ${email}. Check that inbox to set a password.`,
+      email,
       role: "user"
     });
   } catch (error) {
