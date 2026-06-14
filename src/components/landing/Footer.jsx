@@ -206,6 +206,7 @@ export default function Footer() {
         .cs-footer-accent {
           height: 3px;
           background: linear-gradient(90deg, transparent 0%, #00AEEF 25%, #009DFF 50%, #003B8F 75%, transparent 100%);
+          box-shadow: 0 0 18px rgba(0, 174, 239, 0.45);
         }
 
         .cs-footer-inner {
@@ -405,9 +406,10 @@ export default function Footer() {
 
         .cs-footer-nav {
           display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
+          grid-template-columns: repeat(3, 1fr);
           gap: 32px;
           min-width: 0;
+          align-items: start;
         }
 
         .cs-footer-nav-column {
@@ -416,13 +418,13 @@ export default function Footer() {
 
         .cs-footer-nav-column h4 {
           margin: 0 0 18px;
-          color: #0a1628;
+          color: #00AEEF;
           font-size: 11px;
           font-weight: 800;
           letter-spacing: 0.15em;
           line-height: 1.4;
           text-transform: uppercase;
-          opacity: 0.7;
+          text-shadow: 0 0 14px rgba(0, 174, 239, 0.55), 0 0 28px rgba(0, 174, 239, 0.25);
         }
 
         .cs-footer-nav-column ul {
@@ -455,13 +457,14 @@ export default function Footer() {
 
         .cs-footer-bottom {
           grid-column: 1 / -1;
-          display: grid;
-          grid-template-columns: auto 1fr auto;
+          display: flex;
           align-items: center;
+          justify-content: space-between;
           gap: 24px;
           margin-top: 16px;
           padding-top: 24px;
-          border-top: 1px solid rgba(0, 174, 239, 0.08);
+          border-top: 1px solid rgba(0, 174, 239, 0.12);
+          flex-wrap: wrap;
         }
 
         .cs-footer-legal,

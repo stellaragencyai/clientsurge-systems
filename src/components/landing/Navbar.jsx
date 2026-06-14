@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { ChevronDown, Menu, X } from "lucide-react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useLocation, useNavigate, Link } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
 import LaunchCountdownTimer from "@/components/campaign/LaunchCountdownTimer";
@@ -14,7 +14,7 @@ import { base44 } from "@/api/base44Client";
 
 
 const sectionLinks = [
-{ label: "Contact", href: "/contact", isPage: true }
+  { label: "Contact", href: "/contact", isPage: true },
 ];
 
 const solutionsLinks = [
@@ -111,6 +111,11 @@ export default function Navbar() {
 
   const mobileUserName = user?.full_name || user?.email?.split("@")[0] || null;
   const mobileUserRole = user?.role ? user.role.replace(/_/g, " ") : null;
+
+  const isActivePage = (href) => {
+    if (href === "/" ) return location.pathname === "/";
+    return location.pathname.startsWith(href);
+  };
 
   // Track page views
   usePageViewTracking();
@@ -262,16 +267,20 @@ export default function Navbar() {
           </span>
         </button>
 
-        <div className="hidden xl:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+        <div className="hidden xl:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
           <div className="relative" onKeyDown={(e) => {if (e.key === "Escape") setIndustriesOpen(false);}}>
             <button
               type="button"
               onClick={() => setIndustriesOpen(!industriesOpen)}
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
-              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative pb-0.5"
+              style={isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing") ? { color: "#00AEEF" } : {}}>
               Solutions
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
+              {(isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing")) && (
+                <span style={{ position: "absolute", bottom: "-6px", left: 0, right: 0, height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)" }} />
+              )}
             </button>
             {industriesOpen && typeof document !== "undefined" && createPortal((
             <div
@@ -317,8 +326,7 @@ export default function Navbar() {
               onClick={openIndustriesMenu}
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
-              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
-              
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative pb-0.5">
               Industries
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
             </button>
@@ -364,43 +372,55 @@ export default function Navbar() {
               </div>), document.body)
             }
           </div>
+
+          {sectionLinks.map((link) => (
+            <a
+              key={link.href}
+              href={link.href}
+              onClick={(e) => { e.preventDefault(); navigate(link.href); }}
+              className="text-xs lg:text-sm font-medium hover:text-primary transition-colors whitespace-nowrap relative pb-0.5"
+              style={{ color: isActivePage(link.href) ? "#00AEEF" : undefined, textDecoration: "none" }}
+            >
+              {link.label}
+              {isActivePage(link.href) && (
+                <span style={{ position: "absolute", bottom: "-6px", left: 0, right: 0, height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)" }} />
+              )}
+            </a>
+          ))}
         </div>
 
-        <div className="hidden xl:flex items-center gap-3 shrink-0">
+        <div className="hidden xl:flex items-center gap-2 shrink-0">
           <button
-            onClick={() => {
-              trackCTA("demo_client_login", "navbar");
-              handleDemoClientLogin();
-            }}
-            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
+            onClick={() => { trackCTA("demo_client_login", "navbar"); handleDemoClientLogin(); }}
+            className="hidden md:block text-xs font-semibold text-foreground/70 hover:text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/8"
+            style={{ minHeight: "unset", minWidth: "unset" }}>
             Demo Client
           </button>
           <button
-            onClick={() => {
-              trackCTA("login", "navbar");
-              setShowLoginModal(true);
-            }}
-            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
+            onClick={() => { trackCTA("login", "navbar"); setShowLoginModal(true); }}
+            className="hidden md:block text-xs font-semibold text-foreground/70 hover:text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/8 border border-white/20 hover:border-primary/30"
+            style={{ minHeight: "unset", minWidth: "unset" }}>
             Login
           </button>
           <button
-            onClick={() => {
-              trackCTA("book_free_audit", "navbar");
-              setShowBookingModal(true);
-            }}
-            className="hidden md:inline-flex items-center focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-2"
+            onClick={() => { trackCTA("book_free_audit", "navbar"); setShowBookingModal(true); }}
+            className="hidden md:inline-flex items-center focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-5 py-2.5"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
               color: "#ffffff",
               fontWeight: "800",
-              fontSize: "0.875rem",
-              boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38)",
+              fontSize: "0.8125rem",
+              letterSpacing: "0.01em",
+              boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)",
               border: "none",
               cursor: "pointer",
-              transition: "box-shadow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)"
+              transition: "box-shadow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
+              minHeight: "unset",
+              minWidth: "unset",
+              whiteSpace: "nowrap",
             }}
-            onMouseEnter={(e) => e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"}
-            onMouseLeave={(e) => e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38)"}>
+            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
+            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
             Free Automation Audit
           </button>
         </div>

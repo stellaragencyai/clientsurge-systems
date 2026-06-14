@@ -4,7 +4,7 @@
  */
 
 export const CAMPAIGN_CONFIG = {
-  isActive: true,
+  isActive: false,
   name: "Founder's Tier",
   launchDate: new Date("2026-06-12T00:00:00Z"),
   endDate: new Date("2026-06-26T23:59:59Z"), // 14 days
