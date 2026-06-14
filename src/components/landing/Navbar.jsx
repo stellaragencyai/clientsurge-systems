@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Menu, X, Loader2 } from "lucide-react";
+import { ChevronDown, Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -90,7 +90,6 @@ function safeSetThemePreference(value) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
-  const [demoLoading, setDemoLoading] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -175,19 +174,8 @@ export default function Navbar() {
     }
   };
 
-  const handleDemoClientLogin = async () => {
-    setDemoLoading(true);
-    try {
-      // Demo credentials for testing
-      await base44.auth.loginViaEmailPassword("demo@clientsurge.com", "DemoPassword123!");
-      const currentUser = await base44.auth.me();
-      setTimeout(() => {
-        window.location.href = "/client-portal";
-      }, 100);
-    } catch (err) {
-      console.error("Demo login failed:", err);
-      setDemoLoading(false);
-    }
+  const handleDemoClientLogin = () => {
+    navigate("/client-portal");
   };
 
   const openIndustriesMenu = () => {
@@ -384,9 +372,8 @@ export default function Navbar() {
               trackCTA("demo_client_login", "navbar");
               handleDemoClientLogin();
             }}
-            disabled={demoLoading}
-            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
-            {demoLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Demo Client"}
+            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
+            Demo Client
           </button>
           <button
             onClick={() => {
