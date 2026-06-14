@@ -13,7 +13,7 @@ import {
 } from "lucide-react";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
-import { industryPatterns, FILTER_TAGS, INDUSTRY_TAGS } from "@/lib/industryAssets";
+import { industryPatterns, FILTER_TAGS, INDUSTRY_TAGS } from "@/lib/industryAssets.jsx";
 
 const industries = [
 {
