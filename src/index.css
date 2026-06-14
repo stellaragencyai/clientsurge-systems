@@ -843,6 +843,163 @@ img[style*="object-fit"] {
   border-radius: 0.75rem !important;
 }
 
+/* ============================================
+   PREMIUM SAAS UI/UX ENHANCEMENTS
+   ============================================ */
+
+/* Modern SaaS Card System */
+.saas-card {
+  background: hsl(var(--card));
+  border: 1px solid hsl(var(--border));
+  border-radius: 0.75rem;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.03);
+  transition: all 0.2s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.saas-card:hover {
+  box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.08);
+  border-color: hsl(var(--primary), 0.3);
+}
+
+/* Data Table Enhancements */
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+table th {
+  background: hsl(var(--muted));
+  font-weight: 600;
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 0.875rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid hsl(var(--border));
+  color: hsl(var(--muted-foreground));
+}
+table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid hsl(var(--border));
+}
+table tbody tr:hover {
+  background: hsl(var(--muted), 0.5);
+}
+table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status Badge System */
+.badge-success {
+  @apply bg-green-100 text-green-700 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+.badge-warning {
+  @apply bg-yellow-100 text-yellow-700 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+.badge-error {
+  @apply bg-red-100 text-red-700 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+.badge-info {
+  @apply bg-blue-100 text-blue-700 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+.badge-neutral {
+  @apply bg-gray-100 text-gray-700 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold;
+}
+
+/* Form Styling */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]),
+select,
+textarea {
+  background: hsl(var(--background));
+  border: 1px solid hsl(var(--border));
+  transition: all 0.2s ease;
+}
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus,
+select:focus,
+textarea:focus {
+  border-color: hsl(var(--primary));
+  box-shadow: 0 0 0 3px hsl(var(--primary), 0.1);
+}
+
+/* Button Hierarchy */
+.btn-primary {
+  @apply inline-flex items-center justify-center rounded-lg border-none cursor-pointer text-white font-semibold px-4 py-2.5 transition-all duration-200;
+  background: hsl(var(--primary));
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+}
+.btn-primary:hover {
+  box-shadow: 0 4px 12px hsl(var(--primary), 0.3);
+  transform: translateY(-1px);
+}
+.btn-primary:active {
+  transform: translateY(0);
+}
+
+.btn-secondary {
+  @apply inline-flex items-center justify-center rounded-lg border cursor-pointer font-semibold px-4 py-2.5 transition-all duration-200;
+  border-color: hsl(var(--border));
+  color: hsl(var(--foreground));
+  background: transparent;
+}
+.btn-secondary:hover {
+  background: hsl(var(--muted));
+  border-color: hsl(var(--primary), 0.3);
+}
+
+/* Empty State Styling */
+.empty-state {
+  @apply rounded-lg border border-dashed border-border p-12 text-center;
+}
+.empty-state-icon {
+  @apply w-16 h-16 mx-auto mb-4 text-muted-foreground opacity-30;
+}
+.empty-state-title {
+  @apply text-lg font-semibold text-foreground mb-2;
+}
+.empty-state-description {
+  @apply text-sm text-muted-foreground mb-6;
+}
+
+/* Metric Display */
+.metric-card {
+  @apply rounded-lg p-4 bg-card border border-border;
+}
+.metric-value {
+  @apply text-3xl font-bold text-foreground;
+}
+.metric-label {
+  @apply text-xs font-medium text-muted-foreground mt-1 uppercase tracking-wide;
+}
+.metric-change {
+  @apply text-xs font-semibold mt-2;
+}
+.metric-change.positive {
+  @apply text-green-600;
+}
+.metric-change.negative {
+  @apply text-red-600;
+}
+
+/* List Item Styling */
+.list-item {
+  @apply flex items-center justify-between p-3.5 rounded-lg border border-border hover:bg-muted/30 transition-colors cursor-pointer;
+}
+.list-item-primary {
+  @apply font-semibold text-foreground;
+}
+.list-item-secondary {
+  @apply text-sm text-muted-foreground;
+}
+
+/* Section Header */
+.section-header {
+  @apply flex items-center gap-2.5 mb-4;
+}
+.section-title {
+  @apply text-sm font-semibold text-foreground;
+}
+.section-icon {
+  @apply w-4 h-4 text-primary;
+}
+
 /* 5. Input zoom prevention on iOS (font-size must stay >=16px on mobile controls) */
 @media (max-width: 768px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),

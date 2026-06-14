@@ -70,23 +70,23 @@ export default function MissionControlDashboard() {
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
-      <div className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur">
-        <div className="max-w-7xl mx-auto px-6 py-4">
-          <div className="flex items-center justify-between gap-4">
+      <div className="sticky top-0 z-40 border-b border-border bg-card/95 backdrop-blur shadow-sm">
+        <div className="max-w-7xl mx-auto px-6 py-5">
+          <div className="flex items-center justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-2xl font-bold text-foreground">Mission Control</h1>
-              <p className="text-sm text-muted-foreground mt-1">
+              <h1 className="text-3xl font-bold text-foreground">Mission Control</h1>
+              <p className="text-sm text-muted-foreground mt-2">
                 Real-time lead intelligence & system monitoring
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <SystemStatusIndicator
                 status={pollingStatus}
                 lastUpdated={pollingLastUpdated}
               />
               <button
                 onClick={() => setLastRefresh(Date.now())}
-                className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card hover:bg-muted/50 transition-all text-sm font-medium shadow-sm"
                 title="Manual refresh"
               >
                 <RefreshCw className="w-4 h-4" />
@@ -97,40 +97,40 @@ export default function MissionControlDashboard() {
 
           {/* Tenant Switcher (Admin Only) */}
           {isAdmin && (
-            <div className="mb-4">
-              <p className="text-xs text-muted-foreground mb-2">Switch Tenant:</p>
+            <div className="mb-4 pb-4 border-b border-border">
+              <p className="text-xs font-semibold text-muted-foreground mb-3 uppercase tracking-wide">Tenant:</p>
               <TenantSwitcher />
             </div>
           )}
 
           {/* Selected Tenant Info */}
           {(selectedClientId || selectedProjectId) && (
-            <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
-              <p className="text-xs text-primary font-medium">
-                {selectedProjectId ? 'Scoped to Project' : 'Scoped to Client'} — All data below is tenant-filtered
+            <div className="mb-4 p-3.5 rounded-lg bg-primary/8 border border-primary/25">
+              <p className="text-xs font-semibold text-primary">
+                ✓ {selectedProjectId ? 'Project' : 'Client'} scoped • Tenant-filtered data below
               </p>
             </div>
           )}
 
           {/* Filter Bar */}
-          <div className="flex flex-wrap gap-3 mt-4">
+          <div className="flex flex-wrap gap-2 mt-4">
             <input
               type="text"
-              placeholder="Filter by phone number..."
+              placeholder="Filter by phone..."
               value={filters.phoneNumber}
               onChange={(e) =>
                 setFilters({ ...filters, phoneNumber: e.target.value })
               }
-              className="px-3 py-2 rounded-lg border border-border text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              className="px-3.5 py-2.5 rounded-lg border border-border text-sm bg-background focus:ring-2 focus:ring-primary focus:outline-none shadow-sm"
             />
             <select
               value={filters.intentType}
               onChange={(e) =>
                 setFilters({ ...filters, intentType: e.target.value })
               }
-              className="px-3 py-2 rounded-lg border border-border text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              className="px-3.5 py-2.5 rounded-lg border border-border text-sm bg-background focus:ring-2 focus:ring-primary focus:outline-none shadow-sm"
             >
-              <option value="all">All Intent Types</option>
+              <option value="all">All Intents</option>
               <option value="lead">Lead Inquiry</option>
               <option value="booking">Booking Request</option>
               <option value="support">Support</option>
@@ -141,29 +141,29 @@ export default function MissionControlDashboard() {
               onChange={(e) =>
                 setFilters({ ...filters, dateRange: e.target.value })
               }
-              className="px-3 py-2 rounded-lg border border-border text-sm focus:ring-2 focus:ring-primary focus:outline-none"
+              className="px-3.5 py-2.5 rounded-lg border border-border text-sm bg-background focus:ring-2 focus:ring-primary focus:outline-none shadow-sm"
             >
               <option value="last1h">Last 1 Hour</option>
               <option value="last24h">Last 24 Hours</option>
               <option value="last7d">Last 7 Days</option>
               <option value="last30d">Last 30 Days</option>
             </select>
-            <label className="flex items-center gap-2 px-3 py-2 rounded-lg border border-border cursor-pointer hover:bg-muted transition-colors">
+            <label className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-lg border border-border cursor-pointer hover:bg-muted/50 transition-all bg-background shadow-sm">
               <input
                 type="checkbox"
                 checked={isAutoRefreshing}
                 onChange={(e) => setIsAutoRefreshing(e.target.checked)}
                 className="rounded"
               />
-              <span className="text-sm font-medium">Auto-refresh (3s)</span>
+              <span className="text-sm font-medium whitespace-nowrap">Auto-refresh (3s)</span>
             </label>
           </div>
         </div>
 
         {/* Tab Navigation */}
-        <div className="border-t border-border">
+        <div className="border-t border-border bg-background/50">
           <div className="max-w-7xl mx-auto px-6">
-            <div className="flex gap-0 overflow-x-auto">
+            <div className="flex gap-0 overflow-x-auto scrollbar-hide">
               {[
                 { id: 'visibility', label: 'System Visibility', icon: Eye },
                 { id: 'alerts', label: 'Alerts', icon: TrendingUp },
@@ -192,7 +192,7 @@ export default function MissionControlDashboard() {
       </div>
 
       {/* Content Area */}
-      <div className="max-w-7xl mx-auto px-6 py-6">
+      <div className="max-w-7xl mx-auto px-6 py-8">
         {activeTab === 'visibility' && (
           <SystemVisibilityDashboard />
         )}
