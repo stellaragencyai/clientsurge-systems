@@ -178,6 +178,15 @@ export default function Footer() {
           padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
+        .cs-footer::before {
+          content: '';
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(180deg, rgba(245, 248, 252, 0.4) 0%, rgba(245, 248, 252, 0) 100%);
+          pointer-events: none;
+          z-index: 0;
+        }
+
         .cs-footer,
         .cs-footer * {
           box-sizing: border-box;
@@ -315,11 +324,13 @@ export default function Footer() {
         }
 
         .cs-footer-main {
-          padding: 42px 0 28px;
+          padding: 52px 0 40px;
           display: grid;
-          grid-template-columns: minmax(280px, 0.95fr) minmax(0, 1.55fr);
-          gap: 44px;
+          grid-template-columns: 1.1fr 1fr 1.2fr 1fr 0.85fr;
+          gap: 48px;
           align-items: start;
+          position: relative;
+          z-index: 1;
         }
 
         .cs-footer-brand {
@@ -340,11 +351,12 @@ export default function Footer() {
         }
 
         .cs-footer-brand p {
-          margin: 0 0 20px;
-          max-width: 380px;
-          color: rgba(10, 22, 40, 0.72);
+          margin: 0 0 24px;
+          max-width: 35ch;
+          color: rgba(10, 22, 40, 0.68);
           font-size: 13px;
-          line-height: 1.65;
+          line-height: 1.7;
+          font-weight: 500;
         }
 
         .cs-footer-contact-list {
@@ -392,10 +404,7 @@ export default function Footer() {
         }
 
         .cs-footer-nav {
-          display: grid;
-          grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 28px;
-          min-width: 0;
+          display: contents;
         }
 
         .cs-footer-nav-column {
@@ -403,18 +412,19 @@ export default function Footer() {
         }
 
         .cs-footer-nav-column h4 {
-          margin: 0 0 14px;
-          color: #005f99;
-          font-size: 10px;
+          margin: 0 0 18px;
+          color: #0a1628;
+          font-size: 11px;
           font-weight: 800;
-          letter-spacing: 0.16em;
-          line-height: 1.3;
+          letter-spacing: 0.15em;
+          line-height: 1.4;
           text-transform: uppercase;
+          opacity: 0.7;
         }
 
         .cs-footer-nav-column ul {
           display: grid;
-          gap: 9px;
+          gap: 11px;
           margin: 0;
           padding: 0;
           list-style: none;
@@ -423,87 +433,124 @@ export default function Footer() {
         .cs-footer-nav-column a {
           display: inline-flex;
           max-width: 100%;
-          color: rgba(10, 22, 40, 0.72);
+          color: rgba(10, 22, 40, 0.7);
           font-size: 13px;
-          font-weight: 600;
-          line-height: 1.35;
+          font-weight: 500;
+          line-height: 1.5;
+          transition: color 200ms ease, transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .cs-footer-nav-column a:hover {
-          color: #005f99;
+          color: #00AEEF;
+          transform: translateX(4px);
+        }
+
+        .cs-footer-nav-column a:focus-visible {
+          outline: 2px solid #00AEEF;
+          outline-offset: 2px;
         }
 
         .cs-footer-bottom {
           grid-column: 1 / -1;
-          display: flex;
+          display: grid;
+          grid-template-columns: auto 1fr auto;
           align-items: center;
-          justify-content: space-between;
-          gap: 18px;
-          margin-top: 6px;
-          padding-top: 22px;
-          border-top: 1px solid rgba(0, 174, 239, 0.12);
+          gap: 24px;
+          margin-top: 16px;
+          padding-top: 24px;
+          border-top: 1px solid rgba(0, 174, 239, 0.08);
         }
 
         .cs-footer-legal,
         .cs-footer-status {
           display: flex;
           align-items: center;
-          gap: 10px;
+          gap: 12px;
           min-width: 0;
-          color: rgba(10, 22, 40, 0.66);
+          color: rgba(10, 22, 40, 0.6);
           font-size: 12px;
-          line-height: 1.4;
+          line-height: 1.5;
         }
 
         .cs-footer-legal {
           flex-wrap: wrap;
+          justify-self: start;
         }
 
         .cs-footer-legal a {
-          color: rgba(10, 22, 40, 0.68);
-          font-weight: 700;
+          color: rgba(10, 22, 40, 0.65);
+          font-weight: 600;
+          transition: color 160ms ease;
         }
 
         .cs-footer-legal a:hover {
-          color: #005f99;
+          color: #00AEEF;
+        }
+
+        .cs-footer-legal a:focus-visible {
+          outline: 2px solid #00AEEF;
+          outline-offset: 2px;
+        }
+
+        .cs-footer-status {
+          justify-self: end;
         }
 
         .cs-footer-secure {
           display: inline-flex;
           align-items: center;
-          gap: 6px;
+          gap: 7px;
           white-space: nowrap;
+          padding: 7px 12px;
+          border-radius: 6px;
+          background: rgba(0, 174, 239, 0.06);
+          border: 1px solid rgba(0, 174, 239, 0.15);
         }
 
         .cs-footer-secure svg {
-          width: 14px;
-          height: 14px;
-          color: #0088CC;
+          width: 13px;
+          height: 13px;
+          color: #00AEEF;
+          flex-shrink: 0;
         }
 
         .cs-footer-top-button {
           display: inline-flex;
-          width: 34px;
-          height: 34px;
-          flex: 0 0 34px;
+          width: 36px;
+          height: 36px;
+          flex: 0 0 36px;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(0, 136, 204, 0.2);
+          border: 1px solid rgba(0, 174, 239, 0.2);
           border-radius: 8px;
-          background: rgba(0, 136, 204, 0.08);
-          color: #0088CC;
+          background: rgba(0, 174, 239, 0.07);
+          color: #00AEEF;
           cursor: pointer;
-          transition: background 160ms ease, transform 160ms ease;
+          transition: all 160ms cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
         .cs-footer-top-button:hover {
-          background: rgba(0, 136, 204, 0.15);
-          transform: translateY(-1px);
+          background: rgba(0, 174, 239, 0.14);
+          border-color: rgba(0, 174, 239, 0.4);
+          transform: translateY(-2px);
+          box-shadow: 0 0 12px rgba(0, 174, 239, 0.2);
+        }
+
+        .cs-footer-top-button:focus-visible {
+          outline: 2px solid #00AEEF;
+          outline-offset: 3px;
         }
 
         .cs-footer-top-button svg {
-          width: 15px;
-          height: 15px;
+          width: 16px;
+          height: 16px;
+        }
+
+        @media (max-width: 1024px) {
+          .cs-footer-main {
+            grid-template-columns: 1.1fr 1fr 1fr;
+            gap: 40px;
+          }
         }
 
         @media (max-width: 960px) {
@@ -512,20 +559,32 @@ export default function Footer() {
           }
 
           .cs-footer-main {
-            grid-template-columns: 1fr;
-            gap: 30px;
+            grid-template-columns: 1fr 1fr;
+            gap: 36px;
           }
 
           .cs-footer-brand {
+            grid-column: 1 / -1;
             display: grid;
-            grid-template-columns: minmax(0, 1fr) minmax(240px, 0.9fr);
-            gap: 22px;
+            grid-template-columns: 1fr 1fr;
+            gap: 24px;
             align-items: start;
+          }
+
+          .cs-footer-logo-row {
+            grid-column: 1 / -1;
           }
 
           .cs-footer-logo-row,
           .cs-footer-brand p {
             margin-bottom: 0;
+          }
+
+          .cs-footer-nav {
+            display: grid;
+            grid-template-columns: repeat(3, minmax(0, 1fr));
+            gap: 28px;
+            grid-column: 1 / -1;
           }
         }
 
@@ -561,12 +620,14 @@ export default function Footer() {
           }
 
           .cs-footer-main {
-            padding: 34px 0 max(24px, calc(24px + env(safe-area-inset-bottom, 0px)));
+            padding: 40px 0 max(28px, calc(28px + env(safe-area-inset-bottom, 0px)));
+            grid-template-columns: 1fr;
+            gap: 28px;
           }
 
           .cs-footer-brand {
             grid-template-columns: 1fr;
-            gap: 16px;
+            gap: 18px;
           }
 
           .cs-footer-brand p {
@@ -578,48 +639,51 @@ export default function Footer() {
           }
 
           .cs-footer-nav {
-            grid-template-columns: 1fr;
-            gap: 22px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 24px;
           }
 
           .cs-footer-nav-column {
-            padding-top: 18px;
-            border-top: 1px solid rgba(0, 174, 239, 0.1);
+            min-width: 0;
           }
 
           .cs-footer-nav-column ul {
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            column-gap: 16px;
-            row-gap: 10px;
+            gap: 10px;
           }
 
           .cs-footer-bottom {
-            display: grid;
             grid-template-columns: 1fr;
             gap: 16px;
-            margin-top: 4px;
-            padding-top: 20px;
+            margin-top: 0;
+            padding-top: 24px;
           }
 
-          .cs-footer-legal,
-          .cs-footer-status {
-            justify-content: space-between;
-            width: 100%;
+          .cs-footer-legal {
+            justify-self: start;
+            flex-wrap: wrap;
           }
 
           .cs-footer-status {
-            align-items: center;
+            justify-self: start;
           }
         }
 
-        @media (max-width: 420px) {
-          .cs-footer-nav-column ul {
+        @media (max-width: 480px) {
+          .cs-footer-nav {
             grid-template-columns: 1fr;
+          }
+
+          .cs-footer-bottom {
+            grid-template-columns: 1fr;
+            text-align: center;
           }
 
           .cs-footer-legal {
             justify-content: center;
-            text-align: center;
+          }
+
+          .cs-footer-status {
+            justify-content: center;
           }
         }
       `}</style>
