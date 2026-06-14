@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
-import { ChevronDown, Menu, X } from "lucide-react";
+import { ChevronDown, Menu, X, Loader2 } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import DemoBookingModal from "../forms/DemoBookingModal";
@@ -10,6 +10,7 @@ import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { BUTTON_TEXT } from "@/lib/constants";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
+import { base44 } from "@/api/base44Client";
 
 
 const sectionLinks = [
@@ -87,6 +88,7 @@ function safeSetThemePreference(value) {
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
+  const [demoLoading, setDemoLoading] = useState(false);
 
   useEffect(() => {
     if (!open) {
@@ -168,6 +170,21 @@ export default function Navbar() {
     if (industriesCloseTimerRef.current) {
       window.clearTimeout(industriesCloseTimerRef.current);
       industriesCloseTimerRef.current = null;
+    }
+  };
+
+  const handleDemoClientLogin = async () => {
+    setDemoLoading(true);
+    try {
+      // Demo credentials for testing
+      await base44.auth.loginViaEmailPassword("demo@clientsurge.com", "DemoPassword123!");
+      const currentUser = await base44.auth.me();
+      setTimeout(() => {
+        window.location.href = "/client-portal";
+      }, 100);
+    } catch (err) {
+      console.error("Demo login failed:", err);
+      setDemoLoading(false);
     }
   };
 
@@ -360,10 +377,11 @@ export default function Navbar() {
           <button
             onClick={() => {
               trackCTA("demo_client_login", "navbar");
-              navigate("/client-portal");
+              handleDemoClientLogin();
             }}
-            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors">
-            Demo Client
+            disabled={demoLoading}
+            className="hidden md:block text-sm font-semibold text-foreground hover:text-primary border border-white/25 hover:border-primary/40 bg-background/10 focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-4 py-1.5 transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2">
+            {demoLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : "Demo Client"}
           </button>
           <button
             onClick={() => {
