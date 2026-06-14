@@ -276,8 +276,8 @@ export default function Navbar() {
               onClick={() => setIndustriesOpen(!industriesOpen)}
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
-              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative pb-0.5"
-              style={isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing") ? { color: "#00AEEF" } : {}}>
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5"
+              style={{ color: isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing") ? "#00AEEF" : "#0a1628" }}>
               Solutions
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
               {(isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing")) && (
@@ -328,7 +328,8 @@ export default function Navbar() {
               onClick={openIndustriesMenu}
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
-              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative pb-0.5">
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5"
+              style={{ color: "#0a1628" }}>
               Industries
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
             </button>
@@ -380,8 +381,8 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={(e) => { e.preventDefault(); navigate(link.href); }}
-              className="text-xs lg:text-sm font-medium hover:text-primary transition-all duration-300 whitespace-nowrap relative pb-0.5"
-              style={{ color: isActivePage(link.href) ? "#00AEEF" : "inherit", textDecoration: "none" }}
+              className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
+              style={{ color: isActivePage(link.href) ? "#00AEEF" : "#0a1628", textDecoration: "none" }}
             >
               {link.label}
               <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
