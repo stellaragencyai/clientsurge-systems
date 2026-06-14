@@ -140,6 +140,7 @@ export default function Home() {
 
         {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Industries />
         </LazyHomepageSection>
 
@@ -148,22 +149,31 @@ export default function Home() {
         </LazyHomepageSection>
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="problem-solution" aria-hidden="true" />
-          <div id="six-automations" aria-hidden="true" />
+          <div id="problem-solution" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <div id="six-automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <CoreOffer />
         </LazyHomepageSection>
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Pricing />
         </LazyHomepageSection>
 
+        <SectionBreak />
+
         <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <FAQ />
         </LazyHomepageSection>
 
+        <SectionBreak />
+
         <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="testimonials" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Testimonials />
         </LazyHomepageSection>
+
+        <SectionBreak />
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <FinalCTA />
