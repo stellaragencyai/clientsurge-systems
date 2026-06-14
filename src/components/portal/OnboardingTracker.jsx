@@ -133,8 +133,23 @@ function resolveStatus(track, project, order) {
 
 // ─── STATUS ICON ─────────────────────────────────────────────────────────────
 function StatusIcon({ status, color }) {
-  if (status === "complete") return <CheckCircle2 style={{ width: "16px", height: "16px", color: "#22c55e" }} />;
-  if (status === "in_progress") return <Loader2 style={{ width: "15px", height: "15px", color: color || "#0088CC", animation: "onb-spin 1.1s linear infinite" }} />;
+  if (status === "complete") return (
+    <motion.div
+      initial={{ scale: 0.8, opacity: 0 }}
+      animate={{ scale: 1, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+    >
+      <CheckCircle2 style={{ width: "16px", height: "16px", color: "#22c55e" }} />
+    </motion.div>
+  );
+  if (status === "in_progress") return (
+    <motion.div
+      animate={{ rotate: 360 }}
+      transition={{ duration: 1.2, repeat: Infinity, easing: "linear" }}
+    >
+      <Loader2 style={{ width: "15px", height: "15px", color: color || "#0088CC" }} />
+    </motion.div>
+  );
   if (status === "error") return <AlertCircle style={{ width: "15px", height: "15px", color: "#ef4444" }} />;
   if (status === "not_purchased") return <Circle style={{ width: "15px", height: "15px", color: "rgba(0,0,0,0.18)" }} />;
   return <Circle style={{ width: "15px", height: "15px", color: "rgba(0,0,0,0.22)" }} />;
@@ -171,7 +186,7 @@ function TrackRow({ track, status, index, isLast }) {
     <motion.div
       initial={{ opacity: 0, x: -10 }}
       animate={{ opacity: 1, x: 0 }}
-      transition={{ delay: index * 0.05, duration: 0.3 }}
+      transition={{ delay: index * 0.08, duration: 0.4 }}
       style={{ position: "relative" }}
     >
       {/* Connector line */}
@@ -199,28 +214,31 @@ function TrackRow({ track, status, index, isLast }) {
         }}
       >
         {/* Icon bubble */}
-        <div style={{
-          width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
-          background: status === "complete"
-            ? "rgba(34,197,94,0.1)"
-            : status === "in_progress"
-              ? `rgba(0,136,204,0.1)`
-              : status === "error"
-                ? "rgba(239,68,68,0.08)"
-                : "rgba(0,0,0,0.04)",
-          border: `1.5px solid ${
-            status === "complete" ? "rgba(34,197,94,0.35)"
-            : status === "in_progress" ? "rgba(0,136,204,0.3)"
-            : status === "error" ? "rgba(239,68,68,0.3)"
-            : "rgba(0,0,0,0.08)"
-          }`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-        }}>
+        <motion.div
+          animate={status === "in_progress" ? { boxShadow: "0 0 0 6px rgba(0,136,204,0.2)" } : {}}
+          transition={{ duration: 1.5, repeat: Infinity }}
+          style={{
+            width: "36px", height: "36px", borderRadius: "10px", flexShrink: 0,
+            background: status === "complete"
+              ? "rgba(34,197,94,0.1)"
+              : status === "in_progress"
+                ? `rgba(0,136,204,0.1)`
+                : status === "error"
+                  ? "rgba(239,68,68,0.08)"
+                  : "rgba(0,0,0,0.04)",
+            border: `1.5px solid ${
+              status === "complete" ? "rgba(34,197,94,0.35)"
+              : status === "in_progress" ? "rgba(0,136,204,0.3)"
+              : status === "error" ? "rgba(239,68,68,0.3)"
+              : "rgba(0,0,0,0.08)"
+            }`,
+            display: "flex", alignItems: "center", justifyContent: "center",
+          }}>
           {status === "complete" || status === "error" || status === "in_progress"
             ? <StatusIcon status={status} color={track.color} />
             : <Icon style={{ width: "15px", height: "15px", color: track.color }} />
           }
-        </div>
+        </motion.div>
 
         {/* Text */}
         <div style={{ flex: 1, minWidth: 0 }}>
