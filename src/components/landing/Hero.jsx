@@ -38,9 +38,7 @@ export default function Hero() {
     offset: ["start start", "end start"],
   });
 
-  // Parallax: background moves at 40% of scroll speed (slower = depth)
-  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "40%"]);
-  // Refinement #1: Scroll-driven content fade — hero content fades+scales out as user scrolls
+  const bgY = useTransform(scrollYProgress, [0, 1], ["0%", "30%"]);
   const contentOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
   const contentScale = useTransform(scrollYProgress, [0, 0.5], [1, 0.94]);
 
@@ -51,34 +49,55 @@ export default function Hero() {
       style={{
         position: "relative",
         overflow: "hidden",
-        minHeight: "92svh",
+        minHeight: "100svh",
         width: "100%",
         display: "flex",
         alignItems: "center",
       }}
     >
-      {/* ── Parallax background layer ── */}
-      {/* To use a real photo: replace `background` with `backgroundImage: "url('YOUR_URL')"` */}
+      {/* ── Full-viewport cinematic background image with parallax ── */}
+      <motion.div
+        aria-hidden="true"
+        style={{
+          position: "absolute",
+          inset: "-10%",
+          backgroundImage: "url('https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=1920&q=80')",
+          backgroundSize: "cover",
+          backgroundPosition: "center center",
+          y: reduceMotion ? 0 : bgY,
+          zIndex: 0,
+        }}
+      />
 
+      {/* ── Dark cinematic gradient overlay — ensures text legibility ── */}
+      <div aria-hidden="true" style={{
+        position: "absolute",
+        inset: 0,
+        background: "linear-gradient(to bottom, rgba(2,8,20,0.72) 0%, rgba(2,8,30,0.55) 50%, rgba(2,8,20,0.80) 100%)",
+        zIndex: 1,
+      }} />
 
-      {/* Refinement #2: Orbital glow orbs — living, breathing atmosphere */}
-      <div aria-hidden="true" className="hero-orb hero-orb-1" />
-      <div aria-hidden="true" className="hero-orb hero-orb-2" />
-      <div aria-hidden="true" className="hero-orb hero-orb-3" />
+      {/* ── Subtle electric tint layer ── */}
+      <div aria-hidden="true" style={{
+        position: "absolute",
+        inset: 0,
+        background: "radial-gradient(ellipse at 50% 0%, rgba(0,174,239,0.18) 0%, transparent 65%)",
+        zIndex: 2,
+      }} />
 
       {/* ── Cinematic grid overlay ── */}
-      <div aria-hidden="true" className="landing-hero__cinematicGrid" style={{ zIndex: 1 }} />
+      <div aria-hidden="true" className="landing-hero__cinematicGrid" style={{ zIndex: 3 }} />
 
-      {/* ── Content — Refinement #1: scroll-driven opacity+scale ── */}
+      {/* ── Content ── */}
       <motion.div
         className="landing-hero__inner"
         style={{
           position: "relative",
-          zIndex: 2,
+          zIndex: 4,
           width: "100%",
-          maxWidth: "900px",
+          maxWidth: "920px",
           margin: "0 auto",
-          padding: "clamp(7rem, 12vw, 10rem) clamp(1.5rem, 5vw, 3rem) clamp(4rem, 7vw, 6rem)",
+          padding: "clamp(8rem, 14vw, 11rem) clamp(1.5rem, 5vw, 3rem) clamp(5rem, 8vw, 7rem)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
@@ -93,17 +112,19 @@ export default function Hero() {
           variants={heroCopyReveal}
           style={{ width: "100%" }}
         >
-          {/* Badge */}
-          <motion.div variants={heroRevealItem} style={{ marginBottom: "20px", display: "flex", justifyContent: "center" }}>
+          {/* Glass Badge */}
+          <motion.div variants={heroRevealItem} style={{ marginBottom: "24px", display: "flex", justifyContent: "center" }}>
             <span style={{
               display: "inline-flex",
               alignItems: "center",
               gap: "7px",
               borderRadius: "999px",
-              padding: "6px 16px",
-              background: "rgba(0,174,239,0.15)",
-              border: "1px solid rgba(0,174,239,0.35)",
-              color: "#0066aa",
+              padding: "7px 18px",
+              background: "rgba(255,255,255,0.12)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              border: "1px solid rgba(255,255,255,0.25)",
+              color: "#a8e8ff",
               fontSize: "11px",
               fontWeight: 800,
               letterSpacing: "0.12em",
@@ -121,22 +142,23 @@ export default function Hero() {
             </span>
           </motion.div>
 
-          {/* Headline */}
+          {/* Headline — white on dark bg */}
           <motion.h1
             className="landing-hero__headline"
             variants={heroRevealItem}
             style={{
               fontFamily: "'Montserrat', 'Trebuchet MS', sans-serif",
-              fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
+              fontSize: "clamp(2.8rem, 6.5vw, 4.6rem)",
               fontWeight: "900",
-              lineHeight: 1.1,
-              letterSpacing: "-0.025em",
-              color: "#0a1628",
+              lineHeight: 1.08,
+              letterSpacing: "-0.03em",
+              color: "#ffffff",
               margin: "0",
+              textShadow: "0 2px 32px rgba(0,0,0,0.5)",
             }}
           >
             We Build the AI Growth Engines{" "}
-            <span className="landing-hero__headlineAccent" style={{ color: "#0066aa" }}>
+            <span className="landing-hero__headlineAccent">
               That Turn Your Website Into a Booking Machine.
             </span>
           </motion.h1>
@@ -146,22 +168,23 @@ export default function Hero() {
             aria-hidden="true"
             className="landing-hero__headlineBeam"
             variants={heroRevealItem}
-            style={{ margin: "18px auto 22px" }}
+            style={{ margin: "20px auto 24px" }}
           />
 
-          {/* Sub-headline */}
+          {/* Sub-headline — light on dark */}
           <motion.p
             className="landing-hero__body"
             variants={heroRevealItem}
             style={{
               fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-              fontSize: "clamp(1.05rem, 2.4vw, 1.25rem)",
-              color: "#444444",
-              lineHeight: 1.7,
-              maxWidth: "700px",
-              margin: "0 auto 36px",
+              fontSize: "clamp(1.05rem, 2.4vw, 1.22rem)",
+              color: "rgba(220,235,255,0.88)",
+              lineHeight: 1.75,
+              maxWidth: "680px",
+              margin: "0 auto 40px",
               fontWeight: "400",
-              letterSpacing: "-0.005em",
+              letterSpacing: "-0.003em",
+              textShadow: "0 1px 8px rgba(0,0,0,0.4)",
             }}
           >
             Don't just launch a website. We install the complete automation stack that captures every lead, recovers every missed call, and books appointments for you 24/7.
@@ -170,32 +193,31 @@ export default function Hero() {
           {/* CTAs */}
           <motion.div
             variants={heroRevealItem}
-            style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}
+            style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}
           >
-            {/* Refinement #6: Glow-border pulsing CTA + #7: depress on click */}
             <a
               href="/book"
               className="hero-primary-cta"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                height: "52px",
-                padding: "0 30px",
+                height: "54px",
+                padding: "0 32px",
                 borderRadius: "10px",
                 background: "linear-gradient(135deg, #00AEEF 0%, #0099d4 40%, #0088CC 100%)",
                 color: "#ffffff",
                 fontWeight: "800",
                 fontSize: "0.95rem",
                 textDecoration: "none",
-                boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38), 0 4px 12px rgba(0,159,212,0.3)",
+                boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 24px rgba(0,174,239,0.5), 0 4px 16px rgba(0,159,212,0.4)",
                 transition: "box-shadow 0.28s cubic-bezier(0.34,1.56,0.64,1), transform 0.28s cubic-bezier(0.34,1.56,0.64,1)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)";
+                e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.9), 0 0 40px rgba(0,174,239,0.75), 0 4px 24px rgba(0,159,212,0.55)";
                 e.currentTarget.style.transform = "translateY(-2px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38), 0 4px 12px rgba(0,159,212,0.3)";
+                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 24px rgba(0,174,239,0.5), 0 4px 16px rgba(0,159,212,0.4)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
               onMouseDown={(e) => { e.currentTarget.style.transform = "translateY(-1px) scale(0.98)"; }}
@@ -203,42 +225,45 @@ export default function Hero() {
             >
               Get Your Free Automation Audit
             </a>
+            {/* Glass secondary CTA */}
             <a
               href="/store"
               style={{
                 display: "inline-flex",
                 alignItems: "center",
-                height: "52px",
-                padding: "0 28px",
-                borderRadius: "8px",
-                background: "rgba(0,0,0,0.08)",
-                border: "1px solid rgba(0,0,0,0.22)",
-                color: "#0a1628",
+                height: "54px",
+                padding: "0 30px",
+                borderRadius: "10px",
+                background: "rgba(255,255,255,0.12)",
+                backdropFilter: "blur(16px)",
+                WebkitBackdropFilter: "blur(16px)",
+                border: "1px solid rgba(255,255,255,0.28)",
+                color: "#ffffff",
                 fontWeight: "700",
                 fontSize: "0.95rem",
                 textDecoration: "none",
                 transition: "background 0.3s ease, border-color 0.3s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(0,0,0,0.14)";
-                e.currentTarget.style.borderColor = "rgba(0,0,0,0.38)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.2)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(0,0,0,0.08)";
-                e.currentTarget.style.borderColor = "rgba(0,0,0,0.22)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.12)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)";
               }}
             >
               View Systems &amp; Pricing
             </a>
           </motion.div>
 
-          {/* Social proof strip */}
+          {/* Glass stat cards */}
           <motion.div
             variants={heroRevealItem}
             style={{
-              marginTop: "44px",
+              marginTop: "52px",
               display: "flex",
-              gap: "36px",
+              gap: "16px",
               justifyContent: "center",
               flexWrap: "wrap",
             }}
@@ -248,9 +273,18 @@ export default function Hero() {
                { value: "24/7", label: "Lead Response Coverage" },
                { value: "48hr", label: "Average Go-Live Time" },
              ].map(({ value, label }) => (
-               <div key={label} style={{ textAlign: "center" }}>
-                 <div style={{ fontSize: "2rem", fontWeight: 900, color: "#0066aa", lineHeight: 1, fontFamily: "'Montserrat', sans-serif" }}>{value}</div>
-                 <div style={{ fontSize: "12px", color: "#666666", marginTop: "8px", fontWeight: 500, letterSpacing: "0.03em" }}>{label}</div>
+               <div key={label} style={{
+                 textAlign: "center",
+                 background: "rgba(255,255,255,0.08)",
+                 backdropFilter: "blur(20px)",
+                 WebkitBackdropFilter: "blur(20px)",
+                 border: "1px solid rgba(255,255,255,0.15)",
+                 borderRadius: "14px",
+                 padding: "18px 28px",
+                 minWidth: "120px",
+               }}>
+                 <div style={{ fontSize: "2.1rem", fontWeight: 900, color: "#00AEEF", lineHeight: 1, fontFamily: "'Montserrat', sans-serif", textShadow: "0 0 20px rgba(0,174,239,0.6)" }}>{value}</div>
+                 <div style={{ fontSize: "11px", color: "rgba(200,225,255,0.75)", marginTop: "8px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</div>
                </div>
              ))}
           </motion.div>
@@ -276,8 +310,8 @@ export default function Hero() {
         }
         .landing-hero__headlineAccent {
           display: block;
-          color: #66d9ff !important;
-          text-shadow: 0 0 24px rgba(0, 174, 239, 0.6), 0 0 50px rgba(0, 174, 239, 0.28);
+          color: #5dd9ff !important;
+          text-shadow: 0 0 32px rgba(0, 174, 239, 0.75), 0 0 60px rgba(0, 174, 239, 0.35);
         }
         .landing-hero__headlineBeam {
           width: min(480px, 80vw);
