@@ -14,6 +14,7 @@ import { base44 } from "@/api/base44Client";
 
 
 const sectionLinks = [
+  { label: "Pricing", href: "/pricing", isPage: true },
   { label: "Contact", href: "/contact", isPage: true },
 ];
 
@@ -269,7 +270,7 @@ export default function Navbar() {
           </span>
         </button>
 
-        <div className="hidden xl:flex items-center gap-8 absolute left-1/2 -translate-x-1/2">
+        <div className="hidden xl:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
           <div className="relative" onKeyDown={(e) => {if (e.key === "Escape") setIndustriesOpen(false);}}>
             <button
               type="button"
@@ -293,9 +294,9 @@ export default function Navbar() {
                 left: "50%",
                 transform: "translateX(-50%)",
                 top: "calc(var(--cs-nav-height) + 10px)",
-                background: "rgba(255,255,255,0.10)",
-                backdropFilter: "blur(3px) saturate(1.05)",
-                WebkitBackdropFilter: "blur(3px) saturate(1.05)",
+                background: "rgba(255,255,255,0.97)",
+                backdropFilter: "blur(12px)",
+                WebkitBackdropFilter: "blur(12px)",
                 zIndex: 200,
               }}>
               <div className="flex flex-col gap-1">
@@ -350,10 +351,10 @@ export default function Navbar() {
                 role="menu"
                 aria-label="Industries"
                 style={{
-                  background: "rgba(255,255,255,0.10)",
-                  backdropFilter: "blur(3px) saturate(1.05)",
-                  WebkitBackdropFilter: "blur(3px) saturate(1.05)",
-                  boxShadow: "none"
+                  background: "rgba(255,255,255,0.97)",
+                  backdropFilter: "blur(12px)",
+                  WebkitBackdropFilter: "blur(12px)",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.12)"
                 }}>
                   <div className="grid grid-cols-2 gap-2">
                     {industryLinks.map((item) =>
@@ -391,12 +392,6 @@ export default function Navbar() {
         </div>
 
         <div className="hidden xl:flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => { trackCTA("demo_client_login", "navbar"); handleDemoClientLogin(); }}
-            className="hidden md:block text-xs font-semibold text-foreground/70 hover:text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/8"
-            style={{ minHeight: "unset", minWidth: "unset" }}>
-            Demo Client
-          </button>
           <button
             onClick={() => { trackCTA("login", "navbar"); setShowLoginModal(true); }}
             className="hidden md:block text-xs font-semibold text-foreground/70 hover:text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/8 border border-white/20 hover:border-primary/30"
