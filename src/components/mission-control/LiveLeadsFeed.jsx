@@ -2,11 +2,37 @@ import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { formatDistanceToNow } from 'date-fns';
 import { Phone, Mail, Clock, User } from 'lucide-react';
+import { useRealTimePolling } from '@/hooks/useRealTimePolling';
+import { deltaFetchHelpers } from './DeltaFetchHelper';
 
 export default function LiveLeadsFeed({ filters, refreshKey }) {
   const [threads, setThreads] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [lastUpdatedTime, setLastUpdatedTime] = useState(Date.now());
 
+  // Real-time delta fetch - only get new/updated threads
+  const fetchDeltaThreads = async (lastTimestamp) => {
+    try {
+      const newThreads = await deltaFetchHelpers.fetchNewConversationThreads(lastTimestamp);
+      if (newThreads.length > 0) {
+        setThreads(prevThreads => {
+          const existingIds = new Set(prevThreads.map(t => t.id));
+          const filtered = newThreads.filter(t => !existingIds.has(t.id));
+          return [...filtered, ...prevThreads].slice(0, 50);
+        });
+        setLastUpdatedTime(Date.now());
+      }
+      return newThreads;
+    } catch (error) {
+      console.error('Error fetching delta threads:', error);
+      throw error;
+    }
+  };
+
+  // Real-time polling
+  useRealTimePolling(fetchDeltaThreads, 3000, null, null, true);
+
+  // Initial load
   useEffect(() => {
     const loadThreads = async () => {
       setLoading(true);
@@ -21,6 +47,7 @@ export default function LiveLeadsFeed({ filters, refreshKey }) {
         }
 
         setThreads(filtered);
+        setLastUpdatedTime(Date.now());
       } catch (error) {
         console.error('Error loading conversation threads:', error);
       } finally {
@@ -49,7 +76,7 @@ export default function LiveLeadsFeed({ filters, refreshKey }) {
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-lg font-semibold">Active Conversations</h2>
         <span className="text-sm text-muted-foreground">
-          {threads.length} active thread{threads.length !== 1 ? 's' : ''}
+          {threads.length} threads • Updated {Math.round((Date.now() - lastUpdatedTime) / 1000)}s ago
         </span>
       </div>
 

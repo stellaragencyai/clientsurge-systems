@@ -2,13 +2,17 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import {
-  RefreshCw, Phone, MessageSquare, TrendingUp, Server, Filter, Download,
+  RefreshCw, Phone, MessageSquare, TrendingUp, Server,
 } from 'lucide-react';
 import LiveLeadsFeed from '../components/mission-control/LiveLeadsFeed';
 import ConversationsViewer from '../components/mission-control/ConversationsViewer';
 import MessageLogTable from '../components/mission-control/MessageLogTable';
 import IntentAnalytics from '../components/mission-control/IntentAnalytics';
 import SystemHealthPanel from '../components/mission-control/SystemHealthPanel';
+import SystemStatusIndicator from '../components/mission-control/SystemStatusIndicator';
+import AlertsFeed from '../components/mission-control/AlertsFeed';
+import ConversionPipeline from '../components/mission-control/ConversionPipeline';
+import { useRealTimePolling } from '@/hooks/useRealTimePolling';
 
 export default function MissionControlDashboard() {
   const { user } = useAuth();
@@ -18,17 +22,34 @@ export default function MissionControlDashboard() {
     intentType: 'all',
     dateRange: 'last24h',
   });
-  const [lastRefresh, setLastRefresh] = useState(new Date());
+  const [lastRefresh, setLastRefresh] = useState(Date.now());
   const [isAutoRefreshing, setIsAutoRefreshing] = useState(true);
+  const [pollingStatus, setPollingStatus] = useState('CONNECTING');
+  const [pollingLastUpdated, setPollingLastUpdated] = useState(Date.now());
 
-  // Auto-refresh every 12 seconds
+  // Worker health check for real-time connection
+  const checkWorkerHealth = async () => {
+    try {
+      // Simple health check - can be replaced with actual Worker endpoint
+      await base44.entities.CommunicationEvent.list('-created_date', 1);
+      return { status: 'ok' };
+    } catch (err) {
+      throw new Error('Worker health check failed');
+    }
+  };
+
+  // Real-time polling with 3-second interval
+  const { status, lastUpdated } = useRealTimePolling(
+    checkWorkerHealth,
+    3000, // 3 seconds
+    null,
+    setPollingStatus,
+    isAutoRefreshing
+  );
+
   useEffect(() => {
-    if (!isAutoRefreshing) return;
-    const interval = setInterval(() => {
-      setLastRefresh(new Date());
-    }, 12000);
-    return () => clearInterval(interval);
-  }, [isAutoRefreshing]);
+    setPollingLastUpdated(lastUpdated);
+  }, [lastUpdated]);
 
   // Role-based access
   if (user?.role !== 'admin' && user?.role !== 'super_admin') {
@@ -54,18 +75,19 @@ export default function MissionControlDashboard() {
                 Real-time lead intelligence & system monitoring
               </p>
             </div>
-            <div className="flex items-center gap-3">
+            <div className="flex items-center gap-4">
+              <SystemStatusIndicator
+                status={pollingStatus}
+                lastUpdated={pollingLastUpdated}
+              />
               <button
-                onClick={() => setLastRefresh(new Date())}
+                onClick={() => setLastRefresh(Date.now())}
                 className="inline-flex items-center gap-2 px-3 py-2 rounded-lg border border-border hover:bg-muted transition-colors text-sm font-medium"
                 title="Manual refresh"
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
               </button>
-              <div className="text-xs text-muted-foreground">
-                Updated: {lastRefresh.toLocaleTimeString()}
-              </div>
             </div>
           </div>
 
@@ -112,7 +134,7 @@ export default function MissionControlDashboard() {
                 onChange={(e) => setIsAutoRefreshing(e.target.checked)}
                 className="rounded"
               />
-              <span className="text-sm font-medium">Auto-refresh</span>
+              <span className="text-sm font-medium">Auto-refresh (3s)</span>
             </label>
           </div>
         </div>
@@ -122,6 +144,7 @@ export default function MissionControlDashboard() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex gap-0 overflow-x-auto">
               {[
+                { id: 'alerts', label: 'Alerts', icon: TrendingUp },
                 { id: 'live-feeds', label: 'Live Feeds', icon: TrendingUp },
                 { id: 'conversations', label: 'Conversations', icon: MessageSquare },
                 { id: 'message-log', label: 'Message Log', icon: Phone },
@@ -148,6 +171,16 @@ export default function MissionControlDashboard() {
 
       {/* Content Area */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {activeTab === 'alerts' && (
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <div className="lg:col-span-2">
+              <AlertsFeed lastUpdated={pollingLastUpdated} />
+            </div>
+            <div>
+              <ConversionPipeline lastUpdated={pollingLastUpdated} />
+            </div>
+          </div>
+        )}
         {activeTab === 'live-feeds' && (
           <LiveLeadsFeed filters={filters} refreshKey={lastRefresh} />
         )}

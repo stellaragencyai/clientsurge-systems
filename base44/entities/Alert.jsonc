@@ -1,0 +1,141 @@
+{
+  "name": "Alert",
+  "type": "object",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "type": {
+      "type": "string",
+      "title": "Alert Type",
+      "enum": [
+        "high_intent_lead",
+        "booking_request",
+        "follow_up_reminder",
+        "engagement_trigger"
+      ],
+      "description": "Category of alert"
+    },
+    "severity": {
+      "type": "string",
+      "title": "Severity",
+      "enum": [
+        "critical",
+        "high",
+        "medium",
+        "low"
+      ],
+      "default": "medium"
+    },
+    "phone_number": {
+      "type": "string",
+      "title": "Lead Phone Number"
+    },
+    "lead_name": {
+      "type": "string",
+      "title": "Lead Name"
+    },
+    "message": {
+      "type": "string",
+      "title": "Alert Message"
+    },
+    "lead_intent": {
+      "type": "string",
+      "title": "Detected Lead Intent",
+      "enum": [
+        "price_inquiry",
+        "booking_request",
+        "support",
+        "spam"
+      ]
+    },
+    "lead_score": {
+      "type": "number",
+      "title": "Lead Score (0-100)",
+      "default": 0
+    },
+    "conversation_thread_id": {
+      "type": "string",
+      "title": "Linked ConversationThread ID"
+    },
+    "source": {
+      "type": "string",
+      "title": "Alert Source",
+      "enum": [
+        "twilio",
+        "cloudflare_worker",
+        "manual"
+      ]
+    },
+    "notification_sent": {
+      "type": "boolean",
+      "title": "In-App Notification Sent",
+      "default": false
+    },
+    "email_sent": {
+      "type": "boolean",
+      "title": "Email Sent to Admin",
+      "default": false
+    },
+    "sms_sent": {
+      "type": "boolean",
+      "title": "SMS Sent to Admin",
+      "default": false
+    },
+    "read_status": {
+      "type": "boolean",
+      "title": "Read by Admin",
+      "default": false
+    },
+    "read_at": {
+      "type": "string",
+      "title": "Read At",
+      "format": "date-time"
+    },
+    "closing_message_sent": {
+      "type": "boolean",
+      "title": "Auto-Closing Message Sent",
+      "default": false
+    },
+    "closing_message_text": {
+      "type": "string",
+      "title": "Closing Message Sent to Lead"
+    },
+    "follow_up_count": {
+      "type": "integer",
+      "title": "Follow-up Count",
+      "default": 0
+    },
+    "last_follow_up_at": {
+      "type": "string",
+      "title": "Last Follow-up Sent At",
+      "format": "date-time"
+    },
+    "conversion_status": {
+      "type": "string",
+      "title": "Conversion Status",
+      "enum": [
+        "new",
+        "engaged",
+        "booked",
+        "closed",
+        "lost"
+      ],
+      "default": "new"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Alert Tags"
+    }
+  },
+  "required": [
+    "type",
+    "phone_number",
+    "message"
+  ]
+}
