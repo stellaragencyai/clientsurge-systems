@@ -1,7 +1,19 @@
 const isBrowser = typeof window !== "undefined";
 const memoryStorage = new Map();
+const PRODUCTION_APP_ID = "69dc4a79656fdba136d413d3";
+const PRODUCTION_APP_BASE_URL = "https://clientsurgesystems.com";
+const NULL_LIKE_VALUES = new Set(["", "null", "undefined"]);
 
 const toSnakeCase = (str) => str.replace(/([A-Z])/g, "_$1").toLowerCase();
+
+const normalizeParamValue = (value) => {
+	if (value === undefined || value === null) {
+		return null;
+	}
+
+	const normalized = String(value).trim();
+	return NULL_LIKE_VALUES.has(normalized.toLowerCase()) ? null : normalized;
+};
 
 const canUseBrowserStorage = () => {
 	if (!isBrowser) {
@@ -31,20 +43,21 @@ const readStorage = (key) => {
 };
 
 const writeStorage = (key, value) => {
-	if (value === undefined || value === null) {
+	const normalizedValue = normalizeParamValue(value);
+	if (normalizedValue === null) {
 		return;
 	}
 
 	if (canUseBrowserStorage()) {
 		try {
-			window.localStorage.setItem(key, value);
+			window.localStorage.setItem(key, normalizedValue);
 			return;
 		} catch {
 			// Fall back to in-memory storage below.
 		}
 	}
 
-	memoryStorage.set(key, value);
+	memoryStorage.set(key, normalizedValue);
 };
 
 const removeStorage = (key) => {
@@ -92,7 +105,7 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 	const storageKey = `base44_${toSnakeCase(paramName)}`;
 	const location = getLocation();
 	const urlParams = new URLSearchParams(location.search);
-	const searchParam = urlParams.get(paramName);
+	const searchParam = normalizeParamValue(urlParams.get(paramName));
 
 	if (removeFromUrl && searchParam) {
 		urlParams.delete(paramName);
@@ -105,14 +118,15 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 		return searchParam;
 	}
 
-	const storedValue = readStorage(storageKey);
+	const storedValue = normalizeParamValue(readStorage(storageKey));
 	if (storedValue) {
 		return storedValue;
 	}
 
-	if (defaultValue !== undefined) {
-		writeStorage(storageKey, defaultValue);
-		return defaultValue;
+	const normalizedDefaultValue = normalizeParamValue(defaultValue);
+	if (normalizedDefaultValue !== null) {
+		writeStorage(storageKey, normalizedDefaultValue);
+		return normalizedDefaultValue;
 	}
 
 	return null;
@@ -127,11 +141,11 @@ const getAppParams = () => {
 	const location = getLocation();
 
 	return {
-		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID }),
+		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID || PRODUCTION_APP_ID }),
 		token: getAppParamValue("access_token", { removeFromUrl: true }),
 		fromUrl: getAppParamValue("from_url", { defaultValue: location.href }),
 		functionsVersion: getAppParamValue("functions_version", { defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION }),
-		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL }),
+		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL || PRODUCTION_APP_BASE_URL }),
 	};
 };
 
