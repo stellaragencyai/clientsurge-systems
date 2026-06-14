@@ -1,6 +1,12 @@
 {
   "name": "AutomationRule",
   "type": "object",
+  "_metadata": {
+    "status": "CORE_AUTOMATION",
+    "reason": "Primary automation execution system - conditional trigger + action rules. Use for all new production automation. Executed by automationOrchestrator.",
+    "tier": "PRIMARY",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",

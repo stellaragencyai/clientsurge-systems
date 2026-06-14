@@ -1,72 +1,74 @@
 {
   "name": "LeadAnalytics",
   "type": "object",
+  "_metadata": {
+    "status": "DERIVED",
+    "reason": "Calculated metrics for reporting only. Do NOT write directly. Derived from Leads + CommunicationEvent. Use scheduled jobs only.",
+    "read_only": true,
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
-    "description": {
+    "order_id": {
       "type": "string",
-      "title": "Description",
-      "maxLength": 1000
+      "title": "Order ID"
     },
-    "date": {
+    "client_project_id": {
       "type": "string",
-      "title": "Date"
+      "title": "Client Project ID"
     },
-    "total_leads": {
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "snapshot_date": {
+      "type": "string",
+      "title": "Snapshot Date",
+      "format": "date-time"
+    },
+    "leads_captured_total": {
       "type": "number",
-      "title": "Total Leads",
+      "title": "Total Leads Captured",
       "default": 0
     },
-    "new_leads": {
+    "leads_captured_this_period": {
       "type": "number",
-      "title": "New Leads Today",
+      "title": "Leads Captured This Period (24h)",
       "default": 0
     },
-    "high_quality_count": {
+    "leads_responded": {
       "type": "number",
-      "title": "High Quality Count",
+      "title": "Leads Responded",
       "default": 0
     },
-    "medium_quality_count": {
+    "automations_active": {
       "type": "number",
-      "title": "Medium Quality Count",
+      "title": "Active Automations",
       "default": 0
     },
-    "low_quality_count": {
+    "automations_triggered_today": {
       "type": "number",
-      "title": "Low Quality Count",
+      "title": "Automations Triggered Today",
       "default": 0
     },
-    "avg_lead_score": {
+    "sms_sent_count": {
       "type": "number",
-      "title": "Average Lead Score",
+      "title": "SMS Messages Sent",
       "default": 0
     },
-    "stage_new": {
+    "emails_sent_count": {
       "type": "number",
+      "title": "Emails Sent",
       "default": 0
     },
-    "stage_qualified": {
+    "bookings_created_total": {
       "type": "number",
+      "title": "Total Bookings Created",
       "default": 0
     },
-    "stage_contacted": {
+    "bookings_created_today": {
       "type": "number",
-      "default": 0
-    },
-    "stage_responded": {
-      "type": "number",
-      "default": 0
-    },
-    "stage_booked": {
-      "type": "number",
-      "default": 0
-    },
-    "stage_closed": {
-      "type": "number",
+      "title": "Bookings Created Today",
       "default": 0
     }
-  },
-  "required": [
-    "date"
-  ]
+  }
 }

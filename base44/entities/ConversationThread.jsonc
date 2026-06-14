@@ -1,6 +1,12 @@
 {
   "name": "ConversationThread",
   "type": "object",
+  "_metadata": {
+    "status": "CORE_PRODUCTION",
+    "reason": "Primary conversation grouping - groups messages and events into logical conversations. Write in thread management flows. Read by message viewers.",
+    "tenant_scoped": "client_id",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",

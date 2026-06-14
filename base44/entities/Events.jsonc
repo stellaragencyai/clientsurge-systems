@@ -1,6 +1,14 @@
 {
   "name": "Events",
   "type": "object",
+  "_metadata": {
+    "status": "DEPRECATED",
+    "reason": "Replaced by CommunicationEvent (canonical event log). Use CommunicationEvent for all new flows. This entity is read-only legacy.",
+    "sunset_date": "2026-09-30",
+    "replacement": "CommunicationEvent",
+    "read_only": true,
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",

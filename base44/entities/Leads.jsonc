@@ -1,6 +1,12 @@
 {
   "name": "Leads",
   "type": "object",
+  "_metadata": {
+    "status": "CORE_PRODUCTION",
+    "reason": "Primary CRM entity - canonical system of record for all leads/contacts. Write in all production flows. Read by dashboards, automation, reporting.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",

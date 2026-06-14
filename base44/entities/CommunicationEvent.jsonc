@@ -1,6 +1,13 @@
 {
   "name": "CommunicationEvent",
   "type": "object",
+  "_metadata": {
+    "status": "CORE_PRODUCTION",
+    "reason": "Primary event log - immutable append-only audit trail for all system activity. Write in all production flows. Critical for compliance, debugging, analytics.",
+    "immutable": true,
+    "tenant_scoped": "client_id + client_project_id (optional)",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",

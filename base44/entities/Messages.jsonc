@@ -1,6 +1,13 @@
 {
   "name": "Messages",
   "type": "object",
+  "_metadata": {
+    "status": "CORE_PRODUCTION",
+    "reason": "Primary message storage - canonical storage for message bodies, templates, transcripts. Immutable. Write in all message flows.",
+    "immutable": true,
+    "tenant_scoped": "Via lead_id (resolve through Leads)",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",

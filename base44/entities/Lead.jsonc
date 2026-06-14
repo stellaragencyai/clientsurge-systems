@@ -1,6 +1,14 @@
 {
   "name": "Lead",
   "type": "object",
+  "_metadata": {
+    "status": "DEPRECATED",
+    "reason": "Consolidated into Leads entity (canonical CRM). Use Leads for all new flows. This entity is read-only legacy.",
+    "sunset_date": "2026-09-30",
+    "replacement": "Leads",
+    "read_only": true,
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
   "properties": {
     "description": {
       "type": "string",
