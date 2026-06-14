@@ -1,4 +1,17 @@
 {
   "name": "generateServiceTemplates",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Credentials Complete → Generate AI Templates",
+      "description": "When client credentials are submitted, AI auto-generates all 4 personalized SMS/email templates. Task #578.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "ClientInstallationOS",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
 }

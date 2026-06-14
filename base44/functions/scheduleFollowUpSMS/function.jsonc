@@ -1,16 +1,23 @@
 {
   "name": "scheduleFollowUpSMS",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "ends_type": "never",
-      "is_active": false,
       "name": "Follow-Up SMS (15 Min)",
-      "repeat_interval": 15,
-      "repeat_unit": "minutes",
+      "description": null,
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
       "schedule_mode": "recurring",
-      "schedule_type": "simple"
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 15,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

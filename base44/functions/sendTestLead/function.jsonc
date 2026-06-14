@@ -1,4 +1,4 @@
 {
   "name": "sendTestLead",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,17 +1,18 @@
 {
   "name": "startNurtureCampaign",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "entity",
+      "name": "Auto-Enroll Nurture Tagged Leads",
       "description": "Enrolls a lead into the 30-day nurture email sequence when their tags contain \"Nurture\"",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
       "entity_name": "Leads",
       "event_types": [
         "create",
         "update"
-      ],
-      "is_active": true,
-      "name": "Auto-Enroll Nurture Tagged Leads"
+      ]
     }
   ]
 }

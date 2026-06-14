@@ -1,4 +1,4 @@
 {
   "name": "sendDemoConfirmationEmail",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

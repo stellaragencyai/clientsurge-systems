@@ -1,4 +1,4 @@
 {
   "name": "generateMessage",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,4 +1,4 @@
 {
   "name": "generateAIReply",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

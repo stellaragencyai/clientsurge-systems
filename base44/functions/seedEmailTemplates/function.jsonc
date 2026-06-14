@@ -1,4 +1,4 @@
 {
   "name": "seedEmailTemplates",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

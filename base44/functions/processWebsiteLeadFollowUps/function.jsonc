@@ -1,17 +1,40 @@
 {
   "name": "processWebsiteLeadFollowUps",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
+      "name": "Website Lead Follow-Up Processor",
+      "description": "Runs every 10 minutes to process and send follow-up SMS/email sequences for website leads (10-min SMS, 1-hr email, 24-hr SMS). This is the core follow-up engine for WebsiteLead entity.",
+      "function_args": null,
+      "is_active": false,
       "type": "scheduled",
-      "description": "Runs the 3-step website lead follow-up sequence (10min SMS, 1hr email, 24hr SMS) every 5 minutes for leads with no reply and no booking",
-      "ends_type": "never",
-      "is_active": true,
-      "name": "Website Lead Follow-Up Processor — Every 5 Minutes",
-      "repeat_interval": 5,
-      "repeat_unit": "minutes",
       "schedule_mode": "recurring",
-      "schedule_type": "simple"
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 10,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Website Lead Follow-Up Processor — Every 5 Minutes",
+      "description": "Runs the 3-step website lead follow-up sequence (10min SMS, 1hr email, 24hr SMS) every 5 minutes for leads with no reply and no booking",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

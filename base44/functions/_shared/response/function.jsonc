@@ -1,4 +1,4 @@
 {
   "name": "_shared/response",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

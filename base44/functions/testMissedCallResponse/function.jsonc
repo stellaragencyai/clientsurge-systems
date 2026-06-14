@@ -1,4 +1,4 @@
 {
   "name": "testMissedCallResponse",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

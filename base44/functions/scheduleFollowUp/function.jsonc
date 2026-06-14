@@ -1,4 +1,4 @@
 {
   "name": "scheduleFollowUp",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

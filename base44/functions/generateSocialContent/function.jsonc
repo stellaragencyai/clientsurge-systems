@@ -1,4 +1,190 @@
 {
   "name": "generateSocialContent",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Social: Contractors — Bi-Weekly Content",
+      "description": "Every other Wednesday 8am — generates Facebook, LinkedIn, and Blog content for general contractors / trades industry",
+      "function_args": {
+        "industry": "contractors",
+        "content_types": [
+          "blog_post",
+          "facebook",
+          "linkedin"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 2,
+      "start_time": "15:00",
+      "repeat_on_days": [
+        3
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Social: HVAC — Weekly Content",
+      "description": "Every Friday 7am — generates Facebook, LinkedIn, and Blog content for HVAC / home services industry",
+      "function_args": {
+        "industry": "hvac",
+        "content_types": [
+          "blog_post",
+          "facebook",
+          "linkedin",
+          "twitter"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": [
+        5
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Social: Roofing — Bi-Weekly Content",
+      "description": "Every other Monday 8am — generates Facebook, Instagram, and Blog content for roofing / restoration industry",
+      "function_args": {
+        "industry": "roofing",
+        "content_types": [
+          "blog_post",
+          "facebook",
+          "instagram"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 2,
+      "start_time": "15:00",
+      "repeat_on_days": [
+        1
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Social: Chiropractic — Weekly Content",
+      "description": "Every Thursday 7am — generates Instagram, LinkedIn, and Blog content for chiropractic / PT industry",
+      "function_args": {
+        "industry": "chiropractic",
+        "content_types": [
+          "blog_post",
+          "instagram",
+          "linkedin"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": [
+        4
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Social: Med Spa — Weekly Content",
+      "description": "Every Tuesday 7am — generates Instagram, Facebook, and Blog content for med spa / aesthetics industry",
+      "function_args": {
+        "industry": "med_spa",
+        "content_types": [
+          "blog_post",
+          "instagram",
+          "facebook",
+          "tiktok_script"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": [
+        2
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Social: Dental — Weekly Content",
+      "description": "Every Wednesday 7am — generates LinkedIn, Facebook, and Blog content for dental / orthodontics industry",
+      "function_args": {
+        "industry": "dental",
+        "content_types": [
+          "blog_post",
+          "linkedin",
+          "facebook"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": [
+        3
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Blog: ClientSurge General — Weekly SEO Post",
+      "description": "Every Monday 7am — generates a general SEO automation blog post for ClientSurge Systems website",
+      "function_args": {
+        "industry": "general",
+        "content_types": [
+          "blog_post",
+          "linkedin",
+          "twitter"
+        ]
+      },
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": [
+        1
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
 }

@@ -1,4 +1,4 @@
 {
   "name": "scheduleDemoBooking",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

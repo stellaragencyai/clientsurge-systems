@@ -1,4 +1,17 @@
 {
   "name": "onLeadCreated",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "New Lead Created → Route + First SMS",
+      "description": "Fires onLeadCreated when a new Leads record is created. Routes to industry agent, generates first industry-specific SMS, sends it via Twilio.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "create"
+      ]
+    }
+  ]
 }

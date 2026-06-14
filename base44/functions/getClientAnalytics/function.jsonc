@@ -1,4 +1,4 @@
 {
   "name": "getClientAnalytics",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

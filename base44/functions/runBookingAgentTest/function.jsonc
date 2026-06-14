@@ -1,4 +1,4 @@
 {
   "name": "runBookingAgentTest",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

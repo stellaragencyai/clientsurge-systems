@@ -1,4 +1,4 @@
 {
   "name": "_shared/installUtils",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

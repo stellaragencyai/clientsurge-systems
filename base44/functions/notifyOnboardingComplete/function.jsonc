@@ -1,4 +1,18 @@
 {
   "name": "notifyOnboardingComplete",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Onboarding Submission Complete — Notify Admin",
+      "description": null,
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "OnboardingSubmission",
+      "event_types": [
+        "create",
+        "update"
+      ]
+    }
+  ]
 }

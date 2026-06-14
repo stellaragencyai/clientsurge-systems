@@ -1,4 +1,17 @@
 {
   "name": "onChecklistStatusChange",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Notify Client When Automation Goes Live",
+      "description": "Sends a progress update email to the client when their automation checklist status changes to 'active' (goes live).",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "AutomationChecklist",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
 }

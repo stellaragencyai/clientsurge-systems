@@ -1,0 +1,4 @@
+{
+  "name": "automatedCredentialIngestion",
+  "entry": "main.ts"
+}

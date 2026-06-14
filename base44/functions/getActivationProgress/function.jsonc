@@ -1,4 +1,4 @@
 {
   "name": "getActivationProgress",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

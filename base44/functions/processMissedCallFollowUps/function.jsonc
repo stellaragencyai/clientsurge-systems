@@ -1,17 +1,23 @@
 {
   "name": "processMissedCallFollowUps",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Runs the 4-step missed-call recovery sequence (2min SMS, 10min email, 1hr SMS, 24hr email) every 5 minutes for leads in Contacted status with Hot priority",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Missed-Call Follow-Up Processor — Every 5 Minutes",
-      "repeat_interval": 5,
-      "repeat_unit": "minutes",
+      "description": "Runs the 4-step missed-call recovery sequence (2min SMS, 10min email, 1hr SMS, 24hr email) every 5 minutes for leads in Contacted status with Hot priority",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
       "schedule_mode": "recurring",
-      "schedule_type": "simple"
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

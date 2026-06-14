@@ -1,4 +1,4 @@
 {
   "name": "initiateVoiceCloneIntake",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

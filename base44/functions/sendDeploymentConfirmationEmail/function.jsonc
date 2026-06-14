@@ -1,0 +1,4 @@
+{
+  "name": "sendDeploymentConfirmationEmail",
+  "entry": "main.ts"
+}

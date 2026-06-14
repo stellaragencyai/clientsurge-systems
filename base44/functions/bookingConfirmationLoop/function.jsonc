@@ -1,4 +1,4 @@
 {
   "name": "bookingConfirmationLoop",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,18 +1,23 @@
 {
   "name": "runWinBackSequence",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Daily: scans for orders with canceled/past_due/failed payment status for 30+ days and sends a 3-step win-back email sequence (Day 30 special offer, Day 37 diagnostic call, Day 44 final CTA).",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Win-Back Sequence — Daily Check",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
+      "description": "Daily: scans for orders with canceled/past_due/failed payment status for 30+ days and sends a 3-step win-back email sequence (Day 30 special offer, Day 37 diagnostic call, Day 44 final CTA).",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
       "schedule_mode": "recurring",
       "schedule_type": "simple",
-      "start_time": "17:00"
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "17:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

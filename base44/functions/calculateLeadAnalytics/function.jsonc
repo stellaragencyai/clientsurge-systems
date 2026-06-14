@@ -1,4 +1,4 @@
 {
   "name": "calculateLeadAnalytics",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

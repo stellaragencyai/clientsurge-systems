@@ -1,4 +1,4 @@
 {
   "name": "routeLeadToIndustryAgent",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

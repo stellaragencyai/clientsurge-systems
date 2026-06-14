@@ -1,15 +1,17 @@
 {
   "name": "sendClientWelcomeEmail",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
+      "name": "Send Welcome Email on New Order",
+      "description": null,
+      "function_args": null,
+      "is_active": true,
       "type": "entity",
       "entity_name": "Order",
       "event_types": [
         "create"
-      ],
-      "is_active": true,
-      "name": "Send Welcome Email on New Order"
+      ]
     }
   ]
 }

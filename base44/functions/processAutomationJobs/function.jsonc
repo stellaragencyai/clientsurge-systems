@@ -1,17 +1,23 @@
 {
   "name": "processAutomationJobs",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Processes queued SMS and email automation jobs (reactivation outreach, etc.) every 5 minutes.",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Automation Jobs Processor — Every 5 Minutes",
-      "repeat_interval": 5,
-      "repeat_unit": "minutes",
+      "description": "Processes queued SMS and email automation jobs (reactivation outreach, etc.) every 5 minutes.",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
       "schedule_mode": "recurring",
-      "schedule_type": "simple"
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

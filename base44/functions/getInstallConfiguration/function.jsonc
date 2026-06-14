@@ -1,4 +1,4 @@
 {
   "name": "getInstallConfiguration",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,30 +1,40 @@
 {
   "name": "processNurtureCampaigns",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Runs the 8-step 30-day email nurture sequence daily, advancing enrolled leads through their campaign steps.",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Nurture Campaign Processor — Daily 9 AM",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
+      "description": "Runs the 8-step 30-day email nurture sequence daily, advancing enrolled leads through their campaign steps.",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
       "schedule_mode": "recurring",
       "schedule_type": "simple",
-      "start_time": "16:00"
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "16:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     },
     {
-      "type": "scheduled",
-      "description": "Runs the 30-day nurture email sequence daily at 8am, sending the next due step for each active campaign",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Process Nurture Campaigns Daily",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
+      "description": "Runs the 30-day nurture email sequence daily at 8am, sending the next due step for each active campaign",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
       "schedule_mode": "recurring",
       "schedule_type": "simple",
-      "start_time": "15:00"
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "15:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

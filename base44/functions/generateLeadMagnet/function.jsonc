@@ -1,4 +1,4 @@
 {
   "name": "generateLeadMagnet",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

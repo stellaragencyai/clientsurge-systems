@@ -1,4 +1,4 @@
 {
   "name": "getBookedDemoSlots",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

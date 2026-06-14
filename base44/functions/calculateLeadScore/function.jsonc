@@ -1,4 +1,17 @@
 {
   "name": "calculateLeadScore",
-  "entry": "entry.ts"
+  "entry": "entry.ts",
+  "automations": [
+    {
+      "name": "Auto-Score New Leads on Creation",
+      "description": "Fires calculateLeadScore immediately when a new Lead is created, ensuring activation_priority (Hot/High/Medium/Low) and lead_score are set before any downstream automations check them.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "create"
+      ]
+    }
+  ]
 }

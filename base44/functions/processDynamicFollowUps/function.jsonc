@@ -1,4 +1,4 @@
 {
   "name": "processDynamicFollowUps",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,16 +1,17 @@
 {
   "name": "analyzeReplySentiment",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "entity",
+      "name": "AI Sentiment Analysis — New Inbound Message",
       "description": "When a new inbound message is created for a lead, trigger AI sentiment analysis and save Positive/Neutral/Negative to the lead record.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
       "entity_name": "Messages",
       "event_types": [
         "create"
-      ],
-      "is_active": true,
-      "name": "AI Sentiment Analysis — New Inbound Message"
+      ]
     }
   ]
 }

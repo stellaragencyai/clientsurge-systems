@@ -1,4 +1,4 @@
 {
   "name": "sendNPSSurvey",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

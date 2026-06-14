@@ -1,4 +1,4 @@
 {
   "name": "saveQuickStartConfig",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

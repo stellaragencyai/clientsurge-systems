@@ -1,4 +1,23 @@
 {
   "name": "runIntegrationHealthCheck",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Hourly Integration Health Check",
+      "description": "Runs live API pings for Twilio, Resend, and Stripe every hour. Auto-creates fix-it ProjectTasks if persistent errors are detected.",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "hours",
+      "repeat_interval": 1,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
 }

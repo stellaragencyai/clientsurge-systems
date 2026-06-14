@@ -1,4 +1,4 @@
 {
   "name": "receiveInboundVoiceCall",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }
