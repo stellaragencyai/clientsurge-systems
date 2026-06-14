@@ -120,6 +120,65 @@
       ],
       "default": "Onboarding"
     },
+    "lifecycle_stage": {
+      "type": "string",
+      "title": "Lifecycle Stage",
+      "enum": [
+        "pending",
+        "setup_in_progress",
+        "testing",
+        "live",
+        "suspended"
+      ],
+      "default": "pending",
+      "description": "Commercial lifecycle tracking: inferred from ClientProject status and setup completion"
+    },
+    "lifecycle_stage_override": {
+      "type": "string",
+      "title": "Lifecycle Override (Admin Only)",
+      "enum": [
+        "pending",
+        "setup_in_progress",
+        "testing",
+        "live",
+        "suspended"
+      ],
+      "description": "Manual admin override of lifecycle stage"
+    },
+    "lifecycle_override_by": {
+      "type": "string",
+      "title": "Lifecycle Override By (Admin Email)"
+    },
+    "lifecycle_override_at": {
+      "type": "string",
+      "title": "Lifecycle Override At",
+      "format": "date-time"
+    },
+    "onboarding_started_at": {
+      "type": "string",
+      "title": "Onboarding Started At",
+      "format": "date-time"
+    },
+    "setup_completed_at": {
+      "type": "string",
+      "title": "Setup Completed At",
+      "format": "date-time"
+    },
+    "testing_started_at": {
+      "type": "string",
+      "title": "Testing Started At",
+      "format": "date-time"
+    },
+    "testing_completed_at": {
+      "type": "string",
+      "title": "Testing Completed At",
+      "format": "date-time"
+    },
+    "went_live_at": {
+      "type": "string",
+      "title": "Went Live At",
+      "format": "date-time"
+    },
     "tags": {
       "type": "array",
       "items": {
