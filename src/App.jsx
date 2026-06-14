@@ -68,6 +68,7 @@ const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 const Library = lazy(() => import("./pages/Library"));
 const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipeline"));
+const MissionControlDashboard = lazy(() => import("./internal-pages/MissionControlDashboard"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -353,9 +354,10 @@ const AuthenticatedApp = () => {
         }
       >
         {[
-          { route: routePath("dashboard"), element: <Navigate to={routePath("admin")} replace /> },
-          { route: routePath("admin-settings"), element: <Navigate to={routePath("admin")} replace /> },
-          { route: routePath("admin"), Component: AdminDashboard },
+          { route: routePath("dashboard"), element: <Navigate to={routePath("mission-control")} replace /> },
+          { route: routePath("admin-settings"), element: <Navigate to={routePath("mission-control")} replace /> },
+          { route: routePath("mission-control"), Component: MissionControlDashboard },
+          { route: routePath("admin"), element: <Navigate to={routePath("mission-control")} replace /> },
           { route: routePath("admin", "leads"), element: <Navigate to={`${routePath("admin")}?tab=leads`} replace /> },
           { route: routePath("admin", "leads", dynamicParam("leadId")), Component: AdminLeadDetail },
           { route: routePath("admin", "automations"), Component: AdminAutomation },
