@@ -69,6 +69,7 @@ const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 const Library = lazy(() => import("./pages/Library"));
 const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipeline"));
 const MissionControlDashboard = lazy(() => import("./internal-pages/MissionControlDashboard"));
+const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLogs"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -370,6 +371,7 @@ const AuthenticatedApp = () => {
           { route: routePath("admin", "AIStatusDashboard"), caseSensitive: true, element: <Navigate to={routePath("admin")} replace /> },
           { route: routePath("admin", "performance-wars"), Component: PerformanceWars },
           { route: routePath("admin", "onboarding-pipeline"), Component: OnboardingPipeline },
+          { route: routePath("admin", "logs"), Component: MissionControlLogs },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
