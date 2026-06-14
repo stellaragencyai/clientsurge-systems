@@ -103,7 +103,7 @@ export default function Hero() {
               padding: "6px 16px",
               background: "rgba(0,174,239,0.15)",
               border: "1px solid rgba(0,174,239,0.35)",
-              color: "#66d9ff",
+              color: "#0066aa",
               fontSize: "11px",
               fontWeight: 800,
               letterSpacing: "0.12em",
@@ -131,12 +131,12 @@ export default function Hero() {
               fontWeight: "800",
               lineHeight: 1.05,
               letterSpacing: "-0.02em",
-              color: "#ffffff",
+              color: "#0a1628",
               margin: "0",
             }}
           >
             We Build the AI Growth Engines{" "}
-            <span className="landing-hero__headlineAccent">
+            <span className="landing-hero__headlineAccent" style={{ color: "#0066aa" }}>
               That Turn Your Website Into a Booking Machine.
             </span>
           </motion.h1>
@@ -155,7 +155,7 @@ export default function Hero() {
             variants={heroRevealItem}
             style={{
               fontSize: "clamp(1rem, 2.2vw, 1.15rem)",
-              color: "rgba(255,255,255,0.72)",
+              color: "#333333",
               lineHeight: 1.65,
               maxWidth: "660px",
               margin: "0 auto 32px",
@@ -187,6 +187,8 @@ export default function Hero() {
                 boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38), 0 4px 12px rgba(0,159,212,0.3)",
                 transition: "box-shadow 0.28s cubic-bezier(0.34,1.56,0.64,1), transform 0.28s cubic-bezier(0.34,1.56,0.64,1)",
               }}
+              onMouseDown={(e) => { e.currentTarget.style.transform = "translateY(-1px) scale(0.98)"; }}
+              onMouseUp={(e) => { e.currentTarget.style.transform = "translateY(-2px) scale(1)"; }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)";
                 e.currentTarget.style.transform = "translateY(-2px)";
@@ -208,21 +210,21 @@ export default function Hero() {
                 height: "52px",
                 padding: "0 28px",
                 borderRadius: "8px",
-                background: "rgba(255,255,255,0.08)",
-                border: "1px solid rgba(255,255,255,0.22)",
-                color: "#ffffff",
+                background: "rgba(0,0,0,0.08)",
+                border: "1px solid rgba(0,0,0,0.22)",
+                color: "#0a1628",
                 fontWeight: "700",
                 fontSize: "0.95rem",
                 textDecoration: "none",
                 transition: "background 0.3s ease, border-color 0.3s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.14)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.38)";
+                e.currentTarget.style.background = "rgba(0,0,0,0.14)";
+                e.currentTarget.style.borderColor = "rgba(0,0,0,0.38)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.22)";
+                e.currentTarget.style.background = "rgba(0,0,0,0.08)";
+                e.currentTarget.style.borderColor = "rgba(0,0,0,0.22)";
               }}
             >
               View Systems &amp; Pricing
@@ -241,15 +243,15 @@ export default function Hero() {
             }}
           >
             {[
-              { value: "6", label: "AI Automations Installed" },
-              { value: "24/7", label: "Lead Response Coverage" },
-              { value: "48hr", label: "Average Go-Live Time" },
-            ].map(({ value, label }) => (
-              <div key={label} style={{ textAlign: "center" }}>
-                <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#ffffff", lineHeight: 1 }}>{value}</div>
-                <div style={{ fontSize: "11px", color: "rgba(255,255,255,0.50)", marginTop: "5px", fontWeight: 600, letterSpacing: "0.04em" }}>{label}</div>
-              </div>
-            ))}
+               { value: "6", label: "AI Automations Installed" },
+               { value: "24/7", label: "Lead Response Coverage" },
+               { value: "48hr", label: "Average Go-Live Time" },
+             ].map(({ value, label }) => (
+               <div key={label} style={{ textAlign: "center" }}>
+                 <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#0a1628", lineHeight: 1 }}>{value}</div>
+                 <div style={{ fontSize: "11px", color: "#666666", marginTop: "5px", fontWeight: 600, letterSpacing: "0.04em" }}>{label}</div>
+               </div>
+             ))}
           </motion.div>
         </motion.div>
       </motion.div>
