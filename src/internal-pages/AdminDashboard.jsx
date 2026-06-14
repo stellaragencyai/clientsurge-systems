@@ -6,7 +6,7 @@ import {
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw,
   Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
-  CalendarCheck2, ShieldCheck,
+  CalendarCheck2, ShieldCheck, Eye,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -197,6 +197,21 @@ export default function AdminDashboard() {
 
   // Role guard is handled by ProtectedRoute in App.jsx — no redundant check needed here
 
+  const handlePreviewAsClient = async () => {
+    setPreviewingAsClient(true);
+    try {
+      const res = await base44.functions.invoke('getDemoClientAccess', {});
+      const email = res?.data?.email || 'demo@clientsurge.com';
+      // Open the client portal directly in a new tab
+      window.open('/client-portal', '_blank');
+    } catch (e) {
+      // Fallback: just open client portal
+      window.open('/client-portal', '_blank');
+    } finally {
+      setPreviewingAsClient(false);
+    }
+  };
+
   const handleLogout = () => {
     setLoggingOut(true);
     base44.auth.logout('/');
@@ -333,6 +348,14 @@ export default function AdminDashboard() {
             <p className="text-xs text-muted-foreground">Signed in as</p>
             <p className="text-sm font-semibold text-foreground truncate">{user?.full_name || 'Admin'}</p>
           </div>
+          <button
+            onClick={handlePreviewAsClient}
+            disabled={previewingAsClient}
+            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-primary/30 bg-primary/8 text-primary font-medium hover:bg-primary/15 transition-colors text-sm disabled:opacity-60"
+          >
+            {previewingAsClient ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
+            {previewingAsClient ? 'Opening...' : 'Preview as Client'}
+          </button>
           <button
             onClick={handleLogout}
             disabled={loggingOut}
