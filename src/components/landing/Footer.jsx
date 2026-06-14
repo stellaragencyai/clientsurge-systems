@@ -146,11 +146,11 @@ export default function Footer() {
 
         <div className="cs-footer-bottom">
           <div className="cs-footer-legal">
-            <span>Copyright {new Date().getFullYear()} ClientSurge Systems</span>
+            <span style={{ display: "flex", alignItems: "center", gap: "12px" }}>Copyright {new Date().getFullYear()} ClientSurge Systems</span>
             <span aria-hidden="true">/</span>
-            <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")}>Privacy</a>
+            <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")} style={{ display: "flex", alignItems: "center" }}>Privacy</a>
             <span aria-hidden="true">/</span>
-            <a href="/terms" onClick={(e) => handleNavClick(e, "/terms")}>Terms</a>
+            <a href="/terms" onClick={(e) => handleNavClick(e, "/terms")} style={{ display: "flex", alignItems: "center" }}>Terms</a>
           </div>
 
           <div className="cs-footer-status">

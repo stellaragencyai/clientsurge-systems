@@ -69,21 +69,17 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
         }} />
       )}
 
-      {/* Floating badge */}
-       {plan.badge || isRecommended ? (
+      {/* Floating badge — only for recommended */}
+       {isRecommended ? (
          <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
            <span
              className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full shadow-xl"
              style={{
-               background: isRecommended
-                 ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
-                 : "linear-gradient(135deg, #0088CC 0%, #005f99 100%)",
-               boxShadow: isRecommended
-                 ? "0 4px 12px rgba(0,174,239,0.5)"
-                 : "0 2px 8px rgba(0,136,204,0.3)",
+               background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
+               boxShadow: "0 4px 12px rgba(0,174,239,0.5)"
              }}
            >
-             {isRecommended ? `★ Best for ${selectedIndustry?.shortName}` : plan.badge}
+             ★ Best for {selectedIndustry?.shortName}
            </span>
          </div>
        ) : null}

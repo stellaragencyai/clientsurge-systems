@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
+import { motion } from "framer-motion";
 import { X, ArrowRight, Loader2, KeyRound, Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
@@ -86,16 +87,31 @@ export default function PortalLoginModal({ onClose }) {
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] overflow-y-auto">
-      <div className="fixed inset-0 bg-black/50 backdrop-blur-sm" onClick={onClose} />
+      <motion.div
+        className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+        onClick={onClose}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.4 }}
+      />
 
       <div className="flex min-h-full items-center justify-center p-4">
-        <div
+        <motion.div
           ref={dialogRef}
           role="dialog"
           aria-modal="true"
           aria-label="Client portal sign in"
           tabIndex={-1}
           className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl focus:outline-none"
+          initial={{ opacity: 0, scale: 0.92, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.92, y: 20 }}
+          transition={{
+            duration: 0.7,
+            ease: [0.16, 1, 0.3, 1],
+            delay: 0.1
+          }}
         >
           <div className="border-b border-border px-8 pb-5 pt-8">
             <button
@@ -246,9 +262,9 @@ export default function PortalLoginModal({ onClose }) {
               )}
             </div>
           </form>
-        </div>
-      </div>
-    </div>,
-    document.body
-  );
-}
+          </motion.div>
+          </div>
+          </div>,
+          document.body
+          );
+          }

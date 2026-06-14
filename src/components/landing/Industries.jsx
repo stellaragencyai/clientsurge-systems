@@ -307,17 +307,19 @@ export default function Industries() {
       ref={sectionRef}
       className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
       
-      <div className="max-w-6xl mx-auto text-center px-6 pt-10 pb-10">
-        <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3" style={{ color: "var(--cs-electric)" }}>
-          Choose Your Industry
-        </p>
-        <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
-          Built for Businesses That Win on{" "}
-          <span className="text-primary">Fast Response</span>
-        </h2>
-        <p className="mt-4 text-muted-foreground text-lg max-w-3xl mx-auto leading-relaxed">
-          Click your industry and we will show you the AI service stack we would recommend first, why it fits, and which pieces are available now versus by review.
-        </p>
+      <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
+         <div className="flex flex-col items-center text-center">
+           <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3" style={{ color: "var(--cs-electric)" }}>
+             Choose Your Industry
+           </p>
+           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight max-w-4xl" style={{ fontFamily: "Montserrat, sans-serif" }}>
+             Built for Businesses That Win on{" "}
+             <span className="text-primary">Fast Response</span>
+           </h2>
+           <p className="mt-4 text-muted-foreground text-lg max-w-3xl leading-relaxed">
+             Click your industry and we will show you the AI service stack we would recommend first, why it fits, and which pieces are available now versus by review.
+           </p>
+         </div>
 
         {/* Filter pills */}
         <div className="flex flex-wrap justify-center gap-2 mt-6 pb-4">
@@ -386,17 +388,17 @@ export default function Industries() {
                 height="442"
                 className="absolute inset-0 h-full w-full object-cover"
                 style={{ filter: "saturate(1) contrast(1.03) brightness(0.98)" }} />
-              
+
               {/* Unique per-industry SVG texture pattern */}
               {industryPatterns[industry.id]}
-              
+
 
               <div
                 className="absolute inset-0"
                 style={{
                   background: highlighted ?
-                  "linear-gradient(to bottom, rgba(3,7,18,0.02) 0%, rgba(3,7,18,0.08) 50%, rgba(3,7,18,0.58) 100%)" :
-                  "linear-gradient(to bottom, rgba(3,7,18,0.01) 0%, rgba(3,7,18,0.06) 50%, rgba(3,7,18,0.54) 100%)"
+                  "linear-gradient(to bottom, rgba(3,7,18,0) 0%, rgba(3,7,18,0) 30%, rgba(3,7,18,0.48) 100%)" :
+                  "linear-gradient(to bottom, rgba(3,7,18,0) 0%, rgba(3,7,18,0) 30%, rgba(3,7,18,0.44) 100%)"
                 }} />
               
 
