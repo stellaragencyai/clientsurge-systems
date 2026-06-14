@@ -190,8 +190,6 @@ export default function Hero() {
                 boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0, 174, 239, 0.38), 0 4px 12px rgba(0,159,212,0.3)",
                 transition: "box-shadow 0.28s cubic-bezier(0.34,1.56,0.64,1), transform 0.28s cubic-bezier(0.34,1.56,0.64,1)",
               }}
-              onMouseDown={(e) => { e.currentTarget.style.transform = "translateY(-1px) scale(0.98)"; }}
-              onMouseUp={(e) => { e.currentTarget.style.transform = "translateY(-2px) scale(1)"; }}
               onMouseEnter={(e) => {
                 e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)";
                 e.currentTarget.style.transform = "translateY(-2px)";

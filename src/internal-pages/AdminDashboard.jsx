@@ -44,6 +44,7 @@ import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
+import LandingPageAnalyticsPanel from '../components/admin/LandingPageAnalyticsPanel';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
@@ -110,6 +111,7 @@ const NAV_GROUPS = [
       { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'priority', label: 'Priority Queue', icon: Star },
       { id: 'attribution', label: 'Source Attribution', icon: PieChart },
+      { id: 'landing-traffic', label: 'Landing Page Traffic', icon: BarChart3 },
     ],
   },
   {
@@ -249,6 +251,7 @@ export default function AdminDashboard() {
       case 'routing': return <LeadRoutingPanel />;
       case 'priority': return <LeadPriorityQueue />;
       case 'attribution': return <LazyAdminPanel><LeadSourceAttribution /></LazyAdminPanel>;
+      case 'landing-traffic': return <LandingPageAnalyticsPanel />;
       case 'campaign-builder': return <CampaignLibrary />;
       case 'revenue': return <LazyAdminPanel><RevenueDashboard /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
