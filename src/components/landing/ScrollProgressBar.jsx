@@ -1,43 +1,34 @@
-/**
- * Thin scroll progress indicator at the top of the page (#24).
- * Uses a passive scroll listener + CSS transform for 60fps performance.
- */
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
 
 export default function ScrollProgressBar() {
-  const barRef = useRef(null);
+  const [progress, setProgress] = useState(0);
 
   useEffect(() => {
-    const bar = barRef.current;
-    if (!bar) return;
-
-    const onScroll = () => {
-      const scrollTop = window.scrollY || document.documentElement.scrollTop;
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? Math.min(scrollTop / docHeight, 1) : 0;
-      bar.style.transform = `scaleX(${progress})`;
+      const scrolled = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
+      setProgress(scrolled);
     };
 
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   return (
     <div
-      ref={barRef}
-      aria-hidden="true"
       style={{
         position: "fixed",
         top: 0,
         left: 0,
-        right: 0,
         height: "3px",
-        background: "linear-gradient(90deg, #00AEEF, #009DFF, #003B8F)",
-        transformOrigin: "left",
-        transform: "scaleX(0)",
-        zIndex: 9999,
-        pointerEvents: "none",
+        background: "linear-gradient(90deg, #00AEEF, #006BB0)",
+        width: `${progress}%`,
+        transition: "width 0.1s ease",
+        zIndex: 100,
+        boxShadow: "0 0 12px rgba(0, 174, 239, 0.4)",
       }}
+      aria-hidden="true"
     />
   );
 }
