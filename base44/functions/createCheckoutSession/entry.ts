@@ -1,6 +1,5 @@
-import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { getStripeClient, safeStripeError } from "../_shared/stripeInit.js";
+import { getStripeClient, safeStripeError } from "./stripeInit.local.js";
 import { assertCheckoutCapacityAvailable } from "./checkoutCapacity.shared.js";
 import { getTrackedServiceConfig, normalizeInstallConfiguration } from "./installPipeline.shared.js";
 import {
@@ -8,6 +7,18 @@ import {
   buildStoredPricingSummary,
   buildStripeLineItemsForPricingSummary,
 } from "./salesCatalog.shared.js";
+
+function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
+      ...(init.headers || {}),
+    },
+  });
+}
 
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();

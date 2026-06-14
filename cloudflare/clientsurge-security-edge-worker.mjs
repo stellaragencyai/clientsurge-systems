@@ -10,6 +10,7 @@ const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 const CANONICAL_HOST = "clientsurgesystems.com";
 const ALTERNATE_HOST = "www.clientsurgesystems.com";
 const BASE44_ORIGIN_HOST = "grinning-apex-flow-growth.base44.app";
+const BASE44_API_ORIGIN_HOST = "base44.app";
 export const EDGE_HEALTH_PATH = "/.well-known/clientsurge-edge-health.json";
 export const EDGE_HEALTH_HEADER = "x-clientsurge-security-edge";
 export const TRUST_SECURITY_SCRIPT_PATH = "/.well-known/clientsurge-trust-security.js";
@@ -1407,8 +1408,12 @@ export function trustSecurityAssetResponse(pathname) {
 export function originRequestFor(request, url = new URL(request.url)) {
   const originUrl = new URL(url.toString());
   originUrl.protocol = "https:";
-  originUrl.hostname = BASE44_ORIGIN_HOST;
-  return new Request(originUrl.toString(), request);
+  originUrl.hostname = url.pathname.startsWith("/api/apps/")
+    ? BASE44_API_ORIGIN_HOST
+    : BASE44_ORIGIN_HOST;
+  const originRequest = new Request(originUrl.toString(), request);
+  originRequest.headers.delete("host");
+  return originRequest;
 }
 
 export function isAnonymousUserMeRequest(request, url = new URL(request.url)) {

@@ -1,5 +1,25 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { cachedJson, secureJson } from "../_shared/response.ts";
+
+function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
+      ...(init.headers || {}),
+    },
+  });
+}
+
+function cachedJson(data: Record<string, unknown> = {}, maxAge = 60): Response {
+  return secureJson({ success: true, ...data }, {
+    status: 200,
+    headers: {
+      "Cache-Control": `public, max-age=${maxAge}`,
+    },
+  });
+}
 
 // #116: filter by scheduled_date to avoid fetching all records
 Deno.serve(async (req) => {

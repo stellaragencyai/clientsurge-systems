@@ -1,5 +1,16 @@
-import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
+      ...(init.headers || {}),
+    },
+  });
+}
 
 // Inline guard: verify a booking date has not exceeded the max daily slot count
 async function assertBookingDateAvailable(base44, scheduled_date) {

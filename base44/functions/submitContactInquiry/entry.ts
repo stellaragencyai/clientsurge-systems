@@ -1,8 +1,19 @@
-import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+import { validatePublicFormOrigin } from "./publicFormOriginGuard.local.js";
+import { resendFetch } from "./resendFetch.local.js";
+import { twilioFetch } from "./providerFetch.local.js";
+
+function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
+      ...(init.headers || {}),
+    },
+  });
+}
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
