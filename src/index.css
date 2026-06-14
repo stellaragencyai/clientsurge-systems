@@ -455,7 +455,23 @@ body.homepage-white-canvas {
 }
 
 body.homepage-white-canvas::before {
-  display: none !important;
+   display: none !important;
+}
+
+body.homepage-white-canvas::after {
+   display: none !important;
+}
+
+body.homepage-white-canvas {
+  background: #ffffff !important;
+  background-image: none !important;
+}
+
+body.homepage-white-canvas *,
+body.homepage-white-canvas *::before,
+body.homepage-white-canvas *::after {
+  background: #ffffff !important;
+  background-image: none !important;
 }
 
 body.homepage-white-canvas .nebula-bg::before,
@@ -465,7 +481,10 @@ body.homepage-white-canvas .nebula-hero,
 body.homepage-white-canvas .nebula-pricing,
 body.homepage-white-canvas .nebula-testimonials,
 body.homepage-white-canvas .nebula-problem,
-body.homepage-white-canvas [class*="from-card"][class*="to-background"] {
+body.homepage-white-canvas [class*="from-card"][class*="to-background"],
+body.homepage-white-canvas [style*="background"],
+body.homepage-white-canvas [style*="radial-gradient"],
+body.homepage-white-canvas [style*="linear-gradient"] {
   background: #ffffff !important;
   background-image: none !important;
 }
