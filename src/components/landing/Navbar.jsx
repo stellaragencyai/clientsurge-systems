@@ -230,10 +230,10 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: scrolled || open ? `rgba(255,255,255,${0.18 + Math.min(scrolled ? 0.15 : 0, 0.15)})` : "rgba(255,255,255,0.14)",
-        backdropFilter: "blur(3px) saturate(1.05)",
-        WebkitBackdropFilter: "blur(3px) saturate(1.05)",
-        borderBottom: "1px solid rgba(255,255,255,0.16)",
+        background: scrolled || open ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.85)",
+        backdropFilter: "blur(8px) saturate(1.2)",
+        WebkitBackdropFilter: "blur(8px) saturate(1.2)",
+        borderBottom: "1px solid rgba(0,0,0,0.08)",
         boxShadow: "none",
         overflow: "visible",
       }}>
