@@ -14,12 +14,14 @@ import { base44 } from "@/api/base44Client";
 
 
 const sectionLinks = [
+{ label: "Contact", href: "/contact", isPage: true }
+];
+
+const solutionsLinks = [
 { label: "Automations", href: "/automations", isPage: true },
 { label: "Store", href: "/store", isPage: true },
-{ label: "Pricing", href: "/pricing", isPage: true },
-{ label: "Library", href: "/library", isPage: true },
-{ label: "About", href: "/about", isPage: true },
-{ label: "Contact", href: "/contact", isPage: true }];
+{ label: "Pricing", href: "/pricing", isPage: true }
+];
 
 
 const industryLinks = [
@@ -272,45 +274,48 @@ export default function Navbar() {
           </span>
         </button>
 
-        <div className="hidden xl:flex items-center gap-6 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.map((link) =>
-          link.isPage ?
-          <a
-            key={link.href}
-            href={link.href}
-            onClick={() => {trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar");}}
-            className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
-            
-                {link.label}
-              </a> :
-
-          <a
-            key={link.href}
-            href={`/${link.href}`}
-            onClick={(e) => handleSectionNavigation(e, link.href)}
-            className="text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap relative group"
-            style={{ position: "relative", paddingBottom: "2px" }}>
-            
-                {link.label}
-                <span
-              className="group-hover:[transform:scaleX(1)]"
+        <div className="hidden xl:flex items-center gap-10 absolute left-1/2 -translate-x-1/2">
+          <div className="relative" onKeyDown={(e) => {if (e.key === "Escape") setIndustriesOpen(false);}}>
+            <button
+              type="button"
+              onClick={() => setIndustriesOpen(!industriesOpen)}
+              aria-expanded={industriesOpen}
+              aria-haspopup="menu"
+              className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium text-foreground hover:text-primary transition-colors whitespace-nowrap">
+              Solutions
+              <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
+            </button>
+            {industriesOpen && typeof document !== "undefined" && createPortal((
+            <div
+              className="fixed rounded-lg border border-border p-3 shadow-xl"
+              role="menu"
+              aria-label="Solutions"
               style={{
-                position: "absolute",
-                bottom: "-2px",
-                left: 0,
-                height: "2px",
-                width: "100%",
-                background: "linear-gradient(90deg, #00AEEF, #009DFF, #003B8F)",
-                borderRadius: "1px",
-                transform: "scaleX(0)",
-                transformOrigin: "left",
-                transition: "transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                display: "block"
-              }} />
-            
-              </a>
-
-          )}
+                left: "50%",
+                transform: "translateX(-50%)",
+                top: "calc(var(--cs-nav-height) + 10px)",
+                background: "rgba(255,255,255,0.10)",
+                backdropFilter: "blur(3px) saturate(1.05)",
+                WebkitBackdropFilter: "blur(3px) saturate(1.05)",
+                zIndex: 200,
+              }}>
+              <div className="flex flex-col gap-1">
+                {solutionsLinks.map((item) =>
+                <a
+                  key={item.href}
+                  href={item.href}
+                  role="menuitem"
+                  onClick={() => {
+                    trackCTA(`nav_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "solutions_dropdown");
+                    setIndustriesOpen(false);
+                  }}
+                  className="w-full text-left flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer whitespace-nowrap">
+                  {item.label}
+                </a>
+                )}
+              </div>
+            </div>), document.body)}
+          </div>
 
           <div
             className="relative"
@@ -435,8 +440,26 @@ export default function Navbar() {
             backdropFilter: "blur(3px) saturate(1.05)",
             WebkitBackdropFilter: "blur(3px) saturate(1.05)",
           }}>
+          <div className="pt-2 border-t border-border">
+            <p className="text-[11px] font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--cs-electric)" }}>Solutions</p>
+            <div className="space-y-1">
+              {solutionsLinks.map((link) =>
+              <a
+                key={link.href}
+                href={link.href}
+                className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
+                style={{ minHeight: "44px" }}
+                onClick={() => {
+                  trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                  setOpen(false);
+                }}>
+                {link.label}
+              </a>
+              )}
+            </div>
+          </div>
+
           {sectionLinks.map((link) =>
-          link.isPage ?
           <a
             key={link.href}
             href={link.href}
@@ -446,23 +469,8 @@ export default function Navbar() {
               trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
               setOpen(false);
             }}>
-            
-                {link.label}
-              </a> :
-
-          <a
-            key={link.href}
-            href={`/${link.href}`}
-            className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
-            style={{ minHeight: "44px" }}
-            onClick={(e) => {
-              handleSectionNavigation(e, link.href);
-              setOpen(false);
-            }}>
-            
-                {link.label}
-              </a>
-
+            {link.label}
+          </a>
           )}
 
           <div className="pt-2 border-t border-border">
@@ -478,8 +486,7 @@ export default function Navbar() {
                 }}
                 className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
                 style={{ minHeight: "44px" }}>
-                
-                  {item.label}
+                {item.label}
                 </button>
               )}
             </div>
