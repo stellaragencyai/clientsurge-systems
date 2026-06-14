@@ -69,6 +69,9 @@ export default function Pricing() {
           >
             Stop Losing Leads. Start Running a Real System.
           </h2>
+          <p className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto leading-relaxed">
+            Choose the level of automation your business needs. Every plan includes setup, support, and live lead-response infrastructure.
+          </p>
         </div>
 
         {/* Business Size Toggle */}
@@ -102,11 +105,11 @@ export default function Pricing() {
           </div>
         ) : null}
 
-        <div className="flex flex-wrap justify-center gap-3 mb-8">
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           {[
-            { Icon: ShieldCheck, text: "Stripe checkout" },
-            { Icon: CheckCircle2, text: "No hidden fees" },
-            { Icon: Wallet, text: "Month-to-month" },
+            { Icon: ShieldCheck, text: "Secure Stripe Checkout" },
+            { Icon: CheckCircle2, text: "No Long-Term Contract" },
+            { Icon: Wallet, text: "Month-to-Month Billing" },
           ].map(({ Icon, text }) => (
             <span
               key={text}
@@ -138,44 +141,44 @@ export default function Pricing() {
           </div>
         </StaggeredFadeUp>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-8 mb-4 w-full">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-12 mb-6 w-full">
           {[
-            { icon: "No lock-in", text: "No long-term contracts" },
-            { icon: "Launch plan", text: "Timeline confirmed after onboarding" },
-            { icon: "Channels", text: "SMS + Email included" },
-            { icon: "Managed", text: "Done-for-you setup" },
-            { icon: "Protected", text: "30-day money-back guarantee" },
+            { icon: "🔓", text: "No Lock-In" },
+            { icon: "📅", text: "Managed Setup" },
+            { icon: "📱", text: "SMS + Email" },
+            { icon: "🚀", text: "Launch Support" },
+            { icon: "✅", text: "30-Day Guarantee" },
           ].map((badge) => (
             <div
               key={badge.text}
-              className="flex flex-col items-center justify-center gap-2 py-6 rounded-lg font-semibold"
+              className="flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-lg"
               style={{
                 background: "hsl(var(--card))",
                 border: "1px solid rgba(0,174,239,0.18)",
                 color: "rgba(0,0,0,0.75)",
               }}
             >
-              <span
-                style={{
-                  fontSize: "12px",
-                  lineHeight: 1.1,
-                  textTransform: "uppercase",
-                }}
-              >
+              <span style={{ fontSize: "20px", lineHeight: 1 }}>
                 {badge.icon}
               </span>
               <span
                 style={{
-                  fontSize: "12px",
+                  fontSize: "11px",
                   textAlign: "center",
-                  lineHeight: 1.3,
-                  padding: "0 8px",
+                  lineHeight: 1.2,
+                  fontWeight: "600",
                 }}
               >
                 {badge.text}
               </span>
             </div>
           ))}
+        </div>
+
+        <div className="text-center mb-6">
+          <p className="text-sm text-foreground/60">
+            <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth because it includes nurture sequences and AI booking—the fastest path to more booked appointments.
+          </p>
         </div>
 
         <MoneyBackGuarantee />

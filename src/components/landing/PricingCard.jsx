@@ -9,6 +9,27 @@ const TIER_ICONS = {
   pro_system: Crown,
 };
 
+const OUTCOME_COPY = {
+  starter_system: "Recover missed leads fast.",
+  growth_system: "Turn leads into booked appointments.",
+  pro_system: "Run the full response, nurture, and review system.",
+};
+
+const PRO_ONLY_FEATURES = [
+  "Review request automation",
+  "Lead reactivation campaign",
+  "Priority support",
+  "Advanced reporting",
+];
+
+const STARTER_FEATURES = [
+  "Lead capture connection",
+  "SMS notification setup",
+  "Missed-call recovery workflow",
+  "Basic launch support",
+  "Monthly system monitoring",
+];
+
 const PREVIOUS_PLAN = {
   growth_system: "Starter",
   pro_system: "Growth",
@@ -90,49 +111,61 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
             />
           </div>
           <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
+          <p className="text-sm font-medium text-foreground/70 mt-2">{OUTCOME_COPY[plan.packageKey]}</p>
           <p className="text-xs font-medium text-foreground/60 mt-1">{plan.fit}</p>
         </div>
 
         {/* Pricing */}
-        <div className="mb-6 pb-6 border-b border-primary/10">
-          <div className="flex items-baseline gap-2 mb-2">
-            <span className="text-4xl font-bold text-foreground">{plan.monthly}</span>
-            <span className="text-sm text-foreground/60">/month</span>
-          </div>
-          <p className="text-xs text-foreground/60">{plan.setup} one-time setup</p>
-        </div>
+         <div className="mb-6 pb-6 border-b border-primary/10">
+           <div className="flex items-baseline gap-2 mb-2">
+             <span className="text-4xl font-bold text-foreground">{plan.monthly}</span>
+             <span className="text-sm text-foreground/60">/month</span>
+           </div>
+           <p className="text-sm font-semibold text-foreground/80 leading-tight">+{plan.setup} one-time setup</p>
+         </div>
 
         {/* Features */}
-        <ul className="space-y-2.5 flex-1 mb-6">
-          {previousPlanName ? (
-            <>
-              <li className="flex items-center gap-2 mb-3">
-                <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                  Everything in {previousPlanName}, plus:
-                </span>
-              </li>
-              {featureGroups.added.map((feature) => (
-                <li key={feature} className="flex items-start gap-3">
-                  <PageCheckIcon />
-                  <span className="text-sm text-foreground/75">{feature}</span>
-                </li>
-              ))}
-              {featureGroups.base.map((feature) => (
-                <li key={feature} className="hidden sm:flex items-start gap-3 opacity-50">
-                  <PageCheckIcon />
-                  <span className="text-xs text-foreground/60">{feature}</span>
-                </li>
-              ))}
-            </>
-          ) : (
-            featureGroups.main.map((feature) => (
-              <li key={feature} className="flex items-start gap-3">
-                <PageCheckIcon />
-                <span className="text-sm text-foreground/75">{feature}</span>
-              </li>
-            ))
-          )}
-        </ul>
+         <ul className="space-y-2.5 flex-1 mb-6">
+           {plan.packageKey === "starter_system" ? (
+             // Starter: show all features clearly
+             STARTER_FEATURES.map((feature) => (
+               <li key={feature} className="flex items-start gap-3">
+                 <PageCheckIcon />
+                 <span className="text-sm text-foreground/75">{feature}</span>
+               </li>
+             ))
+           ) : plan.packageKey === "pro_system" ? (
+             // Pro: show "Everything in Growth, plus:" with Pro-only features
+             <>
+               <li className="flex items-center gap-2 mb-3">
+                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                   Everything in Growth, plus:
+                 </span>
+               </li>
+               {PRO_ONLY_FEATURES.map((feature) => (
+                 <li key={feature} className="flex items-start gap-3">
+                   <PageCheckIcon />
+                   <span className="text-sm text-foreground/75">{feature}</span>
+                 </li>
+               ))}
+             </>
+           ) : (
+             // Growth: show "Everything in Starter, plus:" with added features
+             <>
+               <li className="flex items-center gap-2 mb-3">
+                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
+                   Everything in Starter, plus:
+                 </span>
+               </li>
+               {["14-day nurture sequences", "AI appointment booking", "Email automation", "Lead scoring"].map((feature) => (
+                 <li key={feature} className="flex items-start gap-3">
+                   <PageCheckIcon />
+                   <span className="text-sm text-foreground/75">{feature}</span>
+                 </li>
+               ))}
+             </>
+           )}
+         </ul>
 
         {/* CTA */}
         <div className="space-y-2">
@@ -171,7 +204,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
             href="/book"
             className="w-full inline-flex items-center justify-center h-9 rounded-lg text-xs font-medium text-foreground/60 hover:text-primary transition-colors"
           >
-            Free strategy call
+            Start free automation audit
           </a>
         </div>
       </div>
