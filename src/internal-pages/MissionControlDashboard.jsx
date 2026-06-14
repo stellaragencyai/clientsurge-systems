@@ -12,10 +12,13 @@ import SystemHealthPanel from '../components/mission-control/SystemHealthPanel';
 import SystemStatusIndicator from '../components/mission-control/SystemStatusIndicator';
 import AlertsFeed from '../components/mission-control/AlertsFeed';
 import ConversionPipeline from '../components/mission-control/ConversionPipeline';
+import TenantSwitcher from '../components/mission-control/TenantSwitcher';
+import { useTenantContext } from '@/lib/useTenantContext.jsx';
 import { useRealTimePolling } from '@/hooks/useRealTimePolling';
 
 export default function MissionControlDashboard() {
   const { user } = useAuth();
+  const { selectedClientId, selectedProjectId, isAdmin } = useTenantContext();
   const [activeTab, setActiveTab] = useState('live-feeds');
   const [filters, setFilters] = useState({
     phoneNumber: '',
@@ -90,6 +93,23 @@ export default function MissionControlDashboard() {
               </button>
             </div>
           </div>
+
+          {/* Tenant Switcher (Admin Only) */}
+          {isAdmin && (
+            <div className="mb-4">
+              <p className="text-xs text-muted-foreground mb-2">Switch Tenant:</p>
+              <TenantSwitcher />
+            </div>
+          )}
+
+          {/* Selected Tenant Info */}
+          {(selectedClientId || selectedProjectId) && (
+            <div className="mb-4 p-3 rounded-lg bg-primary/10 border border-primary/20">
+              <p className="text-xs text-primary font-medium">
+                {selectedProjectId ? 'Scoped to Project' : 'Scoped to Client'} — All data below is tenant-filtered
+              </p>
+            </div>
+          )}
 
           {/* Filter Bar */}
           <div className="flex flex-wrap gap-3 mt-4">

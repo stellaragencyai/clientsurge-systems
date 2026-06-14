@@ -15,6 +15,7 @@ const CookieConsent = lazy(() =>
   import("@/components/landing/CookieConsent").catch(() => ({ default: () => null }))
 );
 import { AuthProvider, useAuth } from "@/lib/AuthContext";
+import { TenantProvider } from "@/lib/useTenantContext.jsx";
 import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import ErrorBoundary from "./components/ErrorBoundary";
@@ -70,6 +71,7 @@ const Library = lazy(() => import("./pages/Library"));
 const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipeline"));
 const MissionControlDashboard = lazy(() => import("./internal-pages/MissionControlDashboard"));
 const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLogs"));
+const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -257,7 +259,7 @@ function AccessDeniedPage() {
   );
 }
 
-const AuthenticatedApp = () => {
+const AuthenticatedAppWithTenant = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
   const location = useLocation();
   const publicRoute = isPublicPath(location.pathname);
@@ -372,6 +374,7 @@ const AuthenticatedApp = () => {
           { route: routePath("admin", "performance-wars"), Component: PerformanceWars },
           { route: routePath("admin", "onboarding-pipeline"), Component: OnboardingPipeline },
           { route: routePath("admin", "logs"), Component: MissionControlLogs },
+          { route: routePath("saas", "admin"), Component: SaaSAdminPanel },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
@@ -413,7 +416,9 @@ function App() {
             <AutoCTAAnalytics />
             <RouteIndexingGuard />
             <div id="main-content" tabIndex={-1}>
-              <AuthenticatedApp />
+              <TenantProvider>
+                <AuthenticatedAppWithTenant />
+              </TenantProvider>
             </div>
             <PublicCookieConsent />
           </Router>
