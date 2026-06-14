@@ -9,11 +9,7 @@ const TIER_ICONS = {
   pro_system: Crown,
 };
 
-const OUTCOME_COPY = {
-  starter_system: "Recover missed leads fast.",
-  growth_system: "Turn leads into booked appointments.",
-  pro_system: "Run the full response, nurture, and review system.",
-};
+
 
 const PRO_ONLY_FEATURES = [
   "Review request automation",
@@ -54,21 +50,22 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 h-full ${
+      className={`relative flex flex-col rounded-3xl overflow-hidden border transition-all duration-300 h-full ${
         isRecommended
-          ? "border-primary/60 ring-2 ring-primary/30 shadow-2xl scale-105"
-          : "border-foreground/12 shadow-sm hover:shadow-lg hover:border-foreground/20"
+          ? "border-primary/50 ring-2 ring-primary/25 shadow-2xl lg:scale-105"
+          : "border-foreground/10 shadow-md hover:shadow-2xl hover:border-foreground/15 hover:-translate-y-1"
       }`}
       style={{
         background: isRecommended
-          ? "linear-gradient(135deg, #ffffff 0%, #f5faff 100%)"
-          : "#ffffff",
+          ? "linear-gradient(135deg, #ffffff 0%, #f7fbff 100%)"
+          : "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
+        backdropFilter: "blur(8px)",
       }}
     >
       {/* Glow accent — only for recommended */}
       {isRecommended && (
-        <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 0 32px rgba(0,174,239,0.15)",
+        <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 0 40px rgba(0,174,239,0.2), inset 0 0 20px rgba(0,174,239,0.05)",
         }} />
       )}
 
@@ -93,17 +90,19 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
 
       <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10">
         {/* Icon + Title */}
-        <div className="mb-6 pb-4 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.2)" : "rgba(0,0,0,0.06)" }}>
+        <div className="mb-6 pb-4 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.15)" : "rgba(0,0,0,0.04)" }}>
             <div
-              className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 flex-shrink-0"
+              className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 flex-shrink-0"
               style={{
                 background: isRecommended
                   ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
                   : plan.packageKey === "pro_system"
                   ? "linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)"
-                  : "rgba(0,174,239,0.12)",
+                  : "linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,136,204,0.08) 100%)",
                 boxShadow: isRecommended
-                  ? "0 4px 16px rgba(0,174,239,0.35)"
+                  ? "0 8px 24px rgba(0,174,239,0.3)"
+                  : plan.packageKey === "pro_system"
+                  ? "0 4px 12px rgba(124,58,237,0.15)"
                   : "none",
               }}
             >
@@ -115,12 +114,11 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
               />
             </div>
             <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-            <p className="text-base font-semibold text-foreground/85 mt-3 leading-snug">{OUTCOME_COPY[plan.packageKey]}</p>
             <p className="text-xs text-foreground/55 mt-2 uppercase tracking-widest">{plan.fit}</p>
           </div>
 
         {/* Pricing */}
-         <div className="mb-7 pb-7 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.2)" : "rgba(0,0,0,0.06)" }}>
+         <div className="mb-7 pb-7 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.15)" : "rgba(0,0,0,0.04)" }}>
            <div className="flex items-baseline gap-2 mb-3">
              <span className={`font-black ${isRecommended ? "text-5xl" : "text-4xl"}`} style={{ color: "#001B44" }}>
                {plan.monthly}

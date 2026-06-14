@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { launchTimelineSteps, iconMap } from "./coreOfferData";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
+import { motion } from "framer-motion";
 
 const STEP_WEIGHTS = [1, 0.5, 0.5, 2.5, 0.5];
 const TOTAL_WEIGHT = STEP_WEIGHTS.reduce((a, b) => a + b, 0);
@@ -108,7 +109,12 @@ function StepRow({ step, idx }) {
   });
 
   return (
-    <div ref={ref} className="relative" style={{ opacity: visible ? 1 : 0, transition: "opacity 0.6s ease" }}>
+    <motion.div
+      ref={ref}
+      className="relative"
+      initial={{ opacity: 0, y: 40 }}
+      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration: 0.7, ease: "easeOut" }}>
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}
         style={{ alignItems: "stretch" }}
@@ -168,7 +174,7 @@ function StepRow({ step, idx }) {
           </div>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }
 
@@ -178,15 +184,22 @@ export default function LaunchTimeline() {
   return (
     <div className="mt-16 md:mt-20">
       {/* Section Header — static, no animation */}
-      <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
-        Launch Plan Confirmed After Onboarding
-      </p>
-      <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
-        Our Process - Start To Launch
-      </h3>
-      <p className="text-center text-sm text-muted-foreground mb-10">
-        Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.
-      </p>
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        viewport={{ once: true, amount: 0.3 }}
+      >
+        <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
+          Launch Plan Confirmed After Onboarding
+        </p>
+        <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
+          Our Process - Start To Launch
+        </h3>
+        <p className="text-center text-sm text-muted-foreground mb-10">
+          Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.
+        </p>
+      </motion.div>
 
       {/* Desktop horizontal tracker */}
       <div className="hidden sm:flex justify-center items-start gap-7 md:gap-10 px-4 mb-6">
