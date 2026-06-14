@@ -21,6 +21,35 @@ export const INDUSTRIES = {
       cta: "Free Med Spa Automation Audit",
     },
 
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      treatmentFlow: {
+        label: "Treatment-Specific Lead Intake",
+        description: "Dropdown selector for Botox, Fillers, Laser, Facials, etc. for better qualification",
+        enabled: true,
+      },
+      beforeAfter: {
+        label: "Before/After Gallery",
+        description: "Showcases aesthetic improvements to build confidence",
+        enabled: true,
+      },
+      luxuryTone: {
+        label: "Refined, Lifestyle-Oriented Copy",
+        description: "Premium language focused on confidence and self-care vs. medical terminology",
+        enabled: true,
+      },
+      reviewSpotlight: {
+        label: "5-Star Review Carousel",
+        description: "Real patient testimonials and Google review snippets",
+        enabled: true,
+      },
+      smsRefinement: {
+        label: "Conversational, Non-Clinical SMS",
+        description: "Messages sound friendly and aspirational, not clinical",
+        enabled: true,
+      },
+    },
+
     // Industry pain stats
     painStats: [
       { icon: "⏱️", value: "47%", label: "of leads go dark if not contacted within 5 min" },
@@ -132,6 +161,35 @@ export const INDUSTRIES = {
       cta: "Free Dental Automation Audit",
     },
 
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      emergencyToggle: {
+        label: "Emergency Tooth Pain Fast-Track",
+        description: "Prominent button in hero for immediate emergency response",
+        enabled: true,
+      },
+      insuranceWidget: {
+        label: "Insurance Provider Icons",
+        description: "Visual grid showing all accepted insurance plans",
+        enabled: true,
+      },
+      ehrBadge: {
+        label: "EHR Integration Badges",
+        description: "Clear indicators for Dentrix, Eaglesoft, Open Dental compatibility",
+        enabled: true,
+      },
+      appointmentReminders: {
+        label: "Detailed Reminder Logic",
+        description: "Explains SMS/Email recall sequence for hygiene visits",
+        enabled: true,
+      },
+      doctorProfiles: {
+        label: "Meet the Doctor Cards",
+        description: "Small profile previews of dentists and specialists",
+        enabled: true,
+      },
+    },
+
     painStats: [
       { icon: "📞", value: "40%", label: "of dental calls go unanswered during busy hours" },
       { icon: "📅", value: "2x", label: "more confirmed appointments with instant response" },
@@ -237,6 +295,35 @@ export const INDUSTRIES = {
       cta: "See How Chiro Offices Use This",
     },
 
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      insuranceVerification: {
+        label: "Insurance Verification Info",
+        description: "AI guides patients on common insurance questions and pre-auth steps",
+        enabled: true,
+      },
+      ehrIntegration: {
+        label: "EHR Auto-Sync",
+        description: "Direct integration with ChiroTouch, Curo, PrognoCIS",
+        enabled: true,
+      },
+      treatmentPlanNurture: {
+        label: "Unfinished Treatment Plan Follow-Up",
+        description: "Automated reminders for patients who paused care",
+        enabled: true,
+      },
+      accessibilityUI: {
+        label: "Accessibility First",
+        description: "Larger fonts, higher contrast for older demographics",
+        enabled: true,
+      },
+      noShowPrevention: {
+        label: "No-Show Prevention",
+        description: "SMS reminders at 24h and 2h before appointments",
+        enabled: true,
+      },
+    },
+
     painStats: [
       { icon: "⏱️", value: "55%", label: "of chiro inquiries go unanswered during clinic hours" },
       { icon: "📊", value: "4x", label: "better conversion with instant pricing & availability" },
@@ -339,6 +426,35 @@ export const INDUSTRIES = {
       headline: "Book More HVAC Service Calls During Peak Demand",
       subheadline: "ClientSurge helps HVAC teams respond to after-hours AC and heating leads, emergency calls, seasonal demand spikes, appointment requests, and maintenance plan opportunities faster.",
       cta: "Free HVAC Automation Audit",
+    },
+
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      emergencyDetection: {
+        label: "Emergency Call Priority Logic",
+        description: "System flags urgent AC/heating calls separately for faster dispatch",
+        enabled: true,
+      },
+      serviceArea: {
+        label: "Service Area Validation",
+        description: "Confirms calls are within your service radius before full engagement",
+        enabled: true,
+      },
+      dispatchSync: {
+        label: "Dispatch Software Integration",
+        description: "Real-time sync with ServiceTitan, Housecall Pro, Jobber",
+        enabled: true,
+      },
+      technicianMobile: {
+        label: "Technician Mobile Details",
+        description: "Full appointment info syncs to field tech app before arrival",
+        enabled: true,
+      },
+      dynamicPricing: {
+        label: "Dynamic Service Pricing",
+        description: "Different rates for diagnostics, repairs, maintenance, seasonal services",
+        enabled: true,
+      },
     },
 
     painStats: [
@@ -446,6 +562,35 @@ export const INDUSTRIES = {
       cta: "Free Plumbing Automation Audit",
     },
 
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      urgencyDetection: {
+        label: "Urgency-Level Detection",
+        description: "AI separates emergency leaks from routine drain repair requests",
+        enabled: true,
+      },
+      afterHours: {
+        label: "24/7 After-Hours Capture",
+        description: "Designed specifically to handle calls outside business hours",
+        enabled: true,
+      },
+      serviceQualification: {
+        label: "Service-Type Intake Flow",
+        description: "Asks about leak, drain, water heater, clog, fixture types",
+        enabled: true,
+      },
+      dispatchContext: {
+        label: "Dispatch Handoff Context",
+        description: "Collects urgency, location, symptoms before routing to dispatch",
+        enabled: true,
+      },
+      confirmationReminder: {
+        label: "Appointment Confirmation & Reminder",
+        description: "Confirmation SMS + 24h reminder reduces no-shows",
+        enabled: true,
+      },
+    },
+
     painStats: [
       { icon: "🚰", value: "Urgent", label: "leak and water-heater leads usually choose the fastest responder" },
       { icon: "📞", value: "24/7", label: "after-hours calls need capture even when dispatch is busy" },
@@ -549,6 +694,35 @@ export const INDUSTRIES = {
       headline: "Get More Roofing Leads Booked Before Competitors Reply",
       subheadline: "ClientSurge helps roofing companies recover missed calls, answer storm and roof repair quote requests fast, follow up automatically, and turn more estimate requests into booked jobs.",
       cta: "Free Roofing Automation Audit",
+    },
+
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      stormSurge: {
+        label: "Storm-Surge Lead Handling",
+        description: "Scales to handle 200+ simultaneous inquiries during storm events",
+        enabled: true,
+      },
+      insuranceEducation: {
+        label: "Insurance Education Block",
+        description: "AI explains deductibles, coverage, and direct billing to reduce hesitation",
+        enabled: true,
+      },
+      estimateBooking: {
+        label: "Estimate Appointment Booking",
+        description: "Schedules inspection appointments directly through automation",
+        enabled: true,
+      },
+      damageAssessment: {
+        label: "Damage Assessment Questionnaire",
+        description: "Collects hail/storm damage details and cost-estimate expectations",
+        enabled: true,
+      },
+      photoCollection: {
+        label: "Photo Collection & Attachment",
+        description: "Customers send before/after photos via SMS that attach to lead",
+        enabled: true,
+      },
     },
 
     painStats: [
@@ -656,6 +830,35 @@ export const INDUSTRIES = {
       cta: "See How Contractors Use This",
     },
 
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      projectTimeline: {
+        label: "Project Timeline Transparency",
+        description: "AI sends realistic timelines and process steps upfront",
+        enabled: true,
+      },
+      processClarity: {
+        label: "Process & Deposit Clarity",
+        description: "Explains deposit requirements, project phases, approval checkpoints",
+        enabled: true,
+      },
+      estimateFollowUp: {
+        label: "Estimate Follow-Up Automation",
+        description: "Automated reminders keep quotes top-of-mind for decision-makers",
+        enabled: true,
+      },
+      photoRouting: {
+        label: "Photo/Question Request Routing",
+        description: "AI acknowledges site photos and questions, routes to your team",
+        enabled: true,
+      },
+      repeatRecognition: {
+        label: "Repeat-Customer Recognition",
+        description: "System recognizes prior jobs and offers faster booking for familiar clients",
+        enabled: true,
+      },
+    },
+
     painStats: [
       { icon: "🏗️", value: "50%", label: "of project inquiries go to the fastest responder" },
       { icon: "📞", value: "4x", label: "faster response = 3-4 more jobs per month" },
@@ -759,6 +962,35 @@ export const INDUSTRIES = {
       cta: "Free Real Estate Automation Audit",
       image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=95&fit=crop&auto=format",
     },
+
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      multiSourceIntegration: {
+        label: "Multi-Source Lead Integration",
+        description: "Connects to Zillow, Realtor.com, MLS portals, and website forms simultaneously",
+        enabled: true,
+      },
+      showingScheduler: {
+        label: "Showing Scheduler",
+        description: "AI books showing appointments directly into your calendar",
+        enabled: true,
+      },
+      cmaDisplay: {
+        label: "CMA & Market Data Display",
+        description: "AI provides comparable sales and market context for sellers",
+        enabled: true,
+      },
+      openHouseNurture: {
+        label: "Open House Attendee Nurture",
+        description: "14-day automated follow-up for open house walkers",
+        enabled: true,
+      },
+      leadAttribution: {
+        label: "Lead Source Attribution",
+        description: "Tracks every lead source to ROI to optimize marketing spend",
+        enabled: true,
+      },
+    },
     painStats: [
       { icon: "⏱️", value: "5 min", label: "is the window before a real estate lead goes cold" },
       { icon: "🏡", value: "78%", label: "of buyers use the first agent who responds" },
@@ -812,6 +1044,35 @@ export const INDUSTRIES = {
       subheadline: "Personal injury leads are high-value and highly perishable. ClientSurge helps PI firms respond instantly to accident inquiries, qualify cases 24/7, and move fast before the next firm in line picks up.",
       cta: "Free Law Firm Automation Audit",
       image: "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95&fit=crop&auto=format",
+    },
+
+    // Top 5 Industry-Specific Enhancements
+    industrySpecific: {
+      intakeBot: {
+        label: "24/7 AI Legal Intake",
+        description: "Answers accident calls immediately, gathers case details around the clock",
+        enabled: true,
+      },
+      casePrescreen: {
+        label: "Automated Case Pre-Screening",
+        description: "AI filters unqualified leads before routing to attorneys",
+        enabled: true,
+      },
+      legalCompliance: {
+        label: "Legal Compliance Guardrails",
+        description: "All messaging non-committal, reviewed by legal, no unauthorized advice",
+        enabled: true,
+      },
+      urgencyEscalation: {
+        label: "Urgent Case Escalation",
+        description: "Severe injuries/liability cases route directly to on-call attorney",
+        enabled: true,
+      },
+      contingencyClarity: {
+        label: "Contingency Fee Clarity",
+        description: "AI clearly explains 'you pay nothing unless we win' upfront",
+        enabled: true,
+      },
     },
     painStats: [
       { icon: "⚖️", value: "82%", label: "of PI leads contact multiple firms — first to respond wins" },

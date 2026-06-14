@@ -16,6 +16,8 @@ import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 import { forceScrollToTop } from "@/lib/scroll";
 import { buildIndustryJsonLd } from "@/utils/industryJsonLd";
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { trackCTA } from "@/lib/analytics";
 
 const INDUSTRY_SEO = {
   roofing: {
@@ -157,7 +159,11 @@ function IndustryTemplateInner({ industrySlug }) {
   const demoBooking = useDemoBooking();
   const notFound = !industry;
 
-  useEffect(() => forceScrollToTop(), [industrySlug]);
+  useEffect(() => {
+    forceScrollToTop();
+    // Track industry page view
+    trackCTA(`industry_page_${industrySlug}`, "industry");
+  }, [industrySlug]);
 
   useEffect(() => {
     if (!industry) return;
@@ -196,27 +202,34 @@ function IndustryTemplateInner({ industrySlug }) {
       <LaunchAnnouncementBanner />
 
       <main style={{ flex: 1 }}>
-        {/* Hero Section */}
-        <IndustryHero
-          eyebrow={industry.hero.eyebrow}
-          headline={seo?.h1 || industry.hero.headline}
-          subheadline={seo?.description || industry.hero.subheadline}
-          image={industry.hero.image || INDUSTRY_HERO_FALLBACKS[industrySlug] || INDUSTRY_HERO_FALLBACKS.contractors}
-          cta={industry.hero.cta}
-          onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
-        />
+         {/* Hero Section */}
+         <ErrorBoundary>
+           <IndustryHero
+             eyebrow={industry.hero.eyebrow}
+             headline={seo?.h1 || industry.hero.headline}
+             subheadline={seo?.description || industry.hero.subheadline}
+             image={industry.hero.image || INDUSTRY_HERO_FALLBACKS[industrySlug] || INDUSTRY_HERO_FALLBACKS.contractors}
+             cta={industry.hero.cta}
+             onBookDemo={() => {
+               trackCTA("hero_demo_cta", `industry_${industrySlug}`);
+               demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug });
+             }}
+           />
+         </ErrorBoundary>
 
-        {/* Pain Stats Bar */}
-        <IndustryPainBar stats={industry.painStats} />
+         {/* Pain Stats Bar */}
+         <ErrorBoundary>
+           <IndustryPainBar stats={industry.painStats} />
+         </ErrorBoundary>
 
-        {/* Problem/Solution Section (industry-tailored) */}
+         {/* Problem/Solution Section (industry-tailored) */}
         <section className="px-4 py-14 md:px-6 md:py-20" style={{ background: "#ffffff" }}>
           <div className="max-w-6xl mx-auto">
             <div className="text-center mb-10">
               <p className="text-xs font-semibold text-primary tracking-[0.18em] uppercase mb-4">
                 The Problem & The Solution
               </p>
-              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight">
+              <h2 className="font-display text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}>
                 Where {industry.shortName} Lose Revenue
               </h2>
             </div>
@@ -270,58 +283,70 @@ function IndustryTemplateInner({ industrySlug }) {
           </div>
         </section>
 
-        <IndustryAutomationUseCases industry={industry} />
+        <ErrorBoundary>
+           <IndustryAutomationUseCases industry={industry} />
+         </ErrorBoundary>
 
-        {blogLink && (
-          <section className="bg-primary/5 px-4 py-12 md:px-6">
-            <div className="mx-auto max-w-5xl rounded-lg border border-primary/15 bg-white p-6 shadow-sm md:p-8">
-              <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
-                Related launch guide
-              </p>
-              <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
-                <div>
-                  <h2 className="mb-2 text-2xl font-black leading-tight text-foreground md:text-3xl">
-                    {blogLink.title}
-                  </h2>
-                  <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
-                    {blogLink.description}
-                  </p>
-                </div>
-                <Link
-                  to={blogLink.href}
-                  className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-black text-white shadow-sm transition hover:opacity-90"
-                >
-                  Read guide
-                </Link>
-              </div>
-            </div>
-          </section>
-        )}
+         {blogLink && (
+           <section className="bg-primary/5 px-4 py-12 md:px-6">
+             <div className="mx-auto max-w-5xl rounded-lg border border-primary/15 bg-white p-6 shadow-sm md:p-8">
+               <p className="mb-3 text-xs font-bold uppercase tracking-[0.18em] text-primary">
+                 Related launch guide
+               </p>
+               <div className="grid gap-5 md:grid-cols-[1fr_auto] md:items-center">
+                 <div>
+                   <h2 className="mb-2 text-2xl font-black leading-tight text-foreground md:text-3xl">
+                     {blogLink.title}
+                   </h2>
+                   <p className="max-w-2xl text-sm leading-6 text-muted-foreground">
+                     {blogLink.description}
+                   </p>
+                 </div>
+                 <Link
+                   to={blogLink.href}
+                   onClick={() => trackCTA("blog_guide_link", `industry_${industrySlug}`)}
+                   className="inline-flex min-h-11 items-center justify-center rounded-full bg-primary px-5 py-2 text-sm font-black text-white shadow-sm transition hover:opacity-90"
+                 >
+                   Read guide
+                 </Link>
+               </div>
+             </div>
+           </section>
+         )}
 
-        {/* SMS Demo */}
-        <IndustrySMSDemo
-          businessName={industry.smsDemo.businessName}
-          initialMessage={industry.smsDemo.initialMessage}
-          automatedResponse={industry.smsDemo.automatedResponse}
-          leadReply={industry.smsDemo.leadReply}
-          confirmationMessage={industry.smsDemo.confirmationMessage}
-          messages={buildSmsMessages(industry.smsDemo)}
-          triggerLabel={theme.triggerLabel || "Simulate"}
-          triggerEvent={theme.triggerEvent || "New lead detected"}
-          automationName={theme.automationName || `${industry.shortName} Automation`}
-          accentColor={theme.accent}
-        />
+         {/* SMS Demo */}
+         <ErrorBoundary>
+           <IndustrySMSDemo
+             businessName={industry.smsDemo.businessName}
+             initialMessage={industry.smsDemo.initialMessage}
+             automatedResponse={industry.smsDemo.automatedResponse}
+             leadReply={industry.smsDemo.leadReply}
+             confirmationMessage={industry.smsDemo.confirmationMessage}
+             messages={buildSmsMessages(industry.smsDemo)}
+             triggerLabel={theme.triggerLabel || "Simulate"}
+             triggerEvent={theme.triggerEvent || "New lead detected"}
+             automationName={theme.automationName || `${industry.shortName} Automation`}
+             accentColor={theme.accent}
+           />
+         </ErrorBoundary>
 
-        {/* Results/Metrics */}
-        <IndustryResults
-          metrics={industry.metrics}
-          testimonial={industry.testimonial}
-          finalCta={industry.hero.cta}
-          onBookDemo={() => demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug })}
-        />
+         {/* Results/Metrics */}
+         <ErrorBoundary>
+           <IndustryResults
+             metrics={industry.metrics}
+             testimonial={industry.testimonial}
+             finalCta={industry.hero.cta}
+             onBookDemo={() => {
+               trackCTA("results_demo_cta", `industry_${industrySlug}`);
+               demoBooking?.openDemoBooking?.({ prefillIndustry: industry.name, industrySlug });
+             }}
+           />
+         </ErrorBoundary>
 
-        {/* FAQ */}
-        <IndustryFAQ faqs={industry.faqs} />
+         {/* FAQ */}
+         <ErrorBoundary>
+           <IndustryFAQ faqs={industry.faqs} />
+         </ErrorBoundary>
       </main>
 
       <Footer />
