@@ -148,6 +148,7 @@ export default function AdminDashboard() {
   const [activeTab, setActiveTab] = useState(() => getActiveTabFromSearch(location.search));
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
+  const [previewingAsClient, setPreviewingAsClient] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
   const [webhookErrorCount, setWebhookErrorCount] = useState(0);
 
