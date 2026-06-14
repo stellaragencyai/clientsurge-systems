@@ -1,0 +1,65 @@
+{
+  "name": "MessageTemplateInsights",
+  "type": "object",
+  "_metadata": {
+    "status": "ANALYTICS_DERIVED",
+    "reason": "Aggregated effectiveness metrics for message templates. Populated asynchronously. Read-only for dashboard.",
+    "read_only": true,
+    "async_only": true
+  },
+  "properties": {
+    "template_id": {
+      "type": "string",
+      "title": "Message Template ID"
+    },
+    "template_name": {
+      "type": "string",
+      "title": "Template Name"
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email"
+      ]
+    },
+    "usage_count": {
+      "type": "integer",
+      "title": "Total Uses",
+      "default": 0
+    },
+    "response_rate_percent": {
+      "type": "number",
+      "title": "Response Rate %",
+      "default": 0
+    },
+    "booking_rate_percent": {
+      "type": "number",
+      "title": "Booking Rate %",
+      "default": 0
+    },
+    "average_response_time_hours": {
+      "type": "number",
+      "title": "Avg Response Time (hours)"
+    },
+    "sentiment_score": {
+      "type": "number",
+      "title": "Avg Sentiment Score (-1 to 1)",
+      "default": 0
+    },
+    "effectiveness_rank": {
+      "type": "integer",
+      "title": "Effectiveness Rank (1=best)"
+    },
+    "last_analyzed_at": {
+      "type": "string",
+      "title": "Last Analyzed At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Key Insights"
+    }
+  }
+}

@@ -1,0 +1,74 @@
+{
+  "name": "LeadOutcomeAnalytics",
+  "type": "object",
+  "_metadata": {
+    "status": "ANALYTICS_DERIVED",
+    "reason": "Stores historical lead outcomes and correlations for business insights. Populated asynchronously by analytics jobs. Read-only for dashboard reporting.",
+    "read_only": true,
+    "async_only": true
+  },
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "lead_score_at_creation": {
+      "type": "number",
+      "title": "Lead Score at Creation"
+    },
+    "lead_score_at_outcome": {
+      "type": "number",
+      "title": "Lead Score at Outcome"
+    },
+    "ai_intent": {
+      "type": "string",
+      "title": "AI Intent Classification"
+    },
+    "initial_message_template_id": {
+      "type": "string",
+      "title": "Initial Message Template ID"
+    },
+    "message_count": {
+      "type": "integer",
+      "title": "Total Messages Exchanged",
+      "default": 0
+    },
+    "response_time_minutes": {
+      "type": "integer",
+      "title": "Time to First Response (minutes)"
+    },
+    "outcome_type": {
+      "type": "string",
+      "title": "Outcome Type",
+      "enum": [
+        "booking_completed",
+        "response_received",
+        "no_response",
+        "unsubscribed"
+      ],
+      "default": "no_response"
+    },
+    "outcome_at": {
+      "type": "string",
+      "title": "Outcome Timestamp",
+      "format": "date-time"
+    },
+    "days_to_outcome": {
+      "type": "integer",
+      "title": "Days from Lead Creation to Outcome"
+    },
+    "lead_lifecycle_length_days": {
+      "type": "integer",
+      "title": "Total Lead Lifecycle (days)"
+    },
+    "analytics_computed_at": {
+      "type": "string",
+      "title": "Analytics Computed At",
+      "format": "date-time"
+    }
+  }
+}

@@ -1,0 +1,69 @@
+{
+  "name": "AutomationRuleInsights",
+  "type": "object",
+  "_metadata": {
+    "status": "ANALYTICS_DERIVED",
+    "reason": "Aggregated effectiveness metrics for automation rules. Populated asynchronously. Read-only for dashboard.",
+    "read_only": true,
+    "async_only": true
+  },
+  "properties": {
+    "rule_id": {
+      "type": "string",
+      "title": "AutomationRule ID"
+    },
+    "rule_name": {
+      "type": "string",
+      "title": "Rule Name"
+    },
+    "project_id": {
+      "type": "string",
+      "title": "Project ID"
+    },
+    "trigger_count": {
+      "type": "integer",
+      "title": "Times Triggered",
+      "default": 0
+    },
+    "success_count": {
+      "type": "integer",
+      "title": "Successful Outcomes",
+      "default": 0
+    },
+    "success_rate_percent": {
+      "type": "number",
+      "title": "Success Rate %",
+      "default": 0
+    },
+    "average_lead_score_change": {
+      "type": "number",
+      "title": "Avg Lead Score Change"
+    },
+    "response_rate_after_trigger": {
+      "type": "number",
+      "title": "Response Rate After Trigger %"
+    },
+    "avg_time_to_response_hours": {
+      "type": "number",
+      "title": "Avg Time to Response (hours)"
+    },
+    "effectiveness_rank": {
+      "type": "integer",
+      "title": "Effectiveness Rank (1=best)"
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Currently Enabled",
+      "default": true
+    },
+    "last_analyzed_at": {
+      "type": "string",
+      "title": "Last Analyzed At",
+      "format": "date-time"
+    },
+    "recommendations": {
+      "type": "string",
+      "title": "Recommendations"
+    }
+  }
+}

@@ -1,0 +1,73 @@
+{
+  "name": "ConversationPattern",
+  "type": "object",
+  "_metadata": {
+    "status": "ANALYTICS_DERIVED",
+    "reason": "Stores anonymized examples of successful conversation flows. Populated asynchronously for pattern analysis and insights.",
+    "read_only": true,
+    "async_only": true
+  },
+  "properties": {
+    "pattern_id": {
+      "type": "string",
+      "title": "Pattern ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "outcome_type": {
+      "type": "string",
+      "title": "Outcome",
+      "enum": [
+        "booking",
+        "response",
+        "conversion"
+      ]
+    },
+    "ai_intent": {
+      "type": "string",
+      "title": "Lead Intent"
+    },
+    "initial_template_name": {
+      "type": "string",
+      "title": "Initial Message Template"
+    },
+    "followup_template_names": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Follow-Up Templates"
+    },
+    "total_messages": {
+      "type": "integer",
+      "title": "Message Count"
+    },
+    "timeframe_hours": {
+      "type": "integer",
+      "title": "Timeframe (hours)"
+    },
+    "key_characteristics": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Key Characteristics"
+    },
+    "success_score": {
+      "type": "number",
+      "title": "Success Score (0-100)"
+    },
+    "frequency": {
+      "type": "integer",
+      "title": "Frequency (# of similar patterns)",
+      "default": 1
+    },
+    "captured_at": {
+      "type": "string",
+      "title": "Pattern Captured At",
+      "format": "date-time"
+    }
+  }
+}
