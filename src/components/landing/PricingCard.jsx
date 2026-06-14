@@ -178,26 +178,28 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
            {isRecommended ? (
              <a
                href={getPackageStorePath(plan.packageKey)}
-               className="w-full block h-12 rounded-xl text-sm font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none flex items-center justify-center gap-2"
+               className="w-full block h-[52px] rounded-[10px] text-sm font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none flex items-center justify-center gap-2"
                style={{
-                 background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-                 boxShadow: "0 6px 20px rgba(0,174,239,0.4)",
+                 background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+                 boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0,174,239,0.38), 0 4px 12px rgba(0,159,212,0.3)",
                }}
                onMouseEnter={(e) => {
-                 e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)";
-                 e.currentTarget.style.transform = "translateY(-3px)";
+                 e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)";
+                 e.currentTarget.style.transform = "translateY(-2px)";
                }}
                onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,174,239,0.4)";
+                 e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 12px rgba(0,174,239,0.38), 0 4px 12px rgba(0,159,212,0.3)";
                  e.currentTarget.style.transform = "translateY(0)";
                }}
+               onMouseDown={(e) => { e.currentTarget.style.transform = "translateY(-1px) scale(0.98)"; }}
+               onMouseUp={(e) => { e.currentTarget.style.transform = "translateY(-2px) scale(1)"; }}
              >
                Start Now <ArrowRight className="w-4 h-4" />
              </a>
            ) : (
              <a
                href={getPackageStorePath(plan.packageKey)}
-               className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-foreground/20 bg-white text-sm font-bold text-foreground hover:border-primary/40 hover:bg-primary/3 transition-all focus:ring-2 focus:ring-primary focus:outline-none"
+               className="w-full inline-flex items-center justify-center gap-2 h-[52px] rounded-[10px] border-2 border-foreground/20 bg-white text-sm font-bold text-foreground hover:border-primary/40 hover:bg-primary/3 transition-all focus:ring-2 focus:ring-primary focus:outline-none"
              >
                Choose Plan <ArrowRight className="w-4 h-4" />
              </a>
