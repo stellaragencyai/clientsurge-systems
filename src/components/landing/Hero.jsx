@@ -182,7 +182,7 @@ export default function Hero() {
                 height: "52px",
                 padding: "0 30px",
                 borderRadius: "10px",
-                background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+                background: "linear-gradient(135deg, #00AEEF 0%, #0099d4 40%, #0088CC 100%)",
                 color: "#ffffff",
                 fontWeight: "800",
                 fontSize: "0.95rem",
