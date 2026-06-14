@@ -2,10 +2,10 @@ import { Loader2, CheckCircle2 } from "lucide-react";
 
 export default function DeploymentProgressBar({ pipelineStatus, installStatus }) {
   const stages = [
-    { key: "Paid", label: "Payment Confirmed", icon: "✓" },
-    { key: "Configuring", label: "AI Configuring System", icon: "⚙" },
-    { key: "Testing", label: "Running Tests", icon: "🧪" },
-    { key: "Live", label: "System Live", icon: "🚀" },
+    { key: "Paid", label: "Payment Confirmed", icon: "✓", status: "Complete" },
+    { key: "Configuring", label: "AI Configuring System", icon: "⚙", status: "Active" },
+    { key: "Testing", label: "Running Tests", icon: "🧪", status: "Active" },
+    { key: "Live", label: "System Live", icon: "🚀", status: "Complete" },
   ];
 
   const currentIndex = stages.findIndex((s) => s.key === installStatus);
@@ -13,8 +13,30 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
   const isError = installStatus === "Error";
   const isActive = currentIndex >= 0 && currentIndex < stages.length;
 
+  const getStatusLabel = (idx) => {
+    if (idx < currentIndex) return "Completed";
+    if (idx === currentIndex) return "In Progress";
+    return "Pending";
+  };
+
+  const getStatusColor = (idx) => {
+    if (idx < currentIndex) return "text-green-600";
+    if (idx === currentIndex) return "text-primary";
+    return "text-muted-foreground";
+  };
+
   return (
     <div className="w-full bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/15 rounded-lg p-6 mb-6">
+      <style>{`
+        @keyframes pulse-ring {
+          0% { box-shadow: 0 0 0 0 rgba(0, 174, 239, 0.7); }
+          70% { box-shadow: 0 0 0 10px rgba(0, 174, 239, 0); }
+          100% { box-shadow: 0 0 0 0 rgba(0, 174, 239, 0); }
+        }
+        .stage-active {
+          animation: pulse-ring 2s infinite;
+        }
+      `}</style>
       <div className="space-y-4">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -39,8 +61,8 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
         <div className="relative">
           <div className="flex items-center justify-between">
             {stages.map((stage, idx) => {
-              const isActive = idx === currentIndex;
               const isCompleted = idx < currentIndex;
+              const isStageActive = idx === currentIndex;
               const isUpcoming = idx > currentIndex;
 
               return (
@@ -51,8 +73,8 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
                       className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
                         isCompleted
                           ? "bg-green-600 text-white"
-                          : isActive
-                          ? "bg-primary text-white ring-2 ring-primary ring-offset-2"
+                          : isStageActive
+                          ? "bg-primary text-white ring-2 ring-primary ring-offset-2 stage-active"
                           : "bg-muted text-muted-foreground"
                       }`}
                     >
@@ -61,18 +83,22 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
                     {/* Label */}
                     <p
                       className={`text-xs mt-2 text-center font-medium ${
-                        isActive || isCompleted ? "text-foreground" : "text-muted-foreground"
+                        isStageActive || isCompleted ? "text-foreground" : "text-muted-foreground"
                       }`}
                     >
                       {stage.label}
                     </p>
+                    {/* Status Badge */}
+                    <span className={`text-xs font-semibold mt-1 ${getStatusColor(idx)}`}>
+                      {getStatusLabel(idx)}
+                    </span>
                   </div>
 
                   {/* Connector Line (if not last) */}
                   {idx < stages.length - 1 && (
                     <div
                       className={`absolute top-5 left-[calc(50%+20px)] w-[calc(100%-40px)] h-1 transition-all ${
-                        isCompleted ? "bg-green-600" : isActive ? "bg-primary" : "bg-muted"
+                        isCompleted ? "bg-green-600" : isStageActive ? "bg-primary" : "bg-muted"
                       }`}
                       style={{ pointerEvents: "none" }}
                     />
@@ -87,12 +113,12 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
             {stages.map((_, idx) => {
               if (idx >= stages.length - 1) return null;
               const isCompleted = idx < currentIndex;
-              const isActive = idx === currentIndex;
+              const isStageActive = idx === currentIndex;
               return (
                 <div
                   key={`connector-${idx}`}
                   className={`absolute top-5 h-1 transition-all ${
-                    isCompleted ? "bg-green-600" : isActive ? "bg-primary" : "bg-muted"
+                    isCompleted ? "bg-green-600" : isStageActive ? "bg-primary" : "bg-muted"
                   }`}
                   style={{
                     left: `calc(${((idx + 1) / stages.length) * 100}% - 20px)`,
