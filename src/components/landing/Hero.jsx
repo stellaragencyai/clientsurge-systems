@@ -120,10 +120,10 @@ export default function Hero() {
               gap: "7px",
               borderRadius: "999px",
               padding: "7px 18px",
-              background: "rgba(255,255,255,0.12)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              border: "1px solid rgba(255,255,255,0.25)",
+              background: "rgba(255,255,255,0.03)",
+              backdropFilter: "blur(36px) saturate(1.8)",
+              WebkitBackdropFilter: "blur(36px) saturate(1.8)",
+              border: "1px solid rgba(255,255,255,0.05)",
               color: "#a8e8ff",
               fontSize: "11px",
               fontWeight: 800,
@@ -234,10 +234,10 @@ export default function Hero() {
                 height: "54px",
                 padding: "0 30px",
                 borderRadius: "10px",
-                background: "rgba(255,255,255,0.12)",
-                backdropFilter: "blur(16px)",
-                WebkitBackdropFilter: "blur(16px)",
-                border: "1px solid rgba(255,255,255,0.28)",
+                background: "rgba(255,255,255,0.03)",
+                backdropFilter: "blur(36px) saturate(1.8)",
+                WebkitBackdropFilter: "blur(36px) saturate(1.8)",
+                border: "1px solid rgba(255,255,255,0.05)",
                 color: "#ffffff",
                 fontWeight: "700",
                 fontSize: "0.95rem",
@@ -245,12 +245,12 @@ export default function Hero() {
                 transition: "background 0.3s ease, border-color 0.3s ease",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.2)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.45)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.15)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.12)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.28)";
+                e.currentTarget.style.background = "rgba(255,255,255,0.03)";
+                e.currentTarget.style.borderColor = "rgba(255,255,255,0.05)";
               }}
             >
               View Systems &amp; Pricing
@@ -275,13 +275,14 @@ export default function Hero() {
              ].map(({ value, label }) => (
                <div key={label} style={{
                  textAlign: "center",
-                 background: "rgba(255,255,255,0.08)",
-                 backdropFilter: "blur(20px)",
-                 WebkitBackdropFilter: "blur(20px)",
-                 border: "1px solid rgba(255,255,255,0.15)",
+                 background: "rgba(255,255,255,0.03)",
+                 backdropFilter: "blur(36px) saturate(1.8)",
+                 WebkitBackdropFilter: "blur(36px) saturate(1.8)",
+                 border: "1px solid rgba(255,255,255,0.05)",
                  borderRadius: "14px",
                  padding: "18px 28px",
                  minWidth: "120px",
+                 boxShadow: "0 4px 12px rgba(0,0,0,0.05)",
                }}>
                  <div style={{ fontSize: "2.1rem", fontWeight: 900, color: "#00AEEF", lineHeight: 1, fontFamily: "'Montserrat', sans-serif", textShadow: "0 0 20px rgba(0,174,239,0.6)" }}>{value}</div>
                  <div style={{ fontSize: "11px", color: "rgba(200,225,255,0.75)", marginTop: "8px", fontWeight: 600, letterSpacing: "0.04em", textTransform: "uppercase" }}>{label}</div>
