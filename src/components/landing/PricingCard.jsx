@@ -54,74 +54,80 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-xl overflow-hidden border transition-all duration-300 h-full ${
+      className={`relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 h-full ${
         isRecommended
-          ? "border-primary/40 ring-1 ring-primary/20 shadow-xl"
-          : "border-primary/12 shadow-sm hover:shadow-md hover:border-primary/20"
+          ? "border-primary/60 ring-2 ring-primary/30 shadow-2xl scale-105"
+          : "border-foreground/12 shadow-sm hover:shadow-lg hover:border-foreground/20"
       }`}
       style={{
         background: isRecommended
-          ? "linear-gradient(135deg, #ffffff 0%, #f0faff 100%)"
+          ? "linear-gradient(135deg, #ffffff 0%, #f5faff 100%)"
           : "#ffffff",
       }}
     >
       {/* Glow accent — only for recommended */}
       {isRecommended && (
-        <div className="absolute inset-0 rounded-xl pointer-events-none" style={{
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.8), 0 0 20px rgba(0,174,239,0.08)",
+        <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{
+          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.9), 0 0 32px rgba(0,174,239,0.15)",
         }} />
       )}
 
       {/* Floating badge */}
-      {plan.badge || isRecommended ? (
-        <div className="absolute -top-3 left-6 z-20">
-          <span
-            className="inline-block text-white text-xs font-bold px-4 py-1 rounded-full shadow-lg"
-            style={{
-              background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-              boxShadow: "0 2px 8px rgba(0,174,239,0.4)",
-            }}
-          >
-            {isRecommended ? `Best for ${selectedIndustry?.shortName}` : plan.badge}
-          </span>
-        </div>
-      ) : null}
+       {plan.badge || isRecommended ? (
+         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+           <span
+             className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full shadow-xl"
+             style={{
+               background: isRecommended
+                 ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
+                 : "linear-gradient(135deg, #0088CC 0%, #005f99 100%)",
+               boxShadow: isRecommended
+                 ? "0 4px 12px rgba(0,174,239,0.5)"
+                 : "0 2px 8px rgba(0,136,204,0.3)",
+             }}
+           >
+             {isRecommended ? `★ Best for ${selectedIndustry?.shortName}` : plan.badge}
+           </span>
+         </div>
+       ) : null}
 
       <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10">
         {/* Icon + Title */}
-        <div className="mb-6">
-          <div
-            className="w-12 h-12 rounded-lg flex items-center justify-center mb-4 flex-shrink-0"
-            style={{
-              background: isRecommended
-                ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
-                : plan.packageKey === "pro_system"
-                ? "linear-gradient(135deg, #7C3AED 0%, #4F46E5 100%)"
-                : "rgba(0,174,239,0.10)",
-              boxShadow: isRecommended
-                ? "0 4px 12px rgba(0,174,239,0.3)"
-                : "none",
-            }}
-          >
-            <TierIcon
-              className="w-6 h-6"
+        <div className="mb-6 pb-4 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.2)" : "rgba(0,0,0,0.06)" }}>
+            <div
+              className="w-14 h-14 rounded-xl flex items-center justify-center mb-4 flex-shrink-0"
               style={{
-                color: isRecommended || plan.packageKey === "pro_system" ? "#ffffff" : "#0088CC",
+                background: isRecommended
+                  ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
+                  : plan.packageKey === "pro_system"
+                  ? "linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)"
+                  : "rgba(0,174,239,0.12)",
+                boxShadow: isRecommended
+                  ? "0 4px 16px rgba(0,174,239,0.35)"
+                  : "none",
               }}
-            />
+            >
+              <TierIcon
+                className="w-7 h-7"
+                style={{
+                  color: isRecommended || plan.packageKey === "pro_system" ? "#ffffff" : "#0088CC",
+                }}
+              />
+            </div>
+            <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
+            <p className="text-base font-semibold text-foreground/85 mt-3 leading-snug">{OUTCOME_COPY[plan.packageKey]}</p>
+            <p className="text-xs text-foreground/55 mt-2 uppercase tracking-widest">{plan.fit}</p>
           </div>
-          <h3 className="text-xl font-semibold text-foreground">{plan.name}</h3>
-          <p className="text-sm font-medium text-foreground/70 mt-2">{OUTCOME_COPY[plan.packageKey]}</p>
-          <p className="text-xs font-medium text-foreground/60 mt-1">{plan.fit}</p>
-        </div>
 
         {/* Pricing */}
-         <div className="mb-6 pb-6 border-b border-primary/10">
-           <div className="flex items-baseline gap-2 mb-2">
-             <span className="text-4xl font-bold text-foreground">{plan.monthly}</span>
-             <span className="text-sm text-foreground/60">/month</span>
+         <div className="mb-7 pb-7 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.2)" : "rgba(0,0,0,0.06)" }}>
+           <div className="flex items-baseline gap-2 mb-3">
+             <span className={`font-black ${isRecommended ? "text-5xl" : "text-4xl"}`} style={{ color: "#001B44" }}>
+               {plan.monthly}
+             </span>
+             <span className="text-base text-foreground/60 font-semibold">/month</span>
            </div>
-           <p className="text-sm font-semibold text-foreground/80 leading-tight">+{plan.setup} one-time setup</p>
+           <p className="text-sm font-bold text-foreground/75">+ {plan.setup} setup fee</p>
          </div>
 
         {/* Features */}
@@ -168,45 +174,41 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
          </ul>
 
         {/* CTA */}
-        <div className="space-y-2">
-          {isRecommended ? (
-            <a
-              href={getPackageStorePath(plan.packageKey)}
-              className="w-full block h-11 rounded-lg text-sm font-semibold text-white transition-all focus:ring-2 focus:ring-primary focus:outline-none"
-              style={{
-                background: "linear-gradient(135deg, #0088CC 0%, #003B8F 100%)",
-                boxShadow: "0 4px 14px rgba(0,174,239,0.35)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                gap: "8px",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,174,239,0.45)";
-                e.currentTarget.style.transform = "translateY(-2px)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = "0 4px 14px rgba(0,174,239,0.35)";
-                e.currentTarget.style.transform = "translateY(0)";
-              }}
-            >
-              Get Started <ArrowRight className="w-4 h-4" />
-            </a>
-          ) : (
-            <a
-              href={getPackageStorePath(plan.packageKey)}
-              className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-lg border border-primary/20 bg-white text-sm font-semibold text-primary hover:border-primary/40 hover:bg-primary/5 transition-all focus:ring-2 focus:ring-primary focus:outline-none"
-            >
-              Get Started <ArrowRight className="w-4 h-4" />
-            </a>
-          )}
-          <a
-            href="/book"
-            className="w-full inline-flex items-center justify-center h-9 rounded-lg text-xs font-medium text-foreground/60 hover:text-primary transition-colors"
-          >
-            Start free automation audit
-          </a>
-        </div>
+         <div className="space-y-2.5">
+           {isRecommended ? (
+             <a
+               href={getPackageStorePath(plan.packageKey)}
+               className="w-full block h-12 rounded-xl text-sm font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none flex items-center justify-center gap-2"
+               style={{
+                 background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
+                 boxShadow: "0 6px 20px rgba(0,174,239,0.4)",
+               }}
+               onMouseEnter={(e) => {
+                 e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)";
+                 e.currentTarget.style.transform = "translateY(-3px)";
+               }}
+               onMouseLeave={(e) => {
+                 e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,174,239,0.4)";
+                 e.currentTarget.style.transform = "translateY(0)";
+               }}
+             >
+               Start Now <ArrowRight className="w-4 h-4" />
+             </a>
+           ) : (
+             <a
+               href={getPackageStorePath(plan.packageKey)}
+               className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-foreground/20 bg-white text-sm font-bold text-foreground hover:border-primary/40 hover:bg-primary/3 transition-all focus:ring-2 focus:ring-primary focus:outline-none"
+             >
+               Choose Plan <ArrowRight className="w-4 h-4" />
+             </a>
+           )}
+           <a
+             href="/book"
+             className="w-full inline-flex items-center justify-center h-10 rounded-lg text-xs font-semibold text-primary hover:text-primary/80 hover:underline transition-colors"
+           >
+             Free automation audit
+           </a>
+         </div>
       </div>
     </div>
   );
