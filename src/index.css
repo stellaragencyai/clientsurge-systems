@@ -475,8 +475,35 @@ body.homepage-white-canvas .landing-hero__ambient {
 }
 
 body.homepage-white-canvas .landing-hero__visualGlow {
-  background: radial-gradient(circle at center, rgba(0,174,239,0.16) 0%, rgba(0,157,255,0.08) 34%, transparent 74%) !important;
-  filter: blur(30px) !important;
+   background: radial-gradient(circle at center, rgba(0,174,239,0.16) 0%, rgba(0,157,255,0.08) 34%, transparent 74%) !important;
+   filter: blur(30px) !important;
+}
+
+/* Text color adjustments for white background homepage */
+body.homepage-white-canvas {
+  --foreground: 220 60% 8%;
+  --muted-foreground: 215 25% 40%;
+}
+
+body.homepage-white-canvas h1,
+body.homepage-white-canvas h2,
+body.homepage-white-canvas h3,
+body.homepage-white-canvas h4,
+body.homepage-white-canvas h5,
+body.homepage-white-canvas h6 {
+  color: hsl(220 60% 8%) !important;
+}
+
+body.homepage-white-canvas p,
+body.homepage-white-canvas span,
+body.homepage-white-canvas li {
+  color: hsl(220 50% 20%) !important;
+}
+
+body.homepage-white-canvas .text-muted-foreground,
+body.homepage-white-canvas .text-foreground\/70,
+body.homepage-white-canvas .text-foreground\/75 {
+  color: hsl(215 25% 40%) !important;
 }
 
 /* ============================================
