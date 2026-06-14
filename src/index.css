@@ -526,15 +526,7 @@ body {
 }
 
 body::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  background:
-    radial-gradient(circle at 18% 18%, rgba(0, 174, 239, 0.06), transparent 32%),
-    radial-gradient(circle at 82% 30%, rgba(0, 59, 143, 0.05), transparent 34%);
-  opacity: 0.06;
-  pointer-events: none;
-  z-index: 0;
+  display: none !important;
 }
 
 body > * {
