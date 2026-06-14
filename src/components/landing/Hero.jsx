@@ -126,11 +126,11 @@ export default function Hero() {
             className="landing-hero__headline"
             variants={heroRevealItem}
             style={{
-              fontFamily: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
-              fontSize: "clamp(2.4rem, 5.5vw, 3.75rem)",
-              fontWeight: "800",
-              lineHeight: 1.05,
-              letterSpacing: "-0.02em",
+              fontFamily: "'Montserrat', 'Trebuchet MS', sans-serif",
+              fontSize: "clamp(2.6rem, 6vw, 4.2rem)",
+              fontWeight: "900",
+              lineHeight: 1.1,
+              letterSpacing: "-0.025em",
               color: "#0a1628",
               margin: "0",
             }}
@@ -154,11 +154,14 @@ export default function Hero() {
             className="landing-hero__body"
             variants={heroRevealItem}
             style={{
-              fontSize: "clamp(1rem, 2.2vw, 1.15rem)",
-              color: "#333333",
-              lineHeight: 1.65,
-              maxWidth: "660px",
-              margin: "0 auto 32px",
+              fontFamily: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif",
+              fontSize: "clamp(1.05rem, 2.4vw, 1.25rem)",
+              color: "#444444",
+              lineHeight: 1.7,
+              maxWidth: "700px",
+              margin: "0 auto 36px",
+              fontWeight: "400",
+              letterSpacing: "-0.005em",
             }}
           >
             Don't just launch a website. We install the complete automation stack that captures every lead, recovers every missed call, and books appointments for you 24/7.
@@ -167,7 +170,7 @@ export default function Hero() {
           {/* CTAs */}
           <motion.div
             variants={heroRevealItem}
-            style={{ display: "flex", gap: "14px", justifyContent: "center", flexWrap: "wrap" }}
+            style={{ display: "flex", gap: "16px", justifyContent: "center", flexWrap: "wrap" }}
           >
             {/* Refinement #6: Glow-border pulsing CTA + #7: depress on click */}
             <a
@@ -248,8 +251,8 @@ export default function Hero() {
                { value: "48hr", label: "Average Go-Live Time" },
              ].map(({ value, label }) => (
                <div key={label} style={{ textAlign: "center" }}>
-                 <div style={{ fontSize: "1.75rem", fontWeight: 900, color: "#0a1628", lineHeight: 1 }}>{value}</div>
-                 <div style={{ fontSize: "11px", color: "#666666", marginTop: "5px", fontWeight: 600, letterSpacing: "0.04em" }}>{label}</div>
+                 <div style={{ fontSize: "2rem", fontWeight: 900, color: "#0066aa", lineHeight: 1, fontFamily: "'Montserrat', sans-serif" }}>{value}</div>
+                 <div style={{ fontSize: "12px", color: "#666666", marginTop: "8px", fontWeight: 500, letterSpacing: "0.03em" }}>{label}</div>
                </div>
              ))}
           </motion.div>
