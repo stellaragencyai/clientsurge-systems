@@ -147,7 +147,7 @@ export default function Pricing() {
             { icon: "📅", text: "Managed Setup" },
             { icon: "📱", text: "SMS + Email" },
             { icon: "🚀", text: "Launch Support" },
-            { icon: "✅", text: "30-Day Guarantee" },
+            { icon: null, image: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/fb4532189_720d06dc-da6b-42eb-80bd-84ce273b6d14.png", text: "30-Day Guarantee" },
           ].map((badge) => (
             <div
               key={badge.text}
@@ -158,9 +158,13 @@ export default function Pricing() {
                 color: "rgba(0,0,0,0.75)",
               }}
             >
-              <span style={{ fontSize: "20px", lineHeight: 1 }}>
-                {badge.icon}
-              </span>
+              {badge.image ? (
+                <img src={badge.image} alt={badge.text} style={{ width: "32px", height: "32px", objectFit: "contain" }} />
+              ) : (
+                <span style={{ fontSize: "20px", lineHeight: 1 }}>
+                  {badge.icon}
+                </span>
+              )}
               <span
                 style={{
                   fontSize: "11px",
