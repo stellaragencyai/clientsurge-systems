@@ -324,10 +324,10 @@ export default function Footer() {
         }
 
         .cs-footer-main {
-          padding: 52px 0 40px;
+          padding: 48px 0 36px;
           display: grid;
-          grid-template-columns: 1.1fr 1fr 1.2fr 1fr 0.85fr;
-          gap: 48px;
+          grid-template-columns: 1fr 2.2fr;
+          gap: 52px;
           align-items: start;
           position: relative;
           z-index: 1;
@@ -404,7 +404,10 @@ export default function Footer() {
         }
 
         .cs-footer-nav {
-          display: contents;
+          display: grid;
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+          gap: 32px;
+          min-width: 0;
         }
 
         .cs-footer-nav-column {
@@ -546,9 +549,9 @@ export default function Footer() {
           height: 16px;
         }
 
-        @media (max-width: 1024px) {
+        @media (max-width: 1080px) {
           .cs-footer-main {
-            grid-template-columns: 1.1fr 1fr 1fr;
+            grid-template-columns: 1fr;
             gap: 40px;
           }
         }
@@ -558,21 +561,11 @@ export default function Footer() {
             grid-template-columns: repeat(2, minmax(0, 1fr));
           }
 
-          .cs-footer-main {
-            grid-template-columns: 1fr 1fr;
-            gap: 36px;
-          }
-
           .cs-footer-brand {
-            grid-column: 1 / -1;
             display: grid;
             grid-template-columns: 1fr 1fr;
-            gap: 24px;
+            gap: 28px;
             align-items: start;
-          }
-
-          .cs-footer-logo-row {
-            grid-column: 1 / -1;
           }
 
           .cs-footer-logo-row,
@@ -583,8 +576,8 @@ export default function Footer() {
           .cs-footer-nav {
             display: grid;
             grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 28px;
-            grid-column: 1 / -1;
+            gap: 32px;
+            min-width: 0;
           }
         }
 
