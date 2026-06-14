@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import {
-  RefreshCw, Phone, MessageSquare, TrendingUp, Server,
+  RefreshCw, Phone, MessageSquare, TrendingUp, Server, Eye,
 } from 'lucide-react';
 import LiveLeadsFeed from '../components/mission-control/LiveLeadsFeed';
 import ConversationsViewer from '../components/mission-control/ConversationsViewer';
@@ -13,6 +13,7 @@ import SystemStatusIndicator from '../components/mission-control/SystemStatusInd
 import AlertsFeed from '../components/mission-control/AlertsFeed';
 import ConversionPipeline from '../components/mission-control/ConversionPipeline';
 import TenantSwitcher from '../components/mission-control/TenantSwitcher';
+import SystemVisibilityDashboard from '../components/mission-control/SystemVisibilityDashboard';
 import { useTenantContext } from '@/lib/useTenantContext.jsx';
 import { useRealTimePolling } from '@/hooks/useRealTimePolling';
 
@@ -164,6 +165,7 @@ export default function MissionControlDashboard() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex gap-0 overflow-x-auto">
               {[
+                { id: 'visibility', label: 'System Visibility', icon: Eye },
                 { id: 'alerts', label: 'Alerts', icon: TrendingUp },
                 { id: 'live-feeds', label: 'Live Feeds', icon: TrendingUp },
                 { id: 'conversations', label: 'Conversations', icon: MessageSquare },
@@ -191,6 +193,9 @@ export default function MissionControlDashboard() {
 
       {/* Content Area */}
       <div className="max-w-7xl mx-auto px-6 py-6">
+        {activeTab === 'visibility' && (
+          <SystemVisibilityDashboard />
+        )}
         {activeTab === 'alerts' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             <div className="lg:col-span-2">
