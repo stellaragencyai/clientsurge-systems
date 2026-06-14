@@ -7,7 +7,6 @@ export default function Hero() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
-        background: "#0a0f1e",
       }}
     >
       <div
