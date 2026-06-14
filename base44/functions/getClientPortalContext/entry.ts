@@ -1,25 +1,34 @@
-import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import {
-  buildInstallSnapshot,
-} from "../_shared/installPipeline.js";
-import {
-  getPackageDisplayLabel,
-  normalizePackageKey,
-} from "../../../src/lib/salesCatalog.js";
+
+function secureJson(data, options = {}) {
+  return new Response(JSON.stringify(data), {
+    status: options.status || 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 
 function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function normalizePackageKey(key) {
+  if (!key) return null;
+  return String(key).toLowerCase().replace(/\s+/g, "_");
+}
+
+function getPackageDisplayLabel(pricingSummary) {
+  if (!pricingSummary) return "Custom Service Bundle";
+  return pricingSummary.package_name || "Custom Service Bundle";
+}
+
 function buildServiceStates(order) {
-  const snapshot = buildInstallSnapshot(order);
-  return snapshot.serviceStates.map((service) => ({
-    service_key: service.service_key,
-    display_name: service.display_name,
-    install_status: service.install_status,
-    configuration_complete: service.configuration_complete,
-    missing_configuration_fields: service.missing_configuration_fields,
+  const items = order?.items || [];
+  return items.map((item) => ({
+    service_key: item.service_key || item.product_id,
+    display_name: item.product_name || item.service_key || "Service",
+    install_status: item.install_status || "Paid",
+    configuration_complete: Boolean(item.install_status && item.install_status !== "Paid"),
+    missing_configuration_fields: [],
   }));
 }
 
@@ -30,13 +39,20 @@ function buildOrderSummary(order) {
       order?.package_type
   );
   const services = buildServiceStates(order);
+  const statuses = services.map((s) => s.install_status);
+  let pipelineStatus = "Paid";
+  if (statuses.every((s) => s === "Live")) pipelineStatus = "Live";
+  else if (statuses.some((s) => s === "Error")) pipelineStatus = "Error";
+  else if (statuses.some((s) => s === "Testing")) pipelineStatus = "Testing";
+  else if (statuses.some((s) => s === "Configuring")) pipelineStatus = "Configuring";
+  else if (statuses.some((s) => s === "Ready for Install")) pipelineStatus = "Ready for Install";
 
   return {
     id: order.id,
     payment_status: order.payment_status,
     billing_status: order.billing_status,
     subscription_status: order.subscription_status,
-    pipeline_status: buildInstallSnapshot(order).pipelineStatus,
+    pipeline_status: pipelineStatus,
     order_status: order.order_status,
     client_id: order.client_id,
     client_project_id: order.client_project_id,
@@ -76,7 +92,7 @@ function buildSubscriptionSummary(order, project) {
     current_period_start: order.current_period_start,
     current_period_end: order.current_period_end,
     cancel_at_period_end: false,
-    services_included: services.map((service) => service.service_key),
+    services_included: services.map((s) => s.service_key),
     change_request_status:
       project?.plan_change_request && project.plan_change_request !== "None"
         ? "pending_review"
@@ -95,10 +111,7 @@ function buildSubscriptionSummary(order, project) {
 }
 
 function buildProjectSummary(project) {
-  if (!project) {
-    return null;
-  }
-
+  if (!project) return null;
   return {
     ...project,
     quick_start_completed: project.quick_start_completed === true,
@@ -173,6 +186,8 @@ Deno.serve(async (req) => {
     }
 
     const email = cleanString(user.email).toLowerCase();
+
+    // Check paid orders first
     const orders = await base44.asServiceRole.entities.Order.filter(
       { customer_email: email },
       "-created_date",
@@ -186,12 +201,35 @@ Deno.serve(async (req) => {
     );
 
     if (paidOrders.length === 0) {
-      await logPortalLoginEvent(base44, {
-        user,
-        email,
-        linkStatus: "no_paid_order",
-      });
+      // Fallback: check for a ClientProject directly linked by client_email (demo/manual accounts)
+      const projectsByEmail = await base44.asServiceRole.entities.ClientProject.filter(
+        { client_email: email },
+        "-created_date",
+        5
+      );
+      const directProject = (projectsByEmail || []).find(
+        (p) => cleanString(p.client_email).toLowerCase() === email
+      );
 
+      if (directProject) {
+        const projectSummary = buildProjectSummary(directProject);
+        await logPortalLoginEvent(base44, {
+          user,
+          email,
+          linkStatus: "direct_project_link",
+          project: directProject,
+        });
+        return secureJson({
+          success: true,
+          project: projectSummary,
+          order: null,
+          subscription: null,
+          link_status: "direct_project_link",
+          empty_state: false,
+        });
+      }
+
+      await logPortalLoginEvent(base44, { user, email, linkStatus: "no_paid_order" });
       return secureJson({
         success: true,
         project: null,
@@ -199,8 +237,7 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "no_paid_order",
         empty_state: true,
-        message:
-          "No paid order is linked to this login yet. Complete checkout or contact support.",
+        message: "No paid order is linked to this login yet. Complete checkout or contact support.",
       });
     }
 
@@ -208,12 +245,7 @@ Deno.serve(async (req) => {
       ...new Set(paidOrders.map((order) => cleanString(order.business_name)).filter(Boolean)),
     ];
     if (businessNames.length > 1) {
-      await logPortalLoginEvent(base44, {
-        user,
-        email,
-        linkStatus: "ambiguous_paid_orders",
-      });
-
+      await logPortalLoginEvent(base44, { user, email, linkStatus: "ambiguous_paid_orders" });
       return secureJson({
         success: true,
         project: null,
@@ -221,8 +253,7 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "ambiguous_paid_orders",
         empty_state: false,
-        message:
-          "Multiple paid businesses are linked to this email. Support needs to finish portal routing before access can be shown safely.",
+        message: "Multiple paid businesses are linked to this email. Support needs to finish portal routing before access can be shown safely.",
       });
     }
 
@@ -230,13 +261,7 @@ Deno.serve(async (req) => {
     const orderSummary = buildOrderSummary(order);
 
     if (!order.client_project_id || !order.client_id) {
-      await logPortalLoginEvent(base44, {
-        user,
-        email,
-        linkStatus: "missing_canonical_links",
-        order,
-      });
-
+      await logPortalLoginEvent(base44, { user, email, linkStatus: "missing_canonical_links", order });
       return secureJson({
         success: true,
         project: null,
@@ -244,26 +269,17 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "missing_canonical_links",
         empty_state: false,
-        message:
-          "Your payment is confirmed, but your client/project linkage is not complete yet. Our team needs to finish linking your portal records.",
+        message: "Your payment is confirmed, but your client/project linkage is not complete yet. Our team needs to finish linking your portal records.",
       });
     }
 
     const [project, client] = await Promise.all([
-      base44.asServiceRole.entities.ClientProject.get(order.client_project_id).catch(
-        () => null
-      ),
+      base44.asServiceRole.entities.ClientProject.get(order.client_project_id).catch(() => null),
       base44.asServiceRole.entities.Client.get(order.client_id).catch(() => null),
     ]);
 
     if (!project || !client) {
-      await logPortalLoginEvent(base44, {
-        user,
-        email,
-        linkStatus: "linked_records_missing",
-        order,
-      });
-
+      await logPortalLoginEvent(base44, { user, email, linkStatus: "linked_records_missing", order });
       return secureJson({
         success: true,
         project: null,
@@ -271,22 +287,14 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "linked_records_missing",
         empty_state: false,
-        message:
-          "Your order is paid, but the linked client records are incomplete. Support needs to repair the portal linkage.",
+        message: "Your order is paid, but the linked client records are incomplete. Support needs to repair the portal linkage.",
       });
     }
 
     const projectSummary = buildProjectSummary(project);
     const subscription = buildSubscriptionSummary(order, projectSummary);
 
-    await logPortalLoginEvent(base44, {
-      user,
-      email,
-      linkStatus: "linked",
-      order,
-      client,
-      project: projectSummary,
-    });
+    await logPortalLoginEvent(base44, { user, email, linkStatus: "linked", order, client, project: projectSummary });
 
     return secureJson({
       success: true,
