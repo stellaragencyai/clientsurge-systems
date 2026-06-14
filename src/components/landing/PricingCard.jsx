@@ -124,8 +124,8 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
            <p className="text-sm font-bold text-foreground/75">+ {plan.setup} setup fee</p>
          </div>
 
-        {/* Features */}
-         <ul className="space-y-2.5 flex-1 mb-6">
+        {/* Features — Task #12: Centralized badge colors */}
+         <ul className="space-y-2.5 flex-1 mb-6" aria-label={`Features for ${plan.name}`}>
            {plan.packageKey === "starter_system" ? (
              // Starter: show all features clearly
              STARTER_FEATURES.map((feature) => (
@@ -173,6 +173,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
              <a
                href={getPackageStorePath(plan.packageKey)}
                className="w-full block h-12 rounded-xl text-sm font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none flex items-center justify-center gap-2"
+               aria-label={`Start with ${plan.name} plan at ${plan.monthly}/month`}
                style={{
                  background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
                  boxShadow: "0 6px 20px rgba(0,174,239,0.4)",

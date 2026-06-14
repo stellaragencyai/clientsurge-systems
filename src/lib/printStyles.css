@@ -1,0 +1,57 @@
+/* Task #33: Print CSS for admin dashboard */
+@media print {
+  /* Hide navigation and interactive elements */
+  nav, 
+  button, 
+  [class*="mobile"],
+  [class*="sticky"] {
+    display: none !important;
+  }
+
+  /* Optimize for printing */
+  body {
+    background: white;
+    color: black;
+    font-size: 11pt;
+    line-height: 1.5;
+  }
+
+  /* Page breaks */
+  .admin-dashboard {
+    page-break-inside: avoid;
+  }
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+
+  th, td {
+    border: 1px solid #ccc;
+    padding: 8px;
+    text-align: left;
+  }
+
+  th {
+    background-color: #f0f0f0;
+    font-weight: bold;
+  }
+
+  /* Remove color backgrounds */
+  [class*="bg-primary"],
+  [class*="bg-accent"] {
+    background-color: white !important;
+  }
+
+  /* Accessible link printing */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: 0.8em;
+  }
+
+  /* Prevent widows and orphans */
+  p {
+    orphans: 3;
+    widows: 3;
+  }
+}

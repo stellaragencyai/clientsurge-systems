@@ -1,18 +1,41 @@
 {
   "name": "ClientSurge Systems",
   "short_name": "ClientSurge",
-  "description": "AI automation systems for local service businesses.",
+  "description": "AI-powered lead automation system for service businesses",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
-  "background_color": "#0A1628",
-  "theme_color": "#0A1628",
+  "orientation": "portrait-primary",
+  "theme_color": "#00AEEF",
+  "background_color": "#ffffff",
   "icons": [
     {
-      "src": "/pwa-icon.svg",
-      "sizes": "any",
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect fill='%2300AEEF' width='192' height='192'/><text x='50%' y='50%' font-size='96' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>CS</text></svg>",
+      "sizes": "192x192",
       "type": "image/svg+xml",
-      "purpose": "any maskable"
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'><rect fill='%2300AEEF' width='180' height='180'/><text x='50%' y='50%' font-size='90' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>CS</text></svg>",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect fill='%2300AEEF' width='512' height='512'/><text x='50%' y='50%' font-size='256' font-weight='bold' fill='white' text-anchor='middle' dominant-baseline='central'>CS</text></svg>",
+      "sizes": "512x512",
+      "type": "image/svg+xml",
+      "purpose": "maskable"
     }
-  ]
+  ],
+  "screenshots": [
+    {
+      "src": "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/screenshot-mobile.png",
+      "sizes": "540x720",
+      "type": "image/png",
+      "form_factor": "narrow"
+    }
+  ],
+  "categories": ["business", "productivity"],
+  "prefer_related_applications": false
 }

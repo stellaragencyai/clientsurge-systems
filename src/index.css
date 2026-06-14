@@ -81,10 +81,11 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Global focus styles for keyboard navigation */
+/* Global focus styles for keyboard navigation — Task #1 unified */
 :focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 2px;
+  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
 }
 
 button:focus-visible,
@@ -96,14 +97,18 @@ select:focus-visible {
   outline-offset: 2px;
 }
 
-/* CTA Button Focus States - Enhanced for Accessibility */
+/* CTA Button Focus States - Enhanced for Accessibility — Task #1 standardized */
 button[type="button"],
 button[type="submit"],
 a[role="button"],
 .shiny-brown-btn,
 [class*="cta"],
-[class*="btn"] {
+[class*="btn"],
+input[type="submit"],
+input[type="button"] {
   position: relative;
+  min-height: 44px;
+  min-width: 44px;
 }
 
 /* Global focus styles for all interactive elements */
@@ -402,13 +407,16 @@ nav {
   }
 }
 
-/* 9. Ensure minimum readable font size on mobile */
+/* 9. Ensure minimum readable font size on mobile — Task #10 checks h2 balance */
 @media (max-width: 480px) {
   body {
     font-size: max(16px, 1rem);
   }
   p, li, label, input, textarea, select {
     font-size: max(16px, 1rem);
+  }
+  h2 {
+    text-wrap: balance;
   }
 }
 
@@ -853,13 +861,18 @@ img[style*="object-fit"] {
   to { background-position: -120% 0; }
 }
 
-/* 4. Scrollbar styling — consistent cross-browser thin scrollbar */
+/* 4. Scrollbar styling — consistent cross-browser thin scrollbar — Task #4 removed dupe */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: rgba(0,174,239,0.35); border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: rgba(0,174,239,0.6); }
 @supports (scrollbar-width: thin) {
   * { scrollbar-width: thin; scrollbar-color: rgba(0,174,239,0.35) transparent; }
+}
+
+/* Task #9: Card border radius — strict 0.75rem standard */
+.card, [class*="card"], .rounded-lg {
+  border-radius: 0.75rem !important;
 }
 
 /* 5. Input zoom prevention on iOS (font-size must stay >=16px on mobile controls) */
