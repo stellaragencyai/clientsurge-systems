@@ -127,9 +127,7 @@ a[role="button"],
 /* Unified primary button system */
 .cs-btn-primary,
 .hero-primary-cta,
-[class*="primary-cta"],
-button[type="button"],
-button[type="submit"] {
+[class*="primary-cta"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -139,25 +137,19 @@ button[type="submit"] {
   background: var(--cs-gradient);
   color: #ffffff;
   font-weight: 800;
-  font-size: 0.95rem;
   padding: 12px 24px;
-  min-height: 44px;
   box-shadow: 0 0 0 1px rgba(0,174,239,0.5), var(--cs-glow-sm);
   transition: box-shadow 0.28s var(--cs-spring-easing), transform 0.28s var(--cs-spring-easing);
 }
 .cs-btn-primary:hover,
 .hero-primary-cta:hover,
-[class*="primary-cta"]:hover,
-button[type="button"]:hover,
-button[type="submit"]:hover {
+[class*="primary-cta"]:hover {
   box-shadow: 0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45);
   transform: translateY(-2px);
 }
 .cs-btn-primary:active,
 .hero-primary-cta:active,
-[class*="primary-cta"]:active,
-button[type="button"]:active,
-button[type="submit"]:active {
+[class*="primary-cta"]:active {
   transform: translateY(0) scale(0.98);
 }
 
@@ -675,31 +667,27 @@ body::after {
 
 /* ============================================
    REFINEMENT #11: FLUID HEADING SCALING
-   Standardized across all pages — unified system
+   clamp(min, preferred, max) across all levels
    ============================================ */
 h1 {
-  font-size: clamp(2.4rem, 5.5vw, 3.75rem);
+  font-size: clamp(2.25rem, 5.5vw, 4rem);
   line-height: 1.08;
   letter-spacing: -0.02em;
-  font-weight: 800;
 }
 h2 {
   font-size: clamp(1.75rem, 4vw, 3rem);
   line-height: 1.1;
-  letter-spacing: -0.02em;
-  font-weight: 800;
+  letter-spacing: -0.02em; /* Refinement #12 */
 }
 h3 {
   font-size: clamp(1.25rem, 2.8vw, 2rem);
   line-height: 1.2;
-  letter-spacing: -0.015em;
-  font-weight: 700;
+  letter-spacing: -0.015em; /* Refinement #12 */
 }
 h4 {
-  font-size: clamp(1rem, 2vw, 1.4rem);
+  font-size: clamp(1.05rem, 2vw, 1.4rem);
   line-height: 1.3;
   letter-spacing: -0.01em;
-  font-weight: 700;
 }
 
 /* Refinement #12: Small uppercase labels get positive tracking */
@@ -713,9 +701,6 @@ h4 {
 /* Refinement #21: Constrain body paragraph line length for editorial readability */
 p {
   max-width: 65ch;
-  font-size: clamp(0.95rem, 1.1vw, 1.05rem);
-  line-height: 1.65;
-  font-weight: 400;
 }
 /* Reset for UI layout paragraphs — flex/grid children, buttons, etc. */
 .no-prose p,
