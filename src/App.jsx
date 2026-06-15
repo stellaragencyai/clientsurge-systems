@@ -46,6 +46,7 @@ const Contact = lazy(() => import("./pages/Contact"));
 const Industries = lazy(() => import("./pages/Industries"));
 const Blog = lazy(() => import("./pages/Blog"));
 const Login = lazy(() => import("./pages/Login"));
+const Register = lazy(() => import("./pages/Register"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Store = lazy(() => import("./pages/Store"));
 const IndustryLandingPage = lazy(() => import("./components/industry/IndustryLandingPage"));
@@ -305,6 +306,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy-policy" />} />
       <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
       <Route path="/login" element={<LazyRoute Component={Login} />} />
+      <Route path="/register" element={<LazyRoute Component={Register} />} />
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
