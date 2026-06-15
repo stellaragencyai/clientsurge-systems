@@ -443,9 +443,9 @@ export default function LeadManagementDashboard({
     <div className="space-y-6">
       <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">Lead Pipeline</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Manage Leads</h2>
           <p className="mt-1 text-sm text-muted-foreground">
-            Canonical Leads pipeline for import, dedupe, segmentation, and daily operator follow-up.
+            Import, organize, and prioritize your leads for outreach.
           </p>
           {snapshot.generated_at ? (
             <p className="mt-2 text-xs text-muted-foreground">
@@ -520,11 +520,11 @@ export default function LeadManagementDashboard({
 
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-6">
         <SummaryCard
-          label="Total Leads"
-          value={snapshot.summary.total_leads}
-          helper="Canonical Leads records loaded for daily operator work, including 5,000+ lead import batches."
-          tone="blue"
-        />
+            label="Total Leads"
+            value={snapshot.summary.total_leads}
+            helper="All leads in your system"
+            tone="blue"
+          />
         <SummaryCard
           label="Actionable Now"
           value={snapshot.summary.actionable_leads}
@@ -569,11 +569,11 @@ export default function LeadManagementDashboard({
         <div className="rounded-xl border border-border bg-white p-4 space-y-4">
           <div className="flex items-center gap-2">
             <Flame className="h-4 w-4 text-primary" />
-            <h3 className="text-lg font-semibold text-foreground">Activation Command View</h3>
-          </div>
-          <p className="text-sm text-muted-foreground">
-            Backend-ranked lead queue showing who to work first, why, and which offer is the best fit.
-          </p>
+            <h3 className="text-lg font-semibold text-foreground">Next Leads to Contact</h3>
+            </div>
+            <p className="text-sm text-muted-foreground">
+            Your highest-priority leads ready for outreach.
+            </p>
 
           <div className="space-y-3">
             {activationQueue.length ? (
@@ -630,7 +630,7 @@ export default function LeadManagementDashboard({
           <div className="rounded-xl border border-border bg-white p-4">
             <div className="mb-4 flex items-center gap-2">
               <Target className="h-4 w-4 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Activation Segments</h3>
+              <h3 className="text-lg font-semibold text-foreground">Lead Segments</h3>
             </div>
             <div className="space-y-3">
               {activationSegments.map((segment) => (
@@ -658,7 +658,7 @@ export default function LeadManagementDashboard({
           <div className="rounded-xl border border-border bg-white p-4">
             <div className="mb-4 flex items-center gap-2">
               <BrainCircuit className="h-4 w-4 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Recommended Offer Mix</h3>
+              <h3 className="text-lg font-semibold text-foreground">Plan Mix</h3>
             </div>
             <div className="grid grid-cols-2 gap-3">
               <SummaryCard
@@ -694,9 +694,9 @@ export default function LeadManagementDashboard({
         <div className="rounded-xl border border-border bg-white p-6 space-y-4">
           <div className="flex flex-col gap-2 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Structured Lead Import</h3>
+              <h3 className="text-lg font-semibold text-foreground">Import Leads</h3>
               <p className="text-sm text-muted-foreground">
-                Paste CSV/TSV or JSON lead rows. The import previews exact email/phone dedupe before writing.
+               Add new leads from CSV, Excel, or JSON. Duplicates are automatically detected.
               </p>
             </div>
             <label className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-3 py-2 text-sm font-medium text-foreground hover:bg-muted">
@@ -810,9 +810,9 @@ export default function LeadManagementDashboard({
           />
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>
-              <h3 className="text-lg font-semibold text-foreground">Actionable Lead Queue</h3>
+              <h3 className="text-lg font-semibold text-foreground">All Leads</h3>
               <p className="text-sm text-muted-foreground">
-                Search, filter, and work canonical Leads without leaving the admin control surface.
+               View, search, and manage all your leads.
               </p>
             </div>
             <div className="text-sm text-muted-foreground">

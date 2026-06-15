@@ -62,7 +62,7 @@ export default function SystemVisibilityDashboard() {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <Eye className="w-5 h-5 text-primary" />
-          <h2 className="text-xl font-semibold">System Visibility</h2>
+          <h2 className="text-xl font-semibold">System Overview</h2>
         </div>
         <div className="flex items-center gap-3">
           <label className="flex items-center gap-2 text-sm">
@@ -84,7 +84,7 @@ export default function SystemVisibilityDashboard() {
       <div>
         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
           <Activity className="w-4 h-4" />
-          Core Modules
+          System Status
         </h3>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
           {Object.entries(visibility.modules).map(([key, module]) => (
@@ -149,7 +149,7 @@ export default function SystemVisibilityDashboard() {
       <div>
         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
           <FileText className="w-4 h-4" />
-          System Event Flow
+          Data Flow
         </h3>
         <div className="p-6 bg-card border border-border rounded-lg">
           <div className="flex items-center justify-between text-xs font-semibold">
@@ -223,17 +223,17 @@ export default function SystemVisibilityDashboard() {
         </div>
       </div>
 
-      {/* Tenant Overview */}
+      {/* Account Overview */}
       <div>
         <h3 className="text-sm font-semibold mb-3 flex items-center gap-2">
           <Building2 className="w-4 h-4" />
-          Tenant Overview
+          Account Overview
         </h3>
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          {/* Clients */}
+          {/* Accounts */}
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground mb-2">
-              Clients ({visibility.tenants.clients.length})
+              Active Accounts ({visibility.tenants.clients.length})
             </h4>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {visibility.tenants.clients.slice(0, 10).map((client) => (
@@ -261,10 +261,10 @@ export default function SystemVisibilityDashboard() {
             </div>
           </div>
 
-          {/* Projects */}
+          {/* Services */}
           <div>
             <h4 className="text-xs font-semibold text-muted-foreground mb-2">
-              Projects ({visibility.tenants.projects.length})
+              Active Services ({visibility.tenants.projects.length})
             </h4>
             <div className="space-y-2 max-h-48 overflow-y-auto">
               {visibility.tenants.projects.slice(0, 10).map((project) => (

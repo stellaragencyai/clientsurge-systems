@@ -73,10 +73,10 @@ export default function DashboardHome() {
     <div className="space-y-6">
       <div className="mb-6">
         <h2 className="text-3xl font-display font-semibold text-foreground mb-1">
-          Pipeline Overview
+          Your Leads
         </h2>
         <p className="text-sm text-muted-foreground">
-          Lead distribution across stages
+          See where your leads are in the sales pipeline
         </p>
       </div>
 

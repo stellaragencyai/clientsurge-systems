@@ -74,9 +74,9 @@ export default function MissionControlDashboard() {
         <div className="max-w-7xl mx-auto px-6 py-5">
           <div className="flex items-center justify-between gap-4 mb-4">
             <div>
-              <h1 className="text-3xl font-bold text-foreground">Mission Control</h1>
+              <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
               <p className="text-sm text-muted-foreground mt-2">
-                Real-time lead intelligence & system monitoring
+                Real-time leads, messages, and revenue insights
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -105,11 +105,11 @@ export default function MissionControlDashboard() {
 
           {/* Selected Tenant Info */}
           {(selectedClientId || selectedProjectId) && (
-            <div className="mb-4 p-3.5 rounded-lg bg-primary/8 border border-primary/25">
-              <p className="text-xs font-semibold text-primary">
-                ✓ {selectedProjectId ? 'Project' : 'Client'} scoped • Tenant-filtered data below
-              </p>
-            </div>
+           <div className="mb-4 p-3.5 rounded-lg bg-primary/8 border border-primary/25">
+             <p className="text-xs font-semibold text-primary">
+               ✓ Viewing data for: {selectedProjectId ? 'Project' : 'Client'}
+             </p>
+           </div>
           )}
 
           {/* Filter Bar */}
@@ -165,13 +165,13 @@ export default function MissionControlDashboard() {
           <div className="max-w-7xl mx-auto px-6">
             <div className="flex gap-0 overflow-x-auto scrollbar-hide">
               {[
-                { id: 'visibility', label: 'System Visibility', icon: Eye },
+                { id: 'visibility', label: 'Overview', icon: Eye },
                 { id: 'alerts', label: 'Alerts', icon: TrendingUp },
-                { id: 'live-feeds', label: 'Live Feeds', icon: TrendingUp },
+                { id: 'live-feeds', label: 'Recent Leads', icon: TrendingUp },
                 { id: 'conversations', label: 'Conversations', icon: MessageSquare },
-                { id: 'message-log', label: 'Message Log', icon: Phone },
-                { id: 'analytics', label: 'Intent Analytics', icon: TrendingUp },
-                { id: 'health', label: 'System Health', icon: Server },
+                { id: 'message-log', label: 'Messages', icon: Phone },
+                { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+                { id: 'health', label: 'System Status', icon: Server },
               ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}

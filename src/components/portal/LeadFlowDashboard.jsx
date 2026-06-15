@@ -86,12 +86,12 @@ export default function LeadFlowDashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3">
-        <div>
-          <h3 className="text-xl font-semibold text-foreground">Lead Flow Summary</h3>
-          <p className="text-sm text-muted-foreground mt-1">Real-time metrics across all your leads</p>
-        </div>
+       {/* Header */}
+       <div className="flex items-center justify-between gap-3">
+         <div>
+           <h3 className="text-xl font-semibold text-foreground">Leads Overview</h3>
+           <p className="text-sm text-muted-foreground mt-1">Your lead pipeline metrics</p>
+         </div>
         <div className="flex items-center gap-2">
           <button
             onClick={handleExport}
