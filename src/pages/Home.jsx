@@ -10,6 +10,7 @@ import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
+import RevenueProofBlock from "../components/landing/RevenueProofBlock";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -118,6 +119,12 @@ export default function Home() {
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Industries />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div className="max-w-6xl mx-auto px-6 pt-4">
+            <RevenueProofBlock industryLoss={14700} leadsRecovered="8-12" bookingsGenerated="3-5" />
+          </div>
         </LazyHomepageSection>
 
         <LazyHomepageSection fallback={<SectionSkeleton />}>

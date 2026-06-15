@@ -353,6 +353,20 @@ nav {
   }
 }
 
+/* MOBILE OPTIMIZATION: Reduce padding on small screens for compact layout */
+@media (max-width: 640px) {
+  section {
+    padding-top: 3rem !important;
+    padding-bottom: 3rem !important;
+  }
+  h2 {
+    font-size: clamp(1.5rem, 5vw, 2rem) !important;
+  }
+  h3 {
+    font-size: clamp(1.1rem, 4vw, 1.5rem) !important;
+  }
+}
+
 /* M06: iPad portrait (768px) — pricing cards should be 2-col not 1-col */
 @media (min-width: 768px) and (max-width: 1023px) {
   .pricing-cards-grid {

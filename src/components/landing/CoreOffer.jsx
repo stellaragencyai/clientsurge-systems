@@ -44,10 +44,10 @@ function CoreOfferHeader() {
 
       {/* Subheadline */}
       <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-         Your AI system responds in seconds, follows up consistently, and books appointments without manual work.
+         Instant response. Automatic follow-up. Direct bookings.
        </p>
-       <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-         Recover the revenue from every missed call and abandoned lead.
+       <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+         Every missed call recovered. Every lead followed up. Every appointment booked.
        </p>
     </div>);
 
@@ -171,7 +171,7 @@ function MobileSystemGroupList({ selectedSystemId, onSelect, showAll, onToggle, 
 function CoreOfferCTA({ onBookDemo }) {
   return (
     <div
-      className="relative mt-10 mb-4 mx-auto flex max-w-4xl flex-col items-center overflow-hidden rounded-lg border border-primary/15 px-6 py-8 text-center shadow-sm md:mt-12 md:mb-6 md:px-10 md:py-10"
+      className="relative mx-auto flex max-w-4xl flex-col items-center overflow-hidden rounded-lg border border-primary/15 px-6 py-8 text-center shadow-sm md:px-10 md:py-10"
       style={{
         background: "linear-gradient(180deg, rgba(255,255,255,0.96) 0%, rgba(232,246,255,0.78) 100%)",
         boxShadow: "0 22px 56px rgba(0,88,160,0.1)",
@@ -183,19 +183,12 @@ function CoreOfferCTA({ onBookDemo }) {
         style={{ background: "linear-gradient(90deg, #003B8F, #00AEEF, #66D9FF)" }}
       />
       <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
-         More booked jobs. Less lost revenue.
+         Start recovering revenue now.
        </p>
-       <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-         Get a free automation audit to see exactly which systems will work for your business.
+       <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+         Get a free automation audit to see exactly how much you can recover.
        </p>
-      <div className="mt-7 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
-        <a
-          href={coreOfferSectionConfig.primaryCta.href}
-          className="inline-flex h-12 w-full min-w-[220px] items-center justify-center gap-2 whitespace-nowrap rounded-lg border border-primary/20 bg-white/80 px-6 text-sm font-semibold text-primary shadow-sm transition-colors hover:bg-primary/8 sm:w-auto">
-          
-          {coreOfferSectionConfig.primaryCta.label}
-          <ArrowRight className="w-4 h-4" />
-        </a>
+      <div className="mt-6 flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row">
         <button
           type="button"
           onClick={onBookDemo}
@@ -217,13 +210,13 @@ function CoreOfferCTA({ onBookDemo }) {
               justifyContent: "center",
               gap: "8px",
               height: "44px",
-              minWidth: "220px",
-              padding: "0 28px",
+              minWidth: "180px",
+              padding: "0 24px",
               borderRadius: "6px",
               background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
               color: "#ffffff",
               fontWeight: "700",
-              fontSize: "0.95rem",
+              fontSize: "0.9rem",
               whiteSpace: "nowrap"
             }}>
             
@@ -231,6 +224,7 @@ function CoreOfferCTA({ onBookDemo }) {
             <ArrowRight className="w-4 h-4" />
           </span>
         </button>
+
       </div>
     </div>);
 
@@ -340,7 +334,9 @@ export default function CoreOffer() {
         
         <LaunchTimeline />
         <ProcessToCtaConnector />
+        <div className="mt-6 md:mt-8">
         <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
+      </div>
       </div>
 
       <StackBuilder
