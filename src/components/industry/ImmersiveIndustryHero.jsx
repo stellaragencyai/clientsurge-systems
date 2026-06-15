@@ -1,9 +1,14 @@
 import { ArrowRight } from 'lucide-react';
 import DemoBookingModal from '../forms/DemoBookingModal';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
 export default function ImmersiveIndustryHero({ config }) {
   const [showBooking, setShowBooking] = useState(false);
+  const [bgAttachment, setBgAttachment] = useState('scroll');
+  
+  useEffect(() => {
+    setBgAttachment(window.innerWidth >= 768 ? 'fixed' : 'scroll');
+  }, []);
   
   if (!config || !config.hero) {
     return null;
@@ -21,7 +26,7 @@ export default function ImmersiveIndustryHero({ config }) {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: window.innerWidth >= 768 ? 'fixed' : 'scroll',
+          backgroundAttachment: bgAttachment,
           backgroundColor: 'hsl(var(--background))',
           WebkitBackgroundSize: 'cover',
         }}
