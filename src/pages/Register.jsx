@@ -101,9 +101,10 @@ export default function Register() {
           </InputOTP>
         </div>
         <Button
-          className="w-full h-12 font-medium"
+          className="w-full h-12 font-bold text-white border-none"
           onClick={handleVerify}
           disabled={loading || otpCode.length < 6}
+          style={{ background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)", boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4)" }}
         >
           {loading ? (
             <>
@@ -212,7 +213,12 @@ export default function Register() {
             />
           </div>
         </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
+        <Button
+          type="submit"
+          className="w-full h-12 font-bold text-white border-none"
+          disabled={loading}
+          style={{ background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)", boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4)" }}
+        >
           {loading ? (
             <>
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
