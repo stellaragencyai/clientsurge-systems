@@ -15,6 +15,7 @@ import AlertsFeed from '../components/mission-control/AlertsFeed';
 import ConversionPipeline from '../components/mission-control/ConversionPipeline';
 import TenantSwitcher from '../components/mission-control/TenantSwitcher';
 import SystemVisibilityDashboard from '../components/mission-control/SystemVisibilityDashboard';
+import LeadIntelligenceTable from '../components/admin/LeadIntelligenceTable';
 import { useTenantContext } from '@/lib/useTenantContext.jsx';
 import { useRealTimePolling } from '@/hooks/useRealTimePolling';
 
@@ -164,17 +165,18 @@ export default function MissionControlDashboard() {
 
         {/* Tab Navigation */}
         <div className="border-t border-border bg-background/50">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="flex gap-0 overflow-x-auto scrollbar-hide">
-              {[
-                { id: 'visibility', label: 'Overview', icon: Eye },
-                { id: 'alerts', label: 'Alerts', icon: TrendingUp },
-                { id: 'live-feeds', label: 'Recent Leads', icon: TrendingUp },
-                { id: 'conversations', label: 'Conversations', icon: MessageSquare },
-                { id: 'message-log', label: 'Messages', icon: Phone },
-                { id: 'analytics', label: 'Analytics', icon: TrendingUp },
-                { id: 'health', label: 'System Status', icon: Server },
-              ].map(({ id, label, icon: Icon }) => (
+        <div className="max-w-7xl mx-auto px-6">
+          <div className="flex gap-0 overflow-x-auto scrollbar-hide">
+            {[
+              { id: 'visibility', label: 'Overview', icon: Eye },
+              { id: 'leads', label: 'Lead Intelligence', icon: ListChecks },
+              { id: 'alerts', label: 'Alerts', icon: TrendingUp },
+              { id: 'live-feeds', label: 'Recent Leads', icon: TrendingUp },
+              { id: 'conversations', label: 'Conversations', icon: MessageSquare },
+              { id: 'message-log', label: 'Messages', icon: Phone },
+              { id: 'analytics', label: 'Analytics', icon: TrendingUp },
+              { id: 'health', label: 'System Status', icon: Server },
+            ].map(({ id, label, icon: Icon }) => (
                 <button
                   key={id}
                   onClick={() => setActiveTab(id)}
@@ -216,16 +218,19 @@ export default function MissionControlDashboard() {
             <SystemVisibilityDashboard />
           </>
         )}
+        {activeTab === 'leads' && (
+           <LeadIntelligenceTable />
+         )}
         {activeTab === 'alerts' && (
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2">
-              <AlertsFeed lastUpdated={pollingLastUpdated} />
-            </div>
-            <div>
-              <ConversionPipeline lastUpdated={pollingLastUpdated} />
-            </div>
-          </div>
-        )}
+           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+             <div className="lg:col-span-2">
+               <AlertsFeed lastUpdated={pollingLastUpdated} />
+             </div>
+             <div>
+               <ConversionPipeline lastUpdated={pollingLastUpdated} />
+             </div>
+           </div>
+         )}
         {activeTab === 'live-feeds' && (
           <LiveLeadsFeed filters={filters} refreshKey={lastRefresh} />
         )}
