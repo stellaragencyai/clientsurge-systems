@@ -413,7 +413,7 @@ export default function Navbar() {
             }}
             onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-            Get Free Automation Audit
+            Claim My System Diagnostic
           </button>
         </div>
 
@@ -515,7 +515,7 @@ export default function Navbar() {
           </button>
           <button
             onClick={() => {
-              trackCTA("book_demo", "mobile_nav");
+              trackCTA("claim_diagnostic", "mobile_nav");
               setOpen(false);
               navigate("/book");
             }}

@@ -9,7 +9,7 @@ const testimonials = [
     before: "Online consult requests wait for manual follow-up",
     after: "New inquiries get an immediate response and booking path",
     result: "Target outcome: faster consult capture",
-    quote: "Workflow preview: lead captured, SMS sent, booking handoff started.",
+    quote: "Workflow preview: lead captured, SMS sent, conversion handoff started.",
     initials: "MS",
     color: "#00AEEF",
   },
@@ -31,7 +31,7 @@ const testimonials = [
     before: "Manual follow-up depends on front desk availability",
     after: "Follow-up sequence keeps qualified patients moving",
     result: "Target outcome: cleaner follow-up queue",
-    quote: "Workflow preview: inquiry qualified, nurture started, booking prompt sent.",
+    quote: "Workflow preview: inquiry qualified, nurture started, conversion prompt sent.",
     initials: "DE",
     color: "#009DFF",
   },
@@ -117,7 +117,7 @@ export default function Testimonials() {
           data-clientsurge-testimonials-cta-align="centered"
         >
           <p className="mb-4 text-center text-lg font-semibold text-foreground">
-            Want a workflow like this for your business?
+            Ready to deploy this system for your business?
           </p>
           {demoBooking ? (
             <button

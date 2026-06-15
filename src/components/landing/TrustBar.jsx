@@ -53,7 +53,7 @@ const items = [
     display: "30-day review",
     animatedValue: null,
     story:
-      "After launch, the system is reviewed against response speed, follow-up completion, missed-call recovery, and booked-lead movement.",
+      "After launch, the system is reviewed against response speed, follow-up completion, missed-call recovery, and lead conversion movement.",
   },
   {
     icon: ShieldCheck,

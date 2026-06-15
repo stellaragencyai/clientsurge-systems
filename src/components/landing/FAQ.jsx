@@ -48,7 +48,7 @@ export default function FAQ() {
            Frequently Asked Questions
           </h2>
           <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base">
-            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your specific gaps</a> or <a href="/pricing" className="text-primary font-semibold hover:underline">get your custom plan</a>
+            Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">See your revenue gaps</a> or <a href="/pricing" className="text-primary font-semibold hover:underline">get your system plan</a>
           </p>
           <div className="mt-8 border-t border-border/40" />
         </div>
@@ -125,7 +125,7 @@ export default function FAQ() {
           <p className="text-sm text-muted-foreground mb-5">We're happy to walk through your specific situation — no pitch, just answers.</p>
           <div className="flex flex-wrap gap-3 justify-center">
             <a href="/book" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-bold text-white" style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 4px 16px rgba(0,136,204,0.3)" }}>
-              Book a Free Call
+              Claim My System Diagnostic
             </a>
             <a href="/contact" className="inline-flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold text-primary border border-primary/25 hover:bg-primary/5 transition-colors">
               Send a Message

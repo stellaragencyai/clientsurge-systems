@@ -1,6 +1,6 @@
 // Unified button text constants — prevents inconsistencies across pages
 export const BUTTON_TEXT = {
-  BOOK_DEMO: "Get Free Automation Audit",
+  BOOK_DEMO: "Claim My System Diagnostic",
   GET_STARTED: "Get Started",
   LEARN_MORE: "Learn More",
   VIEW_PRICING: "View Pricing",

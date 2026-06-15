@@ -44,10 +44,10 @@ function CoreOfferHeader() {
 
       {/* Subheadline */}
       <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-         Instant response. Automatic follow-up. Direct bookings.
+         Instant response. Automatic follow-up. Direct revenue recovery.
        </p>
        <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-         Every missed call recovered. Every lead followed up. Every appointment booked.
+         Every missed call recovered. Every lead followed up. Every prospect converted.
        </p>
     </div>);
 
@@ -186,7 +186,7 @@ function CoreOfferCTA({ onBookDemo }) {
          Start recovering revenue now.
        </p>
        <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-         Get a free automation audit to see exactly how much you can recover.
+         Get a free system diagnostic to see exactly how much revenue you can recover.
        </p>
       <div className="mt-6 flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row">
         <button

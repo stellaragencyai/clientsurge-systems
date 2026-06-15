@@ -30,7 +30,7 @@ export const coreOfferSectionConfig = {
   eyebrow: "The System",
   headline: "We fix revenue loss automatically",
   subheadline:
-    "Your AI system responds in seconds, follows up consistently, and books appointments without manual work.",
+    "Your AI system responds in seconds, follows up consistently, and converts leads into revenue without manual work.",
   helperLine:
     "Recover the revenue from every missed call and abandoned lead.",
   primaryCta: {
@@ -38,7 +38,7 @@ export const coreOfferSectionConfig = {
     href: "/pricing",
   },
   secondaryCta: {
-    label: "Get Free Automation Audit",
+    label: "Claim My System Diagnostic",
   },
 };
 
@@ -63,8 +63,8 @@ export const systemMapStages = [
   },
   {
     id: "booking",
-    title: "The Lead Gets Guided Toward Booking",
-    summary: "Ready leads get pushed into a cleaner booking path with less friction.",
+    title: "The Lead Gets Guided Toward Conversion",
+    summary: "Ready leads get pushed into a cleaner conversion path with less friction.",
     systemsIncluded: ["03", "06"],
   },
   {
@@ -86,17 +86,17 @@ export const systemsById = {
     id: "03",
     service_key: "ai_booking_agent",
     icon: "MessageSquare",
-    title: "Booking Conversation",
+    title: "AI Conversion Agent",
     shortDescription:
-      "When someone is interested, the system helps move the conversation toward booking instead of letting it stall.",
+      "When someone is interested, the system moves the conversation toward a sale instead of letting it stall.",
     badge: "Keeps interest moving",
     mapStageId: "booking",
     detail: {
-      summary: "Interested leads get guided instead of left hanging.",
+      summary: "Interested leads get guided to a decision instead of left hanging.",
       trigger: "A lead shows interest but has not taken the next step yet.",
-      action: "The conversation keeps moving toward booking instead of stalling.",
+      action: "The conversation keeps moving toward a conversion instead of stalling.",
       leadView: "The experience feels guided and responsive.",
-      businessValue: "More warm inquiries turn into real appointments.",
+      businessValue: "More warm inquiries turn into paying customers.",
       includes: ["Keeps conversation moving", "Removes dead space", "Helps ready leads take action"],
     },
   },
@@ -140,18 +140,18 @@ export const systemsById = {
     id: "06",
     service_key: "ai_booking_agent",
     icon: "CalendarCheck",
-    title: "Booking Flow",
+    title: "Conversion Flow",
     shortDescription:
-      "When someone is ready, the system makes scheduling feel easier and faster.",
-    badge: "Less booking friction",
+      "When someone is ready, the system makes the decision to buy feel easier and faster.",
+    badge: "Less conversion friction",
     mapStageId: "booking",
     detail: {
-      summary: "Ready leads reach the booking step with less friction.",
-      trigger: "A lead is ready to schedule.",
-      action: "It pushes them into a cleaner booking path with less back-and-forth.",
-      leadView: "Scheduling feels easier, faster, and less frustrating.",
-      businessValue: "More ready prospects complete the booking step.",
-      includes: ["Smoother scheduling path", "Less friction", "Faster movement to appointment"],
+      summary: "Ready leads reach the decision step with less friction.",
+      trigger: "A lead is ready to move forward.",
+      action: "It pushes them into a cleaner acquisition path with less back-and-forth.",
+      leadView: "The process feels easier, faster, and less frustrating.",
+      businessValue: "More ready prospects complete the purchase step.",
+      includes: ["Smoother acquisition path", "Less friction", "Faster movement to close"],
     },
   },
   "07": {
@@ -249,7 +249,7 @@ export const launchTimelineSteps = [
     bullets: [
       "Automated setup connects your integrations",
       "Your messaging and automation logic configured instantly",
-      "All follow-up sequences and booking flows activated",
+      "All follow-up sequences and conversion flows activated",
       "You don't have to do anything - we handle it all",
     ],
   },

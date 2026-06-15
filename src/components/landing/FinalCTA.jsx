@@ -12,18 +12,18 @@ export default function FinalCTA() {
             Ready to Transform Your Lead Flow?
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Book Your Free <span className="text-primary">Automation Audit</span>
+            Claim Your Free <span className="text-primary">System Diagnostic</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
-            Schedule a free 15-minute strategy call to see exactly where your business is leaking bookings and how AI automation can fix it.
+            Get a free 15-minute readiness assessment to see exactly where your business is leaking revenue and how AI automation can recover it.
           </p>
 
           {/* How the demo works - 3 steps */}
           <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-center sm:text-left">
             {[
-              { step: "01", title: "Book a 15-min slot", body: "Pick a time that works. No sales pressure, no fluff." },
-              { step: "02", title: "We map your lead flow", body: "We show you exactly where bookings are leaking in your current setup." },
-              { step: "03", title: "See your system live", body: "We show the AI workflow for your industry and the proof steps required before go-live." },
+              { step: "01", title: "Claim your diagnostic window", body: "Secure a 15-minute readiness slot. No sales pressure, no fluff." },
+              { step: "02", title: "We map your revenue gaps", body: "We show you exactly where leads are leaking in your current setup." },
+              { step: "03", title: "See your system configured", body: "We preview the AI workflow for your industry and the proof steps required before go-live." },
             ].map((item) => (
               <div key={item.step} className="flex flex-col gap-2">
                 <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
@@ -34,7 +34,7 @@ export default function FinalCTA() {
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground/60">
-            Free 15-minute call · No commitment required · Launch timeline confirmed after onboarding
+            Free 15-minute diagnostic · No commitment required · Activation timeline confirmed after assessment
           </p>
         </div>
 
@@ -81,7 +81,7 @@ export default function FinalCTA() {
                   textShadow: "0 1px 2px rgba(0,0,0,0.2)"
                 }}>
                 
-                Get Free Automation Audit
+                Claim My System Diagnostic
                 <ArrowRight className="w-5 h-5" />
               </span>
             </a>

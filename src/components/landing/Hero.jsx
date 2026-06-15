@@ -40,7 +40,7 @@ export default function Hero() {
             margin: "0",
           }}
         >
-          Turn missed calls and leads into booked jobs automatically.
+          Turn missed calls and dead leads into revenue — automatically.
         </h1>
         <p style={{ 
           fontSize: "clamp(0.95rem, 1.8vw, 1.1rem)", 
@@ -49,7 +49,7 @@ export default function Hero() {
           maxWidth: "620px",
           margin: "1.25rem auto 0"
         }}>
-          AI responds in under 60 seconds. Follows up automatically. Books appointments — even while you sleep.
+          AI responds in under 60 seconds. Follows up automatically. Converts leads into revenue — even while you sleep.
         </p>
 
         {/* CTA buttons */}
@@ -78,7 +78,7 @@ export default function Hero() {
               whiteSpace: "nowrap",
             }}
           >
-            Get Free Automation Audit →
+            Claim My System Diagnostic →
           </a>
           <a
             href="/pricing"
