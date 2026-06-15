@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
-import { useLocation } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
+import { LayoutDashboard } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -165,6 +166,16 @@ export default function Home() {
         <SecurityPriority />
         <Footer />
         <ChatBubble />
+
+        {/* One-click Client Dashboard access */}
+        <Link
+          to="/client-portal"
+          className="fixed bottom-6 left-6 z-50 flex items-center gap-2 px-4 py-2.5 rounded-full text-white text-sm font-semibold shadow-lg transition-all duration-200 hover:-translate-y-0.5 hover:shadow-xl"
+          style={{ background: 'linear-gradient(135deg,#0088CC 0%,#003B8F 100%)', boxShadow: '0 4px 16px rgba(0,136,204,0.4)' }}
+        >
+          <LayoutDashboard className="w-4 h-4" />
+          Client Portal
+        </Link>
       </div>
     </DemoBookingProvider>
   );
