@@ -1,0 +1,161 @@
+{
+  "name": "ConversionFunnel",
+  "type": "object",
+  "_metadata": {
+    "status": "CONVERSION_OPTIMIZATION",
+    "reason": "Tracks conversion funnel metrics per ClientProject. Derived from Leads \u2192 Orders \u2192 Subscriptions. No-write, metrics-only entity.",
+    "read_only": true,
+    "async_only": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "CONVERSION_OPTIMIZATION.md"
+  },
+  "properties": {
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID",
+      "required": true
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "funnel_name": {
+      "type": "string",
+      "title": "Funnel Name",
+      "description": "e.g. 'SaaS Signup \u2192 Trial \u2192 Paid', 'Inbound Lead \u2192 Booking \u2192 Payment'"
+    },
+    "metric_period": {
+      "type": "string",
+      "title": "Metric Period",
+      "enum": [
+        "1d",
+        "7d",
+        "30d",
+        "90d"
+      ]
+    },
+    "period_start": {
+      "type": "string",
+      "title": "Period Start",
+      "format": "date-time"
+    },
+    "period_end": {
+      "type": "string",
+      "title": "Period End",
+      "format": "date-time"
+    },
+    "funnel_stages": {
+      "type": "array",
+      "title": "Funnel Stages with Metrics",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage_name": {
+            "type": "string",
+            "enum": [
+              "visit",
+              "lead_created",
+              "contacted",
+              "replied",
+              "booked",
+              "payment_initiated",
+              "paid",
+              "activated"
+            ]
+          },
+          "stage_number": {
+            "type": "integer"
+          },
+          "total_count": {
+            "type": "integer",
+            "description": "Total users/leads in this stage"
+          },
+          "conversion_from_previous_percent": {
+            "type": "number",
+            "description": "% that converted from previous stage"
+          },
+          "conversion_from_top_percent": {
+            "type": "number",
+            "description": "% of original entry point that reached this stage"
+          },
+          "average_time_to_stage_hours": {
+            "type": "number"
+          },
+          "median_time_to_stage_hours": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "top_to_bottom_conversion_percent": {
+      "type": "number",
+      "title": "Overall Funnel Conversion %",
+      "description": "Top stage entry to final conversion"
+    },
+    "biggest_drop_off_stage": {
+      "type": "string",
+      "title": "Stage with Biggest Drop-Off"
+    },
+    "biggest_drop_off_percent": {
+      "type": "number",
+      "title": "Biggest Drop-Off %"
+    },
+    "revenue_per_funnel_entrant": {
+      "type": "number",
+      "title": "Average Revenue Per Initial Lead ($)"
+    },
+    "total_revenue_attributed": {
+      "type": "number",
+      "title": "Total Revenue in Period ($)"
+    },
+    "by_source": {
+      "type": "object",
+      "title": "Conversion Metrics by Lead Source",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "leads_count": {
+            "type": "integer"
+          },
+          "conversion_rate_percent": {
+            "type": "number"
+          },
+          "revenue_attributed": {
+            "type": "number"
+          },
+          "revenue_per_lead": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "by_utm_source": {
+      "type": "object",
+      "title": "Conversion Metrics by UTM Source",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "leads_count": {
+            "type": "integer"
+          },
+          "conversion_rate_percent": {
+            "type": "number"
+          },
+          "revenue_attributed": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "computed_at": {
+      "type": "string",
+      "title": "Computed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_project_id",
+    "funnel_stages",
+    "metric_period"
+  ]
+}

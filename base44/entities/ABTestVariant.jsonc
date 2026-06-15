@@ -1,0 +1,145 @@
+{
+  "name": "ABTestVariant",
+  "type": "object",
+  "_metadata": {
+    "status": "CONVERSION_OPTIMIZATION",
+    "reason": "Tracks A/B test variants for messages, email sequences, landing pages. Links to existing MessageTemplate, EmailSequence, and WebsiteLead entities.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "CONVERSION_OPTIMIZATION.md"
+  },
+  "properties": {
+    "test_name": {
+      "type": "string",
+      "title": "Test Name",
+      "required": true
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "test_type": {
+      "type": "string",
+      "title": "Test Type",
+      "enum": [
+        "message_template",
+        "email_sequence",
+        "landing_page_cta",
+        "automation_rule",
+        "lead_scoring"
+      ],
+      "required": true
+    },
+    "hypothesis": {
+      "type": "string",
+      "title": "Hypothesis",
+      "maxLength": 500
+    },
+    "status": {
+      "type": "string",
+      "title": "Test Status",
+      "enum": [
+        "draft",
+        "running",
+        "paused",
+        "completed",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Started At",
+      "format": "date-time"
+    },
+    "ended_at": {
+      "type": "string",
+      "title": "Ended At",
+      "format": "date-time"
+    },
+    "variants": {
+      "type": "array",
+      "title": "Test Variants",
+      "items": {
+        "type": "object",
+        "properties": {
+          "variant_id": {
+            "type": "string",
+            "description": "Unique variant identifier (control, variant_a, variant_b, etc)"
+          },
+          "variant_name": {
+            "type": "string"
+          },
+          "is_control": {
+            "type": "boolean",
+            "default": false
+          },
+          "linked_entity_id": {
+            "type": "string",
+            "description": "MessageTemplate ID, EmailSequence ID, etc"
+          },
+          "traffic_allocation_percent": {
+            "type": "number",
+            "description": "% of traffic sent to this variant"
+          },
+          "total_exposed": {
+            "type": "integer",
+            "description": "Total users/leads exposed to variant"
+          },
+          "conversion_count": {
+            "type": "integer"
+          },
+          "conversion_rate_percent": {
+            "type": "number"
+          },
+          "revenue_attributed": {
+            "type": "number"
+          },
+          "average_session_duration_seconds": {
+            "type": "number"
+          }
+        }
+      }
+    },
+    "primary_metric": {
+      "type": "string",
+      "title": "Primary Success Metric",
+      "enum": [
+        "conversion_rate",
+        "revenue_per_lead",
+        "response_rate",
+        "booking_rate",
+        "engagement_score"
+      ]
+    },
+    "statistical_significance_percent": {
+      "type": "number",
+      "title": "Statistical Significance %",
+      "description": "Confidence level in the result (e.g. 95%)"
+    },
+    "winning_variant_id": {
+      "type": "string",
+      "title": "Winning Variant ID (if completed)"
+    },
+    "winner_lift_percent": {
+      "type": "number",
+      "title": "Lift vs Control %"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Test Notes / Learnings"
+    },
+    "created_by": {
+      "type": "string",
+      "title": "Created By (User Email)"
+    }
+  },
+  "required": [
+    "test_name",
+    "test_type",
+    "variants"
+  ]
+}
