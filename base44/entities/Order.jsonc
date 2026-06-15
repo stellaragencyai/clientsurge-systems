@@ -2,6 +2,11 @@
   "name": "Order",
   "type": "object",
   "properties": {
+    "funnel_identity_id": {
+      "type": "string",
+      "title": "Unified Funnel Identity",
+      "description": "Unique identifier representing a single customer journey (inherited from lead or generated at payment)"
+    },
     "customer_email": {
       "type": "string",
       "title": "Customer Email"

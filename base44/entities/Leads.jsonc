@@ -13,6 +13,11 @@
       "title": "Description",
       "maxLength": 1000
     },
+    "funnel_identity_id": {
+      "type": "string",
+      "title": "Unified Funnel Identity",
+      "description": "Unique identifier representing a single customer journey across all touchpoints (lead, messages, events, orders, subscriptions)"
+    },
     "full_name": {
       "type": "string",
       "title": "Full Name"
