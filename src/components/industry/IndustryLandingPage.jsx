@@ -1,7 +1,7 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { getIndustryConfig, calculateRevenueLoss } from '@/data/industryPageConfig';
 import { useState } from 'react';
-import IndustryHero from './IndustryHero';
+import ImmersiveIndustryHero from './ImmersiveIndustryHero';
 import IndustryPainBar from './IndustryPainBar';
 import RevenueProofBlock from '../landing/RevenueProofBlock';
 import IndustryProblems from './IndustryProblems';
@@ -34,8 +34,8 @@ export default function IndustryLandingPage() {
         <p>{config.description}</p>
       </div>
 
-      {/* Hero Section */}
-      <IndustryHero config={config} />
+      {/* Full-Bleed Immersive Hero */}
+      <ImmersiveIndustryHero config={config} />
 
       {/* Pain Calculation Block */}
       <IndustryPainBar config={config} revenueLoss={revenueLoss} />

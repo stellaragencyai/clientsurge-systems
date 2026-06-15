@@ -599,9 +599,37 @@ body::after {
 }
 
 /* ============================================
-   RESPONSIVE SECTION TYPOGRAPHY
-   Ensures all sections look great at every breakpoint
-   ============================================ */
+    LUXURY TYPOGRAPHY SYSTEM — PREMIUM HIERARCHY
+    Unified across all pages and components
+    ============================================ */
+
+/* Font-family assignments */
+.font-titles,
+.font-display,
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Uppercase tracking for headers and labels */
+h1, h2, h3,
+[class*="eyebrow"],
+.uppercase,
+.font-titles {
+  letter-spacing: -0.02em;
+}
+
+/* Premium body text */
+body, p, span, div {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ============================================
+    RESPONSIVE SECTION TYPOGRAPHY
+    Ensures all sections look great at every breakpoint
+    ============================================ */
 
 /* Large section titles — fluid scaling */
 .font-display {
@@ -614,24 +642,31 @@ body::after {
    clamp(min, preferred, max) across all levels
    ============================================ */
 h1 {
-  font-size: clamp(2.25rem, 5.5vw, 4rem);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 900;
+  color: hsl(var(--foreground));
 }
 h2 {
-  font-size: clamp(1.75rem, 4vw, 3rem);
-  line-height: 1.1;
-  letter-spacing: -0.02em; /* Refinement #12 */
+  font-size: clamp(1.75rem, 4.5vw, 3.25rem);
+  line-height: 1.08;
+  letter-spacing: -0.02em;
+  font-weight: 800;
+  color: hsl(var(--foreground));
 }
 h3 {
-  font-size: clamp(1.25rem, 2.8vw, 2rem);
-  line-height: 1.2;
-  letter-spacing: -0.015em; /* Refinement #12 */
+  font-size: clamp(1.25rem, 3vw, 2rem);
+  line-height: 1.15;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+  color: hsl(var(--foreground));
 }
 h4 {
-  font-size: clamp(1.05rem, 2vw, 1.4rem);
-  line-height: 1.3;
+  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+  line-height: 1.25;
   letter-spacing: -0.01em;
+  font-weight: 700;
 }
 
 /* Refinement #12: Small uppercase labels get positive tracking */

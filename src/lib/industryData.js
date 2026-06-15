@@ -19,6 +19,7 @@ export const INDUSTRIES = {
       headline: "Book More Med Spa Consults Before Leads Go Cold",
       subheadline: "ClientSurge helps med spas respond to consultation requests, aesthetic treatment inquiries, missed DMs and calls, and booking handoffs before high-intent leads drift away.",
       cta: "Free Med Spa Automation Audit",
+      image: "https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
@@ -159,6 +160,7 @@ export const INDUSTRIES = {
       headline: "Turn More New Patient Inquiries Into Confirmed Appointments",
       subheadline: "ClientSurge helps dental teams capture new patient calls, appointment requests, missed front desk inquiries, recall opportunities, and follow-up tasks before patients move on.",
       cta: "Free Dental Automation Audit",
+      image: "https://images.unsplash.com/photo-1606811841694-647df192d289?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
@@ -293,6 +295,7 @@ export const INDUSTRIES = {
       headline: "Convert Patient Inquiries Into Booked Adjustments",
       subheadline: "PT and chiropractic leads are price-sensitive and comparison-shop. Respond in 60 seconds with your rates and availability, and you win the booking.",
       cta: "See How Chiro Offices Use This",
+      image: "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
@@ -426,6 +429,7 @@ export const INDUSTRIES = {
       headline: "Book More HVAC Service Calls During Peak Demand",
       subheadline: "ClientSurge helps HVAC teams respond to after-hours AC and heating leads, emergency calls, seasonal demand spikes, appointment requests, and maintenance plan opportunities faster.",
       cta: "Free HVAC Automation Audit",
+      image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
@@ -560,6 +564,7 @@ export const INDUSTRIES = {
       headline: "Turn Urgent Plumbing Calls Into Booked Dispatches Faster",
       subheadline: "ClientSurge helps plumbing teams recover missed emergency leak calls, drain repair requests, water heater inquiries, after-hours calls, and fast-dispatch expectations before homeowners call the next company.",
       cta: "Free Plumbing Automation Audit",
+      image: "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
@@ -694,6 +699,7 @@ export const INDUSTRIES = {
       headline: "Get More Roofing Leads Booked Before Competitors Reply",
       subheadline: "ClientSurge helps roofing companies recover missed calls, answer storm and roof repair quote requests fast, follow up automatically, and turn more estimate requests into booked jobs.",
       cta: "Free Roofing Automation Audit",
+      image: "https://images.unsplash.com/photo-1619886066112-b9faa6d2b77b?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
@@ -828,6 +834,7 @@ export const INDUSTRIES = {
       headline: "Land More Jobs, Faster Response, Higher Closing Rate",
       subheadline: "General contractors live on word-of-mouth and quick turnaround. Respond to estimates in 60 seconds, and you win. Slow down, and your competitor does.",
       cta: "See How Contractors Use This",
+      image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1400&q=95&fit=crop&auto=format",
     },
 
     // Top 5 Industry-Specific Enhancements
