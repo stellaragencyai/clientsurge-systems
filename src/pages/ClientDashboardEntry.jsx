@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { useAuth } from '@/lib/AuthContext';
-import { CheckCircle2, AlertCircle, Clock, ArrowRight } from 'lucide-react';
+import { CheckCircle2, AlertCircle, Clock, ArrowRight, Eye } from 'lucide-react';
 
 export default function ClientDashboardEntry() {
   const navigate = useNavigate();
@@ -25,6 +25,10 @@ export default function ClientDashboardEntry() {
         const response = await base44.functions.invoke('getClientPortalContext', {});
         if (response.data) {
           setClientData(response.data);
+          // If admin preview, still show something useful
+          if (response.data.is_admin_preview) {
+            setError('');
+          }
         }
       } catch (err) {
         console.error('Error fetching client data:', err);
@@ -76,6 +80,20 @@ export default function ClientDashboardEntry() {
         {error && (
           <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-red-700 mb-8">
             {error}
+          </div>
+        )}
+
+        {/* Admin Preview Banner */}
+        {clientData?.is_admin_preview && (
+          <div className="rounded-lg p-5 mb-8 flex items-start gap-3" style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.08), rgba(212,175,55,0.03))", border: "1px solid rgba(212,175,55,0.25)" }}>
+            <Eye className="w-5 h-5 flex-shrink-0" style={{ color: "#B8941F" }} />
+            <div>
+              <p className="text-sm font-bold mb-1" style={{ color: "#B8941F" }}>Admin Preview Mode — no client selected</p>
+              <p className="text-xs text-muted-foreground">
+                You're logged in as an admin. No paid client order resolved for this account.
+                The metrics below are system-level defaults, not client-specific data.
+              </p>
+            </div>
           </div>
         )}
 

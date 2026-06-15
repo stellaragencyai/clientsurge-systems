@@ -12,6 +12,13 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import DeploymentProgressBar from "@/components/dashboard/DeploymentProgressBar";
 import SetupStatusPanel from "@/components/dashboard/SetupStatusPanel";
+import LaunchReadinessPanel from "@/components/dashboard/LaunchReadinessPanel";
+import ActiveAutomationsPanel from "@/components/dashboard/ActiveAutomationsPanel";
+import ClientActionRequiredPanel from "@/components/dashboard/ClientActionRequiredPanel";
+import RecentSystemProofPanel from "@/components/dashboard/RecentSystemProofPanel";
+import RecentIssuesPanel from "@/components/dashboard/RecentIssuesPanel";
+import AdminPreviewBanner from "@/components/dashboard/AdminPreviewBanner";
+import InternalFilterNotice from "@/components/dashboard/InternalFilterNotice";
 
 export const STAGE_MAP = {
   "Paid": 0,
@@ -136,6 +143,9 @@ export default function ClientDashboard() {
   const [lastUpdated, setLastUpdated] = useState(null);
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [portalUser, setPortalUser] = useState(null);
+  const [isAdminPreview, setIsAdminPreview] = useState(false);
+  const [healthEvents, setHealthEvents] = useState([]);
+  const [userRole, setUserRole] = useState(null);
 
   const fetchPortal = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -149,6 +159,9 @@ export default function ClientDashboard() {
       const res = await base44.functions.invoke("getClientPortalContext", {});
       if (res.data?.success) {
         setPortalData(res.data);
+        setIsAdminPreview(res.data.is_admin_preview === true);
+        setHealthEvents(res.data.health?.recent_events || []);
+        setUserRole(res.data.user_role || null);
         setLastUpdated(new Date());
       } else if (res.data?.code === "portal_project_not_found") {
         setPortalData({ success: true, project: null, order: null });
@@ -293,6 +306,47 @@ export default function ClientDashboard() {
                     />
                   </>
                 )}
+
+                {/* Admin Preview Banner */}
+                {isAdminPreview && <AdminPreviewBanner userEmail={userEmail} linkStatus={portalData?.link_status} />}
+
+                {/* Internal/QA Filter Notice */}
+                <InternalFilterNotice isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
+
+                {/* Launch Readiness Panel */}
+                <LaunchReadinessPanel
+                  order={order}
+                  project={project}
+                  events={healthEvents}
+                />
+
+                {/* Active Automations Panel */}
+                <ActiveAutomationsPanel
+                  packageKey={order?.package_type || order?.selected_package_type}
+                  services={order?.services || []}
+                  failedEvents={healthEvents.filter(e => e.status === "failed")}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
+
+                {/* Client Action Required Panel */}
+                <ClientActionRequiredPanel
+                  order={order}
+                  project={project}
+                  readiness={{ canGoLive: (order?.pipeline_status === "Live" && !healthEvents.some(e => e.status === "failed")) }}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
+
+                {/* Recent System Proof */}
+                <RecentSystemProofPanel
+                  events={healthEvents}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
+
+                {/* Recent Issues */}
+                <RecentIssuesPanel
+                  events={healthEvents}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
 
                 {activeServices.length === 0 ? (
                   <EmptyState />

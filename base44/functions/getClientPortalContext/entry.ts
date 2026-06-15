@@ -11,6 +11,30 @@ function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function isAdminRole(user) {
+  if (!user) return false;
+  const role = (user.role || "").toLowerCase();
+  return role === "admin" || role === "super_admin";
+}
+
+async function fetchRecentEvents(base44, order, project, limit = 50) {
+  const clientId = order?.client_id || project?.client_id || null;
+  const projectId = order?.client_project_id || project?.id || null;
+  const query = {};
+  if (clientId) query.client_id = clientId;
+  if (projectId) query.client_project_id = projectId;
+  if (!clientId && !projectId) return [];
+
+  try {
+    const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+      query, "-created_date", limit
+    );
+    return events || [];
+  } catch {
+    return [];
+  }
+}
+
 function normalizePackageKey(key) {
   if (!key) return null;
   return String(key).toLowerCase().replace(/\s+/g, "_");
@@ -226,10 +250,13 @@ Deno.serve(async (req) => {
           subscription: null,
           link_status: "direct_project_link",
           empty_state: false,
+          is_admin_preview: false,
+          user_role: user?.role || "user",
         });
       }
 
       await logPortalLoginEvent(base44, { user, email, linkStatus: "no_paid_order" });
+      const isAdmin = isAdminRole(user);
       return secureJson({
         success: true,
         project: null,
@@ -237,7 +264,11 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "no_paid_order",
         empty_state: true,
-        message: "No paid order is linked to this login yet. Complete checkout or contact support.",
+        is_admin_preview: isAdmin,
+        user_role: user?.role || "user",
+        message: isAdmin
+          ? "Admin Preview Mode — no client selected."
+          : "No paid order is linked to this login yet. Complete checkout or contact support.",
       });
     }
 
@@ -253,6 +284,8 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "ambiguous_paid_orders",
         empty_state: false,
+        is_admin_preview: false,
+        user_role: user?.role || "user",
         message: "Multiple paid businesses are linked to this email. Support needs to finish portal routing before access can be shown safely.",
       });
     }
@@ -269,6 +302,8 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "missing_canonical_links",
         empty_state: false,
+        is_admin_preview: false,
+        user_role: user?.role || "user",
         message: "Your payment is confirmed, but your client/project linkage is not complete yet. Our team needs to finish linking your portal records.",
       });
     }
@@ -287,12 +322,33 @@ Deno.serve(async (req) => {
         subscription: null,
         link_status: "linked_records_missing",
         empty_state: false,
+        is_admin_preview: false,
+        user_role: user?.role || "user",
         message: "Your order is paid, but the linked client records are incomplete. Support needs to repair the portal linkage.",
       });
     }
 
     const projectSummary = buildProjectSummary(project);
     const subscription = buildSubscriptionSummary(order, projectSummary);
+
+    // Fetch recent events for health/readiness panels
+    const recentEvents = await fetchRecentEvents(base44, order, projectSummary, 100);
+    const failedEvents = (recentEvents || []).filter((e) => e.status === "failed");
+    const proofEvents = (recentEvents || []).filter(
+      (e) => e.status !== "failed" && e.direction !== "inbound" && !(e.event_type || "").includes("portal_login")
+    );
+
+    // Readiness check — not "Live" if recent critical failures exist
+    const hasFailedNonProof = failedEvents.some(
+      (e) =>
+        e.event_type &&
+        !e.event_type.includes("simulation") &&
+        !e.event_type.includes("test") &&
+        !e.event_type.includes("proof")
+    );
+    const allLive = (orderSummary.services || []).length > 0 &&
+      (orderSummary.services || []).every((s) => s.install_status === "Live");
+    const readinessStatus = allLive && !hasFailedNonProof ? "Live" : orderSummary.pipeline_status;
 
     await logPortalLoginEvent(base44, { user, email, linkStatus: "linked", order, client, project: projectSummary });
 
@@ -304,6 +360,14 @@ Deno.serve(async (req) => {
       subscription,
       link_status: "linked",
       empty_state: false,
+      is_admin_preview: false,
+      user_role: user?.role || "user",
+      health: {
+        readiness_status: readinessStatus,
+        recent_failed_events_count: failedEvents.length,
+        recent_proof_events_count: proofEvents.length,
+        recent_events: recentEvents.slice(0, 50),
+      },
     });
   } catch (error) {
     console.error("[getClientPortalContext] Error:", error.message);
