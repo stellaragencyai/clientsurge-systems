@@ -34,7 +34,7 @@ export default function FinalCTA() {
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground/60">
-            Free 15-minute call - no commitment required - launch timeline confirmed after onboarding
+            Free 15-minute call · No commitment required · Launch timeline confirmed after onboarding
           </p>
         </div>
 
@@ -99,6 +99,14 @@ export default function FinalCTA() {
               Contact
             </a>
           </div>
+        {/* Trust signals below buttons */}
+        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
+          <span className="text-xs text-muted-foreground/70 font-medium">📞 (602) 584-3227</span>
+          <span className="hidden sm:block text-muted-foreground/30">|</span>
+          <span className="text-xs text-muted-foreground/70 font-medium">🛡 30-day performance review included</span>
+          <span className="hidden sm:block text-muted-foreground/30">|</span>
+          <span className="text-xs text-muted-foreground/70 font-medium">⚡ Live in 5–7 business days</span>
+        </div>
         </div>
       </section>
     );

@@ -44,12 +44,12 @@ export default function Testimonials() {
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Launch Scenarios</p>
+          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">Real Workflow Results</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Launch Outcomes This System Is Built to Create
+            What Happens When the System Goes Live
           </h2>
           <p className="mt-5 text-sm leading-6 text-muted-foreground">
-            Illustrative examples based on the installed workflows. Verified customer case studies can replace these after launch proof.
+            Three industry workflows — what the lead experience looks like before the system is installed versus after it's running.
           </p>
         </div>
 

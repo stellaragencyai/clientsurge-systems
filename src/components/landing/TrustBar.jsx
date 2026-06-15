@@ -147,8 +147,7 @@ export default function TrustBar() {
             Clear Commitments. Cleaner Buying Decision.
           </h2>
           <p className="mt-4 max-w-3xl mx-auto text-sm md:text-base text-foreground/65 leading-relaxed">
-            This section should reduce doubt fast. It gives buyers a simple read on
-            response speed, launch pace, review cadence, and how the engagement is structured.
+            No guessing. No long contracts. Here's exactly what you can expect when you work with ClientSurge Systems — from first response speed to how the engagement is structured.
           </p>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
