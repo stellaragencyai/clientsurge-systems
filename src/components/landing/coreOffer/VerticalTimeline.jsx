@@ -132,6 +132,8 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
       {/* Main card */}
       <motion.div
         onClick={() => setIsExpanded(!isExpanded)}
+        tabIndex={0}
+        onKeyDown={(e) => e.key === "Enter" && setIsExpanded(!isExpanded)}
         style={{
           borderRadius: "24px",
           overflow: "hidden",
@@ -146,8 +148,10 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
             : "0 8px 32px rgba(15,23,42,0.07)",
           position: "relative",
           cursor: "pointer",
+          outline: "none",
         }}
         transition={{ type: "spring", damping: 20, stiffness: 300 }}
+        className="focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
         {/* Numbered watermark */}
         <div style={{
@@ -244,14 +248,15 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
                 whileTap={{ scale: 0.97 }}
                 style={{
                   marginTop: "16px",
-                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  display: "inline-flex", alignItems: "center", gap: "6px", minHeight: "44px", minWidth: "44px", justifyContent: "center",
                   borderRadius: "9999px", padding: "8px 18px",
                   fontSize: "12px", fontWeight: "700",
                   background: isFeatured ? "rgba(255,255,255,0.1)" : "rgba(0,136,204,0.08)",
                   border: isFeatured ? "1px solid rgba(255,255,255,0.15)" : "1px solid rgba(0,136,204,0.2)",
                   color: isFeatured ? "rgba(255,255,255,0.8)" : "#0088CC",
-                  cursor: "pointer", transition: "all 0.2s",
+                  cursor: "pointer", transition: "all 0.2s", outline: "none",
                 }}
+                className="focus-visible:ring-2 focus-visible:ring-blue-400"
               >
                 <ShoppingCart style={{ width: "12px", height: "12px" }} />
                 Add to Stack
@@ -276,28 +281,30 @@ export default function VerticalTimeline({ selectedSystemId, onSystemSelect, onB
         <button
           onClick={handlePrev}
           style={{
-            display: "flex", alignItems: "center", gap: "4px",
+            display: "flex", alignItems: "center", gap: "4px", minHeight: "44px", minWidth: "44px", justifyContent: "center",
             borderRadius: "9999px", padding: "9px 16px",
             fontSize: "13px", fontWeight: "600",
             border: "1px solid rgba(15,23,42,0.12)",
             background: "rgba(255,255,255,0.9)",
             color: "rgba(15,23,42,0.6)",
-            cursor: "pointer", transition: "all 0.2s",
+            cursor: "pointer", transition: "all 0.2s", outline: "none",
           }}
+          className="focus-visible:ring-2 focus-visible:ring-blue-400"
         >
           <ChevronLeft style={{ width: "14px", height: "14px" }} /> Previous
         </button>
         <button
           onClick={handleNext}
           style={{
-            display: "flex", alignItems: "center", gap: "4px",
+            display: "flex", alignItems: "center", gap: "4px", minHeight: "44px", minWidth: "44px", justifyContent: "center",
             borderRadius: "9999px", padding: "9px 16px",
             fontSize: "13px", fontWeight: "600",
             border: "1px solid rgba(15,23,42,0.12)",
             background: "rgba(255,255,255,0.9)",
             color: "rgba(15,23,42,0.6)",
-            cursor: "pointer", transition: "all 0.2s",
+            cursor: "pointer", transition: "all 0.2s", outline: "none",
           }}
+          className="focus-visible:ring-2 focus-visible:ring-blue-400"
         >
           Next <ChevronRight style={{ width: "14px", height: "14px" }} />
         </button>

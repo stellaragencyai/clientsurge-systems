@@ -4,7 +4,7 @@
  * Min-heights prevent CLS while lazy sections load.
  */
 
-export function SectionSkeleton({ height = "360px" }) {
+export function SectionSkeleton({ height = "420px" }) {
   return (
     <div
       aria-hidden="true"
