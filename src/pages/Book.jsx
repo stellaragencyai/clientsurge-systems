@@ -11,13 +11,13 @@ import DemoBookingInline from '@/components/forms/DemoBookingInline';
 export default function Book() {
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
-      title: 'Book Your Free ClientSurge Automation Audit | ClientSurge Systems',
+      title: 'Claim Your Free System Diagnostic | ClientSurge Systems',
       description:
-        'Book a free ClientSurge automation audit to review missed-call leakage, speed-to-lead gaps, website conversion, follow-up gaps, and booking friction.',
+        'Claim a free 15-minute System Diagnostic to identify exactly where your business is leaking revenue and how AI automation can recover it.',
       canonicalPath: '/book',
-      ogTitle: 'Book Your Free ClientSurge Automation Audit',
+      ogTitle: 'Claim Your Free System Diagnostic',
       ogDescription:
-        'Choose a time for a practical review of your lead flow, missed-call recovery, follow-up automation, and booking opportunities.',
+        'Get a free System Diagnostic to map your revenue gaps, missed-call leakage, follow-up failures, and conversion friction — with a live AI system preview.',
     });
 
     return cleanupMetadata;
@@ -34,27 +34,27 @@ export default function Book() {
                 <div className="book-hero-copy">
                   <div className="book-kicker">
                     <span className="book-kicker-dot" />
-                    Free automation audit
+                    Free System Diagnostic
                   </div>
                   <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-                    Book Your Free ClientSurge Automation Audit
+                    Claim Your Free System Diagnostic
                   </h1>
                   <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                    Review the places your local service business may be losing calls, forms, follow-up, and booked appointments.
+                    A free 15-minute readiness assessment to identify exactly where your business is leaking revenue — and how AI automation can recover it.
                   </p>
                   <a
                     href="/automations"
                     onClick={() => trackCTA('review_automation_systems', 'book_page_header')}
                     className="book-text-link mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                   >
-                    Review the automation systems
+                    See the automation systems
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
 
                 <div className="book-audit-card" aria-label="Audit flow preview">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#005f99]">Audit path</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#005f99]">Diagnostic path</p>
                     <span className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                       15 min
                     </span>
@@ -66,7 +66,7 @@ export default function Book() {
                     <span />
                   </div>
                   <div className="mt-5 grid gap-2">
-                    {["Send context", "Review leakage", "Map next openings"].map((item, index) => (
+                    {["Send context", "Map revenue gaps", "See your system preview"].map((item, index) => (
                       <div key={item} className="book-mini-step">
                         <span>{String(index + 1).padStart(2, "0")}</span>
                         {item}
@@ -78,9 +78,9 @@ export default function Book() {
 
               <div className="book-content-panel">
                 <div className="max-w-2xl">
-                  <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What Happens After You Book</p>
+                  <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What Your Diagnostic Covers</p>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    What the audit includes
+                    What the System Diagnostic includes
                   </h2>
                   <p className="mt-3 text-sm md:text-base text-muted-foreground">
                     Built for roofers, HVAC companies, dental practices, med spas, chiropractic clinics, contractors, and other local service businesses.
@@ -89,12 +89,12 @@ export default function Book() {
 
                 <div className="mt-7 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
-                    "Missed-call leakage review",
-                    "Speed-to-lead review",
+                    "Missed-call recovery gap review",
+                    "Speed-to-lead assessment",
                     "Website conversion review",
-                    "Follow-up gap review",
-                    "Booking friction review",
-                    "Practical automation recommendations",
+                    "Follow-up sequence gap review",
+                    "Conversion friction review",
+                    "AI system revenue recovery preview",
                   ].map((item) => (
                     <div key={item} className="book-check-card rounded-lg border border-primary/15 bg-white/76 px-4 py-3 text-sm font-semibold text-foreground">
                       {item}
@@ -106,18 +106,18 @@ export default function Book() {
                   {[
                     {
                       icon: CalendarCheck2,
-                      title: "Choose a time",
-                      body: "Pick a time that works for you and get an immediate confirmation.",
+                      title: "Claim your diagnostic window",
+                      body: "Secure a 15-minute readiness slot. No sales pressure, no fluff — just a clear revenue gap assessment.",
                     },
                     {
                       icon: ClipboardList,
-                      title: "Quick discovery call",
-                      body: "We review your current calls, forms, website path, follow-up process, and booking handoff.",
+                      title: "We map your revenue gaps",
+                      body: "We show you exactly where leads are leaking in your current setup — missed calls, slow response, dead follow-up.",
                     },
                     {
                       icon: MessagesSquare,
-                      title: "Get automation opportunities",
-                      body: "You leave with practical ways to recover missed leads, respond faster, and book more appointments.",
+                      title: "See your system configured",
+                      body: "We preview the AI workflow built for your industry and the proof steps required before go-live.",
                     },
                   ].map((step, index) => {
                     const Icon = step.icon;
@@ -136,21 +136,21 @@ export default function Book() {
                 <div id="scheduler" className="book-scheduler-panel mt-8">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
-                      Audit request path
+                      Diagnostic request path
                     </p>
                     <h3 className="text-xl font-semibold text-foreground mb-3">
-                      Pick a clean audit slot and send the context once.
+                      Claim your diagnostic slot and send context once.
                     </h3>
                     <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
-                      The scheduler captures your contact details, business, website, industry, source page, and the lead-flow problem you want reviewed.
+                      The scheduler captures your contact details, business, website, industry, and the revenue-leakage problem you want diagnosed.
                     </p>
                   </div>
                   <div className="book-scheduler-visual" aria-hidden="true">
                     <span>Context</span>
                     <ArrowRight className="h-4 w-4" />
-                    <span>Audit</span>
+                    <span>Diagnostic</span>
                     <ArrowRight className="h-4 w-4" />
-                    <span>Openings</span>
+                    <span>Revenue Plan</span>
                   </div>
                 </div>
 
@@ -468,4 +468,3 @@ export default function Book() {
     </div>
   );
 }
-
