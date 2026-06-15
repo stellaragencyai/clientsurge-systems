@@ -268,19 +268,20 @@ export default function Navbar() {
             </button>
             {industriesOpen && typeof document !== "undefined" && createPortal((
             <div
-              className="fixed rounded-lg border border-border p-3 shadow-xl"
+              className="fixed shadow-xl"
               role="menu"
               aria-label="Solutions"
               style={{
                 left: "50%",
                 transform: "translateX(-50%)",
                 top: "calc(var(--cs-nav-height) + 10px)",
-                background: "rgba(255,255,255,0.97)",
-                backdropFilter: "blur(12px)",
-                WebkitBackdropFilter: "blur(12px)",
+                background: "#0d1117",
+                borderLeft: "2px solid rgba(0,174,239,0.18)",
+                borderRadius: "4px",
                 zIndex: 200,
+                minWidth: "200px",
               }}>
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col py-1">
                 {solutionsLinks.map((item) =>
                 <a
                    key={item.href}
@@ -292,7 +293,8 @@ export default function Navbar() {
                      navigate(item.href);
                      setIndustriesOpen(false);
                    }}
-                   className="w-full text-left flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer whitespace-nowrap">
+                   className="group w-full text-left flex items-center px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60 hover:text-white transition-all duration-200 border-none bg-transparent cursor-pointer whitespace-nowrap relative border-l-2 border-transparent hover:border-[#00AEEF] -ml-[2px]"
+                   style={{ lineHeight: 1 }}>
                    {item.label}
                 </a>
                 )}
@@ -330,16 +332,16 @@ export default function Navbar() {
                 zIndex: 200,
               }}>
                 <div
-                className="rounded-lg border border-border p-3 shadow-xl"
+                className="shadow-xl"
                 role="menu"
                 aria-label="Industries"
                 style={{
-                  background: "rgba(255,255,255,0.97)",
-                  backdropFilter: "blur(12px)",
-                  WebkitBackdropFilter: "blur(12px)",
-                  boxShadow: "0 8px 32px rgba(0,0,0,0.12)"
+                  background: "#0d1117",
+                  borderLeft: "2px solid rgba(0,174,239,0.18)",
+                  borderRadius: "4px",
+                  boxShadow: "0 8px 32px rgba(0,0,0,0.35)"
                 }}>
-                  <div className="grid grid-cols-2 gap-2">
+                  <div className="grid grid-cols-2 py-1">
                     {industryLinks.map((item) =>
                   <button
                     key={item.label}
@@ -350,7 +352,8 @@ export default function Navbar() {
                       navigate(item.href);
                       setIndustriesOpen(false);
                     }}
-                    className="w-full text-left flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer whitespace-nowrap">
+                    className="group w-full text-left flex items-center px-5 py-3 text-[11px] font-semibold uppercase tracking-[0.18em] text-white/60 hover:text-white transition-all duration-200 border-none bg-transparent cursor-pointer whitespace-nowrap relative border-l-2 border-transparent hover:border-[#00AEEF] -ml-[2px]"
+                    style={{ lineHeight: 1 }}>
                         {item.label}
                       </button>
                   )}
