@@ -105,7 +105,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
               <TierIcon
                 className="w-7 h-7"
                 style={{
-                  color: isRecommended || plan.packageKey === "pro_system" ? "#ffffff" : "#0088CC",
+                  color: isRecommended || plan.packageKey === "pro_system" ? "#ffffff" : "#00AEEF",
                 }}
               />
             </div>

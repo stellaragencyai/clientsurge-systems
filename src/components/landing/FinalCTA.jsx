@@ -46,44 +46,15 @@ export default function FinalCTA() {
                 trackCTA("get_free_automation_audit", "final_cta");
               }}
               className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
+              className="cs-btn-primary"
               style={{
-                borderRadius: "8px",
-                padding: "2px",
-                background:
-                "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-                boxShadow: "0 12px 28px rgba(0,88,160,0.24)",
-                border: "none",
-                cursor: "pointer",
-                textDecoration: "none"
+               padding: "0 40px",
+               height: "56px",
+               fontSize: "1rem",
               }}
-              onMouseEnter={(event) => {
-                event.currentTarget.style.boxShadow =
-                "0 16px 40px rgba(0,174,239,0.36), 0 6px 18px rgba(0,59,143,0.18)";
-              }}
-              onMouseLeave={(event) => {
-                event.currentTarget.style.boxShadow =
-                "0 12px 28px rgba(0,88,160,0.24)";
-              }}
-            >
-              
-              <span
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  height: "56px",
-                  padding: "0 40px",
-                  borderRadius: "6px",
-                  background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-                  color: "#ffffff",
-                  fontWeight: "700",
-                  fontSize: "1rem",
-                  textShadow: "0 1px 2px rgba(0,0,0,0.2)"
-                }}>
-                
-                Activate My System
-                <ArrowRight className="w-5 h-5" />
-              </span>
+              >
+              Activate My System
+              <ArrowRight className="w-5 h-5" />
             </a>
             <a
               href="/pricing"

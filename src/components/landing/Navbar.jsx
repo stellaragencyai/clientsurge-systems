@@ -384,7 +384,7 @@ export default function Navbar() {
           <button
             onClick={() => { trackCTA("client_dashboard", "navbar"); navigate("/client-portal"); }}
             className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border transition-colors"
-            style={{ minHeight: "unset", minWidth: "unset", borderColor: "rgba(0,174,239,0.35)", color: "#005f99", background: "rgba(0,174,239,0.07)" }}>
+            style={{ minHeight: "unset", minWidth: "unset", borderColor: "rgba(0,174,239,0.35)", color: "#00AEEF", background: "rgba(0,174,239,0.07)" }}>
             <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
             Client Dashboard
           </button>
@@ -396,23 +396,8 @@ export default function Navbar() {
           </button>
           <button
             onClick={() => { trackCTA("activate_system", "navbar"); navigate("/book"); }}
-            className="hidden md:inline-flex items-center focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-5 py-2.5"
-            style={{
-              background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
-              color: "#ffffff",
-              fontWeight: "800",
-              fontSize: "0.8125rem",
-              letterSpacing: "0.01em",
-              boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)",
-              border: "none",
-              cursor: "pointer",
-              transition: "box-shadow 0.28s cubic-bezier(0.34, 1.56, 0.64, 1), transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1)",
-              minHeight: "unset",
-              minWidth: "unset",
-              whiteSpace: "nowrap",
-            }}
-            onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
-            onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
+            className="cs-btn-primary"
+            style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset", whiteSpace: "nowrap" }}>
             Activate My System
           </button>
         </div>
@@ -420,7 +405,7 @@ export default function Navbar() {
         <button
           className="xl:hidden w-10 h-10 rounded-full border bg-background/15 backdrop-blur-[3px] flex items-center justify-center text-foreground shadow-sm"
           onClick={() => setOpen(!open)}
-          style={{ borderColor: "rgba(0,136,204,0.22)" }}
+          style={{ borderColor: "rgba(0,174,239,0.22)" }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}>
           
@@ -510,7 +495,7 @@ export default function Navbar() {
               navigate("/client-portal");
             }}
             className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold border"
-            style={{ borderColor: "rgba(0,174,239,0.35)", color: "#005f99", background: "rgba(0,174,239,0.07)", minHeight: "44px" }}>
+            style={{ borderColor: "rgba(0,174,239,0.35)", color: "#00AEEF", background: "rgba(0,174,239,0.07)", minHeight: "44px" }}>
             Client Dashboard
           </button>
           <button

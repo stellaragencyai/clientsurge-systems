@@ -54,7 +54,7 @@ export default function Book() {
 
                 <div className="book-audit-card" aria-label="Audit flow preview">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-[#005f99]">Diagnostic path</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Diagnostic path</p>
                     <span className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                       15 min
                     </span>

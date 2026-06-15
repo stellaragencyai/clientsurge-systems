@@ -81,7 +81,7 @@ function StoreHumanFallbackCTA() {
           gap: "8px",
           minHeight: "48px",
           borderRadius: "999px",
-          background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+          background: "linear-gradient(135deg, #00AEEF, #0088CC)",
           color: "#ffffff",
           fontWeight: 800,
           fontSize: "14px",
@@ -112,7 +112,7 @@ function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
     >
       <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", flexWrap: "wrap", alignItems: "flex-start" }}>
         <div style={{ maxWidth: "720px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#0088CC", margin: "0 0 8px" }}>
+          <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#00AEEF", margin: "0 0 8px" }}>
             Package Review
           </p>
           <h2 style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", lineHeight: 1.1, color: "#0A1628", fontWeight: 800, margin: "0 0 8px" }}>
@@ -168,44 +168,39 @@ function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
           </div>
           <div style={{ marginBottom: "18px" }}>
             <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.56)", margin: "0 0 2px" }}>Monthly service</p>
-            <p style={{ fontSize: "26px", fontWeight: 900, color: "#005f99", margin: 0 }}>${packageOffer.monthly_total.toLocaleString()}<span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(10,22,40,0.48)" }}>/mo</span></p>
+            <p style={{ fontSize: "26px", fontWeight: 900, color: "#00AEEF", margin: 0 }}>${packageOffer.monthly_total.toLocaleString()}<span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(10,22,40,0.48)" }}>/mo</span></p>
           </div>
           <button
-            type="button"
-            onClick={onContinue}
-            style={{
-              width: "100%",
-              minHeight: "48px",
-              borderRadius: "999px",
-              border: "none",
-              background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-              color: "#fff",
-              fontSize: "14px",
-              fontWeight: 800,
-              cursor: "pointer",
-              boxShadow: "0 10px 24px rgba(0,174,239,0.25)",
-              marginBottom: "10px",
-            }}
-          >
-            Continue to Checkout
-          </button>
-          <button
-            type="button"
-            onClick={onBrowseAll}
-            style={{
-              width: "100%",
-              minHeight: "42px",
-              borderRadius: "999px",
-              border: "1px solid rgba(0,136,204,0.16)",
-              background: "rgba(255,255,255,0.9)",
-              color: "#005f99",
-              fontSize: "13px",
-              fontWeight: 700,
-              cursor: "pointer",
-            }}
-          >
-            Browse All Services Instead
-          </button>
+               type="button"
+               onClick={onContinue}
+               className="cs-btn-primary"
+               style={{
+                 width: "100%",
+                 minHeight: "48px",
+                 borderRadius: "999px",
+                 fontSize: "14px",
+                 marginBottom: "10px",
+               }}
+             >
+               Continue to Checkout
+             </button>
+             <button
+               type="button"
+               onClick={onBrowseAll}
+               style={{
+                 width: "100%",
+                 minHeight: "42px",
+                 borderRadius: "999px",
+                 border: "1px solid rgba(0,174,239,0.16)",
+                 background: "rgba(255,255,255,0.9)",
+                 color: "#00AEEF",
+                 fontSize: "13px",
+                 fontWeight: 700,
+                 cursor: "pointer",
+               }}
+             >
+               Browse All Services Instead
+             </button>
         </div>
       </div>
     </section>

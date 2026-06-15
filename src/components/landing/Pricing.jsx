@@ -93,7 +93,7 @@ export default function Pricing() {
 
         {selectedIndustry ? (
           <div className="max-w-4xl mx-auto mb-10 rounded-lg border border-primary/15 bg-primary/5 px-6 py-5 text-center">
-            <p className="text-xs font-semibold text-[#005f99] tracking-[0.22em] uppercase mb-2">
+            <p className="text-xs font-semibold text-primary tracking-[0.22em] uppercase mb-2">
               Recommended For {selectedIndustry.shortName}
             </p>
             <p className="text-lg font-semibold text-foreground">
@@ -117,7 +117,7 @@ export default function Pricing() {
               style={{
                 background: "rgba(0,174,239,0.08)",
                 borderColor: "rgba(0,174,239,0.28)",
-                color: "#005f99",
+                color: "#00AEEF",
               }}
             >
               <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {text}
@@ -195,7 +195,7 @@ export default function Pricing() {
           color: rgba(10,22,40,0.74) !important;
         }
         .nebula-pricing .text-primary {
-          color: #005f99 !important;
+          color: #00AEEF !important;
         }
       `}</style>
     </section>

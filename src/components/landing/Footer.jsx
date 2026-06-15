@@ -382,7 +382,7 @@ export default function Footer() {
         }
 
         .cs-footer-contact-link:hover {
-          color: #005f99;
+          color: #00AEEF;
         }
 
         .cs-footer-contact-icon {
@@ -391,10 +391,10 @@ export default function Footer() {
           height: 32px;
           align-items: center;
           justify-content: center;
-          border: 1px solid rgba(0, 136, 204, 0.2);
+          border: 1px solid rgba(0, 174, 239, 0.2);
           border-radius: 8px;
-          background: rgba(0, 136, 204, 0.08);
-          color: #0088CC;
+          background: rgba(0, 174, 239, 0.08);
+          color: #00AEEF;
         }
 
         .cs-footer-contact-icon svg {
