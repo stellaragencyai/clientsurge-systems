@@ -133,7 +133,19 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" style={{ background: "linear-gradient(to bottom, hsl(var(--background)), hsl(var(--background)))" }}>
+      <style>{`
+        @keyframes fadeInUp {
+          from {
+            opacity: 0;
+            transform: translateY(16px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
       <Navbar />
 
       {/* Luxury Hero Section */}
@@ -152,16 +164,30 @@ export default function Contact() {
         </div>
       </section>
 
-      {/* Split-Screen Luxury Layout */}
-      <section className="px-6 pb-20 pt-12 md:pt-16">
+      {/* Split-Screen Luxury Layout with Floating Containers */}
+      <section className="px-6 pb-20 pt-12 md:pt-16" style={{ background: "linear-gradient(180deg, transparent 0%, rgba(0,174,239,0.02) 100%)" }}>
         <div className="max-w-7xl mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-16 items-start">
             
-            {/* LEFT: Brand Authority & Contact Details */}
-            <div className="flex flex-col gap-10 lg:gap-12">
+            {/* LEFT: Brand Authority & Contact Details - Floating Container */}
+            <div 
+              className="flex flex-col gap-10 lg:gap-12"
+              style={{
+                padding: "40px 32px",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(255,255,255,0.92) 100%)",
+                border: "1px solid rgba(0,174,239,0.12)",
+                borderRadius: "8px",
+                boxShadow: "0 8px 32px rgba(0,174,239,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+                backdropFilter: "blur(12px)",
+              }}
+            >
               
               {/* Contact Information - Minimalist Styling */}
-              <div>
+              <div
+                style={{
+                  animation: "fadeInUp 0.6s ease-out 0.1s backwards",
+                }}
+              >
                 <div className="flex items-center gap-3 mb-8">
                   <div style={{ width: "2px", height: "24px", background: "#00AEEF" }} />
                   <h2 style={{ fontSize: "0.75rem", fontWeight: 900, letterSpacing: "0.15em", color: "hsl(var(--foreground))" }} className="uppercase">Contact Information</h2>
@@ -189,13 +215,27 @@ export default function Contact() {
               {/* Decorative Divider */}
               <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.3), transparent)" }} />
 
-              {/* CTA Card - Direct Action */}
-              <div style={{ 
-                padding: "24px 28px", 
-                background: "linear-gradient(135deg, rgba(0,174,239,0.08) 0%, rgba(0,136,204,0.04) 100%)",
-                border: "1px solid rgba(0,174,239,0.15)",
-                borderRadius: "2px"
-              }}>
+              {/* CTA Card - Direct Action with Hover Effect */}
+              <div 
+                style={{ 
+                  padding: "24px 28px", 
+                  background: "linear-gradient(135deg, rgba(0,174,239,0.08) 0%, rgba(0,136,204,0.04) 100%)",
+                  border: "1px solid rgba(0,174,239,0.15)",
+                  borderRadius: "8px",
+                  transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  cursor: "pointer",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,136,204,0.08) 100%)";
+                  e.currentTarget.style.boxShadow = "0 12px 24px rgba(0,174,239,0.15)";
+                  e.currentTarget.style.transform = "translateY(-2px)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.background = "linear-gradient(135deg, rgba(0,174,239,0.08) 0%, rgba(0,136,204,0.04) 100%)";
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.transform = "translateY(0)";
+                }}
+              >
                 <h3 style={{ fontSize: "0.9rem", fontWeight: 700, letterSpacing: "-0.01em", marginBottom: "8px", color: "hsl(var(--foreground))" }}>
                   Skip the form?
                 </h3>
@@ -227,8 +267,20 @@ export default function Contact() {
               </div>
             </div>
 
-            {/* RIGHT: Conversion Form - Ultra-Minimal */}
-            <div style={{ borderTop: "1px solid rgba(0,174,239,0.2)", paddingTop: "32px" }} className="lg:border-t-0 lg:pt-0">
+            {/* RIGHT: Conversion Form - Floating Premium Container */}
+            <div 
+              style={{ 
+                padding: "40px 32px",
+                background: "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.96) 100%)",
+                border: "1px solid rgba(0,174,239,0.12)",
+                borderRadius: "8px",
+                boxShadow: "0 8px 32px rgba(0,174,239,0.08), inset 0 1px 0 rgba(255,255,255,0.8)",
+                backdropFilter: "blur(12px)",
+                borderTop: "none",
+                paddingTop: "40px",
+              }} 
+              className="lg:border-t lg:border-t-solid lg:pt-10"
+            >
             {success ? (
               <motion.div
                 className="flex flex-col items-center text-center py-8"
@@ -310,7 +362,7 @@ export default function Contact() {
                 {/* Two-Column Grid */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {/* Full Name - Bottom Border Input */}
-                  <div>
+                  <div style={{ animation: "fadeInUp 0.6s ease-out 0.15s backwards" }}>
                     <label htmlFor="contact-full-name" style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.1em", color: "hsl(var(--muted-foreground))", display: "block", marginBottom: "12px" }} className="uppercase">Full Name <span className="text-red-500">*</span></label>
                     <input
                       id="contact-full-name"
@@ -327,20 +379,28 @@ export default function Contact() {
                         background: "transparent",
                         border: "none",
                         borderBottom: errors.full_name ? "2px solid rgb(239,68,68)" : "1px solid rgba(0,174,239,0.3)",
-                        padding: "8px 0",
+                        padding: "10px 0 8px 0",
                         fontSize: "0.95rem",
                         color: "hsl(var(--foreground))",
                         outline: "none",
-                        transition: "border-color 0.2s ease",
+                        transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "rgba(0,174,239,0.6)"}
-                      onBlur={(e) => e.target.style.borderColor = errors.full_name ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)"}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "rgba(0,174,239,0.8)";
+                        e.target.style.borderBottomWidth = "2px";
+                        e.target.style.paddingBottom = "7px";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = errors.full_name ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)";
+                        e.target.style.borderBottomWidth = errors.full_name ? "2px" : "1px";
+                        e.target.style.paddingBottom = "8px";
+                      }}
                     />
                     {errors.full_name && <p id="contact-full-name-error" className="text-red-500 text-xs mt-2">{errors.full_name}</p>}
                   </div>
 
                   {/* Email - Bottom Border Input */}
-                  <div>
+                  <div style={{ animation: "fadeInUp 0.6s ease-out 0.2s backwards" }}>
                     <label htmlFor="contact-email" style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.1em", color: "hsl(var(--muted-foreground))", display: "block", marginBottom: "12px" }} className="uppercase">Email <span className="text-red-500">*</span></label>
                     <input
                       id="contact-email"
@@ -358,14 +418,22 @@ export default function Contact() {
                         background: "transparent",
                         border: "none",
                         borderBottom: errors.email ? "2px solid rgb(239,68,68)" : "1px solid rgba(0,174,239,0.3)",
-                        padding: "8px 0",
+                        padding: "10px 0 8px 0",
                         fontSize: "0.95rem",
                         color: "hsl(var(--foreground))",
                         outline: "none",
-                        transition: "border-color 0.2s ease",
+                        transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "rgba(0,174,239,0.6)"}
-                      onBlur={(e) => e.target.style.borderColor = errors.email ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)"}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "rgba(0,174,239,0.8)";
+                        e.target.style.borderBottomWidth = "2px";
+                        e.target.style.paddingBottom = "7px";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = errors.email ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)";
+                        e.target.style.borderBottomWidth = errors.email ? "2px" : "1px";
+                        e.target.style.paddingBottom = "8px";
+                      }}
                     />
                     {errors.email && <p id="contact-email-error" className="text-red-500 text-xs mt-2">{errors.email}</p>}
                   </div>
@@ -374,7 +442,7 @@ export default function Contact() {
                 {/* Second Row */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   {/* Phone - Bottom Border Input */}
-                  <div>
+                  <div style={{ animation: "fadeInUp 0.6s ease-out 0.25s backwards" }}>
                     <label htmlFor="contact-phone" style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.1em", color: "hsl(var(--muted-foreground))", display: "block", marginBottom: "12px" }} className="uppercase">Phone</label>
                     <input
                       id="contact-phone"
@@ -392,20 +460,28 @@ export default function Contact() {
                         background: "transparent",
                         border: "none",
                         borderBottom: errors.phone ? "2px solid rgb(239,68,68)" : "1px solid rgba(0,174,239,0.3)",
-                        padding: "8px 0",
+                        padding: "10px 0 8px 0",
                         fontSize: "0.95rem",
                         color: "hsl(var(--foreground))",
                         outline: "none",
-                        transition: "border-color 0.2s ease",
+                        transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "rgba(0,174,239,0.6)"}
-                      onBlur={(e) => e.target.style.borderColor = errors.phone ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)"}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "rgba(0,174,239,0.8)";
+                        e.target.style.borderBottomWidth = "2px";
+                        e.target.style.paddingBottom = "7px";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = errors.phone ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)";
+                        e.target.style.borderBottomWidth = errors.phone ? "2px" : "1px";
+                        e.target.style.paddingBottom = "8px";
+                      }}
                     />
                     {errors.phone && <p id="contact-phone-error" className="text-red-500 text-xs mt-2">{errors.phone}</p>}
                   </div>
 
                   {/* Business Type - Bottom Border Select */}
-                  <div>
+                  <div style={{ animation: "fadeInUp 0.6s ease-out 0.3s backwards" }}>
                     <label htmlFor="contact-business-type" style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.1em", color: "hsl(var(--muted-foreground))", display: "block", marginBottom: "12px" }} className="uppercase">Business Type</label>
                     <select
                       id="contact-business-type"
@@ -417,14 +493,22 @@ export default function Contact() {
                         background: "transparent",
                         border: "none",
                         borderBottom: "1px solid rgba(0,174,239,0.3)",
-                        padding: "8px 0",
+                        padding: "10px 0 8px 0",
                         fontSize: "0.95rem",
                         color: "hsl(var(--foreground))",
                         outline: "none",
-                        transition: "border-color 0.2s ease",
+                        transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                       }}
-                      onFocus={(e) => e.target.style.borderColor = "rgba(0,174,239,0.6)"}
-                      onBlur={(e) => e.target.style.borderColor = "rgba(0,174,239,0.3)"}
+                      onFocus={(e) => {
+                        e.target.style.borderColor = "rgba(0,174,239,0.8)";
+                        e.target.style.borderBottomWidth = "2px";
+                        e.target.style.paddingBottom = "7px";
+                      }}
+                      onBlur={(e) => {
+                        e.target.style.borderColor = "rgba(0,174,239,0.3)";
+                        e.target.style.borderBottomWidth = "1px";
+                        e.target.style.paddingBottom = "8px";
+                      }}
                     >
                       <option value="">Select one...</option>
                       <option>Med Spas & Aesthetic Clinics</option>
@@ -439,7 +523,7 @@ export default function Contact() {
                 </div>
 
                 {/* Message - Full Width Bottom Border Textarea */}
-                <div>
+                <div style={{ animation: "fadeInUp 0.6s ease-out 0.35s backwards" }}>
                   <label htmlFor="contact-message" style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.1em", color: "hsl(var(--muted-foreground))", display: "block", marginBottom: "12px" }} className="uppercase">Message <span className="text-red-500">*</span></label>
                   <textarea
                     id="contact-message"
@@ -456,16 +540,24 @@ export default function Contact() {
                       background: "transparent",
                       border: "none",
                       borderBottom: errors.message ? "2px solid rgb(239,68,68)" : "1px solid rgba(0,174,239,0.3)",
-                      padding: "8px 0",
+                      padding: "10px 0 8px 0",
                       fontSize: "0.95rem",
                       color: "hsl(var(--foreground))",
                       outline: "none",
-                      transition: "border-color 0.2s ease",
+                      transition: "all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1)",
                       resize: "none",
                       fontFamily: "inherit",
                     }}
-                    onFocus={(e) => e.target.style.borderColor = "rgba(0,174,239,0.6)"}
-                    onBlur={(e) => e.target.style.borderColor = errors.message ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)"}
+                    onFocus={(e) => {
+                      e.target.style.borderColor = "rgba(0,174,239,0.8)";
+                      e.target.style.borderBottomWidth = "2px";
+                      e.target.style.paddingBottom = "7px";
+                    }}
+                    onBlur={(e) => {
+                      e.target.style.borderColor = errors.message ? "rgb(239,68,68)" : "rgba(0,174,239,0.3)";
+                      e.target.style.borderBottomWidth = errors.message ? "2px" : "1px";
+                      e.target.style.paddingBottom = "8px";
+                    }}
                   />
                   {errors.message && <p id="contact-message-error" className="text-red-500 text-xs mt-2">{errors.message}</p>}
                 </div>
@@ -473,30 +565,37 @@ export default function Contact() {
                 {/* Decorative Divider Before Button */}
                 <div style={{ height: "1px", background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.2), transparent)", margin: "8px 0" }} />
 
-                {/* Submit Button */}
+                {/* Submit Button with Premium Hover */}
                 <button
                   type="submit"
                   disabled={loading}
                   style={{ 
-                    display: "block",
                     width: "100%",
-                    marginTop: "24px",
+                    marginTop: "28px",
                     padding: "14px 0",
                     background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
                     color: "#ffffff",
                     fontWeight: "700",
                     fontSize: "0.95rem",
                     border: "none",
+                    borderRadius: "4px",
                     cursor: loading ? "not-allowed" : "pointer",
                     opacity: loading ? 0.7 : 1,
-                    transition: "all 0.3s ease",
+                    transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
                     gap: "8px",
+                    boxShadow: "0 4px 16px rgba(0,136,204,0.2)",
                   }}
-                  onMouseEnter={(e) => !loading && (e.target.style.boxShadow = "0 12px 32px rgba(0,136,204,0.35)")}
-                  onMouseLeave={(e) => !loading && (e.target.style.boxShadow = "none")}
+                  onMouseEnter={(e) => !loading && (
+                    e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,136,204,0.4)",
+                    e.currentTarget.style.transform = "translateY(-2px)"
+                  )}
+                  onMouseLeave={(e) => !loading && (
+                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,136,204,0.2)",
+                    e.currentTarget.style.transform = "translateY(0)"
+                  )}
                 >
                   {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
                 </button>
