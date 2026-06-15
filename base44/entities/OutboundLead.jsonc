@@ -1,0 +1,152 @@
+{
+  "name": "OutboundLead",
+  "type": "object",
+  "_metadata": {
+    "status": "SALES_AUTOMATION",
+    "reason": "Outbound SaaS lead acquisition pipeline. Tracks all prospects contacted via outbound campaigns.",
+    "tenant_scoped": "client_id (sales team scope)",
+    "documentation": "SALES_AUTOMATION.md"
+  },
+  "properties": {
+    "business_name": {
+      "type": "string",
+      "title": "Business Name",
+      "required": true
+    },
+    "contact_name": {
+      "type": "string",
+      "title": "Contact Name"
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address",
+      "format": "email",
+      "required": true
+    },
+    "phone": {
+      "type": "string",
+      "title": "Phone Number"
+    },
+    "company_website": {
+      "type": "string",
+      "title": "Company Website"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry"
+    },
+    "company_size": {
+      "type": "string",
+      "title": "Company Size",
+      "enum": [
+        "solo",
+        "1-10",
+        "11-50",
+        "51-200",
+        "200+"
+      ]
+    },
+    "outreach_status": {
+      "type": "string",
+      "title": "Outreach Status",
+      "enum": [
+        "new",
+        "contacted",
+        "replied",
+        "booked",
+        "converted",
+        "failed",
+        "paused"
+      ],
+      "default": "new"
+    },
+    "lead_source": {
+      "type": "string",
+      "title": "Lead Source",
+      "enum": [
+        "manual",
+        "referral",
+        "campaign",
+        "imported",
+        "enriched"
+      ],
+      "default": "manual"
+    },
+    "campaign_id": {
+      "type": "string",
+      "title": "Linked Campaign ID"
+    },
+    "sequence_id": {
+      "type": "string",
+      "title": "Active Sequence ID"
+    },
+    "current_sequence_step": {
+      "type": "integer",
+      "title": "Current Sequence Step",
+      "default": 0
+    },
+    "last_contacted_at": {
+      "type": "string",
+      "title": "Last Contacted At",
+      "format": "date-time"
+    },
+    "first_reply_at": {
+      "type": "string",
+      "title": "First Reply At",
+      "format": "date-time"
+    },
+    "conversion_at": {
+      "type": "string",
+      "title": "Conversion At",
+      "format": "date-time"
+    },
+    "converted_order_id": {
+      "type": "string",
+      "title": "Linked Order ID (if converted)"
+    },
+    "converted_client_id": {
+      "type": "string",
+      "title": "Linked Client ID (if converted)"
+    },
+    "total_outreach_messages": {
+      "type": "integer",
+      "title": "Total Outreach Messages",
+      "default": 0
+    },
+    "total_replies": {
+      "type": "integer",
+      "title": "Total Replies",
+      "default": 0
+    },
+    "response_rate_percent": {
+      "type": "number",
+      "title": "Response Rate %",
+      "default": 0
+    },
+    "quality_score": {
+      "type": "number",
+      "title": "Lead Quality Score (0-100)",
+      "default": 0
+    },
+    "last_activity_at": {
+      "type": "string",
+      "title": "Last Activity At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Sales Notes"
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags"
+    }
+  },
+  "required": [
+    "business_name",
+    "email"
+  ]
+}

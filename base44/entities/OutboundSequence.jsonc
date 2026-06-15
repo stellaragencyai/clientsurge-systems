@@ -1,0 +1,130 @@
+{
+  "name": "OutboundSequence",
+  "type": "object",
+  "_metadata": {
+    "status": "SALES_AUTOMATION",
+    "reason": "Defines reusable multi-step outreach sequences for outbound campaigns.",
+    "tenant_scoped": "client_id (sales team scope)",
+    "documentation": "SALES_AUTOMATION.md"
+  },
+  "properties": {
+    "sequence_name": {
+      "type": "string",
+      "title": "Sequence Name",
+      "required": true
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Sales Team / Client ID"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description"
+    },
+    "sequence_type": {
+      "type": "string",
+      "title": "Sequence Type",
+      "enum": [
+        "email_only",
+        "sms_only",
+        "email_sms_mix",
+        "linkedin_outreach",
+        "custom"
+      ],
+      "default": "email_sms_mix"
+    },
+    "steps": {
+      "type": "array",
+      "title": "Sequence Steps",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step_number": {
+            "type": "integer",
+            "title": "Step Number"
+          },
+          "delay_hours": {
+            "type": "integer",
+            "title": "Delay from Previous Step (hours)",
+            "default": 0
+          },
+          "channel": {
+            "type": "string",
+            "title": "Channel",
+            "enum": [
+              "email",
+              "sms",
+              "linkedin"
+            ]
+          },
+          "message_template_id": {
+            "type": "string",
+            "title": "Message Template ID"
+          },
+          "message_subject": {
+            "type": "string",
+            "title": "Subject/Title"
+          },
+          "message_body": {
+            "type": "string",
+            "title": "Message Body",
+            "description": "Supports {{variables}} like {{first_name}}, {{company_name}}"
+          },
+          "cta_link": {
+            "type": "string",
+            "title": "CTA Link (optional)"
+          }
+        },
+        "required": [
+          "step_number",
+          "channel",
+          "message_body"
+        ]
+      }
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "default": true
+    },
+    "total_leads_sent": {
+      "type": "integer",
+      "title": "Total Leads in Sequence",
+      "default": 0
+    },
+    "total_replies": {
+      "type": "integer",
+      "title": "Total Replies",
+      "default": 0
+    },
+    "total_conversions": {
+      "type": "integer",
+      "title": "Total Conversions",
+      "default": 0
+    },
+    "reply_rate_percent": {
+      "type": "number",
+      "title": "Reply Rate %",
+      "default": 0
+    },
+    "conversion_rate_percent": {
+      "type": "number",
+      "title": "Conversion Rate %",
+      "default": 0
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "sequence_name",
+    "steps"
+  ]
+}
