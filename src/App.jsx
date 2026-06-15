@@ -48,7 +48,7 @@ const Blog = lazy(() => import("./pages/Blog"));
 const Login = lazy(() => import("./pages/Login"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Store = lazy(() => import("./pages/Store"));
-const IndustryTemplate = lazy(() => import("./components/landing/IndustryTemplate"));
+const IndustryLandingPage = lazy(() => import("./components/industry/IndustryLandingPage"));
 const About = lazy(() => import("./pages/About"));
 const Automations = lazy(() => import("./pages/Automations"));
 const Onboarding = lazy(() => import("./internal-pages/Onboarding"));
@@ -324,7 +324,7 @@ const AuthenticatedAppWithTenant = () => {
         <Route
           key={slug}
           path={`/${slug}`}
-          element={<LazyRoute Component={IndustryTemplate} industrySlug={slug} />}
+          element={<LazyRoute Component={IndustryLandingPage} />}
         />
       ))}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => (

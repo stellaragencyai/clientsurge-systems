@@ -1,76 +1,53 @@
-import { useEffect, useRef, useState } from "react";
+import { TrendingDown, AlertCircle } from 'lucide-react';
 
-function useCountUp(target, duration = 1600, shouldStart = false) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!shouldStart) return;
-    const numericTarget = parseFloat(String(target).replace(/[^0-9.]/g, "")) || 0;
-    let startTime = null;
-    const step = (ts) => {
-      if (!startTime) startTime = ts;
-      const p = Math.min((ts - startTime) / duration, 1);
-      const eased = 1 - Math.pow(1 - p, 3);
-      setCount(Math.round(eased * numericTarget * 10) / 10);
-      if (p < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [target, duration, shouldStart]);
-  return count;
-}
-
-function PainStatCard({ stat, delay = 0 }) {
-  const ref = useRef(null);
-  const [started, setStarted] = useState(false);
-  const numericTarget = parseFloat(String(stat.value).replace(/[^0-9.]/g, "")) || 0;
-  const suffix = String(stat.value).replace(/[0-9.]/g, "").trim();
-  const count = useCountUp(numericTarget, 1600, started);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) { setStarted(true); observer.disconnect(); }
-    }, { threshold: 0.4 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, []);
-
-  const displayValue = numericTarget > 0 ? `${count}${suffix}` : stat.value;
+/**
+ * Industry-specific revenue loss calculation block
+ * Shows concrete financial impact to grab attention
+ */
+export default function IndustryPainBar({ config, revenueLoss }) {
+  const formattedLoss = new Intl.NumberFormat('en-US', {
+    style: 'currency',
+    currency: 'USD',
+    maximumFractionDigits: 0,
+  }).format(revenueLoss);
 
   return (
-    <div
-      ref={ref}
-      className="rounded-xl px-6 py-6 text-center transition-all duration-300"
-      style={{
-        background: "#ffffff",
-        border: "1px solid rgba(0,136,204,0.14)",
-        boxShadow: "0 14px 36px rgba(0,59,143,0.09)",
-        animationDelay: `${delay}ms`,
-      }}
-    >
-      <div className="text-3xl mb-2">{stat.icon}</div>
-      <p
-        className="font-black mb-1"
-        style={{ fontSize: "clamp(1.8rem, 3.8vw, 2.6rem)", color: "#005f99", lineHeight: 1.02, fontFamily: "var(--font-display)" }}
-      >
-        {displayValue}
-      </p>
-      <p className="text-sm font-semibold leading-snug" style={{ color: "rgba(5,19,46,0.82)" }}>
-        {stat.label}
-      </p>
-      {stat.sub && (
-        <p className="text-xs text-muted-foreground mt-1 leading-relaxed">{stat.sub}</p>
-      )}
-    </div>
-  );
-}
+    <section className="py-16 px-6 bg-destructive/5 border-t border-b border-destructive/20">
+      <div className="max-w-4xl mx-auto">
+        <div className="grid md:grid-cols-3 gap-8">
+          {/* Main stat */}
+          <div className="md:col-span-2">
+            <div className="flex items-start gap-4">
+              <AlertCircle className="w-12 h-12 text-destructive flex-shrink-0 mt-1" />
+              <div>
+                <h3 className="text-3xl md:text-4xl font-bold text-foreground mb-2">
+                  {formattedLoss}
+                </h3>
+                <p className="text-lg text-muted-foreground">
+                  Your estimated monthly revenue loss from missed leads and slow response times.
+                </p>
+              </div>
+            </div>
+          </div>
 
-export default function IndustryPainBar({ stats }) {
-  return (
-    <section className="relative z-20 px-4 pb-12 md:px-6 md:pb-16" style={{ background: "#ffffff" }}>
-      <div className="max-w-6xl mx-auto" style={{ marginTop: "clamp(-3.5rem, -5vw, -2rem)" }}>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5">
-          {stats.map((stat, i) => (
-            <PainStatCard key={i} stat={stat} delay={i * 120} />
-          ))}
+          {/* Key metric */}
+          <div className="md:col-span-1 flex flex-col justify-center">
+            <div className="text-center p-6 rounded-lg bg-background border border-border">
+              <div className="flex items-center justify-center gap-2 mb-2">
+                <TrendingDown className="w-5 h-5 text-destructive" />
+                <span className="text-sm font-semibold text-muted-foreground">Real opportunity cost</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Based on industry averages for your market
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-8 p-6 bg-primary/10 border border-primary/30 rounded-lg">
+          <p className="text-center text-muted-foreground">
+            <strong>Recovery opportunity:</strong> Automate your lead response and capture 50% of missed leads within 90 days. That's an extra <strong className="text-foreground">{formattedLoss.replace('$', '$')}/month</strong> in revenue.
+          </p>
         </div>
       </div>
     </section>
