@@ -16,7 +16,7 @@ const mobileVisibleSystemIds = new Set(["02", "03", "04", "05"]);
 
 function CoreOfferHeader() {
   return (
-    <div className="text-center mx-auto max-w-4xl">
+    <div className="flex flex-col items-center text-center mx-auto max-w-4xl">
       {/* Eyebrow */}
       <p className="cs-eyebrow mb-4">
         {coreOfferSectionConfig.eyebrow}

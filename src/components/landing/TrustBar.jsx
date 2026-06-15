@@ -139,7 +139,7 @@ export default function TrustBar() {
       className="pt-14 md:pt-16 pb-14 md:pb-20 bg-gradient-to-b from-card via-background to-background/60 border-y border-primary/10"
     >
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-10">
+        <div className="flex flex-col items-center text-center mb-10">
           <p className="cs-eyebrow mb-4">What You Can Expect</p>
           <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground">
             Clear Commitments. Cleaner Buying Decision.

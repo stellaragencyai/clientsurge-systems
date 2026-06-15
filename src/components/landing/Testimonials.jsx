@@ -43,7 +43,7 @@ export default function Testimonials() {
     <section id="testimonials" className="nebula-testimonials py-16 md:py-24 px-6 relative overflow-hidden">
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="max-w-2xl mx-auto text-center mb-16">
+        <div className="flex flex-col items-center text-center mb-16">
           <p className="cs-eyebrow mb-4">Real Workflow Results</p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
             What Happens When the System Goes Live

@@ -62,7 +62,7 @@ export default function Pricing() {
       className="nebula-pricing pt-10 md:pt-14 pb-16 md:pb-24 px-6 overflow-visible"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-4xl mx-auto text-center mb-12">
+        <div className="flex flex-col items-center text-center mb-12">
           <p className="cs-eyebrow mb-4">Plans & Pricing</p>
           <h2
             className="text-[#001B44] text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl"

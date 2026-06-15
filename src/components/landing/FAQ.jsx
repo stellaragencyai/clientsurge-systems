@@ -42,7 +42,7 @@ export default function FAQ() {
     <section id="faq" className="px-4 pt-8 pb-20 md:px-6 md:pt-10 md:pb-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="text-center mb-8 md:mb-14">
+        <div className="flex flex-col items-center text-center mb-8 md:mb-14">
           <p className="cs-eyebrow mb-4">Questions</p>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Frequently Asked Questions

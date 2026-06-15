@@ -14,6 +14,9 @@ export default function Hero() {
           maxWidth: "820px",
           margin: "0 auto",
           padding: "clamp(6rem, 12vw, 10rem) clamp(1.5rem, 5vw, 3rem)",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
           textAlign: "center",
         }}
       >

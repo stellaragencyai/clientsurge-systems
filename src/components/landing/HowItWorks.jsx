@@ -58,7 +58,7 @@ export default function HowItWorks() {
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="max-w-2xl mx-auto text-center mb-16">
+        <div className="flex flex-col items-center text-center mb-16">
           <p className="cs-eyebrow mb-4">The Process</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
             How The System Turns Inquiries Into Booked Appointments
