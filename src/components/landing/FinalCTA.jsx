@@ -7,19 +7,19 @@ export default function FinalCTA() {
       <section id="book-demo" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-center">
+        <div className="relative z-10 max-w-3xl mx-auto text-left">
           <p className="cs-eyebrow mb-6">
             Ready to Transform Your Lead Flow?
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
             Claim Your Free <span className="text-primary">System Diagnostic</span>
           </h2>
-          <p className="mt-6 text-muted-foreground text-lg max-w-xl mx-auto leading-relaxed">
+          <p className="mt-6 text-muted-foreground text-lg max-w-xl leading-relaxed">
             Get a free 15-minute readiness assessment to see exactly where your business is leaking revenue and how AI automation can recover it.
           </p>
 
           {/* How the demo works - 3 steps */}
-          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-center sm:text-left">
+          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-left">
             {[
               { step: "01", title: "Claim your diagnostic window", body: "Secure a 15-minute readiness slot. No sales pressure, no fluff." },
               { step: "02", title: "We map your revenue gaps", body: "We show you exactly where leads are leaking in your current setup." },
@@ -38,8 +38,8 @@ export default function FinalCTA() {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="max-w-3xl mx-auto text-left mt-4 relative z-10">
+          <div className="flex flex-col sm:flex-row items-start justify-start gap-3">
             <a
               href="/book"
               onClick={() => {

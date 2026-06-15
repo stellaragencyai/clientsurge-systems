@@ -14,7 +14,7 @@ export default function Hero() {
           maxWidth: "820px",
           margin: "0 auto",
           padding: "clamp(6rem, 12vw, 10rem) clamp(1.5rem, 5vw, 3rem)",
-          textAlign: "center",
+          textAlign: "left",
         }}
       >
         {/* Eyebrow */}
@@ -50,7 +50,7 @@ export default function Hero() {
           display: "flex",
           flexWrap: "wrap",
           gap: "12px",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           marginTop: "2rem",
         }}>
           <a
@@ -90,7 +90,7 @@ export default function Hero() {
           display: "flex",
           flexWrap: "wrap",
           gap: "8px 24px",
-          justifyContent: "center",
+          justifyContent: "flex-start",
           marginTop: "2rem",
         }}>
           {[

@@ -16,18 +16,14 @@ const mobileVisibleSystemIds = new Set(["02", "03", "04", "05"]);
 
 function CoreOfferHeader() {
   return (
-    <div className="text-center mx-auto max-w-4xl">
+    <div className="text-left mx-auto max-w-4xl">
       {/* Eyebrow */}
-      <div className="inline-flex items-center gap-2 mb-5">
-        <div className="h-px w-8" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.6))" }} />
-        <p className="text-[11px] font-bold tracking-[0.3em] uppercase text-primary">
-          {coreOfferSectionConfig.eyebrow}
-        </p>
-        <div className="h-px w-8" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.6))" }} />
-      </div>
+      <p className="cs-eyebrow mb-4">
+        {coreOfferSectionConfig.eyebrow}
+      </p>
 
       {/* Title */}
-      <h2 className="font-bold tracking-tight leading-none text-foreground text-center"
+      <h2 className="font-bold tracking-tight leading-none text-foreground text-left"
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
        We fix revenue loss{" "}
        <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>

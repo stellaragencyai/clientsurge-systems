@@ -42,8 +42,8 @@ export default function FAQ() {
     <section id="faq" className="px-4 pt-8 pb-20 md:px-6 md:pt-10 md:pb-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="text-center mb-8 md:mb-14">
-          <p className="text-[11px] md:text-xs font-semibold text-primary tracking-widest uppercase mb-3 md:mb-4">Questions</p>
+        <div className="text-left mb-8 md:mb-14">
+          <p className="cs-eyebrow mb-4">Questions</p>
           <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
            Frequently Asked Questions
           </h2>
@@ -120,7 +120,7 @@ export default function FAQ() {
         )}
 
         {/* Post-FAQ CTA */}
-        <div className="mt-12 rounded-2xl border border-primary/15 px-6 py-8 text-center" style={{ background: "linear-gradient(135deg, rgba(0,136,204,0.05) 0%, rgba(0,59,143,0.03) 100%)" }}>
+        <div className="mt-12 rounded-2xl border border-primary/15 px-6 py-8 text-left" style={{ background: "linear-gradient(135deg, rgba(0,136,204,0.05) 0%, rgba(0,59,143,0.03) 100%)" }}>
           <p className="text-base font-bold text-foreground mb-1">Still have questions?</p>
           <p className="text-sm text-muted-foreground mb-5">We're happy to walk through your specific situation — no pitch, just answers.</p>
           <div className="flex flex-wrap gap-3 justify-center">

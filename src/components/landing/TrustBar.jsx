@@ -139,14 +139,12 @@ export default function TrustBar() {
       className="pt-14 md:pt-16 pb-14 md:pb-20 bg-gradient-to-b from-card via-background to-background/60 border-y border-primary/10"
     >
       <div className="max-w-6xl mx-auto px-6">
-        <div className="text-center mb-10">
-          <p className="text-xs font-bold tracking-[0.3em] uppercase mb-3 text-primary">
-            What You Can Expect
-          </p>
+        <div className="text-left mb-10">
+          <p className="cs-eyebrow mb-4">What You Can Expect</p>
           <h2 className="font-display text-3xl md:text-4xl font-bold tracking-tight text-foreground">
             Clear Commitments. Cleaner Buying Decision.
           </h2>
-          <p className="mt-4 max-w-3xl mx-auto text-sm md:text-base text-foreground/65 leading-relaxed">
+          <p className="mt-4 max-w-3xl text-sm md:text-base text-foreground/65 leading-relaxed">
             No guessing. No long contracts. Here's exactly what you can expect when you work with ClientSurge Systems — from first response speed to how the engagement is structured.
           </p>
         </div>

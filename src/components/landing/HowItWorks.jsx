@@ -58,8 +58,8 @@ export default function HowItWorks() {
       />
 
       <div className="max-w-7xl mx-auto relative z-10">
-        <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-foreground/70 tracking-widest uppercase mb-4">The Process</p>
+        <div className="max-w-2xl mx-auto text-left mb-16">
+          <p className="cs-eyebrow mb-4">The Process</p>
           <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
             How The System Turns Inquiries Into Booked Appointments
           </h2>
@@ -133,14 +133,14 @@ export default function HowItWorks() {
           </div>
         </div>
 
-        <div className="text-center mb-10">
+        <div className="text-left mb-10">
           <p className="text-lg font-semibold text-foreground">
             No missed calls. No delayed replies. No lost opportunities.
           </p>
         </div>
 
-        <div className="text-center">
-          <p className="text-foreground mb-3">Want to see how this would fit your business?</p>
+        <div className="text-left">
+          <p className="text-foreground mb-3 text-left">Want to see how this would fit your business?</p>
           <a
             href="/pricing"
             className="inline-flex items-center justify-center text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
