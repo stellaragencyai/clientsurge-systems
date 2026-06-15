@@ -7,13 +7,12 @@ import ResponsiveServiceCard from "@/components/dashboard/ResponsiveServiceCard"
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
-import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
+import { Loader2, ShoppingBag, Mail, Phone, RefreshCw, Zap } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import DeploymentProgressBar from "@/components/dashboard/DeploymentProgressBar";
 import SetupStatusPanel from "@/components/dashboard/SetupStatusPanel";
 
-// Map real install_status → numeric stage index (0–4)
 export const STAGE_MAP = {
   "Paid": 0,
   "Ready for Install": 1,
@@ -25,39 +24,26 @@ export const STAGE_MAP = {
 
 function LoadingState() {
   return (
-    <div style={{ textAlign: "center", padding: "80px 20px" }}>
-      <div style={{
-        width: "64px", height: "64px", borderRadius: "16px",
-        background: "linear-gradient(135deg,rgba(0,174,239,0.1),rgba(0,59,143,0.05))",
-        border: "1px solid rgba(0,174,239,0.15)",
-        display: "flex", alignItems: "center", justifyContent: "center",
-        margin: "0 auto 16px",
-      }}>
-        <Loader2 style={{ width: "28px", height: "28px", color: "#00AEEF", animation: "spin 1s linear infinite" }} />
+    <div className="flex flex-col items-center justify-center py-24 gap-4">
+      <div className="w-16 h-16 rounded-2xl flex items-center justify-center"
+        style={{ background: "linear-gradient(135deg,rgba(0,174,239,0.12),rgba(0,59,143,0.06))", border: "1px solid rgba(0,174,239,0.18)" }}>
+        <Loader2 className="w-7 h-7 text-primary animate-spin" />
       </div>
-      <p style={{ fontSize: "15px", fontWeight: "600", color: "hsl(var(--foreground))", margin: "0 0 4px" }}>Loading your dashboard…</p>
-      <p style={{ fontSize: "13px", color: "hsl(var(--muted-foreground))", margin: 0 }}>Fetching your installation status</p>
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
+      <p className="text-[15px] font-semibold text-foreground">Loading your dashboard…</p>
+      <p className="text-[13px] text-muted-foreground">Fetching your installation status</p>
     </div>
   );
 }
 
 function ErrorState({ message, onRetry }) {
   return (
-    <div style={{
-      background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)",
-      borderRadius: "16px", padding: "32px", textAlign: "center",
-    }}>
-      <p style={{ fontSize: "16px", fontWeight: "700", color: "#dc2626", margin: "0 0 8px" }}>⚠ Unable to Load Dashboard</p>
-      <p style={{ fontSize: "14px", color: "rgba(27,20,13,0.6)", margin: "0 0 16px" }}>{message}</p>
+    <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
+      <p className="text-base font-bold text-red-600 mb-2">⚠ Unable to Load Dashboard</p>
+      <p className="text-sm text-muted-foreground mb-5">{message}</p>
       {onRetry && (
-        <button onClick={onRetry} style={{
-          display: "inline-flex", alignItems: "center", gap: "6px",
-          padding: "8px 18px", borderRadius: "9999px",
-          background: "rgba(239,68,68,0.1)", border: "1px solid rgba(239,68,68,0.3)",
-          color: "#dc2626", fontWeight: "600", fontSize: "13px", cursor: "pointer",
-        }}>
-          <RefreshCw style={{ width: "13px", height: "13px" }} /> Try Again
+        <button onClick={onRetry}
+          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-red-50 border border-red-200 text-red-600 font-semibold text-sm cursor-pointer hover:bg-red-100 transition-colors">
+          <RefreshCw className="w-3 h-3" /> Try Again
         </button>
       )}
     </div>
@@ -66,31 +52,27 @@ function ErrorState({ message, onRetry }) {
 
 function EmptyState() {
   return (
-    <div style={{
-      borderRadius: "20px", textAlign: "center", padding: "60px 32px",
-      background: "hsl(var(--card))", border: "1px solid rgba(0,174,239,0.12)",
-      boxShadow: "0 4px 24px rgba(0,59,143,0.07)",
-    }}>
-      <div style={{
-        width: "72px", height: "72px", borderRadius: "20px", margin: "0 auto 20px",
-        background: "linear-gradient(135deg,rgba(0,174,239,0.1),rgba(0,59,143,0.06))",
+    <div className="rounded-3xl text-center py-16 px-8 relative overflow-hidden"
+      style={{
+        background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(232,246,255,0.7) 100%)",
         border: "1px solid rgba(0,174,239,0.15)",
-        display: "flex", alignItems: "center", justifyContent: "center",
+        boxShadow: "0 8px 40px rgba(0,59,143,0.08)"
       }}>
-        <ShoppingBag style={{ width: "32px", height: "32px", color: "#0088CC" }} />
+      {/* Top gradient bar */}
+      <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl"
+        style={{ background: "linear-gradient(90deg, #003B8F, #00AEEF, #66D9FF)" }} />
+      <div className="w-20 h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center"
+        style={{ background: "linear-gradient(135deg,rgba(0,174,239,0.12),rgba(0,59,143,0.07))", border: "1px solid rgba(0,174,239,0.2)" }}>
+        <ShoppingBag className="w-9 h-9 text-primary" />
       </div>
-      <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#0A1628", margin: "0 0 8px" }}>No Services Yet</h3>
-      <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.55)", margin: "0 0 24px", maxWidth: "360px", display: "inline-block", lineHeight: 1.6 }}>
+      <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>No Services Yet</h3>
+      <p className="text-sm text-muted-foreground mb-7 max-w-xs mx-auto leading-relaxed">
         You don't have any active orders yet. Browse our AI automation store to get started.
       </p>
-      <a href="/store" style={{
-        display: "inline-flex", alignItems: "center", gap: "8px",
-        padding: "12px 28px", borderRadius: "9999px",
-        background: "linear-gradient(135deg,#00AEEF,#003B8F)",
-        color: "#ffffff", fontWeight: "700", fontSize: "14px",
-        textDecoration: "none", boxShadow: "0 4px 18px rgba(0,174,239,0.35)",
-      }}>
-        Browse the AI Store →
+      <a href="/store"
+        className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-white font-bold text-sm transition-all hover:-translate-y-0.5"
+        style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 6px 20px rgba(0,174,239,0.35)" }}>
+        <ShoppingBag className="w-4 h-4" /> Browse the AI Store →
       </a>
     </div>
   );
@@ -98,32 +80,26 @@ function EmptyState() {
 
 function SupportCard() {
   return (
-    <div style={{
-      borderRadius: "16px",
-      background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(0,59,143,0.03) 100%)",
-      border: "1px solid rgba(0,174,239,0.14)",
-      padding: "24px 28px", marginTop: "32px",
-      display: "flex", alignItems: "center", justifyContent: "space-between",
-      flexWrap: "wrap", gap: "16px",
-    }}>
+    <div className="rounded-2xl p-6 md:p-8 flex items-center justify-between flex-wrap gap-5 mt-10"
+      style={{
+        background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(0,59,143,0.03) 100%)",
+        border: "1px solid rgba(0,174,239,0.15)",
+        boxShadow: "0 4px 20px rgba(0,59,143,0.06)"
+      }}>
       <div>
-        <p style={{ fontSize: "13px", fontWeight: "800", color: "#0088CC", textTransform: "uppercase", letterSpacing: "0.1em", margin: "0 0 4px" }}>Need Help?</p>
-        <p style={{ fontSize: "15px", fontWeight: "700", color: "#0A1628", margin: "0 0 2px" }}>Our onboarding team is here for you</p>
-        <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", margin: 0 }}>Average response time: under 4 hours</p>
+        <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-1">Need Help?</p>
+        <p className="text-[15px] font-bold text-foreground mb-0.5" style={{ fontFamily: "Montserrat, sans-serif" }}>Our onboarding team is here for you</p>
+        <p className="text-[13px] text-muted-foreground">Average response time: under 4 hours</p>
       </div>
-      <div style={{ display: "flex", gap: "10px", flexWrap: "wrap" }}>
+      <div className="flex gap-3 flex-wrap">
         {[
           { Icon: Mail, label: "Email Support", href: "mailto:support@clientsurgesystems.com" },
           { Icon: Phone, label: "(602) 584-3227", href: "tel:+16025843227" },
         ].map(({ Icon, label, href }) => (
-          <a key={label} href={href} style={{
-            display: "inline-flex", alignItems: "center", gap: "6px",
-            padding: "9px 16px", borderRadius: "9999px",
-            background: "#ffffff", border: "1px solid rgba(0,174,239,0.22)",
-            color: "#0088CC", fontWeight: "600", fontSize: "13px", textDecoration: "none",
-          }}>
-            <Icon style={{ width: "14px", height: "14px" }} />
-            {label}
+          <a key={label} href={href}
+            className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-primary font-semibold text-[13px] no-underline transition-all hover:shadow-md"
+            style={{ border: "1px solid rgba(0,174,239,0.25)" }}>
+            <Icon className="w-3.5 h-3.5" />{label}
           </a>
         ))}
       </div>
@@ -131,31 +107,15 @@ function SupportCard() {
   );
 }
 
-// Live polling indicator
 function LiveIndicator({ lastUpdated, onRefresh, isRefreshing }) {
-  const [age, setAge] = useState(0);
-  useEffect(() => {
-    const t = setInterval(() => setAge(a => a + 1), 30000);
-    return () => clearInterval(t);
-  }, [lastUpdated]);
-
   return (
-    <div style={{
-      display: "flex", alignItems: "center", gap: "8px",
-      marginBottom: "20px", justifyContent: "flex-end",
-    }}>
-      <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#22c55e", boxShadow: "0 0 6px #22c55e", flexShrink: 0 }} />
-      <span style={{ fontSize: "11px", color: "rgba(27,20,13,0.45)", fontWeight: "500" }}>
-        Live — updates every 30s
-      </span>
-      <button onClick={onRefresh} disabled={isRefreshing} style={{
-        display: "inline-flex", alignItems: "center", gap: "4px",
-        padding: "4px 10px", borderRadius: "9999px",
-        background: "rgba(0,174,239,0.07)", border: "1px solid rgba(0,174,239,0.15)",
-        color: "#0088CC", fontSize: "11px", fontWeight: "600", cursor: "pointer",
-        opacity: isRefreshing ? 0.5 : 1,
-      }}>
-        <RefreshCw style={{ width: "10px", height: "10px", animation: isRefreshing ? "spin 1s linear infinite" : "none" }} />
+    <div className="flex items-center gap-2 justify-end mb-5">
+      <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" style={{ boxShadow: "0 0 6px #22c55e" }} />
+      <span className="text-[11px] text-muted-foreground/60 font-medium">Live — updates every 30s</span>
+      <button onClick={onRefresh} disabled={isRefreshing}
+        className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-primary text-[11px] font-semibold transition-opacity disabled:opacity-40 cursor-pointer"
+        style={{ background: "rgba(0,174,239,0.07)", border: "1px solid rgba(0,174,239,0.15)" }}>
+        <RefreshCw className={`w-2.5 h-2.5 ${isRefreshing ? "animate-spin" : ""}`} />
         Refresh
       </button>
     </div>
@@ -191,15 +151,12 @@ export default function ClientDashboard() {
         setPortalData(res.data);
         setLastUpdated(new Date());
       } else if (res.data?.code === "portal_project_not_found") {
-        // No project linked yet — show empty state, not an error
         setPortalData({ success: true, project: null, order: null });
         setLastUpdated(new Date());
       } else {
         setError(res.data?.error || "Unable to load your portal data.");
       }
     } catch (err) {
-      console.error("Portal fetch error:", err);
-      // Check if it's a 404 (no project linked yet)
       const status = err?.response?.status || err?.status;
       const code = err?.response?.data?.code || err?.data?.code;
       if (status === 404 || code === "portal_project_not_found") {
@@ -214,23 +171,17 @@ export default function ClientDashboard() {
     }
   }, []);
 
-  // Initial load
   useEffect(() => { fetchPortal(false); }, [fetchPortal]);
-
-  // Auto-poll every 30s
   useEffect(() => {
     const interval = setInterval(() => fetchPortal(true), 30000);
     return () => clearInterval(interval);
   }, [fetchPortal]);
 
-  // Derive services from portal context
   const services = portalData?.order?.services || [];
   const project = portalData?.project;
   const order = portalData?.order;
-  const user = portalData?.user || null;
   const hasSetupInfo = !!(order?.install_configuration?.brand?.business_name || order?.install_configuration?.shared?.twilio_business_phone);
 
-  // Build activeServices in the shape the sub-components expect
   const activeServices = services.map(svc => ({
     serviceKey: svc.service_key,
     productName: svc.display_name,
@@ -241,15 +192,14 @@ export default function ClientDashboard() {
     paymentStatus: order?.payment_status || "",
   }));
 
-  // Safety: if portalData fetch threw an unhandled error, show support card
   if (!loading && !portalData && !error) {
     return (
       <DemoBookingProvider>
-        <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "hsl(var(--background))" }}>
-          <div style={{ textAlign: "center", padding: "48px 24px" }}>
-            <p style={{ fontSize: "20px", fontWeight: "700", color: "#0A1628", marginBottom: "8px" }}>Something went wrong</p>
-            <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.55)", marginBottom: "24px" }}>We could not load your dashboard. Please refresh or contact support.</p>
-            <a href="mailto:support@clientsurgesystems.com" style={{ color: "#0088CC", fontWeight: "600", fontSize: "14px" }}>support@clientsurgesystems.com</a>
+        <div className="min-h-screen flex items-center justify-center bg-background">
+          <div className="text-center p-12">
+            <p className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>Something went wrong</p>
+            <p className="text-sm text-muted-foreground mb-6">We could not load your dashboard. Please refresh or contact support.</p>
+            <a href="mailto:support@clientsurgesystems.com" className="text-primary font-semibold text-sm">support@clientsurgesystems.com</a>
           </div>
         </div>
       </DemoBookingProvider>
@@ -260,20 +210,55 @@ export default function ClientDashboard() {
     <DemoBookingProvider>
       <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
       <MobileBottomNav />
-      <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", background: "hsl(var(--background))" }}>
-        {/* Minimal dashboard topbar — not the public marketing Navbar */}
-        <header style={{ position: "sticky", top: 0, zIndex: 50, height: "60px", background: "rgba(255,255,255,0.96)", borderBottom: "1px solid rgba(0,174,239,0.1)", backdropFilter: "blur(12px)", display: "flex", alignItems: "center", justifyContent: "space-between", padding: "0 clamp(16px,4vw,40px)" }}>
-          <Link to="/" style={{ display: "flex", alignItems: "center", textDecoration: "none" }}>
-            <img src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png" alt="ClientSurge Systems" height="32" style={{ height: "32px", width: "auto" }} />
+
+      {/* Full page wrapper with same background as landing site */}
+      <div className="min-h-screen flex flex-col" style={{ background: "hsl(var(--background))" }}>
+
+        {/* ── HEADER — matches landing page Navbar style ── */}
+        <header className="sticky top-0 z-50 flex items-center justify-between border-b border-primary/10 bg-white/70 backdrop-blur-2xl"
+          style={{ height: "64px", padding: "0 clamp(1rem,4vw,2.5rem)" }}>
+          {/* Left: Logo */}
+          <Link to="/" className="flex items-center no-underline">
+            <img
+              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+              alt="ClientSurge Systems"
+              style={{ height: "32px", width: "auto" }}
+            />
           </Link>
-          <span style={{ fontSize: "12px", fontWeight: "700", color: "rgba(10,22,40,0.45)", textTransform: "uppercase", letterSpacing: "0.1em" }}>Client Dashboard</span>
-          <a href="mailto:support@clientsurgesystems.com" style={{ fontSize: "12px", fontWeight: "600", color: "#0088CC", textDecoration: "none" }}>Need help?</a>
+
+          {/* Center: Label */}
+          <div className="flex items-center gap-2">
+            <div className="w-1.5 h-1.5 rounded-full bg-primary" style={{ boxShadow: "0 0 8px rgba(0,174,239,0.7)" }} />
+            <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-muted-foreground">
+              Client Dashboard
+            </span>
+          </div>
+
+          {/* Right: Help link */}
+          <a href="mailto:support@clientsurgesystems.com"
+            className="text-[12px] font-semibold text-primary no-underline hover:text-primary/80 transition-colors">
+            Need help?
+          </a>
         </header>
 
-        <main id="main-content" style={{ flex: 1, paddingTop: "0" }}>
-          <div style={{ maxWidth: "1100px", margin: "0 auto", padding: "clamp(24px,4vw,48px) clamp(20px,4vw,40px)" }}>
+        {/* ── MAIN CONTENT ── */}
+        <main id="main-content" className="flex-1">
+          {/* Top electric gradient bar — matches landing page sections */}
+          <div className="w-full h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.4), transparent)" }} />
 
-            {loading ? <LoadingState /> : error ? <ErrorState message={error} onRetry={() => fetchPortal(false)} /> : (
+          {/* Subtle radial glow behind content — matches landing hero atmosphere */}
+          <div className="relative w-full" aria-hidden="true">
+            <div className="absolute inset-0 pointer-events-none"
+              style={{ background: "radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,136,204,0.06) 0%, transparent 70%)" }} />
+          </div>
+
+          <div className="max-w-[1100px] mx-auto px-[clamp(1.25rem,4vw,2.5rem)] py-[clamp(1.5rem,4vw,3rem)] relative z-10">
+
+            {loading ? (
+              <LoadingState />
+            ) : error ? (
+              <ErrorState message={error} onRetry={() => fetchPortal(false)} />
+            ) : (
               <>
                 <WelcomeBanner
                   user={portalUser || { email: userEmail }}
@@ -309,29 +294,52 @@ export default function ClientDashboard() {
                   </>
                 )}
 
-                {activeServices.length === 0 ? <EmptyState /> : (
+                {activeServices.length === 0 ? (
+                  <EmptyState />
+                ) : (
                   <>
-                    {/* Primary stage tracker — uses first service's real install_status */}
-                    <HorizontalStageTracker
-                      serviceKey={activeServices[0].serviceKey}
-                      currentStage={activeServices[0].stageIndex}
-                      productName={activeServices[0].productName}
-                      installStatus={activeServices[0].installStatus}
-                    />
+                    {/* Stage tracker — wrapped in a premium card */}
+                    <div className="rounded-2xl overflow-hidden mb-5"
+                      style={{
+                        background: "linear-gradient(135deg,rgba(255,255,255,0.95) 0%, rgba(232,246,255,0.7) 100%)",
+                        border: "1px solid rgba(0,174,239,0.13)",
+                        boxShadow: "0 4px 24px rgba(0,59,143,0.07)"
+                      }}>
+                      <HorizontalStageTracker
+                        serviceKey={activeServices[0].serviceKey}
+                        currentStage={activeServices[0].stageIndex}
+                        productName={activeServices[0].productName}
+                        installStatus={activeServices[0].installStatus}
+                      />
+                    </div>
 
-                    {/* Metrics Bar — Key Overview */}
+                    {/* Metrics bar */}
                     <DashboardMetricsBar activeServices={activeServices} project={project} />
 
-                    {/* All service cards — Responsive layout */}
-                    <div style={{
-                      display: "grid",
-                      gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
-                      gap: "16px",
-                      marginBottom: "80px",
-                    }}>
-                      {activeServices.map((service, idx) => (
-                        <ResponsiveServiceCard key={service.serviceKey || idx} service={service} />
-                      ))}
+                    {/* ── SERVICE CARDS ── */}
+                    <div className="mb-4 mt-2">
+                      <div className="flex items-center gap-3 mb-4">
+                        <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.3))" }} />
+                        <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">Your Active Systems</p>
+                        <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.3))" }} />
+                      </div>
+                      <div style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
+                        gap: "16px",
+                        marginBottom: "80px",
+                      }}>
+                        {activeServices.map((service, idx) => (
+                          <div key={service.serviceKey || idx}
+                            className="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
+                            style={{
+                              border: "1px solid rgba(0,174,239,0.13)",
+                              boxShadow: "0 2px 12px rgba(0,59,143,0.06), 0 1px 3px rgba(0,0,0,0.04)"
+                            }}>
+                            <ResponsiveServiceCard service={service} />
+                          </div>
+                        ))}
+                      </div>
                     </div>
 
                     <SupportCard />
@@ -342,15 +350,18 @@ export default function ClientDashboard() {
           </div>
         </main>
 
-        <footer style={{ padding: "20px clamp(16px,4vw,40px)", borderTop: "1px solid rgba(0,174,239,0.1)", display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "8px" }}>
-          <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.4)" }}>© {new Date().getFullYear()} ClientSurge Systems</span>
-          <div style={{ display: "flex", gap: "16px" }}>
-            <Link to="/privacy-policy" style={{ fontSize: "11px", color: "rgba(10,22,40,0.45)", textDecoration: "none" }}>Privacy</Link>
-            <Link to="/terms" style={{ fontSize: "11px", color: "rgba(10,22,40,0.45)", textDecoration: "none" }}>Terms</Link>
+        {/* ── FOOTER ── */}
+        <footer className="flex items-center justify-between flex-wrap gap-2 border-t border-primary/8 px-[clamp(1rem,4vw,2.5rem)] py-4">
+          <div className="flex items-center gap-2">
+            <Zap className="w-3 h-3 text-primary/50" />
+            <span className="text-[11px] text-muted-foreground/50">© {new Date().getFullYear()} ClientSurge Systems</span>
+          </div>
+          <div className="flex gap-4">
+            <Link to="/privacy-policy" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Privacy</Link>
+            <Link to="/terms" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Terms</Link>
           </div>
         </footer>
       </div>
-      <style>{`@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}`}</style>
     </DemoBookingProvider>
   );
 }
