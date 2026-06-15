@@ -1,0 +1,175 @@
+{
+  "name": "Agency",
+  "type": "object",
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "Top-level reseller/agency entity. Owns multiple Clients and ClientProjects. Enables white-label SaaS distribution and multi-brand orchestration.",
+    "tenant_scoped": "agency_id (self-scoped)",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  },
+  "properties": {
+    "agency_name": {
+      "type": "string",
+      "title": "Agency Name",
+      "required": true
+    },
+    "agency_slug": {
+      "type": "string",
+      "title": "Agency Slug (URL-safe identifier)",
+      "description": "e.g. 'acme-digital', 'xyz-agency'"
+    },
+    "owner_email": {
+      "type": "string",
+      "title": "Owner Email",
+      "format": "email",
+      "required": true
+    },
+    "owner_name": {
+      "type": "string",
+      "title": "Owner Full Name"
+    },
+    "status": {
+      "type": "string",
+      "title": "Agency Status",
+      "enum": [
+        "active",
+        "paused",
+        "suspended",
+        "archived"
+      ],
+      "default": "active"
+    },
+    "billing_plan": {
+      "type": "string",
+      "title": "Billing Plan",
+      "enum": [
+        "starter",
+        "growth",
+        "enterprise",
+        "custom"
+      ],
+      "default": "starter"
+    },
+    "max_clients_allowed": {
+      "type": "integer",
+      "title": "Max Clients Allowed",
+      "default": -1,
+      "description": "-1 = unlimited"
+    },
+    "current_clients_count": {
+      "type": "integer",
+      "title": "Current Active Clients",
+      "default": 0
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "title": "Stripe Customer ID"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "title": "Stripe Subscription ID"
+    },
+    "billing_email": {
+      "type": "string",
+      "title": "Billing Email Address",
+      "format": "email"
+    },
+    "company_website": {
+      "type": "string",
+      "title": "Agency Website"
+    },
+    "support_email": {
+      "type": "string",
+      "title": "Support Email",
+      "format": "email"
+    },
+    "support_phone": {
+      "type": "string",
+      "title": "Support Phone"
+    },
+    "address": {
+      "type": "object",
+      "title": "Business Address",
+      "properties": {
+        "street": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "state": {
+          "type": "string"
+        },
+        "postal_code": {
+          "type": "string"
+        },
+        "country": {
+          "type": "string"
+        }
+      }
+    },
+    "tax_id": {
+      "type": "string",
+      "title": "Tax ID / VAT Number"
+    },
+    "agency_revenue_share_percentage": {
+      "type": "number",
+      "title": "Revenue Share % (Agency)",
+      "description": "% of revenue retained by agency from client subscriptions",
+      "default": 100
+    },
+    "platform_revenue_share_percentage": {
+      "type": "number",
+      "title": "Revenue Share % (Platform)",
+      "description": "% of revenue retained by platform",
+      "default": 0
+    },
+    "total_revenue_mtd": {
+      "type": "number",
+      "title": "Total Revenue MTD ($)",
+      "default": 0
+    },
+    "total_revenue_ltv": {
+      "type": "number",
+      "title": "Total Revenue LTV ($)",
+      "default": 0
+    },
+    "onboarding_completed": {
+      "type": "boolean",
+      "title": "Agency Onboarding Completed",
+      "default": false
+    },
+    "onboarding_completed_at": {
+      "type": "string",
+      "title": "Onboarding Completed At",
+      "format": "date-time"
+    },
+    "white_label_enabled": {
+      "type": "boolean",
+      "title": "White-Label Mode Enabled",
+      "default": true
+    },
+    "custom_domain": {
+      "type": "string",
+      "title": "Custom Domain (optional)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Internal Notes"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "agency_name",
+    "owner_email"
+  ]
+}

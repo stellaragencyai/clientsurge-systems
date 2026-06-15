@@ -1,0 +1,148 @@
+{
+  "name": "AgencyMetricsSnapshot",
+  "type": "object",
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "Derived metrics snapshot for agency dashboard. Aggregates data from all owned Clients. Read-only, auto-computed via computeAgencyMetrics.",
+    "read_only": true,
+    "async_only": true,
+    "tenant_scoped": "agency_id",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  },
+  "properties": {
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "required": true
+    },
+    "snapshot_date": {
+      "type": "string",
+      "title": "Snapshot Date",
+      "format": "date-time"
+    },
+    "metric_period": {
+      "type": "string",
+      "title": "Metric Period",
+      "enum": [
+        "1d",
+        "7d",
+        "30d",
+        "90d",
+        "ytd"
+      ]
+    },
+    "total_clients": {
+      "type": "integer",
+      "title": "Total Clients",
+      "default": 0
+    },
+    "active_clients": {
+      "type": "integer",
+      "title": "Active Clients (Live Status)",
+      "default": 0
+    },
+    "onboarding_clients": {
+      "type": "integer",
+      "title": "Clients in Onboarding",
+      "default": 0
+    },
+    "paused_clients": {
+      "type": "integer",
+      "title": "Paused Clients",
+      "default": 0
+    },
+    "churned_clients": {
+      "type": "integer",
+      "title": "Churned Clients",
+      "default": 0
+    },
+    "total_active_projects": {
+      "type": "integer",
+      "title": "Total Active Projects Across Clients",
+      "default": 0
+    },
+    "total_leads_captured": {
+      "type": "integer",
+      "title": "Total Leads Across All Clients",
+      "default": 0
+    },
+    "total_automations_active": {
+      "type": "integer",
+      "title": "Total Active Automations",
+      "default": 0
+    },
+    "total_messages_sent": {
+      "type": "integer",
+      "title": "Total Messages Sent",
+      "default": 0
+    },
+    "total_bookings": {
+      "type": "integer",
+      "title": "Total Bookings",
+      "default": 0
+    },
+    "revenue_mtd": {
+      "type": "number",
+      "title": "Revenue Month-to-Date ($)",
+      "default": 0
+    },
+    "revenue_ytd": {
+      "type": "number",
+      "title": "Revenue Year-to-Date ($)",
+      "default": 0
+    },
+    "revenue_ltv": {
+      "type": "number",
+      "title": "Lifetime Revenue ($)",
+      "default": 0
+    },
+    "average_revenue_per_client": {
+      "type": "number",
+      "title": "Average Revenue Per Client ($)",
+      "default": 0
+    },
+    "churn_rate_percent": {
+      "type": "number",
+      "title": "Churn Rate %",
+      "default": 0
+    },
+    "nrr_percent": {
+      "type": "number",
+      "title": "Net Revenue Retention %",
+      "default": 100
+    },
+    "by_client": {
+      "type": "object",
+      "title": "Top Clients by Revenue",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "client_name": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string"
+          },
+          "active_projects": {
+            "type": "integer"
+          },
+          "revenue_mtd": {
+            "type": "number"
+          },
+          "lead_count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "computed_at": {
+      "type": "string",
+      "title": "Computed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "agency_id",
+    "snapshot_date"
+  ]
+}

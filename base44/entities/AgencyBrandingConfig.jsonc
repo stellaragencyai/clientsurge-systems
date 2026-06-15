@@ -1,0 +1,140 @@
+{
+  "name": "AgencyBrandingConfig",
+  "type": "object",
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "White-label branding configuration per Agency. Controls UI appearance across all owned clients (landing pages, dashboards, emails).",
+    "tenant_scoped": "agency_id",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  },
+  "properties": {
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "required": true
+    },
+    "logo_url": {
+      "type": "string",
+      "title": "Logo URL",
+      "description": "Brand logo (used in dashboards, emails, landing pages)"
+    },
+    "logo_url_dark": {
+      "type": "string",
+      "title": "Logo URL (Dark Mode)"
+    },
+    "favicon_url": {
+      "type": "string",
+      "title": "Favicon URL"
+    },
+    "primary_color": {
+      "type": "string",
+      "title": "Primary Brand Color",
+      "description": "Hex code (e.g. #0088CC)"
+    },
+    "secondary_color": {
+      "type": "string",
+      "title": "Secondary Brand Color",
+      "description": "Hex code"
+    },
+    "text_primary_color": {
+      "type": "string",
+      "title": "Primary Text Color",
+      "description": "Hex code"
+    },
+    "background_color": {
+      "type": "string",
+      "title": "Background Color",
+      "description": "Hex code"
+    },
+    "brand_name_override": {
+      "type": "string",
+      "title": "Brand Name Override",
+      "description": "Display name instead of 'ClientSurge' (e.g. 'ACME Sales Suite')"
+    },
+    "dashboard_title": {
+      "type": "string",
+      "title": "Dashboard Title Override",
+      "description": "Custom title for client dashboard"
+    },
+    "email_from_name": {
+      "type": "string",
+      "title": "Email 'From' Name",
+      "description": "Sender name in outbound emails (e.g. 'ACME Sales Team')"
+    },
+    "email_from_address": {
+      "type": "string",
+      "title": "Email 'From' Address",
+      "format": "email",
+      "description": "Sender email address"
+    },
+    "sms_sender_id": {
+      "type": "string",
+      "title": "SMS Sender ID",
+      "description": "Brand name for SMS messages (where applicable)"
+    },
+    "app_domain": {
+      "type": "string",
+      "title": "App Domain",
+      "description": "Custom domain for app (e.g. app.acme-digital.com)"
+    },
+    "login_domain": {
+      "type": "string",
+      "title": "Login Domain",
+      "description": "Custom domain for login page"
+    },
+    "help_center_url": {
+      "type": "string",
+      "title": "Help Center URL",
+      "description": "Custom help/support documentation URL"
+    },
+    "footer_text": {
+      "type": "string",
+      "title": "Footer Text",
+      "maxLength": 500,
+      "description": "Custom footer text for dashboards"
+    },
+    "footer_links": {
+      "type": "array",
+      "title": "Footer Links",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "favicon_uploaded": {
+      "type": "boolean",
+      "title": "Favicon Uploaded",
+      "default": false
+    },
+    "logo_uploaded": {
+      "type": "boolean",
+      "title": "Logo Uploaded",
+      "default": false
+    },
+    "branding_complete": {
+      "type": "boolean",
+      "title": "Branding Configuration Complete",
+      "default": false
+    },
+    "applied_at": {
+      "type": "string",
+      "title": "Applied At",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "agency_id"
+  ]
+}

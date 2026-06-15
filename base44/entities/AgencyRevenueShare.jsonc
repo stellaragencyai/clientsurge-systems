@@ -1,0 +1,96 @@
+{
+  "name": "AgencyRevenueShare",
+  "type": "object",
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "Revenue sharing structure and tracking. Links Subscription/Order revenue to Agency-level revenue splits.",
+    "tenant_scoped": "agency_id",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  },
+  "properties": {
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "required": true
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "subscription_id": {
+      "type": "string",
+      "title": "Linked Subscription ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Linked Order ID"
+    },
+    "billing_period_start": {
+      "type": "string",
+      "title": "Billing Period Start",
+      "format": "date-time"
+    },
+    "billing_period_end": {
+      "type": "string",
+      "title": "Billing Period End",
+      "format": "date-time"
+    },
+    "gross_amount": {
+      "type": "number",
+      "title": "Gross Amount ($)",
+      "description": "Total revenue from subscription/order"
+    },
+    "agency_revenue_share_percentage": {
+      "type": "number",
+      "title": "Agency Share %"
+    },
+    "platform_revenue_share_percentage": {
+      "type": "number",
+      "title": "Platform Share %"
+    },
+    "agency_amount": {
+      "type": "number",
+      "title": "Agency Amount ($)",
+      "description": "Calculated: gross_amount * (agency_revenue_share_percentage / 100)"
+    },
+    "platform_amount": {
+      "type": "number",
+      "title": "Platform Amount ($)",
+      "description": "Calculated: gross_amount * (platform_revenue_share_percentage / 100)"
+    },
+    "agency_payment_status": {
+      "type": "string",
+      "title": "Agency Payment Status",
+      "enum": [
+        "pending",
+        "accrued",
+        "processed",
+        "paid",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "agency_paid_at": {
+      "type": "string",
+      "title": "Agency Paid At",
+      "format": "date-time"
+    },
+    "stripe_payout_id": {
+      "type": "string",
+      "title": "Stripe Payout ID (if applicable)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "agency_id",
+    "gross_amount"
+  ]
+}

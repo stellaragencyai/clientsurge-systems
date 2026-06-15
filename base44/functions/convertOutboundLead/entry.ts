@@ -1,7 +1,9 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 /**
- * Convert Outbound Lead: Converts outbound lead to Order + Client when deal closes
+ * Convert Outbound Lead: Handles conversion event in funnel
+ * Updates OutboundLead status, links to Order, records conversion in ConversionOptimizationSignal
+ * Non-breaking: does not modify existing Order or CommunicationEvent schema
  */
 Deno.serve(async (req) => {
   try {
@@ -9,92 +11,70 @@ Deno.serve(async (req) => {
     const {
       outbound_lead_id,
       order_id,
-      package_type,
-      total_value,
+      client_id,
+      client_project_id,
+      revenue_amount,
+      conversion_source,
     } = await req.json();
 
-    const lead = await base44.asServiceRole.entities.OutboundLead.get(outbound_lead_id);
-    if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+    if (!outbound_lead_id || !order_id) {
+      return Response.json(
+        { error: 'outbound_lead_id and order_id required' },
+        { status: 400 }
+      );
     }
 
-    const results = {
-      converted: false,
-      order_created: false,
-      client_created: false,
-    };
-
-    // Create or link Order
-    let finalOrderId = order_id;
-    if (!order_id) {
-      const newOrder = await base44.asServiceRole.entities.Order.create({
-        customer_email: lead.email,
-        customer_name: lead.contact_name,
-        customer_phone: lead.phone,
-        business_name: lead.business_name,
-        payment_status: 'paid',
-        order_status: 'paid_setup_in_progress',
-        total_setup: total_value || 0,
-        total_monthly: 0,
-      }).catch(() => null);
-
-      if (newOrder) {
-        finalOrderId = newOrder.id;
-        results.order_created = true;
-      }
-    }
-
-    // Create Client if needed
-    const existingClients = await base44.asServiceRole.entities.Client.filter(
-      { email: lead.email },
-      '-created_date',
-      1
-    ).catch(() => []);
-
-    let clientId = null;
-    if (!existingClients?.length) {
-      const newClient = await base44.asServiceRole.entities.Client.create({
-        full_name: lead.contact_name,
-        business_name: lead.business_name,
-        email: lead.email,
-        phone: lead.phone,
-        website: lead.company_website,
-        industry: lead.industry,
-        status: 'Onboarding',
-      }).catch(() => null);
-
-      if (newClient) {
-        clientId = newClient.id;
-        results.client_created = true;
-      }
-    } else {
-      clientId = existingClients[0].id;
-    }
-
-    // Update lead status
-    await base44.asServiceRole.entities.OutboundLead.update(lead.id, {
-      outreach_status: 'converted',
-      conversion_at: new Date().toISOString(),
-      converted_order_id: finalOrderId,
-      converted_client_id: clientId,
-    }).catch(() => {});
-
-    // Log conversion activity
-    await base44.asServiceRole.entities.OutboundActivity.create({
-      outbound_lead_id: lead.id,
-      activity_type: 'conversion_event',
-      occurred_at: new Date().toISOString(),
-    }).catch(() => {});
-
-    results.converted = true;
-
-    console.log(`[convertOutboundLead] Lead converted:`, {
-      lead_id: lead.id,
-      order_id: finalOrderId,
-      client_id: clientId,
+    console.log('[convertOutboundLead] Processing conversion:', {
+      outbound_lead_id,
+      order_id,
+      client_project_id,
     });
 
-    return Response.json({ success: true, ...results });
+    // Update OutboundLead status to converted
+    const convertedAt = new Date().toISOString();
+    await base44.asServiceRole.entities.OutboundLead.update(outbound_lead_id, {
+      outreach_status: 'converted',
+      conversion_at: convertedAt,
+      converted_order_id: order_id,
+      converted_client_id: client_id,
+      last_activity_at: convertedAt,
+    }).catch(err => console.error('[convertOutboundLead] OutboundLead update failed:', err.message));
+
+    // Record conversion event in OutboundActivity
+    await base44.asServiceRole.entities.OutboundActivity.create({
+      outbound_lead_id,
+      client_id,
+      activity_type: 'conversion_event',
+      channel: 'system',
+      status: 'completed',
+      occurred_at: convertedAt,
+    }).catch(err => console.error('[convertOutboundLead] Activity log failed:', err.message));
+
+    // Generate conversion signal if revenue detected
+    if (revenue_amount && revenue_amount > 0) {
+      await base44.asServiceRole.entities.ConversionOptimizationSignal.create({
+        client_id,
+        client_project_id,
+        signal_type: 'success_pattern_detected',
+        severity: 'low',
+        title: `High-Value Conversion: $${revenue_amount} from ${conversion_source || 'outbound'}`,
+        description: `Lead converted successfully with ${revenue_amount} MRR/ARR attributed to this outbound sequence`,
+        metric_affected: 'revenue_per_lead',
+        status: 'active',
+        first_detected_at: convertedAt,
+      }).catch(err => console.error('[convertOutboundLead] Signal creation failed:', err.message));
+    }
+
+    console.log('[convertOutboundLead] Conversion recorded:', {
+      lead: outbound_lead_id,
+      order: order_id,
+    });
+
+    return Response.json({
+      success: true,
+      converted_at: convertedAt,
+      message: 'Outbound lead converted successfully',
+    });
   } catch (error) {
     console.error('[convertOutboundLead] Error:', error.message);
     return Response.json({ error: error.message }, { status: 500 });

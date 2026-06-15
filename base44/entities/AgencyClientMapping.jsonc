@@ -1,0 +1,72 @@
+{
+  "name": "AgencyClientMapping",
+  "type": "object",
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "Explicit mapping of Client entities to their parent Agency. Enables hierarchical tenant isolation and aggregated agency-level operations.",
+    "tenant_scoped": "agency_id",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  },
+  "properties": {
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "required": true
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID",
+      "required": true
+    },
+    "relationship_type": {
+      "type": "string",
+      "title": "Relationship Type",
+      "enum": [
+        "owned",
+        "resold",
+        "managed"
+      ],
+      "default": "owned",
+      "description": "owned = direct agency client, resold = sub-reseller, managed = partner managed"
+    },
+    "client_status_at_mapping": {
+      "type": "string",
+      "title": "Client Status When Mapped",
+      "enum": [
+        "prospect",
+        "onboarding",
+        "live",
+        "paused",
+        "churned"
+      ]
+    },
+    "mapped_at": {
+      "type": "string",
+      "title": "Mapped At",
+      "format": "date-time"
+    },
+    "unmapped_at": {
+      "type": "string",
+      "title": "Unmapped At (if dissociated)",
+      "format": "date-time"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active Mapping",
+      "default": true
+    },
+    "revenue_share_percentage_override": {
+      "type": "number",
+      "title": "Revenue Share Override for Client",
+      "description": "Use client-specific share if differs from agency default"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Mapping Notes"
+    }
+  },
+  "required": [
+    "agency_id",
+    "client_id"
+  ]
+}
