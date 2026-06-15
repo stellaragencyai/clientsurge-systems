@@ -18,14 +18,7 @@ export default function Hero() {
         }}
       >
         {/* Eyebrow */}
-        <p style={{
-          fontSize: "11px",
-          fontWeight: "800",
-          letterSpacing: "0.25em",
-          textTransform: "uppercase",
-          color: "rgba(0,174,239,0.9)",
-          marginBottom: "1rem",
-        }}>
+        <p className="cs-eyebrow" style={{ color: "rgba(0,174,239,0.9)", marginBottom: "1rem" }}>
           AI-Powered Lead Automation for Local Businesses
         </p>
 

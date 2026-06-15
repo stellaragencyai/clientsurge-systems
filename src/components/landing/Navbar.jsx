@@ -419,6 +419,7 @@ export default function Navbar() {
         <div
           className="xl:hidden border-b border-white/25 px-5 pb-safe-bottom pb-6 pt-2 space-y-1 relative z-50"
           style={{
+            maxWidth: "min(420px, 90vw)",
             paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
             background: "rgba(255,255,255,0.10)",
             backdropFilter: "blur(3px) saturate(1.05)",

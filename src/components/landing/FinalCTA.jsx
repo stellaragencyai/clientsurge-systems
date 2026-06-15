@@ -8,7 +8,7 @@ export default function FinalCTA() {
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto text-center">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-6">
+          <p className="cs-eyebrow mb-6">
             Ready to Transform Your Lead Flow?
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>

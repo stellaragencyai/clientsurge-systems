@@ -50,9 +50,9 @@
     --cs-electric-deep: #0088CC;
     --cs-electric-navy: #006BB0;
     --cs-glow-sm: 0 0 12px rgba(0, 174, 239, 0.38);
-    --cs-glow-md: 0 0 24px rgba(0, 174, 239, 0.45);
+    --cs-glow-md: 0 0 24px rgba(0, 174, 239, 0.30);
     --cs-glow-lg: 0 6px 32px rgba(0, 174, 239, 0.55);
-    --cs-gradient: linear-gradient(135deg, #00AEEF 0%, #0088CC 50%, #006BB0 100%);
+    --cs-gradient: linear-gradient(135deg, #00AEEF 0%, #0093E9 100%);
     --cs-gradient-soft: linear-gradient(135deg, rgba(0,136,204,0.12) 0%, rgba(0,59,143,0.06) 100%);
     --cs-spring-easing: cubic-bezier(0.34, 1.56, 0.64, 1);
     --cs-smooth-easing: cubic-bezier(0.25, 0.46, 0.45, 0.94);
@@ -87,11 +87,11 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Global focus styles for keyboard navigation — Task #1 unified */
+/* Global focus styles for keyboard navigation — Refinement #17: unified accessible focus ring */
 :focus-visible {
   outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(var(--primary), 0.15);
 }
 
 button:focus-visible,
@@ -100,7 +100,8 @@ input:focus-visible,
 textarea:focus-visible,
 select:focus-visible {
   outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(var(--primary), 0.15);
 }
 
 /* CTA Button Focus States - Enhanced for Accessibility — Task #1 standardized */
@@ -504,13 +505,14 @@ body {
 .nebula-bg {
   position: relative;
   isolation: isolate;
+  z-index: 0;
 }
 .nebula-bg::before {
   display: none !important;
 }
 .nebula-bg > * {
   position: relative;
-  z-index: 1;
+  z-index: 10;
 }
 
 /* Section-specific nebula tints */
@@ -684,7 +686,7 @@ h1 {
 }
 h2 {
   font-size: clamp(1.75rem, 4.5vw, 3.25rem);
-  line-height: 1.08;
+  line-height: 1.15;
   letter-spacing: -0.02em;
   font-weight: 800;
   color: hsl(var(--foreground));
@@ -703,11 +705,20 @@ h4 {
   font-weight: 700;
 }
 
+/* Refinement #10: Modern eyebrow labels — title case, moderate tracking */
+.cs-eyebrow,
+.eyebrow {
+  letter-spacing: 0.08em;
+  text-transform: none;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: hsl(var(--primary));
+}
+
 /* Refinement #12: Small uppercase labels get positive tracking */
 .text-xs,
 [class*="uppercase"][class*="tracking"],
-.label-sm,
-.eyebrow {
+.label-sm {
   letter-spacing: 0.1em;
 }
 
@@ -789,6 +800,7 @@ td p,
     0 4px 8px rgba(0,0,0,0.06),
     0 12px 24px rgba(0,0,0,0.08);
   transition: box-shadow 0.32s cubic-bezier(0.25,0.46,0.45,0.94), transform 0.32s cubic-bezier(0.25,0.46,0.45,0.94);
+  will-change: transform, box-shadow;
 }
 .pricing-card:hover,
 .feature-card:hover,
@@ -904,7 +916,7 @@ img[style*="object-fit"] {
   background:
     linear-gradient(90deg, rgba(226,238,248,0.72), rgba(255,255,255,0.9), rgba(226,238,248,0.72));
   background-size: 220% 100%;
-  animation: csSkeletonSheen 1.4s ease-in-out infinite;
+  animation: csSkeletonSheen 2.2s ease-in-out infinite;
 }
 
 @keyframes csSkeletonSheen {
@@ -912,11 +924,11 @@ img[style*="object-fit"] {
   to { background-position: -120% 0; }
 }
 
-/* 4. Scrollbar styling — consistent cross-browser thin scrollbar — Task #4 removed dupe */
+/* 4. Scrollbar styling — consistent cross-browser thin scrollbar — Refinement #20: added padding */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: rgba(0,174,239,0.35); border-radius: 9999px; }
-::-webkit-scrollbar-thumb:hover { background: rgba(0,174,239,0.6); }
+::-webkit-scrollbar-track { background: transparent; padding: 2px; }
+::-webkit-scrollbar-thumb { background: rgba(0,174,239,0.35); border-radius: 9999px; border: 2px solid transparent; background-clip: padding-box; }
+::-webkit-scrollbar-thumb:hover { background: rgba(0,174,239,0.6); background-clip: padding-box; }
 @supports (scrollbar-width: thin) {
   * { scrollbar-width: thin; scrollbar-color: rgba(0,174,239,0.35) transparent; }
 }
@@ -1002,6 +1014,64 @@ textarea:focus {
   box-shadow: 0 0 0 3px hsl(var(--primary), 0.1);
 }
 
+/* ============================================
+   REFINEMENT #13: UNIFIED CARD BORDER SYSTEM
+   ============================================ */
+.cs-card-border {
+  border: 1px solid hsla(199, 100%, 47%, 0.15);
+  border-radius: 0.75rem;
+}
+
+/* ============================================
+   REFINEMENT #18: ICON HOVER MICRO-INTERACTIONS
+   ============================================ */
+.feature-card:hover .icon-wrapper,
+.pricing-card:hover .icon-wrapper,
+[class*="feature-card"]:hover .icon-wrapper,
+[class*="pricing-card"]:hover .icon-wrapper {
+  transform: scale(1.15) rotate(-5deg);
+  transition: transform 0.2s ease;
+}
+
+/* ============================================
+   REFINEMENT #21: PRICING TABLE STRIPED ROWS
+   ============================================ */
+table tbody tr:nth-child(even) {
+  background: rgba(0, 174, 239, 0.03);
+}
+
+/* ============================================
+   REFINEMENT #22: MOBILE DASHED CONNECTOR
+   ============================================ */
+@media (max-width: 768px) {
+  .what-happens-next-list > * + * {
+    border-left: 2px dashed rgba(0, 174, 239, 0.20);
+    padding-left: 1rem;
+    margin-left: 0.5rem;
+  }
+}
+
+/* ============================================
+   REFINEMENT #23: STANDARDIZED Z-INDEX STACKING
+   ============================================ */
+:root {
+  --z-chat-bubble: 10;
+  --z-sticky-bar: 20;
+  --z-navbar: 50;
+}
+
+/* ============================================
+   REFINEMENT #24: IMAGE FADE-IN LOADING
+   ============================================ */
+img[loading="lazy"] {
+  opacity: 0;
+  transition: opacity 0.5s ease-in;
+}
+img[loading="lazy"].loaded,
+img.loaded {
+  opacity: 1;
+}
+
 /* Button Hierarchy */
 .btn-primary {
   @apply inline-flex items-center justify-center rounded-lg border-none cursor-pointer text-white font-semibold px-4 py-2.5 transition-all duration-200;
@@ -1083,6 +1153,13 @@ textarea:focus {
   @apply w-4 h-4 text-primary;
 }
 
+/* Refinement #25: Enhanced input focus with shadow glow */
+input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  box-shadow: 0 0 0 4px hsla(var(--primary), 0.15);
+}
+
 /* 5. Input zoom prevention on iOS (font-size must stay >=16px on mobile controls) */
 @media (max-width: 768px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
@@ -1108,6 +1185,15 @@ textarea:focus {
 button, [role="button"] {
   user-select: none;
   -webkit-user-select: none;
+}
+
+/* Refinement #9: Mobile nav drawer text balance */
+@media (max-width: 768px) {
+  .mobile-nav-label,
+  nav [role="menu"] h3,
+  nav [role="menu"] .nav-section-label {
+    text-wrap: balance;
+  }
 }
 
 /* 9. Landscape phone — prevent massive paddings */
