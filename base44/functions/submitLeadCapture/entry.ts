@@ -47,20 +47,30 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check for duplicate: normalized email + business_name
-    const existingLeads = await base44.asServiceRole.entities.WebsiteLead.filter({
-      email: email.toLowerCase().trim(),
-      business_name: business_name.toLowerCase().trim(),
+    // Check for duplicate: normalized email + phone (multi-layer dedup)
+    const normalizedEmail = email.toLowerCase().trim();
+    const existingByEmailPhone = normalizedPhone ? await base44.asServiceRole.entities.WebsiteLead.filter({
+      email: normalizedEmail,
+      phone_number: normalizedPhone,
+    }, '-created_date', 1) : [];
+
+    const existingByEmail = await base44.asServiceRole.entities.WebsiteLead.filter({
+      email: normalizedEmail,
     }, '-created_date', 1);
 
-    if (existingLeads && existingLeads.length > 0) {
-      // Duplicate found — return existing lead
-      console.log(`Duplicate lead detected for ${email}. Returning existing record.`);
+    if (existingByEmailPhone && existingByEmailPhone.length > 0) {
+      // Email + phone match = high confidence duplicate
+      console.log(`Exact duplicate detected for ${email} / ${normalizedPhone}. Returning existing record.`);
       return Response.json({
         success: true,
-        lead_id: existingLeads[0].id,
-        action: 'duplicate_skipped',
+        lead_id: existingByEmailPhone[0].id,
+        action: 'duplicate_exact',
       });
+    }
+
+    if (existingByEmail && existingByEmail.length > 0) {
+      // Email match = potential duplicate, log for review
+      console.log(`Email duplicate detected for ${email}. Continuing with new record.`);
     }
 
     // Create new lead with normalized data

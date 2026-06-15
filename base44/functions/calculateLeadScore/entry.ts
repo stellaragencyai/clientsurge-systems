@@ -37,11 +37,12 @@ function daysSince(isoDate) {
 }
 
 function recencyScore(days) {
+  // Time decay: lose points each day (max 20 pts decays to 0 after 30 days)
   if (days <= 2) return 20;
   if (days <= 7) return 15;
   if (days <= 14) return 10;
   if (days <= 30) return 5;
-  return 0;
+  return 0; // Leads over 30 days old get 0 recency points
 }
 
 function activityScore(n) {
