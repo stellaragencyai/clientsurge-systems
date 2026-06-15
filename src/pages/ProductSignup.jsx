@@ -1,8 +1,45 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
 import { setPageMetadata } from '@/lib/seo';
-import { ChevronRight, Check, ShieldCheck } from 'lucide-react';
+import { ChevronRight, Check, ShieldCheck, Zap } from 'lucide-react';
+
+const ACTIVITY_MESSAGES = [
+  '🔥 Mike T. from Phoenix just signed up for the Growth System',
+  '⚡ Sarah K. from Dallas activated Missed Call Text-Back',
+  '📈 A roofing company in Austin captured 3 leads in the last hour',
+  '🚀 James R. from Denver just went live with AI Booking',
+  '💬 A med spa in Scottsdale recovered $4,200 in missed leads this week',
+];
+
+function LiveActivityTicker() {
+  const [index, setIndex] = useState(0);
+  const [visible, setVisible] = useState(true);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setVisible(false);
+      setTimeout(() => {
+        setIndex(i => (i + 1) % ACTIVITY_MESSAGES.length);
+        setVisible(true);
+      }, 400);
+    }, 4000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="mt-4 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl border mx-auto max-w-md"
+      style={{ borderColor: 'rgba(0,174,239,0.22)', background: 'rgba(0,174,239,0.05)' }}>
+      <span className="w-2 h-2 rounded-full flex-shrink-0 animate-pulse" style={{ background: '#00AEEF' }} />
+      <p
+        className="text-xs font-medium text-center transition-all duration-400"
+        style={{ color: '#005f99', opacity: visible ? 1 : 0, transform: visible ? 'translateY(0)' : 'translateY(4px)', transition: 'opacity 0.4s ease, transform 0.4s ease' }}
+      >
+        {ACTIVITY_MESSAGES[index]}
+      </p>
+    </div>
+  );
+}
 
 const PLANS = {
   starter_system: {
@@ -137,7 +174,7 @@ export default function ProductSignup() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
             alt="ClientSurge Systems"
-            className="h-10 w-auto object-contain"
+            className="h-28 w-auto object-contain"
           />
         </Link>
         <Link to="/login" className="text-sm font-semibold text-muted-foreground hover:text-primary transition-colors">
@@ -189,6 +226,27 @@ export default function ProductSignup() {
           {step === 1 && (
             <div className="space-y-5">
               <h2 className="text-xl font-bold text-foreground mb-1">Tell us about your business</h2>
+              {/* Industry pill selector */}
+              <div>
+                <label className="block text-sm font-semibold mb-2 text-foreground">Your Industry *</label>
+                <div className="flex flex-wrap gap-2">
+                  {['Med Spa', 'Dental', 'HVAC', 'Roofing', 'Plumbing', 'Chiropractic', 'Contractor', 'Other'].map(ind => (
+                    <button
+                      key={ind}
+                      type="button"
+                      onClick={() => setFormData(prev => ({ ...prev, industry: ind }))}
+                      className="px-3 py-1.5 rounded-full text-xs font-semibold border transition-all duration-200"
+                      style={formData.industry === ind
+                        ? { borderColor: '#00AEEF', background: 'rgba(0,174,239,0.12)', color: '#005f99', boxShadow: '0 0 0 1px rgba(0,174,239,0.25)' }
+                        : { borderColor: 'hsl(var(--border))', background: 'transparent', color: 'hsl(var(--muted-foreground))' }
+                      }
+                    >
+                      {ind}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
               {[
                 { label: 'Your Name', name: 'full_name', type: 'text', placeholder: 'John Doe' },
                 { label: 'Business Name', name: 'business_name', type: 'text', placeholder: 'Your Business LLC' },
@@ -320,10 +378,23 @@ export default function ProductSignup() {
           )}
         </div>
 
-        {/* Trust Badges */}
-        <div className="mt-6 text-center text-sm text-muted-foreground">
-          <p>🔒 Your data is secure • 🚀 Setup in minutes • 💪 14-day free trial</p>
+        {/* Social proof strip */}
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-4 text-xs text-muted-foreground">
+          {[
+            { emoji: '🔒', text: 'Secure & Private' },
+            { emoji: '🚀', text: 'Live in 48 Hours' },
+            { emoji: '💪', text: '14-Day Free Trial' },
+            { emoji: '⭐', text: '4.9/5 Client Rating' },
+          ].map(({ emoji, text }) => (
+            <span key={text} className="flex items-center gap-1.5 px-3 py-1.5 rounded-full border" style={{ borderColor: 'rgba(0,174,239,0.2)', background: 'rgba(0,174,239,0.04)' }}>
+              <span>{emoji}</span>
+              <span className="font-semibold">{text}</span>
+            </span>
+          ))}
         </div>
+
+        {/* Live activity ticker */}
+        <LiveActivityTicker />
       </div>
     </div>
   );
