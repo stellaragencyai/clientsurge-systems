@@ -185,6 +185,7 @@ export default function LaunchTimeline() {
     <div className="mt-16 md:mt-20">
       {/* Section Header — static, no animation */}
       <motion.div
+        className="flex flex-col items-center"
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6 }}
@@ -196,7 +197,7 @@ export default function LaunchTimeline() {
         <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
           Our Process - Start To Launch
         </h3>
-        <p className="text-center text-sm text-muted-foreground mb-10">
+        <p className="text-center text-sm text-muted-foreground max-w-xl mb-10">
           Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.
         </p>
       </motion.div>
