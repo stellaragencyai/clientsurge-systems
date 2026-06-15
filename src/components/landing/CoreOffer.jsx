@@ -1,6 +1,6 @@
 import { useEffect, useState, Suspense, lazy } from "react";
 import { ArrowRight, ShoppingCart } from "lucide-react";
-import DemoBookingModal from "../forms/DemoBookingModal";
+import { useNavigate } from "react-router-dom";
 const HeroSMSDemo = lazy(() => import("./HeroSMSDemo"));
 import {
   INDUSTRY_RECOMMENDATIONS_BY_ID,
@@ -251,8 +251,8 @@ function ProcessToCtaConnector() {
 }
 
 export default function CoreOffer() {
+  const navigate = useNavigate();
   const [selectedSystemId, setSelectedSystemId] = useState("02");
-  const [showBookingModal, setShowBookingModal] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [showAllMobileSystems, setShowAllMobileSystems] = useState(false);
   const [stackBuilderOpen, setStackBuilderOpen] = useState(false);
@@ -329,13 +329,13 @@ export default function CoreOffer() {
           <VerticalTimeline
             selectedSystemId={selectedSystemId}
             onSystemSelect={setSelectedSystemId}
-            onBookDemo={() => setShowBookingModal(true)} />
+            onBookDemo={() => navigate("/book")} />
         </div>
         
         <LaunchTimeline />
         <ProcessToCtaConnector />
         <div className="mt-6 md:mt-8">
-        <CoreOfferCTA onBookDemo={() => setShowBookingModal(true)} />
+        <CoreOfferCTA onBookDemo={() => navigate("/book")} />
       </div>
       </div>
 
@@ -343,8 +343,6 @@ export default function CoreOffer() {
         isOpen={stackBuilderOpen}
         onClose={() => setStackBuilderOpen(false)}
         systems={systemsById} />
-      
-      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
       <style>{`
         .core-offer-phone {
           z-index: 2;
