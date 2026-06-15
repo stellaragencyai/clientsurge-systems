@@ -96,7 +96,26 @@ export default function Navbar() {
 
   const isActivePage = (href) => {
     if (href === "/" ) return location.pathname === "/";
+    if (href.startsWith("/#")) return location.pathname === "/" && location.hash === href.replace("/", "");
     return location.pathname.startsWith(href);
+  };
+
+  const handleHashLinkClick = (e, href) => {
+    e.preventDefault();
+    const hash = href.replace("/", "");
+    trackCTA(`nav_${hash.replace("#", "")}`, "navbar");
+    setOpen(false);
+    setIndustriesOpen(false);
+
+    if (location.pathname === "/") {
+      const target = document.getElementById(hash.slice(1));
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.replaceState(null, "", `/${hash}`);
+      }
+    } else {
+      navigate(`/${hash}`);
+    }
   };
 
   // Track page views
@@ -259,10 +278,10 @@ export default function Navbar() {
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
               className="inline-flex items-center gap-1 text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5"
-              style={{ color: isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing") ? "#00AEEF" : "#0a1628" }}>
+              style={{ color: isActivePage("/store") || isActivePage("/automations") ? "#00AEEF" : "#0a1628" }}>
               Solutions
               <ChevronDown className={`w-4 h-4 transition-transform ${industriesOpen ? "rotate-180" : ""}`} />
-              {(isActivePage("/store") || isActivePage("/automations") || isActivePage("/pricing")) && (
+              {(isActivePage("/store") || isActivePage("/automations")) && (
                 <span style={{ position: "absolute", bottom: "-6px", left: 0, right: 0, height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)" }} />
               )}
             </button>
@@ -287,6 +306,10 @@ export default function Navbar() {
                    href={item.href}
                    role="menuitem"
                    onClick={(e) => {
+                     if (item.isHashLink) {
+                       handleHashLinkClick(e, item.href);
+                       return;
+                     }
                      e.preventDefault();
                      trackCTA(`nav_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "solutions_dropdown");
                      navigate(item.href);
@@ -365,6 +388,10 @@ export default function Navbar() {
           key={link.href}
           href={link.href}
           onClick={(e) => { 
+          if (link.isHashLink) {
+            handleHashLinkClick(e, link.href);
+            return;
+          }
           e.preventDefault(); 
           trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar");
           setIndustriesOpen(false);
@@ -435,6 +462,10 @@ export default function Navbar() {
                 className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
                 style={{ minHeight: "44px" }}
                 onClick={(e) => {
+                  if (link.isHashLink) {
+                    handleHashLinkClick(e, link.href);
+                    return;
+                  }
                   e.preventDefault();
                   trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
                   navigate(link.href);
@@ -453,6 +484,10 @@ export default function Navbar() {
             className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
             style={{ minHeight: "44px" }}
             onClick={(e) => {
+              if (link.isHashLink) {
+                handleHashLinkClick(e, link.href);
+                return;
+              }
               e.preventDefault();
               trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
               navigate(link.href);

@@ -10,12 +10,12 @@ export const SITE_CONFIG = {
   },
   navigation: {
     sections: [
-      { label: "Pricing", href: "/pricing", isPage: true },
+      { label: "Pricing", href: "/#pricing", isPage: false, isHashLink: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [
       { label: "Automations", href: "/automations", isPage: true },
-      { label: "Pricing", href: "/pricing", isPage: true },
+      { label: "Pricing", href: "/#pricing", isPage: false, isHashLink: true },
     ],
   },
   industries: [

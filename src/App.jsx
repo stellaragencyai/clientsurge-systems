@@ -36,7 +36,6 @@ const Start = lazy(() => import("./pages/Start"));
 const Book = lazy(() => import("./pages/Book"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ProductLanding = lazy(() => import("./pages/ProductLanding"));
-const ProductPricing = lazy(() => import("./pages/ProductPricing"));
 const ProductSignup = lazy(() => import("./pages/ProductSignup"));
 const ClientDashboardEntry = lazy(() => import("./pages/ClientDashboardEntry"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
@@ -293,7 +292,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
-      <Route path="/pricing" element={<LazyRoute Component={ProductPricing} />} />
+      
       <Route path="/signup" element={<LazyRoute Component={ProductSignup} />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
       <Route path="/book" element={<LazyRoute Component={Book} />} />

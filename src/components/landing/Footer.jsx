@@ -18,7 +18,7 @@ const navColumns = [
       { label: "How It Works", href: "/#problem-solution" },
       { label: "Our System", href: "/our-system" },
       { label: "AI Automations", href: "/automations" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/faq" },
       { label: "Blog", href: "/blog" },
       { label: "Free Automation Audit", href: "/book" },
