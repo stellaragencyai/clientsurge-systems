@@ -61,8 +61,11 @@ Deno.serve(async (req) => {
     // Verify signature
     const isValid = await verifyTwilioSignature(body, signature, token);
     if (!isValid) {
-      console.error('Invalid Twilio signature');
-      return Response.json({ error: 'Invalid signature' }, { status: 403 });
+      console.error('[SECURITY] Invalid Twilio signature attempt', {
+        timestamp: new Date().toISOString(),
+        ip: req.headers.get('x-forwarded-for') || 'unknown',
+      });
+      return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
     // Parse body
@@ -121,9 +124,15 @@ Deno.serve(async (req) => {
       lead_id: lead.id,
     });
   } catch (error) {
-    console.error('receiveTwilioInboundSms error:', error);
+    // Log full error internally
+    console.error('[INTERNAL_ERROR] receiveTwilioInboundSms:', {
+      message: error.message,
+      stack: error.stack,
+      timestamp: new Date().toISOString(),
+    });
+    // Return generic error to client
     return Response.json(
-      { error: error.message || 'Processing failed' },
+      { error: 'An error occurred processing your request.' },
       { status: 500 }
     );
   }
