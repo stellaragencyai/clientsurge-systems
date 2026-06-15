@@ -1,15 +1,16 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { getIndustryConfig, calculateRevenueLoss } from '@/data/industryPageConfig';
-import { useState } from 'react';
+import { useState, lazy, Suspense } from 'react';
 import ImmersiveIndustryHero from './ImmersiveIndustryHero';
 import IndustryPainBar from './IndustryPainBar';
 import RevenueProofBlock from '../landing/RevenueProofBlock';
-import IndustryProblems from './IndustryProblems';
-import IndustrySolution from './IndustrySolution';
-import IndustryHowItWorks from './IndustryHowItWorks';
-import IndustrySystemMapping from './IndustrySystemMapping';
-import IndustrySocialProof from './IndustrySocialProof';
-import IndustryFinalCTA from './IndustryFinalCTA';
+
+const IndustryProblems = lazy(() => import('./IndustryProblems'));
+const IndustrySolution = lazy(() => import('./IndustrySolution'));
+const IndustryHowItWorks = lazy(() => import('./IndustryHowItWorks'));
+const IndustrySystemMapping = lazy(() => import('./IndustrySystemMapping'));
+const IndustrySocialProof = lazy(() => import('./IndustrySocialProof'));
+const IndustryFinalCTA = lazy(() => import('./IndustryFinalCTA'));
 
 /**
  * Unified Industry Landing Page Template
@@ -53,7 +54,9 @@ export default function IndustryLandingPage() {
             {config.painStatement}
           </p>
         </div>
-        <IndustryProblems problems={config.problems} />
+        <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
+          <IndustryProblems problems={config.problems} />
+        </Suspense>
       </section>
 
       {/* Solution Section */}
@@ -62,7 +65,9 @@ export default function IndustryLandingPage() {
           <div className="text-center mb-10">
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{config.solutionTitle}</h2>
           </div>
-          <IndustrySolution features={config.features} />
+          <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
+            <IndustrySolution features={config.features} />
+          </Suspense>
         </div>
       </section>
 
@@ -71,7 +76,9 @@ export default function IndustryLandingPage() {
         <div className="text-center mb-10">
           <h2 className="text-3xl md:text-4xl font-bold mb-2">How It Works</h2>
         </div>
-        <IndustryHowItWorks steps={config.howItWorks} />
+        <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
+          <IndustryHowItWorks steps={config.howItWorks} />
+        </Suspense>
       </section>
 
       {/* System Mapping (Pricing Integration) */}
@@ -83,18 +90,24 @@ export default function IndustryLandingPage() {
               Pick the plan that fits your needs.
             </p>
           </div>
-          <IndustrySystemMapping systemMapping={config.systemMapping} />
+          <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
+            <IndustrySystemMapping systemMapping={config.systemMapping} />
+          </Suspense>
         </div>
       </section>
 
       {/* Social Proof Placeholder */}
       <section className="py-12 px-6 md:py-16 max-w-7xl mx-auto">
-        <IndustrySocialProof industryName={config.name} placeholder={config.testimonialPlaceholder} />
+        <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
+          <IndustrySocialProof industryName={config.name} placeholder={config.testimonialPlaceholder} />
+        </Suspense>
       </section>
 
       {/* Final CTA */}
       <section className="py-12 px-6 md:py-16 bg-gradient-to-r from-primary to-primary/80">
-        <IndustryFinalCTA config={config} />
+        <Suspense fallback={null}>
+          <IndustryFinalCTA config={config} />
+        </Suspense>
       </section>
     </div>
   );
