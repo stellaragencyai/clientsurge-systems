@@ -2,10 +2,16 @@
   "name": "LeadAnalytics",
   "type": "object",
   "_metadata": {
-    "status": "DERIVED",
-    "reason": "Calculated metrics for reporting only. Do NOT write directly. Derived from Leads + CommunicationEvent. Use scheduled jobs only.",
+    "status": "DEPRECATED",
+    "reason": "DEPRECATED: Duplicate of ConversionFunnel + MetricsSnapshot. Use ConversionFunnel for primary KPI metrics instead.",
     "read_only": true,
-    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+    "deprecated": true,
+    "replacement_entity": "ConversionFunnel",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md",
+    "product_layer": "intelligence",
+    "metric_role": "deprecated_redundant",
+    "visibility": "read_only_legacy",
+    "architecture_level": "analytics"
   },
   "properties": {
     "order_id": {

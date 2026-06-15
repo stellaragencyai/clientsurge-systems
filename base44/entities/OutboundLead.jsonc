@@ -5,7 +5,11 @@
     "status": "SALES_AUTOMATION",
     "reason": "Outbound SaaS lead acquisition pipeline. Tracks all prospects contacted via outbound campaigns.",
     "tenant_scoped": "client_id (sales team scope)",
-    "documentation": "SALES_AUTOMATION.md"
+    "documentation": "SALES_AUTOMATION.md",
+    "product_layer": "supporting",
+    "system_role": "acquisition_pipeline",
+    "lead_classification": "prospecting",
+    "architecture_level": "sales_automation"
   },
   "properties": {
     "business_name": {

@@ -5,7 +5,12 @@
     "status": "HARDENED_EVENT_PIPELINE",
     "reason": "Deduplication & collapsing tracking. Prevents duplicate processing, enables event compression, ensures replay safety.",
     "tenant_scoped": "client_id + client_project_id",
-    "documentation": "HARDENED_EVENT_PIPELINE.md"
+    "documentation": "HARDENED_EVENT_PIPELINE.md",
+    "product_layer": "infrastructure",
+    "system_layer": "infrastructure",
+    "visibility": "internal_only",
+    "dependency": "CommunicationEvent",
+    "architecture_level": "event_pipeline"
   },
   "properties": {
     "canonical_event_id": {

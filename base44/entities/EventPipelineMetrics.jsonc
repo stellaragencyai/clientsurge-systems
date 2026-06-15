@@ -6,7 +6,13 @@
     "reason": "Derived metrics for normalized event views. Read-only dashboard reporting.",
     "read_only": true,
     "tenant_scoped": "client_id + client_project_id",
-    "documentation": "HARDENED_EVENT_PIPELINE.md"
+    "documentation": "HARDENED_EVENT_PIPELINE.md",
+    "product_layer": "infrastructure",
+    "system_layer": "infrastructure",
+    "visibility": "internal_only",
+    "dependency": "CommunicationEvent",
+    "metric_role": "infrastructure_health",
+    "architecture_level": "observability"
   },
   "properties": {
     "client_id": {

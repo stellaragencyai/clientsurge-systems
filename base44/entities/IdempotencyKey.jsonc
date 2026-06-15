@@ -5,7 +5,11 @@
     "status": "ORCHESTRATION_LAYER",
     "reason": "Global deduplication tracking. Prevents duplicate execution of critical operations across all subsystems.",
     "tenant_scoped": "client_id + client_project_id (optional)",
-    "documentation": "ORCHESTRATION_LAYER.md"
+    "documentation": "ORCHESTRATION_LAYER.md",
+    "product_layer": "infrastructure",
+    "system_layer": "orchestration",
+    "visibility": "internal_only",
+    "architecture_level": "reliability"
   },
   "properties": {
     "idempotency_key": {

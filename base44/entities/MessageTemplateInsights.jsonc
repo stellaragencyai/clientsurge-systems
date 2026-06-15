@@ -5,7 +5,11 @@
     "status": "ANALYTICS_DERIVED",
     "reason": "Aggregated effectiveness metrics for message templates. Populated asynchronously. Read-only for dashboard.",
     "read_only": true,
-    "async_only": true
+    "async_only": true,
+    "product_layer": "intelligence",
+    "metric_role": "derived_sub_metric",
+    "visibility": "dashboard_secondary",
+    "architecture_level": "analytics"
   },
   "properties": {
     "template_id": {
@@ -61,5 +65,6 @@
       "type": "string",
       "title": "Key Insights"
     }
-  }
+  },
+  "required": []
 }

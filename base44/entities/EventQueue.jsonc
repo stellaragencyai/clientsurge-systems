@@ -5,7 +5,12 @@
     "status": "SCALE_ARCHITECTURE",
     "reason": "Logical queue abstraction over CommunicationEvent flow. Tracks processing state per event.",
     "tenant_scoped": "client_id + client_project_id",
-    "documentation": "SCALE_ARCHITECTURE.md"
+    "documentation": "SCALE_ARCHITECTURE.md",
+    "product_layer": "infrastructure",
+    "system_layer": "infrastructure",
+    "visibility": "internal_only",
+    "dependency": "CommunicationEvent",
+    "architecture_level": "orchestration"
   },
   "properties": {
     "communication_event_id": {

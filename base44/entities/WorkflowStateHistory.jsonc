@@ -6,7 +6,11 @@
     "reason": "Immutable audit trail of state transitions. Prevents duplicate state application and enables replay detection.",
     "immutable": true,
     "tenant_scoped": "client_id + client_project_id",
-    "documentation": "ORCHESTRATION_LAYER.md"
+    "documentation": "ORCHESTRATION_LAYER.md",
+    "product_layer": "infrastructure",
+    "system_layer": "orchestration",
+    "visibility": "internal_only",
+    "architecture_level": "reliability"
   },
   "properties": {
     "workflow_id": {

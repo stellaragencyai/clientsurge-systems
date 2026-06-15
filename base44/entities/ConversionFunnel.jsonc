@@ -7,7 +7,11 @@
     "read_only": true,
     "async_only": true,
     "tenant_scoped": "client_id + client_project_id",
-    "documentation": "CONVERSION_OPTIMIZATION.md"
+    "documentation": "CONVERSION_OPTIMIZATION.md",
+    "product_layer": "intelligence",
+    "metric_role": "primary_kpi_source_of_truth",
+    "visibility": "dashboard_primary",
+    "architecture_level": "analytics"
   },
   "properties": {
     "client_project_id": {

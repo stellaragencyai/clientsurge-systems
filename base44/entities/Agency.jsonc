@@ -5,7 +5,11 @@
     "status": "WHITE_LABEL_SCALING",
     "reason": "Top-level reseller/agency entity. Owns multiple Clients and ClientProjects. Enables white-label SaaS distribution and multi-brand orchestration.",
     "tenant_scoped": "agency_id (self-scoped)",
-    "documentation": "WHITE_LABEL_SYSTEM.md"
+    "documentation": "WHITE_LABEL_SYSTEM.md",
+    "product_layer": "distribution",
+    "architecture_level": "optional_overlay",
+    "visibility": "optional_feature",
+    "core_product_interference": "none"
   },
   "properties": {
     "agency_name": {
