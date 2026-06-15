@@ -1,29 +1,28 @@
 import { useMemo } from "react";
-import { ArrowRight, Zap, TrendingUp, Crown } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { getPackageStorePath } from "@/lib/salesCatalog";
-import PageCheckIcon from "@/components/ui/PageCheckIcon";
 
-const TIER_ICONS = {
-  starter_system: Zap,
-  growth_system: TrendingUp,
-  pro_system: Crown,
-};
-
-
-
-const PRO_ONLY_FEATURES = [
-  "Review request automation",
-  "Lead reactivation campaign",
-  "Priority support",
-  "Advanced reporting",
+// ── Luxury feature data per tier ──
+const STARTER_FEATURES = [
+  "Instant lead response via SMS",
+  "Missed-call auto text-back",
+  "Managed system setup",
+  "Monthly monitoring included",
+  "Launch support",
 ];
 
-const STARTER_FEATURES = [
-  "Lead capture connection",
-  "SMS notification setup",
-  "Missed-call recovery workflow",
-  "Basic launch support",
-  "Monthly system monitoring",
+const GROWTH_ADDED = [
+  "14-day nurture sequences",
+  "AI appointment booking",
+  "Email automation",
+  "Lead scoring & routing",
+];
+
+const PRO_ADDED = [
+  "Review request automation",
+  "Lead reactivation campaigns",
+  "Priority support",
+  "Advanced reporting & insights",
 ];
 
 const PREVIOUS_PLAN = {
@@ -31,179 +30,187 @@ const PREVIOUS_PLAN = {
   pro_system: "Growth",
 };
 
+// ── Elegant bullet — thin gold diamond ──
+function FeatureBullet() {
+  return (
+    <svg className="w-3.5 h-3.5 flex-shrink-0 mt-[3px]" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+      <rect x="3" y="3" width="8" height="8" rx="1.5" stroke="#D4AF37" strokeWidth="1.5" transform="rotate(45 7 7)" />
+    </svg>
+  );
+}
+
 export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
-  const TierIcon = TIER_ICONS[plan.packageKey] || Zap;
   const previousPlanName = PREVIOUS_PLAN[plan.packageKey] || null;
 
-  const featureGroups = useMemo(() => {
-    if (previousPlanName) {
-      return {
-        added: plan.features.slice(2, 4),
-        base: plan.features.slice(0, 2),
-      };
-    }
-    return {
-      main: plan.features.slice(0, 4),
-      extra: plan.features.slice(4),
-    };
-  }, [plan.features, previousPlanName]);
+  const featureList = useMemo(() => {
+    if (plan.packageKey === "starter_system") return { main: STARTER_FEATURES };
+    if (plan.packageKey === "growth_system") return { base: "Starter", added: GROWTH_ADDED };
+    if (plan.packageKey === "pro_system") return { base: "Growth", added: PRO_ADDED };
+    return { main: plan.features };
+  }, [plan.packageKey, plan.features]);
+
+  const isHighlighted = isRecommended || plan.highlight;
 
   return (
     <div
-      className={`relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 h-full ${
-        isRecommended
-          ? "border-primary/50 ring-2 ring-primary/25 shadow-2xl lg:scale-105"
-          : "border-foreground/10 shadow-md hover:shadow-2xl hover:border-foreground/15 hover:-translate-y-1"
-      }`}
+      className="group relative flex flex-col rounded-2xl overflow-hidden transition-all duration-500 h-full"
       style={{
-        background: isRecommended
-          ? "linear-gradient(135deg, #ffffff 0%, #f7fbff 100%)"
-          : "linear-gradient(135deg, #ffffff 0%, #fafbfc 100%)",
-        backdropFilter: "blur(8px)",
+        background: "linear-gradient(180deg, #0a1220 0%, #0f1928 100%)",
+        border: isHighlighted ? "1.5px solid rgba(212,175,55,0.22)" : "1.5px solid rgba(255,255,255,0.06)",
+        boxShadow: isHighlighted
+          ? "0 4px 24px rgba(0,0,0,0.25), 0 0 20px rgba(212,175,55,0.07)"
+          : "0 4px 24px rgba(0,0,0,0.25)",
+        transform: isHighlighted ? "scale(1.02)" : "scale(1)",
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = "rgba(212,175,55,0.55)";
+        e.currentTarget.style.boxShadow = "0 8px 40px rgba(0,0,0,0.35), 0 0 32px rgba(212,175,55,0.14), 0 0 0 1px rgba(212,175,55,0.20)";
+        e.currentTarget.style.transform = "translateY(-4px)";
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = isHighlighted ? "rgba(212,175,55,0.22)" : "rgba(255,255,255,0.06)";
+        e.currentTarget.style.boxShadow = isHighlighted
+          ? "0 4px 24px rgba(0,0,0,0.25), 0 0 20px rgba(212,175,55,0.07)"
+          : "0 4px 24px rgba(0,0,0,0.25)";
+        e.currentTarget.style.transform = isHighlighted ? "scale(1.02)" : "scale(1)";
       }}
     >
-      {/* Glow accent — only for recommended */}
+      {/* Ambient gold corner glow on hover */}
+      <div
+        className="absolute -top-20 -right-20 w-40 h-40 rounded-full pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+        style={{ background: "radial-gradient(circle, rgba(212,175,55,0.10) 0%, transparent 70%)" }}
+      />
+
+      {/* Recommended badge */}
       {isRecommended && (
-        <div className="absolute inset-0 rounded-3xl pointer-events-none" style={{
-          boxShadow: "inset 0 1px 0 rgba(255,255,255,0.95), 0 0 40px rgba(0,174,239,0.2), inset 0 0 20px rgba(0,174,239,0.05)",
-        }} />
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 z-20">
+          <div
+            className="flex items-center gap-1.5 px-5 py-1.5 rounded-b-lg text-[10px] font-bold tracking-[0.14em] uppercase"
+            style={{
+              background: "linear-gradient(135deg, #D4AF37 0%, #B8941F 100%)",
+              color: "#0a1220",
+              boxShadow: "0 4px 16px rgba(212,175,55,0.3)",
+            }}
+          >
+            <span style={{ fontSize: "10px" }}>◆</span> Best for {selectedIndustry?.shortName || "You"}
+          </div>
+        </div>
       )}
 
-      {/* Floating badge — only for recommended */}
-       {isRecommended ? (
-         <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-           <span
-             className="inline-block text-white text-xs font-bold px-5 py-1.5 rounded-full shadow-xl"
-             style={{
-               background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-               boxShadow: "0 4px 12px rgba(0,174,239,0.5)"
-             }}
-           >
-             ★ Best for {selectedIndustry?.shortName}
-           </span>
-         </div>
-       ) : null}
+      {/* Most Popular badge */}
+      {plan.badge && !isRecommended && (
+        <div className="absolute top-3 right-3 z-20">
+          <span
+            className="inline-block text-[10px] font-semibold tracking-[0.12em] uppercase px-3 py-1 rounded-full"
+            style={{
+              background: "rgba(212,175,55,0.12)",
+              border: "1px solid rgba(212,175,55,0.25)",
+              color: "#D4AF37",
+            }}
+          >
+            {plan.badge}
+          </span>
+        </div>
+      )}
 
       <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10">
-        {/* Icon + Title */}
-        <div className="mb-6 pb-4 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.15)" : "rgba(0,0,0,0.04)" }}>
-            <div
-              className="w-16 h-16 rounded-2xl flex items-center justify-center mb-4 flex-shrink-0"
-              style={{
-                background: isRecommended
-                  ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
-                  : plan.packageKey === "pro_system"
-                  ? "linear-gradient(135deg, #7C3AED 0%, #6366F1 100%)"
-                  : "linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,136,204,0.08) 100%)",
-                boxShadow: isRecommended
-                  ? "0 8px 24px rgba(0,174,239,0.3)"
-                  : plan.packageKey === "pro_system"
-                  ? "0 4px 12px rgba(124,58,237,0.15)"
-                  : "none",
-              }}
-            >
-              <TierIcon
-                className="w-7 h-7"
-                style={{
-                  color: isRecommended || plan.packageKey === "pro_system" ? "#ffffff" : "#00AEEF",
-                }}
-              />
-            </div>
-            <h3 className="text-2xl font-bold text-foreground">{plan.name}</h3>
-            <p className="text-xs text-foreground/55 mt-2 uppercase tracking-widest">{plan.fit}</p>
+        {/* ── Header ── */}
+        <div className="mb-7">
+          <p
+            className="text-[10px] font-bold tracking-[0.22em] uppercase mb-3"
+            style={{ color: "#D4AF37" }}
+          >
+            {plan.fit?.split(".")[0] || plan.name}
+          </p>
+          <h3
+            className="text-[22px] font-bold mb-1 tracking-[-0.02em]"
+            style={{ fontFamily: "Montserrat, sans-serif", color: "#ffffff" }}
+          >
+            {plan.name}
+          </h3>
+          <p className="text-[12px] leading-relaxed" style={{ color: "rgba(255,255,255,0.50)" }}>
+            {plan.desc}
+          </p>
+        </div>
+
+        {/* ── Price ── */}
+        <div className="mb-7 pb-7 border-b" style={{ borderColor: "rgba(255,255,255,0.08)" }}>
+          <div className="flex items-baseline gap-1.5 mb-1">
+            <span className="text-[42px] font-extrabold tracking-[-0.03em] leading-none" style={{ color: "#ffffff", fontFamily: "Montserrat, sans-serif" }}>
+              {plan.monthly}
+            </span>
+            <span className="text-[13px] font-medium" style={{ color: "rgba(255,255,255,0.45)" }}>
+              /month
+            </span>
           </div>
+          <p className="text-[12px] font-medium" style={{ color: "rgba(255,255,255,0.40)" }}>
+            + {plan.setup} one-time setup
+          </p>
+        </div>
 
-        {/* Pricing */}
-         <div className="mb-7 pb-7 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.15)" : "rgba(0,0,0,0.04)" }}>
-           <div className="flex items-baseline gap-2 mb-3">
-             <span className={`font-black ${isRecommended ? "text-5xl" : "text-4xl"}`} style={{ color: "#001B44" }}>
-               {plan.monthly}
-             </span>
-             <span className="text-base text-foreground/60 font-semibold">/month</span>
-           </div>
-           <p className="text-sm font-bold text-foreground/75">+ {plan.setup} setup fee</p>
-         </div>
+        {/* ── Features ── */}
+        <ul className="space-y-3 flex-1 mb-8" aria-label={`Features for ${plan.name}`}>
+          {featureList.main ? (
+            featureList.main.map((feature) => (
+              <li key={feature} className="flex items-start gap-3">
+                <FeatureBullet />
+                <span className="text-[13px] leading-snug" style={{ color: "rgba(255,255,255,0.72)" }}>
+                  {feature}
+                </span>
+              </li>
+            ))
+          ) : (
+            <>
+              <li className="pb-2 mb-1" style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
+                <span className="text-[10px] font-semibold tracking-[0.15em] uppercase" style={{ color: "rgba(255,255,255,0.35)" }}>
+                  Everything in {featureList.base}, plus:
+                </span>
+              </li>
+              {featureList.added.map((feature) => (
+                <li key={feature} className="flex items-start gap-3">
+                  <FeatureBullet />
+                  <span className="text-[13px] leading-snug" style={{ color: "rgba(255,255,255,0.72)" }}>
+                    {feature}
+                  </span>
+                </li>
+              ))}
+            </>
+          )}
+        </ul>
 
-        {/* Features — Task #12: Centralized badge colors */}
-         <ul className="space-y-3 flex-1 mb-6" aria-label={`Features for ${plan.name}`}>
-           {plan.packageKey === "starter_system" ? (
-             // Starter: show all features clearly
-             STARTER_FEATURES.map((feature) => (
-               <li key={feature} className="flex items-start gap-3">
-                 <PageCheckIcon />
-                 <span className="text-sm text-foreground/75">{feature}</span>
-               </li>
-             ))
-           ) : plan.packageKey === "pro_system" ? (
-             // Pro: show "Everything in Growth, plus:" with Pro-only features
-             <>
-               <li className="flex items-center gap-2 mb-3">
-                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                   Everything in Growth, plus:
-                 </span>
-               </li>
-               {PRO_ONLY_FEATURES.map((feature) => (
-                 <li key={feature} className="flex items-start gap-3">
-                   <PageCheckIcon />
-                   <span className="text-sm text-foreground/75">{feature}</span>
-                 </li>
-               ))}
-             </>
-           ) : (
-             // Growth: show "Everything in Starter, plus:" with added features
-             <>
-               <li className="flex items-center gap-2 mb-3">
-                 <span className="text-[10px] font-bold text-primary uppercase tracking-wider">
-                   Everything in Starter, plus:
-                 </span>
-               </li>
-               {["14-day nurture sequences", "AI appointment booking", "Email automation", "Lead scoring"].map((feature) => (
-                 <li key={feature} className="flex items-start gap-3">
-                   <PageCheckIcon />
-                   <span className="text-sm text-foreground/75">{feature}</span>
-                 </li>
-               ))}
-             </>
-           )}
-         </ul>
-
-        {/* CTA */}
-         <div className="space-y-2.5">
-           {isRecommended ? (
-             <a
-               href={getPackageStorePath(plan.packageKey)}
-               className="w-full block h-12 rounded-xl text-sm font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none flex items-center justify-center gap-2"
-               aria-label={`Start with ${plan.name} plan at ${plan.monthly}/month`}
-               style={{
-                 background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-                 boxShadow: "0 6px 20px rgba(0,174,239,0.4)",
-               }}
-               onMouseEnter={(e) => {
-                 e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)";
-                 e.currentTarget.style.transform = "translateY(-3px)";
-               }}
-               onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,174,239,0.4)";
-                 e.currentTarget.style.transform = "translateY(0)";
-               }}
-             >
-               Start Now <ArrowRight className="w-4 h-4" />
-             </a>
-           ) : (
-             <a
-               href={getPackageStorePath(plan.packageKey)}
-               className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-foreground/20 bg-white text-sm font-bold text-foreground hover:border-primary/40 hover:bg-primary/3 transition-all focus:ring-2 focus:ring-primary focus:outline-none"
-             >
-               Choose Plan <ArrowRight className="w-4 h-4" />
-             </a>
-           )}
-           <a
-             href="/book"
-             className="w-full inline-flex items-center justify-center h-10 rounded-lg text-xs font-semibold text-primary hover:text-primary/80 hover:underline transition-colors"
-           >
-             Free automation audit
-           </a>
-         </div>
+        {/* ── CTA ── */}
+        <a
+          href={getPackageStorePath(plan.packageKey)}
+          className="w-full flex items-center justify-center gap-2 h-[46px] rounded-xl text-[13px] font-bold tracking-[0.03em] transition-all duration-300 no-underline"
+          style={{
+            background: isHighlighted
+              ? "linear-gradient(135deg, #D4AF37 0%, #B8941F 100%)"
+              : "rgba(255,255,255,0.06)",
+            border: isHighlighted ? "none" : "1px solid rgba(255,255,255,0.12)",
+            color: isHighlighted ? "#0a1220" : "#ffffff",
+          }}
+          onMouseEnter={(e) => {
+            if (isHighlighted) {
+              e.currentTarget.style.boxShadow = "0 8px 28px rgba(212,175,55,0.45)";
+              e.currentTarget.style.transform = "translateY(-2px)";
+            } else {
+              e.currentTarget.style.background = "rgba(255,255,255,0.10)";
+              e.currentTarget.style.borderColor = "rgba(212,175,55,0.35)";
+            }
+          }}
+          onMouseLeave={(e) => {
+            if (isHighlighted) {
+              e.currentTarget.style.boxShadow = "none";
+              e.currentTarget.style.transform = "translateY(0)";
+            } else {
+              e.currentTarget.style.background = "rgba(255,255,255,0.06)";
+              e.currentTarget.style.borderColor = "rgba(255,255,255,0.12)";
+            }
+          }}
+        >
+          {isHighlighted ? "Get Started" : "View Details"}
+          <ArrowRight className="w-3.5 h-3.5" />
+        </a>
       </div>
     </div>
   );
