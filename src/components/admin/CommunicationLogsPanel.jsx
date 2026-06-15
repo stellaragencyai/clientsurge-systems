@@ -16,6 +16,7 @@ import {
 export default function CommunicationLogsPanel() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState(null); // Task 8 — error state
   const [filter, setFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [reassignModal, setReassignModal] = useState(null);
@@ -34,6 +35,7 @@ export default function CommunicationLogsPanel() {
   const loadLogs = async (nextPage = page) => {
     try {
       setLoading(true);
+      setLoadError(null); // Task 8 — clear error on reload
       const query = buildCommunicationLogQuery(filter);
 
       const fetchLimit = getCommunicationLogFetchLimit({ page: nextPage });
@@ -47,6 +49,7 @@ export default function CommunicationLogsPanel() {
       setHasNextPage((data || []).length > getCommunicationLogOffset({ page: nextPage }) + COMMUNICATION_LOG_PAGE_SIZE);
     } catch (error) {
       console.error('Failed to load logs:', error);
+      setLoadError(error.message || 'Failed to load communication logs'); // Task 8
       setHasNextPage(false);
     } finally {
       setLoading(false);
@@ -144,6 +147,15 @@ export default function CommunicationLogsPanel() {
           </button>
         ))}
       </div>
+
+      {/* Task 8 — Error state */}
+      {loadError && !loading && (
+        <div className="flex gap-2 p-4 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
+          <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <span>{loadError}</span>
+          <button onClick={() => loadLogs(page)} className="ml-auto underline font-medium">Retry</button>
+        </div>
+      )}
 
       {loading ? (
         <div className="text-center py-8 text-muted-foreground">

@@ -142,7 +142,7 @@ function NurtureCampaignModal({ count, onConfirm, onClose, loading }) {
   );
 }
 
-export default function BulkActionToolbar({ selectedIds, leads = [], onClearSelection, onActionComplete }) {
+export default function BulkActionToolbar({ selectedIds, leads = [], onClearSelection, onActionComplete, onBulkAction }) {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState(null); // { success, failed, message }
   const [showNoteModal, setShowNoteModal] = useState(false);
@@ -176,7 +176,23 @@ export default function BulkActionToolbar({ selectedIds, leads = [], onClearSele
     }
   };
 
-  const handleStatusChange = (status) => runAction("status_change", { status });
+  // Task 18 — Route dangerous bulk actions through confirmation modal
+  const withConfirm = (action, count, executeFn) => {
+    if (onBulkAction) {
+      onBulkAction(action, count, executeFn);
+    } else {
+      executeFn();
+    }
+  };
+
+  const handleStatusChange = (status) => {
+    const execute = () => runAction("status_change", { status });
+    if (['Closed'].includes(status)) {
+      withConfirm(`set to "${status}"`, count, execute);
+    } else {
+      execute();
+    }
+  };
   const handleSequence = (sequence_type) => runAction("trigger_sequence", { sequence_type });
   const handleNote = async (note) => {
     await runAction("add_note", { note });

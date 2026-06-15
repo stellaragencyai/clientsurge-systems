@@ -34,6 +34,7 @@ import { parseLeadImportRows } from "@/lib/leadImportParser";
 import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
 import BulkActionToolbar from "./BulkActionToolbar";
+import BulkConfirmModal from "./BulkConfirmModal"; // Task 18
 import ErrorBoundary from "@/components/ErrorBoundary";
 
 const intakeTypeLabels = {
@@ -246,6 +247,7 @@ export default function LeadManagementDashboard({
   const [importError, setImportError] = useState("");
   const [importSuccess, setImportSuccess] = useState("");
   const [sortConfig, setSortConfig] = useState({ field: "lead_score", direction: "desc" });
+  const [bulkConfirm, setBulkConfirm] = useState(null); // Task 18 — { action, count, onConfirm }
 
   const loadSnapshot = async ({ append = false, nextOffset = 0, activeFilters = filters } = {}) => {
     const setLoadingState = append ? setLoadingMore : setLoading;
@@ -801,12 +803,23 @@ export default function LeadManagementDashboard({
         </div>
       ) : null}
 
+      {/* Task 18 — Bulk confirmation modal */}
+      {bulkConfirm && (
+        <BulkConfirmModal
+          action={bulkConfirm.action}
+          count={bulkConfirm.count}
+          onConfirm={() => { bulkConfirm.onConfirm(); setBulkConfirm(null); }}
+          onCancel={() => setBulkConfirm(null)}
+        />
+      )}
+
       <div className="rounded-xl border border-border bg-white p-4 space-y-4">
           <BulkActionToolbar
             selectedIds={Array.from(selectedIds)}
             leads={leads}
             onClearSelection={clearSelection}
             onActionComplete={() => loadSnapshot({ append: false, nextOffset: 0 })}
+            onBulkAction={(action, count, executeAction) => setBulkConfirm({ action, count, onConfirm: executeAction })}
           />
           <div className="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between">
             <div>

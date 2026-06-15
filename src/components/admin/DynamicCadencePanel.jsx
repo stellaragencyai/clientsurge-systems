@@ -7,6 +7,7 @@ export default function DynamicCadencePanel() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [saveSuccess, setSaveSuccess] = useState(false);
 
   useEffect(() => {
     loadSettings();
@@ -31,34 +32,38 @@ export default function DynamicCadencePanel() {
     cadence_max_attempts: 6,
   });
 
+  // Task 21 — Clamp numeric settings to valid range before saving
+  const clamp = (val, min, max) => Math.max(min, Math.min(max, Number(val) || min));
+
   const handleChange = (field, value) => {
     setSettings(prev => ({ ...prev, [field]: value }));
+    setSaveSuccess(false);
   };
 
   const handleSave = async () => {
     try {
       setSaving(true);
+      setSaveSuccess(false);
+      // Task 21 — Apply range validation before persisting
+      const validated = {
+        cadence_default_mode: settings.cadence_default_mode,
+        cadence_switch_attempts: clamp(settings.cadence_switch_attempts, 1, 10),
+        cadence_pause_on_reply: settings.cadence_pause_on_reply,
+        cadence_engagement_threshold: clamp(settings.cadence_engagement_threshold, 0, 100),
+        cadence_max_attempts: clamp(settings.cadence_max_attempts, 2, 20),
+      };
+      setSettings(prev => ({ ...prev, ...validated }));
+
       const records = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
       const settingsId = records?.[0]?.id;
 
       if (settingsId) {
-        await base44.asServiceRole.entities.AdminSettings.update(settingsId, {
-          cadence_default_mode: settings.cadence_default_mode,
-          cadence_switch_attempts: settings.cadence_switch_attempts,
-          cadence_pause_on_reply: settings.cadence_pause_on_reply,
-          cadence_engagement_threshold: settings.cadence_engagement_threshold,
-          cadence_max_attempts: settings.cadence_max_attempts,
-        });
+        await base44.asServiceRole.entities.AdminSettings.update(settingsId, validated);
       } else {
-        await base44.asServiceRole.entities.AdminSettings.create({
-          cadence_default_mode: settings.cadence_default_mode,
-          cadence_switch_attempts: settings.cadence_switch_attempts,
-          cadence_pause_on_reply: settings.cadence_pause_on_reply,
-          cadence_engagement_threshold: settings.cadence_engagement_threshold,
-          cadence_max_attempts: settings.cadence_max_attempts,
-        });
+        await base44.asServiceRole.entities.AdminSettings.create(validated);
       }
       setError('');
+      setSaveSuccess(true);
     } catch (err) {
       setError('Failed to save settings');
     } finally {
@@ -89,7 +94,8 @@ export default function DynamicCadencePanel() {
           <select
             value={settings?.cadence_default_mode || 'auto'}
             onChange={(e) => handleChange('cadence_default_mode', e.target.value)}
-            className="w-full px-3 py-2 border border-border rounded-lg bg-white text-foreground"
+            disabled={saving}
+            className="w-full px-3 py-2 border border-border rounded-lg bg-white text-foreground disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <option value="auto">Auto (Alternate channels)</option>
             <option value="sms_first">SMS First (Switch to email after N attempts)</option>
@@ -164,13 +170,14 @@ export default function DynamicCadencePanel() {
       </div>
 
       <div className="flex gap-3 pt-4">
+        {/* Task 20 — Per-field disabled state + success feedback */}
         <button
           onClick={handleSave}
           disabled={saving}
           className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 transition disabled:opacity-60"
         >
           {saving ? <RotateCcw className="w-4 h-4 animate-spin" /> : <Check className="w-4 h-4" />}
-          {saving ? 'Saving...' : 'Save Settings'}
+          {saving ? 'Saving...' : saveSuccess ? 'Saved!' : 'Save Settings'}
         </button>
         <button
           onClick={loadSettings}
