@@ -208,7 +208,7 @@ export default function Industries() {
       className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
       
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
-         <div className="flex flex-col items-start text-left">
+         <div className="flex flex-col items-center text-center">
            <p className="cs-eyebrow mb-4">Choose Your Industry</p>
            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight max-w-4xl" style={{ fontFamily: "Montserrat, sans-serif" }}>
               Recover revenue from{" "}
@@ -220,7 +220,7 @@ export default function Industries() {
          </div>
 
         {/* Filter pills */}
-        <div className="flex flex-wrap justify-start gap-2 mt-6 pb-4">
+        <div className="flex flex-wrap justify-center gap-2 mt-6 pb-4">
           {FILTER_TAGS.map(f => (
             <button
               key={f.id}

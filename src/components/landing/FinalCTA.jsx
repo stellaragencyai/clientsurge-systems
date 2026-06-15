@@ -7,7 +7,7 @@ export default function FinalCTA() {
       <section id="book-demo" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
-        <div className="relative z-10 max-w-3xl mx-auto text-left">
+        <div className="relative z-10 max-w-3xl mx-auto text-center">
           <p className="cs-eyebrow mb-6">
             Ready to Transform Your Lead Flow?
           </p>
@@ -19,7 +19,7 @@ export default function FinalCTA() {
           </p>
 
           {/* How the demo works - 3 steps */}
-          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-left">
+          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-center">
             {[
               { step: "01", title: "Claim your diagnostic window", body: "Secure a 15-minute readiness slot. No sales pressure, no fluff." },
               { step: "02", title: "We map your revenue gaps", body: "We show you exactly where leads are leaking in your current setup." },
@@ -38,8 +38,8 @@ export default function FinalCTA() {
           </p>
         </div>
 
-        <div className="max-w-3xl mx-auto text-left mt-4 relative z-10">
-          <div className="flex flex-col sm:flex-row items-start justify-start gap-3">
+        <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="/book"
               onClick={() => {

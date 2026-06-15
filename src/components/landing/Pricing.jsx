@@ -62,7 +62,7 @@ export default function Pricing() {
       className="nebula-pricing pt-10 md:pt-14 pb-16 md:pb-24 px-6 overflow-visible"
     >
       <div className="max-w-7xl mx-auto">
-        <div className="max-w-4xl mx-auto text-left mb-12">
+        <div className="max-w-4xl mx-auto text-center mb-12">
           <p className="cs-eyebrow mb-4">Plans & Pricing</p>
           <h2
             className="text-[#001B44] text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl"
@@ -76,7 +76,7 @@ export default function Pricing() {
         </div>
 
         {/* Business Size Toggle */}
-        <div className="flex justify-start gap-3 mb-12">
+        <div className="flex justify-center gap-3 mb-12">
           {["Local", "Scaling", "High-Volume"].map((size) => (
             <button
               key={size}
@@ -106,7 +106,7 @@ export default function Pricing() {
           </div>
         ) : null}
 
-        <div className="flex flex-wrap justify-start gap-3 mb-12">
+        <div className="flex flex-wrap justify-center gap-3 mb-12">
           {[
             { Icon: ShieldCheck, text: "Secure Stripe Checkout" },
             { Icon: CheckCircle2, text: "No Long-Term Contract" },
@@ -180,7 +180,7 @@ export default function Pricing() {
           ))}
         </div>
 
-        <div className="text-left mb-6">
+        <div className="text-center mb-6">
           <p className="text-sm text-foreground/60">
             <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth because it includes nurture sequences and AI booking—the fastest path to more booked appointments.
           </p>

@@ -16,14 +16,14 @@ const mobileVisibleSystemIds = new Set(["02", "03", "04", "05"]);
 
 function CoreOfferHeader() {
   return (
-    <div className="text-left mx-auto max-w-4xl">
+    <div className="text-center mx-auto max-w-4xl">
       {/* Eyebrow */}
       <p className="cs-eyebrow mb-4">
         {coreOfferSectionConfig.eyebrow}
       </p>
 
       {/* Title */}
-      <h2 className="font-bold tracking-tight leading-none text-foreground text-left"
+      <h2 className="font-bold tracking-tight leading-none text-foreground text-center"
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
        We fix revenue loss{" "}
        <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>
