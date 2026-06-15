@@ -20,9 +20,16 @@ export default function ImmersiveIndustryHero({ config }) {
           backgroundImage: hero.image ? `url('${hero.image}')` : 'linear-gradient(135deg, hsl(var(--primary)) 0%, hsl(var(--secondary)) 100%)',
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundRepeat: 'no-repeat',
           backgroundAttachment: 'fixed',
+          backgroundColor: 'hsl(var(--background))',
+          WebkitBackgroundSize: 'cover',
         }}
       >
+        {/* Preload image for high quality */}
+        {hero.image && (
+          <link rel="preload" as="image" href={hero.image} />
+        )}
         {/* Overlay for readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 z-10" />
 
