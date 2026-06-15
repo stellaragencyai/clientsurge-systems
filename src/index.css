@@ -1061,14 +1061,13 @@ table tbody tr:nth-child(even) {
 }
 
 /* ============================================
-   REFINEMENT #24: IMAGE FADE-IN LOADING
+   REFINEMENT #24: IMAGE FADE-IN LOADING (opt-in via .img-fade-in)
    ============================================ */
-img[loading="lazy"] {
+.img-fade-in {
   opacity: 0;
   transition: opacity 0.5s ease-in;
 }
-img[loading="lazy"].loaded,
-img.loaded {
+.img-fade-in.loaded {
   opacity: 1;
 }
 
