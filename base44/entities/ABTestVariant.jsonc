@@ -2,144 +2,174 @@
   "name": "ABTestVariant",
   "type": "object",
   "_metadata": {
-    "status": "CONVERSION_OPTIMIZATION",
-    "reason": "Tracks A/B test variants for messages, email sequences, landing pages. Links to existing MessageTemplate, EmailSequence, and WebsiteLead entities.",
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "CONVERSION_OPTIMIZATION.md"
+    "status": "A/B_TESTING",
+    "reason": "Stores A/B test variants for landing pages and industry pages. Enables performance comparison across page versions.",
+    "tenant_scoped": "client_project_id (optional for global tests)",
+    "documentation": "AB_TESTING_SYSTEM.md",
+    "product_layer": "conversion_optimization"
   },
   "properties": {
-    "test_name": {
+    "page_key": {
       "type": "string",
-      "title": "Test Name",
+      "title": "Page Key",
+      "description": "Unique identifier for page being tested (e.g., 'homepage', 'hvac_landing', 'roofing_landing', 'dental_landing', 'chiropractic_landing')",
       "required": true
     },
-    "client_id": {
+    "page_path": {
       "type": "string",
-      "title": "Client ID"
+      "title": "Page Route Path",
+      "description": "React Router path (e.g., '/', '/hvac', '/roofing')"
     },
-    "client_project_id": {
+    "variant_label": {
       "type": "string",
-      "title": "Client Project ID"
-    },
-    "test_type": {
-      "type": "string",
-      "title": "Test Type",
+      "title": "Variant Label",
       "enum": [
-        "message_template",
-        "email_sequence",
-        "landing_page_cta",
-        "automation_rule",
-        "lead_scoring"
+        "A",
+        "B"
       ],
-      "required": true
+      "required": true,
+      "description": "A = control/original, B = variation"
     },
-    "hypothesis": {
+    "variant_name": {
       "type": "string",
-      "title": "Hypothesis",
-      "maxLength": 500
+      "title": "Variant Name",
+      "description": "Human-readable name (e.g., 'Original Hero Section', 'Value-Focused CTA')"
+    },
+    "variant_description": {
+      "type": "string",
+      "title": "Variant Description",
+      "maxLength": 500,
+      "description": "What changed in this variant (copy, layout, colors, CTA placement, etc.)"
     },
     "status": {
       "type": "string",
-      "title": "Test Status",
+      "title": "Status",
       "enum": [
         "draft",
-        "running",
+        "active",
         "paused",
-        "completed",
-        "archived"
+        "completed"
       ],
-      "default": "draft"
+      "default": "draft",
+      "description": "draft=not started, active=collecting data, paused=suspended, completed=test ended"
     },
-    "started_at": {
+    "traffic_split_percent": {
+      "type": "number",
+      "title": "Traffic Split %",
+      "default": 50,
+      "description": "Percentage of traffic sent to this variant (A + B should = 100%)"
+    },
+    "start_date": {
       "type": "string",
-      "title": "Started At",
+      "title": "Test Start Date",
       "format": "date-time"
     },
-    "ended_at": {
+    "end_date": {
       "type": "string",
-      "title": "Ended At",
+      "title": "Test End Date",
       "format": "date-time"
     },
-    "variants": {
-      "type": "array",
-      "title": "Test Variants",
-      "items": {
-        "type": "object",
-        "properties": {
-          "variant_id": {
-            "type": "string",
-            "description": "Unique variant identifier (control, variant_a, variant_b, etc)"
-          },
-          "variant_name": {
+    "test_duration_days": {
+      "type": "integer",
+      "title": "Test Duration (days)",
+      "default": 14,
+      "description": "Planned duration of A/B test"
+    },
+    "changes": {
+      "type": "object",
+      "title": "Changes from Control",
+      "properties": {
+        "hero_title": {
+          "type": "string",
+          "title": "Hero Title (if changed)"
+        },
+        "cta_text": {
+          "type": "string",
+          "title": "CTA Button Text (if changed)"
+        },
+        "cta_color": {
+          "type": "string",
+          "title": "CTA Color (hex code if changed)"
+        },
+        "hero_subheading": {
+          "type": "string",
+          "title": "Hero Subheading (if changed)"
+        },
+        "value_proposition": {
+          "type": "string",
+          "title": "Value Proposition (if changed)"
+        },
+        "layout_change": {
+          "type": "string",
+          "title": "Layout Changes"
+        },
+        "other_changes": {
+          "type": "array",
+          "title": "Other Changes",
+          "items": {
             "type": "string"
-          },
-          "is_control": {
-            "type": "boolean",
-            "default": false
-          },
-          "linked_entity_id": {
-            "type": "string",
-            "description": "MessageTemplate ID, EmailSequence ID, etc"
-          },
-          "traffic_allocation_percent": {
-            "type": "number",
-            "description": "% of traffic sent to this variant"
-          },
-          "total_exposed": {
-            "type": "integer",
-            "description": "Total users/leads exposed to variant"
-          },
-          "conversion_count": {
-            "type": "integer"
-          },
-          "conversion_rate_percent": {
-            "type": "number"
-          },
-          "revenue_attributed": {
-            "type": "number"
-          },
-          "average_session_duration_seconds": {
-            "type": "number"
           }
         }
       }
     },
-    "primary_metric": {
+    "hypothesis": {
+      "type": "string",
+      "title": "Test Hypothesis",
+      "maxLength": 500,
+      "description": "What we're testing and why (e.g., 'Shorter headline increases click-through rate')"
+    },
+    "success_metric": {
       "type": "string",
       "title": "Primary Success Metric",
       "enum": [
         "conversion_rate",
-        "revenue_per_lead",
-        "response_rate",
-        "booking_rate",
-        "engagement_score"
-      ]
+        "click_through_rate",
+        "lead_submission_rate",
+        "booking_rate"
+      ],
+      "description": "Which metric determines winner"
     },
-    "statistical_significance_percent": {
+    "minimum_sample_size": {
+      "type": "integer",
+      "title": "Minimum Sample Size",
+      "default": 100,
+      "description": "Minimum visitors per variant for statistical significance"
+    },
+    "confidence_threshold_percent": {
       "type": "number",
-      "title": "Statistical Significance %",
-      "description": "Confidence level in the result (e.g. 95%)"
+      "title": "Confidence Threshold %",
+      "default": 95,
+      "description": "Statistical significance threshold (95% = 95% confident result is not due to chance)"
     },
-    "winning_variant_id": {
+    "winner": {
       "type": "string",
-      "title": "Winning Variant ID (if completed)"
+      "title": "Test Winner",
+      "enum": [
+        "A",
+        "B",
+        "tie",
+        "undecided"
+      ],
+      "description": "Which variant won (determined after test completion)"
     },
     "winner_lift_percent": {
       "type": "number",
-      "title": "Lift vs Control %"
+      "title": "Winner Lift %",
+      "description": "Improvement of winner vs control (e.g., 15.3% better)"
     },
     "notes": {
       "type": "string",
-      "title": "Test Notes / Learnings"
+      "title": "Test Notes",
+      "description": "Observations, issues, or findings from test"
     },
-    "created_by": {
+    "client_project_id": {
       "type": "string",
-      "title": "Created By (User Email)"
+      "title": "Client Project ID (optional)",
+      "description": "Link to specific client if testing their industry pages"
     }
   },
   "required": [
-    "test_name",
-    "test_type",
-    "variants"
+    "page_key",
+    "variant_label"
   ]
 }
