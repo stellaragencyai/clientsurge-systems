@@ -220,7 +220,7 @@ function CoreOfferCTA({ onBookDemo }) {
               whiteSpace: "nowrap"
             }}>
             
-            {coreOfferSectionConfig.secondaryCta.label}
+            Activate My System
             <ArrowRight className="w-4 h-4" />
           </span>
         </button>

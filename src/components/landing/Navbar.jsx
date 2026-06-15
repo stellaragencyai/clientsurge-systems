@@ -395,7 +395,7 @@ export default function Navbar() {
             Login
           </button>
           <button
-            onClick={() => { trackCTA("book_free_audit", "navbar"); navigate("/book"); }}
+            onClick={() => { trackCTA("activate_system", "navbar"); navigate("/book"); }}
             className="hidden md:inline-flex items-center focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-5 py-2.5"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
@@ -413,7 +413,7 @@ export default function Navbar() {
             }}
             onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-            Claim My System Diagnostic
+            Activate My System
           </button>
         </div>
 
@@ -515,13 +515,13 @@ export default function Navbar() {
           </button>
           <button
             onClick={() => {
-              trackCTA("claim_diagnostic", "mobile_nav");
+              trackCTA("activate_system", "mobile_nav");
               setOpen(false);
               navigate("/book");
             }}
             className="cs-btn-primary" style={{ width: "100%", display: "block" }}>
             <span className="cs-btn-primary-inner" style={{ height: "40px", gap: "6px", fontSize: "0.875rem" }}>
-              {BUTTON_TEXT.BOOK_DEMO}
+              Activate My System
             </span>
           </button>
         </div>
