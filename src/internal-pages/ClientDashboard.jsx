@@ -18,6 +18,7 @@ import ClientActionRequiredPanel from "@/components/dashboard/ClientActionRequir
 import RecentSystemProofPanel from "@/components/dashboard/RecentSystemProofPanel";
 import RecentIssuesPanel from "@/components/dashboard/RecentIssuesPanel";
 import AdminPreviewBanner from "@/components/dashboard/AdminPreviewBanner";
+import AdminPreviewToggler from "@/components/dashboard/AdminPreviewToggler";
 import InternalFilterNotice from "@/components/dashboard/InternalFilterNotice";
 
 export const STAGE_MAP = {
@@ -146,6 +147,8 @@ export default function ClientDashboard() {
   const [isAdminPreview, setIsAdminPreview] = useState(false);
   const [healthEvents, setHealthEvents] = useState([]);
   const [userRole, setUserRole] = useState(null);
+  const [simulatedState, setSimulatedState] = useState("paid");
+  const [simulatedData, setSimulatedData] = useState(null);
 
   const fetchPortal = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -185,14 +188,38 @@ export default function ClientDashboard() {
   }, []);
 
   useEffect(() => { fetchPortal(false); }, [fetchPortal]);
+
+  const fetchSimulated = useCallback(async (state) => {
+    setLoading(true);
+    try {
+      const res = await base44.functions.invoke("getAdminPreviewData", { state });
+      if (res.data?.success) {
+        setSimulatedData(res.data);
+        setLastUpdated(new Date());
+      }
+    } catch {
+      // Silently fail — real data is the fallback
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const handleSimStateChange = useCallback((state) => {
+    setSimulatedState(state);
+    fetchSimulated(state);
+  }, [fetchSimulated]);
+
   useEffect(() => {
     const interval = setInterval(() => fetchPortal(true), 30000);
     return () => clearInterval(interval);
   }, [fetchPortal]);
 
-  const services = portalData?.order?.services || [];
-  const project = portalData?.project;
-  const order = portalData?.order;
+  // Admin preview overrides: use simulated data when available
+  const effectiveData = (isAdminPreview && simulatedData) ? simulatedData : portalData;
+  const services = effectiveData?.order?.services || [];
+  const project = effectiveData?.project;
+  const order = effectiveData?.order;
+  const effectiveHealthEvents = (isAdminPreview && simulatedData) ? (simulatedData?.health?.recent_events || []) : healthEvents;
   const hasSetupInfo = !!(order?.install_configuration?.brand?.business_name || order?.install_configuration?.shared?.twilio_business_phone);
 
   const activeServices = services.map(svc => ({
@@ -307,8 +334,14 @@ export default function ClientDashboard() {
                   </>
                 )}
 
-                {/* Admin Preview Banner */}
-                {isAdminPreview && <AdminPreviewBanner userEmail={userEmail} linkStatus={portalData?.link_status} />}
+                {/* Admin Preview Toggler — switch between simulated pipeline states */}
+                {isAdminPreview && (
+                  <AdminPreviewToggler
+                    currentState={simulatedData?.simulated_state || simulatedState}
+                    onStateChange={handleSimStateChange}
+                    userEmail={userEmail}
+                  />
+                )}
 
                 {/* Internal/QA Filter Notice */}
                 <InternalFilterNotice isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
@@ -317,14 +350,14 @@ export default function ClientDashboard() {
                 <LaunchReadinessPanel
                   order={order}
                   project={project}
-                  events={healthEvents}
+                  events={effectiveHealthEvents}
                 />
 
                 {/* Active Automations Panel */}
                 <ActiveAutomationsPanel
                   packageKey={order?.package_type || order?.selected_package_type}
                   services={order?.services || []}
-                  failedEvents={healthEvents.filter(e => e.status === "failed")}
+                  failedEvents={effectiveHealthEvents.filter(e => e.status === "failed")}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
@@ -332,19 +365,19 @@ export default function ClientDashboard() {
                 <ClientActionRequiredPanel
                   order={order}
                   project={project}
-                  readiness={{ canGoLive: (order?.pipeline_status === "Live" && !healthEvents.some(e => e.status === "failed")) }}
+                  readiness={{ canGoLive: (order?.pipeline_status === "Live" && !effectiveHealthEvents.some(e => e.status === "failed")) }}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
                 {/* Recent System Proof */}
                 <RecentSystemProofPanel
-                  events={healthEvents}
+                  events={effectiveHealthEvents}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
                 {/* Recent Issues */}
                 <RecentIssuesPanel
-                  events={healthEvents}
+                  events={effectiveHealthEvents}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
