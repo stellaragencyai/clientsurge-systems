@@ -253,17 +253,17 @@ export default function ProductCard({ product }) {
               style={{
                 width: "100%",
                 borderRadius: "9999px", padding: "1px",
-                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#00AEEF,#003B8F)",
+                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#00AEEF,#0088CC)",
                 border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 6px 16px rgba(0,136,204,0.18)",
+                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 6px 16px rgba(0,174,239,0.32)",
               }}
             >
               <span className="product-card-cta-label" style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                 width: "100%",
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
-                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "#ffffff",
-                color: inCart ? "#fff" : "#005f99", fontWeight: "700", whiteSpace: "nowrap",
+                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "#00AEEF",
+                color: inCart ? "#fff" : "#fff", fontWeight: "700", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
                 {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}

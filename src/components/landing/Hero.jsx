@@ -62,20 +62,11 @@ export default function Hero() {
         }}>
           <a
             href="/book"
+            className="cs-btn-primary"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: "8px",
               padding: "0 32px",
               height: "52px",
-              borderRadius: "8px",
-              background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-              color: "#ffffff",
-              fontWeight: "700",
               fontSize: "0.95rem",
-              textDecoration: "none",
-              boxShadow: "0 8px 28px rgba(0,136,204,0.45)",
-              whiteSpace: "nowrap",
             }}
           >
             Claim My System Diagnostic →
