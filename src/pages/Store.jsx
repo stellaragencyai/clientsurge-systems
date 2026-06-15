@@ -47,7 +47,7 @@ function StoreHumanFallbackCTA() {
       aria-label="Talk to a human"
       className="store-human-fallback"
       style={{
-        margin: "28px 0 8px",
+        margin: "24px 0 24px",
         borderRadius: "24px",
         border: "1px solid rgba(0,136,204,0.16)",
         background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(255,255,255,0.92))",
@@ -383,6 +383,12 @@ function StoreInner() {
             max-width: 760px;
             margin: 0 auto;
           }
+          @media (min-width: 721px) and (max-width: 1024px) {
+            .store-page .store-stat-grid {
+              grid-template-columns: repeat(2, minmax(0, 1fr));
+              max-width: 540px;
+            }
+          }
           .store-page .store-toolbar {
             display: flex;
             flex-wrap: wrap;
@@ -433,7 +439,7 @@ function StoreInner() {
           .store-page .store-sticky-cart {
             position: sticky;
             top: 64px;
-            z-index: 50;
+            z-index: 40;
             margin: 0 24px 20px;
             border-radius: 18px;
             background: linear-gradient(135deg, rgba(0,80,160,0.95) 0%, rgba(0,136,204,0.95) 52%, rgba(0,59,143,0.97) 100%);
@@ -448,6 +454,7 @@ function StoreInner() {
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
             width: calc(100% - 48px);
+            padding: 14px 20px !important;
             font: inherit;
             text-align: left;
           }
@@ -507,11 +514,16 @@ function StoreInner() {
             .store-page .store-categories {
               flex-wrap: nowrap;
               overflow-x: auto;
-              padding-bottom: 4px;
-              scrollbar-width: none;
+              padding-bottom: 6px;
+              scrollbar-width: thin;
+              scrollbar-color: rgba(0,174,239,0.35) transparent;
             }
             .store-page .store-categories::-webkit-scrollbar {
-              display: none;
+              height: 3px;
+            }
+            .store-page .store-categories::-webkit-scrollbar-thumb {
+              background: rgba(0,174,239,0.35);
+              border-radius: 999px;
             }
             .store-page .store-grid {
               grid-template-columns: 1fr;
@@ -544,7 +556,7 @@ function StoreInner() {
                   lineHeight: 1.08,
                   letterSpacing: 0,
                   color: "hsl(var(--foreground))",
-                  marginBottom: "8px"
+                  marginBottom: "16px"
                 }}>
 
                 {selectedPackageOffer ? "Review Your" : "Build Your"}{" "}
@@ -569,7 +581,7 @@ function StoreInner() {
                   color: "rgba(10,22,40,0.72)",
                   lineHeight: 1.6,
                   maxWidth: "620px",
-                  margin: "0 auto 12px"
+                  margin: "0 auto 24px"
                 }}>
                 
                 {selectedPackageOffer
@@ -817,7 +829,7 @@ function StoreInner() {
                   style={{
                     width: "100%",
                     borderRadius: "9999px",
-                    border: "1.5px solid rgba(0,136,204,0.22)",
+                    border: "1.5px solid rgba(0,136,204,0.42)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
                     background: "rgba(255,255,255,0.85)",
@@ -959,4 +971,3 @@ export default function Store() {
     </DemoBookingProvider>);
 
 }
-
