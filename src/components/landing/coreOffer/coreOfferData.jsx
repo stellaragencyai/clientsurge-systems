@@ -27,18 +27,18 @@ export const iconMap = {
 };
 
 export const coreOfferSectionConfig = {
-  eyebrow: "How It Works",
-  headline: "How The 8-System Flow Works",
+  eyebrow: "The System",
+  headline: "We fix revenue loss automatically",
   subheadline:
-    "One connected system handles the work that usually gets dropped: fast replies, missed calls, follow-up, booking, organization, and ongoing improvement.",
+    "Your AI system responds in seconds, follows up consistently, and books appointments without manual work.",
   helperLine:
-    "You do not need eight separate tools. We set up one system that works together for you.",
+    "Recover the revenue from every missed call and abandoned lead.",
   primaryCta: {
     label: "See Plans And Pricing",
     href: "/pricing",
   },
   secondaryCta: {
-    label: "Free Automation Audit",
+    label: "Get Free Automation Audit",
   },
 };
 

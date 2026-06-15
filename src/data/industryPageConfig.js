@@ -10,9 +10,9 @@ export const INDUSTRY_CONFIG = {
     name: 'HVAC',
     title: 'HVAC Lead Automation | ClientSurge',
     description: 'Never miss an emergency service call. Automate lead response, missed call recovery, and appointment booking for HVAC contractors.',
-    heroTitle: 'Never Miss a Service Call Again',
-    heroSubtitle: 'AI-powered lead response converts emergency calls into booked appointments—24/7.',
-    painStatement: 'Emergency HVAC leads don\'t wait. Every missed call is lost revenue.',
+    heroTitle: 'Never miss another HVAC service call again.',
+    heroSubtitle: 'AI responds instantly 24/7, qualifies leads, and books appointments automatically so you never lose revenue from missed calls.',
+    painStatement: 'Every missed emergency call is lost revenue—sometimes $1,000+ per call.',
     painCalculation: {
       avgJobValue: 3500,
       missedCallsPerMonth: 12,
@@ -102,7 +102,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'HVAC contractor case study',
-    cta: 'Get Your Free HVAC Automation Audit',
+    cta: 'Get Free Automation Audit',
   },
 
   roofing: {
@@ -110,9 +110,9 @@ export const INDUSTRY_CONFIG = {
     name: 'Roofing & Contractors',
     title: 'Contractor Lead Automation | ClientSurge',
     description: 'Stop losing $5K–$20K jobs to slow response times. Automate lead capture, qualification, and booking for roofing and construction contractors.',
-    heroTitle: 'Every Missed Inquiry Could Be a $15K Job',
-    heroSubtitle: 'Respond to leads in seconds. Book consultations automatically. Never lose a high-ticket job again.',
-    painStatement: 'Roofing and construction leads are high-value and high-urgency. A 2-hour delay can cost you the entire job.',
+    heroTitle: 'Every missed call can cost you a $5K–$20K job.',
+    heroSubtitle: 'Respond in seconds. Book consultations automatically. Never lose high-ticket revenue again.',
+    painStatement: 'High-ticket leads require fast response. A 2-hour delay = lost job.',
     painCalculation: {
       avgJobValue: 12000,
       missedCallsPerMonth: 8,
@@ -202,7 +202,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Roofing contractor case study',
-    cta: 'Get Your Free Contractor Automation Audit',
+    cta: 'Get Free Automation Audit',
   },
 
   dental: {
@@ -210,9 +210,9 @@ export const INDUSTRY_CONFIG = {
     name: 'Dental',
     title: 'Dental Practice Lead Automation | ClientSurge',
     description: 'Fill empty chair time automatically. Automate appointment scheduling, patient reactivation, and no-show recovery for dental practices.',
-    heroTitle: 'Fill Empty Chairs Automatically',
-    heroSubtitle: 'Every empty appointment slot is lost revenue. Automate patient booking, reactivation, and no-show recovery.',
-    painStatement: 'Every empty chair in your schedule is a missed treatment and lost revenue. Reactivate patients on autopilot.',
+    heroTitle: 'Fill your empty chair time automatically.',
+    heroSubtitle: 'AI schedules patients 24/7, automates reminders to reduce no-shows, and reactivates inactive patients—all without your team.',
+    painStatement: 'Every empty chair is lost revenue. No-shows hurt your practice and your team\'s schedule.',
     painCalculation: {
       avgTreatmentValue: 500,
       emptyChairsPerDay: 3,
@@ -302,7 +302,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Dental practice case study',
-    cta: 'Get Your Free Dental Practice Automation Audit',
+    cta: 'Get Free Automation Audit',
   },
 
   chiropractic: {
@@ -310,9 +310,9 @@ export const INDUSTRY_CONFIG = {
     name: 'Chiropractic',
     title: 'Chiropractic Practice Automation | ClientSurge',
     description: 'Automate patient follow-ups, reduce no-shows, and boost recurring visits with AI-powered practice automation for chiropractors.',
-    heroTitle: 'Automate Patient Follow-Ups. Reduce No-Shows. Boost Retention.',
-    heroSubtitle: 'Chiropractic success is recurring visits. Automate reminders, follow-ups, and reactivation—24/7.',
-    painStatement: 'Chiropractic practices live on recurring visits. Every missed appointment and lost patient is lost revenue.',
+    heroTitle: 'Stop losing patients from missed follow-ups.',
+    heroSubtitle: 'Automate appointment reminders, post-visit follow-ups, and patient reactivation to fill your schedule with recurring visits.',
+    painStatement: 'Patient drop-off starts with missed appointments. Automate follow-ups to keep patients on track.',
     painCalculation: {
       avgVisitValue: 150,
       missedApptsPerMonth: 15,
@@ -401,7 +401,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Chiropractic practice case study',
-    cta: 'Get Your Free Practice Automation Audit',
+    cta: 'Get Free Automation Audit',
   },
 };
 

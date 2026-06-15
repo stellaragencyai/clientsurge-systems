@@ -29,11 +29,10 @@ function CoreOfferHeader() {
       {/* Title */}
       <h2 className="font-bold tracking-tight leading-none text-foreground text-center"
       style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
-       How The{" "}
+       We fix revenue loss{" "}
        <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>
-         ClientSurge
-       </span>{" "}
-       Flow Works
+         automatically
+       </span>
       </h2>
 
       {/* Thin gold rule */}
@@ -45,11 +44,11 @@ function CoreOfferHeader() {
 
       {/* Subheadline */}
       <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-        {coreOfferSectionConfig.subheadline}
-      </p>
-      <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-        {coreOfferSectionConfig.helperLine}
-      </p>
+         Your AI system responds in seconds, follows up consistently, and books appointments without manual work.
+       </p>
+       <p className="mt-3 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
+         Recover the revenue from every missed call and abandoned lead.
+       </p>
     </div>);
 
 }
@@ -184,11 +183,11 @@ function CoreOfferCTA({ onBookDemo }) {
         style={{ background: "linear-gradient(90deg, #003B8F, #00AEEF, #66D9FF)" }}
       />
       <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
-        Ready to see which systems fit your business?
-      </p>
-      <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
-        We will show you the right setup based on your lead flow, booking process, and goals.
-      </p>
+         More booked jobs. Less lost revenue.
+       </p>
+       <p className="mx-auto mt-3 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+         Get a free automation audit to see exactly which systems will work for your business.
+       </p>
       <div className="mt-7 flex w-full flex-col items-center justify-center gap-3 sm:w-auto sm:flex-row">
         <a
           href={coreOfferSectionConfig.primaryCta.href}

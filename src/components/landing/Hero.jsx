@@ -28,8 +28,18 @@ export default function Hero() {
             margin: "0",
           }}
         >
-          We Build the AI Growth Engines That Turn Your Website Into a Booking Machine.
+          Turn missed calls and leads into booked jobs automatically.
         </h1>
+        <p style={{ 
+          fontSize: "clamp(1rem, 2vw, 1.25rem)", 
+          lineHeight: 1.5, 
+          color: "rgba(255,255,255,0.85)", 
+          marginTop: "1.5rem",
+          maxWidth: "800px",
+          margin: "1.5rem auto 0"
+        }}>
+          ClientSurge installs an AI system that responds instantly, follows up automatically, and books appointments so you never lose revenue again.
+        </p>
       </div>
     </section>
   );

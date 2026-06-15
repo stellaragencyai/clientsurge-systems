@@ -213,11 +213,11 @@ export default function Industries() {
              Choose Your Industry
            </p>
            <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight max-w-4xl" style={{ fontFamily: "Montserrat, sans-serif" }}>
-             Built for Businesses That Win on{" "}
-             <span className="text-primary">Fast Response</span>
+             Built for service businesses that lose revenue on{" "}
+             <span className="text-primary">missed calls</span>
            </h2>
            <p className="mt-4 text-muted-foreground text-lg max-w-3xl leading-relaxed">
-             Click your industry and we will show you the AI service stack we would recommend first, why it fits, and which pieces are available now versus by review.
+             Select your industry to see how we recover the leads and revenue your competitors are capturing.
            </p>
          </div>
 
