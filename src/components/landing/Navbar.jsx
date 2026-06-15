@@ -285,15 +285,17 @@ export default function Navbar() {
               <div className="flex flex-col gap-1">
                 {solutionsLinks.map((item) =>
                 <a
-                  key={item.href}
-                  href={item.href}
-                  role="menuitem"
-                  onClick={() => {
-                    trackCTA(`nav_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "solutions_dropdown");
-                    setIndustriesOpen(false);
-                  }}
-                  className="w-full text-left flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer whitespace-nowrap">
-                  {item.label}
+                   key={item.href}
+                   href={item.href}
+                   role="menuitem"
+                   onClick={(e) => {
+                     e.preventDefault();
+                     trackCTA(`nav_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "solutions_dropdown");
+                     navigate(item.href);
+                     setIndustriesOpen(false);
+                   }}
+                   className="w-full text-left flex items-center rounded-md px-3 py-2.5 text-sm font-medium text-foreground hover:bg-primary/8 hover:text-primary transition-colors border-none bg-transparent cursor-pointer whitespace-nowrap">
+                   {item.label}
                 </a>
                 )}
               </div>
@@ -435,8 +437,10 @@ export default function Navbar() {
                 href={link.href}
                 className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
                 style={{ minHeight: "44px" }}
-                onClick={() => {
+                onClick={(e) => {
+                  e.preventDefault();
                   trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                  navigate(link.href);
                   setOpen(false);
                 }}>
                 {link.label}
