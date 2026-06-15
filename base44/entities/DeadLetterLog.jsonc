@@ -1,0 +1,88 @@
+{
+  "name": "DeadLetterLog",
+  "type": "object",
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Immutable dead letter queue for permanently failed events. Admin review & reconciliation.",
+    "immutable": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "SCALE_ARCHITECTURE.md"
+  },
+  "properties": {
+    "event_queue_id": {
+      "type": "string",
+      "title": "EventQueue ID"
+    },
+    "communication_event_id": {
+      "type": "string",
+      "title": "CommunicationEvent ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "event_category": {
+      "type": "string",
+      "title": "Event Category",
+      "enum": [
+        "inbound_event",
+        "automation_event",
+        "billing_event",
+        "system_event"
+      ]
+    },
+    "processor_type": {
+      "type": "string",
+      "title": "Failed Processor"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason",
+      "description": "Why event permanently failed"
+    },
+    "final_error_message": {
+      "type": "string",
+      "title": "Final Error Message"
+    },
+    "retry_count": {
+      "type": "integer",
+      "title": "Total Attempts",
+      "default": 0
+    },
+    "last_attempt_at": {
+      "type": "string",
+      "title": "Last Attempt At",
+      "format": "date-time"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Event Metadata",
+      "description": "Full context for debugging"
+    },
+    "admin_notes": {
+      "type": "string",
+      "title": "Admin Investigation Notes"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending_review",
+        "under_investigation",
+        "resolved",
+        "archived"
+      ],
+      "default": "pending_review"
+    }
+  },
+  "required": [
+    "event_queue_id",
+    "client_id",
+    "event_category",
+    "failure_reason"
+  ]
+}

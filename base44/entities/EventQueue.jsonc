@@ -1,0 +1,110 @@
+{
+  "name": "EventQueue",
+  "type": "object",
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Logical queue abstraction over CommunicationEvent flow. Tracks processing state per event.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "SCALE_ARCHITECTURE.md"
+  },
+  "properties": {
+    "communication_event_id": {
+      "type": "string",
+      "title": "Linked CommunicationEvent ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "event_category": {
+      "type": "string",
+      "title": "Event Category",
+      "enum": [
+        "inbound_event",
+        "automation_event",
+        "billing_event",
+        "system_event"
+      ],
+      "description": "Categorizes event type for processor routing"
+    },
+    "processor_type": {
+      "type": "string",
+      "title": "Target Processor",
+      "enum": [
+        "messaging_processor",
+        "automation_processor",
+        "billing_processor",
+        "system_processor"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Processing Status",
+      "enum": [
+        "queued",
+        "processing",
+        "completed",
+        "failed",
+        "dead_letter"
+      ],
+      "default": "queued",
+      "description": "Current stage in processing pipeline"
+    },
+    "retry_count": {
+      "type": "integer",
+      "title": "Retry Count",
+      "default": 0
+    },
+    "max_retries": {
+      "type": "integer",
+      "title": "Max Retries",
+      "default": 3
+    },
+    "last_retry_at": {
+      "type": "string",
+      "title": "Last Retry At",
+      "format": "date-time"
+    },
+    "next_retry_at": {
+      "type": "string",
+      "title": "Next Retry At",
+      "format": "date-time"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Last Error Message"
+    },
+    "rate_limited": {
+      "type": "boolean",
+      "title": "Rate Limited",
+      "default": false,
+      "description": "True if event queued due to rate limit (vs processing failure)"
+    },
+    "priority": {
+      "type": "integer",
+      "title": "Processing Priority",
+      "default": 0,
+      "description": "Higher priority processes first within tenant queue"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Processing Metadata",
+      "description": "JSON object tracking processor-specific state"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "communication_event_id",
+    "client_id",
+    "event_category",
+    "processor_type"
+  ]
+}

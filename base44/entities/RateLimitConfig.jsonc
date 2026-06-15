@@ -1,0 +1,114 @@
+{
+  "name": "RateLimitConfig",
+  "type": "object",
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Tenant-scoped rate limiting configuration per Client/ClientProject",
+    "tenant_scoped": "client_id + client_project_id (optional)",
+    "documentation": "SCALE_ARCHITECTURE.md"
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (applies globally to all projects)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (applies to this project only)"
+    },
+    "scope": {
+      "type": "string",
+      "title": "Rate Limit Scope",
+      "enum": [
+        "client",
+        "client_project"
+      ],
+      "description": "Level at which limit applies"
+    },
+    "max_events_per_minute": {
+      "type": "integer",
+      "title": "Max Events Per Minute",
+      "default": 1000,
+      "description": "Total incoming events per minute"
+    },
+    "max_messages_per_hour": {
+      "type": "integer",
+      "title": "Max Messages Per Hour",
+      "default": 5000,
+      "description": "SMS/email messages sent per hour"
+    },
+    "max_automation_triggers_per_minute": {
+      "type": "integer",
+      "title": "Max Automation Triggers Per Minute",
+      "default": 500,
+      "description": "Automation rule executions per minute"
+    },
+    "max_api_calls_per_minute": {
+      "type": "integer",
+      "title": "Max API Calls Per Minute",
+      "default": 500,
+      "description": "External API calls per minute"
+    },
+    "burst_multiplier": {
+      "type": "number",
+      "title": "Burst Multiplier",
+      "default": 1.5,
+      "description": "Allow 1.5x sustained limits for burst periods (seconds)"
+    },
+    "burst_duration_seconds": {
+      "type": "integer",
+      "title": "Burst Duration (seconds)",
+      "default": 30,
+      "description": "How long burst allowance lasts"
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Rate Limiting Enabled",
+      "default": true
+    },
+    "action_on_limit_exceeded": {
+      "type": "string",
+      "title": "Action When Limit Exceeded",
+      "enum": [
+        "queue",
+        "reject",
+        "alert"
+      ],
+      "default": "queue",
+      "description": "Queue (wait for capacity), reject (return error), or alert admin"
+    },
+    "custom_rules": {
+      "type": "array",
+      "title": "Custom Rate Limit Rules",
+      "items": {
+        "type": "object",
+        "properties": {
+          "rule_name": {
+            "type": "string"
+          },
+          "event_category": {
+            "type": "string"
+          },
+          "max_per_window": {
+            "type": "integer"
+          },
+          "window_seconds": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time"
+    },
+    "updated_by": {
+      "type": "string",
+      "title": "Updated By (Admin Email)"
+    }
+  },
+  "required": [
+    "scope"
+  ]
+}
