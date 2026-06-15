@@ -77,6 +77,7 @@ const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipelin
 const MissionControlDashboard = lazy(() => import("./internal-pages/MissionControlDashboard"));
 const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLogs"));
 const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
+const OpportunityReviewQueue = lazy(() => import("./internal-pages/OpportunityReviewQueue"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -382,6 +383,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "onboarding-pipeline"), Component: OnboardingPipeline },
           { route: routePath("admin", "logs"), Component: MissionControlLogs },
           { route: routePath("saas", "admin"), Component: SaaSAdminPanel },
+          { route: routePath("admin", "opportunity-review"), Component: OpportunityReviewQueue },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
