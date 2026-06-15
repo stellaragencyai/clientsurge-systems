@@ -241,7 +241,7 @@ export default function Industries() {
       </div>
 
       <div
-        className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 md:grid-cols-2 lg:grid-cols-3 relative z-10"
+        className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3 relative z-10"
         style={{ overflowX: "hidden" }}>
         {filteredIndustries.map((industry, index) => {
           const Icon = industry.icon;
@@ -260,7 +260,7 @@ export default function Industries() {
             type="button"
             aria-label={industry.name}
             aria-pressed={isSelected}
-            className="group relative block overflow-hidden min-h-[100svh] md:min-h-[50svh] text-left"
+            className="group relative block overflow-hidden min-h-[60svh] sm:min-h-[45svh] md:min-h-[50svh] text-left"
             onClick={() => handleIndustrySelect(industry)}
             onMouseEnter={() => setHoveredIndustryId(industry.id)}
             onMouseLeave={() => setHoveredIndustryId("")}

@@ -62,9 +62,9 @@ export default function ImmersiveIndustryHero({ config }) {
 
             {/* Subheadline */}
             <p 
-              className="text-lg md:text-xl font-light text-white/90 mb-8 leading-relaxed max-w-2xl"
+              className="text-lg md:text-xl font-semibold text-white mb-8 leading-relaxed max-w-2xl"
               style={{
-                textShadow: '0 2px 10px rgba(0,0,0,0.3)',
+                textShadow: '0 2px 16px rgba(0,0,0,0.6)',
               }}
             >
               {hero.subheadline}

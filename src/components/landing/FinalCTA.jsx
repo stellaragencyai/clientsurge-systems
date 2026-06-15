@@ -24,7 +24,7 @@ export default function FinalCTA() {
           </p>
 
           {/* How the demo works - 3 steps */}
-          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-left">
+          <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl mx-auto text-center sm:text-left">
             {[
               { step: "01", title: "Book a 15-min slot", body: "Pick a time that works. No sales pressure, no fluff." },
               { step: "02", title: "We map your lead flow", body: "We show you exactly where bookings are leaking in your current setup." },

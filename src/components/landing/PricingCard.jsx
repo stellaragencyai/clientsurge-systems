@@ -50,7 +50,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
 
   return (
     <div
-      className={`relative flex flex-col rounded-3xl overflow-hidden border transition-all duration-300 h-full ${
+      className={`relative flex flex-col rounded-2xl overflow-hidden border transition-all duration-300 h-full ${
         isRecommended
           ? "border-primary/50 ring-2 ring-primary/25 shadow-2xl lg:scale-105"
           : "border-foreground/10 shadow-md hover:shadow-2xl hover:border-foreground/15 hover:-translate-y-1"
@@ -125,7 +125,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
          </div>
 
         {/* Features — Task #12: Centralized badge colors */}
-         <ul className="space-y-2.5 flex-1 mb-6" aria-label={`Features for ${plan.name}`}>
+         <ul className="space-y-3 flex-1 mb-6" aria-label={`Features for ${plan.name}`}>
            {plan.packageKey === "starter_system" ? (
              // Starter: show all features clearly
              STARTER_FEATURES.map((feature) => (
