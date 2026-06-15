@@ -21,14 +21,16 @@ export default function ImmersiveIndustryHero({ config }) {
           backgroundSize: 'cover',
           backgroundPosition: 'center',
           backgroundRepeat: 'no-repeat',
-          backgroundAttachment: 'fixed',
+          backgroundAttachment: window.innerWidth >= 768 ? 'fixed' : 'scroll',
           backgroundColor: 'hsl(var(--background))',
           WebkitBackgroundSize: 'cover',
         }}
       >
 
-        {/* Overlay for readability */}
-        <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-black/30 to-black/50 z-10" />
+        {/* Premium readability overlay — balanced density */}
+        <div className="absolute inset-0 bg-gradient-to-b from-black/35 via-black/25 to-black/45 z-10" style={{
+          backgroundImage: 'radial-gradient(ellipse 100% 100% at 50% 20%, rgba(0,0,0,0) 0%, rgba(0,0,0,0.15) 100%)',
+        }} />
 
         {/* Content Grid: Left (Text) Right (Image breathing room) */}
         <div className="relative z-20 h-full flex items-center px-6 md:px-10 lg:px-12">
