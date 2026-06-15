@@ -363,16 +363,22 @@ export default function Navbar() {
           </div>
 
           {sectionLinks.map((link) => (
-            <a
-              key={link.href}
-              href={link.href}
-              onClick={(e) => { e.preventDefault(); navigate(link.href); }}
-              className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
-              style={{ color: isActivePage(link.href) ? "#00AEEF" : "#0a1628", textDecoration: "none" }}
-            >
-              {link.label}
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
-            </a>
+          <a
+          key={link.href}
+          href={link.href}
+          onClick={(e) => { 
+          e.preventDefault(); 
+          trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar");
+          setIndustriesOpen(false);
+          setOpen(false);
+          navigate(link.href); 
+          }}
+          className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
+          style={{ color: isActivePage(link.href) ? "#00AEEF" : "#0a1628", textDecoration: "none" }}
+          >
+          {link.label}
+          <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+          </a>
           ))}
         </div>
 
@@ -455,8 +461,10 @@ export default function Navbar() {
             href={link.href}
             className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
             style={{ minHeight: "44px" }}
-            onClick={() => {
+            onClick={(e) => {
+              e.preventDefault();
               trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+              navigate(link.href);
               setOpen(false);
             }}>
             {link.label}
