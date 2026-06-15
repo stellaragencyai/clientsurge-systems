@@ -1,4 +1,3 @@
-import { useMemo } from "react";
 import { ArrowRight, Zap, TrendingUp, Crown } from "lucide-react";
 import { getPackageStorePath } from "@/lib/salesCatalog";
 import PageCheckIcon from "@/components/ui/PageCheckIcon";
@@ -26,27 +25,8 @@ const STARTER_FEATURES = [
   "Monthly system monitoring",
 ];
 
-const PREVIOUS_PLAN = {
-  growth_system: "Starter",
-  pro_system: "Growth",
-};
-
 export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
   const TierIcon = TIER_ICONS[plan.packageKey] || Zap;
-  const previousPlanName = PREVIOUS_PLAN[plan.packageKey] || null;
-
-  const featureGroups = useMemo(() => {
-    if (previousPlanName) {
-      return {
-        added: plan.features.slice(2, 4),
-        base: plan.features.slice(0, 2),
-      };
-    }
-    return {
-      main: plan.features.slice(0, 4),
-      extra: plan.features.slice(4),
-    };
-  }, [plan.features, previousPlanName]);
 
   return (
     <div

@@ -1,6 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
 import { CheckCircle2, ShieldCheck, Wallet } from "lucide-react";
-import { useDemoBooking } from "./DemoBookingContext";
 import {
   getSelectedIndustryRecommendation,
   INDUSTRY_SELECTION_STORAGE_KEY,
@@ -11,9 +10,7 @@ import StaggeredFadeUp from "@/components/visual-effects/StaggeredFadeUp";
 import PricingCard from "./PricingCard";
 
 export default function Pricing() {
-  const demoBooking = useDemoBooking();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
-  const [businessSize, setBusinessSize] = useState(null);
 
   const plans = useMemo(
     () =>
@@ -75,23 +72,6 @@ export default function Pricing() {
           </p>
         </div>
 
-        {/* Business Size Toggle */}
-        <div className="flex justify-center gap-3 mb-12">
-          {["Local", "Scaling", "High-Volume"].map((size) => (
-            <button
-              key={size}
-              onClick={() => setBusinessSize(size)}
-              className={`px-5 py-2 rounded-lg text-sm font-medium transition-all ${
-                businessSize === size
-                  ? "bg-primary text-white shadow-lg"
-                  : "bg-card border border-primary/15 text-foreground hover:border-primary/30"
-              }`}
-            >
-              {size}
-            </button>
-          ))}
-        </div>
-
         {selectedIndustry ? (
           <div className="max-w-4xl mx-auto mb-10 rounded-lg border border-primary/15 bg-primary/5 px-6 py-5 text-left">
             <p className="text-xs font-semibold text-primary tracking-[0.22em] uppercase mb-2">
@@ -142,44 +122,6 @@ export default function Pricing() {
           </div>
         </StaggeredFadeUp>
 
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-2 mt-12 mb-6 w-full">
-          {[
-            { icon: "🔓", text: "No Lock-In" },
-            { icon: "📅", text: "Managed Setup" },
-            { icon: "📱", text: "SMS + Email" },
-            { icon: "🚀", text: "Launch Support" },
-            { icon: null, image: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/fb4532189_720d06dc-da6b-42eb-80bd-84ce273b6d14.png", text: "30-Day Guarantee" },
-          ].map((badge) => (
-            <div
-              key={badge.text}
-              className="flex flex-col items-center justify-center gap-2 py-4 px-2 rounded-lg"
-              style={{
-                background: "hsl(var(--card))",
-                border: "1px solid rgba(0,174,239,0.18)",
-                color: "rgba(0,0,0,0.75)",
-              }}
-            >
-              {badge.image ? (
-                <img src={badge.image} alt={badge.text} style={{ width: "32px", height: "32px", objectFit: "contain" }} />
-              ) : (
-                <span style={{ fontSize: "20px", lineHeight: 1 }}>
-                  {badge.icon}
-                </span>
-              )}
-              <span
-                style={{
-                  fontSize: "11px",
-                  textAlign: "center",
-                  lineHeight: 1.2,
-                  fontWeight: "600",
-                }}
-              >
-                {badge.text}
-              </span>
-            </div>
-          ))}
-        </div>
-
         <div className="text-center mb-6">
           <p className="text-sm text-foreground/60">
             <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth because it includes nurture sequences and AI booking—the fastest path to more booked appointments.
@@ -188,17 +130,6 @@ export default function Pricing() {
 
         <MoneyBackGuarantee />
       </div>
-
-      <style>{`
-        .nebula-pricing .text-muted-foreground,
-        .nebula-pricing .text-foreground\\/70,
-        .nebula-pricing .text-foreground\\/75 {
-          color: rgba(10,22,40,0.74) !important;
-        }
-        .nebula-pricing .text-primary {
-          color: #00AEEF !important;
-        }
-      `}</style>
     </section>
   );
 }
