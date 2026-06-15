@@ -14,3 +14,9 @@ test("homepage testimonials are framed as launch scenarios until customer proof 
   assert.doesNotMatch(testimonialsSource, /5x booking increase|Close rate doubled|ROI within the first month/);
   assert.doesNotMatch(testimonialsSource, /Jessica M\.|Carlos R\.|Amanda T\./);
 });
+
+test("homepage testimonials CTA stays centered below the scenario cards", () => {
+  assert.match(testimonialsSource, /data-clientsurge-testimonials-cta-align="centered"/);
+  assert.match(testimonialsSource, /mx-auto mt-16 flex w-full max-w-2xl flex-col items-center justify-center/);
+  assert.match(testimonialsSource, /mx-auto inline-flex h-12 items-center justify-center/);
+});

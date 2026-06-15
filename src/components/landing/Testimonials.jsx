@@ -112,15 +112,18 @@ export default function Testimonials() {
           ))}
         </div>
 
-        <div className="text-center mt-16 pt-10 border-t border-border">
-          <p className="text-lg font-semibold text-foreground mb-4">
+        <div
+          className="mx-auto mt-16 flex w-full max-w-2xl flex-col items-center justify-center border-t border-border pt-10 text-center"
+          data-clientsurge-testimonials-cta-align="centered"
+        >
+          <p className="mb-4 text-center text-lg font-semibold text-foreground">
             Want a workflow like this for your business?
           </p>
           {demoBooking ? (
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
+              className="mx-auto inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-center text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               style={{ background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-md)" }}
             >
               Plan My System
@@ -128,7 +131,7 @@ export default function Testimonials() {
           ) : (
             <a
               href="/book"
-              className="inline-flex items-center justify-center gap-2 h-12 px-8 rounded-full text-sm font-bold text-white focus:ring-2 focus:ring-primary focus:outline-none focus:ring-offset-2"
+              className="mx-auto inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-center text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
               style={{ background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-md)" }}
             >
               Plan My System
