@@ -77,6 +77,7 @@ const MissionControlDashboard = lazy(() => import("./internal-pages/MissionContr
 const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLogs"));
 const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
 const OpportunityReviewQueue = lazy(() => import("./internal-pages/OpportunityReviewQueue"));
+const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -383,6 +384,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "logs"), Component: MissionControlLogs },
           { route: routePath("saas", "admin"), Component: SaaSAdminPanel },
           { route: routePath("admin", "opportunity-review"), Component: OpportunityReviewQueue },
+          { route: routePath("admin", "audit"), Component: FunctionAudit },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
