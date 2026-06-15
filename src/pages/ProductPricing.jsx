@@ -19,7 +19,7 @@ const PLANS = [
       'Email support',
       'Up to 500 leads/month',
     ],
-    cta_text: 'Start Free Trial',
+    cta_text: 'Get Free Automation Audit',
     highlighted: false,
   },
   {
@@ -37,7 +37,7 @@ const PLANS = [
       'Lead reactivation',
       'Voice call automation',
     ],
-    cta_text: 'Start Free Trial',
+    cta_text: 'Get Free Automation Audit',
     highlighted: true,
   },
   {
@@ -55,7 +55,7 @@ const PLANS = [
       'White-label options',
       'Advanced reporting',
     ],
-    cta_text: 'Start Free Trial',
+    cta_text: 'Get Free Automation Audit',
     highlighted: false,
   },
 ];
@@ -67,14 +67,13 @@ export default function ProductPricing() {
   useEffect(() => {
     setPageMetadata({
       title: 'ClientSurge Systems Pricing | Simple, Transparent Plans',
-      description: 'Choose the right plan for your business. All plans include 14-day free trial. No credit card required.',
+      description: 'Compare ClientSurge automation packages, then book a free automation audit to confirm the right fit before checkout.',
       canonicalPath: '/pricing',
     });
   }, []);
 
   const handleSelectPlan = (planName) => {
-    // Navigate to signup with plan pre-selected
-    navigate(`/signup?plan=${planName.toLowerCase().replace(/\s+/g, '_')}`);
+    navigate(`/book?plan=${planName.toLowerCase().replace(/\s+/g, '_')}`);
   };
 
   return (
@@ -86,7 +85,7 @@ export default function ProductPricing() {
           <div className="text-center mb-12">
             <h1 className="text-4xl font-bold mb-4">Simple, Transparent Pricing</h1>
             <p className="text-muted-foreground text-lg">
-              All plans include a 14-day free trial. No credit card required to start.
+              Compare plans, then book a free automation audit to confirm the right fit.
             </p>
           </div>
 

@@ -15,6 +15,7 @@ export default function Start() {
     canonicalPath: '/start',
     ogTitle: 'Start Your ClientSurge Audit',
     ogDescription: 'Begin the guided demo flow to see where ClientSurge can tighten lead response and booking follow-up.',
+    robots: 'noindex,nofollow',
   }), []);
 
   const handleClose = () => {

@@ -21,10 +21,10 @@ export default function IndustryFinalCTA({ config }) {
         </Link>
 
         <Link
-          to="/book"
+          to="/pricing"
           className="inline-flex items-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
         >
-          Schedule a Demo
+          View Pricing
           <ArrowRight className="w-5 h-5" />
         </Link>
       </div>
@@ -47,7 +47,7 @@ export default function IndustryFinalCTA({ config }) {
         </div>
 
         <p className="text-sm opacity-75">
-          Questions? <a href="mailto:support@clientsurge.com" className="underline hover:opacity-100">Email our team</a> or <Link to="/book" className="underline hover:opacity-100">book a call</Link>
+          Questions? <a href="mailto:support@clientsurgesystems.com" className="underline hover:opacity-100">Email our team</a> or <Link to="/contact" className="underline hover:opacity-100">contact us</Link>
         </p>
       </div>
     </div>

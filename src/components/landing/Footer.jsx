@@ -34,8 +34,6 @@ const navColumns = [
       { label: "Plumbing & Drain Services", href: "/plumbing" },
       { label: "Roofing & Restoration", href: "/roofing" },
       { label: "Contractors & Trades", href: "/contractors" },
-      { label: "Real Estate Agents", href: "/real-estate" },
-      { label: "Personal Injury Law", href: "/personal-injury" },
     ],
   },
   {

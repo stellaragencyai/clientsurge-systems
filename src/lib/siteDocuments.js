@@ -7,20 +7,19 @@ const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 
 const SITEMAP_ROUTE_META = {
   "/": { changefreq: "weekly", priority: "1.0" },
-  "/start": { changefreq: "monthly", priority: "0.8" },
-  "/store": { changefreq: "monthly", priority: "0.9" },
   "/automations": { changefreq: "monthly", priority: "0.9" },
   "/industries": { changefreq: "monthly", priority: "0.8" },
   "/about": { changefreq: "monthly", priority: "0.7" },
   "/contact": { changefreq: "monthly", priority: "0.8" },
   "/blog": { changefreq: "weekly", priority: "0.7" },
+  "/pricing": { changefreq: "monthly", priority: "0.8" },
   "/book": { changefreq: "monthly", priority: "0.7" },
   "/privacy-policy": { changefreq: "yearly", priority: "0.4" },
   "/terms": { changefreq: "yearly", priority: "0.4" },
 };
 
 const SITEMAP_SECTIONS = [
-  ["/", "/start", "/store", "/automations", "/industries", "/about", "/contact", "/blog"],
+  ["/", "/automations", "/industries", "/about", "/contact", "/blog", "/pricing"],
   BLOG_SITEMAP_PATHS,
   [
     "/med-spa",

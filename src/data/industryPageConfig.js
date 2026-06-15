@@ -105,6 +105,93 @@ export const INDUSTRY_CONFIG = {
     cta: 'Get Free Automation Audit',
   },
 
+  plumbing: {
+    slug: 'plumbing',
+    name: 'Plumbing',
+    title: 'Plumbing Dispatch Automation | ClientSurge',
+    description: 'Capture urgent plumbing calls, recover missed after-hours leads, and route booked dispatches with AI-powered plumbing automation.',
+    heroTitle: 'Turn urgent plumbing calls into booked dispatches faster.',
+    heroSubtitle: 'AI responds to emergency leak, drain repair, and water heater inquiries before the customer calls the next plumber.',
+    painStatement: 'Plumbing leads are urgent. If response is slow, the job usually goes to whoever answers first.',
+    painCalculation: {
+      avgJobValue: 900,
+      missedCallsPerMonth: 20,
+      conversionRate: 0.45,
+      monthlyRevenueLoss: function() {
+        return this.avgJobValue * this.missedCallsPerMonth * this.conversionRate;
+      },
+    },
+    problemTitle: 'Plumbing Teams Lose Jobs When Urgent Calls Wait',
+    problems: [
+      {
+        title: 'Emergency leaks need instant response',
+        description: 'Leak and drain repair callers rarely wait. Slow callback windows send them to the next company.',
+      },
+      {
+        title: 'After-hours calls fall through',
+        description: 'Night and weekend calls need capture, triage, and follow-up even when dispatch is limited.',
+      },
+      {
+        title: 'Dispatch details get missed',
+        description: 'Job type, address, urgency, access notes, and preferred timing need to reach the team clearly.',
+      },
+    ],
+    solutionTitle: 'Automate Intake, Recovery, and Dispatch Handoff',
+    features: [
+      {
+        icon: 'Phone',
+        title: 'Missed Call Recovery',
+        description: 'Send fast text-back follow-up when urgent callers are missed.',
+      },
+      {
+        icon: 'MessageSquare',
+        title: 'Emergency Intake',
+        description: 'Capture issue type, location, urgency, and customer details before the lead goes cold.',
+      },
+      {
+        icon: 'Calendar',
+        title: 'Dispatch Handoff',
+        description: 'Move qualified plumbing inquiries toward booking or team follow-up with clear context.',
+      },
+    ],
+    howItWorks: [
+      {
+        number: '1',
+        title: 'Plumbing inquiry arrives',
+        description: 'Call, form, or message comes in for a leak, drain repair, fixture, or water heater issue.',
+      },
+      {
+        number: '2',
+        title: 'AI captures the details',
+        description: 'The workflow gathers urgency, service type, address, and next-step preference.',
+      },
+      {
+        number: '3',
+        title: 'Team gets a cleaner handoff',
+        description: 'The customer is routed toward booking or callback while your team receives the job context.',
+      },
+    ],
+    systemMapping: {
+      starter: {
+        label: 'Plumbing Starter',
+        price: '$497/month',
+        features: ['Missed Call SMS Recovery', 'Emergency Inquiry Intake'],
+      },
+      growth: {
+        label: 'Plumbing Growth',
+        price: '$997/month',
+        features: ['SMS + Email Follow-Up', 'Dispatch Detail Capture', 'Lead Quality Scoring', 'Booking Link Handoff'],
+      },
+      pro: {
+        label: 'Plumbing Pro',
+        price: 'Custom',
+        features: ['All Growth features', 'Voice AI Receptionist', 'Priority Routing Rules', 'Custom Dispatch Workflows'],
+      },
+    },
+    testimonialPlaceholder: 'Plumbing company case study',
+    cta: 'Get Free Automation Audit',
+  },
+
   roofing: {
     slug: 'roofing',
     name: 'Roofing & Contractors',
@@ -202,6 +289,93 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Roofing contractor case study',
+    cta: 'Get Free Automation Audit',
+  },
+
+  contractors: {
+    slug: 'contractors',
+    name: 'Contractors',
+    title: 'Contractor Lead Follow-Up Automation | ClientSurge',
+    description: 'Automate project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation for contractors.',
+    heroTitle: 'Get more contractor leads booked before competitors reply.',
+    heroSubtitle: 'AI captures project details, follows up on estimates, and keeps high-value job opportunities moving.',
+    painStatement: 'Project inquiries go cold when quote follow-up is slow, details are scattered, or estimates sit unanswered.',
+    painCalculation: {
+      avgJobValue: 6500,
+      missedCallsPerMonth: 10,
+      conversionRate: 0.30,
+      monthlyRevenueLoss: function() {
+        return this.avgJobValue * this.missedCallsPerMonth * this.conversionRate;
+      },
+    },
+    problemTitle: 'Contractors Lose Revenue in the Follow-Up Gap',
+    problems: [
+      {
+        title: 'Project details are incomplete',
+        description: 'Teams waste time chasing scope, location, timeline, and budget context after the lead arrives.',
+      },
+      {
+        title: 'Quotes need persistent follow-up',
+        description: 'A good estimate can still die if nobody follows up at the right time with the right next step.',
+      },
+      {
+        title: 'Old opportunities stay buried',
+        description: 'Past inquiries and stalled estimates often sit in email or the CRM without a reactivation path.',
+      },
+    ],
+    solutionTitle: 'Automate Inquiry Routing and Estimate Follow-Up',
+    features: [
+      {
+        icon: 'MessageSquare',
+        title: 'Project Intake',
+        description: 'Capture service type, timeline, location, budget signals, and decision stage.',
+      },
+      {
+        icon: 'TrendingUp',
+        title: 'Estimate Nurture',
+        description: 'Follow up with quote recipients and keep warm opportunities from disappearing.',
+      },
+      {
+        icon: 'RefreshCw',
+        title: 'Opportunity Reactivation',
+        description: 'Bring older project inquiries back into motion with controlled campaigns.',
+      },
+    ],
+    howItWorks: [
+      {
+        number: '1',
+        title: 'Project inquiry arrives',
+        description: 'A call, form, or message starts the workflow with job context capture.',
+      },
+      {
+        number: '2',
+        title: 'AI qualifies the opportunity',
+        description: 'The system collects enough detail for your team to prioritize the next step.',
+      },
+      {
+        number: '3',
+        title: 'Follow-up keeps moving',
+        description: 'Quote follow-up and reactivation workflows keep projects from going silent.',
+      },
+    ],
+    systemMapping: {
+      starter: {
+        label: 'Contractor Starter',
+        price: '$497/month',
+        features: ['Missed Call Recovery', 'Basic Project Intake'],
+      },
+      growth: {
+        label: 'Contractor Growth',
+        price: '$997/month',
+        features: ['SMS + Email Follow-Up', 'Estimate Nurture', 'Project Qualification', 'Booking Link Handoff'],
+      },
+      pro: {
+        label: 'Contractor Pro',
+        price: 'Custom',
+        features: ['All Growth features', 'Voice AI Receptionist', 'Advanced Routing', 'Custom Reactivation Workflows'],
+      },
+    },
+    testimonialPlaceholder: 'Contractor lead follow-up case study',
     cta: 'Get Free Automation Audit',
   },
 
@@ -305,6 +479,93 @@ export const INDUSTRY_CONFIG = {
     cta: 'Get Free Automation Audit',
   },
 
+  'med-spa': {
+    slug: 'med-spa',
+    name: 'Med Spa',
+    title: 'Med Spa Consultation Booking Automation | ClientSurge',
+    description: 'Book more med spa consults with fast lead response, treatment inquiry follow-up, package nurture, no-show reduction, and old inquiry reactivation.',
+    heroTitle: 'Book more med spa consults before leads go cold.',
+    heroSubtitle: 'AI follows up on treatment inquiries, missed calls, DMs, and package leads so more prospects make it to consultation.',
+    painStatement: 'Med spa leads compare options quickly. Slow response turns high-intent treatment inquiries into lost consults.',
+    painCalculation: {
+      avgConsultValue: 1200,
+      missedInquiriesPerMonth: 18,
+      conversionRate: 0.32,
+      monthlyRevenueLoss: function() {
+        return this.avgConsultValue * this.missedInquiriesPerMonth * this.conversionRate;
+      },
+    },
+    problemTitle: 'Med Spas Lose Consults When Inquiry Follow-Up Slows Down',
+    problems: [
+      {
+        title: 'Treatment inquiries need quick answers',
+        description: 'Botox, filler, laser, body contouring, and membership leads lose momentum when nobody replies quickly.',
+      },
+      {
+        title: 'Package leads need nurture',
+        description: 'Higher-ticket services often require several touchpoints before a consultation is booked.',
+      },
+      {
+        title: 'No-shows and old inquiries leak revenue',
+        description: 'Missed consults and old DMs need structured reminders and reactivation.',
+      },
+    ],
+    solutionTitle: 'Automate Consultation Booking and Package Nurture',
+    features: [
+      {
+        icon: 'MessageSquare',
+        title: 'Fast Inquiry Response',
+        description: 'Respond to treatment questions and missed calls before the lead goes cold.',
+      },
+      {
+        icon: 'Calendar',
+        title: 'Consult Booking',
+        description: 'Move high-intent prospects toward consultation with reminders and booking handoff.',
+      },
+      {
+        icon: 'RefreshCw',
+        title: 'Old Inquiry Reactivation',
+        description: 'Bring past treatment inquiries and membership leads back into conversation.',
+      },
+    ],
+    howItWorks: [
+      {
+        number: '1',
+        title: 'Treatment inquiry arrives',
+        description: 'A prospect asks about a service, package, price range, or appointment opening.',
+      },
+      {
+        number: '2',
+        title: 'AI follows up with context',
+        description: 'The workflow captures service interest and keeps the prospect moving toward a consult.',
+      },
+      {
+        number: '3',
+        title: 'Consult is booked or nurtured',
+        description: 'The lead gets reminders, answers, and next steps while your team gets cleaner context.',
+      },
+    ],
+    systemMapping: {
+      starter: {
+        label: 'Med Spa Starter',
+        price: '$497/month',
+        features: ['Missed Call Text-Back', 'Treatment Inquiry Capture'],
+      },
+      growth: {
+        label: 'Med Spa Growth',
+        price: '$997/month',
+        features: ['SMS + Email Nurture', 'Consult Booking Handoff', 'No-Show Follow-Up', 'Package Lead Nurture'],
+      },
+      pro: {
+        label: 'Med Spa Pro',
+        price: 'Custom',
+        features: ['All Growth features', 'Voice AI Receptionist', 'Membership Reactivation', 'Custom Treatment Workflows'],
+      },
+    },
+    testimonialPlaceholder: 'Med spa consultation booking case study',
+    cta: 'Get Free Automation Audit',
+  },
+
   chiropractic: {
     slug: 'chiropractic',
     name: 'Chiropractic',
@@ -318,6 +579,9 @@ export const INDUSTRY_CONFIG = {
       missedApptsPerMonth: 15,
       retentionRevenueLoss: function() {
         return this.avgVisitValue * this.missedApptsPerMonth * 4; // 4 visits per patient per month average
+      },
+      monthlyRevenueLoss: function() {
+        return this.retentionRevenueLoss();
       },
     },
     problemTitle: 'Chiropractic Practices Struggle With Patient Retention',

@@ -1,20 +1,26 @@
 import { ArrowRight } from 'lucide-react';
-import DemoBookingModal from '../forms/DemoBookingModal';
-import { useState, useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function ImmersiveIndustryHero({ config }) {
-  const [showBooking, setShowBooking] = useState(false);
   const [bgAttachment, setBgAttachment] = useState('scroll');
+  const navigate = useNavigate();
   
   useEffect(() => {
     setBgAttachment(window.innerWidth >= 768 ? 'fixed' : 'scroll');
   }, []);
   
-  if (!config || !config.hero) {
+  if (!config) {
     return null;
   }
 
-  const { hero } = config;
+  const hero = config.hero || {
+    eyebrow: config.name,
+    headline: config.heroTitle || config.title,
+    subheadline: config.heroSubtitle || config.description,
+    cta: config.cta || 'Get Free Automation Audit',
+    image: config.image,
+  };
 
   return (
     <>
@@ -72,7 +78,7 @@ export default function ImmersiveIndustryHero({ config }) {
 
             {/* CTA Button */}
             <button
-              onClick={() => setShowBooking(true)}
+              onClick={() => navigate('/book')}
               className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-bold text-white transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
               style={{
                 background: 'linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)',
@@ -94,7 +100,6 @@ export default function ImmersiveIndustryHero({ config }) {
         </div>
       </section>
 
-      {showBooking && <DemoBookingModal onClose={() => setShowBooking(false)} />}
     </>
   );
 }

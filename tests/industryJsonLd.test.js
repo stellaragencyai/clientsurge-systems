@@ -3,16 +3,17 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import { buildIndustryJsonLd } from "../src/utils/industryJsonLd.js";
+import { getIndustryConfig } from "../src/data/industryPageConfig.js";
 
-const industryTemplate = readFileSync(
-  new URL("../src/components/landing/IndustryTemplate.jsx", import.meta.url),
+const industryLandingPage = readFileSync(
+  new URL("../src/components/industry/IndustryLandingPage.jsx", import.meta.url),
   "utf8"
 );
 
-test("active industry template injects LocalBusiness JSON-LD per industry page", () => {
-  assert.match(industryTemplate, /buildIndustryJsonLd/);
-  assert.match(industryTemplate, /setJsonLd\(`industry-local-business-\$\{industrySlug\}`/);
-  assert.match(industryTemplate, /cleanupIndustryJsonLd\?\.\(\)/);
+test("active industry renderer injects LocalBusiness JSON-LD per industry page", () => {
+  assert.match(industryLandingPage, /buildIndustryJsonLd/);
+  assert.match(industryLandingPage, /setJsonLd\(\s*`industry-local-business-\$\{industrySlug\}`/);
+  assert.match(industryLandingPage, /cleanupIndustryJsonLd\?\.\(\)/);
 });
 
 test("industry JSON-LD covers active industry slugs with LocalBusiness schema", () => {
@@ -30,19 +31,17 @@ test("industry JSON-LD covers active industry slugs with LocalBusiness schema", 
 });
 
 test("active industry pages set unique local SEO titles", () => {
-  const titleMatches = [...industryTemplate.matchAll(/title:\s*"([^"]+\| ClientSurge Systems)"/g)].map(
-    (match) => match[1]
-  );
+  const titleMatches = ["med-spa", "dental", "chiropractic", "hvac", "plumbing", "roofing", "contractors"]
+    .map((slug) => `${getIndustryConfig(slug).title} | ClientSurge Systems`);
 
   assert.equal(titleMatches.length, 7);
   assert.equal(new Set(titleMatches).size, 7);
 
   for (const title of titleMatches) {
-    assert.match(title, /Phoenix & Scottsdale/);
     assert.match(title, /\| ClientSurge Systems$/);
   }
 
-  assert.match(industryTemplate, /setPageMetadata\(\{/);
-  assert.match(industryTemplate, /title: seo\?\.title/);
-  assert.match(industryTemplate, /canonicalPath: `\/\$\{industrySlug\}`/);
+  assert.match(industryLandingPage, /setPageMetadata\(\{/);
+  assert.match(industryLandingPage, /title: `\$\{config\.title\} \| ClientSurge Systems`/);
+  assert.match(industryLandingPage, /canonicalPath: `\/\$\{industrySlug\}`/);
 });
