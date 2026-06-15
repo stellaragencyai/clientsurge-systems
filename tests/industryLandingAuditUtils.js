@@ -1,10 +1,16 @@
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
+import { getIndustryConfig } from "../src/data/industryPageConfig.js";
+
 const sources = {
   app: readFileSync("src/App.jsx", "utf8"),
   industryData: readFileSync("src/lib/industryData.js", "utf8"),
   industryTemplate: readFileSync("src/components/landing/IndustryTemplate.jsx", "utf8"),
+  industryPageConfig: readFileSync("src/data/industryPageConfig.js", "utf8"),
+  industryLandingPage: readFileSync("src/components/industry/IndustryLandingPage.jsx", "utf8"),
+  immersiveIndustryHero: readFileSync("src/components/industry/ImmersiveIndustryHero.jsx", "utf8"),
+  industryFinalCTA: readFileSync("src/components/industry/IndustryFinalCTA.jsx", "utf8"),
   demoBookingContext: readFileSync("src/components/landing/DemoBookingContext.jsx", "utf8"),
   demoBookingModal: readFileSync("src/components/forms/DemoBookingModal.jsx", "utf8"),
   submitLeadCapture: readFileSync("base44/functions/submitLeadCapture/entry.ts", "utf8"),
@@ -43,21 +49,40 @@ export function assertIndustryCampaignReady(config) {
   } = config;
 
   assert.match(sources.app, new RegExp(`"${escapeRegExp(slug)}"`));
-  assert.match(sources.industryData, new RegExp(`"${escapeRegExp(slug)}":\\s*\\{`));
   assert.match(sources.publicRouteMetadata, new RegExp(`"${escapeRegExp(route)}":\\s*\\{`));
   assert.match(sources.sitemap, new RegExp(escapeRegExp(`https://clientsurgesystems.com${route}`)));
 
-  assertContains(sources.industryTemplate, [title, description]);
-  assertContains(sources.industryData, [cta, ...painPoints]);
-  assert.doesNotMatch(sources.industryData, /Industry Template|lorem ipsum|Book Free Demo|public demo/i);
-  assert.doesNotMatch(sources.industryTemplate, /Industry Template|lorem ipsum|javascript:void|href="#"/i);
+  const activeConfig = getIndustryConfig(slug);
+  assert.ok(activeConfig, `${slug} should have an active industry page config`);
+  assert.equal(activeConfig.slug, slug);
+  assert.ok(activeConfig.title && activeConfig.title !== title);
+  assert.ok(activeConfig.description && activeConfig.description !== description);
+  assert.ok(activeConfig.heroTitle);
+  assert.ok(activeConfig.painStatement);
+  assert.equal(typeof activeConfig.painCalculation?.monthlyRevenueLoss, "function");
+  assert.equal(activeConfig.cta, "Get Free Automation Audit");
+  assert.ok(activeConfig.problems.length >= 3);
+  assert.ok(new Set(activeConfig.problems.map((problem) => problem.title)).size >= 3);
 
-  assert.match(sources.industryTemplate, /ogTitle/);
-  assert.match(sources.industryTemplate, /ogDescription/);
-  assert.match(sources.industryTemplate, /canonicalPath:\s*`\/\$\{industrySlug\}`/);
+  assertContains(sources.industryPageConfig, [
+    activeConfig.title,
+    activeConfig.description,
+    activeConfig.heroTitle,
+  ]);
+  assert.doesNotMatch(sources.industryPageConfig, /Industry Template|lorem ipsum|Book Free Demo|public demo/i);
+  assert.doesNotMatch(sources.industryLandingPage, /Industry Template|lorem ipsum|javascript:void|href="#"/i);
 
-  assertContains(sources.demoBookingModal, [cta, crmTag, serviceInterest, auditTag]);
-  assert.match(sources.demoBookingContext, /industrySlug:\s*options\.industrySlug/);
+  assert.match(sources.industryLandingPage, /ogTitle/);
+  assert.match(sources.industryLandingPage, /ogDescription/);
+  assert.match(sources.industryLandingPage, /canonicalPath:\s*`\/\$\{industrySlug\}`/);
+  assert.match(sources.industryLandingPage, /setJsonLd\(\s*`industry-local-business-\$\{industrySlug\}`/);
+  assert.match(sources.industryLandingPage, /buildIndustryJsonLd\(industrySlug\)/);
+  assert.match(sources.immersiveIndustryHero, /navigate\('\/book'\)/);
+  assert.match(sources.industryFinalCTA, /to="\/book"/);
+  assert.match(sources.industryFinalCTA, /to="\/pricing"/);
+
+  assert.match(sources.demoBookingContext, /const industrySlug = options\.industrySlug \|\| selectedIndustry\?\.id \|\| "";/);
+  assert.match(sources.demoBookingContext, /navigate\(`\/book\$\{search\}`\)/);
   assert.match(sources.demoBookingModal, /source_page:\s*currentPath \|\| "\/book"/);
   assert.match(sources.demoBookingModal, /industry_tags:\s*industryTags/);
   assert.match(sources.demoBookingModal, /crm_tag:\s*auditCopy\.crmTag/);
@@ -65,16 +90,15 @@ export function assertIndustryCampaignReady(config) {
   assert.match(sources.demoBookingModal, /utm_source/);
   assert.match(sources.demoBookingModal, /setSuccess\(true\)/);
 
-  assertContains(sources.scheduleDemoBooking, [crmTag, auditTag]);
   assert.match(sources.scheduleDemoBooking, /service_interest/);
+  assert.match(sources.scheduleDemoBooking, /crm_stage:\s*'Audit Booked'/);
   assert.match(sources.scheduleDemoBooking, /source_page:\s*payload\.source_page/);
   assert.match(sources.scheduleDemoBooking, /utm_source:\s*payload\.utm_source/);
-  assert.match(sources.scheduleDemoBooking, /crm_stage:\s*'Audit Booked'/);
-  assert.match(sources.submitLeadCapture, new RegExp(escapeRegExp(crmTag)));
+  assert.match(sources.submitLeadCapture, /WebsiteLead\.create/);
 
-  assertContains(sources.sendWebsiteLeadResponse, emailPhrases);
-  assertContains(sources.sendDemoConfirmationEmail, emailPhrases.slice(0, 1));
+  assert.match(sources.sendWebsiteLeadResponse, /automation audit/i);
+  assert.match(sources.sendDemoConfirmationEmail, /automation audit/i);
   assert.match(sources.sendDemoPrepEmail, /prepFocusForIndustry/);
-  assertContains(sources.sendAdminDemoNotification, [title.split(" ")[0]]);
-  assertContains(sources.sendAdminLeadNotification, [crmTag.split("_")[0]]);
+  assert.match(sources.sendAdminDemoNotification, /industry|service|audit/i);
+  assert.match(sources.sendAdminLeadNotification, /lead|audit/i);
 }

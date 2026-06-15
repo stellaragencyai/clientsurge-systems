@@ -1,53 +1,28 @@
-import { createContext, useContext, useMemo, useState } from "react";
-import DemoBookingModal from "../forms/DemoBookingModal";
+import { createContext, useContext, useMemo } from "react";
+import { useNavigate } from "react-router-dom";
 import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
 
 const DemoBookingContext = createContext(null);
 
 export function DemoBookingProvider({ children }) {
-  const [modalState, setModalState] = useState({
-    open: false,
-    prefillIndustry: "",
-    industrySlug: "",
-  });
+  const navigate = useNavigate();
 
   const value = useMemo(
     () => ({
       openDemoBooking: (options = {}) => {
         const selectedIndustry = getSelectedIndustryRecommendation();
-        setModalState({
-          open: true,
-          prefillIndustry:
-            options.prefillIndustry || selectedIndustry?.name || "",
-          industrySlug: options.industrySlug || selectedIndustry?.id || "",
-        });
+        const industrySlug = options.industrySlug || selectedIndustry?.id || "";
+        const search = industrySlug ? `?industry=${encodeURIComponent(industrySlug)}` : "";
+        navigate(`/book${search}`);
       },
-      closeDemoBooking: () =>
-        setModalState({
-          open: false,
-          prefillIndustry: "",
-          industrySlug: "",
-        }),
+      closeDemoBooking: () => {},
     }),
-    []
+    [navigate]
   );
 
   return (
     <DemoBookingContext.Provider value={value}>
       {children}
-      {modalState.open && (
-        <DemoBookingModal
-          onClose={() =>
-            setModalState({
-              open: false,
-              prefillIndustry: "",
-              industrySlug: "",
-            })
-          }
-          prefillIndustry={modalState.prefillIndustry}
-          industrySlug={modalState.industrySlug}
-        />
-      )}
     </DemoBookingContext.Provider>
   );
 }

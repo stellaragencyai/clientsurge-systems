@@ -3,7 +3,6 @@ import { createPortal } from "react-dom";
 import { ChevronDown, Menu, X } from "lucide-react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
-import DemoBookingModal from "../forms/DemoBookingModal";
 import LaunchCountdownTimer from "@/components/campaign/LaunchCountdownTimer";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
@@ -84,7 +83,6 @@ export default function Navbar() {
   }, [open]);
   const [scrolled, setScrolled] = useState(false);
   const [showLoginModal, setShowLoginModal] = useState(false);
-  const [showBookingModal, setShowBookingModal] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
   const [industriesMenuPosition, setIndustriesMenuPosition] = useState({ left: 0, top: 0, width: 560 });
   const industriesCloseTimerRef = useRef(null);
@@ -390,7 +388,7 @@ export default function Navbar() {
             Login
           </button>
           <button
-            onClick={() => { trackCTA("book_free_audit", "navbar"); setShowBookingModal(true); }}
+            onClick={() => { trackCTA("book_free_audit", "navbar"); navigate("/book"); }}
             className="hidden md:inline-flex items-center focus:ring-2 focus:ring-primary focus:outline-none rounded-lg px-5 py-2.5"
             style={{
               background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
@@ -408,7 +406,7 @@ export default function Navbar() {
             }}
             onMouseEnter={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45)"; e.currentTarget.style.transform = "translateY(-1px)"; }}
             onMouseLeave={(e) => { e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4), 0 2px 8px rgba(0,107,176,0.3)"; e.currentTarget.style.transform = "translateY(0)"; }}>
-            Free Automation Audit
+            Get Free Automation Audit
           </button>
         </div>
 
@@ -502,7 +500,7 @@ export default function Navbar() {
             onClick={() => {
               trackCTA("book_demo", "mobile_nav");
               setOpen(false);
-              setShowBookingModal(true);
+              navigate("/book");
             }}
             className="cs-btn-primary" style={{ width: "100%", display: "block" }}>
             <span className="cs-btn-primary-inner" style={{ height: "40px", gap: "6px", fontSize: "0.875rem" }}>
@@ -514,7 +512,6 @@ export default function Navbar() {
       }
 
       {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}
-      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </nav>);
 
 }

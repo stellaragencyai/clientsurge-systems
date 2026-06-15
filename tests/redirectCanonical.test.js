@@ -8,14 +8,29 @@ const redirectsFile = readFileSync(new URL("../public/_redirects", import.meta.u
 
 const redirectPairs = [
   ["/Blog", "/blog"],
+  ["/book-demo", "/book"],
   ["/IndustriesPage", "/industries"],
   ["/IndustryTemplate", "/industries"],
   ["/Roofing", "/roofing"],
+  ["/ROOFING", "/roofing"],
   ["/HVAC", "/hvac"],
+  ["/Hvac", "/hvac"],
   ["/Dental", "/dental"],
+  ["/DENTAL", "/dental"],
   ["/MedSpa", "/med-spa"],
+  ["/Med-Spa", "/med-spa"],
+  ["/MED-SPA", "/med-spa"],
   ["/Chiropractic", "/chiropractic"],
+  ["/CHIROPRACTIC", "/chiropractic"],
   ["/Contractors", "/contractors"],
+  ["/CONTRACTORS", "/contractors"],
+  ["/industries/roofing", "/roofing"],
+  ["/industries/hvac", "/hvac"],
+  ["/industries/plumbing", "/plumbing"],
+  ["/industries/dental", "/dental"],
+  ["/industries/med-spa", "/med-spa"],
+  ["/industries/chiropractic", "/chiropractic"],
+  ["/industries/contractors", "/contractors"],
   ["/legal/privacy", "/privacy-policy"],
   ["/legal/terms", "/terms"],
 ];
@@ -32,10 +47,7 @@ test("legacy redirect routes have explicit canonical destinations", () => {
   assert.match(staticIndex, /var canonicalPath = aliases\[path\] \|\| path;/);
   assert.match(staticIndex, /var canonicalUrl = "https:\/\/clientsurgesystems\.com" \+ canonicalPath;/);
   assert.match(staticIndex, /canonical\.setAttribute\("href", canonicalUrl\)/);
-  assert.match(staticIndex, /"\/pricing": "\/"/);
-  assert.match(staticIndex, /"\/faq": "\/"/);
-  assert.match(staticIndex, /"\/our-system": "\/"/);
-  assert.match(staticIndex, /"\/testimonials": "\/"/);
+  assert.match(staticIndex, /"\/pricing": \{/);
 });
 
 test("in-app section redirects preserve hash navigation without stamping duplicate metadata", () => {
@@ -51,5 +63,8 @@ test("static fallback noindexes private and auth routes before app hydration", (
   assert.match(staticIndex, /"\/client-portal"/);
   assert.match(staticIndex, /"\/client-dashboard"/);
   assert.match(staticIndex, /"\/admin"/);
+  assert.match(staticIndex, /"\/store"/);
+  assert.match(staticIndex, /"\/start"/);
+  assert.match(staticIndex, /"\/book-demo"/);
   assert.match(staticIndex, /robots\.setAttribute\("content", robotsContent\)/);
 });

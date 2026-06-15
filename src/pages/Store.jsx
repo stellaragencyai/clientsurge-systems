@@ -241,7 +241,8 @@ function StoreInner() {
       description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Start for $97/month.",
       canonicalPath: "/store",
       ogTitle: "AI Automation Store | ClientSurge Systems",
-      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5–7 business days. No contracts."
+      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5-7 business days. No contracts.",
+      robots: "noindex,nofollow"
     });
     return cleanupMeta;
   }, []);

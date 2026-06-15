@@ -15,7 +15,6 @@ export const SITE_CONFIG = {
     ],
     solutions: [
       { label: "Automations", href: "/automations", isPage: true },
-      { label: "Store", href: "/store", isPage: true },
       { label: "Pricing", href: "/pricing", isPage: true },
     ],
   },
@@ -27,8 +26,6 @@ export const SITE_CONFIG = {
     { label: "Plumbing & Drain Services", href: "/plumbing" },
     { label: "Roofing & Restoration", href: "/roofing" },
     { label: "Contractors & Trades", href: "/contractors" },
-    { label: "Real Estate Agents", href: "/real-estate" },
-    { label: "Personal Injury Law", href: "/personal-injury" },
   ],
   links: {
     demoBooking: "/book",

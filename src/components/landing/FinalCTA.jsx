@@ -1,14 +1,9 @@
-import { useState } from "react";
 import StardustOverlay from "./StardustOverlay";
 import { ArrowRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
-import DemoBookingModal from "@/components/forms/DemoBookingModal";
 
 export default function FinalCTA() {
-  const [showBookingModal, setShowBookingModal] = useState(false);
-
   return (
-    <>
       <section id="book-demo" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
@@ -45,11 +40,10 @@ export default function FinalCTA() {
 
         <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <button
-              type="button"
+            <a
+              href="/book"
               onClick={() => {
-                trackCTA("book_your_free_demo", "final_cta");
-                setShowBookingModal(true);
+                trackCTA("get_free_automation_audit", "final_cta");
               }}
               className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               style={{
@@ -69,7 +63,8 @@ export default function FinalCTA() {
               onMouseLeave={(event) => {
                 event.currentTarget.style.boxShadow =
                 "0 12px 28px rgba(0,88,160,0.24)";
-              }}>
+              }}
+            >
               
               <span
                 style={{
@@ -86,21 +81,26 @@ export default function FinalCTA() {
                   textShadow: "0 1px 2px rgba(0,0,0,0.2)"
                 }}>
                 
-                Book Your Free Automation Audit
+                Get Free Automation Audit
                 <ArrowRight className="w-5 h-5" />
               </span>
-            </button>
+            </a>
             <a
-              href="/book"
-              onClick={() => trackCTA("lead_leakage_audit", "final_cta")}
+              href="/pricing"
+              onClick={() => trackCTA("view_pricing", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
               
-              Get a Free Lead Leakage Audit
+              View Pricing
+            </a>
+            <a
+              href="/contact"
+              onClick={() => trackCTA("contact_support", "final_cta")}
+              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border border-border bg-background/70 text-sm font-semibold text-foreground hover:bg-muted transition-all duration-200">
+              Contact
             </a>
           </div>
         </div>
       </section>
-      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
-    </>);
+    );
 
 }

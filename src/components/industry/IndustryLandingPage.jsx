@@ -1,9 +1,11 @@
 import { useParams, Navigate } from 'react-router-dom';
 import { getIndustryConfig, calculateRevenueLoss } from '@/data/industryPageConfig';
-import { useState, lazy, Suspense } from 'react';
+import { lazy, Suspense, useEffect } from 'react';
 import ImmersiveIndustryHero from './ImmersiveIndustryHero';
 import IndustryPainBar from './IndustryPainBar';
 import RevenueProofBlock from '../landing/RevenueProofBlock';
+import { setJsonLd, setPageMetadata } from '@/lib/seo';
+import { buildIndustryJsonLd } from '@/utils/industryJsonLd';
 
 const IndustryProblems = lazy(() => import('./IndustryProblems'));
 const IndustrySolution = lazy(() => import('./IndustrySolution'));
@@ -17,9 +19,31 @@ const IndustryFinalCTA = lazy(() => import('./IndustryFinalCTA'));
  * Renders industry-specific content from centralized config
  * Supports: HVAC, Roofing, Dental, Chiropractic
  */
-export default function IndustryLandingPage() {
-  const { industrySlug } = useParams();
+export default function IndustryLandingPage({ industrySlug: explicitIndustrySlug }) {
+  const { industrySlug: routeIndustrySlug } = useParams();
+  const industrySlug = explicitIndustrySlug || routeIndustrySlug;
   const config = getIndustryConfig(industrySlug);
+
+  useEffect(() => {
+    if (!config) return undefined;
+
+    const cleanupMetadata = setPageMetadata({
+      title: `${config.title} | ClientSurge Systems`,
+      description: config.description,
+      canonicalPath: `/${industrySlug}`,
+      ogTitle: config.title,
+      ogDescription: config.description,
+    });
+    const cleanupIndustryJsonLd = setJsonLd(
+      `industry-local-business-${industrySlug}`,
+      buildIndustryJsonLd(industrySlug)
+    );
+
+    return () => {
+      cleanupMetadata?.();
+      cleanupIndustryJsonLd?.();
+    };
+  }, [config, industrySlug]);
 
   if (!config) {
     return <Navigate to="/" replace />;

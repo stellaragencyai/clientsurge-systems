@@ -23,9 +23,14 @@ test("website route governance document covers expected launch routes", () => {
 });
 
 test("route security classifies public, authenticated, admin, and noindex routes", () => {
-  for (const route of ["/", "/book", "/store", "/automations", "/roofing", "/hvac", "/plumbing"]) {
+  for (const route of ["/", "/book", "/pricing", "/automations", "/roofing", "/hvac", "/plumbing"]) {
     assert.equal(classifyRoute(route), ROUTE_ACCESS.PUBLIC, `${route} should be public`);
     assert.equal(shouldNoindexRoute(route), false, `${route} should be indexable`);
+  }
+
+  for (const route of ["/store", "/start", "/book-demo"]) {
+    assert.equal(classifyRoute(route), ROUTE_ACCESS.PUBLIC, `${route} should remain reachable`);
+    assert.equal(shouldNoindexRoute(route), true, `${route} should be noindex`);
   }
 
   for (const route of AUTHENTICATED_ROUTE_PREFIXES) {
@@ -44,12 +49,16 @@ test("route security classifies public, authenticated, admin, and noindex routes
 });
 
 test("public route and sitemap sources include launch-critical pages", () => {
-  for (const route of ["/", "/book", "/contact", "/store", "/automations", "/roofing", "/hvac", "/plumbing", "/dental", "/med-spa", "/privacy-policy", "/terms", "/login"]) {
+  for (const route of ["/", "/book", "/contact", "/store", "/start", "/book-demo", "/pricing", "/automations", "/roofing", "/hvac", "/plumbing", "/dental", "/med-spa", "/privacy-policy", "/terms", "/login"]) {
     assert.ok(PUBLIC_ROUTE_PATHS.includes(route), `PUBLIC_ROUTE_PATHS should include ${route}`);
   }
 
-  for (const route of ["/", "/book", "/contact", "/store", "/automations", "/roofing", "/hvac", "/plumbing", "/dental", "/med-spa", "/privacy-policy", "/terms"]) {
+  for (const route of ["/", "/book", "/contact", "/pricing", "/automations", "/roofing", "/hvac", "/plumbing", "/dental", "/med-spa", "/privacy-policy", "/terms"]) {
     assert.ok(SITEMAP_STATIC_PATHS.includes(route), `SITEMAP_STATIC_PATHS should include ${route}`);
+  }
+
+  for (const route of ["/store", "/start", "/book-demo"]) {
+    assert.equal(SITEMAP_STATIC_PATHS.includes(route), false, `SITEMAP_STATIC_PATHS should exclude ${route}`);
   }
 });
 

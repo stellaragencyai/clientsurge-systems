@@ -50,7 +50,7 @@ export default function IndustrySystemMapping({ systemMapping }) {
                   : 'border-2 border-border text-foreground hover:border-primary hover:bg-primary/5'
               }`}
             >
-              {isGrowth ? 'Start Free Trial' : 'Learn More'}
+              Get Free Automation Audit
             </Link>
 
             {/* Setup indicator */}

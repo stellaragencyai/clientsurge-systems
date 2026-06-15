@@ -104,8 +104,6 @@ const INDUSTRY_ROUTE_SLUGS = [
   "roofing",
   "chiropractic",
   "contractors",
-  "real-estate",
-  "personal-injury",
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [
@@ -326,7 +324,7 @@ const AuthenticatedAppWithTenant = () => {
         <Route
           key={slug}
           path={`/${slug}`}
-          element={<LazyRoute Component={IndustryLandingPage} />}
+          element={<LazyRoute Component={IndustryLandingPage} industrySlug={slug} />}
         />
       ))}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => (
