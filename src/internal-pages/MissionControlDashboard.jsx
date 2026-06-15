@@ -2,8 +2,9 @@ import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/AuthContext';
 import { base44 } from '@/api/base44Client';
 import {
-  RefreshCw, Phone, MessageSquare, TrendingUp, Server, Eye,
+  RefreshCw, Phone, MessageSquare, TrendingUp, Server, Eye, ListChecks,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import LiveLeadsFeed from '../components/mission-control/LiveLeadsFeed';
 import ConversationsViewer from '../components/mission-control/ConversationsViewer';
 import MessageLogTable from '../components/mission-control/MessageLogTable';
@@ -19,6 +20,7 @@ import { useRealTimePolling } from '@/hooks/useRealTimePolling';
 
 export default function MissionControlDashboard() {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const { selectedClientId, selectedProjectId, isAdmin } = useTenantContext();
   const [activeTab, setActiveTab] = useState('live-feeds');
   const [filters, setFilters] = useState({
@@ -194,7 +196,25 @@ export default function MissionControlDashboard() {
       {/* Content Area */}
       <div className="max-w-7xl mx-auto px-6 py-8">
         {activeTab === 'visibility' && (
-          <SystemVisibilityDashboard />
+          <>
+            {/* Opportunity Review shortcut */}
+            <button
+              onClick={() => navigate('/admin/opportunity-review')}
+              className="w-full flex items-center justify-between mb-6 px-5 py-4 rounded-xl border border-border bg-card hover:bg-muted/40 transition-colors text-left group"
+            >
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-lg flex items-center justify-center" style={{ background: "rgba(0,136,204,0.1)", border: "1px solid rgba(0,136,204,0.2)" }}>
+                  <ListChecks className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-sm font-700 font-semibold text-foreground">Opportunity Review Queue</p>
+                  <p className="text-xs text-muted-foreground">Classify leads before manual sales work — review real vs. QA records</p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold text-primary opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap">Open →</span>
+            </button>
+            <SystemVisibilityDashboard />
+          </>
         )}
         {activeTab === 'alerts' && (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -11,7 +11,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, PieChart, Layers, DollarSign, Inbox, RefreshCw,
-  Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck,
+  Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck, ListChecks,
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
 
@@ -51,6 +51,7 @@ const NAV_GROUPS = [
       { id: "revenue",          label: "Revenue & MRR",     icon: DollarSign,      path: "/admin", tab: "revenue" },
       { id: "priority",         label: "Priority Queue",    icon: Star,            path: "/admin", tab: "priority" },
       { id: "attribution",      label: "Source Attribution",icon: PieChart,        path: "/admin", tab: "attribution" },
+      { id: "opportunity-review", label: "Opportunity Review", icon: ListChecks,    path: "/admin/opportunity-review" },
     ],
   },
   {
