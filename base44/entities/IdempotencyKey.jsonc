@@ -1,0 +1,103 @@
+{
+  "name": "IdempotencyKey",
+  "type": "object",
+  "_metadata": {
+    "status": "ORCHESTRATION_LAYER",
+    "reason": "Global deduplication tracking. Prevents duplicate execution of critical operations across all subsystems.",
+    "tenant_scoped": "client_id + client_project_id (optional)",
+    "documentation": "ORCHESTRATION_LAYER.md"
+  },
+  "properties": {
+    "idempotency_key": {
+      "type": "string",
+      "title": "Unique Idempotency Key",
+      "description": "System-wide unique identifier for operation (order_id, stripe_event_id, lead_id+event_type, etc.)"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "operation_type": {
+      "type": "string",
+      "title": "Operation Type",
+      "enum": [
+        "order_processing",
+        "client_provisioning",
+        "onboarding_workflow",
+        "automation_rule_execution",
+        "messaging_send",
+        "subscription_update",
+        "webhook_handling",
+        "custom"
+      ]
+    },
+    "resource_type": {
+      "type": "string",
+      "title": "Resource Type",
+      "enum": [
+        "order",
+        "client",
+        "client_project",
+        "lead",
+        "communication_event",
+        "automation_rule",
+        "stripe_event"
+      ]
+    },
+    "resource_id": {
+      "type": "string",
+      "title": "Resource ID (order_id, lead_id, client_id, etc.)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Processing Status",
+      "enum": [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+        "skipped"
+      ],
+      "default": "pending"
+    },
+    "result_hash": {
+      "type": "string",
+      "title": "Result Hash",
+      "description": "Hash of operation result for consistency verification"
+    },
+    "execution_count": {
+      "type": "integer",
+      "title": "Execution Count",
+      "default": 0,
+      "description": "Number of times this idempotency key was processed"
+    },
+    "first_executed_at": {
+      "type": "string",
+      "title": "First Executed At",
+      "format": "date-time"
+    },
+    "last_executed_at": {
+      "type": "string",
+      "title": "Last Executed At",
+      "format": "date-time"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Operation Metadata",
+      "description": "JSON context (e.g., Stripe event_id, webhook signature)"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Last Error (if failed)"
+    }
+  },
+  "required": [
+    "idempotency_key",
+    "operation_type",
+    "resource_type"
+  ]
+}

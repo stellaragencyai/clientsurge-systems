@@ -1,0 +1,129 @@
+{
+  "name": "OrchestrationWorkflow",
+  "type": "object",
+  "_metadata": {
+    "status": "ORCHESTRATION_LAYER",
+    "reason": "Tracks active workflows to enforce single-active-workflow guarantee per resource. Prevents parallel conflicting executions.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "ORCHESTRATION_LAYER.md"
+  },
+  "properties": {
+    "resource_type": {
+      "type": "string",
+      "title": "Resource Type",
+      "enum": [
+        "order",
+        "client",
+        "client_project",
+        "lead"
+      ]
+    },
+    "resource_id": {
+      "type": "string",
+      "title": "Resource ID (order_id, client_id, etc.)"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "workflow_type": {
+      "type": "string",
+      "title": "Workflow Type",
+      "enum": [
+        "order_to_onboarding",
+        "client_lifecycle",
+        "project_provisioning",
+        "lead_nurture"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Workflow Status",
+      "enum": [
+        "initiated",
+        "in_progress",
+        "completed",
+        "failed",
+        "paused"
+      ],
+      "default": "initiated"
+    },
+    "current_stage": {
+      "type": "string",
+      "title": "Current Execution Stage",
+      "enum": [
+        "billing_validation",
+        "client_provisioning",
+        "onboarding_initialization",
+        "automation_activation",
+        "messaging_triggers",
+        "completed"
+      ],
+      "default": "billing_validation"
+    },
+    "execution_order": {
+      "type": "array",
+      "title": "Deterministic Execution Order",
+      "items": {
+        "type": "object",
+        "properties": {
+          "stage_index": {
+            "type": "integer"
+          },
+          "processor_type": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pending",
+              "executing",
+              "completed",
+              "failed"
+            ]
+          },
+          "executed_at": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "linked_idempotency_keys": {
+      "type": "array",
+      "title": "Linked Idempotency Keys",
+      "items": {
+        "type": "string"
+      },
+      "description": "All idempotency keys processed in this workflow"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Workflow Started At",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Workflow Completed At",
+      "format": "date-time"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message (if failed)"
+    },
+    "parent_workflow_id": {
+      "type": "string",
+      "title": "Parent Workflow ID",
+      "description": "For nested/cascading workflows"
+    }
+  },
+  "required": [
+    "resource_type",
+    "resource_id",
+    "client_id",
+    "workflow_type"
+  ]
+}

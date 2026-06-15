@@ -1,0 +1,207 @@
+{
+  "name": "EventPipelineMetrics",
+  "type": "object",
+  "_metadata": {
+    "status": "HARDENED_EVENT_PIPELINE",
+    "reason": "Derived metrics for normalized event views. Read-only dashboard reporting.",
+    "read_only": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "HARDENED_EVENT_PIPELINE.md"
+  },
+  "properties": {
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "metric_period": {
+      "type": "string",
+      "title": "Metric Period",
+      "enum": [
+        "1h",
+        "24h",
+        "7d",
+        "30d"
+      ]
+    },
+    "period_start": {
+      "type": "string",
+      "title": "Period Start",
+      "format": "date-time"
+    },
+    "period_end": {
+      "type": "string",
+      "title": "Period End",
+      "format": "date-time"
+    },
+    "total_raw_events": {
+      "type": "integer",
+      "title": "Total Raw Events",
+      "default": 0
+    },
+    "unique_events_count": {
+      "type": "integer",
+      "title": "Unique Events (After Dedup)",
+      "default": 0
+    },
+    "duplicate_events_count": {
+      "type": "integer",
+      "title": "Duplicate Events Suppressed",
+      "default": 0
+    },
+    "collapsed_event_groups": {
+      "type": "integer",
+      "title": "Collapsed Event Groups",
+      "default": 0
+    },
+    "collapsed_events_total": {
+      "type": "integer",
+      "title": "Events In Collapsed Groups",
+      "default": 0
+    },
+    "processing_efficiency_score": {
+      "type": "number",
+      "title": "Processing Efficiency %",
+      "default": 0,
+      "description": "unique_events / total_raw_events * 100"
+    },
+    "failed_events_count": {
+      "type": "integer",
+      "title": "Failed Events",
+      "default": 0
+    },
+    "replay_detected_count": {
+      "type": "integer",
+      "title": "Replays Detected",
+      "default": 0
+    },
+    "by_event_type": {
+      "type": "object",
+      "title": "Metrics By Event Type",
+      "properties": {
+        "sms_received": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            },
+            "duplicates": {
+              "type": "integer"
+            }
+          }
+        },
+        "sms_sent": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            },
+            "duplicates": {
+              "type": "integer"
+            }
+          }
+        },
+        "portal_login": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            },
+            "duplicates": {
+              "type": "integer"
+            }
+          }
+        },
+        "status_update": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            },
+            "duplicates": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "by_channel": {
+      "type": "object",
+      "title": "Metrics By Channel",
+      "properties": {
+        "sms": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            }
+          }
+        },
+        "email": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            }
+          }
+        },
+        "webhook": {
+          "type": "object",
+          "properties": {
+            "total": {
+              "type": "integer"
+            },
+            "unique": {
+              "type": "integer"
+            }
+          }
+        }
+      }
+    },
+    "top_collapsed_sources": {
+      "type": "array",
+      "title": "Top Collapsed Event Sources",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "collapse_count": {
+            "type": "integer"
+          }
+        }
+      }
+    },
+    "computed_at": {
+      "type": "string",
+      "title": "Computed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_id",
+    "metric_period"
+  ]
+}

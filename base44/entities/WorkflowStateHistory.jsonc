@@ -1,0 +1,104 @@
+{
+  "name": "WorkflowStateHistory",
+  "type": "object",
+  "_metadata": {
+    "status": "ORCHESTRATION_LAYER",
+    "reason": "Immutable audit trail of state transitions. Prevents duplicate state application and enables replay detection.",
+    "immutable": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "ORCHESTRATION_LAYER.md"
+  },
+  "properties": {
+    "workflow_id": {
+      "type": "string",
+      "title": "OrchestrationWorkflow ID"
+    },
+    "resource_type": {
+      "type": "string",
+      "title": "Resource Type"
+    },
+    "resource_id": {
+      "type": "string",
+      "title": "Resource ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "state_transition": {
+      "type": "object",
+      "title": "State Transition",
+      "properties": {
+        "entity_type": {
+          "type": "string",
+          "title": "Entity Type",
+          "enum": [
+            "subscription",
+            "order",
+            "client",
+            "client_project",
+            "automation_rule"
+          ]
+        },
+        "field_name": {
+          "type": "string",
+          "title": "Field Changed (e.g., pipeline_status, status, lifecycle_stage)"
+        },
+        "from_value": {
+          "type": "string",
+          "title": "Previous State"
+        },
+        "to_value": {
+          "type": "string",
+          "title": "New State"
+        }
+      }
+    },
+    "processor_type": {
+      "type": "string",
+      "title": "Processor That Applied State",
+      "enum": [
+        "billing_processor",
+        "client_provisioning",
+        "onboarding_processor",
+        "automation_processor",
+        "messaging_processor"
+      ]
+    },
+    "idempotency_key": {
+      "type": "string",
+      "title": "Associated Idempotency Key"
+    },
+    "is_duplicate": {
+      "type": "boolean",
+      "title": "Is Duplicate Detection",
+      "default": false,
+      "description": "True if this state was already applied (detected and skipped)"
+    },
+    "duplicate_of_history_id": {
+      "type": "string",
+      "title": "Original State History ID",
+      "description": "If duplicate, references the original state history entry"
+    },
+    "applied_at": {
+      "type": "string",
+      "title": "Applied At",
+      "format": "date-time"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Transition Metadata"
+    }
+  },
+  "required": [
+    "workflow_id",
+    "resource_type",
+    "resource_id",
+    "client_id",
+    "state_transition"
+  ]
+}

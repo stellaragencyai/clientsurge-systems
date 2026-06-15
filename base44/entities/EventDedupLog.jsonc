@@ -1,0 +1,148 @@
+{
+  "name": "EventDedupLog",
+  "type": "object",
+  "_metadata": {
+    "status": "HARDENED_EVENT_PIPELINE",
+    "reason": "Deduplication & collapsing tracking. Prevents duplicate processing, enables event compression, ensures replay safety.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "HARDENED_EVENT_PIPELINE.md"
+  },
+  "properties": {
+    "canonical_event_id": {
+      "type": "string",
+      "title": "Canonical CommunicationEvent ID",
+      "description": "The original/representative event in a dedup/collapse group"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "dedup_key": {
+      "type": "string",
+      "title": "Deduplication Key",
+      "description": "provider_message_id, stripe_event_id, or lead_id+event_type+timestamp_window"
+    },
+    "dedup_type": {
+      "type": "string",
+      "title": "Deduplication Type",
+      "enum": [
+        "strict_duplicate",
+        "collapsed_group",
+        "aggregated",
+        "replay_detected"
+      ],
+      "description": "Type of deduplication applied"
+    },
+    "event_type": {
+      "type": "string",
+      "title": "Event Type",
+      "enum": [
+        "sms_received",
+        "sms_sent",
+        "email_sent",
+        "webhook_sent",
+        "portal_login",
+        "status_update",
+        "lead_created",
+        "booking_created",
+        "order_paid"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email",
+        "webhook",
+        "internal",
+        "voice"
+      ]
+    },
+    "duplicate_count": {
+      "type": "integer",
+      "title": "Duplicate Count",
+      "default": 0,
+      "description": "Number of duplicates collapsed into canonical event"
+    },
+    "time_window_start": {
+      "type": "string",
+      "title": "Time Window Start",
+      "format": "date-time"
+    },
+    "time_window_end": {
+      "type": "string",
+      "title": "Time Window End",
+      "format": "date-time"
+    },
+    "duplicate_event_ids": {
+      "type": "array",
+      "title": "Duplicate Event IDs",
+      "items": {
+        "type": "string"
+      },
+      "description": "All duplicate events merged into canonical"
+    },
+    "status": {
+      "type": "string",
+      "title": "Processing Status",
+      "enum": [
+        "deduplicated",
+        "collapsed",
+        "skipped",
+        "failed",
+        "archived"
+      ],
+      "default": "deduplicated"
+    },
+    "processing_state": {
+      "type": "string",
+      "title": "Processing State (Metadata)",
+      "enum": [
+        "processed",
+        "duplicate",
+        "collapsed",
+        "replay_skipped",
+        "failed"
+      ],
+      "default": "processed",
+      "description": "Enriched state (no schema change, conceptual)"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason",
+      "enum": [
+        "retry_exhausted",
+        "processing_failed",
+        "provider_error",
+        "validation_error"
+      ]
+    },
+    "failure_details": {
+      "type": "string",
+      "title": "Failure Details"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Aggregation Metadata",
+      "description": "JSON: {sources, aggregated_fields, provider_ids}"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "canonical_event_id",
+    "client_id",
+    "dedup_key",
+    "dedup_type",
+    "event_type",
+    "channel"
+  ]
+}
