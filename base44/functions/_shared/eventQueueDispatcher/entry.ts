@@ -2,27 +2,41 @@
  * Event Queue Dispatcher: Routes incoming events to appropriate processors
  * Enforces tenant isolation, rate limiting, and retry logic
  *
+ * SPEED OPTIMIZATION: Priority Routing
+ * HIGH_PRIORITY events (inbound leads, SMS replies, bookings) get priority=100.
+ * BACKGROUND events (digests, analytics, reports) get priority=0.
  * Shared helper — NOT a standalone function
- * Import and call from webhook/automation handlers
  */
+
+const HIGH_PRIORITY_CATEGORIES = ['inbound_event'];
+const HIGH_PRIORITY_EVENT_TYPES = ['sms_received', 'lead_created', 'booking_created', 'voice_call_answered'];
+
+function resolveEventPriority(event_category, event_type, explicit_priority) {
+  if (explicit_priority > 0) return explicit_priority;
+  if (HIGH_PRIORITY_CATEGORIES.includes(event_category)) return 100;
+  if (event_type && HIGH_PRIORITY_EVENT_TYPES.includes(event_type)) return 100;
+  if (event_category === 'billing_event') return 50;
+  return 0;
+}
 
 async function dispatchEvent(base44, eventData) {
   const {
     communication_event_id,
     client_id,
     client_project_id,
-    event_category, // inbound_event | automation_event | billing_event | system_event
-    processor_type, // messaging_processor | automation_processor | billing_processor
+    event_category,
+    processor_type,
+    event_type,
     priority = 0,
   } = eventData;
 
+  const resolvedPriority = resolveEventPriority(event_category, event_type, priority);
+
   try {
-    // Validate tenant isolation
     if (!client_id && !client_project_id) {
       throw new Error('Event must reference at least client_id or client_project_id');
     }
 
-    // Create EventQueue record
     const queueEntry = await base44.asServiceRole.entities.EventQueue.create({
       communication_event_id,
       client_id: client_id || null,
@@ -30,12 +44,12 @@ async function dispatchEvent(base44, eventData) {
       event_category,
       processor_type,
       status: 'queued',
-      priority,
+      priority: resolvedPriority,
       retry_count: 0,
       max_retries: 3,
     });
 
-    console.log(`[dispatcher] Event queued: ${queueEntry.id}`, {
+    console.log(`[dispatcher] Event queued: ${queueEntry.id} priority=${resolvedPriority}`, {
       client_id,
       event_category,
       processor_type,
@@ -45,6 +59,7 @@ async function dispatchEvent(base44, eventData) {
       success: true,
       queue_id: queueEntry.id,
       status: 'queued',
+      priority: resolvedPriority,
     };
   } catch (error) {
     console.error('[dispatcher] Failed to queue event:', error.message);
@@ -52,12 +67,8 @@ async function dispatchEvent(base44, eventData) {
   }
 }
 
-/**
- * Check tenant rate limits before processing
- */
 async function checkRateLimit(base44, clientId, clientProjectId, eventCategory) {
   try {
-    // Fetch rate limit config for tenant
     let config = null;
 
     if (clientProjectId) {
@@ -78,12 +89,10 @@ async function checkRateLimit(base44, clientId, clientProjectId, eventCategory) 
       config = clientConfigs?.[0];
     }
 
-    // If no config, use defaults (no limits)
     if (!config) {
       return { allowed: true, reason: 'no_config' };
     }
 
-    // Check appropriate limit based on event category
     const now = new Date();
     const oneMinuteAgo = new Date(now.getTime() - 60000);
 
@@ -115,16 +124,12 @@ async function checkRateLimit(base44, clientId, clientProjectId, eventCategory) 
     return { allowed: true, reason: 'within_limits' };
   } catch (error) {
     console.error('[rateLimit] Check failed, allowing event:', error.message);
-    return { allowed: true, reason: 'check_failed' }; // Fail-open: allow on error
+    return { allowed: true, reason: 'check_failed' };
   }
 }
 
-/**
- * Schedule retry for failed event with exponential backoff
- */
 async function scheduleRetry(base44, queueId, retryCount) {
   try {
-    // Exponential backoff: 1s, 2s, 4s, 8s, ...
     const backoffMs = Math.pow(2, retryCount) * 1000;
     const nextRetryAt = new Date(Date.now() + backoffMs);
 
@@ -146,9 +151,6 @@ async function scheduleRetry(base44, queueId, retryCount) {
   }
 }
 
-/**
- * Move event to dead letter queue after max retries
- */
 async function moveToDeadLetter(base44, queueEntry, failureReason, errorMessage) {
   try {
     const deadLetter = await base44.asServiceRole.entities.DeadLetterLog.create({
@@ -169,7 +171,6 @@ async function moveToDeadLetter(base44, queueEntry, failureReason, errorMessage)
       status: 'pending_review',
     });
 
-    // Update EventQueue status
     await base44.asServiceRole.entities.EventQueue.update(queueEntry.id, {
       status: 'dead_letter',
     });

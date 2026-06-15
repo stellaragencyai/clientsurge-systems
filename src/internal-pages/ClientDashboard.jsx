@@ -11,6 +11,7 @@ import { Loader2, ShoppingBag, Mail, Phone, RefreshCw } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import DeploymentProgressBar from "@/components/dashboard/DeploymentProgressBar";
+import SetupStatusPanel from "@/components/dashboard/SetupStatusPanel";
 
 // Map real install_status → numeric stage index (0–4)
 export const STAGE_MAP = {
@@ -295,10 +296,17 @@ export default function ClientDashboard() {
                 )}
 
                 {activeServices.length > 0 && (
-                  <DeploymentProgressBar
-                    pipelineStatus={order?.pipeline_status}
-                    installStatus={activeServices[0]?.installStatus}
-                  />
+                  <>
+                    <SetupStatusPanel
+                      installStatus={activeServices[0]?.installStatus}
+                      onRefresh={() => fetchPortal(true)}
+                      isRefreshing={isRefreshing}
+                    />
+                    <DeploymentProgressBar
+                      pipelineStatus={order?.pipeline_status}
+                      installStatus={activeServices[0]?.installStatus}
+                    />
+                  </>
                 )}
 
                 {activeServices.length === 0 ? <EmptyState /> : (
