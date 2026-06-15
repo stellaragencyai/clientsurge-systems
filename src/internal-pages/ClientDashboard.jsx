@@ -1,6 +1,7 @@
 import { useEffect, useLayoutEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
+import HorizontalStageTracker from "@/components/dashboard/HorizontalStageTracker";
 import DashboardMetricsBar from "@/components/dashboard/DashboardMetricsBar";
 import ResponsiveServiceCard from "@/components/dashboard/ResponsiveServiceCard";
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
@@ -9,8 +10,9 @@ import ChatAssistant from "@/components/dashboard/ChatAssistant";
 import { Loader2, ShoppingBag, Mail, Phone, RefreshCw, Zap } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
+import DeploymentProgressBar from "@/components/dashboard/DeploymentProgressBar";
+import SetupStatusPanel from "@/components/dashboard/SetupStatusPanel";
 import LaunchReadinessPanel from "@/components/dashboard/LaunchReadinessPanel";
-import LaunchReadinessBar from "@/components/dashboard/LaunchReadinessBar";
 import ActiveAutomationsPanel from "@/components/dashboard/ActiveAutomationsPanel";
 import ClientActionRequiredPanel from "@/components/dashboard/ClientActionRequiredPanel";
 import RecentSystemProofPanel from "@/components/dashboard/RecentSystemProofPanel";
@@ -318,13 +320,18 @@ export default function ClientDashboard() {
                   />
                 )}
 
-                {/* Consolidated Launch Readiness Bar — single source of truth */}
                 {activeServices.length > 0 && (
-                  <LaunchReadinessBar
-                    order={order}
-                    project={project}
-                    events={effectiveHealthEvents}
-                  />
+                  <>
+                    <SetupStatusPanel
+                      installStatus={activeServices[0]?.installStatus}
+                      onRefresh={() => fetchPortal(true)}
+                      isRefreshing={isRefreshing}
+                    />
+                    <DeploymentProgressBar
+                      pipelineStatus={order?.pipeline_status}
+                      installStatus={activeServices[0]?.installStatus}
+                    />
+                  </>
                 )}
 
                 {/* Admin Preview Toggler — switch between simulated pipeline states */}
@@ -378,6 +385,21 @@ export default function ClientDashboard() {
                   <EmptyState />
                 ) : (
                   <>
+                    {/* Stage tracker — wrapped in a premium card */}
+                    <div className="rounded-2xl overflow-hidden mb-5"
+                      style={{
+                        background: "linear-gradient(135deg,rgba(255,255,255,0.95) 0%, rgba(232,246,255,0.7) 100%)",
+                        border: "1px solid rgba(0,174,239,0.13)",
+                        boxShadow: "0 4px 24px rgba(0,59,143,0.07)"
+                      }}>
+                      <HorizontalStageTracker
+                        serviceKey={activeServices[0].serviceKey}
+                        currentStage={activeServices[0].stageIndex}
+                        productName={activeServices[0].productName}
+                        installStatus={activeServices[0].installStatus}
+                      />
+                    </div>
+
                     {/* Metrics bar */}
                     <DashboardMetricsBar activeServices={activeServices} project={project} />
 
