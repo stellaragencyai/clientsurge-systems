@@ -86,11 +86,11 @@ export const SIX_AUTOMATIONS = [
     id: "appointment-booking",
     slug: "appointment-booking-automation",
     routePath: "/appointment-booking-automation",
-    title: "Appointment Booking Automation",
-    shortTitle: "Appointment Booking",
+    title: "AI Scheduling & Appointment Automation",
+    shortTitle: "AI Scheduling",
     icon: "calendar",
     summary:
-      "Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync.",
+      "AI-powered scheduling that converts interested leads into confirmed appointments with reminders, confirmations, qualification, and calendar sync.",
     bullets: [
       "Reduces booking friction",
       "Confirms appointments",

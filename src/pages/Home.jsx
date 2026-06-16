@@ -11,6 +11,8 @@ import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import RevenueProofBlock from "../components/landing/RevenueProofBlock";
+import AutomationCatalog from "../components/landing/AutomationCatalog";
+import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -121,6 +123,9 @@ export default function Home() {
           <Industries />
         </LazyHomepageSection>
 
+        <div id="automation-catalog" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <AutomationCatalog />
+
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <div className="max-w-6xl mx-auto px-6 pt-4">
             <RevenueProofBlock industryLoss={14700} leadsRecovered="8-12" bookingsGenerated="3-5" />
@@ -155,6 +160,11 @@ export default function Home() {
           <div id="testimonials" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Testimonials />
         </LazyHomepageSection>
+
+        <SectionBreak />
+
+        <div id="revenue-urgency" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <RevenueUrgencySection />
 
         <SectionBreak />
 

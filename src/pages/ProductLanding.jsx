@@ -23,8 +23,8 @@ const FEATURES = [
   },
   {
     icon: <Calendar className="w-6 h-6" />,
-    title: 'Booking Automation',
-    description: 'Direct lead-to-calendar integration with appointment confirmation',
+    title: 'AI Scheduling Agent',
+    description: 'AI-powered scheduling that moves qualified leads to confirmed appointments',
   },
   {
     icon: <BarChart3 className="w-6 h-6" />,
@@ -43,11 +43,11 @@ export default function ProductLanding() {
 
   useEffect(() => {
     setPageMetadata({
-      title: 'ClientSurge Systems | AI Lead Automation for Local Service Businesses',
-      description: 'Turn more leads into booked appointments with AI-powered lead response, follow-up, and booking automation. Built for contractors, salons, clinics, and service businesses.',
+      title: 'ClientSurge Systems | AI Automation for Local Service Businesses',
+      description: 'AI-powered lead response, follow-up, and scheduling automation that turns more inquiries into booked appointments. Built for contractors, salons, clinics, and service businesses.',
       canonicalPath: '/product',
-      ogTitle: 'ClientSurge Systems - AI Lead Automation',
-      ogDescription: 'Automated lead response, AI follow-up, missed call recovery, and booking automation for service businesses.',
+      ogTitle: 'ClientSurge Systems - AI Automation Systems',
+      ogDescription: 'Automated lead response, AI follow-up, missed call recovery, and scheduling automation for service businesses.',
     });
   }, []);
 
@@ -59,28 +59,25 @@ export default function ProductLanding() {
       <section className="py-20 px-6 bg-gradient-to-b from-primary/5 to-background">
         <div className="max-w-4xl mx-auto text-center">
           <h1 className="text-5xl md:text-6xl font-bold mb-6 text-foreground">
-            AI Automation That Closes Leads
+            AI Automation Systems for Local Businesses
           </h1>
           <p className="text-xl text-muted-foreground mb-8 leading-relaxed">
-            ClientSurge automatically responds to leads, qualifies them with AI, follows up intelligently, and books appointments—24/7.
+            ClientSurge responds to leads automatically, qualifies them with AI, follows up intelligently, and converts more inquiries into booked appointments—24/7.
           </p>
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
-              onClick={() => navigate('/signup')}
+              onClick={() => navigate('/book')}
               className="px-8 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
             >
-              Start Free Trial <ArrowRight className="w-4 h-4" />
+              Request Walkthrough <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => navigate('/pricing')}
+              onClick={() => navigate('/automations')}
               className="px-8 py-4 border-2 border-primary text-primary rounded-lg font-semibold hover:bg-primary/5 transition-colors"
             >
-              View Pricing
+              View All Systems
             </button>
           </div>
-          <p className="text-sm text-muted-foreground mt-8">
-            No credit card required • 14-day free trial • Cancel anytime
-          </p>
         </div>
       </section>
 
@@ -88,7 +85,7 @@ export default function ProductLanding() {
       <section className="py-16 px-6 max-w-6xl mx-auto">
         <h2 className="text-3xl font-bold text-center mb-4">How ClientSurge Works</h2>
         <p className="text-center text-muted-foreground mb-12 max-w-2xl mx-auto">
-          Six automated systems work together to capture leads, qualify them, follow up intelligently, and book appointments automatically.
+          Six automated systems work together to capture leads, qualify them, follow up intelligently, and convert more inquiries into booked appointments automatically.
         </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {FEATURES.map((feature, idx) => (
@@ -128,15 +125,15 @@ export default function ProductLanding() {
       {/* CTA Section */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">Ready to Automate Your Leads?</h2>
+          <h2 className="text-3xl font-bold mb-6">See the System in Action</h2>
           <p className="text-muted-foreground mb-8 text-lg">
-            Join hundreds of service businesses closing more leads with AI automation.
+            See how ClientSurge automations capture, respond, follow up, and convert more leads into booked appointments.
           </p>
           <button
-            onClick={() => navigate('/signup')}
+            onClick={() => navigate('/book')}
             className="px-8 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
           >
-            Get Started Free <ArrowRight className="w-4 h-4" />
+            Request Free Audit <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>

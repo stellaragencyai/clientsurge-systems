@@ -68,17 +68,17 @@ const SERVICES = [
   {
     id: "appointment-booking-automation",
     icon: Calendar,
-    title: "Appointment Booking Automation",
+    title: "AI Scheduling & Appointment Automation",
     tagline: "Moves qualified leads from interest to confirmed appointments.",
     description:
-      "Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync.",
+      "AI-powered scheduling that converts interested leads into confirmed appointments with reminders, confirmations, qualification, and calendar sync.",
     stats: [
-      { value: "Less", label: "back-and-forth before booking", source: "Booking workflow" },
+      { value: "Less", label: "back-and-forth before scheduling", source: "AI scheduling workflow" },
       { value: "Auto", label: "confirmation and reminder messages", source: "Calendar automation" },
       { value: "Clear", label: "handoff when the lead is ready", source: "Lead qualification" },
     ],
     whatYouGet: [
-      "Reduces booking friction",
+      "Reduces scheduling friction",
       "Confirms appointments",
       "Sends reminders automatically",
     ],
@@ -173,7 +173,7 @@ function VideoPlaceholder({ service, onClose }) {
               style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
               onClick={onClose}
             >
-              Book a Free Audit <ArrowRight className="w-4 h-4" />
+              Get a Free Automation Audit <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -232,7 +232,7 @@ function ServiceCard({ service }) {
               }}
             >
               <Play className="w-5 h-5 text-white" fill="white" />
-              <span className="text-white text-sm font-semibold">Watch Demo</span>
+              <span className="text-white text-sm font-semibold">Automation Preview</span>
             </div>
           </div>
           {/* Icon */}
@@ -340,7 +340,7 @@ export default function Automations() {
           <span style={{ color: BRAND.color }}>Local Service Businesses</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
-          ClientSurge installs automation systems that capture, follow up with, qualify, book, and reactivate leads so fewer local service opportunities fall through the cracks.
+          Six automation systems working together to capture leads, follow up intelligently, schedule appointments, and reactivate revenue — all installed for your local business.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
           {[
@@ -381,7 +381,7 @@ export default function Automations() {
             Activate Your Systems in 24–48 Hours
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            Book a free automation audit and our team will map the right voice, lead response, follow-up, and booking systems for your business.
+            Request a free automation audit and our team will map the right voice, lead response, follow-up, and scheduling systems for your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
