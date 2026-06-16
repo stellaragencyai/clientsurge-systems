@@ -1,0 +1,17 @@
+{
+  "name": "manageClientLifecycle",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Client Lifecycle Inference",
+      "description": "Infer and update Client lifecycle stage when ClientProject status changes",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "ClientProject",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
+}

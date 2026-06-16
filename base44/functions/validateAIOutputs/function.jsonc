@@ -1,4 +1,4 @@
 {
   "name": "validateAIOutputs",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

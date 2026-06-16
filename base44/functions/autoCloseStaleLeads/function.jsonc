@@ -1,4 +1,4 @@
 {
   "name": "autoCloseStaleLeads",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

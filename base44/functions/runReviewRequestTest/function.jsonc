@@ -1,4 +1,4 @@
 {
   "name": "runReviewRequestTest",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

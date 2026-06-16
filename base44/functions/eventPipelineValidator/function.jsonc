@@ -1,0 +1,4 @@
+{
+  "name": "eventPipelineValidator",
+  "entry": "main.ts"
+}

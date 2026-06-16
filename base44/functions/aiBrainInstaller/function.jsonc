@@ -1,4 +1,4 @@
 {
   "name": "aiBrainInstaller",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

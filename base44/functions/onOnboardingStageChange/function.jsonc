@@ -1,16 +1,17 @@
 {
   "name": "onOnboardingStageChange",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "entity",
+      "name": "Onboarding Stage Change — Email Triggers",
       "description": "Fires client stage emails and admin go-live alerts when any ClientProject step field flips to complete.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
       "entity_name": "ClientProject",
       "event_types": [
         "update"
-      ],
-      "is_active": true,
-      "name": "Onboarding Stage Change — Email Triggers"
+      ]
     }
   ]
 }

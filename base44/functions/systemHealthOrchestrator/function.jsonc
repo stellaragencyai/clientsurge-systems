@@ -1,0 +1,23 @@
+{
+  "name": "systemHealthOrchestrator",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "SystemHealthOrchestrator — Daily 6am MST",
+      "description": "Daily health scan: detects stuck installs, error states, failed jobs. Sends admin alerts if issues found.",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "20:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "name": "stripeOrphanReconciler",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Stripe Orphan Reconciler — Hourly",
+      "description": "Runs every 60 minutes. Cross-references recent Stripe checkout.session.completed events against Orders. Auto-triggers orchestrateOrderToOnboarding for any paid orders missing a pipeline_status.",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 60,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

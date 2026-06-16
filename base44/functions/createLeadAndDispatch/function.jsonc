@@ -1,4 +1,4 @@
 {
   "name": "createLeadAndDispatch",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

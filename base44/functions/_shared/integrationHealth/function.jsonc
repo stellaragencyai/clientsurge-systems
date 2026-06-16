@@ -1,4 +1,4 @@
 {
   "name": "_shared/integrationHealth",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -14,8 +14,7 @@
   "properties": {
     "agency_name": {
       "type": "string",
-      "title": "Agency Name",
-      "required": true
+      "title": "Agency Name"
     },
     "agency_slug": {
       "type": "string",
@@ -25,8 +24,7 @@
     "owner_email": {
       "type": "string",
       "title": "Owner Email",
-      "format": "email",
-      "required": true
+      "format": "email"
     },
     "owner_name": {
       "type": "string",

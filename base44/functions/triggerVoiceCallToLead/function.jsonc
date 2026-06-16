@@ -1,4 +1,4 @@
 {
   "name": "triggerVoiceCallToLead",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

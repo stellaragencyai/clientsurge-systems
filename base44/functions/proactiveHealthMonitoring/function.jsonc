@@ -1,0 +1,23 @@
+{
+  "name": "proactiveHealthMonitoring",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Orchestration Health Monitor",
+      "description": "Monitor orchestration layer health: stalled workflows, duplicate patterns, state transition anomalies",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 15,
+      "start_time": "00:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

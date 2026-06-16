@@ -1,4 +1,4 @@
 {
   "name": "runLeadReactivationTest",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

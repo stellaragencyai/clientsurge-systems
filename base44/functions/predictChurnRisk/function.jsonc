@@ -1,4 +1,4 @@
 {
   "name": "predictChurnRisk",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

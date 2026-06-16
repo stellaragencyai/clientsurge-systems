@@ -1,0 +1,23 @@
+{
+  "name": "processEventQueue",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Event Queue Processing Loop",
+      "description": "Continuously process queued events through their respective processors (messaging, automation, billing)",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5,
+      "start_time": "00:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

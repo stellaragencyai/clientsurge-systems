@@ -12,8 +12,7 @@
   "properties": {
     "client_project_id": {
       "type": "string",
-      "title": "Client Project ID",
-      "required": true
+      "title": "Client Project ID"
     },
     "client_id": {
       "type": "string",
@@ -30,8 +29,7 @@
         "revenue_leakage",
         "conversion_bottleneck",
         "success_pattern_detected"
-      ],
-      "required": true
+      ]
     },
     "severity": {
       "type": "string",

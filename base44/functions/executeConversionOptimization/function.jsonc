@@ -1,0 +1,23 @@
+{
+  "name": "executeConversionOptimization",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Daily Conversion Optimization Analysis",
+      "description": "Runs daily conversion funnel analysis, revenue attribution, and optimization signal generation for all projects",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "02:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

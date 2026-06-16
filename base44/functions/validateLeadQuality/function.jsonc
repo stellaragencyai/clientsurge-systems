@@ -1,4 +1,4 @@
 {
   "name": "validateLeadQuality",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

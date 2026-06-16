@@ -1,4 +1,4 @@
 {
   "name": "stripeInvoiceWebhook",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

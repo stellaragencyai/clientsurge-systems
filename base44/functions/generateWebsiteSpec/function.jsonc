@@ -1,4 +1,4 @@
 {
   "name": "generateWebsiteSpec",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

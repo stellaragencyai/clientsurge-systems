@@ -10,13 +10,11 @@
   "properties": {
     "agency_id": {
       "type": "string",
-      "title": "Agency ID",
-      "required": true
+      "title": "Agency ID"
     },
     "client_id": {
       "type": "string",
-      "title": "Client ID",
-      "required": true
+      "title": "Client ID"
     },
     "relationship_type": {
       "type": "string",

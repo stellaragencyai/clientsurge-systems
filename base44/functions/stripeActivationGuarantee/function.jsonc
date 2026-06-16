@@ -1,0 +1,18 @@
+{
+  "name": "stripeActivationGuarantee",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Stripe Activation Guarantee on Order Payment",
+      "description": "Verify and retry post-payment onboarding (Client, ClientProject, Subscription, InstallationOS creation) on every paid Order",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Order",
+      "event_types": [
+        "create",
+        "update"
+      ]
+    }
+  ]
+}

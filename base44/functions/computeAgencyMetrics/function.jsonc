@@ -1,0 +1,23 @@
+{
+  "name": "computeAgencyMetrics",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Compute Agency Metrics",
+      "description": "Auto-compute aggregated metrics snapshots for all active agencies (supports agency dashboards)",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "hours",
+      "repeat_interval": 6,
+      "start_time": "00:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

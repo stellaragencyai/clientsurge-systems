@@ -1,18 +1,23 @@
 {
   "name": "stalledOnboardingAlert",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Every day at 9AM, check for clients stuck in onboarding for more than 5 days and email Nolan with the list and incomplete steps.",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Stalled Onboarding Alert — Daily 9AM",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
+      "description": "Every day at 9AM, check for clients stuck in onboarding for more than 5 days and email Nolan with the list and incomplete steps.",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
       "schedule_mode": "recurring",
       "schedule_type": "simple",
-      "start_time": "16:00"
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "16:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

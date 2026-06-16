@@ -1,0 +1,17 @@
+{
+  "name": "initializeClientOnboarding",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Initialize Client Onboarding",
+      "description": "Automatically initialize onboarding when a new Client is created: creates ClientProject, OnboardingClient, ClientInstallationOS, and sets Client status to 'In Setup'.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Client",
+      "event_types": [
+        "create"
+      ]
+    }
+  ]
+}

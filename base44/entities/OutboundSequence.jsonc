@@ -10,8 +10,7 @@
   "properties": {
     "sequence_name": {
       "type": "string",
-      "title": "Sequence Name",
-      "required": true
+      "title": "Sequence Name"
     },
     "client_id": {
       "type": "string",

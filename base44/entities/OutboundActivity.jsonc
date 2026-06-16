@@ -11,8 +11,7 @@
   "properties": {
     "outbound_lead_id": {
       "type": "string",
-      "title": "OutboundLead ID",
-      "required": true
+      "title": "OutboundLead ID"
     },
     "client_id": {
       "type": "string",
@@ -39,8 +38,7 @@
         "conversion_event",
         "sequence_paused",
         "sequence_completed"
-      ],
-      "required": true
+      ]
     },
     "channel": {
       "type": "string",
@@ -97,8 +95,7 @@
     "occurred_at": {
       "type": "string",
       "title": "Occurred At",
-      "format": "date-time",
-      "required": true
+      "format": "date-time"
     }
   },
   "required": [

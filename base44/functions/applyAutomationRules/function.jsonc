@@ -1,4 +1,4 @@
 {
   "name": "applyAutomationRules",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

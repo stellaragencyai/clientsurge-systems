@@ -1,0 +1,17 @@
+{
+  "name": "twilioVerify",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Trigger Twilio Verify on Lead Creation",
+      "description": "Auto-send Twilio verification code when a new lead is captured to validate phone number quality immediately\"",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "create"
+      ]
+    }
+  ]
+}

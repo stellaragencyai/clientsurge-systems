@@ -1,0 +1,4 @@
+{
+  "name": "autoScalingLaunchReadinessGate",
+  "entry": "main.ts"
+}

@@ -1,4 +1,4 @@
 {
   "name": "receiveResendWebhook",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

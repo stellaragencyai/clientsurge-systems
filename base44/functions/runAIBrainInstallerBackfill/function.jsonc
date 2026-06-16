@@ -1,4 +1,4 @@
 {
   "name": "runAIBrainInstallerBackfill",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,4 +1,4 @@
 {
   "name": "handleBookingTrigger",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

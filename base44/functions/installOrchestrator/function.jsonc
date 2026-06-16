@@ -1,0 +1,28 @@
+{
+  "name": "installOrchestrator",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "InstallOrchestrator — New Order",
+      "description": "Triggers installOrchestrator when an order is created. Sets up install OS and initial status.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Order",
+      "event_types": [
+        "create"
+      ]
+    },
+    {
+      "name": "InstallOrchestrator — Order Update",
+      "description": "Triggers installOrchestrator when an order status changes. Manages pipeline progression and go-live gates.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Order",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
+}

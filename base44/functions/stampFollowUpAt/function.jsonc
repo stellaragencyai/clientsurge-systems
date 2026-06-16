@@ -1,16 +1,17 @@
 {
   "name": "stampFollowUpAt",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "entity",
+      "name": "Stamp Follow-Up At — Qualified or Replied",
       "description": "When a lead's status changes to Qualified or Replied, stamp next_follow_up_at (+24h for Qualified, +48h for Replied) so the hourly runner knows when to fire.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
       "entity_name": "Leads",
       "event_types": [
         "update"
-      ],
-      "is_active": true,
-      "name": "Stamp Follow-Up At — Qualified or Replied"
+      ]
     }
   ]
 }

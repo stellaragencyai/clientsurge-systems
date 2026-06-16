@@ -1,0 +1,25 @@
+{
+  "name": "pruneIdempotencyKeys",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Idempotency Key Pruner — Weekly",
+      "description": "Runs weekly on Monday at 3am. Archives IdempotencyKey records older than 90 days to prevent unbounded table growth that slows every lookup scan.",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "10:00",
+      "repeat_on_days": [
+        1
+      ],
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

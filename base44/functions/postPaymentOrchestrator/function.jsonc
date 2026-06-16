@@ -1,4 +1,4 @@
 {
   "name": "postPaymentOrchestrator",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

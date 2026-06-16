@@ -1,0 +1,4 @@
+{
+  "name": "getSystemHealthAlerts",
+  "entry": "main.ts"
+}

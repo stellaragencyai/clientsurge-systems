@@ -14,8 +14,7 @@
   "properties": {
     "business_name": {
       "type": "string",
-      "title": "Business Name",
-      "required": true
+      "title": "Business Name"
     },
     "contact_name": {
       "type": "string",
@@ -24,8 +23,7 @@
     "email": {
       "type": "string",
       "title": "Email Address",
-      "format": "email",
-      "required": true
+      "format": "email"
     },
     "phone": {
       "type": "string",

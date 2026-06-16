@@ -1,4 +1,4 @@
 {
   "name": "automationOrchestrator",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

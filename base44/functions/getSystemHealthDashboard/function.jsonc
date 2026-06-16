@@ -1,4 +1,4 @@
 {
   "name": "getSystemHealthDashboard",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

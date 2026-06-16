@@ -12,8 +12,7 @@
     "page_key": {
       "type": "string",
       "title": "Page Key",
-      "description": "Unique identifier for page being tested (e.g., 'homepage', 'hvac_landing', 'roofing_landing', 'dental_landing', 'chiropractic_landing')",
-      "required": true
+      "description": "Unique identifier for page being tested (e.g., 'homepage', 'hvac_landing', 'roofing_landing', 'dental_landing', 'chiropractic_landing')"
     },
     "page_path": {
       "type": "string",
@@ -27,7 +26,6 @@
         "A",
         "B"
       ],
-      "required": true,
       "description": "A = control/original, B = variation"
     },
     "variant_name": {

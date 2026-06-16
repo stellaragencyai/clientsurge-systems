@@ -1,4 +1,4 @@
 {
   "name": "syncLeadToCRM",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

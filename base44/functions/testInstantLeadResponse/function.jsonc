@@ -1,4 +1,4 @@
 {
   "name": "testInstantLeadResponse",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,18 +1,23 @@
 {
   "name": "monthlyClientReport",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "On the 1st of every month, send each Live client a personalized monthly performance summary email signed by Nolan.",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Monthly Client Performance Report",
-      "repeat_on_day_of_month": 1,
-      "repeat_unit": "months",
+      "description": "On the 1st of every month, send each Live client a personalized monthly performance summary email signed by Nolan.",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
       "schedule_mode": "recurring",
       "schedule_type": "simple",
-      "start_time": "15:00"
+      "repeat_unit": "months",
+      "repeat_interval": 1,
+      "start_time": "15:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": 1,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

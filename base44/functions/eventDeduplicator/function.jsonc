@@ -1,0 +1,4 @@
+{
+  "name": "eventDeduplicator",
+  "entry": "main.ts"
+}

@@ -1,4 +1,4 @@
 {
   "name": "getAutomationStatus",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

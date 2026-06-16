@@ -1,4 +1,4 @@
 {
   "name": "dailyDigestGate",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

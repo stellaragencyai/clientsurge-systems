@@ -1,4 +1,4 @@
 {
   "name": "seedIndustryTemplates",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

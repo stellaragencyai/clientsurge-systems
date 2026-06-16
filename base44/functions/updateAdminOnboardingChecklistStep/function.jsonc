@@ -1,4 +1,17 @@
 {
   "name": "updateAdminOnboardingChecklistStep",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Onboarding Stage Change — Update AutomationChecklist",
+      "description": null,
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "OnboardingSubmission",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
 }

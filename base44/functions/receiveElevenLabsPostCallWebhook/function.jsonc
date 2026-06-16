@@ -1,4 +1,17 @@
 {
   "name": "receiveElevenLabsPostCallWebhook",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Voice Call Bad Outcome → Schedule 24h Follow-Up",
+      "description": "USE CASE #2: When voice_call_outcome changes to no_answer/busy/failed, immediately sets next_follow_up_at = 24h from now so processVoiceCallFollowUps picks it up.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
 }

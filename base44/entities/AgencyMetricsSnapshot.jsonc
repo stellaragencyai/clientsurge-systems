@@ -12,8 +12,7 @@
   "properties": {
     "agency_id": {
       "type": "string",
-      "title": "Agency ID",
-      "required": true
+      "title": "Agency ID"
     },
     "snapshot_date": {
       "type": "string",

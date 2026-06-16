@@ -1,4 +1,4 @@
 {
   "name": "updatePortalTimeline",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

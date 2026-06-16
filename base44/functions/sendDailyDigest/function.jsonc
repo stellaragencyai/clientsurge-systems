@@ -1,42 +1,57 @@
 {
   "name": "sendDailyDigest",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Sends daily operational digest to admin every morning at 7am MST. Task #589.",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Daily Digest — 7am MST",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
-      "schedule_mode": "recurring",
-      "schedule_type": "simple",
-      "start_time": "14:00"
-    },
-    {
-      "type": "scheduled",
-      "description": "Sends admin a daily email digest with new leads, hot leads, overdue follow-ups, and replied leads counts.",
-      "ends_type": "never",
-      "is_active": true,
-      "name": "Daily Lead Digest — 8 AM",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
-      "schedule_mode": "recurring",
-      "schedule_type": "simple",
-      "start_time": "15:00"
-    },
-    {
-      "type": "scheduled",
-      "description": "Sends a morning summary email with new leads, hot leads, and overdue follow-ups",
-      "ends_type": "never",
+      "description": "Sends daily operational digest to admin every morning at 7am MST. Task #589.",
+      "function_args": null,
       "is_active": false,
-      "name": "Daily Lead Digest Email",
-      "repeat_interval": 1,
-      "repeat_unit": "days",
+      "type": "scheduled",
       "schedule_mode": "recurring",
       "schedule_type": "simple",
-      "start_time": "15:00"
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Daily Lead Digest — 8 AM",
+      "description": "Sends admin a daily email digest with new leads, hot leads, overdue follow-ups, and replied leads counts.",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "15:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    },
+    {
+      "name": "Daily Lead Digest Email",
+      "description": "Sends a morning summary email with new leads, hot leads, and overdue follow-ups",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "15:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

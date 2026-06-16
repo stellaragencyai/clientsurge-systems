@@ -16,8 +16,7 @@
   "properties": {
     "client_project_id": {
       "type": "string",
-      "title": "Client Project ID",
-      "required": true
+      "title": "Client Project ID"
     },
     "client_id": {
       "type": "string",

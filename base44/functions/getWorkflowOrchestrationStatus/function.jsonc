@@ -1,0 +1,4 @@
+{
+  "name": "getWorkflowOrchestrationStatus",
+  "entry": "main.ts"
+}

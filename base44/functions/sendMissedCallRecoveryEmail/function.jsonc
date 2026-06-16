@@ -1,15 +1,17 @@
 {
   "name": "sendMissedCallRecoveryEmail",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
+      "name": "Send Missed Call Recovery Email",
+      "description": null,
+      "function_args": null,
+      "is_active": true,
       "type": "entity",
       "entity_name": "CommunicationEvent",
       "event_types": [
         "create"
-      ],
-      "is_active": true,
-      "name": "Send Missed Call Recovery Email"
+      ]
     }
   ]
 }

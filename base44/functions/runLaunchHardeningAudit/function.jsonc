@@ -1,0 +1,4 @@
+{
+  "name": "runLaunchHardeningAudit",
+  "entry": "main.ts"
+}

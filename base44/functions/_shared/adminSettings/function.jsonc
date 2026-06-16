@@ -1,4 +1,4 @@
 {
   "name": "_shared/adminSettings",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

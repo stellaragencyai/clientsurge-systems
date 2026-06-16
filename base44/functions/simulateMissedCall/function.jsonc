@@ -1,4 +1,4 @@
 {
   "name": "simulateMissedCall",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

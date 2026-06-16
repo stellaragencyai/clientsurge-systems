@@ -1,4 +1,23 @@
 {
   "name": "processVoiceCallFollowUps",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Voice Call Follow-Up Processor — Hourly",
+      "description": "USE CASE #2: Every hour, finds leads with failed/no-answer voice call outcomes that are 24h+ past their next_follow_up_at, sends personalized re-contact SMS + email.",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "hours",
+      "repeat_interval": 1,
+      "start_time": null,
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
 }

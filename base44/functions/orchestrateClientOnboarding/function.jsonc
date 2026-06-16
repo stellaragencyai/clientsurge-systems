@@ -1,0 +1,17 @@
+{
+  "name": "orchestrateClientOnboarding",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Orchestrate Setup on Lifecycle Change",
+      "description": "Trigger onboarding orchestration when Client enters setup_in_progress lifecycle stage",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Client",
+      "event_types": [
+        "update"
+      ]
+    }
+  ]
+}

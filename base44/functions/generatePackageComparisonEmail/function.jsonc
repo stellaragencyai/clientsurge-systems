@@ -1,4 +1,4 @@
 {
   "name": "generatePackageComparisonEmail",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

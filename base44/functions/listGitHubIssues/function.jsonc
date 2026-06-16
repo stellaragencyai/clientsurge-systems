@@ -1,0 +1,4 @@
+{
+  "name": "listGitHubIssues",
+  "entry": "main.ts"
+}

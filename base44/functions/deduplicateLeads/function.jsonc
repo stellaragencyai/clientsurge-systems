@@ -1,4 +1,4 @@
 {
   "name": "deduplicateLeads",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

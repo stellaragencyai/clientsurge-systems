@@ -1,4 +1,4 @@
 {
   "name": "createInvoicePaymentLink",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

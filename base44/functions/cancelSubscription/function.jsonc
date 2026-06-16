@@ -1,4 +1,4 @@
 {
   "name": "cancelSubscription",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

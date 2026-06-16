@@ -10,8 +10,7 @@
   "properties": {
     "agency_id": {
       "type": "string",
-      "title": "Agency ID",
-      "required": true
+      "title": "Agency ID"
     },
     "logo_url": {
       "type": "string",

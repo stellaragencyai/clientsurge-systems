@@ -1,4 +1,27 @@
 {
   "name": "sendEmail",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Dead Letter Queue Monitoring",
+      "description": "Alert admins to dead letter queue status if events accumulate",
+      "function_args": {
+        "to": "{{ADMIN_NOTIFICATION_EMAIL}}",
+        "subject": "Scale Architecture: Dead Letter Queue Alert",
+        "body": "Check admin dashboard for events requiring manual reconciliation"
+      },
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "hours",
+      "repeat_interval": 1,
+      "start_time": "00:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
 }

@@ -1,4 +1,4 @@
 {
   "name": "bulkLeadAction",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

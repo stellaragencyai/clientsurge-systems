@@ -1,4 +1,4 @@
 {
   "name": "sendSmartEmail",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

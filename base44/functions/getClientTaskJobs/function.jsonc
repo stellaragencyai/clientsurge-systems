@@ -1,4 +1,4 @@
 {
   "name": "getClientTaskJobs",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

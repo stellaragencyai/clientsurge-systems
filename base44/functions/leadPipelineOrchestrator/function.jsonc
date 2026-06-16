@@ -1,0 +1,39 @@
+{
+  "name": "leadPipelineOrchestrator",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "LeadPipelineOrchestrator — Lead Update",
+      "description": "Triggers leadPipelineOrchestrator when a lead is updated. Re-scores, re-routes as needed.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "update"
+      ]
+    },
+    {
+      "name": "LeadPipelineOrchestrator — Website Lead",
+      "description": "Triggers leadPipelineOrchestrator when a new website form lead is captured.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "WebsiteLead",
+      "event_types": [
+        "create"
+      ]
+    },
+    {
+      "name": "LeadPipelineOrchestrator — New Lead",
+      "description": "Triggers leadPipelineOrchestrator when a new lead is created. Handles scoring, intent, routing, follow-up.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
+      "entity_name": "Leads",
+      "event_types": [
+        "create"
+      ]
+    }
+  ]
+}

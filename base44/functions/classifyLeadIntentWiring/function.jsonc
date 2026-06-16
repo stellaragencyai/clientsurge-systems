@@ -1,4 +1,4 @@
 {
   "name": "classifyLeadIntentWiring",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

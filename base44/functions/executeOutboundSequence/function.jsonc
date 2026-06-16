@@ -1,0 +1,23 @@
+{
+  "name": "executeOutboundSequence",
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Execute Outbound Sequences",
+      "description": "Process next steps in active outbound sequences and send messages",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "minutes",
+      "repeat_interval": 5,
+      "start_time": "00:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
+}

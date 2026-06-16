@@ -1,4 +1,4 @@
 {
   "name": "resendActivationLink",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

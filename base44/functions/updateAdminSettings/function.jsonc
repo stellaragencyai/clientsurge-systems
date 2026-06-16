@@ -1,4 +1,4 @@
 {
   "name": "updateAdminSettings",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,4 +1,4 @@
 {
   "name": "sendMilestoneEmail",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

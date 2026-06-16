@@ -1,4 +1,4 @@
 {
   "name": "_shared/installErrors",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

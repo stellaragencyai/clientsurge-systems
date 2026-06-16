@@ -1,4 +1,4 @@
 {
   "name": "crmWonBridge",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

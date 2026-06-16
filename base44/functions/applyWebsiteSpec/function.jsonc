@@ -1,4 +1,4 @@
 {
   "name": "applyWebsiteSpec",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

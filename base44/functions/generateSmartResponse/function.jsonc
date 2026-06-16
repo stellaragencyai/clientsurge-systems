@@ -1,4 +1,4 @@
 {
   "name": "generateSmartResponse",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

@@ -1,38 +1,46 @@
 {
   "name": "generateWeeklyReport",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "scheduled",
-      "description": "Auto-sends weekly performance report to all clients every Monday at 8am MST. Task #564.",
-      "ends_type": "never",
-      "is_active": true,
       "name": "Weekly Client Reports — Monday 8am",
+      "description": "Auto-sends weekly performance report to all clients every Monday at 8am MST. Task #564.",
+      "function_args": null,
+      "is_active": true,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
+      "repeat_interval": 1,
+      "start_time": "15:00",
       "repeat_on_days": [
         1
       ],
-      "repeat_unit": "weeks",
-      "schedule_mode": "recurring",
-      "schedule_type": "simple",
-      "start_time": "15:00"
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     },
     {
-      "type": "scheduled",
+      "name": "Weekly Client Performance Reports",
       "description": "Sends automated weekly performance report emails to all active clients every Monday morning.",
-      "ends_type": "never",
       "function_args": {
         "send_email": true
       },
       "is_active": true,
-      "name": "Weekly Client Performance Reports",
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "weeks",
       "repeat_interval": 1,
+      "start_time": "16:00",
       "repeat_on_days": [
         1
       ],
-      "repeat_unit": "weeks",
-      "schedule_mode": "recurring",
-      "schedule_type": "simple",
-      "start_time": "16:00"
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
     }
   ]
 }

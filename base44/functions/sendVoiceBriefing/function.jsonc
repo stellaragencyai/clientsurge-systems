@@ -1,4 +1,23 @@
 {
   "name": "sendVoiceBriefing",
-  "entry": "entry.ts"
+  "entry": "main.ts",
+  "automations": [
+    {
+      "name": "Daily Voice Briefing — 7am MST",
+      "description": "USE CASE #7: Calls Nolan's phone daily at 7am Phoenix time with an AI-generated 60-second business briefing: new leads, hot leads, overdue follow-ups, stalled installs, payment failures.",
+      "function_args": null,
+      "is_active": false,
+      "type": "scheduled",
+      "schedule_mode": "recurring",
+      "schedule_type": "simple",
+      "repeat_unit": "days",
+      "repeat_interval": 1,
+      "start_time": "14:00",
+      "repeat_on_days": null,
+      "repeat_on_day_of_month": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  ]
 }

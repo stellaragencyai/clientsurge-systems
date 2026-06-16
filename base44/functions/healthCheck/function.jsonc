@@ -1,4 +1,4 @@
 {
   "name": "healthCheck",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

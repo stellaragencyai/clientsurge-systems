@@ -1,4 +1,4 @@
 {
   "name": "sendDemoPrepEmail",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }

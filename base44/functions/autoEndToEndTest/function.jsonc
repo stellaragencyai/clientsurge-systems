@@ -1,16 +1,17 @@
 {
   "name": "autoEndToEndTest",
-  "entry": "entry.ts",
+  "entry": "main.ts",
   "automations": [
     {
-      "type": "entity",
+      "name": "Auto End-to-End Test — Lead Sources Connected",
       "description": "When step_lead_sources is marked true on a client, fire a fake test lead through their webhook, wait 90s, verify instant SMS + Day 1 follow-up queued, mark step_tested true or alert Nolan of failures.",
+      "function_args": null,
+      "is_active": true,
+      "type": "entity",
       "entity_name": "OnboardingClient",
       "event_types": [
         "update"
-      ],
-      "is_active": true,
-      "name": "Auto End-to-End Test — Lead Sources Connected"
+      ]
     }
   ]
 }

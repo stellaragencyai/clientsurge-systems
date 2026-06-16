@@ -1,4 +1,4 @@
 {
   "name": "updateInstallConfiguration",
-  "entry": "entry.ts"
+  "entry": "main.ts"
 }
