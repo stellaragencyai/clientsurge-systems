@@ -1,13 +1,12 @@
 {
   "name": "MetricsSnapshot",
   "type": "object",
-  "_metadata": {
-    "status": "DERIVED",
-    "reason": "Point-in-time metrics snapshot for dashboards only. Do NOT write directly. Derived from Leads + CommunicationEvent + Order. Use scheduled snapshot job only.",
-    "read_only": true,
-    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"
@@ -116,5 +115,11 @@
     "order_id",
     "business_name",
     "snapshot_date"
-  ]
+  ],
+  "_metadata": {
+    "status": "DERIVED",
+    "reason": "Point-in-time metrics snapshot for dashboards only. Do NOT write directly. Derived from Leads + CommunicationEvent + Order. Use scheduled snapshot job only.",
+    "read_only": true,
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  }
 }

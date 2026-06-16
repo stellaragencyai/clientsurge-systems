@@ -1,13 +1,12 @@
 {
   "name": "RateLimitConfig",
   "type": "object",
-  "_metadata": {
-    "status": "SCALE_ARCHITECTURE",
-    "reason": "Tenant-scoped rate limiting configuration per Client/ClientProject",
-    "tenant_scoped": "client_id + client_project_id (optional)",
-    "documentation": "SCALE_ARCHITECTURE.md"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_id": {
       "type": "string",
       "title": "Client ID (applies globally to all projects)"
@@ -110,5 +109,11 @@
   },
   "required": [
     "scope"
-  ]
+  ],
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Tenant-scoped rate limiting configuration per Client/ClientProject",
+    "tenant_scoped": "client_id + client_project_id (optional)",
+    "documentation": "SCALE_ARCHITECTURE.md"
+  }
 }

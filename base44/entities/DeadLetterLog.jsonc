@@ -1,14 +1,12 @@
 {
   "name": "DeadLetterLog",
   "type": "object",
-  "_metadata": {
-    "status": "SCALE_ARCHITECTURE",
-    "reason": "Immutable dead letter queue for permanently failed events. Admin review & reconciliation.",
-    "immutable": true,
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "SCALE_ARCHITECTURE.md"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "event_queue_id": {
       "type": "string",
       "title": "EventQueue ID"
@@ -84,5 +82,12 @@
     "client_id",
     "event_category",
     "failure_reason"
-  ]
+  ],
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Immutable dead letter queue for permanently failed events. Admin review & reconciliation.",
+    "immutable": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "SCALE_ARCHITECTURE.md"
+  }
 }

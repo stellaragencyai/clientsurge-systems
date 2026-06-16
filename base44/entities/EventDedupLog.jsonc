@@ -1,18 +1,12 @@
 {
-  "name": "EventDedupLog",
   "type": "object",
-  "_metadata": {
-    "status": "HARDENED_EVENT_PIPELINE",
-    "reason": "Deduplication & collapsing tracking. Prevents duplicate processing, enables event compression, ensures replay safety.",
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "HARDENED_EVENT_PIPELINE.md",
-    "product_layer": "infrastructure",
-    "system_layer": "infrastructure",
-    "visibility": "internal_only",
-    "dependency": "CommunicationEvent",
-    "architecture_level": "event_pipeline"
-  },
+  "name": "EventDedupLog",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "canonical_event_id": {
       "type": "string",
       "title": "Canonical CommunicationEvent ID",
@@ -39,8 +33,7 @@
         "collapsed_group",
         "aggregated",
         "replay_detected"
-      ],
-      "description": "Type of deduplication applied"
+      ]
     },
     "event_type": {
       "type": "string",
@@ -71,8 +64,7 @@
     "duplicate_count": {
       "type": "integer",
       "title": "Duplicate Count",
-      "default": 0,
-      "description": "Number of duplicates collapsed into canonical event"
+      "default": 0
     },
     "time_window_start": {
       "type": "string",
@@ -89,8 +81,7 @@
       "title": "Duplicate Event IDs",
       "items": {
         "type": "string"
-      },
-      "description": "All duplicate events merged into canonical"
+      }
     },
     "status": {
       "type": "string",
@@ -114,8 +105,7 @@
         "replay_skipped",
         "failed"
       ],
-      "default": "processed",
-      "description": "Enriched state (no schema change, conceptual)"
+      "default": "processed"
     },
     "failure_reason": {
       "type": "string",
@@ -133,8 +123,7 @@
     },
     "metadata_json": {
       "type": "string",
-      "title": "Aggregation Metadata",
-      "description": "JSON: {sources, aggregated_fields, provider_ids}"
+      "title": "Aggregation Metadata"
     },
     "created_at": {
       "type": "string",
@@ -149,5 +138,16 @@
     "dedup_type",
     "event_type",
     "channel"
-  ]
+  ],
+  "_metadata": {
+    "status": "HARDENED_EVENT_PIPELINE",
+    "reason": "Deduplication & collapsing tracking. Prevents duplicate processing, enables event compression, ensures replay safety.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "HARDENED_EVENT_PIPELINE.md",
+    "product_layer": "infrastructure",
+    "system_layer": "infrastructure",
+    "visibility": "internal_only",
+    "dependency": "CommunicationEvent",
+    "architecture_level": "event_pipeline"
+  }
 }

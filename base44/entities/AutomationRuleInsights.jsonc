@@ -1,17 +1,12 @@
 {
   "name": "AutomationRuleInsights",
   "type": "object",
-  "_metadata": {
-    "status": "ANALYTICS_DERIVED",
-    "reason": "Aggregated effectiveness metrics for automation rules. Populated asynchronously. Read-only for dashboard.",
-    "read_only": true,
-    "async_only": true,
-    "product_layer": "intelligence",
-    "metric_role": "derived_sub_metric",
-    "visibility": "dashboard_secondary",
-    "architecture_level": "analytics"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "rule_id": {
       "type": "string",
       "title": "AutomationRule ID"
@@ -70,5 +65,15 @@
       "title": "Recommendations"
     }
   },
-  "required": []
+  "required": [],
+  "_metadata": {
+    "status": "ANALYTICS_DERIVED",
+    "reason": "Aggregated effectiveness metrics for automation rules. Populated asynchronously. Read-only for dashboard.",
+    "read_only": true,
+    "async_only": true,
+    "product_layer": "intelligence",
+    "metric_role": "derived_sub_metric",
+    "visibility": "dashboard_secondary",
+    "architecture_level": "analytics"
+  }
 }

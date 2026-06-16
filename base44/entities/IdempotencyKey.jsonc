@@ -1,21 +1,15 @@
 {
-  "name": "IdempotencyKey",
   "type": "object",
-  "_metadata": {
-    "status": "ORCHESTRATION_LAYER",
-    "reason": "Global deduplication tracking. Prevents duplicate execution of critical operations across all subsystems.",
-    "tenant_scoped": "client_id + client_project_id (optional)",
-    "documentation": "ORCHESTRATION_LAYER.md",
-    "product_layer": "infrastructure",
-    "system_layer": "orchestration",
-    "visibility": "internal_only",
-    "architecture_level": "reliability"
-  },
+  "name": "IdempotencyKey",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "idempotency_key": {
       "type": "string",
-      "title": "Unique Idempotency Key",
-      "description": "System-wide unique identifier for operation (order_id, stripe_event_id, lead_id+event_type, etc.)"
+      "title": "Unique Idempotency Key"
     },
     "client_id": {
       "type": "string",
@@ -54,7 +48,7 @@
     },
     "resource_id": {
       "type": "string",
-      "title": "Resource ID (order_id, lead_id, client_id, etc.)"
+      "title": "Resource ID"
     },
     "status": {
       "type": "string",
@@ -70,14 +64,12 @@
     },
     "result_hash": {
       "type": "string",
-      "title": "Result Hash",
-      "description": "Hash of operation result for consistency verification"
+      "title": "Result Hash"
     },
     "execution_count": {
       "type": "integer",
       "title": "Execution Count",
-      "default": 0,
-      "description": "Number of times this idempotency key was processed"
+      "default": 0
     },
     "first_executed_at": {
       "type": "string",
@@ -91,8 +83,7 @@
     },
     "metadata_json": {
       "type": "string",
-      "title": "Operation Metadata",
-      "description": "JSON context (e.g., Stripe event_id, webhook signature)"
+      "title": "Operation Metadata"
     },
     "error_message": {
       "type": "string",
@@ -103,5 +94,15 @@
     "idempotency_key",
     "operation_type",
     "resource_type"
-  ]
+  ],
+  "_metadata": {
+    "status": "ORCHESTRATION_LAYER",
+    "reason": "Global deduplication tracking. Prevents duplicate execution of critical operations across all subsystems.",
+    "tenant_scoped": "client_id + client_project_id (optional)",
+    "documentation": "ORCHESTRATION_LAYER.md",
+    "product_layer": "infrastructure",
+    "system_layer": "orchestration",
+    "visibility": "internal_only",
+    "architecture_level": "reliability"
+  }
 }

@@ -1,13 +1,12 @@
 {
   "name": "AgencyBrandingConfig",
   "type": "object",
-  "_metadata": {
-    "status": "WHITE_LABEL_SCALING",
-    "reason": "White-label branding configuration per Agency. Controls UI appearance across all owned clients (landing pages, dashboards, emails).",
-    "tenant_scoped": "agency_id",
-    "documentation": "WHITE_LABEL_SYSTEM.md"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "agency_id": {
       "type": "string",
       "title": "Agency ID"
@@ -58,7 +57,7 @@
     "email_from_name": {
       "type": "string",
       "title": "Email 'From' Name",
-      "description": "Sender name in outbound emails (e.g. 'ACME Sales Team')"
+      "description": "Sender name in outbound emails"
     },
     "email_from_address": {
       "type": "string",
@@ -74,7 +73,7 @@
     "app_domain": {
       "type": "string",
       "title": "App Domain",
-      "description": "Custom domain for app (e.g. app.acme-digital.com)"
+      "description": "Custom domain for app"
     },
     "login_domain": {
       "type": "string",
@@ -135,5 +134,11 @@
   },
   "required": [
     "agency_id"
-  ]
+  ],
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "White-label branding configuration per Agency. Controls UI appearance across all owned clients (landing pages, dashboards, emails).",
+    "tenant_scoped": "agency_id",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  }
 }

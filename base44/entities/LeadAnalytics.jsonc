@@ -1,19 +1,12 @@
 {
   "name": "LeadAnalytics",
   "type": "object",
-  "_metadata": {
-    "status": "DEPRECATED",
-    "reason": "DEPRECATED: Duplicate of ConversionFunnel + MetricsSnapshot. Use ConversionFunnel for primary KPI metrics instead.",
-    "read_only": true,
-    "deprecated": true,
-    "replacement_entity": "ConversionFunnel",
-    "documentation": "ARCHITECTURE_CONSOLIDATION.md",
-    "product_layer": "intelligence",
-    "metric_role": "deprecated_redundant",
-    "visibility": "read_only_legacy",
-    "architecture_level": "analytics"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"
@@ -76,5 +69,18 @@
       "title": "Bookings Created Today",
       "default": 0
     }
-  }
+  },
+  "_metadata": {
+    "status": "DEPRECATED",
+    "reason": "DEPRECATED: Duplicate of ConversionFunnel + MetricsSnapshot. Use ConversionFunnel for primary KPI metrics instead.",
+    "read_only": true,
+    "deprecated": true,
+    "replacement_entity": "ConversionFunnel",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md",
+    "product_layer": "intelligence",
+    "metric_role": "deprecated_redundant",
+    "visibility": "read_only_legacy",
+    "architecture_level": "analytics"
+  },
+  "required": []
 }

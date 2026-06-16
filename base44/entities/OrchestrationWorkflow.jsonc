@@ -1,17 +1,12 @@
 {
-  "name": "OrchestrationWorkflow",
   "type": "object",
-  "_metadata": {
-    "status": "ORCHESTRATION_LAYER",
-    "reason": "Tracks active workflows to enforce single-active-workflow guarantee per resource. Prevents parallel conflicting executions.",
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "ORCHESTRATION_LAYER.md",
-    "product_layer": "infrastructure",
-    "system_layer": "orchestration",
-    "visibility": "internal_only",
-    "architecture_level": "reliability"
-  },
+  "name": "OrchestrationWorkflow",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "resource_type": {
       "type": "string",
       "title": "Resource Type",
@@ -24,7 +19,7 @@
     },
     "resource_id": {
       "type": "string",
-      "title": "Resource ID (order_id, client_id, etc.)"
+      "title": "Resource ID"
     },
     "client_id": {
       "type": "string",
@@ -101,8 +96,7 @@
       "title": "Linked Idempotency Keys",
       "items": {
         "type": "string"
-      },
-      "description": "All idempotency keys processed in this workflow"
+      }
     },
     "started_at": {
       "type": "string",
@@ -120,8 +114,7 @@
     },
     "parent_workflow_id": {
       "type": "string",
-      "title": "Parent Workflow ID",
-      "description": "For nested/cascading workflows"
+      "title": "Parent Workflow ID"
     }
   },
   "required": [
@@ -129,5 +122,15 @@
     "resource_id",
     "client_id",
     "workflow_type"
-  ]
+  ],
+  "_metadata": {
+    "status": "ORCHESTRATION_LAYER",
+    "reason": "Tracks active workflows to enforce single-active-workflow guarantee per resource. Prevents parallel conflicting executions.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "ORCHESTRATION_LAYER.md",
+    "product_layer": "infrastructure",
+    "system_layer": "orchestration",
+    "visibility": "internal_only",
+    "architecture_level": "reliability"
+  }
 }

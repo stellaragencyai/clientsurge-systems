@@ -1,14 +1,12 @@
 {
   "name": "OutboundActivity",
   "type": "object",
-  "_metadata": {
-    "status": "SALES_AUTOMATION",
-    "reason": "Immutable event log tracking all outbound interactions (sends, opens, clicks, replies).",
-    "immutable": true,
-    "tenant_scoped": "client_id",
-    "documentation": "SALES_AUTOMATION.md"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "outbound_lead_id": {
       "type": "string",
       "title": "OutboundLead ID"
@@ -102,5 +100,12 @@
     "outbound_lead_id",
     "activity_type",
     "occurred_at"
-  ]
+  ],
+  "_metadata": {
+    "status": "SALES_AUTOMATION",
+    "reason": "Immutable event log tracking all outbound interactions (sends, opens, clicks, replies).",
+    "immutable": true,
+    "tenant_scoped": "client_id",
+    "documentation": "SALES_AUTOMATION.md"
+  }
 }

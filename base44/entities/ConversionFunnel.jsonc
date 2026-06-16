@@ -1,19 +1,12 @@
 {
   "name": "ConversionFunnel",
   "type": "object",
-  "_metadata": {
-    "status": "CONVERSION_OPTIMIZATION",
-    "reason": "Tracks conversion funnel metrics per ClientProject. Derived from Leads \u2192 Orders \u2192 Subscriptions. No-write, metrics-only entity.",
-    "read_only": true,
-    "async_only": true,
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "CONVERSION_OPTIMIZATION.md",
-    "product_layer": "intelligence",
-    "metric_role": "primary_kpi_source_of_truth",
-    "visibility": "dashboard_primary",
-    "architecture_level": "analytics"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_project_id": {
       "type": "string",
       "title": "Client Project ID"
@@ -24,8 +17,7 @@
     },
     "funnel_name": {
       "type": "string",
-      "title": "Funnel Name",
-      "description": "e.g. 'SaaS Signup \u2192 Trial \u2192 Paid', 'Inbound Lead \u2192 Booking \u2192 Payment'"
+      "title": "Funnel Name"
     },
     "metric_period": {
       "type": "string",
@@ -70,16 +62,13 @@
             "type": "integer"
           },
           "total_count": {
-            "type": "integer",
-            "description": "Total users/leads in this stage"
+            "type": "integer"
           },
           "conversion_from_previous_percent": {
-            "type": "number",
-            "description": "% that converted from previous stage"
+            "type": "number"
           },
           "conversion_from_top_percent": {
-            "type": "number",
-            "description": "% of original entry point that reached this stage"
+            "type": "number"
           },
           "average_time_to_stage_hours": {
             "type": "number"
@@ -92,8 +81,7 @@
     },
     "top_to_bottom_conversion_percent": {
       "type": "number",
-      "title": "Overall Funnel Conversion %",
-      "description": "Top stage entry to final conversion"
+      "title": "Overall Funnel Conversion %"
     },
     "biggest_drop_off_stage": {
       "type": "string",
@@ -160,5 +148,17 @@
     "client_project_id",
     "funnel_stages",
     "metric_period"
-  ]
+  ],
+  "_metadata": {
+    "status": "CONVERSION_OPTIMIZATION",
+    "reason": "Tracks conversion funnel metrics per ClientProject. Derived from Leads -> Orders -> Subscriptions. No-write, metrics-only entity.",
+    "read_only": true,
+    "async_only": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "CONVERSION_OPTIMIZATION.md",
+    "product_layer": "intelligence",
+    "metric_role": "primary_kpi_source_of_truth",
+    "visibility": "dashboard_primary",
+    "architecture_level": "analytics"
+  }
 }

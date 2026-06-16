@@ -1,15 +1,12 @@
 {
   "name": "AgencyMetricsSnapshot",
   "type": "object",
-  "_metadata": {
-    "status": "WHITE_LABEL_SCALING",
-    "reason": "Derived metrics snapshot for agency dashboard. Aggregates data from all owned Clients. Read-only, auto-computed via computeAgencyMetrics.",
-    "read_only": true,
-    "async_only": true,
-    "tenant_scoped": "agency_id",
-    "documentation": "WHITE_LABEL_SYSTEM.md"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "agency_id": {
       "type": "string",
       "title": "Agency ID"
@@ -143,5 +140,13 @@
   "required": [
     "agency_id",
     "snapshot_date"
-  ]
+  ],
+  "_metadata": {
+    "status": "WHITE_LABEL_SCALING",
+    "reason": "Derived metrics snapshot for agency dashboard. Aggregates data from all owned Clients. Read-only, auto-computed via computeAgencyMetrics.",
+    "read_only": true,
+    "async_only": true,
+    "tenant_scoped": "agency_id",
+    "documentation": "WHITE_LABEL_SYSTEM.md"
+  }
 }

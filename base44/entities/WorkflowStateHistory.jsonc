@@ -1,18 +1,12 @@
 {
   "name": "WorkflowStateHistory",
   "type": "object",
-  "_metadata": {
-    "status": "ORCHESTRATION_LAYER",
-    "reason": "Immutable audit trail of state transitions. Prevents duplicate state application and enables replay detection.",
-    "immutable": true,
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "ORCHESTRATION_LAYER.md",
-    "product_layer": "infrastructure",
-    "system_layer": "orchestration",
-    "visibility": "internal_only",
-    "architecture_level": "reliability"
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "workflow_id": {
       "type": "string",
       "title": "OrchestrationWorkflow ID"
@@ -50,7 +44,7 @@
         },
         "field_name": {
           "type": "string",
-          "title": "Field Changed (e.g., pipeline_status, status, lifecycle_stage)"
+          "title": "Field Changed"
         },
         "from_value": {
           "type": "string",
@@ -80,13 +74,11 @@
     "is_duplicate": {
       "type": "boolean",
       "title": "Is Duplicate Detection",
-      "default": false,
-      "description": "True if this state was already applied (detected and skipped)"
+      "default": false
     },
     "duplicate_of_history_id": {
       "type": "string",
-      "title": "Original State History ID",
-      "description": "If duplicate, references the original state history entry"
+      "title": "Original State History ID"
     },
     "applied_at": {
       "type": "string",
@@ -104,5 +96,16 @@
     "resource_id",
     "client_id",
     "state_transition"
-  ]
+  ],
+  "_metadata": {
+    "status": "ORCHESTRATION_LAYER",
+    "reason": "Immutable audit trail of state transitions. Prevents duplicate state application and enables replay detection.",
+    "immutable": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "ORCHESTRATION_LAYER.md",
+    "product_layer": "infrastructure",
+    "system_layer": "orchestration",
+    "visibility": "internal_only",
+    "architecture_level": "reliability"
+  }
 }

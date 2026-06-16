@@ -1,18 +1,12 @@
 {
-  "name": "EventQueue",
   "type": "object",
-  "_metadata": {
-    "status": "SCALE_ARCHITECTURE",
-    "reason": "Logical queue abstraction over CommunicationEvent flow. Tracks processing state per event.",
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "SCALE_ARCHITECTURE.md",
-    "product_layer": "infrastructure",
-    "system_layer": "infrastructure",
-    "visibility": "internal_only",
-    "dependency": "CommunicationEvent",
-    "architecture_level": "orchestration"
-  },
+  "name": "EventQueue",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "communication_event_id": {
       "type": "string",
       "title": "Linked CommunicationEvent ID"
@@ -33,8 +27,7 @@
         "automation_event",
         "billing_event",
         "system_event"
-      ],
-      "description": "Categorizes event type for processor routing"
+      ]
     },
     "processor_type": {
       "type": "string",
@@ -56,8 +49,7 @@
         "failed",
         "dead_letter"
       ],
-      "default": "queued",
-      "description": "Current stage in processing pipeline"
+      "default": "queued"
     },
     "retry_count": {
       "type": "integer",
@@ -86,19 +78,16 @@
     "rate_limited": {
       "type": "boolean",
       "title": "Rate Limited",
-      "default": false,
-      "description": "True if event queued due to rate limit (vs processing failure)"
+      "default": false
     },
     "priority": {
       "type": "integer",
       "title": "Processing Priority",
-      "default": 0,
-      "description": "Higher priority processes first within tenant queue"
+      "default": 0
     },
     "metadata_json": {
       "type": "string",
-      "title": "Processing Metadata",
-      "description": "JSON object tracking processor-specific state"
+      "title": "Processing Metadata"
     },
     "completed_at": {
       "type": "string",
@@ -111,5 +100,16 @@
     "client_id",
     "event_category",
     "processor_type"
-  ]
+  ],
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Logical queue abstraction over CommunicationEvent flow. Tracks processing state per event.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "SCALE_ARCHITECTURE.md",
+    "product_layer": "infrastructure",
+    "system_layer": "infrastructure",
+    "visibility": "internal_only",
+    "dependency": "CommunicationEvent",
+    "architecture_level": "orchestration"
+  }
 }

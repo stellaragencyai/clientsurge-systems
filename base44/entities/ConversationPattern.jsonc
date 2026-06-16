@@ -1,13 +1,12 @@
 {
   "name": "ConversationPattern",
   "type": "object",
-  "_metadata": {
-    "status": "ANALYTICS_DERIVED",
-    "reason": "Stores anonymized examples of successful conversation flows. Populated asynchronously for pattern analysis and insights.",
-    "read_only": true,
-    "async_only": true
-  },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "pattern_id": {
       "type": "string",
       "title": "Pattern ID"
@@ -61,7 +60,7 @@
     },
     "frequency": {
       "type": "integer",
-      "title": "Frequency (# of similar patterns)",
+      "title": "Frequency",
       "default": 1
     },
     "captured_at": {
@@ -69,5 +68,11 @@
       "title": "Pattern Captured At",
       "format": "date-time"
     }
+  },
+  "_metadata": {
+    "status": "ANALYTICS_DERIVED",
+    "reason": "Stores anonymized examples of successful conversation flows. Populated asynchronously for pattern analysis and insights.",
+    "read_only": true,
+    "async_only": true
   }
 }

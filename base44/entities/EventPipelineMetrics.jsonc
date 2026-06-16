@@ -1,20 +1,12 @@
 {
-  "name": "EventPipelineMetrics",
   "type": "object",
-  "_metadata": {
-    "status": "HARDENED_EVENT_PIPELINE",
-    "reason": "Derived metrics for normalized event views. Read-only dashboard reporting.",
-    "read_only": true,
-    "tenant_scoped": "client_id + client_project_id",
-    "documentation": "HARDENED_EVENT_PIPELINE.md",
-    "product_layer": "infrastructure",
-    "system_layer": "infrastructure",
-    "visibility": "internal_only",
-    "dependency": "CommunicationEvent",
-    "metric_role": "infrastructure_health",
-    "architecture_level": "observability"
-  },
+  "name": "EventPipelineMetrics",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_id": {
       "type": "string",
       "title": "Client ID"
@@ -71,8 +63,7 @@
     "processing_efficiency_score": {
       "type": "number",
       "title": "Processing Efficiency %",
-      "default": 0,
-      "description": "unique_events / total_raw_events * 100"
+      "default": 0
     },
     "failed_events_count": {
       "type": "integer",
@@ -209,5 +200,18 @@
   "required": [
     "client_id",
     "metric_period"
-  ]
+  ],
+  "_metadata": {
+    "status": "HARDENED_EVENT_PIPELINE",
+    "reason": "Derived metrics for normalized event views. Read-only dashboard reporting.",
+    "read_only": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "HARDENED_EVENT_PIPELINE.md",
+    "product_layer": "infrastructure",
+    "system_layer": "infrastructure",
+    "visibility": "internal_only",
+    "dependency": "CommunicationEvent",
+    "metric_role": "infrastructure_health",
+    "architecture_level": "observability"
+  }
 }
