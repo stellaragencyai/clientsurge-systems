@@ -7,6 +7,9 @@ export default function Hero() {
         display: "flex",
         alignItems: "center",
         justifyContent: "center",
+        background: "linear-gradient(135deg, #003B8F 0%, #006BB0 45%, #0088CC 100%)",
+        position: "relative",
+        overflow: "hidden",
       }}
     >
       <div
