@@ -121,5 +121,27 @@
     "reason": "Point-in-time metrics snapshot for dashboards only. Do NOT write directly. Derived from Leads + CommunicationEvent + Order. Use scheduled snapshot job only.",
     "read_only": true,
     "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+  },
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

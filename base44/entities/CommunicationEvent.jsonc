@@ -156,5 +156,63 @@
     "event_type",
     "provider",
     "status"
-  ]
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "data.lead_id": {
+            "$in": [
+              "{{user.id}}",
+              "{{user.data.linked_lead_ids}}"
+            ]
+          }
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{user.data.linked_order_ids}}"
+            ]
+          }
+        },
+        {
+          "data.client_id": "{{user.id}}"
+        },
+        {
+          "data.client_project_id": {
+            "$in": [
+              "{{user.data.linked_client_project_ids}}"
+            ]
+          }
+        },
+        {
+          "data.onboarding_client_id": {
+            "$in": [
+              "{{user.data.linked_onboarding_client_ids}}"
+            ]
+          }
+        },
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
 }
