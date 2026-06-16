@@ -438,7 +438,28 @@ Deno.serve(async (req) => {
       console.error('[FunctionAudit] Failed events fetch:', e.message);
     }
 
-    // ── 8. Remaining risks ──
+    // ── 8. AutomationChecklist legacy mapping ──
+    const checklistMapping = [];
+    try {
+      const checklistItems = await base44.asServiceRole.entities.AutomationChecklist.list(null, 200).catch(() => []);
+      for (const item of (checklistItems || [])) {
+        const rawKey = item.service_key || item.label || '';
+        const canonical = canonicalServiceName(rawKey);
+        const isLegacy = canonical !== rawKey && rawKey !== '';
+        checklistMapping.push({
+          id: item.id,
+          raw_label: rawKey || item.label || '(empty)',
+          canonical_name: canonical,
+          is_legacy: isLegacy,
+          status: item.status || 'unknown',
+          step: item.step || null,
+        });
+      }
+    } catch (e) {
+      console.error('[FunctionAudit] Checklist fetch failed:', e.message);
+    }
+
+    // ── 9. Remaining risks ──
     const remainingRisks = [
       {
         category: 'Provider configuration',
@@ -498,6 +519,7 @@ Deno.serve(async (req) => {
       stale_automation_notes: staleAutomationPatterns,
       failed_flow_categories: failedFlowCategories,
       service_name_mappings: SERVICE_NAME_MAP,
+      automation_checklist_mapping: checklistMapping,
       remaining_risks: remainingRisks,
       summary: {
         total_classified: Object.keys(classifications).length,

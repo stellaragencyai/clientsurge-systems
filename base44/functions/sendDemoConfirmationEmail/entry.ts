@@ -1,12 +1,21 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * sendDemoConfirmationEmail — #132
- * Formats scheduled_date/time in Arizona local time for all emails.
- */
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-function buildScheduledDateTime(payload: Record<string, unknown>) {
+function safeResendFrom() {
+  const configured = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
+  if (configured && configured.includes("@")) {
+    if (configured.includes("<")) return configured;
+    return `ClientSurge Systems <${configured}>`;
+  }
+  return "ClientSurge Systems <system@clientsurgesystems.com>";
+}
+
+/**
+ * sendDemoConfirmationEmail
+ * Formats scheduled_date/time in Arizona local time for all emails.
+ * Uses safeResendFrom() for consistent sender formatting.
+ */
+
+function buildScheduledDateTime(payload) {
   if (payload.scheduled_datetime) return String(payload.scheduled_datetime);
   if (payload.scheduled_date && payload.scheduled_time) {
     return `${payload.scheduled_date}T${payload.scheduled_time}:00`;
@@ -14,7 +23,7 @@ function buildScheduledDateTime(payload: Record<string, unknown>) {
   return "";
 }
 
-function formatAZTime(isoStr: string): string {
+function formatAZTime(isoStr) {
   if (!isoStr) return "TBD";
   const d = new Date(isoStr);
   return d.toLocaleString("en-US", {
@@ -24,8 +33,10 @@ function formatAZTime(isoStr: string): string {
   }) + " (Arizona time)";
 }
 
-function auditCopyForIndustry(industrySlug = "") {
-  if (industrySlug === "med_spa" || industrySlug === "med-spa") {
+function auditCopyForIndustry(industrySlug) {
+  const slug = String(industrySlug || "").toLowerCase();
+
+  if (slug === "med_spa" || slug === "med-spa") {
     return {
       subjectPrefix: "Med Spa Automation Audit confirmed",
       heading: "Your Med Spa Automation Audit is confirmed",
@@ -33,7 +44,7 @@ function auditCopyForIndustry(industrySlug = "") {
     };
   }
 
-  if (industrySlug === "plumbing") {
+  if (slug === "plumbing") {
     return {
       subjectPrefix: "Plumbing Automation Audit confirmed",
       heading: "Your Plumbing Automation Audit is confirmed",
@@ -41,7 +52,7 @@ function auditCopyForIndustry(industrySlug = "") {
     };
   }
 
-  if (industrySlug === "dental") {
+  if (slug === "dental") {
     return {
       subjectPrefix: "Dental Automation Audit confirmed",
       heading: "Your Dental Automation Audit is confirmed",
@@ -49,7 +60,7 @@ function auditCopyForIndustry(industrySlug = "") {
     };
   }
 
-  if (industrySlug === "roofing") {
+  if (slug === "roofing") {
     return {
       subjectPrefix: "Roofing Automation Audit confirmed",
       heading: "Your Roofing Automation Audit is confirmed",
@@ -57,7 +68,7 @@ function auditCopyForIndustry(industrySlug = "") {
     };
   }
 
-  if (industrySlug === "hvac") {
+  if (slug === "hvac") {
     return {
       subjectPrefix: "HVAC Automation Audit confirmed",
       heading: "Your HVAC Automation Audit is confirmed",
@@ -76,20 +87,31 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json();
-    const { lead_id, business_name, email } = payload;
-    if (!email) return secureJson({ error: "email required" }, { status: 400 });
+
+    const { email, business_name } = payload;
+    if (!email) {
+      return new Response(JSON.stringify({ error: "email required" }), {
+        status: 400,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const resendKey = Deno.env.get("RESEND_API_KEY");
-    if (!resendKey) return secureJson({ error: "No Resend key" }, { status: 500 });
+    if (!resendKey) {
+      return new Response(JSON.stringify({ error: "No Resend key" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
 
     const formatted = formatAZTime(buildScheduledDateTime(payload));
     const auditCopy = auditCopyForIndustry(String(payload.industry_slug || ""));
 
-    await resendFetch("https://api.resend.com/emails", {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({
-        from: "system@clientsurgesystems.com",
+        from: safeResendFrom(),
         reply_to: "nolan@clientsurgesystems.com",
         to: email,
         subject: `${auditCopy.subjectPrefix} - ${formatted}`,
@@ -106,8 +128,23 @@ Deno.serve(async (req) => {
       }),
     });
 
-    return secureJson({ success: true, sent_to: email, formatted_time: formatted });
-  } catch (err: any) {
-    return secureJson({ error: err.message }, { status: 500 });
+    const data = await response.json();
+
+    if (!response.ok) {
+      return new Response(JSON.stringify({ error: data.message || "Email send failed" }), {
+        status: 500,
+        headers: { "Content-Type": "application/json" },
+      });
+    }
+
+    return new Response(JSON.stringify({ success: true, sent_to: email, formatted_time: formatted }), {
+      status: 200,
+      headers: { "Content-Type": "application/json" },
+    });
+  } catch (err) {
+    return new Response(JSON.stringify({ error: err.message }), {
+      status: 500,
+      headers: { "Content-Type": "application/json" },
+    });
   }
 });

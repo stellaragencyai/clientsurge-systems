@@ -1,6 +1,13 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { resendFetch } from "../_shared/resendFetch.js";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
+function safeResendFrom() {
+  const configured = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
+  if (configured && configured.includes("@")) {
+    if (configured.includes("<")) return configured;
+    return `ClientSurge Systems <${configured}>`;
+  }
+  return "ClientSurge Systems <system@clientsurgesystems.com>";
+}
 
 function labelForIndustry(industrySlug = '', industry = '') {
   const combined = `${industrySlug} ${industry}`.toLowerCase();
@@ -93,14 +100,14 @@ Deno.serve(async (req) => {
 </body>
 </html>`;
 
-    const response = await resendFetch('https://api.resend.com/emails', {
+    const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${resendApiKey}`,
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: 'ClientSurge Systems <system@clientsurgesystems.com>',
+        from: safeResendFrom(),
         to: [adminEmail],
         subject: `New ${auditLabel}: ${business_name || full_name} - ${formattedDate} at ${formattedTime}`,
         html: emailBody,

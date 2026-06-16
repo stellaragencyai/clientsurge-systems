@@ -4,6 +4,7 @@ import {
   Shield, AlertTriangle, CheckCircle2, XCircle, Clock,
   Wrench, Server, Mail, Smartphone, Activity, ArrowRight,
   RefreshCw, FileWarning, Layers, Trash2, Search,
+  ClipboardList,
 } from "lucide-react";
 
 const CATEGORY_CONFIG = {
@@ -344,8 +345,59 @@ export default function FunctionAudit() {
               </div>
             </div>
 
-            {/* Stale automations */}
+            {/* Legacy AutomationChecklist mapping */}
             <div className="rounded-xl border border-border bg-card p-6">
+              <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                <ClipboardList className="w-4 h-4 text-primary" />
+                AutomationChecklist — Legacy Label Mapping
+              </h3>
+              {audit.automation_checklist_mapping && audit.automation_checklist_mapping.length > 0 ? (
+                <div className="max-h-80 overflow-y-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr>
+                        <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground uppercase">Raw Label</th>
+                        <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground uppercase">Canonical Name</th>
+                        <th className="text-left py-2 px-3 text-xs font-semibold text-muted-foreground uppercase">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {audit.automation_checklist_mapping.map((item) => (
+                        <tr key={item.id} className="border-t border-border hover:bg-muted/30">
+                          <td className="py-2 px-3">
+                            <span className={`text-sm ${item.is_legacy ? "text-amber-600 font-semibold" : "text-foreground"}`}>
+                              {item.raw_label}
+                              {item.is_legacy && (
+                                <span className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">
+                                  Legacy
+                                </span>
+                              )}
+                            </span>
+                          </td>
+                          <td className="py-2 px-3">
+                            <span className="text-sm text-foreground">{item.canonical_name}</span>
+                          </td>
+                          <td className="py-2 px-3">
+                            <span className={`text-xs font-semibold px-2 py-0.5 rounded-full ${
+                              item.status === "complete" || item.status === "completed"
+                                ? "bg-green-50 text-green-700"
+                                : item.status === "in_progress"
+                                ? "bg-blue-50 text-blue-700"
+                                : "bg-gray-50 text-gray-600"
+                            }`}>{item.status}</span>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+              ) : (
+                <p className="text-sm text-muted-foreground">No AutomationChecklist records found.</p>
+              )}
+            </div>
+
+            {/* Stale automations */}
+            <div className="rounded-xl border border-border bg-card p-6 mt-4">
               <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
                 Stale / Failing Automations
