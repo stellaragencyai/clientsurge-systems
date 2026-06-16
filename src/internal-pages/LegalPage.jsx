@@ -165,7 +165,7 @@ function SummaryCard({ items }) {
         {items.map(({ icon: Icon, text }) => (
           <div key={text} className="flex items-start gap-3">
             <Icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-            <span className="text-sm font-medium text-foreground/80 leading-snug">{text}</span>
+            <span className="text-sm font-medium text-foreground/90 leading-snug">{text}</span>
           </div>
         ))}
       </div>
@@ -186,7 +186,7 @@ function SectionBlock({ section, isActive }) {
         </span>
       </h2>
       {section.body && (
-        <p className="text-sm text-foreground/70 leading-relaxed pl-9 mb-8" style={{ maxWidth: "65ch" }}>
+        <p className="text-sm text-foreground/85 leading-relaxed pl-9 mb-8" style={{ maxWidth: "65ch" }}>
           {section.body}
         </p>
       )}
@@ -301,7 +301,7 @@ export default function LegalPage({ fixedType, canonicalPath }) {
 
   return (
     <DemoBookingProvider>
-      <div style={{ minHeight: "100vh", background: "hsl(var(--background))" }}>
+      <div className="min-h-screen bg-white">
         <Navbar />
 
         <main
