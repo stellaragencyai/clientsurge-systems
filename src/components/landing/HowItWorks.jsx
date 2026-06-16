@@ -16,13 +16,13 @@ const steps = [
   },
   {
     icon: Send,
-    title: "Follow-up keeps running automatically until they respond or book.",
+    title: "Follow-up keeps running automatically until they respond or schedule.",
     subtitle: "Step 3",
     desc: "No manual chasing and no leads slipping through the cracks.",
   },
   {
     icon: CalendarCheck,
-    title: "Ready prospects are pushed into a booking or handoff flow.",
+    title: "Ready prospects are pushed into a scheduling or handoff flow.",
     subtitle: "Step 4",
     desc: "That means more confirmed appointments with less front-desk friction.",
   },
@@ -64,7 +64,7 @@ export default function HowItWorks() {
             How The System Turns Inquiries Into Booked Appointments
           </h2>
           <p className="mt-5 text-muted-foreground text-lg">
-            This is the core service: faster first response, consistent follow-up, and a cleaner path to booking.
+            This is the core service: faster first response, consistent follow-up, and a cleaner path to confirmed appointments.
           </p>
         </div>
 

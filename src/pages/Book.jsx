@@ -52,7 +52,7 @@ export default function Book() {
                   </a>
                 </div>
 
-                <div className="book-audit-card" aria-label="Audit flow preview">
+                <div className="book-audit-card" aria-label="Audit process preview">
                   <div className="flex items-center justify-between gap-3">
                     <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Diagnostic path</p>
                     <span className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
@@ -106,7 +106,7 @@ export default function Book() {
                   {[
                     {
                       icon: CalendarCheck2,
-                      title: "Claim your diagnostic window",
+                      title: "Claim your audit window",
                       body: "Secure a 15-minute readiness slot. No sales pressure, no fluff — just a clear revenue gap assessment.",
                     },
                     {
@@ -146,11 +146,11 @@ export default function Book() {
                     </p>
                   </div>
                   <div className="book-scheduler-visual" aria-hidden="true">
-                    <span>Context</span>
-                    <ArrowRight className="h-4 w-4" />
-                    <span>Diagnostic</span>
-                    <ArrowRight className="h-4 w-4" />
-                    <span>Revenue Plan</span>
+                   <span>Context</span>
+                   <ArrowRight className="h-4 w-4" />
+                   <span>Audit</span>
+                   <ArrowRight className="h-4 w-4" />
+                   <span>Revenue Plan</span>
                   </div>
                 </div>
 

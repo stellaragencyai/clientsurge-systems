@@ -4,7 +4,7 @@ import { trackCTA } from "@/lib/analytics";
 
 export default function FinalCTA() {
   return (
-      <section id="book-demo" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
+      <section id="get-audit" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center">

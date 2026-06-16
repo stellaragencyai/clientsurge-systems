@@ -71,7 +71,7 @@ export function getReviewLabel(record) {
   const missing = getMissingContactFlags(record);
   if (missing.length > 0) return "Verify website/contact info";
   if (!record.consent_given) return "Confirm consent before outreach";
-  if (record.crm_stage === "Audit Booked" || record.status === "Booked" || record.booking_status === "booked") return "Check booking context";
+  if (record.crm_stage === "Audit Booked" || record.status === "Booked" || record.booking_status === "booked") return "Check audit context";
   if (record.lead_score >= 70 || record.activation_priority === "Hot" || record.segment_label === "HOT") return "Review first";
   if (needsVerification(record)) return "Verify website/contact info";
   return "Review first";
@@ -82,8 +82,8 @@ export function getWhyPrioritized(record) {
   if (record.lead_score >= 80) reasons.push(`High lead score (${record.lead_score})`);
   if (record.segment_label === "HOT") reasons.push("Segment: HOT");
   if (record.activation_priority === "Hot") reasons.push("Activation priority: Hot");
-  if (record.booking_status === "booked" || record.crm_stage === "Audit Booked" || record.status === "Booked") reasons.push("Booked or booking link sent");
-  if (record.booked_at || record.booking_link_sent_at) reasons.push("Requested free automation audit");
+  if (record.booking_status === "booked" || record.crm_stage === "Audit Booked" || record.status === "Booked") reasons.push("Audit requested or audit link sent");
+  if (record.booked_at || record.booking_link_sent_at) reasons.push("Free automation audit requested");
   if (record.website || record.website_url || record.business_website_url) reasons.push("Website present");
   if (record.enrichment_notes) reasons.push("Enrichment hook available");
   if (record.source === "website_form" || record.source === "Website") reasons.push("Organic inbound");

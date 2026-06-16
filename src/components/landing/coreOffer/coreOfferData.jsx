@@ -62,7 +62,7 @@ export const systemMapStages = [
     systemsIncluded: ["04", "05"],
   },
   {
-    id: "booking",
+    id: "conversion",
     title: "The Lead Gets Guided Toward Conversion",
     summary: "Ready leads get pushed into a cleaner conversion path with less friction.",
     systemsIncluded: ["03", "06"],
@@ -90,7 +90,7 @@ export const systemsById = {
     shortDescription:
       "When someone is interested, the system moves the conversation toward a sale instead of letting it stall.",
     badge: "Keeps interest moving",
-    mapStageId: "booking",
+    mapStageId: "conversion",
     detail: {
       summary: "Interested leads get guided to a decision instead of left hanging.",
       trigger: "A lead shows interest but has not taken the next step yet.",
@@ -144,7 +144,7 @@ export const systemsById = {
     shortDescription:
       "When someone is ready, the system makes the decision to buy feel easier and faster.",
     badge: "Less conversion friction",
-    mapStageId: "booking",
+    mapStageId: "conversion",
     detail: {
       summary: "Ready leads reach the decision step with less friction.",
       trigger: "A lead is ready to move forward.",

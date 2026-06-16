@@ -6,7 +6,7 @@ const AUTOMATIONS = [
   { label: "AI Voice Agents", desc: "AI phone receptionist for inbound lead capture.", href: "/automations", icon: Headphones },
   { label: "Missed Call Text-Back", desc: "Recover missed calls automatically.", href: "/automations", icon: Phone },
   { label: "Instant Lead Response", desc: "Reply to every lead in under 60 seconds.", href: "/automations", icon: Zap },
-  { label: "AI Booking Agent", desc: "Turns conversations into appointments.", href: "/automations", icon: Calendar },
+  { label: "AI Scheduling Agent", desc: "Turns conversations into appointments.", href: "/automations", icon: Calendar },
   { label: "Lead Reactivation", desc: "Wake up cold leads from up to 90 days.", href: "/automations", icon: RefreshCw },
   { label: "Review Request System", desc: "Auto-request reviews after every appointment.", href: "/automations", icon: Star },
 ];
@@ -21,7 +21,7 @@ const navColumns = [
       { label: "Pricing", href: "/#pricing" },
       { label: "FAQ", href: "/faq" },
       { label: "Blog", href: "/blog" },
-      { label: "Free Automation Audit", href: "/book" },
+      { label: "Get a Free Audit", href: "/book" },
     ],
   },
   {
@@ -111,7 +111,7 @@ export default function Footer() {
             />
           </div>
           <p>
-            AI voice agents, missed-call recovery, follow-up, and booking automation that turn more local leads into booked jobs.
+            AI voice agents, missed-call recovery, follow-up, and scheduling automation that turn more local leads into booked jobs.
           </p>
           <div className="cs-footer-contact-list" aria-label="Contact ClientSurge">
             <a href="tel:+16025843227" className="cs-footer-contact-link">

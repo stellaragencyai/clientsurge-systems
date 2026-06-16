@@ -181,13 +181,13 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           <CheckCircle2 className="w-8 h-8 text-green-400" />
         </div>
         <h3 className="text-xl font-semibold text-white mb-2">You're all set.</h3>
-        <p className="text-sm text-white/50">Nolan will confirm your audit request within 24 hours.</p>
+        <p className="text-sm text-white/50">Nolan will confirm your audit within 24 hours.</p>
         <p className="mt-3 text-xs text-white/45 max-w-sm">
           Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.
         </p>
         {submitWarnings.length > 0 && (
           <p className="mt-3 text-xs text-amber-300 max-w-sm">
-            Your booking was saved, but one or more follow-up actions still need review.
+            Your audit request was saved, but one or more follow-up actions still need review.
           </p>
         )}
       </div>
@@ -262,7 +262,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
             }}
             className="mt-0.5 h-4 w-4 rounded accent-amber-500"
           />
-          <span>I agree to receive automated SMS and email messages from ClientSurge Systems about my audit booking. Reply STOP to opt out.</span>
+          <span>I agree to receive automated SMS and email messages from ClientSurge Systems about my audit request. Reply STOP to opt out.</span>
         </label>
         {Object.keys(errors).length > 0 && (
           <p className="text-xs text-red-400">Please fill in all required fields.</p>
@@ -272,7 +272,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           className="w-full h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90"
           style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
         >
-          Next: Choose Time <ArrowRight className="w-4 h-4" />
+          Next: Choose Audit Time <ArrowRight className="w-4 h-4" />
         </button>
         <p className="text-center text-xs text-white/60">No spam. No pressure. Just a tailored walkthrough of your business.</p>
       </form>
@@ -284,7 +284,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
       {errors.scheduling && <p className="text-xs text-red-400">{errors.scheduling}</p>}
       {errors.submit && <p className="text-xs text-red-400">{errors.submit}</p>}
       <div>
-        <label className="block text-xs font-semibold text-white/60 mb-1">Select Date *</label>
+        <label className="block text-xs font-semibold text-white/60 mb-1">Select Audit Date *</label>
         <input
           type="date"
           value={scheduling.date}
@@ -295,7 +295,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
       </div>
       <div>
         <label className="block text-xs font-semibold text-white/60 mb-1">
-          Select Time * {loadingSlots && <span className="font-normal text-white/30 ml-1">Loading...</span>}
+          Select Audit Time * {loadingSlots && <span className="font-normal text-white/30 ml-1">Loading...</span>}
         </label>
         <select
           value={scheduling.time}
@@ -303,10 +303,10 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           disabled={!scheduling.date || loadingSlots}
           className={`${inputCls("scheduling")} disabled:opacity-40 cursor-pointer`}
         >
-          <option value="">{!scheduling.date ? "Select a date first..." : "Choose a time..."}</option>
+          <option value="">{!scheduling.date ? "Select a date first..." : "Choose an audit time..."}</option>
           {TIME_SLOTS.map(({ value, label }) => {
             const booked = bookedSlots.includes(value);
-            return <option key={value} value={value} disabled={booked}>{label}{booked ? " - Booked" : ""}</option>;
+            return <option key={value} value={value} disabled={booked}>{label}{booked ? " - Reserved" : ""}</option>;
           })}
         </select>
       </div>
@@ -327,5 +327,3 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     </form>
   );
 }
-
-

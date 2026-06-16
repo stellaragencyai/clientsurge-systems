@@ -124,7 +124,7 @@ export default function Pricing() {
 
         <div className="text-center mb-6">
           <p className="text-sm text-foreground/60">
-            <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth because it includes nurture sequences and AI booking—the fastest path to more booked appointments.
+            <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth because it includes nurture sequences and AI scheduling—the fastest path to more booked appointments.
           </p>
         </div>
 

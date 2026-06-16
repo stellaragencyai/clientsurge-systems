@@ -111,6 +111,7 @@ export default function FunctionAudit() {
     { key: "messaging", label: "Messaging Health", icon: Mail },
     { key: "functions", label: "Function Classifications", icon: Layers },
     { key: "risks", label: "Risks & Gaps", icon: AlertTriangle },
+    { key: "terminology", label: "Terminology Alignment", icon: FileWarning },
   ];
 
   return (
@@ -413,6 +414,83 @@ export default function FunctionAudit() {
                   </div>
                 ))}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Terminology Alignment Report ── */}
+        {activeTab === "terminology" && (
+          <div className="space-y-6">
+            <div className="rounded-xl border border-border bg-card p-6">
+              <h3 className="text-sm font-bold text-foreground mb-4 flex items-center gap-2">
+                <FileWarning className="w-4 h-4 text-primary" />
+                Terminology Alignment Report — June 2026
+              </h3>
+              <p className="text-sm text-muted-foreground mb-6">
+                This report documents a systematic terminology alignment pass repositioning ClientSurge as the "Amazon of AI services" — a marketplace, catalog, and installation system — rather than a booking website.
+              </p>
+
+              {[
+                { section: "Where Booking/Demo Language Was Replaced", color: "text-green-600", bg: "bg-green-50", items: [
+                  "Footer: \"AI Booking Agent\" → \"AI Scheduling Agent\"",
+                  "Footer: \"booking automation\" → \"scheduling automation\"",
+                  "Footer: \"Free Automation Audit\" → \"Get a Free Audit\"",
+                  "FinalCTA: section id \"book-demo\" → \"get-audit\"",
+                  "HowItWorks: \"until they respond or book\" → \"until they respond or schedule\"",
+                  "HowItWorks: \"booking or handoff flow\" → \"scheduling or handoff flow\"",
+                  "HowItWorks: \"cleaner path to booking\" → \"cleaner path to confirmed appointments\"",
+                  "Pricing: \"AI booking\" → \"AI scheduling\"",
+                  "DemoBookingInline: \"audit booking\" → \"audit request\" (consent text)",
+                  "DemoBookingInline: \"Your booking was saved\" → \"Your audit request was saved\"",
+                  "DemoBookingInline: \"Booked\" → \"Reserved\" (time slot labels)",
+                  "DemoBookingInline: \"Next: Choose Time\" → \"Next: Choose Audit Time\"",
+                  "DemoBookingInline: \"Select Date\" → \"Select Audit Date\"",
+                  "DemoBookingInline: \"Select Time\" → \"Select Audit Time\"",
+                  "DemoBookingInline: \"Choose a time\" → \"Choose an audit time\"",
+                  "Book page: \"Claim your diagnostic window\" → \"Claim your audit window\"",
+                  "Book page: \"Diagnostic\" → \"Audit\" (visual flow label)",
+                  "coreOfferData: map stage id \"booking\" → \"conversion\"",
+                  "OppRecordCard: label \"Check booking context\" → \"Check audit context\"",
+                  "OppRecordCard: chip \"Booked\" → \"Audit Requested\"",
+                  "OppRecordCard: field label \"Booking\" → \"Audit\"",
+                  "OppReviewQueue: \"Check booking context\" → \"Check audit context\"",
+                  "OppReviewQueue: \"Booked or booking link sent\" → \"Audit requested or audit link sent\"",
+                  "OppReviewQueue: \"Requested free automation audit\" → \"Free automation audit requested\"",
+                ]},
+                { section: "Where Booking Language Was Preserved (Client Outcome)", color: "text-blue-600", bg: "bg-blue-50", items: [
+                  "HowItWorks title: \"How The System Turns Inquiries Into Booked Appointments\" — this describes the client's customer outcomes",
+                  "Footer: \"booked jobs\" — this describes recovered revenue for local service businesses",
+                  "Pricing: \"booked appointments\" — describes what the client gets from automations",
+                  "All internal field names: booked_at, booking_link_sent_at, booking_status, ai_booking_agent — API contracts unchanged",
+                  "Store/catalog labels mentioning client outcomes in their businesses — unchanged",
+                  "System 03 service_key \"ai_booking_agent\" — preserved internally, visible label is \"AI Conversion Agent\"",
+                ]},
+                { section: "Internal Fields Intentionally Left Unchanged", color: "text-amber-600", bg: "bg-amber-50", items: [
+                  "/book route path — unchanged to avoid breaking navigation and existing links",
+                  "booked_at — database field, unchanged",
+                  "booking_link_sent_at — database field, unchanged",
+                  "booking_status — database field, unchanged",
+                  "ai_booking_agent — service key, unchanged",
+                  "getBookedDemoSlots — backend function name, unchanged",
+                  "scheduleDemoBooking — backend function name, unchanged",
+                  "DemoBookingInline, DemoBookingProvider, DemoBookingModal — component names, unchanged",
+                  "onBookDemo prop names — preserved for backward compatibility",
+                  "All Stripe product keys and Twilio/Resend logic — unchanged",
+                  "All backend function names and API contracts — unchanged",
+                ]},
+              ].map(({ section, color, bg, items }) => (
+                <div key={section} className="mb-6">
+                  <h4 className={`text-sm font-bold ${color} mb-3 px-3 py-1.5 rounded-lg ${bg} inline-block`}>{section}</h4>
+                  <ul className="space-y-1.5 mt-2">
+                    {items.map((item, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-foreground/75">
+                        <span className="text-muted-foreground mt-1.5">•</span>
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              ))}
             </div>
           </div>
         )}

@@ -3,7 +3,7 @@ import { getReviewLabel, getWhyPrioritized, getMissingContactFlags, isInternalRe
 const LABEL_STYLES = {
   "Review first":                    { color: "#0088CC",  bg: "rgba(0,136,204,0.08)",   border: "rgba(0,136,204,0.2)" },
   "Verify website/contact info":     { color: "#7c3aed",  bg: "rgba(124,58,237,0.08)",  border: "rgba(124,58,237,0.2)" },
-  "Check booking context":           { color: "#16a34a",  bg: "rgba(22,163,74,0.08)",   border: "rgba(22,163,74,0.2)" },
+  "Check audit context":             { color: "#16a34a",  bg: "rgba(22,163,74,0.08)",   border: "rgba(22,163,74,0.2)" },
   "Keep suppressed":                 { color: "#dc2626",  bg: "rgba(220,38,38,0.08)",   border: "rgba(220,38,38,0.2)" },
   "Exclude from sales metrics":      { color: "#d97706",  bg: "rgba(245,158,11,0.08)",  border: "rgba(245,158,11,0.2)" },
   "Manual audit candidate":          { color: "#64748b",  bg: "rgba(100,116,139,0.08)", border: "rgba(100,116,139,0.2)" },
@@ -74,7 +74,7 @@ export default function OppRecordCard({ record, activeTab }) {
   if (record.do_not_contact || record.outreach_status === "do_not_contact") chips.push({ text: "Do Not Contact",    variant: "danger" });
   if (record.email_bounced)                                                 chips.push({ text: "Email Bounced",      variant: "danger" });
   if (record.email_unsubscribed)                                            chips.push({ text: "Email Unsubscribed", variant: "danger" });
-  if (booking)                                                              chips.push({ text: "Booked",             variant: "green" });
+  if (booking)                                                              chips.push({ text: "Audit Requested",    variant: "green" });
   if (score !== null && score >= 70)                                        chips.push({ text: "High Score",         variant: "blue" });
   if (!internal && !imported && (missingFlags.length > 0 || !record.consent_given)) chips.push({ text: "Needs Verification", variant: "warn" });
 
@@ -136,7 +136,7 @@ export default function OppRecordCard({ record, activeTab }) {
         <Field label="Industry / Type" value={industry} />
         <Field label="Source" value={source} />
         <Field label="Status" value={status} />
-        <Field label="Booking" value={booking} />
+        <Field label="Audit" value={booking} />
         {website && (
           <div style={{ display: "flex", flexDirection: "column", gap: "1px", minWidth: "90px" }}>
             <span style={{ fontSize: "10px", fontWeight: "700", color: "rgba(10,22,40,0.38)", textTransform: "uppercase", letterSpacing: "0.07em" }}>Website</span>
