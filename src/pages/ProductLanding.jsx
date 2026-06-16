@@ -125,9 +125,9 @@ export default function ProductLanding() {
       {/* CTA Section */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">View the Revenue Recovery Map</h2>
+          <h2 className="text-3xl font-bold mb-6">View the Automation Blueprint</h2>
           <p className="text-muted-foreground mb-8 text-lg">
-            See how ClientSurge automations capture, respond, follow up, and convert more leads into booked appointments.
+            A complete visual walkthrough of how your AI automation systems capture, follow up, and convert leads — 24/7, hands-free.
           </p>
           <button
             onClick={() => navigate('/store')}
