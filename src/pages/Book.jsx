@@ -11,13 +11,13 @@ import DemoBookingInline from '@/components/forms/DemoBookingInline';
 export default function Book() {
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
-      title: 'Claim Your Free System Diagnostic | ClientSurge Systems',
+      title: 'Build Your AI Automation Stack | ClientSurge Systems',
       description:
-        'Claim a free 15-minute System Diagnostic to identify exactly where your business is leaking revenue and how AI automation can recover it.',
+        'Configure your AI automation stack — instant lead response, missed-call recovery, AI scheduling, and more. We build it, you collect the revenue.',
       canonicalPath: '/book',
-      ogTitle: 'Claim Your Free System Diagnostic',
+      ogTitle: 'Build Your AI Automation Stack',
       ogDescription:
-        'Get a free System Diagnostic to map your revenue gaps, missed-call leakage, follow-up failures, and conversion friction — with a live AI system preview.',
+        'Select the AI automations your business needs. We handle setup, provider connections, and go-live — your stack runs 24/7 to capture and convert leads.',
     });
 
     return cleanupMetadata;
@@ -34,27 +34,27 @@ export default function Book() {
                 <div className="book-hero-copy">
                   <div className="book-kicker">
                     <span className="book-kicker-dot" />
-                    Free System Diagnostic
+                    AI Automation Stack
                   </div>
                   <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-                    Claim Your Free System Diagnostic
+                    Build Your AI Automation Stack
                   </h1>
                   <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                    A free 15-minute readiness assessment to identify exactly where your business is leaking revenue — and how AI automation can recover it.
+                    Select the AI automations your business needs — instant lead response, missed-call recovery, AI scheduling, and more. We handle setup and go-live; you collect the revenue.
                   </p>
                   <a
                     href="/automations"
                     onClick={() => trackCTA('review_automation_systems', 'book_page_header')}
                     className="book-text-link mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                   >
-                    See the automation systems
+                    Explore the Automation Catalog
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
 
                 <div className="book-audit-card" aria-label="Audit process preview">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Diagnostic path</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Stack path</p>
                     <span className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                       15 min
                     </span>
@@ -66,7 +66,7 @@ export default function Book() {
                     <span />
                   </div>
                   <div className="mt-5 grid gap-2">
-                    {["Send context", "Map revenue gaps", "See your system preview"].map((item, index) => (
+                    {["Choose your stack", "We configure it", "Go live in 5–7 days"].map((item, index) => (
                       <div key={item} className="book-mini-step">
                         <span>{String(index + 1).padStart(2, "0")}</span>
                         {item}
@@ -78,9 +78,9 @@ export default function Book() {
 
               <div className="book-content-panel">
                 <div className="max-w-2xl">
-                  <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What Your Diagnostic Covers</p>
+                  <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What We Configure For You</p>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    What the System Diagnostic includes
+                    What your AI automation stack includes
                   </h2>
                   <p className="mt-3 text-sm md:text-base text-muted-foreground">
                     Built for roofers, HVAC companies, dental practices, med spas, chiropractic clinics, contractors, and other local service businesses.
@@ -89,12 +89,12 @@ export default function Book() {
 
                 <div className="mt-7 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
-                    "Missed-call recovery gap review",
-                    "Speed-to-lead assessment",
-                    "Website conversion review",
-                    "Follow-up sequence gap review",
-                    "Conversion friction review",
-                    "AI system revenue recovery preview",
+                    "Instant lead response SMS & email",
+                    "Missed-call text-back recovery",
+                    "14-day AI nurture sequence",
+                    "AI scheduling & appointment booking",
+                    "Customer reactivation engine",
+                    "Review request automation",
                   ].map((item) => (
                     <div key={item} className="book-check-card rounded-lg border border-primary/15 bg-white/76 px-4 py-3 text-sm font-semibold text-foreground">
                       {item}
@@ -106,18 +106,18 @@ export default function Book() {
                   {[
                     {
                       icon: CalendarCheck2,
-                      title: "Claim your audit window",
-                      body: "Secure a 15-minute readiness slot. No sales pressure, no fluff — just a clear revenue gap assessment.",
+                      title: "Choose your automation stack",
+                      body: "Pick the AI services your business needs. No sales pressure, no fluff — just a clear path to more captured revenue.",
                     },
                     {
                       icon: ClipboardList,
-                      title: "We map your revenue gaps",
-                      body: "We show you exactly where leads are leaking in your current setup — missed calls, slow response, dead follow-up.",
+                      title: "We handle setup and go-live",
+                      body: "We configure your automations, connect your providers, and get everything running in 5–7 business days.",
                     },
                     {
                       icon: MessagesSquare,
-                      title: "See your system configured",
-                      body: "We preview the AI workflow built for your industry and the proof steps required before go-live.",
+                      title: "Your stack runs 24/7",
+                      body: "Leads are captured, followed up, and converted — automatically. You focus on your business while the system works.",
                     },
                   ].map((step, index) => {
                     const Icon = step.icon;
@@ -139,22 +139,22 @@ export default function Book() {
                       Diagnostic request path
                     </p>
                     <h3 className="text-xl font-semibold text-foreground mb-3">
-                      Claim your diagnostic slot and send context once.
+                      Tell us about your business and pick your stack.
                     </h3>
                     <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
-                      The scheduler captures your contact details, business, website, industry, and the revenue-leakage problem you want diagnosed.
+                      Share your business details, industry, and website — we'll recommend the right AI automations to recover your lost revenue.
                     </p>
                   </div>
                   <div className="book-scheduler-visual" aria-hidden="true">
-                   <span>Context</span>
+                   <span>Choose</span>
                    <ArrowRight className="h-4 w-4" />
-                   <span>Audit</span>
+                   <span>Configure</span>
                    <ArrowRight className="h-4 w-4" />
-                   <span>Revenue Plan</span>
+                   <span>Go Live</span>
                   </div>
                 </div>
 
-                <div className="book-inline-scheduler mt-6" aria-label="Free Automation Audit scheduler">
+                <div className="book-inline-scheduler mt-6" aria-label="AI Automation Stack scheduler">
                   <DemoBookingInline />
                 </div>
 

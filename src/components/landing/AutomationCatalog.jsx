@@ -157,7 +157,7 @@ export default function AutomationCatalog() {
             className="cs-btn-primary"
             style={{ padding: "0 36px", height: "52px", fontSize: "0.9rem" }}
           >
-            Get Free Automation Audit
+            Build My AI Automation Stack
           </button>
           <button
             type="button"

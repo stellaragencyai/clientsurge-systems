@@ -65,7 +65,7 @@ export default function Hero() {
               fontSize: "0.95rem",
             }}
           >
-            Claim My System Diagnostic →
+            Build My AI Automation Stack →
           </a>
           <a
             href="/pricing"

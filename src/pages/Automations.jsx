@@ -165,7 +165,7 @@ function VideoPlaceholder({ service, onClose }) {
             </div>
             <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>{service.title}</h3>
             <p className="text-sm text-white/60 max-w-md mb-6">
-              Review this workflow during your free automation audit with a real-world example from your industry.
+              Explore this workflow — see how it captures and converts leads for businesses like yours.
             </p>
             <Link
               to="/book"
@@ -173,7 +173,7 @@ function VideoPlaceholder({ service, onClose }) {
               style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
               onClick={onClose}
             >
-              Get a Free Automation Audit <ArrowRight className="w-4 h-4" />
+              Build My AI Automation Stack <ArrowRight className="w-4 h-4" />
             </Link>
           </div>
         </div>
@@ -310,11 +310,11 @@ export default function Automations() {
     return setPageMetadata({
       title: "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
       description:
-        "ClientSurge installs AI automation systems that capture, follow up with, qualify, book, and reactivate leads for local service businesses.",
+        "ClientSurge installs AI automation systems that capture, follow up with, qualify, schedule, and reactivate leads for local service businesses.",
       canonicalPath: "/automations",
-      ogTitle: "AI Automations That Turn Local Leads Into Booked Jobs",
+      ogTitle: "AI Automation Systems for Local Service Businesses",
       ogDescription:
-        "Voice agents, missed-call recovery, instant response, follow-up, booking, review, and reactivation automation for local service businesses.",
+        "Voice agents, missed-call recovery, instant response, follow-up, scheduling, review, and reactivation automation for local service businesses.",
     });
   }, []);
 
@@ -381,7 +381,7 @@ export default function Automations() {
             Activate Your Systems in 24–48 Hours
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            Request a free automation audit and our team will map the right voice, lead response, follow-up, and scheduling systems for your business.
+            Build your AI automation stack and our team will configure the right voice, lead response, follow-up, and scheduling systems for your business.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
@@ -389,7 +389,7 @@ export default function Automations() {
               className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-white transition-colors shadow-lg"
               style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
             >
-              Free Automation Audit <ArrowRight className="w-5 h-5" />
+              Build My AI Automation Stack <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
               to="/store"

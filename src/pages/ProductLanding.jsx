@@ -69,7 +69,7 @@ export default function ProductLanding() {
               onClick={() => navigate('/book')}
               className="px-8 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors flex items-center justify-center gap-2"
             >
-              Request Walkthrough <ArrowRight className="w-4 h-4" />
+              Explore the Automation Catalog <ArrowRight className="w-4 h-4" />
             </button>
             <button
               onClick={() => navigate('/automations')}
@@ -125,15 +125,15 @@ export default function ProductLanding() {
       {/* CTA Section */}
       <section className="py-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
-          <h2 className="text-3xl font-bold mb-6">See the System in Action</h2>
+          <h2 className="text-3xl font-bold mb-6">View the Revenue Recovery Map</h2>
           <p className="text-muted-foreground mb-8 text-lg">
             See how ClientSurge automations capture, respond, follow up, and convert more leads into booked appointments.
           </p>
           <button
-            onClick={() => navigate('/book')}
+            onClick={() => navigate('/store')}
             className="px-8 py-4 bg-primary text-white rounded-lg font-semibold hover:bg-primary/90 transition-colors inline-flex items-center gap-2"
           >
-            Request Free Audit <ArrowRight className="w-4 h-4" />
+            Explore the Automation Catalog <ArrowRight className="w-4 h-4" />
           </button>
         </div>
       </section>

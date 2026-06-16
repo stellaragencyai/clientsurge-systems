@@ -4,26 +4,26 @@ import { trackCTA } from "@/lib/analytics";
 
 export default function FinalCTA() {
   return (
-      <section id="get-audit" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
+      <section id="build-stack" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center">
           <p className="cs-eyebrow mb-6">
-            Ready to Transform Your Lead Flow?
+            Ready to Automate Your Lead Flow?
           </p>
           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Claim Your Free <span className="text-primary">System Diagnostic</span>
+            Build Your <span className="text-primary">AI Automation Stack</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl leading-relaxed">
-            Get a free 15-minute readiness assessment to see exactly where your business is leaking revenue and how AI automation can recover it.
+            Select the automations your business needs. We handle setup, provider connections, and go-live in 5–7 business days — your stack runs 24/7.
           </p>
 
           {/* How the demo works - 3 steps */}
           <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-center">
             {[
-              { step: "01", title: "Claim your diagnostic window", body: "Secure a 15-minute readiness slot. No sales pressure, no fluff." },
-              { step: "02", title: "We map your revenue gaps", body: "We show you exactly where leads are leaking in your current setup." },
-              { step: "03", title: "See your system configured", body: "We preview the AI workflow for your industry and the proof steps required before go-live." },
+              { step: "01", title: "Choose your automations", body: "Pick the AI services your business needs. No sales pressure, no fluff." },
+              { step: "02", title: "We configure everything", body: "We set up your automations, connect your providers, and handle the technical work." },
+              { step: "03", title: "Your stack goes live", body: "In 5–7 business days, your AI automations are running 24/7 — capturing and converting leads." },
             ].map((item) => (
               <div key={item.step} className="flex flex-col gap-2">
                 <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
@@ -34,7 +34,7 @@ export default function FinalCTA() {
           </div>
 
           <p className="mt-6 text-xs text-muted-foreground/60">
-            Free 15-minute diagnostic · No commitment required · Activation timeline confirmed after assessment
+            Live in 5–7 business days · No commitment required · Cancel anytime, month-to-month
           </p>
         </div>
 
@@ -43,7 +43,7 @@ export default function FinalCTA() {
             <a
               href="/book"
               onClick={() => {
-                trackCTA("get_free_automation_audit", "final_cta");
+                trackCTA("build_ai_automation_stack", "final_cta");
               }}
               className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               className="cs-btn-primary"

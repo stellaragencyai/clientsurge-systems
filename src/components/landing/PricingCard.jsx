@@ -181,7 +181,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
              href="/book"
              className="w-full inline-flex items-center justify-center h-10 rounded-lg text-xs font-semibold text-primary hover:text-primary/80 hover:underline transition-colors"
            >
-             Free automation audit
+             Explore the Automation Catalog
            </a>
          </div>
       </div>
