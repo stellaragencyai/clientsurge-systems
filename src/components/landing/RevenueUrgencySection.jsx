@@ -35,8 +35,8 @@ export default function RevenueUrgencySection() {
     >
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-14">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4" style={{ color: "rgba(0,174,239,0.7)" }}>
-            The Cost of Waiting
+          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4 text-center" style={{ color: "rgba(0,174,239,0.7)" }}>
+            THE COST OF WAITING
           </p>
           <h2
             className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight"
