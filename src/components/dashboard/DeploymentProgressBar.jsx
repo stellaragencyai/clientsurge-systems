@@ -1,9 +1,9 @@
-import { Loader2, CheckCircle2 } from "lucide-react";
+import { Loader2, CheckCircle2, Zap } from "lucide-react";
 
 export default function DeploymentProgressBar({ pipelineStatus, installStatus }) {
   const stages = [
     { key: "Paid", label: "Payment Confirmed", icon: "✓", status: "Complete" },
-    { key: "Configuring", label: "AI Configuring System", icon: "⚙", status: "Active" },
+    { key: "Configuring", label: "AI Configuring", icon: "⚙", status: "Active" },
     { key: "Testing", label: "Running Tests", icon: "🧪", status: "Active" },
     { key: "Live", label: "System Live", icon: "🚀", status: "Complete" },
   ];
@@ -19,30 +19,41 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
     return "Pending";
   };
 
-  const getStatusColor = (idx) => {
-    if (idx < currentIndex) return "text-green-600";
-    if (idx === currentIndex) return "text-primary";
-    return "text-muted-foreground";
-  };
-
   return (
-    <div className="w-full bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/15 rounded-lg p-6 mb-6">
+    <div style={{
+      background: "linear-gradient(135deg, rgba(0,174,239,0.04) 0%, rgba(0,59,143,0.03) 100%)",
+      border: "1px solid rgba(0,174,239,0.15)",
+      borderRadius: "16px",
+      padding: "clamp(18px, 3vw, 28px)",
+      marginBottom: "24px",
+      position: "relative",
+      overflow: "hidden",
+    }}>
+      {/* Subtle top glow bar */}
+      <div style={{
+        position: "absolute", top: 0, left: 0, right: 0, height: "2px",
+        background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.5), transparent)",
+      }} />
+
       <style>{`
         @keyframes pulse-ring {
-          0% { box-shadow: 0 0 0 0 rgba(0, 174, 239, 0.7); }
-          70% { box-shadow: 0 0 0 10px rgba(0, 174, 239, 0); }
+          0% { box-shadow: 0 0 0 0 rgba(0, 174, 239, 0.6); }
+          70% { box-shadow: 0 0 0 12px rgba(0, 174, 239, 0); }
           100% { box-shadow: 0 0 0 0 rgba(0, 174, 239, 0); }
         }
-        .stage-active {
-          animation: pulse-ring 2s infinite;
+        .deploy-stage-active {
+          animation: pulse-ring 2.2s infinite;
         }
       `}</style>
-      <div className="space-y-4">
+
+      <div>
         {/* Header */}
-        <div className="flex items-center justify-between">
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "20px", flexWrap: "wrap", gap: "8px" }}>
           <div>
-            <p className="text-sm font-semibold text-foreground">System Deployment Progress</p>
-            <p className="text-xs text-muted-foreground mt-1">
+            <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(0,174,239,0.6)", textTransform: "uppercase", letterSpacing: "0.18em", margin: "0 0 4px" }}>
+              Deployment Pipeline
+            </p>
+            <p style={{ fontSize: "13px", fontWeight: "600", color: "#0A1628", margin: 0 }}>
               {isComplete
                 ? "Your system is fully live and operational"
                 : isError
@@ -50,81 +61,96 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
                 : "AI is provisioning your system in real-time"}
             </p>
           </div>
-          {isComplete ? (
-            <CheckCircle2 className="w-6 h-6 text-green-600" />
-          ) : !isError ? (
-            <Loader2 className="w-6 h-6 text-primary animate-spin" />
-          ) : null}
+          <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+            {isComplete ? (
+              <CheckCircle2 style={{ width: "22px", height: "22px", color: "#22c55e" }} />
+            ) : !isError ? (
+              <Loader2 style={{ width: "22px", height: "22px", color: "#00AEEF", animation: "spin 1s linear infinite" }} />
+            ) : null}
+            {isComplete && (
+              <Zap style={{ width: "16px", height: "16px", color: "#00AEEF" }} />
+            )}
+          </div>
         </div>
 
         {/* Progress Stages */}
-        <div className="relative">
-          <div className="flex items-center justify-between">
+        <div style={{ position: "relative" }}>
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", position: "relative" }}>
             {stages.map((stage, idx) => {
               const isCompleted = idx < currentIndex;
               const isStageActive = idx === currentIndex;
               const isUpcoming = idx > currentIndex;
+              const showConnector = idx < stages.length - 1;
 
               return (
-                <div key={stage.key} className="flex-1">
+                <div key={stage.key} style={{ display: "flex", flexDirection: "column", alignItems: "center", flex: 1, position: "relative" }}>
                   {/* Stage Dot */}
-                  <div className="flex flex-col items-center">
-                    <div
-                      className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all ${
+                  <div
+                    className={isStageActive ? "deploy-stage-active" : ""}
+                    style={{
+                      width: "44px", height: "44px", borderRadius: "50%",
+                      display: "flex", alignItems: "center", justifyContent: "center",
+                      fontSize: "15px", fontWeight: "800",
+                      background: isCompleted
+                        ? "linear-gradient(135deg, #00AEEF, #0088CC)"
+                        : isStageActive
+                        ? "linear-gradient(135deg, rgba(0,174,239,0.25), rgba(0,136,204,0.15))"
+                        : "rgba(0,174,239,0.06)",
+                      border: `2px solid ${
                         isCompleted
-                          ? "bg-green-600 text-white"
+                          ? "rgba(0,174,239,0.5)"
                           : isStageActive
-                          ? "bg-primary text-white ring-2 ring-primary ring-offset-2 stage-active"
-                          : "bg-muted text-muted-foreground"
-                      }`}
-                    >
-                      {isCompleted ? "✓" : stage.icon}
-                    </div>
-                    {/* Label */}
-                    <p
-                      className={`text-xs mt-2 text-center font-medium ${
-                        isStageActive || isCompleted ? "text-foreground" : "text-muted-foreground"
-                      }`}
-                    >
-                      {stage.label}
-                    </p>
-                    {/* Status Badge */}
-                    <span className={`text-xs font-semibold mt-1 ${getStatusColor(idx)}`}>
-                      {getStatusLabel(idx)}
-                    </span>
+                          ? "rgba(0,174,239,0.8)"
+                          : "rgba(0,174,239,0.15)"
+                      }`,
+                      color: isCompleted ? "#fff" : isStageActive ? "#00AEEF" : "rgba(10,22,40,0.3)",
+                      boxShadow: isStageActive
+                        ? "0 0 20px rgba(0,174,239,0.4)"
+                        : isCompleted
+                        ? "0 0 10px rgba(0,174,239,0.2)"
+                        : "none",
+                      transition: "all 0.4s ease",
+                      flexShrink: 0,
+                    }}
+                  >
+                    {isCompleted ? "✓" : stage.icon}
                   </div>
 
-                  {/* Connector Line (if not last) */}
-                  {idx < stages.length - 1 && (
-                    <div
-                      className={`absolute top-5 left-[calc(50%+20px)] w-[calc(100%-40px)] h-1 transition-all ${
-                        isCompleted ? "bg-green-600" : isStageActive ? "bg-primary" : "bg-muted"
-                      }`}
-                      style={{ pointerEvents: "none" }}
-                    />
+                  {/* Label */}
+                  <p style={{
+                    fontSize: "11px", fontWeight: "700", marginTop: "10px", textAlign: "center",
+                    color: isStageActive || isCompleted ? "#0A1628" : "rgba(10,22,40,0.35)",
+                  }}>
+                    {stage.label}
+                  </p>
+
+                  {/* Status Badge */}
+                  <span style={{
+                    fontSize: "9px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.06em",
+                    marginTop: "4px",
+                    color: isCompleted ? "#22c55e" : isStageActive ? "#00AEEF" : "rgba(10,22,40,0.25)",
+                  }}>
+                    {getStatusLabel(idx)}
+                  </span>
+
+                  {/* Connector line */}
+                  {showConnector && (
+                    <div style={{
+                      position: "absolute",
+                      top: "22px",
+                      left: "calc(50% + 22px)",
+                      width: "calc(100% - 44px)",
+                      height: "2px",
+                      borderRadius: "2px",
+                      background: isCompleted
+                        ? "linear-gradient(90deg, #00AEEF, rgba(0,174,239,0.4))"
+                        : "rgba(0,174,239,0.1)",
+                      boxShadow: isCompleted ? "0 0 6px rgba(0,174,239,0.3)" : "none",
+                      transition: "all 0.5s ease",
+                      zIndex: 0,
+                    }} />
                   )}
                 </div>
-              );
-            })}
-          </div>
-
-          {/* Invisible connectors at correct z-index */}
-          <div className="absolute top-0 left-0 w-full h-full pointer-events-none">
-            {stages.map((_, idx) => {
-              if (idx >= stages.length - 1) return null;
-              const isCompleted = idx < currentIndex;
-              const isStageActive = idx === currentIndex;
-              return (
-                <div
-                  key={`connector-${idx}`}
-                  className={`absolute top-5 h-1 transition-all ${
-                    isCompleted ? "bg-green-600" : isStageActive ? "bg-primary" : "bg-muted"
-                  }`}
-                  style={{
-                    left: `calc(${((idx + 1) / stages.length) * 100}% - 20px)`,
-                    width: `calc(${(100 / stages.length)}% - 40px)`,
-                  }}
-                />
               );
             })}
           </div>
@@ -132,21 +158,31 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
 
         {/* Status Message */}
         {isError && (
-          <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-            <p className="text-xs text-destructive font-medium">
+          <div style={{
+            marginTop: "16px", padding: "12px 16px",
+            background: "rgba(239,68,68,0.07)", border: "1px solid rgba(239,68,68,0.2)",
+            borderRadius: "10px",
+          }}>
+            <p style={{ fontSize: "12px", fontWeight: "600", color: "#ef4444", margin: 0 }}>
               ⚠ Setup paused due to missing credentials. Add your Twilio and email settings to resume.
             </p>
           </div>
         )}
 
         {isActive && !isComplete && (
-          <div className="mt-2 p-3 bg-primary/10 border border-primary/20 rounded-lg">
-            <p className="text-xs text-primary font-medium">
-              Your system is being configured. This typically takes 2–5 minutes. Keep this window open.
+          <div style={{
+            marginTop: "16px", padding: "12px 16px",
+            background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.18)",
+            borderRadius: "10px",
+          }}>
+            <p style={{ fontSize: "12px", fontWeight: "600", color: "#0088CC", margin: 0 }}>
+              Your system is being configured. This typically takes 2–5 minutes.
             </p>
           </div>
         )}
       </div>
+
+      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>
   );
 }

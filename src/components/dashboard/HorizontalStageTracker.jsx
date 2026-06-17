@@ -1,6 +1,5 @@
-import { CheckCircle2, Loader2 } from "lucide-react";
+import { CheckCircle2, Loader2, Zap } from "lucide-react";
 
-// Plain-English stage labels — no technical terms visible to clients
 const DEFAULT_STAGES = ["Payment Confirmed", "Queued for Setup", "Being Configured", "Being Tested", "You're Live! ✦"];
 
 const stageConfig = {
@@ -12,48 +11,73 @@ const stageConfig = {
   review_request:        ["Payment Confirmed", "Queued for Setup", "Setting Up Review Link", "Being Tested", "You're Live! ✦"],
 };
 
+const LEVEL_LABELS = ["Lv. 1", "Lv. 2", "Lv. 3", "Lv. 4", "MAX"];
+
 export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus }) {
-  // Always fall back to a valid 5-stage track — never renders empty
   const stages = (serviceKey && stageConfig[serviceKey]) ? stageConfig[serviceKey] : DEFAULT_STAGES;
   const safeStage = Math.min(Math.max(currentStage, 0), stages.length - 1);
 
   return (
     <div style={{
-      background: "linear-gradient(135deg, #3d1f0a 0%, #6b3f1f 40%, #4a2510 100%)",
-      borderRadius: "18px",
-      padding: "clamp(20px,3vw,28px)",
+      background: "linear-gradient(135deg, #0A1628 0%, #003B8F 100%)",
+      borderRadius: "20px",
+      padding: "clamp(20px, 3vw, 32px)",
       marginBottom: "28px",
-      boxShadow: "0 12px 40px rgba(60,25,5,0.28), 0 2px 8px rgba(0,0,0,0.1)",
-      border: "1px solid rgba(245,217,168,0.18)",
-      position: "relative", overflow: "hidden",
+      boxShadow: "0 12px 44px rgba(0,59,143,0.3), 0 0 0 1px rgba(0,174,239,0.15)",
+      border: "1px solid rgba(0,174,239,0.22)",
+      position: "relative",
+      overflow: "hidden",
     }}>
-      {/* Ambient glow */}
+      {/* Ambient pulse glow */}
       <div style={{
-        position: "absolute", top: "-60%", right: "-5%",
-        width: "300px", height: "300px", borderRadius: "50%",
-        background: "radial-gradient(circle, rgba(200,150,92,0.1) 0%, transparent 70%)",
+        position: "absolute", top: "-40%", right: "-10%",
+        width: "320px", height: "320px", borderRadius: "50%",
+        background: "radial-gradient(circle, rgba(0,174,239,0.14) 0%, transparent 70%)",
         pointerEvents: "none",
+        animation: "trackerPulse 3s ease-in-out infinite",
+      }} />
+      {/* Subtle scan line */}
+      <div style={{
+        position: "absolute", inset: 0,
+        background: "linear-gradient(0deg, transparent 49%, rgba(0,174,239,0.03) 50%, transparent 51%)",
+        backgroundSize: "100% 4px",
+        pointerEvents: "none",
+        opacity: 0.4,
       }} />
 
       <div style={{ position: "relative", zIndex: 1 }}>
         {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "24px", flexWrap: "wrap", gap: "8px" }}>
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px", flexWrap: "wrap", gap: "10px" }}>
           <div>
-            <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(245,217,168,0.5)", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 4px" }}>
-              Installation Progress
+            <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(0,174,239,0.6)", textTransform: "uppercase", letterSpacing: "0.22em", margin: "0 0 5px" }}>
+              System Tracker
             </p>
-            <h3 style={{ fontSize: "clamp(15px,2.5vw,20px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
+            <h3 style={{ fontSize: "clamp(16px, 2.5vw, 22px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
               {productName}
             </h3>
           </div>
           <div style={{
-            padding: "6px 14px", borderRadius: "9999px",
-            background: installStatus === "Live" ? "rgba(34,197,94,0.2)" : installStatus === "Error" ? "rgba(239,68,68,0.18)" : "rgba(245,158,11,0.18)",
-            border: `1px solid ${installStatus === "Live" ? "rgba(34,197,94,0.4)" : installStatus === "Error" ? "rgba(239,68,68,0.35)" : "rgba(245,158,11,0.35)"}`,
+            padding: "6px 16px", borderRadius: "9999px",
+            background: installStatus === "Live"
+              ? "rgba(34,197,94,0.18)"
+              : installStatus === "Error"
+              ? "rgba(239,68,68,0.16)"
+              : "rgba(0,174,239,0.16)",
+            border: `1px solid ${
+              installStatus === "Live"
+                ? "rgba(34,197,94,0.4)"
+                : installStatus === "Error"
+                ? "rgba(239,68,68,0.35)"
+                : "rgba(0,174,239,0.35)"
+            }`,
             fontSize: "12px", fontWeight: "700",
-            color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#fbbf24",
+            color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#00AEEF",
           }}>
-            {installStatus === "Live" ? "✦ Live" : installStatus === "Error" ? "⚠ Needs Attention" : `Step ${Math.min(safeStage + 1, stages.length)} of ${stages.length}`}
+            {installStatus === "Live"
+              ? "✦ ONLINE"
+              : installStatus === "Error"
+              ? "⚠ OFFLINE"
+              : `Step ${Math.min(safeStage + 1, stages.length)} of ${stages.length}`}
           </div>
         </div>
 
@@ -66,40 +90,57 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
             return (
               <div key={idx} style={{ display: "flex", alignItems: "center", flex: isLast ? "0 0 auto" : 1, minWidth: 0 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
-                  {/* Circle */}
+                  {/* Circle with level indicator */}
                   <div style={{
-                    width: "38px", height: "38px", borderRadius: "50%", flexShrink: 0,
-                    background: isComplete ? "linear-gradient(135deg,#22c55e,#16a34a)" : isCurrent ? "linear-gradient(135deg,#f5d9a8,#c8965c)" : "rgba(255,255,255,0.1)",
-                    border: `2px solid ${isComplete ? "rgba(34,197,94,0.5)" : isCurrent ? "rgba(245,217,168,0.7)" : "rgba(255,255,255,0.2)"}`,
+                    width: "42px", height: "42px", borderRadius: "50%", flexShrink: 0,
+                    background: isComplete
+                      ? "linear-gradient(135deg, #00AEEF, #0088CC)"
+                      : isCurrent
+                      ? "linear-gradient(135deg, rgba(0,174,239,0.3), rgba(0,136,204,0.2))"
+                      : "rgba(255,255,255,0.06)",
+                    border: `2px solid ${
+                      isComplete
+                        ? "rgba(0,174,239,0.6)"
+                        : isCurrent
+                        ? "rgba(0,174,239,0.8)"
+                        : "rgba(255,255,255,0.12)"
+                    }`,
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    boxShadow: isCurrent ? "0 0 16px rgba(245,217,168,0.5)" : isComplete ? "0 0 10px rgba(34,197,94,0.3)" : "none",
-                    transition: "all 0.4s ease",
+                    boxShadow: isCurrent
+                      ? "0 0 24px rgba(0,174,239,0.55), 0 0 48px rgba(0,174,239,0.15)"
+                      : isComplete
+                      ? "0 0 14px rgba(0,174,239,0.25)"
+                      : "none",
+                    transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   }}>
                     {isComplete ? (
-                      <CheckCircle2 style={{ width: "18px", height: "18px", color: "#fff" }} />
+                      <CheckCircle2 style={{ width: "19px", height: "19px", color: "#fff" }} />
                     ) : isCurrent ? (
-                      <Loader2 style={{ width: "16px", height: "16px", color: "#7a4825", animation: "spin 1.5s linear infinite" }} />
+                      <Loader2 style={{ width: "17px", height: "17px", color: "#00AEEF", animation: "spin 1.5s linear infinite" }} />
                     ) : (
-                      <span style={{ fontSize: "12px", fontWeight: "800", color: "rgba(255,255,255,0.4)" }}>{idx + 1}</span>
+                      <span style={{ fontSize: "11px", fontWeight: "800", color: "rgba(255,255,255,0.3)", letterSpacing: "0.02em" }}>
+                        {LEVEL_LABELS[idx]}
+                      </span>
                     )}
                   </div>
-                  {/* Label */}
+                  {/* Level label */}
                   <span style={{
                     fontSize: "9px", fontWeight: "700", textAlign: "center",
-                    color: isComplete ? "#4ade80" : isCurrent ? "#fff" : "rgba(255,255,255,0.4)",
-                    lineHeight: 1.3, maxWidth: "64px", display: "block",
+                    color: isComplete ? "#4ade80" : isCurrent ? "#ffffff" : "rgba(255,255,255,0.35)",
+                    lineHeight: 1.3, maxWidth: "68px", display: "block",
                   }}>
                     {stage}
                   </span>
                 </div>
-                {/* Connector line */}
+                {/* Connector line — glows when active */}
                 {!isLast && (
                   <div style={{
                     flex: 1, height: "2px", margin: "0 4px", marginBottom: "24px",
                     background: idx < safeStage
-                      ? "linear-gradient(90deg,#22c55e,#16a34a)"
-                      : "rgba(255,255,255,0.12)",
-                    transition: "background 0.4s ease",
+                      ? "linear-gradient(90deg, #00AEEF, rgba(0,174,239,0.6))"
+                      : "rgba(255,255,255,0.1)",
+                    boxShadow: idx < safeStage ? "0 0 8px rgba(0,174,239,0.5)" : "none",
+                    transition: "all 0.5s ease",
                     borderRadius: "2px",
                   }} />
                 )}
@@ -108,7 +149,10 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
           })}
         </div>
       </div>
-      <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
+      <style>{`
+        @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
+        @keyframes trackerPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }
+      `}</style>
     </div>
   );
 }
