@@ -21,9 +21,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/book": {
     key: "book",
-    title: "Book Your Free ClientSurge Automation Audit | ClientSurge Systems",
+    title: "Get Help Choosing Your AI Growth System | ClientSurge Systems",
     description:
-      "Book a free audit to review missed-call leakage, speed-to-lead gaps, website conversion, follow-up gaps, booking friction, and practical automation opportunities.",
+      "Not sure whether Starter, Growth, or Pro is right for your business? Get help choosing the best ClientSurge package for your lead flow.",
   },
   "/contact": {
     key: "contact",
@@ -69,9 +69,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/start": {
     key: "start",
-    title: "Start Your AI Automation Audit | ClientSurge Systems",
+    title: "Get Help Choosing Your AI Growth System | ClientSurge Systems",
     description:
-      "Begin the guided ClientSurge audit flow to review lead response, follow-up, and booking gaps in your service business.",
+      "Compare Starter, Growth, and Pro packages to choose the AI growth system built for your local business lead flow.",
   },
   "/industries": {
     key: "industries",
