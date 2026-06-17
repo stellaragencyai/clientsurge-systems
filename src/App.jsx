@@ -29,6 +29,38 @@ import {
 import { shouldNoindexRoute } from "@/lib/routeSecurity";
 import { forceScrollToTop } from "@/lib/scroll";
 
+/**
+ * ═══════════════════════════════════════════════════════════════════
+ * AREA 1 — ROUTE CLASSIFICATION QA CHECKLIST
+ * ═══════════════════════════════════════════════════════════════════
+ *
+ * PUBLIC (no auth required, indexed for SEO):
+ *   /  /automations  /pricing  /store  /book  /contact  /about
+ *   /industries  /blog  /blog/:slug  /faq  /testimonials  /library
+ *   /our-system  /product  /signup  /start  /privacy-policy  /terms
+ *   /setup-lookup  /thank-you  /success  /leads/capture  /order-success
+ *   /lead-capture-automation  /missed-call-text-back  /ai-lead-follow-up
+ *   /appointment-booking-automation  /review-automation  /customer-reactivation
+ *   /roofing  /hvac  /plumbing  /dental  /med-spa  /chiropractic  /contractors
+ *
+ * AUTH_PUBLIC (no auth required, noindex):
+ *   /login  /register  /forgot-password  /reset-password
+ *
+ * PROTECTED_CLIENT (auth required, any role):
+ *   /client-portal  /client-dashboard  /dashboard-entry
+ *
+ * PROTECTED_ADMIN (auth required, admin or super_admin only):
+ *   /mission-control  /admin/*  /saas/admin  /dashboard  /admin-settings
+ *   /lead-intelligence  /sam  /medspa-dashboard
+ *
+ * LEGACY REDIRECTS (clean 301-style redirects):
+ *   /privacy → /privacy-policy   /product-landing → /product
+ *   /client-dashboard-entry → /dashboard-entry
+ *   (see lib/publicRouteMetadata.js for full list)
+ *
+ * ═══════════════════════════════════════════════════════════════════
+ */
+
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
 
@@ -46,6 +78,7 @@ const Industries = lazy(() => import("./pages/Industries"));
 const Blog = lazy(() => import("./pages/Blog"));
 const Login = lazy(() => import("./pages/Login"));
 const Register = lazy(() => import("./pages/Register"));
+const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Store = lazy(() => import("./pages/Store"));
 const IndustryLandingPage = lazy(() => import("./components/industry/IndustryLandingPage"));
@@ -77,6 +110,7 @@ const MissionControlDashboard = lazy(() => import("./internal-pages/MissionContr
 const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLogs"));
 const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
 const OpportunityReviewQueue = lazy(() => import("./internal-pages/OpportunityReviewQueue"));
+const ClientSetupLookup = lazy(() => import("./pages/ClientSetupLookup"));
 const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
@@ -254,10 +288,33 @@ function AuthRedirectFallback() {
 
 function AccessDeniedPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6">
+    <div className="min-h-screen flex items-center justify-center px-6 bg-background">
       <div className="max-w-md text-center">
-        <h1 className="mb-3 text-2xl font-semibold text-foreground">Access Denied</h1>
-        <p className="text-muted-foreground">You do not have permission to view this page.</p>
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          style={{ background: "linear-gradient(135deg, #003B8F, #00AEEF)" }}
+        >
+          <span className="text-white text-xl font-bold">!</span>
+        </div>
+        <h1 className="mb-3 text-2xl font-semibold text-foreground">Access Restricted</h1>
+        <p className="text-muted-foreground text-sm mb-8 leading-relaxed">
+          You do not have permission to view this page. If you believe this is an error, please contact support.
+        </p>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <a
+            href="/"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold border border-border text-foreground hover:bg-muted transition-colors"
+          >
+            Back to Home
+          </a>
+          <a
+            href="/contact"
+            className="cs-btn-primary"
+            style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset" }}
+          >
+            Contact Support
+          </a>
+        </div>
       </div>
     </div>
   );
@@ -306,6 +363,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
       <Route path="/login" element={<LazyRoute Component={Login} />} />
       <Route path="/register" element={<LazyRoute Component={Register} />} />
+      <Route path="/forgot-password" element={<LazyRoute Component={ForgotPassword} />} />
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
@@ -318,6 +376,7 @@ const AuthenticatedAppWithTenant = () => {
       />
       <Route path="/about" element={<LazyRoute Component={About} />} />
       <Route path="/automations" element={<LazyRoute Component={Automations} />} />
+      <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
       ))}

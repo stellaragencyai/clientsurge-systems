@@ -133,6 +133,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Review the ClientSurge Systems terms governing service access, billing, platform usage, and customer responsibilities.",
   },
+  "/setup-lookup": {
+    key: "setup-lookup",
+    title: "Check Your Setup Progress | ClientSurge Systems",
+    description:
+      "Enter your email or order ID to see exactly where your AI automation system setup stands. No login required.",
+  },
   "/login": {
     key: "login",
     title: "Client Login | ClientSurge Systems",
@@ -218,6 +224,9 @@ export const LEGACY_REDIRECTS = [
   ["/WebsiteSpecPreview", "/admin"],
   ["/legal/privacy", "/privacy-policy"],
   ["/legal/terms", "/terms"],
+  ["/privacy", "/privacy-policy"],
+  ["/product-landing", "/product"],
+  ["/client-dashboard-entry", "/dashboard-entry"],
 ];
 
 export const PUBLIC_ROUTE_PATHS = [
@@ -263,6 +272,7 @@ export const PUBLIC_ROUTE_PATHS = [
   "/automations",
   "/leads/capture",
   "/thank-you",
+  "/setup-lookup",
 ];
 
 // App shell behavior is slightly broader than indexable/public SEO routes.
@@ -271,6 +281,7 @@ export const APP_SHELL_PUBLIC_PATHS = [
   ...PUBLIC_ROUTE_PATHS,
   "/onboarding",
   "/setup/preview",
+  "/setup-lookup",
 ];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
@@ -314,6 +325,7 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/order-success",
   "/success",
   "/thank-you",
+  "/setup-lookup",
 ];
 
 export const SITEMAP_STATIC_PATHS = [
@@ -340,6 +352,7 @@ export const SITEMAP_STATIC_PATHS = [
   "/customer-reactivation",
   "/privacy-policy",
   "/terms",
+  "/setup-lookup",
 ];
 
 export const BLOG_SITEMAP_PATHS = [

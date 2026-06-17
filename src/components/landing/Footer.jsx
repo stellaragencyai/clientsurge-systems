@@ -15,25 +15,10 @@ const navColumns = [
   {
     title: "Platform",
     links: [
-      { label: "How It Works", href: "/#problem-solution" },
-      { label: "Our System", href: "/our-system" },
+      { label: "Home", href: "/" },
       { label: "AI Automations", href: "/automations" },
-      { label: "Pricing", href: "/#pricing" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Blog", href: "/blog" },
-      { label: "Get a Free Audit", href: "/book" },
-    ],
-  },
-  {
-    title: "Industries",
-    links: [
-      { label: "Med Spas & Aesthetics", href: "/med-spa" },
-      { label: "Dental & Orthodontics", href: "/dental" },
-      { label: "Chiropractic & PT", href: "/chiropractic" },
-      { label: "HVAC & Home Services", href: "/hvac" },
-      { label: "Plumbing & Drain Services", href: "/plumbing" },
-      { label: "Roofing & Restoration", href: "/roofing" },
-      { label: "Contractors & Trades", href: "/contractors" },
+      { label: "Pricing", href: "/pricing" },
+      { label: "Industries", href: "/industries" },
     ],
   },
   {
@@ -43,6 +28,7 @@ const navColumns = [
       { label: "Contact Us", href: "/contact" },
       { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "Terms of Service", href: "/terms" },
+      { label: "Client Login", href: "/login" },
     ],
   },
 ];
@@ -404,7 +390,7 @@ export default function Footer() {
 
         .cs-footer-nav {
           display: grid;
-          grid-template-columns: repeat(3, 1fr);
+          grid-template-columns: repeat(2, 1fr);
           gap: 32px;
           min-width: 0;
           align-items: start;
@@ -576,7 +562,7 @@ export default function Footer() {
 
           .cs-footer-nav {
             display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
+            grid-template-columns: repeat(2, minmax(0, 1fr));
             gap: 32px;
             min-width: 0;
           }

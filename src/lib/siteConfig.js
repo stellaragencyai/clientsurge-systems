@@ -1,6 +1,39 @@
 /**
  * Centralized site configuration & constants
  * Replaces hardcoded strings scattered across Navbar, Footer, Pricing, etc.
+ *
+ * ── AREA 1 QA: CANONICAL PUBLIC NAVIGATION ──
+ * Public header: Automations→/automations | Pricing→/pricing | Industries→/industries |
+ *                About→/about | Contact→/contact | Login→/login | CTA→/book
+ *
+ * ── AREA 1 QA: CANONICAL CTA DESTINATION MAP ──
+ * "Free Automation Audit"          → /book
+ * "Book Free Automation Audit"     → /book
+ * "View AI Automations"            → /automations
+ * "View Pricing" / "See Packages"  → /pricing
+ * "Contact Us" / support CTAs      → /contact
+ * "Client Login"                   → /login
+ * Phone CTAs                       → tel:+16025843227
+ * Email CTAs                       → mailto:support@clientsurgesystems.com
+ * Fallback (buyer CTA)             → /book
+ * Fallback (support CTA)           → /contact
+ *
+ * ── AREA 1 QA: PUBLIC ROUTE CLASSIFICATION ──
+ * PUBLIC: / /automations /pricing /store /industries /about /contact /book
+ *         /privacy-policy /terms /login /faq /blog /testimonials /start /setup-lookup
+ *         /roofing /hvac /plumbing /dental /med-spa /chiropractic /contractors
+ *         /lead-capture-automation /missed-call-text-back /ai-lead-follow-up
+ *         /appointment-booking-automation /review-automation /customer-reactivation
+ *         /success /onboarding /leads/capture /legal/:type /order-success
+ *         /thank-you /setup /setup/* /product /signup /our-system /library /register
+ *         /reset-password /forgot-password
+ * AUTH_PUBLIC: /login /register /forgot-password /reset-password
+ * PROTECTED_CLIENT: /client-portal /client-dashboard /dashboard-entry
+ * PROTECTED_ADMIN: /admin/* /mission-control /saas/admin
+ * DEPRECATED: /product /signup /our-system /library (template pages, redirect or sunset)
+ *
+ * ── FOOTER: PUBLIC LINKS ONLY (no admin/dashboard/setup/internal) ──
+ * Home | Automations | Pricing | Industries | About | Contact | Privacy | Terms | Login
  */
 
 export const SITE_CONFIG = {
@@ -10,12 +43,14 @@ export const SITE_CONFIG = {
   },
   navigation: {
     sections: [
-      { label: "Pricing", href: "/#pricing", isPage: false, isHashLink: true },
+      { label: "Pricing", href: "/pricing", isPage: true },
+      { label: "Industries", href: "/industries", isPage: true },
+      { label: "About", href: "/about", isPage: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [
       { label: "Automations", href: "/automations", isPage: true },
-      { label: "Pricing", href: "/#pricing", isPage: false, isHashLink: true },
+      { label: "Pricing", href: "/pricing", isPage: true },
     ],
   },
   industries: [
@@ -29,6 +64,8 @@ export const SITE_CONFIG = {
   ],
   links: {
     demoBooking: "/book",
+    pricing: "/pricing",
+    automations: "/automations",
     store: "/store",
     contact: "/contact",
     privacyPolicy: "/privacy-policy",
