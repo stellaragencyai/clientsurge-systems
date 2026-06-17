@@ -126,6 +126,8 @@ export default function Home() {
         <div id="automation-catalog" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <AutomationCatalog />
 
+        <div id="revenue-proof" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <div className="max-w-6xl mx-auto px-6 pt-4">
             <RevenueProofBlock industryLoss={14700} leadsRecovered="8-12" bookingsGenerated="3-5" />

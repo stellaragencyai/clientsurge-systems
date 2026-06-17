@@ -87,7 +87,7 @@ html {
   text-size-adjust: 100%;
 }
 
-/* Global focus styles for keyboard navigation — Refinement #17: unified accessible focus ring */
+/* Global focus styles for keyboard navigation — unified accessible focus ring */
 :focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 3px;
@@ -98,34 +98,11 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 textarea:focus-visible,
-select:focus-visible {
+select:focus-visible,
+[role="button"]:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 3px;
   box-shadow: 0 0 0 4px hsla(var(--primary), 0.15);
-}
-
-/* CTA Button Focus States - Enhanced for Accessibility — Task #1 standardized */
-button[type="button"],
-button[type="submit"],
-a[role="button"],
-.shiny-brown-btn,
-[class*="cta"],
-[class*="btn"],
-input[type="submit"],
-input[type="button"] {
-  position: relative;
-}
-
-/* Global focus styles for all interactive elements */
-button:focus-visible,
-a:focus-visible,
-[role="button"]:focus-visible,
-input:focus-visible,
-textarea:focus-visible,
-select:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
 }
 
 /* Rotating Border Glow Animation for Premium CTAs */
@@ -213,17 +190,7 @@ select:focus-visible {
   50% { opacity: 1; transform: scaleX(1); }
 }
 
-/* Enhanced focus ring for CTAs */
-button[type="button"]:focus-visible,
-button[type="submit"]:focus-visible,
-a[role="button"]:focus-visible,
-.shiny-brown-btn:focus-visible,
-[class*="cta"]:focus-visible,
-[class*="btn"]:focus-visible {
-  outline: 2px solid hsl(var(--primary));
-  outline-offset: 2px;
-  box-shadow: 0 0 0 3px hsla(var(--primary), 0.15);
-}
+
 
 /* ============================================
    MOBILE / CROSS-BROWSER GLOBAL FIXES
@@ -491,7 +458,6 @@ html {
 
 body {
   background: #ffffff;
-  transition: background 0.6s ease;
 }
 
 
@@ -747,6 +713,7 @@ td p,
   backdrop-filter: blur(20px) saturate(1.6) !important;
   -webkit-backdrop-filter: blur(20px) saturate(1.6) !important;
   border-color: rgba(255, 255, 255, 0.14) !important;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
 }
 .glass-card:hover {
   background: rgba(255, 255, 255, 0.11) !important;
@@ -913,6 +880,9 @@ img[style*="object-fit"] {
 .cs-section-skeleton {
   min-height: clamp(180px, 22vw, 320px);
   border-radius: 8px;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 1200px;
   background:
     linear-gradient(90deg, rgba(226,238,248,0.72), rgba(255,255,255,0.9), rgba(226,238,248,0.72));
   background-size: 220% 100%;
@@ -1045,7 +1015,7 @@ table tbody tr:nth-child(even) {
    ============================================ */
 @media (max-width: 768px) {
   .what-happens-next-list > * + * {
-    border-left: 2px dashed rgba(0, 174, 239, 0.20);
+    border-left: 3px dashed rgba(0, 174, 239, 0.28);
     padding-left: 1rem;
     margin-left: 0.5rem;
   }
@@ -1143,7 +1113,7 @@ table tbody tr:nth-child(even) {
 
 /* Section Header */
 .section-header {
-  @apply flex items-center gap-2.5 mb-4;
+  @apply flex items-center gap-2.5 mb-6;
 }
 .section-title {
   @apply text-sm font-semibold text-foreground;
@@ -1207,7 +1177,27 @@ button, [role="button"] {
   }
 }
 
-/* 10. High-DPI / Retina display sharpness for borders */
+/* 10. Touch target sizing — consistent 44x44 for icon-only buttons */
+button.icon-only,
+.icon-btn {
+  @apply flex items-center justify-center;
+  min-width: 44px;
+  min-height: 44px;
+}
+
+/* 11. Z-index consistency — dropdown portals use navbar stacking */
+.cs-dropdown-portal {
+  z-index: calc(var(--z-navbar) + 1);
+}
+
+/* 12. Mobile nav drawer — top padding to clear navbar */
+@media (max-width: 768px) {
+  .mobile-nav-drawer {
+    padding-top: calc(var(--cs-nav-height) - 20px);
+  }
+}
+
+/* 13. High-DPI / Retina display sharpness for borders */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .border, [class*="border-"] {
     border-width: 0.5px;

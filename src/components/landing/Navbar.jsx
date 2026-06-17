@@ -19,6 +19,7 @@ export default function Navbar() {
   const [showLoginModal, setShowLoginModal] = useState(false);
   const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
+  const [dropdownPos, setDropdownPos] = useState({ solutions: null, industries: null });
 
   const solutionsTriggerRef = useRef(null);
   const industriesTriggerRef = useRef(null);
@@ -84,21 +85,27 @@ export default function Navbar() {
     return acquireBodyScrollLock("landing-mobile-nav");
   }, [open]);
 
-  // ── Close on body click (stray clicks) ──
-  useEffect(() => {
-    if (!solutionsOpen && !industriesOpen) return;
-    const handler = () => { setSolutionsOpen(false); setIndustriesOpen(false); };
-    document.addEventListener("click", handler, { once: true, capture: true });
-    return () => document.removeEventListener("click", handler, { capture: true });
-  }, [solutionsOpen, industriesOpen]);
+
 
   // ── Shared helpers ──
   const clearTimer = (ref) => { if (ref.current) { clearTimeout(ref.current); ref.current = null; } };
 
-  const openSolutions = () => { clearTimer(solutionsCloseTimerRef); setSolutionsOpen(true); setIndustriesOpen(false); };
-  const closeSolutionsSoon = () => { clearTimer(solutionsCloseTimerRef); solutionsCloseTimerRef.current = setTimeout(() => setSolutionsOpen(false), 150); };
-  const openIndustries = () => { clearTimer(industriesCloseTimerRef); setIndustriesOpen(true); setSolutionsOpen(false); };
-  const closeIndustriesSoon = () => { clearTimer(industriesCloseTimerRef); industriesCloseTimerRef.current = setTimeout(() => setIndustriesOpen(false), 150); };
+  const openSolutions = () => {
+    clearTimer(solutionsCloseTimerRef);
+    setIndustriesOpen(false);
+    const rect = solutionsTriggerRef.current?.getBoundingClientRect();
+    setDropdownPos(prev => ({ ...prev, solutions: rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null }));
+    setSolutionsOpen(true);
+  };
+  const closeSolutionsSoon = () => { clearTimer(solutionsCloseTimerRef); solutionsCloseTimerRef.current = setTimeout(() => setSolutionsOpen(false), 250); };
+  const openIndustries = () => {
+    clearTimer(industriesCloseTimerRef);
+    setSolutionsOpen(false);
+    const rect = industriesTriggerRef.current?.getBoundingClientRect();
+    setDropdownPos(prev => ({ ...prev, industries: rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null }));
+    setIndustriesOpen(true);
+  };
+  const closeIndustriesSoon = () => { clearTimer(industriesCloseTimerRef); industriesCloseTimerRef.current = setTimeout(() => setIndustriesOpen(false), 250); };
 
   const handleLogoClick = (e) => {
     e.preventDefault();
@@ -120,17 +127,16 @@ export default function Navbar() {
     <div
       onMouseEnter={openSolutions}
       onMouseLeave={closeSolutionsSoon}
-      className="fixed rounded-lg border border-border/60 p-3 shadow-xl"
+      className="fixed rounded-lg border border-border/60 p-3 shadow-xl cs-dropdown-portal"
       role="menu"
       aria-label="Solutions"
       style={{
-        left: "50%",
+        left: dropdownPos.solutions?.left ?? "50%",
         transform: "translateX(-50%)",
-        top: "calc(var(--cs-nav-height) + 6px)",
+        top: dropdownPos.solutions?.top ?? "calc(var(--cs-nav-height) + 6px)",
         background: "rgba(255,255,255,0.98)",
         backdropFilter: "blur(16px)",
         WebkitBackdropFilter: "blur(16px)",
-        zIndex: 200,
         boxShadow: "0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,174,239,0.08)",
       }}
     >
@@ -162,12 +168,11 @@ export default function Navbar() {
     <div
       onMouseEnter={openIndustries}
       onMouseLeave={closeIndustriesSoon}
-      className="fixed"
+      className="fixed cs-dropdown-portal"
       style={{
-        left: "50%",
+        left: dropdownPos.industries?.left ?? "50%",
         transform: "translateX(-50%)",
-        top: "calc(var(--cs-nav-height) + 6px)",
-        zIndex: 200,
+        top: dropdownPos.industries?.top ?? "calc(var(--cs-nav-height) + 6px)",
       }}
     >
       <div
@@ -343,7 +348,7 @@ export default function Navbar() {
         <>
           <div className="fixed inset-0 z-40 xl:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
           <div
-            className="xl:hidden border-b border-white/25 px-5 pb-6 pt-2 space-y-1 relative z-50"
+            className="xl:hidden border-b border-white/25 px-5 pb-6 pt-2 space-y-1 relative z-50 mobile-nav-drawer"
             style={{
               maxWidth: "min(420px, 90vw)",
               paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
