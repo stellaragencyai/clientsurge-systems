@@ -10,6 +10,7 @@ const PACKAGES = [
     description: "Best for businesses that need the basics fixed.",
     price: "$497",
     setup: "$797 setup",
+    baseLabel: null,
     includes: [
       "AI-ready landing/website setup",
       "Lead capture",
@@ -28,8 +29,8 @@ const PACKAGES = [
     description: "Best for businesses that need more bookings and stronger follow-up.",
     price: "$997",
     setup: "$1,297 setup",
+    baseLabel: "Everything in Starter, plus:",
     includes: [
-      "Everything in Starter",
       "Multi-step SMS/email follow-up",
       "Booking automation",
       "Review request system",
@@ -46,8 +47,8 @@ const PACKAGES = [
     description: "Best for businesses that want the complete lead recovery system.",
     price: "$1,997",
     setup: "$2,497 setup",
+    baseLabel: "Everything in Growth, plus:",
     includes: [
-      "Everything in Growth",
       "Full website build/design",
       "Lead reactivation",
       "Advanced reporting",
@@ -110,23 +111,22 @@ export default function ThreeSystemsSection() {
               className="flex flex-col rounded-xl overflow-hidden transition-all duration-300 group"
               style={{
                 background: "#ffffff",
-                border: pkg.highlight ? "2px solid #00AEEF" : "1px solid rgba(0,174,239,0.15)",
+                border: pkg.highlight ? "1px solid rgba(0,174,239,0.5)" : "1px solid rgba(0,174,239,0.12)",
                 boxShadow: pkg.highlight
-                  ? "0 16px 48px rgba(0,174,239,0.15), 0 4px 12px rgba(0,0,0,0.06)"
-                  : "0 2px 16px rgba(0,0,0,0.05)",
-                transform: pkg.highlight ? "scale(1.03)" : "scale(1)",
+                  ? "0 8px 32px rgba(0,174,239,0.10), 0 2px 8px rgba(0,0,0,0.04)"
+                  : "0 2px 12px rgba(0,0,0,0.04)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,174,239,0.45), 0 0 40px rgba(0,174,239,0.25), 0 16px 48px rgba(0,174,239,0.18)";
-                e.currentTarget.style.transform = pkg.highlight ? "scale(1.05)" : "scale(1.02) translateY(-4px)";
-                e.currentTarget.style.borderColor = "rgba(0,174,239,0.6)";
+                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.35), 0 0 28px rgba(0,174,239,0.14), 0 8px 32px rgba(0,174,239,0.10)";
+                e.currentTarget.style.transform = "translateY(-4px)";
+                e.currentTarget.style.borderColor = "rgba(0,174,239,0.55)";
               }}
               onMouseLeave={(e) => {
                 e.currentTarget.style.boxShadow = pkg.highlight
-                  ? "0 16px 48px rgba(0,174,239,0.15), 0 4px 12px rgba(0,0,0,0.06)"
-                  : "0 2px 16px rgba(0,0,0,0.05)";
-                e.currentTarget.style.transform = pkg.highlight ? "scale(1.03)" : "scale(1)";
-                e.currentTarget.style.borderColor = pkg.highlight ? "#00AEEF" : "rgba(0,174,239,0.15)";
+                  ? "0 8px 32px rgba(0,174,239,0.10), 0 2px 8px rgba(0,0,0,0.04)"
+                  : "0 2px 12px rgba(0,0,0,0.04)";
+                e.currentTarget.style.transform = "translateY(0)";
+                e.currentTarget.style.borderColor = pkg.highlight ? "rgba(0,174,239,0.5)" : "rgba(0,174,239,0.12)";
               }}
             >
               {pkg.highlight && (
@@ -137,23 +137,26 @@ export default function ThreeSystemsSection() {
                   Most Popular
                 </div>
               )}
-              <div className="p-6 md:p-8 flex flex-col flex-1">
-                <div className="mb-5">
+              <div className="p-7 md:p-9 flex flex-col flex-1">
+                <div className="mb-4">
                   <h3 className="font-titles text-[#001B44] text-xl md:text-2xl font-bold mb-1">
                     {pkg.title}
                   </h3>
                   <p className="text-sm text-muted-foreground">{pkg.description}</p>
                 </div>
 
-                <div className="mb-6">
-                  <div className="flex items-baseline gap-1.5">
-                    <span className="text-4xl md:text-5xl font-black tracking-tight text-[#001B44]" style={{ fontFamily: "'Montserrat', system-ui, sans-serif", letterSpacing: "-0.03em" }}>{pkg.price}</span>
+                <div className="mb-5">
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-3xl font-bold tracking-tight text-[#001B44]">{pkg.price}</span>
                     <span className="text-sm text-muted-foreground font-medium">/mo</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{pkg.setup}</p>
                 </div>
 
-                <ul className="space-y-3 mb-8 flex-1">
+                {pkg.baseLabel && (
+                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">{pkg.baseLabel}</p>
+                )}
+                <ul className="space-y-3 mb-6 flex-1">
                   {pkg.includes.map((item) => (
                     <li key={item} className="flex items-start gap-2.5">
                       <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#00AEEF" }} />
@@ -165,10 +168,9 @@ export default function ThreeSystemsSection() {
                 <Link
                   to={pkg.href}
                   onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
-                  className="cs-btn-primary w-full text-center"
+                  className="cs-btn-primary w-full text-center mt-auto"
                   style={pkg.highlight ? {
                     background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-                    boxShadow: "0 8px 28px rgba(0,174,239,0.35)",
                   } : {}}
                 >
                   {pkg.cta} <ArrowRight className="w-4 h-4 inline ml-1" />

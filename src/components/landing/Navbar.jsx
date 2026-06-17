@@ -8,6 +8,7 @@ import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
 import { SITE_CONFIG } from "@/lib/siteConfig";
+import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 
 const sectionLinks = SITE_CONFIG.navigation.sections;
 const solutionsLinks = SITE_CONFIG.navigation.solutions;
@@ -193,6 +194,9 @@ export default function Navbar() {
               type="button"
               role="menuitem"
               onClick={() => {
+                const slug = item.href.split("/").pop();
+                window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
+                window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
                 trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
                 navigate(item.href);
                 setIndustriesOpen(false);
@@ -296,7 +300,15 @@ export default function Navbar() {
             Login
           </button>
           <button
-            onClick={() => { trackCTA("compare_packages", "navbar"); navigate("/pricing"); }}
+            onClick={() => {
+              trackCTA("compare_packages", "navbar");
+              if (location.pathname === "/") {
+                const el = document.getElementById("pricing");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              } else {
+                navigate("/#pricing");
+              }
+            }}
             className="cs-btn-primary"
             style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset", whiteSpace: "nowrap" }}
           >
@@ -362,6 +374,9 @@ export default function Navbar() {
                     key={item.label}
                     type="button"
                     onClick={() => {
+                      const slug = item.href.split("/").pop();
+                      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
+                      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
                       trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
                       navigate(item.href);
                       setOpen(false);
@@ -385,7 +400,18 @@ export default function Navbar() {
 
             <div className="mt-5 flex gap-2">
               <button
-                onClick={() => { trackCTA("compare_packages", "mobile_nav"); setOpen(false); navigate("/pricing"); }}
+                onClick={() => {
+                  trackCTA("compare_packages", "mobile_nav");
+                  setOpen(false);
+                  if (location.pathname === "/") {
+                    setTimeout(() => {
+                      const el = document.getElementById("pricing");
+                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+                    }, 100);
+                  } else {
+                    navigate("/#pricing");
+                  }
+                }}
                 className="cs-btn-primary flex-1"
                 style={{ minHeight: "unset" }}
               >

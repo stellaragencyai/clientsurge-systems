@@ -136,6 +136,12 @@ select:focus-visible,
 .cs-btn-primary:active {
   transform: translateY(0) scale(0.98);
 }
+/* #10: Explicit focus ring for CTA buttons — keyboard accessibility */
+.cs-btn-primary:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(var(--primary), 0.2);
+}
 .hero-primary-cta,
 .cs-footer-cta,
 .shiny-brown-btn {
@@ -366,6 +372,25 @@ nav {
   }
   h3 {
     font-size: clamp(1.1rem, 4vw, 1.5rem) !important;
+  }
+}
+
+/* #8: Tablet typography — ensure readable base on iPads and mid-size devices */
+@media (min-width: 641px) and (max-width: 1024px) {
+  body {
+    font-size: 16px;
+  }
+  h2 {
+    font-size: clamp(1.85rem, 4vw, 2.75rem) !important;
+  }
+  h3 {
+    font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
+  }
+  p, li, label {
+    font-size: clamp(0.95rem, 1.4vw, 1.05rem);
+  }
+  button, a[role="button"] {
+    font-size: clamp(0.85rem, 1.3vw, 1rem);
   }
 }
 

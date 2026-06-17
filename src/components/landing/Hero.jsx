@@ -89,7 +89,12 @@ export default function Hero() {
           <button
             onClick={() => {
               trackCTA("compare_packages", "hero");
-              navigate("/pricing");
+              if (window.location.pathname === "/") {
+                const el = document.getElementById("pricing");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              } else {
+                navigate("/#pricing");
+              }
             }}
             className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-bold text-white transition-all duration-300 hover:scale-105"
             style={{
