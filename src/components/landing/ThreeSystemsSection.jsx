@@ -1,4 +1,4 @@
-import { ArrowRight, CheckCircle2, ShieldCheck, Wallet } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Zap, Crown, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
@@ -10,7 +10,6 @@ const PACKAGES = [
     description: "Best for businesses that need the basics fixed.",
     price: "$497",
     setup: "$797 setup",
-    baseLabel: null,
     includes: [
       "AI-ready landing/website setup",
       "Lead capture",
@@ -22,6 +21,11 @@ const PACKAGES = [
     cta: "Start With Starter",
     href: "/pricing",
     highlight: false,
+    Icon: Sparkles,
+    accent: "#00AEEF",
+    accentBorder: "rgba(0,174,239,0.12)",
+    accentGlow: "rgba(0,174,239,0.18)",
+    iconBg: "rgba(0,174,239,0.1)",
   },
   {
     name: "Growth",
@@ -29,7 +33,6 @@ const PACKAGES = [
     description: "Best for businesses that need more bookings and stronger follow-up.",
     price: "$997",
     setup: "$1,297 setup",
-    baseLabel: "Everything in Starter, plus:",
     includes: [
       "Multi-step SMS/email follow-up",
       "Booking automation",
@@ -40,6 +43,11 @@ const PACKAGES = [
     cta: "Start With Growth",
     href: "/pricing",
     highlight: true,
+    Icon: Zap,
+    accent: "#00AEEF",
+    accentBorder: "rgba(0,174,239,0.45)",
+    accentGlow: "rgba(0,174,239,0.28)",
+    iconBg: "rgba(0,174,239,0.14)",
   },
   {
     name: "Pro",
@@ -47,7 +55,6 @@ const PACKAGES = [
     description: "Best for businesses that want the complete lead recovery system.",
     price: "$1,997",
     setup: "$2,497 setup",
-    baseLabel: "Everything in Growth, plus:",
     includes: [
       "Full website build/design",
       "Lead reactivation",
@@ -58,6 +65,11 @@ const PACKAGES = [
     cta: "Start With Pro",
     href: "/pricing",
     highlight: false,
+    Icon: Crown,
+    accent: "#003B8F",
+    accentBorder: "rgba(0,59,143,0.18)",
+    accentGlow: "rgba(0,59,143,0.16)",
+    iconBg: "rgba(0,59,143,0.1)",
   },
 ];
 
@@ -104,77 +116,101 @@ export default function ThreeSystemsSection() {
         </div>
 
         {/* Package cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-5">
           {PACKAGES.map((pkg) => (
-            <div
-              key={pkg.name}
-              className="flex flex-col rounded-xl overflow-hidden transition-all duration-300 group"
-              style={{
-                background: "#ffffff",
-                border: pkg.highlight ? "1px solid rgba(0,174,239,0.5)" : "1px solid rgba(0,174,239,0.12)",
-                boxShadow: pkg.highlight
-                  ? "0 8px 32px rgba(0,174,239,0.10), 0 2px 8px rgba(0,0,0,0.04)"
-                  : "0 2px 12px rgba(0,0,0,0.04)",
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.boxShadow = "0 0 0 1px rgba(0,174,239,0.35), 0 0 28px rgba(0,174,239,0.14), 0 8px 32px rgba(0,174,239,0.10)";
-                e.currentTarget.style.transform = "translateY(-4px)";
-                e.currentTarget.style.borderColor = "rgba(0,174,239,0.55)";
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.boxShadow = pkg.highlight
-                  ? "0 8px 32px rgba(0,174,239,0.10), 0 2px 8px rgba(0,0,0,0.04)"
-                  : "0 2px 12px rgba(0,0,0,0.04)";
-                e.currentTarget.style.transform = "translateY(0)";
-                e.currentTarget.style.borderColor = pkg.highlight ? "rgba(0,174,239,0.5)" : "rgba(0,174,239,0.12)";
-              }}
-            >
+            <div key={pkg.name} className="relative" style={{ paddingTop: pkg.highlight ? "28px" : 0 }}>
+              {/* Floating "Recommended" pill badge */}
               {pkg.highlight && (
-                <div
-                  className="text-center py-2.5 text-xs font-bold text-white uppercase tracking-wider"
-                  style={{ background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)" }}
-                >
-                  Most Popular
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
+                  <span
+                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold"
+                    style={{
+                      background: "rgba(255,255,255,0.95)",
+                      border: "1px solid rgba(0,174,239,0.25)",
+                      color: "#006BB0",
+                      boxShadow: "0 2px 12px rgba(0,174,239,0.18), 0 0 0 2px rgba(0,174,239,0.06)",
+                    }}
+                  >
+                    <Sparkles className="w-3 h-3" style={{ color: "#00AEEF" }} />
+                    Recommended
+                  </span>
                 </div>
               )}
-              <div className="p-7 md:p-9 flex flex-col flex-1">
-                <div className="mb-4">
-                  <h3 className="font-titles text-[#001B44] text-xl md:text-2xl font-bold mb-1">
+
+              <div
+                className="flex flex-col rounded-xl overflow-hidden transition-all duration-300"
+                style={{
+                  background: "#ffffff",
+                  border: `1px solid ${pkg.accentBorder}`,
+                  boxShadow: pkg.highlight
+                    ? `0 8px 32px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.04)`
+                    : "0 2px 12px rgba(0,0,0,0.04)",
+                  height: "100%",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = `0 0 0 1px ${pkg.accentGlow}, 0 0 32px ${pkg.accentGlow}, 0 8px 32px ${pkg.accentGlow}`;
+                  e.currentTarget.style.transform = "translateY(-4px)";
+                  e.currentTarget.style.borderColor = pkg.accent;
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = pkg.highlight
+                    ? `0 8px 32px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.04)`
+                    : "0 2px 12px rgba(0,0,0,0.04)";
+                  e.currentTarget.style.transform = "translateY(0)";
+                  e.currentTarget.style.borderColor = pkg.accentBorder;
+                }}
+              >
+                <div className="p-7 md:p-9 flex flex-col flex-1 items-center text-center">
+                  {/* Centered tier icon */}
+                  <div
+                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                    style={{ background: pkg.iconBg }}
+                  >
+                    <pkg.Icon className="w-5 h-5" style={{ color: pkg.accent }} />
+                  </div>
+
+                  {/* Title + subtitle */}
+                  <h3 className="font-titles text-[#001B44] text-xl md:text-2xl font-bold mb-1.5">
                     {pkg.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground">{pkg.description}</p>
-                </div>
+                  <p className="text-sm text-muted-foreground mb-6">{pkg.description}</p>
 
-                <div className="mb-5">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl font-bold tracking-tight text-[#001B44]">{pkg.price}</span>
-                    <span className="text-sm text-muted-foreground font-medium">/mo</span>
+                  {/* Price */}
+                  <div className="mb-6">
+                    <div className="flex items-baseline justify-center gap-1">
+                      <span className="text-4xl font-bold tracking-tight text-[#001B44]">{pkg.price}</span>
+                      <span className="text-sm text-muted-foreground font-medium">/mo</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">{pkg.setup}</p>
                   </div>
-                  <p className="text-xs text-muted-foreground mt-1">{pkg.setup}</p>
+
+                  {/* CTA with accent glow */}
+                  <Link
+                    to={pkg.href}
+                    onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
+                    className="cs-btn-primary w-full text-center mb-6"
+                    style={{
+                      background: pkg.highlight
+                        ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
+                        : `linear-gradient(135deg, ${pkg.accent} 0%, ${pkg.accent}dd 100%)`,
+                      boxShadow: pkg.highlight
+                        ? `0 0 20px ${pkg.accentGlow}, 0 4px 12px rgba(0,0,0,0.08)`
+                        : `0 0 12px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.04)`,
+                    }}
+                  >
+                    {pkg.cta} <ArrowRight className="w-4 h-4 inline ml-1" />
+                  </Link>
+
+                  {/* Feature list */}
+                  <ul className="space-y-3 w-full text-left flex-1">
+                    {pkg.includes.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent }} />
+                        <span className="text-sm text-[#0A1628] leading-snug">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
-
-                {pkg.baseLabel && (
-                  <p className="text-[11px] font-semibold uppercase tracking-wider text-muted-foreground mb-3">{pkg.baseLabel}</p>
-                )}
-                <ul className="space-y-3 mb-6 flex-1">
-                  {pkg.includes.map((item) => (
-                    <li key={item} className="flex items-start gap-2.5">
-                      <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#00AEEF" }} />
-                      <span className="text-sm text-[#0A1628] leading-snug">{item}</span>
-                    </li>
-                  ))}
-                </ul>
-
-                <Link
-                  to={pkg.href}
-                  onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
-                  className="cs-btn-primary w-full text-center mt-auto"
-                  style={pkg.highlight ? {
-                    background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-                  } : {}}
-                >
-                  {pkg.cta} <ArrowRight className="w-4 h-4 inline ml-1" />
-                </Link>
               </div>
             </div>
           ))}
