@@ -3,9 +3,9 @@ import { SIX_AUTOMATIONS } from "./sixAutomations.js";
 export const PUBLIC_ROUTE_METADATA = {
   "/": {
     key: "home",
-    title: "AI Automation Systems for Local Leads | ClientSurge Systems",
+    title: "AI Growth Systems for Local Service Businesses | ClientSurge Systems",
     description:
-      "AI-powered websites, voice agents, missed-call recovery, lead follow-up, and booking automation for local service businesses that want more booked jobs.",
+      "ClientSurge combines web design, CRM handoff, missed-call recovery, AI follow-up, booking, reviews, and reactivation into three systems you can compare and choose.",
   },
   "/automations": {
     key: "automations",
@@ -15,9 +15,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/about": {
     key: "about",
-    title: "About ClientSurge Systems | AI Automation for Local Businesses",
+    title: "About ClientSurge Systems | AI Growth Systems",
     description:
-      "Learn how ClientSurge Systems combines conversion-focused websites, AI voice agents, lead follow-up, booking automation, and recovery workflows for local service businesses.",
+      "Learn how ClientSurge Systems combines web design, CRM handoff, lead follow-up, booking automation, and recovery workflows for local service businesses.",
   },
   "/book": {
     key: "book",
@@ -27,9 +27,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/contact": {
     key: "contact",
-    title: "Contact ClientSurge Systems | AI Automation Questions",
+    title: "Contact ClientSurge Systems | AI Growth Systems",
     description:
-      "Contact ClientSurge Systems about AI voice agents, lead capture, missed-call recovery, booking automation, and local service business automation.",
+      "Contact ClientSurge Systems about lead capture, missed-call recovery, booking automation, and AI growth systems for local service businesses.",
   },
   "/pricing": {
     key: "pricing",
@@ -63,9 +63,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/store": {
     key: "store",
-    title: "AI Automation Store | ClientSurge Systems",
+    title: "Compare Packages | ClientSurge Systems",
     description:
-      "Compare ClientSurge packages, automation systems, and done-for-you launch options for local service businesses.",
+      "Compare Starter, Growth, and Pro systems — each combines web design, CRM handoff, and automation modules into one complete lead recovery engine.",
   },
   "/start": {
     key: "start",
