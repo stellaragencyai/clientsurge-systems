@@ -249,7 +249,7 @@ export default function Navbar() {
 
         {/* Desktop center links */}
         <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.map((link) => (
+          {sectionLinks.filter(l => l.label !== "Industries").map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -268,7 +268,7 @@ export default function Navbar() {
             </a>
           ))}
 
-          {/* Industries */}
+          {/* Industries dropdown (no text link — only hover/click opens it) */}
           <div className="relative" onMouseEnter={openIndustries} onMouseLeave={closeIndustriesSoon}>
             <button
               ref={industriesTriggerRef}
@@ -277,9 +277,10 @@ export default function Navbar() {
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
               className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: "#0a1628" }}
+              style={{ color: industriesOpen ? "#00AEEF" : "#0a1628" }}
             >
               Industries
+              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </button>
             {IndustriesDropdown}
           </div>
@@ -318,61 +319,44 @@ export default function Navbar() {
       {/* Mobile drawer */}
       {open && (
         <>
-          <div className="fixed inset-0 z-40 xl:hidden" aria-hidden="true" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40 xl:hidden bg-black/30" aria-hidden="true" onClick={() => setOpen(false)} />
           <div
-            className="xl:hidden border-b border-white/25 px-5 pb-6 pt-2 space-y-1 relative z-50 mobile-nav-drawer"
+            className="xl:hidden px-5 pb-8 pt-2 relative z-50 mobile-nav-drawer"
             style={{
               maxWidth: "min(420px, 90vw)",
-              paddingBottom: "max(1.5rem, env(safe-area-inset-bottom))",
-              background: "rgba(255,255,255,0.97)",
-              backdropFilter: "blur(12px)",
-              WebkitBackdropFilter: "blur(12px)",
+              paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
+              background: "rgba(255,255,255,0.98)",
+              backdropFilter: "blur(16px)",
+              WebkitBackdropFilter: "blur(16px)",
+              borderBottom: "1px solid rgba(0,174,239,0.12)",
+              boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
             }}
           >
-            <div className="pt-2 border-t border-border">
-              <p className="text-[11px] font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--cs-electric)" }}>Solutions</p>
-              <div className="space-y-1">
-                {solutionsLinks.map((link) => (
-                  <a
-                    key={link.href}
-                    href={link.href}
-                    className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
-                    style={{ minHeight: "44px" }}
-                    onClick={(e) => {
-                      if (link.isHashLink) { handleHashLinkClick(e, link.href); return; }
-                      e.preventDefault();
-                      trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                      navigate(link.href);
-                      setOpen(false);
-                    }}
-                  >
-                    {link.label}
-                  </a>
-                ))}
-              </div>
+            {/* Primary nav pages */}
+            <div className="pt-3 pb-2 space-y-0.5">
+              {sectionLinks.filter(l => l.label !== "Industries").map((link) => (
+                <a
+                  key={link.href}
+                  href={link.href}
+                  className="flex items-center text-[15px] font-semibold text-[#0a1628] hover:text-[#00AEEF] focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-[#00AEEF]/5"
+                  style={{ minHeight: "44px" }}
+                  onClick={(e) => {
+                    if (link.isHashLink) { handleHashLinkClick(e, link.href); return; }
+                    e.preventDefault();
+                    trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                    navigate(link.href);
+                    setOpen(false);
+                  }}
+                >
+                  {link.label}
+                </a>
+              ))}
             </div>
 
-            {sectionLinks.map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                className="flex items-center text-sm font-medium text-muted-foreground hover:text-foreground focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-muted/50"
-                style={{ minHeight: "44px" }}
-                onClick={(e) => {
-                  if (link.isHashLink) { handleHashLinkClick(e, link.href); return; }
-                  e.preventDefault();
-                  trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                  navigate(link.href);
-                  setOpen(false);
-                }}
-              >
-                {link.label}
-              </a>
-            ))}
-
-            <div className="pt-2 border-t border-border">
-              <p className="text-[11px] font-semibold uppercase tracking-widest mb-2" style={{ color: "var(--cs-electric)" }}>Industries</p>
-              <div className="space-y-1">
+            {/* Industries compact section */}
+            <div className="pt-3 mt-1 border-t border-border">
+              <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-3" style={{ color: "#00AEEF" }}>Industries</p>
+              <div className="grid grid-cols-2 gap-0.5">
                 {industryLinks.map((item) => (
                   <button
                     key={item.label}
@@ -382,7 +366,7 @@ export default function Navbar() {
                       navigate(item.href);
                       setOpen(false);
                     }}
-                    className="w-full text-left flex items-center rounded-xl px-3 py-3 text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
+                    className="w-full text-left flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
                     style={{ minHeight: "44px" }}
                   >
                     {item.label}
@@ -392,22 +376,31 @@ export default function Navbar() {
             </div>
 
             {mobileUserName && (
-              <div className="rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
+              <div className="mt-4 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
                 <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
                 <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
                 <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
               </div>
             )}
 
-            <button
-              onClick={() => { trackCTA("compare_packages", "mobile_nav"); setOpen(false); navigate("/pricing"); }}
-              className="cs-btn-primary"
-              style={{ width: "100%", display: "block" }}
-            >
-              <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", fontSize: "0.875rem" }}>
-                Compare Packages
-              </span>
-            </button>
+            <div className="mt-5 flex gap-2">
+              <button
+                onClick={() => { trackCTA("compare_packages", "mobile_nav"); setOpen(false); navigate("/pricing"); }}
+                className="cs-btn-primary flex-1"
+                style={{ minHeight: "unset" }}
+              >
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", fontSize: "0.875rem" }}>
+                  Compare Packages
+                </span>
+              </button>
+              <button
+                onClick={() => { trackCTA("contact", "mobile_nav"); setOpen(false); navigate("/contact"); }}
+                className="inline-flex items-center justify-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                style={{ flex: "0 0 auto", minHeight: "unset", height: "48px", padding: "0 20px" }}
+              >
+                Contact
+              </button>
+            </div>
           </div>
         </>
       )}

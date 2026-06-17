@@ -91,10 +91,8 @@ export default function Hero() {
               trackCTA("compare_packages", "hero");
               navigate("/pricing");
             }}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-bold text-white transition-all duration-300 hover:scale-105"
+            className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-bold text-white transition-all duration-300 hover:scale-105"
             style={{
-              background: "linear-gradient(135deg, #00AEEF 0%, #0088CC 100%)",
-              boxShadow: "0 8px 32px rgba(0,174,239,0.45), 0 0 0 1px rgba(255,255,255,0.2)",
               minHeight: "unset",
               minWidth: "unset",
             }}
