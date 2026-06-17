@@ -82,11 +82,11 @@ export default function RevenueUrgencySection() {
           </p>
           <button
             type="button"
-            onClick={() => navigate("/book")}
+            onClick={() => navigate("/pricing")}
             className="cs-btn-primary"
             style={{ padding: "0 36px", height: "52px", fontSize: "0.9rem" }}
           >
-            Stop Losing Revenue — Build My AI Automation Stack <ArrowRight className="w-5 h-5" />
+            Choose Your System <ArrowRight className="w-5 h-5" />
           </button>
         </div>
       </div>

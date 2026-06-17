@@ -187,7 +187,7 @@ function CoreOfferCTA({ onBookDemo }) {
           className="cs-btn-primary"
           style={{ padding: "0 24px", height: "48px", fontSize: "0.9rem" }}
         >
-          Activate My System
+          Get Help Choosing
           <ArrowRight className="w-4 h-4" />
         </button>
 
@@ -267,7 +267,7 @@ export default function CoreOffer() {
 
   return (
     <section
-      id="services"
+      id="how-it-works"
       className="pt-12 md:pt-16 pb-6 md:pb-8 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative"
       style={{ overflowX: "hidden" }}>
       

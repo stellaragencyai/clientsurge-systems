@@ -72,7 +72,7 @@ export default function FinalCTA() {
           </div>
         {/* Trust signals below buttons */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <span className="text-xs text-muted-foreground/70 font-medium">📞 (602) 584-3227</span>
+          <a href="tel:+16025843227" className="text-xs text-muted-foreground/70 font-medium hover:text-primary transition-colors" style={{ textDecoration: "none" }}>📞 (602) 584-3227</a>
           <span className="hidden sm:block text-muted-foreground/30">|</span>
           <span className="text-xs text-muted-foreground/70 font-medium">🛡 30-day performance review included</span>
           <span className="hidden sm:block text-muted-foreground/30">|</span>
