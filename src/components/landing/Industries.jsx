@@ -116,7 +116,7 @@ const industries = [
 },
 {
   id: "real-estate",
-  routePath: "/real-estate",
+  routePath: "/industries?industry=real-estate",
   icon: KeyRound,
   name: "Real Estate Agents",
   accent: {
@@ -130,7 +130,7 @@ const industries = [
 },
 {
   id: "personal-injury",
-  routePath: "/personal-injury",
+  routePath: "/industries?industry=personal-injury",
   icon: Scale,
   name: "Personal Injury Law",
   accent: {
@@ -256,7 +256,7 @@ export default function Industries() {
             <button
             key={industry.id}
             type="button"
-            aria-label={industry.name}
+            aria-label={`View ${industry.name} automation system`}
             aria-pressed={isSelected}
             className="group relative block overflow-hidden min-h-[60svh] sm:min-h-[45svh] md:min-h-[50svh] text-left"
             onClick={() => handleIndustrySelect(industry)}
