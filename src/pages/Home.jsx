@@ -19,7 +19,7 @@ const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
-const Pricing = lazy(() => import("../components/landing/Pricing"));
+// Pricing replaced by ThreeSystemsSection at the original pricing location below
 
 const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
@@ -118,8 +118,6 @@ export default function Home() {
         <Navbar />
         <Hero />
 
-        <ThreeSystemsSection />
-
         {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
@@ -147,10 +145,8 @@ export default function Home() {
           <CoreOffer />
         </LazyHomepageSection>
 
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <Pricing />
-        </LazyHomepageSection>
+        <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <ThreeSystemsSection />
 
         <SectionBreak />
 

@@ -61,12 +61,15 @@ const PACKAGES = [
 
 export default function ThreeSystemsSection() {
   return (
-    <section id="how-it-works" className="py-16 px-6 md:py-24" style={{ background: "linear-gradient(180deg, #f7fbff 0%, #ffffff 100%)" }}>
+    <section
+      id="pricing"
+      className="nebula-pricing pt-10 md:pt-14 pb-16 md:pb-24 px-6 overflow-visible"
+    >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
-        <div className="text-center mb-12 md:mb-16">
-          <p className="cs-eyebrow mb-3">ClientSurge Package Overview</p>
-          <h2 className="font-display text-[#001B44] text-3xl md:text-5xl font-bold mb-4">
+        <div className="flex flex-col items-center text-center mb-12">
+          <p className="cs-eyebrow mb-3">Compare AI Growth Systems</p>
+          <h2 className="font-titles text-[#001B44] text-3xl md:text-5xl font-bold mb-4">
             Three Systems. One Lead Recovery Engine.
           </h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -136,6 +139,26 @@ export default function ThreeSystemsSection() {
               </div>
             </div>
           ))}
+        </div>
+
+        {/* Bottom CTA row */}
+        <div className="text-center mt-10 space-y-4">
+          <Link
+            to="/pricing"
+            onClick={() => trackCTA("compare_packages", "three_systems_section")}
+            className="cs-btn-primary inline-flex"
+          >
+            Compare Packages <ArrowRight className="w-4 h-4 inline ml-1" />
+          </Link>
+          <div>
+            <Link
+              to="/automations"
+              onClick={() => trackCTA("view_automations", "three_systems_section")}
+              className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors underline underline-offset-4"
+            >
+              View Included Automations
+            </Link>
+          </div>
         </div>
 
         {/* Bottom note */}
