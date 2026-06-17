@@ -96,6 +96,17 @@ Deno.serve(async (req) => {
       });
     }
 
+    // Idempotency guard: check if this MessageSid was already processed
+    const existingEvents = await base44.asServiceRole.entities.CommunicationEvent.filter(
+      { provider_message_id: messageId, event_type: 'sms_received' },
+      '-created_date',
+      1
+    );
+    if (existingEvents && existingEvents.length > 0) {
+      console.log(`[InboundSms] Duplicate MessageSid ${messageId} — already processed`);
+      return Response.json({ received: true, matched: true, duplicate: true });
+    }
+
     // Log the SMS
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: lead.id,
@@ -108,7 +119,7 @@ Deno.serve(async (req) => {
       provider_message_id: messageId,
     });
 
-    // Update lead status
+    // Update lead status — mark as responded, pause cadence
     await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
       reply_status: 'responded',
       last_engagement_type: 'sms',
