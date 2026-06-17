@@ -1,6 +1,7 @@
-import { ArrowRight, CheckCircle2, Zap } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
+import MoneyBackGuarantee from "./MoneyBackGuarantee";
 
 const PACKAGES = [
   {
@@ -77,6 +78,27 @@ export default function ThreeSystemsSection() {
           </p>
         </div>
 
+        {/* Trust badges */}
+        <div className="flex flex-wrap justify-center gap-3 mb-10">
+          {[
+            { Icon: ShieldCheck, text: "Secure Stripe Checkout" },
+            { Icon: CheckCircle2, text: "No Long-Term Contract" },
+            { Icon: Wallet, text: "Month-to-Month Billing" },
+          ].map(({ Icon, text }) => (
+            <span
+              key={text}
+              className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border"
+              style={{
+                background: "rgba(0,174,239,0.08)",
+                borderColor: "rgba(0,174,239,0.28)",
+                color: "#00AEEF",
+              }}
+            >
+              <Icon className="h-3.5 w-3.5" aria-hidden="true" /> {text}
+            </span>
+          ))}
+        </div>
+
         {/* Package cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8">
           {PACKAGES.map((pkg) => (
@@ -141,8 +163,18 @@ export default function ThreeSystemsSection() {
           ))}
         </div>
 
+        {/* Guidance text */}
+        <div className="text-center mt-10 mb-2">
+          <p className="text-sm text-foreground/60 max-w-2xl mx-auto leading-relaxed">
+            <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth — it includes nurture sequences and AI scheduling for the fastest path to more booked appointments.
+          </p>
+        </div>
+
+        {/* 30-day guarantee */}
+        <MoneyBackGuarantee />
+
         {/* Bottom CTA row */}
-        <div className="text-center mt-10 space-y-4">
+        <div className="text-center mt-6 space-y-4">
           <Link
             to="/pricing"
             onClick={() => trackCTA("compare_packages", "three_systems_section")}
