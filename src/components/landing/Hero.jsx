@@ -25,7 +25,7 @@ export default function Hero() {
       >
         {/* Eyebrow */}
         <p className="cs-eyebrow" style={{ color: "rgba(0,174,239,0.9)", marginBottom: "1rem" }}>
-          AI-Powered Lead Automation for Local Businesses
+          AI services marketplace for local service businesses
         </p>
 
         <h1
@@ -39,7 +39,7 @@ export default function Hero() {
             margin: "0",
           }}
         >
-          Turn missed calls and dead leads into revenue — automatically.
+          Browse, choose, and activate AI automation systems built to recover more leads.
         </h1>
         <p style={{ 
           fontSize: "clamp(0.95rem, 1.8vw, 1.1rem)", 
@@ -48,7 +48,7 @@ export default function Hero() {
           maxWidth: "620px",
           margin: "1.25rem auto 0"
         }}>
-          AI responds in under 60 seconds. Follows up automatically. Converts leads into revenue — even while you sleep.
+          ClientSurge brings lead capture, missed-call text-back, AI follow-up, booking, review requests, and lead reactivation into one storefront so local businesses can build the automation stack they need.
         </p>
 
         {/* CTA buttons */}
@@ -60,7 +60,7 @@ export default function Hero() {
           marginTop: "2rem",
         }}>
           <a
-            href="/book"
+            href="/store"
             className="cs-btn-primary"
             style={{
               padding: "0 32px",
@@ -68,10 +68,10 @@ export default function Hero() {
               fontSize: "0.95rem",
             }}
           >
-            Build My AI Automation Stack →
+            Browse AI Services →
           </a>
           <a
-            href="/pricing"
+            href="/automations"
             style={{
               display: "inline-flex",
               alignItems: "center",
@@ -87,7 +87,7 @@ export default function Hero() {
               whiteSpace: "nowrap",
             }}
           >
-            View Pricing
+            View Automation Categories
           </a>
         </div>
 
@@ -100,9 +100,12 @@ export default function Hero() {
           marginTop: "2rem",
         }}>
           {[
-            "✓ Responds in under 60 seconds",
-            "✓ Live in 5–7 business days",
-            "✓ Month-to-month, no lock-in",
+            "✓ Lead capture systems",
+            "✓ Missed-call recovery",
+            "✓ AI follow-up",
+            "✓ Booking automation",
+            "✓ Review request systems",
+            "✓ Lead reactivation",
           ].map((item) => (
             <span key={item} style={{
               fontSize: "12px",

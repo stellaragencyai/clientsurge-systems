@@ -47,7 +47,7 @@ export default function MobileCallBar() {
             }}
           >
             <CalendarCheck className="w-4 h-4 flex-shrink-0" />
-            <span>Free Automation Audit</span>
+            <span>Get Help Choosing</span>
           </button>
         </div>
       </div>

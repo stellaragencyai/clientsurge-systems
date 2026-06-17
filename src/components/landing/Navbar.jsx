@@ -249,8 +249,17 @@ export default function Navbar() {
 
         {/* Desktop center links */}
         <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-          {/* Solutions */}
-          <div className="relative" onMouseEnter={openSolutions} onMouseLeave={closeSolutionsSoon}>
+        <a
+        href="/store"
+        onClick={(e) => { e.preventDefault(); trackCTA("nav_ai_services", "navbar"); closeAll(); navigate("/store"); }}
+        className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5"
+        style={{ color: isActivePage("/store") ? "#00AEEF" : "#0a1628", textDecoration: "none" }}
+        >
+        AI Services
+        <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage("/store") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+        </a>
+        {/* Solutions */}
+        <div className="relative" onMouseEnter={openSolutions} onMouseLeave={closeSolutionsSoon}>
             <button
               ref={solutionsTriggerRef}
               type="button"
@@ -323,11 +332,11 @@ export default function Navbar() {
             Login
           </button>
           <button
-            onClick={() => { trackCTA("activate_system", "navbar"); navigate("/book"); }}
+            onClick={() => { trackCTA("browse_ai_services", "navbar"); navigate("/store"); }}
             className="cs-btn-primary"
             style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset", whiteSpace: "nowrap" }}
           >
-            Activate My System
+            Browse AI Services
           </button>
         </div>
 
@@ -435,12 +444,12 @@ export default function Navbar() {
               Client Dashboard
             </button>
             <button
-              onClick={() => { trackCTA("activate_system", "mobile_nav"); setOpen(false); navigate("/book"); }}
+              onClick={() => { trackCTA("browse_ai_services", "mobile_nav"); setOpen(false); navigate("/store"); }}
               className="cs-btn-primary"
               style={{ width: "100%", display: "block" }}
             >
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", fontSize: "0.875rem" }}>
-                Activate My System
+                Browse AI Services
               </span>
             </button>
           </div>

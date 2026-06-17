@@ -41,9 +41,9 @@ export default function FinalCTA() {
         <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
-              href="/book"
+              href="/store"
               onClick={() => {
-                trackCTA("build_ai_automation_stack", "final_cta");
+                trackCTA("browse_ai_services", "final_cta");
               }}
               className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               className="cs-btn-primary"
@@ -53,7 +53,7 @@ export default function FinalCTA() {
                fontSize: "1rem",
               }}
               >
-              Activate My System
+              Browse AI Services
               <ArrowRight className="w-5 h-5" />
             </a>
             <a

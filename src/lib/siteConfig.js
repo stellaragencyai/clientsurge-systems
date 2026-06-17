@@ -3,19 +3,19 @@
  * Replaces hardcoded strings scattered across Navbar, Footer, Pricing, etc.
  *
  * ── AREA 1 QA: CANONICAL PUBLIC NAVIGATION ──
- * Public header: Automations→/automations | Pricing→/pricing | Industries→/industries |
- *                About→/about | Contact→/contact | Login→/login | CTA→/book
+ * Public header: Automations→/automations | AI Services→/store | Industries→/industries |
+ *                About→/about | Contact→/contact | Login→/login | CTA→/store
  *
  * ── AREA 1 QA: CANONICAL CTA DESTINATION MAP ──
- * "Free Automation Audit"          → /book
- * "Book Free Automation Audit"     → /book
- * "View AI Automations"            → /automations
+ * "Browse AI Services"             → /store
+ * "View Automation Categories"     → /automations
+ * "Get Help Choosing"              → /book
  * "View Pricing" / "See Packages"  → /pricing
  * "Contact Us" / support CTAs      → /contact
  * "Client Login"                   → /login
  * Phone CTAs                       → tel:+16025843227
  * Email CTAs                       → mailto:support@clientsurgesystems.com
- * Fallback (buyer CTA)             → /book
+ * Fallback (buyer CTA)             → /store
  * Fallback (support CTA)           → /contact
  *
  * ── AREA 1 QA: PUBLIC ROUTE CLASSIFICATION ──

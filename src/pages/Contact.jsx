@@ -240,14 +240,14 @@ export default function Contact() {
                   Skip the form?
                 </h3>
                 <p style={{ fontSize: "0.85rem", lineHeight: 1.6, color: "hsl(var(--muted-foreground))", marginBottom: "16px", fontWeight: 400 }}>
-                  Book a free automation audit. We&apos;ll review your lead flow and show you the fastest wins.
+                  Get help choosing your AI services. We&apos;ll talk through your lead flow and recommend the right automation stack.
                 </p>
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(true)}
                   className="cs-btn-primary"
                 >
-                  Book Free Audit <ArrowRight className="w-3.5 h-3.5" />
+                  Get Help Choosing <ArrowRight className="w-3.5 h-3.5" />
                 </button>
               </div>
             </div>
@@ -309,7 +309,7 @@ export default function Contact() {
                     onClick={() => setShowBookingModal(true)}
                     className="inline-flex items-center justify-center rounded-full border border-primary/20 bg-primary/5 px-5 py-3 text-sm font-semibold text-primary hover:bg-primary/10 transition-colors"
                   >
-                    Prefer to start a free automation audit instead?
+                    Want help choosing your AI services instead?
                   </button>
                   <a
                     href="mailto:support@clientsurgesystems.com"
