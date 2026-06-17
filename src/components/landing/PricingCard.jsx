@@ -64,7 +64,7 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
          </div>
        ) : null}
 
-      <div className="p-6 md:p-8 flex flex-col flex-1 relative z-10">
+      <div className="py-9 md:py-12 px-6 md:px-8 flex flex-col flex-1 relative z-10 min-h-[420px] md:min-h-[500px]">
         {/* Icon + Title */}
         <div className="mb-6 pb-4 border-b-2" style={{ borderColor: isRecommended ? "rgba(0,174,239,0.15)" : "rgba(0,0,0,0.04)" }}>
             <div
