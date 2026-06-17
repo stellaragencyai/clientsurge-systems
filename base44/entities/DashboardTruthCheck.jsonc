@@ -1,0 +1,191 @@
+{
+  "name": "DashboardTruthCheck",
+  "type": "object",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "customer_email": {
+      "type": "string",
+      "title": "Customer Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "environment": {
+      "type": "string",
+      "title": "Environment",
+      "enum": [
+        "production",
+        "qa",
+        "smoke",
+        "demo",
+        "internal",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "scope": {
+      "type": "string",
+      "title": "Scope",
+      "enum": [
+        "order",
+        "client_project",
+        "client",
+        "customer",
+        "admin_dashboard",
+        "customer_dashboard",
+        "mission_control"
+      ]
+    },
+    "truth_status": {
+      "type": "string",
+      "title": "Truth Status",
+      "enum": [
+        "trusted",
+        "warning",
+        "blocked",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "safe_to_show_client": {
+      "type": "boolean",
+      "title": "Safe To Show Client",
+      "default": false
+    },
+    "safe_to_show_admin": {
+      "type": "boolean",
+      "title": "Safe To Show Admin",
+      "default": false
+    },
+    "safe_to_launch": {
+      "type": "boolean",
+      "title": "Safe To Launch",
+      "default": false
+    },
+    "blocker_count": {
+      "type": "number",
+      "title": "Blocker Count",
+      "default": 0
+    },
+    "warning_count": {
+      "type": "number",
+      "title": "Warning Count",
+      "default": 0
+    },
+    "blockers": {
+      "type": "array",
+      "title": "Blockers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Blocker Code"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "enum": [
+              "critical_blocker",
+              "launch_blocker",
+              "advisory"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "entity_name": {
+            "type": "string",
+            "title": "Entity Name"
+          },
+          "record_id": {
+            "type": "string",
+            "title": "Record ID"
+          },
+          "fix_action": {
+            "type": "string",
+            "title": "Fix Action"
+          }
+        }
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "title": "Warnings",
+      "items": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string",
+            "title": "Warning Code"
+          },
+          "severity": {
+            "type": "string",
+            "title": "Severity",
+            "enum": [
+              "critical_blocker",
+              "launch_blocker",
+              "advisory"
+            ]
+          },
+          "message": {
+            "type": "string",
+            "title": "Message"
+          },
+          "entity_name": {
+            "type": "string",
+            "title": "Entity Name"
+          },
+          "record_id": {
+            "type": "string",
+            "title": "Record ID"
+          },
+          "fix_action": {
+            "type": "string",
+            "title": "Fix Action"
+          }
+        }
+      }
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary"
+    },
+    "source_records": {
+      "type": "object",
+      "title": "Source Records"
+    },
+    "last_checked_at": {
+      "type": "string",
+      "title": "Last Checked At",
+      "format": "date-time"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "scope",
+    "truth_status"
+  ]
+}

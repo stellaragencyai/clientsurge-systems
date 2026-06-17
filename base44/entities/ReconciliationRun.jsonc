@@ -1,0 +1,81 @@
+{
+  "name": "ReconciliationRun",
+  "type": "object",
+  "properties": {
+    "run_type": {
+      "type": "string",
+      "title": "Run Type",
+      "enum": [
+        "full_audit",
+        "paid_order_reconciliation",
+        "client_dashboard_reconciliation",
+        "admin_dashboard_reconciliation",
+        "metrics_rebuild",
+        "service_key_migration",
+        "environment_classification"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "failed",
+        "completed_with_blockers"
+      ],
+      "default": "queued"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Started At",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    },
+    "total_records_checked": {
+      "type": "number",
+      "title": "Total Records Checked",
+      "default": 0
+    },
+    "records_updated": {
+      "type": "number",
+      "title": "Records Updated",
+      "default": 0
+    },
+    "blockers_found": {
+      "type": "number",
+      "title": "Blockers Found",
+      "default": 0
+    },
+    "warnings_found": {
+      "type": "number",
+      "title": "Warnings Found",
+      "default": 0
+    },
+    "safe_summary": {
+      "type": "string",
+      "title": "Safe Summary"
+    },
+    "details_json": {
+      "type": "string",
+      "title": "Details JSON"
+    },
+    "triggered_by": {
+      "type": "string",
+      "title": "Triggered By"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "run_type"
+  ]
+}

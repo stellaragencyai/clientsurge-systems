@@ -148,6 +148,43 @@
     "metadata_json": {
       "type": "string",
       "title": "Metadata"
+    },
+    "environment": {
+      "type": "string",
+      "title": "Environment",
+      "enum": [
+        "production",
+        "qa",
+        "smoke",
+        "demo",
+        "internal",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "dashboard_excluded": {
+      "type": "boolean",
+      "title": "Excluded From Dashboard",
+      "default": false
+    },
+    "dashboard_exclusion_reason": {
+      "type": "string",
+      "title": "Dashboard Exclusion Reason"
+    },
+    "dashboard_truth_status": {
+      "type": "string",
+      "title": "Dashboard Truth Status",
+      "enum": [
+        "trusted",
+        "warning",
+        "blocked",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "dashboard_truth_notes": {
+      "type": "string",
+      "title": "Dashboard Truth Notes"
     }
   },
   "required": [
