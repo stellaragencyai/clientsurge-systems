@@ -115,5 +115,37 @@
     "reason": "Tenant-scoped rate limiting configuration per Client/ClientProject",
     "tenant_scoped": "client_id + client_project_id (optional)",
     "documentation": "SCALE_ARCHITECTURE.md"
+  },
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

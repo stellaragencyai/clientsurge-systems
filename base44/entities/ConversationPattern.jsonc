@@ -74,5 +74,35 @@
     "reason": "Stores anonymized examples of successful conversation flows. Populated asynchronously for pattern analysis and insights.",
     "read_only": true,
     "async_only": true
-  }
+  },
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  },
+  "required": []
 }

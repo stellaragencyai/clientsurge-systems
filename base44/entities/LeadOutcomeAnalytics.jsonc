@@ -80,5 +80,41 @@
     "metric_role": "derived_intelligence",
     "visibility": "dashboard_secondary",
     "architecture_level": "analytics"
+  },
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.lead_id": {
+            "$in": [
+              "{{leads.id}}"
+            ]
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

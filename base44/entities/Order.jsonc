@@ -638,19 +638,38 @@
     "read": {
       "$or": [
         {
-          "data.customer_email": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
+        },
+        {
+          "data.customer_email": "{{user.email}}"
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.customer_email": "{{user.email}}"
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
     },
     "delete": {
       "user_condition": {

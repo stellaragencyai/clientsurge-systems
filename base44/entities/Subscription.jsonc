@@ -91,19 +91,40 @@
     "read": {
       "$or": [
         {
-          "data.client_id": "{{user.created_by_id}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{orders.id}}"
+            ]
           }
         }
       ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{orders.id}}"
+            ]
+          }
+        }
+      ]
     },
     "delete": {
       "user_condition": {

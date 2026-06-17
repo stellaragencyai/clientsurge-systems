@@ -364,22 +364,32 @@
     "read": {
       "$or": [
         {
-          "data.client_email": "{{user.email}}"
-        },
-        {
-          "data.contact_email": "{{user.email}}"
-        },
-        {
           "user_condition": {
             "role": "admin"
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_email": "{{user.email}}"
         }
       ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
     },
     "delete": {
       "user_condition": {

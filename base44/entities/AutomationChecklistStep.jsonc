@@ -82,14 +82,36 @@
       }
     },
     "read": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{client_projects.order_id}}"
+            ]
+          }
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{client_projects.order_id}}"
+            ]
+          }
+        }
+      ]
     },
     "delete": {
       "user_condition": {

@@ -203,40 +203,28 @@
     "read": {
       "$or": [
         {
-          "data.lead_id": {
-            "$in": [
-              "{{user.id}}",
-              "{{user.data.linked_lead_ids}}"
-            ]
+          "user_condition": {
+            "role": "admin"
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         },
         {
           "data.order_id": {
             "$in": [
-              "{{user.data.linked_order_ids}}"
+              "{{orders.id}}"
             ]
           }
         },
         {
-          "data.client_id": "{{user.id}}"
-        },
-        {
-          "data.client_project_id": {
+          "data.lead_id": {
             "$in": [
-              "{{user.data.linked_client_project_ids}}"
+              "{{leads.id}}"
             ]
-          }
-        },
-        {
-          "data.onboarding_client_id": {
-            "$in": [
-              "{{user.data.linked_onboarding_client_ids}}"
-            ]
-          }
-        },
-        {
-          "user_condition": {
-            "role": "admin"
           }
         }
       ]

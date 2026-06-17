@@ -140,5 +140,41 @@
     "reason": "White-label branding configuration per Agency. Controls UI appearance across all owned clients (landing pages, dashboards, emails).",
     "tenant_scoped": "agency_id",
     "documentation": "WHITE_LABEL_SYSTEM.md"
+  },
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.agency_id": "{{agency_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.agency_id": "{{agency_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

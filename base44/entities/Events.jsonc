@@ -51,16 +51,15 @@
     "read": {
       "$or": [
         {
-          "data.lead_id": {
-            "$in": [
-              "{{user.id}}",
-              "{{user.data.linked_lead_ids}}"
-            ]
+          "user_condition": {
+            "role": "admin"
           }
         },
         {
-          "user_condition": {
-            "role": "admin"
+          "data.lead_id": {
+            "$in": [
+              "{{leads.id}}"
+            ]
           }
         }
       ]

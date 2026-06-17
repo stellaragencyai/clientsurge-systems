@@ -116,14 +116,28 @@
       }
     },
     "read": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_projects.id}}"
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_projects.id}}"
+        }
+      ]
     },
     "delete": {
       "user_condition": {
