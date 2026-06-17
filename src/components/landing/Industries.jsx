@@ -211,9 +211,8 @@ export default function Industries() {
          <div className="flex flex-col items-center text-center">
            <p className="cs-eyebrow mb-4">Choose Your Industry</p>
            <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
-              Recover revenue from{" "}
-              <span className="text-primary">missed calls</span>
-            </h2>
+              Built For Your Industry
+              </h2>
             <p className="mt-3 text-base md:text-lg max-w-2xl leading-relaxed" style={{ color: "#0a1628" }}>
               Pick your industry to see how much revenue you're losing and how to recover it.
             </p>

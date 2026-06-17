@@ -77,7 +77,7 @@ export default function AutomationCatalog() {
         <div className="text-center mb-14">
           <p className="cs-eyebrow mb-3">Included Automation Modules</p>
           <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-            Every module included in your package.
+            Included Automations
           </h2>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">
             Each automation module is included across our Starter, Growth, and Pro packages — or available as an add-on later.

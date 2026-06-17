@@ -24,10 +24,7 @@ function CoreOfferHeader() {
 
       {/* Title */}
       <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight text-center">
-       We fix revenue loss{" "}
-       <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>
-         automatically
-       </span>
+        How It Works
       </h2>
 
       {/* Thin gold rule */}

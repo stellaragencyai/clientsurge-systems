@@ -21,7 +21,7 @@ export default function Hero() {
       style={{
         minHeight: "100svh",
         paddingTop: "var(--cs-nav-height)",
-        background: "linear-gradient(135deg, #003B8F 0%, #006BB0 52%, #00AEEF 100%)",
+        background: "#0A0A0A",
         isolation: "isolate",
       }}
     >
@@ -54,7 +54,7 @@ export default function Hero() {
             style={{ background: "#00AEEF", boxShadow: "0 0 8px rgba(0,174,239,0.8)" }}
           />
           <span className="text-xs font-bold text-white/90 uppercase tracking-wider">
-            Automate your lead flow
+            Automate Your Lead Flow
           </span>
         </motion.div>
 
@@ -66,7 +66,7 @@ export default function Hero() {
           className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight"
           style={{ fontFamily: "'Montserrat', sans-serif" }}
         >
-          Choose the growth system built to capture, follow up, and book more leads.
+          Capture. Follow Up. Book.
         </motion.h1>
 
         {/* Subheadline */}
@@ -76,7 +76,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed"
         >
-          ClientSurge turns web design, CRM handoff, missed-call recovery, AI follow-up, booking automation, review requests, and lead reactivation into systems you can compare, choose, and activate.
+          ClientSurge combines web design, CRM handoff, missed-call recovery, AI follow-up, booking, reviews, and reactivation into three systems you can compare and choose.
         </motion.p>
 
         {/* CTAs */}

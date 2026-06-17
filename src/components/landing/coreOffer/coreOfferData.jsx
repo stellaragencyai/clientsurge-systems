@@ -27,8 +27,8 @@ export const iconMap = {
 };
 
 export const coreOfferSectionConfig = {
-  eyebrow: "The System",
-  headline: "We fix revenue loss automatically",
+  eyebrow: "How It Works",
+  headline: "How It Works",
   subheadline:
     "Your AI system responds in seconds, follows up consistently, and converts leads into revenue without manual work.",
   helperLine:

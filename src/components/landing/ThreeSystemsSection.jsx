@@ -71,7 +71,7 @@ export default function ThreeSystemsSection() {
         <div className="flex flex-col items-center text-center mb-12">
           <p className="cs-eyebrow mb-3">Compare AI Growth Systems</p>
           <h2 className="font-titles text-[#001B44] text-3xl md:text-5xl font-bold mb-4">
-            Three Systems. One Lead Recovery Engine.
+            Compare Packages
           </h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             Choose the package that matches how much of your lead flow you want ClientSurge to handle — from essential capture and response to a complete website, follow-up, booking, review, and reactivation system.
