@@ -10,7 +10,7 @@ const iconMap = {
 };
 
 export default function ServiceIcon({ serviceKey, size = 40 }) {
-  const cfg = iconMap[serviceKey] || { Icon: Zap, color: "#9a5c2e", bg: "rgba(154,92,46,0.12)" };
+  const cfg = iconMap[serviceKey] || { Icon: Zap, color: "#0088CC", bg: "rgba(0,136,204,0.12)" };
   const { Icon } = cfg;
   return (
     <div style={{

@@ -25,24 +25,26 @@ export default function ServiceCardActions({ serviceKey, orderId }) {
             onClick={() => handleAction(action.action)}
             style={{
               borderRadius: "10px",
-              border: "1px solid rgba(154,92,46,0.18)",
-              background: "rgba(154,92,46,0.05)",
+              border: "1px solid rgba(0,174,239,0.16)",
+              background: "rgba(0,174,239,0.04)",
               padding: "10px 12px",
               cursor: "pointer",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
               gap: "6px",
-              transition: "all 0.2s ease",
-              color: "#9a5c2e",
+              transition: "all 0.25s cubic-bezier(0.25,0.46,0.45,0.94)",
+              color: "#0088CC",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(154,92,46,0.12)";
-              e.currentTarget.style.borderColor = "rgba(154,92,46,0.3)";
+              e.currentTarget.style.background = "rgba(0,174,239,0.12)";
+              e.currentTarget.style.borderColor = "rgba(0,174,239,0.4)";
+              e.currentTarget.style.boxShadow = "0 0 16px rgba(0,174,239,0.15)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(154,92,46,0.05)";
-              e.currentTarget.style.borderColor = "rgba(154,92,46,0.18)";
+              e.currentTarget.style.background = "rgba(0,174,239,0.04)";
+              e.currentTarget.style.borderColor = "rgba(0,174,239,0.16)";
+              e.currentTarget.style.boxShadow = "none";
             }}
           >
             <Icon style={{ width: "16px", height: "16px" }} />

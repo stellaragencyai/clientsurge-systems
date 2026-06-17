@@ -3,7 +3,7 @@ export default function ServiceStatusBadge({ installStatus }) {
     if (installStatus === "Live")               return { label: "Live",             color: "#22c55e", bg: "rgba(34,197,94,0.12)"  };
     if (installStatus === "Testing")            return { label: "Testing",          color: "#3b82f6", bg: "rgba(59,130,246,0.12)" };
     if (installStatus === "Configuring")        return { label: "Configuring",      color: "#f59e0b", bg: "rgba(245,158,11,0.12)" };
-    if (installStatus === "Ready for Install")  return { label: "Ready for Setup",  color: "#9a5c2e", bg: "rgba(154,92,46,0.12)"  };
+    if (installStatus === "Ready for Install")  return { label: "Ready for Setup",  color: "#0088CC", bg: "rgba(0,136,204,0.12)"  };
     if (installStatus === "Error")              return { label: "Needs Attention",  color: "#ef4444", bg: "rgba(239,68,68,0.12)"  };
     return                                             { label: "Pending",          color: "rgba(27,20,13,0.45)", bg: "rgba(27,20,13,0.06)" };
   })();

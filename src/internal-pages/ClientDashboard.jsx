@@ -45,12 +45,17 @@ function LoadingState() {
 
 function ErrorState({ message, onRetry }) {
   return (
-    <div className="rounded-2xl border border-red-200 bg-red-50/60 p-8 text-center">
-      <p className="text-base font-bold text-red-600 mb-2">⚠ Unable to Load Dashboard</p>
+    <div className="rounded-2xl p-8 text-center" style={{
+      background: "linear-gradient(135deg, rgba(255,255,255,0.95) 0%, rgba(232,246,255,0.7) 100%)",
+      border: "1px solid rgba(0,174,239,0.15)",
+      boxShadow: "0 4px 24px rgba(0,59,143,0.07)"
+    }}>
+      <p className="text-base font-bold mb-2" style={{ color: "#003B8F" }}>Unable to Load Dashboard</p>
       <p className="text-sm text-muted-foreground mb-5">{message}</p>
       {onRetry && (
         <button onClick={onRetry}
-          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full bg-red-50 border border-red-200 text-red-600 font-semibold text-sm cursor-pointer hover:bg-red-100 transition-colors">
+          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-white font-semibold text-sm cursor-pointer transition-all hover:-translate-y-0.5"
+          style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 4px 14px rgba(0,174,239,0.3)" }}>
           <RefreshCw className="w-3 h-3" /> Try Again
         </button>
       )}
@@ -256,13 +261,13 @@ export default function ClientDashboard() {
 
         {/* ── HEADER — matches landing page Navbar style ── */}
         <header className="sticky top-0 z-50 flex items-center justify-between border-b border-primary/10 bg-white/70 backdrop-blur-2xl"
-          style={{ height: "64px", padding: "0 clamp(1rem,4vw,2.5rem)" }}>
+          style={{ height: "72px", padding: "0 clamp(1rem,4vw,2.5rem)" }}>
           {/* Left: Logo */}
           <Link to="/" className="flex items-center no-underline">
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge Systems"
-              style={{ height: "32px", width: "auto" }}
+              style={{ height: "48px", width: "auto" }}
             />
           </Link>
 
@@ -413,15 +418,15 @@ export default function ClientDashboard() {
                       <div style={{
                         display: "grid",
                         gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 300px), 1fr))",
-                        gap: "16px",
+                        gap: "20px",
                         marginBottom: "80px",
                       }}>
                         {activeServices.map((service, idx) => (
                           <div key={service.serviceKey || idx}
-                            className="rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-0.5"
+                            className="rounded-2xl overflow-hidden transition-all duration-350 hover:-translate-y-1"
                             style={{
                               border: "1px solid rgba(0,174,239,0.13)",
-                              boxShadow: "0 2px 12px rgba(0,59,143,0.06), 0 1px 3px rgba(0,0,0,0.04)"
+                              boxShadow: "0 2px 14px rgba(0,59,143,0.05), 0 0 0 1px rgba(0,174,239,0.04)"
                             }}>
                             <ResponsiveServiceCard service={service} />
                           </div>

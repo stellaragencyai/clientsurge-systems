@@ -22,9 +22,9 @@ export default function DashboardHeader({ activeServices, project, order }) {
       display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: "12px", marginBottom: "24px",
     }}>
       {[
-        { icon: MessageSquare, label: "Automation Systems", value: totalServices, sub: "in your account", color: "#1b140d" },
+        { icon: MessageSquare, label: "Automation Systems", value: totalServices, sub: "in your account", color: "#0a1628" },
         { icon: CheckCircle, label: "Live & Running", value: liveCount, sub: "capturing leads now", color: "#16a34a" },
-        { icon: Clock, label: "Being Set Up", value: inProgressCount, sub: "our team is on it", color: "#d97706" },
+        { icon: Clock, label: "Being Set Up", value: inProgressCount, sub: "our team is on it", color: "#0088CC" },
       ].map(({ icon: Icon, label, value, sub, color }) => (
         <div key={label} style={{
           background: "#ffffff", border: "1px solid rgba(0,174,239,0.14)",

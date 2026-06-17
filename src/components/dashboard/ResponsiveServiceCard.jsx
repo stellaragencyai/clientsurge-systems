@@ -11,27 +11,27 @@ export default function ResponsiveServiceCard({ service }) {
   return (
     <div style={{
       borderRadius: "16px",
-      background: "rgba(255,255,255,0.95)",
-      border: "1.5px solid rgba(154,92,46,0.12)",
-      boxShadow: "0 4px 16px rgba(15,23,42,0.06)",
+      background: "rgba(255,255,255,0.98)",
+      border: "1px solid rgba(0,174,239,0.13)",
+      boxShadow: "0 2px 16px rgba(0,59,143,0.05), 0 1px 3px rgba(0,0,0,0.03)",
       overflow: "hidden",
-      transition: "all 0.3s ease",
+      transition: "all 0.35s cubic-bezier(0.25,0.46,0.45,0.94)",
     }}
     onMouseEnter={(e) => {
       if (window.innerWidth > 768) {
-        e.currentTarget.style.boxShadow = "0 12px 36px rgba(15,23,42,0.12)";
-        e.currentTarget.style.transform = "translateY(-2px)";
+        e.currentTarget.style.boxShadow = "0 16px 44px rgba(0,59,143,0.12), 0 0 0 1px rgba(0,174,239,0.08)";
+        e.currentTarget.style.transform = "translateY(-3px)";
       }
     }}
     onMouseLeave={(e) => {
       if (window.innerWidth > 768) {
-        e.currentTarget.style.boxShadow = "0 4px 16px rgba(15,23,42,0.06)";
+        e.currentTarget.style.boxShadow = "0 2px 16px rgba(0,59,143,0.05), 0 1px 3px rgba(0,0,0,0.03)";
         e.currentTarget.style.transform = "translateY(0)";
       }
     }}
     >
-      {/* Top accent bar */}
-      <div style={{ height: "3px", background: `linear-gradient(90deg, rgba(154,92,46,0.5), rgba(200,150,92,0.8), rgba(154,92,46,0.3))` }} />
+      {/* Top accent bar — electric blue pulse */}
+      <div style={{ height: "3px", background: `linear-gradient(90deg, transparent, #00AEEF, transparent)` }} />
 
       <div style={{ padding: "20px" }}>
         <ServiceCardHeader service={service} />
@@ -50,21 +50,21 @@ export default function ResponsiveServiceCard({ service }) {
             style={{
               width: "100%",
               borderRadius: "10px",
-              border: "1px solid rgba(154,92,46,0.2)",
-              background: "rgba(154,92,46,0.06)",
+              border: "1px solid rgba(0,174,239,0.22)",
+              background: "rgba(0,174,239,0.05)",
               padding: "10px 12px",
               fontSize: "13px",
               fontWeight: "600",
-              color: "#9a5c2e",
+              color: "#0088CC",
               cursor: "pointer",
               marginTop: "8px",
               transition: "all 0.2s ease",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "rgba(154,92,46,0.12)";
+              e.currentTarget.style.background = "rgba(0,174,239,0.12)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "rgba(154,92,46,0.06)";
+              e.currentTarget.style.background = "rgba(0,174,239,0.05)";
             }}
           >
             {expanded ? "−  Collapse Details" : "+  Show Details"}
