@@ -288,14 +288,6 @@ export default function Navbar() {
         {/* Desktop right actions */}
         <div className="hidden xl:flex items-center gap-2 shrink-0">
           <button
-            onClick={() => { trackCTA("client_dashboard", "navbar"); navigate("/client-portal"); }}
-            className="hidden md:inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border transition-colors"
-            style={{ minHeight: "unset", minWidth: "unset", borderColor: "rgba(0,174,239,0.35)", color: "#00AEEF", background: "rgba(0,174,239,0.07)" }}
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
-            Client Dashboard
-          </button>
-          <button
             onClick={() => { trackCTA("login", "navbar"); setShowLoginModal(true); }}
             className="hidden md:block text-xs font-semibold text-foreground/70 hover:text-primary transition-colors px-3 py-1.5 rounded-lg hover:bg-primary/8 border border-white/20 hover:border-primary/30"
             style={{ minHeight: "unset", minWidth: "unset" }}
@@ -407,13 +399,6 @@ export default function Navbar() {
               </div>
             )}
 
-            <button
-              onClick={() => { trackCTA("client_dashboard", "mobile_nav"); setOpen(false); navigate("/client-portal"); }}
-              className="w-full flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold border"
-              style={{ borderColor: "rgba(0,174,239,0.35)", color: "#00AEEF", background: "rgba(0,174,239,0.07)", minHeight: "44px" }}
-            >
-              Client Dashboard
-            </button>
             <button
               onClick={() => { trackCTA("compare_packages", "mobile_nav"); setOpen(false); navigate("/pricing"); }}
               className="cs-btn-primary"
