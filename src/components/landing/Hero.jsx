@@ -54,7 +54,7 @@ export default function Hero() {
             style={{ background: "#00AEEF", boxShadow: "0 0 8px rgba(0,174,239,0.8)" }}
           />
           <span className="text-xs font-bold text-white/90 uppercase tracking-wider">
-            Ready-to-activate AI automation systems
+            Automate your lead flow
           </span>
         </motion.div>
 
