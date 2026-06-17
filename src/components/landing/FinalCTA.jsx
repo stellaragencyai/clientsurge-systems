@@ -41,9 +41,9 @@ export default function FinalCTA() {
         <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
-              href="/store"
+              href="/pricing"
               onClick={() => {
-                trackCTA("browse_ai_services", "final_cta");
+                trackCTA("compare_packages", "final_cta");
               }}
               className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               className="cs-btn-primary"
@@ -53,7 +53,7 @@ export default function FinalCTA() {
                fontSize: "1rem",
               }}
               >
-              Browse AI Services
+              Compare Packages
               <ArrowRight className="w-5 h-5" />
             </a>
             <a

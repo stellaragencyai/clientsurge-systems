@@ -75,12 +75,12 @@ export default function AutomationCatalog() {
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
-          <p className="cs-eyebrow mb-3">AI Automation Systems</p>
+          <p className="cs-eyebrow mb-3">Included Automation Modules</p>
           <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-            Choose the AI automation system your business needs.
+            Every module included in your package.
           </h2>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">
-            Six automated systems that capture leads, follow up intelligently, schedule appointments, and recover revenue — running 24/7.
+            Each automation module is included across our Starter, Growth, and Pro packages — or available as an add-on later.
           </p>
         </div>
 
@@ -150,18 +150,18 @@ export default function AutomationCatalog() {
         <div className="mt-12 flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             type="button"
-            onClick={() => navigate("/book")}
+            onClick={() => navigate("/pricing")}
             className="cs-btn-primary"
             style={{ padding: "0 36px", height: "52px", fontSize: "0.9rem" }}
           >
-            Build My AI Automation Stack
+            Compare Packages
           </button>
           <button
             type="button"
             onClick={() => navigate("/automations")}
             className="inline-flex items-center justify-center h-[52px] px-8 rounded-lg border-2 border-primary/25 bg-background/80 text-sm font-bold text-primary hover:bg-primary/5 transition-colors"
           >
-            View Automation Systems
+            View All Modules
           </button>
         </div>
       </div>

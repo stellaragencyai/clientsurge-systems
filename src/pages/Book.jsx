@@ -11,13 +11,13 @@ import DemoBookingInline from '@/components/forms/DemoBookingInline';
 export default function Book() {
   useEffect(() => {
     const cleanupMetadata = setPageMetadata({
-      title: 'Build Your AI Automation Stack | ClientSurge Systems',
+      title: 'Get Help Choosing Your AI Growth System | ClientSurge Systems',
       description:
-        'Configure your AI automation stack — instant lead response, missed-call recovery, AI scheduling, and more. We build it, you collect the revenue.',
+        'Not sure whether Starter, Growth, or Pro is right for your business? Get help choosing the best ClientSurge package for your lead flow.',
       canonicalPath: '/book',
-      ogTitle: 'Build Your AI Automation Stack',
+      ogTitle: 'Get Help Choosing Your AI Growth System',
       ogDescription:
-        'Select the AI automations your business needs. We handle setup, provider connections, and go-live — your stack runs 24/7 to capture and convert leads.',
+        'Talk to a human about whether Starter, Growth, or Pro is the right ClientSurge package for your business lead flow.',
     });
 
     return cleanupMetadata;
@@ -34,27 +34,27 @@ export default function Book() {
                 <div className="book-hero-copy">
                   <div className="book-kicker">
                     <span className="book-kicker-dot" />
-                    AI Automation Stack
+                    Package Guidance
                   </div>
                   <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-                    Build Your AI Automation Stack
+                    Get Help Choosing Your AI Growth System
                   </h1>
                   <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                    Select the AI automations your business needs — instant lead response, missed-call recovery, AI scheduling, and more. We handle setup and go-live; you collect the revenue.
+                    Not sure whether Starter, Growth, or Pro is the right fit for your business? Tell us about your lead flow and we'll recommend the best package — no audit, no pressure.
                   </p>
                   <a
-                    href="/automations"
-                    onClick={() => trackCTA('review_automation_systems', 'book_page_header')}
+                    href="/pricing"
+                    onClick={() => trackCTA('compare_packages', 'book_page_header')}
                     className="book-text-link mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                   >
-                    Explore the Automation Catalog
+                    Compare Packages Instead
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
 
-                <div className="book-audit-card" aria-label="Audit process preview">
+                <div className="book-audit-card" aria-label="Package selection process">
                   <div className="flex items-center justify-between gap-3">
-                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Stack path</p>
+                    <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary">Process</p>
                     <span className="rounded-lg border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">
                       15 min
                     </span>
@@ -66,7 +66,7 @@ export default function Book() {
                     <span />
                   </div>
                   <div className="mt-5 grid gap-2">
-                    {["Choose your stack", "We configure it", "Go live in 5–7 days"].map((item, index) => (
+                    {["Choose your package", "We configure it", "Go live in 5–7 days"].map((item, index) => (
                       <div key={item} className="book-mini-step">
                         <span>{String(index + 1).padStart(2, "0")}</span>
                         {item}
@@ -78,9 +78,9 @@ export default function Book() {
 
               <div className="book-content-panel">
                 <div className="max-w-2xl">
-                  <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What We Configure For You</p>
+                  <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What's Inside Each Package</p>
                   <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
-                    What your AI automation stack includes
+                    What your AI growth system includes
                   </h2>
                   <p className="mt-3 text-sm md:text-base text-muted-foreground">
                     Built for roofers, HVAC companies, dental practices, med spas, chiropractic clinics, contractors, and other local service businesses.
@@ -89,12 +89,12 @@ export default function Book() {
 
                 <div className="mt-7 grid sm:grid-cols-2 lg:grid-cols-3 gap-3">
                   {[
-                    "Instant lead response SMS & email",
-                    "Missed-call text-back recovery",
-                    "14-day AI nurture sequence",
-                    "AI scheduling & appointment booking",
-                    "Customer reactivation engine",
-                    "Review request automation",
+                  "Instant lead response SMS & email",
+                  "Missed-call text-back recovery",
+                  "Multi-step SMS/email follow-up",
+                  "Booking & scheduling automation",
+                  "Lead reactivation engine",
+                  "Review request automation",
                   ].map((item) => (
                     <div key={item} className="book-check-card rounded-lg border border-primary/15 bg-white/76 px-4 py-3 text-sm font-semibold text-foreground">
                       {item}
@@ -106,8 +106,8 @@ export default function Book() {
                   {[
                     {
                       icon: CalendarCheck2,
-                      title: "Choose your automation stack",
-                      body: "Pick the AI services your business needs. No sales pressure, no fluff — just a clear path to more captured revenue.",
+                      title: "Choose your package",
+                      body: "Pick Starter, Growth, or Pro based on your lead flow needs. No sales pressure — just a clear path to more captured revenue.",
                     },
                     {
                       icon: ClipboardList,
@@ -116,7 +116,7 @@ export default function Book() {
                     },
                     {
                       icon: MessagesSquare,
-                      title: "Your stack runs 24/7",
+                      title: "Your system runs 24/7",
                       body: "Leads are captured, followed up, and converted — automatically. You focus on your business while the system works.",
                     },
                   ].map((step, index) => {
@@ -136,13 +136,13 @@ export default function Book() {
                 <div id="scheduler" className="book-scheduler-panel mt-8">
                   <div>
                     <p className="text-xs font-semibold uppercase tracking-widest text-primary mb-3">
-                      Diagnostic request path
+                      Package guidance
                     </p>
                     <h3 className="text-xl font-semibold text-foreground mb-3">
-                      Tell us about your business and pick your stack.
+                      Tell us about your business and we'll recommend the right package.
                     </h3>
                     <p className="max-w-2xl text-sm text-muted-foreground leading-relaxed">
-                      Share your business details, industry, and website — we'll recommend the right AI automations to recover your lost revenue.
+                      Share your business details, industry, and website — we'll help you decide whether Starter, Growth, or Pro is the best fit.
                     </p>
                   </div>
                   <div className="book-scheduler-visual" aria-hidden="true">

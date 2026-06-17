@@ -306,13 +306,13 @@ function ServiceCard({ service }) {
 export default function Automations() {
   useEffect(() => {
     return setPageMetadata({
-      title: "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
+      title: "Included Automation Modules | ClientSurge Systems",
       description:
-        "ClientSurge installs AI automation systems that capture, follow up with, qualify, schedule, and reactivate leads for local service businesses.",
+        "Automation modules included across ClientSurge packages — lead capture, instant response, missed-call recovery, follow-up, booking, reviews, and reactivation.",
       canonicalPath: "/automations",
-      ogTitle: "AI Automation Systems for Local Service Businesses",
+      ogTitle: "Included Automation Modules | ClientSurge Systems",
       ogDescription:
-        "Voice agents, missed-call recovery, instant response, follow-up, scheduling, review, and reactivation automation for local service businesses.",
+        "See the automation modules included inside ClientSurge Starter, Growth, and Pro packages for local service businesses.",
     });
   }, []);
 
@@ -327,18 +327,18 @@ export default function Automations() {
         <div
           className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest border border-primary/20 bg-primary/10 text-primary"
         >
-          AI Lead Conversion Systems
+          Included Automation Modules
         </div>
         <h1
           className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          AI Automation Systems for
+          Automation Modules Included
           <br />
-          <span style={{ color: BRAND.color }}>Local Service Businesses</span>
+          <span style={{ color: BRAND.color }}>Across Every Package</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
-          Six automation systems working together to capture leads, follow up intelligently, schedule appointments, and reactivate revenue — all installed for your local business.
+          ClientSurge packages are powered by a catalog of automation modules — each one designed to capture, follow up with, schedule, and convert more leads for your local service business.
         </p>
         <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
           {[
@@ -371,26 +371,26 @@ export default function Automations() {
           className="mt-16 rounded-3xl p-10 md:p-14 text-center"
           style={{ background: "linear-gradient(135deg,#eaf8ff 0%,#dff5ff 60%,#f8fbff 100%)", border: "1px solid rgba(0,136,204,0.14)" }}
         >
-          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Ready to Begin?</p>
+          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Choose Your System</p>
           <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-4">
-            Activate Your Systems in 24–48 Hours
+            Pick the Package That Fits Your Business
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            Build your AI automation stack and our team will configure the right voice, lead response, follow-up, and scheduling systems for your business.
+            These automation modules are included across our Starter, Growth, and Pro packages. Compare packages to see exactly what each one includes.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
-              to="/book"
+              to="/pricing"
               className="cs-btn-primary"
               style={{ padding: "0 40px", height: "56px", fontSize: "1rem" }}
             >
-              Build My AI Automation Stack <ArrowRight className="w-5 h-5" />
+              Compare Packages <ArrowRight className="w-5 h-5" />
             </Link>
             <Link
-              to="/store"
+              to="/book"
               className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground border-2 border-border hover:border-primary/40 transition-colors"
             >
-              Browse the AI Store
+              Get Help Choosing
             </Link>
           </div>
           <p className="mt-5 text-xs text-muted-foreground">No credit card required · Typical setup time: 24–48 hours</p>

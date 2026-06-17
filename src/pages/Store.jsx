@@ -62,13 +62,13 @@ function StoreHumanFallbackCTA() {
     >
       <div style={{ maxWidth: "620px" }}>
         <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 6px" }}>
-          Not sure what to pick?
+          Not sure which package fits?
         </p>
         <p style={{ fontSize: "17px", color: "#0A1628", fontWeight: 800, margin: "0 0 4px" }}>
-          Talk to a human before building your stack.
+          Get help choosing the right system for your business.
         </p>
         <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.62)", margin: 0, lineHeight: 1.6 }}>
-          We will map the fastest path for your business and tell you which services are worth buying now.
+          We'll talk through your lead flow and recommend whether Starter, Growth, or Pro is the best fit.
         </p>
       </div>
       <a
@@ -76,7 +76,7 @@ function StoreHumanFallbackCTA() {
         className="cs-btn-primary"
       >
         <MessageCircle style={{ width: "18px", height: "18px" }} aria-hidden="true" />
-        Talk to a Human
+        Get Help Choosing
       </a>
     </section>
   );
@@ -217,11 +217,11 @@ function StoreInner() {
 
   useEffect(() => {
     const cleanupMeta = setPageMetadata({
-      title: "AI Automation Store | ClientSurge Systems",
-      description: "Build your custom AI automation stack for your local business. Instant lead response, missed call text-back, 14-day nurture sequences, and more. Start for $97/month.",
+      title: "Compare AI Growth Systems | ClientSurge Systems",
+      description: "Compare ClientSurge Starter, Growth, and Pro packages. Choose the AI growth system built for your local business lead flow.",
       canonicalPath: "/store",
-      ogTitle: "AI Automation Store | ClientSurge Systems",
-      ogDescription: "Pick the AI automations your business needs. Done-for-you setup in 5-7 business days. No contracts.",
+      ogTitle: "Compare AI Growth Systems | ClientSurge Systems",
+      ogDescription: "Compare ClientSurge packages — website, CRM handoff, and automation workflows in three ready-to-activate systems.",
       robots: "noindex,nofollow"
     });
     return cleanupMeta;
@@ -539,7 +539,7 @@ function StoreInner() {
                   marginBottom: "16px"
                 }}>
 
-                {selectedPackageOffer ? "Review Your" : "Build Your"}{" "}
+                {selectedPackageOffer ? "Review Your" : "Compare"}{" "}
                 <span
                 style={{
                   background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
@@ -551,7 +551,7 @@ function StoreInner() {
 
                 {selectedPackageOffer
                   ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} Package`
-                  : "AI-Powered Business"}
+                  : "AI Growth Systems"}
                 </span>
               </h1>
 
@@ -566,7 +566,7 @@ function StoreInner() {
                 
                 {selectedPackageOffer
                   ? "Your package is preloaded for a faster self-serve checkout. Review what is included, then continue straight into the purchase flow."
-                  : "Pick the services you need, add them to your cart, and we handle the setup. Your automations go live in 5 to 7 business days."}
+                  : "Choose the system that matches your lead flow. Each package combines an AI-ready website, CRM handoff, and automation modules into one complete system."}
               </p>
             </div>
 
@@ -612,8 +612,8 @@ function StoreInner() {
 
             <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
               {[
-              { label: "Catalog Offers Available", val: "12", Icon: LayoutGrid },
-              { label: "Avg. Setup Time", val: "4–6 Hours", Icon: Clock },
+              { label: "Packages Available", val: "3 Systems", Icon: LayoutGrid },
+              { label: "Avg. Setup Time", val: "5–7 Days", Icon: Clock },
               { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck }].
               map(({ label, val, Icon }, idx) =>
               <motion.div

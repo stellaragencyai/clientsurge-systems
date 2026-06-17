@@ -2,24 +2,25 @@
  * Centralized site configuration & constants
  * Replaces hardcoded strings scattered across Navbar, Footer, Pricing, etc.
  *
- * ── AREA 1 QA: CANONICAL PUBLIC NAVIGATION ──
- * Public header: Automations→/automations | AI Services→/store | Industries→/industries |
- *                About→/about | Contact→/contact | Login→/login | CTA→/store
+ * ── AREA 1 QA: CANONICAL PUBLIC NAVIGATION (PACKAGE-FIRST) ──
+ * Public header: AI Packages→/pricing | Automations→/automations |
+ *                Industries→/industries | How It Works→/#how-it-works |
+ *                Contact→/contact | Login→/login | CTA→/pricing
  *
  * ── AREA 1 QA: CANONICAL CTA DESTINATION MAP ──
- * "Browse AI Services"             → /store
- * "View Automation Categories"     → /automations
- * "Get Help Choosing"              → /book
- * "View Pricing" / "See Packages"  → /pricing
- * "Contact Us" / support CTAs      → /contact
- * "Client Login"                   → /login
- * Phone CTAs                       → tel:+16025843227
- * Email CTAs                       → mailto:support@clientsurgesystems.com
- * Fallback (buyer CTA)             → /store
- * Fallback (support CTA)           → /contact
+ * "Compare Packages"                → /pricing
+ * "Choose Your System"              → /pricing
+ * "View Included Automations"       → /automations
+ * "Get Help Choosing"               → /book
+ * "Contact Us" / support CTAs       → /contact
+ * "Client Login"                    → /login
+ * Phone CTAs                        → tel:+16025843227
+ * Email CTAs                        → mailto:support@clientsurgesystems.com
+ * Fallback (buyer CTA)              → /pricing
+ * Fallback (support CTA)            → /contact
  *
  * ── AREA 1 QA: PUBLIC ROUTE CLASSIFICATION ──
- * PUBLIC: / /automations /pricing /store /industries /about /contact /book
+ * PUBLIC: / /pricing /automations /industries /about /contact /book
  *         /privacy-policy /terms /login /faq /blog /testimonials /start /setup-lookup
  *         /roofing /hvac /plumbing /dental /med-spa /chiropractic /contractors
  *         /lead-capture-automation /missed-call-text-back /ai-lead-follow-up
@@ -33,7 +34,7 @@
  * DEPRECATED: /product /signup /our-system /library (template pages, redirect or sunset)
  *
  * ── FOOTER: PUBLIC LINKS ONLY (no admin/dashboard/setup/internal) ──
- * Home | Automations | Pricing | Industries | About | Contact | Privacy | Terms | Login
+ * Platform | Company links only
  */
 
 export const SITE_CONFIG = {
@@ -43,9 +44,10 @@ export const SITE_CONFIG = {
   },
   navigation: {
     sections: [
-      { label: "Pricing", href: "/pricing", isPage: true },
+      { label: "AI Packages", href: "/pricing", isPage: true },
+      { label: "Automations", href: "/automations", isPage: true },
       { label: "Industries", href: "/industries", isPage: true },
-      { label: "About", href: "/about", isPage: true },
+      { label: "How It Works", href: "/#how-it-works", isHashLink: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [
@@ -63,13 +65,13 @@ export const SITE_CONFIG = {
     { label: "Contractors & Trades", href: "/contractors" },
   ],
   links: {
-    demoBooking: "/book",
-    pricing: "/pricing",
+    packages: "/pricing",
     automations: "/automations",
-    store: "/store",
+    help: "/book",
     contact: "/contact",
     privacyPolicy: "/privacy-policy",
     terms: "/terms",
+    login: "/login",
   },
   social: {
     twitter: "https://twitter.com/clientsurge",

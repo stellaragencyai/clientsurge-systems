@@ -1,121 +1,155 @@
+import { ArrowRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { trackCTA } from "@/lib/analytics";
+import { motion } from "framer-motion";
+
+const FEATURE_CHIPS = [
+  "AI-ready website",
+  "Lead capture",
+  "CRM handoff",
+  "Missed-call recovery",
+  "AI follow-up",
+  "Booking automation",
+];
+
 export default function Hero() {
+  const navigate = useNavigate();
+
   return (
     <section
+      className="hero-section relative flex items-center justify-center overflow-hidden"
       style={{
         minHeight: "100svh",
-        width: "100%",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "center",
-        background: "linear-gradient(135deg, #003B8F 0%, #006BB0 45%, #0088CC 100%)",
-        position: "relative",
-        overflow: "hidden",
+        paddingTop: "var(--cs-nav-height)",
+        background: "linear-gradient(135deg, #003B8F 0%, #006BB0 52%, #00AEEF 100%)",
+        isolation: "isolate",
       }}
     >
+      {/* Subtle grid texture */}
       <div
+        className="absolute inset-0 pointer-events-none"
         style={{
-          maxWidth: "820px",
-          margin: "0 auto",
-          padding: "clamp(6rem, 12vw, 10rem) clamp(1.5rem, 5vw, 3rem)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          textAlign: "center",
+          backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
         }}
-      >
-        {/* Eyebrow */}
-        <p className="cs-eyebrow" style={{ color: "rgba(0,174,239,0.9)", marginBottom: "1rem" }}>
-          AI services marketplace for local service businesses
-        </p>
+      />
 
-        <h1
+      <div className="relative z-10 w-full max-w-5xl mx-auto px-6 py-12 md:py-20 text-center">
+        {/* Eyebrow */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-full mb-6"
           style={{
-            fontFamily: "'Montserrat', sans-serif",
-            fontSize: "clamp(2.4rem, 6vw, 4.2rem)",
-            fontWeight: "900",
-            lineHeight: 1.1,
-            letterSpacing: "-0.03em",
-            color: "#ffffff",
-            margin: "0",
+            background: "rgba(255,255,255,0.12)",
+            border: "1px solid rgba(255,255,255,0.2)",
+            backdropFilter: "blur(8px)",
           }}
         >
-          Browse, choose, and activate AI automation systems built to recover more leads.
-        </h1>
-        <p style={{ 
-          fontSize: "clamp(0.95rem, 1.8vw, 1.1rem)", 
-          lineHeight: 1.6, 
-          color: "rgba(255,255,255,0.75)", 
-          maxWidth: "620px",
-          margin: "1.25rem auto 0"
-        }}>
-          ClientSurge brings lead capture, missed-call text-back, AI follow-up, booking, review requests, and lead reactivation into one storefront so local businesses can build the automation stack they need.
-        </p>
+          <span
+            className="w-2 h-2 rounded-full"
+            style={{ background: "#00AEEF", boxShadow: "0 0 8px rgba(0,174,239,0.8)" }}
+          />
+          <span className="text-xs font-bold text-white/90 uppercase tracking-wider">
+            AI website + automation systems for local service businesses
+          </span>
+        </motion.div>
 
-        {/* CTA buttons */}
-        <div style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "12px",
-          justifyContent: "center",
-          marginTop: "2rem",
-        }}>
-          <a
-            href="/store"
-            className="cs-btn-primary"
+        {/* Headline */}
+        <motion.h1
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight"
+          style={{ fontFamily: "'Montserrat', sans-serif" }}
+        >
+          Choose the AI growth system built to capture, follow up, and book more leads.
+        </motion.h1>
+
+        {/* Subheadline */}
+        <motion.p
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed"
+        >
+          ClientSurge combines an AI-ready website, CRM handoff, and automation workflows into three ready-to-activate packages for local businesses that rely on calls, forms, bookings, reviews, and repeat customers.
+        </motion.p>
+
+        {/* CTAs */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10"
+        >
+          <button
+            onClick={() => {
+              trackCTA("compare_packages", "hero");
+              navigate("/pricing");
+            }}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-bold text-white transition-all duration-300 hover:scale-105"
             style={{
-              padding: "0 32px",
-              height: "52px",
-              fontSize: "0.95rem",
+              background: "linear-gradient(135deg, #00AEEF 0%, #0088CC 100%)",
+              boxShadow: "0 8px 32px rgba(0,174,239,0.45), 0 0 0 1px rgba(255,255,255,0.2)",
+              minHeight: "unset",
+              minWidth: "unset",
             }}
           >
-            Browse AI Services →
-          </a>
-          <a
-            href="/automations"
+            Compare Packages <ArrowRight className="w-5 h-5" />
+          </button>
+          <button
+            onClick={() => {
+              trackCTA("view_included_automations", "hero");
+              navigate("/automations");
+            }}
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-semibold text-white transition-all duration-300 hover:bg-white/10"
             style={{
-              display: "inline-flex",
-              alignItems: "center",
-              padding: "0 28px",
-              height: "52px",
-              borderRadius: "8px",
-              border: "1.5px solid rgba(255,255,255,0.28)",
               background: "rgba(255,255,255,0.08)",
-              color: "#ffffff",
-              fontWeight: "600",
-              fontSize: "0.9rem",
-              textDecoration: "none",
-              whiteSpace: "nowrap",
+              border: "1px solid rgba(255,255,255,0.25)",
+              backdropFilter: "blur(4px)",
+              minHeight: "unset",
+              minWidth: "unset",
             }}
           >
-            View Automation Categories
-          </a>
-        </div>
+            View Included Automations <ArrowRight className="w-5 h-5" />
+          </button>
+        </motion.div>
 
-        {/* Trust micro-bar */}
-        <div style={{
-          display: "flex",
-          flexWrap: "wrap",
-          gap: "8px 24px",
-          justifyContent: "center",
-          marginTop: "2rem",
-        }}>
-          {[
-            "✓ Lead capture systems",
-            "✓ Missed-call recovery",
-            "✓ AI follow-up",
-            "✓ Booking automation",
-            "✓ Review request systems",
-            "✓ Lead reactivation",
-          ].map((item) => (
-            <span key={item} style={{
-              fontSize: "12px",
-              fontWeight: "600",
-              color: "rgba(255,255,255,0.65)",
-            }}>
-              {item}
+        {/* Trust line */}
+        <motion.p
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.4 }}
+          className="text-sm text-white/60 mb-6"
+        >
+          Built for roofing, HVAC, plumbing, dental, med spa, chiropractic, and contractor businesses.
+        </motion.p>
+
+        {/* Feature chips */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.5 }}
+          className="flex flex-wrap items-center justify-center gap-2"
+        >
+          {FEATURE_CHIPS.map((chip) => (
+            <span
+              key={chip}
+              className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold"
+              style={{
+                background: "rgba(255,255,255,0.1)",
+                border: "1px solid rgba(255,255,255,0.15)",
+                color: "rgba(255,255,255,0.85)",
+              }}
+            >
+              {chip}
             </span>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

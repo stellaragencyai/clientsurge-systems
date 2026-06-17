@@ -249,51 +249,6 @@ export default function Navbar() {
 
         {/* Desktop center links */}
         <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-        <a
-        href="/store"
-        onClick={(e) => { e.preventDefault(); trackCTA("nav_ai_services", "navbar"); closeAll(); navigate("/store"); }}
-        className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5"
-        style={{ color: isActivePage("/store") ? "#00AEEF" : "#0a1628", textDecoration: "none" }}
-        >
-        AI Services
-        <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage("/store") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
-        </a>
-        {/* Solutions */}
-        <div className="relative" onMouseEnter={openSolutions} onMouseLeave={closeSolutionsSoon}>
-            <button
-              ref={solutionsTriggerRef}
-              type="button"
-              onClick={() => setSolutionsOpen(!solutionsOpen)}
-              aria-expanded={solutionsOpen}
-              aria-haspopup="menu"
-              className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: isActivePage("/store") || isActivePage("/automations") ? "#00AEEF" : "#0a1628" }}
-            >
-              Solutions
-              {(isActivePage("/store") || isActivePage("/automations")) && (
-                <span style={{ position: "absolute", bottom: "-6px", left: 0, right: 0, height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)" }} />
-              )}
-            </button>
-            {SolutionsDropdown}
-          </div>
-
-          {/* Industries */}
-          <div className="relative" onMouseEnter={openIndustries} onMouseLeave={closeIndustriesSoon}>
-            <button
-              ref={industriesTriggerRef}
-              type="button"
-              onClick={() => setIndustriesOpen(!industriesOpen)}
-              aria-expanded={industriesOpen}
-              aria-haspopup="menu"
-              className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: "#0a1628" }}
-            >
-              Industries
-            </button>
-            {IndustriesDropdown}
-          </div>
-
-          {/* Section links */}
           {sectionLinks.map((link) => (
             <a
               key={link.href}
@@ -312,6 +267,22 @@ export default function Navbar() {
               <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </a>
           ))}
+
+          {/* Industries */}
+          <div className="relative" onMouseEnter={openIndustries} onMouseLeave={closeIndustriesSoon}>
+            <button
+              ref={industriesTriggerRef}
+              type="button"
+              onClick={() => setIndustriesOpen(!industriesOpen)}
+              aria-expanded={industriesOpen}
+              aria-haspopup="menu"
+              className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
+              style={{ color: "#0a1628" }}
+            >
+              Industries
+            </button>
+            {IndustriesDropdown}
+          </div>
         </div>
 
         {/* Desktop right actions */}
@@ -332,11 +303,11 @@ export default function Navbar() {
             Login
           </button>
           <button
-            onClick={() => { trackCTA("browse_ai_services", "navbar"); navigate("/store"); }}
+            onClick={() => { trackCTA("compare_packages", "navbar"); navigate("/pricing"); }}
             className="cs-btn-primary"
             style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset", whiteSpace: "nowrap" }}
           >
-            Browse AI Services
+            Compare Packages
           </button>
         </div>
 
@@ -444,12 +415,12 @@ export default function Navbar() {
               Client Dashboard
             </button>
             <button
-              onClick={() => { trackCTA("browse_ai_services", "mobile_nav"); setOpen(false); navigate("/store"); }}
+              onClick={() => { trackCTA("compare_packages", "mobile_nav"); setOpen(false); navigate("/pricing"); }}
               className="cs-btn-primary"
               style={{ width: "100%", display: "block" }}
             >
               <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", fontSize: "0.875rem" }}>
-                Browse AI Services
+                Compare Packages
               </span>
             </button>
           </div>

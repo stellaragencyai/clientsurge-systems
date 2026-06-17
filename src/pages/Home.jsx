@@ -13,6 +13,7 @@ import { FAQ_ITEMS } from "../components/landing/FAQData";
 import RevenueProofBlock from "../components/landing/RevenueProofBlock";
 import AutomationCatalog from "../components/landing/AutomationCatalog";
 import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
+import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -88,11 +89,11 @@ export default function Home() {
     let cleanupFaq = () => {};
 
     try { cleanupMetadata = setPageMetadata({
-      title: "AI Automation Systems for Local Leads | ClientSurge Systems",
-      description: "six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
+      title: "AI Growth Systems for Local Service Businesses | ClientSurge Systems",
+      description: "Choose the AI growth system for your business — Starter, Growth, or Pro. Website, CRM handoff, and automation modules built to capture, follow up, and book more leads.",
       canonicalPath: "/",
-      ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
-      ogDescription: "ClientSurge builds AI voice-agent, follow-up, missed-call recovery, and booking automation systems for local service businesses.",
+      ogTitle: "AI Growth Systems That Turn More Leads Into Booked Jobs",
+      ogDescription: "ClientSurge combines AI-ready websites, CRM handoff, and automation workflows into three ready-to-activate packages for local businesses.",
     }); } catch (_e) {}
     try { cleanupOrg = setJsonLd("organization", getOrganizationSchema()); } catch (_e) {}
     try { cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema()); } catch (_e) {}
@@ -116,6 +117,8 @@ export default function Home() {
         <ScrollProgressBar />
         <Navbar />
         <Hero />
+
+        <ThreeSystemsSection />
 
         {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>

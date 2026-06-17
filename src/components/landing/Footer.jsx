@@ -16,8 +16,8 @@ const navColumns = [
     title: "Platform",
     links: [
       { label: "Home", href: "/" },
-      { label: "AI Automations", href: "/automations" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "AI Packages", href: "/pricing" },
+      { label: "Included Automations", href: "/automations" },
       { label: "Industries", href: "/industries" },
     ],
   },
@@ -57,11 +57,11 @@ export default function Footer() {
         <div className="cs-footer-inner">
           <div className="cs-footer-system-header">
             <div>
-              <p className="cs-footer-eyebrow">Our Full System Stack</p>
-              <h3 id="footer-system-heading">Every automation you need to convert more leads, done for you.</h3>
+              <p className="cs-footer-eyebrow">Included Automation Modules</p>
+              <h3 id="footer-system-heading">Every automation included across our three growth systems, powered by a catalog of modules.</h3>
             </div>
-            <a className="cs-footer-system-cta" href="/automations" onClick={(e) => handleNavClick(e, "/automations")}>
-              View automations
+            <a className="cs-footer-system-cta" href="/pricing" onClick={(e) => handleNavClick(e, "/pricing")}>
+              Compare Packages
             </a>
           </div>
 
