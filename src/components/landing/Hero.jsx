@@ -54,7 +54,7 @@ export default function Hero() {
             style={{ background: "#00AEEF", boxShadow: "0 0 8px rgba(0,174,239,0.8)" }}
           />
           <span className="text-xs font-bold text-white/90 uppercase tracking-wider">
-            AI automation marketplace
+            Ready-to-activate AI automation systems
           </span>
         </motion.div>
 
@@ -76,7 +76,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed"
         >
-          ClientSurge turns web design, CRM handoff, missed-call recovery, AI follow-up, booking automation, review requests, and lead reactivation into ready-to-activate systems you can compare and choose from.
+          ClientSurge turns web design, CRM handoff, missed-call recovery, AI follow-up, booking automation, review requests, and lead reactivation into systems you can compare, choose, and activate.
         </motion.p>
 
         {/* CTAs */}
