@@ -112,6 +112,7 @@ const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
 const OpportunityReviewQueue = lazy(() => import("./internal-pages/OpportunityReviewQueue"));
 const ClientSetupLookup = lazy(() => import("./pages/ClientSetupLookup"));
 const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
+const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -444,6 +445,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("saas", "admin"), Component: SaaSAdminPanel },
           { route: routePath("admin", "opportunity-review"), Component: OpportunityReviewQueue },
           { route: routePath("admin", "audit"), Component: FunctionAudit },
+          { route: routePath("admin", "reconciliation"), Component: AdminReconciliation },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
