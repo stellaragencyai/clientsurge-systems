@@ -67,9 +67,12 @@ export default function SecurityPriority() {
             <ShieldCheck aria-hidden="true" />
             Trust & Security
           </div>
-          <h2 id="security-priority-title">
-            Your Trust & Security <span>Are Our Priority</span>
-          </h2>
+          <div className="flex items-center justify-center gap-4">
+            <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "42px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
+            <h2 id="security-priority-title">
+              Your Trust & Security <span>Are Our Priority</span>
+            </h2>
+          </div>
           <p>
             We are committed to providing a secure and reliable platform. Your success and safety are
             the cornerstones of ClientSurge Systems.
@@ -128,7 +131,7 @@ export default function SecurityPriority() {
           margin: 0;
           color: #001B44;
           font-family: 'Montserrat', sans-serif;
-          font-size: clamp(34px, 5vw, 58px);
+          font-size: clamp(26px, 3.5vw, 40px);
           font-weight: 800;
           letter-spacing: -0.02em;
           line-height: 1.15;
@@ -141,9 +144,9 @@ export default function SecurityPriority() {
 
         .security-priority__header p {
           max-width: 840px;
-          margin: 22px auto 0;
+          margin: 18px auto 0;
           color: rgba(5, 11, 20, 0.72);
-          font-size: clamp(18px, 2.2vw, 24px);
+          font-size: clamp(15px, 1.6vw, 20px);
           line-height: 1.55;
         }
 
@@ -164,9 +167,9 @@ export default function SecurityPriority() {
         }
 
         .security-priority__badge {
-          width: clamp(124px, 11vw, 156px);
+          width: clamp(84px, 7.5vw, 104px);
           aspect-ratio: 1;
-          margin: 0 auto clamp(22px, 2.4vw, 30px);
+          margin: 0 auto clamp(16px, 1.8vw, 22px);
           display: flex;
           align-items: center;
           justify-content: center;
@@ -185,10 +188,10 @@ export default function SecurityPriority() {
 
         .security-priority__item h3 {
           width: min(100%, 230px);
-          min-height: 3.1em;
-          margin: 0 auto 14px;
+          min-height: 2.5em;
+          margin: 0 auto 10px;
           color: #050b14;
-          font-size: clamp(18px, 1.75vw, 24px);
+          font-size: clamp(14px, 1.3vw, 18px);
           font-weight: 900;
           letter-spacing: 0;
           line-height: 1.28;
@@ -199,7 +202,7 @@ export default function SecurityPriority() {
           max-width: 245px;
           margin: 0 auto;
           color: rgba(5, 11, 20, 0.7);
-          font-size: clamp(14px, 1.25vw, 16px);
+          font-size: clamp(12px, 1vw, 14px);
           line-height: 1.55;
         }
 

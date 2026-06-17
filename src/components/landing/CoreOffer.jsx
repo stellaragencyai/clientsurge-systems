@@ -22,10 +22,13 @@ function CoreOfferHeader() {
         {coreOfferSectionConfig.eyebrow}
       </p>
 
-      {/* Title */}
-      <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight text-center">
-        How It Works
-      </h2>
+      {/* Title with vertical blue bar */}
+      <div className="flex items-center gap-4">
+        <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
+        <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight text-center">
+          How It Works
+        </h2>
+      </div>
 
       {/* Thin gold rule */}
       <div className="flex items-center justify-center gap-3 mt-5 mb-6">

@@ -75,10 +75,15 @@ export default function AutomationCatalog() {
     >
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
-          <p className="cs-eyebrow mb-3">Included Automation Modules</p>
-          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-            Included Automations
-          </h2>
+          <div className="flex flex-col items-center">
+            <p className="cs-eyebrow mb-3">Included Automation Modules</p>
+            <div className="flex items-center gap-4">
+              <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
+              <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
+                Included Automations
+              </h2>
+            </div>
+          </div>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">
             Each automation module is included across our Starter, Growth, and Pro packages — or available as an add-on later.
           </p>

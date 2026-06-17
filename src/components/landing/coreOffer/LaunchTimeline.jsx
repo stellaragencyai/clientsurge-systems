@@ -112,9 +112,9 @@ function StepRow({ step, idx }) {
     <motion.div
       ref={ref}
       className="relative"
-      initial={{ opacity: 0, y: 40 }}
-      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.7, ease: "easeOut" }}>
+      initial={{ opacity: 0, y: 50 }}
+      animate={visible ? { opacity: 1, y: 0 } : { opacity: 0, y: 50 }}
+      transition={{ duration: 0.75, delay: idx * 0.08, ease: [0.22, 1, 0.36, 1] }}>
       <div
         className={`grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-12 ${isEven ? "" : "md:[&>:first-child]:order-2 md:[&>:last-child]:order-1"}`}
         style={{ alignItems: "stretch" }}
@@ -183,21 +183,31 @@ export default function LaunchTimeline() {
 
   return (
     <div className="mt-16 md:mt-20">
-      {/* Section Header — static, no animation */}
+      {/* Section Header — scroll-triggered fade in */}
       <motion.div
         className="flex flex-col items-center"
-        initial={{ opacity: 0, y: 20 }}
+        initial={{ opacity: 0, y: 30 }}
         whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
+        transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         viewport={{ once: true, amount: 0.3 }}
       >
         <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
           Launch Plan Confirmed After Onboarding
         </p>
-        <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center mb-2">
-          Our Process - Start To Launch
-        </h3>
-        <p className="text-center text-sm text-muted-foreground max-w-xl mb-10">
+        <div className="flex items-center gap-4">
+          <motion.div
+            className="w-1.5 rounded-full flex-shrink-0"
+            style={{ background: "#00AEEF", minHeight: "36px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }}
+            initial={{ scaleY: 0 }}
+            whileInView={{ scaleY: 1 }}
+            transition={{ duration: 0.5, delay: 0.3 }}
+            viewport={{ once: true }}
+          />
+          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center">
+            Our Process - Start To Launch
+          </h3>
+        </div>
+        <p className="text-center text-sm text-muted-foreground max-w-xl mt-3 mb-10">
           Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.
         </p>
       </motion.div>
@@ -209,10 +219,16 @@ export default function LaunchTimeline() {
           const isActive = activeStep === idx;
           return (
             <div key={step.id} className="flex items-start gap-7 md:gap-10">
-              <button
+              <motion.button
                 type="button"
                 onClick={() => setActiveStep(idx)}
-                className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer"
+                className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
+                whileHover={{ scale: 1.08 }}
+                whileTap={{ scale: 0.95 }}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: idx * 0.1, ease: "easeOut" }}
               >
                 <div
                   className="rounded-full flex items-center justify-center flex-shrink-0 relative"
@@ -238,9 +254,15 @@ export default function LaunchTimeline() {
                 </div>
                 <p className="text-xs font-semibold text-foreground text-center max-w-[90px] leading-tight">{step.title}</p>
                 <p className="text-[10px] text-muted-foreground text-center">{step.duration}</p>
-              </button>
+              </motion.button>
               {idx < launchTimelineSteps.length - 1 && (
-                <div className="flex-shrink-0 text-primary/30 text-2xl mt-5">→</div>
+                <motion.div
+                  className="flex-shrink-0 text-primary/30 text-2xl mt-5"
+                  initial={{ opacity: 0, scaleX: 0 }}
+                  whileInView={{ opacity: 1, scaleX: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.35, delay: idx * 0.1 + 0.2 }}
+                >→</motion.div>
               )}
             </div>
           );

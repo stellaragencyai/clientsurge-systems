@@ -70,10 +70,13 @@ export default function ThreeSystemsSection() {
         {/* Section header */}
         <div className="flex flex-col items-center text-center mb-12">
           <p className="cs-eyebrow mb-3">Compare AI Growth Systems</p>
-          <h2 className="font-titles text-[#001B44] text-3xl md:text-5xl font-bold mb-4">
-            Compare Packages
-          </h2>
-          <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
+          <div className="flex items-center gap-4">
+            <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
+            <h2 className="font-titles text-[#001B44] text-3xl md:text-5xl font-bold">
+              Compare Packages
+            </h2>
+          </div>
+          <p className="mt-4 text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
             Choose the package that matches how much of your lead flow you want ClientSurge to handle — from essential capture and response to a complete website, follow-up, booking, review, and reactivation system.
           </p>
         </div>
@@ -104,7 +107,7 @@ export default function ThreeSystemsSection() {
           {PACKAGES.map((pkg) => (
             <div
               key={pkg.name}
-              className="flex flex-col rounded-xl overflow-hidden transition-all duration-300"
+              className="flex flex-col rounded-xl overflow-hidden transition-all duration-300 group"
               style={{
                 background: "#ffffff",
                 border: pkg.highlight ? "2px solid #00AEEF" : "1px solid rgba(0,174,239,0.15)",
@@ -112,6 +115,18 @@ export default function ThreeSystemsSection() {
                   ? "0 16px 48px rgba(0,174,239,0.15), 0 4px 12px rgba(0,0,0,0.06)"
                   : "0 2px 16px rgba(0,0,0,0.05)",
                 transform: pkg.highlight ? "scale(1.03)" : "scale(1)",
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.boxShadow = "0 0 0 2px rgba(0,174,239,0.45), 0 0 40px rgba(0,174,239,0.25), 0 16px 48px rgba(0,174,239,0.18)";
+                e.currentTarget.style.transform = pkg.highlight ? "scale(1.05)" : "scale(1.02) translateY(-4px)";
+                e.currentTarget.style.borderColor = "rgba(0,174,239,0.6)";
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.boxShadow = pkg.highlight
+                  ? "0 16px 48px rgba(0,174,239,0.15), 0 4px 12px rgba(0,0,0,0.06)"
+                  : "0 2px 16px rgba(0,0,0,0.05)";
+                e.currentTarget.style.transform = pkg.highlight ? "scale(1.03)" : "scale(1)";
+                e.currentTarget.style.borderColor = pkg.highlight ? "#00AEEF" : "rgba(0,174,239,0.15)";
               }}
             >
               {pkg.highlight && (
@@ -131,8 +146,8 @@ export default function ThreeSystemsSection() {
                 </div>
 
                 <div className="mb-6">
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-3xl md:text-4xl font-black text-[#001B44]">{pkg.price}</span>
+                  <div className="flex items-baseline gap-1.5">
+                    <span className="text-4xl md:text-5xl font-black tracking-tight text-[#001B44]" style={{ fontFamily: "'Montserrat', system-ui, sans-serif", letterSpacing: "-0.03em" }}>{pkg.price}</span>
                     <span className="text-sm text-muted-foreground font-medium">/mo</span>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1">{pkg.setup}</p>

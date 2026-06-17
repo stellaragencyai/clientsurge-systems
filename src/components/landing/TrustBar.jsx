@@ -141,9 +141,12 @@ export default function TrustBar() {
       <div className="max-w-6xl mx-auto px-6">
         <div className="flex flex-col items-center text-center mb-10">
           <p className="cs-eyebrow mb-4">What You Can Expect</p>
-          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-            Clear Commitments. Cleaner Buying Decision.
-          </h2>
+          <div className="flex items-center gap-4">
+            <div className="cs-section-bar" style={{ minHeight: "48px" }} />
+            <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
+              Clear Commitments. Cleaner Buying Decision.
+            </h2>
+          </div>
           <p className="mt-4 max-w-3xl text-sm md:text-base text-foreground/65 leading-relaxed">
             No guessing. No long contracts. Here's exactly what you can expect when you work with ClientSurge Systems — from first response speed to how the engagement is structured.
           </p>

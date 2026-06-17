@@ -38,9 +38,12 @@ export default function RevenueUrgencySection() {
           <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4 text-center" style={{ color: "rgba(0,174,239,0.7)" }}>
             THE COST OF WAITING
           </p>
-          <h2 className="font-titles text-white text-4xl md:text-5xl font-bold tracking-tight">
-            Revenue you're losing right now.
-          </h2>
+          <div className="flex items-center justify-center gap-4">
+            <div className="cs-section-bar" style={{ minHeight: "48px" }} />
+            <h2 className="font-titles text-white text-4xl md:text-5xl font-bold tracking-tight">
+              Revenue you're losing right now.
+            </h2>
+          </div>
           <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm leading-relaxed">
             Most local service businesses don't have a lead problem — they have a lead response problem. Here's what that costs.
           </p>

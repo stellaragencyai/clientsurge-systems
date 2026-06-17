@@ -1122,6 +1122,15 @@ table tbody tr:nth-child(even) {
   @apply w-4 h-4 text-primary;
 }
 
+/* Section title accent bar — vertical blue bar to the left of headings */
+.cs-section-bar {
+  width: 6px;
+  border-radius: 9999px;
+  flex-shrink: 0;
+  background: #00AEEF;
+  box-shadow: 0 0 14px rgba(0, 174, 239, 0.5);
+}
+
 /* Refinement #25: Enhanced input focus with shadow glow */
 input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):focus-visible,
 textarea:focus-visible,
