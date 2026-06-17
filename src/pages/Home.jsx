@@ -10,12 +10,14 @@ import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
-
+import RevenueProofBlock from "../components/landing/RevenueProofBlock";
+import AutomationCatalog from "../components/landing/AutomationCatalog";
 import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
-import HowClientSurgeWorks from "../components/landing/HowClientSurgeWorks";
 
+const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
+const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FAQ = lazy(() => import("../components/landing/FAQ"));
 // Pricing replaced by ThreeSystemsSection at the original pricing location below
 
@@ -122,8 +124,26 @@ export default function Home() {
           <Industries />
         </LazyHomepageSection>
 
-        <div id="how-it-works" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <HowClientSurgeWorks />
+        <div id="automation-catalog" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <AutomationCatalog />
+
+        <div id="revenue-proof" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div className="max-w-6xl mx-auto px-6 pt-4">
+            <RevenueProofBlock industryLoss={14700} leadsRecovered="8-12" bookingsGenerated="3-5" />
+          </div>
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <TrustBar />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="problem-solution" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <div id="six-automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <CoreOffer />
+        </LazyHomepageSection>
 
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <ThreeSystemsSection />
