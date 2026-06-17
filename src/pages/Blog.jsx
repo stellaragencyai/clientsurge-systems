@@ -558,7 +558,7 @@ function BlogIndex() {
         <div className="mb-8 grid gap-6 lg:grid-cols-[1fr_19rem] lg:items-end">
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-[0.22em] text-primary">Launch guides</p>
-            <h1 className="mb-4 max-w-3xl text-4xl font-black leading-tight text-foreground md:text-5xl">
+            <h1 className="font-titles text-[#001B44] mb-4 max-w-3xl text-4xl font-bold leading-tight md:text-5xl">
               AI lead response guides for local service businesses
             </h1>
             <p className="max-w-2xl text-base leading-7 text-muted-foreground">
@@ -641,7 +641,7 @@ function BlogArticle({ post }) {
           <span className="rounded-full border border-primary/20 bg-primary/10 px-3 py-1 text-xs font-bold text-primary">{post.tag}</span>
           <span className="text-xs text-muted-foreground">{post.date}</span>
         </div>
-        <h1 className="mb-5 text-4xl font-black leading-tight text-foreground md:text-5xl">{post.title}</h1>
+        <h1 className="font-titles text-[#001B44] mb-5 text-4xl font-bold leading-tight md:text-5xl">{post.title}</h1>
         <p className="mb-8 text-lg leading-8 text-muted-foreground">{post.description}</p>
 
         <div className="mb-10 rounded-lg border border-primary/12 bg-card p-5 shadow-sm">
@@ -658,14 +658,14 @@ function BlogArticle({ post }) {
         <div className="space-y-8">
           {post.sections.map((section) => (
             <section key={section.heading}>
-              <h2 className="mb-3 text-2xl font-extrabold text-foreground">{section.heading}</h2>
+              <h2 className="font-titles text-[#001B44] mb-3 text-2xl font-bold">{section.heading}</h2>
               <p className="text-base leading-8 text-muted-foreground">{section.body}</p>
             </section>
           ))}
         </div>
 
         <section className="mt-12">
-          <h2 className="mb-5 text-2xl font-extrabold text-foreground">FAQ</h2>
+          <h2 className="font-titles text-[#001B44] mb-5 text-2xl font-bold">FAQ</h2>
           <div className="space-y-3">
             {post.faqs.map(([question, answer]) => (
               <div key={question} className="rounded-lg border border-primary/12 bg-card p-5 shadow-sm">
@@ -677,11 +677,11 @@ function BlogArticle({ post }) {
         </section>
 
         <div className="mt-12 rounded-lg border border-primary/20 bg-primary/5 p-6">
-          <h2 className="mb-3 text-2xl font-extrabold text-foreground">Ready to inspect your lead path?</h2>
+          <h2 className="font-titles text-[#001B44] mb-3 text-2xl font-bold">Ready to inspect your lead path?</h2>
           <p className="mb-5 text-sm leading-6 text-muted-foreground">
             ClientSurge audits where leads go cold, then maps the automation stack that fits your package, team, and launch readiness.
           </p>
-          <Link to={post.cta.href} className="inline-flex rounded-lg bg-primary px-5 py-3 text-sm font-black text-white shadow-sm hover:opacity-90">
+          <Link to={post.cta.href} className="cs-btn-primary">
             {post.cta.label}
           </Link>
         </div>

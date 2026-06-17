@@ -190,7 +190,7 @@ export default function Contact() {
               >
                 <div className="flex items-center gap-3 mb-8">
                   <div style={{ width: "2px", height: "24px", background: "#00AEEF" }} />
-                  <h2 style={{ fontSize: "0.75rem", fontWeight: 900, letterSpacing: "0.15em", color: "hsl(var(--foreground))" }} className="uppercase">Contact Information</h2>
+                  <h2 className="font-titles text-[#001B44] text-base font-bold uppercase tracking-wider">Contact Information</h2>
                 </div>
                 <div className="space-y-8">
                   <div>
@@ -245,22 +245,7 @@ export default function Contact() {
                 <button
                   type="button"
                   onClick={() => setShowBookingModal(true)}
-                  style={{ 
-                    display: "inline-flex", 
-                    alignItems: "center", 
-                    gap: "8px", 
-                    fontSize: "0.85rem",
-                    fontWeight: 700,
-                    padding: "10px 20px",
-                    background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-                    color: "#ffffff",
-                    border: "none",
-                    borderRadius: "2px",
-                    cursor: "pointer",
-                    transition: "all 0.3s ease",
-                  }}
-                  onMouseEnter={(e) => e.target.style.boxShadow = "0 8px 20px rgba(0,136,204,0.3)"}
-                  onMouseLeave={(e) => e.target.style.boxShadow = "none"}
+                  className="cs-btn-primary"
                 >
                   Book Free Audit <ArrowRight className="w-3.5 h-3.5" />
                 </button>
@@ -338,7 +323,7 @@ export default function Contact() {
               <form action="/contact" method="post" onSubmit={handleSubmit} className="space-y-6" noValidate>
                 <div className="flex items-center gap-3 mb-8">
                   <div style={{ width: "2px", height: "24px", background: "#00AEEF" }} />
-                  <h3 style={{ fontSize: "0.75rem", fontWeight: 900, letterSpacing: "0.15em", color: "hsl(var(--foreground))" }} className="uppercase">Send a Message</h3>
+                  <h3 className="font-titles text-[#001B44] text-base font-bold uppercase tracking-wider">Send a Message</h3>
                 </div>
 
                 {errors.submit && (
@@ -569,33 +554,8 @@ export default function Contact() {
                 <button
                   type="submit"
                   disabled={loading}
-                  style={{ 
-                    width: "100%",
-                    marginTop: "28px",
-                    padding: "14px 0",
-                    background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-                    color: "#ffffff",
-                    fontWeight: "700",
-                    fontSize: "0.95rem",
-                    border: "none",
-                    borderRadius: "4px",
-                    cursor: loading ? "not-allowed" : "pointer",
-                    opacity: loading ? 0.7 : 1,
-                    transition: "all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    gap: "8px",
-                    boxShadow: "0 4px 16px rgba(0,136,204,0.2)",
-                  }}
-                  onMouseEnter={(e) => !loading && (
-                    e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,136,204,0.4)",
-                    e.currentTarget.style.transform = "translateY(-2px)"
-                  )}
-                  onMouseLeave={(e) => !loading && (
-                    e.currentTarget.style.boxShadow = "0 4px 16px rgba(0,136,204,0.2)",
-                    e.currentTarget.style.transform = "translateY(0)"
-                  )}
+                  className="cs-btn-primary w-full mt-7"
+                  style={{ opacity: loading ? 0.7 : 1 }}
                 >
                   {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
                 </button>

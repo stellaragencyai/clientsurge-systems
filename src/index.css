@@ -655,14 +655,14 @@ h2 {
   line-height: 1.15;
   letter-spacing: -0.02em;
   font-weight: 800;
-  color: hsl(var(--foreground));
+  color: #001B44;
 }
 h3 {
   font-size: clamp(1.25rem, 3vw, 2rem);
   line-height: 1.15;
   letter-spacing: -0.015em;
   font-weight: 700;
-  color: hsl(var(--foreground));
+  color: #001B44;
 }
 h4 {
   font-size: clamp(1.05rem, 2.2vw, 1.5rem);

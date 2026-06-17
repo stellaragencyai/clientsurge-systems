@@ -200,12 +200,7 @@ export default function PortalLoginModal({ onClose }) {
             <button
               type="submit"
               disabled={loading}
-              style={{
-              background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-              borderRadius: "9999px",
-              boxShadow: "0 4px 18px rgba(0,136,204,0.35)",
-              }}
-              className="flex h-12 w-full items-center justify-center gap-2 text-sm font-bold text-white transition hover:opacity-90 disabled:opacity-60"
+              className="cs-btn-primary flex h-12 w-full items-center justify-center gap-2 text-sm font-bold disabled:opacity-60"
             >
               {loading ? (
                 <>

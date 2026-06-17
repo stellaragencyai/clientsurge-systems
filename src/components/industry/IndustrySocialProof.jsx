@@ -4,7 +4,7 @@ export default function IndustrySocialProof({ industryName, placeholder }) {
   return (
     <div className="max-w-4xl mx-auto">
       <div className="text-center mb-12">
-        <h2 className="text-3xl md:text-4xl font-bold mb-4">Trusted by {industryName} Leaders</h2>
+        <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-4">Trusted by {industryName} Leaders</h2>
         <p className="text-muted-foreground text-lg">
           See how practices like yours use ClientSurge to automate lead response and grow revenue
         </p>

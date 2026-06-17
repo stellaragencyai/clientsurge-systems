@@ -38,10 +38,7 @@ export default function RevenueUrgencySection() {
           <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4 text-center" style={{ color: "rgba(0,174,239,0.7)" }}>
             THE COST OF WAITING
           </p>
-          <h2
-            className="text-3xl md:text-5xl font-bold tracking-tight text-white leading-tight"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
+          <h2 className="font-titles text-white text-4xl md:text-5xl font-bold tracking-tight">
             Revenue you're losing right now.
           </h2>
           <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm leading-relaxed">

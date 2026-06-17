@@ -76,10 +76,7 @@ export default function AutomationCatalog() {
       <div className="max-w-7xl mx-auto">
         <div className="text-center mb-14">
           <p className="cs-eyebrow mb-3">AI Automation Systems</p>
-          <h2
-            className="text-4xl md:text-5xl font-bold tracking-tight text-foreground leading-tight"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
+          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
             Choose the AI automation system your business needs.
           </h2>
           <p className="mt-4 text-muted-foreground max-w-2xl mx-auto text-base leading-relaxed">

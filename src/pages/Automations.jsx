@@ -169,8 +169,7 @@ function VideoPlaceholder({ service, onClose }) {
             </p>
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-full text-sm font-bold text-white"
-              style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
+              className="cs-btn-primary"
               onClick={onClose}
             >
               Build My AI Automation Stack <ArrowRight className="w-4 h-4" />
@@ -292,8 +291,7 @@ function ServiceCard({ service }) {
           {/* CTA */}
           <Link
             to="/book"
-            className="w-full inline-flex items-center justify-center gap-2 h-11 rounded-xl text-sm font-bold text-white transition-all duration-200 hover:opacity-90 active:scale-95"
-            style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
+            className="cs-btn-primary w-full"
           >
             Get This System <ArrowRight className="w-4 h-4" />
           </Link>
@@ -374,10 +372,7 @@ export default function Automations() {
           style={{ background: "linear-gradient(135deg,#eaf8ff 0%,#dff5ff 60%,#f8fbff 100%)", border: "1px solid rgba(0,136,204,0.14)" }}
         >
           <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Ready to Begin?</p>
-          <h2
-            className="text-3xl md:text-4xl font-bold text-foreground mb-4"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
+          <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-4">
             Activate Your Systems in 24–48 Hours
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">
@@ -386,8 +381,8 @@ export default function Automations() {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-10 py-4 rounded-full text-base font-bold text-white transition-colors shadow-lg"
-              style={{ background: `linear-gradient(135deg, ${BRAND.gradientFrom}, ${BRAND.gradientTo})` }}
+              className="cs-btn-primary"
+              style={{ padding: "0 40px", height: "56px", fontSize: "1rem" }}
             >
               Build My AI Automation Stack <ArrowRight className="w-5 h-5" />
             </Link>

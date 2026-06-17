@@ -126,11 +126,12 @@ export default function SecurityPriority() {
 
         .security-priority h2 {
           margin: 0;
-          color: #050b14;
+          color: #001B44;
+          font-family: 'Montserrat', sans-serif;
           font-size: clamp(34px, 5vw, 58px);
-          font-weight: 900;
-          letter-spacing: 0;
-          line-height: 1.06;
+          font-weight: 800;
+          letter-spacing: -0.02em;
+          line-height: 1.15;
         }
 
         .security-priority h2 span {

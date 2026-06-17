@@ -61,10 +61,7 @@ export default function Pricing() {
       <div className="max-w-7xl mx-auto">
         <div className="flex flex-col items-center text-center mb-12">
           <p className="cs-eyebrow mb-4">Plans & Pricing</p>
-          <h2
-            className="text-[#001B44] text-4xl font-bold tracking-tight leading-tight md:text-5xl lg:text-6xl"
-            style={{ fontFamily: "Montserrat, sans-serif" }}
-          >
+          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
             Stop Losing Leads. Start Running a Real System.
           </h2>
           <p className="mt-4 text-lg text-foreground/70 max-w-2xl mx-auto leading-relaxed">
@@ -123,7 +120,7 @@ export default function Pricing() {
         </StaggeredFadeUp>
 
         <div className="text-center mb-6">
-          <p className="text-sm text-foreground/60">
+          <p className="text-sm text-foreground/60 max-w-2xl mx-auto leading-relaxed">
             <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth because it includes nurture sequences and AI scheduling—the fastest path to more booked appointments.
           </p>
         </div>

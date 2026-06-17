@@ -55,11 +55,7 @@ function ResourceCard({ resource, onDownload }) {
         )}
         <button
           onClick={() => onDownload(resource)}
-          className="mt-4 w-full py-2.5 rounded-lg text-sm font-semibold transition-all"
-          style={{
-            background: "linear-gradient(135deg, #0088CC 0%, #003B8F 100%)",
-            color: "#fff",
-          }}
+          className="cs-btn-primary mt-4 w-full"
         >
           {resource.is_gated ? "Get Free Access" : "Download Now"}
         </button>
@@ -111,7 +107,7 @@ export default function Library() {
       {/* Hero */}
       <div className="pt-32 pb-16 px-6 text-center bg-gradient-to-b from-primary/5 to-background">
         <p className="text-xs font-bold tracking-[0.3em] uppercase text-primary mb-3">Free Resources</p>
-        <h1 className="text-4xl md:text-5xl font-bold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
+        <h1 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold mb-4">
           The Local Business<br />
           <span className="text-primary">Automation Library</span>
         </h1>

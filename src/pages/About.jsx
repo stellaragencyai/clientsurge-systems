@@ -44,7 +44,7 @@ export default function About() {
           {/* What we do */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
             <div>
-              <h2 className="font-display text-2xl font-semibold text-foreground mb-4">What We Do</h2>
+              <h2 className="font-titles text-[#001B44] text-2xl font-bold mb-4">What We Do</h2>
               <p className="text-muted-foreground leading-relaxed mb-4">
                 ClientSurge Systems is an AI-powered lead automation platform built specifically for service businesses — med spas, dental offices, HVAC companies, roofers, chiropractors, and contractors. We automate the most critical part of your business: what happens the moment a new lead reaches out.
               </p>
@@ -77,7 +77,7 @@ export default function About() {
 
           {/* Who it's for */}
           <div>
-            <h2 className="font-display text-2xl font-semibold text-foreground mb-4">Who It's For</h2>
+            <h2 className="font-titles text-[#001B44] text-2xl font-bold mb-4">Who It's For</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
               ClientSurge Systems is built for local service business owners who are tired of watching leads fall through the cracks. If your team is manually following up with inquiries, playing phone tag, or losing potential clients to faster-responding competitors, our platform was designed for you.
             </p>
@@ -91,7 +91,7 @@ export default function About() {
 
           {/* Who builds it */}
           <div className="p-8 rounded-2xl border border-primary/20 bg-primary/5">
-            <h2 className="font-display text-2xl font-semibold text-foreground mb-4">Who Builds It</h2>
+            <h2 className="font-titles text-[#001B44] text-2xl font-bold mb-4">Who Builds It</h2>
             <p className="text-muted-foreground leading-relaxed mb-4">
               ClientSurge Systems is founded and operated out of Phoenix, Arizona. Our team combines deep expertise in AI automation, business operations, and service industry workflows. We don't just build software — we build systems we'd want running in our own businesses.
             </p>
@@ -110,7 +110,7 @@ export default function About() {
               </Link>
               <Link
                 to="/store"
-                className="inline-flex items-center gap-2 rounded-full bg-primary text-primary-foreground px-5 py-2.5 text-sm font-semibold hover:bg-primary/90 transition-colors"
+                className="cs-btn-primary"
               >
                 See Our Services
               </Link>

@@ -151,24 +151,12 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
          <div className="space-y-2.5">
            {isRecommended ? (
              <a
-               href={getPackageStorePath(plan.packageKey)}
-               className="w-full block h-12 rounded-xl text-sm font-bold text-white transition-all focus:ring-2 focus:ring-offset-2 focus:ring-primary focus:outline-none flex items-center justify-center gap-2"
-               aria-label={`Start with ${plan.name} plan at ${plan.monthly}/month`}
-               style={{
-                 background: "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)",
-                 boxShadow: "0 6px 20px rgba(0,174,239,0.4)",
-               }}
-               onMouseEnter={(e) => {
-                 e.currentTarget.style.boxShadow = "0 8px 28px rgba(0,174,239,0.55)";
-                 e.currentTarget.style.transform = "translateY(-3px)";
-               }}
-               onMouseLeave={(e) => {
-                 e.currentTarget.style.boxShadow = "0 6px 20px rgba(0,174,239,0.4)";
-                 e.currentTarget.style.transform = "translateY(0)";
-               }}
-             >
-               Start Now <ArrowRight className="w-4 h-4" />
-             </a>
+                             href={getPackageStorePath(plan.packageKey)}
+                             className="cs-btn-primary w-full"
+                             aria-label={`Start with ${plan.name} plan at ${plan.monthly}/month`}
+                           >
+                             Start Now <ArrowRight className="w-4 h-4" />
+                           </a>
            ) : (
              <a
                href={getPackageStorePath(plan.packageKey)}

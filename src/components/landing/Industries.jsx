@@ -210,7 +210,7 @@ export default function Industries() {
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
          <div className="flex flex-col items-center text-center">
            <p className="cs-eyebrow mb-4">Choose Your Industry</p>
-           <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight leading-tight max-w-4xl" style={{ fontFamily: "Montserrat, sans-serif", color: "#0a1628" }}>
+           <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
               Recover revenue from{" "}
               <span className="text-primary">missed calls</span>
             </h2>

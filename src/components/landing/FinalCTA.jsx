@@ -11,7 +11,7 @@ export default function FinalCTA() {
           <p className="cs-eyebrow mb-6">
             Ready to Automate Your Lead Flow?
           </p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground leading-tight" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
             Build Your <span className="text-primary">AI Automation Stack</span>
           </h2>
           <p className="mt-6 text-muted-foreground text-lg max-w-xl leading-relaxed">

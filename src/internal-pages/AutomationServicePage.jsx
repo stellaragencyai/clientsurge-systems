@@ -54,7 +54,7 @@ function AutomationServicePageInner() {
                 <Icon className="h-4 w-4" />
                 ClientSurge automation
               </div>
-              <h1 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground md:text-6xl">
+              <h1 className="font-titles text-[#001B44] text-4xl font-bold leading-tight tracking-tight md:text-6xl">
                 {automation.title}
               </h1>
               <p className="mt-5 max-w-2xl text-lg leading-8 text-muted-foreground">{automation.summary}</p>
@@ -62,8 +62,7 @@ function AutomationServicePageInner() {
                 <button
                   type="button"
                   onClick={demoBooking?.openDemoBooking}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-full px-6 text-sm font-bold text-white shadow-lg transition-transform hover:-translate-y-0.5"
-                  style={{ background: "linear-gradient(135deg, #0088CC 0%, #006BB0 45%, #00AEEF 100%)" }}
+                  className="cs-btn-primary"
                 >
                   Get My Automation Plan
                   <ArrowRight className="h-4 w-4" />
@@ -122,7 +121,7 @@ function AutomationServicePageInner() {
               <p className="mb-3 text-xs font-bold uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
                 Example messages
               </p>
-              <h2 className="font-display text-4xl font-bold leading-tight tracking-tight text-foreground">
+              <h2 className="font-titles text-[#001B44] text-4xl font-bold leading-tight tracking-tight">
                 Clear, useful follow-up without sounding generic.
               </h2>
               <p className="mt-4 text-base leading-7 text-muted-foreground">
@@ -184,7 +183,7 @@ function AutomationServicePageInner() {
 function InfoPanel({ title, body }) {
   return (
     <div className="rounded-lg border bg-white p-5" style={{ borderColor: "rgba(0,174,239,0.14)" }}>
-      <h2 className="mb-4 text-xl font-bold text-foreground">{title}</h2>
+      <h2 className="font-titles text-[#001B44] mb-4 text-xl font-bold">{title}</h2>
       <p className="text-sm leading-7 text-muted-foreground">{body}</p>
     </div>
   );

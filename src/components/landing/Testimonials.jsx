@@ -45,7 +45,7 @@ export default function Testimonials() {
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="flex flex-col items-center text-center mb-16">
           <p className="cs-eyebrow mb-4">Real Workflow Results</p>
-          <h2 className="text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
             What Happens When the System Goes Live
           </h2>
           <p className="mt-5 text-sm leading-6 text-muted-foreground">
@@ -123,16 +123,14 @@ export default function Testimonials() {
             <button
               type="button"
               onClick={demoBooking.openDemoBooking}
-              className="mx-auto inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-center text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              style={{ background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-md)" }}
+              className="cs-btn-primary mx-auto"
             >
               Plan My System
             </button>
           ) : (
             <a
               href="/book"
-              className="mx-auto inline-flex h-12 items-center justify-center gap-2 rounded-full px-8 text-center text-sm font-bold text-white focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
-              style={{ background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-md)" }}
+              className="cs-btn-primary mx-auto"
             >
               Plan My System
             </a>

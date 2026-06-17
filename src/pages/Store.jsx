@@ -73,22 +73,7 @@ function StoreHumanFallbackCTA() {
       </div>
       <a
         href="/book"
-        className="store-human-fallback__cta"
-        style={{
-          display: "inline-flex",
-          alignItems: "center",
-          justifyContent: "center",
-          gap: "8px",
-          minHeight: "48px",
-          borderRadius: "999px",
-          background: "linear-gradient(135deg, #00AEEF, #0088CC)",
-          color: "#ffffff",
-          fontWeight: 800,
-          fontSize: "14px",
-          padding: "0 22px",
-          textDecoration: "none",
-          boxShadow: "0 8px 20px rgba(0,174,239,0.28)"
-        }}
+        className="cs-btn-primary"
       >
         <MessageCircle style={{ width: "18px", height: "18px" }} aria-hidden="true" />
         Talk to a Human

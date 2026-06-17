@@ -23,8 +23,7 @@ function CoreOfferHeader() {
       </p>
 
       {/* Title */}
-      <h2 className="font-bold tracking-tight leading-none text-foreground text-center"
-      style={{ fontSize: "clamp(1.75rem, 4.5vw, 3.5rem)", fontFamily: "Montserrat, sans-serif" }}>
+      <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight text-center">
        We fix revenue loss{" "}
        <span style={{ color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.28)" }}>
          automatically
@@ -188,37 +187,11 @@ function CoreOfferCTA({ onBookDemo }) {
         <button
           type="button"
           onClick={onBookDemo}
-          style={{
-            borderRadius: "8px",
-            padding: "2px",
-            background: "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-            boxShadow: "0 12px 28px rgba(0,88,160,0.24)",
-            border: "none",
-            cursor: "pointer",
-            width: "100%",
-            maxWidth: "240px"
-          }}>
-          
-          <span
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: "8px",
-              height: "44px",
-              minWidth: "180px",
-              padding: "0 24px",
-              borderRadius: "6px",
-              background: "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-              color: "#ffffff",
-              fontWeight: "700",
-              fontSize: "0.9rem",
-              whiteSpace: "nowrap"
-            }}>
-            
-            Activate My System
-            <ArrowRight className="w-4 h-4" />
-          </span>
+          className="cs-btn-primary"
+          style={{ padding: "0 24px", height: "48px", fontSize: "0.9rem" }}
+        >
+          Activate My System
+          <ArrowRight className="w-4 h-4" />
         </button>
 
       </div>

@@ -18,7 +18,7 @@ export default function IndustryHero({ config }) {
           </span>
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-6">
+        <h1 className="font-titles text-[#001B44] text-4xl md:text-6xl font-bold leading-tight mb-6">
           {config.heroTitle}
         </h1>
 
@@ -30,7 +30,7 @@ export default function IndustryHero({ config }) {
         <div className="flex flex-col sm:flex-row gap-4 justify-center items-center">
           <Link
             to="/book"
-            className="inline-flex items-center gap-2 bg-primary text-white px-8 py-4 rounded-lg font-semibold hover:shadow-lg hover:scale-105 transition-all"
+            className="cs-btn-primary"
           >
             {config.cta}
             <ArrowRight className="w-5 h-5" />

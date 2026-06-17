@@ -44,7 +44,7 @@ export default function FAQ() {
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="flex flex-col items-center text-center mb-8 md:mb-14">
           <p className="cs-eyebrow mb-4">Questions</p>
-          <h2 className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-foreground" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
            Frequently Asked Questions
           </h2>
           <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base">
