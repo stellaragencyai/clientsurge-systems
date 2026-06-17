@@ -13,7 +13,7 @@ export default function IndustryFinalCTA({ config }) {
       {/* CTA Buttons */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
         <Link
-          to="/store"
+          to="/pricing"
           className="inline-flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all"
         >
           {config.cta}

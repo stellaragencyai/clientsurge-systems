@@ -102,7 +102,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'HVAC contractor case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 
   plumbing: {
@@ -189,7 +189,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Plumbing company case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 
   roofing: {
@@ -289,7 +289,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Roofing contractor case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 
   contractors: {
@@ -376,7 +376,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Contractor lead follow-up case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 
   dental: {
@@ -476,7 +476,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Dental practice case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 
   'med-spa': {
@@ -563,7 +563,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Med spa consultation booking case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 
   chiropractic: {
@@ -665,7 +665,7 @@ export const INDUSTRY_CONFIG = {
       },
     },
     testimonialPlaceholder: 'Chiropractic practice case study',
-    cta: 'Browse AI Services',
+    cta: 'Compare Packages',
   },
 };
 
