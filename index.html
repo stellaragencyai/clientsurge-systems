@@ -252,6 +252,11 @@
             "key": "login",
             "title": "Client Login | ClientSurge Systems",
             "description": "ClientSurge Systems client login for existing customers accessing their portal and automation dashboard."
+          },
+          "/setup-lookup": {
+            "key": "setup-lookup",
+            "title": "Check Your Setup Progress | ClientSurge Systems",
+            "description": "Enter your email or order ID to see exactly where your AI automation system setup stands. No login required."
           }
         };
         var aliases = {
@@ -282,7 +287,8 @@
           "/industries/chiropractic": "/chiropractic",
           "/industries/contractors": "/contractors",
           "/legal/privacy": "/privacy-policy",
-          "/legal/terms": "/terms"
+          "/legal/terms": "/terms",
+          "/privacy": "/privacy-policy"
         };
         var noindexPrefixes = [
           "/login",
@@ -312,7 +318,8 @@
           "/admin/AIStatusDashboard",
           "/order-success",
           "/success",
-          "/thank-you"
+          "/thank-you",
+          "/setup-lookup"
         ];
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         var canonicalPath = aliases[path] || path;
@@ -387,7 +394,10 @@
       html[data-static-route="med-spa"] .static-route--med-spa,
       html[data-static-route="chiropractic"] .static-route--chiropractic,
       html[data-static-route="contractors"] .static-route--contractors,
+      html[data-static-route="pricing"] .static-route--pricing,
+      html[data-static-route="store"] .static-route--store,
       html[data-static-route="privacy"] .static-route--privacy,
+      html[data-static-route="privacy-policy"] .static-route--privacy,
       html[data-static-route="login"] .static-route--login {
         display: block;
       }
@@ -794,6 +804,29 @@
             <p class="static-lede">ClientSurge helps contractors with project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.</p>
             <div class="static-grid two"><article class="static-card"><h2>Project Inquiry Routing</h2><p>Capture job type, timeline, location, budget range, and next-step needs before the opportunity gets cold.</p></article><article class="static-card"><h2>Quote Follow-Up</h2><p>Recover missed calls, nurture estimates, and reactivate old opportunities sitting in email or the CRM.</p></article></div>
             <div class="static-actions"><a class="static-button" href="/book">Free Contractor Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--pricing static-section" aria-labelledby="static-pricing-heading">
+            <p class="static-eyebrow">Plans & Pricing</p>
+            <h1 id="static-pricing-heading">Pricing & Automation Packages</h1>
+            <p class="static-lede">Choose the level of AI automation that fits your service business. Every plan includes lead capture, missed-call recovery, follow-up, booking, and review automation managed for you.</p>
+            <div class="static-grid">
+              <article class="static-card"><h2>Starter System</h2><p>$797 one-time + $497/month. Core automations including lead capture, missed-call text-back, and instant lead response. Best for small service businesses getting started with automation.</p><a href="/book">Free Automation Audit</a></article>
+              <article class="static-card"><h2>Growth System</h2><p>$1,297 one-time + $997/month. Includes everything in Starter plus AI scheduling, review automation, and advanced follow-up sequences. Best for growing businesses that want appointment booking and reputation automation.</p><a href="/book">Free Automation Audit</a></article>
+              <article class="static-card"><h2>Pro System</h2><p>$2,497 one-time + $1,997/month. Includes everything in Growth plus AI voice agents, lead reactivation, and priority support. Best for established businesses that want full-stack AI automation with voice handling.</p><a href="/book">Free Automation Audit</a></article>
+            </div>
+            <div class="static-actions"><a class="static-button" href="/book">Free Automation Audit</a></div>
+          </section>
+
+          <section class="static-route static-route--store static-section" aria-labelledby="static-store-heading">
+            <p class="static-eyebrow">AI Automation Store</p>
+            <h1 id="static-store-heading">AI Automation Store</h1>
+            <p class="static-lede">Compare ClientSurge packages, automation systems, and done-for-you launch options for local service businesses. Build your custom stack or choose a pre-built plan.</p>
+            <div class="static-grid two">
+              <article class="static-card"><h2>Automation Packages</h2><p>Starter, Growth, and Pro packages include done-for-you setup, monthly management, and ongoing optimization for lead capture, follow-up, booking, reviews, and voice automation.</p></article>
+              <article class="static-card"><h2>Build Your Stack</h2><p>Mix and match the automation services your business needs — AI voice agents, missed-call recovery, scheduling, reviews, and reactivation workflows — into a custom automation plan.</p></article>
+            </div>
+            <div class="static-actions"><a class="static-button" href="/book">Free Automation Audit</a></div>
           </section>
 
           <section class="static-route static-route--privacy static-section" aria-labelledby="static-privacy-heading">
