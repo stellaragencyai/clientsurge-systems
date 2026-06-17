@@ -18,7 +18,7 @@ export default function ImmersiveIndustryHero({ config }) {
     eyebrow: config.name,
     headline: config.heroTitle || config.title,
     subheadline: config.heroSubtitle || config.description,
-    cta: config.cta || 'Get Free Automation Audit',
+    cta: config.cta || 'Compare Packages',
     image: config.image,
   };
 

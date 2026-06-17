@@ -50,14 +50,14 @@ export default function IndustrySystemMapping({ systemMapping }) {
                   : 'border-2 border-border text-foreground hover:border-primary hover:bg-primary/5'
               }`}
             >
-              Get Free Automation Audit
+              Compare Packages
             </Link>
 
             {/* Setup indicator */}
             <div className="mt-6 pt-6 border-t border-border/50">
               <div className="flex items-center gap-2 text-xs text-muted-foreground">
                 <Zap className="w-4 h-4" />
-                <span>Setup in under 30 minutes</span>
+                <span>Done-for-you setup</span>
               </div>
             </div>
           </div>
