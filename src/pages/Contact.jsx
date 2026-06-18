@@ -177,7 +177,7 @@ export default function Contact() {
             <div style={{
               width: "clamp(8px, 1vw, 12px)",
               height: "clamp(48px, 10vw, 132px)",
-              background: "#E0B63F",
+              background: "#00AEEF",
               flexShrink: 0,
             }} />
 
