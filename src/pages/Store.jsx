@@ -217,11 +217,11 @@ function StoreInner() {
 
   useEffect(() => {
     const cleanupMeta = setPageMetadata({
-      title: "Compare AI Growth Systems | ClientSurge Systems",
-      description: "Compare ClientSurge Starter, Growth, and Pro packages. Choose the AI growth system built for your local business lead flow.",
+      title: "Business AI Automation Store — Browse Installable Systems | ClientSurge Systems",
+      description: "Browse installable AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Remote setup by ClientSurge.",
       canonicalPath: "/store",
-      ogTitle: "Compare AI Growth Systems | ClientSurge Systems",
-      ogDescription: "Compare ClientSurge packages — website, CRM handoff, and automation workflows in three ready-to-activate systems.",
+      ogTitle: "Business AI Automation Store | ClientSurge Systems",
+      ogDescription: "Browse and choose from six AI automation systems. ClientSurge handles remote setup, testing, and launch through a guided AI intake process.",
       robots: "noindex,nofollow"
     });
     return cleanupMeta;
@@ -528,6 +528,9 @@ function StoreInner() {
             <div className="store-hero-copy">
 
 
+              <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#00AEEF", margin: "0 0 10px" }}>
+                Business AI Automation Store
+              </p>
               <h1
                 className="font-display"
                 style={{
@@ -539,7 +542,7 @@ function StoreInner() {
                   marginBottom: "16px"
                 }}>
 
-                {selectedPackageOffer ? "Review Your" : "Compare"}{" "}
+                {selectedPackageOffer ? "Review Your" : "Business AI"}{" "}
                 <span
                 style={{
                   background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
@@ -551,7 +554,7 @@ function StoreInner() {
 
                 {selectedPackageOffer
                   ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} Package`
-                  : "AI Growth Systems"}
+                  : "Automation Store"}
                 </span>
               </h1>
 
@@ -560,13 +563,13 @@ function StoreInner() {
                   fontSize: "0.9rem",
                   color: "rgba(10,22,40,0.72)",
                   lineHeight: 1.6,
-                  maxWidth: "620px",
+                  maxWidth: "640px",
                   margin: "0 auto 24px"
                 }}>
                 
                 {selectedPackageOffer
                   ? "Your package is preloaded for a faster self-serve checkout. Review what is included, then continue straight into the purchase flow."
-                  : "Choose the system that matches your lead flow. Each package combines an AI-ready website, CRM handoff, and automation modules into one complete system."}
+                  : "Browse installable AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Choose a system, complete guided intake, and ClientSurge handles remote setup and testing."}
               </p>
             </div>
 
@@ -914,6 +917,61 @@ function StoreInner() {
             null}
 
             <StoreHumanFallbackCTA />
+
+            {/* Need a Complete System? */}
+            <section
+              aria-label="Package bundles"
+              style={{
+                margin: "8px 0 28px",
+                borderRadius: "20px",
+                border: "1px solid rgba(0,136,204,0.16)",
+                background: "linear-gradient(135deg, rgba(0,174,239,0.07), rgba(255,255,255,0.95))",
+                padding: "28px",
+                boxShadow: "0 8px 28px rgba(0,59,143,0.07)",
+              }}
+            >
+              <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#00AEEF", margin: "0 0 6px" }}>
+                Complete Systems
+              </p>
+              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0A1628", margin: "0 0 8px" }}>
+                Need a Complete System Instead?
+              </h3>
+              <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.65)", lineHeight: 1.6, margin: "0 0 20px" }}>
+                Most businesses start with a package that bundles multiple automations together for a faster, more complete remote setup.
+              </p>
+              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
+                {[
+                  { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false },
+                  { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
+                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
+                ].map((pkg) => (
+                  <a
+                    key={pkg.key}
+                    href={`/pricing`}
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "6px",
+                      borderRadius: "14px",
+                      border: pkg.highlight ? "1.5px solid rgba(0,174,239,0.6)" : "1.5px solid rgba(0,136,204,0.18)",
+                      background: pkg.highlight ? "rgba(0,174,239,0.08)" : "#ffffff",
+                      padding: "16px",
+                      textDecoration: "none",
+                      boxShadow: pkg.highlight ? "0 4px 16px rgba(0,174,239,0.2)" : "none",
+                      position: "relative",
+                    }}
+                  >
+                    {pkg.badge && (
+                      <span style={{ position: "absolute", top: "-10px", left: "14px", background: "linear-gradient(90deg, #0079c1, #005691)", color: "#fff", fontSize: "10px", fontWeight: 800, borderRadius: "999px", padding: "3px 10px" }}>
+                        {pkg.badge}
+                      </span>
+                    )}
+                    <span style={{ fontSize: "14px", fontWeight: 800, color: "#0A1628", marginTop: pkg.badge ? "6px" : 0 }}>{pkg.name}</span>
+                    <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.55)" }}>{pkg.price}</span>
+                  </a>
+                ))}
+              </div>
+            </section>
 
             {items.length > 0 ?
             <Suspense fallback={<StoreSuspenseFallback minHeight={320} />}>

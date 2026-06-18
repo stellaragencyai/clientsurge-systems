@@ -1,33 +1,29 @@
 import { useEffect } from "react";
 import Navbar from "../components/landing/Navbar";
-import Pricing from "../components/landing/Pricing";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import { setPageMetadata } from "@/lib/seo";
+import PricingPageContent from "@/components/pricing/PricingPageContent";
 
 export default function PricingPage() {
   useEffect(() => {
     return setPageMetadata({
-      title: "Pricing | ClientSurge Systems",
+      title: "Business AI Automation Packages — Starter, Growth, Pro | ClientSurge Systems",
       description:
-        "Compare ClientSurge automation packages, setup pricing, monthly management, and what is included for local service businesses.",
+        "Choose your ClientSurge automation package. Starter, Growth, and Pro systems for lead capture, missed-call recovery, AI follow-up, booking, reviews, and reactivation. Remote setup included.",
       canonicalPath: "/pricing",
-      ogTitle: "ClientSurge Pricing",
+      ogTitle: "Choose Your Business AI Automation Package | ClientSurge Systems",
       ogDescription:
-        "See ClientSurge package pricing, what each system includes, and how to choose the right automation rollout for your business.",
+        "Compare Starter ($797 setup), Growth ($1,297 setup), and Pro ($2,497 setup) packages. Remotely installed AI automation systems for service businesses.",
     });
   }, []);
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen bg-[linear-gradient(180deg,#f7fbff_0%,#ffffff_32%,#f3f9ff_100%)]">
+      <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="px-4 pb-28 pt-[calc(var(--cs-nav-height)+20px)] md:px-6 md:pb-20 md:pt-[calc(var(--cs-nav-height)+28px)]">
-          <div className="mx-auto max-w-7xl">
-            <Pricing />
-          </div>
-        </main>
+        <PricingPageContent />
         <Footer />
         <MobileCallBar />
       </div>
