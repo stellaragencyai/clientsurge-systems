@@ -8,47 +8,46 @@ import { useRef } from "react";
 
 const STACK = [
   {
-    name: "ElevenLabs",
-    abbr: "11L",
-    accentColor: "#a855f7",
-    // swap src to real asset when available:
-    // logoSrc: "/logos/elevenlabs.svg",
-  },
-  {
     name: "Twilio",
     abbr: "Tw",
     accentColor: "#F22F46",
-    // logoSrc: "/logos/twilio.svg",
-  },
-  {
-    name: "Resend",
-    abbr: "Re",
-    accentColor: "#000000",
-    // logoSrc: "/logos/resend.svg",
+    logoSrc: "https://upload.wikimedia.org/wikipedia/commons/7/7e/Twilio-logo-red.svg",
   },
   {
     name: "Stripe",
     abbr: "St",
     accentColor: "#635BFF",
-    // logoSrc: "/logos/stripe.svg",
+    logoSrc: "https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg",
   },
   {
     name: "Cloudflare",
     abbr: "CF",
     accentColor: "#F6821F",
-    // logoSrc: "/logos/cloudflare.svg",
+    logoSrc: "https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png",
   },
   {
     name: "Zapier",
     abbr: "Za",
     accentColor: "#FF4A00",
-    // logoSrc: "/logos/zapier.svg",
+    logoSrc: "https://upload.wikimedia.org/wikipedia/commons/f/fd/Zapier_logo.svg",
+  },
+  {
+    name: "Resend",
+    abbr: "Re",
+    accentColor: "#000000",
+    logoSrc: null, // placeholder — no reliable public CDN
+  },
+  {
+    name: "ElevenLabs",
+    abbr: "11L",
+    accentColor: "#a855f7",
+    logoSrc: null, // placeholder — no reliable public CDN
   },
   {
     name: "Asana",
     abbr: "As",
     accentColor: "#F06A6A",
-    // logoSrc: "/logos/asana.svg",
+    logoSrc: "https://upload.wikimedia.org/wikipedia/commons/3/3b/Asana_logo.svg",
   },
 ];
 
@@ -75,10 +74,19 @@ function LogoItem({ tool }) {
           e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.06)";
         }}
       >
-        {/* ── Swap this <span> for <img src={tool.logoSrc} … /> when assets are ready ── */}
+        {tool.logoSrc ? (
+          <img
+            src={tool.logoSrc}
+            alt={`${tool.name} logo`}
+            width="44"
+            height="28"
+            style={{ width: "44px", height: "28px", objectFit: "contain", opacity: 0.72 }}
+            onError={(e) => { e.currentTarget.style.display = "none"; e.currentTarget.nextSibling.style.display = "block"; }}
+          />
+        ) : null}
         <span
           className="text-sm font-black tracking-tight"
-          style={{ color: tool.accentColor }}
+          style={{ color: tool.accentColor, display: tool.logoSrc ? "none" : "block" }}
         >
           {tool.abbr}
         </span>
