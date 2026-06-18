@@ -148,19 +148,54 @@ export default function Contact() {
       `}</style>
       <Navbar />
 
-      {/* Luxury Hero Section */}
-      <section className="px-6 pb-10 pt-[calc(var(--cs-nav-height)+24px)] md:pb-12 md:pt-[calc(var(--cs-nav-height)+32px)]" style={{ background: "linear-gradient(to bottom, hsl(var(--muted)), hsl(var(--background)))" }}>
-        <div className="max-w-6xl mx-auto">
-          <div className="flex items-center gap-3 mb-6 md:mb-8">
-            <div style={{ width: "3px", height: "32px", background: "#00AEEF", borderRadius: "1px" }} />
-            <p className="text-xs font-bold text-primary tracking-[0.2em] uppercase">Get In Touch</p>
-          </div>
-          <h1 className="font-titles text-[#001B44] text-base font-bold uppercase tracking-wider mb-4 md:mb-6">
-            Contact ClientSurge
-          </h1>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
-            Have a question about AI automation, lead capture, or booking systems? Send a message and we&apos;ll get back to you within one business day.
+      {/* Hero Section */}
+      <section style={{
+        background: "#ffffff",
+        paddingTop: "calc(var(--cs-nav-height) + 100px)",
+        paddingBottom: "84px",
+        paddingLeft: "clamp(1.5rem, 6vw, 80px)",
+        paddingRight: "clamp(1.5rem, 6vw, 80px)",
+      }}>
+        <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          {/* Eyebrow */}
+          <p style={{
+            fontFamily: "'Montserrat', 'Inter', system-ui, sans-serif",
+            fontSize: "clamp(18px, 3vw, 44px)",
+            fontWeight: 300,
+            letterSpacing: "0.08em",
+            textTransform: "uppercase",
+            color: "#777777",
+            lineHeight: 1.1,
+            marginBottom: "34px",
+          }}>
+            Get In Touch
           </p>
+
+          {/* Title row: gold bar + CONTACT */}
+          <div style={{ display: "flex", alignItems: "center", gap: "clamp(18px, 4vw, 58px)" }}>
+            {/* Gold vertical bar */}
+            <div style={{
+              width: "clamp(8px, 1vw, 12px)",
+              height: "clamp(48px, 10vw, 132px)",
+              background: "#E0B63F",
+              flexShrink: 0,
+            }} />
+
+            {/* Main title */}
+            <h1 style={{
+              fontFamily: "'Montserrat', system-ui, sans-serif",
+              fontSize: "clamp(56px, 12vw, 164px)",
+              fontWeight: 900,
+              lineHeight: 0.88,
+              letterSpacing: "-0.035em",
+              color: "#000000",
+              textTransform: "uppercase",
+              margin: 0,
+              whiteSpace: "nowrap",
+            }}>
+              CONTACT
+            </h1>
+          </div>
         </div>
       </section>
 
