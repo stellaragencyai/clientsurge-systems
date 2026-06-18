@@ -91,6 +91,7 @@ export default function MissionControlDashboard() {
                 onClick={() => setLastRefresh(Date.now())}
                 className="inline-flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-card hover:bg-muted/50 transition-all text-sm font-medium shadow-sm"
                 title="Manual refresh"
+                aria-label="Manually refresh dashboard data"
               >
                 <RefreshCw className="w-4 h-4" />
                 Refresh
@@ -120,6 +121,7 @@ export default function MissionControlDashboard() {
             <input
               type="text"
               placeholder="Filter by phone..."
+              aria-label="Filter leads by phone number"
               value={filters.phoneNumber}
               onChange={(e) =>
                 setFilters({ ...filters, phoneNumber: e.target.value })
@@ -127,6 +129,7 @@ export default function MissionControlDashboard() {
               className="px-3.5 py-2.5 rounded-lg border border-border text-sm bg-background focus:ring-2 focus:ring-primary focus:outline-none shadow-sm"
             />
             <select
+              aria-label="Filter by intent type"
               value={filters.intentType}
               onChange={(e) =>
                 setFilters({ ...filters, intentType: e.target.value })
@@ -140,6 +143,7 @@ export default function MissionControlDashboard() {
               <option value="spam">Spam/Bot</option>
             </select>
             <select
+              aria-label="Filter by date range"
               value={filters.dateRange}
               onChange={(e) =>
                 setFilters({ ...filters, dateRange: e.target.value })
