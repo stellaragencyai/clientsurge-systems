@@ -151,8 +151,8 @@ export default function Contact() {
       {/* Hero Section */}
       <section style={{
         background: "#ffffff",
-        paddingTop: "calc(var(--cs-nav-height) + 100px)",
-        paddingBottom: "84px",
+        paddingTop: "calc(var(--cs-nav-height) + 48px)",
+        paddingBottom: "48px",
         paddingLeft: "clamp(1.5rem, 6vw, 80px)",
         paddingRight: "clamp(1.5rem, 6vw, 80px)",
       }}>
@@ -160,7 +160,7 @@ export default function Contact() {
           {/* Eyebrow */}
           <p style={{
             fontFamily: "'Montserrat', 'Inter', system-ui, sans-serif",
-            fontSize: "clamp(18px, 3vw, 44px)",
+            fontSize: "12px",
             fontWeight: 300,
             letterSpacing: "0.08em",
             textTransform: "uppercase",
@@ -171,30 +171,31 @@ export default function Contact() {
             Get In Touch
           </p>
 
-          {/* Title row: gold bar + CONTACT */}
-          <div style={{ display: "flex", alignItems: "center", gap: "clamp(18px, 4vw, 58px)" }}>
-            {/* Gold vertical bar */}
+          {/* Title row: bar + CONTACT */}
+          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
+            {/* Blue vertical bar */}
             <div style={{
-              width: "clamp(8px, 1vw, 12px)",
-              height: "clamp(48px, 10vw, 132px)",
+              width: "6px",
+              height: "68px",
               background: "#00AEEF",
+              borderRadius: "3px",
               flexShrink: 0,
             }} />
 
-            {/* Main title */}
-            <h1 style={{
+            {/* Main title — div avoids global h1 color/size overrides */}
+            <div role="heading" aria-level="1" style={{
               fontFamily: "'Montserrat', system-ui, sans-serif",
-              fontSize: "clamp(56px, 12vw, 164px)",
+              fontSize: "clamp(40px, 6vw, 72px)",
               fontWeight: 900,
-              lineHeight: 0.88,
-              letterSpacing: "-0.035em",
-              color: "#000000",
+              lineHeight: 1,
+              letterSpacing: "-0.025em",
+              color: "#000000 !important",
               textTransform: "uppercase",
               margin: 0,
-              whiteSpace: "nowrap",
+              WebkitTextFillColor: "#000000",
             }}>
               CONTACT
-            </h1>
+            </div>
           </div>
         </div>
       </section>
