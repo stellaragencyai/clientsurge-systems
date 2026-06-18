@@ -15,7 +15,7 @@ import AutomationCatalog from "../components/landing/AutomationCatalog";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
-import TrustedBySection from "../components/landing/TrustedBySection";
+import TrustedStackCarousel from "../components/landing/TrustedStackCarousel";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -119,8 +119,8 @@ export default function Home() {
         <ScrollProgressBar />
         <Navbar />
         <Hero />
+        <TrustedStackCarousel />
         <AutomationSystemsGrid />
-        <TrustedBySection />
 
         {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
