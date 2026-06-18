@@ -34,20 +34,20 @@ export default function Book() {
                 <div className="book-hero-copy">
                   <div className="book-kicker">
                     <span className="book-kicker-dot" />
-                    Package Guidance
+                    Free Automation Audit
                   </div>
                   <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
-                    Get Help Choosing Your AI Growth System
+                    Not Sure What to Choose? Book a Free Automation Audit
                   </h1>
                   <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
-                    Not sure whether Starter, Growth, or Pro is the right fit for your business? Tell us about your lead flow and we'll recommend the best package — no audit, no pressure.
+                    If you're not sure which automation system or package fits your business, book a free audit. ClientSurge will review your lead capture, missed-call flow, booking process, follow-up gaps, and automation opportunities.
                   </p>
                   <a
-                    href="/pricing"
-                    onClick={() => trackCTA('compare_packages', 'book_page_header')}
+                    href="/start"
+                    onClick={() => trackCTA('start_remote_setup', 'book_page_header')}
                     className="book-text-link mt-5 inline-flex items-center gap-2 text-sm font-semibold text-primary hover:text-primary/80 transition-colors"
                   >
-                    Compare Packages Instead
+                    Ready to start? Begin Remote Setup Instead
                     <ArrowRight className="w-4 h-4" />
                   </a>
                 </div>
