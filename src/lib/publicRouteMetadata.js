@@ -135,15 +135,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/how-it-works": {
     key: "how-it-works",
-    title: "How It Works — ClientSurge AI Brain & Remote Fulfillment | ClientSurge Systems",
+    title: "How It Works — AI-Guided Remote Setup | ClientSurge Systems",
     description:
-      "Learn how the ClientSurge AI Brain turns a business signup into a remote setup plan. Package selection, guided intake, setup checklists, automation templates, and remote configuration workflows.",
-  },
-  "/how-it-works": {
-    key: "how-it-works",
-    title: "How It Works — ClientSurge AI Brain & Remote Setup | ClientSurge Systems",
-    description:
-      "See how the ClientSurge AI Brain turns a business signup into a remote setup plan: package selection, guided intake, setup checklists, automation templates, and remote configuration.",
+      "See how the ClientSurge AI Brain turns a business signup into a remote setup plan: package selection, guided intake, setup checklists, automation templates, and testing before launch.",
   },
   "/proof": {
     key: "proof",
@@ -336,7 +330,7 @@ export const INTERNAL_ROUTE_PREFIXES = [
 
 export const NOINDEX_ROUTE_PREFIXES = [
   "/login",
-  "/store",
+  // /store and /pricing are indexable public product pages — intentionally NOT noindexed
   "/start",
   "/book-demo",
   ...AUTHENTICATED_ROUTE_PREFIXES,
