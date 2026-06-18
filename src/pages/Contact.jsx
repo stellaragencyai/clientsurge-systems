@@ -150,31 +150,39 @@ export default function Contact() {
 
       {/* Hero Section */}
       <style>{`
-        .cs-contact-hero { background: #ffffff; padding-top: calc(var(--cs-nav-height) + 48px); padding-bottom: 48px; padding-left: clamp(1.5rem, 6vw, 80px); padding-right: clamp(1.5rem, 6vw, 80px); }
-        .cs-contact-eyebrow { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif; font-size: 22px; font-weight: 400; letter-spacing: 0.04em; text-transform: uppercase; color: #777777 !important; line-height: 1.2; margin: 0 0 12px 0; }
-        .cs-contact-title-row { display: flex; align-items: center; gap: 28px; }
-        .cs-contact-bar { width: 6px; height: 58px; background: #00AEEF; border-radius: 3px; flex-shrink: 0; }
-        .cs-contact-title { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif !important; font-size: 72px !important; font-weight: 900 !important; line-height: 0.95 !important; letter-spacing: -0.02em !important; color: #000000 !important; text-transform: uppercase !important; margin: 0 !important; -webkit-text-fill-color: #000000 !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important; }
+        .cs-contact-hero { background: #ffffff; padding-top: calc(var(--cs-nav-height) + 52px); padding-bottom: 44px; padding-left: clamp(1.5rem, 6vw, 80px); padding-right: clamp(1.5rem, 6vw, 80px); }
+        .cs-contact-eyebrow { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #00AEEF !important; line-height: 1.2; margin: 0 0 16px 0; }
+        .cs-contact-title-row { display: flex; align-items: center; gap: 20px; }
+        .cs-contact-bar { width: 5px; height: 52px; background: #00AEEF; border-radius: 3px; flex-shrink: 0; }
+        .cs-contact-title { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif !important; font-size: 52px !important; font-weight: 700 !important; line-height: 1.05 !important; letter-spacing: -0.025em !important; color: #1a1a1a !important; text-transform: none !important; margin: 0 !important; -webkit-text-fill-color: #1a1a1a !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important; }
+        .cs-contact-subtitle { font-family: 'Inter', Arial, system-ui, sans-serif; font-size: 16px; font-weight: 400; color: #6b7280; line-height: 1.6; margin: 12px 0 0 0; max-width: 480px; }
+        .cs-contact-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #16a34a; margin-bottom: 20px; }
+        .cs-contact-badge-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: csPulse 2s ease-in-out infinite; }
+        @keyframes csPulse { 0%,100% { opacity:1; transform:scale(1); } 50% { opacity:0.6; transform:scale(1.3); } }
         @media (max-width: 1024px) {
-          .cs-contact-eyebrow { font-size: 18px; }
-          .cs-contact-bar { height: 46px; width: 5px; }
-          .cs-contact-title-row { gap: 20px; }
-          .cs-contact-title { font-size: 58px !important; }
+          .cs-contact-bar { height: 42px; }
+          .cs-contact-title { font-size: 42px !important; }
+          .cs-contact-subtitle { font-size: 15px; }
         }
         @media (max-width: 640px) {
-          .cs-contact-eyebrow { font-size: 15px; }
-          .cs-contact-bar { height: 36px; width: 5px; }
-          .cs-contact-title-row { gap: 16px; }
-          .cs-contact-title { font-size: 44px !important; }
+          .cs-contact-bar { height: 34px; width: 4px; }
+          .cs-contact-title-row { gap: 14px; }
+          .cs-contact-title { font-size: 32px !important; }
+          .cs-contact-subtitle { font-size: 14px; }
         }
       `}</style>
       <section className="cs-contact-hero">
         <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
+          <div className="cs-contact-badge">
+            <span className="cs-contact-badge-dot" />
+            Typically replies within 1 business day
+          </div>
           <p className="cs-contact-eyebrow">Get In Touch</p>
           <div className="cs-contact-title-row">
             <div className="cs-contact-bar" aria-hidden="true" />
-            <h1 className="cs-contact-title">CONTACT</h1>
+            <h1 className="cs-contact-title">Contact Us</h1>
           </div>
+          <p className="cs-contact-subtitle">Have a question or ready to get started? Send us a message and we'll get back to you.</p>
         </div>
       </section>
 
@@ -196,33 +204,38 @@ export default function Contact() {
               }}
             >
               
-              {/* Contact Information - Minimalist Styling */}
-              <div
-                style={{
-                  animation: "fadeInUp 0.6s ease-out 0.1s backwards",
-                }}
-              >
-                <div className="flex items-center gap-3 mb-8">
-                  <div style={{ width: "2px", height: "24px", background: "#00AEEF" }} />
-                  <h2 className="font-titles text-[#001B44] text-base font-bold uppercase tracking-wider">Contact Information</h2>
+              {/* Contact Information - Icon Cards */}
+              <div style={{ animation: "fadeInUp 0.6s ease-out 0.1s backwards" }}>
+                <div className="flex items-center gap-3 mb-6">
+                  <div style={{ width: "3px", height: "20px", background: "#00AEEF", borderRadius: "2px" }} />
+                  <h2 style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.15em", color: "#1a1a1a", textTransform: "uppercase", margin: 0 }}>Contact Information</h2>
                 </div>
-                <div className="space-y-8">
-                  <div>
-                    <p style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.15em", color: "hsl(var(--muted-foreground))" }} className="uppercase mb-2">Email</p>
-                    <a href="mailto:support@clientsurgesystems.com" className="text-sm text-foreground hover:text-primary transition-colors font-light">
-                      support@clientsurgesystems.com
-                    </a>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.15em", color: "hsl(var(--muted-foreground))" }} className="uppercase mb-2">Phone</p>
-                    <a href="tel:+16025843227" className="text-sm text-foreground hover:text-primary transition-colors font-light">
-                      (602) 584-3227
-                    </a>
-                  </div>
-                  <div>
-                    <p style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.15em", color: "hsl(var(--muted-foreground))" }} className="uppercase mb-2">Location</p>
-                    <p className="text-sm text-foreground font-light">Phoenix, Arizona</p>
-                  </div>
+                <div className="flex flex-col gap-4">
+                  {[
+                    { Icon: Mail, label: "Email", value: "support@clientsurgesystems.com", href: "mailto:support@clientsurgesystems.com" },
+                    { Icon: Phone, label: "Phone", value: "(602) 584-3227", href: "tel:+16025843227" },
+                    { Icon: MapPin, label: "Location", value: "Phoenix, Arizona", href: null },
+                  ].map(({ Icon, label, value, href }) => (
+                    <div key={label} style={{ display: "flex", alignItems: "center", gap: "14px", padding: "14px 16px", background: "#f9fafb", borderRadius: "10px", border: "1px solid #f0f0f0", transition: "border-color 0.2s" }}
+                      onMouseEnter={(e) => e.currentTarget.style.borderColor = "rgba(0,174,239,0.25)"}
+                      onMouseLeave={(e) => e.currentTarget.style.borderColor = "#f0f0f0"}
+                    >
+                      <div style={{ width: "36px", height: "36px", background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.15)", borderRadius: "8px", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <Icon style={{ width: "15px", height: "15px", color: "#00AEEF" }} />
+                      </div>
+                      <div>
+                        <p style={{ fontSize: "10px", fontWeight: 700, letterSpacing: "0.12em", color: "#9ca3af", textTransform: "uppercase", marginBottom: "2px" }}>{label}</p>
+                        {href ? (
+                          <a href={href} style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", textDecoration: "none", transition: "color 0.2s" }}
+                            onMouseEnter={(e) => e.target.style.color = "#00AEEF"}
+                            onMouseLeave={(e) => e.target.style.color = "#1a1a1a"}
+                          >{value}</a>
+                        ) : (
+                          <p style={{ fontSize: "13px", fontWeight: 500, color: "#1a1a1a", margin: 0 }}>{value}</p>
+                        )}
+                      </div>
+                    </div>
+                  ))}
                 </div>
               </div>
 
@@ -263,6 +276,24 @@ export default function Contact() {
                 >
                   Get Help Choosing <ArrowRight className="w-3.5 h-3.5" />
                 </button>
+              </div>
+              {/* What Happens Next — 3-step mini timeline */}
+              <div style={{ borderTop: "1px solid #f0f0f0", paddingTop: "24px" }}>
+                <p style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.15em", color: "#9ca3af", textTransform: "uppercase", marginBottom: "16px" }}>What Happens Next</p>
+                <div className="flex flex-col gap-4">
+                  {[
+                    { n: "1", text: "We review your message within 1 business day" },
+                    { n: "2", text: "We'll reach out to learn more about your business" },
+                    { n: "3", text: "We recommend the right automation stack for you" },
+                  ].map(({ n, text }) => (
+                    <div key={n} style={{ display: "flex", alignItems: "flex-start", gap: "12px" }}>
+                      <div style={{ width: "22px", height: "22px", background: "rgba(0,174,239,0.10)", border: "1px solid rgba(0,174,239,0.2)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginTop: "1px" }}>
+                        <span style={{ fontSize: "10px", fontWeight: 800, color: "#00AEEF" }}>{n}</span>
+                      </div>
+                      <p style={{ fontSize: "13px", color: "#4b5563", lineHeight: 1.5, margin: 0, fontWeight: 400 }}>{text}</p>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
 
