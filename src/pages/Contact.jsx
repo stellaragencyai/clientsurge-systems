@@ -155,8 +155,16 @@ export default function Contact() {
             <div style={{ width: "3px", height: "32px", background: "#00AEEF", borderRadius: "1px" }} />
             <p className="text-xs font-bold text-primary tracking-[0.2em] uppercase">Get In Touch</p>
           </div>
-          <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1.08, color: "hsl(var(--foreground))" }} className="mb-4 md:mb-6">
-            Contact ClientSurge
+          <h1 style={{ fontSize: "clamp(2.5rem, 6vw, 4rem)", fontWeight: 900, letterSpacing: "-0.03em", lineHeight: 1.08, color: "hsl(var(--foreground))" }} className="font-titles mb-4 md:mb-6">
+            Let&apos;s Build Your{" "}
+            <span style={{
+              background: "linear-gradient(135deg, #00AEEF 0%, #0088CC 60%, #003B8F 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}>
+              Automation System
+            </span>
           </h1>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl leading-relaxed">
             Have a question about AI automation, lead capture, or booking systems? Send a message and we&apos;ll get back to you within one business day.
