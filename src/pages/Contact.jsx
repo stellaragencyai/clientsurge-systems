@@ -149,53 +149,31 @@ export default function Contact() {
       <Navbar />
 
       {/* Hero Section */}
-      <section style={{
-        background: "#ffffff",
-        paddingTop: "calc(var(--cs-nav-height) + 48px)",
-        paddingBottom: "48px",
-        paddingLeft: "clamp(1.5rem, 6vw, 80px)",
-        paddingRight: "clamp(1.5rem, 6vw, 80px)",
-      }}>
+      <style>{`
+        .cs-contact-hero { background: #ffffff; padding-top: calc(var(--cs-nav-height) + 48px); padding-bottom: 48px; padding-left: clamp(1.5rem, 6vw, 80px); padding-right: clamp(1.5rem, 6vw, 80px); }
+        .cs-contact-eyebrow { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif; font-size: 22px; font-weight: 400; letter-spacing: 0.04em; text-transform: uppercase; color: #777777 !important; line-height: 1.2; margin: 0 0 12px 0; }
+        .cs-contact-title-row { display: flex; align-items: center; gap: 28px; }
+        .cs-contact-bar { width: 6px; height: 58px; background: #00AEEF; border-radius: 3px; flex-shrink: 0; }
+        .cs-contact-title { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif !important; font-size: 72px !important; font-weight: 900 !important; line-height: 0.95 !important; letter-spacing: -0.02em !important; color: #000000 !important; text-transform: uppercase !important; margin: 0 !important; -webkit-text-fill-color: #000000 !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important; }
+        @media (max-width: 1024px) {
+          .cs-contact-eyebrow { font-size: 18px; }
+          .cs-contact-bar { height: 46px; width: 5px; }
+          .cs-contact-title-row { gap: 20px; }
+          .cs-contact-title { font-size: 58px !important; }
+        }
+        @media (max-width: 640px) {
+          .cs-contact-eyebrow { font-size: 15px; }
+          .cs-contact-bar { height: 36px; width: 5px; }
+          .cs-contact-title-row { gap: 16px; }
+          .cs-contact-title { font-size: 44px !important; }
+        }
+      `}</style>
+      <section className="cs-contact-hero">
         <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
-          {/* Eyebrow */}
-          <p style={{
-            fontFamily: "'Montserrat', 'Inter', system-ui, sans-serif",
-            fontSize: "12px",
-            fontWeight: 300,
-            letterSpacing: "0.08em",
-            textTransform: "uppercase",
-            color: "#777777",
-            lineHeight: 1.1,
-            marginBottom: "34px",
-          }}>
-            Get In Touch
-          </p>
-
-          {/* Title row: bar + CONTACT */}
-          <div style={{ display: "flex", alignItems: "center", gap: "20px" }}>
-            {/* Blue vertical bar */}
-            <div style={{
-              width: "6px",
-              height: "68px",
-              background: "#00AEEF",
-              borderRadius: "3px",
-              flexShrink: 0,
-            }} />
-
-            {/* Main title — div avoids global h1 color/size overrides */}
-            <div role="heading" aria-level="1" style={{
-              fontFamily: "'Montserrat', system-ui, sans-serif",
-              fontSize: "clamp(40px, 6vw, 72px)",
-              fontWeight: 900,
-              lineHeight: 1,
-              letterSpacing: "-0.025em",
-              color: "#000000 !important",
-              textTransform: "uppercase",
-              margin: 0,
-              WebkitTextFillColor: "#000000",
-            }}>
-              CONTACT
-            </div>
+          <p className="cs-contact-eyebrow">Get In Touch</p>
+          <div className="cs-contact-title-row">
+            <div className="cs-contact-bar" aria-hidden="true" />
+            <h1 className="cs-contact-title">CONTACT</h1>
           </div>
         </div>
       </section>

@@ -16,6 +16,7 @@ import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import TrustedStackCarousel from "../components/landing/TrustedStackCarousel";
+import TrustStrip from "../components/landing/TrustStrip";
 
 const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -151,6 +152,7 @@ export default function Home() {
 
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <ThreeSystemsSection />
+        <TrustStrip />
 
         <SectionBreak />
 

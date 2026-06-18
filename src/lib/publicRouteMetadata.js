@@ -139,6 +139,18 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Learn how the ClientSurge AI Brain turns a business signup into a remote setup plan. Package selection, guided intake, setup checklists, automation templates, and remote configuration workflows.",
   },
+  "/how-it-works": {
+    key: "how-it-works",
+    title: "How It Works — ClientSurge AI Brain & Remote Setup | ClientSurge Systems",
+    description:
+      "See how the ClientSurge AI Brain turns a business signup into a remote setup plan: package selection, guided intake, setup checklists, automation templates, and remote configuration.",
+  },
+  "/proof": {
+    key: "proof",
+    title: "Proof — What ClientSurge Is Actually Built On | ClientSurge Systems",
+    description:
+      "Honest proof that ClientSurge is more than an AI agency landing page. See what the platform foundation supports today and what buyers should expect.",
+  },
   "/setup-lookup": {
     key: "setup-lookup",
     title: "Check Your Setup Progress | ClientSurge Systems",
@@ -280,6 +292,7 @@ export const PUBLIC_ROUTE_PATHS = [
   "/thank-you",
   "/setup-lookup",
   "/how-it-works",
+  "/proof",
 ];
 
 // App shell behavior is slightly broader than indexable/public SEO routes.
@@ -361,6 +374,7 @@ export const SITEMAP_STATIC_PATHS = [
   "/terms",
   "/setup-lookup",
   "/how-it-works",
+  "/proof",
 ];
 
 export const BLOG_SITEMAP_PATHS = [

@@ -5,6 +5,7 @@ import MobileCallBar from "../components/landing/MobileCallBar";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import { setPageMetadata } from "@/lib/seo";
 import PricingPageContent from "@/components/pricing/PricingPageContent";
+import TrustStrip from "@/components/landing/TrustStrip";
 
 export default function PricingPage() {
   useEffect(() => {
@@ -23,6 +24,7 @@ export default function PricingPage() {
     <DemoBookingProvider>
       <div className="min-h-screen bg-background">
         <Navbar />
+        <TrustStrip />
         <PricingPageContent />
         <Footer />
         <MobileCallBar />

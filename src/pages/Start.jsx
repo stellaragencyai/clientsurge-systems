@@ -7,6 +7,7 @@ import MobileCallBar from '@/components/landing/MobileCallBar';
 import { setPageMetadata } from '@/lib/seo';
 import { trackCTA } from '@/lib/analytics';
 import { base44 } from '@/api/base44Client';
+import TrustStrip from '@/components/landing/TrustStrip';
 
 const PACKAGE_LABELS = {
   starter_system: 'Starter System',
@@ -501,6 +502,7 @@ export default function Start() {
         </div>
       </main>
 
+      <TrustStrip />
       <Footer />
       <MobileCallBar />
     </div>
