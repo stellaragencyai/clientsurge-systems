@@ -13,7 +13,7 @@ export default function FinalCTA() {
           </p>
           <div className="flex items-center gap-4">
             <div className="cs-section-bar" style={{ minHeight: "48px" }} />
-            <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
+            <h2 className="font-titles text-black text-4xl md:text-5xl font-bold tracking-tight">
               Build Your <span className="text-primary">AI Automation Stack</span>
             </h2>
           </div>

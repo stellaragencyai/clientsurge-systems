@@ -123,15 +123,15 @@ select:focus-visible,
    All blue UI elements derive from #00AEEF
    ============================================ */
 
-/* Unified primary button system — reusable classes */
+/* Unified primary button system — matches style guide: blue gradient pill, white text */
 .cs-btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg border-none cursor-pointer text-white font-extrabold px-6 py-3 transition-all duration-300;
-  background: var(--cs-gradient);
-  box-shadow: 0 0 0 1px rgba(0,174,239,0.5), var(--cs-glow-sm);
+  @apply inline-flex items-center justify-center rounded-full border-none cursor-pointer text-white font-semibold px-6 py-3 transition-all duration-300;
+  background: linear-gradient(90deg, #0079c1 0%, #005691 100%);
+  box-shadow: 0 2px 12px rgba(0,121,193,0.35);
 }
 .cs-btn-primary:hover {
-  box-shadow: 0 0 0 1.5px rgba(0,174,239,0.85), 0 0 32px rgba(0,159,212,0.7), 0 4px 20px rgba(0,159,212,0.45);
-  transform: translateY(-2px);
+  box-shadow: 0 4px 24px rgba(0,121,193,0.5);
+  transform: translateY(-1px);
 }
 .cs-btn-primary:active {
   transform: translateY(0) scale(0.98);
@@ -680,14 +680,14 @@ h2 {
   line-height: 1.15;
   letter-spacing: -0.02em;
   font-weight: 800;
-  color: #001B44;
+  color: #000000;
 }
 h3 {
   font-size: clamp(1.25rem, 3vw, 2rem);
   line-height: 1.15;
   letter-spacing: -0.015em;
   font-weight: 700;
-  color: #001B44;
+  color: #000000;
 }
 h4 {
   font-size: clamp(1.05rem, 2.2vw, 1.5rem);

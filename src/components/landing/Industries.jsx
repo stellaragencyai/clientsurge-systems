@@ -212,7 +212,7 @@ export default function Industries() {
            <p className="cs-eyebrow mb-4">Choose Your Industry</p>
            <div className="flex items-center gap-4">
              <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-             <h2 className="font-titles text-[#00050F] text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
+             <h2 className="font-titles text-black text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
                 Built For Your Industry
              </h2>
            </div>

@@ -80,7 +80,7 @@ export default function ThreeSystemsSection() {
           <p className="cs-eyebrow mb-3">AI Growth Systems</p>
           <div className="flex items-center gap-4">
             <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-            <h2 className="font-titles text-[#00050F] text-3xl md:text-5xl font-bold">
+            <h2 className="font-titles text-black text-3xl md:text-5xl font-bold">
               Choose Your AI Growth System
             </h2>
           </div>
@@ -165,7 +165,7 @@ export default function ThreeSystemsSection() {
               >
                 <div className="p-8 md:p-10 flex flex-col flex-1 items-center text-center" style={{ minHeight: "580px" }}>
                   {/* Title + subtitle */}
-                  <h3 className="font-titles text-[#00050F] text-xl md:text-2xl font-bold mb-2 mt-4">
+                  <h3 className="font-titles text-black text-xl md:text-2xl font-bold mb-2 mt-4">
                     {pkg.title}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-7">{pkg.description}</p>
@@ -183,7 +183,7 @@ export default function ThreeSystemsSection() {
                   {/* Price */}
                   <div className="mb-6 w-full">
                     <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#00050F]">{pkg.price}</span>
+                      <span className="text-3xl md:text-4xl font-extrabold tracking-tight text-black">{pkg.price}</span>
                       <span className="text-sm text-muted-foreground font-semibold">/mo</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1.5">{pkg.setup}</p>
@@ -194,14 +194,6 @@ export default function ThreeSystemsSection() {
                     to={pkg.href}
                     onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
                     className="cs-btn-primary w-full text-center"
-                    style={{
-                      background: pkg.highlight
-                        ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
-                        : `linear-gradient(135deg, ${pkg.accent} 0%, ${pkg.accent}dd 100%)`,
-                      boxShadow: pkg.highlight
-                        ? `0 0 20px ${pkg.accentGlow}, 0 4px 12px rgba(0,0,0,0.08)`
-                        : `0 0 12px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.04)`,
-                    }}
                   >
                     {pkg.cta} <ArrowRight className="w-4 h-4 inline ml-1" />
                   </Link>
