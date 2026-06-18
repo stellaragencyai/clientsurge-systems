@@ -4,12 +4,12 @@ import { trackCTA } from "@/lib/analytics";
 import { motion } from "framer-motion";
 
 const FEATURE_CHIPS = [
-  "Web design",
-  "Lead capture",
-  "CRM handoff",
-  "Missed-call recovery",
-  "AI follow-up",
-  "Booking automation",
+  "Lead Capture",
+  "Missed-Call Recovery",
+  "AI Follow-Up",
+  "Booking Automation",
+  "Review Requests",
+  "Lead Reactivation",
 ];
 
 export default function Hero() {
@@ -54,7 +54,7 @@ export default function Hero() {
             style={{ background: "#00AEEF", boxShadow: "0 0 8px rgba(0,174,239,0.8)" }}
           />
           <span className="text-xs font-bold text-white/90 uppercase tracking-wider">
-            Automate Your Lead Flow
+            Business AI Automation Store
           </span>
         </motion.div>
 
@@ -66,7 +66,7 @@ export default function Hero() {
           className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight"
           style={{ fontFamily: "'Montserrat', sans-serif" }}
         >
-          Capture. Follow Up. Book.
+          The Business AI Automation Store — Pick Your System, We Install It Remotely
         </motion.h1>
 
         {/* Subheadline */}
@@ -76,7 +76,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.2 }}
           className="text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed"
         >
-          ClientSurge combines web design, CRM handoff, missed-call recovery, AI follow-up, booking, reviews, and reactivation into three systems you can compare and choose.
+          ClientSurge helps businesses browse, choose, and activate AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, reactivation, and operations — through a guided AI-powered remote setup process.
         </motion.p>
 
         {/* CTAs */}
@@ -88,13 +88,8 @@ export default function Hero() {
         >
           <button
             onClick={() => {
-              trackCTA("compare_packages", "hero");
-              if (window.location.pathname === "/") {
-                const el = document.getElementById("pricing");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              } else {
-                navigate("/#pricing");
-              }
+              trackCTA("browse_automation_systems", "hero");
+              navigate("/store");
             }}
             className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-bold text-white transition-all duration-300 hover:scale-105"
             style={{
@@ -102,12 +97,12 @@ export default function Hero() {
               minWidth: "unset",
             }}
           >
-            Compare Packages <ArrowRight className="w-5 h-5" />
+            Browse AI Automation Systems <ArrowRight className="w-5 h-5" />
           </button>
           <button
             onClick={() => {
-              trackCTA("view_included_automations", "hero");
-              navigate("/automations");
+              trackCTA("start_remote_setup", "hero");
+              navigate("/book");
             }}
             className="inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-semibold text-white transition-all duration-300 hover:bg-white/10"
             style={{
@@ -118,7 +113,7 @@ export default function Hero() {
               minWidth: "unset",
             }}
           >
-            View Included Automations <ArrowRight className="w-5 h-5" />
+            Start Remote Setup <ArrowRight className="w-5 h-5" />
           </button>
         </motion.div>
 
@@ -129,7 +124,7 @@ export default function Hero() {
           transition={{ duration: 0.5, delay: 0.4 }}
           className="text-sm text-white/60 mb-6"
         >
-          Built for roofing, HVAC, plumbing, dental, med spa, chiropractic, and contractor businesses.
+          Built for service businesses, clinics, contractors, agencies, and local operators that need faster response, better follow-up, and fewer lost opportunities.
         </motion.p>
 
         {/* Feature chips */}

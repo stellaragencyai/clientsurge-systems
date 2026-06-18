@@ -12,6 +12,7 @@ import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import RevenueProofBlock from "../components/landing/RevenueProofBlock";
 import AutomationCatalog from "../components/landing/AutomationCatalog";
+import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import TrustedBySection from "../components/landing/TrustedBySection";
@@ -90,11 +91,11 @@ export default function Home() {
     let cleanupFaq = () => {};
 
     try { cleanupMetadata = setPageMetadata({
-      title: "AI Growth Systems for Local Service Businesses | ClientSurge Systems",
-      description: "Choose the AI growth system for your business — Starter, Growth, or Pro. Website, CRM handoff, and automation modules built to capture, follow up, and book more leads.",
+      title: "Business AI Automation Store — Pick Your System, We Install It Remotely | ClientSurge Systems",
+      description: "Browse, choose, and activate AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Remotely installed and tested for service businesses.",
       canonicalPath: "/",
-      ogTitle: "AI Growth Systems That Turn More Leads Into Booked Jobs",
-      ogDescription: "ClientSurge combines AI-ready websites, CRM handoff, and automation workflows into three ready-to-activate packages for local businesses.",
+      ogTitle: "The Business AI Automation Store — Pick Your System, We Install It Remotely",
+      ogDescription: "ClientSurge helps businesses browse, choose, and activate AI automation systems through a guided AI-powered remote setup process.",
     }); } catch (_e) {}
     try { cleanupOrg = setJsonLd("organization", getOrganizationSchema()); } catch (_e) {}
     try { cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema()); } catch (_e) {}
@@ -118,6 +119,7 @@ export default function Home() {
         <ScrollProgressBar />
         <Navbar />
         <Hero />
+        <AutomationSystemsGrid />
         <TrustedBySection />
 
         {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
