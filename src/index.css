@@ -808,6 +808,22 @@ td p,
 }
 
 /* ============================================
+   TOUCH DEVICES — skip hover-lift transforms
+   Keeps scrolling smooth + avoids sticky hover on mobile
+   ============================================ */
+@media (pointer: coarse) {
+  .pricing-card:hover,
+  .feature-card:hover,
+  [class*="pricing-card"]:hover,
+  [class*="feature-card"]:hover,
+  .glass-card:hover,
+  .cs-card-shadow:hover,
+  .overlay-card:hover {
+    transform: none;
+  }
+}
+
+/* ============================================
    PREMIUM WHITESPACE — more breathing room
    ============================================ */
 
@@ -819,17 +835,7 @@ td p,
   }
 }
 
-/* Extra breathing room between adjacent sections */
-section + section {
-  margin-top: 1rem;
-}
-@media (min-width: 1025px) {
-  section + section {
-    margin-top: 2rem;
-  }
-}
-
-/* Section spacing — sections manage their own padding */
+/* Section spacing — sections manage their own padding (dead conflicting margins removed) */
 section + section {
   margin-top: 0;
 }
