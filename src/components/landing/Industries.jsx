@@ -210,9 +210,12 @@ export default function Industries() {
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
          <div className="flex flex-col items-center text-center">
            <p className="cs-eyebrow mb-4">Choose Your Industry</p>
-           <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
-              Built For Your Industry
-              </h2>
+           <div className="flex items-center gap-4">
+             <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
+             <h2 className="font-titles text-[#00050F] text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
+                Built For Your Industry
+             </h2>
+           </div>
             <p className="mt-3 text-base md:text-lg max-w-2xl leading-relaxed" style={{ color: "#0a1628" }}>
               Pick your industry to see how much revenue you're losing and how to recover it.
             </p>
@@ -224,10 +227,10 @@ export default function Industries() {
             <button
               key={f.id}
               onClick={() => setActiveFilter(f.id)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all ${
+              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
                 activeFilter === f.id
                   ? "text-white border-transparent shadow-sm"
-                  : "bg-background/80 text-muted-foreground border-border hover:text-foreground"
+                  : "bg-background/80 text-muted-foreground border-border hover:text-foreground hover:border-[#00AEEF] hover:bg-[rgba(0,174,239,0.08)] hover:shadow-[0_0_14px_rgba(0,174,239,0.35)]"
               }`}
             style={activeFilter === f.id ? { background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-sm)" } : { borderColor: "rgba(0,174,239,0.22)" }}
             >

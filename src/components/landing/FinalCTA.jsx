@@ -56,7 +56,7 @@ export default function FinalCTA() {
                fontSize: "1rem",
               }}
               >
-              Compare Packages
+              See Plans &amp; Pricing
               <ArrowRight className="w-5 h-5" />
             </a>
             <a

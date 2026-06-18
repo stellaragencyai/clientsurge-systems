@@ -312,7 +312,7 @@ export default function Navbar() {
             className="cs-btn-primary"
             style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset", whiteSpace: "nowrap" }}
           >
-            Compare Packages
+            See Plans &amp; Pricing
           </button>
         </div>
 
@@ -416,7 +416,7 @@ export default function Navbar() {
                 style={{ minHeight: "unset" }}
               >
                 <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", fontSize: "0.875rem" }}>
-                  Compare Packages
+                  See Plans &amp; Pricing
                 </span>
               </button>
               <button

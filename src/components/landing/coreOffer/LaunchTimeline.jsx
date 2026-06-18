@@ -191,25 +191,43 @@ export default function LaunchTimeline() {
         transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
         viewport={{ once: true, amount: 0.3 }}
       >
-        <p className="text-xs font-semibold text-primary tracking-[0.24em] uppercase text-center mb-3">
+        <motion.p
+          className="cs-eyebrow mb-3 text-center"
+          initial={{ opacity: 0, y: 12 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, ease: "easeOut" }}
+        >
           Launch Plan Confirmed After Onboarding
-        </p>
+        </motion.p>
         <div className="flex items-center gap-4">
           <motion.div
             className="w-1.5 rounded-full flex-shrink-0"
-            style={{ background: "#00AEEF", minHeight: "36px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }}
+            style={{ background: "#00AEEF", minHeight: "40px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }}
             initial={{ scaleY: 0 }}
             whileInView={{ scaleY: 1 }}
             transition={{ duration: 0.5, delay: 0.3 }}
             viewport={{ once: true }}
           />
-          <h3 className="font-display text-2xl md:text-3xl font-bold text-foreground text-center">
+          <motion.h3
+            className="font-display text-2xl md:text-3xl font-bold text-[#00050F] text-center"
+            initial={{ opacity: 0, x: -20 }}
+            whileInView={{ opacity: 1, x: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.15, ease: "easeOut" }}
+          >
             Our Process - Start To Launch
-          </h3>
+          </motion.h3>
         </div>
-        <p className="text-center text-sm text-muted-foreground max-w-xl mt-3 mb-10">
+        <motion.p
+          className="text-center text-sm text-muted-foreground max-w-xl mt-3 mb-10"
+          initial={{ opacity: 0, y: 8 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3, ease: "easeOut" }}
+        >
           Every setup follows the same review, build, test, and launch path. Your exact timeline is confirmed after onboarding.
-        </p>
+        </motion.p>
       </motion.div>
 
       {/* Desktop horizontal tracker */}
@@ -223,12 +241,12 @@ export default function LaunchTimeline() {
                 type="button"
                 onClick={() => setActiveStep(idx)}
                 className="flex flex-col items-center gap-3 border-none bg-transparent cursor-pointer group"
-                whileHover={{ scale: 1.08 }}
-                whileTap={{ scale: 0.95 }}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.9 }}
+                initial={{ opacity: 0, y: 40, scale: 0.7 }}
+                whileInView={{ opacity: 1, y: 0, scale: 1 }}
                 viewport={{ once: true }}
-                transition={{ duration: 0.4, delay: idx * 0.1, ease: "easeOut" }}
+                transition={{ duration: 0.55, delay: idx * 0.12, ease: [0.34, 1.56, 0.64, 1] }}
               >
                 <div
                   className="rounded-full flex items-center justify-center flex-shrink-0 relative"
@@ -240,6 +258,7 @@ export default function LaunchTimeline() {
                     border: isActive ? "2px solid #0088CC" : "2px solid rgba(0,174,239,0.3)",
                     boxShadow: isActive ? "0 0 0 5px rgba(0,174,239,0.15), 0 4px 14px rgba(0,174,239,0.35)" : "none",
                     transition: "background 0.3s ease, box-shadow 0.3s ease",
+                    animation: isActive ? "launchPulse 2.4s ease-in-out infinite" : "none",
                   }}
                 >
                   <span className="font-black leading-none relative z-10" style={{ fontSize: "28px", color: isActive ? "#fff" : "#0088CC" }}>
@@ -320,6 +339,13 @@ export default function LaunchTimeline() {
           ))}
         </div>
       </div>
+
+      <style>{`
+        @keyframes launchPulse {
+          0%, 100% { box-shadow: 0 0 0 5px rgba(0,174,239,0.15), 0 4px 14px rgba(0,174,239,0.35); }
+          50% { box-shadow: 0 0 0 12px rgba(0,174,239,0.04), 0 0 24px rgba(0,174,239,0.5), 0 4px 14px rgba(0,174,239,0.35); }
+        }
+      `}</style>
 
     </div>
   );

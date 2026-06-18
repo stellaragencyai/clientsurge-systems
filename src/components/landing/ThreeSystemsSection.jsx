@@ -82,11 +82,11 @@ export default function ThreeSystemsSection() {
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
         <div className="flex flex-col items-center text-center mb-12">
-          <p className="cs-eyebrow mb-3">Compare AI Growth Systems</p>
+          <p className="cs-eyebrow mb-3">AI Growth Systems</p>
           <div className="flex items-center gap-4">
             <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-            <h2 className="font-titles text-[#001B44] text-3xl md:text-5xl font-bold">
-              Compare Packages
+            <h2 className="font-titles text-[#00050F] text-3xl md:text-5xl font-bold">
+              Choose Your AI Growth System
             </h2>
           </div>
           <p className="mt-4 text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
@@ -160,35 +160,45 @@ export default function ThreeSystemsSection() {
                   e.currentTarget.style.borderColor = pkg.accentBorder;
                 }}
               >
-                <div className="p-7 md:p-9 flex flex-col flex-1 items-center text-center">
+                <div className="p-8 md:p-10 flex flex-col flex-1 items-center text-center" style={{ minHeight: "580px" }}>
                   {/* Centered tier icon */}
                   <div
-                    className="w-12 h-12 rounded-xl flex items-center justify-center mb-5"
+                    className="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
                     style={{ background: pkg.iconBg }}
                   >
-                    <pkg.Icon className="w-5 h-5" style={{ color: pkg.accent }} />
+                    <pkg.Icon className="w-6 h-6" style={{ color: pkg.accent }} />
                   </div>
 
                   {/* Title + subtitle */}
-                  <h3 className="font-titles text-[#001B44] text-xl md:text-2xl font-bold mb-1.5">
+                  <h3 className="font-titles text-[#00050F] text-xl md:text-2xl font-bold mb-2">
                     {pkg.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-6">{pkg.description}</p>
+                  <p className="text-sm text-muted-foreground mb-7">{pkg.description}</p>
+
+                  {/* Feature list */}
+                  <ul className="space-y-3.5 w-full text-left flex-1 mb-6">
+                    {pkg.includes.map((item) => (
+                      <li key={item} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent }} />
+                        <span className="text-sm text-[#0A1628] leading-snug">{item}</span>
+                      </li>
+                    ))}
+                  </ul>
 
                   {/* Price */}
-                  <div className="mb-6">
-                    <div className="flex items-baseline justify-center gap-1">
-                      <span className="text-4xl font-bold tracking-tight text-[#001B44]">{pkg.price}</span>
-                      <span className="text-sm text-muted-foreground font-medium">/mo</span>
+                  <div className="mb-6 w-full">
+                    <div className="flex items-baseline justify-center gap-1.5">
+                      <span className="text-5xl md:text-6xl font-extrabold tracking-tight text-[#00050F]">{pkg.price}</span>
+                      <span className="text-sm text-muted-foreground font-semibold">/mo</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1">{pkg.setup}</p>
+                    <p className="text-xs text-muted-foreground mt-1.5">{pkg.setup}</p>
                   </div>
 
-                  {/* CTA with accent glow */}
+                  {/* CTA at bottom */}
                   <Link
                     to={pkg.href}
                     onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
-                    className="cs-btn-primary w-full text-center mb-6"
+                    className="cs-btn-primary w-full text-center"
                     style={{
                       background: pkg.highlight
                         ? "linear-gradient(135deg, #00AEEF 0%, #003B8F 100%)"
@@ -200,16 +210,6 @@ export default function ThreeSystemsSection() {
                   >
                     {pkg.cta} <ArrowRight className="w-4 h-4 inline ml-1" />
                   </Link>
-
-                  {/* Feature list */}
-                  <ul className="space-y-3 w-full text-left flex-1">
-                    {pkg.includes.map((item) => (
-                      <li key={item} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent }} />
-                        <span className="text-sm text-[#0A1628] leading-snug">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
                 </div>
               </div>
             </div>
@@ -219,7 +219,7 @@ export default function ThreeSystemsSection() {
         {/* Guidance text */}
         <div className="text-center mt-10 mb-2">
           <p className="text-sm text-foreground/60 max-w-2xl mx-auto leading-relaxed">
-            <strong>Not sure which plan fits?</strong> Most local service businesses start with Growth — it includes nurture sequences and AI scheduling for the fastest path to more booked appointments.
+            <strong>Not sure which system fits?</strong> Most local service businesses start with Growth — it includes nurture sequences and AI scheduling for the fastest path to more booked appointments.
           </p>
         </div>
 
@@ -233,7 +233,7 @@ export default function ThreeSystemsSection() {
             onClick={() => trackCTA("compare_packages", "three_systems_section")}
             className="cs-btn-primary inline-flex"
           >
-            Compare Packages <ArrowRight className="w-4 h-4 inline ml-1" />
+            See Plans &amp; Pricing <ArrowRight className="w-4 h-4 inline ml-1" />
           </Link>
           <div>
             <Link
