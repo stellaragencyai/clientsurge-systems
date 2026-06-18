@@ -1,5 +1,6 @@
-import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Zap, Crown, Wallet } from "lucide-react";
+import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 
@@ -21,11 +22,9 @@ const PACKAGES = [
     cta: "Start With Starter",
     href: "/pricing",
     highlight: false,
-    Icon: Sparkles,
     accent: "#00AEEF",
     accentBorder: "rgba(0,174,239,0.12)",
     accentGlow: "rgba(0,174,239,0.18)",
-    iconBg: "rgba(0,174,239,0.1)",
   },
   {
     name: "Growth",
@@ -43,11 +42,9 @@ const PACKAGES = [
     cta: "Start With Growth",
     href: "/pricing",
     highlight: true,
-    Icon: Zap,
     accent: "#00AEEF",
     accentBorder: "rgba(0,174,239,0.45)",
     accentGlow: "rgba(0,174,239,0.28)",
-    iconBg: "rgba(0,174,239,0.14)",
   },
   {
     name: "Pro",
@@ -65,11 +62,9 @@ const PACKAGES = [
     cta: "Start With Pro",
     href: "/pricing",
     highlight: false,
-    Icon: Crown,
     accent: "#003B8F",
     accentBorder: "rgba(0,59,143,0.18)",
     accentGlow: "rgba(0,59,143,0.16)",
-    iconBg: "rgba(0,59,143,0.1)",
   },
 ];
 
@@ -117,8 +112,16 @@ export default function ThreeSystemsSection() {
 
         {/* Package cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-5">
-          {PACKAGES.map((pkg) => (
-            <div key={pkg.name} className="relative" style={{ paddingTop: pkg.highlight ? "28px" : 0 }}>
+          {PACKAGES.map((pkg, idx) => (
+            <motion.div
+              key={pkg.name}
+              className="relative"
+              style={{ paddingTop: pkg.highlight ? "28px" : 0 }}
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, amount: 0.2 }}
+              transition={{ duration: 0.6, delay: idx * 0.12, ease: [0.22, 1, 0.36, 1] }}
+            >
               {/* Floating "Recommended" pill badge */}
               {pkg.highlight && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
@@ -161,16 +164,8 @@ export default function ThreeSystemsSection() {
                 }}
               >
                 <div className="p-8 md:p-10 flex flex-col flex-1 items-center text-center" style={{ minHeight: "580px" }}>
-                  {/* Centered tier icon */}
-                  <div
-                    className="w-14 h-14 rounded-xl flex items-center justify-center mb-5"
-                    style={{ background: pkg.iconBg }}
-                  >
-                    <pkg.Icon className="w-6 h-6" style={{ color: pkg.accent }} />
-                  </div>
-
                   {/* Title + subtitle */}
-                  <h3 className="font-titles text-[#00050F] text-xl md:text-2xl font-bold mb-2">
+                  <h3 className="font-titles text-[#00050F] text-xl md:text-2xl font-bold mb-2 mt-4">
                     {pkg.title}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-7">{pkg.description}</p>
@@ -188,7 +183,7 @@ export default function ThreeSystemsSection() {
                   {/* Price */}
                   <div className="mb-6 w-full">
                     <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-5xl md:text-6xl font-extrabold tracking-tight text-[#00050F]">{pkg.price}</span>
+                      <span className="text-3xl md:text-4xl font-extrabold tracking-tight text-[#00050F]">{pkg.price}</span>
                       <span className="text-sm text-muted-foreground font-semibold">/mo</span>
                     </div>
                     <p className="text-xs text-muted-foreground mt-1.5">{pkg.setup}</p>
@@ -212,7 +207,7 @@ export default function ThreeSystemsSection() {
                   </Link>
                 </div>
               </div>
-            </div>
+            </motion.div>
           ))}
         </div>
 

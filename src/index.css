@@ -361,11 +361,11 @@ nav {
   }
 }
 
-/* MOBILE OPTIMIZATION: Reduce padding on small screens for compact layout */
+/* MOBILE OPTIMIZATION: Generous padding for breathing room */
 @media (max-width: 640px) {
   section {
-    padding-top: 3rem !important;
-    padding-bottom: 3rem !important;
+    padding-top: 4.5rem !important;
+    padding-bottom: 4.5rem !important;
   }
   h2 {
     font-size: clamp(1.5rem, 5vw, 2rem) !important;
@@ -814,8 +814,18 @@ td p,
 /* Desktop: generous top/bottom for every section */
 @media (min-width: 1025px) {
   section {
-    padding-top: max(var(--section-pt, 0px), 0px);
-    padding-bottom: max(var(--section-pb, 0px), 0px);
+    padding-top: max(var(--section-pt, 0px), 6rem);
+    padding-bottom: max(var(--section-pb, 0px), 6rem);
+  }
+}
+
+/* Extra breathing room between adjacent sections */
+section + section {
+  margin-top: 1rem;
+}
+@media (min-width: 1025px) {
+  section + section {
+    margin-top: 2rem;
   }
 }
 
