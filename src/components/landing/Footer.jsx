@@ -16,7 +16,7 @@ const navColumns = [
     title: "Platform",
     links: [
       { label: "Home", href: "/" },
-      { label: "AI Packages", href: "/pricing" },
+      { label: "Store", href: "/store" },
       { label: "Included Automations", href: "/automations" },
       { label: "Industries", href: "/industries" },
     ],
