@@ -133,6 +133,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Review the ClientSurge Systems terms governing service access, billing, platform usage, and customer responsibilities.",
   },
+  "/how-it-works": {
+    key: "how-it-works",
+    title: "How It Works — ClientSurge AI Brain & Remote Fulfillment | ClientSurge Systems",
+    description:
+      "Learn how the ClientSurge AI Brain turns a business signup into a remote setup plan. Package selection, guided intake, setup checklists, automation templates, and remote configuration workflows.",
+  },
   "/setup-lookup": {
     key: "setup-lookup",
     title: "Check Your Setup Progress | ClientSurge Systems",
@@ -273,6 +279,7 @@ export const PUBLIC_ROUTE_PATHS = [
   "/leads/capture",
   "/thank-you",
   "/setup-lookup",
+  "/how-it-works",
 ];
 
 // App shell behavior is slightly broader than indexable/public SEO routes.
@@ -353,6 +360,7 @@ export const SITEMAP_STATIC_PATHS = [
   "/privacy-policy",
   "/terms",
   "/setup-lookup",
+  "/how-it-works",
 ];
 
 export const BLOG_SITEMAP_PATHS = [

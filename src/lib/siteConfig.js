@@ -47,7 +47,7 @@ export const SITE_CONFIG = {
       { label: "Automation Store", href: "/store", isPage: true },
       { label: "Packages", href: "/pricing", isPage: true },
       { label: "Industries", href: "/industries", isPage: true },
-      { label: "How It Works", href: "/#how-it-works", isHashLink: true },
+      { label: "How It Works", href: "/how-it-works", isPage: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [

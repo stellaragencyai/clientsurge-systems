@@ -111,6 +111,7 @@ const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLog
 const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
 const OpportunityReviewQueue = lazy(() => import("./internal-pages/OpportunityReviewQueue"));
 const ClientSetupLookup = lazy(() => import("./pages/ClientSetupLookup"));
+const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
 
@@ -377,6 +378,7 @@ const AuthenticatedAppWithTenant = () => {
       />
       <Route path="/about" element={<LazyRoute Component={About} />} />
       <Route path="/automations" element={<LazyRoute Component={Automations} />} />
+      <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
       <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
