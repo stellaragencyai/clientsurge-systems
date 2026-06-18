@@ -39,22 +39,18 @@ function RiskFlag({ flag }) {
 // Summary cards
 function SummaryCards({ stats }) {
   const cards = [
-    { label: 'Total Leads', value: stats.total, color: 'bg-blue-50 border-blue-200' },
-    { label: 'Hot', value: stats.hot, color: 'bg-red-50 border-red-200' },
-    { label: 'Booked', value: stats.booked, color: 'bg-green-50 border-green-200' },
-    { label: 'Imported', value: stats.imported, color: 'bg-purple-50 border-purple-200' },
-    { label: 'Needs Verification', value: stats.needsVerification, color: 'bg-orange-50 border-orange-200' },
-    { label: 'Duplicates', value: stats.duplicates, color: 'bg-gray-50 border-gray-200' },
-    { label: 'QA/Test', value: stats.qaTest, color: 'bg-slate-50 border-slate-200' },
-    { label: 'Do Not Contact', value: stats.dnc, color: 'bg-red-50 border-red-200' },
+    { label: 'Total Leads', value: stats.total, bg: 'bg-blue-50', border: 'border-blue-200', val: 'text-blue-700' },
+    { label: 'Hot Leads',   value: stats.hot,   bg: 'bg-red-50',  border: 'border-red-200',  val: 'text-red-700' },
+    { label: 'Booked',      value: stats.booked, bg: 'bg-green-50', border: 'border-green-200', val: 'text-green-700' },
+    { label: 'QA / Test',   value: stats.qaTest, bg: 'bg-slate-50', border: 'border-slate-200', val: 'text-slate-600' },
   ];
 
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-6">
+    <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
       {cards.map((card) => (
-        <div key={card.label} className={`rounded-lg border p-3 ${card.color}`}>
-          <p className="text-xs font-semibold text-gray-600">{card.label}</p>
-          <p className="text-2xl font-bold text-gray-900 mt-1">{card.value}</p>
+        <div key={card.label} className={`rounded-xl border p-5 ${card.bg} ${card.border}`}>
+          <p className="text-xs font-semibold text-gray-500 mb-2">{card.label}</p>
+          <p className={`text-3xl font-bold ${card.val}`}>{card.value}</p>
         </div>
       ))}
     </div>
@@ -67,12 +63,8 @@ function FilterTabs({ activeFilter, onFilterChange }) {
     'All Leads',
     'Hot Leads',
     'Booked',
-    'Imported Prospects',
-    'Needs Verification',
-    'Duplicates',
-    'QA/Test/Proof',
-    'Do Not Contact',
-    'Missing Contact',
+    'Needs Review',
+    'QA / Test',
   ];
 
   return (
@@ -183,18 +175,10 @@ export default function LeadIntelligenceTable() {
       filtered = filtered.filter(l => l.lead_score >= 70 && !l.do_not_contact && !isQATestProof(l));
     } else if (activeFilter === 'Booked') {
       filtered = filtered.filter(l => l.crm_stage === 'booked' || l.booked_at);
-    } else if (activeFilter === 'Imported Prospects') {
-      filtered = filtered.filter(l => l.import_source);
-    } else if (activeFilter === 'Needs Verification') {
-      filtered = filtered.filter(l => !l.email || !l.phone || !l.website);
-    } else if (activeFilter === 'Duplicates') {
-      filtered = filtered.filter(l => l.dedupe_status === 'merged_duplicate' || l.dedupe_duplicate_of);
-    } else if (activeFilter === 'QA/Test/Proof') {
+    } else if (activeFilter === 'Needs Review') {
+      filtered = filtered.filter(l => !l.email || !l.phone || l.dedupe_status === 'merged_duplicate' || l.dedupe_duplicate_of || l.do_not_contact);
+    } else if (activeFilter === 'QA / Test') {
       filtered = filtered.filter(l => isQATestProof(l));
-    } else if (activeFilter === 'Do Not Contact') {
-      filtered = filtered.filter(l => l.do_not_contact);
-    } else if (activeFilter === 'Missing Contact') {
-      filtered = filtered.filter(l => !l.phone || !l.email);
     } else {
       // All Leads: exclude QA/test by default
       filtered = filtered.filter(l => !isQATestProof(l));
@@ -350,14 +334,9 @@ export default function LeadIntelligenceTable() {
                   <td className="px-4 py-3 text-gray-600 text-xs">{lead.source || '—'}</td>
                   <td className="px-4 py-3">
                     {getRiskFlags(lead).length > 0 ? (
-                      <div className="space-y-1">
-                        {getRiskFlags(lead).slice(0, 2).map((flag) => (
-                          <div key={flag}><RiskFlag flag={flag} /></div>
-                        ))}
-                        {getRiskFlags(lead).length > 2 && (
-                          <div className="text-xs text-gray-600">+{getRiskFlags(lead).length - 2} more</div>
-                        )}
-                      </div>
+                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-orange-100 text-orange-700">
+                        {getRiskFlags(lead).length} flag{getRiskFlags(lead).length > 1 ? 's' : ''}
+                      </span>
                     ) : (
                       <span className="text-xs text-gray-400">—</span>
                     )}
