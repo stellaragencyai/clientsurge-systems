@@ -170,6 +170,36 @@ const isPublicPath = (pathname) =>
     );
   });
 
+// PathNormalizer — redirects uppercase/mixed-case paths to lowercase canonical equivalents
+// Also handles explicit legacy aliases from publicRouteMetadata
+const EXPLICIT_REDIRECT_MAP = {
+  "/Dashboard": "/mission-control",
+  "/AdminSettings": "/mission-control",
+  "/AdminLeadDetail": "/admin?tab=leads",
+  "/LeadIntelligence": "/admin",
+  "/Sam": "/admin",
+  "/MedSpaDashboard": "/admin",
+  "/WebsiteSpecPreview": "/admin",
+};
+
+function PathNormalizer() {
+  const location = useLocation();
+  const { pathname } = location;
+
+  // Check explicit map first
+  if (EXPLICIT_REDIRECT_MAP[pathname]) {
+    return <Navigate to={EXPLICIT_REDIRECT_MAP[pathname]} replace />;
+  }
+
+  // Normalize uppercase to lowercase (covers /HVAC → /hvac, /Roofing → /roofing, etc.)
+  const lower = pathname.toLowerCase();
+  if (pathname !== lower) {
+    return <Navigate to={lower + location.search + location.hash} replace />;
+  }
+
+  return null;
+}
+
 // Fix 1: ScrollToTop — resets scroll position on every route change
 function ScrollToTop() {
   const location = useLocation();
@@ -489,6 +519,7 @@ function App() {
               Skip to content
             </a>
             <ScrollToTop />
+            <PathNormalizer />
             <AppInner />
             <AutoCTAAnalytics />
             <RouteIndexingGuard />
