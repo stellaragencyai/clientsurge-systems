@@ -1,13 +1,42 @@
 import { useEffect, useState } from "react";
 import confetti from "canvas-confetti";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
+import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin, Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
+
+// ── A: Industry context map ──────────────────────────────────────────────────
+const INDUSTRY_CONTEXT = {
+  "med-spa":       { label: "Med Spa & Aesthetics", sub: "Ready to automate your Med Spa or Aesthetic Clinic?" },
+  "dental":        { label: "Dental & Orthodontics", sub: "Ready to automate your Dental or Orthodontic practice?" },
+  "hvac":          { label: "HVAC & Home Services", sub: "Ready to automate your HVAC or Home Services business?" },
+  "plumbing":      { label: "Plumbing", sub: "Ready to automate your Plumbing business?" },
+  "roofing":       { label: "Roofing & Restoration", sub: "Ready to automate your Roofing business?" },
+  "chiropractic":  { label: "Chiropractic & PT", sub: "Ready to automate your Chiropractic practice?" },
+  "contractors":   { label: "Contractors & Trades", sub: "Ready to automate your Contracting business?" },
+};
+
+function detectIndustryFromReferrer() {
+  const path = document.referrer ? new URL(document.referrer).pathname : window.location.pathname;
+  const slug = Object.keys(INDUSTRY_CONTEXT).find((k) => path.includes(k));
+  return slug ? INDUSTRY_CONTEXT[slug] : null;
+}
+
+// ── B: Pain point chips ───────────────────────────────────────────────────────
+const PAIN_POINTS = [
+  "Missed Calls",
+  "Slow Lead Follow-Up",
+  "No-Show Appointments",
+  "Manual Booking Process",
+  "Review Management",
+  "Cold / Dead Leads",
+  "Staff Overwhelmed",
+  "No Automation Yet",
+];
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
@@ -25,9 +54,24 @@ export default function Contact() {
     utm_campaign: "",
     utm_content: "",
     referrer: "",
+    pain_points: "",
   });
-  
-  // Capture UTM params from URL on mount
+
+  // ── A: Industry context detection ───────────────────────────────────────────
+  const [industryContext, setIndustryContext] = useState(null);
+
+  // ── B: Pain point selection ──────────────────────────────────────────────────
+  const [selectedPains, setSelectedPains] = useState([]);
+
+  const togglePain = (pain) => {
+    setSelectedPains((prev) => {
+      const next = prev.includes(pain) ? prev.filter((p) => p !== pain) : [...prev, pain];
+      setForm((f) => ({ ...f, pain_points: next.join(", ") }));
+      return next;
+    });
+  };
+
+  // Capture UTM params + industry context from URL on mount
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setForm((prev) => ({
@@ -38,6 +82,7 @@ export default function Contact() {
       utm_content: params.get("utm_content") || "",
       referrer: document.referrer || "",
     }));
+    setIndustryContext(detectIndustryFromReferrer());
   }, []);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -175,14 +220,16 @@ export default function Contact() {
         <div style={{ maxWidth: "1180px", margin: "0 auto" }}>
           <div className="cs-contact-badge">
             <span className="cs-contact-badge-dot" />
-            Typically replies within 1 business day
+            {industryContext ? `${industryContext.label} — We're ready to help` : "Typically replies within 1 business day"}
           </div>
           <p className="cs-contact-eyebrow">Get In Touch</p>
           <div className="cs-contact-title-row">
             <div className="cs-contact-bar" aria-hidden="true" />
             <h1 className="cs-contact-title">CONTACT US</h1>
           </div>
-          <p className="cs-contact-subtitle">Have a question or ready to get started? Send us a message and we'll get back to you.</p>
+          <p className="cs-contact-subtitle">
+            {industryContext ? industryContext.sub : "Have a question or ready to get started? Send us a message and we'll get back to you."}
+          </p>
         </div>
       </section>
 
@@ -549,6 +596,40 @@ export default function Contact() {
                       <option>Contractors & Trades</option>
                       <option>Other</option>
                     </select>
+                  </div>
+                </div>
+
+                {/* B: Pain Point Grid */}
+                <div style={{ animation: "fadeInUp 0.6s ease-out 0.32s backwards" }}>
+                  <label style={{ fontSize: "0.65rem", fontWeight: 900, letterSpacing: "0.1em", color: "hsl(var(--muted-foreground))", display: "flex", alignItems: "center", gap: "6px", marginBottom: "12px" }} className="uppercase">
+                    <Zap style={{ width: "11px", height: "11px", color: "#00AEEF" }} />
+                    What's your biggest challenge? <span style={{ fontWeight: 400, textTransform: "none", letterSpacing: 0, color: "#9ca3af", fontSize: "0.6rem" }}>(pick all that apply)</span>
+                  </label>
+                  <div style={{ display: "flex", flexWrap: "wrap", gap: "8px" }}>
+                    {PAIN_POINTS.map((pain) => {
+                      const active = selectedPains.includes(pain);
+                      return (
+                        <button
+                          key={pain}
+                          type="button"
+                          onClick={() => togglePain(pain)}
+                          style={{
+                            padding: "6px 12px",
+                            borderRadius: "20px",
+                            fontSize: "12px",
+                            fontWeight: 600,
+                            cursor: "pointer",
+                            transition: "all 0.18s ease",
+                            border: active ? "1px solid #00AEEF" : "1px solid rgba(0,174,239,0.2)",
+                            background: active ? "rgba(0,174,239,0.1)" : "transparent",
+                            color: active ? "#00AEEF" : "#6b7280",
+                            boxShadow: active ? "0 0 8px rgba(0,174,239,0.15)" : "none",
+                          }}
+                        >
+                          {active && "✓ "}{pain}
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
