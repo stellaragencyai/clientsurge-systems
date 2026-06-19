@@ -40,6 +40,7 @@ import AutomationAlertsPanel from '../components/admin/AutomationAlertsPanel';
 import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
 import AuditLogPanel from '../components/admin/AuditLogPanel';
 import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
+import TwilioRuntimeHealth from '../components/admin/TwilioRuntimeHealth';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
@@ -123,6 +124,7 @@ const NAV_GROUPS = [
       { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
+      { id: 'twilio-health', label: '📡 Twilio Runtime Health', icon: Activity },
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
@@ -241,6 +243,7 @@ export default function AdminDashboard() {
       case 'launch-gates': return <LaunchGatesPanel />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'templates': return <CommunicationTemplates />;
+      case 'twilio-health': return <TwilioRuntimeHealth />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
       case 'ai-sales-reps': return <AIAgentsDashboard />;
