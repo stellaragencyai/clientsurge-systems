@@ -16,15 +16,18 @@ const navColumns = [
     title: "Platform",
     links: [
       { label: "Home", href: "/" },
-      { label: "Store", href: "/store" },
+      { label: "Automation Store", href: "/store" },
+      { label: "Packages & Pricing", href: "/pricing" },
       { label: "Included Automations", href: "/automations" },
       { label: "Industries", href: "/industries" },
+      { label: "How It Works", href: "/how-it-works" },
     ],
   },
   {
     title: "Company",
     links: [
       { label: "About Us", href: "/about" },
+      { label: "Proof & Trust", href: "/proof" },
       { label: "Contact Us", href: "/contact" },
       { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "Terms of Service", href: "/terms" },
