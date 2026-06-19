@@ -154,7 +154,8 @@ export default function Contact() {
         .cs-contact-eyebrow { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #00AEEF !important; line-height: 1.2; margin: 0 0 16px 0; }
         .cs-contact-title-row { display: flex; align-items: center; gap: 20px; }
         .cs-contact-bar { width: 5px; height: 52px; background: #00AEEF; border-radius: 3px; flex-shrink: 0; }
-        .cs-contact-title { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif !important; font-size: 52px !important; font-weight: 700 !important; line-height: 1.05 !important; letter-spacing: -0.025em !important; color: #1a1a1a !important; text-transform: none !important; margin: 0 !important; -webkit-text-fill-color: #1a1a1a !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important; }
+        .cs-contact-title { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif !important; font-size: 52px !important; font-weight: 800 !important; line-height: 1.05 !important; letter-spacing: -0.025em !important; color: #000000 !important; text-transform: uppercase !important; margin: 0 !important; -webkit-text-fill-color: #000000 !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important; }
+        .cs-contact-bar { width: 5px; height: 52px; background: #005fa3; border-radius: 3px; flex-shrink: 0; box-shadow: 0 0 14px rgba(0,95,163,0.75), 0 0 28px rgba(0,95,163,0.4); }
         .cs-contact-subtitle { font-family: 'Inter', Arial, system-ui, sans-serif; font-size: 16px; font-weight: 400; color: #6b7280; line-height: 1.6; margin: 12px 0 0 0; max-width: 480px; }
         .cs-contact-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #16a34a; margin-bottom: 20px; }
         .cs-contact-badge-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: csPulse 2s ease-in-out infinite; }
@@ -180,7 +181,7 @@ export default function Contact() {
           <p className="cs-contact-eyebrow">Get In Touch</p>
           <div className="cs-contact-title-row">
             <div className="cs-contact-bar" aria-hidden="true" />
-            <h1 className="cs-contact-title">Contact Us</h1>
+            <h1 className="cs-contact-title">CONTACT US</h1>
           </div>
           <p className="cs-contact-subtitle">Have a question or ready to get started? Send us a message and we'll get back to you.</p>
         </div>
@@ -189,7 +190,7 @@ export default function Contact() {
       {/* Split-Screen Luxury Layout with Floating Containers */}
       <section className="px-6 pb-20 pt-12 md:pt-16" style={{ background: "linear-gradient(180deg, transparent 0%, rgba(0,174,239,0.02) 100%)" }}>
         <div className="max-w-7xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_1.1fr] gap-12 lg:gap-16 items-start">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-stretch">
             
             {/* LEFT: Brand Authority & Contact Details - Floating Container */}
             <div 
