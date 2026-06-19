@@ -1,6 +1,6 @@
 /**
  * LegalPage.jsx — Privacy Policy & Terms of Service
- * Refactored: semantic JSX, sticky TOC, summary header, compliance badges, consistent typography.
+ * Rebuilt to match main site: Montserrat headings, #000000 text, electric blue accents, blue bar hero.
  */
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -158,14 +158,21 @@ const COMPLIANCE_BADGES = [
 
 function SummaryCard({ items }) {
   return (
-    <div className="rounded-xl border border-primary/10 p-5 md:p-6 mb-10"
-      style={{ background: "linear-gradient(135deg, rgba(0,136,204,0.04) 0%, rgba(0,59,143,0.02) 100%)" }}>
-      <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-primary mb-4">At a Glance</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+    <div style={{
+      borderRadius: "0.75rem",
+      border: "1px solid rgba(0,174,239,0.15)",
+      padding: "24px",
+      marginBottom: "40px",
+      background: "linear-gradient(135deg, rgba(0,136,204,0.05) 0%, rgba(0,59,143,0.03) 100%)",
+    }}>
+      <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "#00AEEF", marginBottom: "16px" }}>
+        At a Glance
+      </p>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
         {items.map(({ icon: Icon, text }) => (
-          <div key={text} className="flex items-start gap-3">
-            <Icon className="w-4 h-4 text-primary mt-0.5 shrink-0" />
-            <span className="text-sm font-medium text-foreground/90 leading-snug">{text}</span>
+          <div key={text} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
+            <Icon style={{ width: "16px", height: "16px", color: "#00AEEF", flexShrink: 0, marginTop: "2px" }} />
+            <span style={{ fontSize: "14px", fontWeight: 500, color: "#1a1a1a", lineHeight: 1.5 }}>{text}</span>
           </div>
         ))}
       </div>
@@ -175,33 +182,76 @@ function SummaryCard({ items }) {
 
 function SectionBlock({ section, isActive }) {
   return (
-    <div id={section.id} className={`scroll-mt-[calc(var(--cs-nav-height)+24px)] ${isActive ? "ring-2 ring-primary/20 rounded-lg" : ""}`}>
-      <h2 className="flex items-baseline gap-3 mb-3 group">
-        <span className="text-[13px] font-extrabold text-primary/50 tabular-nums shrink-0 w-6 text-right">
+    <div
+      id={section.id}
+      style={{
+        scrollMarginTop: "calc(var(--cs-nav-height) + 24px)",
+        borderLeft: isActive ? "3px solid #00AEEF" : "3px solid transparent",
+        paddingLeft: isActive ? "16px" : "0",
+        transition: "border-color 0.2s, padding-left 0.2s",
+        marginBottom: "40px",
+      }}
+    >
+      {/* Section heading row */}
+      <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "12px" }}>
+        <span style={{
+          fontSize: "12px",
+          fontWeight: 800,
+          color: "#00AEEF",
+          fontFamily: "'Montserrat', sans-serif",
+          minWidth: "20px",
+          flexShrink: 0,
+        }}>
           {section.number}.
         </span>
-        <span className="text-lg md:text-xl font-bold leading-snug"
-          style={{ fontFamily: "'Montserrat', sans-serif", color: "#000000" }}>
+        <h2 style={{
+          fontFamily: "'Montserrat', sans-serif",
+          fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
+          fontWeight: 800,
+          color: "#000000",
+          lineHeight: 1.2,
+          margin: 0,
+          letterSpacing: "-0.01em",
+        }}>
           {section.title}
-        </span>
-      </h2>
+        </h2>
+      </div>
+
       {section.body && (
-        <p className="text-sm text-foreground/85 leading-relaxed pl-9 mb-8" style={{ maxWidth: "65ch" }}>
+        <p style={{
+          fontSize: "15px",
+          color: "#1a1a1a",
+          lineHeight: 1.75,
+          paddingLeft: "32px",
+          maxWidth: "68ch",
+          margin: 0,
+          fontFamily: "'Inter', sans-serif",
+          fontWeight: 400,
+        }}>
           {section.body}
         </p>
       )}
+
       {section.contact && (
-        <div className="pl-9 mb-8 space-y-2">
-          <p className="text-sm text-foreground/70 leading-relaxed">Questions? Reach us at:</p>
-          <a href="mailto:support@clientsurgesystems.com"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline underline-offset-2 transition-colors">
-            support@clientsurgesystems.com
-          </a>
-          <span className="text-sm text-foreground/50 mx-2">or</span>
-          <a href="tel:+16025843227"
-            className="inline-flex items-center gap-1.5 text-sm font-semibold text-primary hover:underline underline-offset-2 transition-colors">
-            (602) 584-3227
-          </a>
+        <div style={{ paddingLeft: "32px" }}>
+          <p style={{ fontSize: "15px", color: "#1a1a1a", lineHeight: 1.7, marginBottom: "8px", fontFamily: "'Inter', sans-serif" }}>
+            Questions? Reach us at:
+          </p>
+          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
+            <a href="mailto:support@clientsurgesystems.com" style={{
+              fontSize: "14px", fontWeight: 700, color: "#00AEEF", textDecoration: "none",
+              borderBottom: "1px solid rgba(0,174,239,0.3)", paddingBottom: "1px",
+            }}>
+              support@clientsurgesystems.com
+            </a>
+            <span style={{ color: "#6b7280", fontSize: "13px" }}>or</span>
+            <a href="tel:+16025843227" style={{
+              fontSize: "14px", fontWeight: 700, color: "#00AEEF", textDecoration: "none",
+              borderBottom: "1px solid rgba(0,174,239,0.3)", paddingBottom: "1px",
+            }}>
+              (602) 584-3227
+            </a>
+          </div>
         </div>
       )}
     </div>
@@ -210,48 +260,71 @@ function SectionBlock({ section, isActive }) {
 
 function TableOfContents({ sections, activeId }) {
   return (
-    <nav aria-label="Page sections" className="space-y-0.5">
-      <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground mb-3">On This Page</p>
-      {sections.map((s) => (
-        <a
-          key={s.id}
-          href={`#${s.id}`}
-          className={`flex items-center gap-2 py-1.5 px-2 -mx-2 rounded-md text-sm transition-colors ${
-            activeId === s.id
-              ? "text-primary font-semibold bg-primary/5"
-              : "text-muted-foreground hover:text-foreground hover:bg-muted/40"
-          }`}
-          onClick={(e) => {
-            e.preventDefault();
-            const el = document.getElementById(s.id);
-            if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-          }}
-        >
-          <span className="text-[11px] font-bold tabular-nums text-muted-foreground/60 w-5 shrink-0">{s.number}</span>
-          <span className="truncate">{s.title}</span>
-          {activeId === s.id && <ChevronRight className="w-3 h-3 shrink-0 ml-auto" />}
-        </a>
-      ))}
+    <nav aria-label="Page sections">
+      <p style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>
+        On This Page
+      </p>
+      <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+        {sections.map((s) => (
+          <a
+            key={s.id}
+            href={`#${s.id}`}
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById(s.id);
+              if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: "8px",
+              padding: "6px 8px",
+              borderRadius: "6px",
+              fontSize: "13px",
+              fontWeight: activeId === s.id ? 700 : 500,
+              color: activeId === s.id ? "#00AEEF" : "#1a1a1a",
+              background: activeId === s.id ? "rgba(0,174,239,0.06)" : "transparent",
+              textDecoration: "none",
+              transition: "all 0.15s ease",
+              borderLeft: activeId === s.id ? "2px solid #00AEEF" : "2px solid transparent",
+            }}
+          >
+            <span style={{ fontSize: "10px", fontWeight: 700, color: "#9ca3af", minWidth: "16px" }}>{s.number}</span>
+            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.title}</span>
+            {activeId === s.id && <ChevronRight style={{ width: "12px", height: "12px", marginLeft: "auto", flexShrink: 0 }} />}
+          </a>
+        ))}
+      </div>
     </nav>
   );
 }
 
 function ComplianceBadgeBar() {
   return (
-    <div className="max-w-4xl mx-auto px-4 md:px-6 pb-16 pt-8">
-      <p className="text-[11px] font-bold uppercase tracking-[0.15em] text-muted-foreground text-center mb-5">
-        Compliance &amp; Trust
-      </p>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {COMPLIANCE_BADGES.map(({ label, desc }) => (
-          <div key={label}
-            className="rounded-xl border border-border/60 p-4 text-center flex flex-col items-center gap-2"
-            style={{ background: "rgba(255,255,255,0.6)" }}>
-            <Shield className="w-5 h-5 text-muted-foreground/40" />
-            <span className="text-xs font-bold text-foreground/70 leading-tight">{label}</span>
-            <span className="text-[10px] text-muted-foreground/60 leading-snug">{desc}</span>
-          </div>
-        ))}
+    <div style={{ background: "#f8fafc", borderTop: "1px solid rgba(0,174,239,0.10)", padding: "48px 24px" }}>
+      <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
+        <p style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6b7280", textAlign: "center", marginBottom: "20px" }}>
+          Compliance &amp; Trust
+        </p>
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
+          {COMPLIANCE_BADGES.map(({ label, desc }) => (
+            <div key={label} style={{
+              borderRadius: "0.75rem",
+              border: "1px solid rgba(0,174,239,0.12)",
+              padding: "16px",
+              textAlign: "center",
+              background: "#ffffff",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "8px",
+            }}>
+              <Shield style={{ width: "20px", height: "20px", color: "#00AEEF" }} />
+              <span style={{ fontSize: "12px", fontWeight: 700, color: "#000000", lineHeight: 1.3 }}>{label}</span>
+              <span style={{ fontSize: "11px", color: "#6b7280", lineHeight: 1.4 }}>{desc}</span>
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -278,21 +351,16 @@ export default function LegalPage({ fixedType, canonicalPath }) {
     ogDescription: `Review the latest ClientSurge Systems ${title.toLowerCase()} for lead capture, messaging, and service operations.`,
   }), [canonicalPath, title, type]);
 
-  // Intersection observer for active TOC item
   useEffect(() => {
     const observer = new IntersectionObserver(
       (entries) => {
         for (const entry of entries) {
-          if (entry.isIntersecting) {
-            setActiveId(entry.target.id);
-            break;
-          }
+          if (entry.isIntersecting) { setActiveId(entry.target.id); break; }
         }
       },
       { rootMargin: "-80px 0px -60% 0px", threshold: 0 }
     );
-    const ids = sections.map((s) => s.id);
-    ids.forEach((id) => {
+    sections.forEach(({ id }) => {
       const el = document.getElementById(id);
       if (el) observer.observe(el);
     });
@@ -301,98 +369,168 @@ export default function LegalPage({ fixedType, canonicalPath }) {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen bg-white">
+      <div style={{ minHeight: "100vh", background: "#ffffff" }}>
         <Navbar />
 
-        <main
-          ref={contentRef}
-          className="mx-auto px-4 md:px-6"
-          style={{
-            maxWidth: "1024px",
-            paddingTop: "calc(var(--cs-nav-height) + 36px)",
-            paddingBottom: "48px",
-          }}
-        >
-          {/* Last updated + tab switcher */}
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
-            <p className="text-[11px] font-medium text-muted-foreground/60">
-              Last updated: {updated}
+        {/* ── Hero — matches main site contact/about hero style ── */}
+        <section style={{
+          background: "linear-gradient(180deg, rgba(0,174,239,0.06) 0%, #ffffff 100%)",
+          paddingTop: "calc(var(--cs-nav-height) + 48px)",
+          paddingBottom: "40px",
+          paddingLeft: "clamp(1.5rem, 6vw, 80px)",
+          paddingRight: "clamp(1.5rem, 6vw, 80px)",
+        }}>
+          <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
+            {/* Eyebrow */}
+            <p style={{
+              fontSize: "11px",
+              fontWeight: 800,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "#00AEEF",
+              marginBottom: "14px",
+              fontFamily: "'Montserrat', sans-serif",
+            }}>
+              Legal
             </p>
-            <div className="flex gap-1 rounded-lg border border-border/60 p-0.5 bg-muted/30">
-              <button
-                onClick={() => navigate("/privacy-policy")}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                  type === "privacy" ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Privacy
-              </button>
-              <button
-                onClick={() => navigate("/terms")}
-                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-colors ${
-                  type === "terms" ? "bg-white text-primary shadow-sm" : "text-muted-foreground hover:text-foreground"
-                }`}
-              >
-                Terms
-              </button>
+
+            {/* Title row — blue bar + heading */}
+            <div style={{ display: "flex", alignItems: "center", gap: "18px", marginBottom: "16px" }}>
+              <div style={{
+                width: "5px",
+                height: "52px",
+                background: "#00AEEF",
+                borderRadius: "3px",
+                flexShrink: 0,
+                boxShadow: "0 0 14px rgba(0,174,239,0.6)",
+              }} />
+              <h1 style={{
+                fontFamily: "'Montserrat', sans-serif",
+                fontSize: "clamp(2rem, 5vw, 3rem)",
+                fontWeight: 900,
+                color: "#000000",
+                lineHeight: 1.05,
+                letterSpacing: "-0.025em",
+                textTransform: "uppercase",
+                margin: 0,
+              }}>
+                {title}
+              </h1>
+            </div>
+
+            {/* Last updated + tab switcher */}
+            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+              <p style={{ fontSize: "12px", fontWeight: 500, color: "#6b7280" }}>
+                Last updated: {updated}
+              </p>
+              <div style={{
+                display: "flex",
+                gap: "4px",
+                borderRadius: "8px",
+                border: "1px solid rgba(0,174,239,0.2)",
+                padding: "3px",
+                background: "#f9fafb",
+              }}>
+                <button
+                  onClick={() => navigate("/privacy-policy")}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    background: type === "privacy" ? "#ffffff" : "transparent",
+                    color: type === "privacy" ? "#00AEEF" : "#6b7280",
+                    boxShadow: type === "privacy" ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                  }}
+                >
+                  Privacy
+                </button>
+                <button
+                  onClick={() => navigate("/terms")}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: "6px",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all 0.15s",
+                    background: type === "terms" ? "#ffffff" : "transparent",
+                    color: type === "terms" ? "#00AEEF" : "#6b7280",
+                    boxShadow: type === "terms" ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
+                  }}
+                >
+                  Terms
+                </button>
+              </div>
             </div>
           </div>
+        </section>
 
-          {/* Title */}
-          <h1
-            className="font-extrabold mb-2 tracking-tight"
-            style={{ color: "#000000", fontFamily: "'Montserrat', sans-serif", fontSize: "clamp(1.5rem, 4vw, 2.25rem)", lineHeight: 1.15 }}
-          >
-            {title}
-          </h1>
-
-          {/* Gold rule */}
-          <div className="flex items-center justify-start gap-3 mb-8">
-            <div className="h-px w-16" style={{ background: "linear-gradient(to right, rgba(0,174,239,0.5), transparent)" }} />
-            <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#00AEEF" }} />
-          </div>
-
+        {/* ── Main content ── */}
+        <main
+          ref={contentRef}
+          style={{
+            maxWidth: "1024px",
+            margin: "0 auto",
+            padding: "40px 24px 64px",
+          }}
+        >
           {/* Summary card */}
           <SummaryCard items={summary} />
 
           {/* Mobile TOC toggle */}
-          <div className="lg:hidden mb-6">
+          <div style={{ display: "block", marginBottom: "24px" }} className="lg:hidden">
             <button
               onClick={() => setMobileTocOpen(!mobileTocOpen)}
-              className="flex items-center gap-2 w-full px-4 py-3 rounded-xl border border-border/60 bg-card text-sm font-semibold text-foreground hover:border-primary/30 transition-colors"
+              style={{
+                display: "flex",
+                alignItems: "center",
+                gap: "8px",
+                width: "100%",
+                padding: "12px 16px",
+                borderRadius: "10px",
+                border: "1px solid rgba(0,174,239,0.2)",
+                background: "#f9fafb",
+                fontSize: "13px",
+                fontWeight: 700,
+                color: "#000000",
+                cursor: "pointer",
+              }}
             >
-              <ScrollText className="w-4 h-4 text-primary" />
+              <ScrollText style={{ width: "15px", height: "15px", color: "#00AEEF" }} />
               On This Page
-              <ChevronDown className={`w-4 h-4 ml-auto transition-transform ${mobileTocOpen ? "rotate-180" : ""}`} />
+              <ChevronDown style={{ width: "15px", height: "15px", marginLeft: "auto", transform: mobileTocOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
             </button>
             {mobileTocOpen && (
-              <div className="mt-2 p-4 rounded-xl border border-border/60 bg-card">
+              <div style={{ marginTop: "8px", padding: "16px", borderRadius: "10px", border: "1px solid rgba(0,174,239,0.15)", background: "#ffffff" }}>
                 <TableOfContents sections={sections} activeId={activeId} />
               </div>
             )}
           </div>
 
           {/* Content + Desktop TOC */}
-          <div className="flex gap-12">
-            {/* Content */}
-            <div className="flex-1 min-w-0">
+          <div style={{ display: "flex", gap: "56px", alignItems: "flex-start" }}>
+            {/* Sections */}
+            <div style={{ flex: 1, minWidth: 0 }}>
               {sections.map((section) => (
                 <SectionBlock key={section.id} section={section} isActive={activeId === section.id} />
               ))}
             </div>
 
             {/* Desktop sticky TOC */}
-            <aside className="hidden lg:block w-56 shrink-0">
-              <div className="sticky" style={{ top: "calc(var(--cs-nav-height) + 32px)" }}>
+            <aside className="hidden lg:block" style={{ width: "220px", flexShrink: 0 }}>
+              <div style={{ position: "sticky", top: "calc(var(--cs-nav-height) + 32px)" }}>
                 <TableOfContents sections={sections} activeId={activeId} />
               </div>
             </aside>
           </div>
         </main>
 
-        {/* Compliance badges */}
         <ComplianceBadgeBar />
-
         <Footer />
         <MobileCallBar />
       </div>
