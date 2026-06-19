@@ -49,7 +49,12 @@ const APP_URL = import.meta.env.VITE_BASE44_APP_BASE_URL
 const VOICE_WEBHOOK_URL = `${APP_URL}/api/receiveInboundVoiceCall`;
 const SMS_WEBHOOK_URL = `${APP_URL}/api/receiveTwilioInboundSms`;
 const MISSED_CALL_WEBHOOK_URL = `${APP_URL}/api/receiveTwilioMissedCallWebhook`;
-const VOICE_PING_URL = 'https://clientsurgesystems.com/api/twilioVoicePing';
+// ⚠️ Custom domain /api/* routes DO NOT work as Twilio webhook targets.
+// Base44 backend functions must be called via the platform's direct function URL.
+const APP_ID = '69dc4a79656fdba136d413d3';
+const BASE44_FUNCTION_BASE = `https://app.base44.com/api/apps/${APP_ID}/functions`;
+const VOICE_PING_URL = `${BASE44_FUNCTION_BASE}/twilioVoicePing`;
+const VOICE_WEBHOOK_DIRECT_URL = `${BASE44_FUNCTION_BASE}/receiveInboundVoiceCall`;
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
@@ -420,30 +425,39 @@ export default function TwilioRuntimeHealth() {
           )}
         </p>
 
-        <div className="space-y-3">
+        <div className="rounded-lg border-2 border-red-200 bg-red-50 p-3 mb-3">
+          <p className="text-xs font-bold text-red-700 flex items-center gap-1.5">
+            <XCircle className="w-3.5 h-3.5" />
+            ⚠️ Custom-domain /api/* URLs below are confirmed BROKEN for Twilio webhooks. Use the Base44 direct URLs in the section below instead.
+          </p>
+        </div>
+        <div className="space-y-3 opacity-60">
           <UrlRow
-            label="Voice — A Call Comes In"
-            url={data?.adminSettings?.voice_webhook_url || VOICE_WEBHOOK_URL}
+            label="[BROKEN] Voice — Custom Domain (DO NOT USE)"
+            url={VOICE_WEBHOOK_URL}
             method="POST"
-            description="Twilio Console → Phone Numbers → (your number) → Voice & Fax → 'A Call Comes In' → Webhook"
+            description="❌ Confirmed failing — custom domain does not correctly proxy to Base44 functions."
           />
           <UrlRow
-            label="Voice — Call Status Changes (Status Callback)"
-            url={data?.adminSettings?.voice_webhook_url || VOICE_WEBHOOK_URL}
+            label="[BROKEN] Messaging — Custom Domain (DO NOT USE)"
+            url={SMS_WEBHOOK_URL}
             method="POST"
-            description="Same URL handles both initial call and status callbacks (completed, no-answer, busy). Set under the same number's 'Call Status Changes' field."
+            description="❌ May also be failing — use direct Base44 URL instead."
+          />
+        </div>
+        <div className="mt-4 space-y-3">
+          <p className="text-xs font-bold text-green-800 uppercase tracking-widest">✅ Use These Direct Base44 URLs Instead</p>
+          <UrlRow
+            label="Voice Ping — Bare Minimum TwiML (test first)"
+            url={VOICE_PING_URL}
+            method="POST"
+            description="Twilio Console → Phone Numbers → Voice → 'A Call Comes In' → Webhook POST. Returns TwiML immediately. No DB, no auth."
           />
           <UrlRow
-            label="Messaging — A Message Comes In"
-            url={data?.adminSettings?.sms_webhook_url || SMS_WEBHOOK_URL}
+            label="Voice — Full Handler (use after ping is confirmed)"
+            url={VOICE_WEBHOOK_DIRECT_URL}
             method="POST"
-            description="Twilio Console → Phone Numbers → (your number) → Messaging → 'A Message Comes In' → Webhook"
-          />
-          <UrlRow
-            label="Missed Call Text-Back Webhook"
-            url={data?.adminSettings?.missed_call_webhook_url || MISSED_CALL_WEBHOOK_URL}
-            method="POST"
-            description="Used by the Missed Call Text-Back automation. Can also be set as Voice fallback URL."
+            description="Full inbound voice handler with async logging. Switch to this once the ping URL works."
           />
         </div>
 
@@ -519,36 +533,68 @@ export default function TwilioRuntimeHealth() {
         </div>
       )}
 
-      {/* Emergency bypass ping endpoint */}
-      <div className="rounded-xl border-2 border-orange-400 bg-orange-50 p-5 space-y-3">
+      {/* ROOT CAUSE: Custom domain /api routes don't work for Twilio */}
+      <div className="rounded-xl border-2 border-red-400 bg-red-50 p-5 space-y-4">
         <div className="flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0" />
-          <h3 className="font-bold text-orange-900 text-sm">🔧 Emergency Bypass: twilioVoicePing</h3>
+          <XCircle className="w-5 h-5 text-red-600 flex-shrink-0" />
+          <h3 className="font-bold text-red-900 text-sm">⛔ Root Cause Identified: Custom-Domain /api Routes Fail</h3>
         </div>
-        <p className="text-xs text-orange-800 leading-relaxed">
-          If <code className="bg-orange-100 px-1 rounded font-mono text-xs">/api/receiveInboundVoiceCall</code> still causes a Twilio application error,
-          use this bare-minimum ping route to prove Twilio can reach Base44 at all.
-          It has <strong>no database, no auth, no imports, no external calls</strong> — just TwiML.
-        </p>
-        <div className="rounded-lg border border-orange-300 bg-white p-3 space-y-2">
-          <p className="text-[10px] font-bold text-orange-700 uppercase tracking-widest">Temporary Setup Instruction</p>
-          <p className="text-xs text-orange-900 leading-relaxed">
-            In Twilio Console → Phone Numbers → (your number) → Voice &amp; Fax → <strong>"A Call Comes In"</strong> →
-            change to <strong>Webhook POST</strong> and paste this URL:
+        <div className="rounded-lg border border-red-300 bg-white p-3 space-y-2 text-xs text-red-800">
+          <p className="font-semibold">Live test results (confirmed failures):</p>
+          <ul className="space-y-1 list-disc list-inside text-red-700">
+            <li><code className="font-mono bg-red-50 px-1 rounded">https://clientsurgesystems.com/api/receiveInboundVoiceCall</code> → ❌ Twilio application error</li>
+            <li><code className="font-mono bg-red-50 px-1 rounded">https://clientsurgesystems.com/api/twilioVoicePing</code> → ❌ Twilio application error</li>
+          </ul>
+          <p className="text-red-700 mt-2">
+            <strong>Why:</strong> The custom domain <code className="font-mono">clientsurgesystems.com/api/*</code> does not correctly proxy to Base44 backend functions.
+            Twilio requires a URL that responds with valid TwiML within 15 seconds — the custom domain routing fails before the function is reached.
           </p>
-          <div className="flex items-center gap-1 bg-slate-50 rounded px-3 py-2 border border-slate-200">
-            <code className="text-xs text-slate-800 break-all flex-1 font-mono">{VOICE_PING_URL}</code>
-            <CopyButton text={VOICE_PING_URL} />
+        </div>
+
+        <div className="rounded-lg border-2 border-green-400 bg-green-50 p-4 space-y-3">
+          <p className="text-xs font-bold text-green-800 uppercase tracking-widest">✅ Correct URL — Paste This Into Twilio Console</p>
+          <p className="text-xs text-green-800 leading-relaxed">
+            Base44 backend functions are publicly reachable at the direct platform URL below.
+            This bypasses the custom-domain proxy entirely.
+          </p>
+
+          <div className="space-y-2">
+            <p className="text-[10px] font-bold text-green-700 uppercase tracking-widest">Voice Ping (bare-minimum TwiML — use this first)</p>
+            <div className="flex items-center gap-1 bg-white rounded px-3 py-2.5 border-2 border-green-400">
+              <code className="text-xs text-slate-900 break-all flex-1 font-mono font-bold">{VOICE_PING_URL}</code>
+              <CopyButton text={VOICE_PING_URL} />
+            </div>
+            <p className="text-[11px] text-green-700">Method: <strong>POST</strong> · Returns TwiML: <em>"Welcome to ClientSurge Systems. The voice webhook is connected."</em></p>
           </div>
-          <p className="text-xs text-orange-700 mt-1">
-            When a call is routed here, the caller will hear: <em>"Welcome to ClientSurge Systems. The voice webhook is connected."</em>
-            <br />
-            GET <span className="font-mono">{VOICE_PING_URL}</span> returns <code className="font-mono">twilio voice ping ok</code>.
+
+          <div className="space-y-2 border-t border-green-300 pt-3">
+            <p className="text-[10px] font-bold text-green-700 uppercase tracking-widest">Full Voice Handler (use after ping is confirmed working)</p>
+            <div className="flex items-center gap-1 bg-white rounded px-3 py-2.5 border border-green-300">
+              <code className="text-xs text-slate-800 break-all flex-1 font-mono">{VOICE_WEBHOOK_DIRECT_URL}</code>
+              <CopyButton text={VOICE_WEBHOOK_DIRECT_URL} />
+            </div>
+            <p className="text-[11px] text-green-700">Method: <strong>POST</strong></p>
+          </div>
+        </div>
+
+        <div className="rounded-lg bg-slate-100 border border-slate-200 p-3 text-xs text-slate-700 space-y-1">
+          <p className="font-bold">Setup Steps:</p>
+          <ol className="list-decimal list-inside space-y-1">
+            <li>Go to <strong>Twilio Console → Phone Numbers → Manage → Active numbers → (your number)</strong></li>
+            <li>Under <strong>Voice & Fax → "A Call Comes In"</strong>, set to <strong>Webhook</strong>, method <strong>POST</strong></li>
+            <li>Paste the <strong>Voice Ping URL</strong> above</li>
+            <li>Save and place a real test call</li>
+            <li>If the caller hears "Welcome to ClientSurge Systems…" — the route works. Then swap to the full handler URL.</li>
+          </ol>
+        </div>
+
+        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
+          <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+          <p className="text-xs text-amber-800">
+            <strong>Status: Waiting for live call proof.</strong> No voice gate has been marked live. No call proof has been faked.
+            Run the proof check button above after a real call succeeds.
           </p>
         </div>
-        <p className="text-[11px] text-orange-600 font-semibold">
-          ⚠ This is a temporary diagnostic tool. Once confirmed working, switch back to the main voice webhook URL.
-        </p>
       </div>
 
       {/* Asana integration status */}
