@@ -776,6 +776,12 @@ h1 {
   line-height: 1.05;
   letter-spacing: -0.03em;
   font-weight: 900;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
 }
 h2 {
   font-size: clamp(1.75rem, 4.5vw, 3.25rem);

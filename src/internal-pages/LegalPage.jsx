@@ -408,21 +408,28 @@ export default function LegalPage({ fixedType, canonicalPath }) {
                 fontFamily: "'Montserrat', sans-serif",
                 fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 900,
-                color: "#000000 !important",
-                WebkitTextFillColor: "#000000",
                 lineHeight: 1.05,
                 letterSpacing: "-0.025em",
                 textTransform: "uppercase",
                 margin: 0,
-                textShadow: "none",
-                background: "none !important",
-                backgroundImage: "none !important",
-                WebkitBackgroundClip: "unset !important",
-                backgroundClip: "unset !important",
-                filter: "none",
-                opacity: 1,
+                background: "none",
+                backgroundImage: "none",
+                WebkitBackgroundClip: "unset",
+                backgroundClip: "unset",
+                WebkitTextFillColor: "#000000",
+                color: "#000000",
               }}>
-                {title}
+                <span style={{
+                  color: "#000000",
+                  WebkitTextFillColor: "#000000",
+                  background: "none",
+                  backgroundImage: "none",
+                  WebkitBackgroundClip: "unset",
+                  backgroundClip: "unset",
+                  display: "inline",
+                }}>
+                  {title}
+                </span>
               </h1>
             </div>
 
