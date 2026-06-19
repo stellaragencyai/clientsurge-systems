@@ -3,12 +3,15 @@
  * Fix #5
  */
 import { useState, useEffect } from 'react';
-import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle, MessageCircle } from 'lucide-react';
+import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle, MessageCircle, Copy, Radio, Loader2 } from 'lucide-react';
 import { fetchAdminSettings, getAdminSettingsError, saveAdminSettings } from '@/lib/adminSettingsApi';
 import EmailTemplatePreviewModal from './EmailTemplatePreviewModal';
+import { base44 } from '@/api/base44Client';
+import WebhooksTab from './WebhooksTab';
 
 const TABS = [
   { id: "channels", label: "Channels" },
+  { id: "webhooks", label: "Webhooks" },
   { id: "security", label: "Security" },
   { id: "instant", label: "Instant Response" },
   { id: "followup", label: "Follow-Up SMS" },
@@ -223,6 +226,10 @@ export default function AdminSettingsPanel() {
             </div>
           </div>
         </div>
+      )}
+
+      {activeTab === "webhooks" && (
+        <WebhooksTab settings={settings} onSettingsUpdated={setSettings} />
       )}
 
       {activeTab === "security" && (

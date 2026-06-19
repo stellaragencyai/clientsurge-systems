@@ -104,13 +104,15 @@ export default function TwilioRuntimeHealth() {
     setError(null);
     try {
       // Load in parallel: CommunicationEvents, WebhookRegistrations, LaunchGates, AutomationChecklists
-      const [voiceEvents, smsEvents, webhookRegs, launchGates, checklists] = await Promise.all([
+      const [voiceEvents, smsEvents, webhookRegs, launchGates, checklists, adminSettingsList] = await Promise.all([
         base44.entities.CommunicationEvent.filter({ channel: 'voice', provider: 'twilio' }, '-created_date', 1).catch(() => []),
         base44.entities.CommunicationEvent.filter({ channel: 'sms', provider: 'twilio' }, '-created_date', 1).catch(() => []),
         base44.entities.WebhookRegistration.list('-created_date', 50).catch(() => []),
         base44.entities.LaunchGate.list('', 50).catch(() => []),
         base44.entities.AutomationChecklist.list('-created_date', 100).catch(() => []),
+        base44.entities.AdminSettings.list('-created_date', 1).catch(() => []),
       ]);
+      const adminSettings = adminSettingsList?.[0] || null;
 
       // Normalization layer — same alias set as the proof runner
       const SMS_SOURCE_NAME_ALIASES = new Set([
@@ -147,6 +149,7 @@ export default function TwilioRuntimeHealth() {
         legacyKeyIssues,
         unknownKeyIssues,
         checklist_count: checklists?.length || 0,
+        adminSettings,
       });
     } catch (err) {
       setError(err.message);
@@ -398,49 +401,66 @@ export default function TwilioRuntimeHealth() {
 
       {/* Twilio Console Setup Instructions */}
       <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <ExternalLink className="w-4 h-4 text-slate-600" />
-          <h3 className="font-semibold text-slate-900 text-sm">Twilio Console Setup Instructions</h3>
+        <div className="flex items-center justify-between flex-wrap gap-2">
+          <div className="flex items-center gap-2">
+            <ExternalLink className="w-4 h-4 text-slate-600" />
+            <h3 className="font-semibold text-slate-900 text-sm">Twilio Console Setup Instructions</h3>
+          </div>
+          {data?.adminSettings?.webhook_enabled ? (
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-green-100 text-green-700">webhook_enabled: true</span>
+          ) : (
+            <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-amber-100 text-amber-700">webhook_enabled: false — go to Settings → Webhooks → Seed URLs</span>
+          )}
         </div>
         <p className="text-xs text-slate-500">
           Paste these exact URLs into your Twilio phone number configuration. All use HTTP POST.
+          {data?.adminSettings?.last_webhook_test_at && (
+            <span className="ml-1 text-green-600">Route health checked: {new Date(data.adminSettings.last_webhook_test_at).toLocaleString()}</span>
+          )}
         </p>
 
         <div className="space-y-3">
           <UrlRow
             label="Voice — A Call Comes In"
-            url={VOICE_WEBHOOK_URL}
+            url={data?.adminSettings?.voice_webhook_url || VOICE_WEBHOOK_URL}
             method="POST"
             description="Twilio Console → Phone Numbers → (your number) → Voice & Fax → 'A Call Comes In' → Webhook"
           />
           <UrlRow
             label="Voice — Call Status Changes (Status Callback)"
-            url={VOICE_WEBHOOK_URL}
+            url={data?.adminSettings?.voice_webhook_url || VOICE_WEBHOOK_URL}
             method="POST"
             description="Same URL handles both initial call and status callbacks (completed, no-answer, busy). Set under the same number's 'Call Status Changes' field."
           />
           <UrlRow
             label="Messaging — A Message Comes In"
-            url={SMS_WEBHOOK_URL}
+            url={data?.adminSettings?.sms_webhook_url || SMS_WEBHOOK_URL}
             method="POST"
             description="Twilio Console → Phone Numbers → (your number) → Messaging → 'A Message Comes In' → Webhook"
           />
           <UrlRow
             label="Missed Call Text-Back Webhook"
-            url={MISSED_CALL_WEBHOOK_URL}
+            url={data?.adminSettings?.missed_call_webhook_url || MISSED_CALL_WEBHOOK_URL}
             method="POST"
             description="Used by the Missed Call Text-Back automation. Can also be set as Voice fallback URL."
           />
         </div>
 
+        {data?.adminSettings?.last_webhook_test_result && (
+          <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
+            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Last Route Health Check</p>
+            <p className="text-xs text-slate-700 font-mono">{data.adminSettings.last_webhook_test_result}</p>
+          </div>
+        )}
+
         <div className="rounded-lg bg-blue-50 border border-blue-200 p-3">
           <p className="text-xs font-semibold text-blue-800 flex items-center gap-1.5">
             <Info className="w-3.5 h-3.5" />
-            After pasting the URLs, place a test call to your Twilio number.
+            After pasting the URLs, place a test call or send a test SMS to your Twilio number.
           </p>
           <p className="text-xs text-blue-700 mt-1">
-            A successful call will create a CommunicationEvent (channel=voice, provider=twilio)
-            and update the WebhookRegistration.last_triggered_at. Run the proof check above to verify.
+            A real inbound call creates a CommunicationEvent (channel=voice, provider=twilio) and updates WebhookRegistration.last_triggered_at.
+            A real inbound SMS does the same for channel=sms. Run the proof check to verify.
           </p>
         </div>
       </div>

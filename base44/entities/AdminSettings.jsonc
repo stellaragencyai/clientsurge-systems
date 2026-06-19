@@ -78,7 +78,30 @@
     },
     "webhook_url": {
       "type": "string",
-      "title": "Webhook URL"
+      "title": "Webhook URL (legacy single-field)"
+    },
+    "voice_webhook_url": {
+      "type": "string",
+      "title": "Twilio Voice Webhook URL",
+      "description": "Full public URL for Twilio Voice \u2014 paste into Twilio Console \u2192 Phone Numbers \u2192 Voice & Fax \u2192 A Call Comes In"
+    },
+    "sms_webhook_url": {
+      "type": "string",
+      "title": "Twilio SMS Webhook URL",
+      "description": "Full public URL for Twilio Inbound SMS \u2014 paste into Twilio Console \u2192 Phone Numbers \u2192 Messaging \u2192 A Message Comes In"
+    },
+    "missed_call_webhook_url": {
+      "type": "string",
+      "title": "Twilio Missed Call Webhook URL",
+      "description": "Full public URL for missed-call text-back \u2014 paste into Twilio Console voice fallback or status callback"
+    },
+    "last_webhook_test_result": {
+      "type": "string",
+      "title": "Last Webhook Test Result"
+    },
+    "last_webhook_test_at": {
+      "type": "string",
+      "title": "Last Webhook Test At"
     },
     "sms_template": {
       "type": "string",
@@ -187,14 +210,6 @@
     "nurture_step8_body": {
       "type": "string",
       "title": "Nurture Step 8 Body (Day 30 \u2014 Final CTA)"
-    },
-    "last_webhook_test_result": {
-      "type": "string",
-      "title": "Last Webhook Test Result"
-    },
-    "last_webhook_test_at": {
-      "type": "string",
-      "title": "Last Webhook Test At"
     },
     "cadence_default_mode": {
       "type": "string",
