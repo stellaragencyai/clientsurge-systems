@@ -155,7 +155,7 @@ export default function Contact() {
         .cs-contact-title-row { display: flex; align-items: center; gap: 20px; }
         .cs-contact-bar { width: 5px; height: 52px; background: #00AEEF; border-radius: 3px; flex-shrink: 0; }
         .cs-contact-title { font-family: 'Montserrat', 'Inter', Arial, system-ui, sans-serif !important; font-size: 52px !important; font-weight: 800 !important; line-height: 1.05 !important; letter-spacing: -0.025em !important; color: #000000 !important; text-transform: uppercase !important; margin: 0 !important; -webkit-text-fill-color: #000000 !important; background: none !important; -webkit-background-clip: unset !important; background-clip: unset !important; }
-        .cs-contact-bar { width: 5px; height: 52px; background: #005fa3; border-radius: 3px; flex-shrink: 0; box-shadow: 0 0 14px rgba(0,95,163,0.75), 0 0 28px rgba(0,95,163,0.4); }
+        .cs-contact-bar { width: 5px; height: 52px; background: #002966; border-radius: 3px; flex-shrink: 0; box-shadow: 0 0 16px rgba(0,41,102,0.95), 0 0 32px rgba(0,41,102,0.7), 0 0 48px rgba(0,41,102,0.4); }
         .cs-contact-subtitle { font-family: 'Inter', Arial, system-ui, sans-serif; font-size: 16px; font-weight: 400; color: #6b7280; line-height: 1.6; margin: 12px 0 0 0; max-width: 480px; }
         .cs-contact-badge { display: inline-flex; align-items: center; gap: 6px; background: #f0fdf4; border: 1px solid #bbf7d0; border-radius: 20px; padding: 4px 12px; font-size: 11px; font-weight: 600; color: #16a34a; margin-bottom: 20px; }
         .cs-contact-badge-dot { width: 6px; height: 6px; background: #22c55e; border-radius: 50%; animation: csPulse 2s ease-in-out infinite; }
