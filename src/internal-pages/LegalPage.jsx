@@ -172,7 +172,7 @@ function SummaryCard({ items }) {
         {items.map(({ icon: Icon, text }) => (
           <div key={text} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
             <Icon style={{ width: "16px", height: "16px", color: "#00AEEF", flexShrink: 0, marginTop: "2px" }} />
-            <span style={{ fontSize: "14px", fontWeight: 500, color: "#1a1a1a", lineHeight: 1.5 }}>{text}</span>
+            <span style={{ fontSize: "14px", fontWeight: 500, color: "#000000", lineHeight: 1.5 }}>{text}</span>
           </div>
         ))}
       </div>
@@ -220,7 +220,7 @@ function SectionBlock({ section, isActive }) {
       {section.body && (
         <p style={{
           fontSize: "15px",
-          color: "#1a1a1a",
+          color: "#000000",
           lineHeight: 1.75,
           paddingLeft: "32px",
           maxWidth: "68ch",
@@ -234,7 +234,7 @@ function SectionBlock({ section, isActive }) {
 
       {section.contact && (
         <div style={{ paddingLeft: "32px" }}>
-          <p style={{ fontSize: "15px", color: "#1a1a1a", lineHeight: 1.7, marginBottom: "8px", fontFamily: "'Inter', sans-serif" }}>
+          <p style={{ fontSize: "15px", color: "#000000", lineHeight: 1.7, marginBottom: "8px", fontFamily: "'Inter', sans-serif" }}>
             Questions? Reach us at:
           </p>
           <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
@@ -408,16 +408,19 @@ export default function LegalPage({ fixedType, canonicalPath }) {
                 fontFamily: "'Montserrat', sans-serif",
                 fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 900,
-                color: "#000000",
+                color: "#000000 !important",
                 WebkitTextFillColor: "#000000",
                 lineHeight: 1.05,
                 letterSpacing: "-0.025em",
                 textTransform: "uppercase",
                 margin: 0,
                 textShadow: "none",
-                background: "none",
-                WebkitBackgroundClip: "unset",
-                backgroundClip: "unset",
+                background: "none !important",
+                backgroundImage: "none !important",
+                WebkitBackgroundClip: "unset !important",
+                backgroundClip: "unset !important",
+                filter: "none",
+                opacity: 1,
               }}>
                 {title}
               </h1>
