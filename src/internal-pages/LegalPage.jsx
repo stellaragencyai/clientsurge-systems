@@ -180,8 +180,8 @@ function SectionBlock({ section, isActive }) {
         <span className="text-[13px] font-extrabold text-primary/50 tabular-nums shrink-0 w-6 text-right">
           {section.number}.
         </span>
-        <span className="text-lg md:text-xl font-bold text-foreground leading-snug"
-          style={{ fontFamily: "'Montserrat', sans-serif" }}>
+        <span className="text-lg md:text-xl font-bold leading-snug"
+          style={{ fontFamily: "'Montserrat', sans-serif", color: "#000000" }}>
           {section.title}
         </span>
       </h2>
@@ -340,12 +340,8 @@ export default function LegalPage({ fixedType, canonicalPath }) {
 
           {/* Title */}
           <h1
-            className="font-extrabold text-foreground mb-2 tracking-tight"
-            style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontSize: "clamp(1.5rem, 4vw, 2.25rem)",
-              lineHeight: 1.15,
-            }}
+            className="font-extrabold mb-2 tracking-tight"
+            style={{ color: "#000000", fontFamily: "'Montserrat', sans-serif", fontSize: "clamp(1.5rem, 4vw, 2.25rem)", lineHeight: 1.15 }}
           >
             {title}
           </h1>
