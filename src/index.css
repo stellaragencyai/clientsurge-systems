@@ -4,9 +4,9 @@
 
 @layer base {
   :root {
-    --font-inter: 'Inter', sans-serif;
-    --font-display: 'Bebas Neue', sans-serif;
-    --font-titles: 'Montserrat', sans-serif;
+    --font-inter: 'Barlow', sans-serif;
+    --font-display: 'Raleway', sans-serif;
+    --font-titles: 'Raleway', sans-serif;
 
     /* ClientSurge Electric Blue Theme — unified to #00AEEF */
     --background: 210 100% 99%;
@@ -430,7 +430,7 @@ nav {
   }
   h2 {
     font-size: clamp(1.5rem, 5vw, 2rem) !important;
-    font-family: 'Montserrat', sans-serif !important;
+    font-family: 'Raleway', sans-serif !important;
     color: #000000 !important;
   }
   h3 {
@@ -693,11 +693,12 @@ body::after {
     Unified across all pages and components
     ============================================ */
 
-/* Font-family assignments — Montserrat for ALL headings, Inter for body */
+/* Font-family assignments — Raleway for ALL headings (uppercase), Barlow for body */
 .font-titles,
 .font-display,
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif !important;
+  font-family: 'Raleway', sans-serif !important;
+  text-transform: uppercase;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #000000 !important;
@@ -708,6 +709,17 @@ h1, h2, h3, h4, h5, h6 {
   background-clip: unset !important;
 }
 
+/* Opt-out: allow specific headings to skip uppercase (e.g. admin UI, legal text) */
+.heading-no-upper,
+.heading-no-upper h1,
+.heading-no-upper h2,
+.heading-no-upper h3,
+.heading-no-upper h4,
+.heading-no-upper h5,
+.heading-no-upper h6 {
+  text-transform: none !important;
+}
+
 /* Pillar 1 Task 17 — Remove rogue text-shadows from body paragraphs */
 p, li, span, td, th {
   text-shadow: none;
@@ -715,7 +727,7 @@ p, li, span, td, th {
 
 /* Pillar 1 Task 18 — Standardize form labels */
 label, .cs-form-label {
-  font-family: 'Inter', sans-serif;
+  font-family: 'Barlow', sans-serif;
   font-size: 0.65rem;
   font-weight: 700;
   letter-spacing: 0.1em;
@@ -738,17 +750,15 @@ a[href^="tel:"]:hover {
   color: #00AEEF;
 }
 
-/* Uppercase tracking for headers and labels */
-h1, h2, h3,
+/* Eyebrow/label tracking */
 [class*="eyebrow"],
-.uppercase,
 .font-titles {
-  letter-spacing: -0.02em;
+  letter-spacing: 0.08em;
 }
 
 /* Premium body text */
 body, p, span, div {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Barlow', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -764,31 +774,44 @@ body, p, span, div {
 }
 
 /* ============================================
-   REFINEMENT #11: FLUID HEADING SCALING
-   clamp(min, preferred, max) across all levels
+   HEADING SCALE — Raleway, uppercase, black
+   Desktop: h1=70px h2=48px h3=34px h4=26px h5=20px h6=16px
+   Mobile: scaled down via clamp
    ============================================ */
 h1 {
-  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-size: clamp(2.5rem, 6vw, 4.375rem); /* 70px */
   line-height: 1.05;
-  letter-spacing: -0.03em;
+  letter-spacing: 0.02em;
   font-weight: 900;
 }
 h2 {
-  font-size: clamp(1.75rem, 4.5vw, 3.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  font-size: clamp(1.75rem, 4.5vw, 3rem); /* 48px */
+  line-height: 1.1;
+  letter-spacing: 0.02em;
   font-weight: 800;
 }
 h3 {
-  font-size: clamp(1.25rem, 3vw, 2rem);
+  font-size: clamp(1.25rem, 3vw, 2.125rem); /* 34px */
   line-height: 1.15;
-  letter-spacing: -0.015em;
+  letter-spacing: 0.02em;
   font-weight: 700;
 }
 h4 {
-  font-size: clamp(1.05rem, 2.2vw, 1.5rem);
-  line-height: 1.25;
-  letter-spacing: -0.01em;
+  font-size: clamp(1.05rem, 2.2vw, 1.625rem); /* 26px */
+  line-height: 1.2;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+h5 {
+  font-size: 1.25rem; /* 20px */
+  line-height: 1.3;
+  letter-spacing: 0.02em;
+  font-weight: 700;
+}
+h6 {
+  font-size: 1rem; /* 16px */
+  line-height: 1.4;
+  letter-spacing: 0.02em;
   font-weight: 700;
 }
 
@@ -1030,6 +1053,7 @@ button[type="submit"]:focus-visible {
 
 /* 1. Font rendering — crisp on all OS/browsers */
 body, input, button, select, textarea {
+  font-family: 'Barlow', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-synthesis: none;

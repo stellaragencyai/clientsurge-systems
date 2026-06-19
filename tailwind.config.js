@@ -5,12 +5,14 @@ module.exports = {
   theme: {
   	extend: {
   		fontFamily: {
-  			inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-  			display: ['var(--font-display)', 'Montserrat', 'system-ui', 'sans-serif'],
-  			titles: ['var(--font-titles)', 'Montserrat', 'system-ui', 'sans-serif'],
-  			bebas: ['Montserrat', 'system-ui', 'sans-serif'],
-  			montserrat: ['Montserrat', 'system-ui', 'sans-serif'],
-  			sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+  			inter: ['Barlow', 'system-ui', 'sans-serif'],
+  			display: ['Raleway', 'system-ui', 'sans-serif'],
+  			titles: ['Raleway', 'system-ui', 'sans-serif'],
+  			bebas: ['Raleway', 'system-ui', 'sans-serif'],
+  			montserrat: ['Raleway', 'system-ui', 'sans-serif'],
+  			barlow: ['Barlow', 'system-ui', 'sans-serif'],
+  			raleway: ['Raleway', 'system-ui', 'sans-serif'],
+  			sans: ['Barlow', 'system-ui', 'sans-serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',
