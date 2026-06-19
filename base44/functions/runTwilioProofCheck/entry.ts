@@ -71,11 +71,15 @@ Deno.serve(async (req) => {
     const voiceEventExists = !!latestVoiceEvent;
 
     // ── WebhookRegistration checks ──
+    // Normalization layer: all known SMS source_name aliases resolve to the canonical twilio_sms registration
+    const SMS_SOURCE_NAME_ALIASES = new Set([
+      'twilio_sms', 'sms_inbound', 'inbound_sms', 'missed_call_textback', 'missed_call_text_back',
+    ]);
     let smsWebhookReg = null;
     let voiceWebhookReg = null;
     try {
       const regs = await base44.asServiceRole.entities.WebhookRegistration.list('-created_date', 50);
-      smsWebhookReg = regs?.find(r => r.source_name === 'twilio_sms' || r.source_name?.includes('sms')) || null;
+      smsWebhookReg = regs?.find(r => SMS_SOURCE_NAME_ALIASES.has(r.source_name)) || null;
       voiceWebhookReg = regs?.find(r => r.source_name === 'twilio_voice') || null;
     } catch (_) {}
 

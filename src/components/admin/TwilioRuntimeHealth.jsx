@@ -112,8 +112,12 @@ export default function TwilioRuntimeHealth() {
         base44.entities.AutomationChecklist.list('-created_date', 100).catch(() => []),
       ]);
 
+      // Normalization layer — same alias set as the proof runner
+      const SMS_SOURCE_NAME_ALIASES = new Set([
+        'twilio_sms', 'sms_inbound', 'inbound_sms', 'missed_call_textback', 'missed_call_text_back',
+      ]);
       const voiceWebhookReg = webhookRegs?.find(r => r.source_name === 'twilio_voice') || null;
-      const smsWebhookReg = webhookRegs?.find(r => r.source_name === 'twilio_sms' || r.source_name?.includes('sms')) || null;
+      const smsWebhookReg = webhookRegs?.find(r => SMS_SOURCE_NAME_ALIASES.has(r.source_name)) || null;
       const smsGate = launchGates?.find(g => g.gate_key === 'twilio_sms_gate') || null;
       const voiceGate = launchGates?.find(g => g.gate_key === 'twilio_voice_gate') || null;
 
@@ -280,29 +284,67 @@ export default function TwilioRuntimeHealth() {
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
-          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">Latest SMS Event</p>
-          {data?.latestSmsEvent ? (
-            <div className="space-y-1 text-sm">
+          <p className="text-xs font-bold uppercase tracking-widest text-slate-500">SMS WebhookRegistration</p>
+          {data?.smsWebhookReg ? (
+            <div className="space-y-1.5 text-xs">
               <div className="flex items-center gap-2">
                 <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0" />
-                <span className="text-green-700 font-semibold">SMS events exist</span>
+                <span className="text-green-700 font-semibold text-sm">Registration found</span>
               </div>
-              <p className="text-xs text-slate-500">Last: {new Date(data.latestSmsEvent.created_date).toLocaleString()}</p>
-              <p className="text-xs text-slate-500">Status: {data.latestSmsEvent.status}</p>
-              <p className="text-xs text-slate-500">Type: {data.latestSmsEvent.event_type}</p>
+              <div className="grid grid-cols-[auto,1fr] gap-x-2 gap-y-1 mt-1">
+                <span className="text-slate-400 font-semibold">source_name</span>
+                <span className="text-slate-700 font-mono">{data.smsWebhookReg.source_name}</span>
+                <span className="text-slate-400 font-semibold">service_key</span>
+                <span className="text-slate-700 font-mono">{data.smsWebhookReg.service_key}</span>
+                <span className="text-slate-400 font-semibold">route</span>
+                <span className="text-slate-700 font-mono break-all">{data.smsWebhookReg.webhook_url}</span>
+                <span className="text-slate-400 font-semibold">status</span>
+                <span className={data.smsWebhookReg.status === 'active' ? 'text-green-600 font-semibold' : 'text-amber-600 font-semibold'}>
+                  {data.smsWebhookReg.status}
+                </span>
+                <span className="text-slate-400 font-semibold">last_triggered</span>
+                <span className={data.smsWebhookReg.last_triggered_at ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'}>
+                  {data.smsWebhookReg.last_triggered_at
+                    ? new Date(data.smsWebhookReg.last_triggered_at).toLocaleString()
+                    : 'NEVER — awaiting first real SMS hit'}
+                </span>
+              </div>
+              {data.smsWebhookReg.failure_count > 0 && (
+                <p className="text-red-600 font-semibold">Failures: {data.smsWebhookReg.failure_count} · {data.smsWebhookReg.last_error}</p>
+              )}
             </div>
           ) : (
-            <div className="flex items-center gap-2 text-sm">
-              <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
-              <span className="text-red-700">No SMS CommunicationEvents found (provider=twilio)</span>
+            <div className="space-y-1.5">
+              <div className="flex items-center gap-2 text-sm">
+                <XCircle className="w-4 h-4 text-red-500 flex-shrink-0" />
+                <span className="text-red-700 font-semibold">NOT FOUND</span>
+              </div>
+              <p className="text-xs text-red-600">
+                No WebhookRegistration found for source_names: twilio_sms, sms_inbound, inbound_sms, missed_call_textback, missed_call_text_back.
+                This is what was blocking the SMS gate.
+              </p>
             </div>
           )}
+          {/* Latest SMS CommunicationEvent */}
+          <div className="border-t border-slate-100 pt-2 space-y-1">
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Latest SMS CommunicationEvent</p>
+            {data?.latestSmsEvent ? (
+              <div className="text-xs text-slate-600 space-y-0.5">
+                <p>{new Date(data.latestSmsEvent.created_date).toLocaleString()} · {data.latestSmsEvent.event_type} · {data.latestSmsEvent.status}</p>
+              </div>
+            ) : (
+              <p className="text-xs text-red-600">None found (provider=twilio, channel=sms)</p>
+            )}
+          </div>
           {data?.smsGate && (
-            <p className="text-[11px] font-semibold">
+            <p className="text-[11px] font-semibold border-t border-slate-100 pt-2">
               Gate: <span className={data.smsGate.status === 'blocked' ? 'text-amber-600' : 'text-green-600'}>
                 {data.smsGate.status}
               </span>
               {' '}({data.smsGate.proof_percent}% proof)
+              {data.smsGate.current_blocker && (
+                <span className="text-slate-500 font-normal"> — {data.smsGate.current_blocker}</span>
+              )}
             </p>
           )}
         </div>
