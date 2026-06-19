@@ -409,10 +409,15 @@ export default function LegalPage({ fixedType, canonicalPath }) {
                 fontSize: "clamp(2rem, 5vw, 3rem)",
                 fontWeight: 900,
                 color: "#000000",
+                WebkitTextFillColor: "#000000",
                 lineHeight: 1.05,
                 letterSpacing: "-0.025em",
                 textTransform: "uppercase",
                 margin: 0,
+                textShadow: "none",
+                background: "none",
+                WebkitBackgroundClip: "unset",
+                backgroundClip: "unset",
               }}>
                 {title}
               </h1>
