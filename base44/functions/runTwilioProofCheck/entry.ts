@@ -121,7 +121,10 @@ Deno.serve(async (req) => {
     const voiceMissingItems = voiceChecks.filter(c => !c.passed).map(c => c.label);
     const voiceBlocker = voiceMissingItems.length > 0
       ? `Missing: ${voiceMissingItems.join('; ')}`
-      : 'All voice checks passed — awaiting manual approval';
+      : 'Smoke webhook passed — live inbound phone call not yet tested';
+    const voiceNextAction = voicePassedCount === voiceChecks.length
+      ? 'Place a real call to the Twilio number and confirm a non-smoke voice CommunicationEvent is created'
+      : voiceMissingItems[0];
 
     // ── Update LaunchGate records ──
     const launchGates = await base44.asServiceRole.entities.LaunchGate.list('', 50);
@@ -135,11 +138,30 @@ Deno.serve(async (req) => {
       `SMS WebhookRegistration: ${smsWebhookReg ? smsWebhookReg.status : 'NOT FOUND'}`,
     ].join(' | ');
 
+    // Detect if the latest voice event is a smoke/test payload vs real inbound call
+    const isSmoke = latestVoiceEvent?.provider_message_id?.startsWith('CA_TEST')
+      || latestVoiceEvent?.provider_message_id?.startsWith('SMOKE');
+    const voiceEventLabel = latestVoiceEvent
+      ? `${latestVoiceEvent.created_date} (id=${latestVoiceEvent.id}, sid=${latestVoiceEvent.provider_message_id}, ${isSmoke ? 'SMOKE PAYLOAD — not a real call' : 'REAL CALL'})`
+      : 'NONE — webhook never hit';
+
+    // WebsiteLead call capture check
+    let voiceLeadCapture = null;
+    try {
+      const leads = await base44.asServiceRole.entities.WebsiteLead.filter(
+        { call_sid: latestVoiceEvent?.provider_message_id }, '-created_date', 1
+      );
+      voiceLeadCapture = leads?.[0] || null;
+    } catch (_) {}
+
     const voiceEvidenceSummary = [
       `Twilio credentials: ${twilioCredsOk ? 'PRESENT' : 'MISSING'}`,
       `ElevenLabs agent: ${voiceAgentConfigured ? 'CONFIGURED' : 'MISSING'}`,
-      `Latest voice CommunicationEvent: ${latestVoiceEvent ? latestVoiceEvent.created_date : 'NONE — webhook never hit'}`,
+      `Latest voice CommunicationEvent: ${voiceEventLabel}`,
       `Voice webhook last_triggered_at: ${voiceWebhookReg?.last_triggered_at || 'NEVER'}`,
+      `WebsiteLead call capture: ${voiceLeadCapture ? `id=${voiceLeadCapture.id}` : 'NONE'}`,
+      `Smoke webhook passed: ${voiceEventExists && isSmoke ? 'YES' : 'NO'}`,
+      `Real live inbound call: ${voiceEventExists && !isSmoke ? 'YES' : 'NOT YET TESTED'}`,
     ].join(' | ');
 
     if (smsDatabaseGate) {
@@ -164,9 +186,7 @@ Deno.serve(async (req) => {
         completion_percent: voiceCompletionPct,
         proof_percent: voiceProofPct,
         current_blocker: voiceBlocker,
-        next_action: voicePassedCount === voiceChecks.length
-          ? 'All voice checks pass — request manual approval'
-          : voiceMissingItems[0],
+        next_action: voiceNextAction,
         evidence_summary: voiceEvidenceSummary,
         last_checked_at: now,
         last_verdict: `Proof runner executed ${now} — ${voicePassedCount}/${voiceChecks.length} checks passed`,
