@@ -49,6 +49,7 @@ const APP_URL = import.meta.env.VITE_BASE44_APP_BASE_URL
 const VOICE_WEBHOOK_URL = `${APP_URL}/api/receiveInboundVoiceCall`;
 const SMS_WEBHOOK_URL = `${APP_URL}/api/receiveTwilioInboundSms`;
 const MISSED_CALL_WEBHOOK_URL = `${APP_URL}/api/receiveTwilioMissedCallWebhook`;
+const VOICE_PING_URL = 'https://clientsurgesystems.com/api/twilioVoicePing';
 
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
@@ -517,6 +518,38 @@ export default function TwilioRuntimeHealth() {
           All {data?.checklist_count} AutomationChecklist records use canonical service keys.
         </div>
       )}
+
+      {/* Emergency bypass ping endpoint */}
+      <div className="rounded-xl border-2 border-orange-400 bg-orange-50 p-5 space-y-3">
+        <div className="flex items-center gap-2">
+          <AlertTriangle className="w-5 h-5 text-orange-600 flex-shrink-0" />
+          <h3 className="font-bold text-orange-900 text-sm">🔧 Emergency Bypass: twilioVoicePing</h3>
+        </div>
+        <p className="text-xs text-orange-800 leading-relaxed">
+          If <code className="bg-orange-100 px-1 rounded font-mono text-xs">/api/receiveInboundVoiceCall</code> still causes a Twilio application error,
+          use this bare-minimum ping route to prove Twilio can reach Base44 at all.
+          It has <strong>no database, no auth, no imports, no external calls</strong> — just TwiML.
+        </p>
+        <div className="rounded-lg border border-orange-300 bg-white p-3 space-y-2">
+          <p className="text-[10px] font-bold text-orange-700 uppercase tracking-widest">Temporary Setup Instruction</p>
+          <p className="text-xs text-orange-900 leading-relaxed">
+            In Twilio Console → Phone Numbers → (your number) → Voice &amp; Fax → <strong>"A Call Comes In"</strong> →
+            change to <strong>Webhook POST</strong> and paste this URL:
+          </p>
+          <div className="flex items-center gap-1 bg-slate-50 rounded px-3 py-2 border border-slate-200">
+            <code className="text-xs text-slate-800 break-all flex-1 font-mono">{VOICE_PING_URL}</code>
+            <CopyButton text={VOICE_PING_URL} />
+          </div>
+          <p className="text-xs text-orange-700 mt-1">
+            When a call is routed here, the caller will hear: <em>"Welcome to ClientSurge Systems. The voice webhook is connected."</em>
+            <br />
+            GET <span className="font-mono">{VOICE_PING_URL}</span> returns <code className="font-mono">twilio voice ping ok</code>.
+          </p>
+        </div>
+        <p className="text-[11px] text-orange-600 font-semibold">
+          ⚠ This is a temporary diagnostic tool. Once confirmed working, switch back to the main voice webhook URL.
+        </p>
+      </div>
 
       {/* Asana integration status */}
       <div className="rounded-lg border border-slate-200 bg-white p-4">
