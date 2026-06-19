@@ -45,6 +45,33 @@
     --sidebar-border: 199 40% 88%;
     --sidebar-ring: 199 100% 47%;
 
+    /* ── Spacing scale (4px base grid) ── */
+    --space-1: 4px;
+    --space-2: 8px;
+    --space-3: 12px;
+    --space-4: 16px;
+    --space-6: 24px;
+    --space-8: 32px;
+    --space-12: 48px;
+    --space-16: 64px;
+
+    /* ── Semantic color aliases (map to hsl tokens above) ── */
+    --color-text-primary: hsl(220, 60%, 8%);
+    --color-text-muted: hsl(215, 25%, 40%);
+    --color-text-heading: #000000;
+    --color-surface: hsl(210, 100%, 99%);
+    --color-surface-card: hsl(210, 60%, 98%);
+    --color-border-default: hsl(199, 40%, 88%);
+    --color-accent: #00AEEF;
+
+    /* ── Typography scale (px reference — enforced via h1–h6 rules below) ── */
+    --font-size-h1: 4.375rem;   /* 70px */
+    --font-size-h2: 3rem;       /* 48px */
+    --font-size-h3: 2.125rem;   /* 34px */
+    --font-size-h4: 1.625rem;   /* 26px */
+    --font-size-h5: 1.25rem;    /* 20px */
+    --font-size-h6: 1rem;       /* 16px */
+
     /* Electric Glow system — Primary blue #00AEEF */
     --cs-electric: #00AEEF;
     --cs-electric-deep: #0088CC;
@@ -425,36 +452,23 @@ nav {
 /* MOBILE OPTIMIZATION: Generous padding for breathing room */
 @media (max-width: 640px) {
   section {
-    padding-top: 4.5rem !important;
-    padding-bottom: 4.5rem !important;
+    padding-top: var(--space-12) !important;
+    padding-bottom: var(--space-12) !important;
   }
-  h2 {
-    font-size: clamp(1.5rem, 5vw, 2rem) !important;
-    font-family: 'Raleway', sans-serif !important;
-    color: #000000 !important;
-  }
+  h2 { font-size: clamp(1.5rem, 5vw, 2rem) !important; }
   h3 {
     font-size: clamp(1.1rem, 4vw, 1.5rem) !important;
   }
 }
 
-/* #8: Tablet typography — ensure readable base on iPads and mid-size devices */
+/* #8: Tablet typography — readable base on iPads and mid-size devices */
 @media (min-width: 641px) and (max-width: 1024px) {
-  body {
-    font-size: 16px;
-  }
-  h2 {
-    font-size: clamp(1.85rem, 4vw, 2.75rem) !important;
-  }
-  h3 {
-    font-size: clamp(1.25rem, 3vw, 1.75rem) !important;
-  }
-  p, li, label {
-    font-size: clamp(0.95rem, 1.4vw, 1.05rem);
-  }
-  button, a[role="button"] {
-    font-size: clamp(0.85rem, 1.3vw, 1rem);
-  }
+  body { font-size: 16px; }
+  h1 { font-size: clamp(2.25rem, 5.5vw, var(--font-size-h1)) !important; }
+  h2 { font-size: clamp(1.85rem, 4vw, 2.75rem) !important; }
+  h3 { font-size: clamp(1.25rem, 3vw, 1.75rem) !important; }
+  h4 { font-size: clamp(1rem, 2vw, 1.5rem) !important; }
+  p, li, label { font-size: clamp(0.95rem, 1.4vw, 1.05rem); }
 }
 
 /* M06: iPad portrait (768px) — pricing cards should be 2-col not 1-col */
@@ -775,44 +789,78 @@ body, p, span, div {
 
 /* ============================================
    HEADING SCALE — Raleway, uppercase, black
+   Single source of truth. Do NOT override outside this block.
    Desktop: h1=70px h2=48px h3=34px h4=26px h5=20px h6=16px
-   Mobile: scaled down via clamp
    ============================================ */
-h1 {
-  font-size: clamp(2.5rem, 6vw, 4.375rem); /* 70px */
+h1, .h1 {
+  font-size: clamp(2.25rem, 6vw, var(--font-size-h1));
   line-height: 1.05;
   letter-spacing: 0.02em;
   font-weight: 900;
 }
-h2 {
-  font-size: clamp(1.75rem, 4.5vw, 3rem); /* 48px */
+h2, .h2 {
+  font-size: clamp(1.75rem, 4.5vw, var(--font-size-h2));
   line-height: 1.1;
   letter-spacing: 0.02em;
   font-weight: 800;
 }
-h3 {
-  font-size: clamp(1.25rem, 3vw, 2.125rem); /* 34px */
+h3, .h3 {
+  font-size: clamp(1.25rem, 3vw, var(--font-size-h3));
   line-height: 1.15;
   letter-spacing: 0.02em;
   font-weight: 700;
 }
-h4 {
-  font-size: clamp(1.05rem, 2.2vw, 1.625rem); /* 26px */
+h4, .h4 {
+  font-size: clamp(1.05rem, 2.2vw, var(--font-size-h4));
   line-height: 1.2;
   letter-spacing: 0.02em;
   font-weight: 700;
 }
-h5 {
-  font-size: 1.25rem; /* 20px */
+h5, .h5 {
+  font-size: var(--font-size-h5);
   line-height: 1.3;
   letter-spacing: 0.02em;
   font-weight: 700;
 }
-h6 {
-  font-size: 1rem; /* 16px */
+h6, .h6 {
+  font-size: var(--font-size-h6);
   line-height: 1.4;
   letter-spacing: 0.02em;
   font-weight: 700;
+}
+
+/* ── global-title: section heading utility that always inherits the h2 scale ── */
+.global-title {
+  font-family: 'Raleway', sans-serif !important;
+  font-size: clamp(1.75rem, 4.5vw, var(--font-size-h2)) !important;
+  font-weight: 800 !important;
+  text-transform: uppercase !important;
+  color: var(--color-text-heading) !important;
+  -webkit-text-fill-color: var(--color-text-heading) !important;
+  letter-spacing: 0.02em !important;
+  line-height: 1.1 !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}
+
+/* ── global-section: auto-applies base spacing/typography to any <section> ── */
+.global-section {
+  padding-top: var(--space-16);
+  padding-bottom: var(--space-16);
+}
+@media (max-width: 768px) {
+  .global-section {
+    padding-top: var(--space-12);
+    padding-bottom: var(--space-12);
+  }
+}
+@media (max-width: 480px) {
+  .global-section {
+    padding-top: var(--space-8);
+    padding-bottom: var(--space-8);
+  }
 }
 
 /* Refinement #10: Modern eyebrow labels — title case, moderate tracking */
@@ -972,15 +1020,8 @@ section + section {
 /* Responsive section padding — consistent across all screen sizes */
 @media (max-width: 640px) {
   section {
-    padding-left: max(1rem, env(safe-area-inset-left));
-    padding-right: max(1rem, env(safe-area-inset-right));
-  }
-  /* Ensure section h2 titles don't overflow on small screens */
-  h2 {
-    font-size: clamp(1.75rem, 7vw, 3rem);
-  }
-  h3 {
-    font-size: clamp(1.25rem, 5vw, 2rem);
+    padding-left: max(var(--space-4), env(safe-area-inset-left));
+    padding-right: max(var(--space-4), env(safe-area-inset-right));
   }
 }
 

@@ -14,6 +14,34 @@ module.exports = {
   			raleway: ['Raleway', 'system-ui', 'sans-serif'],
   			sans: ['Barlow', 'system-ui', 'sans-serif'],
   		},
+  		spacing: {
+  			'0': '0px',
+  			'1': 'var(--space-1)',   /* 4px */
+  			'2': 'var(--space-2)',   /* 8px */
+  			'3': 'var(--space-3)',   /* 12px */
+  			'4': 'var(--space-4)',   /* 16px */
+  			'5': '20px',
+  			'6': 'var(--space-6)',   /* 24px */
+  			'7': '28px',
+  			'8': 'var(--space-8)',   /* 32px */
+  			'9': '36px',
+  			'10': '40px',
+  			'11': '44px',
+  			'12': 'var(--space-12)', /* 48px */
+  			'14': '56px',
+  			'16': 'var(--space-16)', /* 64px */
+  			'20': '80px',
+  			'24': '96px',
+  			'32': '128px',
+  			'40': '160px',
+  			'48': '192px',
+  			'64': '256px',
+  			'px': '1px',
+  			'0.5': '2px',
+  			'1.5': '6px',
+  			'2.5': '10px',
+  			'3.5': '14px',
+  		},
   		borderRadius: {
   			lg: 'var(--radius)',
   			md: 'calc(var(--radius) - 2px)',
