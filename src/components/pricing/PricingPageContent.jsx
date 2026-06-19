@@ -304,7 +304,7 @@ export default function PricingPageContent() {
 
           <div className="text-center mt-8">
             <button
-              onClick={() => { trackCTA("start_remote_setup_pricing", "pricing_page"); navigate("/book"); }}
+              onClick={() => { trackCTA("start_remote_setup_pricing", "pricing_page"); navigate("/start"); }}
               className="cs-btn-primary inline-flex items-center gap-2"
             >
               Start Remote Setup
