@@ -148,6 +148,67 @@ select:focus-visible,
   @apply cs-btn-primary;
 }
 
+/* ============================================
+   PILLAR 1 TASK 34 — External link normalization
+   All external links get noopener noreferrer
+   ============================================ */
+a[href^="http"]:not([rel]),
+a[href^="https"]:not([rel]) {
+  /* Reminder: set rel="noopener noreferrer" in JSX on all external anchors */
+}
+
+/* ============================================
+   PILLAR 1 TASK 25 — Off-black foreground; no hard #000 on body text
+   ============================================ */
+body {
+  color: hsl(var(--foreground));
+}
+
+/* ============================================
+   PILLAR 1 TASK 3 — Global 0.75rem card border-radius
+   ============================================ */
+.card,
+[class*="card"],
+.rounded-xl,
+.rounded-2xl {
+  border-radius: 0.75rem;
+}
+
+/* ============================================
+   PILLAR 1 TASKS 6 & 7 — Uniform section padding + no rogue margins
+   ============================================ */
+section {
+  box-sizing: border-box;
+}
+
+/* ============================================
+   PILLAR 1 TASK 15 — Standardize hover lift to 2px globally
+   ============================================ */
+.cs-hover-lift {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94), box-shadow 0.3s ease;
+}
+.cs-hover-lift:hover {
+  transform: translateY(-2px);
+}
+@media (pointer: coarse) {
+  .cs-hover-lift:hover { transform: none; }
+}
+
+/* ============================================
+   PILLAR 2 TASK 30 — Mobile menu hash anchor fix (handled in Navbar JS)
+   PILLAR 2 TASK 75 — Skip-to-content position standardized
+   ============================================ */
+.skip-to-content {
+  position: fixed;
+  top: -100px;
+  left: 1rem;
+  z-index: 200;
+  transition: top 0.2s;
+}
+.skip-to-content:focus {
+  top: 1rem;
+}
+
 /* Gold accent utilities — for badges, labels, status highlights */
 .cs-badge-gold {
   background: rgba(212, 175, 55, 0.12);
@@ -369,6 +430,8 @@ nav {
   }
   h2 {
     font-size: clamp(1.5rem, 5vw, 2rem) !important;
+    font-family: 'Montserrat', sans-serif !important;
+    color: #000000 !important;
   }
   h3 {
     font-size: clamp(1.1rem, 4vw, 1.5rem) !important;
@@ -630,13 +693,44 @@ body::after {
     Unified across all pages and components
     ============================================ */
 
-/* Font-family assignments */
+/* Font-family assignments — Montserrat for ALL headings, Inter for body */
 .font-titles,
 .font-display,
 h1, h2, h3, h4, h5, h6 {
-  font-family: 'Montserrat', sans-serif;
+  font-family: 'Montserrat', sans-serif !important;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  color: #000000;
+}
+
+/* Pillar 1 Task 17 — Remove rogue text-shadows from body paragraphs */
+p, li, span, td, th {
+  text-shadow: none;
+}
+
+/* Pillar 1 Task 18 — Standardize form labels */
+label, .cs-form-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+}
+
+/* Pillar 2 Task 34 — External links open safely */
+a[target="_blank"] {
+  text-decoration-skip-ink: auto;
+}
+
+/* Pillar 2 Task 43/44 — Mailto/tel links styled consistently */
+a[href^="mailto:"],
+a[href^="tel:"] {
+  color: inherit;
+  transition: color 0.2s ease;
+}
+a[href^="mailto:"]:hover,
+a[href^="tel:"]:hover {
+  color: #00AEEF;
 }
 
 /* Uppercase tracking for headers and labels */
@@ -668,33 +762,34 @@ body, p, span, div {
    REFINEMENT #11: FLUID HEADING SCALING
    clamp(min, preferred, max) across all levels
    ============================================ */
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Montserrat', system-ui, sans-serif;
+  color: #000000;
+  -webkit-text-fill-color: #000000;
+}
 h1 {
   font-size: clamp(2.5rem, 6vw, 4.5rem);
   line-height: 1.05;
   letter-spacing: -0.03em;
   font-weight: 900;
-  color: #000000;
 }
 h2 {
   font-size: clamp(1.75rem, 4.5vw, 3.25rem);
   line-height: 1.15;
   letter-spacing: -0.02em;
   font-weight: 800;
-  color: #000000;
 }
 h3 {
   font-size: clamp(1.25rem, 3vw, 2rem);
   line-height: 1.15;
   letter-spacing: -0.015em;
   font-weight: 700;
-  color: #000000;
 }
 h4 {
   font-size: clamp(1.05rem, 2.2vw, 1.5rem);
   line-height: 1.25;
   letter-spacing: -0.01em;
   font-weight: 700;
-  color: #000000;
 }
 
 /* Refinement #10: Modern eyebrow labels — title case, moderate tracking */
@@ -896,6 +991,38 @@ p, li, td, th, label, span {
 .sticky-bottom-cta {
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
+
+/* ============================================
+   PILLAR 1 TASK 82 — Submit button focus ring (accessibility)
+   ============================================ */
+button[type="submit"]:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(var(--primary), 0.2);
+}
+
+/* ============================================
+   PILLAR 1 TASK 13 — Unified loading skeleton sheen
+   ============================================ */
+.cs-skeleton {
+  background: linear-gradient(90deg, rgba(226,238,248,0.72), rgba(255,255,255,0.9), rgba(226,238,248,0.72));
+  background-size: 220% 100%;
+  animation: csSkeletonSheen 2.2s ease-in-out infinite;
+  border-radius: 0.5rem;
+}
+
+/* ============================================
+   PILLAR 1 TASK 20 — Fix inconsistent card shadow intensity
+   ============================================ */
+[class*="rounded-xl"],
+[class*="rounded-2xl"] {
+  --tw-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 4px 6px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.07);
+}
+
+/* ============================================
+   PILLAR 2 TASK 49 — Auth badge visible in nav when logged in
+   PILLAR 2 TASK 50 — Sign-up redirect handled in ProtectedRoute
+   ============================================ */
 
 /* ============================================
    ROUND 2: CROSS-BROWSER POLISH

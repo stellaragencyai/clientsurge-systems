@@ -103,11 +103,11 @@ export default function Footer() {
             AI voice agents, missed-call recovery, follow-up, and scheduling automation that turn more local leads into booked jobs.
           </p>
           <div className="cs-footer-contact-list" aria-label="Contact ClientSurge">
-            <a href="tel:+16025843227" className="cs-footer-contact-link">
+            <a href="tel:+16025843227" className="cs-footer-contact-link" aria-label="Call ClientSurge Systems">
               <span className="cs-footer-contact-icon" aria-hidden="true"><Phone /></span>
               <span>(602) 584-3227</span>
             </a>
-            <a href="mailto:support@clientsurgesystems.com" className="cs-footer-contact-link">
+            <a href="mailto:support@clientsurgesystems.com" className="cs-footer-contact-link" aria-label="Email ClientSurge Systems">
               <span className="cs-footer-contact-icon" aria-hidden="true"><Mail /></span>
               <span>support@clientsurgesystems.com</span>
             </a>

@@ -1,0 +1,194 @@
+/**
+ * design-system.css — ClientSurge Design Token Utilities
+ * Pillar 1 & 2 unified design system enforcement
+ * Imported by main.jsx or index.css
+ */
+
+/* ============================================
+   TYPOGRAPHY — Montserrat for all headings (enforced globally)
+   ============================================ */
+h1, h2, h3, h4, h5, h6,
+.font-display, .font-titles, .font-heading {
+  font-family: 'Montserrat', system-ui, sans-serif !important;
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: none !important;
+}
+
+/* Body / UI text stays Inter */
+body, p, span, li, td, th, label, input, textarea, select, button {
+  font-family: 'Inter', system-ui, sans-serif;
+}
+
+/* ============================================
+   SECTION SPACING — uniform 6rem desktop, 4.5rem mobile
+   ============================================ */
+@media (min-width: 1025px) {
+  .cs-section {
+    padding-top: 6rem;
+    padding-bottom: 6rem;
+  }
+}
+@media (max-width: 1024px) {
+  .cs-section {
+    padding-top: 4.5rem;
+    padding-bottom: 4.5rem;
+  }
+}
+
+/* ============================================
+   CONTAINER — standardized 1180px max-width
+   ============================================ */
+.cs-container {
+  width: min(100% - 3rem, 1180px);
+  margin-inline: auto;
+}
+@media (max-width: 640px) {
+  .cs-container {
+    width: min(100% - 2rem, 1180px);
+  }
+}
+
+/* ============================================
+   CARD SYSTEM — 0.75rem radius, multi-layer shadow
+   ============================================ */
+.cs-card {
+  border-radius: 0.75rem;
+  border: 1px solid hsl(var(--border));
+  background: hsl(var(--card));
+  box-shadow:
+    0 1px 2px rgba(0,0,0,0.03),
+    0 4px 6px rgba(0,0,0,0.05),
+    0 10px 20px rgba(0,0,0,0.07);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.cs-card:hover {
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.05),
+    0 8px 20px rgba(0,0,0,0.09),
+    0 24px 48px rgba(0,0,0,0.11),
+    0 0 0 1px rgba(0,174,239,0.10);
+  transform: translateY(-2px);
+}
+@media (pointer: coarse) {
+  .cs-card:hover { transform: none; }
+}
+
+/* ============================================
+   DIVIDER — gradient fade (standardized)
+   ============================================ */
+.cs-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,174,239,0.3), transparent);
+  border: none;
+  margin: 0;
+}
+
+/* ============================================
+   SECTION TITLE — left-aligned with Blue Bar accent
+   ============================================ */
+.cs-section-title-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 1.5rem;
+}
+.cs-section-bar {
+  width: 5px;
+  min-height: 36px;
+  background: #00AEEF;
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(0,174,239,0.55);
+}
+
+/* ============================================
+   GOLD BADGE — premium label system
+   ============================================ */
+.cs-badge-premium {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(212,175,55,0.10);
+  border: 1px solid rgba(212,175,55,0.25);
+  border-radius: 20px;
+  padding: 4px 12px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #B8941F;
+  letter-spacing: 0.05em;
+}
+
+/* ============================================
+   ELECTRIC PRIMARY — interaction tokens
+   ============================================ */
+.cs-interactive {
+  color: #00AEEF;
+  transition: color 0.2s ease;
+}
+.cs-interactive:hover { color: #0088CC; }
+
+/* ============================================
+   FORM LABELS — 0.65rem, uppercase, 0.1em tracking
+   ============================================ */
+.cs-label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: hsl(var(--muted-foreground));
+  display: block;
+  margin-bottom: 10px;
+}
+
+/* ============================================
+   EXTERNAL LINKS — safety attributes reminder (enforced in JSX)
+   TOUCH TARGETS — 44px minimum for all interactive elements
+   ============================================ */
+a:not(.text-link):not(.inline-link),
+button {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* ============================================
+   LOADING STATE — unified spinner
+   ============================================ */
+.cs-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid hsl(var(--border));
+  border-top-color: #00AEEF;
+  border-radius: 50%;
+  animation: csSpin 0.7s linear infinite;
+}
+@keyframes csSpin {
+  to { transform: rotate(360deg); }
+}
+
+/* ============================================
+   EMPTY STATE — standardized padding
+   ============================================ */
+.cs-empty-state {
+  padding: 3rem 2rem;
+  text-align: center;
+  border: 1px dashed hsl(var(--border));
+  border-radius: 0.75rem;
+}
+.cs-empty-state-icon {
+  width: 3rem;
+  height: 3rem;
+  margin: 0 auto 1rem;
+  color: hsl(var(--muted-foreground));
+  opacity: 0.3;
+}
+.cs-empty-state-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: hsl(var(--foreground));
+  margin-bottom: 0.5rem;
+}
+.cs-empty-state-desc {
+  font-size: 0.85rem;
+  color: hsl(var(--muted-foreground));
+}

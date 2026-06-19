@@ -170,9 +170,9 @@ const isPublicPath = (pathname) =>
     );
   });
 
-// PathNormalizer — redirects uppercase/mixed-case paths to lowercase canonical equivalents
-// Also handles explicit legacy aliases from publicRouteMetadata
-const EXPLICIT_REDIRECT_MAP = {
+// PathNormalizer — single source of truth for all path normalization
+// Handles: uppercase → lowercase, legacy admin aliases, industry slug aliases
+const PATH_EXPLICIT_MAP = {
   "/Dashboard": "/mission-control",
   "/AdminSettings": "/mission-control",
   "/AdminLeadDetail": "/admin?tab=leads",
@@ -185,18 +185,13 @@ const EXPLICIT_REDIRECT_MAP = {
 function PathNormalizer() {
   const location = useLocation();
   const { pathname } = location;
-
-  // Check explicit map first
-  if (EXPLICIT_REDIRECT_MAP[pathname]) {
-    return <Navigate to={EXPLICIT_REDIRECT_MAP[pathname]} replace />;
+  if (PATH_EXPLICIT_MAP[pathname]) {
+    return <Navigate to={PATH_EXPLICIT_MAP[pathname]} replace />;
   }
-
-  // Normalize uppercase to lowercase (covers /HVAC → /hvac, /Roofing → /roofing, etc.)
   const lower = pathname.toLowerCase();
   if (pathname !== lower) {
     return <Navigate to={lower + location.search + location.hash} replace />;
   }
-
   return null;
 }
 
@@ -412,7 +407,6 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/automations" element={<LazyRoute Component={Automations} />} />
       <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
       <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
-      <Route path="/how-it-works" element={<LazyRoute Component={HowItWorksPage} />} />
       <Route path="/proof" element={<LazyRoute Component={ProofPage} />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
