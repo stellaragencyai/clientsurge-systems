@@ -132,7 +132,7 @@ export default function PricingPageContent() {
 
   const handlePackageCTA = (pkg) => {
     trackCTA(`package_${pkg.key}`, "pricing_page");
-    navigate(`/book?package=${pkg.key}`);
+    navigate(`/start?package=${pkg.key}`);
   };
 
   return (
