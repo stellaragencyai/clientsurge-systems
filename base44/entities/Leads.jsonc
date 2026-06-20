@@ -632,6 +632,56 @@
       "title": "Last Conversion Date",
       "format": "date-time",
       "description": "Timestamp of most recent revenue conversion"
+    },
+    "data_quality_status": {
+      "type": "string",
+      "title": "Data Quality Status",
+      "enum": [
+        "complete",
+        "partial",
+        "incomplete"
+      ],
+      "default": "complete",
+      "description": "Overall data completeness: complete (all key fields), partial (missing some), incomplete (missing critical)"
+    },
+    "data_quality_flags": {
+      "type": "array",
+      "title": "Data Quality Flags",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of identified data quality issues: missing_email, missing_phone, missing_business_name, missing_industry, needs_normalization, scoring_conflict, invalid_lead_state, etc."
+    },
+    "normalization_status": {
+      "type": "string",
+      "title": "Normalization Status",
+      "enum": [
+        "complete",
+        "partial",
+        "pending"
+      ],
+      "default": "pending",
+      "description": "Normalization readiness: complete (all normalized fields populated), partial (some), pending (awaiting normalization)"
+    },
+    "dedup_review_needed": {
+      "type": "boolean",
+      "title": "Deduplication Review Needed",
+      "default": false,
+      "description": "Flag set to true if manual dedup review recommended"
+    },
+    "scoring_validation_issues": {
+      "type": "array",
+      "title": "Scoring Validation Issues",
+      "items": {
+        "type": "string"
+      },
+      "description": "Any scoring inconsistencies detected: negative_score, out_of_range, intelligence_mismatch, etc."
+    },
+    "data_quality_checked_at": {
+      "type": "string",
+      "title": "Last Data Quality Check",
+      "format": "date-time",
+      "description": "Timestamp of most recent quality validation"
     }
   },
   "required": [

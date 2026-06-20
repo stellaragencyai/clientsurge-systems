@@ -60,8 +60,8 @@ const LeadSourceAttribution = lazy(() => import('../components/admin/LeadSourceA
 const RevenueDashboard = lazy(() => import('../components/admin/RevenueDashboard'));
 const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueTrackingDashboard'));
 const PlatformClientsPanel = lazy(() => import('../components/admin/PlatformClientsPanel'));
-const ClientLifecyclePanel = lazy(() => import('../components/admin/ClientLifecyclePanel'));
 const UnifiedOnboardingProgress = lazy(() => import('../components/admin/UnifiedOnboardingProgress'));
+const LeadDataQualityDashboard = lazy(() => import('../components/admin/LeadDataQualityDashboard'));
 
 function AdminPanelSkeleton() {
   return (
@@ -129,8 +129,8 @@ const NAV_GROUPS = [
     group: 'System',
     items: [
       { id: 'onboarding-orchestration', label: '🔄 Onboarding', icon: Zap },
+      { id: 'data-quality', label: '✓ Data Quality', icon: Activity },
       { id: 'platform-clients', label: '🏢 Platform Clients', icon: Users },
-      { id: 'lifecycle', label: '🔄 Client Lifecycle', icon: BarChart3 },
       { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
       { id: 'performance-wars', label: '🏆 Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
@@ -278,8 +278,8 @@ export default function AdminDashboard() {
       case 'revenue': return <LazyAdminPanel><RevenueDashboard /></LazyAdminPanel>;
       case 'revenue-tracking': return <LazyAdminPanel><RevenueTrackingDashboard /></LazyAdminPanel>;
       case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
+      case 'data-quality': return <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>;
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
-      case 'lifecycle': return <LazyAdminPanel><ClientLifecyclePanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;
