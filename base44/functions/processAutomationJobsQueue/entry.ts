@@ -51,14 +51,21 @@ Deno.serve(async (req) => {
           environment: getEnvironment(),
         });
 
-        // 3. Execute based on job type
+        // 3. Execute based on job type — only handle types this processor owns
+        if (!['instant_sms', 'confirmation_email'].includes(job.job_type)) {
+          // Skip legacy/other job types silently — they belong to other processors
+          await base44.asServiceRole.entities.AutomationJob.update(job.id, {
+            status: 'queued', // leave in queue for other processors
+          });
+          results.push({ job_id: job.id, skipped: true, reason: `job_type_not_handled: ${job.job_type}` });
+          continue;
+        }
+
         let result;
         if (job.job_type === 'instant_sms') {
           result = await executeInstantSms(base44, job);
         } else if (job.job_type === 'confirmation_email') {
           result = await executeConfirmationEmail(base44, job);
-        } else {
-          throw new Error(`Unknown job type: ${job.job_type}`);
         }
 
         // 4. Update job status
@@ -87,11 +94,11 @@ Deno.serve(async (req) => {
               final_error: result.error,
             });
 
-            // Create DeadLetterLog
+            // Create DeadLetterLog — client_id is required; fall back to 'unknown'
             await base44.asServiceRole.entities.DeadLetterLog.create({
               event_queue_id: job.id,
               communication_event_id: null,
-              client_id: job.client_id,
+              client_id: job.client_id || 'unknown',
               client_project_id: job.client_project_id,
               event_category: 'automation_event',
               processor_type: job.job_type,
