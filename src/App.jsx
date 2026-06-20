@@ -117,7 +117,7 @@ const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
 const SystemObservabilityDashboard = lazy(() => import("./components/mission-control/SystemObservabilityDashboard"));
-const ConversionInsightsDashboard = lazy(() => import("./components/mission-control/ConversionInsightsDashboard"));
+const FunnelOptimizationPage = lazy(() => import("./components/admin/FunnelOptimizationDashboard"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -479,7 +479,8 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "audit"), Component: FunctionAudit },
           { route: routePath("admin", "reconciliation"), Component: AdminReconciliation },
           { route: routePath("admin", "system-observability"), Component: SystemObservabilityDashboard },
-          { route: routePath("admin", "conversion-insights"), Component: ConversionInsightsDashboard },
+          { route: routePath("admin", "funnel-optimization"), Component: FunnelOptimizationPage },
+           { route: routePath("admin", "conversion-insights"), Component: lazy(() => import("./pages/admin/ConversionInsights")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}

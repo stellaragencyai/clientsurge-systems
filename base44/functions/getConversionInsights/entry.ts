@@ -1,148 +1,163 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 /**
- * Conversion Insights - Funnel analysis and drop-off tracking
- * READ-ONLY: Aggregates existing lead data for funnel visibility
+ * Conversion Insights — read-only aggregation of funnel, drop-off, source performance, and time-to-convert
  */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    
     if (!user || user.role !== 'admin') {
       return Response.json({ error: 'Unauthorized' }, { status: 403 });
     }
 
-    // Parse query params for filters
-    const url = new URL(req.url);
-    const dateRangeParam = url.searchParams.get('dateRange'); // days
-    const sourceFilter = url.searchParams.get('source');
-    const industryFilter = url.searchParams.get('industry');
+    const body = await req.json().catch(() => ({}));
+    const { date_range = '30d', source_filter = null, industry_filter = null } = body;
 
-    // Fetch all leads
-    const allLeads = await base44.asServiceRole.entities.Leads.filter({}, '-created_date', 5000);
-
+    // Calculate date range cutoff
     const now = new Date();
-    const daysBack = dateRangeParam ? parseInt(dateRangeParam) : 90;
-    const cutoffDate = new Date(now.getTime() - daysBack * 24 * 60 * 60 * 1000);
+    const rangeDays = { '7d': 7, '30d': 30, '90d': 90 }[date_range] || 30;
+    const cutoff = new Date(now.getTime() - rangeDays * 24 * 60 * 60 * 1000);
 
-    // Apply filters
-    let filteredLeads = allLeads.filter(l => new Date(l.created_date) > cutoffDate);
-    if (sourceFilter) filteredLeads = filteredLeads.filter(l => l.source === sourceFilter);
-    if (industryFilter) filteredLeads = filteredLeads.filter(l => l.industry === industryFilter);
+    // Fetch leads (limited for performance)
+    let allLeads = await base44.asServiceRole.entities.Leads.filter({}, '-created_date', 5000);
+
+    // Apply date filter
+    allLeads = allLeads.filter(l => new Date(l.created_date) >= cutoff);
+
+    // Apply source filter
+    if (source_filter) {
+      allLeads = allLeads.filter(l => l.source === source_filter);
+    }
+    // Apply industry filter
+    if (industry_filter) {
+      allLeads = allLeads.filter(l => l.industry === industry_filter);
+    }
+
+    const total = allLeads.length;
 
     // === FUNNEL STAGES ===
-    const stageCreated = filteredLeads.length;
-    const stageContacted = filteredLeads.filter(l => 
-      l.outreach_status === 'contacted' || l.outreach_status === 'replied' || l.outreach_status === 'booked'
-    ).length;
-    const stageResponded = filteredLeads.filter(l => 
-      l.outreach_status === 'replied' || l.outreach_status === 'booked'
-    ).length;
-    const stageBooked = filteredLeads.filter(l => 
-      l.outreach_status === 'booked'
-    ).length;
-    const stageClosed = filteredLeads.filter(l => 
-      l.lead_state === 'WON' || (l.outreach_status === 'booked' && l.lead_state === 'BOOKED')
+    const contacted = allLeads.filter(l =>
+      ['contacted', 'replied', 'booked'].includes(l.outreach_status) ||
+      ['Contacted', 'Replied', 'Qualified', 'Booking Prompt Sent', 'Booked', 'Closed'].includes(l.status)
     ).length;
 
-    // === CONVERSION RATES ===
-    const conversionRates = {
-      created_to_contacted: stageCreated > 0 ? Math.round((stageContacted / stageCreated) * 100) : 0,
-      contacted_to_responded: stageContacted > 0 ? Math.round((stageResponded / stageContacted) * 100) : 0,
-      responded_to_booked: stageResponded > 0 ? Math.round((stageBooked / stageResponded) * 100) : 0,
-      booked_to_closed: stageBooked > 0 ? Math.round((stageClosed / stageBooked) * 100) : 0,
-      overall: stageCreated > 0 ? Math.round((stageClosed / stageCreated) * 100) : 0,
-    };
+    const responded = allLeads.filter(l =>
+      ['replied', 'booked'].includes(l.outreach_status) ||
+      ['Replied', 'Qualified', 'Booked', 'Closed'].includes(l.status)
+    ).length;
+
+    const booked = allLeads.filter(l =>
+      l.outreach_status === 'booked' ||
+      l.status === 'Booked' ||
+      l.lead_state === 'BOOKED'
+    ).length;
+
+    const won = allLeads.filter(l =>
+      l.lead_state === 'WON' ||
+      l.crm_stage === 'Won' ||
+      l.status === 'Closed'
+    ).length;
+
+    const rate = (n, d) => d > 0 ? Math.round((n / d) * 100) : 0;
+
+    const funnelStages = [
+      { stage: 'Created', count: total, rate_from_prev: 100 },
+      { stage: 'Contacted', count: contacted, rate_from_prev: rate(contacted, total) },
+      { stage: 'Responded', count: responded, rate_from_prev: rate(responded, contacted) },
+      { stage: 'Booked', count: booked, rate_from_prev: rate(booked, responded) },
+      { stage: 'Won', count: won, rate_from_prev: rate(won, booked) },
+    ];
 
     // === DROP-OFF ANALYSIS ===
-    const dropOffs = [
-      { stage: 'Created → Contacted', leads: stageCreated - stageContacted, rate: 100 - conversionRates.created_to_contacted },
-      { stage: 'Contacted → Responded', leads: stageContacted - stageResponded, rate: 100 - conversionRates.contacted_to_responded },
-      { stage: 'Responded → Booked', leads: stageResponded - stageBooked, rate: 100 - conversionRates.responded_to_booked },
-      { stage: 'Booked → Closed', leads: stageBooked - stageClosed, rate: 100 - conversionRates.booked_to_closed },
+    const drops = [
+      { from: 'Created → Contacted', count: total - contacted, rate: rate(total - contacted, total) },
+      { from: 'Contacted → Responded', count: contacted - responded, rate: rate(contacted - responded, contacted) },
+      { from: 'Responded → Booked', count: responded - booked, rate: rate(responded - booked, responded) },
+      { from: 'Booked → Won', count: booked - won, rate: rate(booked - won, booked) },
     ];
-    const topDropOff = dropOffs.sort((a, b) => b.rate - a.rate)[0];
+    const biggestDropOff = drops.reduce((max, d) => d.rate > max.rate ? d : max, drops[0] || { from: 'N/A', rate: 0, count: 0 });
 
     // === SOURCE PERFORMANCE ===
-    const sources = {};
-    filteredLeads.forEach(l => {
+    const sourceMap = {};
+    allLeads.forEach(l => {
       const src = l.source || 'Unknown';
-      if (!sources[src]) {
-        sources[src] = { leads: 0, booked: 0, conversions: 0 };
+      if (!sourceMap[src]) sourceMap[src] = { total: 0, booked: 0, won: 0 };
+      sourceMap[src].total++;
+      if (l.outreach_status === 'booked' || l.status === 'Booked' || l.lead_state === 'BOOKED') {
+        sourceMap[src].booked++;
       }
-      sources[src].leads++;
-      if (l.outreach_status === 'booked') sources[src].booked++;
-      if (l.lead_state === 'WON') sources[src].conversions++;
+      if (l.lead_state === 'WON' || l.crm_stage === 'Won') {
+        sourceMap[src].won++;
+      }
     });
-
-    const sourcePerformance = Object.entries(sources)
+    const sourcePerformance = Object.entries(sourceMap)
       .map(([source, data]) => ({
         source,
-        total_leads: data.leads,
+        total: data.total,
         booked: data.booked,
-        conversions: data.conversions,
-        booking_rate: data.leads > 0 ? Math.round((data.booked / data.leads) * 100) : 0,
-        conversion_rate: data.leads > 0 ? Math.round((data.conversions / data.leads) * 100) : 0,
+        won: data.won,
+        conversion_rate: rate(data.booked, data.total),
       }))
-      .sort((a, b) => b.total_leads - a.total_leads);
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 10);
 
     // === TIME TO CONVERT ===
-    const leadsWithConversion = filteredLeads.filter(l => 
-      l.last_contacted_at && (l.lead_state === 'WON' || l.outreach_status === 'booked')
-    );
-    const leadsWithBookingTime = filteredLeads.filter(l => 
-      l.created_date && l.booked_at
-    );
+    let timeToBookSamples = [];
+    allLeads.forEach(l => {
+      if (l.booked_at && l.created_date) {
+        const hours = (new Date(l.booked_at) - new Date(l.created_date)) / (1000 * 60 * 60);
+        if (hours > 0 && hours < 8760) timeToBookSamples.push(hours);
+      }
+    });
+    const avgTimeToBook = timeToBookSamples.length > 0
+      ? Math.round(timeToBookSamples.reduce((a, b) => a + b, 0) / timeToBookSamples.length)
+      : null;
 
-    const avgTimeToBook = leadsWithBookingTime.length > 0
-      ? Math.round(
-          leadsWithBookingTime.reduce((sum, l) => {
-            const created = new Date(l.created_date);
-            const booked = new Date(l.booked_at);
-            return sum + (booked - created) / (1000 * 60 * 60 * 24); // days
-          }, 0) / leadsWithBookingTime.length
-        )
-      : 0;
+    let timeToContactSamples = [];
+    allLeads.forEach(l => {
+      if (l.last_contacted_at && l.created_date) {
+        const hours = (new Date(l.last_contacted_at) - new Date(l.created_date)) / (1000 * 60 * 60);
+        if (hours >= 0 && hours < 2160) timeToContactSamples.push(hours);
+      }
+    });
+    const avgTimeToContact = timeToContactSamples.length > 0
+      ? Math.round(timeToContactSamples.reduce((a, b) => a + b, 0) / timeToContactSamples.length * 10) / 10
+      : null;
 
-    const avgTimeToConvert = leadsWithConversion.length > 0
-      ? Math.round(
-          leadsWithConversion.reduce((sum, l) => {
-            const contacted = new Date(l.last_contacted_at);
-            const converted = new Date(l.lead_state === 'WON' ? l.updated_date : l.booked_at);
-            return sum + (converted - contacted) / (1000 * 60 * 60 * 24); // days
-          }, 0) / leadsWithConversion.length
-        )
-      : 0;
+    // === INDUSTRY BREAKDOWN ===
+    const industryMap = {};
+    allLeads.forEach(l => {
+      const ind = l.industry || 'Unknown';
+      if (!industryMap[ind]) industryMap[ind] = { total: 0, booked: 0 };
+      industryMap[ind].total++;
+      if (l.outreach_status === 'booked' || l.status === 'Booked') industryMap[ind].booked++;
+    });
+    const industryBreakdown = Object.entries(industryMap)
+      .map(([industry, data]) => ({
+        industry,
+        total: data.total,
+        booked: data.booked,
+        conversion_rate: rate(data.booked, data.total),
+      }))
+      .sort((a, b) => b.total - a.total)
+      .slice(0, 8);
+
+    // Available filters
+    const allSources = [...new Set(allLeads.map(l => l.source).filter(Boolean))];
+    const allIndustries = [...new Set(allLeads.map(l => l.industry).filter(Boolean))];
 
     return Response.json({
-      timestamp: new Date().toISOString(),
-      date_range_days: daysBack,
-      funnel_stages: {
-        created: stageCreated,
-        contacted: stageContacted,
-        responded: stageResponded,
-        booked: stageBooked,
-        closed: stageClosed,
-      },
-      conversion_rates: conversionRates,
-      drop_off_analysis: {
-        stages: dropOffs,
-        top_drop_off: topDropOff,
-      },
+      meta: { total_leads: total, date_range, generated_at: now.toISOString() },
+      funnel_stages: funnelStages,
+      drop_off: { stages: drops, biggest: biggestDropOff },
       source_performance: sourcePerformance,
-      time_to_convert: {
-        average_days_to_book: avgTimeToBook,
-        average_days_contact_to_conversion: avgTimeToConvert,
-        leads_with_booking_time: leadsWithBookingTime.length,
-        leads_with_conversion_time: leadsWithConversion.length,
-      },
+      time_to_convert: { avg_hours_to_book: avgTimeToBook, avg_hours_to_contact: avgTimeToContact },
+      industry_breakdown: industryBreakdown,
+      filter_options: { sources: allSources, industries: allIndustries },
     });
   } catch (error) {
     console.error('[getConversionInsights]', error);
-    return Response.json(
-      { error: error.message || 'Failed to fetch conversion insights' },
-      { status: 500 }
-    );
+    return Response.json({ error: error.message }, { status: 500 });
   }
 });
