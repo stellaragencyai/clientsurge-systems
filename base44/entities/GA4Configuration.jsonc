@@ -1,0 +1,113 @@
+{
+  "name": "GA4Configuration",
+  "type": "object",
+  "properties": {
+    "measurement_id": {
+      "type": "string",
+      "title": "GA4 Measurement ID",
+      "description": "Google Analytics 4 property measurement ID (G-XXXXXXX)"
+    },
+    "api_secret": {
+      "type": "string",
+      "title": "GA4 API Secret",
+      "description": "Optional: API secret for server-side event tracking"
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "default": false,
+      "description": "Whether GA4 tracking is active"
+    },
+    "tracked_events": {
+      "type": "array",
+      "title": "Tracked Events",
+      "description": "Which event types are sent to GA4",
+      "items": {
+        "type": "string",
+        "enum": [
+          "page_view",
+          "scroll",
+          "cta_click",
+          "pricing_view",
+          "checkout_click",
+          "form_submit",
+          "demo_booking"
+        ]
+      },
+      "default": [
+        "page_view",
+        "cta_click",
+        "pricing_view",
+        "checkout_click",
+        "form_submit"
+      ]
+    },
+    "setup_status": {
+      "type": "string",
+      "title": "Setup Status",
+      "enum": [
+        "not_configured",
+        "configured",
+        "active",
+        "error"
+      ],
+      "default": "not_configured",
+      "description": "Current configuration state"
+    },
+    "setup_guide": {
+      "type": "string",
+      "title": "Setup Guide",
+      "description": "Step-by-step GA4 integration instructions"
+    },
+    "enhanced_measurement_enabled": {
+      "type": "boolean",
+      "title": "Enhanced Measurement Enabled",
+      "default": false
+    },
+    "conversion_events": {
+      "type": "array",
+      "title": "Conversion Events",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of events marked as conversions in GA4"
+    },
+    "last_verified_at": {
+      "type": "string",
+      "title": "Last Verified At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    }
+  },
+  "required": [
+    "measurement_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

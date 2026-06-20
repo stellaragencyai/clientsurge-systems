@@ -1,0 +1,145 @@
+{
+  "name": "LandingPageAnalytics",
+  "type": "object",
+  "properties": {
+    "page_key": {
+      "type": "string",
+      "title": "Page Key",
+      "enum": [
+        "homepage",
+        "med_spa",
+        "dental",
+        "hvac",
+        "roofing",
+        "contractors",
+        "real_estate",
+        "personal_injury",
+        "plumbing",
+        "chiropractic",
+        "pricing"
+      ]
+    },
+    "date": {
+      "type": "string",
+      "title": "Date",
+      "format": "date",
+      "description": "Analytics date (YYYY-MM-DD)"
+    },
+    "impressions": {
+      "type": "integer",
+      "title": "Page Views",
+      "default": 0
+    },
+    "sessions": {
+      "type": "integer",
+      "title": "Unique Sessions",
+      "default": 0
+    },
+    "cta_clicks": {
+      "type": "integer",
+      "title": "CTA Clicks",
+      "default": 0
+    },
+    "demo_bookings": {
+      "type": "integer",
+      "title": "Demo Bookings",
+      "default": 0
+    },
+    "checkout_clicks": {
+      "type": "integer",
+      "title": "Checkout Clicks",
+      "default": 0
+    },
+    "form_submissions": {
+      "type": "integer",
+      "title": "Form Submissions",
+      "default": 0
+    },
+    "conversion_rate": {
+      "type": "number",
+      "title": "Conversion Rate (%)",
+      "default": 0,
+      "description": "CTA clicks / sessions"
+    },
+    "avg_time_on_page_seconds": {
+      "type": "number",
+      "title": "Avg Time on Page (s)",
+      "default": 0
+    },
+    "bounce_rate": {
+      "type": "number",
+      "title": "Bounce Rate (%)",
+      "default": 0
+    },
+    "scroll_completion_rate": {
+      "type": "number",
+      "title": "Scroll Completion Rate (%)",
+      "default": 0
+    },
+    "top_utm_source": {
+      "type": "string",
+      "title": "Top Traffic Source (UTM)"
+    },
+    "top_utm_campaign": {
+      "type": "string",
+      "title": "Top Campaign (UTM)"
+    },
+    "device_breakdown": {
+      "type": "object",
+      "title": "Device Breakdown",
+      "properties": {
+        "mobile": {
+          "type": "integer",
+          "default": 0
+        },
+        "tablet": {
+          "type": "integer",
+          "default": 0
+        },
+        "desktop": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "page_key",
+    "date"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,147 @@
+{
+  "name": "AutoOptimizationRule",
+  "type": "object",
+  "properties": {
+    "rule_key": {
+      "type": "string",
+      "title": "Rule Key",
+      "description": "Unique identifier for this rule (e.g., high_bounce_rule)"
+    },
+    "name": {
+      "type": "string",
+      "title": "Rule Name",
+      "description": "Human-readable rule name"
+    },
+    "condition_type": {
+      "type": "string",
+      "title": "Condition Type",
+      "enum": [
+        "threshold",
+        "anomaly",
+        "comparison",
+        "declining_trend"
+      ],
+      "description": "How this rule evaluates data"
+    },
+    "metric": {
+      "type": "string",
+      "title": "Metric",
+      "description": "Which metric to monitor (e.g., 'bounce_rate', 'conversion_rate')"
+    },
+    "operator": {
+      "type": "string",
+      "title": "Operator",
+      "enum": [
+        "<",
+        ">",
+        "=",
+        ">=",
+        "<=",
+        "drop_percent"
+      ],
+      "description": "Comparison operator"
+    },
+    "threshold_value": {
+      "type": "number",
+      "title": "Threshold Value",
+      "description": "Value to trigger the rule (e.g., 50 for 50% bounce rate)"
+    },
+    "signal_type": {
+      "type": "string",
+      "title": "Signal Type Generated",
+      "enum": [
+        "drop_off",
+        "low_ctr",
+        "high_bounce",
+        "weak_cta",
+        "pricing_underperformance",
+        "low_engagement"
+      ],
+      "description": "What signal type to generate when rule triggers"
+    },
+    "severity": {
+      "type": "string",
+      "title": "Default Severity",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "action_template": {
+      "type": "string",
+      "title": "Action Template",
+      "description": "Template for optimization action when triggered"
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "default": true,
+      "description": "Whether this rule is active"
+    },
+    "applies_to_industries": {
+      "type": "array",
+      "title": "Applies To Industries",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of industries to apply this rule to (empty = all)"
+    },
+    "min_sample_size": {
+      "type": "integer",
+      "title": "Min Sample Size",
+      "default": 50,
+      "description": "Minimum data points required to trigger"
+    },
+    "lookback_days": {
+      "type": "integer",
+      "title": "Lookback Days",
+      "default": 7,
+      "description": "Days of historical data to analyze"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "rule_key",
+    "name",
+    "condition_type",
+    "metric",
+    "operator",
+    "threshold_value"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

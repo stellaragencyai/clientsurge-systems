@@ -1,0 +1,155 @@
+{
+  "name": "OptimizationAction",
+  "type": "object",
+  "properties": {
+    "action_id": {
+      "type": "string",
+      "title": "Action ID",
+      "description": "Unique identifier for this optimization action"
+    },
+    "signal_id": {
+      "type": "string",
+      "title": "Signal ID",
+      "description": "Reference to the GrowthOptimizationSignal that triggered this"
+    },
+    "action_type": {
+      "type": "string",
+      "title": "Action Type",
+      "enum": [
+        "copy_change",
+        "cta_change",
+        "layout_change",
+        "pricing_adjustment",
+        "targeting_adjustment",
+        "design_improvement",
+        "color_change",
+        "button_position"
+      ],
+      "description": "Type of optimization action"
+    },
+    "target_page": {
+      "type": "string",
+      "title": "Target Page",
+      "description": "Which page to apply this to"
+    },
+    "title": {
+      "type": "string",
+      "title": "Title",
+      "description": "Short action title"
+    },
+    "instruction": {
+      "type": "string",
+      "title": "Detailed Instruction",
+      "description": "Step-by-step instruction for implementation"
+    },
+    "current_implementation": {
+      "type": "string",
+      "title": "Current Implementation",
+      "description": "What's currently on the page"
+    },
+    "proposed_change": {
+      "type": "string",
+      "title": "Proposed Change",
+      "description": "What should replace it"
+    },
+    "expected_outcome": {
+      "type": "string",
+      "title": "Expected Outcome",
+      "description": "What improvement should result (e.g., '+15% CTR')"
+    },
+    "priority": {
+      "type": "string",
+      "title": "Priority",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "default": "medium",
+      "description": "Implementation priority"
+    },
+    "estimated_effort": {
+      "type": "string",
+      "title": "Estimated Effort",
+      "enum": [
+        "quick",
+        "moderate",
+        "complex"
+      ],
+      "default": "moderate",
+      "description": "Time to implement"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "suggested",
+        "approved",
+        "applied",
+        "dismissed",
+        "monitoring"
+      ],
+      "default": "suggested",
+      "description": "Current status of this action"
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Confidence Score (0-100)",
+      "default": 75
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "applied_at": {
+      "type": "string",
+      "title": "Applied At",
+      "format": "date-time",
+      "description": "When this action was implemented"
+    },
+    "result_impact": {
+      "type": "string",
+      "title": "Result Impact",
+      "description": "Actual result after implementation (if monitored)"
+    }
+  },
+  "required": [
+    "action_id",
+    "signal_id",
+    "action_type",
+    "target_page",
+    "instruction"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

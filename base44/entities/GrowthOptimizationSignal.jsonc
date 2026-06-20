@@ -1,0 +1,178 @@
+{
+  "name": "GrowthOptimizationSignal",
+  "type": "object",
+  "properties": {
+    "signal_id": {
+      "type": "string",
+      "title": "Signal ID",
+      "description": "Unique identifier for this optimization signal"
+    },
+    "page_key": {
+      "type": "string",
+      "title": "Page Key",
+      "enum": [
+        "homepage",
+        "med_spa",
+        "dental",
+        "hvac",
+        "roofing",
+        "contractors",
+        "real_estate",
+        "personal_injury",
+        "plumbing",
+        "chiropractic",
+        "pricing"
+      ],
+      "description": "Which landing page this signal applies to"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry",
+      "description": "Industry name for context"
+    },
+    "signal_type": {
+      "type": "string",
+      "title": "Signal Type",
+      "enum": [
+        "drop_off",
+        "low_ctr",
+        "high_bounce",
+        "weak_cta",
+        "pricing_underperformance",
+        "winning_variant",
+        "losing_variant",
+        "scroll_drop",
+        "low_engagement"
+      ],
+      "description": "Type of optimization opportunity detected"
+    },
+    "severity": {
+      "type": "string",
+      "title": "Severity",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "How urgent this optimization is"
+    },
+    "metric_affected": {
+      "type": "string",
+      "title": "Metric Affected",
+      "enum": [
+        "conversion_rate",
+        "click_through_rate",
+        "bounce_rate",
+        "scroll_depth",
+        "session_duration",
+        "engagement_rate"
+      ],
+      "description": "Primary metric impacted by this signal"
+    },
+    "current_value": {
+      "type": "number",
+      "title": "Current Value",
+      "description": "Current metric value (e.g., 2.5 for 2.5% conversion rate)"
+    },
+    "benchmark_value": {
+      "type": "number",
+      "title": "Benchmark Value",
+      "description": "Expected baseline value for this metric across all industries"
+    },
+    "variance_percent": {
+      "type": "number",
+      "title": "Variance (%)",
+      "description": "Percentage deviation from benchmark (negative = worse)"
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Confidence Score",
+      "minimum": 0,
+      "maximum": 100,
+      "description": "AI confidence in this signal (0-100%)"
+    },
+    "impact_estimate": {
+      "type": "string",
+      "title": "Impact Estimate",
+      "description": "Estimated revenue/conversion impact if fixed (e.g., '+$2K monthly')"
+    },
+    "data_source": {
+      "type": "string",
+      "title": "Data Source",
+      "enum": [
+        "conversion_tracking_events",
+        "landing_page_analytics",
+        "ga4_metrics",
+        "ab_test_results"
+      ],
+      "description": "Where this signal was detected"
+    },
+    "samples_analyzed": {
+      "type": "integer",
+      "title": "Samples Analyzed",
+      "description": "Number of data points used to generate signal"
+    },
+    "triggered_at": {
+      "type": "string",
+      "title": "Triggered At",
+      "format": "date-time",
+      "description": "When this signal was generated"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "new",
+        "acknowledged",
+        "in_progress",
+        "resolved"
+      ],
+      "default": "new",
+      "description": "Tracking status of this optimization"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    }
+  },
+  "required": [
+    "signal_id",
+    "page_key",
+    "signal_type",
+    "metric_affected",
+    "triggered_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
