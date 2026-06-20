@@ -2,6 +2,7 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from '@/App.jsx'
 import '@/index.css'
+import '@/design-tokens.css'
 import '@/design-system.css'
 
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references

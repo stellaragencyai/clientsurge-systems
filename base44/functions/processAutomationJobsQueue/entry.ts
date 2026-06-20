@@ -89,12 +89,35 @@ Deno.serve(async (req) => {
         }
 
         // 4. Update job status
+        const now = new Date().toISOString();
         if (result.success) {
           await base44.asServiceRole.entities.AutomationJob.update(job.id, {
             status: 'completed',
-            completed_at: new Date().toISOString(),
+            completed_at: now,
             provider_message_id: result.provider_message_id,
           });
+
+          // Update EventQueue → completed
+          if (eqToUpdate) {
+            await base44.asServiceRole.entities.EventQueue.update(eqToUpdate.id, {
+              status: 'completed',
+              completed_at: now,
+            }).catch(err => console.warn('[processAutomationJobsQueue] EventQueue completed update failed:', err.message));
+          }
+
+          // DashboardTruthCheck — provider success proof exists → safe_to_launch eligible
+          await upsertDashboardTruth(base44, job, {
+            truth_status: 'trusted',
+            safe_to_launch: true,
+            safe_to_show_admin: true,
+            safe_to_show_client: true,
+            blocker_count: 0,
+            warning_count: 0,
+            blockers: [],
+            warnings: [],
+            evidence_summary: `provider_send_succeeded for job ${job.id} (${job.job_type}). Provider message id: ${result.provider_message_id}. Delivery proof exists.`,
+          });
+
           results.push({ job_id: job.id, success: true, type: job.job_type });
         } else {
           // Retry logic
@@ -103,31 +126,70 @@ Deno.serve(async (req) => {
               status: 'queued',
               retry_count: (job.retry_count || 0) + 1,
               last_error: result.error,
-              last_attempt_at: new Date().toISOString(),
+              last_attempt_at: now,
             });
+
+            // EventQueue stays in processing — update retry metadata
+            if (eqToUpdate) {
+              await base44.asServiceRole.entities.EventQueue.update(eqToUpdate.id, {
+                status: 'queued',
+                retry_count: (job.retry_count || 0) + 1,
+                last_retry_at: now,
+                error_message: result.error,
+              }).catch(() => {});
+            }
+
             results.push({ job_id: job.id, success: false, retrying: true, error: result.error });
           } else {
             // Max retries exceeded
             await base44.asServiceRole.entities.AutomationJob.update(job.id, {
               status: 'failed',
-              failed_at: new Date().toISOString(),
+              failed_at: now,
               final_error: result.error,
             });
 
+            // Update EventQueue → dead_letter
+            if (eqToUpdate) {
+              await base44.asServiceRole.entities.EventQueue.update(eqToUpdate.id, {
+                status: 'dead_letter',
+                error_message: `Max retries exceeded: ${result.error}`,
+              }).catch(() => {});
+            }
+
             // Create DeadLetterLog — client_id is required; fall back to 'unknown'
             await base44.asServiceRole.entities.DeadLetterLog.create({
-              event_queue_id: job.id,
+              event_queue_id: eqToUpdate?.id || job.id,
               communication_event_id: null,
               client_id: job.client_id || 'unknown',
               client_project_id: job.client_project_id,
               event_category: 'automation_event',
-              processor_type: job.job_type,
+              processor_type: 'messaging_processor',
               failure_reason: `Max retries (${job.max_retries || 3}) exceeded`,
               final_error_message: result.error,
               retry_count: job.retry_count || 0,
-              last_attempt_at: new Date().toISOString(),
+              last_attempt_at: now,
               metadata_json: JSON.stringify(job),
               status: 'pending_review',
+            });
+
+            // DashboardTruthCheck — dead lettered, no proof
+            await upsertDashboardTruth(base44, job, {
+              truth_status: 'blocked',
+              safe_to_launch: false,
+              safe_to_show_admin: true,
+              safe_to_show_client: false,
+              blocker_count: 1,
+              warning_count: 0,
+              blockers: [{
+                code: 'job_dead_lettered',
+                severity: 'critical_blocker',
+                message: `Job ${job.id} (${job.job_type}) dead-lettered after ${job.max_retries || 3} retries. Last error: ${result.error}`,
+                entity_name: 'AutomationJob',
+                record_id: job.id,
+                fix_action: 'Check AdminSettings provider config (Twilio/Resend). Review DeadLetterLog.',
+              }],
+              warnings: [],
+              evidence_summary: `Job ${job.id} (${job.job_type}) failed all retries. No provider_send_succeeded event. safe_to_launch=false.`,
             });
 
             results.push({ job_id: job.id, success: false, dead_lettered: true });

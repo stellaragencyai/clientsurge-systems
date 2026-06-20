@@ -1,24 +1,10 @@
 /**
- * design-system.css — ClientSurge Design Token Utilities
- * Pillar 1 & 2 unified design system enforcement
- * Imported by main.jsx or index.css
+ * design-system.css — ClientSurge Component Utilities
+ * Legacy component helpers — tokens are now in design-tokens.css
+ * This file keeps backward-compatible .cs-* class aliases.
  */
 
-/* ============================================
-   TYPOGRAPHY — Montserrat for all headings (enforced globally)
-   ============================================ */
-h1, h2, h3, h4, h5, h6,
-.font-display, .font-titles, .font-heading {
-  font-family: 'Montserrat', system-ui, sans-serif !important;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  text-shadow: none !important;
-}
-
-/* Body / UI text stays Inter */
-body, p, span, li, td, th, label, input, textarea, select, button {
-  font-family: 'Inter', system-ui, sans-serif;
-}
+/* Typography + body already handled by design-tokens.css */
 
 /* ============================================
    SECTION SPACING — uniform 6rem desktop, 4.5rem mobile

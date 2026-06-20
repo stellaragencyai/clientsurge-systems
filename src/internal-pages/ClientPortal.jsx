@@ -28,6 +28,7 @@ import SystemStatusBadge from "../components/portal/SystemStatusBadge";
 import OrderTracker from "../components/landing/OrderTracker";
 import OnboardingMissingAssetsBanner from "../components/portal/OnboardingMissingAssetsBanner";
 import EmptyStateDashboard from "../components/portal/EmptyStateDashboard";
+import GettingStartedBanner from "../components/portal/GettingStartedBanner";
 import LaunchReadinessPanel from "../components/dashboard/LaunchReadinessPanel";
 import ActiveAutomationsPanel from "../components/dashboard/ActiveAutomationsPanel";
 import RecentSystemProofPanel from "../components/dashboard/RecentSystemProofPanel";
@@ -452,6 +453,7 @@ export default function ClientPortal() {
         )}
         {activeTab === "progress" && (
           <div className="space-y-6">
+            <GettingStartedBanner project={project} order={portalOrder} />
             <SetupProgressHub project={project} order={portalOrder} user={user} />
             <OrderTracker />
           </div>
