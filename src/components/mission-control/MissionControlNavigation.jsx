@@ -69,9 +69,9 @@ export default function MissionControlNavigation({ activeModule, onNavigate }) {
   }, []);
 
   const getCount = (moduleId) => {
-    if (moduleId === 'leads') return counts.leads;
-    if (moduleId === 'automation') return counts.automations;
-    if (moduleId === 'system-health') return counts.events;
+    if (moduleId === 'leads') return counts.leads || null;
+    if (moduleId === 'automation') return counts.automations || null;
+    if (moduleId === 'system-health') return counts.events || null;
     return null;
   };
 
