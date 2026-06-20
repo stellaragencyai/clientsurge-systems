@@ -60,10 +60,8 @@ const LeadSourceAttribution = lazy(() => import('../components/admin/LeadSourceA
 const RevenueDashboard = lazy(() => import('../components/admin/RevenueDashboard'));
 const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueTrackingDashboard'));
 const PlatformClientsPanel = lazy(() => import('../components/admin/PlatformClientsPanel'));
-const SaaSPlanManagerPanel = lazy(() => import('../components/admin/SaaSPlanManagerPanel'));
 const UnifiedOnboardingProgress = lazy(() => import('../components/admin/UnifiedOnboardingProgress'));
 const LeadDataQualityDashboard = lazy(() => import('../components/admin/LeadDataQualityDashboard'));
-const AutomationEdgeCasePanel = lazy(() => import('../components/admin/AutomationEdgeCasePanel'));
 
 function AdminPanelSkeleton() {
   return (
@@ -85,69 +83,77 @@ function LazyAdminPanel({ children }) {
 
 const NAV_GROUPS = [
   {
-    group: 'Main',
+    group: 'Leads & Intelligence',
     items: [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
       { id: 'leads', label: 'Leads', icon: Users },
-      { id: 'lead-intelligence', label: '🧠 Lead Intelligence', icon: Flame },
+      { id: 'lead-intelligence', label: 'Lead Intelligence', icon: Flame },
+      { id: 'priority', label: 'Priority Queue', icon: Star },
       { id: 'crm-health', label: 'CRM Health', icon: ShieldCheck },
-      { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
-      { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
-      { id: 'onboarding', label: 'Client Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
+    ],
+  },
+  {
+    group: 'Clients & Onboarding',
+    items: [
+      { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
+      { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
+      { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: Zap },
+      { id: 'install-queue', label: 'Install Queue', icon: Server },
+      { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
+      { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
+      { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
+      { id: 'website-leads', label: 'Website Leads', icon: Target },
     ],
   },
   {
     group: 'Automation',
     items: [
-      { id: 'website-leads', label: 'Website Leads', icon: Target },
-      { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
-      { id: 'install-queue', label: 'Install Queue', icon: Server },
-      { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
       { id: 'drip', label: 'Drip Campaigns', icon: Send },
       { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
-      { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
-      { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
+      { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
       { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
     ],
   },
   {
-    group: 'Insights',
+    group: 'Revenue & Funnels',
     items: [
       { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
       { id: 'revenue-tracking', label: 'Revenue Tracking', icon: DollarSign },
-      { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
-      { id: 'priority', label: 'Priority Queue', icon: Star },
       { id: 'attribution', label: 'Source Attribution', icon: PieChart },
-      { id: 'landing-traffic', label: 'Landing Page Traffic', icon: BarChart3 },
+      { id: 'landing-traffic', label: 'Landing Traffic', icon: BarChart3 },
+      { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
     ],
   },
   {
-    group: 'System',
+    group: 'System Health',
     items: [
-      { id: 'onboarding-orchestration', label: '🔄 Onboarding', icon: Zap },
-      { id: 'data-quality', label: '✓ Data Quality', icon: Activity },
-      { id: 'edge-case-stability', label: '🛡️ Automation Stability', icon: ShieldCheck },
-      { id: 'platform-clients', label: '🏢 Platform Clients', icon: Users },
-      { id: 'saas-plans', label: '💎 SaaS Plan Manager', icon: DollarSign },
-      { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
+      { id: 'data-quality', label: 'Data Quality', icon: Activity },
+      { id: 'platform-clients', label: 'Platform Clients', icon: Users },
+      { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
+      { id: 'health', label: 'Integration Health', icon: Activity },
+      { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
+      { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
+      { id: 'settings', label: 'Settings', icon: Settings },
+    ],
+  },
+  {
+    group: 'Tools',
+    items: [
+      { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
+      { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
-      { id: 'performance-wars', label: '🏆 Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
+      { id: 'performance-wars', label: 'Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
       { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
       { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
       { id: 'task-board', label: 'Task Board', icon: ClipboardList },
-      { id: 'twilio-health', label: '📡 Twilio Runtime Health', icon: Activity },
-      { id: 'health', label: 'Integration Health', icon: Activity },
-      { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
-      { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
       { id: 'templates', label: 'Templates', icon: MessageSquare },
       { id: 'review-request', label: 'Review Requests', icon: Star },
-      { id: 'settings', label: 'Settings', icon: Settings },
       { id: 'qa', label: 'QA Tools', icon: RefreshCw },
       { id: 'install-guide', label: 'Install Guide', icon: BookOpen, external: true, externalPath: '/admin/install-guide' },
     ],
@@ -284,8 +290,6 @@ export default function AdminDashboard() {
       case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
       case 'data-quality': return <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>;
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
-      case 'saas-plans': return <LazyAdminPanel><SaaSPlanManagerPanel /></LazyAdminPanel>;
-      case 'edge-case-stability': return <LazyAdminPanel><AutomationEdgeCasePanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;
