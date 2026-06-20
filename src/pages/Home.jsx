@@ -7,16 +7,15 @@ import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
-import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import TrustStrip from "../components/landing/TrustStrip";
+import ProblemSection from "../components/landing/ProblemSection";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
-const FAQ = lazy(() => import("../components/landing/FAQ"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 
 import {
@@ -114,18 +113,15 @@ export default function Home() {
         {/* 1. Hero */}
         <Hero />
 
-        {/* 2. Automation Systems Preview (six-system grid) */}
+        {/* 2. Problem Section */}
+        <ProblemSection />
+
+        {/* 3. Automation Systems Preview */}
         <AutomationSystemsGrid />
 
-        {/* 3. How It Works Teaser */}
+        {/* 4. How It Works Teaser */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <CoreOffer />
-        </LazyHomepageSection>
-
-        {/* 4. Industries / Best Fit Preview */}
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <Industries />
         </LazyHomepageSection>
 
         {/* 5. Package Preview */}
@@ -135,16 +131,13 @@ export default function Home() {
         {/* 6. Compact Trust Strip */}
         <TrustStrip />
 
-        {/* Trust & Security Section */}
-        <SecurityPriority />
-
-        {/* FAQ Section */}
+        {/* 7. Industries Preview */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <FAQ />
+          <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <Industries />
         </LazyHomepageSection>
 
-        {/* 7. Final CTA */}
+        {/* 8. Final CTA */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <FinalCTA />
         </LazyHomepageSection>
