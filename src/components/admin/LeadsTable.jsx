@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const PAGE_SIZE = 25;
@@ -23,6 +23,19 @@ function getIntelligenceSegmentBadge(segment) {
     COLD: "Cold",
   };
   return { label: labels[segment] || segment, color: styles[segment] || "bg-gray-100 text-gray-800" };
+}
+
+// Row highlight based on lead_state for visual consistency
+function getRowHighlight(leadState) {
+  const highlights = {
+    HOT: "bg-red-50/30 hover:bg-red-50/50",
+    BOOKED: "bg-green-50/30 hover:bg-green-50/50",
+    WON: "bg-green-100/20 hover:bg-green-100/30",
+    ENGAGED: "bg-blue-50/20 hover:bg-blue-50/40",
+    DORMANT: "bg-gray-50/30 hover:bg-gray-50/50",
+    NEW: "hover:bg-primary/5 transition-colors",
+  };
+  return highlights[leadState] || "hover:bg-primary/5 transition-colors";
 }
 
 // Status badge styles
@@ -54,6 +67,7 @@ export default function LeadsTable() {
   });
   const [sort, setSort] = useState({ field: "last_activity_at", order: -1 });
   const [totalCount, setTotalCount] = useState(0);
+  const [duplicateWarnings, setDuplicateWarnings] = useState(0);
   const [kpis, setKpis] = useState({
     total: 0,
     hot: 0,
@@ -93,13 +107,24 @@ export default function LeadsTable() {
         // Fetch counts efficiently
         const [totalList, hotList, newList, bookedList] = await Promise.all([
           base44.asServiceRole.entities.Leads.filter({}, "id", 1),
-          base44.asServiceRole.entities.Leads.filter({ lead_score: { $gte: 80 } }, "id", 1),
-          base44.asServiceRole.entities.Leads.filter({ status: "New" }, "id", 1),
-          base44.asServiceRole.entities.Leads.filter({ status: "Booked" }, "id", 1),
+          base44.asServiceRole.entities.Leads.filter({ intelligence_score: { $gte: 80 } }, "id", 1),
+          base44.asServiceRole.entities.Leads.filter({ lead_state: "NEW" }, "id", 1),
+          base44.asServiceRole.entities.Leads.filter({ lead_state: "BOOKED" }, "id", 1),
         ]);
 
-        // Extract total from query results (we fetch just IDs with limit 1 to get count)
-        // This is a workaround — ideally backend provides count
+        // Count potential duplicates (same normalized email)
+        const allLeads = await base44.asServiceRole.entities.Leads.filter({}, "id", 100);
+        const emailCounts = {};
+        const duplicates = new Set();
+        (allLeads || []).forEach((l) => {
+          const key = l.normalized_email || l.email;
+          if (key) {
+            emailCounts[key] = (emailCounts[key] || 0) + 1;
+            if (emailCounts[key] > 1) duplicates.add(key);
+          }
+        });
+
+        setDuplicateWarnings(duplicates.size);
         setKpis({
           total: totalList?.length || 0,
           hot: hotList?.length || 0,
@@ -209,6 +234,16 @@ export default function LeadsTable() {
           <p className="text-2xl font-bold text-green-600 mt-1">{kpis.booked}</p>
         </div>
       </div>
+
+      {/* Duplicate Warning */}
+      {duplicateWarnings > 0 && (
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200/50 text-xs text-amber-800">
+          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
+          <span>
+            <strong>{duplicateWarnings} potential duplicate(s)</strong> detected by email. Review and merge if needed.
+          </span>
+        </div>
+      )}
 
       {/* Search & Filters */}
       <div className="space-y-3 rounded-lg border border-border/40 bg-background/30 p-3">
@@ -339,7 +374,7 @@ export default function LeadsTable() {
                 </tr>
               ) : (
                 leads.map((lead) => (
-                  <tr key={lead.id} className="hover:bg-primary/5 transition-colors">
+                  <tr key={lead.id} className={`${getRowHighlight(lead.lead_state)}`}>
                     <td className="px-3 py-2 font-medium text-foreground">{lead.full_name || "-"}</td>
                     <td className="px-3 py-2 text-muted-foreground">{lead.business_name || "-"}</td>
                     <td className="px-3 py-2 text-muted-foreground">
