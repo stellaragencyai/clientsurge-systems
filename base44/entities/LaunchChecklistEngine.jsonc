@@ -1,0 +1,97 @@
+{
+  "name": "LaunchChecklistEngine",
+  "type": "object",
+  "properties": {
+    "checklist_id": {
+      "type": "string",
+      "title": "Checklist ID"
+    },
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID"
+    },
+    "ga4_ready": {
+      "type": "boolean",
+      "title": "GA4 Ready",
+      "default": false
+    },
+    "stripe_ready": {
+      "type": "boolean",
+      "title": "Stripe Ready",
+      "default": false
+    },
+    "landing_pages_ready": {
+      "type": "boolean",
+      "title": "Landing Pages Ready",
+      "default": false
+    },
+    "pricing_page_ready": {
+      "type": "boolean",
+      "title": "Pricing Page Ready",
+      "default": false
+    },
+    "onboarding_ready": {
+      "type": "boolean",
+      "title": "Onboarding Ready",
+      "default": false
+    },
+    "automation_ready": {
+      "type": "boolean",
+      "title": "Automation Ready",
+      "default": false
+    },
+    "tracking_integrated": {
+      "type": "boolean",
+      "title": "Tracking Integrated",
+      "default": false
+    },
+    "conversion_tracking_ready": {
+      "type": "boolean",
+      "title": "Conversion Tracking Ready",
+      "default": false
+    },
+    "score": {
+      "type": "number",
+      "title": "Readiness Score (0-100)",
+      "default": 0
+    },
+    "missing_items": {
+      "type": "array",
+      "title": "Missing Items",
+      "items": {
+        "type": "string"
+      }
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "checklist_id",
+    "launch_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

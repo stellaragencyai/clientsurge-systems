@@ -1,0 +1,104 @@
+{
+  "name": "LaunchMonitoringSystem",
+  "type": "object",
+  "properties": {
+    "alert_id": {
+      "type": "string",
+      "title": "Alert ID"
+    },
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID"
+    },
+    "alert_type": {
+      "type": "string",
+      "title": "Alert Type",
+      "enum": [
+        "traffic_drop",
+        "conversion_drop",
+        "checkout_failure",
+        "onboarding_failure",
+        "tracking_failure"
+      ]
+    },
+    "severity": {
+      "type": "string",
+      "title": "Severity",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "detected_metric": {
+      "type": "string",
+      "title": "Detected Metric"
+    },
+    "current_value": {
+      "type": "number",
+      "title": "Current Value"
+    },
+    "benchmark_value": {
+      "type": "number",
+      "title": "Benchmark Value"
+    },
+    "variance_percent": {
+      "type": "number",
+      "title": "Variance (%)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "active",
+        "investigating",
+        "resolved"
+      ],
+      "default": "active"
+    },
+    "triggered_at": {
+      "type": "string",
+      "title": "Triggered At",
+      "format": "date-time"
+    },
+    "resolved_at": {
+      "type": "string",
+      "title": "Resolved At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Investigation Notes"
+    }
+  },
+  "required": [
+    "alert_id",
+    "launch_id",
+    "alert_type",
+    "severity",
+    "triggered_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

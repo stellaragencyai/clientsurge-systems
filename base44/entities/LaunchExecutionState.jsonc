@@ -1,0 +1,85 @@
+{
+  "name": "LaunchExecutionState",
+  "type": "object",
+  "properties": {
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "status": {
+      "type": "string",
+      "title": "Launch Status",
+      "enum": [
+        "pre_launch",
+        "launching",
+        "live",
+        "stabilizing",
+        "failed",
+        "optimized"
+      ],
+      "default": "pre_launch"
+    },
+    "readiness_score": {
+      "type": "number",
+      "title": "Readiness Score (0-100)",
+      "default": 0
+    },
+    "blockers_count": {
+      "type": "integer",
+      "title": "Total Blockers",
+      "default": 0
+    },
+    "critical_blockers_count": {
+      "type": "integer",
+      "title": "Critical Blockers",
+      "default": 0
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Launch Notes"
+    }
+  },
+  "required": [
+    "launch_id",
+    "client_project_id",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

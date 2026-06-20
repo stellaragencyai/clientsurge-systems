@@ -1,0 +1,90 @@
+{
+  "name": "LaunchKPIMetrics",
+  "type": "object",
+  "properties": {
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID"
+    },
+    "metric_window": {
+      "type": "string",
+      "title": "Metric Window",
+      "enum": [
+        "24h",
+        "7d",
+        "30d"
+      ]
+    },
+    "traffic": {
+      "type": "integer",
+      "title": "Traffic (Sessions)",
+      "default": 0
+    },
+    "conversions": {
+      "type": "integer",
+      "title": "Conversions",
+      "default": 0
+    },
+    "conversion_rate": {
+      "type": "number",
+      "title": "Conversion Rate (%)",
+      "default": 0
+    },
+    "revenue": {
+      "type": "number",
+      "title": "Revenue ($)",
+      "default": 0
+    },
+    "bounce_rate": {
+      "type": "number",
+      "title": "Bounce Rate (%)",
+      "default": 0
+    },
+    "avg_session_time": {
+      "type": "number",
+      "title": "Avg Session Time (seconds)",
+      "default": 0
+    },
+    "pricing_page_conversion": {
+      "type": "number",
+      "title": "Pricing Page Conversion (%)",
+      "default": 0
+    },
+    "checkout_conversion": {
+      "type": "number",
+      "title": "Checkout Conversion (%)",
+      "default": 0
+    },
+    "measured_at": {
+      "type": "string",
+      "title": "Measured At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "launch_id",
+    "metric_window"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

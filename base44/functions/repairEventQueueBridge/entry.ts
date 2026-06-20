@@ -41,10 +41,29 @@ Deno.serve(async (req) => {
       });
     }
 
+    // ── FETCH ALL ORDERS (for client_id lookup) ───────────────────────────────
+    const orders = await base44.asServiceRole.entities.Order.list('-created_date', 2000).catch(() => []);
+    const orderMap = {};
+    if (orders) {
+      for (const order of orders) {
+        orderMap[order.id] = order;
+      }
+    }
+
     // ── PROCESS EACH JOB ──────────────────────────────────────────────────────
     for (const job of jobs) {
       try {
         stats.jobs_processed++;
+
+        // Get client_id from linked Order
+        const linkedOrder = orderMap[job.order_id];
+        const clientId = linkedOrder?.client_id;
+
+        // Skip jobs without client_id (can't create EventQueue without it)
+        if (!clientId) {
+          stats.errors.push(`Skipped job ${job.id}: no linked Order or client_id found`);
+          continue;
+        }
 
         // Check if EventQueue already exists for this job (idempotent)
         const existingQueue = await base44.asServiceRole.entities.EventQueue.filter(
@@ -110,6 +129,7 @@ Deno.serve(async (req) => {
           };
 
           const queueRecord = await base44.asServiceRole.entities.EventQueue.create({
+            client_id: clientId,
             event_category: 'automation_event',
             processor_type: 'messaging_processor',
             context_type: 'AutomationJob',

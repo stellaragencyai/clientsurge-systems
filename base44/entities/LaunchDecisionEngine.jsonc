@@ -1,0 +1,80 @@
+{
+  "name": "LaunchDecisionEngine",
+  "type": "object",
+  "properties": {
+    "decision_id": {
+      "type": "string",
+      "title": "Decision ID"
+    },
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID"
+    },
+    "decision": {
+      "type": "string",
+      "title": "Decision",
+      "enum": [
+        "GO",
+        "NO_GO",
+        "CONDITIONAL_GO"
+      ]
+    },
+    "decision_reason": {
+      "type": "string",
+      "title": "Decision Reason"
+    },
+    "required_fixes": {
+      "type": "array",
+      "title": "Required Fixes",
+      "items": {
+        "type": "string"
+      }
+    },
+    "risk_level": {
+      "type": "string",
+      "title": "Risk Level",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ]
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By (Admin Email)"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "decision_id",
+    "launch_id",
+    "decision"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
