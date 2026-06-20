@@ -7,74 +7,89 @@
       "title": "Description",
       "maxLength": 1000
     },
-    "entity_name": {
+    "event_queue_id": {
       "type": "string",
-      "title": "Failed Entity Type",
-      "description": "e.g. AutomationJob, CommunicationEvent, EventQueue"
+      "title": "EventQueue ID"
     },
-    "entity_id": {
+    "communication_event_id": {
       "type": "string",
-      "title": "Failed Entity ID"
+      "title": "CommunicationEvent ID"
     },
-    "final_attempt": {
-      "type": "integer",
-      "title": "Final Attempt Number",
-      "description": "Number of retry attempts made before moving to dead letter"
-    },
-    "error_message": {
+    "client_id": {
       "type": "string",
-      "title": "Error Message",
-      "maxLength": 2000
+      "title": "Client ID"
     },
-    "error_stack": {
+    "client_project_id": {
       "type": "string",
-      "title": "Error Stack Trace",
-      "maxLength": 5000
+      "title": "Client Project ID"
     },
-    "context_json": {
+    "event_category": {
       "type": "string",
-      "title": "Additional Context (JSON)",
-      "description": "Job metadata, event details, or other context"
-    },
-    "status": {
-      "type": "string",
-      "title": "Review Status",
+      "title": "Event Category",
       "enum": [
-        "pending_review",
-        "acknowledged",
-        "investigating",
-        "fixed",
-        "archived"
-      ],
-      "default": "pending_review"
+        "inbound_event",
+        "automation_event",
+        "billing_event",
+        "system_event"
+      ]
+    },
+    "processor_type": {
+      "type": "string",
+      "title": "Failed Processor"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason",
+      "description": "Why event permanently failed"
+    },
+    "final_error_message": {
+      "type": "string",
+      "title": "Final Error Message"
+    },
+    "retry_count": {
+      "type": "integer",
+      "title": "Total Attempts",
+      "default": 0
+    },
+    "last_attempt_at": {
+      "type": "string",
+      "title": "Last Attempt At",
+      "format": "date-time"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Event Metadata",
+      "description": "Full context for debugging"
     },
     "admin_notes": {
       "type": "string",
-      "title": "Admin Notes",
-      "maxLength": 2000
+      "title": "Admin Investigation Notes"
     },
-    "reviewed_by": {
+    "status": {
       "type": "string",
-      "title": "Reviewed By (Admin Email)"
-    },
-    "reviewed_at": {
-      "type": "string",
-      "title": "Reviewed At",
-      "format": "date-time"
-    },
-    "moved_at": {
-      "type": "string",
-      "title": "Moved to Dead Letter At",
-      "format": "date-time"
+      "title": "Status",
+      "enum": [
+        "pending_review",
+        "under_investigation",
+        "resolved",
+        "archived"
+      ],
+      "default": "pending_review"
     }
   },
   "required": [
-    "entity_name",
-    "entity_id",
-    "error_message",
-    "final_attempt",
-    "moved_at"
+    "event_queue_id",
+    "client_id",
+    "event_category",
+    "failure_reason"
   ],
+  "_metadata": {
+    "status": "SCALE_ARCHITECTURE",
+    "reason": "Immutable dead letter queue for permanently failed events. Admin review & reconciliation.",
+    "immutable": true,
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "SCALE_ARCHITECTURE.md"
+  },
   "rls": {
     "create": {
       "user_condition": {
@@ -82,9 +97,19 @@
       }
     },
     "read": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
     },
     "update": {
       "user_condition": {

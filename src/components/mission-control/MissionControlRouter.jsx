@@ -8,7 +8,6 @@ import LaunchGatesModule from './LaunchGatesModule';
 import SystemHealthModule from './SystemHealthModule';
 import SystemSimulationLab from './SystemSimulationLab';
 import ImprovementReviewQueue from './ImprovementReviewQueue';
-import FailureHandlingMonitorPanel from './FailureHandlingMonitorPanel';
 
 const MODULE_COMPONENTS = {
   'mission-control': MissionControlDashboard,
@@ -19,7 +18,6 @@ const MODULE_COMPONENTS = {
   'system-health': SystemHealthModule,
   'simulation-lab': SystemSimulationLab,
   'improvement-review': ImprovementReviewQueue,
-  'failure-monitor': FailureHandlingMonitorPanel,
   // stubs for future modules
   'leads': MissionControlDashboard,
   'campaigns': MissionControlDashboard,

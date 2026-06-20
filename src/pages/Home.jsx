@@ -3,18 +3,30 @@ import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import Hero from "../components/landing/Hero.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
-import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
-import HomepageHowItWorksTeaser from "../components/landing/HomepageHowItWorksTeaser";
-import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
-import TrustStrip from "../components/landing/TrustStrip";
+
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
+import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
+import RevenueProofBlock from "../components/landing/RevenueProofBlock";
+import AutomationCatalog from "../components/landing/AutomationCatalog";
+import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
+import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
+import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
+import TrustedStackCarousel from "../components/landing/TrustedStackCarousel";
+import TrustStrip from "../components/landing/TrustStrip";
 
+const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
+const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
+const FAQ = lazy(() => import("../components/landing/FAQ"));
+// Pricing replaced by ThreeSystemsSection at the original pricing location below
+
+const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
+const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 
 import {
   getFAQSchema,
@@ -30,52 +42,76 @@ function isEditorSandbox() {
     const h = window.location.hostname;
     return h.includes("preview-sandbox") || h.includes("base44");
   } catch {
-    return true;
+    return true; // fail-safe: treat unknown environments as sandboxed
   }
 }
 
-function LazySection({ children }) {
-  return <Suspense fallback={<SectionSkeleton />}>{children}</Suspense>;
+
+
+function LazyHomepageSection({ children, fallback }) {
+  return <Suspense fallback={fallback}>{children}</Suspense>;
 }
 
 export default function Home() {
   const location = useLocation();
-
-  // Hash anchor scroll
   useEffect(() => {
-    if (!location.hash) return undefined;
+    if (!location.hash) {
+      return undefined;
+    }
+
     const id = decodeURIComponent(location.hash.slice(1));
     let attempts = 0;
     let timeoutId;
+
     const scrollToHashTarget = () => {
       const target = document.getElementById(id);
-      if (target) { target.scrollIntoView({ behavior: "smooth", block: "start" }); return; }
-      if (attempts < 24) { attempts += 1; timeoutId = window.setTimeout(scrollToHashTarget, 125); }
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+
+      if (attempts < 24) {
+        attempts += 1;
+        timeoutId = window.setTimeout(scrollToHashTarget, 125);
+      }
     };
+
     timeoutId = window.setTimeout(scrollToHashTarget, 0);
     return () => window.clearTimeout(timeoutId);
   }, [location.hash]);
 
-  // SEO
   useEffect(() => {
     if (isEditorSandbox()) return () => {};
     if (typeof document === "undefined" || !document.head) return () => {};
 
-    let cleanups = [];
-    try { cleanups.push(setPageMetadata({
+    let cleanupMetadata = () => {};
+    let cleanupOrg = () => {};
+    let cleanupBusiness = () => {};
+    let cleanupService = () => {};
+    let cleanupWebsite = () => {};
+    let cleanupFaq = () => {};
+
+    try { cleanupMetadata = setPageMetadata({
       title: "Business AI Automation Store — Pick Your System, We Install It Remotely | ClientSurge Systems",
       description: "Browse, choose, and activate AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Remotely installed and tested for service businesses.",
       canonicalPath: "/",
       ogTitle: "The Business AI Automation Store — Pick Your System, We Install It Remotely",
       ogDescription: "ClientSurge helps businesses browse, choose, and activate AI automation systems through a guided AI-powered remote setup process.",
-    })); } catch (_e) {}
-    try { cleanups.push(setJsonLd("organization", getOrganizationSchema())); } catch (_e) {}
-    try { cleanups.push(setJsonLd("local-business", getLocalBusinessSchema())); } catch (_e) {}
-    try { cleanups.push(setJsonLd("service", getServiceSchema())); } catch (_e) {}
-    try { cleanups.push(setJsonLd("website", getWebsiteSchema())); } catch (_e) {}
-    try { cleanups.push(setJsonLd("faq", getFAQSchema(FAQ_ITEMS))); } catch (_e) {}
+    }); } catch (_e) {}
+    try { cleanupOrg = setJsonLd("organization", getOrganizationSchema()); } catch (_e) {}
+    try { cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema()); } catch (_e) {}
+    try { cleanupService = setJsonLd("service", getServiceSchema()); } catch (_e) {}
+    try { cleanupWebsite = setJsonLd("website", getWebsiteSchema()); } catch (_e) {}
+    try { cleanupFaq = setJsonLd("faq", getFAQSchema(FAQ_ITEMS)); } catch (_e) {}
 
-    return () => cleanups.forEach(fn => { try { fn(); } catch (_e) {} });
+    return () => {
+      try { cleanupFaq(); } catch (_e) {}
+      try { cleanupService(); } catch (_e) {}
+      try { cleanupBusiness(); } catch (_e) {}
+      try { cleanupOrg(); } catch (_e) {}
+      try { cleanupWebsite(); } catch (_e) {}
+      try { cleanupMetadata(); } catch (_e) {}
+    };
   }, []);
 
   return (
@@ -83,37 +119,71 @@ export default function Home() {
       <div className="min-h-screen">
         <ScrollProgressBar />
         <Navbar />
-
-        {/* 1. Hero */}
         <Hero />
-
-        {/* 2. Automation Systems Preview — concise 6-system grid, CTA → /store */}
-        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <TrustedStackCarousel />
         <AutomationSystemsGrid />
 
-        {/* 3. How It Works Teaser — process strip only, CTA → /how-it-works */}
-        <HomepageHowItWorksTeaser />
+        {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <Industries />
+        </LazyHomepageSection>
 
-        {/* 4. Package Preview — concise Starter/Growth/Pro, CTA → /pricing */}
+        <div id="automation-catalog" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <AutomationCatalog />
+
+        <div id="revenue-proof" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div className="max-w-6xl mx-auto px-6 pt-4">
+            <RevenueProofBlock industryLoss={14700} leadsRecovered="8-12" bookingsGenerated="3-5" />
+          </div>
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <TrustBar />
+        </LazyHomepageSection>
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="problem-solution" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <div id="six-automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <CoreOffer />
+        </LazyHomepageSection>
+
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <ThreeSystemsSection />
-
-        {/* 5. Industries / Best Fit Preview — who this is for, CTA → /industries */}
-        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <LazySection>
-          <Industries />
-        </LazySection>
-
-        {/* 6. Compact Trust Strip */}
         <TrustStrip />
 
-        {/* 7. Final CTA block */}
-        <LazySection>
-          <FinalCTA />
-        </LazySection>
+        <SectionBreak />
 
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <FAQ />
+        </LazyHomepageSection>
+
+        <SectionBreak />
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="testimonials" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <Testimonials />
+        </LazyHomepageSection>
+
+        <SectionBreak />
+
+        <div id="revenue-urgency" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <RevenueUrgencySection />
+
+        <SectionBreak />
+
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <FinalCTA />
+        </LazyHomepageSection>
+
+        <SecurityPriority />
         <Footer />
         <ChatBubble />
+
+
       </div>
     </DemoBookingProvider>
   );

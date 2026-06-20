@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Users, Send, Zap, MessageSquare, TrendingUp,
   AlertTriangle, Activity, Lightbulb, Settings, ChevronRight,
-  FlaskConical, CheckSquare, HeartPulse, ShieldAlert,
+  FlaskConical, CheckSquare,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -33,17 +33,15 @@ const NAV_GROUPS = [
   {
     label: 'Infrastructure',
     items: [
-      { id: 'launch-gates',     label: 'Launch Gates',      icon: AlertTriangle },
-      { id: 'system-health',   label: 'System Health',     icon: Activity },
-      { id: 'diagnostics',     label: 'Health & Fix Recs', icon: HeartPulse },
-      { id: 'failure-monitor', label: 'Failure Monitor',   icon: ShieldAlert },
+      { id: 'launch-gates',   label: 'Launch Gates',  icon: AlertTriangle },
+      { id: 'system-health',  label: 'System Health', icon: Activity },
     ],
   },
   {
     label: 'Admin Tools',
     items: [
       { id: 'improvement-review', label: 'Improvement Review', icon: CheckSquare },
-      { id: 'simulation-lab',     label: 'Simulation Lab',     icon: FlaskConical },
+      { id: 'simulation-lab', label: 'Simulation Lab', icon: FlaskConical },
     ],
   },
 ];
