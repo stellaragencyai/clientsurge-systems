@@ -60,6 +60,7 @@ const LeadSourceAttribution = lazy(() => import('../components/admin/LeadSourceA
 const RevenueDashboard = lazy(() => import('../components/admin/RevenueDashboard'));
 const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueTrackingDashboard'));
 const PlatformClientsPanel = lazy(() => import('../components/admin/PlatformClientsPanel'));
+const UnifiedOnboardingProgress = lazy(() => import('../components/admin/UnifiedOnboardingProgress'));
 
 function AdminPanelSkeleton() {
   return (
@@ -126,6 +127,7 @@ const NAV_GROUPS = [
   {
     group: 'System',
     items: [
+      { id: 'onboarding-orchestration', label: '🔄 Onboarding', icon: Zap },
       { id: 'platform-clients', label: '🏢 Platform Clients', icon: Users },
       { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
@@ -273,6 +275,7 @@ export default function AdminDashboard() {
       case 'campaign-builder': return <CampaignLibrary />;
       case 'revenue': return <LazyAdminPanel><RevenueDashboard /></LazyAdminPanel>;
       case 'revenue-tracking': return <LazyAdminPanel><RevenueTrackingDashboard /></LazyAdminPanel>;
+      case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
