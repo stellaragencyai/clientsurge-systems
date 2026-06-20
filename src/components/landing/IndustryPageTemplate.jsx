@@ -2,15 +2,14 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getIndustryBySlug } from '@/data/industryMarketingConfig';
 import { getPlanFeatures } from '@/lib/saasProductizationConfig';
+import { base44 } from '@/api/base44Client';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
 import { ArrowRight, CheckCircle, TrendingUp, Zap } from 'lucide-react';
 
-// Hero image URLs for cinematic industry pages (template for future expansion)
-const HERO_IMAGES = {
-  roofing: 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/e92b5f56c_watermarked_img_13975777732204341720.jpg',
-};
+// Fallback hero image URL
+const FALLBACK_HERO_IMAGE = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&h=900&fit=crop';
 
 // Roofing-specific hero configuration
 const ROOFING_HERO_CONFIG = {
@@ -18,7 +17,7 @@ const ROOFING_HERO_CONFIG = {
   headline: 'AI Automation Systems for Roofing Companies',
   subheadline: 'Capture more roofing leads, respond to missed calls, follow up on quotes, book inspections, request reviews, and reactivate old opportunities with a remote AI-powered setup workflow.',
   description: '',
-  backgroundImage: HERO_IMAGES.roofing,
+  backgroundImage: null, // Dynamically set from Google Drive
   primaryCTA: {
     label: 'Start Roofing Setup',
     path: '/start?industry=roofing',
@@ -37,6 +36,7 @@ export default function IndustryPageTemplate() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [industry, setIndustry] = useState(null);
+  const [heroImageUrl, setHeroImageUrl] = useState(FALLBACK_HERO_IMAGE);
 
   useEffect(() => {
     const data = getIndustryBySlug(slug);
@@ -48,6 +48,23 @@ export default function IndustryPageTemplate() {
     }
   }, [slug, navigate]);
 
+  // Fetch roofing hero image from Google Drive on mount
+  useEffect(() => {
+    if (slug === 'roofing') {
+      base44.functions
+        .invoke('syncRoofingHeroImageFromGoogleDrive', {})
+        .then((res) => {
+          if (res?.data?.imageUrl) {
+            setHeroImageUrl(res.data.imageUrl);
+          }
+        })
+        .catch((err) => {
+          console.warn('Failed to sync Google Drive image, using fallback:', err);
+          setHeroImageUrl(FALLBACK_HERO_IMAGE);
+        });
+    }
+  }, [slug]);
+
   if (!industry) return null;
 
   const recommendedFeatures = getPlanFeatures(industry.recommended_plan);
@@ -55,7 +72,10 @@ export default function IndustryPageTemplate() {
   // Determine hero config based on industry slug
   const getHeroConfig = () => {
     if (slug === 'roofing') {
-      return ROOFING_HERO_CONFIG;
+      return {
+        ...ROOFING_HERO_CONFIG,
+        backgroundImage: heroImageUrl, // Use dynamically synced Google Drive image
+      };
     }
     // Fallback: generate from industry data for other industries
     return {
