@@ -213,7 +213,15 @@ Deno.serve(async (req) => {
       orchResult = await base44.asServiceRole.entities.OnboardingOrchestration.create(orchestrationPayload);
     }
 
-    // ── 10. Propagate stage to linked entities (only on change) ──────────
+    // ── 10. Trigger activation readiness evaluation ────────────────────
+    const readinessResult = await base44.functions.invoke('evaluateActivationReadiness', {
+      order_id: orderId,
+    }).catch(e => {
+      syncErrors.push(`Activation readiness evaluation failed: ${e.message}`);
+      return { data: { skipped: true } };
+    });
+
+    // ── 11. Propagate stage to linked entities (only on change) ──────────
     await Promise.all([
       instOS && instOS.onboarding_unified_stage !== unified_stage
         ? base44.asServiceRole.entities.ClientInstallationOS.update(instOS.id, {
@@ -227,7 +235,7 @@ Deno.serve(async (req) => {
         : null,
     ].filter(Boolean));
 
-    // ── 11. Upsert DashboardTruthCheck ───────────────────────────────────
+    // ── 12. Upsert DashboardTruthCheck ───────────────────────────────────
     const isQAOrder = ['qa', 'smoke', 'demo', 'internal'].includes(order.environment);
     const truthStatus = blockers.length > 0 ? 'blocked'
       : syncErrors.length > 0 ? 'warning'
@@ -275,8 +283,8 @@ Deno.serve(async (req) => {
       safe_to_show_client: !isQAOrder && truthStatus === 'trusted',
       safe_to_show_admin: !isQAOrder,
       safe_to_launch: ready_to_go_live && !isQAOrder,
-      blocker_count: truthBlockers.length,
-      warning_count: truthWarnings.length + (isQAOrder ? 1 : 0),
+      blocker_count: truthBlockers.length + (readinessResult?.data?.blocker_count || 0),
+      warning_count: truthWarnings.length + (isQAOrder ? 1 : 0) + (readinessResult?.data?.missing_count || 0),
       blockers: truthBlockers,
       warnings: isQAOrder
         ? [{ code: 'qa_order', severity: 'advisory', message: 'QA/smoke order — excluded from production dashboard', entity_name: 'Order', record_id: orderId }, ...truthWarnings]
@@ -296,7 +304,7 @@ Deno.serve(async (req) => {
       }).catch(e => syncErrors.push(`DashboardTruthCheck create: ${e.message}`));
     }
 
-    // ── 12. If sync errors occurred, patch them back into orchestration ──
+    // ── 13. If sync errors occurred, patch them back into orchestration ──
     if (syncErrors.length > 0 && orchResult?.id) {
       await base44.asServiceRole.entities.OnboardingOrchestration.update(
         orchResult.id ?? currentOrch?.id,
@@ -322,6 +330,7 @@ Deno.serve(async (req) => {
         automation_checklist: autoCList?.id,
         orchestration: orchResult?.id ?? currentOrch?.id,
       },
+      activation_readiness: readinessResult?.data || null,
     });
   } catch (error) {
     console.error('[syncOnboardingOrchestration]', error.message);

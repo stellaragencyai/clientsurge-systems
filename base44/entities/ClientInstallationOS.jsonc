@@ -15,6 +15,10 @@
       "type": "string",
       "title": "Client ID"
     },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
     "client_email": {
       "type": "string",
       "title": "Client Email"
@@ -62,22 +66,25 @@
         "type": "string"
       }
     },
-    "activation_eligible": {
-      "type": "boolean",
-      "title": "Eligible for Activation",
-      "default": false,
-      "description": "True if all required checklist items complete"
-    },
     "activation_status": {
       "type": "string",
       "title": "Activation Status",
       "enum": [
         "not_ready",
-        "ready_for_approval",
-        "activated",
-        "paused"
+        "ready_for_activation",
+        "activating",
+        "testing",
+        "live",
+        "blocked"
       ],
-      "default": "not_ready"
+      "default": "not_ready",
+      "description": "Current activation state: not_ready \u2192 ready_for_activation \u2192 activating \u2192 testing \u2192 live. blocked = unrecoverable issue."
+    },
+    "activation_eligible": {
+      "type": "boolean",
+      "title": "Eligible for Activation",
+      "default": false,
+      "description": "True if all required setup is complete and no blockers exist"
     },
     "activation_approved_at": {
       "type": "string",
@@ -91,7 +98,8 @@
     "activation_override": {
       "type": "boolean",
       "title": "Override Activation Checks",
-      "default": false
+      "default": false,
+      "description": "Admin can bypass readiness checks if necessary"
     },
     "activation_override_reason": {
       "type": "string",
@@ -101,9 +109,120 @@
       "type": "string",
       "title": "Override By (Admin Email)"
     },
+    "missing_requirements": {
+      "type": "array",
+      "title": "Missing Setup Requirements",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of unmet setup items (e.g., phone_number, booking_link, email_configured)"
+    },
+    "activation_blockers": {
+      "type": "array",
+      "title": "Activation Blockers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "integration_error",
+              "test_failed",
+              "client_not_approved",
+              "checklist_incomplete",
+              "proof_missing"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "identified_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "description": "Issues preventing activation"
+    },
+    "next_required_action": {
+      "type": "object",
+      "title": "Next Required Action",
+      "properties": {
+        "action_type": {
+          "type": "string",
+          "enum": [
+            "configure_integration",
+            "run_test",
+            "get_client_approval",
+            "complete_checklist",
+            "contact_support",
+            "ready_to_activate"
+          ]
+        },
+        "description": {
+          "type": "string"
+        },
+        "estimated_time_minutes": {
+          "type": "integer"
+        }
+      },
+      "description": "Single recommended next step to progress toward activation"
+    },
+    "integration_readiness": {
+      "type": "object",
+      "title": "Integration Readiness Status",
+      "properties": {
+        "sms_ready": {
+          "type": "boolean",
+          "title": "SMS Integration Ready"
+        },
+        "email_ready": {
+          "type": "boolean",
+          "title": "Email Integration Ready"
+        },
+        "booking_link_ready": {
+          "type": "boolean",
+          "title": "Booking Link Ready"
+        },
+        "lead_form_connected": {
+          "type": "boolean",
+          "title": "Lead Form Connected"
+        },
+        "webhooks_verified": {
+          "type": "boolean",
+          "title": "Webhooks Verified"
+        }
+      },
+      "description": "Integration capability flags for visibility"
+    },
+    "checklist_completion_percent": {
+      "type": "number",
+      "title": "Checklist Completion %",
+      "default": 0,
+      "description": "Overall completion of all automation checklists (0-100)"
+    },
     "admin_notes": {
       "type": "string",
       "title": "Admin Workflow Notes"
+    },
+    "last_readiness_check_at": {
+      "type": "string",
+      "title": "Last Readiness Check",
+      "format": "date-time",
+      "description": "When activation readiness was last evaluated"
+    },
+    "went_live_at": {
+      "type": "string",
+      "title": "Went Live At",
+      "format": "date-time",
+      "description": "When the client's automations went live"
     },
     "environment": {
       "type": "string",
