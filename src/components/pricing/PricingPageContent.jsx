@@ -20,7 +20,7 @@ const PACKAGES = [
       "Owner notification / CRM handoff where supported",
       "Remote setup workflow",
     ],
-    cta: "Start With Starter",
+    cta: "Choose Starter",
     ctaStyle: "secondary",
   },
   {
@@ -38,7 +38,7 @@ const PACKAGES = [
       "Stronger lead routing and follow-up structure",
       "Remote setup and testing workflow",
     ],
-    cta: "Start With Growth",
+    cta: "Choose Growth",
     ctaStyle: "primary",
   },
   {
@@ -55,7 +55,7 @@ const PACKAGES = [
       "Advanced automation setup coverage",
       "Higher-touch remote setup and launch support",
     ],
-    cta: "Apply for Pro System",
+    cta: "Choose Pro",
     ctaStyle: "secondary",
   },
 ];
