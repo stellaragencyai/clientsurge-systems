@@ -1,0 +1,77 @@
+{
+  "name": "PlanFeatureMapping",
+  "type": "object",
+  "_metadata": {
+    "status": "READ_ONLY_CONFIG",
+    "reason": "Maps each plan to its enabled feature keys and usage limits. Do not write to this table from billing or onboarding flows.",
+    "immutable": true
+  },
+  "properties": {
+    "plan_type": {
+      "type": "string",
+      "title": "Plan Type",
+      "enum": [
+        "starter_system",
+        "growth_system",
+        "elite_system"
+      ]
+    },
+    "feature_keys": {
+      "type": "array",
+      "title": "Enabled Feature Keys",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of feature_key strings enabled for this plan (e.g. instant_lead_response, missed_call_text_back, ai_booking_agent)"
+    },
+    "usage_limits": {
+      "type": "object",
+      "title": "Usage Limits",
+      "properties": {
+        "leads_per_month": {
+          "type": "integer"
+        },
+        "sms_per_month": {
+          "type": "integer"
+        },
+        "email_per_month": {
+          "type": "integer"
+        },
+        "automations_per_month": {
+          "type": "integer"
+        }
+      },
+      "description": "Hard monthly usage limits for this plan"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "plan_type",
+    "feature_keys"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

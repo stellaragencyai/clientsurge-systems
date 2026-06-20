@@ -1,0 +1,97 @@
+{
+  "name": "UpgradeLogicRules",
+  "type": "object",
+  "_metadata": {
+    "status": "READ_ONLY_CONFIG",
+    "reason": "Defines conditions under which a plan upgrade should be suggested. Read-only \u2014 do not modify from billing or automation flows."
+  },
+  "properties": {
+    "rule_key": {
+      "type": "string",
+      "title": "Rule Key",
+      "description": "Unique identifier for this upgrade rule (e.g. leads_limit_reached, feature_blocked_ai_booking)"
+    },
+    "applies_to_plan": {
+      "type": "string",
+      "title": "Applies To Plan",
+      "enum": [
+        "starter_system",
+        "growth_system",
+        "elite_system"
+      ],
+      "description": "Plan this rule applies to (when this plan hits the condition)"
+    },
+    "rule_type": {
+      "type": "string",
+      "title": "Rule Type",
+      "enum": [
+        "usage_limit",
+        "feature_blocked"
+      ],
+      "description": "usage_limit = triggered by exceeding a metric; feature_blocked = triggered by attempting an unavailable feature"
+    },
+    "metric_key": {
+      "type": "string",
+      "title": "Metric Key",
+      "description": "For usage_limit rules: the limit field being checked (e.g. leads_per_month, sms_per_month)"
+    },
+    "threshold_percent": {
+      "type": "number",
+      "title": "Threshold (%)",
+      "description": "For usage_limit rules: percentage of limit at which to trigger the rule (e.g. 80 = warn at 80% used)"
+    },
+    "blocked_feature_key": {
+      "type": "string",
+      "title": "Blocked Feature Key",
+      "description": "For feature_blocked rules: the feature_key that is not available on this plan"
+    },
+    "suggested_plan": {
+      "type": "string",
+      "title": "Suggested Upgrade Plan",
+      "enum": [
+        "growth_system",
+        "elite_system"
+      ],
+      "description": "Which plan to suggest upgrading to"
+    },
+    "message": {
+      "type": "string",
+      "title": "Upgrade Message",
+      "description": "User-facing message shown when this rule triggers"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active",
+      "default": true
+    }
+  },
+  "required": [
+    "rule_key",
+    "applies_to_plan",
+    "rule_type",
+    "suggested_plan",
+    "message"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

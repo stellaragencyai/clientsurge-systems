@@ -1,0 +1,80 @@
+{
+  "name": "SaaSProductizationControlMap",
+  "type": "object",
+  "_metadata": {
+    "status": "READ_ONLY_CONFIG",
+    "reason": "Top-level control map linking plans to system capabilities. Single source of truth for SaaS productization.",
+    "immutable": true
+  },
+  "properties": {
+    "plan_type": {
+      "type": "string",
+      "title": "Plan Type",
+      "enum": [
+        "starter_system",
+        "growth_system",
+        "elite_system"
+      ],
+      "description": "Canonical plan identifier"
+    },
+    "display_name": {
+      "type": "string",
+      "title": "Display Name",
+      "description": "Customer-facing plan name"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "Mapping of plan to system capabilities"
+    },
+    "tier_order": {
+      "type": "integer",
+      "title": "Tier Order",
+      "description": "1=Starter, 2=Growth, 3=Elite \u2014 used for upgrade path logic"
+    },
+    "setup_fee_usd": {
+      "type": "number",
+      "title": "Setup Fee (USD)"
+    },
+    "monthly_fee_usd": {
+      "type": "number",
+      "title": "Monthly Fee (USD)"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active",
+      "default": true
+    },
+    "notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    }
+  },
+  "required": [
+    "plan_type",
+    "display_name",
+    "tier_order"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

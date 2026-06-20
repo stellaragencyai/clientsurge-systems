@@ -1,0 +1,79 @@
+{
+  "name": "StripeMappingReference",
+  "type": "object",
+  "_metadata": {
+    "status": "READ_ONLY_CONFIG",
+    "reason": "Maps Stripe product/price IDs to canonical plan types. Do not modify from payment or webhook flows \u2014 this is a reference layer only."
+  },
+  "properties": {
+    "stripe_product_id": {
+      "type": "string",
+      "title": "Stripe Product ID",
+      "description": "e.g. prod_UReWMpnZsCnfcL"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "title": "Stripe Price ID",
+      "description": "e.g. price_XXXXX \u2014 the specific price variant (one-time or monthly)"
+    },
+    "price_type": {
+      "type": "string",
+      "title": "Price Type",
+      "enum": [
+        "one_time",
+        "recurring"
+      ],
+      "description": "Whether this price ID is a one-time setup fee or a recurring monthly charge"
+    },
+    "amount_usd": {
+      "type": "number",
+      "title": "Amount (USD)",
+      "description": "Dollar amount for this price"
+    },
+    "mapped_plan": {
+      "type": "string",
+      "title": "Mapped Plan",
+      "enum": [
+        "starter_system",
+        "growth_system",
+        "elite_system"
+      ],
+      "description": "Canonical plan this Stripe product/price maps to"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active",
+      "default": true
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "stripe_product_id",
+    "mapped_plan"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
