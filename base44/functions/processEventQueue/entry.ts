@@ -27,6 +27,66 @@ Deno.serve(async (req) => {
 
     for (const event of queuedEvents) {
       try {
+        // ── DEDUPLICATION GUARD ──────────────────────────────────────────────
+        // Compute idempotency key for this event
+        const idempKey = event.communication_event_id
+          ? `eq_${event.communication_event_id}_${event.processor_type}`
+          : null;
+
+        if (idempKey) {
+          // Check if this exact event has already been processed or is in flight
+          const [existingKey, existingCompleted] = await Promise.all([
+            base44.asServiceRole.entities.IdempotencyKey.filter(
+              { idempotency_key: idempKey, status: { $in: ['completed', 'processing'] } },
+              '-created_date',
+              1
+            ).catch(() => []),
+            base44.asServiceRole.entities.EventQueue.filter(
+              {
+                communication_event_id: event.communication_event_id,
+                status: { $in: ['completed'] },
+                id: { $ne: event.id },
+              },
+              '-created_date',
+              1
+            ).catch(() => []),
+          ]);
+
+          const isDuplicate =
+            (existingKey?.length > 0) ||
+            (existingCompleted?.length > 0);
+
+          if (isDuplicate) {
+            // Mark as ignored — no processing, no deletion
+            await base44.asServiceRole.entities.EventQueue.update(event.id, {
+              status: 'ignored',
+              error_message: 'Skipped: duplicate of already-processed event',
+            }).catch(() => {});
+
+            console.warn(`[processEventQueue] Skipping duplicate event:`, {
+              queue_id: event.id,
+              comm_event_id: event.communication_event_id,
+              idempotency_key: idempKey,
+            });
+
+            results.total_processed++;
+            continue;
+          }
+
+          // Register idempotency key as processing
+          await base44.asServiceRole.entities.IdempotencyKey.create({
+            idempotency_key: idempKey,
+            operation_type: 'event_queue_processing',
+            resource_type: 'event_queue',
+            resource_id: event.id,
+            client_id: event.client_id,
+            client_project_id: event.client_project_id || null,
+            status: 'processing',
+            execution_count: 1,
+          }).catch(() => {}); // Silently ignore if already exists — idempotent create
+        }
+        // ────────────────────────────────────────────────────────────────────
+
         // Mark as processing
         await base44.asServiceRole.entities.EventQueue.update(event.id, {
           status: 'processing',
@@ -70,6 +130,23 @@ Deno.serve(async (req) => {
             status: 'completed',
             completed_at: new Date().toISOString(),
           });
+
+          // Mark idempotency key as completed
+          if (idempKey) {
+            await base44.asServiceRole.entities.IdempotencyKey.filter(
+              { idempotency_key: idempKey },
+              '-created_date',
+              1
+            ).then(async (keys) => {
+              if (keys?.length > 0) {
+                await base44.asServiceRole.entities.IdempotencyKey.update(keys[0].id, {
+                  status: 'completed',
+                  last_executed_at: new Date().toISOString(),
+                }).catch(() => {});
+              }
+            }).catch(() => {});
+          }
+
           results.successful++;
         } else {
           throw new Error(processorResult.error || 'Processor failed');

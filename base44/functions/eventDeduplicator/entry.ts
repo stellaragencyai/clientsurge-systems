@@ -68,20 +68,56 @@ Deno.serve(async (req) => {
       results.reason = 'strict_duplicate_found';
 
       // Update dedup log with new duplicate
-      if (!dedupEntry.duplicate_event_ids) {
-        dedupEntry.duplicate_event_ids = [];
-      }
-      if (!dedupEntry.duplicate_event_ids.includes(communication_event_id)) {
+      const currentDupIds = dedupEntry.duplicate_event_ids || [];
+      if (!currentDupIds.includes(communication_event_id)) {
         await base44.asServiceRole.entities.EventDedupLog.update(dedupEntry.id, {
-          duplicate_event_ids: [...dedupEntry.duplicate_event_ids, communication_event_id],
+          duplicate_event_ids: [...currentDupIds, communication_event_id],
           duplicate_count: (dedupEntry.duplicate_count || 0) + 1,
         }).catch(() => {});
       }
 
-      console.log(`[eventDeduplicator] Duplicate detected:`, {
+      // CRITICAL: Mark CommunicationEvent as excluded to prevent re-dispatch
+      if (communication_event_id) {
+        await base44.asServiceRole.entities.CommunicationEvent.update(communication_event_id, {
+          dashboard_excluded: true,
+          dashboard_exclusion_reason: `Duplicate of canonical event ${dedupEntry.canonical_event_id} (${dedupKey})`,
+        }).catch(() => {});
+      }
+
+      // CRITICAL: Cancel any EventQueue items for this duplicate event
+      const dupQueueItems = await base44.asServiceRole.entities.EventQueue.filter(
+        { communication_event_id, status: { $in: ['queued', 'processing'] } },
+        '-created_date',
+        5
+      ).catch(() => []);
+
+      for (const qItem of dupQueueItems) {
+        await base44.asServiceRole.entities.EventQueue.update(qItem.id, {
+          status: 'ignored',
+          error_message: `Ignored: duplicate event. Canonical: ${dedupEntry.canonical_event_id}`,
+        }).catch(() => {});
+      }
+
+      // CRITICAL: Cancel any pending AutomationJobs for this duplicate
+      const dupJobs = await base44.asServiceRole.entities.AutomationJob.filter(
+        { communication_event_id, status: { $in: ['pending', 'processing'] } },
+        '-created_date',
+        5
+      ).catch(() => []);
+
+      for (const job of dupJobs) {
+        await base44.asServiceRole.entities.AutomationJob.update(job.id, {
+          status: 'cancelled',
+          error_message: `Cancelled: duplicate event. Canonical: ${dedupEntry.canonical_event_id}`,
+        }).catch(() => {});
+      }
+
+      console.log(`[eventDeduplicator] Duplicate detected and suppressed:`, {
         dedup_key: dedupKey,
         canonical: dedupEntry.canonical_event_id,
         duplicate: communication_event_id,
+        queue_items_ignored: dupQueueItems.length,
+        jobs_cancelled: dupJobs.length,
       });
     } else {
       // Create new dedup entry
