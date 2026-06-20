@@ -18,12 +18,35 @@ export default function MissionControlDashboard({ onNavigate }) {
   useEffect(() => {
     const loadMetrics = async () => {
       try {
-        const [leads, automations, events, conversions] = await Promise.all([
-          base44.asServiceRole.entities.Leads.filter({}, 'id', 1),
-          base44.asServiceRole.entities.AutomationRule.filter({ status: 'active' }, 'id', 1),
-          base44.asServiceRole.entities.CommunicationEvent.filter({}, 'id', 1),
-          base44.asServiceRole.entities.ConversionFunnel.filter({}, '-created_date', 1),
-        ]);
+        // Load metrics with individual error handling for each query
+        let leads = [];
+        let automations = [];
+        let events = [];
+        let conversions = [];
+
+        try {
+          leads = await base44.asServiceRole.entities.Leads.list('-created_date', 1);
+        } catch (e) {
+          console.warn('Failed to load leads:', e);
+        }
+
+        try {
+          automations = await base44.asServiceRole.entities.AutomationRule.filter({ status: 'active' }, '-created_date', 1);
+        } catch (e) {
+          console.warn('Failed to load automations:', e);
+        }
+
+        try {
+          events = await base44.asServiceRole.entities.CommunicationEvent.list('-created_date', 1);
+        } catch (e) {
+          console.warn('Failed to load events:', e);
+        }
+
+        try {
+          conversions = await base44.asServiceRole.entities.ConversionFunnel.list('-created_date', 1);
+        } catch (e) {
+          console.warn('Failed to load conversions:', e);
+        }
 
         setMetrics({
           total_leads: (leads || []).length,
@@ -33,7 +56,15 @@ export default function MissionControlDashboard({ onNavigate }) {
           revenue_impact: conversions?.[0]?.total_revenue_attributed || 0,
         });
       } catch (e) {
-        console.error('Failed to load metrics:', e);
+        console.error('Critical error loading metrics:', e);
+        // Set default metrics on critical error
+        setMetrics({
+          total_leads: 0,
+          active_automations: 0,
+          messages_sent: 0,
+          bookings: 0,
+          revenue_impact: 0,
+        });
       } finally {
         setLoading(false);
       }
