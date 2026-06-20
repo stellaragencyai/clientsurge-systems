@@ -214,41 +214,41 @@ export default function LeadsTable() {
   };
 
   return (
-    <div className="space-y-6">
-      {/* KPI Cards - Minimal */}
+    <div className="space-y-5">
+      {/* KPI Cards - Clean & Minimal */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        <div className="rounded-lg bg-background/50 p-3 border border-border/40">
-          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-wide">Total</p>
-          <p className="text-2xl font-bold text-foreground mt-1">{kpis.total}</p>
+        <div className="rounded-lg bg-white p-4 border border-border text-center">
+          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest">Total</p>
+          <p className="text-3xl font-bold text-foreground mt-2">{kpis.total}</p>
         </div>
-        <div className="rounded-lg bg-background/50 p-3 border border-border/40">
-          <p className="text-[10px] text-red-600 font-semibold uppercase tracking-wide">Hot</p>
-          <p className="text-2xl font-bold text-red-600 mt-1">{kpis.hot}</p>
+        <div className="rounded-lg bg-white p-4 border border-border text-center">
+          <p className="text-[11px] text-red-600 font-bold uppercase tracking-widest">Hot</p>
+          <p className="text-3xl font-bold text-red-600 mt-2">{kpis.hot}</p>
         </div>
-        <div className="rounded-lg bg-background/50 p-3 border border-border/40">
-          <p className="text-[10px] text-blue-600 font-semibold uppercase tracking-wide">New</p>
-          <p className="text-2xl font-bold text-blue-600 mt-1">{kpis.new}</p>
+        <div className="rounded-lg bg-white p-4 border border-border text-center">
+          <p className="text-[11px] text-blue-600 font-bold uppercase tracking-widest">New</p>
+          <p className="text-3xl font-bold text-blue-600 mt-2">{kpis.new}</p>
         </div>
-        <div className="rounded-lg bg-background/50 p-3 border border-border/40">
-          <p className="text-[10px] text-green-600 font-semibold uppercase tracking-wide">Booked</p>
-          <p className="text-2xl font-bold text-green-600 mt-1">{kpis.booked}</p>
+        <div className="rounded-lg bg-white p-4 border border-border text-center">
+          <p className="text-[11px] text-green-600 font-bold uppercase tracking-widest">Booked</p>
+          <p className="text-3xl font-bold text-green-600 mt-2">{kpis.booked}</p>
         </div>
       </div>
 
       {/* Duplicate Warning */}
       {duplicateWarnings > 0 && (
-        <div className="flex items-center gap-2 p-3 rounded-lg bg-amber-50 border border-amber-200/50 text-xs text-amber-800">
-          <AlertTriangle className="w-3.5 h-3.5 flex-shrink-0" />
-          <span>
-            <strong>{duplicateWarnings} potential duplicate(s)</strong> detected by email. Review and merge if needed.
-          </span>
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900">
+          <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <div>
+            <strong>{duplicateWarnings} potential duplicate(s) found</strong> by email address. Review in data quality dashboard.
+          </div>
         </div>
       )}
 
       {/* Search & Filters */}
-      <div className="space-y-3 rounded-lg border border-border/40 bg-background/30 p-3">
-        <div className="flex items-center gap-2 rounded-lg border border-border/40 bg-background/50 px-3 py-2">
-          <Search className="w-3.5 h-3.5 text-muted-foreground" />
+      <div className="space-y-3 rounded-lg border border-border bg-white p-4">
+        <div className="flex items-center gap-3 rounded-lg border border-border bg-background px-4 py-3">
+          <Search className="w-4 h-4 text-muted-foreground flex-shrink-0" />
           <input
             type="text"
             placeholder="Search business name or email..."
@@ -262,7 +262,7 @@ export default function LeadsTable() {
           <select
             value={filters.lead_state}
             onChange={(e) => handleFilterChange("lead_state", e.target.value)}
-            className="rounded-lg border border-border/40 bg-background/50 px-2.5 py-1.5 text-xs outline-none hover:border-primary transition-colors"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
             <option value="">State</option>
             <option value="NEW">New</option>
@@ -276,7 +276,7 @@ export default function LeadsTable() {
           <select
             value={filters.intelligence_segment}
             onChange={(e) => handleFilterChange("intelligence_segment", e.target.value)}
-            className="rounded-lg border border-border/40 bg-background/50 px-2.5 py-1.5 text-xs outline-none hover:border-primary transition-colors"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
             <option value="">Segment</option>
             <option value="HOT_LEADS">Hot</option>
@@ -288,7 +288,7 @@ export default function LeadsTable() {
           <select
             value={filters.industry}
             onChange={(e) => handleFilterChange("industry", e.target.value)}
-            className="rounded-lg border border-border/40 bg-background/50 px-2.5 py-1.5 text-xs outline-none hover:border-primary transition-colors"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
             <option value="">Industry</option>
             <option value="med-spa">Med Spa</option>
@@ -306,7 +306,7 @@ export default function LeadsTable() {
             max="100"
             value={filters.scoreMin}
             onChange={(e) => handleFilterChange("scoreMin", e.target.value)}
-            className="rounded-lg border border-border/40 bg-background/50 px-2.5 py-1.5 text-xs outline-none hover:border-primary transition-colors"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           />
 
           <input
@@ -316,28 +316,28 @@ export default function LeadsTable() {
             max="100"
             value={filters.scoreMax}
             onChange={(e) => handleFilterChange("scoreMax", e.target.value)}
-            className="rounded-lg border border-border/40 bg-background/50 px-2.5 py-1.5 text-xs outline-none hover:border-primary transition-colors"
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           />
         </div>
       </div>
 
       {/* Table */}
-      <div className="rounded-lg border border-border/40 bg-background/20 overflow-hidden">
+      <div className="rounded-lg border border-border bg-white overflow-hidden">
         {error && (
-          <div className="flex items-center gap-2 p-3 text-xs text-red-700 bg-red-50/50 border-b border-red-200/30">
-            <AlertCircle className="w-3.5 h-3.5" />
-            {error}
+          <div className="flex items-start gap-3 p-4 text-sm text-red-800 bg-red-50 border-b border-red-200">
+            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+            <div>{error}</div>
           </div>
         )}
 
         <div className="overflow-x-auto">
-          <table className="w-full text-xs">
-            <thead className="bg-background/50 border-b border-border/40">
+          <table className="w-full text-sm">
+            <thead className="bg-gray-50 border-b border-border">
               <tr>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">Name</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">Business</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">Contact</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Name</th>
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Business</th>
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Contact</th>
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
                   <button
                     onClick={() => handleSort("intelligence_score")}
                     className="hover:text-primary transition-colors"
@@ -345,8 +345,8 @@ export default function LeadsTable() {
                     Intelligence {renderSortIcon("intelligence_score")}
                   </button>
                 </th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">State</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground">
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">State</th>
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
                   <button
                     onClick={() => handleSort("last_activity_at")}
                     className="hover:text-primary transition-colors"
@@ -356,7 +356,7 @@ export default function LeadsTable() {
                 </th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-border/40">
+            <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
                   <td colSpan="6" className="px-3 py-6 text-center">
@@ -374,33 +374,33 @@ export default function LeadsTable() {
                 </tr>
               ) : (
                 leads.map((lead) => (
-                  <tr key={lead.id} className={`${getRowHighlight(lead.lead_state)}`}>
-                    <td className="px-3 py-2 font-medium text-foreground">{lead.full_name || "-"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">{lead.business_name || "-"}</td>
-                    <td className="px-3 py-2 text-muted-foreground">
-                      <div className="space-y-0.5">
+                  <tr key={lead.id} className={`${getRowHighlight(lead.lead_state)} border-none`}>
+                    <td className="px-4 py-3 font-medium text-foreground">{lead.full_name || "-"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">{lead.business_name || "-"}</td>
+                    <td className="px-4 py-3 text-muted-foreground">
+                      <div className="space-y-1">
                         <div>{lead.email || "-"}</div>
-                        {lead.phone && <div>{lead.phone}</div>}
+                        {lead.phone && <div className="text-xs">{lead.phone}</div>}
                       </div>
                     </td>
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-1.5">
-                        <span className="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold bg-blue-100/80 text-blue-700">
+                    <td className="px-4 py-3">
+                      <div className="flex items-center gap-2">
+                        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
                           {lead.intelligence_score || 0}
                         </span>
                         {lead.intelligence_segment && (
-                          <span className={`inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-semibold ${getIntelligenceSegmentBadge(lead.intelligence_segment).color}`}>
+                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${getIntelligenceSegmentBadge(lead.intelligence_segment).color}`}>
                             {getIntelligenceSegmentBadge(lead.intelligence_segment).label}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-3 py-2">
-                      <span className="inline-flex px-1.5 py-0.5 rounded text-[10px] font-semibold bg-primary/10 text-primary">
+                    <td className="px-4 py-3">
+                      <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary">
                         {lead.lead_state || "NEW"}
                       </span>
                     </td>
-                    <td className="px-3 py-2 text-muted-foreground">
+                    <td className="px-4 py-3 text-muted-foreground text-sm">
                       {lead.last_activity_at
                         ? new Date(lead.last_activity_at).toLocaleDateString()
                         : "—"}
@@ -412,26 +412,26 @@ export default function LeadsTable() {
           </table>
         </div>
 
-        {/* Pagination - Minimal */}
-        <div className="flex items-center justify-between border-t border-border/40 px-3 py-2 bg-background/30">
-          <p className="text-[11px] text-muted-foreground">
+        {/* Pagination */}
+        <div className="flex items-center justify-between border-t border-border px-4 py-3 bg-gray-50">
+          <p className="text-sm text-muted-foreground">
             {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, totalCount)} of ~{kpis.total}
           </p>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-2">
             <button
               onClick={() => setPage(Math.max(0, page - 1))}
               disabled={page === 0 || loading}
-              className="px-2 py-1 rounded text-[11px] font-medium border border-border/40 hover:bg-background/50 disabled:opacity-40 transition-colors"
+              className="px-3 py-2 rounded text-sm font-medium border border-border hover:bg-muted disabled:opacity-40 transition-colors"
             >
-              Prev
+              ← Prev
             </button>
-            <span className="text-[10px] text-muted-foreground px-1.5">Page {page + 1}</span>
+            <span className="text-sm text-muted-foreground px-2">Page {page + 1}</span>
             <button
               onClick={() => setPage(page + 1)}
               disabled={leads.length < PAGE_SIZE || loading}
-              className="px-2 py-1 rounded text-[11px] font-medium border border-border/40 hover:bg-background/50 disabled:opacity-40 transition-colors"
+              className="px-3 py-2 rounded text-sm font-medium border border-border hover:bg-muted disabled:opacity-40 transition-colors"
             >
-              Next
+              Next →
             </button>
           </div>
         </div>

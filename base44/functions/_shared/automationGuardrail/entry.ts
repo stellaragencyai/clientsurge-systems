@@ -6,26 +6,16 @@
  * - Race condition guard per lead_id
  * - Retry safety verification
  * - AutomationJob duplicate check
- *
- * Usage:
- *   import { checkAutomationGuardrail, markGuardrailOutcome } from './_shared/automationGuardrail.js';
- *   const guard = await checkAutomationGuardrail(base44, { lead_id, job_type, trigger_event, idempotency_key });
- *   if (!guard.proceed) return Response.json({ skipped: true, reason: guard.reason });
  */
 
-/**
- * Dedup window in milliseconds — events arriving within this window are considered duplicates
- */
 const DEDUP_WINDOW_MS = 60 * 1000; // 60 seconds
 const MAX_RETRIES = 5;
 
 /**
- * Check all guardrails before executing an automation action
+ * Check all guardrails before executing an automation action.
  * Returns { proceed: boolean, reason: string, existing_id?: string }
  */
-export async function checkAutomationGuardrail(base44, { lead_id, job_type, trigger_event, idempotency_key, client_id }) {
-  const checks = [];
-
+async function checkAutomationGuardrail(base44, { lead_id, job_type, trigger_event, idempotency_key }) {
   // 1. Idempotency key check
   if (idempotency_key) {
     try {
@@ -72,7 +62,7 @@ export async function checkAutomationGuardrail(base44, { lead_id, job_type, trig
         return { proceed: false, reason: 'active_job_exists', existing_id: conflicting.id };
       }
 
-      // Check if a completed job for same event already exists (within 24h)
+      // Check completed within 24h
       const recentCompleted = (existingJobs || []).find(j => {
         const jobTime = new Date(j.created_date).getTime();
         return j.trigger_event === trigger_event &&
@@ -90,12 +80,11 @@ export async function checkAutomationGuardrail(base44, { lead_id, job_type, trig
 }
 
 /**
- * Mark the outcome of a guardrail check in the EventDedupLog
- * Call this AFTER a successful execution to prevent future duplicates
+ * Mark the outcome of a guardrail check in the EventDedupLog.
+ * Call this AFTER successful execution to prevent future duplicates.
  */
-export async function markGuardrailOutcome(base44, { lead_id, event_type, idempotency_key, outcome, job_id }) {
+async function markGuardrailOutcome(base44, { lead_id, event_type, idempotency_key, outcome, job_id }) {
   try {
-    // Record in dedup log
     if (lead_id && event_type) {
       await base44.entities.EventDedupLog.create({
         lead_id,
@@ -107,7 +96,6 @@ export async function markGuardrailOutcome(base44, { lead_id, event_type, idempo
       }).catch(() => null);
     }
 
-    // Mark idempotency key as processed
     if (idempotency_key) {
       const existing = await base44.entities.IdempotencyKey.filter({ key: idempotency_key }, '-created_date', 1);
       if (existing && existing.length > 0) {
@@ -120,26 +108,17 @@ export async function markGuardrailOutcome(base44, { lead_id, event_type, idempo
   } catch (_) {}
 }
 
-/**
- * Build an idempotency key from components
- */
-export function buildIdempotencyKey(...parts) {
+function buildIdempotencyKey(...parts) {
   return parts.filter(Boolean).join('_');
 }
 
-/**
- * Check retry safety — returns false if max retries exceeded or original already succeeded
- */
-export function isRetrieSafe({ retry_count = 0, status, max_retries = MAX_RETRIES }) {
+function isRetrySafe({ retry_count = 0, status, max_retries = MAX_RETRIES }) {
   if (retry_count >= max_retries) return false;
   if (status === 'completed' || status === 'success') return false;
   return true;
 }
 
-/**
- * Append safety flags to a CommunicationEvent update payload (non-destructive)
- */
-export function buildSafetyFlags({ duplicate_detected = false, execution_skipped = false, retry_blocked = false, reason = '' }) {
+function buildSafetyFlags({ duplicate_detected = false, execution_skipped = false, retry_blocked = false, reason = '' }) {
   return {
     duplicate_detected,
     execution_skipped,
@@ -148,3 +127,13 @@ export function buildSafetyFlags({ duplicate_detected = false, execution_skipped
     safety_flagged_at: new Date().toISOString(),
   };
 }
+
+export {
+  checkAutomationGuardrail,
+  markGuardrailOutcome,
+  buildIdempotencyKey,
+  isRetrySafe,
+  buildSafetyFlags,
+  DEDUP_WINDOW_MS,
+  MAX_RETRIES,
+};
