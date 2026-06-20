@@ -46,6 +46,7 @@ import AuditLogPanel from '../components/admin/AuditLogPanel';
 import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
 import TwilioRuntimeHealth from '../components/admin/TwilioRuntimeHealth';
 import InstantLeadResponseDebugPanel from '../components/admin/InstantLeadResponseDebugPanel';
+import PipelineProofAuditButton from '../components/admin/PipelineProofAuditButton';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
@@ -524,7 +525,10 @@ function OverviewDashboard({ onNavigate }) {
           <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
           <p className="text-sm text-muted-foreground mt-1">Lead activation overview — click any card to drill in.</p>
         </div>
-        <AutomationAlertsPanel compact onNavigate={onNavigate} />
+        <div className="flex items-center gap-3">
+          <PipelineProofAuditButton onComplete={() => fetchOverviewData()} />
+          <AutomationAlertsPanel compact onNavigate={onNavigate} />
+        </div>
       </div>
 
       {/* Stats Grid */}
