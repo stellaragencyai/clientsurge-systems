@@ -116,6 +116,7 @@ const ProofPage = lazy(() => import("./pages/ProofPage"));
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
 const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
+const SystemObservabilityDashboard = lazy(() => import("./components/mission-control/observability/SystemObservabilityDashboard"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -476,6 +477,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "opportunity-review"), Component: OpportunityReviewQueue },
           { route: routePath("admin", "audit"), Component: FunctionAudit },
           { route: routePath("admin", "reconciliation"), Component: AdminReconciliation },
+          { route: routePath("admin", "observability"), Component: SystemObservabilityDashboard },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
