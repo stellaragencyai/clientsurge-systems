@@ -55,25 +55,25 @@ export default function LiveActivityStream() {
   return (
     <div className="bg-card rounded-xl border border-border overflow-hidden">
       {loading ? (
-        <div className="p-8 text-center text-muted-foreground">Loading activity...</div>
+        <div className="p-8 text-center text-sm text-muted-foreground">Loading activity...</div>
       ) : events.length === 0 ? (
-        <div className="p-8 text-center text-muted-foreground">No activity yet</div>
+        <div className="p-8 text-center text-sm text-muted-foreground">No activity yet</div>
       ) : (
-        <div className="divide-y divide-border">
+        <div className="divide-y divide-border max-h-96 overflow-y-auto">
           {events.map((event) => {
             const Icon = getEventIcon(event.event_type);
             return (
               <button
                 key={event.id}
-                className={`w-full p-4 text-left transition-colors hover:bg-muted/50 ${getEventColor(event.status)}`}
+                className={`w-full px-4 py-3 text-left transition-colors hover:bg-muted/50 ${getEventColor(event.status)}`}
               >
                 <div className="flex items-start gap-3">
-                  <Icon className="w-5 h-5 flex-shrink-0 mt-0.5" />
+                  <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 opacity-75" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold capitalize">
+                    <p className="text-sm font-medium capitalize">
                       {(event.event_type || 'event').replace(/_/g, ' ')}
                     </p>
-                    <p className="text-xs text-muted-foreground mt-1">
+                    <p className="text-xs text-muted-foreground mt-0.5">
                       {event.channel === 'email' ? '📧' : event.channel === 'sms' ? '💬' : '📡'}
                       {' '}
                       {event.direction === 'outbound' ? 'Sent' : 'Received'}

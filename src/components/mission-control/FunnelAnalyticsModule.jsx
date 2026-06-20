@@ -33,10 +33,15 @@ export default function FunnelAnalyticsModule() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Funnel Analytics</h1>
-        <p className="text-muted-foreground">Conversion rates and drop-off analysis.</p>
+        <div className="flex items-start gap-4 mb-2">
+          <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
+          <div>
+            <h1 className="text-4xl font-black text-foreground tracking-tight">Funnel Analytics</h1>
+            <p className="text-sm text-muted-foreground mt-2">Conversion rates and drop-off analysis.</p>
+          </div>
+        </div>
       </div>
 
       {funnels.map((funnel) => (

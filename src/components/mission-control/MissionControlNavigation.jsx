@@ -50,9 +50,9 @@ export default function MissionControlNavigation({ activeModule, onNavigate }) {
   };
 
   return (
-    <nav className="flex-1 p-4 overflow-y-auto space-y-1">
-      <div className="px-4 py-3 mb-4">
-        <p className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Navigation</p>
+    <nav className="flex-1 p-6 overflow-y-auto space-y-0.5">
+      <div className="px-4 py-4 mb-6">
+        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 letter-spacing-[0.12em]">Navigation</p>
       </div>
 
       {NAV_ITEMS.map((item) => {
@@ -84,8 +84,8 @@ export default function MissionControlNavigation({ activeModule, onNavigate }) {
         );
       })}
 
-      <div className="border-t border-slate-700 mt-6 pt-6">
-        <p className="px-4 text-[11px] font-bold uppercase tracking-widest text-slate-400 mb-3">System</p>
+      <div className="border-t border-slate-700 mt-8 pt-6">
+        <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">System</p>
         <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 text-sm font-medium transition-all">
           <Settings className="w-4 h-4" />
           <span>Settings</span>

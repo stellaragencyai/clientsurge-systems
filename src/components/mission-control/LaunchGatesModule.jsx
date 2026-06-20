@@ -33,10 +33,15 @@ export default function LaunchGatesModule() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Launch Gates</h1>
-        <p className="text-muted-foreground">System readiness checklist and blockers.</p>
+        <div className="flex items-start gap-4 mb-2">
+          <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
+          <div>
+            <h1 className="text-4xl font-black text-foreground tracking-tight">Launch Gates</h1>
+            <p className="text-sm text-muted-foreground mt-2">System readiness checklist and blockers.</p>
+          </div>
+        </div>
       </div>
 
       {gates.length === 0 ? (

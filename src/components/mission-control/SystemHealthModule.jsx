@@ -52,10 +52,15 @@ export default function SystemHealthModule() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">System Health</h1>
-        <p className="text-muted-foreground">Event processing and delivery metrics.</p>
+        <div className="flex items-start gap-4 mb-2">
+          <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
+          <div>
+            <h1 className="text-4xl font-black text-foreground tracking-tight">System Health</h1>
+            <p className="text-sm text-muted-foreground mt-2">Event processing and delivery metrics.</p>
+          </div>
+        </div>
       </div>
 
       {/* Health Metrics */}

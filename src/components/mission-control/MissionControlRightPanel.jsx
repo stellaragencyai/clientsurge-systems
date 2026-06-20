@@ -33,8 +33,8 @@ export default function MissionControlRightPanel() {
   return (
     <div className="flex flex-col h-full bg-card">
       {/* Header */}
-      <div className="border-b border-border p-4 flex items-center justify-between">
-        <h3 className="font-semibold text-foreground">Truth + Alerts</h3>
+      <div className="border-b border-border p-5 flex items-center justify-between">
+        <h3 className="font-bold text-sm text-foreground">Truth + Alerts</h3>
         <button className="p-1.5 hover:bg-muted rounded transition-colors">
           <RefreshCw className="w-4 h-4 text-muted-foreground" />
         </button>
@@ -44,9 +44,9 @@ export default function MissionControlRightPanel() {
       <div className="flex-1 overflow-y-auto">
         {/* Critical Alerts */}
         {criticalAlerts.length > 0 && (
-          <div className="border-b border-border p-4">
-            <p className="text-xs font-bold uppercase tracking-wider text-red-600 mb-3">
-              🚨 Critical Alerts ({criticalAlerts.length})
+          <div className="border-b border-border p-5">
+            <p className="text-xs font-bold uppercase tracking-wider text-red-700 mb-3">
+              🚨 Critical ({criticalAlerts.length})
             </p>
             <div className="space-y-2">
               {criticalAlerts.map((alert) => (
@@ -75,9 +75,9 @@ export default function MissionControlRightPanel() {
         )}
 
         {/* Live Truth Stream */}
-        <div className="p-4">
+        <div className="p-5">
           <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-3">
-            Last 10 Events
+            Last Events
           </p>
           <div className="space-y-2">
             {loading ? (

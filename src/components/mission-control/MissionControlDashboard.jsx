@@ -85,10 +85,13 @@ export default function MissionControlDashboard({ onNavigate }) {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       {/* Section A — Executive Metrics */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Executive Metrics</h2>
+        <div className="mb-6">
+          <h2 className="text-3xl font-black text-foreground tracking-tight">Executive Metrics</h2>
+          <div className="w-1 h-8 bg-primary rounded-sm mt-3" />
+        </div>
         {loading ? (
           <div className="flex items-center justify-center py-12">
             <Loader2 className="w-8 h-8 animate-spin text-primary" />
@@ -104,13 +107,19 @@ export default function MissionControlDashboard({ onNavigate }) {
 
       {/* Section B — Sales Pipeline */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Sales Pipeline</h2>
+        <div className="mb-6">
+          <h2 className="text-3xl font-black text-foreground tracking-tight">Sales Pipeline</h2>
+          <div className="w-1 h-8 bg-primary rounded-sm mt-3" />
+        </div>
         <SalesPipelineVisual onNavigate={onNavigate} />
       </div>
 
       {/* Section C — Live Activity Stream */}
       <div>
-        <h2 className="text-2xl font-bold text-foreground mb-6">Live Activity Stream</h2>
+        <div className="mb-6">
+          <h2 className="text-3xl font-black text-foreground tracking-tight">Live Activity Stream</h2>
+          <div className="w-1 h-8 bg-primary rounded-sm mt-3" />
+        </div>
         <LiveActivityStream />
       </div>
     </div>

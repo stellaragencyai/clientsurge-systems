@@ -42,10 +42,15 @@ export default function AutomationEngineModule() {
   }
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-12">
       <div>
-        <h1 className="text-3xl font-bold text-foreground mb-2">Automation Engine</h1>
-        <p className="text-muted-foreground">Active workflows and performance metrics.</p>
+        <div className="flex items-start gap-4 mb-2">
+          <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
+          <div>
+            <h1 className="text-4xl font-black text-foreground tracking-tight">Automation Engine</h1>
+            <p className="text-sm text-muted-foreground mt-2">Active workflows and performance metrics.</p>
+          </div>
+        </div>
       </div>
 
       {/* Automation Tiles */}

@@ -37,25 +37,28 @@ export default function SalesPipelineVisual({ onNavigate }) {
   }, []);
 
   return (
-    <div className="bg-card rounded-xl border border-border p-8">
+    <div className="bg-card rounded-xl border border-border p-8 space-y-6">
       {loading ? (
-        <p className="text-muted-foreground">Loading pipeline...</p>
+        <p className="text-sm text-muted-foreground">Loading pipeline...</p>
       ) : (
-        <div className="flex items-center justify-between gap-4">
-          {PIPELINE_STAGES.map((stage, idx) => (
-            <React.Fragment key={stage.name}>
-              <button
-                onClick={() => onNavigate('leads')}
-                className={`flex-1 rounded-lg border-2 border-border p-4 text-center transition-all hover:shadow-md cursor-pointer ${stage.color}`}
-              >
-                <p className="text-sm font-semibold mb-1">{stage.name}</p>
-                <p className="text-2xl font-bold">{stageCounts[stage.name] || 0}</p>
-              </button>
-              {idx < PIPELINE_STAGES.length - 1 && (
-                <ChevronRight className="w-6 h-6 text-muted-foreground flex-shrink-0" />
-              )}
-            </React.Fragment>
-          ))}
+        <div className="space-y-4">
+          <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground">Lead Progression</p>
+          <div className="flex items-center justify-between gap-3">
+            {PIPELINE_STAGES.map((stage, idx) => (
+              <React.Fragment key={stage.name}>
+                <button
+                  onClick={() => onNavigate('leads')}
+                  className={`flex-1 rounded-xl border-2 border-border p-4 text-center transition-all hover:shadow-md cursor-pointer ${stage.color}`}
+                >
+                  <p className="text-xs font-bold uppercase tracking-wider mb-2 opacity-75">{stage.name}</p>
+                  <p className="text-3xl font-black">{stageCounts[stage.name] || 0}</p>
+                </button>
+                {idx < PIPELINE_STAGES.length - 1 && (
+                  <ChevronRight className="w-5 h-5 text-muted-foreground flex-shrink-0" />
+                )}
+              </React.Fragment>
+            ))}
+          </div>
         </div>
       )}
     </div>
