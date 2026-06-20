@@ -1,0 +1,164 @@
+{
+  "name": "AutonomyControlPanel",
+  "type": "object",
+  "_metadata": {
+    "status": "AUTONOMOUS_EXECUTION_LAYER",
+    "reason": "Per-client control of system autonomy level. Admin retains full override authority at all times.",
+    "tenant_scoped": "client_project_id"
+  },
+  "properties": {
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID",
+      "description": "Associated client project"
+    },
+    "autonomy_level": {
+      "type": "string",
+      "title": "Autonomy Level",
+      "enum": [
+        "manual_only",
+        "suggestions_only",
+        "queued_execution",
+        "safe_auto_execution"
+      ],
+      "default": "suggestions_only",
+      "description": "manual_only = no automation; suggestions_only = recommendations only; queued_execution = actions queue for approval; safe_auto_execution = low-risk auto-execute"
+    },
+    "allowed_domains": {
+      "type": "array",
+      "title": "Allowed Optimization Domains",
+      "items": {
+        "type": "string"
+      },
+      "default": [
+        "conversion",
+        "acquisition"
+      ],
+      "description": "Domains where optimization is allowed: acquisition, conversion, activation, retention"
+    },
+    "blocked_actions": {
+      "type": "array",
+      "title": "Blocked Action Types",
+      "items": {
+        "type": "string"
+      },
+      "description": "Action types that are always blocked regardless of autonomy level: fix_landing_page, adjust_cta, adjust_pricing_display, trigger_email_campaign, pause_campaign, boost_campaign, optimize_funnel_step, improve_onboarding_flow"
+    },
+    "max_daily_actions": {
+      "type": "integer",
+      "title": "Max Daily Actions",
+      "default": 10,
+      "description": "Maximum number of actions that can execute per day"
+    },
+    "max_revenue_impact_per_action": {
+      "type": "number",
+      "title": "Max Revenue Impact Per Action ($)",
+      "default": 5000,
+      "description": "Estimated revenue impact ceiling for auto-executable actions"
+    },
+    "emergency_kill_switch": {
+      "type": "boolean",
+      "title": "Emergency Kill Switch",
+      "default": false,
+      "description": "If true, all autonomous optimization is paused immediately"
+    },
+    "kill_switch_reason": {
+      "type": "string",
+      "title": "Kill Switch Reason",
+      "description": "Why kill switch was activated"
+    },
+    "kill_switch_activated_at": {
+      "type": "string",
+      "title": "Kill Switch Activated At",
+      "format": "date-time"
+    },
+    "kill_switch_activated_by": {
+      "type": "string",
+      "title": "Kill Switch Activated By",
+      "description": "Admin email who activated kill switch"
+    },
+    "approval_required_for_domains": {
+      "type": "array",
+      "title": "Domains Requiring Approval",
+      "items": {
+        "type": "string"
+      },
+      "description": "Optimization domains that always require admin approval regardless of autonomy level"
+    },
+    "notification_recipients": {
+      "type": "array",
+      "title": "Notification Recipients",
+      "items": {
+        "type": "string"
+      },
+      "description": "Email addresses to notify on action execution or high-impact changes"
+    },
+    "audit_log_enabled": {
+      "type": "boolean",
+      "title": "Audit Log Enabled",
+      "default": true,
+      "description": "Whether to log all actions and outcomes"
+    },
+    "rollback_enabled": {
+      "type": "boolean",
+      "title": "Rollback Enabled",
+      "default": true,
+      "description": "Whether admins can rollback executed actions"
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time"
+    },
+    "updated_by": {
+      "type": "string",
+      "title": "Updated By",
+      "description": "Admin email who last updated these controls"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on autonomy configuration for this client"
+    }
+  },
+  "required": [
+    "client_project_id",
+    "autonomy_level"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

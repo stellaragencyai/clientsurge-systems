@@ -1,0 +1,222 @@
+{
+  "name": "ExecutionOutcomeTracker",
+  "type": "object",
+  "_metadata": {
+    "status": "AUTONOMOUS_EXECUTION_LAYER",
+    "reason": "Tracks and measures results of executed optimization actions. Data source for machine learning and continuous improvement.",
+    "tenant_scoped": "client_project_id (optional)"
+  },
+  "properties": {
+    "outcome_id": {
+      "type": "string",
+      "title": "Outcome ID",
+      "description": "Unique identifier for this outcome tracking record"
+    },
+    "action_id": {
+      "type": "string",
+      "title": "Action ID",
+      "description": "Reference to SafeExecutionQueue action that was executed"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID",
+      "description": "Associated client project"
+    },
+    "action_type": {
+      "type": "string",
+      "title": "Action Type",
+      "enum": [
+        "fix_landing_page",
+        "adjust_cta",
+        "adjust_pricing_display",
+        "trigger_email_campaign",
+        "pause_campaign",
+        "boost_campaign",
+        "optimize_funnel_step",
+        "improve_onboarding_flow"
+      ]
+    },
+    "before_metrics": {
+      "type": "object",
+      "title": "Before Metrics",
+      "description": "Metrics snapshot before action execution",
+      "properties": {
+        "conversion_rate": {
+          "type": "number"
+        },
+        "bounce_rate": {
+          "type": "number"
+        },
+        "avg_response_time_minutes": {
+          "type": "number"
+        },
+        "revenue_per_lead": {
+          "type": "number"
+        },
+        "onboarding_completion_rate": {
+          "type": "number"
+        },
+        "churn_rate": {
+          "type": "number"
+        },
+        "email_open_rate": {
+          "type": "number"
+        },
+        "email_click_rate": {
+          "type": "number"
+        },
+        "custom_metrics": {
+          "type": "object"
+        }
+      }
+    },
+    "after_metrics": {
+      "type": "object",
+      "title": "After Metrics",
+      "description": "Metrics snapshot after action execution (measured at analysis_at)",
+      "properties": {
+        "conversion_rate": {
+          "type": "number"
+        },
+        "bounce_rate": {
+          "type": "number"
+        },
+        "avg_response_time_minutes": {
+          "type": "number"
+        },
+        "revenue_per_lead": {
+          "type": "number"
+        },
+        "onboarding_completion_rate": {
+          "type": "number"
+        },
+        "churn_rate": {
+          "type": "number"
+        },
+        "email_open_rate": {
+          "type": "number"
+        },
+        "email_click_rate": {
+          "type": "number"
+        },
+        "custom_metrics": {
+          "type": "object"
+        }
+      }
+    },
+    "revenue_delta": {
+      "type": "number",
+      "title": "Revenue Delta ($)",
+      "default": 0,
+      "description": "Estimated revenue change from this action"
+    },
+    "conversion_delta": {
+      "type": "number",
+      "title": "Conversion Delta (%)",
+      "default": 0,
+      "description": "Percentage point change in conversion rate"
+    },
+    "bounce_rate_delta": {
+      "type": "number",
+      "title": "Bounce Rate Delta (%)",
+      "default": 0,
+      "description": "Percentage point change in bounce rate (negative is good)"
+    },
+    "engagement_delta": {
+      "type": "number",
+      "title": "Engagement Delta (%)",
+      "default": 0,
+      "description": "Change in user engagement metrics"
+    },
+    "success": {
+      "type": "boolean",
+      "title": "Was Successful",
+      "default": false,
+      "description": "Whether action achieved positive outcomes"
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Outcome Confidence (0-100)",
+      "default": 0,
+      "description": "Confidence that observed changes are due to this action (not noise)"
+    },
+    "sample_size": {
+      "type": "integer",
+      "title": "Sample Size",
+      "description": "Number of data points in after_metrics sample"
+    },
+    "measurement_period_days": {
+      "type": "integer",
+      "title": "Measurement Period (days)",
+      "description": "How many days after execution were results measured"
+    },
+    "analysis_at": {
+      "type": "string",
+      "title": "Analysis At",
+      "format": "date-time",
+      "description": "When outcome metrics were analyzed"
+    },
+    "was_reversed": {
+      "type": "boolean",
+      "title": "Was Reversed",
+      "default": false,
+      "description": "Whether this action was rolled back"
+    },
+    "reversed_at": {
+      "type": "string",
+      "title": "Reversed At",
+      "format": "date-time",
+      "description": "When action was reversed (if applicable)"
+    },
+    "reversal_reason": {
+      "type": "string",
+      "title": "Reversal Reason",
+      "description": "Why this action was rolled back"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Additional analysis notes"
+    },
+    "learning_insights": {
+      "type": "string",
+      "title": "Learning Insights",
+      "description": "Key learnings from this outcome for future optimizations"
+    }
+  },
+  "required": [
+    "outcome_id",
+    "action_id",
+    "before_metrics",
+    "after_metrics"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

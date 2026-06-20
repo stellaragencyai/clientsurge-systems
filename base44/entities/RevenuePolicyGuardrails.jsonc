@@ -1,0 +1,154 @@
+{
+  "name": "RevenuePolicyGuardrails",
+  "type": "object",
+  "_metadata": {
+    "status": "AUTONOMOUS_EXECUTION_LAYER",
+    "reason": "Strict safety rules and guardrails governing autonomous revenue optimization. All actions must pass validation.",
+    "immutable": false
+  },
+  "properties": {
+    "policy_id": {
+      "type": "string",
+      "title": "Policy ID",
+      "description": "Unique identifier for this guardrail policy"
+    },
+    "rule_name": {
+      "type": "string",
+      "title": "Rule Name",
+      "description": "Human-readable name for this policy rule"
+    },
+    "metric": {
+      "type": "string",
+      "title": "Metric Being Monitored",
+      "description": "Metric to check: conversion_rate, bounce_rate, response_time, onboarding_completion, churn_rate, revenue_trend, etc."
+    },
+    "condition_type": {
+      "type": "string",
+      "title": "Condition Type",
+      "enum": [
+        "threshold",
+        "anomaly",
+        "performance_drop"
+      ],
+      "description": "threshold = check if metric crosses threshold; anomaly = detect unusual behavior; performance_drop = detect decline"
+    },
+    "threshold_value": {
+      "type": "number",
+      "title": "Threshold Value",
+      "description": "Value at which rule triggers (e.g., 50 for 50% bounce rate)"
+    },
+    "comparison_operator": {
+      "type": "string",
+      "title": "Comparison Operator",
+      "enum": [
+        "<",
+        ">",
+        ">=",
+        "<=",
+        "="
+      ],
+      "description": "How to compare metric to threshold"
+    },
+    "allowed_action_types": {
+      "type": "array",
+      "title": "Allowed Action Types",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of action types allowed when rule triggers: fix_landing_page, adjust_cta, adjust_pricing_display, trigger_email_campaign, pause_campaign, boost_campaign, optimize_funnel_step, improve_onboarding_flow"
+    },
+    "auto_execute_enabled": {
+      "type": "boolean",
+      "title": "Auto-Execute Enabled",
+      "default": false,
+      "description": "If true, low-risk actions auto-execute; if false, queue for approval"
+    },
+    "requires_admin_override": {
+      "type": "boolean",
+      "title": "Requires Admin Override",
+      "default": false,
+      "description": "If true, even low-risk actions require admin confirmation"
+    },
+    "is_blocking": {
+      "type": "boolean",
+      "title": "Is Blocking",
+      "default": false,
+      "description": "If true, violating this rule blocks any optimization actions (kill switch)"
+    },
+    "severity_level": {
+      "type": "string",
+      "title": "Severity Level",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "How serious is a violation of this rule"
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Is Enabled",
+      "default": true,
+      "description": "Whether this policy rule is active"
+    },
+    "lookback_days": {
+      "type": "integer",
+      "title": "Lookback Period (days)",
+      "default": 7,
+      "description": "Days of history to analyze for this metric"
+    },
+    "trigger_notification": {
+      "type": "boolean",
+      "title": "Trigger Notification",
+      "default": true,
+      "description": "Whether to notify admins when this rule is triggered"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on why this guardrail exists"
+    }
+  },
+  "required": [
+    "policy_id",
+    "rule_name",
+    "metric",
+    "condition_type",
+    "threshold_value",
+    "allowed_action_types"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

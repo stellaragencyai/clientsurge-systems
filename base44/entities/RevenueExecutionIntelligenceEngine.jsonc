@@ -1,0 +1,160 @@
+{
+  "name": "RevenueExecutionIntelligenceEngine",
+  "type": "object",
+  "_metadata": {
+    "status": "AUTONOMOUS_EXECUTION_LAYER",
+    "reason": "Core system analyzing revenue health and generating safe optimization decisions. Read-only data sources only.",
+    "tenant_scoped": "client_project_id"
+  },
+  "properties": {
+    "engine_id": {
+      "type": "string",
+      "title": "Engine ID",
+      "description": "Unique identifier for this revenue optimization engine instance"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID",
+      "description": "Associated client project for scoped analysis"
+    },
+    "mode": {
+      "type": "string",
+      "title": "Engine Mode",
+      "enum": [
+        "recommendations_only",
+        "queued_execution",
+        "safe_auto_execution"
+      ],
+      "default": "recommendations_only",
+      "description": "recommendations_only = suggestions only; queued_execution = queue actions pending approval; safe_auto_execution = auto-execute low-risk only"
+    },
+    "revenue_health_score": {
+      "type": "number",
+      "title": "Revenue Health Score (0-100)",
+      "default": 0,
+      "description": "Overall revenue trend and stability health"
+    },
+    "conversion_health_score": {
+      "type": "number",
+      "title": "Conversion Health Score (0-100)",
+      "default": 0,
+      "description": "Conversion funnel health and performance"
+    },
+    "acquisition_health_score": {
+      "type": "number",
+      "title": "Acquisition Health Score (0-100)",
+      "default": 0,
+      "description": "Lead acquisition volume and quality health"
+    },
+    "activation_health_score": {
+      "type": "number",
+      "title": "Activation Health Score (0-100)",
+      "default": 0,
+      "description": "Onboarding and customer activation health"
+    },
+    "retention_health_score": {
+      "type": "number",
+      "title": "Retention Health Score (0-100)",
+      "default": 0,
+      "description": "Customer retention and churn indicators"
+    },
+    "detected_bottlenecks": {
+      "type": "array",
+      "title": "Detected Bottlenecks",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of identified revenue leakage points: low_conversion_rate, high_bounce_rate, slow_response_time, poor_onboarding_completion, high_churn_rate, etc."
+    },
+    "estimated_revenue_leak": {
+      "type": "number",
+      "title": "Estimated Monthly Revenue Leak ($)",
+      "default": 0,
+      "description": "Estimated lost revenue per month from identified issues"
+    },
+    "estimated_opportunity": {
+      "type": "number",
+      "title": "Estimated Revenue Opportunity ($)",
+      "default": 0,
+      "description": "Estimated potential revenue recovery from optimizations"
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Analysis Confidence (0-100)",
+      "default": 0,
+      "description": "Confidence in detected issues and opportunity estimates"
+    },
+    "analysis_data_sources": {
+      "type": "array",
+      "title": "Data Sources Used",
+      "items": {
+        "type": "string"
+      },
+      "description": "Read-only entities analyzed: ConversionTrackingEvent, LandingPageAnalytics, ConversionFunnel, RevenueTracking, ClientInstallationOS, OnboardingOrchestration"
+    },
+    "last_analysis_at": {
+      "type": "string",
+      "title": "Last Analysis At",
+      "format": "date-time",
+      "description": "When revenue analysis was last performed"
+    },
+    "analysis_interval_minutes": {
+      "type": "integer",
+      "title": "Analysis Interval (minutes)",
+      "default": 60,
+      "description": "How frequently to run revenue analysis"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active",
+      "default": true,
+      "description": "Whether this engine is actively analyzing"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on optimization strategy"
+    }
+  },
+  "required": [
+    "engine_id",
+    "client_project_id",
+    "mode"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

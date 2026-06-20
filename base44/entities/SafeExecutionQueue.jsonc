@@ -1,0 +1,196 @@
+{
+  "name": "SafeExecutionQueue",
+  "type": "object",
+  "_metadata": {
+    "status": "AUTONOMOUS_EXECUTION_LAYER",
+    "reason": "Queue of optimization actions pending approval or safe execution. All actions logged and auditable.",
+    "tenant_scoped": "client_project_id"
+  },
+  "properties": {
+    "action_id": {
+      "type": "string",
+      "title": "Action ID",
+      "description": "Unique identifier for this queued optimization action"
+    },
+    "engine_id": {
+      "type": "string",
+      "title": "Engine ID",
+      "description": "Revenue engine that generated this action"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID",
+      "description": "Associated client project"
+    },
+    "action_type": {
+      "type": "string",
+      "title": "Action Type",
+      "enum": [
+        "fix_landing_page",
+        "adjust_cta",
+        "adjust_pricing_display",
+        "trigger_email_campaign",
+        "pause_campaign",
+        "boost_campaign",
+        "optimize_funnel_step",
+        "improve_onboarding_flow"
+      ],
+      "description": "Type of optimization action"
+    },
+    "target_entity": {
+      "type": "string",
+      "title": "Target Entity",
+      "description": "Entity type being modified (e.g., GrowthOptimizationSignal, OptimizationAction, EmailCampaign, LandingPageAnalytics)"
+    },
+    "target_id": {
+      "type": "string",
+      "title": "Target ID",
+      "description": "ID of specific record being optimized"
+    },
+    "action_payload": {
+      "type": "object",
+      "title": "Action Payload",
+      "description": "Detailed action instructions and parameters (read-only template, not executed directly)",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "recommendation": {
+          "type": "string"
+        },
+        "expected_impact": {
+          "type": "string"
+        },
+        "implementation_steps": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "estimated_lift": {
+          "type": "string"
+        }
+      }
+    },
+    "risk_level": {
+      "type": "string",
+      "title": "Risk Level",
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "description": "low = safe for auto-execution; medium = requires approval; high = requires admin override"
+    },
+    "execution_status": {
+      "type": "string",
+      "title": "Execution Status",
+      "enum": [
+        "queued",
+        "approved",
+        "executed",
+        "failed",
+        "rejected"
+      ],
+      "default": "queued",
+      "description": "Current status of this action"
+    },
+    "requires_approval": {
+      "type": "boolean",
+      "title": "Requires Approval",
+      "default": false,
+      "description": "Whether human approval is required before execution"
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By",
+      "description": "Admin email who approved this action (if approved)"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time",
+      "description": "When this action was approved"
+    },
+    "expected_revenue_impact": {
+      "type": "string",
+      "title": "Expected Revenue Impact",
+      "description": "Estimated financial impact (e.g., '+$2000/month', '+15% conversion')"
+    },
+    "implementation_notes": {
+      "type": "string",
+      "title": "Implementation Notes",
+      "description": "Technical details for execution (for audit trail)"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time",
+      "description": "When action was queued"
+    },
+    "executed_at": {
+      "type": "string",
+      "title": "Executed At",
+      "format": "date-time",
+      "description": "When action was executed (if executed)"
+    },
+    "rejection_reason": {
+      "type": "string",
+      "title": "Rejection Reason",
+      "description": "Why action was rejected (if rejected)"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message",
+      "description": "Error details if execution failed"
+    },
+    "is_reversible": {
+      "type": "boolean",
+      "title": "Is Reversible",
+      "default": true,
+      "description": "Whether this action can be rolled back"
+    },
+    "rollback_instructions": {
+      "type": "string",
+      "title": "Rollback Instructions",
+      "description": "How to undo this action if needed"
+    }
+  },
+  "required": [
+    "action_id",
+    "engine_id",
+    "client_project_id",
+    "action_type",
+    "target_entity",
+    "risk_level"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
