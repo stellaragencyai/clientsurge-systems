@@ -264,6 +264,39 @@ async function executeConfirmationEmail(base44, job) {
   }
 }
 
+async function upsertDashboardTruth(base44, job, fields) {
+  try {
+    const env = getEnvironment();
+    // Skip QA/smoke/internal records from production truth
+    if (env !== 'production') return;
+
+    const now = new Date().toISOString();
+    const existing = await base44.asServiceRole.entities.DashboardTruthCheck.filter(
+      { scope: 'admin_dashboard', client_id: job.client_id || 'platform' },
+      '-created_date', 1
+    ).catch(() => []);
+
+    const payload = {
+      scope: 'admin_dashboard',
+      client_id: job.client_id || 'platform',
+      client_project_id: job.client_project_id,
+      environment: env,
+      last_checked_at: now,
+      updated_at: now,
+      source_records: { job_id: job.id, job_type: job.job_type, lead_id: job.lead_id },
+      ...fields,
+    };
+
+    if (existing?.[0]?.id) {
+      await base44.asServiceRole.entities.DashboardTruthCheck.update(existing[0].id, payload);
+    } else {
+      await base44.asServiceRole.entities.DashboardTruthCheck.create({ ...payload, created_at: now });
+    }
+  } catch (err) {
+    console.warn('[processAutomationJobsQueue] upsertDashboardTruth failed:', err.message);
+  }
+}
+
 function getEnvironment() {
   try {
     const hostname = Deno.env.get('APP_URL') || '';
