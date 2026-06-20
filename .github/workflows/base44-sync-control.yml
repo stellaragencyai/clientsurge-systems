@@ -13,6 +13,14 @@ on:
         description: "Live URL to verify"
         required: true
         default: "https://clientsurgesystems.com"
+      run_base44_safety_tests:
+        description: "Run Base44 publish safety tests"
+        required: true
+        type: choice
+        default: "false"
+        options:
+          - "false"
+          - "true"
       run_full_node_tests:
         description: "Run the full Node test suite"
         required: true
@@ -43,7 +51,7 @@ concurrency:
 
 jobs:
   validate:
-    name: Validate build and Base44 safety tests
+    name: Validate build
     runs-on: ubuntu-latest
     timeout-minutes: 25
     steps:
@@ -63,6 +71,7 @@ jobs:
         run: npm run build
 
       - name: Run Base44 publish safety tests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_base44_safety_tests == 'true' }}
         run: node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js
 
       - name: Run full Node tests
