@@ -157,36 +157,36 @@ export default function Contact() {
       <Navbar />
 
       {/* Split Layout Container */}
-      <div className="flex min-h-[calc(100vh-200px)]">
+      <div className="flex min-h-screen">
         {/* LEFT: Dark sidebar with contact info */}
-        <div className="hidden lg:flex lg:w-1/2 bg-slate-900 text-white flex-col justify-between p-16">
+        <div className="hidden lg:flex lg:w-1/2 bg-slate-900 text-white flex-col justify-center p-20">
           <div>
-            <div className="mb-12">
-              <div className="text-2xl font-bold mb-8 flex items-center gap-2">
-                <div className="w-1 h-8 bg-primary rounded-sm" />
+            <div className="mb-16">
+              <div className="text-3xl font-bold mb-12 flex items-center gap-3">
+                <div className="w-1.5 h-10 bg-primary rounded-sm" />
                 ClientSurge
               </div>
-              <div className="border-b border-slate-700 pb-8 mb-8">
-                <div className="space-y-4">
+              <div className="border-b border-slate-700 pb-10 mb-10">
+                <div className="space-y-6">
                   <div className="flex items-center gap-4">
-                    <Phone className="w-5 h-5 text-primary flex-shrink-0" />
-                    <a href="tel:+16025843227" className="hover:text-primary transition">
+                    <Phone className="w-6 h-6 text-primary flex-shrink-0" />
+                    <a href="tel:+16025843227" className="hover:text-primary transition text-base">
                       (602) 584-3227
                     </a>
                   </div>
                   <div className="flex items-start gap-4">
-                    <Mail className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                    <div className="space-y-1">
-                      <p className="text-xs font-semibold text-slate-400">SALES</p>
-                      <a href="mailto:support@clientsurgesystems.com" className="hover:text-primary transition block text-sm">
+                    <Mail className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
+                    <div className="space-y-2">
+                      <p className="text-xs font-semibold text-slate-400 uppercase">Sales Inquiries</p>
+                      <a href="mailto:support@clientsurgesystems.com" className="hover:text-primary transition block text-base">
                         support@clientsurgesystems.com
                       </a>
                     </div>
                   </div>
                   <div className="flex items-start gap-4">
-                    <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <MapPin className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
                     <div>
-                      <p className="text-sm">Phoenix, Arizona</p>
+                      <p className="text-base">Phoenix, Arizona</p>
                     </div>
                   </div>
                 </div>
@@ -194,11 +194,11 @@ export default function Contact() {
             </div>
 
             {/* Info text */}
-            <div className="text-sm text-slate-400 leading-relaxed">
-              <p className="mb-4">
+            <div className="text-base text-slate-300 leading-relaxed space-y-4">
+              <p>
                 {industryContext 
                   ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right automation stack.`
-                  : "Have questions? We'd love to hear from you. Send us a message and we'll get back to you within one business day."
+                  : "Have questions or ready to get started? We'd love to hear from you. Send us a message and we'll get back to you within one business day."
                 }
               </p>
               <p>Ready to transform how you handle leads and follow-ups?</p>
@@ -206,19 +206,19 @@ export default function Contact() {
           </div>
 
           {/* Social Icons */}
-          <div className="flex items-center gap-6">
+          <div className="flex items-center gap-8 mt-auto pt-8">
             <a href="#" className="text-primary hover:text-white transition">
-              <Facebook className="w-5 h-5" />
+              <Facebook className="w-6 h-6" />
             </a>
             <a href="#" className="text-primary hover:text-white transition">
-              <Instagram className="w-5 h-5" />
+              <Instagram className="w-6 h-6" />
             </a>
           </div>
         </div>
 
         {/* RIGHT: White form area */}
-        <div className="w-full lg:w-1/2 bg-white p-8 md:p-16 flex items-center justify-center">
-          <div className="w-full max-w-md">
+        <div className="w-full lg:w-1/2 bg-white p-8 md:p-20 flex items-center justify-center">
+          <div className="w-full max-w-lg">
             {success ? (
               <motion.div
                 className="text-center py-8"
@@ -247,16 +247,16 @@ export default function Contact() {
                 </button>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-6" noValidate>
-                <div className="mb-10">
-                  <p className="text-sm font-semibold text-slate-600 tracking-widest uppercase mb-2">Get in Touch</p>
-                  <div className="flex items-center gap-3">
-                    <div className="w-1 h-10 bg-primary rounded-sm" />
-                    <h1 className="text-4xl font-black text-slate-900">CONTACT</h1>
+              <form onSubmit={handleSubmit} className="space-y-8" noValidate>
+                <div className="mb-12">
+                  <p className="text-xs font-semibold text-slate-600 tracking-widest uppercase mb-3">Get in Touch</p>
+                  <div className="flex items-center gap-4">
+                    <div className="w-1.5 h-12 bg-primary rounded-sm" />
+                    <h1 className="text-5xl font-black text-slate-900">CONTACT</h1>
                   </div>
                 </div>
 
-                <p className="text-slate-700 text-sm mb-8 leading-relaxed">
+                <p className="text-slate-700 text-lg mb-10 leading-relaxed">
                   We would love to hear from you! Send us a message and we'll get right back in touch.
                 </p>
 
@@ -276,9 +276,9 @@ export default function Contact() {
                 />
 
                 {/* First Name & Last Name */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-8">
                   <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
                       First Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -286,14 +286,14 @@ export default function Contact() {
                       value={form.full_name}
                       onChange={handleChange}
                       placeholder="Jane"
-                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                       aria-invalid={Boolean(errors.full_name)}
                     />
-                    {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
+                    {errors.full_name && <p className="text-red-500 text-xs mt-2">{errors.full_name}</p>}
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
                       Last Name <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -301,15 +301,15 @@ export default function Contact() {
                       value={form.business_type}
                       onChange={handleChange}
                       placeholder="Smith"
-                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                     />
                   </div>
                 </div>
 
                 {/* Phone & Email */}
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-2 gap-8">
                   <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
                       Phone No.
                     </label>
                     <input
@@ -318,14 +318,14 @@ export default function Contact() {
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="(555) 000-0000"
-                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                       aria-invalid={Boolean(errors.phone)}
                     />
-                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                    {errors.phone && <p className="text-red-500 text-xs mt-2">{errors.phone}</p>}
                   </div>
 
                   <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
                       Email Address <span className="text-red-500">*</span>
                     </label>
                     <input
@@ -334,16 +334,16 @@ export default function Contact() {
                       value={form.email}
                       onChange={handleChange}
                       placeholder="jane@business.com"
-                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                       aria-invalid={Boolean(errors.email)}
                     />
-                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                    {errors.email && <p className="text-red-500 text-xs mt-2">{errors.email}</p>}
                   </div>
                 </div>
 
                 {/* Message */}
                 <div>
-                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
                     Message <span className="text-red-500">*</span>
                   </label>
                   <textarea
@@ -351,49 +351,23 @@ export default function Contact() {
                     value={form.message}
                     onChange={handleChange}
                     placeholder="Tell us about your business and what you're looking for..."
-                    rows={4}
-                    className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition resize-none"
+                    rows={5}
+                    className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition resize-none font-inter"
                     aria-invalid={Boolean(errors.message)}
                   />
-                  {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
-                </div>
-
-                {/* Pain Points */}
-                <div>
-                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
-                    What's your biggest challenge?
-                  </label>
-                  <div className="flex flex-wrap gap-2">
-                    {PAIN_POINTS.map((pain) => {
-                      const active = selectedPains.includes(pain);
-                      return (
-                        <button
-                          key={pain}
-                          type="button"
-                          onClick={() => togglePain(pain)}
-                          className={`px-3 py-1.5 text-xs font-medium rounded transition ${
-                            active
-                              ? "bg-primary text-white"
-                              : "border border-slate-300 text-slate-700 hover:border-primary hover:text-primary"
-                          }`}
-                        >
-                          {active && "✓ "}{pain}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  {errors.message && <p className="text-red-500 text-xs mt-2">{errors.message}</p>}
                 </div>
 
                 {/* Submit Button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-32 px-6 py-3 border-2 border-slate-900 text-slate-900 font-bold uppercase tracking-wide hover:bg-slate-900 hover:text-white transition disabled:opacity-70 mt-8"
+                  className="w-32 px-6 py-4 border-2 border-slate-900 text-slate-900 font-bold uppercase tracking-wide hover:bg-slate-900 hover:text-white transition disabled:opacity-70 mt-10 text-base"
                 >
-                  {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "SEND"}
+                  {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "SEND"}
                 </button>
 
-                <p className="text-xs text-slate-500 mt-6">
+                <p className="text-sm text-slate-500 mt-8">
                   No spam, no pressure. Just thoughtful replies from our team.
                 </p>
               </form>
