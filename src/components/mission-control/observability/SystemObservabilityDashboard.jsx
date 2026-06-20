@@ -83,7 +83,7 @@ export default function SystemObservabilityDashboard() {
     return <div className="p-6 text-center text-red-600">Failed to load observability data.</div>;
   }
 
-  const { kpis, pipeline_stages, automation, events_breakdown, lead_flow, recent_errors, system_status } = metrics;
+  const { kpis, pipeline_stages, automation, events_breakdown, lead_flow, recent_errors, system_status, optimization_insights } = metrics;
 
   return (
     <div className="space-y-6 p-6">
@@ -236,6 +236,153 @@ export default function SystemObservabilityDashboard() {
             ))}
           </div>
         </div>
+      )}
+
+      {/* OPTIMIZATION INSIGHTS */}
+      {optimization_insights && (
+        <>
+          <div className="border-t border-border pt-8 mt-8">
+            <h2 className="text-lg font-bold text-foreground mb-4 flex items-center gap-2">
+              <TrendingUp className="w-5 h-5 text-primary" />
+              Optimization Insights
+            </h2>
+          </div>
+
+          {/* Performance Summary */}
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h3 className="font-bold text-foreground mb-4">Performance Summary (24h)</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div className="text-center">
+                <p className="text-2xl font-bold text-foreground">{optimization_insights.performance_summary.avg_response_time_minutes}</p>
+                <p className="text-xs font-medium text-muted-foreground mt-1">Avg Response Time (min)</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-foreground">{optimization_insights.performance_summary.event_volume_24h}</p>
+                <p className="text-xs font-medium text-muted-foreground mt-1">Event Volume</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-green-600">{optimization_insights.performance_summary.conversion_rate_percent}%</p>
+                <p className="text-xs font-medium text-muted-foreground mt-1">Conversion Rate</p>
+              </div>
+              <div className="text-center">
+                <p className="text-2xl font-bold text-blue-600">{optimization_insights.performance_summary.response_rate_percent}%</p>
+                <p className="text-xs font-medium text-muted-foreground mt-1">Response Rate</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Top Lead Sources */}
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h3 className="font-bold text-foreground mb-4">Top Lead Sources (by Conversion)</h3>
+            <div className="space-y-3">
+              {optimization_insights.top_lead_sources.map((src, idx) => (
+                <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-foreground capitalize">{src.source}</p>
+                    <p className="text-xs text-muted-foreground">{src.total} leads</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-sm font-bold text-foreground">{src.conversion_rate}%</p>
+                    <p className="text-xs text-muted-foreground">{src.booked} booked</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Top Automation Types */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h3 className="font-bold text-foreground mb-4">Top Automation Job Types</h3>
+              <div className="space-y-3">
+                {optimization_insights.top_automation_types.map((job, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <p className="text-sm font-medium text-foreground">{job.type}</p>
+                    <div className="flex items-center gap-3">
+                      <span className="text-xs text-muted-foreground">{job.count}</span>
+                      <span className="text-sm font-bold text-green-600">{job.success_rate}%</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Top Failures */}
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h3 className="font-bold text-foreground mb-4">Top Failure Categories</h3>
+              <div className="space-y-3">
+                {optimization_insights.top_failures.map((fail, idx) => (
+                  <div key={idx} className="flex items-center justify-between py-2 border-b border-border last:border-0">
+                    <p className="text-sm font-medium text-foreground">{fail.reason}</p>
+                    <span className="text-sm font-bold text-red-600">{fail.count}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Lead Engagement & High-Intent */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h3 className="font-bold text-foreground mb-4">Most Engaged Leads</h3>
+              <div className="space-y-2">
+                {optimization_insights.most_engaged_leads.map((lead, idx) => (
+                  <div key={idx} className="text-sm py-2 border-b border-border last:border-0">
+                    <p className="font-medium text-foreground">{lead.name}</p>
+                    <p className="text-xs text-muted-foreground">{lead.email}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-lg border border-border bg-card p-5">
+              <h3 className="font-bold text-foreground mb-4">High-Intent Uncontacted</h3>
+              <div className="space-y-2">
+                {optimization_insights.high_intent_uncontacted.map((lead, idx) => (
+                  <div key={idx} className="text-sm py-2 border-b border-border last:border-0">
+                    <p className="font-medium text-foreground">{lead.name}</p>
+                    <p className="text-xs text-muted-foreground">{lead.email}</p>
+                    <p className="text-xs font-semibold text-primary mt-1 capitalize">{lead.intent}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          {/* Event Distribution */}
+          <div className="rounded-lg border border-border bg-card p-5">
+            <h3 className="font-bold text-foreground mb-4">Event Distribution (24h)</h3>
+            <div className="space-y-3">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">SMS</span>
+                  <span className="text-sm font-bold">{optimization_insights.event_distribution.sms_percentage}%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full" style={{ width: `${optimization_insights.event_distribution.sms_percentage}%`, background: '#00AEEF' }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Email</span>
+                  <span className="text-sm font-bold">{optimization_insights.event_distribution.email_percentage}%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full" style={{ width: `${optimization_insights.event_distribution.email_percentage}%`, background: '#0088CC' }} />
+                </div>
+              </div>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-sm font-medium text-foreground">Webhooks</span>
+                  <span className="text-sm font-bold">{optimization_insights.event_distribution.webhook_percentage}%</span>
+                </div>
+                <div className="w-full h-2 rounded-full bg-muted overflow-hidden">
+                  <div className="h-full" style={{ width: `${optimization_insights.event_distribution.webhook_percentage}%`, background: '#006BB0' }} />
+                </div>
+              </div>
+            </div>
+          </div>
+        </>
       )}
     </div>
   );

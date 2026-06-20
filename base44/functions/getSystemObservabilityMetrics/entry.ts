@@ -99,6 +99,105 @@ Deno.serve(async (req) => {
       webhooks_sent: eventBreakdown.webhook_sent,
     };
 
+    // === OPTIMIZATION INSIGHTS ===
+
+    // 1. Lead source performance
+    const leadsBySource = {};
+    recentLeads.forEach(l => {
+      const src = l.source || 'unknown';
+      if (!leadsBySource[src]) leadsBySource[src] = { total: 0, booked: 0 };
+      leadsBySource[src].total++;
+      if (l.outreach_status === 'booked') leadsBySource[src].booked++;
+    });
+    const topLeadSources = Object.entries(leadsBySource)
+      .map(([source, data]) => ({
+        source,
+        total: data.total,
+        booked: data.booked,
+        conversion_rate: data.total > 0 ? Math.round((data.booked / data.total) * 100) : 0,
+      }))
+      .sort((a, b) => b.conversion_rate - a.conversion_rate)
+      .slice(0, 5);
+
+    // 2. Average response time
+    const responseTimes = recentLeads
+      .filter(l => l.last_contacted_at && l.created_date)
+      .map(l => {
+        const created = new Date(l.created_date);
+        const contacted = new Date(l.last_contacted_at);
+        return (contacted.getTime() - created.getTime()) / 1000 / 60; // minutes
+      })
+      .filter(t => t > 0 && t < 10080); // filter outliers (>7 days)
+    const avgResponseTime = responseTimes.length > 0
+      ? Math.round(responseTimes.reduce((a, b) => a + b, 0) / responseTimes.length)
+      : 0;
+
+    // 3. Automation job type performance
+    const jobsByType = {};
+    allJobs.forEach(j => {
+      const type = j.automation_type || 'unknown';
+      if (!jobsByType[type]) jobsByType[type] = { total: 0, successful: 0, failed: 0 };
+      jobsByType[type].total++;
+      if (j.status === 'completed') jobsByType[type].successful++;
+      if (j.status === 'failed') jobsByType[type].failed++;
+    });
+    const topJobTypes = Object.entries(jobsByType)
+      .map(([type, data]) => ({
+        type,
+        count: data.total,
+        success_rate: data.total > 0 ? Math.round((data.successful / data.total) * 100) : 0,
+      }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // 4. Failure categories
+    const failureReasons = {};
+    failedEvents.forEach(e => {
+      const reason = e.event_type || 'unknown';
+      failureReasons[reason] = (failureReasons[reason] || 0) + 1;
+    });
+    const topFailures = Object.entries(failureReasons)
+      .map(([reason, count]) => ({ reason, count }))
+      .sort((a, b) => b.count - a.count)
+      .slice(0, 5);
+
+    // 5. Most engaged leads
+    const leadEngagement = recentLeads
+      .map(l => ({
+        id: l.id,
+        name: l.full_name,
+        email: l.email,
+        interactions: (l.last_contacted_at ? 1 : 0) + (l.reply_sentiment ? 1 : 0) + (l.booked_at ? 1 : 0),
+      }))
+      .sort((a, b) => b.interactions - a.interactions)
+      .slice(0, 5);
+
+    // 6. Least engaged leads (no contact in 24h)
+    const leastEngaged = recentLeads
+      .filter(l => !l.last_contacted_at)
+      .slice(0, 5);
+
+    // 7. High-intent leads not recently contacted
+    const highIntentUncontacted = allLeads
+      .filter(l => 
+        (l.ai_intent === 'booking_ready' || l.ai_intent === 'pricing_interest') &&
+        (!l.last_contacted_at || new Date(l.last_contacted_at) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000))
+      )
+      .slice(0, 5);
+
+    // 8. Conversion metrics
+    const totalLeads24h = recentLeads.length;
+    const bookedLeads24h = recentLeads.filter(l => l.outreach_status === 'booked').length;
+    const respondedLeads24h = recentLeads.filter(l => l.outreach_status === 'replied').length;
+    const contactedLeads24h = recentLeads.filter(l => l.outreach_status === 'contacted').length;
+    const conversionRate = totalLeads24h > 0 ? Math.round((bookedLeads24h / totalLeads24h) * 100) : 0;
+    const responseRate = contactedLeads24h > 0 ? Math.round((respondedLeads24h / contactedLeads24h) * 100) : 0;
+
+    // 9. Event distribution
+    const totalEventVolume = recentEvents.length;
+    const smsPercentage = totalEventVolume > 0 ? Math.round((eventBreakdown.sms_sent / totalEventVolume) * 100) : 0;
+    const emailPercentage = totalEventVolume > 0 ? Math.round((eventBreakdown.email_sent / totalEventVolume) * 100) : 0;
+
     return Response.json({
       timestamp: new Date().toISOString(),
       observability: {
@@ -147,6 +246,37 @@ Deno.serve(async (req) => {
             (successRate * 0.6 +
               Math.max(0, 100 - (failedEvents.length / Math.max(1, recentEvents.length) * 100)) * 0.4) / 1
           ),
+        },
+
+        // Optimization insights
+        optimization_insights: {
+          performance_summary: {
+            avg_response_time_minutes: avgResponseTime,
+            event_volume_24h: totalEventVolume,
+            conversion_rate_percent: conversionRate,
+            response_rate_percent: responseRate,
+          },
+          top_lead_sources: topLeadSources,
+          top_automation_types: topJobTypes,
+          top_failures: topFailures,
+          most_engaged_leads: leadEngagement,
+          least_engaged_leads: leastEngaged.map(l => ({
+            id: l.id,
+            name: l.full_name,
+            email: l.email,
+            created: l.created_date,
+          })),
+          high_intent_uncontacted: highIntentUncontacted.map(l => ({
+            id: l.id,
+            name: l.full_name,
+            email: l.email,
+            intent: l.ai_intent,
+          })),
+          event_distribution: {
+            sms_percentage: smsPercentage,
+            email_percentage: emailPercentage,
+            webhook_percentage: totalEventVolume > 0 ? Math.round((eventBreakdown.webhook_sent / totalEventVolume) * 100) : 0,
+          },
         },
       },
     });
