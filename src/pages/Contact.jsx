@@ -134,7 +134,7 @@ export default function Contact() {
       <div className="flex flex-1" style={{ minHeight: "calc(100vh - var(--cs-nav-height, 76px))" }}>
 
         {/* ── LEFT: Dark sidebar ── */}
-        <aside className="hidden lg:flex lg:w-[42%] xl:w-[38%] bg-slate-900 text-white flex-col justify-between p-14 xl:p-20 flex-shrink-0">
+        <aside className="hidden lg:flex lg:w-[42%] xl:w-[38%] bg-slate-900 text-white flex-col justify-start p-14 xl:p-20 flex-shrink-0">
           {/* Top block */}
           <div>
             {/* Logo / Brand */}
@@ -235,10 +235,10 @@ export default function Contact() {
                   </div>
 
                   <div className="flex items-center gap-4 mb-3">
-                    <div className="w-1.5 h-12 bg-slate-900 rounded-sm flex-shrink-0" />
+                    <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
                     <h1 className="text-5xl font-black text-slate-900 leading-none">CONTACT</h1>
                   </div>
-                  <p className="text-slate-500 text-base leading-relaxed">
+                  <p className="text-slate-900 text-base leading-relaxed">
                     We'd love to hear from you. Send us a message and we'll get right back in touch.
                   </p>
                 </div>
@@ -259,7 +259,6 @@ export default function Contact() {
                       name="full_name"
                       value={form.full_name}
                       onChange={handleChange}
-                      placeholder="Jane"
                       aria-invalid={Boolean(errors.full_name)}
                       className={inputClass}
                     />
@@ -269,7 +268,6 @@ export default function Contact() {
                       name="business_type"
                       value={form.business_type}
                       onChange={handleChange}
-                      placeholder="Smith"
                       className={inputClass}
                     />
                   </Field>
@@ -283,7 +281,6 @@ export default function Contact() {
                       type="tel"
                       value={form.phone}
                       onChange={handleChange}
-                      placeholder="(555) 000-0000"
                       aria-invalid={Boolean(errors.phone)}
                       className={inputClass}
                     />
@@ -294,7 +291,6 @@ export default function Contact() {
                       type="email"
                       value={form.email}
                       onChange={handleChange}
-                      placeholder="jane@business.com"
                       aria-invalid={Boolean(errors.email)}
                       className={inputClass}
                     />
@@ -307,7 +303,6 @@ export default function Contact() {
                     name="message"
                     value={form.message}
                     onChange={handleChange}
-                    placeholder="Tell us about your business and what you're looking for..."
                     rows={5}
                     aria-invalid={Boolean(errors.message)}
                     className={`${inputClass} resize-none`}
@@ -318,17 +313,28 @@ export default function Contact() {
                   </p>
                 </Field>
 
-                {/* Visual Improvement #2: Full-width solid blue CTA button */}
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full flex items-center justify-center gap-3 py-4 bg-primary text-white font-bold text-base uppercase tracking-widest hover:bg-[#0088CC] transition disabled:opacity-60"
-                >
-                  {loading
-                    ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
-                    : <><span>Send Message</span><ArrowRight className="w-5 h-5" /></>
-                  }
-                </button>
+                {/* Visual Improvement #2: Full-width solid blue CTA button with conditional glow */}
+                {(() => {
+                  const hasErrors = Object.keys(errors).length > 0;
+                  const isValid = form.full_name && form.email && form.message && !hasErrors;
+                  return (
+                    <button
+                      type="submit"
+                      disabled={loading}
+                      className="cs-btn-primary w-full"
+                      style={{
+                        boxShadow: isValid ? '0 0 24px rgba(0, 174, 239, 0.35)' : undefined,
+                        transition: 'box-shadow 0.3s ease',
+                        minHeight: 'unset'
+                      }}
+                    >
+                      {loading
+                        ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
+                        : <><span>Send Message</span><ArrowRight className="w-5 h-5" /></>
+                      }
+                    </button>
+                  );
+                })()}
 
                 <p className="text-center text-xs text-slate-400">
                   No spam, no pressure — just a thoughtful reply from our team.

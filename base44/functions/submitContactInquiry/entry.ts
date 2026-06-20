@@ -1,7 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { validatePublicFormOrigin } from "./publicFormOriginGuard.local.js";
-import { resendFetch } from "./resendFetch.local.js";
-import { twilioFetch } from "./providerFetch.local.js";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.32';
 
 function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
   return new Response(JSON.stringify(data), {
@@ -290,6 +287,22 @@ async function sendUserThankYouEmail(contact: ReturnType<typeof normalizeContact
   return { sent: true };
 }
 
+function validatePublicFormOrigin(req) {
+  const origin = req.headers.get('origin');
+  const appUrl = Deno.env.get('CLIENTSURGE_WEBSITE_URL') || 'https://clientsurgesystems.com';
+  const isValidOrigin = !origin || origin === appUrl || origin.includes('localhost') || origin.includes('127.0.0.1');
+  if (!isValidOrigin) return { ok: false, status: 403, error: 'Invalid origin' };
+  return { ok: true };
+}
+
+async function resendFetch(url, options) {
+  return fetch(url, options);
+}
+
+async function twilioFetch(url, options) {
+  return fetch(url, options);
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -441,6 +454,7 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : 'Failed to submit contact inquiry';
+    console.error('[submitContactInquiry] Error:', message, error instanceof Error ? error.stack : '');
     return secureJson({ error: message }, { status: 500 });
   }
 });
