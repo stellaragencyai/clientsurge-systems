@@ -13,6 +13,7 @@ import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipeli
 import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadsTable from '../components/admin/LeadsTable';
+import LeadsRecentChanges from '../components/admin/LeadsRecentChanges';
 import LeadIntelligenceDashboard from '../components/admin/LeadIntelligenceDashboard';
 import LeadIntelligenceMiniPanel from '../components/admin/LeadIntelligenceMiniPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
@@ -242,7 +243,12 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'leads': return <LeadsTable />;
+      case 'leads': return (
+        <div className="space-y-6">
+          <LeadsTable />
+          <LeadsRecentChanges />
+        </div>
+      );
       case 'lead-intelligence': return <LeadIntelligenceDashboard />;
       case 'crm-health': return <CrmHealthDashboard />;
       case 'launch-gates': return <LaunchGatesPanel />;
