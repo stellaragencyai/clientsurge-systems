@@ -138,16 +138,93 @@ Deno.serve(async (req) => {
       console.warn('[handleInstantLeadResponse] No email on lead — skipping email job');
     }
 
-    // 7. Queue each job in EventQueue
+    // 7. Queue each job in EventQueue with proper schema fields
+    const eventQueueIds = [];
     for (const job of jobs) {
-      await base44.asServiceRole.entities.EventQueue.create({
-        lead_id,
-        event_type: 'automation_job_created',
-        status: 'pending',
-        source: 'instant_lead_response',
-        payload_json: JSON.stringify({ job_id: job.id, job_type: job.job_type }),
-        created_at: new Date().toISOString(),
-      }).catch(err => console.warn('EventQueue create failed:', err.message));
+      const eq = await base44.asServiceRole.entities.EventQueue.create({
+        communication_event_id: workflowEvent?.id || 'workflow_triggered',
+        client_id: lead.client_id || 'unknown',
+        client_project_id: lead.client_project_id,
+        event_category: 'automation_event',
+        processor_type: 'messaging_processor',
+        status: 'queued',
+        retry_count: 0,
+        max_retries: 3,
+        priority: 1,
+        metadata_json: JSON.stringify({
+          job_id: job.id,
+          job_type: job.job_type,
+          lead_id,
+          lead_type,
+          channel: job.channel,
+        }),
+      }).catch(err => { console.warn('EventQueue create failed:', err.message); return null; });
+      if (eq) eventQueueIds.push(eq.id);
+    }
+
+    // 8. Write DashboardTruthCheck for admin_dashboard scope
+    const now = new Date().toISOString();
+    const hasProofEvents = false; // No completed provider_send_succeeded events yet — jobs just queued
+    const blockers = [];
+    const warnings = [];
+
+    if (jobs.length === 0) {
+      blockers.push({
+        code: 'no_jobs_created',
+        severity: 'launch_blocker',
+        message: 'No AutomationJob records were created — Twilio or Resend may not be configured, or lead is missing phone/email.',
+        entity_name: 'AutomationJob',
+        fix_action: 'Enable Twilio/Resend in AdminSettings and ensure lead has phone_number and email.',
+      });
+    } else {
+      warnings.push({
+        code: 'jobs_queued_no_provider_proof',
+        severity: 'advisory',
+        message: `${jobs.length} job(s) created with status=queued. No provider_send_succeeded events exist yet. safe_to_launch remains false until real delivery proof is recorded.`,
+        entity_name: 'AutomationJob',
+        fix_action: 'Run processAutomationJobsQueue and confirm provider_send_succeeded CommunicationEvent exists.',
+      });
+    }
+
+    // Exclude QA/smoke/internal from production truth
+    const isProductionLead = !isTestLead(lead);
+    if (isProductionLead) {
+      const existingTruth = await base44.asServiceRole.entities.DashboardTruthCheck.filter(
+        { scope: 'admin_dashboard', client_id: lead.client_id || 'platform' },
+        '-created_date',
+        1
+      ).catch(() => []);
+
+      const truthPayload = {
+        scope: 'admin_dashboard',
+        client_id: lead.client_id || 'platform',
+        client_project_id: lead.client_project_id,
+        environment: 'production',
+        truth_status: blockers.length > 0 ? 'blocked' : warnings.length > 0 ? 'warning' : 'trusted',
+        safe_to_show_admin: true,
+        safe_to_show_client: false,
+        safe_to_launch: hasProofEvents, // false until real provider success proof exists
+        blocker_count: blockers.length,
+        warning_count: warnings.length,
+        blockers,
+        warnings,
+        evidence_summary: jobs.length === 0
+          ? 'No AutomationJobs created. Provider integration (Twilio/Resend) likely not configured or lead missing contact info.'
+          : `${jobs.length} job(s) queued (${jobs.map(j => j.job_type).join(', ')}). Workflow event logged (id: ${workflowEvent?.id || 'none'}). No provider_send_succeeded events yet — safe_to_launch=false.`,
+        source_records: { lead_id, workflow_event_id: workflowEvent?.id, job_ids: jobs.map(j => j.id) },
+        last_checked_at: now,
+        updated_at: now,
+      };
+
+      if (existingTruth?.[0]?.id) {
+        await base44.asServiceRole.entities.DashboardTruthCheck.update(existingTruth[0].id, truthPayload).catch(err =>
+          console.warn('[handleInstantLeadResponse] DashboardTruthCheck update failed:', err.message)
+        );
+      } else {
+        await base44.asServiceRole.entities.DashboardTruthCheck.create({ ...truthPayload, created_at: now }).catch(err =>
+          console.warn('[handleInstantLeadResponse] DashboardTruthCheck create failed:', err.message)
+        );
+      }
     }
 
     return Response.json({
@@ -158,6 +235,7 @@ Deno.serve(async (req) => {
       sms_job_id: jobs.find(j => j.job_type === 'instant_sms')?.id,
       email_job_id: jobs.find(j => j.job_type === 'confirmation_email')?.id,
       workflow_event_id: workflowEvent?.id,
+      event_queue_ids: eventQueueIds,
       skipped_existing: [...existing],
     });
   } catch (error) {

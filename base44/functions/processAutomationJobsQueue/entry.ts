@@ -36,6 +36,26 @@ Deno.serve(async (req) => {
         // Derive channel safely (older queued jobs may not have it stored)
         const channel = job.channel || (job.job_type === 'instant_sms' ? 'sms' : 'email');
 
+        // 1b. Update linked EventQueue record to 'processing'
+        const linkedEQs = await base44.asServiceRole.entities.EventQueue.filter(
+          { communication_event_id: job.id },
+          '-created_date', 1
+        ).catch(() => []);
+        // Also try matching by metadata_json job_id
+        const allEQs = linkedEQs?.length > 0 ? linkedEQs : await base44.asServiceRole.entities.EventQueue.filter(
+          { status: 'queued', event_category: 'automation_event' },
+          '-created_date', 20
+        ).then(rows => (rows || []).filter(r => {
+          try { return JSON.parse(r.metadata_json || '{}').job_id === job.id; } catch { return false; }
+        })).catch(() => []);
+
+        const eqToUpdate = allEQs?.[0];
+        if (eqToUpdate) {
+          await base44.asServiceRole.entities.EventQueue.update(eqToUpdate.id, {
+            status: 'processing',
+          }).catch(err => console.warn('[processAutomationJobsQueue] EventQueue processing update failed:', err.message));
+        }
+
         // 2. Log runtime_attempt_started
         await base44.asServiceRole.entities.CommunicationEvent.create({
           lead_id: job.lead_id,

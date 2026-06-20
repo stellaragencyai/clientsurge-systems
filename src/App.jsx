@@ -103,6 +103,7 @@ const AdminInstallGuide = lazy(() => import("./internal-pages/AdminInstallGuide"
 const AISalesCommandCenter = lazy(() => import("./internal-pages/AISalesCommandCenter"));
 const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
+const ClientSaasDashboard = lazy(() => import("./pages/ClientSaasDashboard"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 const Library = lazy(() => import("./pages/Library"));
 const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipeline"));
@@ -433,6 +434,7 @@ const AuthenticatedAppWithTenant = () => {
         {[
           { route: routePath("client-portal"), Component: ClientPortal },
           { route: routePath("client-dashboard"), Component: ClientDashboard },
+          { route: routePath("client-saas"), Component: ClientSaasDashboard },
           { route: routePath("dashboard-entry"), Component: ClientDashboardEntry },
         ].map(({ route, Component }) => (
           <Route

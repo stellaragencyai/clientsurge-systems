@@ -1,0 +1,577 @@
+/**
+ * ════════════════════════════════════════════════════════════════════
+ *  CLIENTSURGE DESIGN SYSTEM — SINGLE SOURCE OF TRUTH
+ *  All branding, color, typography, spacing, and component tokens
+ *  Import this ONCE in main.jsx — all pages inherit automatically
+ * ════════════════════════════════════════════════════════════════════
+ *
+ * TOKEN HIERARCHY:
+ *   1. Raw values (hex / px / rem)         → --cs-raw-*
+ *   2. Semantic aliases (purpose-named)     → --cs-color-*, --cs-font-*
+ *   3. Component shortcuts                  → .cs-btn-*, .cs-card, etc.
+ *
+ * CHANGE ONE TOKEN → UPDATES EVERYWHERE:
+ *   Change --cs-brand: → all buttons, links, highlights, icons update
+ *   Change --cs-font-heading → all H1–H6 update
+ */
+
+/* ──────────────────────────────────────────────────────────────────
+   1. COLOR TOKENS — Primary Blue System
+   ────────────────────────────────────────────────────────────────── */
+:root {
+  /* PRIMARY BRAND BLUE — single source, never override inline */
+  --cs-brand:            #00AEEF;   /* primary interactive blue */
+  --cs-brand-deep:       #0088CC;   /* hover / dark variant */
+  --cs-brand-navy:       #005691;   /* darkest — gradients, CTA bg */
+  --cs-brand-pale:       rgba(0, 174, 239, 0.08); /* tint backgrounds */
+  --cs-brand-border:     rgba(0, 174, 239, 0.20); /* border accents */
+
+  /* SECONDARY ACCENT — gold for premium labels/badges only */
+  --cs-accent-gold:      #D4AF37;
+  --cs-accent-gold-dark: #B8941F;
+  --cs-accent-gold-pale: rgba(212, 175, 55, 0.10);
+
+  /* NEUTRAL SCALE */
+  --cs-neutral-bg:       #FAFBFF;   /* page background */
+  --cs-neutral-surface:  #FFFFFF;   /* card / panel surface */
+  --cs-neutral-surface2: #F4F7FB;   /* secondary surface */
+  --cs-neutral-border:   #DDE6F0;   /* default border */
+  --cs-neutral-border2:  #C8D8E8;   /* stronger border */
+
+  /* TEXT HIERARCHY */
+  --cs-text-heading:     #0A0E1A;   /* H1–H3 — near-black */
+  --cs-text-primary:     #1A2035;   /* body text */
+  --cs-text-secondary:   #5A6A82;   /* supporting text */
+  --cs-text-muted:       #8898AA;   /* placeholders, labels */
+  --cs-text-on-primary:  #FFFFFF;   /* text on brand-blue backgrounds */
+
+  /* SEMANTIC STATUS */
+  --cs-success:  #16a34a;
+  --cs-warning:  #d97706;
+  --cs-error:    #dc2626;
+  --cs-info:     #0284c7;
+
+  /* GRADIENTS */
+  --cs-gradient-primary:  linear-gradient(135deg, #0088CC 0%, #005691 100%);
+  --cs-gradient-hero:     linear-gradient(135deg, #0A1628 0%, #003B8F 60%, #005691 100%);
+  --cs-gradient-subtle:   linear-gradient(135deg, rgba(0,136,204,0.08) 0%, rgba(0,86,145,0.04) 100%);
+
+  /* SHADOWS & GLOWS */
+  --cs-shadow-sm:   0 1px 2px rgba(0,0,0,0.04), 0 2px 4px rgba(0,0,0,0.04);
+  --cs-shadow-md:   0 2px 4px rgba(0,0,0,0.05), 0 6px 14px rgba(0,0,0,0.07);
+  --cs-shadow-lg:   0 4px 8px rgba(0,0,0,0.06), 0 16px 32px rgba(0,0,0,0.10);
+  --cs-shadow-card: 0 1px 2px rgba(0,0,0,0.04), 0 4px 6px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.07);
+  --cs-glow-brand:  0 0 24px rgba(0, 174, 239, 0.30);
+  --cs-glow-cta:    0 8px 24px rgba(0, 136, 204, 0.35);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   2. TYPOGRAPHY TOKENS — Single Font System
+   ────────────────────────────────────────────────────────────────── */
+:root {
+  /* FONT FAMILIES */
+  --cs-font-heading: 'Montserrat', system-ui, -apple-system, sans-serif;
+  --cs-font-body:    'Inter',      system-ui, -apple-system, sans-serif;
+
+  /* HEADING SCALE — fluid clamp() for all viewports */
+  --cs-size-h1: clamp(2.25rem, 5.5vw, 4.25rem);   /* 36–68px */
+  --cs-size-h2: clamp(1.75rem, 4vw,   3rem);       /* 28–48px */
+  --cs-size-h3: clamp(1.25rem, 2.8vw, 2rem);       /* 20–32px */
+  --cs-size-h4: clamp(1.05rem, 2vw,   1.5rem);     /* 17–24px */
+  --cs-size-h5: clamp(0.95rem, 1.5vw, 1.2rem);     /* 15–19px */
+  --cs-size-h6: 1rem;                               /* 16px */
+
+  /* BODY TEXT SCALE */
+  --cs-size-body-lg:  1.125rem;  /* 18px — hero subheadlines */
+  --cs-size-body:     1rem;      /* 16px — standard */
+  --cs-size-body-sm:  0.9375rem; /* 15px — secondary */
+  --cs-size-small:    0.875rem;  /* 14px */
+  --cs-size-xs:       0.8125rem; /* 13px */
+  --cs-size-xxs:      0.75rem;   /* 12px — labels, badges */
+
+  /* FONT WEIGHTS */
+  --cs-weight-black:      900;
+  --cs-weight-extrabold:  800;
+  --cs-weight-bold:       700;
+  --cs-weight-semibold:   600;
+  --cs-weight-medium:     500;
+  --cs-weight-regular:    400;
+
+  /* LINE HEIGHTS */
+  --cs-leading-tight:   1.05;
+  --cs-leading-heading: 1.15;
+  --cs-leading-snug:    1.35;
+  --cs-leading-body:    1.65;
+
+  /* LETTER SPACING */
+  --cs-tracking-tight:    -0.03em;
+  --cs-tracking-heading:  -0.02em;
+  --cs-tracking-normal:    0;
+  --cs-tracking-wide:      0.05em;
+  --cs-tracking-wider:     0.08em;
+  --cs-tracking-widest:    0.12em;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   3. SPACING TOKENS — 4px base grid
+   ────────────────────────────────────────────────────────────────── */
+:root {
+  --cs-space-1:  0.25rem;  /* 4px */
+  --cs-space-2:  0.5rem;   /* 8px */
+  --cs-space-3:  0.75rem;  /* 12px */
+  --cs-space-4:  1rem;     /* 16px */
+  --cs-space-5:  1.25rem;  /* 20px */
+  --cs-space-6:  1.5rem;   /* 24px */
+  --cs-space-8:  2rem;     /* 32px */
+  --cs-space-10: 2.5rem;   /* 40px */
+  --cs-space-12: 3rem;     /* 48px */
+  --cs-space-16: 4rem;     /* 64px */
+  --cs-space-20: 5rem;     /* 80px */
+  --cs-space-24: 6rem;     /* 96px */
+
+  /* SECTION PADDING */
+  --cs-section-py-desktop: 6rem;
+  --cs-section-py-tablet:  4.5rem;
+  --cs-section-py-mobile:  3rem;
+
+  /* CONTAINER */
+  --cs-container-max: 1180px;
+  --cs-container-px:  1.5rem;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   4. BORDER + RADIUS TOKENS
+   ────────────────────────────────────────────────────────────────── */
+:root {
+  --cs-radius-xs:     0.25rem;  /* 4px — tight pills */
+  --cs-radius-sm:     0.5rem;   /* 8px */
+  --cs-radius-md:     0.75rem;  /* 12px — cards */
+  --cs-radius-lg:     1rem;     /* 16px — panels */
+  --cs-radius-xl:     1.5rem;   /* 24px — hero cards */
+  --cs-radius-full:   9999px;   /* pills / avatars */
+
+  /* STANDARD USAGE */
+  --cs-card-radius:   var(--cs-radius-md);
+  --cs-btn-radius:    var(--cs-radius-full);  /* pill buttons globally */
+  --cs-input-radius:  var(--cs-radius-md);
+  --cs-badge-radius:  var(--cs-radius-full);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   5. GLOBAL ELEMENT ENFORCEMENT
+      These override inconsistent per-component styles at root level
+   ────────────────────────────────────────────────────────────────── */
+
+/* HEADINGS — Montserrat + near-black */
+h1, h2, h3, h4, h5, h6,
+.cs-heading,
+.font-display, .font-titles, .font-heading, .font-montserrat, .font-bebas {
+  font-family: var(--cs-font-heading) !important;
+  color: var(--cs-text-heading) !important;
+  -webkit-text-fill-color: var(--cs-text-heading) !important;
+  background: none !important;
+  background-image: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+  text-shadow: none !important;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Exception: white headings inside dark/hero sections */
+.cs-on-dark h1, .cs-on-dark h2, .cs-on-dark h3,
+.cs-on-dark h4, .cs-on-dark h5, .cs-on-dark h6,
+[data-theme="dark"] h1, [data-theme="dark"] h2, [data-theme="dark"] h3 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+}
+
+/* Exception: primary-colored eyebrow text */
+.cs-eyebrow, .eyebrow {
+  color: var(--cs-brand) !important;
+  -webkit-text-fill-color: var(--cs-brand) !important;
+}
+
+/* HEADING SIZES */
+h1 { font-size: var(--cs-size-h1); font-weight: var(--cs-weight-black); line-height: var(--cs-leading-tight); letter-spacing: var(--cs-tracking-tight); }
+h2 { font-size: var(--cs-size-h2); font-weight: var(--cs-weight-extrabold); line-height: var(--cs-leading-heading); letter-spacing: var(--cs-tracking-heading); }
+h3 { font-size: var(--cs-size-h3); font-weight: var(--cs-weight-bold); line-height: var(--cs-leading-heading); }
+h4 { font-size: var(--cs-size-h4); font-weight: var(--cs-weight-bold); line-height: var(--cs-leading-snug); }
+h5 { font-size: var(--cs-size-h5); font-weight: var(--cs-weight-semibold); }
+h6 { font-size: var(--cs-size-h6); font-weight: var(--cs-weight-semibold); }
+
+/* BODY TEXT — Inter */
+body, p, li, span, td, th, input, textarea, select, button, label {
+  font-family: var(--cs-font-body);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   6. BUTTON COMPONENT SYSTEM — unified CTA across all pages
+   ────────────────────────────────────────────────────────────────── */
+
+/* PRIMARY CTA — brand gradient pill */
+.cs-btn,
+.cs-btn-primary,
+.hero-primary-cta,
+.cs-footer-cta,
+.shiny-brown-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--cs-btn-radius);
+  padding: 0.75rem 1.75rem;
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-small);
+  font-weight: var(--cs-weight-semibold);
+  color: var(--cs-text-on-primary);
+  background: var(--cs-gradient-primary);
+  border: none;
+  cursor: pointer;
+  transition: box-shadow 0.25s ease, transform 0.2s ease;
+  box-shadow: var(--cs-glow-cta);
+  white-space: nowrap;
+  text-decoration: none;
+  min-height: 44px;
+  min-width: 44px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.cs-btn:hover, .cs-btn-primary:hover, .hero-primary-cta:hover {
+  box-shadow: 0 12px 32px rgba(0, 136, 204, 0.50);
+  transform: translateY(-1px);
+}
+.cs-btn:active, .cs-btn-primary:active {
+  transform: translateY(0) scale(0.98);
+}
+.cs-btn:focus-visible, .cs-btn-primary:focus-visible {
+  outline: 2px solid var(--cs-brand);
+  outline-offset: 3px;
+}
+
+/* SECONDARY BUTTON — outlined */
+.cs-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--cs-btn-radius);
+  padding: 0.75rem 1.75rem;
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-small);
+  font-weight: var(--cs-weight-semibold);
+  color: var(--cs-brand-deep);
+  background: transparent;
+  border: 1.5px solid var(--cs-brand-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  min-width: 44px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cs-btn-secondary:hover {
+  background: var(--cs-brand-pale);
+  border-color: var(--cs-brand);
+}
+
+/* GHOST BUTTON — text only */
+.cs-btn-ghost {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--cs-btn-radius);
+  padding: 0.75rem 1.25rem;
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-small);
+  font-weight: var(--cs-weight-medium);
+  color: var(--cs-brand-deep);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  min-height: 44px;
+  text-decoration: none;
+}
+.cs-btn-ghost:hover {
+  background: var(--cs-brand-pale);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   7. CARD COMPONENT SYSTEM
+   ────────────────────────────────────────────────────────────────── */
+
+/* STANDARD CARD */
+.cs-card {
+  background: var(--cs-neutral-surface);
+  border: 1px solid var(--cs-neutral-border);
+  border-radius: var(--cs-card-radius);
+  box-shadow: var(--cs-shadow-card);
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
+}
+.cs-card:hover {
+  box-shadow: var(--cs-shadow-lg), 0 0 0 1px var(--cs-brand-border);
+  transform: translateY(-2px);
+}
+@media (pointer: coarse) {
+  .cs-card:hover { transform: none; }
+}
+
+/* DASHBOARD PANEL — no hover lift */
+.cs-panel {
+  background: var(--cs-neutral-surface);
+  border: 1px solid var(--cs-neutral-border);
+  border-radius: var(--cs-radius-md);
+  box-shadow: var(--cs-shadow-sm);
+  padding: 1.5rem;
+}
+
+/* KPI METRIC CARD */
+.cs-metric-card {
+  background: var(--cs-neutral-surface);
+  border: 1px solid var(--cs-neutral-border);
+  border-radius: var(--cs-card-radius);
+  box-shadow: var(--cs-shadow-sm);
+  padding: 1.25rem 1.5rem;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   8. SECTION + LAYOUT SYSTEM
+   ────────────────────────────────────────────────────────────────── */
+
+/* SECTION — standard padding */
+.cs-section {
+  padding-top: var(--cs-section-py-desktop);
+  padding-bottom: var(--cs-section-py-desktop);
+}
+@media (max-width: 1024px) {
+  .cs-section { padding-top: var(--cs-section-py-tablet); padding-bottom: var(--cs-section-py-tablet); }
+}
+@media (max-width: 640px) {
+  .cs-section { padding-top: var(--cs-section-py-mobile); padding-bottom: var(--cs-section-py-mobile); }
+}
+
+/* CONTAINER */
+.cs-container {
+  width: min(100% - calc(var(--cs-container-px) * 2), var(--cs-container-max));
+  margin-inline: auto;
+}
+
+/* SECTION HEADING BLOCK — eyebrow + h2 + subtitle */
+.cs-section-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+.cs-section-header .cs-eyebrow {
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-xxs);
+  font-weight: var(--cs-weight-bold);
+  letter-spacing: var(--cs-tracking-widest);
+  text-transform: uppercase;
+  color: var(--cs-brand) !important;
+  -webkit-text-fill-color: var(--cs-brand) !important;
+  display: block;
+  margin-bottom: 0.75rem;
+}
+.cs-section-header h2 {
+  margin-bottom: 1rem;
+}
+.cs-section-header .cs-subtitle {
+  font-size: var(--cs-size-body-lg);
+  color: var(--cs-text-secondary);
+  max-width: 48rem;
+  margin-inline: auto;
+  line-height: var(--cs-leading-body);
+}
+
+/* DIVIDER */
+.cs-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cs-brand-border), transparent);
+  border: none;
+  margin: 0;
+}
+
+/* LEFT-ACCENT SECTION TITLE */
+.cs-title-bar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.cs-title-bar-accent {
+  width: 5px;
+  min-height: 36px;
+  background: var(--cs-brand);
+  border-radius: 3px;
+  flex-shrink: 0;
+  box-shadow: 0 0 12px rgba(0,174,239,0.55);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   9. INDUSTRY PAGE STANDARDIZATION
+      Forces all industry pages to share layout + typography rules
+   ────────────────────────────────────────────────────────────────── */
+
+.industry-page h2,
+.industry-page h3 {
+  font-family: var(--cs-font-heading) !important;
+  color: var(--cs-text-heading) !important;
+  -webkit-text-fill-color: var(--cs-text-heading) !important;
+}
+
+/* Industry section headings — standardized size without hardcoded colors */
+.industry-page section h2 {
+  font-size: clamp(1.75rem, 4vw, 2.75rem);
+  font-weight: var(--cs-weight-extrabold);
+  letter-spacing: var(--cs-tracking-heading);
+}
+
+/* Industry section standard padding */
+.industry-page section:not(.industry-hero) {
+  padding-left: max(1.5rem, env(safe-area-inset-left));
+  padding-right: max(1.5rem, env(safe-area-inset-right));
+}
+
+/* Industry final CTA — uses brand gradient */
+.industry-page .industry-cta-section {
+  background: var(--cs-gradient-primary);
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   10. DASHBOARD CONSISTENCY LAYER
+       Admin + Mission Control + Observability share these rules
+   ────────────────────────────────────────────────────────────────── */
+
+/* Admin tables */
+.cs-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--cs-size-small);
+}
+.cs-table th {
+  background: var(--cs-neutral-surface2);
+  font-weight: var(--cs-weight-semibold);
+  font-size: var(--cs-size-xxs);
+  text-transform: uppercase;
+  letter-spacing: var(--cs-tracking-wide);
+  padding: 0.875rem 1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--cs-neutral-border);
+  color: var(--cs-text-secondary);
+}
+.cs-table td {
+  padding: 0.875rem 1rem;
+  border-bottom: 1px solid var(--cs-neutral-border);
+  color: var(--cs-text-primary);
+}
+.cs-table tbody tr:hover {
+  background: var(--cs-brand-pale);
+}
+.cs-table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Status badge utilities */
+.cs-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.25rem 0.625rem;
+  border-radius: var(--cs-badge-radius);
+  font-size: var(--cs-size-xxs);
+  font-weight: var(--cs-weight-semibold);
+  line-height: 1;
+}
+.cs-badge-success  { background: #dcfce7; color: #15803d; }
+.cs-badge-warning  { background: #fef9c3; color: #a16207; }
+.cs-badge-error    { background: #fee2e2; color: #b91c1c; }
+.cs-badge-info     { background: #dbeafe; color: #1d4ed8; }
+.cs-badge-neutral  { background: #f1f5f9; color: #475569; }
+.cs-badge-brand    { background: var(--cs-brand-pale); color: var(--cs-brand-deep); border: 1px solid var(--cs-brand-border); }
+
+/* ──────────────────────────────────────────────────────────────────
+   11. FORM SYSTEM
+   ────────────────────────────────────────────────────────────────── */
+.cs-input,
+.cs-select,
+.cs-textarea {
+  display: block;
+  width: 100%;
+  border-radius: var(--cs-input-radius);
+  border: 1px solid var(--cs-neutral-border);
+  background: var(--cs-neutral-surface);
+  padding: 0.75rem 1rem;
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-body);
+  color: var(--cs-text-primary);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+.cs-input:focus, .cs-select:focus, .cs-textarea:focus {
+  outline: none;
+  border-color: var(--cs-brand);
+  box-shadow: 0 0 0 3px var(--cs-brand-pale);
+}
+
+.cs-label {
+  display: block;
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-xxs);
+  font-weight: var(--cs-weight-bold);
+  letter-spacing: var(--cs-tracking-widest);
+  text-transform: uppercase;
+  color: var(--cs-text-secondary);
+  margin-bottom: 0.5rem;
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   12. RESPONSIVE TYPOGRAPHY ADJUSTMENTS
+   ────────────────────────────────────────────────────────────────── */
+@media (max-width: 640px) {
+  h1 { font-size: clamp(2rem, 8vw, 2.75rem); }
+  h2 { font-size: clamp(1.5rem, 6vw, 2rem) !important; }
+  h3 { font-size: clamp(1.15rem, 4.5vw, 1.5rem) !important; }
+  .cs-section-header .cs-subtitle { font-size: 1rem; }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+  h2 { font-size: clamp(1.75rem, 4vw, 2.5rem) !important; }
+}
+
+/* ──────────────────────────────────────────────────────────────────
+   13. LEGACY OVERRIDE CLEANUP
+       Force-replaces any remaining hardcoded values
+   ────────────────────────────────────────────────────────────────── */
+
+/* Any element using Raleway (not loaded) — snap to correct font */
+[style*="Raleway"],
+[class*="font-raleway"] {
+  font-family: var(--cs-font-heading) !important;
+}
+
+/* Any element using Bebas Neue (not loaded) — snap to Montserrat */
+[style*="Bebas Neue"],
+[class*="font-bebas"] {
+  font-family: var(--cs-font-heading) !important;
+}
+
+/* Playfair Display (no longer loaded) — snap to Montserrat for headings */
+[style*="Playfair Display"] {
+  font-family: var(--cs-font-heading) !important;
+}
+
+/* Hardcoded dark navy color commonly used on industry pages */
+[class*="text-[#001B44]"],
+[style*="color: #001B44"],
+[style*="color:#001B44"] {
+  color: var(--cs-text-heading) !important;
+}
+
+/* Prevent gradient clipping from hiding heading text on white bg */
+h1, h2, h3, h4, h5, h6 {
+  background: none !important;
+  -webkit-background-clip: unset !important;
+  background-clip: unset !important;
+}

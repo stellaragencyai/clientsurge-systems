@@ -81,8 +81,8 @@ export default function ImmersiveIndustryHero({ config }) {
               onClick={() => navigate('/book')}
               className="inline-flex items-center gap-3 px-8 py-4 rounded-lg font-bold text-white transition-all duration-300 hover:shadow-2xl hover:-translate-y-1"
               style={{
-                background: 'linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)',
-                boxShadow: '0 8px 24px rgba(0,136,204,0.3)',
+                background: 'var(--cs-gradient)',
+                boxShadow: 'var(--cs-glow-md)',
               }}
             >
               {hero.cta}

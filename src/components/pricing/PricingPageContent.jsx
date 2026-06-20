@@ -70,7 +70,6 @@ const COMPARISON_ROWS = [
   { label: "Remote setup workflow",         starter: true,  growth: true,  pro: true },
   { label: "Testing / launch checklist",    starter: true,  growth: true,  pro: true },
   { label: "Best for",                      starter: "Essentials", growth: "Full System", pro: "Revenue Recovery" },
-  { label: "Package key",                   starter: "starter_system", growth: "growth_system", pro: "pro_system" },
 ];
 
 const PROCESS_STEPS = [
@@ -174,6 +173,31 @@ export default function PricingPageContent() {
         )}
       </div>
 
+      {/* Quick selector */}
+      <div className="px-6 pb-8 max-w-3xl mx-auto">
+        <div className="rounded-xl border border-border bg-muted/40 p-5">
+          <p className="text-sm font-semibold text-foreground mb-3 text-center">Not sure where to start?</p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+            {[
+              { label: "Just getting started", sub: "Need lead capture + missed-call recovery", pkg: "Starter" },
+              { label: "Want more bookings", sub: "Need follow-up, nurture + booking automation", pkg: "Growth", highlight: true },
+              { label: "Full revenue recovery", sub: "Want reviews, reactivation + full stack", pkg: "Pro" },
+            ].map((opt) => (
+              <button
+                key={opt.pkg}
+                onClick={() => { trackCTA(`quick_select_${opt.pkg.toLowerCase()}`, "pricing_page"); navigate(`/start?package=${opt.pkg.toLowerCase()}_system`); }}
+                className={`rounded-lg border p-3 text-left transition-all hover:border-primary/50 hover:bg-primary/5 ${opt.highlight ? "border-primary/40 bg-primary/5" : "border-border bg-background"}`}
+                style={{ minHeight: "unset", minWidth: "unset" }}
+              >
+                <p className="font-semibold text-foreground text-xs mb-0.5">{opt.label}</p>
+                <p className="text-muted-foreground text-xs leading-relaxed">{opt.sub}</p>
+                <p className="text-primary text-xs font-bold mt-1.5">→ {opt.pkg} System</p>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       {/* Package Cards */}
       <div className="px-6 pb-16 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -185,7 +209,7 @@ export default function PricingPageContent() {
                   ? "border-primary shadow-lg"
                   : "border-border"
               }`}
-              style={pkg.highlight ? { boxShadow: "0 8px 32px rgba(0,174,239,0.18)" } : {}}
+              style={pkg.highlight ? { boxShadow: "0 8px 32px rgba(0,174,239,0.18)", background: "linear-gradient(160deg, rgba(0,174,239,0.04) 0%, #ffffff 60%)" } : {}}
             >
               {pkg.badge && (
                 <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
