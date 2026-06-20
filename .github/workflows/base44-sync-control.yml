@@ -1,0 +1,123 @@
+name: ClientSurge Base44 Sync Control
+
+on:
+  pull_request:
+    branches:
+      - main
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+    inputs:
+      verify_url:
+        description: "Live URL to verify"
+        required: true
+        default: "https://clientsurgesystems.com"
+      run_base44_safety_tests:
+        description: "Run Base44 publish safety tests"
+        required: true
+        type: choice
+        default: "false"
+        options:
+          - "false"
+          - "true"
+      run_full_node_tests:
+        description: "Run the full Node test suite"
+        required: true
+        type: choice
+        default: "false"
+        options:
+          - "false"
+          - "true"
+      run_deno_tests:
+        description: "Run Deno function tests"
+        required: true
+        type: choice
+        default: "false"
+        options:
+          - "false"
+          - "true"
+
+permissions:
+  contents: read
+
+defaults:
+  run:
+    shell: bash
+
+concurrency:
+  group: clientsurge-base44-sync-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  validate:
+    name: Validate build
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build app
+        run: npm run build
+
+      - name: Run Base44 publish safety tests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_base44_safety_tests == 'true' }}
+        run: node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js
+
+      - name: Run full Node tests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_full_node_tests == 'true' }}
+        run: npm run test:node
+
+      - name: Set up Deno
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_deno_tests == 'true' }}
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
+      - name: Run Deno function tests
+        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_deno_tests == 'true' }}
+        run: npm run test:deno
+
+  live-smoke:
+    name: Live domain smoke check
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    needs: validate
+    if: ${{ github.event_name == 'workflow_dispatch' }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify root domain
+        env:
+          VERIFY_URL: ${{ inputs.verify_url }}
+        run: |
+          curl -sSIL --max-time 25 "$VERIFY_URL/" | sed -n '1,25p'
+
+      - name: Verify www redirect
+        run: |
+          curl -sSIL --max-time 25 "https://www.clientsurgesystems.com/" | sed -n '1,25p'
+
+      - name: Run public route smoke checks
+        env:
+          VERIFY_URL: ${{ inputs.verify_url }}
+        run: npm run smoke:public-routes -- --base-url="$VERIFY_URL"
