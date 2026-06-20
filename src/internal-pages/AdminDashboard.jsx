@@ -47,6 +47,7 @@ import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
 import TwilioRuntimeHealth from '../components/admin/TwilioRuntimeHealth';
 import InstantLeadResponseDebugPanel from '../components/admin/InstantLeadResponseDebugPanel';
 import PipelineProofAuditButton from '../components/admin/PipelineProofAuditButton';
+import AdminReconciliationButton from '../components/admin/AdminReconciliationButton';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
@@ -527,6 +528,7 @@ function OverviewDashboard({ onNavigate }) {
         </div>
         <div className="flex items-center gap-3">
           <PipelineProofAuditButton onComplete={() => fetchOverviewData()} />
+          <AdminReconciliationButton onComplete={() => fetchOverviewData()} />
           <AutomationAlertsPanel compact onNavigate={onNavigate} />
         </div>
       </div>
