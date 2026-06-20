@@ -12,6 +12,7 @@ import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
 import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
+import LeadsTable from '../components/admin/LeadsTable';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import CrmHealthDashboard from '../components/admin/CrmHealthDashboard';
 import LaunchGatesPanel from '../components/admin/LaunchGatesPanel';
@@ -238,7 +239,7 @@ export default function AdminDashboard() {
 
   const renderContent = () => {
     switch (activeTab) {
-      case 'leads': return <LeadManagementDashboard />;
+      case 'leads': return <LeadsTable />;
       case 'crm-health': return <CrmHealthDashboard />;
       case 'launch-gates': return <LaunchGatesPanel />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
