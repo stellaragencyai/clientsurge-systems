@@ -35,11 +35,12 @@ export default function IndustryHero({
   if (useCinematicHero) {
     return (
       <section
-        className="relative w-full pt-32 pb-24 flex items-center justify-start min-h-[70vh] md:min-h-[80vh]"
+        className="relative w-full pt-32 pb-24 flex items-center justify-start min-h-[70vh] md:min-h-[80vh] bg-cover bg-center"
         style={{
-          backgroundImage: `url('${backgroundImage}')`,
+          backgroundImage: `url("${backgroundImage}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
         }}
       >
         {/* Dark gradient overlay — strongest at bottom and slight left */}
