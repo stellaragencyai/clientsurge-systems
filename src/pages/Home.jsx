@@ -7,26 +7,15 @@ import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
-import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
-import RevenueProofBlock from "../components/landing/RevenueProofBlock";
-import AutomationCatalog from "../components/landing/AutomationCatalog";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
-import RevenueUrgencySection from "../components/landing/RevenueUrgencySection";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
-import TrustedStackCarousel from "../components/landing/TrustedStackCarousel";
 import TrustStrip from "../components/landing/TrustStrip";
 
-const TrustBar = lazy(() => import("../components/landing/TrustBar"));
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
-const FAQ = lazy(() => import("../components/landing/FAQ"));
-// Pricing replaced by ThreeSystemsSection at the original pricing location below
-
-const Testimonials = lazy(() => import("../components/landing/Testimonials"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
-const SectionBreak = lazy(() => import("../components/landing/SectionBreak"));
 
 import {
   getFAQSchema,
@@ -119,70 +108,38 @@ export default function Home() {
       <div className="min-h-screen">
         <ScrollProgressBar />
         <Navbar />
+
+        {/* 1. Hero */}
         <Hero />
-        <TrustedStackCarousel />
+
+        {/* 2. Automation Systems Preview (six-system grid) */}
         <AutomationSystemsGrid />
 
-        {/* Each section gets its own Suspense boundary — prevents one slow section from blocking others */}
+        {/* 3. How It Works Teaser */}
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <CoreOffer />
+        </LazyHomepageSection>
+
+        {/* 4. Industries / Best Fit Preview */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Industries />
         </LazyHomepageSection>
 
-        <div id="automation-catalog" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <AutomationCatalog />
-
-        <div id="revenue-proof" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div className="max-w-6xl mx-auto px-6 pt-4">
-            <RevenueProofBlock industryLoss={14700} leadsRecovered="8-12" bookingsGenerated="3-5" />
-          </div>
-        </LazyHomepageSection>
-
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <TrustBar />
-        </LazyHomepageSection>
-
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="problem-solution" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <div id="six-automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <CoreOffer />
-        </LazyHomepageSection>
-
+        {/* 5. Package Preview */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <ThreeSystemsSection />
+
+        {/* 6. Compact Trust Strip */}
         <TrustStrip />
 
-        <SectionBreak />
-
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <FAQ />
-        </LazyHomepageSection>
-
-        <SectionBreak />
-
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="testimonials" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <Testimonials />
-        </LazyHomepageSection>
-
-        <SectionBreak />
-
-        <div id="revenue-urgency" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <RevenueUrgencySection />
-
-        <SectionBreak />
-
+        {/* 7. Final CTA */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <FinalCTA />
         </LazyHomepageSection>
 
-        <SecurityPriority />
         <Footer />
         <ChatBubble />
-
 
       </div>
     </DemoBookingProvider>
