@@ -41,29 +41,13 @@ Deno.serve(async (req) => {
       });
     }
 
-    // ── FETCH ALL ORDERS (for client_id lookup) ───────────────────────────────
-    const orders = await base44.asServiceRole.entities.Order.list('-created_date', 2000).catch(() => []);
-    const orderMap = {};
-    if (orders) {
-      for (const order of orders) {
-        orderMap[order.id] = order;
-      }
-    }
-
     // ── PROCESS EACH JOB ──────────────────────────────────────────────────────
     for (const job of jobs) {
       try {
         stats.jobs_processed++;
 
-        // Get client_id from linked Order
-        const linkedOrder = orderMap[job.order_id];
-        const clientId = linkedOrder?.client_id;
-
-        // Skip jobs without client_id (can't create EventQueue without it)
-        if (!clientId) {
-          stats.errors.push(`Skipped job ${job.id}: no linked Order or client_id found`);
-          continue;
-        }
+        // Fall back to "system" when no client can be resolved — never skip
+        const clientId = job.client_id || 'system';
 
         // Check if EventQueue already exists for this job (idempotent)
         const existingQueue = await base44.asServiceRole.entities.EventQueue.filter(
@@ -125,7 +109,7 @@ Deno.serve(async (req) => {
             job_id: job.id,
             job_type: job.job_type,
             trigger_event: job.trigger_event,
-            result_metadata: job.result_metadata ? JSON.parse(job.result_metadata) : {},
+            result_metadata: (() => { try { return job.result_metadata ? JSON.parse(job.result_metadata) : {}; } catch { return {}; } })(),
           };
 
           const queueRecord = await base44.asServiceRole.entities.EventQueue.create({
@@ -154,7 +138,7 @@ Deno.serve(async (req) => {
             job_id: job.id,
             job_type: job.job_type,
             trigger_event: job.trigger_event,
-            result_metadata: job.result_metadata ? JSON.parse(job.result_metadata) : {},
+            result_metadata: (() => { try { return job.result_metadata ? JSON.parse(job.result_metadata) : {}; } catch { return {}; } })(),
           };
 
           await base44.asServiceRole.entities.EventQueue.update(existingQueue[0].id, {
@@ -192,11 +176,14 @@ Deno.serve(async (req) => {
     };
 
     // Update all relevant DashboardTruthCheck records
+    // scope enum values: 'admin_dashboard' | 'mission_control' | 'customer_dashboard'
     const dashboardNames = ['admin_dashboard', 'mission_control', 'customer_dashboard'];
 
-    for (const dashboardName of dashboardNames) {
+    const evidenceSummary = `EventQueue bridge repair ${now}: ${queueStats.total_automation_jobs} jobs → ${stats.event_queues_created} queues created, ${stats.event_queues_updated} updated, ${stats.communication_events_created} comm events created. Total EventQueues: ${queueStats.total_event_queues}. Failed: ${queueStats.failed_job_count}. Provider succeeded: ${queueStats.provider_send_succeeded}.`;
+
+    for (const scope of dashboardNames) {
       const existingCheck = await base44.asServiceRole.entities.DashboardTruthCheck.filter(
-        { dashboard_name: dashboardName },
+        { scope },
         '-created_date',
         1
       ).catch(() => []);
@@ -205,32 +192,22 @@ Deno.serve(async (req) => {
         await base44.asServiceRole.entities.DashboardTruthCheck.update(
           existingCheck[0].id,
           {
-            total_automation_jobs: queueStats.total_automation_jobs,
-            total_event_queues: queueStats.total_event_queues,
-            processing_job_count: queueStats.processing_job_count,
-            failed_job_count: queueStats.failed_job_count,
-            completed_job_count: queueStats.completed_job_count,
-            provider_send_succeeded: queueStats.provider_send_succeeded,
             safe_to_launch: queueStats.safe_to_launch,
-            last_verified_at: now,
+            evidence_summary: evidenceSummary,
+            last_checked_at: now,
           }
         ).catch((err) => {
-          stats.errors.push(`Failed to update DashboardTruthCheck for ${dashboardName}: ${err.message}`);
+          stats.errors.push(`Failed to update DashboardTruthCheck for ${scope}: ${err.message}`);
         });
       } else {
         await base44.asServiceRole.entities.DashboardTruthCheck.create({
-          dashboard_name: dashboardName,
-          total_automation_jobs: queueStats.total_automation_jobs,
-          total_event_queues: queueStats.total_event_queues,
-          processing_job_count: queueStats.processing_job_count,
-          failed_job_count: queueStats.failed_job_count,
-          completed_job_count: queueStats.completed_job_count,
-          provider_send_succeeded: queueStats.provider_send_succeeded,
+          scope,
+          truth_status: 'warning',
           safe_to_launch: queueStats.safe_to_launch,
-          status: 'operational',
-          last_verified_at: now,
+          evidence_summary: evidenceSummary,
+          last_checked_at: now,
         }).catch((err) => {
-          stats.errors.push(`Failed to create DashboardTruthCheck for ${dashboardName}: ${err.message}`);
+          stats.errors.push(`Failed to create DashboardTruthCheck for ${scope}: ${err.message}`);
         });
       }
     }
