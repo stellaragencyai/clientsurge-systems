@@ -1,0 +1,220 @@
+{
+  "name": "AgencyPerformanceDashboard",
+  "type": "object",
+  "_metadata": {
+    "status": "SAAS_AGENCY_LAYER",
+    "reason": "Read-only aggregated performance metrics for an agency managing multiple clients. Derived from AgencyClient, RevenueTracking, and Leads entities.",
+    "tenant_scoped": "agency_id"
+  },
+  "properties": {
+    "dashboard_id": {
+      "type": "string",
+      "title": "Dashboard ID",
+      "description": "Unique identifier for this performance snapshot"
+    },
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "description": "Reference to the AgencyWorkspace"
+    },
+    "report_period": {
+      "type": "string",
+      "title": "Report Period",
+      "enum": [
+        "weekly",
+        "monthly",
+        "quarterly",
+        "yearly"
+      ],
+      "description": "Time period this dashboard covers"
+    },
+    "period_start_date": {
+      "type": "string",
+      "title": "Period Start Date",
+      "format": "date",
+      "description": "Start date of the reporting period"
+    },
+    "period_end_date": {
+      "type": "string",
+      "title": "Period End Date",
+      "format": "date",
+      "description": "End date of the reporting period"
+    },
+    "total_clients": {
+      "type": "integer",
+      "title": "Total Clients",
+      "default": 0,
+      "description": "Total count of clients managed by this agency"
+    },
+    "active_clients": {
+      "type": "integer",
+      "title": "Active Clients",
+      "default": 0,
+      "description": "Count of currently active clients"
+    },
+    "onboarding_clients": {
+      "type": "integer",
+      "title": "Onboarding Clients",
+      "default": 0,
+      "description": "Count of clients still in onboarding phase"
+    },
+    "paused_clients": {
+      "type": "integer",
+      "title": "Paused Clients",
+      "default": 0,
+      "description": "Count of paused client accounts"
+    },
+    "total_leads": {
+      "type": "integer",
+      "title": "Total Leads",
+      "default": 0,
+      "description": "Total leads generated across all clients this period"
+    },
+    "leads_by_client": {
+      "type": "object",
+      "title": "Leads by Client",
+      "description": "Breakdown of leads generated per client",
+      "additionalProperties": {
+        "type": "integer"
+      }
+    },
+    "total_revenue": {
+      "type": "number",
+      "title": "Total Revenue ($)",
+      "default": 0,
+      "description": "Total revenue from all clients this period"
+    },
+    "mrr": {
+      "type": "number",
+      "title": "MRR ($)",
+      "default": 0,
+      "description": "Monthly recurring revenue"
+    },
+    "arr": {
+      "type": "number",
+      "title": "ARR ($)",
+      "default": 0,
+      "description": "Annual recurring revenue (MRR \u00d7 12)"
+    },
+    "revenue_by_client": {
+      "type": "object",
+      "title": "Revenue by Client",
+      "description": "Breakdown of revenue per client",
+      "additionalProperties": {
+        "type": "number"
+      }
+    },
+    "avg_client_value": {
+      "type": "number",
+      "title": "Average Client Value ($)",
+      "default": 0,
+      "description": "Average revenue per client"
+    },
+    "total_conversions": {
+      "type": "integer",
+      "title": "Total Conversions",
+      "default": 0,
+      "description": "Total customers acquired across all clients"
+    },
+    "avg_conversion_rate": {
+      "type": "number",
+      "title": "Avg Conversion Rate (%)",
+      "default": 0,
+      "description": "Average conversion rate across all clients"
+    },
+    "total_automations": {
+      "type": "integer",
+      "title": "Total Active Automations",
+      "default": 0,
+      "description": "Total active automation systems across all clients"
+    },
+    "churn_rate": {
+      "type": "number",
+      "title": "Churn Rate (%)",
+      "default": 0,
+      "description": "Percentage of clients lost this period"
+    },
+    "new_clients_this_period": {
+      "type": "integer",
+      "title": "New Clients This Period",
+      "default": 0,
+      "description": "Number of new clients added during this period"
+    },
+    "clients_activated_this_period": {
+      "type": "integer",
+      "title": "Clients Activated This Period",
+      "default": 0,
+      "description": "Number of clients moved from onboarding to active"
+    },
+    "top_client_by_revenue": {
+      "type": "string",
+      "title": "Top Client by Revenue",
+      "description": "Name of the highest-revenue client"
+    },
+    "top_client_revenue": {
+      "type": "number",
+      "title": "Top Client Revenue ($)",
+      "default": 0
+    },
+    "worst_performing_client": {
+      "type": "string",
+      "title": "Worst Performing Client",
+      "description": "Name of lowest-revenue client"
+    },
+    "worst_client_revenue": {
+      "type": "number",
+      "title": "Worst Client Revenue ($)",
+      "default": 0
+    },
+    "generated_at": {
+      "type": "string",
+      "title": "Generated At",
+      "format": "date-time",
+      "description": "When this dashboard was generated"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin observations on agency performance"
+    }
+  },
+  "required": [
+    "dashboard_id",
+    "agency_id",
+    "report_period"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

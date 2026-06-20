@@ -1,0 +1,225 @@
+{
+  "name": "ClientProvisioningPipeline",
+  "type": "object",
+  "_metadata": {
+    "status": "SAAS_AGENCY_LAYER",
+    "reason": "Tracks the setup and provisioning workflow when an agency adds a new client to ClientSurge.",
+    "tenant_scoped": "agency_id"
+  },
+  "properties": {
+    "provisioning_id": {
+      "type": "string",
+      "title": "Provisioning ID",
+      "description": "Unique identifier for this provisioning workflow"
+    },
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "description": "Reference to the parent AgencyWorkspace"
+    },
+    "agency_client_id": {
+      "type": "string",
+      "title": "Agency Client ID",
+      "description": "Reference to the AgencyClient"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID",
+      "description": "Reference to the Client being provisioned"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "failed"
+      ],
+      "default": "pending",
+      "description": "Overall provisioning status"
+    },
+    "progress_percent": {
+      "type": "integer",
+      "title": "Progress (%)",
+      "default": 0,
+      "description": "Overall progress of provisioning (0-100)"
+    },
+    "steps": {
+      "type": "object",
+      "title": "Provisioning Steps",
+      "description": "Status of each provisioning step",
+      "properties": {
+        "stripe_setup": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "in_progress",
+                "completed",
+                "failed"
+              ]
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "error": {
+              "type": "string"
+            }
+          }
+        },
+        "landing_pages_setup": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "in_progress",
+                "completed",
+                "failed"
+              ]
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "pages_deployed": {
+              "type": "integer",
+              "default": 0
+            },
+            "error": {
+              "type": "string"
+            }
+          }
+        },
+        "automations_setup": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "in_progress",
+                "completed",
+                "failed"
+              ]
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "automations_configured": {
+              "type": "integer",
+              "default": 0
+            },
+            "error": {
+              "type": "string"
+            }
+          }
+        },
+        "onboarding_setup": {
+          "type": "object",
+          "properties": {
+            "status": {
+              "type": "string",
+              "enum": [
+                "pending",
+                "in_progress",
+                "completed",
+                "failed"
+              ]
+            },
+            "completed_at": {
+              "type": "string",
+              "format": "date-time"
+            },
+            "email_sequences_ready": {
+              "type": "boolean"
+            },
+            "error": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Started At",
+      "format": "date-time",
+      "description": "When provisioning workflow was initiated"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time",
+      "description": "When provisioning was completed"
+    },
+    "failed_at": {
+      "type": "string",
+      "title": "Failed At",
+      "format": "date-time",
+      "description": "When provisioning failed (if applicable)"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason",
+      "description": "Details about why provisioning failed"
+    },
+    "estimated_completion": {
+      "type": "string",
+      "title": "Estimated Completion",
+      "format": "date-time",
+      "description": "Estimated time for provisioning to complete"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on this provisioning workflow"
+    }
+  },
+  "required": [
+    "provisioning_id",
+    "agency_id",
+    "client_id",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

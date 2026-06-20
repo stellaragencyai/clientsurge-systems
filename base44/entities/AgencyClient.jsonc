@@ -1,0 +1,167 @@
+{
+  "name": "AgencyClient",
+  "type": "object",
+  "_metadata": {
+    "status": "SAAS_AGENCY_LAYER",
+    "reason": "Links a client business to an agency workspace, enabling multi-client management within a single agency.",
+    "tenant_scoped": "agency_id"
+  },
+  "properties": {
+    "agency_client_id": {
+      "type": "string",
+      "title": "Agency Client ID",
+      "description": "Unique identifier for this agency-client relationship"
+    },
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "description": "Reference to the parent AgencyWorkspace"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID",
+      "description": "Reference to the Client or ClientProject entity"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Client Business Name",
+      "description": "Name of the client business"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry",
+      "description": "Industry vertical (roofing, hvac, dental, etc.)"
+    },
+    "client_contact_email": {
+      "type": "string",
+      "title": "Client Contact Email",
+      "description": "Primary contact email for the client"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "onboarding",
+        "active",
+        "paused",
+        "offboarded"
+      ],
+      "default": "onboarding",
+      "description": "Lifecycle status of this client"
+    },
+    "subscription_plan": {
+      "type": "string",
+      "title": "Subscription Plan",
+      "enum": [
+        "starter_system",
+        "growth_system",
+        "elite_system"
+      ],
+      "description": "Which ClientSurge package this client is on"
+    },
+    "monthly_revenue": {
+      "type": "number",
+      "title": "Monthly Revenue ($)",
+      "default": 0,
+      "description": "Monthly recurring revenue (MRR) from this client"
+    },
+    "total_revenue": {
+      "type": "number",
+      "title": "Total Revenue ($)",
+      "default": 0,
+      "description": "Cumulative revenue from this client"
+    },
+    "payment_status": {
+      "type": "string",
+      "title": "Payment Status",
+      "enum": [
+        "current",
+        "overdue",
+        "suspended"
+      ],
+      "default": "current",
+      "description": "Current payment status"
+    },
+    "next_billing_date": {
+      "type": "string",
+      "title": "Next Billing Date",
+      "format": "date",
+      "description": "When the next charge is scheduled"
+    },
+    "leads_generated": {
+      "type": "integer",
+      "title": "Leads Generated",
+      "default": 0,
+      "description": "Total leads captured for this client"
+    },
+    "active_automations": {
+      "type": "integer",
+      "title": "Active Automations",
+      "default": 0,
+      "description": "Number of active automation systems for this client"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time",
+      "description": "When this client was added to the agency"
+    },
+    "activated_at": {
+      "type": "string",
+      "title": "Activated At",
+      "format": "date-time",
+      "description": "When this client went live"
+    },
+    "offboarded_at": {
+      "type": "string",
+      "title": "Offboarded At",
+      "format": "date-time",
+      "description": "When this client relationship ended (if applicable)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Internal notes on this client"
+    }
+  },
+  "required": [
+    "agency_client_id",
+    "agency_id",
+    "client_id",
+    "business_name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

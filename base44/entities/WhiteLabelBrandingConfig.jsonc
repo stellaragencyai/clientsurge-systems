@@ -1,0 +1,143 @@
+{
+  "name": "WhiteLabelBrandingConfig",
+  "type": "object",
+  "_metadata": {
+    "status": "SAAS_AGENCY_LAYER",
+    "reason": "Stores white-label branding customization for an agency workspace.",
+    "tenant_scoped": "agency_id"
+  },
+  "properties": {
+    "branding_id": {
+      "type": "string",
+      "title": "Branding ID",
+      "description": "Unique identifier for this branding configuration"
+    },
+    "agency_id": {
+      "type": "string",
+      "title": "Agency ID",
+      "description": "Reference to the parent AgencyWorkspace"
+    },
+    "brand_name": {
+      "type": "string",
+      "title": "Brand Name",
+      "description": "Custom brand name to display instead of 'ClientSurge' (e.g., 'Digital Growth Pro')"
+    },
+    "logo_url": {
+      "type": "string",
+      "title": "Logo URL",
+      "description": "URL to agency's custom logo image"
+    },
+    "favicon_url": {
+      "type": "string",
+      "title": "Favicon URL",
+      "description": "URL to agency's custom favicon"
+    },
+    "primary_color": {
+      "type": "string",
+      "title": "Primary Color (Hex)",
+      "description": "Primary brand color in hex format (e.g., #0066CC)"
+    },
+    "secondary_color": {
+      "type": "string",
+      "title": "Secondary Color (Hex)",
+      "description": "Secondary brand color in hex format"
+    },
+    "support_email": {
+      "type": "string",
+      "title": "Support Email",
+      "description": "Custom support email address for client communications"
+    },
+    "support_phone": {
+      "type": "string",
+      "title": "Support Phone",
+      "description": "Custom support phone number"
+    },
+    "website_url": {
+      "type": "string",
+      "title": "Website URL",
+      "description": "Agency's website URL for branding"
+    },
+    "custom_domain": {
+      "type": "string",
+      "title": "Custom Domain",
+      "description": "Custom domain for white-label client portal (e.g., clients.myagency.com)"
+    },
+    "email_signature": {
+      "type": "string",
+      "title": "Email Signature",
+      "description": "Custom email signature for automated communications"
+    },
+    "terms_url": {
+      "type": "string",
+      "title": "Terms of Service URL",
+      "description": "URL to agency's custom terms of service"
+    },
+    "privacy_url": {
+      "type": "string",
+      "title": "Privacy Policy URL",
+      "description": "URL to agency's custom privacy policy"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active",
+      "default": true,
+      "description": "Whether white-label branding is currently active"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time",
+      "description": "When this branding config was created"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At",
+      "format": "date-time",
+      "description": "When this branding config was last updated"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on branding configuration"
+    }
+  },
+  "required": [
+    "branding_id",
+    "agency_id",
+    "brand_name"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
