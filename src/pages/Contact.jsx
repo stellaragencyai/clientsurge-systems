@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowRight, Loader2, CheckCircle2, Mail, Phone, MapPin } from "lucide-react";
+import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -156,333 +156,251 @@ export default function Contact() {
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* Hero Section */}
-      <section className="bg-background pt-24 pb-16 px-6 md:px-12">
-        <div className="max-w-5xl mx-auto">
-          <div className="inline-flex items-center gap-2 mb-8 text-sm font-semibold text-muted-foreground">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary" />
-            {industryContext ? industryContext.label : "Ready to automate"}
-          </div>
-          <div className="flex items-start gap-8 mb-8">
-            <div className="w-1 h-20 bg-foreground rounded-sm flex-shrink-0 mt-1" />
-            <div>
-              <h1 className="text-5xl md:text-6xl font-titles font-black text-foreground mb-6">Contact Us</h1>
-              <p className="text-lg text-muted-foreground max-w-2xl leading-relaxed">
-                {industryContext ? industryContext.sub : "Have questions or ready to discuss your lead flow? Reach out and let's talk about the right automation stack for your business."}
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Form Section */}
-      <section className="px-6 md:px-12 pb-32">
-        <div className="max-w-5xl mx-auto">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-20">
-            
-            {/* LEFT: Contact Info & Timeline */}
-            <div className="flex flex-col gap-16">
-              {/* Contact Details */}
-              <div>
-                <div className="flex items-center gap-3 mb-10">
-                  <div className="w-1 h-6 bg-foreground rounded-sm" />
-                  <h2 className="text-xs font-bold uppercase tracking-widest text-foreground">Contact Information</h2>
-                </div>
+      {/* Split Layout Container */}
+      <div className="flex min-h-[calc(100vh-200px)]">
+        {/* LEFT: Dark sidebar with contact info */}
+        <div className="hidden lg:flex lg:w-1/2 bg-slate-900 text-white flex-col justify-between p-16">
+          <div>
+            <div className="mb-12">
+              <div className="text-2xl font-bold mb-8 flex items-center gap-2">
+                <div className="w-1 h-8 bg-primary rounded-sm" />
+                ClientSurge
+              </div>
+              <div className="border-b border-slate-700 pb-8 mb-8">
                 <div className="space-y-4">
-                  {[
-                    { Icon: Mail, label: "Email", value: "support@clientsurgesystems.com", href: "mailto:support@clientsurgesystems.com" },
-                    { Icon: Phone, label: "Phone", value: "(602) 584-3227", href: "tel:+16025843227" },
-                    { Icon: MapPin, label: "Location", value: "Phoenix, Arizona", href: null },
-                  ].map(({ Icon, label, value, href }) => (
-                    <div key={label} className="flex items-center gap-4 p-4 bg-card rounded-lg border border-border hover:border-primary/30 transition-colors">
-                      <div className="w-10 h-10 flex items-center justify-center bg-primary/10 rounded-lg flex-shrink-0">
-                        <Icon className="w-5 h-5 text-primary" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">{label}</p>
-                        {href ? (
-                          <a href={href} className="text-sm font-medium text-foreground hover:text-primary transition-colors">
-                            {value}
-                          </a>
-                        ) : (
-                          <p className="text-sm font-medium text-foreground">{value}</p>
-                        )}
-                      </div>
+                  <div className="flex items-center gap-4">
+                    <Phone className="w-5 h-5 text-primary flex-shrink-0" />
+                    <a href="tel:+16025843227" className="hover:text-primary transition">
+                      (602) 584-3227
+                    </a>
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <Mail className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div className="space-y-1">
+                      <p className="text-xs font-semibold text-slate-400">SALES</p>
+                      <a href="mailto:support@clientsurgesystems.com" className="hover:text-primary transition block text-sm">
+                        support@clientsurgesystems.com
+                      </a>
                     </div>
-                  ))}
+                  </div>
+                  <div className="flex items-start gap-4">
+                    <MapPin className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <div>
+                      <p className="text-sm">Phoenix, Arizona</p>
+                    </div>
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* CTA Box */}
-              <div className="p-6 border border-border rounded-lg bg-card hover:border-primary/30 hover:shadow-lg transition-all">
-                <h3 className="font-semibold text-foreground mb-2">Prefer a quick call?</h3>
-                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                  Skip the form and let's discuss your lead flow directly. We'll recommend the right automation stack.
+            {/* Info text */}
+            <div className="text-sm text-slate-400 leading-relaxed">
+              <p className="mb-4">
+                {industryContext 
+                  ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right automation stack.`
+                  : "Have questions? We'd love to hear from you. Send us a message and we'll get back to you within one business day."
+                }
+              </p>
+              <p>Ready to transform how you handle leads and follow-ups?</p>
+            </div>
+          </div>
+
+          {/* Social Icons */}
+          <div className="flex items-center gap-6">
+            <a href="#" className="text-primary hover:text-white transition">
+              <Facebook className="w-5 h-5" />
+            </a>
+            <a href="#" className="text-primary hover:text-white transition">
+              <Instagram className="w-5 h-5" />
+            </a>
+          </div>
+        </div>
+
+        {/* RIGHT: White form area */}
+        <div className="w-full lg:w-1/2 bg-white p-8 md:p-16 flex items-center justify-center">
+          <div className="w-full max-w-md">
+            {success ? (
+              <motion.div
+                className="text-center py-8"
+                initial={{ opacity: 0, y: 16 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+              >
+                <motion.div
+                  className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
+                  initial={{ scale: 0.9 }}
+                  animate={{ scale: 1 }}
+                  transition={{ delay: 0.1, type: "spring" }}
+                >
+                  <CheckCircle2 className="w-8 h-8 text-green-600" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-slate-900 mb-2">Message Received</h3>
+                <p className="text-slate-600 mb-8 leading-relaxed">
+                  Thanks for reaching out. We'll get back to you within one business day.
                 </p>
                 <button
                   type="button"
-                  onClick={() => setShowBookingModal(true)}
-                  className="cs-btn-primary inline-flex items-center gap-2"
+                  onClick={() => window.location.href = "/"}
+                  className="px-6 py-2.5 border border-slate-300 text-slate-900 font-semibold rounded hover:bg-slate-50 transition"
                 >
-                  Get Help Choosing <ArrowRight className="w-3.5 h-3.5" />
+                  Back to Home
                 </button>
-              </div>
-
-              {/* Timeline */}
-              <div className="border-t border-border pt-8">
-                <p className="text-xs font-bold uppercase tracking-widest text-muted-foreground mb-8">What happens next</p>
-                <div className="space-y-6">
-                  {[
-                    { n: "1", text: "We review your message within 1 business day" },
-                    { n: "2", text: "We'll reach out to learn more about your business" },
-                    { n: "3", text: "We recommend the right automation stack for you" },
-                  ].map(({ n, text }) => (
-                    <div key={n} className="flex items-start gap-4">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-primary/10 text-primary font-bold text-sm flex-shrink-0 mt-0.5">
-                        {n}
-                      </div>
-                      <p className="text-sm text-muted-foreground leading-relaxed pt-1">{text}</p>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* RIGHT: Form */}
-            <div>
-              {success ? (
-                <motion.div
-                  className="flex flex-col items-center text-center py-12"
-                  aria-live="polite"
-                  initial={{ opacity: 0, y: 16 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.4, ease: "easeOut" }}
-                >
-                  <motion.div
-                    className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6"
-                    initial={{ scale: 0.9 }}
-                    animate={{ scale: 1 }}
-                    transition={{ delay: 0.1, type: "spring", stiffness: 300, damping: 20 }}
-                  >
-                    <CheckCircle2 className="w-8 h-8 text-green-600" />
-                  </motion.div>
-                  <motion.h3
-                    className="text-2xl font-semibold text-foreground mb-2"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.15, duration: 0.3 }}
-                  >
-                    Message Sent
-                  </motion.h3>
-                  <motion.p
-                    className="text-muted-foreground leading-relaxed max-w-sm mb-8"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.2, duration: 0.3 }}
-                  >
-                    Thanks for reaching out. We'll get back to you within one business day.
-                  </motion.p>
-                  <motion.div
-                    className="flex flex-col sm:flex-row gap-3"
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.25, duration: 0.3 }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setShowBookingModal(true)}
-                      className="px-5 py-2.5 text-sm font-semibold text-primary border border-primary/20 rounded-lg hover:bg-primary/5 transition-colors"
-                    >
-                      Want help choosing your AI services?
-                    </button>
-                    <a
-                      href="mailto:support@clientsurgesystems.com"
-                      className="px-5 py-2.5 text-sm font-semibold text-foreground border border-border rounded-lg hover:bg-muted transition-colors"
-                    >
-                      Email us directly
-                    </a>
-                  </motion.div>
-                </motion.div>
-              ) : (
-                <form action="/contact" method="post" onSubmit={handleSubmit} className="space-y-8" noValidate>
+              </motion.div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+                <div className="mb-10">
+                  <p className="text-sm font-semibold text-slate-600 tracking-widest uppercase mb-2">Get in Touch</p>
                   <div className="flex items-center gap-3">
-                    <div className="w-1 h-6 bg-foreground rounded-sm" />
-                    <h2 className="text-xs font-bold uppercase tracking-widest text-foreground">Send a Message</h2>
+                    <div className="w-1 h-10 bg-primary rounded-sm" />
+                    <h1 className="text-4xl font-black text-slate-900">CONTACT</h1>
                   </div>
+                </div>
 
-                  {errors.submit && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 text-sm text-red-700" role="alert">
-                      {errors.submit}
-                    </div>
-                  )}
+                <p className="text-slate-700 text-sm mb-8 leading-relaxed">
+                  We would love to hear from you! Send us a message and we'll get right back in touch.
+                </p>
 
-                  <input
-                    type="text"
-                    name="website_url"
-                    value={form.website_url}
-                    onChange={handleChange}
-                    tabIndex={-1}
-                    autoComplete="off"
-                    className="hidden"
-                    aria-hidden="true"
-                  />
-                  
-                  {/* Two-Column Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    <div>
-                      <label htmlFor="contact-full-name" className="block text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
-                        Full Name <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="contact-full-name"
-                        name="full_name"
-                        value={form.full_name}
-                        onChange={handleChange}
-                        autoComplete="name"
-                        required
-                        aria-invalid={Boolean(errors.full_name)}
-                        aria-describedby={errors.full_name ? "contact-full-name-error" : undefined}
-                        placeholder="Jane Smith"
-                        className="w-full bg-transparent border-b border-border focus:border-primary focus:outline-none transition-colors py-2 text-foreground placeholder:text-muted-foreground"
-                      />
-                      {errors.full_name && <p id="contact-full-name-error" className="text-red-500 text-xs mt-2">{errors.full_name}</p>}
-                    </div>
-
-                    <div>
-                      <label htmlFor="contact-email" className="block text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
-                        Email <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        id="contact-email"
-                        name="email"
-                        type="email"
-                        value={form.email}
-                        onChange={handleChange}
-                        autoComplete="email"
-                        required
-                        aria-invalid={Boolean(errors.email)}
-                        aria-describedby={errors.email ? "contact-email-error" : undefined}
-                        placeholder="jane@business.com"
-                        className="w-full bg-transparent border-b border-border focus:border-primary focus:outline-none transition-colors py-2 text-foreground placeholder:text-muted-foreground"
-                      />
-                      {errors.email && <p id="contact-email-error" className="text-red-500 text-xs mt-2">{errors.email}</p>}
-                    </div>
+                {errors.submit && (
+                  <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+                    {errors.submit}
                   </div>
+                )}
 
-                  {/* Second Row */}
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                    <div>
-                      <label htmlFor="contact-phone" className="block text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
-                        Phone
-                      </label>
-                      <input
-                        id="contact-phone"
-                        name="phone"
-                        type="tel"
-                        value={form.phone}
-                        onChange={handleChange}
-                        autoComplete="tel"
-                        inputMode="tel"
-                        aria-invalid={Boolean(errors.phone)}
-                        aria-describedby={errors.phone ? "contact-phone-error" : undefined}
-                        placeholder="(555) 000-0000"
-                        className="w-full bg-transparent border-b border-border focus:border-primary focus:outline-none transition-colors py-2 text-foreground placeholder:text-muted-foreground"
-                      />
-                      {errors.phone && <p id="contact-phone-error" className="text-red-500 text-xs mt-2">{errors.phone}</p>}
-                    </div>
+                <input
+                  type="text"
+                  name="website_url"
+                  value={form.website_url}
+                  onChange={handleChange}
+                  className="hidden"
+                  tabIndex={-1}
+                />
 
-                    <div>
-                      <label htmlFor="contact-business-type" className="block text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
-                        Business Type
-                      </label>
-                      <select
-                        id="contact-business-type"
-                        name="business_type"
-                        value={form.business_type}
-                        onChange={handleChange}
-                        className="w-full bg-transparent border-b border-border focus:border-primary focus:outline-none transition-colors py-2 text-foreground"
-                      >
-                        <option value="">Select one...</option>
-                        <option>Med Spas & Aesthetic Clinics</option>
-                        <option>Dental & Orthodontics</option>
-                        <option>Chiropractic & Physical Therapy</option>
-                        <option>HVAC, Plumbing & Home Services</option>
-                        <option>Roofing & Restoration</option>
-                        <option>Contractors & Trades</option>
-                        <option>Other</option>
-                      </select>
-                    </div>
-                  </div>
-
-                  {/* Pain Points */}
+                {/* First Name & Last Name */}
+                <div className="grid grid-cols-2 gap-6">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wide text-muted-foreground mb-4">
-                      What's your biggest challenge? <span className="font-normal normal-case text-muted-foreground text-[0.65rem]">(pick all that apply)</span>
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                      First Name <span className="text-red-500">*</span>
                     </label>
-                    <div className="flex flex-wrap gap-2">
-                      {PAIN_POINTS.map((pain) => {
-                        const active = selectedPains.includes(pain);
-                        return (
-                          <button
-                            key={pain}
-                            type="button"
-                            onClick={() => togglePain(pain)}
-                            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
-                              active
-                                ? "bg-primary text-white"
-                                : "bg-card text-muted-foreground border border-border hover:border-primary/30"
-                            }`}
-                          >
-                            {active && "✓ "}{pain}
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Message */}
-                  <div>
-                    <label htmlFor="contact-message" className="block text-xs font-bold uppercase tracking-wide text-muted-foreground mb-3">
-                      Message <span className="text-red-500">*</span>
-                    </label>
-                    <textarea
-                      id="contact-message"
-                      name="message"
-                      value={form.message}
+                    <input
+                      name="full_name"
+                      value={form.full_name}
                       onChange={handleChange}
-                      required
-                      aria-invalid={Boolean(errors.message)}
-                      aria-describedby={errors.message ? "contact-message-error" : undefined}
-                      placeholder="Tell us about your business and what you're looking for..."
-                      rows={5}
-                      className="w-full bg-transparent border-b border-border focus:border-primary focus:outline-none transition-colors py-2 text-foreground placeholder:text-muted-foreground resize-none font-inter"
+                      placeholder="Jane"
+                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      aria-invalid={Boolean(errors.full_name)}
                     />
-                    {errors.message && <p id="contact-message-error" className="text-red-500 text-xs mt-2">{errors.message}</p>}
+                    {errors.full_name && <p className="text-red-500 text-xs mt-1">{errors.full_name}</p>}
                   </div>
 
-                  {/* Submit Button */}
-                  <button
-                    type="submit"
-                    disabled={loading}
-                    className="cs-btn-primary w-full mt-8 inline-flex items-center justify-center gap-2"
-                    style={{ opacity: loading ? 0.7 : 1 }}
-                  >
-                    {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <>Send Message <ArrowRight className="w-4 h-4" /></>}
-                  </button>
-
-                  <div className="space-y-3 text-center text-xs text-muted-foreground">
-                    <p>No spam. No pressure. Just a thoughtful reply from our team.</p>
-                    <p>
-                      We respect your privacy. See our{" "}
-                      <a href="/privacy-policy" className="underline hover:text-foreground transition-colors">Privacy Policy</a>.
-                    </p>
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                      Last Name <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="business_type"
+                      value={form.business_type}
+                      onChange={handleChange}
+                      placeholder="Smith"
+                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                    />
                   </div>
-                </form>
-              )}
-            </div>
+                </div>
+
+                {/* Phone & Email */}
+                <div className="grid grid-cols-2 gap-6">
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                      Phone No.
+                    </label>
+                    <input
+                      name="phone"
+                      type="tel"
+                      value={form.phone}
+                      onChange={handleChange}
+                      placeholder="(555) 000-0000"
+                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      aria-invalid={Boolean(errors.phone)}
+                    />
+                    {errors.phone && <p className="text-red-500 text-xs mt-1">{errors.phone}</p>}
+                  </div>
+
+                  <div>
+                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                      Email Address <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      name="email"
+                      type="email"
+                      value={form.email}
+                      onChange={handleChange}
+                      placeholder="jane@business.com"
+                      className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition"
+                      aria-invalid={Boolean(errors.email)}
+                    />
+                    {errors.email && <p className="text-red-500 text-xs mt-1">{errors.email}</p>}
+                  </div>
+                </div>
+
+                {/* Message */}
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-2 block">
+                    Message <span className="text-red-500">*</span>
+                  </label>
+                  <textarea
+                    name="message"
+                    value={form.message}
+                    onChange={handleChange}
+                    placeholder="Tell us about your business and what you're looking for..."
+                    rows={4}
+                    className="w-full border-b border-slate-300 focus:border-primary outline-none py-2 text-slate-900 placeholder:text-slate-400 transition resize-none"
+                    aria-invalid={Boolean(errors.message)}
+                  />
+                  {errors.message && <p className="text-red-500 text-xs mt-1">{errors.message}</p>}
+                </div>
+
+                {/* Pain Points */}
+                <div>
+                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
+                    What's your biggest challenge?
+                  </label>
+                  <div className="flex flex-wrap gap-2">
+                    {PAIN_POINTS.map((pain) => {
+                      const active = selectedPains.includes(pain);
+                      return (
+                        <button
+                          key={pain}
+                          type="button"
+                          onClick={() => togglePain(pain)}
+                          className={`px-3 py-1.5 text-xs font-medium rounded transition ${
+                            active
+                              ? "bg-primary text-white"
+                              : "border border-slate-300 text-slate-700 hover:border-primary hover:text-primary"
+                          }`}
+                        >
+                          {active && "✓ "}{pain}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+
+                {/* Submit Button */}
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-32 px-6 py-3 border-2 border-slate-900 text-slate-900 font-bold uppercase tracking-wide hover:bg-slate-900 hover:text-white transition disabled:opacity-70 mt-8"
+                >
+                  {loading ? <Loader2 className="w-4 h-4 animate-spin mx-auto" /> : "SEND"}
+                </button>
+
+                <p className="text-xs text-slate-500 mt-6">
+                  No spam, no pressure. Just thoughtful replies from our team.
+                </p>
+              </form>
+            )}
           </div>
         </div>
-      </section>
+      </div>
 
       <Footer />
       <MobileCallBar />
