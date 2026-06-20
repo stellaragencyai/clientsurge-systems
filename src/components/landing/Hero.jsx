@@ -58,12 +58,28 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Headline */}
+        {/* Headline with glow backdrop */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.08 }}
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            width: "120%",
+            height: "200px",
+            background: "radial-gradient(ellipse at center, rgba(0,174,239,0.15), transparent 70%)",
+            filter: "blur(40px)",
+            zIndex: -1,
+          }}
+        />
         <motion.h1
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight"
+          className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight relative"
           style={{ fontFamily: "'Montserrat', sans-serif" }}
         >
           The Business AI Automation Store — Pick Your System, We Install It Remotely

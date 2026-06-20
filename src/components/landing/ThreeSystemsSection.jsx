@@ -141,15 +141,15 @@ export default function ThreeSystemsSection() {
               )}
 
               <div
-                className="flex flex-col rounded-xl overflow-hidden transition-all duration-300"
-                style={{
-                  background: "#ffffff",
-                  border: `1px solid ${pkg.accentBorder}`,
-                  boxShadow: pkg.highlight
-                    ? `0 8px 32px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.04)`
-                    : "0 2px 12px rgba(0,0,0,0.04)",
-                  height: "100%",
-                }}
+               className="flex flex-col rounded-xl overflow-hidden transition-all duration-300"
+               style={{
+                 background: "#ffffff",
+                 border: `1.5px solid ${pkg.accentBorder}`,
+                 boxShadow: pkg.highlight
+                   ? `0 12px 40px ${pkg.accentGlow}, 0 0 0 1px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.05)`
+                   : "0 4px 16px rgba(0,0,0,0.06)",
+                 height: "100%",
+               }}
                 onMouseEnter={(e) => {
                   e.currentTarget.style.boxShadow = `0 0 0 1px ${pkg.accentGlow}, 0 0 32px ${pkg.accentGlow}, 0 8px 32px ${pkg.accentGlow}`;
                   e.currentTarget.style.transform = "translateY(-4px)";

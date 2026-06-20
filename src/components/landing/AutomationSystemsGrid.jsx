@@ -95,7 +95,7 @@ export default function AutomationSystemsGrid() {
             {SYSTEMS.map(({ icon: Icon, title, outcome, cta, href }) => (
               <div
                 key={title}
-                className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 hover:border-primary/40 hover:shadow-md transition-all"
+                className="rounded-xl border border-border bg-card p-6 flex flex-col gap-4 hover:border-primary/50 hover:shadow-lg hover:-translate-y-1 transition-all duration-300"
               >
                 <div
                   className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"

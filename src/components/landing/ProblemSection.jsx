@@ -35,10 +35,10 @@ const ProblemCard = ({ problem }) => {
     <div 
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      className={`p-6 rounded-2xl bg-background/5 transition-all ${hovered ? "border border-slate-600" : "border border-transparent"}`}
+      className={`p-6 rounded-2xl bg-background/5 transition-all duration-300 transform ${hovered ? "border border-slate-600 -translate-y-1 shadow-lg" : "border border-transparent"}`}
     >
-      <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center mb-4">
-        <problem.icon className="w-5 h-5 text-primary" />
+      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all ${hovered ? "bg-primary/30 scale-110" : "bg-primary/20"}`}>
+        <problem.icon className="w-6 h-6 text-primary" />
       </div>
       <h3 className="text-base font-semibold text-background mb-2">{problem.title}</h3>
       <p className="text-sm text-background/60 leading-relaxed">{problem.desc}</p>

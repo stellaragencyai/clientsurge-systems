@@ -303,15 +303,15 @@ export default function Industries() {
               
 
               <div
-                className="absolute inset-0 border-2 transition-all duration-300"
-                style={{
-                  borderColor: isSelected ? accent.color : highlighted ? accent.color : "rgba(255,255,255,0.08)",
-                  boxShadow: isSelected ?
-                  `inset 0 0 0 1px ${accent.soft}, 0 0 0 2px ${accent.glow}` :
-                  highlighted ?
-                  `inset 0 0 0 1px ${accent.soft}, 0 0 0 2px ${accent.glow}` :
-                  "none"
-                }} />
+               className="absolute inset-0 border-2 transition-all duration-300"
+               style={{
+                 borderColor: isSelected ? accent.color : highlighted ? accent.color : "rgba(255,255,255,0.12)",
+                 boxShadow: isSelected ?
+                 `inset 0 0 0 1px ${accent.soft}, 0 0 32px ${accent.glow}, 0 0 0 2px ${accent.glow}` :
+                 highlighted ?
+                 `inset 0 0 0 1px ${accent.soft}, 0 0 24px ${accent.glow}, 0 0 0 1.5px ${accent.glow}` :
+                 "0 0 0 1px rgba(255,255,255,0.08)"
+               }} />
               {isSelected && (
                 <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-lg z-20">
                   <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M5 12l4 4 10-10" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
