@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, Clock, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FullClientOperationsCommandCenter from './FullClientOperationsCommandCenter';
+import AssistedOperationsMode from './observability/AssistedOperationsMode';
 
 function MetricCard({ label, value, icon: Icon, subtext }) {
   return (
@@ -127,6 +128,9 @@ export default function SystemObservabilityDashboard() {
         </h1>
         <p className="text-muted-foreground text-sm mt-1">Real-time system health and activity monitoring</p>
       </div>
+
+      {/* ASSISTED OPERATIONS MODE */}
+      <AssistedOperationsMode />
 
       {/* FULL CLIENT OPERATIONS COMMAND CENTER */}
       <FullClientOperationsCommandCenter />
