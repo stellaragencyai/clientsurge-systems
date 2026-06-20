@@ -58,6 +58,7 @@ const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashb
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
 const LeadSourceAttribution = lazy(() => import('../components/admin/LeadSourceAttribution'));
 const RevenueDashboard = lazy(() => import('../components/admin/RevenueDashboard'));
+const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueTrackingDashboard'));
 
 function AdminPanelSkeleton() {
   return (
@@ -114,6 +115,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
+      { id: 'revenue-tracking', label: 'Revenue Tracking', icon: DollarSign },
       { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'priority', label: 'Priority Queue', icon: Star },
       { id: 'attribution', label: 'Source Attribution', icon: PieChart },
@@ -268,6 +270,7 @@ export default function AdminDashboard() {
       case 'landing-traffic': return <LandingPageAnalyticsPanel />;
       case 'campaign-builder': return <CampaignLibrary />;
       case 'revenue': return <LazyAdminPanel><RevenueDashboard /></LazyAdminPanel>;
+      case 'revenue-tracking': return <LazyAdminPanel><RevenueTrackingDashboard /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
       case 'install-checklists': return <AutomationInstallChecklist />;

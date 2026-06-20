@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import SystemNotesSection from './SystemNotesSection';
 import DecisionSupportLayer from './DecisionSupportLayer';
 import SuggestionsPanel from './SuggestionsPanel';
+import UnifiedIntelligenceCommandLayer from './UnifiedIntelligenceCommandLayer';
 
 function KPICard({ label, value, icon: Icon, color = 'text-blue-600' }) {
   return (
@@ -240,6 +241,14 @@ export default function SystemObservabilityDashboard() {
           </div>
         </div>
       )}
+
+      {/* UNIFIED INTELLIGENCE COMMAND LAYER */}
+      <UnifiedIntelligenceCommandLayer 
+        metrics={metrics} 
+        suggestions={metrics?.suggestions}
+        decisionSupport={optimization_insights?.decision_support}
+        systemNotes={optimization_insights?.daily_activity}
+      />
 
       {/* SUGGESTIONS */}
       {metrics?.suggestions && <SuggestionsPanel suggestions={metrics.suggestions} />}
