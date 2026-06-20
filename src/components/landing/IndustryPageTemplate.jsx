@@ -8,11 +8,8 @@ import IndustryHero from '@/components/industry/IndustryHero';
 import { ArrowRight, CheckCircle, TrendingUp, Zap } from 'lucide-react';
 
 // Hero image URLs for cinematic industry pages (template for future expansion)
-// NOTE: Roofing image URL needs to be uploaded to Base44 media storage
-// The image file is: roofing/city/sunset with roofers on metal roof
 const HERO_IMAGES = {
-  // roofing: 'https://media.base44.com/images/public/YOUR_BASE44_ROOFING_IMAGE_ID/roofing_hero.jpg',
-  roofing: null, // Awaiting Base44 asset upload
+  roofing: 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/e92b5f56c_watermarked_img_13975777732204341720.jpg',
 };
 
 // Roofing-specific hero configuration
@@ -21,7 +18,7 @@ const ROOFING_HERO_CONFIG = {
   headline: 'AI Automation Systems for Roofing Companies',
   subheadline: 'Capture more roofing leads, respond to missed calls, follow up on quotes, book inspections, request reviews, and reactivate old opportunities with a remote AI-powered setup workflow.',
   description: '',
-  backgroundImage: HERO_IMAGES.roofing, // PLACEHOLDER: waiting for Base44 asset upload
+  backgroundImage: HERO_IMAGES.roofing,
   primaryCTA: {
     label: 'Start Roofing Setup',
     path: '/start?industry=roofing',
