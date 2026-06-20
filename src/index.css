@@ -10,8 +10,8 @@
 
     /* ClientSurge Electric Blue Theme — unified to #00AEEF */
     --background: 210 100% 99%;
-    /* Refinement #8: Off-black foreground — eliminates harsh pure black */
-    --foreground: 220 60% 8%;
+    /* Pure black foreground — solid, sharp, zero fade */
+    --foreground: 0 0% 0%;
     --card: 210 60% 98%;
     --card-foreground: 220 80% 10%;
     --popover: 0 0% 100%;
@@ -206,6 +206,18 @@ body {
    ============================================ */
 section {
   box-sizing: border-box;
+}
+
+/* ============================================
+   GLOBAL TEXT RENDERING — Remove all fade effects
+   ============================================ */
+body, p, span, div, h1, h2, h3, h4, h5, h6, label, input, textarea, select, button, a {
+  -webkit-font-smoothing: subpixel-antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+  opacity: 1 !important;
+  letter-spacing: -0.02em;
 }
 
 /* ============================================
@@ -706,7 +718,7 @@ body::after {
 }
 
 /* ============================================
-    LUXURY TYPOGRAPHY SYSTEM — PREMIUM HIERARCHY
+   LUXURY TYPOGRAPHY SYSTEM — PREMIUM HIERARCHY
     Unified across all pages and components
     ============================================ */
 
@@ -715,7 +727,7 @@ body::after {
 .font-display,
 h1, h2, h3, h4, h5, h6 {
   font-family: 'Montserrat', sans-serif !important;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: subpixel-antialiased;
   -moz-osx-font-smoothing: grayscale;
   color: #000000 !important;
   -webkit-text-fill-color: #000000 !important;
@@ -723,11 +735,14 @@ h1, h2, h3, h4, h5, h6 {
   background-image: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
+  font-weight: 900 !important;
 }
 
 /* Pillar 1 Task 17 — Remove rogue text-shadows from body paragraphs */
 p, li, span, td, th {
   text-shadow: none;
+  color: #000000;
+  opacity: 1;
 }
 
 /* Pillar 1 Task 18 — Standardize form labels */
@@ -766,7 +781,9 @@ h1, h2, h3,
 /* Premium body text */
 body, p, span, div {
   font-family: 'Inter', system-ui, sans-serif;
-  -webkit-font-smoothing: antialiased;
+  -webkit-font-smoothing: subpixel-antialiased;
+  color: #000000;
+  opacity: 1;
 }
 
 /* ============================================
