@@ -1,0 +1,387 @@
+{
+  "name": "SaaSLaunchHardeningReport",
+  "type": "object",
+  "_metadata": {
+    "status": "GOVERNANCE_LAYER",
+    "reason": "Final SaaS launch hardening: single source-of-truth map, duplication identification, and launch readiness scoring. Consolidation reference only\u2014no data deletion.",
+    "immutable": false,
+    "tenant_scoped": "client_project_id (optional)"
+  },
+  "properties": {
+    "report_id": {
+      "type": "string",
+      "title": "Report ID",
+      "description": "Unique identifier for this hardening report"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Optional)",
+      "description": "If set, report is scoped to one client project; if empty, system-wide report"
+    },
+    "system_health_score": {
+      "type": "number",
+      "title": "System Health Score (0-100)",
+      "default": 0,
+      "description": "Overall system operational health"
+    },
+    "launch_readiness_score": {
+      "type": "number",
+      "title": "Launch Readiness Score (0-100)",
+      "default": 0,
+      "description": "Readiness for SaaS production launch"
+    },
+    "duplicate_systems_detected": {
+      "type": "array",
+      "title": "Duplicate Systems Detected",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of duplicate/redundant systems identified: Lead vs Leads, EmailCampaign vs EmailSequence vs NurtureCampaign vs EmailDripCampaign, ConversionOptimizationSignal vs GrowthOptimizationSignal vs AutoOptimizationRule, Events vs CommunicationEvent"
+    },
+    "deprecated_systems": {
+      "type": "array",
+      "title": "Deprecated Systems (Recommendations)",
+      "items": {
+        "type": "string"
+      },
+      "description": "Systems recommended for deprecation (NOT deleted): Lead (legacy), LeadAnalytics (legacy), EmailSequence (legacy), NurtureCampaign (legacy), EmailDripCampaign (legacy), Events (legacy)"
+    },
+    "canonical_truth_map": {
+      "type": "object",
+      "title": "Canonical Truth Map",
+      "description": "Single source-of-truth definition for each domain",
+      "properties": {
+        "leads": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "Leads"
+            },
+            "description": {
+              "type": "string",
+              "default": "All lead/contact records MUST use Leads entity. Legacy Lead entity is superseded."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. All create/update operations on lead data route through Leads. Lead entity remains for backward compatibility only."
+            }
+          }
+        },
+        "messaging": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "CommunicationEvent + EmailCampaign"
+            },
+            "description": {
+              "type": "string",
+              "default": "All communication logs and outbound campaigns MUST use CommunicationEvent (immutable event log) and EmailCampaign (campaign engine). Legacy EmailSequence, NurtureCampaign, EmailDripCampaign are deprecated."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. CommunicationEvent is the audit trail. EmailCampaign is the canonical campaign orchestrator."
+            }
+          }
+        },
+        "revenue": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "RevenueTracking"
+            },
+            "description": {
+              "type": "string",
+              "default": "All revenue attribution and conversion tracking MUST use RevenueTracking. Single source for revenue pipeline."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. RevenueTracking is the authoritative revenue ledger."
+            }
+          }
+        },
+        "onboarding": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "OnboardingOrchestration + ClientInstallationOS"
+            },
+            "description": {
+              "type": "string",
+              "default": "Onboarding state orchestration MUST use OnboardingOrchestration (unified stage state) and ClientInstallationOS (installation workflow)."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. OnboardingOrchestration is the single state-of-record. ClientInstallationOS manages the installation workflow."
+            }
+          }
+        },
+        "optimization": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "GrowthOptimizationSignal"
+            },
+            "description": {
+              "type": "string",
+              "default": "All growth optimization signals and recommendations MUST use GrowthOptimizationSignal. AutoOptimizationRule and ConversionOptimizationSignal are deprecated."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. GrowthOptimizationSignal is the canonical signal engine."
+            }
+          }
+        },
+        "analytics": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "ConversionFunnel + LandingPageAnalytics"
+            },
+            "description": {
+              "type": "string",
+              "default": "All conversion funnel and landing page analytics MUST use ConversionFunnel (funnel stage tracking) and LandingPageAnalytics (page-level metrics)."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. These entities form the analytics record layer."
+            }
+          }
+        },
+        "events": {
+          "type": "object",
+          "properties": {
+            "canonical_entity": {
+              "type": "string",
+              "default": "CommunicationEvent + EventQueue"
+            },
+            "description": {
+              "type": "string",
+              "default": "All event logging and queuing MUST use CommunicationEvent (immutable log) and EventQueue (processing queue). Legacy Events entity is deprecated."
+            },
+            "governance": {
+              "type": "string",
+              "default": "Mandatory. CommunicationEvent is the audit trail. EventQueue is the processing pipeline."
+            }
+          }
+        }
+      }
+    },
+    "event_system_status": {
+      "type": "string",
+      "title": "Event System Status",
+      "enum": [
+        "healthy",
+        "degraded",
+        "fragmented"
+      ],
+      "default": "healthy",
+      "description": "Health of event logging and queue processing (CommunicationEvent + EventQueue)"
+    },
+    "lead_system_status": {
+      "type": "string",
+      "title": "Lead System Status",
+      "enum": [
+        "healthy",
+        "fragmented",
+        "duplicated"
+      ],
+      "default": "healthy",
+      "description": "Health of lead/contact management (Leads canonical entity)"
+    },
+    "campaign_system_status": {
+      "type": "string",
+      "title": "Campaign System Status",
+      "enum": [
+        "healthy",
+        "fragmented"
+      ],
+      "default": "healthy",
+      "description": "Health of outbound campaign orchestration (EmailCampaign canonical)"
+    },
+    "optimization_system_status": {
+      "type": "string",
+      "title": "Optimization System Status",
+      "enum": [
+        "healthy",
+        "duplicated",
+        "stable"
+      ],
+      "default": "healthy",
+      "description": "Health of growth optimization signals (GrowthOptimizationSignal canonical)"
+    },
+    "revenue_system_status": {
+      "type": "string",
+      "title": "Revenue System Status",
+      "enum": [
+        "healthy",
+        "stable"
+      ],
+      "default": "healthy",
+      "description": "Health of revenue attribution (RevenueTracking canonical)"
+    },
+    "onboarding_system_status": {
+      "type": "string",
+      "title": "Onboarding System Status",
+      "enum": [
+        "healthy",
+        "stable"
+      ],
+      "default": "healthy",
+      "description": "Health of onboarding orchestration (OnboardingOrchestration + ClientInstallationOS)"
+    },
+    "control_plane_status": {
+      "type": "string",
+      "title": "Control Plane Status",
+      "enum": [
+        "healthy",
+        "partial",
+        "complete"
+      ],
+      "default": "healthy",
+      "description": "Readiness of launch gate control plane (LaunchExecutionState, LaunchChecklistEngine, etc.)"
+    },
+    "go_to_market_status": {
+      "type": "string",
+      "title": "Go-to-Market Status",
+      "enum": [
+        "healthy",
+        "partial",
+        "complete"
+      ],
+      "default": "healthy",
+      "description": "Readiness of GTM systems (landing pages, conversions, onboarding)"
+    },
+    "critical_risks": {
+      "type": "array",
+      "title": "Critical Risks Identified",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of critical blockers or risks preventing launch: duplication ambiguity, missing single source-of-truth, fragmented event pipeline, etc."
+    },
+    "recommended_consolidations": {
+      "type": "array",
+      "title": "Recommended Consolidations",
+      "items": {
+        "type": "string"
+      },
+      "description": "Recommended system consolidations (post-launch roadmap): merge EmailSequence into EmailCampaign, merge Events into CommunicationEvent, consolidate optimization signal rules, etc."
+    },
+    "single_source_of_truth_map": {
+      "type": "object",
+      "title": "Single Source of Truth Map",
+      "description": "Explicit mapping of system domains to canonical entities. Used for governance and launch readiness checks.",
+      "properties": {
+        "status": {
+          "type": "string",
+          "enum": [
+            "established",
+            "partial",
+            "needs_work"
+          ],
+          "default": "established"
+        },
+        "coverage_percent": {
+          "type": "number",
+          "default": 0,
+          "description": "Percentage of system domains with single source-of-truth defined"
+        },
+        "last_reviewed_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "launch_readiness_details": {
+      "type": "object",
+      "title": "Launch Readiness Details",
+      "description": "Breakdown of launch readiness score",
+      "properties": {
+        "event_system_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "lead_system_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "campaign_system_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "revenue_system_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "onboarding_system_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "control_plane_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "go_to_market_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "no_critical_risks": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "last_generated_at": {
+      "type": "string",
+      "title": "Last Generated At",
+      "format": "date-time",
+      "description": "When this report was last generated/updated"
+    },
+    "generated_by_function": {
+      "type": "string",
+      "title": "Generated By Function",
+      "description": "Backend function that generated this report (e.g., runLaunchHardeningAudit)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on hardening progress and launch readiness"
+    }
+  },
+  "required": [
+    "report_id",
+    "system_health_score",
+    "launch_readiness_score",
+    "canonical_truth_map",
+    "event_system_status",
+    "lead_system_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
