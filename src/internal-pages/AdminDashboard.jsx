@@ -62,7 +62,7 @@ const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueT
 const PlatformClientsPanel = lazy(() => import('../components/admin/PlatformClientsPanel'));
 const UnifiedOnboardingProgress = lazy(() => import('../components/admin/UnifiedOnboardingProgress'));
 const LeadDataQualityDashboard = lazy(() => import('../components/admin/LeadDataQualityDashboard'));
-const GTMStrategyPanel = lazy(() => import('../components/admin/GTMStrategyPanel'));
+const ProductionHardeningPanel = lazy(() => import('../components/admin/ProductionHardeningPanel'));
 
 function AdminPanelSkeleton() {
   return (
@@ -135,7 +135,7 @@ const NAV_GROUPS = [
     group: 'System Health',
     items: [
       { id: 'data-quality', label: 'Data Quality', icon: Activity },
-      { id: 'gtm-strategy', label: 'GTM Strategy', icon: Target },
+      { id: 'production-hardening', label: 'Production Safety', icon: ShieldCheck },
       { id: 'platform-clients', label: 'Platform Clients', icon: Users },
       { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
       { id: 'health', label: 'Integration Health', icon: Activity },
@@ -291,7 +291,7 @@ export default function AdminDashboard() {
       case 'revenue-tracking': return <LazyAdminPanel><RevenueTrackingDashboard /></LazyAdminPanel>;
       case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
       case 'data-quality': return <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>;
-      case 'gtm-strategy': return <LazyAdminPanel><GTMStrategyPanel /></LazyAdminPanel>;
+      case 'production-hardening': return <LazyAdminPanel><ProductionHardeningPanel /></LazyAdminPanel>;
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
