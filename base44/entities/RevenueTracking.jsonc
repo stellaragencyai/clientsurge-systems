@@ -1,0 +1,121 @@
+{
+  "name": "RevenueTracking",
+  "type": "object",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "funnel_identity_id": {
+      "type": "string",
+      "title": "Funnel Identity ID"
+    },
+    "revenue_amount": {
+      "type": "number",
+      "title": "Revenue Amount ($)"
+    },
+    "revenue_source": {
+      "type": "string",
+      "title": "Revenue Source",
+      "enum": [
+        "lead",
+        "outbound",
+        "campaign",
+        "referral",
+        "manual"
+      ]
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email",
+        "web",
+        "call",
+        "other"
+      ]
+    },
+    "campaign_id": {
+      "type": "string",
+      "title": "Campaign ID"
+    },
+    "automation_job_id": {
+      "type": "string",
+      "title": "Automation Job ID"
+    },
+    "conversion_date": {
+      "type": "string",
+      "title": "Conversion Date",
+      "format": "date-time"
+    },
+    "time_to_convert_hours": {
+      "type": "number",
+      "title": "Time to Convert (hours)"
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Confidence Score (0-100)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "lead_id",
+    "revenue_amount",
+    "conversion_date"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{orders.id}}"
+            ]
+          }
+        },
+        {
+          "data.lead_id": {
+            "$in": [
+              "{{leads.id}}"
+            ]
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

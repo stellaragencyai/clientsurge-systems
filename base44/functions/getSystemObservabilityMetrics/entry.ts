@@ -93,6 +93,67 @@ Deno.serve(async (req) => {
     .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
     .slice(0, 20);
 
+    // === SUGGESTIONS ===
+    const suggestions = [];
+
+    // 1. High-activity leads not yet contacted
+    const highActivityNotContacted = allLeads.filter(l => {
+      const score = l.intelligence_score || l.lead_score || 0;
+      const contacted = l.outreach_status === 'contacted' || l.outreach_status === 'replied';
+      return score >= 70 && !contacted;
+    });
+    if (highActivityNotContacted.length > 0) {
+      suggestions.push({
+        title: 'High-Activity Leads Waiting for Contact',
+        description: `${highActivityNotContacted.length} high-score leads haven't been contacted yet. Prioritize outreach.`,
+        priority: 'high',
+        category: 'Leads',
+      });
+    }
+
+    // 2. Recent activity spike
+    const recentLeadCount = leadsLast24h.length;
+    const avgDaily = allLeads.length > 30 ? allLeads.length / 30 : allLeads.length;
+    if (recentLeadCount > avgDaily * 1.5) {
+      suggestions.push({
+        title: 'Lead Volume Spike Detected',
+        description: `Unusual high volume in last 24h (${recentLeadCount} leads). Consider capacity review.`,
+        priority: 'medium',
+        category: 'System',
+      });
+    }
+
+    // 3. Messaging health issues
+    if (smsHealth > 15 || emailHealth > 15) {
+      const worstChannel = smsHealth > emailHealth ? `SMS (${smsHealth}%)` : `Email (${emailHealth}%)`;
+      suggestions.push({
+        title: 'High Failure Rate in Messaging',
+        description: `${worstChannel} showing elevated failure rates. Check provider health.`,
+        priority: 'high',
+        category: 'Messaging',
+      });
+    }
+
+    // 4. Automation queue backlog
+    if (queuedItems > 50) {
+      suggestions.push({
+        title: 'Automation Queue Building Up',
+        description: `${queuedItems} jobs queued. Processing may be slower than usual.`,
+        priority: 'medium',
+        category: 'Automation',
+      });
+    }
+
+    // 5. Success rate trend
+    if (successRate < 70 && totalJobs > 20) {
+      suggestions.push({
+        title: 'Low Automation Success Rate',
+        description: `Only ${successRate}% of jobs succeeded. Review error patterns.`,
+        priority: 'high',
+        category: 'Automation',
+      });
+    }
+
     return Response.json({
       timestamp: new Date().toISOString(),
       core_metrics: {
@@ -128,6 +189,7 @@ Deno.serve(async (req) => {
         },
       },
       activity_feed: activityFeed,
+      suggestions: suggestions.slice(0, 5),
     });
   } catch (error) {
     console.error('[getSystemObservabilityMetrics]', error);

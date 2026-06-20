@@ -3,6 +3,7 @@ import { Activity, AlertTriangle, CheckCircle2, Clock, Zap, TrendingUp } from 'l
 import { base44 } from '@/api/base44Client';
 import SystemNotesSection from './SystemNotesSection';
 import DecisionSupportLayer from './DecisionSupportLayer';
+import SuggestionsPanel from './SuggestionsPanel';
 
 function KPICard({ label, value, icon: Icon, color = 'text-blue-600' }) {
   return (
@@ -239,6 +240,9 @@ export default function SystemObservabilityDashboard() {
           </div>
         </div>
       )}
+
+      {/* SUGGESTIONS */}
+      {metrics?.suggestions && <SuggestionsPanel suggestions={metrics.suggestions} />}
 
       {/* DECISION SUPPORT LAYER */}
       {optimization_insights && <DecisionSupportLayer insights={optimization_insights} />}
