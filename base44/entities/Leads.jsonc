@@ -16,6 +16,11 @@
       "type": "string",
       "title": "Unified Funnel Identity"
     },
+    "canonical_lead_id": {
+      "type": "string",
+      "title": "Canonical Lead ID",
+      "description": "Unique identifier derived from email/phone/business_name for deduplication"
+    },
     "full_name": {
       "type": "string",
       "title": "Full Name"
@@ -163,6 +168,23 @@
         "Follow Up Later"
       ],
       "default": "Not Contacted"
+    },
+    "lead_state": {
+      "type": "string",
+      "title": "Lead Lifecycle State",
+      "enum": [
+        "NEW",
+        "UNQUALIFIED",
+        "QUALIFIED",
+        "ENGAGED",
+        "HOT",
+        "BOOKED",
+        "WON",
+        "LOST",
+        "DORMANT"
+      ],
+      "default": "NEW",
+      "description": "Canonical lifecycle state \u2014 every lead has exactly one"
     },
     "outreach_status": {
       "type": "string",
@@ -363,15 +385,23 @@
     },
     "normalized_email": {
       "type": "string",
-      "title": "Normalized Email"
+      "title": "Normalized Email",
+      "description": "Lowercase, trimmed email for deduplication"
     },
     "normalized_phone": {
       "type": "string",
-      "title": "Normalized Phone"
+      "title": "Normalized Phone",
+      "description": "Digits only, standardized phone for deduplication"
     },
     "normalized_business_name": {
       "type": "string",
-      "title": "Normalized Business Name"
+      "title": "Normalized Business Name",
+      "description": "Lowercase, trimmed business name for deduplication"
+    },
+    "normalized_domain": {
+      "type": "string",
+      "title": "Normalized Domain",
+      "description": "Domain extracted from email/website for deduplication"
     },
     "dedupe_key": {
       "type": "string",
@@ -506,6 +536,12 @@
       "title": "Recency Score (0-100)",
       "default": 0
     },
+    "engagement_score": {
+      "type": "number",
+      "title": "Engagement Score (0-100)",
+      "default": 0,
+      "description": "Derived from opens, clicks, replies"
+    },
     "segment_label": {
       "type": "string",
       "title": "Segment Label",
@@ -534,6 +570,44 @@
         "COLD"
       ],
       "description": "Auto-segmentation by Lead Intelligence Layer"
+    },
+    "segment": {
+      "type": "string",
+      "title": "Segment (from Intelligence Score)",
+      "enum": [
+        "HOT",
+        "HIGH_INTENT",
+        "ENGAGED",
+        "NURTURE",
+        "DORMANT",
+        "LOST"
+      ],
+      "description": "Derived from intelligence_score: 80-100=HOT, 65-79=HIGH_INTENT, 50-64=ENGAGED, 30-49=NURTURE, 1-29=DORMANT, 0=LOST"
+    },
+    "score_breakdown": {
+      "type": "object",
+      "title": "Score Breakdown",
+      "description": "Admin visibility into score components",
+      "properties": {
+        "engagement_component": {
+          "type": "number"
+        },
+        "intent_component": {
+          "type": "number"
+        },
+        "recency_component": {
+          "type": "number"
+        },
+        "stage_component": {
+          "type": "number"
+        },
+        "source_quality_component": {
+          "type": "number"
+        },
+        "website_presence_component": {
+          "type": "number"
+        }
+      }
     },
     "revenue_impact_estimate": {
       "type": "number",

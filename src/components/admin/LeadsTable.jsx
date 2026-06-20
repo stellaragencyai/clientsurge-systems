@@ -5,10 +5,24 @@ import { base44 } from "@/api/base44Client";
 const PAGE_SIZE = 25;
 
 // Lead score categories
-function getLeadScoreBadge(score) {
-  if (score >= 80) return { label: "Hot", color: "bg-red-100 text-red-800" };
-  if (score >= 50) return { label: "Warm", color: "bg-orange-100 text-orange-800" };
-  return { label: "Cold", color: "bg-blue-100 text-blue-800" };
+function getIntelligenceSegmentBadge(segment) {
+  const styles = {
+    HOT_LEADS: "bg-red-100 text-red-800",
+    HIGH_INTENT: "bg-orange-100 text-orange-800",
+    ENGAGED: "bg-cyan-100 text-cyan-800",
+    NURTURE: "bg-blue-100 text-blue-800",
+    DORMANT: "bg-gray-100 text-gray-800",
+    COLD: "bg-slate-100 text-slate-800",
+  };
+  const labels = {
+    HOT_LEADS: "Hot",
+    HIGH_INTENT: "High Intent",
+    ENGAGED: "Engaged",
+    NURTURE: "Nurture",
+    DORMANT: "Dormant",
+    COLD: "Cold",
+  };
+  return { label: labels[segment] || segment, color: styles[segment] || "bg-gray-100 text-gray-800" };
 }
 
 // Status badge styles
@@ -31,9 +45,12 @@ export default function LeadsTable() {
   const [search, setSearch] = useState("");
   const [filters, setFilters] = useState({
     status: "",
-    crm_stage: "",
+    lead_state: "",
+    intelligence_segment: "",
+    scoreMin: "",
+    scoreMax: "",
+    crm_tag: "",
     industry: "",
-    minScore: "",
   });
   const [sort, setSort] = useState({ field: "last_activity_at", order: -1 });
   const [totalCount, setTotalCount] = useState(0);
@@ -55,9 +72,16 @@ export default function LeadsTable() {
     }
 
     if (filters.status) f.status = filters.status;
-    if (filters.crm_stage) f.crm_stage = filters.crm_stage;
+    if (filters.lead_state) f.lead_state = filters.lead_state;
+    if (filters.intelligence_segment) f.intelligence_segment = filters.intelligence_segment;
+    if (filters.crm_tag) f.crm_tag = filters.crm_tag;
     if (filters.industry) f.industry = filters.industry;
-    if (filters.minScore) f.lead_score = { $gte: parseInt(filters.minScore) };
+    
+    if (filters.scoreMin || filters.scoreMax) {
+      f.intelligence_score = {};
+      if (filters.scoreMin) f.intelligence_score.$gte = parseInt(filters.scoreMin);
+      if (filters.scoreMax) f.intelligence_score.$lte = parseInt(filters.scoreMax);
+    }
 
     return f;
   }, [search, filters]);
@@ -100,7 +124,7 @@ export default function LeadsTable() {
 
         // Fetch with sort and pagination
         const sortKey =
-          sort.field === "lead_score" ? "lead_score" : "last_activity_at";
+          sort.field === "intelligence_score" ? "intelligence_score" : "last_activity_at";
         const sortValue = sort.order === 1 ? sortKey : `-${sortKey}`;
 
         const results = await base44.asServiceRole.entities.Leads.filter(
@@ -189,46 +213,75 @@ export default function LeadsTable() {
           />
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-2">
           <select
             value={filters.status}
             onChange={(e) => handleFilterChange("status", e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
-            <option value="">All Statuses</option>
+            <option value="">Status</option>
             <option value="New">New</option>
             <option value="Contacted">Contacted</option>
             <option value="Replied">Replied</option>
             <option value="Qualified">Qualified</option>
             <option value="Booked">Booked</option>
-            <option value="Closed">Closed</option>
           </select>
 
           <select
-            value={filters.crm_stage}
-            onChange={(e) => handleFilterChange("crm_stage", e.target.value)}
+            value={filters.lead_state}
+            onChange={(e) => handleFilterChange("lead_state", e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
-            <option value="">All CRM Stages</option>
-            <option value="Not Contacted">Not Contacted</option>
-            <option value="Contacted">Contacted</option>
-            <option value="Opened / Clicked">Opened / Clicked</option>
-            <option value="Replied">Replied</option>
-            <option value="Audit Booked">Audit Booked</option>
-            <option value="Proposal Sent">Proposal Sent</option>
-            <option value="Won">Won</option>
-            <option value="Lost">Lost</option>
+            <option value="">Lead State</option>
+            <option value="NEW">New</option>
+            <option value="QUALIFIED">Qualified</option>
+            <option value="ENGAGED">Engaged</option>
+            <option value="HOT">Hot</option>
+            <option value="BOOKED">Booked</option>
+            <option value="WON">Won</option>
+            <option value="DORMANT">Dormant</option>
           </select>
 
           <select
-            value={filters.minScore}
-            onChange={(e) => handleFilterChange("minScore", e.target.value)}
+            value={filters.intelligence_segment}
+            onChange={(e) => handleFilterChange("intelligence_segment", e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
-            <option value="">All Scores</option>
-            <option value="50">50+</option>
-            <option value="70">70+</option>
-            <option value="80">80+ (Hot)</option>
+            <option value="">Segment</option>
+            <option value="HOT_LEADS">Hot</option>
+            <option value="HIGH_INTENT">High Intent</option>
+            <option value="ENGAGED">Engaged</option>
+            <option value="NURTURE">Nurture</option>
+            <option value="DORMANT">Dormant</option>
+          </select>
+
+          <div className="flex gap-1.5">
+            <input
+              type="number"
+              placeholder="Score min"
+              min="0"
+              max="100"
+              value={filters.scoreMin}
+              onChange={(e) => handleFilterChange("scoreMin", e.target.value)}
+              className="flex-1 rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none hover:border-primary transition-colors"
+            />
+            <input
+              type="number"
+              placeholder="Score max"
+              min="0"
+              max="100"
+              value={filters.scoreMax}
+              onChange={(e) => handleFilterChange("scoreMax", e.target.value)}
+              className="flex-1 rounded-lg border border-border bg-background px-2 py-2 text-sm outline-none hover:border-primary transition-colors"
+            />
+          </div>
+
+          <select
+            value={filters.crm_tag}
+            onChange={(e) => handleFilterChange("crm_tag", e.target.value)}
+            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
+          >
+            <option value="">CRM Tag</option>
           </select>
 
           <select
@@ -236,7 +289,7 @@ export default function LeadsTable() {
             onChange={(e) => handleFilterChange("industry", e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           >
-            <option value="">All Industries</option>
+            <option value="">Industry</option>
             <option value="med-spa">Med Spa</option>
             <option value="dental">Dental</option>
             <option value="hvac">HVAC</option>
@@ -263,16 +316,16 @@ export default function LeadsTable() {
               <tr>
                 <th className="px-4 py-3 text-left font-semibold">Name</th>
                 <th className="px-4 py-3 text-left font-semibold">Business</th>
-                <th className="px-4 py-3 text-left font-semibold">Email / Phone</th>
+                <th className="px-4 py-3 text-left font-semibold">Contact</th>
                 <th className="px-4 py-3 text-left font-semibold">
                   <button
-                    onClick={() => handleSort("lead_score")}
+                    onClick={() => handleSort("intelligence_score")}
                     className="hover:text-primary transition-colors"
                   >
-                    Score {renderSortIcon("lead_score")}
+                    Intelligence {renderSortIcon("intelligence_score")}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left font-semibold">Status</th>
+                <th className="px-4 py-3 text-left font-semibold">State</th>
                 <th className="px-4 py-3 text-left font-semibold">
                   <button
                     onClick={() => handleSort("last_activity_at")}
@@ -309,17 +362,20 @@ export default function LeadsTable() {
                       {lead.phone && <div>{lead.phone}</div>}
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${
-                          getLeadScoreBadge(lead.lead_score).color
-                        }`}
-                      >
-                        {lead.lead_score || 0}
-                      </span>
+                      <div className="space-y-1">
+                        <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-800">
+                          {lead.intelligence_score || 0}
+                        </span>
+                        {lead.intelligence_segment && (
+                          <div className={`inline-flex items-center px-2 py-1 rounded-full text-xs font-semibold ${getIntelligenceSegmentBadge(lead.intelligence_segment).color}`}>
+                            {getIntelligenceSegmentBadge(lead.intelligence_segment).label}
+                          </div>
+                        )}
+                      </div>
                     </td>
                     <td className="px-4 py-3">
-                      <span className={`inline-flex px-2 py-1 rounded text-xs font-semibold ${getStatusBadge(lead.status)}`}>
-                        {lead.status || "New"}
+                      <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary">
+                        {lead.lead_state || "NEW"}
                       </span>
                     </td>
                     <td className="px-4 py-3 text-xs text-muted-foreground">
