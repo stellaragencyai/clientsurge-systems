@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, Clock, Zap } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import FullClientOperationsCommandCenter from './FullClientOperationsCommandCenter';
-import AssistedOperationsMode from './observability/AssistedOperationsMode';
+import AssistedOperationsMode from './AssistedOperationsMode';
 
 function MetricCard({ label, value, icon: Icon, subtext }) {
   return (

@@ -31,13 +31,13 @@
       "type": "string",
       "title": "Plan Type",
       "enum": [
-        "starter",
-        "growth",
-        "pro",
+        "starter_system",
+        "growth_system",
+        "pro_system",
         "enterprise",
         "trial"
       ],
-      "default": "starter"
+      "default": "starter_system"
     },
     "plan_status": {
       "type": "string",
@@ -101,6 +101,30 @@
         "advanced_analytics_enabled": {
           "type": "boolean",
           "default": false
+        },
+        "conversion_insights_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "funnel_optimization_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "command_center_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "assisted_operations_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "white_label_enabled": {
+          "type": "boolean",
+          "default": false
+        },
+        "api_access_enabled": {
+          "type": "boolean",
+          "default": false
         }
       }
     },
@@ -123,6 +147,10 @@
         "max_automations": {
           "type": "integer",
           "default": 5
+        },
+        "max_clients": {
+          "type": "integer",
+          "default": 1
         }
       }
     },
@@ -146,8 +174,43 @@
           "type": "integer",
           "default": 0
         },
+        "events_processed": {
+          "type": "integer",
+          "default": 0
+        },
         "period_start": {
           "type": "string"
+        }
+      }
+    },
+    "usage_all_time": {
+      "type": "object",
+      "title": "All-Time Usage Totals",
+      "description": "Cumulative usage across all time \u2014 informational only",
+      "properties": {
+        "leads_processed_count": {
+          "type": "integer",
+          "default": 0
+        },
+        "messages_sent_count": {
+          "type": "integer",
+          "default": 0
+        },
+        "automations_triggered_count": {
+          "type": "integer",
+          "default": 0
+        },
+        "event_volume_count": {
+          "type": "integer",
+          "default": 0
+        },
+        "emails_sent_count": {
+          "type": "integer",
+          "default": 0
+        },
+        "sms_sent_count": {
+          "type": "integer",
+          "default": 0
         }
       }
     },
@@ -227,6 +290,42 @@
         }
       }
     },
+    "white_label": {
+      "type": "object",
+      "title": "White-Label Branding",
+      "description": "Optional branding overrides for white-label support",
+      "properties": {
+        "brand_name_override": {
+          "type": "string",
+          "title": "Brand Name Override"
+        },
+        "logo_url_override": {
+          "type": "string",
+          "title": "Logo URL Override"
+        },
+        "primary_color": {
+          "type": "string",
+          "title": "Primary Color (hex)",
+          "description": "e.g. #00AEEF"
+        },
+        "secondary_color": {
+          "type": "string",
+          "title": "Secondary Color (hex)"
+        },
+        "favicon_url": {
+          "type": "string",
+          "title": "Favicon URL"
+        },
+        "support_email_override": {
+          "type": "string",
+          "title": "Support Email Override"
+        },
+        "portal_domain": {
+          "type": "string",
+          "title": "Custom Portal Domain"
+        }
+      }
+    },
     "workspace_status": {
       "type": "string",
       "title": "Workspace Status",
@@ -268,6 +367,17 @@
         "high"
       ],
       "default": "low"
+    },
+    "platform_role": {
+      "type": "string",
+      "title": "Platform Role",
+      "enum": [
+        "platform_admin",
+        "client_admin",
+        "viewer"
+      ],
+      "default": "client_admin",
+      "description": "Controls access scope: platform_admin has global access, client_admin is scoped to own workspace"
     },
     "notes": {
       "type": "string",

@@ -60,6 +60,7 @@ const LeadSourceAttribution = lazy(() => import('../components/admin/LeadSourceA
 const RevenueDashboard = lazy(() => import('../components/admin/RevenueDashboard'));
 const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueTrackingDashboard'));
 const PlatformClientsPanel = lazy(() => import('../components/admin/PlatformClientsPanel'));
+const SaaSPlanManagerPanel = lazy(() => import('../components/admin/SaaSPlanManagerPanel'));
 const UnifiedOnboardingProgress = lazy(() => import('../components/admin/UnifiedOnboardingProgress'));
 const LeadDataQualityDashboard = lazy(() => import('../components/admin/LeadDataQualityDashboard'));
 const AutomationEdgeCasePanel = lazy(() => import('../components/admin/AutomationEdgeCasePanel'));
@@ -133,6 +134,7 @@ const NAV_GROUPS = [
       { id: 'data-quality', label: '✓ Data Quality', icon: Activity },
       { id: 'edge-case-stability', label: '🛡️ Automation Stability', icon: ShieldCheck },
       { id: 'platform-clients', label: '🏢 Platform Clients', icon: Users },
+      { id: 'saas-plans', label: '💎 SaaS Plan Manager', icon: DollarSign },
       { id: 'sniper', label: '🎯 Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
       { id: 'performance-wars', label: '🏆 Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
@@ -282,6 +284,7 @@ export default function AdminDashboard() {
       case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
       case 'data-quality': return <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>;
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
+      case 'saas-plans': return <LazyAdminPanel><SaaSPlanManagerPanel /></LazyAdminPanel>;
       case 'edge-case-stability': return <LazyAdminPanel><AutomationEdgeCasePanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
