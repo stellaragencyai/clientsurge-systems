@@ -1,0 +1,215 @@
+{
+  "name": "AcquisitionCampaign",
+  "type": "object",
+  "_metadata": {
+    "status": "GTM_ORCHESTRATION_LAYER",
+    "reason": "Tracks acquisition campaigns across channels: landing pages, outbound, email, ads, retargeting. Read-only integration with ConversionTrackingEvent, LandingPageAnalytics, RevenueTracking.",
+    "tenant_scoped": "gtm_id"
+  },
+  "properties": {
+    "campaign_id": {
+      "type": "string",
+      "title": "Campaign ID",
+      "description": "Unique identifier for this acquisition campaign"
+    },
+    "gtm_id": {
+      "type": "string",
+      "title": "GTM Engine ID",
+      "description": "Reference to parent GTMLaunchEngine"
+    },
+    "campaign_type": {
+      "type": "string",
+      "title": "Campaign Type",
+      "enum": [
+        "landing_page",
+        "outbound",
+        "email",
+        "ads",
+        "retargeting",
+        "organic",
+        "referral"
+      ],
+      "description": "Acquisition channel type"
+    },
+    "campaign_name": {
+      "type": "string",
+      "title": "Campaign Name",
+      "description": "Human-readable campaign identifier (e.g., 'Roofing Storm Response Q2')"
+    },
+    "industry_target": {
+      "type": "string",
+      "title": "Industry Target",
+      "description": "Target industry vertical (e.g., roofing, hvac, dental)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Campaign Status",
+      "enum": [
+        "draft",
+        "active",
+        "paused",
+        "completed",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Current campaign state"
+    },
+    "landing_page_url": {
+      "type": "string",
+      "title": "Landing Page URL",
+      "description": "Primary landing page for this campaign"
+    },
+    "pricing_page_url": {
+      "type": "string",
+      "title": "Pricing Page URL",
+      "description": "Pricing page destination (optional)"
+    },
+    "expected_conversion_rate": {
+      "type": "number",
+      "title": "Expected Conversion Rate (%)",
+      "default": 0,
+      "description": "Targeted/benchmarked conversion rate"
+    },
+    "actual_conversion_rate": {
+      "type": "number",
+      "title": "Actual Conversion Rate (%)",
+      "default": 0,
+      "description": "Measured conversion rate to date"
+    },
+    "traffic_generated": {
+      "type": "integer",
+      "title": "Traffic Generated",
+      "default": 0,
+      "description": "Total sessions/visits from this campaign"
+    },
+    "leads_generated": {
+      "type": "integer",
+      "title": "Leads Generated",
+      "default": 0,
+      "description": "Total leads captured by this campaign"
+    },
+    "revenue_attributed": {
+      "type": "number",
+      "title": "Revenue Attributed ($)",
+      "default": 0,
+      "description": "Total revenue traced back to this campaign"
+    },
+    "cost": {
+      "type": "number",
+      "title": "Campaign Cost ($)",
+      "default": 0,
+      "description": "Media spend or acquisition cost for this campaign"
+    },
+    "roi": {
+      "type": "number",
+      "title": "ROI (%)",
+      "default": 0,
+      "description": "Return on investment: (revenue_attributed - cost) / cost * 100"
+    },
+    "cpc": {
+      "type": "number",
+      "title": "Cost Per Click ($)",
+      "default": 0,
+      "description": "Average cost per click"
+    },
+    "cpl": {
+      "type": "number",
+      "title": "Cost Per Lead ($)",
+      "default": 0,
+      "description": "Average cost per lead acquired"
+    },
+    "cpa": {
+      "type": "number",
+      "title": "Cost Per Acquisition ($)",
+      "default": 0,
+      "description": "Average cost per customer acquired"
+    },
+    "bounce_rate": {
+      "type": "number",
+      "title": "Bounce Rate (%)",
+      "default": 0,
+      "description": "Landing page bounce rate percentage"
+    },
+    "avg_time_on_page": {
+      "type": "number",
+      "title": "Avg Time on Page (sec)",
+      "default": 0,
+      "description": "Average session duration on landing page"
+    },
+    "scroll_completion_rate": {
+      "type": "number",
+      "title": "Scroll Completion Rate (%)",
+      "default": 0,
+      "description": "Percentage of users scrolling to bottom of page"
+    },
+    "start_date": {
+      "type": "string",
+      "title": "Campaign Start Date",
+      "format": "date",
+      "description": "When this campaign launched"
+    },
+    "end_date": {
+      "type": "string",
+      "title": "Campaign End Date",
+      "format": "date",
+      "description": "When this campaign ended (if completed/archived)"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time",
+      "description": "When this campaign record was created"
+    },
+    "last_activity_at": {
+      "type": "string",
+      "title": "Last Activity At",
+      "format": "date-time",
+      "description": "Last time metrics were updated for this campaign"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Campaign Notes",
+      "description": "Admin notes on campaign performance, changes, or insights"
+    }
+  },
+  "required": [
+    "campaign_id",
+    "gtm_id",
+    "campaign_type",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

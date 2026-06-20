@@ -1,0 +1,168 @@
+{
+  "name": "GTMLaunchEngine",
+  "type": "object",
+  "_metadata": {
+    "status": "GTM_ORCHESTRATION_LAYER",
+    "reason": "Central tracking for acquisition performance, funnel health, and revenue attribution across campaigns and industries.",
+    "tenant_scoped": "client_project_id"
+  },
+  "properties": {
+    "gtm_id": {
+      "type": "string",
+      "title": "GTM Engine ID",
+      "description": "Unique identifier for this GTM orchestration instance"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID",
+      "description": "Associated client project for scoped analysis"
+    },
+    "status": {
+      "type": "string",
+      "title": "GTM Status",
+      "enum": [
+        "draft",
+        "active",
+        "scaling",
+        "paused"
+      ],
+      "default": "draft",
+      "description": "Current state of GTM initiative"
+    },
+    "primary_industry": {
+      "type": "string",
+      "title": "Primary Industry Target",
+      "description": "Main industry vertical being targeted (e.g., roofing, hvac, dental)"
+    },
+    "traffic_sources": {
+      "type": "array",
+      "title": "Traffic Sources",
+      "items": {
+        "type": "string"
+      },
+      "description": "Acquisition channels: organic, paid, outbound, referral, email, direct",
+      "default": []
+    },
+    "funnel_stage_bottleneck": {
+      "type": "string",
+      "title": "Primary Funnel Bottleneck",
+      "enum": [
+        "traffic",
+        "landing_page",
+        "pricing",
+        "checkout",
+        "onboarding",
+        "none"
+      ],
+      "default": "traffic",
+      "description": "Identified stage with highest drop-off or friction"
+    },
+    "conversion_rate": {
+      "type": "number",
+      "title": "Overall Conversion Rate (%)",
+      "default": 0,
+      "description": "Traffic to customer conversion percentage"
+    },
+    "revenue_per_lead": {
+      "type": "number",
+      "title": "Revenue Per Lead ($)",
+      "default": 0,
+      "description": "Average revenue generated per lead acquired"
+    },
+    "funnel_score": {
+      "type": "number",
+      "title": "Funnel Health Score (0-100)",
+      "default": 0,
+      "description": "Overall funnel performance and conversion health"
+    },
+    "active_campaigns_count": {
+      "type": "integer",
+      "title": "Active Campaigns Count",
+      "default": 0,
+      "description": "Number of active acquisition campaigns"
+    },
+    "total_traffic_this_month": {
+      "type": "integer",
+      "title": "Total Traffic This Month",
+      "default": 0,
+      "description": "Sessions and visitor count across all campaigns"
+    },
+    "total_conversions_this_month": {
+      "type": "integer",
+      "title": "Total Conversions This Month",
+      "default": 0,
+      "description": "Leads and customers acquired this period"
+    },
+    "attributed_revenue_this_month": {
+      "type": "number",
+      "title": "Attributed Revenue This Month ($)",
+      "default": 0,
+      "description": "Revenue traced back to GTM campaigns"
+    },
+    "last_optimization_at": {
+      "type": "string",
+      "title": "Last Optimization At",
+      "format": "date-time",
+      "description": "When GTM was last analyzed and optimized"
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time",
+      "description": "When GTM metrics were last refreshed"
+    },
+    "notes": {
+      "type": "string",
+      "title": "GTM Strategy Notes",
+      "description": "Admin notes on overall GTM strategy and direction"
+    }
+  },
+  "required": [
+    "gtm_id",
+    "client_project_id",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
