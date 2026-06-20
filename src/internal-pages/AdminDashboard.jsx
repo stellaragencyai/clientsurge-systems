@@ -13,6 +13,8 @@ import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipeli
 import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadsTable from '../components/admin/LeadsTable';
+import LeadIntelligenceDashboard from '../components/admin/LeadIntelligenceDashboard';
+import LeadIntelligenceMiniPanel from '../components/admin/LeadIntelligenceMiniPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import CrmHealthDashboard from '../components/admin/CrmHealthDashboard';
 import LaunchGatesPanel from '../components/admin/LaunchGatesPanel';
@@ -80,6 +82,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
       { id: 'leads', label: 'Leads', icon: Users },
+      { id: 'lead-intelligence', label: '🧠 Lead Intelligence', icon: Flame },
       { id: 'crm-health', label: 'CRM Health', icon: ShieldCheck },
       { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
@@ -240,6 +243,7 @@ export default function AdminDashboard() {
   const renderContent = () => {
     switch (activeTab) {
       case 'leads': return <LeadsTable />;
+      case 'lead-intelligence': return <LeadIntelligenceDashboard />;
       case 'crm-health': return <CrmHealthDashboard />;
       case 'launch-gates': return <LaunchGatesPanel />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
@@ -480,6 +484,9 @@ function OverviewDashboard({ onNavigate }) {
   return (
     <div className="space-y-8">
       <AdminAICommandBar />
+
+      {/* Intelligence Quick KPIs */}
+      <LeadIntelligenceMiniPanel onNavigate={onNavigate} />
 
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
