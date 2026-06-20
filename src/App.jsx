@@ -463,7 +463,7 @@ const AuthenticatedAppWithTenant = () => {
         {[
           { route: routePath("dashboard"), Component: AdminDashboard },
           { route: routePath("admin-settings"), Component: AdminDashboard },
-          { route: routePath("mission-control"), Component: MissionControlDashboard },
+          { route: routePath("mission-control"), element: <Navigate to="/admin" replace /> },
           { route: routePath("admin"), Component: AdminDashboard },
           { route: routePath("admin", "leads"), element: <Navigate to={`${routePath("admin")}?tab=leads`} replace /> },
           { route: routePath("admin", "leads", dynamicParam("leadId")), Component: AdminLeadDetail },
