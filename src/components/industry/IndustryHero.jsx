@@ -30,7 +30,7 @@ export default function IndustryHero({
   const navigate = useNavigate();
 
   // Determine if this hero uses cinematic wallpaper (roofing and future hero-image industries)
-  const useCinematicHero = backgroundImage && ['roofing'].includes(industryKey);
+  const useCinematicHero = backgroundImage && industryKey && ['roofing'].includes(industryKey.toLowerCase());
 
   if (useCinematicHero) {
     return (
@@ -40,7 +40,6 @@ export default function IndustryHero({
           backgroundImage: `url("${backgroundImage}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
         }}
       >
         {/* Dark gradient overlay — strongest at bottom and slight left */}
