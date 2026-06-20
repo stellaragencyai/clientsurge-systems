@@ -2,14 +2,12 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getIndustryBySlug } from '@/data/industryMarketingConfig';
 import { getPlanFeatures } from '@/lib/saasProductizationConfig';
-import { base44 } from '@/api/base44Client';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
 import { ArrowRight, CheckCircle, TrendingUp, Zap } from 'lucide-react';
 
-// Fallback hero image URL
-const FALLBACK_HERO_IMAGE = 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=1600&h=900&fit=crop';
+const ROOFING_HERO_IMAGE = 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/e92b5f56c_watermarked_img_13975777732204341720.jpg';
 
 // Roofing-specific hero configuration
 const ROOFING_HERO_CONFIG = {
@@ -36,7 +34,7 @@ export default function IndustryPageTemplate() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [industry, setIndustry] = useState(null);
-  const [heroImageUrl, setHeroImageUrl] = useState(FALLBACK_HERO_IMAGE);
+  const [heroImageUrl, setHeroImageUrl] = useState(ROOFING_HERO_IMAGE);
 
   useEffect(() => {
     const data = getIndustryBySlug(slug);
@@ -48,22 +46,7 @@ export default function IndustryPageTemplate() {
     }
   }, [slug, navigate]);
 
-  // Fetch roofing hero image from Google Drive on mount
-  useEffect(() => {
-    if (slug === 'roofing') {
-      base44.functions
-        .invoke('syncRoofingHeroImageFromGoogleDrive', {})
-        .then((res) => {
-          if (res?.data?.imageUrl) {
-            setHeroImageUrl(res.data.imageUrl);
-          }
-        })
-        .catch((err) => {
-          console.warn('Failed to sync Google Drive image, using fallback:', err);
-          setHeroImageUrl(FALLBACK_HERO_IMAGE);
-        });
-    }
-  }, [slug]);
+
 
   if (!industry) return null;
 
