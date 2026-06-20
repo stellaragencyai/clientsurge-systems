@@ -164,8 +164,10 @@ async function sendViaResend(fromEmail, toEmail, subject, html) {
 }
 
 function getEnvironment() {
-  const hostname = Deno.env.get('DENO_ENVIRONMENT') || 'production';
-  if (hostname?.includes('smoke') || hostname?.includes('test')) return 'smoke';
-  if (hostname?.includes('staging')) return 'qa';
+  try {
+    const hostname = Deno.env.get('APP_URL') || '';
+    if (hostname?.includes('smoke') || hostname?.includes('test')) return 'smoke';
+    if (hostname?.includes('staging')) return 'qa';
+  } catch {}
   return 'production';
 }

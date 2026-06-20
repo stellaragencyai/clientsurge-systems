@@ -45,6 +45,7 @@ import AdminFailedJobsPanel from '../components/admin/AdminFailedJobsPanel';
 import AuditLogPanel from '../components/admin/AuditLogPanel';
 import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
 import TwilioRuntimeHealth from '../components/admin/TwilioRuntimeHealth';
+import InstantLeadResponseDebugPanel from '../components/admin/InstantLeadResponseDebugPanel';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
@@ -62,7 +63,6 @@ const RevenueTrackingDashboard = lazy(() => import('../components/admin/RevenueT
 const PlatformClientsPanel = lazy(() => import('../components/admin/PlatformClientsPanel'));
 const UnifiedOnboardingProgress = lazy(() => import('../components/admin/UnifiedOnboardingProgress'));
 const LeadDataQualityDashboard = lazy(() => import('../components/admin/LeadDataQualityDashboard'));
-const ProductionHardeningPanel = lazy(() => import('../components/admin/ProductionHardeningPanel'));
 
 function AdminPanelSkeleton() {
   return (
@@ -118,8 +118,9 @@ const NAV_GROUPS = [
       { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
       { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
-    ],
-  },
+      { id: 'instant-response', label: 'Instant Response', icon: Send },
+      ],
+      },
   {
     group: 'Revenue & Funnels',
     items: [
@@ -135,7 +136,6 @@ const NAV_GROUPS = [
     group: 'System Health',
     items: [
       { id: 'data-quality', label: 'Data Quality', icon: Activity },
-      { id: 'production-hardening', label: 'Production Safety', icon: ShieldCheck },
       { id: 'platform-clients', label: 'Platform Clients', icon: Users },
       { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
       { id: 'health', label: 'Integration Health', icon: Activity },
@@ -291,7 +291,6 @@ export default function AdminDashboard() {
       case 'revenue-tracking': return <LazyAdminPanel><RevenueTrackingDashboard /></LazyAdminPanel>;
       case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
       case 'data-quality': return <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>;
-      case 'production-hardening': return <LazyAdminPanel><ProductionHardeningPanel /></LazyAdminPanel>;
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
@@ -300,6 +299,7 @@ export default function AdminDashboard() {
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'failed-jobs': return <AdminFailedJobsPanel />;
+      case 'instant-response': return <InstantLeadResponseDebugPanel />;
       case 'audit-log': return <AuditLogPanel />;
       case 'cadence': return <DynamicCadencePanel />;
       case 'reactivation': return <LeadReactivationPanel />;

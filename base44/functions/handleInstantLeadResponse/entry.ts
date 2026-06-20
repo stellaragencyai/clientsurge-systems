@@ -2,68 +2,95 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
 /**
  * INSTANT LEAD RESPONSE ORCHESTRATOR
- * Triggered on WebsiteLead or Leads creation.
- * Creates AutomationJob records for instant_sms and confirmation_email if automation_enabled.
+ * Triggered on WebsiteLead creation via entity automation.
+ * Also callable directly with { lead_id, lead_type }.
+ * Creates AutomationJob records for instant_sms and confirmation_email.
+ * Idempotent — skips if jobs already exist for this lead.
  */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { lead_id, lead_type, client_id, client_project_id } = await req.json();
+    const body = await req.json();
 
-    if (!lead_id || !lead_type) {
-      return Response.json({ error: 'Missing lead_id or lead_type' }, { status: 400 });
+    // Support both entity automation format (event.entity_id) and direct call format
+    const isEntityAutomation = body?.event?.type === 'create';
+    const lead_id = isEntityAutomation ? body.event.entity_id : body.lead_id;
+    const lead_type = isEntityAutomation ? (body.event.entity_name || 'WebsiteLead') : (body.lead_type || 'WebsiteLead');
+
+    if (!lead_id) {
+      return Response.json({ error: 'No lead_id found in payload' }, { status: 400 });
     }
 
-    // 1. Fetch the lead record
+    // 1. Idempotency check — don't double-create jobs for same lead
+    const existingJobs = await base44.asServiceRole.entities.AutomationJob.filter(
+      { lead_id },
+      '-created_at',
+      5
+    ).catch(() => []);
+
+    if (existingJobs?.length > 0) {
+      const existingTypes = new Set(existingJobs.map(j => j.job_type));
+      console.log(`[handleInstantLeadResponse] Jobs already exist for lead ${lead_id}:`, [...existingTypes]);
+    }
+
+    // 2. Fetch the lead record
     const lead = await (lead_type === 'WebsiteLead'
       ? base44.asServiceRole.entities.WebsiteLead.get(lead_id)
       : base44.asServiceRole.entities.Leads.get(lead_id)
     );
 
     if (!lead) {
-      return Response.json({ error: 'Lead not found' }, { status: 404 });
+      return Response.json({ error: 'Lead not found', lead_id }, { status: 404 });
     }
 
-    // Check automation_enabled (defaults to true if not set)
+    // Skip if automation disabled
     if (lead.automation_enabled === false) {
-      console.log(`[handleInstantLeadResponse] Automation disabled for lead ${lead_id}`);
-      return Response.json({ skipped: true, reason: 'automation_disabled' });
+      return Response.json({ skipped: true, reason: 'automation_disabled', lead_id });
     }
 
-    // 2. Log workflow_triggered
+    // Skip smoke/QA data — check for test markers
+    if (isTestLead(lead)) {
+      console.log(`[handleInstantLeadResponse] Skipping test/smoke lead ${lead_id}`);
+      return Response.json({ skipped: true, reason: 'test_lead', lead_id });
+    }
+
+    // 3. Log workflow_triggered
     const workflowEvent = await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id,
-      client_id: client_id || lead.client_id,
-      client_project_id: client_project_id || lead.client_project_id,
+      client_id: lead.client_id,
+      client_project_id: lead.client_project_id,
       channel: 'internal',
       direction: 'system',
       event_type: 'workflow_triggered',
       provider: 'internal',
       status: 'processed',
-      subject: `Instant lead response workflow triggered for ${lead_type} ${lead_id}`,
+      subject: `Instant lead response workflow triggered`,
       message_body: JSON.stringify({ lead_id, lead_type, email: lead.email, phone: lead.phone_number }),
-      environment: getEnvironment(),
+      environment: 'production',
+      dashboard_excluded: false,
+      dashboard_truth_status: 'trusted',
+    }).catch(err => {
+      console.warn('[handleInstantLeadResponse] Failed to log workflow event:', err.message);
+      return null;
     });
 
-    // 3. Get admin settings for enabled channels
-    const settings = await base44.asServiceRole.entities.AdminSettings.list().then(s => s?.[0]);
-    const smsEnabled = settings?.sms_enabled || settings?.twilio_enabled;
-    const emailEnabled = settings?.email_confirmation_template && settings?.resend_enabled;
+    // 4. Get admin settings
+    const settings = await base44.asServiceRole.entities.AdminSettings.list().then(s => s?.[0]).catch(() => null);
 
     const jobs = [];
+    const existing = new Set((existingJobs || []).map(j => j.job_type));
 
-    // 4. Create instant_sms job if SMS is enabled and lead has phone
-    if (smsEnabled && lead.phone_number) {
+    // 5. Create instant_sms job if not already created
+    if (!existing.has('instant_sms') && settings?.twilio_enabled && lead.phone_number) {
       const smsJob = await base44.asServiceRole.entities.AutomationJob.create({
         lead_id,
         lead_type,
-        client_id: client_id || lead.client_id,
-        client_project_id: client_project_id || lead.client_project_id,
+        client_id: lead.client_id,
+        client_project_id: lead.client_project_id,
         job_type: 'instant_sms',
         status: 'queued',
         channel: 'sms',
         recipient_phone: lead.phone_number,
-        recipient_email: null,
         template_key: 'instant_lead_response',
         retry_count: 0,
         max_retries: 3,
@@ -76,19 +103,22 @@ Deno.serve(async (req) => {
         }),
       });
       jobs.push(smsJob);
+    } else if (!settings?.twilio_enabled) {
+      console.warn('[handleInstantLeadResponse] Twilio not enabled — skipping SMS job');
+    } else if (!lead.phone_number) {
+      console.warn('[handleInstantLeadResponse] No phone number on lead — skipping SMS job');
     }
 
-    // 5. Create confirmation_email job if email is enabled and lead has email
-    if (emailEnabled && lead.email) {
+    // 6. Create confirmation_email job if not already created
+    if (!existing.has('confirmation_email') && settings?.resend_enabled && lead.email) {
       const emailJob = await base44.asServiceRole.entities.AutomationJob.create({
         lead_id,
         lead_type,
-        client_id: client_id || lead.client_id,
-        client_project_id: client_project_id || lead.client_project_id,
+        client_id: lead.client_id,
+        client_project_id: lead.client_project_id,
         job_type: 'confirmation_email',
         status: 'queued',
         channel: 'email',
-        recipient_phone: null,
         recipient_email: lead.email,
         template_key: 'confirmation_email',
         retry_count: 0,
@@ -102,9 +132,13 @@ Deno.serve(async (req) => {
         }),
       });
       jobs.push(emailJob);
+    } else if (!settings?.resend_enabled) {
+      console.warn('[handleInstantLeadResponse] Resend not enabled — skipping email job');
+    } else if (!lead.email) {
+      console.warn('[handleInstantLeadResponse] No email on lead — skipping email job');
     }
 
-    // 6. Add jobs to EventQueue for processing
+    // 7. Queue each job in EventQueue
     for (const job of jobs) {
       await base44.asServiceRole.entities.EventQueue.create({
         lead_id,
@@ -113,7 +147,7 @@ Deno.serve(async (req) => {
         source: 'instant_lead_response',
         payload_json: JSON.stringify({ job_id: job.id, job_type: job.job_type }),
         created_at: new Date().toISOString(),
-      });
+      }).catch(err => console.warn('EventQueue create failed:', err.message));
     }
 
     return Response.json({
@@ -121,9 +155,10 @@ Deno.serve(async (req) => {
       lead_id,
       lead_type,
       jobs_created: jobs.length,
-      sms_job: jobs.find(j => j.job_type === 'instant_sms')?.id,
-      email_job: jobs.find(j => j.job_type === 'confirmation_email')?.id,
-      workflow_event_id: workflowEvent.id,
+      sms_job_id: jobs.find(j => j.job_type === 'instant_sms')?.id,
+      email_job_id: jobs.find(j => j.job_type === 'confirmation_email')?.id,
+      workflow_event_id: workflowEvent?.id,
+      skipped_existing: [...existing],
     });
   } catch (error) {
     console.error('[handleInstantLeadResponse]', error);
@@ -131,9 +166,11 @@ Deno.serve(async (req) => {
   }
 });
 
-function getEnvironment() {
-  const hostname = Deno.env.get('DENO_ENVIRONMENT') || 'production';
-  if (hostname?.includes('smoke') || hostname?.includes('test')) return 'smoke';
-  if (hostname?.includes('staging')) return 'qa';
-  return 'production';
+function isTestLead(lead) {
+  const testMarkers = ['test', 'smoke', 'qa', 'demo', 'staging'];
+  const emailDomain = (lead.email || '').split('@')[1] || '';
+  const businessName = (lead.business_name || '').toLowerCase();
+  return testMarkers.some(m =>
+    emailDomain.includes(m) || businessName.includes(m)
+  );
 }

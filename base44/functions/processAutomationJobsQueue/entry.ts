@@ -33,18 +33,21 @@ Deno.serve(async (req) => {
           processing_at: new Date().toISOString(),
         });
 
+        // Derive channel safely (older queued jobs may not have it stored)
+        const channel = job.channel || (job.job_type === 'instant_sms' ? 'sms' : 'email');
+
         // 2. Log runtime_attempt_started
         await base44.asServiceRole.entities.CommunicationEvent.create({
           lead_id: job.lead_id,
           client_id: job.client_id,
           client_project_id: job.client_project_id,
-          channel: job.channel,
+          channel,
           direction: 'outbound',
           event_type: 'runtime_attempt_started',
-          provider: job.channel === 'sms' ? 'twilio' : 'resend',
+          provider: channel === 'sms' ? 'twilio' : 'resend',
           status: 'pending',
           subject: `Executing ${job.job_type}`,
-          message_body: job.context_json,
+          message_body: job.context_json || '',
           environment: getEnvironment(),
         });
 
@@ -173,9 +176,11 @@ async function executeConfirmationEmail(base44, job) {
 }
 
 function getEnvironment() {
-  const hostname = Deno.env.get('DENO_ENVIRONMENT') || 'production';
-  if (hostname?.includes('smoke') || hostname?.includes('test')) return 'smoke';
-  if (hostname?.includes('staging')) return 'qa';
+  try {
+    const hostname = Deno.env.get('APP_URL') || '';
+    if (hostname?.includes('smoke') || hostname?.includes('test')) return 'smoke';
+    if (hostname?.includes('staging')) return 'qa';
+  } catch {}
   return 'production';
 }
 
