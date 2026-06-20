@@ -1,0 +1,118 @@
+import React, { useState, useEffect } from 'react';
+import { TrendingUp, MessageSquare, Zap, Target, DollarSign, Loader2 } from 'lucide-react';
+import { base44 } from '@/api/base44Client';
+import MissionControlMetricsCard from './MissionControlMetricsCard';
+import SalesPipelineVisual from './SalesPipelineVisual';
+import LiveActivityStream from './LiveActivityStream';
+
+export default function MissionControlDashboard({ onNavigate }) {
+  const [metrics, setMetrics] = useState({
+    total_leads: 0,
+    active_automations: 0,
+    messages_sent: 0,
+    bookings: 0,
+    revenue_impact: 0,
+  });
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadMetrics = async () => {
+      try {
+        const [leads, automations, events, conversions] = await Promise.all([
+          base44.asServiceRole.entities.Leads.filter({}, 'id', 1),
+          base44.asServiceRole.entities.AutomationRule.filter({ status: 'active' }, 'id', 1),
+          base44.asServiceRole.entities.CommunicationEvent.filter({}, 'id', 1),
+          base44.asServiceRole.entities.ConversionFunnel.filter({}, '-created_date', 1),
+        ]);
+
+        setMetrics({
+          total_leads: (leads || []).length,
+          active_automations: (automations || []).length,
+          messages_sent: (events || []).length,
+          bookings: conversions?.[0]?.funnel_stages?.find(s => s.stage_name === 'booked')?.total_count || 0,
+          revenue_impact: conversions?.[0]?.total_revenue_attributed || 0,
+        });
+      } catch (e) {
+        console.error('Failed to load metrics:', e);
+      } finally {
+        setLoading(false);
+      }
+    };
+    loadMetrics();
+  }, []);
+
+  const metricCards = [
+    {
+      id: 'leads',
+      label: 'Total Leads',
+      value: metrics.total_leads,
+      icon: TrendingUp,
+      color: 'bg-blue-50 text-blue-700',
+      onClick: () => onNavigate('leads'),
+    },
+    {
+      id: 'automations',
+      label: 'Active Automations',
+      value: metrics.active_automations,
+      icon: Zap,
+      color: 'bg-purple-50 text-purple-700',
+      onClick: () => onNavigate('automation'),
+    },
+    {
+      id: 'messages',
+      label: 'Messages Sent',
+      value: metrics.messages_sent,
+      icon: MessageSquare,
+      color: 'bg-green-50 text-green-700',
+      onClick: () => onNavigate('system-health'),
+    },
+    {
+      id: 'bookings',
+      label: 'Bookings',
+      value: metrics.bookings,
+      icon: Target,
+      color: 'bg-orange-50 text-orange-700',
+      onClick: () => onNavigate('funnels'),
+    },
+    {
+      id: 'revenue',
+      label: 'Revenue Impact',
+      value: `$${(metrics.revenue_impact / 1000).toFixed(1)}k`,
+      icon: DollarSign,
+      color: 'bg-emerald-50 text-emerald-700',
+      onClick: () => onNavigate('funnels'),
+    },
+  ];
+
+  return (
+    <div className="space-y-8">
+      {/* Section A — Executive Metrics */}
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-6">Executive Metrics</h2>
+        {loading ? (
+          <div className="flex items-center justify-center py-12">
+            <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+            {metricCards.map((card) => (
+              <MissionControlMetricsCard key={card.id} {...card} />
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Section B — Sales Pipeline */}
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-6">Sales Pipeline</h2>
+        <SalesPipelineVisual onNavigate={onNavigate} />
+      </div>
+
+      {/* Section C — Live Activity Stream */}
+      <div>
+        <h2 className="text-2xl font-bold text-foreground mb-6">Live Activity Stream</h2>
+        <LiveActivityStream />
+      </div>
+    </div>
+  );
+}
