@@ -218,13 +218,14 @@ export default function PricingPageContent() {
                   ))}
                 </ul>
 
-                <button
-                  onClick={() => handlePackageCTA(pkg)}
+                <a
+                  href={`/start?package=${pkg.key}`}
+                  onClick={() => trackCTA(`package_${pkg.key}`, "pricing_page")}
                   className={pkg.ctaStyle === "primary" ? "cs-btn-primary w-full text-center justify-center" : "w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors py-3 px-4"}
                   style={{ minHeight: "unset", minWidth: "unset" }}
                 >
                   {pkg.cta}
-                </button>
+                </a>
               </div>
             </div>
           ))}

@@ -6,6 +6,7 @@ import AutomationEngineModule from './AutomationEngineModule';
 import FunnelAnalyticsModule from './FunnelAnalyticsModule';
 import LaunchGatesModule from './LaunchGatesModule';
 import SystemHealthModule from './SystemHealthModule';
+import SystemSimulationLab from './SystemSimulationLab';
 
 const MODULE_COMPONENTS = {
   'mission-control': MissionControlDashboard,
@@ -14,7 +15,8 @@ const MODULE_COMPONENTS = {
   'funnels': FunnelAnalyticsModule,
   'launch-gates': LaunchGatesModule,
   'system-health': SystemHealthModule,
-  // TODO: Add remaining modules
+  'simulation-lab': SystemSimulationLab,
+  // stubs for future modules
   'leads': MissionControlDashboard,
   'campaigns': MissionControlDashboard,
   'conversations': MissionControlDashboard,

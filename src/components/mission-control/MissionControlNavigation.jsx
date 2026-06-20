@@ -2,21 +2,47 @@ import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Users, Send, Zap, MessageSquare, TrendingUp,
   AlertTriangle, Activity, Lightbulb, Settings, ChevronRight,
-  Flame, BarChart3, ArrowRight, CheckCircle
+  FlaskConical,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
-const NAV_ITEMS = [
-  { id: 'mission-control', label: 'Mission Control', icon: LayoutDashboard },
-  { id: 'sales-acquisition', label: 'Sales Acquisition System', icon: Users },
-  { id: 'leads', label: 'Leads', icon: Users },
-  { id: 'campaigns', label: 'Outbound Campaigns', icon: Send },
-  { id: 'automation', label: 'Automation Engine', icon: Zap },
-  { id: 'conversations', label: 'Conversations', icon: MessageSquare },
-  { id: 'funnels', label: 'Funnel Analytics', icon: TrendingUp },
-  { id: 'launch-gates', label: 'Launch Gates', icon: AlertTriangle },
-  { id: 'ai-insights', label: 'AI Insights', icon: Lightbulb },
-  { id: 'system-health', label: 'System Health', icon: Activity },
+const NAV_GROUPS = [
+  {
+    label: 'Overview',
+    items: [
+      { id: 'mission-control',   label: 'Mission Control',          icon: LayoutDashboard },
+      { id: 'sales-acquisition', label: 'Sales Acquisition System', icon: Users },
+    ],
+  },
+  {
+    label: 'Pipeline',
+    items: [
+      { id: 'leads',         label: 'Leads',              icon: Users },
+      { id: 'campaigns',     label: 'Outbound Campaigns', icon: Send },
+      { id: 'conversations', label: 'Conversations',       icon: MessageSquare },
+      { id: 'funnels',       label: 'Funnel Analytics',   icon: TrendingUp },
+    ],
+  },
+  {
+    label: 'Automation',
+    items: [
+      { id: 'automation',   label: 'Automation Engine', icon: Zap },
+      { id: 'ai-insights',  label: 'AI Insights',       icon: Lightbulb },
+    ],
+  },
+  {
+    label: 'Infrastructure',
+    items: [
+      { id: 'launch-gates',   label: 'Launch Gates',  icon: AlertTriangle },
+      { id: 'system-health',  label: 'System Health', icon: Activity },
+    ],
+  },
+  {
+    label: 'Admin Tools',
+    items: [
+      { id: 'simulation-lab', label: 'Simulation Lab', icon: FlaskConical },
+    ],
+  },
 ];
 
 export default function MissionControlNavigation({ activeModule, onNavigate }) {
@@ -50,43 +76,50 @@ export default function MissionControlNavigation({ activeModule, onNavigate }) {
   };
 
   return (
-    <nav className="flex-1 p-6 overflow-y-auto space-y-0.5">
-      <div className="px-4 py-4 mb-6">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 letter-spacing-[0.12em]">Navigation</p>
-      </div>
+    <nav className="flex-1 p-4 overflow-y-auto space-y-6">
+      {NAV_GROUPS.map((group) => (
+        <div key={group.label}>
+          <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+            {group.label}
+          </p>
+          <div className="space-y-0.5">
+            {group.items.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeModule === item.id;
+              const count = getCount(item.id);
+              const isAdminTool = group.label === 'Admin Tools';
 
-      {NAV_ITEMS.map((item) => {
-        const Icon = item.icon;
-        const isActive = activeModule === item.id;
-        const count = getCount(item.id);
+              return (
+                <button
+                  key={item.id}
+                  onClick={() => onNavigate(item.id)}
+                  className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-all text-sm font-medium ${
+                    isActive
+                      ? 'bg-primary text-primary-foreground shadow-md'
+                      : isAdminTool
+                      ? 'text-amber-400 hover:bg-amber-900/30 hover:text-amber-300'
+                      : 'text-slate-300 hover:bg-slate-800 hover:text-white'
+                  }`}
+                >
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span className="flex-1 text-left">{item.label}</span>
+                  {count && (
+                    <span className={`text-xs rounded-full px-2 py-0.5 font-semibold ${
+                      isActive ? 'bg-white/20' : 'bg-slate-700 text-slate-300'
+                    }`}>
+                      {count}
+                    </span>
+                  )}
+                  {isActive && <ChevronRight className="w-3.5 h-3.5" />}
+                </button>
+              );
+            })}
+          </div>
+        </div>
+      ))}
 
-        return (
-          <button
-            key={item.id}
-            onClick={() => onNavigate(item.id)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-lg transition-all text-sm font-medium ${
-              isActive
-                ? 'bg-primary text-primary-foreground shadow-lg'
-                : 'text-slate-300 hover:bg-slate-800 hover:text-white'
-            }`}
-          >
-            <Icon className="w-4 h-4 flex-shrink-0" />
-            <span className="flex-1 text-left">{item.label}</span>
-            {count && (
-              <span className={`text-xs rounded-full px-2 py-1 font-semibold ${
-                isActive ? 'bg-white/20' : 'bg-slate-700 text-slate-300'
-              }`}>
-                {count}
-              </span>
-            )}
-            {isActive && <ChevronRight className="w-4 h-4" />}
-          </button>
-        );
-      })}
-
-      <div className="border-t border-slate-700 mt-8 pt-6">
-        <p className="px-4 text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-4">System</p>
-        <button className="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-slate-300 hover:bg-slate-800 text-sm font-medium transition-all">
+      <div className="border-t border-slate-700 pt-4">
+        <button className="w-full flex items-center gap-3 px-4 py-2.5 rounded-lg text-slate-400 hover:bg-slate-800 text-sm font-medium transition-all">
           <Settings className="w-4 h-4" />
           <span>Settings</span>
         </button>
