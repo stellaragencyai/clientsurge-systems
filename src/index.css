@@ -741,7 +741,6 @@ h1, h2, h3, h4, h5, h6 {
 /* Pillar 1 Task 17 — Remove rogue text-shadows from body paragraphs */
 p, li, span, td, th {
   text-shadow: none;
-  color: #000000;
   opacity: 1;
 }
 
@@ -782,8 +781,6 @@ h1, h2, h3,
 body, p, span, div {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: subpixel-antialiased;
-  color: #000000;
-  opacity: 1;
 }
 
 /* ============================================

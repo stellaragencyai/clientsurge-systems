@@ -248,22 +248,22 @@ export default function ProductCard({ product }) {
             <motion.button
               onClick={toggle}
               whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
-              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 8px 20px rgba(0,59,143,0.38)" }}
+              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 4px 24px rgba(0,121,193,0.5)" }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               style={{
                 width: "100%",
                 borderRadius: "9999px", padding: "1px",
-                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(135deg,#00AEEF,#0088CC)",
+                background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(90deg, #0079c1 0%, #005691 100%)",
                 border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 6px 16px rgba(0,174,239,0.32)",
+                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 2px 12px rgba(0,121,193,0.35)",
               }}
             >
               <span className="product-card-cta-label" style={{
                 display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
                 width: "100%",
                 height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
-                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "#00AEEF",
-                color: inCart ? "#fff" : "#fff", fontWeight: "700", whiteSpace: "nowrap",
+                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(90deg, #0079c1 0%, #005691 100%)",
+                color: "#fff", fontWeight: "700", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
                 {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}
