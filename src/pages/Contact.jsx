@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram } from "lucide-react";
+import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight, Clock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -9,13 +9,13 @@ import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
 
 const INDUSTRY_CONTEXT = {
-  "med-spa":       { label: "Med Spa & Aesthetics", sub: "Ready to automate your Med Spa or Aesthetic Clinic?" },
-  "dental":        { label: "Dental & Orthodontics", sub: "Ready to automate your Dental or Orthodontic practice?" },
-  "hvac":          { label: "HVAC & Home Services", sub: "Ready to automate your HVAC or Home Services business?" },
-  "plumbing":      { label: "Plumbing", sub: "Ready to automate your Plumbing business?" },
-  "roofing":       { label: "Roofing & Restoration", sub: "Ready to automate your Roofing business?" },
-  "chiropractic":  { label: "Chiropractic & PT", sub: "Ready to automate your Chiropractic practice?" },
-  "contractors":   { label: "Contractors & Trades", sub: "Ready to automate your Contracting business?" },
+  "med-spa":      { label: "Med Spa & Aesthetics", sub: "Ready to automate your Med Spa or Aesthetic Clinic?" },
+  "dental":       { label: "Dental & Orthodontics", sub: "Ready to automate your Dental or Orthodontic practice?" },
+  "hvac":         { label: "HVAC & Home Services", sub: "Ready to automate your HVAC or Home Services business?" },
+  "plumbing":     { label: "Plumbing", sub: "Ready to automate your Plumbing business?" },
+  "roofing":      { label: "Roofing & Restoration", sub: "Ready to automate your Roofing business?" },
+  "chiropractic": { label: "Chiropractic & PT", sub: "Ready to automate your Chiropractic practice?" },
+  "contractors":  { label: "Contractors & Trades", sub: "Ready to automate your Contracting business?" },
 };
 
 function detectIndustryFromReferrer() {
@@ -24,19 +24,26 @@ function detectIndustryFromReferrer() {
   return slug ? INDUSTRY_CONTEXT[slug] : null;
 }
 
-const PAIN_POINTS = [
-  "Missed Calls",
-  "Slow Lead Follow-Up",
-  "No-Show Appointments",
-  "Manual Booking Process",
-  "Review Management",
-  "Cold / Dead Leads",
-  "Staff Overwhelmed",
-  "No Automation Yet",
-];
-
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
+
+// Visual Improvement #2: reusable styled input field with animated focus border
+function Field({ label, required, error, children }) {
+  return (
+    <div className="group">
+      <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+        {label} {required && <span className="text-primary">*</span>}
+      </label>
+      {children}
+      {error && (
+        <p className="text-red-500 text-xs mt-1.5">{error}</p>
+      )}
+    </div>
+  );
+}
+
+const inputClass =
+  "w-full bg-transparent border-b border-slate-200 py-3 text-base text-slate-900 placeholder:text-slate-300 outline-none transition-all duration-300 focus:border-primary";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -55,19 +62,10 @@ export default function Contact() {
   });
 
   const [industryContext, setIndustryContext] = useState(null);
-  const [selectedPains, setSelectedPains] = useState([]);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
   const [showBookingModal, setShowBookingModal] = useState(false);
-
-  const togglePain = (pain) => {
-    setSelectedPains((prev) => {
-      const next = prev.includes(pain) ? prev.filter((p) => p !== pain) : [...prev, pain];
-      setForm((f) => ({ ...f, pain_points: next.join(", ") }));
-      return next;
-    });
-  };
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -94,58 +92,34 @@ export default function Contact() {
   }, []);
 
   const validate = () => {
-    const nextErrors = {};
-
-    if (!form.full_name.trim()) {
-      nextErrors.full_name = 'Required';
-    }
-
-    if (!form.email.trim()) {
-      nextErrors.email = 'Required';
-    } else if (!EMAIL_REGEX.test(form.email)) {
-      nextErrors.email = 'Enter a valid email';
-    }
-
+    const e = {};
+    if (!form.full_name.trim()) e.full_name = "Required";
+    if (!form.email.trim()) e.email = "Required";
+    else if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email";
     if (form.phone.trim()) {
-      const digits = form.phone.replace(/\D/g, '');
-      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) {
-        nextErrors.phone = 'Enter a valid phone number';
-      }
+      const digits = form.phone.replace(/\D/g, "");
+      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) e.phone = "Enter a valid phone number";
     }
-
-    if (!form.message.trim()) {
-      nextErrors.message = 'Required';
-    }
-
-    return nextErrors;
+    if (!form.message.trim()) e.message = "Required";
+    return e;
   };
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setForm((current) => ({ ...current, [name]: value }));
-    setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
+    setForm((c) => ({ ...c, [name]: value }));
+    setErrors((c) => ({ ...c, [name]: undefined, submit: undefined }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const nextErrors = validate();
-
-    if (Object.keys(nextErrors).length > 0) {
-      setErrors(nextErrors);
-      return;
-    }
-
+    if (Object.keys(nextErrors).length > 0) { setErrors(nextErrors); return; }
     setLoading(true);
-
     try {
       const result = await base44.functions.invoke("submitContactInquiry", form);
-
-      if (!result.data?.success) {
-        throw new Error(result.data?.error || "Contact submission failed");
-      }
-
+      if (!result.data?.success) throw new Error(result.data?.error || "Submission failed");
       setSuccess(true);
-    } catch (error) {
+    } catch {
       setErrors({ submit: "Something went wrong. Please try again or email us directly." });
     } finally {
       setLoading(false);
@@ -153,226 +127,231 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen flex flex-col bg-background overflow-x-hidden">
       <Navbar />
 
-      {/* Split Layout Container */}
-      <div className="flex min-h-screen">
-        {/* LEFT: Dark sidebar with contact info */}
-        <div className="hidden lg:flex lg:w-1/2 bg-slate-900 text-white flex-col justify-center p-20">
+      {/* Full-height split layout — accounts for navbar */}
+      <div className="flex flex-1" style={{ minHeight: "calc(100vh - var(--cs-nav-height, 76px))" }}>
+
+        {/* ── LEFT: Dark sidebar ── */}
+        <aside className="hidden lg:flex lg:w-[42%] xl:w-[38%] bg-slate-900 text-white flex-col justify-between p-14 xl:p-20 flex-shrink-0">
+          {/* Top block */}
           <div>
-            <div className="mb-16">
-              <div className="text-3xl font-bold mb-12 flex items-center gap-3">
-                <div className="w-1.5 h-10 bg-primary rounded-sm" />
-                ClientSurge
+            {/* Logo / Brand */}
+            <div className="flex items-center gap-3 mb-16">
+              <div className="w-1.5 h-10 bg-primary rounded-sm flex-shrink-0" />
+              <span className="text-2xl font-black tracking-tight">ClientSurge</span>
+            </div>
+
+            {/* Divider */}
+            <div className="border-t border-slate-700 pt-10 mb-10 space-y-7">
+              <div className="flex items-center gap-4">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-4 h-4 text-primary" />
+                </div>
+                <a href="tel:+16025843227" className="text-base text-slate-200 hover:text-primary transition">
+                  (602) 584-3227
+                </a>
               </div>
-              <div className="border-b border-slate-700 pb-10 mb-10">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <Phone className="w-6 h-6 text-primary flex-shrink-0" />
-                    <a href="tel:+16025843227" className="hover:text-primary transition text-base">
-                      (602) 584-3227
-                    </a>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <Mail className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                    <div className="space-y-2">
-                      <p className="text-xs font-semibold text-slate-400 uppercase">Sales Inquiries</p>
-                      <a href="mailto:support@clientsurgesystems.com" className="hover:text-primary transition block text-base">
-                        support@clientsurgesystems.com
-                      </a>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-4">
-                    <MapPin className="w-6 h-6 text-primary flex-shrink-0 mt-1" />
-                    <div>
-                      <p className="text-base">Phoenix, Arizona</p>
-                    </div>
-                  </div>
+              <div className="flex items-start gap-4">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4 text-primary" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Email</p>
+                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-200 hover:text-primary transition break-all">
+                    support@clientsurgesystems.com
+                  </a>
                 </div>
               </div>
+              <div className="flex items-center gap-4">
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-4 h-4 text-primary" />
+                </div>
+                <span className="text-base text-slate-200">Phoenix, Arizona</span>
+              </div>
             </div>
 
-            {/* Info text */}
-            <div className="text-base text-slate-300 leading-relaxed space-y-4">
-              <p>
-                {industryContext 
-                  ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right automation stack.`
-                  : "Have questions or ready to get started? We'd love to hear from you. Send us a message and we'll get back to you within one business day."
-                }
-              </p>
-              <p>Ready to transform how you handle leads and follow-ups?</p>
-            </div>
+            {/* Description */}
+            <p className="text-slate-400 text-base leading-relaxed">
+              {industryContext
+                ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right stack.`
+                : "Have questions or ready to get started? Send us a message and we'll be in touch within one business day."}
+            </p>
           </div>
 
-          {/* Social Icons */}
-          <div className="flex items-center gap-8 mt-auto pt-8">
-            <a href="#" className="text-primary hover:text-white transition">
-              <Facebook className="w-6 h-6" />
+          {/* Bottom: social icons */}
+          <div className="flex items-center gap-6">
+            <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+              <Facebook className="w-4 h-4" />
             </a>
-            <a href="#" className="text-primary hover:text-white transition">
-              <Instagram className="w-6 h-6" />
+            <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+              <Instagram className="w-4 h-4" />
             </a>
           </div>
-        </div>
+        </aside>
 
-        {/* RIGHT: White form area */}
-        <div className="w-full lg:w-1/2 bg-white p-8 md:p-20 flex items-center justify-center">
-          <div className="w-full max-w-lg">
+        {/* ── RIGHT: Form ── */}
+        <main className="flex-1 bg-white flex flex-col justify-center px-6 py-16 sm:px-10 md:px-16 lg:px-20 xl:px-24 overflow-y-auto">
+          <div className="w-full max-w-xl mx-auto">
+
             {success ? (
+              /* ── Success state ── */
               <motion.div
-                className="text-center py-8"
+                className="text-center py-16"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
               >
                 <motion.div
-                  className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6"
-                  initial={{ scale: 0.9 }}
+                  className="w-20 h-20 bg-green-50 border border-green-200 rounded-full flex items-center justify-center mx-auto mb-8"
+                  initial={{ scale: 0.85 }}
                   animate={{ scale: 1 }}
-                  transition={{ delay: 0.1, type: "spring" }}
+                  transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
                 >
-                  <CheckCircle2 className="w-8 h-8 text-green-600" />
+                  <CheckCircle2 className="w-9 h-9 text-green-600" />
                 </motion.div>
-                <h3 className="text-2xl font-bold text-slate-900 mb-2">Message Received</h3>
-                <p className="text-slate-600 mb-8 leading-relaxed">
-                  Thanks for reaching out. We'll get back to you within one business day.
+                <h2 className="text-3xl font-black text-slate-900 mb-3">Message Received</h2>
+                <p className="text-slate-500 text-base leading-relaxed mb-10 max-w-sm mx-auto">
+                  Thanks for reaching out. We'll respond within one business day.
                 </p>
-                <button
-                  type="button"
-                  onClick={() => window.location.href = "/"}
-                  className="px-6 py-2.5 border border-slate-300 text-slate-900 font-semibold rounded hover:bg-slate-50 transition"
+                <a
+                  href="/"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition"
                 >
-                  Back to Home
-                </button>
+                  Back to Home <ArrowRight className="w-4 h-4" />
+                </a>
               </motion.div>
             ) : (
-              <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-                <div className="mb-12">
-                  <p className="text-xs font-semibold text-slate-600 tracking-widest uppercase mb-3">Get in Touch</p>
-                  <div className="flex items-center gap-4">
-                    <div className="w-1.5 h-12 bg-primary rounded-sm" />
-                    <h1 className="text-5xl font-black text-slate-900">CONTACT</h1>
+              /* ── Form ── */
+              <form onSubmit={handleSubmit} noValidate className="space-y-9">
+
+                {/* HEADER */}
+                <div>
+                  {/* Visual Improvement #3: Response-time trust badge */}
+                  <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full">
+                    <Clock className="w-3.5 h-3.5 text-primary" />
+                    <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wide">Typically responds within 1 business day</span>
                   </div>
+
+                  <div className="flex items-center gap-4 mb-3">
+                    <div className="w-1.5 h-12 bg-slate-900 rounded-sm flex-shrink-0" />
+                    <h1 className="text-5xl font-black text-slate-900 leading-none">CONTACT</h1>
+                  </div>
+                  <p className="text-slate-500 text-base leading-relaxed">
+                    We'd love to hear from you. Send us a message and we'll get right back in touch.
+                  </p>
                 </div>
 
-                <p className="text-slate-700 text-lg mb-10 leading-relaxed">
-                  We would love to hear from you! Send us a message and we'll get right back in touch.
-                </p>
-
                 {errors.submit && (
-                  <div className="bg-red-50 border border-red-200 rounded p-3 text-sm text-red-700">
+                  <div className="bg-red-50 border border-red-200 rounded p-4 text-sm text-red-700">
                     {errors.submit}
                   </div>
                 )}
 
-                <input
-                  type="text"
-                  name="website_url"
-                  value={form.website_url}
-                  onChange={handleChange}
-                  className="hidden"
-                  tabIndex={-1}
-                />
+                {/* Honeypot */}
+                <input type="text" name="website_url" value={form.website_url} onChange={handleChange} className="hidden" tabIndex={-1} aria-hidden="true" />
 
-                {/* First Name & Last Name */}
-                <div className="grid grid-cols-2 gap-8">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
-                      First Name <span className="text-red-500">*</span>
-                    </label>
+                {/* Row 1: Name */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Field label="First Name" required error={errors.full_name}>
                     <input
                       name="full_name"
                       value={form.full_name}
                       onChange={handleChange}
                       placeholder="Jane"
-                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                       aria-invalid={Boolean(errors.full_name)}
+                      className={inputClass}
                     />
-                    {errors.full_name && <p className="text-red-500 text-xs mt-2">{errors.full_name}</p>}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
-                      Last Name <span className="text-red-500">*</span>
-                    </label>
+                  </Field>
+                  <Field label="Last Name">
                     <input
                       name="business_type"
                       value={form.business_type}
                       onChange={handleChange}
                       placeholder="Smith"
-                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
+                      className={inputClass}
                     />
-                  </div>
+                  </Field>
                 </div>
 
-                {/* Phone & Email */}
-                <div className="grid grid-cols-2 gap-8">
-                  <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
-                      Phone No.
-                    </label>
+                {/* Row 2: Phone & Email */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <Field label="Phone No." error={errors.phone}>
                     <input
                       name="phone"
                       type="tel"
                       value={form.phone}
                       onChange={handleChange}
                       placeholder="(555) 000-0000"
-                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                       aria-invalid={Boolean(errors.phone)}
+                      className={inputClass}
                     />
-                    {errors.phone && <p className="text-red-500 text-xs mt-2">{errors.phone}</p>}
-                  </div>
-
-                  <div>
-                    <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
-                      Email Address <span className="text-red-500">*</span>
-                    </label>
+                  </Field>
+                  <Field label="Email Address" required error={errors.email}>
                     <input
                       name="email"
                       type="email"
                       value={form.email}
                       onChange={handleChange}
                       placeholder="jane@business.com"
-                      className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition"
                       aria-invalid={Boolean(errors.email)}
+                      className={inputClass}
                     />
-                    {errors.email && <p className="text-red-500 text-xs mt-2">{errors.email}</p>}
-                  </div>
+                  </Field>
                 </div>
 
                 {/* Message */}
-                <div>
-                  <label className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-3 block">
-                    Message <span className="text-red-500">*</span>
-                  </label>
+                <Field label="Message" required error={errors.message}>
                   <textarea
                     name="message"
                     value={form.message}
                     onChange={handleChange}
                     placeholder="Tell us about your business and what you're looking for..."
                     rows={5}
-                    className="w-full border-b-2 border-slate-300 focus:border-primary outline-none py-3 text-base text-slate-900 placeholder:text-slate-400 transition resize-none font-inter"
                     aria-invalid={Boolean(errors.message)}
+                    className={`${inputClass} resize-none`}
                   />
-                  {errors.message && <p className="text-red-500 text-xs mt-2">{errors.message}</p>}
-                </div>
+                  {/* Visual Improvement #1: character counter */}
+                  <p className="text-right text-[11px] text-slate-300 mt-1.5">
+                    {form.message.length} characters
+                  </p>
+                </Field>
 
-                {/* Submit Button */}
+                {/* Visual Improvement #2: Full-width solid blue CTA button */}
                 <button
                   type="submit"
                   disabled={loading}
-                  className="w-32 px-6 py-4 border-2 border-slate-900 text-slate-900 font-bold uppercase tracking-wide hover:bg-slate-900 hover:text-white transition disabled:opacity-70 mt-10 text-base"
+                  className="w-full flex items-center justify-center gap-3 py-4 bg-primary text-white font-bold text-base uppercase tracking-widest hover:bg-[#0088CC] transition disabled:opacity-60"
                 >
-                  {loading ? <Loader2 className="w-5 h-5 animate-spin mx-auto" /> : "SEND"}
+                  {loading
+                    ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
+                    : <><span>Send Message</span><ArrowRight className="w-5 h-5" /></>
+                  }
                 </button>
 
-                <p className="text-sm text-slate-500 mt-8">
-                  No spam, no pressure. Just thoughtful replies from our team.
+                <p className="text-center text-xs text-slate-400">
+                  No spam, no pressure — just a thoughtful reply from our team.
                 </p>
               </form>
             )}
           </div>
+        </main>
+      </div>
+
+      {/* Mobile: show contact info above footer */}
+      <div className="lg:hidden bg-slate-900 text-white px-6 py-10 space-y-5">
+        <div className="flex items-center gap-3">
+          <Phone className="w-4 h-4 text-primary" />
+          <a href="tel:+16025843227" className="text-sm">(602) 584-3227</a>
+        </div>
+        <div className="flex items-center gap-3">
+          <Mail className="w-4 h-4 text-primary" />
+          <a href="mailto:support@clientsurgesystems.com" className="text-sm">support@clientsurgesystems.com</a>
+        </div>
+        <div className="flex items-center gap-3">
+          <MapPin className="w-4 h-4 text-primary" />
+          <span className="text-sm">Phoenix, Arizona</span>
         </div>
       </div>
 
