@@ -4,7 +4,34 @@ import { getIndustryBySlug } from '@/data/industryMarketingConfig';
 import { getPlanFeatures } from '@/lib/saasProductizationConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
+import IndustryHero from '@/components/industry/IndustryHero';
 import { ArrowRight, CheckCircle, TrendingUp, Zap } from 'lucide-react';
+
+// Hero image URLs for cinematic industry pages (template for future expansion)
+const HERO_IMAGES = {
+  roofing: 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/roofing_hero_wallpaper.jpg',
+};
+
+// Roofing-specific hero configuration
+const ROOFING_HERO_CONFIG = {
+  eyebrow: 'Roofing AI Automation',
+  headline: 'AI Automation Systems for Roofing Companies',
+  subheadline: 'Capture more roofing leads, respond to missed calls, follow up on quotes, book inspections, request reviews, and reactivate old opportunities with a remote AI-powered setup workflow.',
+  description: '',
+  backgroundImage: HERO_IMAGES.roofing,
+  primaryCTA: {
+    label: 'Start Roofing Setup',
+    path: '/start?industry=roofing',
+  },
+  secondaryCTA: {
+    label: 'View Roofing Automations',
+    path: '/store?industry=roofing',
+  },
+  fallbackCTA: {
+    label: 'Not sure? Book Free Audit',
+    path: '/book?industry=roofing',
+  },
+};
 
 export default function IndustryPageTemplate() {
   const { slug } = useParams();
@@ -25,44 +52,47 @@ export default function IndustryPageTemplate() {
 
   const recommendedFeatures = getPlanFeatures(industry.recommended_plan);
 
+  // Determine hero config based on industry slug
+  const getHeroConfig = () => {
+    if (slug === 'roofing') {
+      return ROOFING_HERO_CONFIG;
+    }
+    // Fallback: generate from industry data for other industries
+    return {
+      eyebrow: `${industry.industry_name} Automation`,
+      headline: industry.hero_headline,
+      subheadline: industry.hero_subheadline,
+      description: industry.hero_description,
+      backgroundImage: null,
+      primaryCTA: {
+        label: industry.primary_cta,
+        path: '/book',
+      },
+      secondaryCTA: {
+        label: industry.secondary_cta,
+        path: '/pricing',
+      },
+    };
+  };
+
+  const heroConfig = getHeroConfig();
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* HERO */}
-      <section className="pt-32 pb-24 px-6 bg-gradient-to-br from-slate-50 to-blue-50">
-        <div className="max-w-4xl mx-auto text-center">
-          <div className="mb-6 inline-block">
-            <span className="text-xs font-bold uppercase tracking-widest text-blue-600">
-              {industry.industry_name} Automation
-            </span>
-          </div>
-          <h1 className="text-5xl md:text-6xl font-bold text-slate-900 mb-6 leading-tight">
-            {industry.hero_headline}
-          </h1>
-          <p className="text-xl text-slate-600 mb-8 leading-relaxed max-w-2xl mx-auto">
-            {industry.hero_subheadline}
-          </p>
-          <p className="text-base text-slate-600 mb-12 max-w-3xl mx-auto leading-relaxed">
-            {industry.hero_description}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/book')}
-              className="cs-btn-primary inline-flex items-center justify-center gap-2"
-            >
-              {industry.primary_cta}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => navigate('/pricing')}
-              className="inline-flex items-center justify-center px-6 py-3 border border-slate-200 rounded-lg text-slate-900 font-semibold hover:bg-slate-50 transition"
-            >
-              {industry.secondary_cta}
-            </button>
-          </div>
-        </div>
-      </section>
+      {/* HERO — Uses IndustryHero component for reusable cinematic/standard template */}
+      <IndustryHero
+        industryKey={slug}
+        eyebrow={heroConfig.eyebrow}
+        headline={heroConfig.headline}
+        subheadline={heroConfig.subheadline}
+        description={heroConfig.description}
+        backgroundImage={heroConfig.backgroundImage}
+        primaryCTA={heroConfig.primaryCTA}
+        secondaryCTA={heroConfig.secondaryCTA}
+        fallbackCTA={heroConfig.fallbackCTA}
+      />
 
       {/* PAIN POINTS */}
       <section className="py-20 px-6 bg-white">
