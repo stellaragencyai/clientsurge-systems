@@ -4,7 +4,11 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import { setPageMetadata } from "@/lib/seo";
-import PricingPageContent from "@/components/pricing/PricingPageContent";
+import PricingOfferHero from "@/components/pricing/PricingOfferHero";
+import PricingPackageGrid from "@/components/pricing/PricingPackageGrid";
+import FeatureComparisonTable from "@/components/pricing/FeatureComparisonTable";
+import BuyerConfidenceSection from "@/components/pricing/BuyerConfidenceSection";
+import PricingFAQ from "@/components/pricing/PricingFAQ";
 import TrustStrip from "@/components/landing/TrustStrip";
 
 export default function PricingPage() {
@@ -25,7 +29,11 @@ export default function PricingPage() {
       <div className="min-h-screen bg-background">
         <Navbar />
         <TrustStrip />
-        <PricingPageContent />
+        <PricingOfferHero />
+        <PricingPackageGrid />
+        <FeatureComparisonTable />
+        <BuyerConfidenceSection />
+        <PricingFAQ />
         <Footer />
         <MobileCallBar />
       </div>
