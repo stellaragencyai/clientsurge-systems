@@ -1,0 +1,283 @@
+{
+  "name": "ClientExperiencePortal",
+  "type": "object",
+  "_metadata": {
+    "status": "CLIENT_EXPERIENCE_LAYER",
+    "reason": "Single source of truth for client-facing dashboards. Aggregates from ClientInstallationOS, OnboardingOrchestration, Leads, RevenueTracking, ConversionFunnel, and CommunicationEvent without modifying them.",
+    "tenant_scoped": "client_id + client_project_id"
+  },
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "subscription_id": {
+      "type": "string",
+      "title": "Subscription ID"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "portal_status": {
+      "type": "string",
+      "title": "Portal Status",
+      "enum": [
+        "draft",
+        "active",
+        "suspended",
+        "archived"
+      ],
+      "default": "draft",
+      "description": "Visibility and access state of this client's portal"
+    },
+    "theme_mode": {
+      "type": "string",
+      "title": "Theme Mode",
+      "enum": [
+        "light",
+        "dark",
+        "auto"
+      ],
+      "default": "auto",
+      "description": "UI theme preference for client portal"
+    },
+    "branding_source": {
+      "type": "string",
+      "title": "Branding Source",
+      "enum": [
+        "default",
+        "agency",
+        "custom"
+      ],
+      "default": "default",
+      "description": "Which branding configuration to apply: default=platform, agency=from AgencyBrandingConfig, custom=client-specific overrides"
+    },
+    "branding_agency_id": {
+      "type": "string",
+      "title": "Branding Agency ID",
+      "description": "If branding_source=agency, ID of the agency for branding lookup"
+    },
+    "show_overview": {
+      "type": "boolean",
+      "title": "Show Overview Section",
+      "default": true
+    },
+    "show_leads_summary": {
+      "type": "boolean",
+      "title": "Show Leads Summary",
+      "default": true
+    },
+    "show_automation_status": {
+      "type": "boolean",
+      "title": "Show Automation Status",
+      "default": true
+    },
+    "show_revenue_tracking": {
+      "type": "boolean",
+      "title": "Show Revenue Tracking",
+      "default": true
+    },
+    "show_funnel_performance": {
+      "type": "boolean",
+      "title": "Show Funnel Performance",
+      "default": true
+    },
+    "show_onboarding_progress": {
+      "type": "boolean",
+      "title": "Show Onboarding Progress",
+      "default": true
+    },
+    "total_leads_received": {
+      "type": "integer",
+      "title": "Total Leads Received",
+      "default": 0,
+      "description": "Sum of all leads for this client (read-only, computed)"
+    },
+    "leads_contacted": {
+      "type": "integer",
+      "title": "Leads Contacted",
+      "default": 0,
+      "description": "Number of leads contacted via automation (read-only, computed)"
+    },
+    "leads_booked": {
+      "type": "integer",
+      "title": "Leads Booked",
+      "default": 0,
+      "description": "Number of leads that booked (read-only, computed)"
+    },
+    "revenue_generated": {
+      "type": "number",
+      "title": "Revenue Generated ($)",
+      "default": 0,
+      "description": "Total revenue attributed to leads (read-only, computed)"
+    },
+    "conversion_rate": {
+      "type": "number",
+      "title": "Conversion Rate (%)",
+      "default": 0,
+      "description": "Percentage of leads that booked (0-100, read-only, computed)"
+    },
+    "avg_response_time_minutes": {
+      "type": "number",
+      "title": "Avg Response Time (min)",
+      "default": 0,
+      "description": "Average time from lead capture to first contact (read-only, computed)"
+    },
+    "onboarding_stage": {
+      "type": "string",
+      "title": "Onboarding Stage",
+      "description": "Current stage from OnboardingOrchestration (read-only, computed)"
+    },
+    "onboarding_completion_percent": {
+      "type": "number",
+      "title": "Onboarding Completion %",
+      "default": 0,
+      "description": "Checklist and setup completion percentage (0-100, read-only, computed)"
+    },
+    "activation_status": {
+      "type": "string",
+      "title": "Activation Status",
+      "description": "Current activation state from ClientInstallationOS (read-only, computed)"
+    },
+    "blockers_count": {
+      "type": "integer",
+      "title": "Active Blockers",
+      "default": 0,
+      "description": "Number of issues preventing progression (read-only, computed)"
+    },
+    "automation_health_status": {
+      "type": "string",
+      "title": "Automation Health Status",
+      "enum": [
+        "healthy",
+        "degraded",
+        "failed",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Overall health of automation systems for this client (read-only, computed)"
+    },
+    "event_pipeline_status": {
+      "type": "string",
+      "title": "Event Pipeline Status",
+      "enum": [
+        "healthy",
+        "degraded",
+        "failed",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Health of webhook and event processing (read-only, computed)"
+    },
+    "recent_activity_summary": {
+      "type": "string",
+      "title": "Recent Activity Summary",
+      "description": "Human-readable summary of last 7 days of activity"
+    },
+    "ai_summary": {
+      "type": "string",
+      "title": "AI Summary",
+      "description": "AI-generated client-friendly summary of current state and performance"
+    },
+    "ai_recommendations": {
+      "type": "string",
+      "title": "AI Recommendations",
+      "description": "AI-generated next steps and optimization recommendations for the client"
+    },
+    "portal_access_enabled": {
+      "type": "boolean",
+      "title": "Portal Access Enabled",
+      "default": false,
+      "description": "Admin toggle: if false, client cannot view this portal"
+    },
+    "portal_customized": {
+      "type": "boolean",
+      "title": "Portal Customized",
+      "default": false,
+      "description": "True if admin has customized sections or branding for this client"
+    },
+    "last_client_viewed_at": {
+      "type": "string",
+      "title": "Last Client Viewed At",
+      "format": "date-time",
+      "description": "When the client last viewed their portal"
+    },
+    "last_synced_at": {
+      "type": "string",
+      "title": "Last Synced At",
+      "format": "date-time",
+      "description": "When portal metrics were last computed from source systems"
+    },
+    "created_at": {
+      "type": "string",
+      "title": "Created At",
+      "format": "date-time"
+    },
+    "updated_at": {
+      "type": "string",
+      "title": "Updated At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_id",
+    "business_name"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "$and": [
+            {
+              "data.client_id": "{{client_id}}"
+            },
+            {
+              "data.portal_access_enabled": true
+            }
+          ]
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

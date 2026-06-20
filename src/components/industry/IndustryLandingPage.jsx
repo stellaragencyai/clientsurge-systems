@@ -73,7 +73,7 @@ export default function IndustryLandingPage({ industrySlug: explicitIndustrySlug
       {/* Problem Section */}
       <section className="py-12 px-6 md:py-16 max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-3">{config.problemTitle}</h2>
+          <h2 className="font-titles text-3xl md:text-4xl font-bold mb-3">{config.problemTitle}</h2>
           <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
             {config.painStatement}
           </p>
@@ -87,7 +87,7 @@ export default function IndustryLandingPage({ industrySlug: explicitIndustrySlug
       <section className="py-12 px-6 md:py-16 bg-card/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-2">{config.solutionTitle}</h2>
+            <h2 className="font-titles text-3xl md:text-4xl font-bold mb-2">{config.solutionTitle}</h2>
           </div>
           <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
             <IndustrySolution features={config.features} />
@@ -98,7 +98,7 @@ export default function IndustryLandingPage({ industrySlug: explicitIndustrySlug
       {/* How It Works */}
       <section className="py-12 px-6 md:py-16 max-w-7xl mx-auto">
         <div className="text-center mb-10">
-          <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-2">How It Works</h2>
+          <h2 className="font-titles text-3xl md:text-4xl font-bold mb-2">How It Works</h2>
         </div>
         <Suspense fallback={<div className="h-40 bg-muted rounded-lg animate-pulse" />}>
           <IndustryHowItWorks steps={config.howItWorks} />
@@ -109,7 +109,7 @@ export default function IndustryLandingPage({ industrySlug: explicitIndustrySlug
       <section className="py-12 px-6 md:py-16 bg-card/50">
         <div className="max-w-7xl mx-auto">
           <div className="text-center mb-10">
-            <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-2">Start Recovering Revenue</h2>
+            <h2 className="font-titles text-3xl md:text-4xl font-bold mb-2">Start Recovering Revenue</h2>
             <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto">
               Pick the plan that fits your needs.
             </p>

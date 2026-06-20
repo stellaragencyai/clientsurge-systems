@@ -6,8 +6,8 @@ module.exports = {
   	extend: {
   		fontFamily: {
   			inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
-  			display: ['var(--font-display)', 'Montserrat', 'system-ui', 'sans-serif'],
-  			titles: ['var(--font-titles)', 'Montserrat', 'system-ui', 'sans-serif'],
+  			display: ['Montserrat', 'system-ui', 'sans-serif'],
+  			titles: ['Montserrat', 'system-ui', 'sans-serif'],
   			bebas: ['Montserrat', 'system-ui', 'sans-serif'],
   			montserrat: ['Montserrat', 'system-ui', 'sans-serif'],
   			sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
