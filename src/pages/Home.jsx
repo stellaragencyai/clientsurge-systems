@@ -7,6 +7,7 @@ import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
+import SecurityPriority from "../components/landing/SecurityPriority";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
@@ -15,6 +16,7 @@ import TrustStrip from "../components/landing/TrustStrip";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
+const FAQ = lazy(() => import("../components/landing/FAQ"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 
 import {
@@ -132,6 +134,15 @@ export default function Home() {
 
         {/* 6. Compact Trust Strip */}
         <TrustStrip />
+
+        {/* Trust & Security Section */}
+        <SecurityPriority />
+
+        {/* FAQ Section */}
+        <LazyHomepageSection fallback={<SectionSkeleton />}>
+          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <FAQ />
+        </LazyHomepageSection>
 
         {/* 7. Final CTA */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
