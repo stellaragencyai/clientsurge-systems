@@ -198,6 +198,15 @@ Deno.serve(async (req) => {
     const smsPercentage = totalEventVolume > 0 ? Math.round((eventBreakdown.sms_sent / totalEventVolume) * 100) : 0;
     const emailPercentage = totalEventVolume > 0 ? Math.round((eventBreakdown.email_sent / totalEventVolume) * 100) : 0;
 
+    // 10. Daily activity summary
+    const dailyActivitySummary = {
+      new_leads: recentLeads.length,
+      total_events: recentEvents.length,
+      jobs_executed: allJobs.filter(j => new Date(j.created_date) > oneDayAgo).length,
+      messages_sent: eventBreakdown.sms_sent + eventBreakdown.email_sent,
+      system_health: system_status.health_score,
+    };
+
     return Response.json({
       timestamp: new Date().toISOString(),
       observability: {
@@ -277,6 +286,7 @@ Deno.serve(async (req) => {
             email_percentage: emailPercentage,
             webhook_percentage: totalEventVolume > 0 ? Math.round((eventBreakdown.webhook_sent / totalEventVolume) * 100) : 0,
           },
+          daily_activity: dailyActivitySummary,
         },
       },
     });
