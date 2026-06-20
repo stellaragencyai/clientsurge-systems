@@ -72,8 +72,8 @@ export const trackConversionEvent = async (
       .catch((err) => console.error('[trackConversionEvent]', err));
 
     // Send to GA4 if configured
-    if (typeof gtag !== 'undefined') {
-      gtag('event', eventType, {
+    if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
+      window.gtag('event', eventType, {
         page_key: pageKey,
         event_label: eventLabel,
         ...metadata,
