@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { Activity, AlertTriangle, CheckCircle2, Clock, Zap, TrendingUp } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import SystemNotesSection from './SystemNotesSection';
+import DecisionSupportLayer from './DecisionSupportLayer';
 
 function KPICard({ label, value, icon: Icon, color = 'text-blue-600' }) {
   return (
@@ -238,6 +239,9 @@ export default function SystemObservabilityDashboard() {
           </div>
         </div>
       )}
+
+      {/* DECISION SUPPORT LAYER */}
+      {optimization_insights && <DecisionSupportLayer insights={optimization_insights} />}
 
       {/* SYSTEM NOTES */}
       {optimization_insights && <SystemNotesSection insights={optimization_insights} />}
