@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import {
   LayoutDashboard, Users, Send, Zap, MessageSquare, TrendingUp,
   AlertTriangle, Activity, Lightbulb, Settings, ChevronRight,
-  FlaskConical,
+  FlaskConical, CheckSquare,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -40,6 +40,7 @@ const NAV_GROUPS = [
   {
     label: 'Admin Tools',
     items: [
+      { id: 'improvement-review', label: 'Improvement Review', icon: CheckSquare },
       { id: 'simulation-lab', label: 'Simulation Lab', icon: FlaskConical },
     ],
   },
