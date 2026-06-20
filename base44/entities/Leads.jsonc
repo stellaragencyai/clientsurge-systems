@@ -614,6 +614,24 @@
       "title": "Revenue Impact Estimate ($)",
       "default": 0,
       "description": "Estimated revenue potential based on intelligence score"
+    },
+    "total_revenue": {
+      "type": "number",
+      "title": "Total Revenue Generated ($)",
+      "default": 0,
+      "description": "Sum of all revenue tracked for this lead"
+    },
+    "number_of_conversions": {
+      "type": "integer",
+      "title": "Number of Conversions",
+      "default": 0,
+      "description": "Count of tracked revenue conversions"
+    },
+    "last_conversion_date": {
+      "type": "string",
+      "title": "Last Conversion Date",
+      "format": "date-time",
+      "description": "Timestamp of most recent revenue conversion"
     }
   },
   "required": [
