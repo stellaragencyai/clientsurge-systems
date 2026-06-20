@@ -1,0 +1,137 @@
+{
+  "name": "LaunchChecklistStatus",
+  "type": "object",
+  "_metadata": {
+    "status": "LAUNCH_READINESS_LAYER",
+    "reason": "Tracks individual launch readiness checks across billing, marketing, funnel, onboarding, and automation systems.",
+    "immutable": false
+  },
+  "properties": {
+    "check_id": {
+      "type": "string",
+      "title": "Check ID",
+      "description": "Unique identifier for this checklist item"
+    },
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID",
+      "description": "Reference to parent LaunchReadinessState"
+    },
+    "category": {
+      "type": "string",
+      "title": "Category",
+      "enum": [
+        "billing",
+        "tracking",
+        "marketing",
+        "funnel",
+        "onboarding",
+        "automation",
+        "system",
+        "security"
+      ],
+      "description": "Check category for organization"
+    },
+    "check_name": {
+      "type": "string",
+      "title": "Check Name",
+      "description": "Short name of the readiness check (e.g., 'Stripe Live Keys')"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "pass",
+        "fail",
+        "warning",
+        "pending",
+        "not_applicable"
+      ],
+      "default": "pending",
+      "description": "Current status of this check"
+    },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "description": "Human-readable explanation of what this check validates"
+    },
+    "impact_level": {
+      "type": "string",
+      "title": "Impact Level",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium",
+      "description": "Impact on launch if this check fails"
+    },
+    "blocker": {
+      "type": "boolean",
+      "title": "Is Blocker",
+      "default": false,
+      "description": "If true, failure blocks launch entirely"
+    },
+    "detected_issue": {
+      "type": "string",
+      "title": "Detected Issue",
+      "description": "Details of any issue found by this check"
+    },
+    "remediation_steps": {
+      "type": "array",
+      "title": "Remediation Steps",
+      "items": {
+        "type": "string"
+      },
+      "description": "Steps to resolve if check fails",
+      "default": []
+    },
+    "last_checked_at": {
+      "type": "string",
+      "title": "Last Checked At",
+      "format": "date-time",
+      "description": "When this check was last evaluated"
+    },
+    "fixed_at": {
+      "type": "string",
+      "title": "Fixed At",
+      "format": "date-time",
+      "description": "When this issue was resolved (if applicable)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes",
+      "description": "Admin notes on this specific check"
+    }
+  },
+  "required": [
+    "check_id",
+    "launch_id",
+    "category",
+    "check_name",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

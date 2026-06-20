@@ -1,0 +1,196 @@
+{
+  "name": "LaunchReadinessState",
+  "type": "object",
+  "_metadata": {
+    "status": "LAUNCH_READINESS_LAYER",
+    "reason": "Real-time tracking of system readiness for production launch. Single source of truth for go/no-go decisions.",
+    "immutable": false
+  },
+  "properties": {
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID",
+      "description": "Unique identifier for this launch readiness tracking instance"
+    },
+    "overall_readiness_score": {
+      "type": "number",
+      "title": "Overall Readiness Score (0-100)",
+      "default": 0,
+      "description": "Composite score: (system_health + gtm_health + funnel_health + ops_health) / 4"
+    },
+    "system_status": {
+      "type": "string",
+      "title": "System Status",
+      "enum": [
+        "not_ready",
+        "ready",
+        "live",
+        "degraded",
+        "paused"
+      ],
+      "default": "not_ready",
+      "description": "Overall system status for launch readiness"
+    },
+    "critical_blockers": {
+      "type": "array",
+      "title": "Critical Blockers",
+      "items": {
+        "type": "string"
+      },
+      "description": "List of critical issues preventing launch (stripe misconfigured, GA4 inactive, etc.)",
+      "default": []
+    },
+    "warning_items": {
+      "type": "array",
+      "title": "Warning Items",
+      "items": {
+        "type": "string"
+      },
+      "description": "Non-critical issues to address (bounce rate high, conversion low, etc.)",
+      "default": []
+    },
+    "system_checks": {
+      "type": "object",
+      "title": "System Component Checks",
+      "description": "Health status of each core system component",
+      "properties": {
+        "stripe_active": {
+          "type": "boolean",
+          "default": false
+        },
+        "stripe_live_keys": {
+          "type": "boolean",
+          "default": false
+        },
+        "ga4_active": {
+          "type": "boolean",
+          "default": false
+        },
+        "landing_pages_live": {
+          "type": "boolean",
+          "default": false
+        },
+        "pricing_page_live": {
+          "type": "boolean",
+          "default": false
+        },
+        "event_pipeline_healthy": {
+          "type": "boolean",
+          "default": false
+        },
+        "automation_healthy": {
+          "type": "boolean",
+          "default": false
+        },
+        "onboarding_ready": {
+          "type": "boolean",
+          "default": false
+        },
+        "client_portal_live": {
+          "type": "boolean",
+          "default": false
+        },
+        "twilio_provisioned": {
+          "type": "boolean",
+          "default": false
+        }
+      }
+    },
+    "system_health_score": {
+      "type": "number",
+      "title": "System Health Score (0-100)",
+      "default": 0,
+      "description": "Based on event pipeline, automation, onboarding health"
+    },
+    "gtm_health_score": {
+      "type": "number",
+      "title": "GTM Health Score (0-100)",
+      "default": 0,
+      "description": "Based on campaigns, conversion rates, revenue attribution"
+    },
+    "funnel_health_score": {
+      "type": "number",
+      "title": "Funnel Health Score (0-100)",
+      "default": 0,
+      "description": "Based on conversion rates and drop-off analysis across stages"
+    },
+    "ops_health_score": {
+      "type": "number",
+      "title": "Ops Health Score (0-100)",
+      "default": 0,
+      "description": "Based on onboarding, client portal, and support readiness"
+    },
+    "go_no_go_decision": {
+      "type": "string",
+      "title": "Go/No-Go Decision",
+      "enum": [
+        "go",
+        "conditional_go",
+        "no_go"
+      ],
+      "default": "no_go",
+      "description": "Launch decision based on readiness score and blockers"
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By",
+      "description": "Admin email who approved launch (if approved)"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time",
+      "description": "When launch was approved"
+    },
+    "live_at": {
+      "type": "string",
+      "title": "Live At",
+      "format": "date-time",
+      "description": "When system went live to external traffic"
+    },
+    "last_evaluated_at": {
+      "type": "string",
+      "title": "Last Evaluated At",
+      "format": "date-time",
+      "description": "Most recent readiness assessment timestamp"
+    },
+    "next_evaluation_at": {
+      "type": "string",
+      "title": "Next Evaluation At",
+      "format": "date-time",
+      "description": "When next readiness check is scheduled"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Launch Notes",
+      "description": "Admin notes on launch status, blockers, and decisions"
+    }
+  },
+  "required": [
+    "launch_id",
+    "overall_readiness_score",
+    "system_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

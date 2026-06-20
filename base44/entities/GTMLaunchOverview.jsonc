@@ -1,0 +1,166 @@
+{
+  "name": "GTMLaunchOverview",
+  "type": "object",
+  "_metadata": {
+    "status": "LAUNCH_READINESS_LAYER",
+    "reason": "Real-time snapshot of GTM performance metrics for launch dashboard visibility. Read-only aggregation from GTMLaunchEngine and AcquisitionCampaign.",
+    "immutable": false
+  },
+  "properties": {
+    "overview_id": {
+      "type": "string",
+      "title": "Overview ID",
+      "description": "Unique identifier for this GTM overview snapshot"
+    },
+    "launch_id": {
+      "type": "string",
+      "title": "Launch ID",
+      "description": "Reference to parent LaunchReadinessState"
+    },
+    "total_campaigns_active": {
+      "type": "integer",
+      "title": "Active Campaigns",
+      "default": 0,
+      "description": "Number of currently active acquisition campaigns"
+    },
+    "total_traffic_this_week": {
+      "type": "integer",
+      "title": "Traffic This Week",
+      "default": 0,
+      "description": "Total sessions across all campaigns"
+    },
+    "total_conversions_this_week": {
+      "type": "integer",
+      "title": "Conversions This Week",
+      "default": 0,
+      "description": "Total leads/customers acquired this week"
+    },
+    "overall_conversion_rate": {
+      "type": "number",
+      "title": "Overall Conversion Rate (%)",
+      "default": 0,
+      "description": "Traffic to lead conversion percentage across all campaigns"
+    },
+    "top_industry_by_conversion": {
+      "type": "string",
+      "title": "Top Industry by Conversion",
+      "description": "Industry vertical with highest conversion rate (e.g., roofing)"
+    },
+    "top_industry_conversion_rate": {
+      "type": "number",
+      "title": "Top Industry Conversion Rate (%)",
+      "default": 0
+    },
+    "worst_industry_by_bounce": {
+      "type": "string",
+      "title": "Worst Industry by Bounce Rate",
+      "description": "Industry vertical with highest bounce rate"
+    },
+    "worst_industry_bounce_rate": {
+      "type": "number",
+      "title": "Worst Industry Bounce Rate (%)",
+      "default": 0
+    },
+    "revenue_per_lead": {
+      "type": "number",
+      "title": "Revenue Per Lead ($)",
+      "default": 0,
+      "description": "Average revenue generated per lead acquired"
+    },
+    "total_revenue_this_week": {
+      "type": "number",
+      "title": "Revenue This Week ($)",
+      "default": 0,
+      "description": "Total revenue attributed to campaigns this week"
+    },
+    "average_roi_all_campaigns": {
+      "type": "number",
+      "title": "Average ROI All Campaigns (%)",
+      "default": 0,
+      "description": "Average return on investment across active campaigns"
+    },
+    "funnel_drop_off_stage": {
+      "type": "string",
+      "title": "Biggest Funnel Drop-Off Stage",
+      "enum": [
+        "traffic",
+        "landing_page",
+        "pricing",
+        "checkout",
+        "onboarding",
+        "none"
+      ],
+      "description": "Stage with highest abandonment/drop-off rate"
+    },
+    "funnel_drop_off_percent": {
+      "type": "number",
+      "title": "Drop-Off at Critical Stage (%)",
+      "default": 0,
+      "description": "Percentage of users lost at worst-performing stage"
+    },
+    "acquisition_health_score": {
+      "type": "number",
+      "title": "Acquisition Health Score (0-100)",
+      "default": 0,
+      "description": "Overall GTM and acquisition funnel health"
+    },
+    "top_performing_campaign": {
+      "type": "string",
+      "title": "Top Performing Campaign",
+      "description": "Campaign ID of highest ROI campaign"
+    },
+    "top_campaign_roi": {
+      "type": "number",
+      "title": "Top Campaign ROI (%)",
+      "default": 0
+    },
+    "opportunity_identified": {
+      "type": "string",
+      "title": "Primary Opportunity Identified",
+      "description": "Biggest optimization opportunity (e.g., 'Improve checkout conversion', 'Expand roofing campaigns')"
+    },
+    "estimated_opportunity_value": {
+      "type": "number",
+      "title": "Estimated Opportunity Value ($)",
+      "default": 0,
+      "description": "Revenue potential if identified opportunity is addressed"
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time",
+      "description": "When this overview was last refreshed"
+    },
+    "notes": {
+      "type": "string",
+      "title": "GTM Notes",
+      "description": "Admin observations on GTM readiness and performance"
+    }
+  },
+  "required": [
+    "overview_id",
+    "launch_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
