@@ -91,7 +91,7 @@ function LeadRow({ lead }) {
   );
 }
 
-export default function LeadActivityFeed() {
+export default function LeadActivityFeed({ project }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -100,10 +100,27 @@ export default function LeadActivityFeed() {
     setLoading(true);
     setError("");
     try {
-      const res = await base44.functions.invoke("getClientPortalLeads", { limit: 200 });
-      setLeads(res.data?.leads || []);
-    } catch {
+      // Load leads in chunks to handle large datasets (5000+)
+      let allLeads = [];
+      let skip = 0;
+      const pageSize = 500;
+      let hasMore = true;
+
+      while (hasMore) {
+        const res = await base44.functions.invoke("getClientPortalLeads", {
+          skip,
+          limit: pageSize,
+        });
+        const pageLeads = res.data?.leads || [];
+        allLeads = [...allLeads, ...pageLeads];
+        hasMore = pageLeads.length === pageSize;
+        skip += pageSize;
+      }
+
+      setLeads(allLeads);
+    } catch (err) {
       setError("Unable to load lead activity right now.");
+      console.error(err);
     } finally {
       setLoading(false);
     }
