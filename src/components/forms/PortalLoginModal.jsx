@@ -50,7 +50,11 @@ export default function PortalLoginModal({ onClose }) {
       const currentUser = await base44.auth.me();
       applyAuthenticatedUser(currentUser);
       onClose();
-      navigate(currentUser?.role === "admin" ? "/admin" : "/client-portal");
+      // Hard redirect required — the auth provider must re-initialize with the new token.
+      // navigate() leaves the app in a half-initialized state and breaks portal access.
+      const role = (currentUser?.role || "").toLowerCase();
+      const dest = role === "admin" || role === "super_admin" ? "/admin" : "/client-portal";
+      window.location.href = dest;
     } catch (err) {
       setError(err?.data?.message || err?.message || "Unable to sign in. Please check your email and password.");
     } finally {
