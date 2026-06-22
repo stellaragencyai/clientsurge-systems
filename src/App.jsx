@@ -218,6 +218,49 @@ function AppInner() {
     if (window.location.hostname.includes("preview-sandbox")) return;
     installGa4();
     initializeAnalyticsObserver();
+    
+    // Track all form submissions
+    const trackFormSubmits = () => {
+      document.querySelectorAll('form').forEach(form => {
+        form.addEventListener('submit', () => {
+          if (window.gtag) {
+            window.gtag('event', 'form_submit', {
+              form_id: form.id || form.name,
+              page_path: window.location.pathname,
+            });
+          }
+        });
+      });
+    };
+    
+    // Track link clicks
+    const trackLinks = () => {
+      document.querySelectorAll('a[href]').forEach(link => {
+        if (link.href.includes('http') && !link.href.includes(window.location.hostname)) {
+          link.addEventListener('click', () => {
+            if (window.gtag) {
+              window.gtag('event', 'link_click', {
+                link_url: link.href,
+                link_text: link.textContent,
+                link_type: 'external',
+              });
+            }
+          });
+        }
+      });
+    };
+    
+    trackFormSubmits();
+    trackLinks();
+    
+    // Re-track on navigation
+    const observer = new MutationObserver(() => {
+      trackFormSubmits();
+      trackLinks();
+    });
+    observer.observe(document.body, { childList: true, subtree: true });
+    
+    return () => observer.disconnect();
   }, []);
   return null;
 }
