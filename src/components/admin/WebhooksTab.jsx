@@ -85,53 +85,57 @@ export default function WebhooksTab({ settings, onSettingsUpdated }) {
   return (
     <div className="space-y-6">
       {/* Status banner */}
-      <div className={`flex items-start gap-3 rounded-xl border p-4 ${webhookEnabled ? 'border-green-200 bg-green-50' : 'border-amber-200 bg-amber-50'}`}>
-        <Radio className={`w-5 h-5 flex-shrink-0 mt-0.5 ${webhookEnabled ? 'text-green-600' : 'text-amber-600'}`} />
+      <div className="flex items-start gap-3 rounded-xl border-2 border-red-300 p-4 bg-red-50">
+        <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5 text-red-600" />
         <div>
-          <p className={`font-semibold text-sm ${webhookEnabled ? 'text-green-800' : 'text-amber-800'}`}>
-            Webhooks: {webhookEnabled ? 'Enabled — routes verified' : 'Not yet configured'}
+          <p className="font-semibold text-sm text-red-800">
+            ⚠️ Voice Webhook: FAILED LIVE TEST
           </p>
-          {testAt && (
-            <p className="text-xs mt-0.5 text-slate-500">
-              Last tested: {new Date(testAt).toLocaleString()} — {testResult}
-            </p>
-          )}
-          {!testAt && (
-            <p className="text-xs mt-0.5 text-slate-500">
-              Click "Seed Webhook URLs" to detect routes, store the URLs, and run a lightweight health check.
-            </p>
-          )}
+          <p className="text-xs mt-1 text-red-700">
+            <strong>Status:</strong> webhook_enabled=true, but real Twilio calls failed.
+            Custom-domain /api routes do not work as Twilio webhook targets.
+          </p>
+          <p className="text-xs mt-1 text-red-700">
+            <strong>Next Steps:</strong> Use ElevenLabs Agent as first voice responder, or configure Twilio Function + async logging to Base44. See Twilio Runtime Health panel for working direct Base44 URLs.
+          </p>
         </div>
       </div>
 
       {/* URL fields */}
-      <div className="bg-white rounded-xl border border-slate-200 p-5 space-y-5">
+      <div className="bg-white rounded-xl border border-red-200 p-5 space-y-5">
+        <div className="rounded-lg bg-red-50 border border-red-200 p-3 mb-2">
+          <p className="text-xs font-bold text-red-700 flex items-center gap-1">
+            <XCircle className="w-3.5 h-3.5" />
+            ⚠️ These URLs are NOT recommended for live Twilio — they have FAILED live call tests
+          </p>
+        </div>
         <div className="flex items-center gap-2 mb-1">
           <ExternalLink className="w-4 h-4 text-slate-500" />
-          <p className="text-sm font-semibold text-slate-800">Twilio Console Webhook URLs</p>
+          <p className="text-sm font-semibold text-slate-800">Stored URLs (FAILED — do not use)</p>
         </div>
         <p className="text-xs text-slate-500">
-          Paste these into Twilio Console → Phone Numbers → (your number). All use HTTP POST.
+          These URLs are stored in AdminSettings but are NOT safe for production Twilio webhooks.
+          Real Twilio calls to these endpoints return application errors.
         </p>
         <UrlField
-          label="Voice — A Call Comes In"
+          label="[BROKEN] Voice — A Call Comes In"
           url={settings?.voice_webhook_url}
-          description="Twilio Console → Phone Numbers → Voice & Fax → 'A Call Comes In' → Webhook → POST"
+          description="❌ FAILED LIVE TEST — Do not paste into Twilio Console. Use direct Base44 URL in Twilio Runtime Health panel instead."
         />
         <UrlField
-          label="Voice — Call Status Changes"
+          label="[BROKEN] Voice — Call Status Changes"
           url={settings?.voice_webhook_url}
-          description="Same URL handles status callbacks (completed, no-answer, busy). Set under 'Call Status Changes'."
+          description="❌ FAILED LIVE TEST — Same URL, same failure. Do not use."
         />
         <UrlField
-          label="Messaging — A Message Comes In"
+          label="[BROKEN] Messaging — A Message Comes In"
           url={settings?.sms_webhook_url}
-          description="Twilio Console → Phone Numbers → Messaging → 'A Message Comes In' → Webhook → POST"
+          description="❌ May also be failing — check Twilio Runtime Health for verified working URLs."
         />
         <UrlField
-          label="Missed Call / Voice Fallback"
+          label="[BROKEN] Missed Call / Voice Fallback"
           url={settings?.missed_call_webhook_url}
-          description="For missed-call text-back automation. Can also be set as Voice fallback URL."
+          description="❌ FAILED LIVE TEST — Do not use for production voice."
         />
       </div>
 
@@ -181,6 +185,36 @@ export default function WebhooksTab({ settings, onSettingsUpdated }) {
           place a real test call or send a test SMS to your Twilio number.
         </p>
       </div>
-    </div>
-  );
-}
+
+      {/* Recommended Architecture */}
+      <div className="rounded-xl border-2 border-green-400 bg-green-50 p-5 space-y-3">
+        <p className="text-sm font-bold text-green-800 flex items-center gap-2">
+          ✅ Recommended Voice Architecture
+        </p>
+        <p className="text-xs text-green-800">
+          Since custom-domain /api routes fail for live Twilio calls, use one of these architectures:
+        </p>
+        <div className="space-y-2">
+          <div className="rounded-lg bg-white border border-green-300 p-3 space-y-1">
+            <p className="text-xs font-semibold text-green-900">Option A: ElevenLabs Agent (Recommended)</p>
+            <p className="text-xs text-green-700">
+              ElevenLabs Agent answers inbound calls directly from Twilio. After call ends, async logging 
+              sends call metadata (transcript, duration, outcome) to Base44. Base44 remains the system of record for leads and analytics.
+            </p>
+          </div>
+          <div className="rounded-lg bg-white border border-green-300 p-3 space-y-1">
+            <p className="text-xs font-semibold text-green-900">Option B: Twilio Function</p>
+            <p className="text-xs text-green-700">
+              Twilio Function (node.js/python) answers inbound calls and returns TwiML. Function then 
+              async logs the call metadata to Base44 via backend function invocation or webhook. Base44 remains system of record.
+            </p>
+          </div>
+        </div>
+        <p className="text-xs text-green-700 font-semibold mt-2">
+          In both cases: Base44 is NOT the first voice responder. External service handles the call, 
+          then logs the outcome to Base44 asynchronously for CRM/analytics.
+        </p>
+      </div>
+      </div>
+      );
+      }

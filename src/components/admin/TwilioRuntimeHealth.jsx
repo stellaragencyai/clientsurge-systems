@@ -233,24 +233,36 @@ export default function TwilioRuntimeHealth() {
         </div>
       )}
 
-      {/* BIG WARNING when no runtime proof */}
-      {showBigWarning && (
-        <div className="rounded-xl border-2 border-amber-400 bg-amber-50 p-5 flex items-start gap-4">
-          <AlertTriangle className="w-7 h-7 text-amber-600 flex-shrink-0 mt-0.5" />
-          <div>
-            <p className="font-bold text-amber-900 text-base">No Runtime Proof for Voice Webhook</p>
-            <p className="text-amber-800 text-sm mt-1 leading-relaxed">
-              The voice handler (<code className="bg-amber-100 px-1 rounded text-xs font-mono">/api/receiveInboundVoiceCall</code>) exists
-              and is deployed, but <strong>no voice CommunicationEvent records have been created</strong> and
-              the WebhookRegistration has never been triggered. This means Twilio has not called this endpoint yet.
-            </p>
-            <p className="text-amber-800 text-sm mt-2 leading-relaxed">
-              <strong>To fix:</strong> Paste the webhook URL below into your Twilio phone number configuration, then
-              place a test call to your Twilio number. A CommunicationEvent will be created automatically on hit.
-            </p>
-          </div>
+      {/* BIG WARNING — CONFIRMED FAILED LIVE TEST */}
+      <div className="rounded-xl border-2 border-red-400 bg-red-50 p-5 flex items-start gap-4">
+        <AlertTriangle className="w-7 h-7 text-red-600 flex-shrink-0 mt-0.5" />
+        <div className="space-y-2">
+          <p className="font-bold text-red-900 text-base">🚨 Voice Webhook: FAILED LIVE TEST</p>
+          <p className="text-red-800 text-sm leading-relaxed">
+            <strong>Confirmed Status:</strong> Real Twilio calls to these URLs return application error:
+          </p>
+          <ul className="text-red-800 text-sm list-disc list-inside space-y-0.5 ml-2">
+            <li><code className="bg-red-100 px-1 rounded text-xs font-mono">https://clientsurgesystems.com/api/receiveInboundVoiceCall</code></li>
+            <li><code className="bg-red-100 px-1 rounded text-xs font-mono">https://clientsurgesystems.com/api/twilioVoicePing</code></li>
+          </ul>
+          <p className="text-red-800 text-sm mt-2 leading-relaxed">
+            <strong>Root Cause:</strong> Custom-domain /api routes do not correctly proxy to Base44 backend functions 
+            when Twilio calls them. Twilio expects a URL that responds with TwiML within 15 seconds; 
+            the custom domain routing fails before the function is reached.
+          </p>
+          <p className="text-red-800 text-sm mt-2 leading-relaxed font-semibold">
+            <strong>Decision Required:</strong> Do NOT use Base44 custom-domain /api routes as Twilio's first voice responder. 
+            Choose one of these architectures:
+          </p>
+          <ul className="text-red-800 text-sm list-disc list-inside space-y-0.5 ml-2">
+            <li><strong>ElevenLabs Agent:</strong> ElevenLabs answers calls, logs outcome to Base44 async</li>
+            <li><strong>Twilio Function:</strong> Twilio Function answers calls, logs outcome to Base44 async</li>
+          </ul>
+          <p className="text-red-800 text-sm mt-2">
+            Base44 remains the system of record for leads and analytics — not the first voice responder.
+          </p>
         </div>
-      )}
+      </div>
 
       {/* Proof run result */}
       {proofResult && (
@@ -395,11 +407,14 @@ export default function TwilioRuntimeHealth() {
             </div>
           )}
           {data?.voiceGate && (
-            <p className="text-[11px] font-semibold">
-              Gate: <span className={data.voiceGate.status === 'blocked' ? 'text-amber-600' : 'text-green-600'}>
-                {data.voiceGate.status}
-              </span>
-              {' '}({data.voiceGate.proof_percent}% proof)
+            <p className="text-[11px] font-semibold space-y-1">
+              <div>Gate: <span className='text-red-600 font-bold'>
+                FAILED LIVE TEST
+              </span></div>
+              <div className="text-red-600 text-xs mt-1">
+                Smoke proof passed ({data.voiceGate.proof_percent}% via simulated checks), 
+                but real Twilio phone calls fail. Voice gate remains ready_for_proof, not live.
+              </div>
             </p>
           )}
         </div>
@@ -588,11 +603,14 @@ export default function TwilioRuntimeHealth() {
           </ol>
         </div>
 
-        <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 p-3">
-          <AlertTriangle className="w-4 h-4 text-amber-600 flex-shrink-0" />
-          <p className="text-xs text-amber-800">
-            <strong>Status: Waiting for live call proof.</strong> No voice gate has been marked live. No call proof has been faked.
-            Run the proof check button above after a real call succeeds.
+        <div className="flex items-center gap-2 rounded-lg border border-red-300 bg-red-50 p-3">
+          <XCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
+          <p className="text-xs text-red-800">
+            <strong>Voice Gate Status: FAILED — NOT LIVE</strong><br />
+            <strong>Smoke proof:</strong> Passed (simulated checks only).<br />
+            <strong>Real phone call proof:</strong> FAILED (custom-domain /api routes error).<br />
+            <strong>Gate state:</strong> ready_for_proof (not live).<br />
+            <strong>Recommendation:</strong> Use ElevenLabs Agent or Twilio Function as first responder. Base44 is system of record only.
           </p>
         </div>
       </div>
