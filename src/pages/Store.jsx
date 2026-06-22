@@ -50,7 +50,7 @@ function StoreHumanFallbackCTA() {
       style={{
         margin: "24px 0 24px",
         borderRadius: "24px",
-        border: "1px solid rgba(0,136,204,0.16)",
+        border: "1px solid rgba(0,174,239,0.16)",
         background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(255,255,255,0.92))",
         padding: "22px",
         display: "flex",
@@ -58,7 +58,7 @@ function StoreHumanFallbackCTA() {
         justifyContent: "space-between",
         gap: "18px",
         flexWrap: "wrap",
-        boxShadow: "0 12px 32px rgba(0, 88, 132, 0.08)"
+        boxShadow: "0 12px 32px rgba(0, 59, 143, 0.08)"
       }}
     >
       <div style={{ maxWidth: "620px" }}>
@@ -90,7 +90,7 @@ function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
       style={{
         marginBottom: "22px",
         borderRadius: "28px",
-        border: "1px solid rgba(0,136,204,0.16)",
+        border: "1px solid rgba(0,174,239,0.16)",
         background: "linear-gradient(135deg, rgba(0,174,239,0.10), rgba(255,255,255,0.96), rgba(0,59,143,0.06))",
         boxShadow: "0 18px 48px rgba(0,59,143,0.08)",
         padding: "24px",
@@ -118,7 +118,7 @@ function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
                   borderRadius: "999px",
                   padding: "8px 12px",
                   background: "rgba(255,255,255,0.88)",
-                  border: "1px solid rgba(0,136,204,0.14)",
+                  border: "1px solid rgba(0,174,239,0.14)",
                   fontSize: "12px",
                   fontWeight: 700,
                   color: "#0A1628",
@@ -141,7 +141,7 @@ function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
             borderRadius: "22px",
             padding: "18px",
             background: "#ffffff",
-            border: "1px solid rgba(0,136,204,0.14)",
+            border: "1px solid rgba(0,174,239,0.14)",
             boxShadow: "0 12px 30px rgba(0,59,143,0.07)",
           }}
         >
@@ -335,27 +335,29 @@ function StoreInner() {
         minHeight: "100vh",
         fontFamily: "'Inter', sans-serif",
         position: "relative",
-        background: "linear-gradient(180deg, #f7fbff 0%, #ffffff 42%, #f7fbff 100%)"
+        background: "hsl(var(--background))"
       }}>
-      
-      
+
+
 
       <div style={{ position: "relative", zIndex: 2 }}>
         <style>{`
-          .store-page nav {
-            background: rgba(247,251,255,0.9) !important;
-            border-bottom-color: rgba(0,136,204,0.14) !important;
-            backdrop-filter: blur(22px) !important;
-            -webkit-backdrop-filter: blur(22px) !important;
-          }
           .store-page .store-hero {
             text-align: center;
-            padding: 96px 24px 14px;
+            padding: calc(var(--cs-nav-height) + 40px) 24px 14px;
             position: relative;
           }
           .store-page .store-hero-copy {
-            max-width: 640px;
+            max-width: 880px;
             margin: 0 auto;
+          }
+          .store-page .store-hero-copy .cs-section-title {
+            white-space: nowrap;
+          }
+          @media (max-width: 720px) {
+            .store-page .store-hero-copy .cs-section-title {
+              white-space: normal;
+            }
           }
           .store-page .store-stat-grid {
             display: grid;
@@ -419,11 +421,11 @@ function StoreInner() {
           }
           .store-page .store-sticky-cart {
             position: sticky;
-            top: 64px;
+            top: calc(var(--cs-nav-height) + 12px);
             z-index: 40;
             margin: 0 24px 20px;
             border-radius: 18px;
-            background: linear-gradient(135deg, rgba(0,80,160,0.95) 0%, rgba(0,136,204,0.95) 52%, rgba(0,59,143,0.97) 100%);
+            background: linear-gradient(135deg, rgba(0,107,176,0.95) 0%, rgba(0,174,239,0.95) 52%, rgba(0,59,143,0.97) 100%);
             padding: 12px 16px;
             display: flex;
             align-items: center;
@@ -547,12 +549,11 @@ function StoreInner() {
               style={{
                 maxWidth: "760px",
                 margin: "0 auto 10px",
-                padding: "8px 12px",
+                padding: "12px 16px",
                 borderRadius: "12px",
-                background: "rgba(255,255,255,0.4)",
-                border: "none",
-                borderBottom: "1px solid rgba(0,136,204,0.12)",
-                boxShadow: "none",
+                background: "rgba(0,174,239,0.06)",
+                border: "1px solid rgba(0,174,239,0.2)",
+                boxShadow: "0 2px 8px rgba(0,59,143,0.05)",
                 fontSize: "12px"
               }}>
               
@@ -593,7 +594,7 @@ function StoreInner() {
                 initial={{ opacity: 0, y: 28 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
-                whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,136,204,0.13)" }}
+                whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,174,239,0.13)" }}
                 style={{
                   display: "flex",
                   alignItems: "center",
@@ -601,7 +602,7 @@ function StoreInner() {
                   borderRadius: "14px",
                   padding: "14px 18px",
                   background: "#ffffff",
-                  border: "1.5px solid rgba(0,136,204,0.14)",
+                  border: "1.5px solid rgba(0,174,239,0.14)",
                   boxShadow: "0 8px 22px rgba(0,59,143,0.08)",
                   cursor: "default"
                 }}>
@@ -770,7 +771,7 @@ function StoreInner() {
                     transform: "translateY(-50%)",
                     width: "14px",
                     height: "14px",
-                    color: "rgba(0,136,204,0.6)"
+                    color: "rgba(0,174,239,0.6)"
                   }} />
                 
                 <input
@@ -781,14 +782,14 @@ function StoreInner() {
                   style={{
                     width: "100%",
                     borderRadius: "9999px",
-                    border: "1.5px solid rgba(0,136,204,0.42)",
+                    border: "1.5px solid rgba(0,174,239,0.42)",
                     padding: "11px 16px 11px 38px",
                     fontSize: "13px",
-                    background: "rgba(255,255,255,0.85)",
+                    background: "#ffffff",
                     outline: "none",
                     boxSizing: "border-box",
                     color: "#0A1628",
-                    boxShadow: "0 2px 8px rgba(0,136,204,0.07)"
+                    boxShadow: "0 2px 8px rgba(0,174,239,0.07)"
                   }} />
                 
               </div>
@@ -820,13 +821,13 @@ function StoreInner() {
                       fontWeight: "600",
                       border:
                       activeCategory === category ?
-                      "1.5px solid rgba(0,136,204,0.6)" :
-                      "1.5px solid rgba(0,136,204,0.18)",
+                      "1.5px solid rgba(0,174,239,0.6)" :
+                      "1.5px solid rgba(0,174,239,0.18)",
                       cursor: "pointer",
                       background:
                       activeCategory === category ?
-                      "linear-gradient(135deg,#0088CC,#00AEEF)" :
-                      "rgba(255,255,255,0.75)",
+                      "linear-gradient(135deg,#00AEEF,#0079c1)" :
+                      "#ffffff",
                       color:
                       activeCategory === category ?
                       "#ffffff" :
@@ -834,7 +835,7 @@ function StoreInner() {
                       boxShadow:
                       activeCategory === category ?
                       "0 4px 14px rgba(0,174,239,0.35)" :
-                      "0 1px 4px rgba(0,136,204,0.08)"
+                      "0 1px 4px rgba(0,174,239,0.08)"
                     }}>
                     
                       {category}
@@ -893,7 +894,7 @@ function StoreInner() {
               style={{
                 margin: "8px 0 28px",
                 borderRadius: "20px",
-                border: "1px solid rgba(0,136,204,0.16)",
+                border: "1px solid rgba(0,174,239,0.16)",
                 background: "linear-gradient(135deg, rgba(0,174,239,0.07), rgba(255,255,255,0.95))",
                 padding: "28px",
                 boxShadow: "0 8px 28px rgba(0,59,143,0.07)",
@@ -922,7 +923,7 @@ function StoreInner() {
                       flexDirection: "column",
                       gap: "6px",
                       borderRadius: "14px",
-                      border: pkg.highlight ? "1.5px solid rgba(0,174,239,0.6)" : "1.5px solid rgba(0,136,204,0.18)",
+                      border: pkg.highlight ? "1.5px solid rgba(0,174,239,0.6)" : "1.5px solid rgba(0,174,239,0.18)",
                       background: pkg.highlight ? "rgba(0,174,239,0.08)" : "#ffffff",
                       padding: "16px",
                       textDecoration: "none",
