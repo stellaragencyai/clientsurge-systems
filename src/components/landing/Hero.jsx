@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion } from "framer-motion";
 
 const FEATURE_CHIPS = [
   "Lead Capture",
@@ -14,6 +14,7 @@ const FEATURE_CHIPS = [
 
 export default function Hero() {
   const navigate = useNavigate();
+  const shouldReduceMotion = useReducedMotion();
 
   return (
     <section
@@ -58,25 +59,28 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Headline with glow backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.08 }}
-          className="absolute inset-0 pointer-events-none"
-          style={{
-            top: "50%",
-            left: "50%",
-            transform: "translate(-50%, -50%)",
-            width: "120%",
-            height: "200px",
-            background: "radial-gradient(ellipse at center, rgba(0,174,239,0.15), transparent 70%)",
-            filter: "blur(40px)",
-            zIndex: -1,
-          }}
-        />
+        {/* Headline with glow backdrop — skipped when prefers-reduced-motion */}
+        {!shouldReduceMotion && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.08 }}
+            className="absolute inset-0 pointer-events-none"
+            aria-hidden="true"
+            style={{
+              top: "50%",
+              left: "50%",
+              transform: "translate(-50%, -50%)",
+              width: "120%",
+              height: "200px",
+              background: "radial-gradient(ellipse at center, rgba(0,174,239,0.15), transparent 70%)",
+              filter: "blur(40px)",
+              zIndex: -1,
+            }}
+          />
+        )}
         <motion.h1
-          initial={{ opacity: 0, y: 16 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
           className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight relative"
@@ -87,10 +91,10 @@ export default function Hero() {
 
         {/* Subheadline */}
         <motion.p
-          initial={{ opacity: 0, y: 16 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-base md:text-lg text-white/80 max-w-3xl mx-auto mb-8 leading-relaxed"
+          className="text-base md:text-lg font-normal text-white/85 max-w-3xl mx-auto mb-8 leading-relaxed"
         >
           ClientSurge helps businesses browse, choose, and activate AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, reactivation, and operations — through a guided AI-powered remote setup process.
         </motion.p>
@@ -107,10 +111,11 @@ export default function Hero() {
               trackCTA("browse_automation_systems", "hero");
               navigate("/store");
             }}
-            className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-bold text-white transition-all duration-300 hover:scale-105"
+            className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white transition-all duration-300 hover:scale-105 hover:shadow-xl"
             style={{
               minHeight: "unset",
               minWidth: "unset",
+              boxShadow: "0 4px 20px rgba(0,121,193,0.45)",
             }}
           >
             Browse AI Automation Systems <ArrowRight className="w-5 h-5" />
@@ -120,11 +125,11 @@ export default function Hero() {
               trackCTA("start_remote_setup", "hero");
               navigate("/book");
             }}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-lg text-base font-semibold text-white transition-all duration-300 hover:bg-white/10"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white transition-all duration-300 hover:bg-white/25"
             style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1px solid rgba(255,255,255,0.25)",
-              backdropFilter: "blur(4px)",
+              background: "rgba(255,255,255,0.15)",
+              border: "1.5px solid rgba(255,255,255,0.45)",
+              backdropFilter: "blur(8px)",
               minHeight: "unset",
               minWidth: "unset",
             }}
@@ -138,7 +143,7 @@ export default function Hero() {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-sm text-white/60 mb-6"
+          className="text-sm font-medium text-white/75 mb-6"
         >
           Built for service businesses, clinics, contractors, agencies, and local operators that need faster response, better follow-up, and fewer lost opportunities.
         </motion.p>

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import { Clock, PhoneMissed, Users, AlertTriangle, Archive } from "lucide-react";
 
 const problems = [
@@ -30,34 +29,31 @@ const problems = [
 ];
 
 const ProblemCard = ({ problem }) => {
-  const [hovered, setHovered] = useState(false);
   return (
-    <div 
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={() => setHovered(false)}
-      className={`p-6 rounded-2xl bg-background/5 transition-all duration-300 transform ${hovered ? "border border-slate-600 -translate-y-1 shadow-lg" : "border border-transparent"}`}
+    <div
+      className="p-6 rounded-2xl bg-white/5 border border-white/10 transition-all duration-300 hover:-translate-y-1.5 hover:border-primary/40 hover:shadow-[0_8px_30px_rgba(0,174,239,0.18)] group"
     >
-      <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 transition-all ${hovered ? "bg-primary/30 scale-110" : "bg-primary/20"}`}>
+      <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/20 transition-transform duration-300 group-hover:scale-110 group-hover:bg-primary/35">
         <problem.icon className="w-6 h-6 text-primary" />
       </div>
-      <h3 className="text-base font-semibold text-background mb-2">{problem.title}</h3>
-      <p className="text-sm text-background/60 leading-relaxed">{problem.desc}</p>
+      <h3 className="text-base font-bold text-white mb-2 leading-snug">{problem.title}</h3>
+      <p className="text-sm font-normal text-white/75 leading-relaxed">{problem.desc}</p>
     </div>
   );
 };
 
 export default function ProblemSection() {
   return (
-    <section className="py-24 md:py-32 px-6 bg-foreground">
+    <section className="py-28 md:py-40 px-6 bg-foreground">
       <div className="max-w-6xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">The Real Problem</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-background leading-tight">
+        <div className="max-w-2xl mx-auto text-center mb-20">
+          <p className="text-xs font-bold text-primary tracking-widest uppercase mb-5">The Real Problem</p>
+          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-black tracking-tight text-white leading-tight">
             You Don't Have a Lead Problem.
             <br />
             <span className="text-primary">You Have a Follow-Up Problem.</span>
           </h2>
-          <p className="mt-5 text-background/60 text-lg leading-relaxed">
+          <p className="mt-6 text-white/80 text-lg font-normal leading-relaxed">
             Every delayed response is lost revenue. Every missed call is a booking that went elsewhere.
           </p>
         </div>

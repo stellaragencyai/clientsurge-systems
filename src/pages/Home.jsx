@@ -115,6 +115,9 @@ export default function Home() {
         {/* 1. Hero */}
         <Hero />
 
+        {/* 1b. Breathing room between hero and problem statement */}
+        <div className="h-2 md:h-4 bg-foreground" aria-hidden="true" />
+
         {/* 2. Problem Section */}
         <ProblemSection />
 

@@ -317,8 +317,13 @@ html, body {
 /* FIX 6 — Heading text overflow */
 h1, h2, h3 { overflow-wrap: break-word; word-break: break-word; }
 
-/* FIX 10 — Image overflow prevention */
+/* FIX 10 — Image overflow prevention + lazy loading baseline */
 img { max-width: 100%; height: auto; }
+/* Below-the-fold images: use loading="lazy" in JSX; this ensures consistent aspect-ratio boxes */
+img[loading="lazy"] { content-visibility: auto; }
+/* Standardize image containers to prevent layout shift */
+.img-container { position: relative; overflow: hidden; }
+.img-container img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 /* FIX 2 — Timeline 4-col grid */
 @media (max-width: 640px) { .timeline-grid { grid-template-columns: 1fr 1fr !important; gap: 12px !important; } }
@@ -742,6 +747,17 @@ h1, h2, h3, h4, h5, h6 {
 p, li, span, td, th {
   text-shadow: none;
   opacity: 1;
+}
+
+/* Standardized body copy weights — no thin/light text */
+p, li, td, th, label, span {
+  font-weight: 400; /* minimum readable weight on all screens */
+}
+/* Muted/secondary text: minimum 400 weight with sufficient contrast */
+.text-muted-foreground,
+[class*="text-white/"],
+[class*="text-background/"] {
+  font-weight: 400;
 }
 
 /* Pillar 1 Task 18 — Standardize form labels */
@@ -1203,6 +1219,27 @@ textarea:focus {
 [class*="pricing-card"]:hover .icon-wrapper {
   transform: scale(1.15) rotate(-5deg);
   transition: transform 0.2s ease;
+}
+
+/* ============================================
+   GLOBAL CARD MICRO-INTERACTIONS
+   Consistent lift + shadow on any interactive card
+   ============================================ */
+.cs-interactive-card {
+  transition: transform 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.25s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.25s ease;
+}
+.cs-interactive-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 28px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0,174,239,0.1);
+}
+@media (pointer: coarse) {
+  .cs-interactive-card:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-interactive-card { transition: none !important; }
+  .cs-interactive-card:hover { transform: none !important; }
 }
 
 /* ============================================

@@ -25,8 +25,12 @@
     <link rel="preconnect" href="https://checkout.stripe.com" crossorigin />
     <link rel="preconnect" href="https://api.twilio.com" crossorigin />
     <link rel="preconnect" href="https://api.resend.com" crossorigin />
+    <!-- Preload critical font weights first to prevent CLS -->
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/inter/v19/UcCO3FwrK3iLTeHuS_nVMrMxCp50SjIw2boKoduKmMEVuLyfAZ9hiJ-Ek-_EeA.woff2" />
+    <link rel="preload" as="font" type="font/woff2" crossorigin href="https://fonts.gstatic.com/s/montserrat/v29/JTUHjIg1_i6t8kCHKm4532VJOt5-QNFgpCtr6Ew.woff2" />
     <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" media="print" onload="this.media='all'" />
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Montserrat:wght@600;700;800;900&display=swap" /></noscript>
     <link rel="alternate" hreflang="en-US" href="https://clientsurgesystems.com/" />
     <link rel="icon" type="image/svg+xml" href="/pwa-icon.svg" />
     <link rel="apple-touch-icon" href="/pwa-icon.svg" />
@@ -101,6 +105,39 @@
             "url": "https://clientsurgesystems.com",
             "publisher": { "@id": "https://clientsurgesystems.com/#organization" },
             "inLanguage": "en-US"
+          },
+          {
+            "@type": "SoftwareApplication",
+            "@id": "https://clientsurgesystems.com/#ai-automation-platform",
+            "name": "ClientSurge AI Automation Platform",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web",
+            "offers": [
+              {
+                "@type": "Offer",
+                "name": "Starter System",
+                "price": "497.00",
+                "priceCurrency": "USD",
+                "priceSpecification": { "@type": "RecurringCharges", "billingDuration": "P1M" },
+                "description": "Lead capture, missed-call text-back, and instant lead response automation."
+              },
+              {
+                "@type": "Offer",
+                "name": "Growth System",
+                "price": "997.00",
+                "priceCurrency": "USD",
+                "priceSpecification": { "@type": "RecurringCharges", "billingDuration": "P1M" },
+                "description": "Full automation suite including AI scheduling, review automation, and advanced follow-up."
+              },
+              {
+                "@type": "Offer",
+                "name": "Elite System",
+                "price": "1997.00",
+                "priceCurrency": "USD",
+                "priceSpecification": { "@type": "RecurringCharges", "billingDuration": "P1M" },
+                "description": "Full-stack AI automation with voice agents, lead reactivation, and priority support."
+              }
+            ]
           }
         ]
       }
