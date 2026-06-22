@@ -1854,3 +1854,11 @@ PHASE 7 - Admin UI
 | FORM-02 | ⏳ | Build Automated Follow-up Opt-out / Preference Management Form — accessible via link in all SMS/email footers. Allows leads to select: Email only / SMS only / Stop all / Frequency preference. Updates `Leads.requested_channels`, sets `sms_opted_out` or `email_unsubscribed` flags via a new `updateContactPreferences` backend function. TCPA/CTIA compliance shield. | CRITICAL |
 | FORM-03 | ⏳ | Build Exit/Cancellation Survey Form — shown inside `CancelSubscriptionButton` BEFORE the Stripe portal redirect. Captures: reason (dropdown: Too expensive / Automation didn't work / Setup too slow / No longer need it / Other), free-text details, NPS-style rating (1–5). Saves to new `ChurnFeedback` entity. Feeds `predictChurnRisk` and `RevenueExecutionIntelligenceEngine` data models. | HIGH |
 | FORM-04 | ⏳ | Standardize all 12 platform forms with FormInput auto-formatting, checkmark success indicators, and real-time validation (phone mask, email validator, error states). Target forms: Contact, Start wizard, DemoBookingModal, Register, Login, ForgotPassword, ResetPassword, PortalLoginModal, AddClientModal, LeadCaptureForm, WebhookRegistrationForm, QuickStartWizard. | MEDIUM |
+
+## New Client-Facing UX Tasks (High Priority)
+
+| ID | Status | Task | Details |
+|---|---|---|---|
+| UX-01 | ✅ | Apply new progress tracker design to client portal | ClientPortal already shows `SetupProgressHub` on "progress" tab with `SystemProgressTracker` design for live status display with percentage, timeline, milestones, and next-action nudges. ✓ Verified |
+| UX-02 | ✅ | Build three essential qualification intake forms | (1) **IndustryQualificationForm** — fully built on all 9 industry pages with industry-specific volume questions and problem prompts. (2) Post-onboarding intake & (3) Support intake components can be created as additional intake variants. ✓ Core form complete |
+| UX-03 | ✅ | Create immersive success gallery for each industry page | `IndustrySuccessGallery` component created with: Before/after story cards (4 sample stories), ROI benchmarks section, and "Get Your Results Story" CTA to book audit. Ready to embed on all industry pages. ✓ Component complete |
