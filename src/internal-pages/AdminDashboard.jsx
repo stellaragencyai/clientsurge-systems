@@ -54,6 +54,7 @@ import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
 import LandingPageAnalyticsPanel from '../components/admin/LandingPageAnalyticsPanel';
 import SalesFunnelPanel from '../components/admin/SalesFunnelPanel';
+import CustomerOnboardingPanel from '../components/admin/CustomerOnboardingPanel';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
@@ -100,6 +101,7 @@ const NAV_GROUPS = [
   {
     group: 'Clients & Onboarding',
     items: [
+      { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
       { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: Zap },
@@ -277,6 +279,7 @@ export default function AdminDashboard() {
       case 'crm-health': return <CrmHealthDashboard />;
       case 'launch-gates': return <LaunchGatesPanel />;
       case 'sales-funnel': return <SalesFunnelPanel />;
+      case 'customer-onboarding': return <CustomerOnboardingPanel />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'templates': return <CommunicationTemplates />;
       case 'twilio-health': return <TwilioRuntimeHealth />;
