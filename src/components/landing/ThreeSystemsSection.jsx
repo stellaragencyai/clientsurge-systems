@@ -168,7 +168,7 @@ export default function ThreeSystemsSection() {
                   <ul className="space-y-3.5 w-full text-left flex-1 mb-6">
                     {pkg.includes.map((item) => (
                       <li key={item} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent }} />
+                        <CheckCircle2 data-checkicon="true" aria-hidden="true" className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent, strokeWidth: 2.5 }} />
                         <span className="text-sm text-[#0A1628] leading-snug">{item}</span>
                       </li>
                     ))}

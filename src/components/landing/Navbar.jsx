@@ -117,7 +117,11 @@ export default function Navbar() {
     e.preventDefault();
     trackCTA("nav_logo", "navbar");
     closeAll();
-    if (location.pathname === "/" && location.hash === "") {
+    // #3 — Robust scroll-to-top on logo click, even if already on home
+    if (location.pathname === "/") {
+      if (location.hash) {
+        window.history.replaceState(null, "", "/");
+      }
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       return;
     }
@@ -339,7 +343,8 @@ export default function Navbar() {
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}
         >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          {open ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
+          <span className="sr-only">{open ? "Close navigation menu" : "Open navigation menu"}</span>
         </button>
       </div>
 

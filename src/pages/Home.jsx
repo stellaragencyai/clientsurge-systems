@@ -8,6 +8,7 @@ import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
+import VisualFlawsPatch60 from "../components/landing/VisualFlawsPatch60";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
@@ -108,6 +109,7 @@ export default function Home() {
     <DemoBookingProvider>
       <div className="min-h-screen">
         <ScrollProgressBar />
+        <VisualFlawsPatch60 />
         <Navbar />
 
         {/* 1. Hero */}
