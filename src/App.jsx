@@ -300,7 +300,7 @@ function AdminLoadingSkeleton() {
 
 function RouteLoadingSkeleton() {
   return (
-    <div className="fixed inset-0 flex items-center justify-center">
+    <div className="fixed inset-0 flex items-center justify-center" style={{ minHeight: "100svh" }}>
       <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
     </div>
   );

@@ -151,8 +151,18 @@ export default function InstallQueuePanel() {
                 <div key={item.service_key} className="flex items-center justify-between text-sm">
                   <span className="text-foreground/70">{item.product_name}</span>
                   <div className="flex items-center gap-2">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-white/40">
-                      {item.install_status || "Paid"}
+                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${
+                      item.install_status === "Live"
+                        ? "bg-green-500 text-white font-bold"
+                        : item.install_status === "Testing"
+                        ? "bg-cyan-100 text-cyan-800"
+                        : item.install_status === "Configuring"
+                        ? "bg-purple-100 text-purple-800"
+                        : item.install_status === "Error"
+                        ? "bg-red-100 text-red-800"
+                        : "bg-white/40"
+                    }`}>
+                      {item.install_status === "Live" ? "✓ Live" : (item.install_status || "Paid")}
                     </span>
                     {item.install_status !== "Live" && item.install_status !== "Error" && (
                       <button

@@ -88,6 +88,27 @@ Deno.serve(async (req) => {
     // Create order
     const order = await base44.asServiceRole.entities.Order.create(orderData);
 
+    // PL-63: Send SMS confirmation to customer after checkout
+    const customerPhone = session.customer_details?.phone;
+    if (customerPhone) {
+      try {
+        const twilioSid = Deno.env.get('TWILIO_ACCOUNT_SID');
+        const twilioToken = Deno.env.get('TWILIO_AUTH_TOKEN');
+        const twilioFrom = Deno.env.get('TWILIO_PHONE_NUMBER');
+        if (twilioSid && twilioToken && twilioFrom) {
+          const smsBody = `Thanks for your order with ClientSurge Systems! Your automation setup is now in progress. We'll reach out within 1 business day to get your systems configured. Reply STOP to opt out.`;
+          const auth = btoa(`${twilioSid}:${twilioToken}`);
+          await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
+            method: 'POST',
+            headers: { 'Authorization': `Basic ${auth}`, 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: new URLSearchParams({ From: twilioFrom, To: customerPhone, Body: smsBody }).toString(),
+          }).catch(e => console.error('[stripeWebhookOrders] SMS confirmation failed:', e.message));
+        }
+      } catch (smsErr) {
+        console.error('[stripeWebhookOrders] SMS post-checkout error:', smsErr.message);
+      }
+    }
+
     // Mark webhook as processed
     await base44.asServiceRole.entities.CommunicationEvent.create({
       provider_message_id: event.id,

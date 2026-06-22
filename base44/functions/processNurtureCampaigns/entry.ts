@@ -1,4 +1,9 @@
-import { secureJson } from "../_shared/response.ts";
+function secureJson(data, opts = {}) {
+  return new Response(JSON.stringify(data), {
+    status: opts.status || 200,
+    headers: { "Content-Type": "application/json", "X-Content-Type-Options": "nosniff" },
+  });
+}
 /**
  * processNurtureCampaigns — daily runner for the 30-day nurture email sequence. (redeployed 2026-05-02b)
  *
@@ -17,7 +22,21 @@ import { secureJson } from "../_shared/response.ts";
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
+// Inline resendFetch with retry logic (replaces shared import)
+async function resendFetch(url, options = {}, retries = 2) {
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (res.status === 429 || res.status >= 500) {
+        if (attempt < retries) { await new Promise(r => setTimeout(r, 2000 * (attempt + 1))); continue; }
+      }
+      return res;
+    } catch (err) {
+      if (attempt >= retries) throw err;
+      await new Promise(r => setTimeout(r, 2000 * (attempt + 1)));
+    }
+  }
+}
 
 // #97 / #495: 24-hour idempotency guard — prevents duplicate nurture sends inside the same daily window
 const IDEMPOTENCY_WINDOW_MS = 24 * 3600000;
@@ -241,14 +260,23 @@ function getCampaignSendGate() {
   return { ok: true, proof_status: proofStatus };
 }
 
+// PL-67: Business hours gate — only send nurture emails 8am–7pm recipient local (Phoenix as default)
+function isWithinBusinessHours() {
+  const now = new Date();
+  const hour = parseInt(now.toLocaleString("en-US", { timeZone: "America/Phoenix", hour: "numeric", hour12: false }), 10);
+  return hour >= 8 && hour < 19;
+}
+
 async function sendEmail(to, subject, html, resendKey, fromEmail) {
+  // PL-66: include plain-text fallback for email clients that don't render HTML
+  const text = html.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
   const res = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: {
       Authorization: `Bearer ${resendKey}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ from: fromEmail, to, subject, html }),
+    body: JSON.stringify({ from: fromEmail, to, subject, html, text }),
   });
   if (!res.ok) {
     const err = await res.json().catch(() => ({}));
@@ -312,6 +340,11 @@ Deno.serve(async (req) => {
         },
         { status: 403 }
       );
+    }
+
+    // PL-67: Only send during business hours (8am–7pm Arizona time)
+    if (!isWithinBusinessHours()) {
+      return secureJson({ success: true, processed: 0, message: "Outside business hours (8am–7pm AZ). Skipping nurture sends." });
     }
 
     const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };

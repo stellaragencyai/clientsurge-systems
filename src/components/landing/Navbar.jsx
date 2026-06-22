@@ -253,7 +253,7 @@ export default function Navbar() {
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge Systems"
               width="240"
-              height="72"
+              height="112"
               decoding="async"
               style={{ height: "clamp(80px, 9.5vw, 112px)", width: "auto", maxWidth: "none", objectFit: "contain", display: "block", transform: "translate(-15px, -20px)" }}
             />
