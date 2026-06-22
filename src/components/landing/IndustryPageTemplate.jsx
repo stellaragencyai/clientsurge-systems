@@ -5,8 +5,9 @@ import { getPlanFeatures } from '@/lib/saasProductizationConfig';
 import Navbar from './Navbar';
 import Footer from './Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
-import { ArrowRight, CheckCircle, TrendingUp, Zap } from 'lucide-react';
+import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
+import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
 
 const ROOFING_HERO_IMAGE = 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/e92b5f56c_watermarked_img_13975777732204341720.jpg';
 
@@ -132,18 +133,22 @@ export default function IndustryPageTemplate() {
           <SectionHeader title={`How ${industry.industry_name} Automation Works`} />
           <div className="grid md:grid-cols-2 gap-8">
             {industry.use_cases.map((useCase, i) => {
-              const IconComponent = useCase.icon === 'MessageSquare' ? () => <Zap className="w-6 h-6" />
-                : useCase.icon === 'Calendar' ? () => <TrendingUp className="w-6 h-6" />
-                : useCase.icon === 'Phone' ? () => <Zap className="w-6 h-6" />
-                : useCase.icon === 'AlertCircle' ? () => <TrendingUp className="w-6 h-6" />
-                : () => <CheckCircle className="w-6 h-6" />;
+              const ICON_MAP = {
+                MessageSquare: MessageSquare,
+                Calendar: Calendar,
+                Phone: Phone,
+                AlertCircle: AlertCircle,
+                Zap: Zap,
+                TrendingUp: TrendingUp,
+              };
+              const IconComponent = ICON_MAP[useCase.icon] || CheckCircle;
 
               return (
                 <div key={i} className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
                       <div className="flex items-center justify-center w-12 h-12 rounded-lg bg-blue-100 text-blue-600">
-                        <IconComponent />
+                        <IconComponent className="w-6 h-6" />
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
@@ -212,6 +217,27 @@ export default function IndustryPageTemplate() {
                 <span className="text-slate-700 font-medium">{feature}</span>
               </div>
             ))}
+          </div>
+        </div>
+      </section>
+
+      {/* INDUSTRY QUALIFICATION FORM */}
+      <section className="py-20 px-6 bg-white">
+        <div className="max-w-2xl mx-auto">
+          <div className="mb-8 text-center">
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">Free Automation Audit</p>
+            <h2 className="text-3xl font-extrabold text-foreground mb-3">
+              Is Your {industry.industry_name} Business Ready to Automate?
+            </h2>
+            <p className="text-muted-foreground text-base leading-relaxed">
+              Answer 4 quick questions and we'll tell you exactly which automation system fits your volume, budget, and goals — free, no obligation.
+            </p>
+          </div>
+          <div className="rounded-2xl border border-border bg-white shadow-sm p-6 md:p-8">
+            <IndustryQualificationForm
+              industrySlug={slug}
+              industryName={industry.industry_name}
+            />
           </div>
         </div>
       </section>

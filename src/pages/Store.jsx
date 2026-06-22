@@ -913,7 +913,7 @@ function StoreInner() {
                 {[
                   { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false },
                   { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
-                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
+                  { name: "Elite System", key: "elite_system", price: "$2,497 setup + $1,997/mo", highlight: false },
                 ].map((pkg) => (
                   <a
                     key={pkg.key}

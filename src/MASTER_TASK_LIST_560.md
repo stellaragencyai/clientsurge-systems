@@ -1840,3 +1840,17 @@ PHASE 7 - Admin UI
 
 *Merged from PRE_LAUNCH_100_TASKS.md + PROJECT_COMPLETION_CHECKLIST.md - 2026-05-05*
 *Total merged tasks: 100 (PL) + 33 (AC) = 133 additional tasks appended to master list*
+
+---
+
+---
+
+# 🆕 FORM INFRASTRUCTURE — ESSENTIAL MISSING FORMS
+### Added by Base44 AI | 2026-06-22 | From strategic gap analysis
+
+| # | Status | Task | Priority |
+|---|---|---|---|
+| FORM-01 | ✅ | Build Industry-Specific Qualification Form — embedded on all 9 industry pages. Captures lead volume, industry-specific problem, contact info. Submits via `submitLeadCapture` with `intake_type: "industry_qualification"`. Includes real-time phone formatting, email/phone checkmark validation, consent gate, and success state. | HIGH |
+| FORM-02 | ⏳ | Build Automated Follow-up Opt-out / Preference Management Form — accessible via link in all SMS/email footers. Allows leads to select: Email only / SMS only / Stop all / Frequency preference. Updates `Leads.requested_channels`, sets `sms_opted_out` or `email_unsubscribed` flags via a new `updateContactPreferences` backend function. TCPA/CTIA compliance shield. | CRITICAL |
+| FORM-03 | ⏳ | Build Exit/Cancellation Survey Form — shown inside `CancelSubscriptionButton` BEFORE the Stripe portal redirect. Captures: reason (dropdown: Too expensive / Automation didn't work / Setup too slow / No longer need it / Other), free-text details, NPS-style rating (1–5). Saves to new `ChurnFeedback` entity. Feeds `predictChurnRisk` and `RevenueExecutionIntelligenceEngine` data models. | HIGH |
+| FORM-04 | ⏳ | Standardize all 12 platform forms with FormInput auto-formatting, checkmark success indicators, and real-time validation (phone mask, email validator, error states). Target forms: Contact, Start wizard, DemoBookingModal, Register, Login, ForgotPassword, ResetPassword, PortalLoginModal, AddClientModal, LeadCaptureForm, WebhookRegistrationForm, QuickStartWizard. | MEDIUM |
