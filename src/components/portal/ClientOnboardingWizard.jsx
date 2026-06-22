@@ -184,6 +184,8 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
             )}
             {step.id === 'channels' && <ChannelsStep formData={formData} onChange={handleInputChange} />}
             {step.id === 'preferences' && <PreferencesStep formData={formData} onChange={handleInputChange} />}
+            {step.id === 'channels' && <ChannelsStep formData={formData} onChange={handleInputChange} />}
+            {step.id === 'preferences' && <PreferencesStep formData={formData} onChange={handleInputChange} />}
             {step.id === 'complete' && <CompleteStep />}
 
             {error && (
