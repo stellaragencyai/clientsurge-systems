@@ -31,7 +31,7 @@ const PHONE_REGEX = /^[\d\s()+.-]+$/;
 function Field({ label, required, error, children }) {
   return (
     <div className="group">
-      <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-2">
+      <label className="block text-[11px] font-bold uppercase tracking-widest text-black mb-2">
         {label} {required && <span className="text-primary">*</span>}
       </label>
       {children}
@@ -43,7 +43,7 @@ function Field({ label, required, error, children }) {
 }
 
 const inputClass =
-  "w-full bg-transparent border-b border-slate-200 py-3 text-base text-slate-900 placeholder:text-slate-300 outline-none transition-all duration-300 focus:border-primary";
+  "w-full bg-transparent border-b border-black py-3 text-base text-black placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -211,8 +211,8 @@ export default function Contact() {
                 >
                   <CheckCircle2 className="w-9 h-9 text-green-600" />
                 </motion.div>
-                <h2 className="text-3xl font-black text-slate-900 mb-3">Message Received</h2>
-                <p className="text-slate-500 text-base leading-relaxed mb-10 max-w-sm mx-auto">
+                <h2 className="text-3xl font-black text-black mb-3">Message Received</h2>
+                <p className="text-slate-600 text-base leading-relaxed mb-10 max-w-sm mx-auto">
                   Thanks for reaching out. We'll respond within one business day.
                 </p>
                 <a
@@ -229,21 +229,21 @@ export default function Contact() {
                 {/* HEADER */}
                 <div>
                   {/* #8 — Tracked uppercase eyebrow label */}
-                  <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-4">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-black mb-4">
                     Get In Touch
                   </p>
 
                   {/* #5/#6 — Bold, wide, uppercase CONTACT heading with accent bar */}
                   <div className="flex items-center gap-5 mb-5">
                     <div className="w-1.5 h-14 bg-primary rounded-sm flex-shrink-0" />
-                    <h1 className="text-6xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>CONTACT</h1>
+                    <h1 className="text-6xl font-black text-black leading-none tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>CONTACT</h1>
                   </div>
 
                   {/* #7 — Editorial sub-text with generous leading */}
-                  <p className="text-base font-semibold text-slate-900 mb-1" style={{ lineHeight: 1.5 }}>
+                  <p className="text-base font-semibold text-black mb-1" style={{ lineHeight: 1.5 }}>
                     We'd love to hear from you!
                   </p>
-                  <p className="text-sm text-slate-500" style={{ lineHeight: 1.7 }}>
+                  <p className="text-sm text-black" style={{ lineHeight: 1.7 }}>
                     Send us a message and we'll get right back in touch.
                   </p>
                 </div>
@@ -313,7 +313,7 @@ export default function Contact() {
                     className={`${inputClass} resize-none`}
                   />
                   {/* Visual Improvement #1: character counter */}
-                  <p className="text-right text-[11px] text-slate-300 mt-1.5">
+                  <p className="text-right text-[11px] text-black mt-1.5">
                     {form.message.length} characters
                   </p>
                 </Field>
@@ -342,7 +342,7 @@ export default function Contact() {
                   );
                 })()}
 
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-black">
                   No spam, no pressure — just a thoughtful reply from our team.
                 </p>
               </form>

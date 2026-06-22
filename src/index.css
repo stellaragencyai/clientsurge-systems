@@ -777,12 +777,14 @@ h1, h2, h3,
   letter-spacing: -0.02em;
 }
 
-/* Premium body text — true black, no fade */
+/* Premium body text — true black, no fade, spacious premium leading */
 body, p, span, div {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: subpixel-antialiased;
   color: #000000;
   opacity: 1;
+  line-height: 1.6;
+  letter-spacing: -0.011em;
 }
 
 /* ============================================
@@ -802,27 +804,31 @@ body, p, span, div {
    ============================================ */
 h1 {
   font-size: clamp(2.5rem, 6vw, 4.5rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
+  line-height: 1.02;
+  letter-spacing: -0.035em;
   font-weight: 900;
 }
 h2 {
   font-size: clamp(1.75rem, 4.5vw, 3.25rem);
-  line-height: 1.15;
-  letter-spacing: -0.02em;
+  line-height: 1.08;
+  letter-spacing: -0.025em;
   font-weight: 800;
 }
 h3 {
   font-size: clamp(1.25rem, 3vw, 2rem);
-  line-height: 1.15;
-  letter-spacing: -0.015em;
+  line-height: 1.12;
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 h4 {
   font-size: clamp(1.05rem, 2.2vw, 1.5rem);
+  line-height: 1.2;
+  letter-spacing: -0.015em;
+  font-weight: 700;
+}
+h5, h6 {
   line-height: 1.25;
   letter-spacing: -0.01em;
-  font-weight: 700;
 }
 
 /* Refinement #10: Modern eyebrow labels — title case, moderate tracking */
