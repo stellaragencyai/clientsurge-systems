@@ -6,7 +6,7 @@ import {
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw,
   Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
-  CalendarCheck2, ShieldCheck, Eye, TrendingDown,
+  CalendarCheck2, ShieldCheck, Eye, TrendingDown, Database,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -46,6 +46,8 @@ import AuditLogPanel from '../components/admin/AuditLogPanel';
 import AIAgentsDashboard from '../components/admin/AIAgentsDashboard';
 import TwilioRuntimeHealth from '../components/admin/TwilioRuntimeHealth';
 import InstantLeadResponseDebugPanel from '../components/admin/InstantLeadResponseDebugPanel';
+import CanonicalSystemMap from '../components/admin/CanonicalSystemMap';
+import TemplatesView from '../components/admin/TemplatesView';
 import PipelineProofAuditButton from '../components/admin/PipelineProofAuditButton';
 import AdminReconciliationButton from '../components/admin/AdminReconciliationButton';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
@@ -117,16 +119,14 @@ const NAV_GROUPS = [
     group: 'Automation',
     items: [
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
-      { id: 'drip', label: 'Drip Campaigns', icon: Send },
-      { id: 'nurture', label: 'Nurture Campaigns', icon: Flame },
       { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
       { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
       { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
       { id: 'routing', label: 'Lead Routing', icon: Target },
       { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
       { id: 'instant-response', label: 'Instant Response', icon: Send },
-      ],
-      },
+    ],
+  },
   {
     group: 'Revenue & Funnels',
     items: [
@@ -154,6 +154,7 @@ const NAV_GROUPS = [
   {
     group: 'Tools',
     items: [
+      { id: 'canonical-map', label: 'System Map', icon: Database },
       { id: 'resource-library', label: 'Resource Library', icon: BookOpen },
       { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
@@ -283,8 +284,9 @@ export default function AdminDashboard() {
       case 'sales-funnel': return <SalesFunnelPanel />;
       case 'customer-onboarding': return <CustomerOnboardingPanel />;
       case 'resource-library': return <ResourceLibrary />;
+      case 'canonical-map': return <CanonicalSystemMap />;
+      case 'templates': return <TemplatesView />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
-      case 'templates': return <CommunicationTemplates />;
       case 'twilio-health': return <TwilioRuntimeHealth />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
@@ -601,9 +603,9 @@ function OverviewDashboard({ onNavigate }) {
           <h3 className="text-lg font-semibold text-foreground mb-4">Offer Mix</h3>
           <div className="space-y-3">
             {[
-              { key: 'starter_system', label: 'Starter', helper: 'Response + missed-call fit' },
-              { key: 'growth_system', label: 'Growth', helper: 'Response + nurture fit' },
-              { key: 'pro_system', legacyKey: 'elite_system', label: 'Pro', helper: 'Full-stack fit' },
+              { key: 'starter_system', label: 'Starter System', helper: 'Response + missed-call fit' },
+              { key: 'growth_system', label: 'Growth System', helper: 'Response + nurture fit' },
+              { key: 'elite_system', legacyKey: 'pro_system', label: 'Elite System', helper: 'Full-stack fit' },
               { key: 'single_service', label: 'Single Service', helper: 'One clear first-service fit' },
             ].map(({ key, legacyKey, label, helper }) => (
               <button
