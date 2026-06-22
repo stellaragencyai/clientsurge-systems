@@ -31,19 +31,19 @@ const PHONE_REGEX = /^[\d\s()+.-]+$/;
 function Field({ label, required, error, children }) {
   return (
     <div className="group">
-      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-700 mb-3">
-        {label} {required && <span className="text-primary font-black">*</span>}
+      <label className="block text-[11px] font-bold uppercase tracking-widest text-black mb-2">
+        {label} {required && <span className="text-primary">*</span>}
       </label>
       {children}
       {error && (
-        <p className="text-red-600 text-xs font-medium mt-2">{error}</p>
+        <p className="text-red-500 text-xs mt-1.5">{error}</p>
       )}
     </div>
   );
 }
 
 const inputClass =
-  "w-full bg-transparent border-b-2 border-slate-300 py-3 text-base font-medium text-black placeholder:text-slate-500 outline-none transition-all duration-300 focus:border-primary";
+  "w-full bg-transparent border-b border-black py-3 text-base text-black placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -144,36 +144,36 @@ export default function Contact() {
             </div>
 
             {/* Divider */}
-            <div className="border-t border-slate-600 pt-12 mb-12 space-y-8">
+            <div className="border-t border-slate-700 pt-10 mb-10 space-y-7">
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/25 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-4.5 h-4.5 text-primary" />
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <Phone className="w-4 h-4 text-primary" />
                 </div>
-                <a href="tel:+16025843227" className="text-base font-medium text-white hover:text-primary transition-colors underline-offset-4 hover:underline">
+                <a href="tel:+16025843227" className="text-base text-slate-200 hover:text-primary transition">
                   (602) 584-3227
                 </a>
               </div>
               <div className="flex items-start gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/25 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Mail className="w-4.5 h-4.5 text-primary" />
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <Mail className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1.5">Email</p>
-                  <a href="mailto:support@clientsurgesystems.com" className="text-base font-medium text-white hover:text-primary transition-colors underline-offset-4 hover:underline break-all">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Email</p>
+                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-200 hover:text-primary transition break-all">
                     support@clientsurgesystems.com
                   </a>
                 </div>
               </div>
               <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-lg bg-primary/25 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-4.5 h-4.5 text-primary" />
+                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-4 h-4 text-primary" />
                 </div>
-                <span className="text-base font-medium text-white">Phoenix, Arizona</span>
+                <span className="text-base text-slate-200">Phoenix, Arizona</span>
               </div>
             </div>
 
             {/* Description */}
-            <p className="text-slate-300 text-base font-normal leading-relaxed">
+            <p className="text-slate-400 text-base leading-relaxed">
               {industryContext
                 ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right stack.`
                 : "Have questions or ready to get started? Send us a message and we'll be in touch within one business day."}
@@ -181,12 +181,12 @@ export default function Contact() {
           </div>
 
           {/* Bottom: social icons */}
-          <div className="flex items-center gap-5">
-            <a href="#" aria-label="Facebook" className="w-11 h-11 rounded-lg bg-primary/30 flex items-center justify-center text-white hover:bg-primary hover:text-slate-900 transition-all duration-300 font-bold">
-              <Facebook className="w-5 h-5" />
+          <div className="flex items-center gap-6">
+            <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+              <Facebook className="w-4 h-4" />
             </a>
-            <a href="#" aria-label="Instagram" className="w-11 h-11 rounded-lg bg-primary/30 flex items-center justify-center text-white hover:bg-primary hover:text-slate-900 transition-all duration-300 font-bold">
-              <Instagram className="w-5 h-5" />
+            <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+              <Instagram className="w-4 h-4" />
             </a>
           </div>
         </aside>
@@ -198,27 +198,26 @@ export default function Contact() {
             {success ? (
               /* ── Success state ── */
               <motion.div
-                className="text-center py-20"
+                className="text-center py-16"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
               >
                 <motion.div
-                  className="w-24 h-24 bg-gradient-to-br from-primary/20 to-primary/5 border-2 border-primary/40 rounded-full flex items-center justify-center mx-auto mb-10"
-                  initial={{ scale: 0.8, opacity: 0 }}
-                  animate={{ scale: 1, opacity: 1 }}
+                  className="w-20 h-20 bg-green-50 border border-green-200 rounded-full flex items-center justify-center mx-auto mb-8"
+                  initial={{ scale: 0.85 }}
+                  animate={{ scale: 1 }}
                   transition={{ delay: 0.1, type: "spring", stiffness: 300 }}
                 >
-                  <CheckCircle2 className="w-12 h-12 text-primary" />
+                  <CheckCircle2 className="w-9 h-9 text-green-600" />
                 </motion.div>
-                <h2 className="text-4xl font-black text-black mb-4">Message Received</h2>
-                <p className="text-slate-700 text-base font-medium leading-relaxed mb-12 max-w-sm mx-auto">
+                <h2 className="text-3xl font-black text-black mb-3">Message Received</h2>
+                <p className="text-slate-600 text-base leading-relaxed mb-10 max-w-sm mx-auto">
                   Thanks for reaching out. We'll respond within one business day.
                 </p>
                 <a
                   href="/"
-                  className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white transition-all duration-300 hover:shadow-xl hover:scale-105"
-                  style={{ boxShadow: '0 4px 20px rgba(0,121,193,0.4)' }}
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition"
                 >
                   Back to Home <ArrowRight className="w-4 h-4" />
                 </a>
@@ -228,23 +227,23 @@ export default function Contact() {
               <form onSubmit={handleSubmit} noValidate className="space-y-12">
 
                 {/* HEADER */}
-                <div className="mb-8">
+                <div>
                   {/* #8 — Tracked uppercase eyebrow label */}
-                  <p className="text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-6">
+                  <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-black mb-4">
                     Get In Touch
                   </p>
 
                   {/* #5/#6 — Bold, wide, uppercase CONTACT heading with accent bar */}
-                  <div className="flex items-center gap-6 mb-8">
-                    <div className="w-1.5 h-16 bg-primary rounded-sm flex-shrink-0" />
-                    <h1 className="text-6xl font-black text-black leading-tight tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>CONTACT</h1>
+                  <div className="flex items-center gap-5 mb-5">
+                    <div className="w-1.5 h-14 bg-primary rounded-sm flex-shrink-0" />
+                    <h1 className="text-6xl font-black text-black leading-none tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>CONTACT</h1>
                   </div>
 
                   {/* #7 — Editorial sub-text with generous leading */}
-                  <p className="text-lg font-bold text-black mb-3" style={{ lineHeight: 1.5 }}>
+                  <p className="text-base font-semibold text-black mb-1" style={{ lineHeight: 1.5 }}>
                     We'd love to hear from you!
                   </p>
-                  <p className="text-base text-slate-700 font-medium" style={{ lineHeight: 1.7 }}>
+                  <p className="text-sm text-black" style={{ lineHeight: 1.7 }}>
                     Send us a message and we'll get right back in touch.
                   </p>
                 </div>
@@ -319,17 +318,17 @@ export default function Contact() {
                   </p>
                 </Field>
 
-                {/* #11 — Bold gradient pill SEND button, left-aligned */}
+                {/* #11 — Rectangular outlined SEND button, left-aligned */}
                 {(() => {
                   const hasErrors = Object.keys(errors).length > 0;
                   const isValid = form.full_name && form.email && form.message && !hasErrors;
                   return (
-                    <div className="pt-6">
+                    <div className="pt-2">
                       <button
                         type="submit"
                         disabled={loading}
-                        className="cs-btn-primary inline-flex items-center justify-center gap-2 px-10 py-4 rounded-full text-base font-bold text-white transition-all duration-300 hover:shadow-xl hover:scale-105"
-                        style={{ minHeight: 'unset', minWidth: 'unset', boxShadow: '0 4px 20px rgba(0,121,193,0.4)' }}
+                        className="inline-flex items-center justify-center gap-2 px-10 py-3.5 border-2 border-slate-900 text-slate-900 font-bold text-sm uppercase tracking-widest bg-transparent hover:bg-slate-900 hover:text-white transition-colors duration-300 rounded-none"
+                        style={{ minHeight: 'unset', minWidth: 'unset' }}
                       >
                         {loading
                           ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
@@ -353,24 +352,18 @@ export default function Contact() {
       </div>
 
       {/* Mobile: show contact info above footer */}
-      <div className="lg:hidden bg-slate-900 text-white px-6 py-10 space-y-6">
-        <div className="flex items-center gap-4">
-          <div className="w-9 h-9 rounded-lg bg-primary/25 flex items-center justify-center flex-shrink-0">
-            <Phone className="w-4 h-4 text-primary" />
-          </div>
-          <a href="tel:+16025843227" className="text-sm font-medium text-white hover:text-primary transition-colors underline-offset-4 hover:underline">(602) 584-3227</a>
+      <div className="lg:hidden bg-slate-900 text-white px-6 py-10 space-y-5">
+        <div className="flex items-center gap-3">
+          <Phone className="w-4 h-4 text-primary" />
+          <a href="tel:+16025843227" className="text-sm">(602) 584-3227</a>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="w-9 h-9 rounded-lg bg-primary/25 flex items-center justify-center flex-shrink-0">
-            <Mail className="w-4 h-4 text-primary" />
-          </div>
-          <a href="mailto:support@clientsurgesystems.com" className="text-sm font-medium text-white hover:text-primary transition-colors underline-offset-4 hover:underline">support@clientsurgesystems.com</a>
+        <div className="flex items-center gap-3">
+          <Mail className="w-4 h-4 text-primary" />
+          <a href="mailto:support@clientsurgesystems.com" className="text-sm">support@clientsurgesystems.com</a>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="w-9 h-9 rounded-lg bg-primary/25 flex items-center justify-center flex-shrink-0">
-            <MapPin className="w-4 h-4 text-primary" />
-          </div>
-          <span className="text-sm font-medium text-white">Phoenix, Arizona</span>
+        <div className="flex items-center gap-3">
+          <MapPin className="w-4 h-4 text-primary" />
+          <span className="text-sm">Phoenix, Arizona</span>
         </div>
       </div>
 
