@@ -331,6 +331,17 @@ Deno.serve(async (req) => {
     const projectSummary = buildProjectSummary(project);
     const subscription = buildSubscriptionSummary(order, projectSummary);
 
+    // Fetch onboarding orchestration for progress tracker
+    let onboardingRecord = null;
+    try {
+      const onboardingRecords = await base44.asServiceRole.entities.OnboardingOrchestration.filter(
+        { order_id: order.id }, "-created_date", 1
+      );
+      onboardingRecord = (onboardingRecords || [])[0] || null;
+    } catch {
+      // Non-critical — tracker degrades gracefully
+    }
+
     // Fetch recent events for health/readiness panels
     const recentEvents = await fetchRecentEvents(base44, order, projectSummary, 100);
     const failedEvents = (recentEvents || []).filter((e) => e.status === "failed");
@@ -362,6 +373,14 @@ Deno.serve(async (req) => {
       empty_state: false,
       is_admin_preview: false,
       user_role: user?.role || "user",
+      onboarding: onboardingRecord ? {
+        unified_stage: onboardingRecord.unified_stage || "intake_received",
+        stage_progression: onboardingRecord.stage_progression || [],
+        completion_metrics: onboardingRecord.completion_metrics || {},
+        blockers: onboardingRecord.blockers || [],
+        missing_setup_items: onboardingRecord.missing_setup_items || [],
+        ready_to_go_live: onboardingRecord.ready_to_go_live || false,
+      } : null,
       health: {
         readiness_status: readinessStatus,
         recent_failed_events_count: failedEvents.length,

@@ -20,6 +20,7 @@ import RecentIssuesPanel from "@/components/dashboard/RecentIssuesPanel";
 import AdminPreviewBanner from "@/components/dashboard/AdminPreviewBanner";
 import AdminPreviewToggler from "@/components/dashboard/AdminPreviewToggler";
 import InternalFilterNotice from "@/components/dashboard/InternalFilterNotice";
+import OverallProgressTracker from "@/components/dashboard/OverallProgressTracker";
 
 export const STAGE_MAP = {
   "Paid": 0,
@@ -154,6 +155,7 @@ export default function ClientDashboard() {
   const [userRole, setUserRole] = useState(null);
   const [simulatedState, setSimulatedState] = useState("paid");
   const [simulatedData, setSimulatedData] = useState(null);
+  const [onboardingData, setOnboardingData] = useState(null);
 
   const fetchPortal = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -170,6 +172,7 @@ export default function ClientDashboard() {
         setIsAdminPreview(res.data.is_admin_preview === true);
         setHealthEvents(res.data.health?.recent_events || []);
         setUserRole(res.data.user_role || null);
+        setOnboardingData(res.data.onboarding || null);
         setLastUpdated(new Date());
       } else if (res.data?.code === "portal_project_not_found") {
         setPortalData({ success: true, project: null, order: null });
@@ -310,6 +313,13 @@ export default function ClientDashboard() {
                   order={order}
                   hasSetupInfo={hasSetupInfo}
                 />
+
+                {onboardingData && (
+                  <OverallProgressTracker
+                    onboarding={onboardingData}
+                    completionPercentage={onboardingData.completion_metrics?.completion_percentage || 0}
+                  />
+                )}
 
                 <DashboardHeader
                   activeServices={activeServices}
