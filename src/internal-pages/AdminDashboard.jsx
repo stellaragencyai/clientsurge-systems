@@ -61,6 +61,7 @@ import ResourceLibrary from '../components/admin/ResourceLibrary';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
+import ProductionHardeningPanel from '../components/admin/ProductionHardeningPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));

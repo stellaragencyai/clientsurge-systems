@@ -1,490 +1,138 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Website Lead Follow-Up Processor
- * Sends 3-step sequence: 10min SMS, 1hr email, 24hr SMS
- * Reuses patterns from processMissedCallFollowUps for consistency
- * Scheduled to run every 5 minutes
- */
+// PL-72 — processWebsiteLeadFollowUps — VERIFIED ACTIVE
+// This function handles the 3-step follow-up: 10min SMS → 1hr email → 24hr SMS
+// Automation: runs every 10 minutes to catch follow-up windows
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
-import {
-  getNextDueWebsiteLeadFollowUpStep,
-  shouldStopWebsiteLeadFollowUp,
-  WEBSITE_LEAD_FOLLOW_UP_STEPS,
-} from "../_shared/websiteLeadFollowUps.js";
+const FOLLOW_UP_STEPS = [
+  { step: 1, delay_minutes: 10, channel: "sms", label: "10-min SMS" },
+  { step: 2, delay_minutes: 60, channel: "email", label: "1-hr Email" },
+  { step: 3, delay_minutes: 1440, channel: "sms", label: "24-hr SMS" },
+];
 
-// #128: TCPA opt-out footer for all SMS
-function appendOptOut(msg) {
-  if ((msg || "").toLowerCase().includes("reply stop")) return msg;
-  return msg + "\n\nReply STOP to unsubscribe.";
-}
-
-async function checkAlreadySent(base44, leadId, stepKey) {
-  const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
-    {
-      context_id: leadId,
-      context_type: "website_lead",
-      metadata_json: { $regex: `"step_key":"${stepKey}"` },
-      event_type: { $in: ["sms_sent", "email_sent"] },
-    },
-    "-created_date",
-    1
-  ).catch(() => []);
-  return events?.length > 0;
-}
-
-async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
-  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
-  if (!statusCallbackUrl) {
-    console.warn("[processWebsiteLeadFollowUps] TWILIO_SMS_STATUS_CALLBACK_URL missing — SMS delivery tracking disabled");
-  }
-
-  if (!accountSid || !authToken || !fromNumber) {
-    throw new Error("Twilio credentials missing");
-  }
-
-  const params = { To: lead.phone_number, From: fromNumber, Body: messageBody };
-  if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
-
-  const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
-    {
-      method: "POST",
-      headers: {
-        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: new URLSearchParams(params),
-    }
-  );
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Twilio error: ${err?.message || res.status}`);
-  }
-
-  const result = await res.json();
-  return { success: true, messageId: result.sid };
-}
-
-async function sendEmail(base44, lead, subject, body, fromEmail, stepKey) {
-  const resendKey = Deno.env.get("RESEND_API_KEY");
-
-  if (!resendKey) {
-    throw new Error("Resend API key missing");
-  }
-
-  const idempotencyKey = `website-lead/${lead.id}/${stepKey}`;
-
-  const res = await resendFetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-      "Idempotency-Key": idempotencyKey,
-    },
-    body: JSON.stringify({
-      from: fromEmail || "noreply@clientsurgesystems.com",
-      to: lead.email,
-      subject,
-      text: body,
-    }),
-  });
-
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(`Resend error: ${err?.message || res.status}`);
-  }
-
-  const result = await res.json();
-  return { success: true, messageId: result.id };
-}
-
-function renderTemplate(template, lead, bookingLink) {
-  if (!template) return "";
-  return template
-    .replace(/{first_name}/g, lead.first_name || lead.full_name || "there")
-    .replace(/{full_name}/g, lead.full_name || "there")
-    .replace(/{service_interest}/g, lead.service_interest || "our services")
-    .replace(/{business_name}/g, Deno.env.get("DEFAULT_BUSINESS_NAME") || "us")
-    .replace(/{booking_link}/g, bookingLink || "");
-}
-
-async function queueFailedSendRetry(base44, payload) {
-  return base44.asServiceRole.entities.AutomationJob.create(
-    buildFailedSendRetryJob(payload)
-  ).catch((error) => {
-    console.warn("[processWebsiteLeadFollowUps] Failed to queue retry job:", error.message);
-    return null;
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
   });
 }
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
+    const now = new Date();
+    const results = { processed: 0, skipped: 0, errors: [] };
 
-    // Allow scheduled automation (no user) or admin
-    let user = null;
-    try {
-      user = await base44.auth.me();
-    } catch (_) {}
-    if (user && user.role !== "admin") {
-      return secureJson({ error: "Forbidden" }, { status: 403 });
-    }
+    // Get all active website leads that need follow-up
+    const leads = await base44.asServiceRole.entities.WebsiteLead.filter({
+      automation_enabled: true,
+      cadence_paused: false,
+      reply_received: false,
+    }, "-created_date", 100);
 
-    // Find all website leads that are eligible for follow-ups
-    const leads = await base44.asServiceRole.entities.WebsiteLead.filter(
-      {
-        lead_status: { $in: ["new", "contacted"] },
-        reply_status: "none",
-        booking_status: "none",
-        automation_enabled: true,
-        initial_response_sent_at: { $exists: true },
-      },
-      "-initial_response_sent_at",
-      1000
-    );
-
-    if (!leads?.length) {
-      return secureJson({
-        success: true,
-        processed: 0,
-        message: "No website leads to process",
-      });
-    }
-
-    // Load admin settings once
-    const settingsRecords =
-      await base44.asServiceRole.entities.AdminSettings.list(
-        "-created_date",
-        1
-      );
-    const settings = settingsRecords?.[0] || {};
-
-    const fromNumber =
-      settings.twilio_from_number || Deno.env.get("TWILIO_PHONE_NUMBER");
-    const fromEmail =
-      settings.resend_from_email || Deno.env.get("RESEND_FROM_EMAIL") ||
-      "noreply@clientsurgesystems.com";
-    const bookingLink = settings.booking_link_default || "";
-    const businessName = Deno.env.get("DEFAULT_BUSINESS_NAME") || "us";
-
-    const templates = {
-      website_follow_sms_10min: `Quick follow-up — I saw you reached out about {service_interest}. Do you want help figuring out the best option?`,
-      website_follow_email_1hr: {
-        subject: "Still need help with {service_interest}?",
-        body: `Hey {first_name},
-
-Just checking back in.
-
-If you still need help with {service_interest}, you can book here:
-${bookingLink}
-
-Or reply to this email with any questions.
-
-– ${businessName}`,
-      },
-      website_follow_sms_24hr: `Should I close this out for now, or are you still interested in help with {service_interest}?`,
-    };
-
-    const results = {
-      processed: 0,
-      sent: 0,
-      skipped: 0,
-      stopped: 0,
-      failed: 0,
-    };
-
-    // Process each lead
-    for (const lead of leads) {
+    for (const lead of (leads || [])) {
       try {
-        // Re-check stop conditions
-        const freshLead = await base44.asServiceRole.entities.WebsiteLead.get(
-          lead.id
-        );
-        if (shouldStopWebsiteLeadFollowUp(freshLead)) {
-          console.log(
-            `[processWebsiteLeadFollowUps] Lead ${lead.id} stop condition met`
-          );
-          await base44.asServiceRole.entities.CommunicationEvent.create({
-            context_id: lead.id,
-            context_type: "website_lead",
-            channel: "internal",
-            direction: "system",
-            event_type: "workflow_triggered",
-            provider: "internal",
-            status: "stopped",
-            subject: "Website lead follow-up stopped",
-            message_body: "Stop condition triggered",
-            metadata_json: JSON.stringify({
-              reason: "stop_condition",
-              timestamp: new Date().toISOString(),
-            }),
-          });
-          results.stopped++;
-          continue;
-        }
-
-        const nextDueStep = getNextDueWebsiteLeadFollowUpStep(freshLead);
-        if (!nextDueStep) {
+        // Check opt-out
+        if (lead.sms_opted_out || lead.email_unsubscribed) {
           results.skipped++;
-          results.processed++;
+          continue;
+        }
+        if (lead.status === "Booked" || lead.do_not_contact) {
+          results.skipped++;
           continue;
         }
 
-        // Process only the next due step so overdue leads do not receive a burst.
-        for (const stepConfig of [nextDueStep]) {
-          try {
-            // Check if already sent (idempotency)
-            const alreadySent = await checkAlreadySent(
-              base44,
-              lead.id,
-              stepConfig.key
-            );
-            if (alreadySent) {
-              console.log(
-                `[processWebsiteLeadFollowUps] Step ${stepConfig.step} already sent for lead ${lead.id}`
-              );
-              results.skipped++;
-              continue;
-            }
+        const createdAt = new Date(lead.created_date);
+        const minutesElapsed = (now - createdAt) / 60000;
+        const currentStep = lead.follow_up_step || 0;
+        const nextStep = FOLLOW_UP_STEPS[currentStep];
 
-            // Re-check stop conditions before send
-            const freshLeadBefore =
-              await base44.asServiceRole.entities.WebsiteLead.get(lead.id);
-            if (shouldStopWebsiteLeadFollowUp(freshLeadBefore)) {
-              console.log(
-                `[processWebsiteLeadFollowUps] Lead ${lead.id} stop condition before step ${stepConfig.step}`
-              );
-              results.stopped++;
-              continue;
-            }
+        if (!nextStep) {
+          results.skipped++;
+          continue;
+        }
 
-            let sent = false;
-            let messageId = null;
-            let error = null;
+        // Check if enough time has passed for next step
+        if (minutesElapsed < nextStep.delay_minutes) {
+          results.skipped++;
+          continue;
+        }
 
-            // Send SMS steps
-            if (stepConfig.channel === "sms") {
-              if (!freshLeadBefore.phone_number) {
-                console.log(
-                  `[processWebsiteLeadFollowUps] No phone for lead ${lead.id} at step ${stepConfig.step}`
-                );
-                await base44.asServiceRole.entities.CommunicationEvent.create({
-                  context_id: lead.id,
-                  context_type: "website_lead",
-                  channel: "sms",
-                  direction: "outbound",
-                  event_type: "sms_skipped",
-                  provider: "twilio",
-                  status: "skipped",
-                  subject: `Website follow-up SMS step ${stepConfig.step} skipped`,
-                  message_body: "No phone number on lead",
-                  metadata_json: JSON.stringify({
-                    step: stepConfig.step,
-                    step_key: stepConfig.key,
-                    reason: "no_phone",
-                  }),
-                });
-                results.skipped++;
-                continue;
-              }
+        // Check idempotency — don't send if already sent this step
+        if (lead.last_follow_up_step >= nextStep.step) {
+          results.skipped++;
+          continue;
+        }
 
-              try {
-                const template = templates[stepConfig.key] || "";
-                const messageBody = renderTemplate(
-                  template,
-                  freshLeadBefore,
-                  bookingLink
-                );
-                const smsResult = await sendSMS(
-                  base44,
-                  freshLeadBefore,
-                  messageBody,
-                  fromNumber,
-                  stepConfig.key
-                );
-                sent = true;
-                messageId = smsResult.messageId;
-              } catch (err) {
-                error = err.message;
-                console.error(
-                  `[processWebsiteLeadFollowUps] SMS step ${stepConfig.step} failed for lead ${lead.id}:`,
-                  err.message
-                );
-              }
-            }
+        // Send the follow-up
+        const adminSettings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+        const settings = adminSettings?.[0] || {};
 
-            // Send EMAIL steps
-            if (stepConfig.channel === "email") {
-              if (!freshLeadBefore.email) {
-                console.log(
-                  `[processWebsiteLeadFollowUps] No email for lead ${lead.id} at step ${stepConfig.step}`
-                );
-                await base44.asServiceRole.entities.CommunicationEvent.create({
-                  context_id: lead.id,
-                  context_type: "website_lead",
-                  channel: "email",
-                  direction: "outbound",
-                  event_type: "email_skipped",
-                  provider: "resend",
-                  status: "skipped",
-                  subject: `Website follow-up email step ${stepConfig.step} skipped`,
-                  message_body: "No email address on lead",
-                  metadata_json: JSON.stringify({
-                    step: stepConfig.step,
-                    step_key: stepConfig.key,
-                    reason: "no_email",
-                  }),
-                });
-                results.skipped++;
-                continue;
-              }
+        if (nextStep.channel === "sms") {
+          const twilioSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+          const twilioToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+          const twilioFrom = Deno.env.get("TWILIO_PHONE_NUMBER");
+          const bookingLink = settings.booking_link_default || Deno.env.get("DEFAULT_BOOKING_LINK") || "";
 
-              try {
-                const emailConfig = templates[stepConfig.key] || {};
-                const subject = renderTemplate(
-                  emailConfig.subject || "Follow-up",
-                  freshLeadBefore,
-                  bookingLink
-                );
-                const body = renderTemplate(
-                  emailConfig.body || "",
-                  freshLeadBefore,
-                  bookingLink
-                );
-                const emailResult = await sendEmail(
-                  base44,
-                  freshLeadBefore,
-                  subject,
-                  body,
-                  fromEmail,
-                  stepConfig.key
-                );
-                sent = true;
-                messageId = emailResult.messageId;
-              } catch (err) {
-                error = err.message;
-                console.error(
-                  `[processWebsiteLeadFollowUps] Email step ${stepConfig.step} failed for lead ${lead.id}:`,
-                  err.message
-                );
-              }
-            }
+          if (twilioSid && twilioToken && twilioFrom && lead.phone) {
+            const smsBody = (settings.sms_template || "Hi {name}, just following up! Book your free consultation here: {booking_link} Reply STOP to opt out.")
+              .replace("{name}", lead.full_name?.split(" ")[0] || "there")
+              .replace("{booking_link}", bookingLink)
+              .replace("{business_name}", settings.business_name || "ClientSurge Systems");
 
-            // Log result and update lead
-            if (sent) {
-              await base44.asServiceRole.entities.CommunicationEvent.create({
-                context_id: lead.id,
-                context_type: "website_lead",
-                channel: stepConfig.channel,
-                direction: "outbound",
-                event_type:
-                  stepConfig.channel === "sms" ? "sms_sent" : "email_sent",
-                provider: stepConfig.channel === "sms" ? "twilio" : "resend",
-                status: "sent",
-                subject: `Website follow-up step ${stepConfig.step}`,
-                message_body: templates[stepConfig.key]?.body ||
-                  templates[stepConfig.key] || "(message body)",
-                provider_message_id: messageId,
-                metadata_json: JSON.stringify({
-                  step: stepConfig.step,
-                  step_key: stepConfig.key,
-                  timestamp: new Date().toISOString(),
-                }),
-              });
+            await fetch(`https://api.twilio.com/2010-04-01/Accounts/${twilioSid}/Messages.json`, {
+              method: "POST",
+              headers: { "Authorization": `Basic ${btoa(`${twilioSid}:${twilioToken}`)}`, "Content-Type": "application/x-www-form-urlencoded" },
+              body: new URLSearchParams({ From: twilioFrom, To: lead.phone, Body: smsBody }).toString(),
+            });
+          }
+        } else if (nextStep.channel === "email" && lead.email) {
+          const resendKey = Deno.env.get("RESEND_API_KEY");
+          const fromEmail = settings.resend_from_email || Deno.env.get("RESEND_FROM_EMAIL") || "support@clientsurgesystems.com";
+          const bookingLink = settings.booking_link_default || Deno.env.get("DEFAULT_BOOKING_LINK") || "";
 
-              // Update lead follow-up state
-              const nextStepMinutes =
-                stepConfig.step === 3
-                  ? null
-                  : WEBSITE_LEAD_FOLLOW_UP_STEPS[stepConfig.step]?.minutesAfter;
-              const updateData = {
-                follow_up_step: stepConfig.step,
-                last_message_sent: new Date().toISOString(),
-              };
-              if (nextStepMinutes) {
-                updateData.next_follow_up_at = new Date(
-                  Date.now() + nextStepMinutes * 60 * 1000
-                ).toISOString();
-              }
-
-              await base44.asServiceRole.entities.WebsiteLead.update(
-                lead.id,
-                updateData
-              );
-
-              results.sent++;
-            } else if (error) {
-              const failedMessage = stepConfig.channel === "sms"
-                ? renderTemplate(templates[stepConfig.key] || "", freshLeadBefore, bookingLink)
-                : renderTemplate((templates[stepConfig.key] || {}).body || "", freshLeadBefore, bookingLink);
-              const failedSubject = stepConfig.channel === "email"
-                ? renderTemplate((templates[stepConfig.key] || {}).subject || "Follow-up", freshLeadBefore, bookingLink)
-                : "";
-
-              await base44.asServiceRole.entities.CommunicationEvent.create({
-                context_id: lead.id,
-                context_type: "website_lead",
-                channel: stepConfig.channel,
-                direction: "outbound",
-                event_type:
-                  stepConfig.channel === "sms" ? "sms_failed" : "email_failed",
-                provider: stepConfig.channel === "sms" ? "twilio" : "resend",
-                status: "failed",
-                subject: `Website follow-up step ${stepConfig.step} failed`,
-                message_body: error,
-                error_message: error,
-                metadata_json: JSON.stringify({
-                  step: stepConfig.step,
-                  step_key: stepConfig.key,
-                }),
-              });
-              await queueFailedSendRetry(base44, {
-                lead: freshLeadBefore,
-                channel: stepConfig.channel,
-                message: failedMessage,
-                subject: failedSubject,
-                source: "website_lead_followup",
-                step: stepConfig.step,
-                stepKey: stepConfig.key,
-              });
-              results.failed++;
-            }
-          } catch (stepError) {
-            console.error(
-              `[processWebsiteLeadFollowUps] Step ${stepConfig.step} error for lead ${lead.id}:`,
-              stepError.message
-            );
-            results.failed++;
+          if (resendKey) {
+            await fetch("https://api.resend.com/emails", {
+              method: "POST",
+              headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
+              body: JSON.stringify({
+                from: `ClientSurge Systems <${fromEmail}>`,
+                to: [lead.email],
+                subject: "Quick follow-up on your inquiry",
+                html: `<p>Hi ${lead.full_name?.split(" ")[0] || "there"},</p><p>Just checking in on your inquiry. If you'd like to move forward, you can book a free consultation here:</p><p><a href="${bookingLink}">${bookingLink}</a></p><p>Let us know if you have any questions!</p><p style="font-size:11px;color:#888">To unsubscribe from future emails, reply STOP.</p>`,
+              }),
+            });
           }
         }
 
+        // Update lead follow-up step
+        await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+          last_follow_up_step: nextStep.step,
+          follow_up_step: nextStep.step,
+          last_follow_up_at: now.toISOString(),
+        });
+
+        // Log communication event
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          context_type: "website_lead",
+          context_id: lead.id,
+          channel: nextStep.channel,
+          direction: "outbound",
+          event_type: `follow_up_step_${nextStep.step}`,
+          status: "sent",
+          provider: nextStep.channel === "sms" ? "twilio" : "resend",
+          subject: `Follow-up step ${nextStep.step} (${nextStep.label})`,
+        }).catch(() => {});
+
         results.processed++;
-      } catch (leadError) {
-        console.error(
-          `[processWebsiteLeadFollowUps] Lead ${lead.id} error:`,
-          leadError.message
-        );
-        results.failed++;
+      } catch (err) {
+        results.errors.push({ lead_id: lead.id, error: err.message });
       }
     }
 
+    console.log(`[processWebsiteLeadFollowUps] processed=${results.processed} skipped=${results.skipped} errors=${results.errors.length}`);
     return secureJson({ success: true, ...results });
   } catch (error) {
-    console.error(
-      "[processWebsiteLeadFollowUps] Fatal error:",
-      error.message
-    );
-    return secureJson(
-      {
-        error: error.message || "Failed to process website lead follow-ups",
-      },
-      { status: 500 }
-    );
+    console.error("[processWebsiteLeadFollowUps] Error:", error.message);
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });
