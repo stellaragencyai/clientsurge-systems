@@ -6,7 +6,7 @@ import {
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, Star, PieChart, Layers, DollarSign, Inbox, RefreshCw,
   Server, RotateCcw, BookOpen, Wand2, Sparkles, Crosshair, Trophy,
-  CalendarCheck2, ShieldCheck, Eye,
+  CalendarCheck2, ShieldCheck, Eye, TrendingDown,
 } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
@@ -53,6 +53,7 @@ import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
 import SniperDashboard from '../components/admin/SniperDashboard';
 import LandingPageAnalyticsPanel from '../components/admin/LandingPageAnalyticsPanel';
+import SalesFunnelPanel from '../components/admin/SalesFunnelPanel';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
@@ -126,6 +127,7 @@ const NAV_GROUPS = [
   {
     group: 'Revenue & Funnels',
     items: [
+      { id: 'sales-funnel', label: 'Sales Funnel', icon: TrendingDown },
       { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
       { id: 'revenue-tracking', label: 'Revenue Tracking', icon: DollarSign },
@@ -274,6 +276,7 @@ export default function AdminDashboard() {
       case 'lead-intelligence': return <LeadIntelligenceDashboard />;
       case 'crm-health': return <CrmHealthDashboard />;
       case 'launch-gates': return <LaunchGatesPanel />;
+      case 'sales-funnel': return <SalesFunnelPanel />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'templates': return <CommunicationTemplates />;
       case 'twilio-health': return <TwilioRuntimeHealth />;
