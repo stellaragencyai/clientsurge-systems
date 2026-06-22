@@ -18,6 +18,7 @@ import {
   AlertTriangle, CheckCircle2, XCircle, Copy, RefreshCw,
   Loader2, Radio, MessageSquare, Zap, ExternalLink, Info
 } from 'lucide-react';
+import VoiceFrontLinePanel from './VoiceFrontLinePanel';
 
 // Canonical service key aliases — legacy keys that should map to canonical equivalents
 const LEGACY_KEY_MAP = {
@@ -114,7 +115,7 @@ export default function TwilioRuntimeHealth() {
         base44.entities.CommunicationEvent.filter({ channel: 'voice', provider: 'twilio' }, '-created_date', 1).catch(() => []),
         base44.entities.CommunicationEvent.filter({ channel: 'sms', provider: 'twilio' }, '-created_date', 1).catch(() => []),
         base44.entities.WebhookRegistration.list('-created_date', 50).catch(() => []),
-        base44.entities.LaunchGate.list('', 50).catch(() => []),
+        base44.entities.LaunchGate.list('', 100).catch(() => []),
         base44.entities.AutomationChecklist.list('-created_date', 100).catch(() => []),
         base44.entities.AdminSettings.list('-created_date', 1).catch(() => []),
       ]);
@@ -128,6 +129,8 @@ export default function TwilioRuntimeHealth() {
       const smsWebhookReg = webhookRegs?.find(r => SMS_SOURCE_NAME_ALIASES.has(r.source_name)) || null;
       const smsGate = launchGates?.find(g => g.gate_key === 'twilio_sms_gate') || null;
       const voiceGate = launchGates?.find(g => g.gate_key === 'twilio_voice_gate') || null;
+      const frontlineGate = launchGates?.find(g => g.gate_key === 'voice_frontline_gate') || null;
+      const postCallGate = launchGates?.find(g => g.gate_key === 'elevenlabs_postcall_logging_gate') || null;
 
       // Find legacy service_key issues
       const legacyKeyIssues = (checklists || [])
@@ -152,6 +155,8 @@ export default function TwilioRuntimeHealth() {
         smsWebhookReg,
         smsGate,
         voiceGate,
+        frontlineGate,
+        postCallGate,
         legacyKeyIssues,
         unknownKeyIssues,
         checklist_count: checklists?.length || 0,
@@ -232,6 +237,13 @@ export default function TwilioRuntimeHealth() {
           {error}
         </div>
       )}
+
+      {/* Voice Front-Line Control Panel */}
+      <VoiceFrontLinePanel
+        frontlineGate={data?.frontlineGate || null}
+        postCallGate={data?.postCallGate || null}
+        onRefresh={load}
+      />
 
       {/* BIG WARNING — CONFIRMED FAILED LIVE TEST */}
       <div className="rounded-xl border-2 border-red-400 bg-red-50 p-5 flex items-start gap-4">
