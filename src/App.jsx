@@ -528,6 +528,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "system-observability"), Component: SystemObservabilityDashboard },
           { route: routePath("admin", "funnel-optimization"), Component: FunnelOptimizationPage },
            { route: routePath("admin", "conversion-insights"), Component: lazy(() => import("./pages/admin/ConversionInsights")) },
+           { route: routePath("admin", "task-status"), Component: lazy(() => import("./pages/admin/TaskStatusDashboard")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
