@@ -104,19 +104,14 @@ export default function LeadsTable() {
   useEffect(() => {
     const loadKpis = async () => {
       try {
-        // Fetch counts efficiently
-        const [totalList, hotList, newList, bookedList] = await Promise.all([
-          base44.asServiceRole.entities.Leads.filter({}, "id", 1),
-          base44.asServiceRole.entities.Leads.filter({ intelligence_score: { $gte: 80 } }, "id", 1),
-          base44.asServiceRole.entities.Leads.filter({ lead_state: "NEW" }, "id", 1),
-          base44.asServiceRole.entities.Leads.filter({ lead_state: "BOOKED" }, "id", 1),
-        ]);
+        // Single fetch for all KPIs + duplicate detection
+        const allLeads = await base44.asServiceRole.entities.Leads.filter({}, "id", 500);
+        const leadsList = allLeads || [];
 
         // Count potential duplicates (same normalized email)
-        const allLeads = await base44.asServiceRole.entities.Leads.filter({}, "id", 100);
         const emailCounts = {};
         const duplicates = new Set();
-        (allLeads || []).forEach((l) => {
+        leadsList.forEach((l) => {
           const key = l.normalized_email || l.email;
           if (key) {
             emailCounts[key] = (emailCounts[key] || 0) + 1;
@@ -126,10 +121,10 @@ export default function LeadsTable() {
 
         setDuplicateWarnings(duplicates.size);
         setKpis({
-          total: totalList?.length || 0,
-          hot: hotList?.length || 0,
-          new: newList?.length || 0,
-          booked: bookedList?.length || 0,
+          total: leadsList.length,
+          hot: leadsList.filter((l) => (l.intelligence_score || 0) >= 80).length,
+          new: leadsList.filter((l) => l.lead_state === "NEW").length,
+          booked: leadsList.filter((l) => l.lead_state === "BOOKED").length,
         });
       } catch {
         // Silently fail — KPIs are secondary
@@ -172,7 +167,7 @@ export default function LeadsTable() {
     loadLeads();
 
     // Subscribe to lead updates for real-time row changes
-    const unsubscribe = base44.asServiceRole.entities.Leads.subscribe((event) => {
+    const unsubscribe = base44.entities.Leads.subscribe((event) => {
       if (event.type === "update" && event.data) {
         // Update only the changed lead in the current view
         setLeads((prev) =>
