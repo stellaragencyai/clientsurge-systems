@@ -226,14 +226,14 @@ export default function ClientPortal() {
               <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
                 <li>Admins see this preview state instead of an error</li>
                 <li>To view a real client dashboard, log in with that client's email</li>
-                <li>Or use the admin Mission Control panel for system-level views</li>
+                <li>Or use the Admin Dashboard for system-level views</li>
               </ul>
             </div>
             <div className="flex flex-col gap-3">
-              <a href="/mission-control"
+              <a href="/admin"
                 className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
                 style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}>
-                Go to Mission Control
+                Go to Admin Dashboard
               </a>
               <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Back to Home</a>
             </div>
