@@ -632,10 +632,9 @@ body::before {
   display: none !important;
 }
 
-body > * {
-  position: relative;
-  z-index: 1;
-}
+/* body > * z-index cap REMOVED — was forcing all content below the
+   body::after noise overlay (z-index:9999), which blocked industry hero
+   background images from rendering properly. */
 
 /* Sophisticated Container Effects */
 .glass-card {
@@ -667,17 +666,9 @@ body > * {
   transition: box-shadow 0.3s cubic-bezier(0.25,0.46,0.45,0.94);
 }
 
-/* Refinement #9: Global micro-grain overlay — removes digital-plastic look */
-body::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  pointer-events: none;
-  z-index: 9999;
-  opacity: 0.028;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  background-size: 256px 256px;
-}
+/* Refinement #9: Global micro-grain overlay — REMOVED
+   Was blocking industry hero background images by creating a fixed
+   z-index:9999 overlay above all content (capped at z-index:1 by body > * rule). */
 
 /* Fade In & Up Animations */
 @keyframes fadeInUp {
@@ -734,13 +725,18 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Montserrat', sans-serif !important;
   -webkit-font-smoothing: subpixel-antialiased;
   -moz-osx-font-smoothing: grayscale;
-  color: #000000 !important;
-  -webkit-text-fill-color: #000000 !important;
-  background: none !important;
-  background-image: none !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
   font-weight: 900 !important;
+}
+
+/* Headings inside cinematic hero sections keep their white color and text shadows */
+.cs-industry-hero h1,
+.cs-industry-hero h2,
+.cs-industry-hero h3,
+.cs-industry-hero h4,
+.cs-industry-hero h5,
+.cs-industry-hero h6 {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Pillar 1 Task 17 — Remove rogue text-shadows from body paragraphs */
@@ -911,13 +907,9 @@ td p,
   .cs-btn-primary,
   /* Skeletons */
   .cs-section-skeleton,
-  /* Body grain (fixed overlay — fine to keep but stops animation) */
-  body::after,
   /* SVG stroke draws */
   .svg-draw-line,
-  .clip-path-reveal,
-  /* Nebula / body background pseudo */
-  body::before {
+  .clip-path-reveal {
     animation: none !important;
     transition: none !important;
   }
@@ -999,6 +991,27 @@ section + section {
   #root > .industry-page {
     padding-bottom: 0 !important;
   }
+}
+
+/* ═══════════════════════════════════════════════════════════════
+   INDUSTRY HERO BACKGROUND IMAGE PROTECTION
+   Ensures background images on cinematic industry heroes are never
+   stripped or overridden by any global CSS reset or heading rule.
+   ═══════════════════════════════════════════════════════════════ */
+.cs-industry-hero {
+  background-size: cover !important;
+  background-position: center !important;
+  background-repeat: no-repeat !important;
+}
+
+/* Ensure hero text stays white and visible on dark background images */
+.cs-industry-hero h1,
+.cs-industry-hero h2,
+.cs-industry-hero h3,
+.cs-industry-hero p,
+.cs-industry-hero span {
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
 }
 
 /* Responsive section padding — consistent across all screen sizes */

@@ -169,11 +169,6 @@ h1, h2, h3, h4, h5, h6,
   font-family: var(--cs-font-heading) !important;
   color: var(--cs-text-heading) !important;
   -webkit-text-fill-color: var(--cs-text-heading) !important;
-  background: none !important;
-  background-image: none !important;
-  -webkit-background-clip: unset !important;
-  background-clip: unset !important;
-  text-shadow: none !important;
   -webkit-font-smoothing: antialiased;
 }
 
@@ -569,8 +564,10 @@ body, p, li, span, td, th, input, textarea, select, button, label {
   color: var(--cs-text-heading) !important;
 }
 
-/* Prevent gradient clipping from hiding heading text on white bg */
-h1, h2, h3, h4, h5, h6 {
+/* Prevent gradient clipping from hiding heading text on white bg —
+   background stripping REMOVED from global headings. Was interfering with
+   industry hero rendering. Use .cs-heading class for targeted cleanup instead. */
+.cs-heading {
   background: none !important;
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
