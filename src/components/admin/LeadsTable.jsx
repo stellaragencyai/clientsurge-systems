@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const PAGE_SIZE = 25;
@@ -56,6 +56,8 @@ export default function LeadsTable() {
   const [error, setError] = useState("");
   const [page, setPage] = useState(0);
   const [search, setSearch] = useState("");
+  const [deleteTarget, setDeleteTarget] = useState(null);
+  const [deleting, setDeleting] = useState(false);
   const [filters, setFilters] = useState({
     status: "",
     lead_state: "",
@@ -222,6 +224,21 @@ export default function LeadsTable() {
     );
   };
 
+  const handleDeleteLead = async () => {
+    if (!deleteTarget) return;
+    setDeleting(true);
+    try {
+      await base44.entities.Leads.delete(deleteTarget.id);
+      setLeads((prev) => prev.filter((l) => l.id !== deleteTarget.id));
+      setKpis((prev) => ({ ...prev, total: prev.total - 1 }));
+      setDeleteTarget(null);
+    } catch (err) {
+      setError(err.message || "Failed to delete lead");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
   return (
     <div className="space-y-5">
       {/* KPI Cards - Clean & Minimal */}
@@ -363,12 +380,13 @@ export default function LeadsTable() {
                     Last Activity {renderSortIcon("last_activity_at")}
                   </button>
                 </th>
+                <th className="px-4 py-3 text-center font-semibold text-muted-foreground">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
-                  <td colSpan="6" className="px-3 py-6 text-center">
+                  <td colSpan="7" className="px-3 py-6 text-center">
                     <div className="flex items-center justify-center gap-2 text-muted-foreground">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       <span className="text-xs">Loading...</span>
@@ -377,7 +395,7 @@ export default function LeadsTable() {
                 </tr>
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan="6" className="px-3 py-6 text-center text-muted-foreground text-xs">
+                  <td colSpan="7" className="px-3 py-6 text-center text-muted-foreground text-xs">
                     No leads found
                   </td>
                 </tr>
@@ -414,6 +432,15 @@ export default function LeadsTable() {
                         ? new Date(lead.last_activity_at).toLocaleDateString()
                         : "—"}
                     </td>
+                    <td className="px-4 py-3 text-center">
+                      <button
+                        onClick={() => setDeleteTarget(lead)}
+                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+                        title="Delete lead"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
+                    </td>
                   </tr>
                 ))
               )}
@@ -445,6 +472,57 @@ export default function LeadsTable() {
           </div>
         </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      {deleteTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-5 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <Trash2 className="w-5 h-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">Delete Lead?</h3>
+              </div>
+              <button onClick={() => setDeleteTarget(null)} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-muted-foreground mb-3">
+                This will permanently delete this lead record. This action cannot be undone.
+              </p>
+              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
+                <p className="text-sm font-semibold text-foreground">{deleteTarget.full_name || "—"}</p>
+                <p className="text-xs text-muted-foreground">{deleteTarget.business_name || "—"}</p>
+                <p className="text-xs text-muted-foreground">{deleteTarget.email || "—"}</p>
+              </div>
+            </div>
+            <div className="flex gap-3 p-5 border-t border-border">
+              <button
+                onClick={() => setDeleteTarget(null)}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDeleteLead}
+                disabled={deleting}
+                className="flex-1 px-4 py-2.5 rounded-lg text-white text-sm font-semibold transition-colors disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)" }}
+              >
+                {deleting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
+                  </span>
+                ) : (
+                  "Delete Permanently"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
