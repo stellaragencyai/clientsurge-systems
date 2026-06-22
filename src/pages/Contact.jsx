@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight, Clock } from "lucide-react";
+import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -134,7 +134,7 @@ export default function Contact() {
       <div className="flex flex-1" style={{ minHeight: "calc(100vh - var(--cs-nav-height, 76px))" }}>
 
         {/* ── LEFT: Dark sidebar ── */}
-        <aside className="hidden lg:flex lg:w-[42%] xl:w-[38%] bg-slate-900 text-white flex-col justify-start p-14 xl:p-20 flex-shrink-0">
+        <aside className="hidden lg:flex lg:w-[40%] xl:w-[40%] bg-slate-900 text-white flex-col justify-between p-14 xl:p-20 flex-shrink-0">
           {/* Top block */}
           <div>
             {/* Logo / Brand */}
@@ -193,7 +193,7 @@ export default function Contact() {
 
         {/* ── RIGHT: Form ── */}
         <main className="flex-1 bg-white flex flex-col justify-center px-6 py-16 sm:px-10 md:px-16 lg:px-20 xl:px-24 overflow-y-auto">
-          <div className="w-full max-w-xl mx-auto">
+          <div className="w-full max-w-2xl mx-auto">
 
             {success ? (
               /* ── Success state ── */
@@ -224,22 +224,27 @@ export default function Contact() {
               </motion.div>
             ) : (
               /* ── Form ── */
-              <form onSubmit={handleSubmit} noValidate className="space-y-9">
+              <form onSubmit={handleSubmit} noValidate className="space-y-12">
 
                 {/* HEADER */}
                 <div>
-                  {/* Visual Improvement #3: Response-time trust badge */}
-                  <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full">
-                    <Clock className="w-3.5 h-3.5 text-primary" />
-                    <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wide">Typically responds within 1 business day</span>
+                  {/* #8 — Tracked uppercase eyebrow label */}
+                  <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-slate-500 mb-4">
+                    Get In Touch
+                  </p>
+
+                  {/* #5/#6 — Bold, wide, uppercase CONTACT heading with accent bar */}
+                  <div className="flex items-center gap-5 mb-5">
+                    <div className="w-1.5 h-14 bg-primary rounded-sm flex-shrink-0" />
+                    <h1 className="text-6xl font-black text-slate-900 leading-none tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>CONTACT</h1>
                   </div>
 
-                  <div className="flex items-center gap-4 mb-3">
-                    <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
-                    <h1 className="text-5xl font-black text-slate-900 leading-none">CONTACT</h1>
-                  </div>
-                  <p className="text-slate-900 text-base leading-relaxed">
-                    We'd love to hear from you. Send us a message and we'll get right back in touch.
+                  {/* #7 — Editorial sub-text with generous leading */}
+                  <p className="text-base font-semibold text-slate-900 mb-1" style={{ lineHeight: 1.5 }}>
+                    We'd love to hear from you!
+                  </p>
+                  <p className="text-sm text-slate-500" style={{ lineHeight: 1.7 }}>
+                    Send us a message and we'll get right back in touch.
                   </p>
                 </div>
 
@@ -253,7 +258,7 @@ export default function Contact() {
                 <input type="text" name="website_url" value={form.website_url} onChange={handleChange} className="hidden" tabIndex={-1} aria-hidden="true" />
 
                 {/* Row 1: Name */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <Field label="First Name" required error={errors.full_name}>
                     <input
                       name="full_name"
@@ -274,7 +279,7 @@ export default function Contact() {
                 </div>
 
                 {/* Row 2: Phone & Email */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
                   <Field label="Phone No." error={errors.phone}>
                     <input
                       name="phone"
@@ -313,30 +318,31 @@ export default function Contact() {
                   </p>
                 </Field>
 
-                {/* Visual Improvement #2: Full-width solid blue CTA button with conditional glow */}
+                {/* #11 — Rectangular outlined SEND button, left-aligned */}
                 {(() => {
                   const hasErrors = Object.keys(errors).length > 0;
                   const isValid = form.full_name && form.email && form.message && !hasErrors;
                   return (
-                    <button
-                      type="submit"
-                      disabled={loading}
-                      className="cs-btn-primary w-full"
-                      style={{
-                        boxShadow: isValid ? '0 0 24px rgba(0, 174, 239, 0.35)' : undefined,
-                        transition: 'box-shadow 0.3s ease',
-                        minHeight: 'unset'
-                      }}
-                    >
-                      {loading
-                        ? <><Loader2 className="w-5 h-5 animate-spin" /> Sending...</>
-                        : <><span>Send Message</span><ArrowRight className="w-5 h-5" /></>
-                      }
-                    </button>
+                    <div className="pt-2">
+                      <button
+                        type="submit"
+                        disabled={loading}
+                        className="inline-flex items-center justify-center gap-2 px-10 py-3.5 border-2 border-slate-900 text-slate-900 font-bold text-sm uppercase tracking-widest bg-transparent hover:bg-slate-900 hover:text-white transition-colors duration-300 rounded-none"
+                        style={{ minHeight: 'unset', minWidth: 'unset' }}
+                      >
+                        {loading
+                          ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
+                          : <><span>Send</span><ArrowRight className="w-4 h-4" /></>
+                        }
+                      </button>
+                      {isValid && (
+                        <span className="sr-only">Form is valid and ready to send</span>
+                      )}
+                    </div>
                   );
                 })()}
 
-                <p className="text-center text-xs text-slate-400">
+                <p className="text-xs text-slate-400">
                   No spam, no pressure — just a thoughtful reply from our team.
                 </p>
               </form>
