@@ -40,12 +40,11 @@ export default function IndustryHero({
           backgroundImage: `url("${backgroundImage}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
-          backgroundAttachment: 'fixed',
         }}
       >
-        {/* Cinematic multi-layer overlay — deepens the left content column and bottom */}
-        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(105deg, rgba(2,6,23,0.92) 0%, rgba(15,23,42,0.78) 38%, rgba(15,23,42,0.45) 62%, rgba(2,6,23,0.35) 100%)' }} />
-        <div className="absolute inset-x-0 bottom-0 h-48 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(2,6,23,0.85), transparent)' }} />
+        {/* Cinematic overlay — lightens so the photo is clearly visible; deeper only on the left edge for text contrast */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(100deg, rgba(2,6,23,0.62) 0%, rgba(15,23,42,0.38) 40%, rgba(15,23,42,0.12) 68%, rgba(2,6,23,0.18) 100%)' }} />
+        <div className="absolute inset-x-0 bottom-0 h-40 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(2,6,23,0.55), transparent)' }} />
 
         {/* Content — left-aligned with substantial whitespace, clears the fixed navbar */}
         <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-2xl" style={{ paddingTop: 'calc(var(--cs-nav-height, 76px) + 2rem)' }}>
