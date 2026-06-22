@@ -682,6 +682,109 @@
       "title": "Last Data Quality Check",
       "format": "date-time",
       "description": "Timestamp of most recent quality validation"
+    },
+    "quality_review_status": {
+      "type": "string",
+      "title": "Quality Review Status",
+      "enum": [
+        "active",
+        "audit_pending",
+        "quarantine_candidate",
+        "quarantined",
+        "duplicate_candidate",
+        "verified_outbound_ready"
+      ],
+      "default": "active",
+      "description": "Lead quality lifecycle state for CRM separation"
+    },
+    "quality_reason": {
+      "type": "string",
+      "title": "Quality Reason",
+      "description": "Human-readable reason for quality status"
+    },
+    "quality_reason_codes": {
+      "type": "array",
+      "title": "Quality Reason Codes",
+      "items": {
+        "type": "string"
+      },
+      "description": "Machine-readable codes: internal_test, smoke_test, example_email, test_phone, generic_business_name, raw_import, missing_contact, chain_franchise, duplicate_candidate, etc."
+    },
+    "quality_confidence": {
+      "type": "number",
+      "title": "Quality Confidence (0-100)",
+      "default": 0,
+      "description": "Confidence score for the quality classification"
+    },
+    "audited_at": {
+      "type": "string",
+      "title": "Audited At",
+      "format": "date-time",
+      "description": "When the lead was last quality-audited"
+    },
+    "canonical_website_url": {
+      "type": "string",
+      "title": "Canonical Website URL",
+      "description": "Normalized website URL for deduplication"
+    },
+    "canonical_phone": {
+      "type": "string",
+      "title": "Canonical Phone",
+      "description": "Standardized phone for deduplication"
+    },
+    "canonical_email": {
+      "type": "string",
+      "title": "Canonical Email",
+      "description": "Lowercase, trimmed email for deduplication"
+    },
+    "canonical_business_name": {
+      "type": "string",
+      "title": "Canonical Business Name",
+      "description": "Normalized business name for deduplication"
+    },
+    "canonical_city": {
+      "type": "string",
+      "title": "Canonical City",
+      "description": "Normalized city for deduplication"
+    },
+    "canonical_state": {
+      "type": "string",
+      "title": "Canonical State",
+      "description": "Normalized state for deduplication"
+    },
+    "google_place_id": {
+      "type": "string",
+      "title": "Google Place ID",
+      "description": "Google Places API place_id for business enrichment"
+    },
+    "google_rating": {
+      "type": "number",
+      "title": "Google Rating",
+      "description": "Google Business rating (0-5)"
+    },
+    "google_review_count": {
+      "type": "integer",
+      "title": "Google Review Count",
+      "default": 0,
+      "description": "Number of Google reviews"
+    },
+    "google_business_profile_url": {
+      "type": "string",
+      "title": "Google Business Profile URL",
+      "description": "URL to Google Business Profile"
+    },
+    "enrichment_status": {
+      "type": "string",
+      "title": "Enrichment Status",
+      "enum": [
+        "not_started",
+        "needs_lookup",
+        "enriched",
+        "failed",
+        "not_found"
+      ],
+      "default": "not_started",
+      "description": "Google Places enrichment lifecycle"
     }
   },
   "required": [

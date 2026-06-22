@@ -62,6 +62,7 @@ import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 import ProductionHardeningPanel from '../components/admin/ProductionHardeningPanel';
+import LeadQualityControl from '../components/admin/LeadQualityControl';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -98,7 +99,8 @@ const NAV_GROUPS = [
       { id: 'leads', label: 'Leads', icon: Users },
       { id: 'lead-intelligence', label: 'Lead Intelligence', icon: Flame },
       { id: 'priority', label: 'Priority Queue', icon: Star },
-      { id: 'crm-health', label: 'CRM Health', icon: ShieldCheck },
+      { id: 'lead-quality', label: 'Lead Quality Control', icon: ShieldCheck },
+      { id: 'crm-health', label: 'CRM Health', icon: Activity },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
     ],
   },
@@ -280,6 +282,7 @@ export default function AdminDashboard() {
         </div>
       );
       case 'lead-intelligence': return <LeadIntelligenceDashboard />;
+      case 'lead-quality': return <LeadQualityControl />;
       case 'crm-health': return <CrmHealthDashboard />;
       case 'launch-gates': return <LaunchGatesPanel />;
       case 'sales-funnel': return <SalesFunnelPanel />;

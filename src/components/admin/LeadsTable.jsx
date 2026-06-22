@@ -99,6 +99,9 @@ export default function LeadsTable() {
       if (filters.scoreMax) f.intelligence_score.$lte = parseInt(filters.scoreMax);
     }
 
+    // Hide quarantined records by default — they're managed in Lead Quality Control
+    f.quality_review_status = { $nin: ['quarantine_candidate', 'quarantined'] };
+
     return f;
   }, [search, filters]);
 
