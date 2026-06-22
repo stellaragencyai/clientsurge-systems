@@ -1,10 +1,11 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight, Clock, ShieldCheck, BadgeCheck, Wallet } from "lucide-react";
+import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight, Clock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
+import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
 
 const INDUSTRY_CONTEXT = {
@@ -26,28 +27,23 @@ function detectIndustryFromReferrer() {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
 
-const TRUST_BADGES = [
-  { Icon: ShieldCheck, label: "Secure & Private" },
-  { Icon: BadgeCheck, label: "No Long-Term Contracts" },
-  { Icon: Wallet, label: "Month-to-Month Billing" },
-];
-
+// Visual Improvement #2: reusable styled input field with animated focus border
 function Field({ label, required, error, children }) {
   return (
     <div className="group">
-      <label className="cs-form-label block mb-2 text-slate-600">
+      <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 mb-2">
         {label} {required && <span className="text-primary">*</span>}
       </label>
       {children}
       {error && (
-        <p className="text-red-500 text-xs mt-1.5" role="alert">{error}</p>
+        <p className="text-red-500 text-xs mt-1.5">{error}</p>
       )}
     </div>
   );
 }
 
 const inputClass =
-  "w-full bg-transparent border-b border-slate-300 py-3 text-base text-slate-900 placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary";
+  "w-full bg-transparent border-b border-slate-200 py-3 text-base text-slate-900 placeholder:text-slate-300 outline-none transition-all duration-300 focus:border-primary";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -69,8 +65,7 @@ export default function Contact() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [errors, setErrors] = useState({});
-  const successRef = useRef(null);
-  const errorSummaryRef = useRef(null);
+  const [showBookingModal, setShowBookingModal] = useState(false);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -96,24 +91,16 @@ export default function Contact() {
     });
   }, []);
 
-  useEffect(() => {
-    if (success && successRef.current) {
-      successRef.current.focus();
-    } else if (errors.submit && errorSummaryRef.current) {
-      errorSummaryRef.current.focus();
-    }
-  }, [success, errors.submit]);
-
   const validate = () => {
     const e = {};
-    if (!form.full_name.trim()) e.full_name = "Please enter your full name so we know who to reply to.";
-    if (!form.email.trim()) e.email = "Please enter your email so we can reply to you.";
-    else if (!EMAIL_REGEX.test(form.email)) e.email = "Please enter a valid email address.";
+    if (!form.full_name.trim()) e.full_name = "Required";
+    if (!form.email.trim()) e.email = "Required";
+    else if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email";
     if (form.phone.trim()) {
       const digits = form.phone.replace(/\D/g, "");
-      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) e.phone = "Please enter a valid phone number (at least 10 digits).";
+      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) e.phone = "Enter a valid phone number";
     }
-    if (!form.message.trim()) e.message = "Please tell us a little about what you need help with.";
+    if (!form.message.trim()) e.message = "Required";
     return e;
   };
 
@@ -133,7 +120,7 @@ export default function Contact() {
       if (!result.data?.success) throw new Error(result.data?.error || "Submission failed");
       setSuccess(true);
     } catch {
-      setErrors({ submit: "Something went wrong. Please try again or email us directly at support@clientsurgesystems.com." });
+      setErrors({ submit: "Something went wrong. Please try again or email us directly." });
     } finally {
       setLoading(false);
     }
@@ -153,41 +140,40 @@ export default function Contact() {
             {/* Logo / Brand */}
             <div className="flex items-center gap-3 mb-16">
               <div className="w-1.5 h-10 bg-primary rounded-sm flex-shrink-0" />
-              <span className="text-2xl font-black tracking-tight font-display">ClientSurge</span>
+              <span className="text-2xl font-black tracking-tight">ClientSurge</span>
             </div>
 
-            {/* Contact details — semantic list */}
-            <h2 className="sr-only">Contact Information</h2>
-            <ul className="border-t border-slate-700 pt-10 mb-10 space-y-7">
-              <li className="flex items-center gap-4">
+            {/* Divider */}
+            <div className="border-t border-slate-700 pt-10 mb-10 space-y-7">
+              <div className="flex items-center gap-4">
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                <a href="tel:+16025843227" className="text-base text-slate-100 hover:text-primary transition">
+                <a href="tel:+16025843227" className="text-base text-slate-200 hover:text-primary transition">
                   (602) 584-3227
                 </a>
-              </li>
-              <li className="flex items-start gap-4">
+              </div>
+              <div className="flex items-start gap-4">
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
                   <Mail className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-1">Email</p>
-                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-100 hover:text-primary transition break-all">
+                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Email</p>
+                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-200 hover:text-primary transition break-all">
                     support@clientsurgesystems.com
                   </a>
                 </div>
-              </li>
-              <li className="flex items-center gap-4">
+              </div>
+              <div className="flex items-center gap-4">
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <MapPin className="w-4 h-4 text-primary" />
                 </div>
-                <span className="text-base text-slate-100">Phoenix, Arizona</span>
-              </li>
-            </ul>
+                <span className="text-base text-slate-200">Phoenix, Arizona</span>
+              </div>
+            </div>
 
-            {/* Description — improved contrast */}
-            <p className="text-slate-300 text-base leading-relaxed">
+            {/* Description */}
+            <p className="text-slate-400 text-base leading-relaxed">
               {industryContext
                 ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right stack.`
                 : "Have questions or ready to get started? Send us a message and we'll be in touch within one business day."}
@@ -212,9 +198,7 @@ export default function Contact() {
             {success ? (
               /* ── Success state ── */
               <motion.div
-                ref={successRef}
-                tabIndex={-1}
-                className="text-center py-16 outline-none"
+                className="text-center py-16"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -227,13 +211,13 @@ export default function Contact() {
                 >
                   <CheckCircle2 className="w-9 h-9 text-green-600" />
                 </motion.div>
-                <h2 className="text-3xl font-black text-slate-900 mb-3 font-display">Message Received</h2>
+                <h2 className="text-3xl font-black text-slate-900 mb-3">Message Received</h2>
                 <p className="text-slate-500 text-base leading-relaxed mb-10 max-w-sm mx-auto">
                   Thanks for reaching out. We'll respond within one business day.
                 </p>
                 <a
                   href="/"
-                  className="cs-btn-primary inline-flex"
+                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition"
                 >
                   Back to Home <ArrowRight className="w-4 h-4" />
                 </a>
@@ -244,7 +228,7 @@ export default function Contact() {
 
                 {/* HEADER */}
                 <div>
-                  {/* Response-time trust badge */}
+                  {/* Visual Improvement #3: Response-time trust badge */}
                   <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-full">
                     <Clock className="w-3.5 h-3.5 text-primary" />
                     <span className="text-[11px] font-semibold text-slate-600 uppercase tracking-wide">Typically responds within 1 business day</span>
@@ -252,33 +236,15 @@ export default function Contact() {
 
                   <div className="flex items-center gap-4 mb-3">
                     <div className="w-1.5 h-12 bg-primary rounded-sm flex-shrink-0" />
-                    <h1 className="text-5xl font-black text-slate-900 leading-none font-display">CONTACT</h1>
+                    <h1 className="text-5xl font-black text-slate-900 leading-none">CONTACT</h1>
                   </div>
-                  <p className="text-slate-700 text-base leading-relaxed">
+                  <p className="text-slate-900 text-base leading-relaxed">
                     We'd love to hear from you. Send us a message and we'll get right back in touch.
                   </p>
-
-                  {/* Trust signals — consistent with site */}
-                  <div className="flex flex-wrap gap-3 mt-5">
-                    {TRUST_BADGES.map(({ Icon, label }) => (
-                      <span
-                        key={label}
-                        className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-1.5 rounded-full border"
-                        style={{ background: "rgba(0,174,239,0.08)", borderColor: "rgba(0,174,239,0.28)", color: "#00AEEF" }}
-                      >
-                        <Icon className="w-3.5 h-3.5" aria-hidden="true" /> {label}
-                      </span>
-                    ))}
-                  </div>
                 </div>
 
                 {errors.submit && (
-                  <div
-                    ref={errorSummaryRef}
-                    tabIndex={-1}
-                    className="bg-red-50 border border-red-200 rounded p-4 text-sm text-red-700 outline-none"
-                    role="alert"
-                  >
+                  <div className="bg-red-50 border border-red-200 rounded p-4 text-sm text-red-700">
                     {errors.submit}
                   </div>
                 )}
@@ -286,9 +252,9 @@ export default function Contact() {
                 {/* Honeypot */}
                 <input type="text" name="website_url" value={form.website_url} onChange={handleChange} className="hidden" tabIndex={-1} aria-hidden="true" />
 
-                {/* Row 1: Full Name + Business Type */}
+                {/* Row 1: Name */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <Field label="Full Name" required error={errors.full_name}>
+                  <Field label="First Name" required error={errors.full_name}>
                     <input
                       name="full_name"
                       value={form.full_name}
@@ -297,7 +263,7 @@ export default function Contact() {
                       className={inputClass}
                     />
                   </Field>
-                  <Field label="Business Type">
+                  <Field label="Last Name">
                     <input
                       name="business_type"
                       value={form.business_type}
@@ -341,12 +307,13 @@ export default function Contact() {
                     aria-invalid={Boolean(errors.message)}
                     className={`${inputClass} resize-none`}
                   />
-                  <p className="text-right text-[11px] text-slate-400 mt-1.5">
+                  {/* Visual Improvement #1: character counter */}
+                  <p className="text-right text-[11px] text-slate-300 mt-1.5">
                     {form.message.length} characters
                   </p>
                 </Field>
 
-                {/* Full-width solid blue CTA button with conditional glow */}
+                {/* Visual Improvement #2: Full-width solid blue CTA button with conditional glow */}
                 {(() => {
                   const hasErrors = Object.keys(errors).length > 0;
                   const isValid = form.full_name && form.email && form.message && !hasErrors;
@@ -369,7 +336,7 @@ export default function Contact() {
                   );
                 })()}
 
-                <p className="text-center text-xs text-slate-500">
+                <p className="text-center text-xs text-slate-400">
                   No spam, no pressure — just a thoughtful reply from our team.
                 </p>
               </form>
@@ -379,26 +346,24 @@ export default function Contact() {
       </div>
 
       {/* Mobile: show contact info above footer */}
-      <div className="lg:hidden bg-slate-900 text-white px-6 py-10">
-        <h2 className="sr-only">Contact Information</h2>
-        <ul className="space-y-5">
-          <li className="flex items-center gap-3">
-            <Phone className="w-4 h-4 text-primary" />
-            <a href="tel:+16025843227" className="text-sm text-slate-100">(602) 584-3227</a>
-          </li>
-          <li className="flex items-center gap-3">
-            <Mail className="w-4 h-4 text-primary" />
-            <a href="mailto:support@clientsurgesystems.com" className="text-sm text-slate-100">support@clientsurgesystems.com</a>
-          </li>
-          <li className="flex items-center gap-3">
-            <MapPin className="w-4 h-4 text-primary" />
-            <span className="text-sm text-slate-100">Phoenix, Arizona</span>
-          </li>
-        </ul>
+      <div className="lg:hidden bg-slate-900 text-white px-6 py-10 space-y-5">
+        <div className="flex items-center gap-3">
+          <Phone className="w-4 h-4 text-primary" />
+          <a href="tel:+16025843227" className="text-sm">(602) 584-3227</a>
+        </div>
+        <div className="flex items-center gap-3">
+          <Mail className="w-4 h-4 text-primary" />
+          <a href="mailto:support@clientsurgesystems.com" className="text-sm">support@clientsurgesystems.com</a>
+        </div>
+        <div className="flex items-center gap-3">
+          <MapPin className="w-4 h-4 text-primary" />
+          <span className="text-sm">Phoenix, Arizona</span>
+        </div>
       </div>
 
       <Footer />
       <MobileCallBar />
+      {showBookingModal && <DemoBookingModal onClose={() => setShowBookingModal(false)} />}
     </div>
   );
 }
