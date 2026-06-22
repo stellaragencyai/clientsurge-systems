@@ -1,6 +1,7 @@
 import { ArrowRight, Check, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 // Premium custom SVG icons — each uniquely designed for its automation system
 const IconLeadCapture = () => (
@@ -200,13 +201,11 @@ export default function AutomationSystemsGrid() {
       {/* ── Section 1: Browse Systems ── */}
       <section id="automation-systems" className="py-20 px-6 bg-background" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="cs-eyebrow mb-3">AI Automation Marketplace</p>
-            <h2 className="font-titles text-foreground mb-4">Browse Business AI Automation Systems</h2>
-            <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-              Choose from practical automation systems that solve real business problems: missed calls, slow follow-up, unbooked leads, forgotten quotes, review gaps, and old opportunities sitting untouched.
-            </p>
-          </div>
+          <SectionHeader
+            eyebrow="AI Automation Marketplace"
+            title="Browse Business AI Automation Systems"
+            subtitle="Choose from practical automation systems that solve real business problems: missed calls, slow follow-up, unbooked leads, forgotten quotes, review gaps, and old opportunities sitting untouched."
+          />
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {SYSTEMS.map(({ SvgIcon, title, outcome, impact, impactSub, cta, href, accentColor }) => {
@@ -314,13 +313,11 @@ export default function AutomationSystemsGrid() {
       {/* ── Section 2: How the AI Brain Works ── */}
       <section className="py-20 px-6" style={{ background: "hsl(var(--muted))" }}>
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="cs-eyebrow mb-3">Remote Setup Engine</p>
-            <h2 className="font-titles text-foreground mb-4">How the ClientSurge AI Brain Works</h2>
-            <p className="text-muted-foreground text-base max-w-2xl mx-auto leading-relaxed">
-              ClientSurge does not just sell automation ideas. After a business chooses a system, the ClientSurge AI brain helps collect business details, lead sources, phone and email requirements, booking links, CRM details, and automation goals. It turns that information into a setup plan so the automation can be remotely configured, tested, and launched.
-            </p>
-          </div>
+          <SectionHeader
+            eyebrow="Remote Setup Engine"
+            title="How the ClientSurge AI Brain Works"
+            subtitle="ClientSurge does not just sell automation ideas. After a business chooses a system, the ClientSurge AI brain helps collect business details, lead sources, phone and email requirements, booking links, CRM details, and automation goals. It turns that information into a setup plan so the automation can be remotely configured, tested, and launched."
+          />
 
           {/* Horizontal process steps */}
           <div className="flex flex-wrap items-center justify-center mb-12">

@@ -17,6 +17,7 @@ import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
 import { setPageMetadata } from "@/lib/seo";
 import { forceScrollToTop } from "@/lib/scroll";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const industries = [
 {
@@ -130,14 +131,11 @@ export default function Industries() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <section className="text-center pr-4 pl-4 pt-24 pb-8" style={{ background: "linear-gradient(to bottom, #f7fbff, #ffffff)" }}>
-        <p className="text-xs font-semibold text-[#005f99] tracking-widest uppercase mb-4">Industries</p>
-        <h1 className="font-display text-4xl md:text-5xl font-semibold tracking-tight text-foreground mb-4">
-          Automation for Appointment-Based Businesses
-        </h1>
-        <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-          We build done-for-you automation systems for lead-driven businesses. Start with the live med spa page, or explore the
-          industries we are expanding into next.
-        </p>
+        <SectionHeader
+          eyebrow="Industries"
+          title="Automation for Appointment-Based Businesses"
+          subtitle="We build done-for-you automation systems for lead-driven businesses. Start with the live med spa page, or explore the industries we are expanding into next."
+        />
       </section>
 
       <section className="py-16 px-6">

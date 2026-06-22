@@ -10,42 +10,20 @@ import { systemsById, systemGroups, coreOfferSectionConfig, iconMap } from "./co
 import VerticalTimeline from "./coreOffer/VerticalTimeline";
 import LaunchTimeline from "./coreOffer/LaunchTimeline";
 import StackBuilder from "./coreOffer/StackBuilder";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const orderedSystemIds = Object.keys(systemsById);
 const mobileVisibleSystemIds = new Set(["02", "03", "04", "05"]);
 
 function CoreOfferHeader() {
   return (
-    <div className="flex flex-col items-center text-center mx-auto max-w-4xl">
-      {/* Eyebrow */}
-      <p className="cs-eyebrow mb-4">
-        {coreOfferSectionConfig.eyebrow}
-      </p>
-
-      {/* Title with vertical blue bar */}
-      <div className="flex items-center gap-4">
-        <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-        <h2 className="font-titles text-black text-4xl md:text-5xl font-bold tracking-tight text-center">
-          How It Works
-        </h2>
-      </div>
-
-      {/* Thin gold rule */}
-      <div className="flex items-center justify-center gap-3 mt-5 mb-6">
-        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.45))" }} />
-        <div className="w-1.5 h-1.5 rounded-full" style={{ background: "#00AEEF" }} />
-        <div className="h-px flex-1 max-w-[80px]" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.45))" }} />
-      </div>
-
-      {/* Subheadline */}
-      <p className="text-base md:text-lg font-medium text-foreground/80 max-w-2xl mx-auto leading-relaxed">
-         Instant response. Automatic follow-up. Direct revenue recovery.
-       </p>
-       <p className="mt-2 text-sm text-muted-foreground max-w-xl mx-auto leading-relaxed">
-         Every missed call recovered. Every lead followed up. Every prospect converted.
-       </p>
+    <div className="mx-auto max-w-4xl">
+      <SectionHeader
+        eyebrow={coreOfferSectionConfig.eyebrow}
+        title="How It Works"
+        subtitle="Instant response. Automatic follow-up. Direct revenue recovery. Every missed call recovered. Every lead followed up. Every prospect converted."
+      />
     </div>);
-
 }
 
 // CoreOfferHeader is already placed first inside the section wrapper.

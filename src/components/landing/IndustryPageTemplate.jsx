@@ -6,6 +6,7 @@ import Navbar from './Navbar';
 import Footer from './Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
 import { ArrowRight, CheckCircle, TrendingUp, Zap } from 'lucide-react';
+import SectionHeader from '@/components/design-system/SectionHeader';
 
 const ROOFING_HERO_IMAGE = 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/e92b5f56c_watermarked_img_13975777732204341720.jpg';
 
@@ -136,9 +137,7 @@ export default function IndustryPageTemplate() {
       {/* PAIN POINTS */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 text-center mb-16">
-            The {industry.industry_name} Problem
-          </h2>
+          <SectionHeader title={`The ${industry.industry_name} Problem`} />
           <div className="grid md:grid-cols-2 gap-6">
             {industry.pain_points.map((point, i) => (
               <div key={i} className="p-6 border border-slate-200 rounded-xl bg-slate-50">
@@ -153,9 +152,7 @@ export default function IndustryPageTemplate() {
       {/* USE CASES */}
       <section className="py-20 px-6 bg-slate-50">
         <div className="max-w-6xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 text-center mb-16">
-            How {industry.industry_name} Automation Works
-          </h2>
+          <SectionHeader title={`How ${industry.industry_name} Automation Works`} />
           <div className="grid md:grid-cols-2 gap-8">
             {industry.use_cases.map((useCase, i) => {
               const IconComponent = useCase.icon === 'MessageSquare' ? () => <Zap className="w-6 h-6" />
@@ -188,9 +185,7 @@ export default function IndustryPageTemplate() {
       {/* ROI METRICS */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 text-center mb-16">
-            Typical ROI For {industry.industry_name}
-          </h2>
+          <SectionHeader title={`Typical ROI For ${industry.industry_name}`} />
           <div className="grid md:grid-cols-4 gap-6">
             {Object.entries(industry.roi_metrics).map(([key, value]) => (
               <div key={key} className="p-6 border border-slate-200 rounded-xl text-center">
@@ -208,9 +203,7 @@ export default function IndustryPageTemplate() {
       {industry.testimonials?.length > 0 && (
         <section className="py-20 px-6 bg-slate-50">
           <div className="max-w-5xl mx-auto">
-            <h2 className="text-4xl font-bold text-slate-900 text-center mb-16">
-              Real Results From {industry.industry_name} Leaders
-            </h2>
+            <SectionHeader title={`Real Results From ${industry.industry_name} Leaders`} />
             <div className="grid md:grid-cols-2 gap-8">
               {industry.testimonials.map((testimonial, i) => (
                 <div key={i} className="bg-white p-8 rounded-xl border border-slate-200 shadow-sm">
@@ -234,9 +227,7 @@ export default function IndustryPageTemplate() {
       {/* FEATURES */}
       <section className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <h2 className="text-4xl font-bold text-slate-900 text-center mb-16">
-            Your {industry.industry_name} System Includes
-          </h2>
+          <SectionHeader title={`Your ${industry.industry_name} System Includes`} />
           <div className="grid md:grid-cols-2 gap-4 max-w-2xl mx-auto">
             {industry.key_features.map((feature, i) => (
               <div key={i} className="flex items-center gap-3 p-4">

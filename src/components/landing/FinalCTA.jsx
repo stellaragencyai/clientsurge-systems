@@ -1,6 +1,7 @@
 import StardustOverlay from "./StardustOverlay";
 import { ArrowRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 export default function FinalCTA() {
   return (
@@ -8,18 +9,11 @@ export default function FinalCTA() {
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center">
-          <p className="cs-eyebrow mb-6">
-            Ready to Automate Your Lead Flow?
-          </p>
-          <div className="flex items-center gap-4">
-            <div className="cs-section-bar" style={{ minHeight: "48px" }} />
-            <h2 className="font-titles text-black text-4xl md:text-5xl font-bold tracking-tight">
-              Build Your <span className="text-primary">AI Automation Stack</span>
-            </h2>
-          </div>
-          <p className="mt-6 text-muted-foreground text-lg max-w-xl leading-relaxed">
-            Select the automations your business needs. We handle setup, provider connections, and go-live in 5–7 business days — your stack runs 24/7.
-          </p>
+          <SectionHeader
+            eyebrow="Ready to Automate Your Lead Flow?"
+            title="Build Your AI Automation Stack"
+            subtitle="Select the automations your business needs. We handle setup, provider connections, and go-live in 5–7 business days — your stack runs 24/7."
+          />
 
           {/* How the demo works - 3 steps */}
           <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-center">

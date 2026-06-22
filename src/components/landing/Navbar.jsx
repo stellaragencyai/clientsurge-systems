@@ -309,8 +309,8 @@ export default function Navbar() {
                 navigate("/#pricing");
               }
             }}
-            className="cs-btn-primary"
-            style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset", whiteSpace: "nowrap" }}
+            className="cs-btn-primary cs-nav-cta"
+            style={{ minHeight: "unset", minWidth: "unset" }}
           >
             See Plans &amp; Pricing
           </button>
@@ -412,10 +412,10 @@ export default function Navbar() {
                     navigate("/#pricing");
                   }
                 }}
-                className="cs-btn-primary flex-1"
+                className="cs-btn-primary cs-nav-cta flex-1"
                 style={{ minHeight: "unset" }}
               >
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px", fontSize: "0.875rem" }}>
+                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px" }}>
                   See Plans &amp; Pricing
                 </span>
               </button>

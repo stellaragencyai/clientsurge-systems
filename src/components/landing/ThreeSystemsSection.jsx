@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const PACKAGES = [
   {
@@ -76,18 +77,11 @@ export default function ThreeSystemsSection() {
     >
       <div className="max-w-7xl mx-auto">
         {/* Section header */}
-        <div className="flex flex-col items-center text-center mb-12">
-          <p className="cs-eyebrow mb-3">AI Growth Systems</p>
-          <div className="flex items-center gap-4">
-            <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-            <h2 className="font-titles text-black text-3xl md:text-5xl font-bold">
-              Choose Your AI Growth System
-            </h2>
-          </div>
-          <p className="mt-4 text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed">
-            Choose the package that matches how much of your lead flow you want ClientSurge to handle — from essential capture and response to a complete website, follow-up, booking, review, and reactivation system.
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="AI Growth Systems"
+          title="Choose Your AI Growth System"
+          subtitle="Choose the package that matches how much of your lead flow you want ClientSurge to handle — from essential capture and response to a complete website, follow-up, booking, review, and reactivation system."
+        />
 
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
