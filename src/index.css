@@ -13,14 +13,14 @@
     /* Pure black foreground — solid, sharp, zero fade */
     --foreground: 0 0% 0%;
     --card: 210 60% 98%;
-    --card-foreground: 220 80% 10%;
+    --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
-    --popover-foreground: 220 80% 10%;
+    --popover-foreground: 0 0% 0%;
     /* Primary locked to #00AEEF — hsl(199, 100%, 47%) */
     --primary: 199 100% 47%;
     --primary-foreground: 0 0% 100%;
     --secondary: 210 60% 95%;
-    --secondary-foreground: 220 80% 10%;
+    --secondary-foreground: 0 0% 0%;
     --muted: 210 50% 96%;
     --muted-foreground: 215 25% 40%;
     --accent: 199 100% 47%;
@@ -37,11 +37,11 @@
     --chart-5: 217 90% 55%;
     --radius: 0.5rem;
     --sidebar-background: 0 0% 100%;
-    --sidebar-foreground: 220 80% 10%;
+    --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 199 100% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
     --sidebar-accent: 210 60% 95%;
-    --sidebar-accent-foreground: 220 80% 10%;
+    --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 199 40% 88%;
     --sidebar-ring: 199 100% 47%;
 
@@ -56,7 +56,7 @@
     --space-16: 64px;
 
     /* ── Semantic color aliases (map to hsl tokens above) ── */
-    --color-text-primary: hsl(220, 60%, 8%);
+    --color-text-primary: hsl(0, 0%, 0%);
     --color-text-muted: hsl(215, 25%, 40%);
     --color-text-heading: #000000;
     --color-surface: hsl(210, 100%, 99%);
@@ -777,10 +777,12 @@ h1, h2, h3,
   letter-spacing: -0.02em;
 }
 
-/* Premium body text */
+/* Premium body text — true black, no fade */
 body, p, span, div {
   font-family: 'Inter', system-ui, sans-serif;
   -webkit-font-smoothing: subpixel-antialiased;
+  color: #000000;
+  opacity: 1;
 }
 
 /* ============================================
