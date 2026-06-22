@@ -14,6 +14,7 @@ import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
 import Footer from "@/components/landing/Footer";
 import { useSearchParams } from "react-router-dom";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 // Lazy load heavy store components
 const InteractiveStackBuilder = lazy(() =>
@@ -526,51 +527,19 @@ function StoreInner() {
 
           <div id="top" className="store-hero">
             <div className="store-hero-copy">
-
-
-              <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#00AEEF", margin: "0 0 10px" }}>
-                Business AI Automation Store
-              </p>
-              <h1
-                className="font-display"
-                style={{
-                  fontSize: "clamp(1.5rem, 4.5vw, 2.6rem)",
-                  fontWeight: "800",
-                  lineHeight: 1.08,
-                  letterSpacing: 0,
-                  color: "hsl(var(--foreground))",
-                  marginBottom: "16px"
-                }}>
-
-                {selectedPackageOffer ? "Review Your" : "Business AI"}{" "}
-                <span
-                style={{
-                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 52%, #003B8F 100%)",
-                  WebkitBackgroundClip: "text",
-                  WebkitTextFillColor: "transparent",
-                  backgroundClip: "text",
-                  filter: "drop-shadow(0 0 18px rgba(0,174,239,0.4))"
-                }}>
-
-                {selectedPackageOffer
-                  ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} Package`
-                  : "Automation Store"}
-                </span>
-              </h1>
-
-              <p
-                style={{
-                  fontSize: "0.9rem",
-                  color: "rgba(10,22,40,0.72)",
-                  lineHeight: 1.6,
-                  maxWidth: "640px",
-                  margin: "0 auto 24px"
-                }}>
-                
-                {selectedPackageOffer
-                  ? "Your package is preloaded for a faster self-serve checkout. Review what is included, then continue straight into the purchase flow."
-                  : "Browse installable AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Choose a system, complete guided intake, and ClientSurge handles remote setup and testing."}
-              </p>
+              <SectionHeader
+                eyebrow={selectedPackageOffer ? "Review Your Package" : "Business AI Automation Store"}
+                title={
+                  selectedPackageOffer
+                    ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} Package`
+                    : "Business AI Automation Store"
+                }
+                subtitle={
+                  selectedPackageOffer
+                    ? "Your package is preloaded for a faster self-serve checkout. Review what is included, then continue straight into the purchase flow."
+                    : "Browse installable AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Choose a system, complete guided intake, and ClientSurge handles remote setup and testing."
+                }
+              />
             </div>
 
             {selectedIndustry ?
