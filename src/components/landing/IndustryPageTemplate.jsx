@@ -84,42 +84,19 @@ export default function IndustryPageTemplate() {
     <div className="min-h-screen bg-white">
       <Navbar />
 
-      {/* HERO */}
+      {/* HERO — Roofing uses the immersive cinematic hero from IndustryHero */}
       {slug === 'roofing' ? (
-        <section
-          style={{
-            backgroundImage: `url(${ROOFING_HERO_IMAGE})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center top',
-            minHeight: '80vh',
-            display: 'flex',
-            alignItems: 'center',
-            position: 'relative',
-            paddingTop: 'calc(var(--cs-nav-height) + 2rem)',
-            paddingBottom: '4rem',
-          }}
-        >
-          <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to bottom right, rgba(15,23,42,0.45), rgba(15,23,42,0.55), rgba(2,6,23,0.85))', pointerEvents: 'none' }} />
-          <div style={{ position: 'relative', zIndex: 10, padding: '0 3rem', maxWidth: '700px' }}>
-            <p style={{ fontSize: '11px', fontWeight: 800, letterSpacing: '0.18em', textTransform: 'uppercase', color: 'rgba(255,255,255,0.85)', marginBottom: '1.5rem' }}>
-              {ROOFING_HERO_CONFIG.eyebrow}
-            </p>
-            <h1 style={{ fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 900, color: '#ffffff', marginBottom: '1.5rem', lineHeight: 1.08, fontFamily: 'Montserrat, sans-serif' }}>
-              {ROOFING_HERO_CONFIG.headline}
-            </h1>
-            <p style={{ fontSize: '1.125rem', color: 'rgba(255,255,255,0.92)', marginBottom: '2.5rem', lineHeight: 1.7, maxWidth: '560px' }}>
-              {ROOFING_HERO_CONFIG.subheadline}
-            </p>
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-              <button onClick={() => navigate(ROOFING_HERO_CONFIG.primaryCTA.path)} className="cs-btn-primary" style={{ background: '#ffffff', color: '#0f172a', minHeight: 'unset', minWidth: 'unset' }}>
-                {ROOFING_HERO_CONFIG.primaryCTA.label} <ArrowRight className="w-4 h-4 inline ml-1" />
-              </button>
-              <button onClick={() => navigate(ROOFING_HERO_CONFIG.secondaryCTA.path)} style={{ display: 'inline-flex', alignItems: 'center', padding: '0.75rem 1.5rem', border: '2px solid rgba(255,255,255,0.7)', borderRadius: '8px', color: '#ffffff', fontWeight: 600, background: 'transparent', cursor: 'pointer' }}>
-                {ROOFING_HERO_CONFIG.secondaryCTA.label}
-              </button>
-            </div>
-          </div>
-        </section>
+        <IndustryHero
+          industryKey="roofing"
+          eyebrow={ROOFING_HERO_CONFIG.eyebrow}
+          headline={ROOFING_HERO_CONFIG.headline}
+          subheadline={ROOFING_HERO_CONFIG.subheadline}
+          description={ROOFING_HERO_CONFIG.description}
+          backgroundImage={ROOFING_HERO_IMAGE}
+          primaryCTA={ROOFING_HERO_CONFIG.primaryCTA}
+          secondaryCTA={ROOFING_HERO_CONFIG.secondaryCTA}
+          fallbackCTA={ROOFING_HERO_CONFIG.fallbackCTA}
+        />
       ) : (
         <IndustryHero
           industryKey={slug}

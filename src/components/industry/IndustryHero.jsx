@@ -35,38 +35,41 @@ export default function IndustryHero({
   if (useCinematicHero) {
     return (
       <section
-        className="relative w-full pt-32 pb-24 flex items-center justify-start min-h-[70vh] md:min-h-[80vh] bg-cover bg-center"
+        className="relative w-full flex items-center justify-start min-h-[100svh] overflow-hidden"
         style={{
           backgroundImage: `url("${backgroundImage}")`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
+          backgroundAttachment: 'fixed',
         }}
       >
-        {/* Dark gradient overlay — strongest at bottom and slight left */}
-        <div className="absolute inset-0 bg-gradient-to-br from-slate-900/40 via-slate-900/50 to-slate-950/85 pointer-events-none" />
+        {/* Cinematic multi-layer overlay — deepens the left content column and bottom */}
+        <div className="absolute inset-0 pointer-events-none" style={{ background: 'linear-gradient(105deg, rgba(2,6,23,0.92) 0%, rgba(15,23,42,0.78) 38%, rgba(15,23,42,0.45) 62%, rgba(2,6,23,0.35) 100%)' }} />
+        <div className="absolute inset-x-0 bottom-0 h-48 pointer-events-none" style={{ background: 'linear-gradient(to top, rgba(2,6,23,0.85), transparent)' }} />
 
-        {/* Content — lower-left alignment with substantial whitespace */}
-        <div className="relative z-10 px-6 md:px-12 max-w-2xl">
-          {/* Eyebrow */}
-          <div className="mb-6 inline-block">
-            <span className="text-xs font-bold uppercase tracking-widest text-white/90">
+        {/* Content — left-aligned with substantial whitespace, clears the fixed navbar */}
+        <div className="relative z-10 px-6 md:px-12 lg:px-16 max-w-2xl" style={{ paddingTop: 'calc(var(--cs-nav-height, 76px) + 2rem)' }}>
+          {/* Eyebrow — with electric-blue accent bar */}
+          <div className="mb-6 flex items-center gap-3">
+            <span className="h-4 w-1 rounded-full" style={{ background: '#00AEEF', boxShadow: '0 0 12px rgba(0,174,239,0.7)' }} />
+            <span className="text-xs font-bold uppercase tracking-[0.2em] text-white/95" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
               {eyebrow}
             </span>
           </div>
 
           {/* Headline */}
-          <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-8 leading-tight drop-shadow-lg">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-[4.25rem] font-bold text-white mb-6 leading-[1.05]" style={{ textShadow: '0 4px 24px rgba(0,0,0,0.55), 0 1px 3px rgba(0,0,0,0.4)', fontFamily: 'Montserrat, sans-serif' }}>
             {headline}
           </h1>
 
           {/* Subheadline */}
-          <p className="text-lg md:text-xl text-white/95 mb-6 leading-relaxed max-w-xl drop-shadow">
+          <p className="text-base md:text-lg lg:text-xl text-white/95 mb-8 leading-relaxed max-w-xl" style={{ textShadow: '0 2px 12px rgba(0,0,0,0.6)' }}>
             {subheadline}
           </p>
 
           {/* Description */}
           {description && (
-            <p className="text-base md:text-lg text-white/85 mb-10 leading-relaxed max-w-2xl drop-shadow">
+            <p className="text-sm md:text-base text-white/85 mb-10 leading-relaxed max-w-2xl" style={{ textShadow: '0 2px 10px rgba(0,0,0,0.5)' }}>
               {description}
             </p>
           )}
@@ -76,7 +79,8 @@ export default function IndustryHero({
             {primaryCTA && (
               <button
                 onClick={() => navigate(primaryCTA.path)}
-                className="cs-btn-primary inline-flex items-center justify-center gap-2 bg-white text-slate-900 hover:bg-blue-50"
+                className="cs-btn-primary inline-flex items-center justify-center gap-2"
+                style={{ background: '#ffffff', color: '#0f172a' }}
               >
                 {primaryCTA.label}
                 <ArrowRight className="w-4 h-4" />
@@ -85,7 +89,8 @@ export default function IndustryHero({
             {secondaryCTA && (
               <button
                 onClick={() => navigate(secondaryCTA.path)}
-                className="inline-flex items-center justify-center px-6 py-3 border-2 border-white rounded-lg text-white font-semibold hover:bg-white/10 transition"
+                className="inline-flex items-center justify-center px-6 py-3 border-2 border-white/90 rounded-lg text-white font-semibold hover:bg-white/10 transition backdrop-blur-sm"
+                style={{ minHeight: 'unset' }}
               >
                 {secondaryCTA.label}
               </button>
