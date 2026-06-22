@@ -152,7 +152,7 @@ Deno.serve(async (req) => {
         total_processed: leadsToEnrich.length,
         enriched,
         failed,
-        not_found,
+        not_found: notFound,
       },
       results
     });
