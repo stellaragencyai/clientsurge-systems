@@ -1,5 +1,6 @@
 import { useDemoBooking } from "./DemoBookingContext";
 import StardustOverlay from "./StardustOverlay";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const testimonials = [
   {
@@ -43,14 +44,12 @@ export default function Testimonials() {
     <section id="testimonials" className="nebula-testimonials py-16 md:py-24 px-6 relative overflow-hidden">
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
-        <div className="flex flex-col items-center text-center mb-16">
-          <p className="cs-eyebrow mb-4">Real Workflow Results</p>
-          <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-            What Happens When the System Goes Live
-          </h2>
-          <p className="mt-5 text-sm leading-6 text-muted-foreground">
-            Three industry workflows — what the lead experience looks like before the system is installed versus after it's running.
-          </p>
+        <div className="mb-16">
+          <SectionHeader
+            eyebrow="Real Workflow Results"
+            title="What Happens When the System Goes Live"
+            subtitle="Three industry workflows — what the lead experience looks like before the system is installed versus after it's running."
+          />
         </div>
 
         {/* CSS-only staggered fade-in — no GPU compositing overhead */}

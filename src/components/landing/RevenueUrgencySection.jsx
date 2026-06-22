@@ -1,5 +1,6 @@
 import { ArrowRight, Clock, PhoneOff, TrendingUp, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const URGENCY_POINTS = [
   {
@@ -34,19 +35,13 @@ export default function RevenueUrgencySection() {
       style={{ background: "#0A1628" }}
     >
       <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-14">
-          <p className="text-xs font-bold uppercase tracking-[0.22em] mb-4 text-center" style={{ color: "rgba(0,174,239,0.7)" }}>
-            THE COST OF WAITING
-          </p>
-          <div className="flex items-center justify-center gap-4">
-            <div className="cs-section-bar" style={{ minHeight: "48px" }} />
-            <h2 className="font-titles text-white text-4xl md:text-5xl font-bold tracking-tight">
-              Revenue you're losing right now.
-            </h2>
-          </div>
-          <p className="mt-4 text-white/50 max-w-xl mx-auto text-sm leading-relaxed">
-            Most local service businesses don't have a lead problem — they have a lead response problem. Here's what that costs.
-          </p>
+        <div className="mb-14">
+          <SectionHeader
+            eyebrow="The Cost of Waiting"
+            title="Revenue you're losing right now."
+            subtitle="Most local service businesses don't have a lead problem — they have a lead response problem. Here's what that costs."
+            variant="dark"
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">

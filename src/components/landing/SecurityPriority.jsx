@@ -1,5 +1,6 @@
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const trustItems = [
   {
@@ -54,7 +55,7 @@ function TrustBadge({ item, index }) {
 
 export default function SecurityPriority() {
   return (
-    <section className="security-priority" aria-labelledby="security-priority-title">
+    <section className="security-priority" aria-label="Trust and Security">
       <div className="security-priority__inner">
         <motion.div
           className="security-priority__header"
@@ -67,16 +68,10 @@ export default function SecurityPriority() {
             <ShieldCheck aria-hidden="true" />
             Trust & Security
           </div>
-          <div className="flex items-center justify-center gap-4">
-            <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "42px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-            <h2 id="security-priority-title">
-              Your Trust & Security <span>Are Our Priority</span>
-            </h2>
-          </div>
-          <p>
-            We are committed to providing a secure and reliable platform. Your success and safety are
-            the cornerstones of ClientSurge Systems.
-          </p>
+          <SectionHeader
+            title="Your Trust & Security Are Our Priority"
+            subtitle="We are committed to providing a secure and reliable platform. Your success and safety are the cornerstones of ClientSurge Systems."
+          />
         </motion.div>
 
         <div className="security-priority__grid">

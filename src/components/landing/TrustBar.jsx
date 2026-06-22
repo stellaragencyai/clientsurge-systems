@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CalendarCheck, ShieldCheck, TimerReset, Zap } from "lucide-react";
 import { motion } from "framer-motion";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 function useCountUp(value, inView, duration = 1800) {
   const [count, setCount] = useState(typeof value === "number" ? 1 : value);
@@ -139,17 +140,12 @@ export default function TrustBar() {
       className="pt-14 md:pt-16 pb-14 md:pb-20 bg-gradient-to-b from-card via-background to-background/60 border-y border-primary/10"
     >
       <div className="max-w-6xl mx-auto px-6">
-        <div className="flex flex-col items-center text-center mb-10">
-          <p className="cs-eyebrow mb-4">What You Can Expect</p>
-          <div className="flex items-center gap-4">
-            <div className="cs-section-bar" style={{ minHeight: "48px" }} />
-            <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-              Clear Commitments. Cleaner Buying Decision.
-            </h2>
-          </div>
-          <p className="mt-4 max-w-3xl text-sm md:text-base text-foreground/65 leading-relaxed">
-            No guessing. No long contracts. Here's exactly what you can expect when you work with ClientSurge Systems — from first response speed to how the engagement is structured.
-          </p>
+        <div className="mb-10">
+          <SectionHeader
+            eyebrow="What You Can Expect"
+            title="Clear Commitments. Cleaner Buying Decision."
+            subtitle="No guessing. No long contracts. Here's exactly what you can expect when you work with ClientSurge Systems — from first response speed to how the engagement is structured."
+          />
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4 md:gap-5">
           {items.map((item, index) => (

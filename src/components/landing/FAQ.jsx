@@ -3,8 +3,9 @@ import {
   AccordionContent,
   AccordionItem,
   AccordionTrigger } from
-"@/components/ui/accordion";
+  "@/components/ui/accordion";
 import { FAQ_ITEMS } from "./FAQData";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 export default function FAQ() {
 
@@ -12,15 +13,12 @@ export default function FAQ() {
     <section id="faq" className="px-4 pt-8 pb-20 md:px-6 md:pt-10 md:pb-32 relative overflow-hidden bg-gradient-to-b from-card to-background">
 
       <div className="max-w-3xl mx-auto relative z-10">
-        <div className="flex flex-col items-center text-center mb-8 md:mb-14">
-          <p className="cs-eyebrow mb-4">Questions</p>
-          <div className="flex items-center gap-4">
-            <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-            <h2 className="font-titles text-[#001B44] text-4xl md:text-5xl font-bold tracking-tight">
-             Frequently Asked Questions
-            </h2>
-          </div>
-          <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base">
+        <div className="mb-8 md:mb-14">
+          <SectionHeader
+            eyebrow="Questions"
+            title="Frequently Asked Questions"
+          />
+          <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base text-center">
             Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">Get Help Choosing</a> or <a href="/pricing" className="text-primary font-semibold hover:underline">Compare Packages</a>
           </p>
           <div className="mt-8 border-t border-border/40" />

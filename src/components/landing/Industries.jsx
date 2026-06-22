@@ -14,6 +14,7 @@ import {
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 import { industryPatterns, FILTER_TAGS, INDUSTRY_TAGS } from "@/lib/industryAssets.jsx";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const industries = [
 {
@@ -208,18 +209,11 @@ export default function Industries() {
       className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
       
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
-         <div className="flex flex-col items-center text-center">
-           <p className="cs-eyebrow mb-4">Choose Your Industry</p>
-           <div className="flex items-center gap-4">
-             <div className="w-1.5 self-stretch rounded-full flex-shrink-0" style={{ background: "#00AEEF", minHeight: "48px", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-             <h2 className="font-titles text-black text-4xl md:text-5xl font-bold tracking-tight max-w-4xl">
-                Built For Your Industry
-             </h2>
-           </div>
-            <p className="mt-3 text-base md:text-lg max-w-2xl leading-relaxed" style={{ color: "#0a1628" }}>
-              Pick your industry to see how much revenue you're losing and how to recover it.
-            </p>
-         </div>
+         <SectionHeader
+            eyebrow="Choose Your Industry"
+            title="Built For Your Industry"
+            subtitle="Pick your industry to see how much revenue you're losing and how to recover it."
+         />
 
         {/* Filter pills */}
         <div className="flex flex-wrap justify-center gap-2 mt-6 pb-4">
