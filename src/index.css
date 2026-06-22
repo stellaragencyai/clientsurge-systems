@@ -463,7 +463,7 @@ nav {
 
 /* MOBILE OPTIMIZATION: Generous padding for breathing room */
 @media (max-width: 640px) {
-  section {
+  section:not(.cs-industry-hero) {
     padding-top: var(--space-12) !important;
     padding-bottom: var(--space-12) !important;
   }

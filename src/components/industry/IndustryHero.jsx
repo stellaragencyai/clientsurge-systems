@@ -35,7 +35,7 @@ export default function IndustryHero({
   if (useCinematicHero) {
     return (
       <section
-        className="relative w-full flex items-center justify-start min-h-[100svh] overflow-hidden"
+        className="cs-industry-hero relative w-full flex items-center justify-start min-h-[100svh] overflow-hidden"
         style={{
           backgroundImage: `url("${backgroundImage}")`,
           backgroundSize: 'cover',

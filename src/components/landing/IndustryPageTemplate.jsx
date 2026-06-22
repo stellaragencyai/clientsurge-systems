@@ -81,7 +81,7 @@ export default function IndustryPageTemplate() {
   const heroConfig = getHeroConfig();
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen">
       <Navbar />
 
       {/* HERO — Roofing uses the immersive cinematic hero from IndustryHero */}
