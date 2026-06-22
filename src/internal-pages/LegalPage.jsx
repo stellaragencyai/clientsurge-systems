@@ -76,13 +76,13 @@ const TERMS_SECTIONS = [
     id: "services",
     number: "1",
     title: "Services",
-    body: "ClientSurge Systems provides AI-powered lead automation services on a monthly subscription basis. Service tiers and pricing are listed at clientsurgesystems.com/pricing.",
+    body: "ClientSurge Systems provides AI-powered lead automation services on a monthly subscription basis. Service tiers and pricing are listed at clientsurgesystems.com/pricing. By using our services, you agree to these terms.",
   },
   {
     id: "billing",
     number: "2",
     title: "Subscription Billing and Auto-Renewal",
-    body: "Monthly subscriptions automatically renew each billing period until cancelled. By purchasing a subscription, you authorize ClientSurge Systems and its payment processor to charge the payment method on file for recurring monthly fees, applicable setup fees, add-ons, taxes, and other amounts disclosed at checkout.",
+    body: "Monthly subscriptions automatically renew each billing period until cancelled. By purchasing a subscription, you authorize ClientSurge Systems and its payment processor to charge the payment method on file for recurring monthly fees, applicable setup fees, add-ons, taxes, and other amounts disclosed at checkout. Subscriptions renew automatically unless you cancel before your next billing date. You may cancel at any time through the client portal or by contacting support@clientsurgesystems.com before your renewal date.",
   },
   {
     id: "cancellation",

@@ -1,0 +1,65 @@
+{
+  "name": "ChurnFeedback",
+  "type": "object",
+  "_metadata": {
+    "status": "ACTIVE",
+    "reason": "Captures cancellation survey responses to feed predictChurnRisk model"
+  },
+  "properties": {
+    "cancellation_reason": {
+      "type": "string",
+      "title": "Cancellation Reason",
+      "enum": [
+        "too_expensive",
+        "automation_didnt_work",
+        "setup_too_slow",
+        "no_longer_needed",
+        "switching_provider",
+        "other"
+      ]
+    },
+    "cancellation_details": {
+      "type": "string",
+      "title": "Details"
+    },
+    "nps_rating": {
+      "type": "integer",
+      "title": "NPS Rating (1-5)"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "submitted_at": {
+      "type": "string",
+      "title": "Submitted At",
+      "format": "date-time"
+    }
+  },
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "user"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

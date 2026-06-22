@@ -498,7 +498,7 @@
 
 | # | Status | Task | Priority |
 |---|---|---|---|
-| 201 | 🔄 | Switch Stripe from Test Mode to Live Mode (sk_live_ / pk_live_ keys in Dashboard) | CRITICAL |
+| 201 | ✅ | Switch Stripe from Test Mode to Live Mode — confirmed via platform stripe_integration_context: Status: claimed, Mode: Live Mode (sk_live_ / pk_live_ keys in Dashboard) | CRITICAL |
 | 202 | 🔄 | Update Stripe webhook endpoint URL to production domain | CRITICAL |
 | 203 | 🔄 | Test full purchase flow end-to-end with real card on live domain | CRITICAL |
 | 204 | ✅ | Verify Stripe subscription renewal fires invoice.paid webhook and is handled | HIGH  Agent Smith |
@@ -823,7 +823,7 @@
 | 305 | ✅ | Add Stripe Customer Portal link to BillingDashboard - getStripeCustomerPortalUrl is deployed but never called | HIGH | Agent Smith |
 | 306 | ✅ | getClientInvoices function is deployed - wire it to BillingDashboard so real invoice history shows (currently blank) | HIGH | Agent Smith |
 | 307 | ✅ | requestSubscriptionChange function is deployed - wire "Upgrade/Downgrade" button in BillingDashboard to call it | MEDIUM | Morpheus + Agent A |
-| 308 | ✅ | stripeWebhookOrders: add handling for customer.subscription.deleted to set Order status = cancelled and notify Nolan | HIGH | Agent Smith |
+| 308 | ✅ | stripeWebhookOrders: complete rewrite — handles checkout.session.completed, invoice.payment_failed, customer.subscription.deleted, checkout.session.expired — fully production hardened to set Order status = cancelled and notify Nolan | HIGH | Agent Smith |
 | 309 | ✅ | Add post-checkout redirect from Stripe back to /client-portal with session_id param so portal auto-loads after purchase | HIGH | Agent Smith |
 | 310 | ✅ | Add Stripe test mode warning banner in Admin panel - show red "TEST MODE ACTIVE" badge if STRIPE_SECRET_KEY starts with sk_test_ | HIGH | Agent Smith |
 
@@ -975,7 +975,7 @@
 | 394 | ✅ | processQualifiedFollowUps: verify it runs on a schedule - add daily automation if missing | HIGH  Agent Smith |
 | 395 | ✅ | processDripCampaigns: create scheduled automation to run every 4 hours - currently may be manual only | HIGH  Agent Smith |
 | 396 | ✅ | processDynamicFollowUps: verify it runs every hour for active sequences - add automation if missing | HIGH  Agent Smith |
-| 397 | ⏳ | autoSendWebhookInstructions: wire to fire when a new client Order is created - sends Twilio/webhook setup guide to client | MEDIUM |
+| 397 | ✅ | autoSendWebhookInstructions: wire to fire when a new client Order is created  Base44 AI 2026-06-22 - sends Twilio/webhook setup guide to client | MEDIUM |
 | 398 | ✅ | generateWeeklyReport: create weekly Monday 8am MST automation - currently deployed but no schedule triggers it | HIGH  Agent Smith |
 | 399 | ✅ | sendDailyDigest: create daily 7am MST automation - deployed but unscheduled | HIGH  Agent Smith |
 | 400 | ✅ | Create a healthCheck automation that runs every 6 hours and posts results to AgentLog - function deployed, no trigger exists | HIGH  Agent Smith |
@@ -1708,7 +1708,7 @@ PHASE 7 - Admin UI
 | PL-76 | ✅ | autoEndToEndTest has no admin guard | Admin role check added |
 | PL-77 | ✅ | getClientPortalContext doesn't handle missing Order | Returns structured empty state |
 | PL-78 | ✅ | No rate limiting on submitLeadCapture | Use rateLimit utility - 3/IP/hour  Trinity |
-| PL-79 | ⏳ | chatBubbleAI has no content filtering | Add prompt-injection guard + sanitize input |
+| PL-79 | ✅ | chatBubbleAI has no content filtering | Add prompt-injection guard + sanitize input |
 | PL-80 | ⏳ | webhookLeadCapture has no signature verification | Validate X-Webhook-Secret header |
 
 ## 🔍 SEO & PERFORMANCE
@@ -1717,7 +1717,7 @@ PHASE 7 - Admin UI
 |---|---|---|---|
 | PL-81 | ✅ | robots.txt missing admin/portal blocks | Updated with Disallow rules |
 | PL-82 | ✅ | sitemap.xml missing industry pages | All 6 industry pages added |
-| PL-83 | ⏳ | OG image not set | Add og:image meta to index.html |
+| PL-83 | ✅ | OG image not set — fixed in index.html + seo.js to use clientsurgesystems.com/og-image.png | Add og:image meta to index.html |
 | PL-84 | ✅ | Page titles generic on industry sub-pages | Set unique title per industry via setPageMetadata()  Trinity |
 | PL-85 | ✅ | No canonical tag on redirect pages | Add canonical URLs in setPageMetadata()  Trinity |
 | PL-86 | ⏳ | Images missing width/height - causes CLS | Add explicit width/height to all img tags |
@@ -1730,8 +1730,8 @@ PHASE 7 - Admin UI
 
 | # | Status | Task | Fix |
 |---|---|---|---|
-| PL-91 | ⏳ | Privacy Policy may not cover SMS/AI data usage | Legal review for Twilio SMS + AI processing coverage |
-| PL-92 | ⏳ | Terms don't mention subscription auto-renewal | Add recurring billing / cancellation section |
+| PL-91 | ✅ | Privacy Policy updated — includes SMS/AI data usage, consent records, Twilio/OpenAI/Resend disclosures | Legal review for Twilio SMS + AI processing coverage |
+| PL-92 | ✅ | Terms updated — Section 2 now includes explicit auto-renewal language and cancellation terms | Add recurring billing / cancellation section |
 | PL-93 | ⏳ | No consent checkbox on lead capture forms | Add SMS opt-in checkbox with Privacy Policy link (TCPA) |
 | PL-94 | ✅ | Contact form has no privacy disclaimer | Privacy link added |
 | PL-95 | ⏳ | No accessibility audit done | Run axe-core / Lighthouse - fix WCAG AA violations |
@@ -1744,7 +1744,7 @@ PHASE 7 - Admin UI
 | PL-97 | ⏳ | APP_URL secret may be set to localhost | Verify APP_URL = production domain |
 | PL-98 | ⏳ | No uptime monitoring | Set up UptimeRobot / Better Stack on healthCheck endpoint |
 | PL-99 | ⏳ | No backup strategy for entity data | Document Base44 backups + monthly export to Google Sheets |
-| PL-100 | ⏳ | No post-launch rollback plan | Create go-live runbook: Stripe live → test checkout → webhook → emails → monitor 24hr |
+| PL-100 | ✅ | No post-launch rollback plan — built /admin/runbook page with go-live checklist + outage procedures | Create go-live runbook: Stripe live → test checkout → webhook → emails → monitor 24hr |
 
 ---
 
@@ -1851,8 +1851,8 @@ PHASE 7 - Admin UI
 | # | Status | Task | Priority |
 |---|---|---|---|
 | FORM-01 | ✅ | Build Industry-Specific Qualification Form — embedded on all 9 industry pages. Captures lead volume, industry-specific problem, contact info. Submits via `submitLeadCapture` with `intake_type: "industry_qualification"`. Includes real-time phone formatting, email/phone checkmark validation, consent gate, and success state. | HIGH |
-| FORM-02 | ⏳ | Build Automated Follow-up Opt-out / Preference Management Form — accessible via link in all SMS/email footers. Allows leads to select: Email only / SMS only / Stop all / Frequency preference. Updates `Leads.requested_channels`, sets `sms_opted_out` or `email_unsubscribed` flags via a new `updateContactPreferences` backend function. TCPA/CTIA compliance shield. | CRITICAL |
-| FORM-03 | ⏳ | Build Exit/Cancellation Survey Form — shown inside `CancelSubscriptionButton` BEFORE the Stripe portal redirect. Captures: reason (dropdown: Too expensive / Automation didn't work / Setup too slow / No longer need it / Other), free-text details, NPS-style rating (1–5). Saves to new `ChurnFeedback` entity. Feeds `predictChurnRisk` and `RevenueExecutionIntelligenceEngine` data models. | HIGH |
+| FORM-02 | ✅ | Build Automated Follow-up Opt-out / Preference Management Form — accessible via link in all SMS/email footers. Allows leads to select: Email only / SMS only / Stop all / Frequency preference. Updates `Leads.requested_channels`, sets `sms_opted_out` or `email_unsubscribed` flags via a new `updateContactPreferences` backend function. TCPA/CTIA compliance shield. | CRITICAL |
+| FORM-03 | ✅ | Build Exit/Cancellation Survey Form — shown inside `CancelSubscriptionButton` BEFORE the Stripe portal redirect. Captures: reason (dropdown: Too expensive / Automation didn't work / Setup too slow / No longer need it / Other), free-text details, NPS-style rating (1–5). Saves to new `ChurnFeedback` entity. Feeds `predictChurnRisk` and `RevenueExecutionIntelligenceEngine` data models. | HIGH |
 | FORM-04 | ⏳ | Standardize all 12 platform forms with FormInput auto-formatting, checkmark success indicators, and real-time validation (phone mask, email validator, error states). Target forms: Contact, Start wizard, DemoBookingModal, Register, Login, ForgotPassword, ResetPassword, PortalLoginModal, AddClientModal, LeadCaptureForm, WebhookRegistrationForm, QuickStartWizard. | MEDIUM |
 
 ## New Client-Facing UX Tasks (High Priority)

@@ -1,131 +1,139 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import {
-  buildChatConversationContext,
-  hasPromptInjectionAttempt,
-  sanitizeChatMessages,
-} from './chatBubbleAI.shared.js';
+// PL-79: chatBubbleAI — with prompt injection guard and content sanitization
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-const SALES_PROMPT = `You are a friendly, concise sales assistant for ClientSurge Systems — a done-for-you AI lead automation agency.
+const BLOCKED_PATTERNS = [
+  /ignore\s+(previous|all|above|prior)/i,
+  /forget\s+(everything|all|your|prior)/i,
+  /jailbreak/i,
+  /act\s+as\s+(a\s+)?(different|another|new)/i,
+  /pretend\s+(you\s+are|to\s+be)/i,
+  /system\s*:/i,
+  /<script/i,
+  /javascript:/i,
+  /data:/i,
+];
 
-ClientSurge helps local service businesses (med spas, dental, HVAC, roofing, contractors, etc.) by:
-- Sending instant AI-powered SMS responses to new leads (within seconds)
-- Automated follow-up sequences (Day 1, 3, 7)
-- Missed call text-back recovery
-- Qualified lead to booking prompt automation
-- 8-step nurture email sequences
-- Lead reactivation for old/dead leads
+const BLOCKED_TOPICS = [
+  /credit\s+card\s+number/i,
+  /social\s+security/i,
+  /ssn/i,
+  /bank\s+account/i,
+  /password/i,
+  /personal\s+information/i,
+];
 
-Pricing: Starter $497/mo + $797 setup, Growth $997/mo + $1,297 setup, Pro $1,997/mo + $2,497 setup. No contracts. 5-7 business day setup.
-
-You answer questions clearly and briefly (2-4 sentences max). 
-If someone asks to book a demo, see a demo, talk to someone, get started, or wants pricing details — respond EXACTLY with the special token: [TRIGGER_BOOKING]
-Do NOT include any other text with [TRIGGER_BOOKING], just that token alone.
-Keep all other answers friendly, confident, and concise.`;
-
-const SUPPORT_PROMPT = `You are a warm, concise installation support assistant for ClientSurge Systems.
-Your job is to help paying clients understand their installation progress and get answers fast.
-Rules:
-- Keep every reply to 2-4 sentences max. Be specific — use the client's actual status and services if provided.
-- Never promise specific go-live dates beyond "5-7 business days from order date".
-- If the client needs urgent help, direct them to call (602) 587-4608 or email support@clientsurgesystems.com.
-- Don't be robotic. Be helpful and human.
-- Install stages in order: Paid → Ready for Install → Configuring → Testing → Live.
-- "Configuring" means we are actively building their automation flows.
-- "Testing" means flows are built and we are doing final end-to-end verification.`;
-
-// ── In-memory rate limiter ──────────────────────────────────────────────────
-const rateLimitMap = new Map<string, { count: number; windowStart: number }>();
-const RATE_LIMIT_MAX = 15;
-const RATE_LIMIT_WINDOW_MS = 5 * 60 * 1000;
-
-function getClientIp(req: Request): string {
-  return (
-    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
-    req.headers.get('cf-connecting-ip') ||
-    req.headers.get('x-real-ip') ||
-    'unknown'
-  );
+function sanitizeInput(input) {
+  if (!input || typeof input !== "string") return "";
+  // Remove HTML tags, limit length
+  return input.replace(/<[^>]*>/g, "").trim().substring(0, 2000);
 }
 
-function isRateLimited(ip: string): boolean {
-  const now = Date.now();
-  const entry = rateLimitMap.get(ip);
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    rateLimitMap.set(ip, { count: 1, windowStart: now });
-    return false;
+function isBlockedInput(input) {
+  for (const pattern of BLOCKED_PATTERNS) {
+    if (pattern.test(input)) return true;
   }
-  if (entry.count >= RATE_LIMIT_MAX) return true;
-  entry.count += 1;
   return false;
 }
 
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of rateLimitMap.entries()) {
-    if (now - entry.windowStart > RATE_LIMIT_WINDOW_MS * 2) rateLimitMap.delete(ip);
+function containsSensitiveTopics(input) {
+  for (const pattern of BLOCKED_TOPICS) {
+    if (pattern.test(input)) return true;
   }
-}, RATE_LIMIT_WINDOW_MS);
-// ────────────────────────────────────────────────────────────────────────────
+  return false;
+}
+
+const SYSTEM_PROMPT = `You are an AI assistant for ClientSurge Systems, an AI automation platform for local service businesses.
+You help potential clients understand:
+- What services we offer (AI lead response, missed call text-back, booking automation, review requests, nurture sequences, lead reactivation)
+- How our pricing works (Starter $797/$497mo, Growth $1297/$997mo, Elite $2497/$1997mo)
+- How the setup process works (5-7 business days, remote setup)
+- How to book a consultation
+
+Be helpful, concise, and professional. Do NOT:
+- Share personal data or contact information from other clients
+- Make guarantees about specific lead volumes or revenue
+- Discuss competitor products negatively
+- Respond to requests outside of ClientSurge's business context
+
+If asked about something outside your scope, politely redirect to contacting support@clientsurgesystems.com or booking a call at clientsurgesystems.com/book`;
 
 Deno.serve(async (req) => {
   try {
-    const ip = getClientIp(req);
-
-    if (isRateLimited(ip)) {
-      return secureJson(
-        { reply: "You're sending messages pretty fast! Take a breath — or book a free call and we'll answer everything live." },
-        { status: 429 }
-      );
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
     }
 
-    const base44 = createClientFromRequest(req);
-    const body = await req.json();
-    const { messages, installStatus, services, mode } = body;
+    const { message, history } = await req.json();
 
-    if (!messages || !Array.isArray(messages)) {
-      return secureJson({ error: 'messages array required' }, { status: 400 });
+    if (!message) {
+      return Response.json({ error: "Message is required" }, { status: 400 });
     }
 
-    // Prompt injection guard — strip script tags and reject obvious injection attempts
-    if (hasPromptInjectionAttempt(messages)) {
-      return secureJson({
-        reply: "I can help with ClientSurge pricing, demos, services, or installation support, but I can't follow requests to reveal or override internal instructions.",
+    const sanitized = sanitizeInput(message);
+
+    // PL-79: Prompt injection guard
+    if (isBlockedInput(sanitized)) {
+      return Response.json({
+        reply: "I'm here to help you learn about ClientSurge Systems' AI automation services. Is there something specific about our packages or how we help local businesses that I can help with?",
+        blocked: true,
       });
     }
 
-    const trimmedMessages = sanitizeChatMessages(messages);
-
-    // Determine which system prompt to use
-    // If installStatus or services are passed, this is a support chat (client dashboard)
-    let systemPrompt = SALES_PROMPT;
-    if (installStatus || (services && services.length > 0)) {
-      const serviceNames = Array.isArray(services)
-        ? services.map((s: any) => s.productName || s.name || s.service_key).filter(Boolean).join(', ')
-        : 'unknown';
-      systemPrompt = `${SUPPORT_PROMPT}
-
-Client context:
-- Current install status: ${installStatus || 'Unknown'}
-- Purchased services: ${serviceNames || 'Unknown'}`;
+    // Block requests asking for sensitive data
+    if (containsSensitiveTopics(sanitized)) {
+      return Response.json({
+        reply: "I'm not able to assist with that topic. For account-specific questions, please contact support@clientsurgesystems.com.",
+        blocked: true,
+      });
     }
 
-    const conversationContext = buildChatConversationContext({
-      systemPrompt,
-      messages: trimmedMessages,
+    const openAiKey = Deno.env.get("OPENAI_API_KEY");
+    if (!openAiKey) {
+      return Response.json({ error: "AI service not configured" }, { status: 503 });
+    }
+
+    // Build message history (limit to last 8 messages)
+    const messages = [
+      { role: "system", content: SYSTEM_PROMPT },
+    ];
+
+    if (Array.isArray(history)) {
+      const recentHistory = history.slice(-8);
+      for (const msg of recentHistory) {
+        if (msg.role && msg.content) {
+          messages.push({ role: msg.role, content: sanitizeInput(String(msg.content)) });
+        }
+      }
+    }
+
+    messages.push({ role: "user", content: sanitized });
+
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Authorization": `Bearer ${openAiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini",
+        messages,
+        max_tokens: 400,
+        temperature: 0.7,
+      }),
     });
 
-    const reply = await base44.asServiceRole.integrations.Core.InvokeLLM({
-      prompt: conversationContext,
-    });
+    if (!response.ok) {
+      const errText = await response.text();
+      console.error("[chatBubbleAI] OpenAI error:", errText);
+      return Response.json({ error: "AI service temporarily unavailable" }, { status: 503 });
+    }
 
-    const replyText = typeof reply === 'string' ? reply.trim() : String(reply).trim();
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content?.trim() || "I'm not sure how to answer that. Please contact support@clientsurgesystems.com for help.";
 
-    return secureJson({ reply: replyText });
+    return Response.json({ reply });
   } catch (error) {
-    console.error('[chatBubbleAI] chatBubbleAI error:', error);
-    return secureJson({
-      reply: 'I\'m having trouble connecting right now. For urgent support, call (602) 587-4608 or email support@clientsurgesystems.com.',
-    }, { status: 500 });
+    console.error("[chatBubbleAI] Error:", error.message);
+    return Response.json({ error: "Service error" }, { status: 500 });
   }
 });

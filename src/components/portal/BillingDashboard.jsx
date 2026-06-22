@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
+import CancellationSurvey from '@/pages/CancellationSurvey';
 import {
   getCurrentPackageKey,
   getSubscriptionChangeOptions,
@@ -401,6 +402,7 @@ export default function BillingDashboard({ project, order, subscription, onSubsc
   const [managing, setManaging] = useState(false);
   const [manageError, setManageError] = useState('');
   const [invoiceFilter, setInvoiceFilter] = useState('all'); // all | unpaid | paid
+  const [showCancelSurvey, setShowCancelSurvey] = useState(false);
 
   useEffect(() => { load(); }, [project?.id]);
 
@@ -437,6 +439,10 @@ export default function BillingDashboard({ project, order, subscription, onSubsc
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleCancelClick = () => {
+    setShowCancelSurvey(true);
   };
 
   const handleManageBilling = async () => {
@@ -653,6 +659,18 @@ export default function BillingDashboard({ project, order, subscription, onSubsc
           </div>
         )}
       </div>
+
+      {/* ── FORM-03: Cancellation Survey Modal ──────────────────── */}
+      {showCancelSurvey && (
+        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.5)', zIndex: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '24px' }}>
+          <div style={{ background: '#fff', borderRadius: '16px', padding: '32px', maxWidth: '520px', width: '100%' }}>
+            <CancellationSurvey
+              onComplete={() => { setShowCancelSurvey(false); handleManageBilling(); }}
+              onSkip={() => { setShowCancelSurvey(false); handleManageBilling(); }}
+            />
+          </div>
+        </div>
+      )}
 
       {/* ── 30-day guarantee reassurance ──────────────────────── */}
       <GuaranteeCard />

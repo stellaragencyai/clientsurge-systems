@@ -32,6 +32,7 @@ const navColumns = [
       { label: "Privacy Policy", href: "/privacy-policy" },
       { label: "Terms of Service", href: "/terms" },
       { label: "Client Login", href: "/login" },
+      { label: "Contact Preferences", href: "/opt-out" },
     ],
   },
 ];

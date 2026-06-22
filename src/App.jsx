@@ -442,6 +442,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/register" element={<LazyRoute Component={Register} />} />
       <Route path="/forgot-password" element={<LazyRoute Component={ForgotPassword} />} />
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
+      <Route path="/opt-out" element={<LazyRoute Component={lazy(() => import("./pages/OptOut"))} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
@@ -529,6 +530,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "funnel-optimization"), Component: FunnelOptimizationPage },
            { route: routePath("admin", "conversion-insights"), Component: lazy(() => import("./pages/admin/ConversionInsights")) },
            { route: routePath("admin", "task-status"), Component: lazy(() => import("./pages/admin/TaskStatusDashboard")) },
+           { route: routePath("admin", "runbook"), Component: lazy(() => import("./pages/admin/SystemRunbook")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
