@@ -1,6 +1,14 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
+
+const formatPhoneNumber = (value) => {
+  const digits = value.replace(/\D/g, '');
+  if (digits.length === 0) return '';
+  if (digits.length <= 3) return digits;
+  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+};
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import MobileCallBar from '@/components/landing/MobileCallBar';
@@ -321,18 +329,18 @@ export default function Start() {
                 <StepHeader title="Your business details" subtitle="We'll use this to configure your setup path." />
                 <FormRow>
                   <FormField label="Contact Name" required error={errors.contact_name}>
-                    <FInput value={form.contact_name} onChange={v => update('contact_name', v)} placeholder="Jane Smith" />
+                    <FInput value={form.contact_name} onChange={v => update('contact_name', v)} placeholder="Jane Smith" autoComplete="name" />
                   </FormField>
                   <FormField label="Business Name" required error={errors.business_name}>
-                    <FInput value={form.business_name} onChange={v => update('business_name', v)} placeholder="ABC Roofing Co." />
+                    <FInput value={form.business_name} onChange={v => update('business_name', v)} placeholder="ABC Roofing Co." autoComplete="organization" />
                   </FormField>
                 </FormRow>
                 <FormRow>
                   <FormField label="Business Email" required error={errors.email}>
-                    <FInput type="email" value={form.email} onChange={v => update('email', v)} placeholder="owner@yourbusiness.com" />
+                    <FInput type="email" value={form.email} onChange={v => update('email', v)} placeholder="owner@yourbusiness.com" autoComplete="email" />
                   </FormField>
                   <FormField label="Business Phone" required error={errors.phone}>
-                    <FInput type="tel" value={form.phone} onChange={v => update('phone', v)} placeholder="(602) 555-0100" />
+                    <FInput type="tel" value={form.phone} onChange={v => update('phone', v)} placeholder="(602) 555-0100" autoComplete="tel" />
                   </FormField>
                 </FormRow>
                 <FormRow>
@@ -601,15 +609,34 @@ function FormField({ label, hint, required, error, children }) {
   );
 }
 
-function FInput({ type = 'text', value, onChange, placeholder }) {
+function FInput({ type = 'text', value, onChange, placeholder, autoComplete = '' }) {
+  const isEmail = type === 'email';
+  const isTel = type === 'tel';
+
+  const handleChange = (e) => {
+    let val = e.target.value;
+    if (isTel) val = formatPhoneNumber(val);
+    onChange(val);
+  };
+
+  const isValidEmail = isEmail && value && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value);
+  const isValidPhone = isTel && value && value.replace(/\D/g, '').length >= 10;
+  const showCheck = isValidEmail || isValidPhone;
+
   return (
-    <input
-      type={type}
-      value={value}
-      onChange={e => onChange(e.target.value)}
-      placeholder={placeholder}
-      className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-    />
+    <div className="relative">
+      <input
+        type={type}
+        value={value}
+        onChange={handleChange}
+        placeholder={placeholder}
+        autoComplete={autoComplete}
+        className="w-full px-3 py-2.5 pr-9 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+      />
+      {showCheck && (
+        <CheckCircle2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500 pointer-events-none" />
+      )}
+    </div>
   );
 }
 

@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight } from "lucide-react";
+import FormInput from "../components/forms/FormInput";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -27,7 +28,8 @@ function detectIndustryFromReferrer() {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
 
-// Visual Improvement #2: reusable styled input field with animated focus border
+const inputClass = "w-full bg-transparent border-b border-black py-3 text-base text-black placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary";
+
 function Field({ label, required, error, children }) {
   return (
     <div className="group">
@@ -41,9 +43,6 @@ function Field({ label, required, error, children }) {
     </div>
   );
 }
-
-const inputClass =
-  "w-full bg-transparent border-b border-black py-3 text-base text-black placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary";
 
 export default function Contact() {
   const [form, setForm] = useState({
@@ -259,47 +258,46 @@ export default function Contact() {
 
                 {/* Row 1: Name */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <Field label="First Name" required error={errors.full_name}>
-                    <input
-                      name="full_name"
-                      value={form.full_name}
-                      onChange={handleChange}
-                      aria-invalid={Boolean(errors.full_name)}
-                      className={inputClass}
-                    />
-                  </Field>
-                  <Field label="Last Name">
-                    <input
-                      name="business_type"
-                      value={form.business_type}
-                      onChange={handleChange}
-                      className={inputClass}
-                    />
-                  </Field>
+                  <FormInput
+                    label="First Name"
+                    name="full_name"
+                    value={form.full_name}
+                    onChange={handleChange}
+                    error={errors.full_name}
+                    required
+                    autoComplete="given-name"
+                  />
+                  <FormInput
+                    label="Last Name"
+                    name="business_type"
+                    value={form.business_type}
+                    onChange={handleChange}
+                    autoComplete="family-name"
+                  />
                 </div>
 
                 {/* Row 2: Phone & Email */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
-                  <Field label="Phone No." error={errors.phone}>
-                    <input
-                      name="phone"
-                      type="tel"
-                      value={form.phone}
-                      onChange={handleChange}
-                      aria-invalid={Boolean(errors.phone)}
-                      className={inputClass}
-                    />
-                  </Field>
-                  <Field label="Email Address" required error={errors.email}>
-                    <input
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      aria-invalid={Boolean(errors.email)}
-                      className={inputClass}
-                    />
-                  </Field>
+                  <FormInput
+                    label="Phone No."
+                    type="tel"
+                    name="phone"
+                    value={form.phone}
+                    onChange={handleChange}
+                    error={errors.phone}
+                    placeholder="(123) 456-7890"
+                    autoComplete="tel"
+                  />
+                  <FormInput
+                    label="Email Address"
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    error={errors.email}
+                    required
+                    autoComplete="email"
+                  />
                 </div>
 
                 {/* Message */}
