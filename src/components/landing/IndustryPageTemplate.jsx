@@ -8,6 +8,7 @@ import IndustryHero from '@/components/industry/IndustryHero';
 import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
 import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
+import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery';
 
 const ROOFING_HERO_IMAGE = 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/e92b5f56c_watermarked_img_13975777732204341720.jpg';
 
@@ -180,6 +181,9 @@ export default function IndustryPageTemplate() {
           </div>
         </div>
       </section>
+
+      {/* IMMERSIVE SUCCESS GALLERY */}
+      <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 
       {/* TESTIMONIALS */}
       {industry.testimonials?.length > 0 && (

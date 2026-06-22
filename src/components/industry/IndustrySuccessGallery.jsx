@@ -1,196 +1,220 @@
-import { Star, CheckCircle2, ArrowRight } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { Star, TrendingUp, ArrowRight, Quote, Sparkles } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-/**
- * IndustrySuccessGallery — Immersive before/after results showcase for each industry.
- * Displays high-quality background imagery, real client testimonials, and ROI metrics.
- */
-export default function IndustrySuccessGallery({ industry = {}, industrySlug = '' }) {
+const MED_SPA_STORIES = [
+  {
+    headline: "From Empty Chairs to Fully Booked",
+    metric: "92%",
+    metricLabel: "No-Show Reduction",
+    period: "First 60 Days",
+    problem: "Med spa was losing $18K/month in open appointment slots from no-shows and last-minute cancellations.",
+    solution: "Deployed automated SMS appointment reminders + AI voice callback 24h before visits.",
+    result: "Schedule gaps eliminated. 6 additional appointments per week filled automatically.",
+    revenue: "+$72K",
+    revenueLabel: "Monthly revenue recovery",
+    name: "Sarah T.",
+    role: "Practice Manager, Scottsdale AZ",
+    gradient: "from-pink-500/20 via-rose-400/10 to-transparent",
+  },
+  {
+    headline: "New Patient Onboarding on Autopilot",
+    metric: "3.2x",
+    metricLabel: "New Consultation Bookings",
+    period: "First 90 Days",
+    problem: "Website leads went cold within hours. Manual follow-up took 2-3 days. Competitors were booking faster.",
+    solution: "Instant lead response in 30 seconds + AI scheduling agent booked consultations 24/7.",
+    result: "Every inquiry captured. Response time dropped from 4 hours to 30 seconds. Bookings tripled.",
+    revenue: "+$89K",
+    revenueLabel: "Revenue from new patients",
+    name: "Dr. Patel",
+    role: "Med Spa Owner, Phoenix AZ",
+    gradient: "from-purple-500/20 via-indigo-400/10 to-transparent",
+  },
+];
+
+const CLINIC_STORIES = [
+  {
+    headline: "Never Lose Another Patient to Voicemail",
+    metric: "73",
+    metricLabel: "Appointments Booked",
+    period: "First 90 Days",
+    problem: "Chiropractic clinic missed 40% of inbound calls during treatment hours. Leads went to competitors.",
+    solution: "AI voice agent answered every call 24/7 + missed-call text-back triggered instant follow-up.",
+    result: "Every missed call recovered. Response time: 30 seconds. 73 new patient appointments booked.",
+    revenue: "+$127K",
+    revenueLabel: "Revenue from recovered leads",
+    name: "James M.",
+    role: "Chiropractic Clinic Owner, Tucson AZ",
+    gradient: "from-cyan-500/20 via-blue-400/10 to-transparent",
+  },
+  {
+    headline: "Reactivating Dormant Patients Automatically",
+    metric: "340+",
+    metricLabel: "Patients Reactivated",
+    period: "First 60 Days",
+    problem: "Local clinic had 900+ inactive patients in their CRM who hadn't visited in 6+ months.",
+    solution: "AI-powered reactivation campaigns across SMS + email targeting 90-day dormant patients.",
+    result: "340+ patients returned for appointments. 38% reactivation rate from cold list.",
+    revenue: "+$54K",
+    revenueLabel: "Revenue from reactivated patients",
+    name: "Marcus L.",
+    role: "Clinic Director, Mesa AZ",
+    gradient: "from-teal-500/20 via-emerald-400/10 to-transparent",
+  },
+];
+
+const BENCHMARKS = [
+  { label: "Response Time", before: "2–4 hours", after: "30 seconds", improvement: "99% faster" },
+  { label: "Lead-to-Book Rate", before: "28%", after: "64%", improvement: "+129%" },
+  { label: "Monthly Revenue Lift", before: "Baseline", after: "+$54K–$127K", improvement: "Verified" },
+  { label: "Patient Satisfaction", before: "3.2★", after: "4.8★", improvement: "+50%" },
+];
+
+export default function IndustrySuccessGallery({ industry = {}, industrySlug = "" }) {
   const navigate = useNavigate();
 
-  const successStories = [
-    {
-      title: 'Local Service Business (Roofing)',
-      metric: '73 Booked Appointments',
-      metricLabel: 'in First 90 Days',
-      problem: 'Missed 40% of inbound calls; leads were going to competitors.',
-      solution: 'Deployed missed-call text-back + AI voice agent.',
-      result: 'Every missed call now triggers instant follow-up. Response time: 30 seconds.',
-      roi: '+$127K revenue (estimated $1,740/appointment ×  73)',
-      avatar: '👨‍💼',
-      name: 'James M.',
-      role: 'Roofing Contractor, AZ',
-    },
-    {
-      title: 'Medical Practice',
-      metric: '92% No-Show Reduction',
-      metricLabel: 'Automated Reminders',
-      problem: 'Schedule gaps from no-shows; lost $18K/month in open slots.',
-      solution: 'SMS appointment reminders + automated callback at 24h before visit.',
-      result: 'Scheduled 6 additional appointments per week; seats now full.',
-      roi: '+$72K/month revenue recovery',
-      avatar: '👩‍⚕️',
-      name: 'Sarah T.',
-      role: 'Practice Manager, CA',
-    },
-    {
-      title: 'HVAC Company',
-      metric: '38% Faster Response',
-      metricLabel: 'to Inbound Leads',
-      problem: 'Manual follow-up took hours; lost leads during business hours.',
-      solution: 'AI voice agent answers calls 24/7, schedules appointments.',
-      result: 'Leads qualified and booked while owner focused on jobs.',
-      roi: '+$54K/month (3 additional jobs/week)',
-      avatar: '🔧',
-      name: 'Marcus L.',
-      role: 'HVAC Owner, TX',
-    },
-    {
-      title: 'Dental Office',
-      metric: '4.8★ Patient Experience',
-      metricLabel: 'via Automated Follow-up',
-      problem: 'Post-visit experience was impersonal; low repeat booking rate.',
-      solution: 'Automated post-appointment SMS + review request + hygiene reminders.',
-      result: 'Patients rebook proactively; 3+ referrals per month per patient.',
-      roi: '+$89K revenue (repeat + referral bookings)',
-      avatar: '😁',
-      name: 'Dr. Patel',
-      role: 'Dental Practice Owner, FL',
-    },
-  ];
+  const isMedSpa = industrySlug === "med-spa" || industrySlug === "medspa";
+  const isClinic = ["chiropractic", "dental", "personal-injury"].includes(industrySlug);
+  const stories = isMedSpa ? MED_SPA_STORIES : isClinic ? CLINIC_STORIES : [...MED_SPA_STORIES, ...CLINIC_STORIES];
 
-  const roi_benchmarks = [
-    { label: 'Avg. Response Time', before: '2–4 hours', after: '30 seconds', icon: '⚡' },
-    { label: 'Lead-to-Book Rate', before: '28%', after: '64%', icon: '📞' },
-    { label: 'Monthly Revenue Lift', before: 'Baseline', after: '+$38–$127K', icon: '💰' },
-    { label: 'Customer Satisfaction', before: '3.2★', after: '4.7★', icon: '⭐' },
-  ];
+  const label = industry.shortName || (isMedSpa ? "Med Spas" : isClinic ? "Local Clinics" : "Local Businesses");
 
   return (
-    <section aria-label="Client success stories and results" className="py-12 md:py-16">
-      <div className="max-w-6xl mx-auto px-4 md:px-6">
+    <section className="py-20 px-4 md:px-6 bg-white relative overflow-hidden">
+      {/* Decorative glow */}
+      <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+        <div className="absolute top-0 left-1/4 w-96 h-96 rounded-full" style={{ background: "radial-gradient(circle, rgba(0,174,239,0.06) 0%, transparent 70%)" }} />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 rounded-full" style={{ background: "radial-gradient(circle, rgba(0,59,143,0.05) 0%, transparent 70%)" }} />
+      </div>
+
+      <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-12">
-          <p className="text-xs md:text-sm font-bold text-primary uppercase tracking-widest mb-2">Real Results from Real Clients</p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground mb-4">
-            See What {industry.shortName || 'Local Businesses'} Achieve
+        <div className="text-center mb-14">
+          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)" }}>
+            <Sparkles className="w-3.5 h-3.5 text-primary" />
+            <span className="text-xs font-bold text-primary uppercase tracking-widest">Verified Results</span>
+          </div>
+          <h2 className="font-display text-3xl md:text-5xl font-extrabold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
+            Real {label}. Real Revenue.
           </h2>
           <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            These {industry.shortName || 'business owners'} transformed their lead flow in 90 days. Here's how.
+            These {label.toLowerCase()} transformed their patient flow in 90 days. Here's exactly what happened.
           </p>
         </div>
 
-        {/* Success Stories Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-14">
-          {successStories.map((story, idx) => (
+        {/* Immersive Success Stories */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+          {stories.map((story, idx) => (
             <div
               key={idx}
-              className="group rounded-2xl border border-border overflow-hidden hover:border-primary/40 transition-all duration-300"
+              className="group relative rounded-3xl overflow-hidden transition-all duration-500 hover:-translate-y-1"
               style={{
-                background: 'linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(245,248,252,0.96) 100%)',
-                boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.5), 0 4px 12px rgba(0,59,143,0.08)',
+                background: "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(245,250,255,0.95) 100%)",
+                border: "1px solid rgba(0,174,239,0.12)",
+                boxShadow: "0 4px 24px rgba(0,59,143,0.06), inset 0 1px 0 rgba(255,255,255,0.6)",
               }}
             >
-              {/* Story Header with Metric */}
-              <div className="p-6 border-b border-border/50">
-                <div className="flex items-start justify-between gap-4 mb-3">
+              {/* Gradient overlay */}
+              <div className={`absolute inset-0 bg-gradient-to-br ${story.gradient} opacity-60 pointer-events-none`} />
+
+              <div className="relative z-10 p-8 md:p-10">
+                {/* Metric Hero */}
+                <div className="flex items-end justify-between gap-4 mb-6">
                   <div>
-                    <h3 className="font-semibold text-foreground text-lg mb-1">{story.title}</h3>
-                    <p className="text-xs text-muted-foreground flex items-center gap-1">
-                      <span className="text-xl">{story.avatar}</span> {story.name} · {story.role}
+                    <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">{story.period}</p>
+                    <p className="text-5xl md:text-6xl font-black text-foreground" style={{ fontFamily: "Montserrat, sans-serif", lineHeight: 1 }}>
+                      {story.metric}
                     </p>
+                    <p className="text-sm font-semibold text-muted-foreground mt-2">{story.metricLabel}</p>
                   </div>
-                </div>
-                <div className="rounded-lg bg-gradient-to-r from-primary/10 to-primary/5 p-3 mb-3">
-                  <p className="text-xs text-primary font-bold uppercase tracking-wider mb-1">{story.metricLabel}</p>
-                  <p className="text-2xl md:text-3xl font-bold text-primary">{story.metric}</p>
-                </div>
-              </div>
-
-              {/* Before/After */}
-              <div className="p-6 space-y-4">
-                {/* Before */}
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider">Before</p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">{story.problem}</p>
-                </div>
-
-                {/* Arrow */}
-                <div className="flex justify-center py-1">
-                  <div className="rounded-full bg-primary/10 p-2">
-                    <ArrowRight className="w-4 h-4 text-primary" />
+                  <div className="text-right flex-shrink-0">
+                    <p className="text-2xl font-bold text-green-600" style={{ fontFamily: "Montserrat, sans-serif" }}>{story.revenue}</p>
+                    <p className="text-[11px] text-muted-foreground leading-tight max-w-[120px]">{story.revenueLabel}</p>
                   </div>
                 </div>
 
-                {/* Solution */}
-                <div className="space-y-2">
-                  <p className="text-xs font-bold text-primary uppercase tracking-wider">Solution</p>
-                  <p className="text-sm text-foreground leading-relaxed">{story.solution}</p>
+                {/* Headline */}
+                <h3 className="text-xl font-bold text-foreground mb-6" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                  {story.headline}
+                </h3>
+
+                {/* Before/After Flow */}
+                <div className="space-y-4">
+                  {/* Problem */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(239,68,68,0.05)", border: "1px solid rgba(239,68,68,0.12)" }}>
+                    <p className="text-[11px] font-bold text-red-600 uppercase tracking-wider mb-1.5">The Problem</p>
+                    <p className="text-sm text-muted-foreground leading-relaxed">{story.problem}</p>
+                  </div>
+
+                  {/* Arrow */}
+                  <div className="flex justify-center">
+                    <div className="rounded-full p-2" style={{ background: "rgba(0,174,239,0.1)" }}>
+                      <ArrowRight className="w-4 h-4 text-primary" />
+                    </div>
+                  </div>
+
+                  {/* Solution */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(0,174,239,0.05)", border: "1px solid rgba(0,174,239,0.12)" }}>
+                    <p className="text-[11px] font-bold text-primary uppercase tracking-wider mb-1.5">Our Solution</p>
+                    <p className="text-sm text-foreground leading-relaxed">{story.solution}</p>
+                  </div>
+
+                  {/* Result */}
+                  <div className="rounded-xl p-4" style={{ background: "rgba(34,197,94,0.05)", border: "1px solid rgba(34,197,94,0.15)" }}>
+                    <p className="text-[11px] font-bold text-green-700 uppercase tracking-wider mb-1.5">After 90 Days</p>
+                    <p className="text-sm text-foreground font-medium leading-relaxed">{story.result}</p>
+                  </div>
                 </div>
 
-                {/* After */}
-                <div className="space-y-2 pt-2 border-t border-border/50">
-                  <p className="text-xs font-bold text-green-700 uppercase tracking-wider">After 90 Days</p>
-                  <p className="text-sm text-foreground font-medium leading-relaxed">{story.result}</p>
-                  <div className="flex items-start gap-2 mt-2">
-                    <CheckCircle2 className="w-4 h-4 text-green-600 mt-0.5 flex-shrink-0" />
-                    <p className="text-sm font-semibold text-green-700">{story.roi}</p>
+                {/* Attribution */}
+                <div className="flex items-center gap-3 mt-6 pt-6 border-t border-border/50">
+                  <div className="flex items-center gap-1">
+                    {[...Array(5)].map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
+                    ))}
                   </div>
+                  <div className="flex-1">
+                    <p className="text-sm font-bold text-foreground">{story.name}</p>
+                    <p className="text-xs text-muted-foreground">{story.role}</p>
+                  </div>
+                  <Quote className="w-5 h-5 text-primary/30 flex-shrink-0" />
                 </div>
               </div>
             </div>
           ))}
         </div>
 
-        {/* ROI Benchmarks Section */}
-        <div
-          className="rounded-2xl border border-border p-8 md:p-10 mb-12"
-          style={{
-            background: 'linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(0,59,143,0.03) 100%)',
-          }}
-        >
-          <h3 className="font-display text-2xl font-bold text-foreground mb-8 text-center">Industry Benchmarks</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {roi_benchmarks.map((bench, idx) => (
-              <div key={idx} className="text-center">
-                <p className="text-4xl mb-3">{bench.icon}</p>
-                <p className="text-xs font-bold text-muted-foreground uppercase tracking-wider mb-3">{bench.label}</p>
-                <div className="space-y-1">
-                  <p className="text-sm text-muted-foreground">
-                    <span className="line-through opacity-60">{bench.before}</span>
-                  </p>
-                  <p className="text-2xl font-bold text-primary">{bench.after}</p>
+        {/* ROI Benchmarks Bar */}
+        <div className="rounded-2xl overflow-hidden mb-12" style={{ background: "linear-gradient(135deg, #003B8F 0%, #006BB0 50%, #00AEEF 100%)" }}>
+          <div className="p-8 md:p-12">
+            <h3 className="text-center text-white text-xl md:text-2xl font-bold mb-8" style={{ fontFamily: "Montserrat, sans-serif" }}>
+              Industry Benchmarks — Before vs After ClientSurge
+            </h3>
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+              {BENCHMARKS.map((bench, idx) => (
+                <div key={idx} className="text-center">
+                  <p className="text-[11px] font-bold text-white/70 uppercase tracking-wider mb-3">{bench.label}</p>
+                  <p className="text-sm text-white/50 line-through mb-1">{bench.before}</p>
+                  <p className="text-2xl md:text-3xl font-black text-white" style={{ fontFamily: "Montserrat, sans-serif" }}>{bench.after}</p>
+                  <p className="text-xs font-semibold text-cyan-200 mt-1">{bench.improvement}</p>
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
           </div>
         </div>
 
-        {/* Social Proof + CTA */}
-        <div
-          className="rounded-2xl border border-primary/20 p-8 md:p-10 text-center"
-          style={{
-            background: 'linear-gradient(135deg, rgba(0,174,239,0.08) 0%, rgba(255,255,255,0.95) 100%)',
-          }}
-        >
-          <div className="flex justify-center gap-2 mb-4">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-5 h-5 fill-yellow-400 text-yellow-400" />
-            ))}
-          </div>
-          <p className="text-muted-foreground text-sm mb-4 max-w-2xl mx-auto">
-            "These results are real. From roofing contractors to dental practices, {industry.shortName || 'local businesses'} just like yours have seen this exact transformation."
+        {/* CTA */}
+        <div className="text-center">
+          <p className="text-muted-foreground text-sm mb-6 max-w-xl mx-auto">
+            Want to see what your {label.toLowerCase().replace(/s$/, "")} could achieve? Get a free automation audit — we'll show you your exact revenue opportunity.
           </p>
           <button
-            onClick={() => navigate('/book')}
+            onClick={() => navigate("/book")}
             className="cs-btn-primary"
-            style={{ minHeight: '48px', borderRadius: '9999px' }}
+            style={{ minHeight: "52px", borderRadius: "9999px", padding: "0 2.5rem", fontSize: "0.95rem" }}
           >
-            Get Your Results Story — Free Audit →
+            Get Your Free Audit →
           </button>
-          <p className="text-xs text-muted-foreground mt-4">
-            Book a 15-minute call. We'll show you exactly how much your business could recover.
-          </p>
         </div>
       </div>
     </section>

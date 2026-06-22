@@ -105,7 +105,7 @@ export default function LeadsTable() {
     const loadKpis = async () => {
       try {
         // Single fetch for all KPIs + duplicate detection
-        const allLeads = await base44.asServiceRole.entities.Leads.filter({}, "id", 500);
+        const allLeads = await base44.entities.Leads.filter({}, "id", 500);
         const leadsList = allLeads || [];
 
         // Count potential duplicates (same normalized email)
@@ -147,14 +147,28 @@ export default function LeadsTable() {
           sort.field === "intelligence_score" ? "intelligence_score" : "last_activity_at";
         const sortValue = sort.order === 1 ? sortKey : `-${sortKey}`;
 
-        const results = await base44.asServiceRole.entities.Leads.filter(
+        // Use user-scoped client — admin role passes RLS read check.
+        const results = await base44.entities.Leads.filter(
           filter,
           sortValue,
           PAGE_SIZE + 1,
           offset
         );
 
-        const items = results?.slice(0, PAGE_SIZE) || [];
+        let items = results?.slice(0, PAGE_SIZE) || [];
+        if (search) {
+          const q = search.toLowerCase();
+          items = items.filter((l) =>
+            (l.full_name || "").toLowerCase().includes(q) ||
+            (l.business_name || "").toLowerCase().includes(q) ||
+            (l.email || "").toLowerCase().includes(q)
+          );
+        }
+        // Fallback: if filter returned nothing, try list() with skip
+        if (items.length === 0 && !search && Object.keys(filter).length === 0) {
+          const fallback = await base44.entities.Leads.list(sortValue, PAGE_SIZE + 1, offset);
+          items = (fallback || []).slice(0, PAGE_SIZE);
+        }
         setLeads(items);
         setTotalCount(offset + items.length);
       } catch (err) {
