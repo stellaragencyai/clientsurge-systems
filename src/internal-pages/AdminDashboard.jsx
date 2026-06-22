@@ -55,6 +55,7 @@ import SniperDashboard from '../components/admin/SniperDashboard';
 import LandingPageAnalyticsPanel from '../components/admin/LandingPageAnalyticsPanel';
 import SalesFunnelPanel from '../components/admin/SalesFunnelPanel';
 import CustomerOnboardingPanel from '../components/admin/CustomerOnboardingPanel';
+import ResourceLibrary from '../components/admin/ResourceLibrary';
 import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
@@ -153,6 +154,7 @@ const NAV_GROUPS = [
   {
     group: 'Tools',
     items: [
+      { id: 'resource-library', label: 'Resource Library', icon: BookOpen },
       { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
@@ -280,6 +282,7 @@ export default function AdminDashboard() {
       case 'launch-gates': return <LaunchGatesPanel />;
       case 'sales-funnel': return <SalesFunnelPanel />;
       case 'customer-onboarding': return <CustomerOnboardingPanel />;
+      case 'resource-library': return <ResourceLibrary />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'templates': return <CommunicationTemplates />;
       case 'twilio-health': return <TwilioRuntimeHealth />;
