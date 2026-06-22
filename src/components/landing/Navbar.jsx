@@ -9,6 +9,7 @@ import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
 import { SITE_CONFIG } from "@/lib/siteConfig";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
+import { INDUSTRY_GROUPS } from "@/lib/industryNavConfig";
 
 const sectionLinks = SITE_CONFIG.navigation.sections;
 const solutionsLinks = SITE_CONFIG.navigation.solutions;
@@ -186,35 +187,53 @@ export default function Navbar() {
       }}
     >
       <div
-        className="rounded-lg border border-border/60 p-4 shadow-xl"
+        className="rounded-xl border border-border/60 p-5 shadow-xl"
         role="menu"
         aria-label="Industries"
         style={{
           background: "rgba(255,255,255,0.98)",
           backdropFilter: "blur(16px)",
           WebkitBackdropFilter: "blur(16px)",
-          boxShadow: "0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,174,239,0.08)",
+          boxShadow: "0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,174,239,0.06)",
         }}
       >
-        <div className="grid grid-cols-2 gap-1 min-w-[420px]">
-          {industryLinks.map((item) => (
-            <button
-              key={item.label}
-              type="button"
-              role="menuitem"
-              onClick={() => {
-                const slug = item.href.split("/").pop();
-                window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
-                window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
-                trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
-                navigate(item.href);
-                setIndustriesOpen(false);
-              }}
-              className={menuItemClass}
-            >
-              {item.label}
-            </button>
+        <div className="grid grid-cols-2 gap-x-8 gap-y-1 min-w-[480px]">
+          {INDUSTRY_GROUPS.map((group) => (
+            <div key={group.label}>
+              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-primary/60 mb-2 px-3">
+                {group.label}
+              </p>
+              <div className="flex flex-col gap-0.5">
+                {group.industries.map((item) => (
+                  <button
+                    key={item.label}
+                    type="button"
+                    role="menuitem"
+                    onClick={() => {
+                      const slug = item.href.split("/").pop();
+                      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
+                      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
+                      trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
+                      navigate(item.href);
+                      setIndustriesOpen(false);
+                    }}
+                    className={menuItemClass}
+                  >
+                    {item.label}
+                  </button>
+                ))}
+              </div>
+            </div>
           ))}
+        </div>
+        <div className="mt-3 pt-3 border-t border-border/50 text-center">
+          <a
+            href="/industries"
+            onClick={(e) => { e.preventDefault(); trackCTA("all_industries", "navbar_dropdown"); navigate("/industries"); setIndustriesOpen(false); }}
+            className="text-[12px] font-bold text-primary hover:underline"
+          >
+            View All Industries →
+          </a>
         </div>
       </div>
     </div>,
@@ -301,19 +320,35 @@ export default function Navbar() {
 
         {/* Desktop right actions */}
         <div className="hidden xl:flex items-center gap-2 shrink-0">
-          <button
-            onClick={() => { trackCTA("login", "navbar"); setShowLoginModal(true); }}
-            className="hidden md:block text-xs font-semibold transition-colors px-3 py-1.5 rounded-lg border"
-            style={{
-              minHeight: "unset",
-              minWidth: "unset",
-              color: navbarTransparentAtTop ? "#ffffff" : "rgba(10,22,40,0.7)",
-              borderColor: navbarTransparentAtTop ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.2)",
-              textShadow: navbarTransparentAtTop ? "0 1px 4px rgba(0,0,0,0.5)" : "none",
-            }}
-          >
-            Login
-          </button>
+          {user ? (
+            <button
+              onClick={() => { trackCTA("client_dashboard", "navbar"); navigate("/client-dashboard"); }}
+              className="hidden md:flex items-center gap-1.5 text-xs font-bold transition-colors px-4 py-1.5 rounded-lg"
+              style={{
+                minHeight: "unset",
+                minWidth: "unset",
+                color: "#ffffff",
+                background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+                boxShadow: "0 2px 8px rgba(0,174,239,0.25)",
+              }}
+            >
+              Dashboard
+            </button>
+          ) : (
+            <button
+              onClick={() => { trackCTA("login", "navbar"); setShowLoginModal(true); }}
+              className="hidden md:block text-xs font-semibold transition-colors px-3 py-1.5 rounded-lg border"
+              style={{
+                minHeight: "unset",
+                minWidth: "unset",
+                color: navbarTransparentAtTop ? "#ffffff" : "rgba(10,22,40,0.7)",
+                borderColor: navbarTransparentAtTop ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.2)",
+                textShadow: navbarTransparentAtTop ? "0 1px 4px rgba(0,0,0,0.5)" : "none",
+              }}
+            >
+              Login
+            </button>
+          )}
           <button
             onClick={() => {
               trackCTA("compare_packages", "navbar");
@@ -385,29 +420,43 @@ export default function Navbar() {
               ))}
             </div>
 
-            {/* Industries compact section */}
+            {/* Industries compact section — grouped by category */}
             <div className="pt-3 mt-1 border-t border-border">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-3" style={{ color: "#00AEEF" }}>Industries</p>
-              <div className="grid grid-cols-2 gap-0.5">
-                {industryLinks.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    onClick={() => {
-                      const slug = item.href.split("/").pop();
-                      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
-                      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
-                      trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                      navigate(item.href);
-                      setOpen(false);
-                    }}
-                    className="w-full text-left flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
-                    style={{ minHeight: "44px" }}
-                  >
-                    {item.label}
-                  </button>
+              <div className="space-y-3">
+                {INDUSTRY_GROUPS.map((group) => (
+                  <div key={group.label}>
+                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] mb-1.5 px-3 text-muted-foreground/60">{group.label}</p>
+                    <div className="grid grid-cols-1 gap-0.5">
+                      {group.industries.map((item) => (
+                        <button
+                          key={item.label}
+                          type="button"
+                          onClick={() => {
+                            const slug = item.href.split("/").pop();
+                            window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
+                            window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
+                            trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
+                            navigate(item.href);
+                            setOpen(false);
+                          }}
+                          className="w-full text-left flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
+                          style={{ minHeight: "44px" }}
+                        >
+                          {item.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 ))}
               </div>
+              <a
+                href="/industries"
+                onClick={(e) => { e.preventDefault(); trackCTA("all_industries", "mobile_nav"); navigate("/industries"); setOpen(false); }}
+                className="block text-center text-[12px] font-bold text-primary hover:underline mt-3 py-2"
+              >
+                View All Industries →
+              </a>
             </div>
 
             {mobileUserName && (
@@ -415,6 +464,13 @@ export default function Navbar() {
                 <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
                 <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
                 <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
+                <button
+                  onClick={() => { trackCTA("client_dashboard", "mobile_nav"); navigate("/client-dashboard"); setOpen(false); }}
+                  className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-white text-[13px] font-bold transition-all hover:-translate-y-0.5"
+                  style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)" }}
+                >
+                  Go to Dashboard →
+                </button>
               </div>
             )}
 

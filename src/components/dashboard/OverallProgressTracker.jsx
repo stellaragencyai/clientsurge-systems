@@ -44,6 +44,10 @@ export default function OverallProgressTracker({ onboarding, completionPercentag
   const currentStageIndex = STAGES.findIndex(s => s.id === onboarding.unified_stage);
   const isBlocked = onboarding.unified_stage === "blocked";
   const activeIdx = isBlocked ? -1 : (currentStageIndex === -1 ? 0 : currentStageIndex);
+  const isLive = onboarding.unified_stage === "live";
+  const currentStage = STAGES[activeIdx];
+  const missingItems = onboarding.missing_setup_items || [];
+  const hasNextAction = !isLive && (missingItems.length > 0 || isBlocked || currentStage?.id === "awaiting_client_approval");
 
   return (
     <div className="rounded-2xl p-6 md:p-8 mb-6" style={{
@@ -58,14 +62,69 @@ export default function OverallProgressTracker({ onboarding, completionPercentag
           <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary">Setup Journey</p>
         </div>
         <h3 className="text-[22px] font-bold text-foreground mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
-          {isBlocked ? "Setup Blocked" : "Your Setup Progress"}
+          {isBlocked ? "Setup Blocked" : isLive ? "You're Live! 🎉" : "Your Setup Progress"}
         </h3>
         <p className="text-[13px] text-muted-foreground">
           {isBlocked
             ? "There's an issue blocking your setup. Check 'Action Required' below."
-            : `${completionPercentage || 0}% complete — ${STAGES[activeIdx]?.label || "getting started"}`}
+            : isLive
+            ? "Your automation system is fully operational. Monitor your performance below."
+            : `${completionPercentage || 0}% complete — ${currentStage?.label || "getting started"}`}
         </p>
       </div>
+
+      {/* ── NEXT ACTION CALLOUT ── */}
+      {hasNextAction && (
+        <div className="mb-6 p-4 md:p-5 rounded-xl" style={{
+          background: isBlocked
+            ? "linear-gradient(135deg, rgba(239,68,68,0.06), rgba(239,68,68,0.02))"
+            : "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(0,174,239,0.02))",
+          border: isBlocked
+            ? "1.5px solid rgba(239,68,68,0.25)"
+            : "1.5px solid rgba(0,174,239,0.25)",
+          boxShadow: isBlocked ? "none" : "0 0 16px rgba(0,174,239,0.08)",
+        }}>
+          <div className="flex items-start gap-3">
+            <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{
+              background: isBlocked ? "rgba(239,68,68,0.12)" : "rgba(0,174,239,0.12)",
+            }}>
+              {isBlocked ? (
+                <AlertCircle className="w-4 h-4" style={{ color: "#ef4444" }} />
+              ) : (
+                <ArrowRight className="w-4 h-4 text-primary" />
+              )}
+            </div>
+            <div className="flex-1">
+              <p className="text-[11px] font-black uppercase tracking-[0.16em] mb-1" style={{
+                color: isBlocked ? "#ef4444" : "#00AEEF"
+              }}>
+                {isBlocked ? "Action Required" : "Next Step for You"}
+              </p>
+              <p className="text-[14px] font-semibold text-foreground leading-snug mb-2">
+                {isBlocked && onboarding.blockers?.length > 0
+                  ? onboarding.blockers[0]?.description
+                  : currentStage?.id === "awaiting_client_approval"
+                  ? "Review and approve your system for production launch"
+                  : missingItems.length > 0
+                  ? missingItems[0]
+                  : "We're working on your setup — nothing needed from you yet"}
+              </p>
+              {missingItems.length > 1 && (
+                <p className="text-[12px] text-muted-foreground">
+                  +{missingItems.length - 1} more item{missingItems.length > 2 ? "s" : ""} to complete below
+                </p>
+              )}
+              {currentStage?.id === "awaiting_client_approval" && (
+                <a href="/client-portal"
+                  className="inline-flex items-center gap-1.5 mt-2 px-4 py-2 rounded-full text-white text-[12px] font-bold no-underline transition-all hover:-translate-y-0.5"
+                  style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)", boxShadow: "0 4px 14px rgba(0,174,239,0.3)" }}>
+                  Review & Approve →
+                </a>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Progress Bar */}
       <div className="mb-8">
@@ -205,16 +264,26 @@ export default function OverallProgressTracker({ onboarding, completionPercentag
         </div>
       )}
 
-      {/* Missing items */}
-      {onboarding.missing_setup_items && onboarding.missing_setup_items.length > 0 && (
-        <div className="mt-4 p-4 rounded-lg" style={{ background: "rgba(0,174,239,0.04)", border: "1px solid rgba(0,174,239,0.1)" }}>
-          <p className="text-[12px] font-bold text-primary uppercase tracking-wider mb-2">To continue your setup:</p>
-          {onboarding.missing_setup_items.map((item, idx) => (
-            <div key={idx} className="text-[13px] text-muted-foreground mb-1.5 flex items-center gap-2">
-              <ArrowRight className="w-3 h-3 text-primary flex-shrink-0" />
-              <span>{item}</span>
-            </div>
-          ))}
+      {/* ── ACTIONABLE CHECKLIST ── */}
+      {missingItems.length > 0 && (
+        <div className="mt-4 p-4 md:p-5 rounded-xl" style={{ background: "rgba(0,174,239,0.04)", border: "1px solid rgba(0,174,239,0.1)" }}>
+          <div className="flex items-center gap-2 mb-3">
+            <ArrowRight className="w-3.5 h-3.5 text-primary" />
+            <p className="text-[12px] font-bold text-primary uppercase tracking-wider">Steps You Need to Complete</p>
+          </div>
+          <div className="space-y-2">
+            {missingItems.map((item, idx) => (
+              <div key={idx} className="flex items-start gap-3 p-2.5 rounded-lg" style={{ background: "rgba(255,255,255,0.6)" }}>
+                <div className="w-5 h-5 rounded-md border-2 flex items-center justify-center flex-shrink-0 mt-0.5" style={{
+                  borderColor: "rgba(0,174,239,0.3)",
+                  background: "rgba(255,255,255,0.9)",
+                }}>
+                  <span className="text-[10px] font-bold text-primary">{idx + 1}</span>
+                </div>
+                <span className="text-[13px] text-foreground leading-relaxed">{item}</span>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>

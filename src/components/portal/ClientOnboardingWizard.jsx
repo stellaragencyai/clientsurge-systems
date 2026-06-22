@@ -1,33 +1,21 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { ArrowRight, ArrowLeft, CheckCircle2, Loader2, Mail, MessageSquare } from 'lucide-react';
+import { ArrowRight, ArrowLeft, CheckCircle2, Loader2, Mail, MessageSquare, Globe, Calendar, Phone, ExternalLink, Building2 } from 'lucide-react';
 
 const STEPS = [
-  {
-    id: 'welcome',
-    title: 'Welcome to ClientSurge',
-    description: 'Let\'s set up your lead automation system in a few quick steps.',
-  },
-  {
-    id: 'channels',
-    title: 'Connect Your Communication Channels',
-    description: 'Choose how you want to receive lead notifications.',
-  },
-  {
-    id: 'preferences',
-    title: 'Customize Notification Preferences',
-    description: 'Tell us when and how often you want to be notified.',
-  },
-  {
-    id: 'complete',
-    title: 'You\'re All Set!',
-    description: 'Your system is ready to start capturing and nurturing leads.',
-  },
+  { id: 'welcome', title: 'Welcome to ClientSurge', description: 'Let\'s set up your lead automation system in a few quick steps.' },
+  { id: 'business', title: 'Your Business Details', description: 'Tell us about your website and domain so we can connect everything.' },
+  { id: 'booking', title: 'Connect Your Booking Link', description: 'Paste your Calendly or scheduling link so leads can book appointments automatically.' },
+  { id: 'channels', title: 'Notification Channels', description: 'Choose how you want to receive lead notifications.' },
+  { id: 'preferences', title: 'Notification Preferences', description: 'Tell us when and how often you want to be notified.' },
+  { id: 'complete', title: 'You\'re All Set!', description: 'Your system is ready to start capturing and nurturing leads.' },
 ];
 
 export default function ClientOnboardingWizard({ project, onComplete }) {
   const [currentStep, setCurrentStep] = useState(0);
   const [formData, setFormData] = useState({
+    business_website: '',
+    booking_link: project?.booking_link || '',
     email_notifications: true,
     sms_notifications: false,
     phone_number: '',
@@ -44,8 +32,8 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
   const isFirstStep = currentStep === 0;
 
   const handleNext = async () => {
+    setError('');
     if (currentStep === STEPS.length - 2) {
-      // Save preferences before final step
       await savePreferences();
     }
     if (currentStep < STEPS.length - 1) {
@@ -54,6 +42,7 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
   };
 
   const handlePrev = () => {
+    setError('');
     if (currentStep > 0) {
       setCurrentStep(currentStep - 1);
     }
@@ -70,16 +59,23 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
     } catch (err) {
       setError(err?.data?.error || 'Failed to save preferences');
       setSaving(false);
-      return;
+      return false;
     }
     setSaving(false);
+    return true;
   };
 
   const handleComplete = async () => {
-    await savePreferences();
-    await base44.entities.ClientProject.update(project.id, {
-      onboarding_wizard_completed: true,
-    });
+    const saved = await savePreferences();
+    if (!saved) return;
+    try {
+      await base44.entities.ClientProject.update(project.id, {
+        onboarding_wizard_completed: true,
+        booking_link: formData.booking_link || undefined,
+      });
+    } catch {
+      // Non-critical — wizard completion is the main flag
+    }
     onComplete?.();
   };
 
@@ -96,20 +92,20 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
             className="h-full transition-all duration-300"
             style={{
               width: `${((currentStep + 1) / STEPS.length) * 100}%`,
-              background: 'linear-gradient(90deg, #6b3f1f, #9a5c2e)',
+              background: 'linear-gradient(90deg, #0088CC, #00AEEF)',
             }}
           />
         </div>
 
         {/* Content */}
-        <div className="p-8 md:p-12">
+        <div className="p-8 md:p-12 max-h-[75vh] overflow-y-auto">
           {/* Step Indicator */}
           <div className="flex items-center justify-between mb-8">
             <div>
               <p className="text-xs font-bold text-primary uppercase tracking-widest">
                 Step {currentStep + 1} of {STEPS.length}
               </p>
-              <h2 className="text-3xl font-semibold text-foreground mt-2">{step.title}</h2>
+              <h2 className="text-3xl font-semibold text-foreground mt-2" style={{ fontFamily: 'Montserrat, sans-serif' }}>{step.title}</h2>
               <p className="text-muted-foreground mt-1">{step.description}</p>
             </div>
             {currentStep === STEPS.length - 1 && (
@@ -119,27 +115,12 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
 
           {/* Step Content */}
           <div className="space-y-6 min-h-48">
-            {step.id === 'welcome' && (
-              <WelcomeStep />
-            )}
-
-            {step.id === 'channels' && (
-              <ChannelsStep
-                formData={formData}
-                onChange={handleInputChange}
-              />
-            )}
-
-            {step.id === 'preferences' && (
-              <PreferencesStep
-                formData={formData}
-                onChange={handleInputChange}
-              />
-            )}
-
-            {step.id === 'complete' && (
-              <CompleteStep />
-            )}
+            {step.id === 'welcome' && <WelcomeStep />}
+            {step.id === 'business' && <BusinessStep formData={formData} onChange={handleInputChange} />}
+            {step.id === 'booking' && <BookingStep formData={formData} onChange={handleInputChange} />}
+            {step.id === 'channels' && <ChannelsStep formData={formData} onChange={handleInputChange} />}
+            {step.id === 'preferences' && <PreferencesStep formData={formData} onChange={handleInputChange} />}
+            {step.id === 'complete' && <CompleteStep />}
 
             {error && (
               <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -164,7 +145,7 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
                 onClick={handleNext}
                 disabled={saving}
                 className="flex items-center gap-2 px-6 py-2.5 rounded-lg text-white font-medium transition-all disabled:opacity-60"
-                style={{ background: 'linear-gradient(135deg, #6b3f1f, #9a5c2e)' }}
+                style={{ background: 'linear-gradient(135deg, #0088CC, #00AEEF)' }}
               >
                 {saving ? (
                   <Loader2 className="w-4 h-4 animate-spin" />
@@ -202,19 +183,22 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
 function WelcomeStep() {
   return (
     <div className="space-y-6">
-      <div className="rounded-2xl p-8" style={{ background: 'rgba(154, 92, 46, 0.06)', border: '1px solid rgba(154, 92, 46, 0.15)' }}>
+      <div className="rounded-2xl p-8" style={{ background: 'rgba(0,174,239,0.06)', border: '1px solid rgba(0,174,239,0.15)' }}>
         <p className="text-lg text-foreground leading-relaxed mb-4">
           Your lead automation system is ready to work for you. In the next few steps, we'll configure:
         </p>
         <ul className="space-y-3">
           {[
-            '📧 How to receive notifications (email, SMS, or both)',
-            '🔔 When to get notified (new leads, replies, bookings)',
-            '⚡ How often updates are sent',
-          ].map((item, idx) => (
-            <li key={idx} className="flex items-start gap-3">
-              <span className="text-xl flex-shrink-0">{item.split(' ')[0]}</span>
-              <span className="text-foreground">{item.slice(2)}</span>
+            { icon: Globe, text: 'Your website and domain connection' },
+            { icon: Calendar, text: 'Your booking/scheduling link' },
+            { icon: Mail, text: 'How to receive notifications (email, SMS, or both)' },
+            { icon: MessageSquare, text: 'When to get notified (new leads, replies, bookings)' },
+          ].map(({ icon: Icon, text }, idx) => (
+            <li key={idx} className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: 'rgba(0,174,239,0.1)' }}>
+                <Icon className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-foreground">{text}</span>
             </li>
           ))}
         </ul>
@@ -229,11 +213,107 @@ function WelcomeStep() {
   );
 }
 
+function BusinessStep({ formData, onChange }) {
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,174,239,0.1)' }}>
+          <Building2 className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-foreground">Business Website</p>
+          <p className="text-xs text-muted-foreground">We'll use this to set up your lead capture forms and automation workflows.</p>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-foreground mb-2">
+          Your Website URL
+        </label>
+        <div className="relative">
+          <Globe className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="url"
+            value={formData.business_website}
+            onChange={(e) => onChange('business_website', e.target.value)}
+            placeholder="https://yourbusiness.com"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground mt-1.5">
+          Don't have a website yet? Skip this step — we can build one for you.
+        </p>
+      </div>
+
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4">
+        <div className="flex items-start gap-2">
+          <span className="text-amber-600 font-bold text-sm">⚠️</span>
+          <div>
+            <p className="text-sm font-semibold text-amber-900">Domain Verification</p>
+            <p className="text-xs text-amber-800 mt-0.5">
+              If you want us to send emails from your domain (e.g., leads@yourbusiness.com), we'll send you DNS instructions after this wizard.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function BookingStep({ formData, onChange }) {
+  return (
+    <div className="space-y-5">
+      <div className="flex items-center gap-3 mb-2">
+        <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: 'rgba(0,174,239,0.1)' }}>
+          <Calendar className="w-5 h-5 text-primary" />
+        </div>
+        <div>
+          <p className="text-sm font-bold text-foreground">Appointment Booking Link</p>
+          <p className="text-xs text-muted-foreground">Our AI agent will route qualified leads to this link to book with you automatically.</p>
+        </div>
+      </div>
+
+      <div>
+        <label className="block text-sm font-semibold text-foreground mb-2">
+          Your Scheduling Link
+        </label>
+        <div className="relative">
+          <ExternalLink className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+          <input
+            type="url"
+            value={formData.booking_link}
+            onChange={(e) => onChange('booking_link', e.target.value)}
+            placeholder="https://calendly.com/yourbusiness/30min"
+            className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+          />
+        </div>
+        <p className="text-xs text-muted-foreground mt-1.5">
+          Works with Calendly, Setmore, Cal.com, Acuity Scheduling, or any booking platform with a shareable link.
+        </p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-3">
+        {['Calendly', 'Setmore', 'Cal.com', 'Acuity', 'Google Calendar', 'Other'].map((platform) => (
+          <div key={platform} className="flex items-center gap-2 p-2.5 rounded-lg border border-border text-xs text-muted-foreground">
+            <span className="w-1.5 h-1.5 rounded-full bg-primary/30" />
+            {platform}
+          </div>
+        ))}
+      </div>
+
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4">
+        <p className="text-sm text-blue-900">
+          <span className="font-semibold">💡 No booking link?</span> We'll create one for you as part of your setup. Just skip this step and we'll follow up.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function ChannelsStep({ formData, onChange }) {
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {/* Email */}
         <label className={`p-5 rounded-xl border-2 cursor-pointer transition-all ${
           formData.email_notifications
             ? 'border-primary bg-primary/5'
@@ -254,7 +334,6 @@ function ChannelsStep({ formData, onChange }) {
           </div>
         </label>
 
-        {/* SMS */}
         <label className={`p-5 rounded-xl border-2 cursor-pointer transition-all ${
           formData.sms_notifications
             ? 'border-primary bg-primary/5'
@@ -281,13 +360,16 @@ function ChannelsStep({ formData, onChange }) {
           <label className="block text-sm font-semibold text-foreground mb-2">
             Phone Number for SMS
           </label>
-          <input
-            type="tel"
-            value={formData.phone_number}
-            onChange={(e) => onChange('phone_number', e.target.value)}
-            placeholder="+1 (555) 000-0000"
-            className="w-full px-4 py-2.5 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
-          />
+          <div className="relative">
+            <Phone className="w-4 h-4 text-muted-foreground absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="tel"
+              value={formData.phone_number}
+              onChange={(e) => onChange('phone_number', e.target.value)}
+              placeholder="+1 (555) 000-0000"
+              className="w-full pl-10 pr-4 py-2.5 rounded-lg border border-border focus:outline-none focus:ring-2 focus:ring-primary text-foreground"
+            />
+          </div>
         </div>
       )}
     </div>
@@ -297,7 +379,6 @@ function ChannelsStep({ formData, onChange }) {
 function PreferencesStep({ formData, onChange }) {
   return (
     <div className="space-y-6">
-      {/* Notification Events */}
       <div>
         <p className="text-sm font-semibold text-foreground mb-3">What should we notify you about?</p>
         <div className="space-y-3">
@@ -320,7 +401,6 @@ function PreferencesStep({ formData, onChange }) {
         </div>
       </div>
 
-      {/* Notification Frequency */}
       <div>
         <p className="text-sm font-semibold text-foreground mb-3">How often should we send updates?</p>
         <div className="space-y-2">
@@ -357,10 +437,13 @@ function CompleteStep() {
     <div className="space-y-6 text-center">
       <div className="space-y-3">
         <p className="text-lg text-foreground leading-relaxed">
-          ✅ Email notifications enabled
+          ✅ Business details configured
         </p>
         <p className="text-lg text-foreground leading-relaxed">
-          ✅ Notification preferences configured
+          ✅ Booking link connected
+        </p>
+        <p className="text-lg text-foreground leading-relaxed">
+          ✅ Notification preferences saved
         </p>
         <p className="text-lg text-foreground leading-relaxed">
           ✅ System ready to capture leads
