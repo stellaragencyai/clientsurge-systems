@@ -52,7 +52,7 @@ export default function FormInput({
 
   return (
     <div className="group">
-      <label className="block text-[11px] font-bold uppercase tracking-widest text-black mb-2">
+      <label className="cs-eyebrow block mb-2 text-foreground">
         {label} {required && <span className="text-primary">*</span>}
       </label>
       
@@ -67,17 +67,17 @@ export default function FormInput({
           autoComplete={autoComplete}
           aria-invalid={Boolean(error)}
           aria-describedby={error ? `${name}-error` : undefined}
-          className={`w-full bg-transparent border-b border-black py-3 text-base text-black placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary pr-10 ${
-            error ? 'border-red-500' : ''
+          className={`w-full bg-background border rounded-xl px-4 py-3 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_hsla(199,100%,47%,0.12)] pr-10 ${
+            error ? 'border-red-500' : 'border-border'
           }`}
         />
         
         {/* Validity indicator icons */}
         {showCheckmark && (
-          <CheckCircle2 className="absolute right-0 top-3 w-5 h-5 text-green-500 flex-shrink-0" aria-label="valid" />
+          <CheckCircle2 className="absolute right-3 top-3.5 w-5 h-5 text-green-500 flex-shrink-0" aria-label="valid" />
         )}
         {error && value && (
-          <AlertCircle className="absolute right-0 top-3 w-5 h-5 text-red-500 flex-shrink-0" aria-label="invalid" />
+          <AlertCircle className="absolute right-3 top-3.5 w-5 h-5 text-red-500 flex-shrink-0" aria-label="invalid" />
         )}
       </div>
       

@@ -28,12 +28,12 @@ function detectIndustryFromReferrer() {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
 
-const inputClass = "w-full bg-transparent border-b border-black py-3 text-base text-black placeholder:text-slate-400 outline-none transition-all duration-300 focus:border-primary";
+const textareaClass = "w-full bg-background border border-border rounded-xl px-4 py-3 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_hsla(199,100%,47%,0.12)] resize-none";
 
 function Field({ label, required, error, children }) {
   return (
     <div className="group">
-      <label className="block text-[11px] font-bold uppercase tracking-widest text-black mb-2">
+      <label className="cs-eyebrow block mb-2 text-foreground">
         {label} {required && <span className="text-primary">*</span>}
       </label>
       {children}
@@ -132,23 +132,23 @@ export default function Contact() {
       {/* Full-height split layout — accounts for navbar */}
       <div className="flex flex-1" style={{ minHeight: "calc(100vh - var(--cs-nav-height, 76px))" }}>
 
-        {/* ── LEFT: Dark sidebar ── */}
-        <aside className="hidden lg:flex lg:w-[40%] xl:w-[40%] bg-slate-900 text-white flex-col justify-between p-14 xl:p-20 flex-shrink-0">
+        {/* ── LEFT: Dark sidebar — content vertically distributed ── */}
+        <aside className="hidden lg:flex lg:w-[40%] xl:w-[40%] flex-col justify-between p-10 xl:p-16 flex-shrink-0" style={{ background: "#0A1628" }}>
           {/* Top block */}
           <div>
             {/* Logo / Brand */}
-            <div className="flex items-center gap-3 mb-16">
+            <div className="flex items-center gap-3 mb-12">
               <div className="w-1.5 h-10 bg-primary rounded-sm flex-shrink-0" />
-              <span className="text-2xl font-black tracking-tight">ClientSurge</span>
+              <span className="text-2xl font-titles font-black tracking-tight text-white">ClientSurge</span>
             </div>
 
             {/* Divider */}
-            <div className="border-t border-slate-700 pt-10 mb-10 space-y-7">
+            <div className="border-t border-white/10 pt-10 mb-10 space-y-7">
               <div className="flex items-center gap-4">
                 <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                   <Phone className="w-4 h-4 text-primary" />
                 </div>
-                <a href="tel:+16025843227" className="text-base text-slate-200 hover:text-primary transition">
+                <a href="tel:+16025843227" className="text-base text-slate-200 hover:text-primary transition-colors duration-300">
                   (602) 584-3227
                 </a>
               </div>
@@ -157,8 +157,8 @@ export default function Contact() {
                   <Mail className="w-4 h-4 text-primary" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-bold uppercase tracking-widest text-slate-500 mb-1">Email</p>
-                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-200 hover:text-primary transition break-all">
+                  <p className="cs-eyebrow text-slate-500 mb-1">Email</p>
+                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-200 hover:text-primary transition-colors duration-300 break-all">
                     support@clientsurgesystems.com
                   </a>
                 </div>
@@ -172,7 +172,7 @@ export default function Contact() {
             </div>
 
             {/* Description */}
-            <p className="text-slate-400 text-base leading-relaxed">
+            <p className="text-slate-400 text-base leading-relaxed max-w-sm">
               {industryContext
                 ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right stack.`
                 : "Have questions or ready to get started? Send us a message and we'll be in touch within one business day."}
@@ -180,24 +180,24 @@ export default function Contact() {
           </div>
 
           {/* Bottom: social icons */}
-          <div className="flex items-center gap-6">
-            <a href="#" aria-label="Facebook" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+          <div className="flex items-center gap-4">
+            <a href="https://facebook.com/clientsurge" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300">
               <Facebook className="w-4 h-4" />
             </a>
-            <a href="#" aria-label="Instagram" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition">
+            <a href="https://instagram.com/clientsurge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300">
               <Instagram className="w-4 h-4" />
             </a>
           </div>
         </aside>
 
         {/* ── RIGHT: Form ── */}
-        <main className="flex-1 bg-white flex flex-col justify-center px-6 py-16 sm:px-10 md:px-16 lg:px-20 xl:px-24 overflow-y-auto">
+        <main className="flex-1 bg-background flex flex-col justify-center px-6 py-16 sm:px-10 md:px-12 lg:px-16 xl:px-20 overflow-y-auto">
           <div className="w-full max-w-2xl mx-auto">
 
             {success ? (
               /* ── Success state ── */
               <motion.div
-                className="text-center py-16"
+                className="text-center py-8 md:py-16 px-4"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -210,45 +210,45 @@ export default function Contact() {
                 >
                   <CheckCircle2 className="w-9 h-9 text-green-600" />
                 </motion.div>
-                <h2 className="text-3xl font-black text-black mb-3">Message Received</h2>
-                <p className="text-slate-600 text-base leading-relaxed mb-10 max-w-sm mx-auto">
+                <h2 className="text-3xl font-titles font-black text-foreground mb-3">Message Received</h2>
+                <p className="text-muted-foreground text-base leading-relaxed mb-10 max-w-xs mx-auto">
                   Thanks for reaching out. We'll respond within one business day.
                 </p>
                 <a
                   href="/"
-                  className="inline-flex items-center gap-2 px-6 py-3 bg-slate-900 text-white font-semibold text-sm hover:bg-slate-800 transition"
+                  className="cs-btn-primary"
                 >
                   Back to Home <ArrowRight className="w-4 h-4" />
                 </a>
               </motion.div>
             ) : (
               /* ── Form ── */
-              <form onSubmit={handleSubmit} noValidate className="space-y-12">
+              <form onSubmit={handleSubmit} noValidate className="space-y-10">
 
                 {/* HEADER */}
                 <div>
-                  {/* #8 — Tracked uppercase eyebrow label */}
-                  <p className="text-[11px] font-bold uppercase tracking-[0.25em] text-black mb-4">
+                  {/* #9 — Consistent cs-eyebrow label */}
+                  <p className="cs-eyebrow mb-4 text-primary">
                     Get In Touch
                   </p>
 
-                  {/* #5/#6 — Bold, wide, uppercase CONTACT heading with accent bar */}
+                  {/* #5/#6 — Bold heading with accent bar, using font-titles class */}
                   <div className="flex items-center gap-5 mb-5">
                     <div className="w-1.5 h-14 bg-primary rounded-sm flex-shrink-0" />
-                    <h1 className="text-6xl font-black text-black leading-none tracking-tight" style={{ fontFamily: "'Montserrat', sans-serif" }}>CONTACT</h1>
+                    <h1 className="text-5xl md:text-6xl font-titles font-black text-foreground leading-none tracking-tight">CONTACT</h1>
                   </div>
 
-                  {/* #7 — Editorial sub-text with generous leading */}
-                  <p className="text-base font-semibold text-black mb-1" style={{ lineHeight: 1.5 }}>
+                  {/* #11 — Consistent leading with global body text */}
+                  <p className="text-base font-semibold text-foreground mb-1 leading-relaxed">
                     We'd love to hear from you!
                   </p>
-                  <p className="text-sm text-black" style={{ lineHeight: 1.7 }}>
+                  <p className="text-sm text-muted-foreground leading-relaxed">
                     Send us a message and we'll get right back in touch.
                   </p>
                 </div>
 
                 {errors.submit && (
-                  <div className="bg-red-50 border border-red-200 rounded p-4 text-sm text-red-700">
+                  <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
                     {errors.submit}
                   </div>
                 )}
@@ -256,8 +256,8 @@ export default function Contact() {
                 {/* Honeypot */}
                 <input type="text" name="website_url" value={form.website_url} onChange={handleChange} className="hidden" tabIndex={-1} aria-hidden="true" />
 
-                {/* Row 1: Name */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                {/* #15 — Consistent gap between form field rows */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <FormInput
                     label="First Name"
                     name="full_name"
@@ -276,8 +276,7 @@ export default function Contact() {
                   />
                 </div>
 
-                {/* Row 2: Phone & Email */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <FormInput
                     label="Phone No."
                     type="tel"
@@ -308,39 +307,30 @@ export default function Contact() {
                     onChange={handleChange}
                     rows={5}
                     aria-invalid={Boolean(errors.message)}
-                    className={`${inputClass} resize-none`}
+                    className={textareaClass}
                   />
-                  {/* Visual Improvement #1: character counter */}
-                  <p className="text-right text-[11px] text-black mt-1.5">
+                  {/* Character counter */}
+                  <p className="text-right text-xs text-muted-foreground mt-1.5">
                     {form.message.length} characters
                   </p>
                 </Field>
 
-                {/* #11 — Rectangular outlined SEND button, left-aligned */}
-                {(() => {
-                  const hasErrors = Object.keys(errors).length > 0;
-                  const isValid = form.full_name && form.email && form.message && !hasErrors;
-                  return (
-                    <div className="pt-2">
-                      <button
-                        type="submit"
-                        disabled={loading}
-                        className="inline-flex items-center justify-center gap-2 px-10 py-3.5 border-2 border-slate-900 text-slate-900 font-bold text-sm uppercase tracking-widest bg-transparent hover:bg-slate-900 hover:text-white transition-colors duration-300 rounded-none"
-                        style={{ minHeight: 'unset', minWidth: 'unset' }}
-                      >
-                        {loading
-                          ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
-                          : <><span>Send</span><ArrowRight className="w-4 h-4" /></>
-                        }
-                      </button>
-                      {isValid && (
-                        <span className="sr-only">Form is valid and ready to send</span>
-                      )}
-                    </div>
-                  );
-                })()}
+                {/* #4/#19 — Unified CTA button with disabled feedback */}
+                <div className="pt-2">
+                  <button
+                    type="submit"
+                    disabled={loading}
+                    className="cs-btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
+                    style={{ minHeight: "unset", minWidth: "unset" }}
+                  >
+                    {loading
+                      ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
+                      : <><span>Send Message</span><ArrowRight className="w-4 h-4" /></>
+                    }
+                  </button>
+                </div>
 
-                <p className="text-xs text-black">
+                <p className="text-xs text-muted-foreground">
                   No spam, no pressure — just a thoughtful reply from our team.
                 </p>
               </form>
@@ -349,19 +339,19 @@ export default function Contact() {
         </main>
       </div>
 
-      {/* Mobile: show contact info above footer */}
-      <div className="lg:hidden bg-slate-900 text-white px-6 py-10 space-y-5">
+      {/* #7/#12 — Mobile contact info with safe-area awareness */}
+      <div className="lg:hidden bg-[#0A1628] text-white px-6 py-10 space-y-5 safe-bottom">
         <div className="flex items-center gap-3">
-          <Phone className="w-4 h-4 text-primary" />
-          <a href="tel:+16025843227" className="text-sm">(602) 584-3227</a>
+          <Phone className="w-4 h-4 text-primary flex-shrink-0" />
+          <a href="tel:+16025843227" className="text-sm text-slate-200">(602) 584-3227</a>
         </div>
         <div className="flex items-center gap-3">
-          <Mail className="w-4 h-4 text-primary" />
-          <a href="mailto:support@clientsurgesystems.com" className="text-sm">support@clientsurgesystems.com</a>
+          <Mail className="w-4 h-4 text-primary flex-shrink-0" />
+          <a href="mailto:support@clientsurgesystems.com" className="text-sm text-slate-200 break-all">support@clientsurgesystems.com</a>
         </div>
         <div className="flex items-center gap-3">
-          <MapPin className="w-4 h-4 text-primary" />
-          <span className="text-sm">Phoenix, Arizona</span>
+          <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
+          <span className="text-sm text-slate-200">Phoenix, Arizona</span>
         </div>
       </div>
 
