@@ -50,17 +50,17 @@ export default function SixStepFlow() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="py-16 md:py-24 bg-background">
+    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0A0E27" }}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4 text-primary">The ClientSurge Flow</p>
+          <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>The ClientSurge Flow</p>
           <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4 leading-tight tracking-tight"
+            className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight"
             style={{ fontFamily: "'Montserrat', sans-serif" }}
           >
             Six Steps From Lead to Revenue
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
             Every step is tied to an existing ClientSurge automation — working together as one system.
           </p>
         </div>
@@ -75,7 +75,12 @@ export default function SixStepFlow() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: i * 0.08 }}
-                className="relative rounded-2xl p-6 border border-border bg-card hover:border-primary/30 transition-colors duration-300"
+                className="relative rounded-2xl p-6 transition-colors duration-300"
+                style={{
+                  background: "rgba(255,255,255,0.04)",
+                  border: "1px solid rgba(255,255,255,0.08)",
+                  backdropFilter: "blur(8px)",
+                }}
               >
                 {/* Step number */}
                 <span
@@ -95,14 +100,14 @@ export default function SixStepFlow() {
 
                 {/* Title */}
                 <h3
-                  className="text-lg font-bold text-foreground mb-2"
+                  className="text-lg font-bold text-white mb-2"
                   style={{ fontFamily: "'Montserrat', sans-serif" }}
                 >
                   {step.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">{step.desc}</p>
+                <p className="text-sm text-white/55 leading-relaxed mb-3">{step.desc}</p>
 
                 {/* Service tag */}
                 <span

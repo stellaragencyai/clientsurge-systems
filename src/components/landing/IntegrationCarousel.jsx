@@ -19,7 +19,7 @@ function Badge({ item }) {
       {item.logoUrl ? (
         <img src={item.logoUrl} alt={item.name} className="h-6 w-auto opacity-70" />
       ) : (
-        <span className="text-base md:text-lg font-bold text-slate-400 whitespace-nowrap">{item.name}</span>
+        <span className="text-base md:text-lg font-bold text-white/40 whitespace-nowrap">{item.name}</span>
       )}
     </div>
   );
@@ -30,9 +30,9 @@ export default function IntegrationCarousel() {
   const items = [...INTEGRATIONS, ...INTEGRATIONS];
 
   return (
-    <section className="py-12 md:py-16 bg-background border-y border-border">
+    <section className="py-12 md:py-16 relative overflow-hidden" style={{ background: "#0A0E27" }}>
       <div className="max-w-7xl mx-auto px-6">
-        <p className="text-center text-sm md:text-base text-muted-foreground font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-center text-sm md:text-base text-white/50 font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
           Built to connect with the tools modern businesses already use.
         </p>
 
@@ -46,7 +46,7 @@ export default function IntegrationCarousel() {
                 {item.logoUrl ? (
                   <img src={item.logoUrl} alt={item.name} className="h-6 w-auto opacity-70" />
                 ) : (
-                  <span className="text-sm md:text-base font-bold text-muted-foreground text-center">{item.name}</span>
+                  <span className="text-sm md:text-base font-bold text-white/40 text-center">{item.name}</span>
                 )}
               </div>
             ))}
@@ -54,8 +54,8 @@ export default function IntegrationCarousel() {
         ) : (
           <div className="relative overflow-hidden">
             {/* Edge fades */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-r from-background to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 bg-gradient-to-l from-background to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, #0A0E27, transparent)" }} />
+            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none" style={{ background: "linear-gradient(to left, #0A0E27, transparent)" }} />
 
             {/* Marquee track */}
             <style>{`

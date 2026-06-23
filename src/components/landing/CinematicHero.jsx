@@ -14,8 +14,8 @@ const PROOF_CARDS = [
 export default function CinematicHero({ videoUrl, posterUrl }) {
   const shouldReduceMotion = useReducedMotion();
 
-  const scrollToSection = (id, ctaName) => {
-    trackCTA(ctaName, "hero");
+  const scrollToSection = (id, eventName) => {
+    trackCTA(eventName, "hero");
     const el = document.getElementById(id);
     if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -109,14 +109,14 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           className="flex flex-col sm:flex-row items-center justify-center gap-3"
         >
           <button
-            onClick={() => scrollToSection("pricing", "compare_packages")}
+            onClick={() => scrollToSection("pricing", "hero_compare_packages_click")}
             className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white"
             style={{ minHeight: "unset", minWidth: "unset", boxShadow: "0 4px 20px rgba(0,121,193,0.45)" }}
           >
             Compare Packages <ArrowRight className="w-5 h-5" />
           </button>
           <button
-            onClick={() => scrollToSection("automations", "view_automations")}
+            onClick={() => scrollToSection("automations", "hero_view_automations_click")}
             className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white transition-all duration-300 hover:bg-white/10"
             style={{
               background: "rgba(255,255,255,0.08)",

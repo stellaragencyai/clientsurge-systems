@@ -16,7 +16,9 @@ import { FAQ_ITEMS } from "../components/landing/FAQData";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import TrustStrip from "../components/landing/TrustStrip";
-import ProblemSection from "../components/landing/ProblemSection";
+import WhatHappensAfter from "../components/landing/WhatHappensAfter";
+import BeforeAfterComparison from "../components/landing/BeforeAfterComparison";
+import CTABand from "../components/landing/CTABand";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
@@ -127,8 +129,22 @@ export default function Home() {
         {/* 1d. Six-Step ClientSurge Flow */}
         <SixStepFlow />
 
-        {/* 2. Problem Section */}
-        <ProblemSection />
+        {/* 1e. What Happens After You Start */}
+        <WhatHappensAfter />
+
+        {/* 1f. Before ClientSurge vs After ClientSurge */}
+        <BeforeAfterComparison />
+
+        {/* 1g. CTA Band 1 */}
+        <CTABand
+          headline="Every missed lead is a delayed sale."
+          subcopy="Install the response system before more inquiries go cold."
+          primaryLabel="Request Free Automation Audit"
+          primaryAction="contact"
+          secondaryLabel="Compare Packages"
+          secondaryAction="pricing"
+          location="cta_band_1"
+        />
 
         {/* 3. Automation Systems Preview */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
@@ -142,6 +158,17 @@ export default function Home() {
         {/* 5. Package Preview */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <ThreeSystemsSection />
+
+        {/* 5b. CTA Band 2 */}
+        <CTABand
+          headline="Ready to turn your website into a lead-response system?"
+          subcopy="ClientSurge connects capture, follow-up, booking, reviews, and reactivation into one operating flow."
+          primaryLabel="View Automations"
+          primaryAction="automations"
+          secondaryLabel="Compare Packages"
+          secondaryAction="pricing"
+          location="cta_band_2"
+        />
 
         {/* 6. Compact Trust Strip */}
         <TrustStrip />
