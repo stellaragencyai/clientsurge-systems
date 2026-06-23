@@ -1,23 +1,31 @@
 import { useReducedMotion } from "framer-motion";
 
 const INTEGRATIONS = [
+  { name: "Stripe", logoUrl: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/7b21d4fcd_6a982f4b4_291f0920-0064-4718-862c-ed781a664620.png" },
+  { name: "Cloudflare", logoUrl: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/abfbc3e2a_a80a9600-ac24-4b94-879a-160cac31059a.png" },
+  { name: "OpenAI", logoUrl: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/09317eed9_Chatgpt-logo-1672775463-logotic-brandsvg.png" },
+  { name: "Resend", logoUrl: "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/edd28679a_resend-logo-png_seeklogo-623015.png" },
   { name: "Twilio", logoUrl: null },
-  { name: "Stripe", logoUrl: null },
   { name: "ElevenLabs", logoUrl: null },
-  { name: "OpenAI", logoUrl: null },
   { name: "Google Calendar", logoUrl: null },
-  { name: "Resend", logoUrl: null },
-  { name: "Cloudflare", logoUrl: null },
   { name: "Base44", logoUrl: null },
   { name: "Google Analytics", logoUrl: null },
   { name: "Microsoft Clarity", logoUrl: null },
 ];
 
+function LogoImg({ item }) {
+  return (
+    <div className="flex items-center justify-center h-8 w-28">
+      <img src={item.logoUrl} alt={item.name} className="max-h-8 max-w-28 w-auto h-auto object-contain" loading="lazy" />
+    </div>
+  );
+}
+
 function Badge({ item }) {
   return (
-    <div className="flex items-center gap-2 flex-shrink-0 px-6 py-3">
+    <div className="flex items-center justify-center flex-shrink-0 px-6 py-3">
       {item.logoUrl ? (
-        <img src={item.logoUrl} alt={item.name} className="h-6 w-auto opacity-70" />
+        <LogoImg item={item} />
       ) : (
         <span className="text-base md:text-lg font-bold text-white/40 whitespace-nowrap">{item.name}</span>
       )}
@@ -41,10 +49,11 @@ export default function IntegrationCarousel() {
             {INTEGRATIONS.map((item) => (
               <div
                 key={item.name}
-                className="flex items-center justify-center px-4 py-4 rounded-xl border border-border bg-card"
+                className="flex items-center justify-center px-4 py-4 rounded-xl border border-white/10"
+                style={{ background: "rgba(255,255,255,0.03)" }}
               >
                 {item.logoUrl ? (
-                  <img src={item.logoUrl} alt={item.name} className="h-6 w-auto opacity-70" />
+                  <LogoImg item={item} />
                 ) : (
                   <span className="text-sm md:text-base font-bold text-white/40 text-center">{item.name}</span>
                 )}
