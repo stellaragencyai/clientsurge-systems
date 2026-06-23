@@ -19,8 +19,33 @@ function redactSecrets(text) {
     .slice(0, 2000);
 }
 
-function detectEnvironment() {
-  return Deno.env.get("BASE44_APP_ID") ? "production" : "preview";
+function detectEnvironment(req) {
+  try {
+    const url = new URL(req.url);
+    if (url.hostname.includes("preview") || url.hostname.includes("sandbox")) return "preview";
+  } catch (_) {}
+  return "production";
+}
+
+/**
+ * Reject synthetic / placeholder provider message IDs.
+ * Real Twilio SIDs start with "SM" followed by ~32 hex chars.
+ * Real Resend IDs are UUID-like strings.
+ */
+const SYNTHETIC_ID_PATTERNS = [
+  /^SM_TEST/i,
+  /^TEST_/i,
+  /^demo_/i,
+  /^mock_/i,
+  /^placeholder_/i,
+  /^fake_/i,
+  /^test-lead-id$/i,
+  /^TEST_EMAIL_ID$/i,
+];
+
+function isSyntheticId(id) {
+  if (!id || typeof id !== "string") return false;
+  return SYNTHETIC_ID_PATTERNS.some((pattern) => pattern.test(id.trim()));
 }
 
 /**
@@ -29,6 +54,8 @@ function detectEnvironment() {
  *
  * Creates a CommunicationLog record and optionally updates WebsiteLead tracking fields.
  * Non-blocking: always returns success even if logging fails.
+ *
+ * Rejects synthetic provider_message_id values to prevent fake "sent" logs.
  */
 Deno.serve(async (req) => {
   try {
@@ -37,8 +64,20 @@ Deno.serve(async (req) => {
     const now = new Date().toISOString();
     const ds = payload.delivery_status || "unknown";
 
+    // ── Reject synthetic provider IDs for "sent" status ──
+    // If the caller passes a fake ID with delivery_status=sent/queued, downgrade to "failed"
+    let effectiveStatus = ds;
+    let effectiveError = payload.error_message || null;
+    if (
+      isSyntheticId(payload.provider_message_id) &&
+      (ds === "sent" || ds === "queued" || ds === "delivered")
+    ) {
+      effectiveStatus = "failed";
+      effectiveError = `Synthetic provider_message_id rejected: "${payload.provider_message_id}". Real provider calls must capture actual IDs.`;
+    }
+
     // Create CommunicationLog record
-    await base44.asServiceRole.entities.CommunicationLog.create({
+    const created = await base44.asServiceRole.entities.CommunicationLog.create({
       related_entity_type: payload.related_entity_type || null,
       related_entity_id: payload.related_entity_id || null,
       lead_email: payload.lead_email || null,
@@ -53,17 +92,17 @@ Deno.serve(async (req) => {
       from_address: payload.from_address || null,
       subject: payload.subject || null,
       body_preview: (payload.body_preview || "").slice(0, 500),
-      provider_message_id: payload.provider_message_id || null,
+      provider_message_id: isSyntheticId(payload.provider_message_id) ? null : (payload.provider_message_id || null),
       provider_status: payload.provider_status || null,
-      delivery_status: ds,
+      delivery_status: effectiveStatus,
       error_code: payload.error_code || null,
-      error_message: payload.error_message || null,
+      error_message: effectiveError,
       request_payload_redacted: redactSecrets(payload.request_payload || ""),
       response_payload_redacted: redactSecrets(payload.response_payload || ""),
-      sent_at: ds === "sent" || ds === "queued" ? now : null,
-      delivered_at: ds === "delivered" ? now : null,
-      failed_at: ds === "failed" ? now : null,
-      environment: payload.environment || detectEnvironment(),
+      sent_at: effectiveStatus === "sent" || effectiveStatus === "queued" ? now : null,
+      delivered_at: effectiveStatus === "delivered" ? now : null,
+      failed_at: effectiveStatus === "failed" ? now : null,
+      environment: payload.environment || detectEnvironment(req),
     });
 
     // Update WebsiteLead tracking only when provider accepted the message
@@ -71,7 +110,7 @@ Deno.serve(async (req) => {
       !payload.skip_lead_update &&
       payload.related_entity_type === "WebsiteLead" &&
       payload.related_entity_id &&
-      (ds === "sent" || ds === "queued")
+      (effectiveStatus === "sent" || effectiveStatus === "queued")
     ) {
       const updateData = {
         last_message_sent: now,
@@ -98,7 +137,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    return json({ success: true });
+    return json({ success: true, log_id: created?.id || null });
   } catch (error) {
     console.warn("[logCommunication] Error:", error.message);
     return json({ success: false, error: error.message }, 200); // Return 200 so callers don't break
