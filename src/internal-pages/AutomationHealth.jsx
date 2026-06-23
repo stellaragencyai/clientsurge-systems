@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck } from "lucide-react";
+import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck, Server } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 
@@ -44,6 +44,86 @@ function formatDate(iso) {
   }
 }
 
+function TestResultBanner({ result, provider }) {
+  if (!result) return null;
+  const passed = result.passed === true || result.success === true;
+  return (
+    <div className={`mt-3 p-3 rounded-lg text-sm border ${passed ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"}`}>
+      <div className="flex items-center gap-2 mb-1">
+        {passed ? <CheckCircle className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
+        <span className="font-bold">{passed ? "PASSED" : "FAILED"}</span>
+        <span className="opacity-70">· {provider}</span>
+      </div>
+      <div className="space-y-0.5 text-xs">
+        <div><span className="font-semibold">Provider Message ID:</span> <code className="font-mono bg-black/5 px-1 rounded">{result.provider_message_id || result.message_sid || result.message_id || "—"}</code></div>
+        {!passed && result.error && (
+          <div className="text-red-800"><span className="font-semibold">Error:</span> {result.error}</div>
+        )}
+        {result.sent_to && (
+          <div><span className="font-semibold">Sent to:</span> {result.sent_to}</div>
+        )}
+        {result.communication_log_id && (
+          <div className="flex items-center gap-1">
+            <span className="font-semibold">CommunicationLog:</span>
+            <code className="font-mono text-[10px] bg-black/5 px-1 rounded">{result.communication_log_id.slice(0, 12)}…</code>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+function ProviderReadinessCard({ provider, data }) {
+  const configOk = data?.config_present === "yes";
+  const testPassed = data?.last_test_passed === "yes";
+  const testFailed = data?.last_test_passed === "no";
+  const testNever = data?.last_test_passed === "never";
+
+  const statusColor = configOk && testPassed ? "green" : configOk && testNever ? "amber" : "red";
+  const Icon = provider === "twilio" ? MessageSquare : Mail;
+
+  return (
+    <div className="rounded-xl border border-border bg-card p-5">
+      <div className="flex items-center gap-2 mb-4">
+        <Icon className="w-5 h-5 text-primary" />
+        <h3 className="font-bold text-foreground capitalize">{provider === "twilio" ? "Twilio (SMS)" : "Resend (Email)"}</h3>
+        <span className={`ml-auto inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-bold ${
+          statusColor === "green" ? "bg-green-100 text-green-700" : statusColor === "amber" ? "bg-amber-100 text-amber-700" : "bg-red-100 text-red-700"
+        }`}>
+          {statusColor === "green" ? <CheckCircle className="w-3 h-3" /> : statusColor === "amber" ? <Clock className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
+          {statusColor === "green" ? "Ready" : statusColor === "amber" ? "Untested" : "Not Ready"}
+        </span>
+      </div>
+      <div className="space-y-2 text-sm">
+        <div className="flex items-center justify-between">
+          <span className="text-foreground/60">Config present:</span>
+          <span className={`font-bold ${configOk ? "text-green-600" : "text-red-600"}`}>{data?.config_present || "unknown"}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-foreground/60">Last test passed:</span>
+          <span className={`font-bold ${testPassed ? "text-green-600" : testFailed ? "text-red-600" : "text-amber-600"}`}>{data?.last_test_passed || "unknown"}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-foreground/60">Last test time:</span>
+          <span className="text-xs text-foreground/80">{formatDate(data?.last_test_time)}</span>
+        </div>
+        <div className="flex items-center justify-between">
+          <span className="text-foreground/60">Last provider ID:</span>
+          <code className="font-mono text-[10px] text-foreground/80 max-w-[140px] truncate" title={data?.last_provider_message_id || ""}>
+            {data?.last_provider_message_id ? data.last_provider_message_id.slice(0, 20) : "—"}
+          </code>
+        </div>
+        {data?.last_error && (
+          <div className="pt-2 border-t border-border/50">
+            <span className="text-foreground/60 text-xs font-semibold">Last error:</span>
+            <p className="text-xs text-red-600 mt-1 break-words">{data.last_error.slice(0, 200)}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function AutomationHealth() {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -52,7 +132,6 @@ export default function AutomationHealth() {
   // Test panel state
   const [testEmailRecipient, setTestEmailRecipient] = useState("");
   const [testSmsRecipient, setTestSmsRecipient] = useState("");
-  const [testMessage, setTestMessage] = useState("");
   const [emailResult, setEmailResult] = useState(null);
   const [smsResult, setSmsResult] = useState(null);
   const [sendingEmail, setSendingEmail] = useState(false);
@@ -81,12 +160,13 @@ export default function AutomationHealth() {
     try {
       const res = await base44.functions.invoke("sendTestCommunication", {
         action: "email",
-        recipient_email: testEmailRecipient,
-        message: testMessage || undefined,
+        recipient_email: testEmailRecipient || undefined,
       });
       setEmailResult(res.data);
+      // Refresh health data to pick up the new log + snapshot
+      setTimeout(() => fetchData(), 500);
     } catch (err) {
-      setEmailResult({ success: false, error: err.response?.data?.error || err.message });
+      setEmailResult({ success: false, passed: false, provider: "resend", error: err.response?.data?.error || err.message });
     } finally {
       setSendingEmail(false);
     }
@@ -99,11 +179,11 @@ export default function AutomationHealth() {
       const res = await base44.functions.invoke("sendTestCommunication", {
         action: "sms",
         recipient_phone: testSmsRecipient,
-        message: testMessage || undefined,
       });
       setSmsResult(res.data);
+      setTimeout(() => fetchData(), 500);
     } catch (err) {
-      setSmsResult({ success: false, error: err.response?.data?.error || err.message });
+      setSmsResult({ success: false, passed: false, provider: "twilio", error: err.response?.data?.error || err.message });
     } finally {
       setSendingSms(false);
     }
@@ -146,7 +226,7 @@ export default function AutomationHealth() {
             Automation Health
           </h1>
           <p className="text-sm text-foreground/60 mt-1">
-            Prove Twilio SMS and Resend emails are working end-to-end.
+            Prove Twilio SMS and Resend emails are working with real provider calls.
           </p>
         </div>
         <button
@@ -226,7 +306,13 @@ export default function AutomationHealth() {
                       )}
                     </td>
                     <td className="p-3 text-xs text-foreground/60">{log.to_address || "—"}</td>
-                    <td className="p-3 text-xs text-foreground/50 font-mono">{log.provider_message_id ? log.provider_message_id.slice(0, 18) + "…" : "—"}</td>
+                    <td className="p-3 text-xs text-foreground/50 font-mono">
+                      {log.provider_message_id ? (
+                        <span title={log.provider_message_id}>{log.provider_message_id.slice(0, 18)}…</span>
+                      ) : (
+                        <span className="text-red-400">no provider ID</span>
+                      )}
+                    </td>
                     <td className="p-3 text-xs text-red-600 max-w-[200px] truncate" title={log.error_message || ""}>
                       {log.error_message ? log.error_message.slice(0, 50) : "—"}
                     </td>
@@ -239,7 +325,7 @@ export default function AutomationHealth() {
       </div>
 
       {/* Section 3: Stuck Leads */}
-      <h2 className="text-lg font-bold text-foreground mb-3">Stuck Leads</h2>
+      <h2 className="text-lg font-bold text-foreground mb-3">Stuck Leads (Auto On, No Response, &gt; 5 min)</h2>
       <div className="rounded-xl border border-border bg-card overflow-hidden mb-8">
         {stuck.length === 0 ? (
           <div className="p-8 text-center text-sm text-foreground/50">
@@ -255,10 +341,6 @@ export default function AutomationHealth() {
                   <th className="text-left p-3 font-semibold text-foreground/70">Email</th>
                   <th className="text-left p-3 font-semibold text-foreground/70">Phone</th>
                   <th className="text-left p-3 font-semibold text-foreground/70">Business</th>
-                  <th className="text-left p-3 font-semibold text-foreground/70">Source</th>
-                  <th className="text-left p-3 font-semibold text-foreground/70">Consent</th>
-                  <th className="text-left p-3 font-semibold text-foreground/70">SMS Perm</th>
-                  <th className="text-left p-3 font-semibold text-foreground/70">Paused</th>
                   <th className="text-left p-3 font-semibold text-foreground/70">Created</th>
                   <th className="text-left p-3 font-semibold text-foreground/70">Reason Stuck</th>
                 </tr>
@@ -270,16 +352,6 @@ export default function AutomationHealth() {
                     <td className="p-3 text-xs text-foreground/60">{lead.email || "—"}</td>
                     <td className="p-3 text-xs text-foreground/60">{lead.phone_number || "—"}</td>
                     <td className="p-3 text-xs text-foreground/60">{lead.business_name || "—"}</td>
-                    <td className="p-3 text-xs text-foreground/60">{lead.source || "—"}</td>
-                    <td className="p-3 text-xs">
-                      {lead.consent_given ? <CheckCircle className="w-3.5 h-3.5 text-green-500" /> : <XCircle className="w-3.5 h-3.5 text-red-400" />}
-                    </td>
-                    <td className="p-3 text-xs">
-                      {lead.sms_permission ? <CheckCircle className="w-3.5 h-3.5 text-green-500" /> : <XCircle className="w-3.5 h-3.5 text-red-400" />}
-                    </td>
-                    <td className="p-3 text-xs">
-                      {lead.cadence_paused ? <CheckCircle className="w-3.5 h-3.5 text-amber-500" /> : <XCircle className="w-3.5 h-3.5 text-gray-300" />}
-                    </td>
                     <td className="p-3 text-xs text-foreground/60 whitespace-nowrap">{formatDate(lead.created_date)}</td>
                     <td className="p-3 text-xs text-amber-700">{lead.reason}</td>
                   </tr>
@@ -291,7 +363,8 @@ export default function AutomationHealth() {
       </div>
 
       {/* Section 4: Test Panel */}
-      <h2 className="text-lg font-bold text-foreground mb-3">Test Panel</h2>
+      <h2 className="text-lg font-bold text-foreground mb-3">Test Panel — Real Provider Calls</h2>
+      <p className="text-xs text-foreground/50 mb-4">These buttons send real Twilio SMS and Resend email messages. The actual provider response ID is captured and logged — no synthetic IDs.</p>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
         {/* Test Email */}
         <div className="rounded-xl border border-border bg-card p-5">
@@ -304,34 +377,19 @@ export default function AutomationHealth() {
             type="email"
             value={testEmailRecipient}
             onChange={(e) => setTestEmailRecipient(e.target.value)}
-            placeholder="admin@example.com"
+            placeholder="admin@example.com (defaults to your email)"
             className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-3 bg-background"
           />
-          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Message (optional)</label>
-          <textarea
-            value={testMessage}
-            onChange={(e) => setTestMessage(e.target.value)}
-            placeholder="Custom test message…"
-            rows={2}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-3 bg-background"
-          />
+          <p className="text-xs text-foreground/50 mb-3">Subject: "ClientSurge Resend Test — Automation Health"</p>
           <button
             onClick={sendTestEmail}
-            disabled={sendingEmail || !testEmailRecipient}
+            disabled={sendingEmail}
             className="cs-btn-primary w-full"
           >
             {sendingEmail ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            <span className="ml-1">{sendingEmail ? "Sending…" : "Send Test Email"}</span>
+            <span className="ml-1">{sendingEmail ? "Sending…" : "Send Real Test Email"}</span>
           </button>
-          {emailResult && (
-            <div className={`mt-3 p-3 rounded-lg text-sm ${emailResult.success ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-              {emailResult.success ? (
-                <><CheckCircle className="w-4 h-4 inline mr-1" /> Email sent to {emailResult.sent_to} (ID: {emailResult.message_id || "—"})</>
-              ) : (
-                <><XCircle className="w-4 h-4 inline mr-1" /> Failed: {emailResult.error}</>
-              )}
-            </div>
-          )}
+          <TestResultBanner result={emailResult} provider="Resend" />
         </div>
 
         {/* Test SMS */}
@@ -340,7 +398,7 @@ export default function AutomationHealth() {
             <MessageSquare className="w-5 h-5 text-primary" />
             <h3 className="font-bold text-foreground">Test SMS (Twilio)</h3>
           </div>
-          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Recipient Phone</label>
+          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Recipient Phone (required)</label>
           <input
             type="tel"
             value={testSmsRecipient}
@@ -348,64 +406,28 @@ export default function AutomationHealth() {
             placeholder="+1XXXXXXXXXX"
             className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-3 bg-background"
           />
-          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Message (optional)</label>
-          <textarea
-            value={testMessage}
-            onChange={(e) => setTestMessage(e.target.value)}
-            placeholder="Custom test message…"
-            rows={2}
-            className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-3 bg-background"
-          />
+          <p className="text-xs text-foreground/50 mb-3">Body: "ClientSurge Twilio test: automation health check."</p>
           <button
             onClick={sendTestSms}
             disabled={sendingSms || !testSmsRecipient}
             className="cs-btn-primary w-full"
           >
             {sendingSms ? <Loader2 className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
-            <span className="ml-1">{sendingSms ? "Sending…" : "Send Test SMS"}</span>
+            <span className="ml-1">{sendingSms ? "Sending…" : "Send Real Test SMS"}</span>
           </button>
-          {smsResult && (
-            <div className={`mt-3 p-3 rounded-lg text-sm ${smsResult.success ? "bg-green-50 text-green-700 border border-green-200" : "bg-red-50 text-red-700 border border-red-200"}`}>
-              {smsResult.success ? (
-                <><CheckCircle className="w-4 h-4 inline mr-1" /> SMS sent to {smsResult.sent_to} (SID: {smsResult.message_sid || "—"})</>
-              ) : (
-                <><XCircle className="w-4 h-4 inline mr-1" /> Failed: {smsResult.error}</>
-              )}
-            </div>
-          )}
+          <TestResultBanner result={smsResult} provider="Twilio" />
         </div>
       </div>
 
-      {/* Section 5: Provider Readiness Checklist */}
-      <h2 className="text-lg font-bold text-foreground mb-3">Provider Readiness Checklist</h2>
-      <div className="rounded-xl border border-border bg-card p-5 mb-8">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-          {[
-            { label: "Twilio Account Configured", value: readiness.twilio_account_configured },
-            { label: "Twilio From Number Configured", value: readiness.twilio_from_number_configured },
-            { label: "Resend API Configured", value: readiness.resend_api_configured },
-            { label: "Resend From Email Configured", value: readiness.resend_from_email_configured },
-            { label: "App Base URL Configured", value: readiness.app_base_url_configured },
-          ].map((item) => (
-            <div key={item.label} className="flex items-center gap-2">
-              {item.value === "yes" ? (
-                <CheckCircle className="w-5 h-5 text-green-500 flex-shrink-0" />
-              ) : item.value === "no" ? (
-                <XCircle className="w-5 h-5 text-red-500 flex-shrink-0" />
-              ) : (
-                <ShieldCheck className="w-5 h-5 text-amber-500 flex-shrink-0" />
-              )}
-              <span className="text-sm font-medium text-foreground">{item.label}</span>
-              <span className={`text-xs font-bold ml-auto ${item.value === "yes" ? "text-green-600" : item.value === "no" ? "text-red-600" : "text-amber-600"}`}>
-                {item.value || "unknown"}
-              </span>
-            </div>
-          ))}
-        </div>
+      {/* Section 5: Provider Readiness */}
+      <h2 className="text-lg font-bold text-foreground mb-3">Provider Readiness</h2>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        <ProviderReadinessCard provider="twilio" data={readiness.twilio} />
+        <ProviderReadinessCard provider="resend" data={readiness.resend} />
       </div>
 
       <p className="text-xs text-foreground/40 text-center mb-4">
-        Snapshot taken at {formatDate(data?.snapshot_at)}. Data is real-time — refresh to get latest.
+        Snapshot taken at {formatDate(data?.snapshot_at)}. Environment: {data?.environment || "production"}. An AutomationHealthSnapshot row is persisted on each page load.
       </p>
     </div>
   );

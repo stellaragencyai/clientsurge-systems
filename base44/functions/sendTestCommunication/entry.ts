@@ -27,11 +27,19 @@ function safeResendFrom() {
   return "ClientSurge Systems <system@clientsurgesystems.com>";
 }
 
-async function logComm(base44, payload) {
+function detectEnvironment(req) {
+  try {
+    const url = new URL(req.url);
+    if (url.hostname.includes("preview") || url.hostname.includes("sandbox")) return "preview";
+  } catch (_) {}
+  return "production";
+}
+
+async function createCommLog(base44, payload) {
   try {
     const now = new Date().toISOString();
     const ds = payload.delivery_status || "unknown";
-    await base44.asServiceRole.entities.CommunicationLog.create({
+    const created = await base44.asServiceRole.entities.CommunicationLog.create({
       related_entity_type: payload.related_entity_type || null,
       related_entity_id: payload.related_entity_id || null,
       lead_email: payload.lead_email || null,
@@ -54,14 +62,22 @@ async function logComm(base44, payload) {
       request_payload_redacted: redactSecrets(payload.request_payload || ""),
       response_payload_redacted: redactSecrets(payload.response_payload || ""),
       sent_at: ds === "sent" || ds === "queued" ? now : null,
+      delivered_at: ds === "delivered" ? now : null,
       failed_at: ds === "failed" ? now : null,
-      environment: "production",
+      environment: payload.environment || "production",
     });
+    return created?.id || null;
   } catch (e) {
-    console.warn("[sendTestCommunication] logComm failed:", e.message);
+    console.warn("[sendTestCommunication] createCommLog failed:", e.message);
+    return null;
   }
 }
 
+/**
+ * Sends REAL Twilio SMS and Resend email test messages.
+ * Captures actual provider response IDs. Never creates synthetic provider IDs.
+ * Logs every attempt (success or failure) as a CommunicationLog row.
+ */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -71,16 +87,17 @@ Deno.serve(async (req) => {
       return json({ error: "Forbidden — admin access required" }, 403);
     }
 
-    const { action, recipient_email, recipient_phone, message } = await req.json();
+    const { action, recipient_email, recipient_phone } = await req.json();
+    const adminEmail = user.email;
+    const env = detectEnvironment(req);
 
     if (!action || !["email", "sms"].includes(action)) {
       return json({ error: "action must be 'email' or 'sms'" }, 400);
     }
 
-    const testMessage = message || "This is a test message from ClientSurge Automation Health.";
-    const adminEmail = user.email;
-
-    // ── TEST EMAIL via Resend ──
+    // ═══════════════════════════════════════════
+    // TEST EMAIL via Resend
+    // ═══════════════════════════════════════════
     if (action === "email") {
       const toEmail = (recipient_email || adminEmail || "").trim();
       if (!toEmail || !toEmail.includes("@")) {
@@ -88,20 +105,31 @@ Deno.serve(async (req) => {
       }
 
       const resendKey = Deno.env.get("RESEND_API_KEY");
+      const fromEmail = safeResendFrom();
+      const subject = "ClientSurge Resend Test — Automation Health";
+      const body = "This is a ClientSurge automation health check. If you received this, Resend is connected.";
+
+      // If Resend is not configured, log a FAILED row with the real reason
       if (!resendKey) {
-        await logComm(base44, {
+        const logPayload = {
           channel: "email", provider: "resend", direction: "outbound",
-          trigger_name: "manual_test", to_address: toEmail,
-          from_address: safeResendFrom(), subject: "ClientSurge Test Email",
-          body_preview: testMessage.slice(0, 200),
-          delivery_status: "failed", error_message: "RESEND_API_KEY not configured",
+          trigger_name: "manual_test", to_address: toEmail, from_address: fromEmail,
+          subject, body_preview: body.slice(0, 200),
+          delivery_status: "failed", error_code: "MISSING_CONFIG",
+          error_message: "RESEND_API_KEY environment variable is not set",
+          environment: env,
+        };
+        const logId = await createCommLog(base44, logPayload);
+        return json({
+          success: false,
+          passed: false,
+          provider: "resend",
+          error: "RESEND_API_KEY environment variable is not set",
+          communication_log_id: logId,
         });
-        return json({ success: false, error: "RESEND_API_KEY not configured" });
       }
 
-      const emailSubject = "ClientSurge Automation Health — Test Email";
-      const emailBody = `This is a test email sent from the Automation Health dashboard.\n\nMessage: ${testMessage}\n\nIf you received this, Resend is working correctly.\n\n— ClientSurge Systems`;
-      const requestBody = JSON.stringify({ from: safeResendFrom(), to: toEmail, subject: emailSubject, text: emailBody });
+      const requestBody = JSON.stringify({ from: fromEmail, to: toEmail, subject, text: body });
 
       try {
         const res = await fetch("https://api.resend.com/emails", {
@@ -111,40 +139,102 @@ Deno.serve(async (req) => {
         });
         const responseText = await res.text();
 
+        // Twilio/Resend rejected the request → log FAILED with real error
         if (!res.ok) {
-          const errorMsg = `Resend API error: ${res.status} — ${responseText.slice(0, 300)}`;
-          await logComm(base44, {
+          let parsedErr = null;
+          try { parsedErr = JSON.parse(responseText); } catch (_) {}
+          const errorMsg = parsedErr?.message || `Resend API error: ${res.status} — ${responseText.slice(0, 300)}`;
+          const errorCode = String(res.status);
+
+          const logPayload = {
             channel: "email", provider: "resend", direction: "outbound",
-            trigger_name: "manual_test", to_address: toEmail, from_address: safeResendFrom(),
-            subject: emailSubject, body_preview: testMessage.slice(0, 200),
-            delivery_status: "failed", error_message: errorMsg,
+            trigger_name: "manual_test", to_address: toEmail, from_address: fromEmail,
+            subject, body_preview: body.slice(0, 200),
+            delivery_status: "failed", error_code: errorCode, error_message: errorMsg,
             request_payload_redacted: requestBody, response_payload_redacted: responseText,
+            environment: env,
+          };
+          const logId = await createCommLog(base44, logPayload);
+
+          return json({
+            success: false,
+            passed: false,
+            provider: "resend",
+            error: errorMsg,
+            error_code: errorCode,
+            communication_log_id: logId,
           });
-          return json({ success: false, error: errorMsg });
         }
 
+        // Provider accepted — capture the REAL Resend email id
         const result = JSON.parse(responseText);
         const messageId = result.id || null;
-        await logComm(base44, {
+
+        if (!messageId) {
+          // Resend returned 200 but no ID — suspicious, log as failed
+          const logPayload = {
+            channel: "email", provider: "resend", direction: "outbound",
+            trigger_name: "manual_test", to_address: toEmail, from_address: fromEmail,
+            subject, body_preview: body.slice(0, 200),
+            delivery_status: "failed", error_message: "Resend returned 200 but no email id in response body",
+            request_payload_redacted: requestBody, response_payload_redacted: responseText,
+            environment: env,
+          };
+          const logId = await createCommLog(base44, logPayload);
+
+          return json({
+            success: false,
+            passed: false,
+            provider: "resend",
+            error: "Resend returned 200 but no email id in response body",
+            communication_log_id: logId,
+          });
+        }
+
+        const logPayload = {
           channel: "email", provider: "resend", direction: "outbound",
-          trigger_name: "manual_test", to_address: toEmail, from_address: safeResendFrom(),
-          subject: emailSubject, body_preview: testMessage.slice(0, 200),
+          trigger_name: "manual_test", to_address: toEmail, from_address: fromEmail,
+          subject, body_preview: body.slice(0, 200),
           provider_message_id: messageId, provider_status: "sent", delivery_status: "sent",
           request_payload_redacted: requestBody, response_payload_redacted: responseText,
+          environment: env,
+        };
+        const logId = await createCommLog(base44, logPayload);
+
+        return json({
+          success: true,
+          passed: true,
+          provider: "resend",
+          message_id: messageId,
+          provider_message_id: messageId,
+          sent_to: toEmail,
+          communication_log_id: logId,
         });
-        return json({ success: true, message_id: messageId, sent_to: toEmail });
       } catch (err) {
-        await logComm(base44, {
+        // Network error — provider unreachable
+        const logPayload = {
           channel: "email", provider: "resend", direction: "outbound",
-          trigger_name: "manual_test", to_address: toEmail, from_address: safeResendFrom(),
-          subject: "ClientSurge Test Email", body_preview: testMessage.slice(0, 200),
-          delivery_status: "failed", error_message: err.message,
+          trigger_name: "manual_test", to_address: toEmail, from_address: fromEmail,
+          subject, body_preview: body.slice(0, 200),
+          delivery_status: "failed", error_code: "NETWORK_ERROR", error_message: err.message,
+          environment: env,
+        };
+        const logId = await createCommLog(base44, logPayload);
+
+        return json({
+          success: false,
+          passed: false,
+          provider: "resend",
+          error: err.message,
+          error_code: "NETWORK_ERROR",
+          communication_log_id: logId,
         });
-        return json({ success: false, error: err.message });
       }
     }
 
-    // ── TEST SMS via Twilio ──
+    // ═══════════════════════════════════════════
+    // TEST SMS via Twilio
+    // ═══════════════════════════════════════════
     if (action === "sms") {
       const toPhone = (recipient_phone || "").trim();
       if (!toPhone || toPhone.replace(/\D/g, "").length < 10) {
@@ -154,20 +244,36 @@ Deno.serve(async (req) => {
       const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
       const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
       const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+      const smsBody = "ClientSurge Twilio test: automation health check.\n\nReply STOP to opt out.";
 
+      // If Twilio is not configured, log a FAILED row with the real reason
       if (!accountSid || !authToken || !fromNumber) {
-        await logComm(base44, {
+        const missing = [];
+        if (!accountSid) missing.push("TWILIO_ACCOUNT_SID");
+        if (!authToken) missing.push("TWILIO_AUTH_TOKEN");
+        if (!fromNumber) missing.push("TWILIO_PHONE_NUMBER");
+        const errorMsg = `Twilio credentials not configured: ${missing.join(", ")}`;
+
+        const logPayload = {
           channel: "sms", provider: "twilio", direction: "outbound",
           trigger_name: "manual_test", to_address: toPhone,
           from_address: fromNumber || "not_configured",
-          body_preview: testMessage.slice(0, 200),
-          delivery_status: "failed", error_message: "Twilio credentials not configured",
+          body_preview: smsBody.slice(0, 200),
+          delivery_status: "failed", error_code: "MISSING_CONFIG", error_message: errorMsg,
+          environment: env,
+        };
+        const logId = await createCommLog(base44, logPayload);
+
+        return json({
+          success: false,
+          passed: false,
+          provider: "twilio",
+          error: errorMsg,
+          communication_log_id: logId,
         });
-        return json({ success: false, error: "Twilio credentials not configured" });
       }
 
       const auth = btoa(`${accountSid}:${authToken}`);
-      const smsBody = `${testMessage}\n\nReply STOP to opt out.`;
       const params = new URLSearchParams({ From: fromNumber, To: toPhone, Body: smsBody });
 
       try {
@@ -181,36 +287,98 @@ Deno.serve(async (req) => {
         );
         const responseText = await res.text();
 
+        // Twilio rejected → log FAILED with real error
         if (!res.ok) {
-          const errorMsg = `Twilio API error: ${res.status} — ${responseText.slice(0, 300)}`;
-          await logComm(base44, {
+          let parsedErr = null;
+          try { parsedErr = JSON.parse(responseText); } catch (_) {}
+          const errorMsg = parsedErr?.message || `Twilio API error: ${res.status} — ${responseText.slice(0, 300)}`;
+          const errorCode = parsedErr?.code ? String(parsedErr.code) : String(res.status);
+
+          const logPayload = {
             channel: "sms", provider: "twilio", direction: "outbound",
             trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
             body_preview: smsBody.slice(0, 200), delivery_status: "failed",
-            error_message: errorMsg, request_payload_redacted: params.toString(),
-            response_payload_redacted: responseText,
+            error_code: errorCode, error_message: errorMsg,
+            request_payload_redacted: params.toString(), response_payload_redacted: responseText,
+            environment: env,
+          };
+          const logId = await createCommLog(base44, logPayload);
+
+          return json({
+            success: false,
+            passed: false,
+            provider: "twilio",
+            error: errorMsg,
+            error_code: errorCode,
+            communication_log_id: logId,
           });
-          return json({ success: false, error: errorMsg });
         }
 
+        // Provider accepted — capture the REAL Twilio Message SID
         const result = JSON.parse(responseText);
         const messageSid = result.sid || null;
-        await logComm(base44, {
+        const providerStatus = result.status || "queued";
+
+        if (!messageSid) {
+          const logPayload = {
+            channel: "sms", provider: "twilio", direction: "outbound",
+            trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
+            body_preview: smsBody.slice(0, 200),
+            delivery_status: "failed", error_message: "Twilio returned 200 but no Message SID in response body",
+            request_payload_redacted: params.toString(), response_payload_redacted: responseText,
+            environment: env,
+          };
+          const logId = await createCommLog(base44, logPayload);
+
+          return json({
+            success: false,
+            passed: false,
+            provider: "twilio",
+            error: "Twilio returned 200 but no Message SID in response body",
+            communication_log_id: logId,
+          });
+        }
+
+        const logPayload = {
           channel: "sms", provider: "twilio", direction: "outbound",
           trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
-          body_preview: smsBody.slice(0, 200), provider_message_id: messageSid,
-          provider_status: result.status || "queued", delivery_status: "sent",
+          body_preview: smsBody.slice(0, 200),
+          provider_message_id: messageSid, provider_status: providerStatus,
+          delivery_status: providerStatus === "queued" ? "queued" : "sent",
           request_payload_redacted: params.toString(), response_payload_redacted: responseText,
+          environment: env,
+        };
+        const logId = await createCommLog(base44, logPayload);
+
+        return json({
+          success: true,
+          passed: true,
+          provider: "twilio",
+          message_sid: messageSid,
+          provider_message_id: messageSid,
+          provider_status: providerStatus,
+          sent_to: toPhone,
+          communication_log_id: logId,
         });
-        return json({ success: true, message_sid: messageSid, sent_to: toPhone });
       } catch (err) {
-        await logComm(base44, {
+        // Network error — provider unreachable
+        const logPayload = {
           channel: "sms", provider: "twilio", direction: "outbound",
           trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
-          body_preview: testMessage.slice(0, 200), delivery_status: "failed",
-          error_message: err.message,
+          body_preview: smsBody.slice(0, 200),
+          delivery_status: "failed", error_code: "NETWORK_ERROR", error_message: err.message,
+          environment: env,
+        };
+        const logId = await createCommLog(base44, logPayload);
+
+        return json({
+          success: false,
+          passed: false,
+          provider: "twilio",
+          error: err.message,
+          error_code: "NETWORK_ERROR",
+          communication_log_id: logId,
         });
-        return json({ success: false, error: err.message });
       }
     }
 

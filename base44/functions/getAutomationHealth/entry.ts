@@ -7,6 +7,19 @@ function json(data, status = 200) {
   });
 }
 
+function detectEnvironment(req) {
+  try {
+    const url = new URL(req.url);
+    if (url.hostname.includes("preview") || url.hostname.includes("sandbox")) return "preview";
+  } catch (_) {}
+  return "production";
+}
+
+/**
+ * Returns real-time automation health data and persists an AutomationHealthSnapshot.
+ * Provider readiness includes: config present, last test pass/fail, last test time,
+ * last provider message ID, and last error — all derived from CommunicationLog records.
+ */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -17,11 +30,9 @@ Deno.serve(async (req) => {
     }
 
     const now = new Date();
-    const twentyFourHoursAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
-    const fiveMinutesAgo = new Date(now.getTime() - 5 * 60 * 1000).toISOString();
+    const env = detectEnvironment(req);
 
     // ── 1. CommunicationLog stats for last 24h ──
-    // Fetch most recent 500 logs and filter in JS (avoids date-format comparison issues)
     const recentLogs = await base44.asServiceRole.entities.CommunicationLog.list(
       "-created_date",
       500
@@ -31,75 +42,41 @@ Deno.serve(async (req) => {
       const logDate = new Date(l.created_date || l.sent_at || l.failed_at);
       return logDate.getTime() >= now.getTime() - 24 * 60 * 60 * 1000;
     });
-    const smsSent = logs.filter((l) => l.channel === "sms" && (l.delivery_status === "sent" || l.delivery_status === "delivered" || l.delivery_status === "queued"));
+
+    const smsSent = logs.filter((l) => l.channel === "sms" && ["sent", "delivered", "queued"].includes(l.delivery_status));
     const smsFailed = logs.filter((l) => l.channel === "sms" && l.delivery_status === "failed");
-    const emailSent = logs.filter((l) => l.channel === "email" && (l.delivery_status === "sent" || l.delivery_status === "delivered" || l.delivery_status === "queued"));
+    const emailSent = logs.filter((l) => l.channel === "email" && ["sent", "delivered", "queued"].includes(l.delivery_status));
     const emailFailed = logs.filter((l) => l.channel === "email" && l.delivery_status === "failed");
 
     const latestSms = logs.find((l) => l.channel === "sms" && l.sent_at);
     const latestEmail = logs.find((l) => l.channel === "email" && l.sent_at);
     const latestFailure = logs.find((l) => l.delivery_status === "failed");
 
-    // ── 2. Stuck leads ──
-    // WebsiteLead records where automation_enabled=true, initial_response_sent_at is null,
-    // and created_date is older than 5 minutes
-    const stuckLeads = await base44.asServiceRole.entities.WebsiteLead.filter(
-      {
-        automation_enabled: true,
-        initial_response_sent_at: null,
-        created_date: { $lt: fiveMinutesAgo },
-        archived: false,
-      },
-      "-created_date",
-      50
-    ).catch(() => []);
+    // ── 2. Provider test history (from manual_test logs) ──
+    const twilioTestLogs = (recentLogs || [])
+      .filter((l) => l.trigger_name === "manual_test" && l.provider === "twilio")
+      .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
+    const resendTestLogs = (recentLogs || [])
+      .filter((l) => l.trigger_name === "manual_test" && l.provider === "resend")
+      .sort((a, b) => new Date(b.created_date) - new Date(a.created_date));
 
-    // ── 3. Total website leads ──
-    const allWebsiteLeads = await base44.asServiceRole.entities.WebsiteLead.filter(
-      { archived: false },
-      "-created_date",
-      1
-    ).catch(() => []);
+    const lastTwilioTest = twilioTestLogs[0] || null;
+    const lastResendTest = resendTestLogs[0] || null;
 
-    // Use count from a broader query — we just need total + waiting count
-    const totalLeadsQuery = await base44.asServiceRole.entities.WebsiteLead.filter(
+    // ── 3. Stuck leads (automation on, no response, older than 5 min) ──
+    const allLeads = await base44.asServiceRole.entities.WebsiteLead.filter(
       { archived: false },
       "-created_date",
       500
     ).catch(() => []);
-    const totalLeads = (totalLeadsQuery || []).length;
-    const leadsWaiting = (totalLeadsQuery || []).filter(
-      (l) => l.automation_enabled === true && !l.initial_response_sent_at
-    ).length;
 
-    // ── 4. Recent logs for table ──
-    const recentForTable = (logs || []).slice(0, 50);
+    const fiveMinAgo = now.getTime() - 5 * 60 * 1000;
+    const stuckLeads = (allLeads || []).filter(
+      (l) => l.automation_enabled === true && !l.initial_response_sent_at && new Date(l.created_date).getTime() < fiveMinAgo
+    );
 
-    // ── 5. Provider readiness ──
-    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
-    const twilioFromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
-    const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    const resendFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
-    const appBaseUrl = Deno.env.get("APP_URL") || Deno.env.get("VITE_BASE44_APP_BASE_URL");
-
-    const providerReadiness = {
-      twilio_account_configured: twilioAccountSid ? "yes" : "no",
-      twilio_from_number_configured: twilioFromNumber ? "yes" : "no",
-      resend_api_configured: resendApiKey ? "yes" : "no",
-      resend_from_email_configured: resendFromEmail ? "yes" : "no",
-      app_base_url_configured: appBaseUrl ? "yes" : "no",
-    };
-
-    // ── 6. Warning banner logic ──
-    const recentLeadsExist = leadsWaiting > 0;
-    const logsBeingCreated = (logs || []).length > 0;
-    const launchBlockerWarning =
-      recentLeadsExist && !logsBeingCreated
-        ? "⚠️ Recent leads exist but no CommunicationLog rows are being created. The automation path is bypassing the messaging layer. This is a launch blocker."
-        : null;
-
-    // ── 7. Build stuck lead details ──
-    const stuckLeadDetails = (stuckLeads || []).map((lead) => {
+    // For each stuck lead, determine the likely reason
+    const stuckLeadDetails = stuckLeads.slice(0, 50).map((lead) => {
       const reasons = [];
       if (!lead.phone_number) reasons.push("missing_phone");
       if (!lead.email) reasons.push("missing_email");
@@ -107,7 +84,16 @@ Deno.serve(async (req) => {
       if (lead.sms_permission === false) reasons.push("no_sms_permission");
       if (lead.cadence_paused === true) reasons.push("cadence_paused");
       if (lead.do_not_contact === true) reasons.push("do_not_contact");
-      if (reasons.length === 0) reasons.push("unknown — automation may not be triggering");
+
+      // Check if any CommunicationLog exists for this lead
+      const leadLogs = (recentLogs || []).filter(
+        (l) => l.related_entity_type === "WebsiteLead" && l.related_entity_id === lead.id
+      );
+      if (leadLogs.length === 0) {
+        reasons.push("no_communication_log_found");
+      }
+
+      if (reasons.length === 0) reasons.push("unknown");
 
       return {
         id: lead.id,
@@ -125,23 +111,102 @@ Deno.serve(async (req) => {
       };
     });
 
-    return json({
-      status_cards: {
+    const totalLeads = (allLeads || []).length;
+    const leadsWaiting = (allLeads || []).filter(
+      (l) => l.automation_enabled === true && !l.initial_response_sent_at
+    ).length;
+
+    // ── 4. Provider readiness (config + last test result) ──
+    const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+    const twilioFromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+    const resendApiKey = Deno.env.get("RESEND_API_KEY");
+    const resendFromEmail = Deno.env.get("RESEND_FROM_EMAIL");
+
+    const twilioConfigPresent = Boolean(twilioAccountSid && twilioFromNumber);
+    const resendConfigPresent = Boolean(resendApiKey && resendFromEmail);
+
+    const lastTwilioTestPassed = lastTwilioTest
+      ? ["sent", "queued", "delivered"].includes(lastTwilioTest.delivery_status)
+      : null;
+    const lastResendTestPassed = lastResendTest
+      ? ["sent", "queued", "delivered"].includes(lastResendTest.delivery_status)
+      : null;
+
+    const providerReadiness = {
+      twilio: {
+        config_present: twilioConfigPresent ? "yes" : "no",
+        last_test_passed: lastTwilioTestPassed === null ? "never" : lastTwilioTestPassed ? "yes" : "no",
+        last_test_time: lastTwilioTest?.created_date || null,
+        last_provider_message_id: lastTwilioTest?.provider_message_id || null,
+        last_error: lastTwilioTest?.error_message || null,
+      },
+      resend: {
+        config_present: resendConfigPresent ? "yes" : "no",
+        last_test_passed: lastResendTestPassed === null ? "never" : lastResendTestPassed ? "yes" : "no",
+        last_test_time: lastResendTest?.created_date || null,
+        last_provider_message_id: lastResendTest?.provider_message_id || null,
+        last_error: lastResendTest?.error_message || null,
+      },
+    };
+
+    // ── 5. Launch blocker warning ──
+    const launchBlockerWarning =
+      leadsWaiting > 0 && (logs || []).length === 0
+        ? "⚠️ Leads waiting for initial response but no CommunicationLog rows exist in 24h. Automation path is bypassing the messaging layer."
+        : null;
+
+    // ── 6. Build status cards ──
+    const statusCards = {
+      sms_sent_24h: smsSent.length,
+      sms_failed_24h: smsFailed.length,
+      email_sent_24h: emailSent.length,
+      email_failed_24h: emailFailed.length,
+      latest_sms_at: latestSms?.sent_at || null,
+      latest_email_at: latestEmail?.sent_at || null,
+      latest_failure_at: latestFailure?.failed_at || null,
+      leads_waiting_initial_response: leadsWaiting,
+      leads_stuck_with_automation: stuckLeadDetails.length,
+      total_website_leads: totalLeads,
+    };
+
+    // ── 7. Persist AutomationHealthSnapshot ──
+    const notesParts = [];
+    notesParts.push(`SMS: ${smsSent.length} sent, ${smsFailed.length} failed`);
+    notesParts.push(`Email: ${emailSent.length} sent, ${emailFailed.length} failed`);
+    notesParts.push(`Twilio last test: ${lastTwilioTestPassed === null ? "never" : lastTwilioTestPassed ? "passed" : "failed"}`);
+    notesParts.push(`Resend last test: ${lastResendTestPassed === null ? "never" : lastResendTestPassed ? "passed" : "failed"}`);
+    notesParts.push(`Stuck leads: ${stuckLeadDetails.length}`);
+    if (launchBlockerWarning) notesParts.push("LAUNCH BLOCKER: no logs being created");
+
+    try {
+      await base44.asServiceRole.entities.AutomationHealthSnapshot.create({
+        snapshot_at: now.toISOString(),
+        total_website_leads: totalLeads,
+        leads_waiting_initial_response: leadsWaiting,
         sms_sent_24h: smsSent.length,
         sms_failed_24h: smsFailed.length,
         email_sent_24h: emailSent.length,
         email_failed_24h: emailFailed.length,
         latest_sms_at: latestSms?.sent_at || null,
         latest_email_at: latestEmail?.sent_at || null,
-        leads_waiting_initial_response: leadsWaiting,
-        leads_stuck_with_automation: stuckLeadDetails.length,
-        total_website_leads: totalLeads,
-      },
+        latest_failure_at: latestFailure?.failed_at || null,
+        notes: notesParts.join(" | "),
+      });
+    } catch (e) {
+      console.warn("[getAutomationHealth] Snapshot create failed:", e.message);
+    }
+
+    // ── 8. Recent logs for table ──
+    const recentForTable = (logs || []).slice(0, 50);
+
+    return json({
+      status_cards: statusCards,
       recent_logs: recentForTable,
       stuck_leads: stuckLeadDetails,
       provider_readiness: providerReadiness,
       launch_blocker_warning: launchBlockerWarning,
       snapshot_at: now.toISOString(),
+      environment: env,
     });
   } catch (error) {
     console.error("[getAutomationHealth] Error:", error.message);
