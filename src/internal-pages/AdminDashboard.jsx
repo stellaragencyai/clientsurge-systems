@@ -63,6 +63,7 @@ import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 import ProductionHardeningPanel from '../components/admin/ProductionHardeningPanel';
 import LeadQualityControl from '../components/admin/LeadQualityControl';
+import TabErrorBoundary from '../components/admin/TabErrorBoundary.jsx';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -454,9 +455,13 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Page Content */}
+        {/* Page Content — wrapped in TabErrorBoundary so a single tab crash never takes down the dashboard */}
         <div className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">{renderContent()}</div>
+          <div className="max-w-7xl mx-auto">
+            <TabErrorBoundary tabName={activeTab}>
+              {renderContent()}
+            </TabErrorBoundary>
+          </div>
         </div>
       </div>
 

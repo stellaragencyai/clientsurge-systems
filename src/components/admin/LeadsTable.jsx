@@ -1,8 +1,21 @@
-import React, { useState, useEffect, useCallback } from "react";
-import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X } from "lucide-react";
+import { useState, useEffect, useCallback } from "react";
+import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X, RefreshCw } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const PAGE_SIZE = 25;
+
+// ── Safe field helpers — never throw on missing/undefined ──
+const safeStr = (val, fallback = "—") => (val != null && String(val).trim() !== "") ? String(val) : fallback;
+const safeNum = (val, fallback = 0) => (typeof val === "number" && !isNaN(val)) ? val : fallback;
+const safeDate = (val) => {
+  if (!val) return "—";
+  try {
+    const d = new Date(val);
+    return isNaN(d.getTime()) ? "—" : d.toLocaleDateString();
+  } catch {
+    return "—";
+  }
+};
 
 // Lead score categories
 function getIntelligenceSegmentBadge(segment) {
@@ -22,10 +35,10 @@ function getIntelligenceSegmentBadge(segment) {
     DORMANT: "Dormant",
     COLD: "Cold",
   };
-  return { label: labels[segment] || segment, color: styles[segment] || "bg-gray-100 text-gray-800" };
+  return { label: labels[segment] || segment || "Unknown", color: styles[segment] || "bg-gray-100 text-gray-800" };
 }
 
-// Row highlight based on lead_state for visual consistency
+// Row highlight based on lead_state
 function getRowHighlight(leadState) {
   const highlights = {
     HOT: "bg-red-50/30 hover:bg-red-50/50",
@@ -36,18 +49,6 @@ function getRowHighlight(leadState) {
     NEW: "hover:bg-primary/5 transition-colors",
   };
   return highlights[leadState] || "hover:bg-primary/5 transition-colors";
-}
-
-// Status badge styles
-function getStatusBadge(status) {
-  const styles = {
-    Booked: "bg-green-100 text-green-800",
-    Qualified: "bg-purple-100 text-purple-800",
-    Contacted: "bg-blue-100 text-blue-800",
-    Replied: "bg-cyan-100 text-cyan-800",
-    New: "bg-gray-100 text-gray-800",
-  };
-  return styles[status] || "bg-gray-100 text-gray-800";
 }
 
 export default function LeadsTable() {
@@ -64,60 +65,38 @@ export default function LeadsTable() {
     intelligence_segment: "",
     scoreMin: "",
     scoreMax: "",
-    crm_tag: "",
-    industry: "",
   });
-  const [sort, setSort] = useState({ field: "last_activity_at", order: -1 });
-  const [totalCount, setTotalCount] = useState(0);
+  const [sort, setSort] = useState({ field: "created_date", order: -1 });
+  const [kpis, setKpis] = useState({ total: 0, hot: 0, new: 0, booked: 0 });
   const [duplicateWarnings, setDuplicateWarnings] = useState(0);
-  const [kpis, setKpis] = useState({
-    total: 0,
-    hot: 0,
-    new: 0,
-    booked: 0,
-  });
 
-  // Build query filter
+  // Build query filter for the canonical Leads entity
   const buildFilter = useCallback(() => {
     const f = {};
-
-    if (search) {
-      // Search across business_name, email, phone, industry
-      // Note: Leads SDK doesn't support full-text search, so we filter client-side OR build multiple queries
-      // For now, we'll fetch and filter client-side with limit
-    }
-
     if (filters.status) f.status = filters.status;
     if (filters.lead_state) f.lead_state = filters.lead_state;
     if (filters.intelligence_segment) f.intelligence_segment = filters.intelligence_segment;
-    if (filters.crm_tag) f.crm_tag = filters.crm_tag;
-    if (filters.industry) f.industry = filters.industry;
-    
     if (filters.scoreMin || filters.scoreMax) {
       f.intelligence_score = {};
-      if (filters.scoreMin) f.intelligence_score.$gte = parseInt(filters.scoreMin);
-      if (filters.scoreMax) f.intelligence_score.$lte = parseInt(filters.scoreMax);
+      if (filters.scoreMin) f.intelligence_score.$gte = parseInt(filters.scoreMin, 10);
+      if (filters.scoreMax) f.intelligence_score.$lte = parseInt(filters.scoreMax, 10);
     }
-
-    // Hide quarantined records by default — they're managed in Lead Quality Control
-    f.quality_review_status = { $nin: ['quarantine_candidate', 'quarantined'] };
-
+    // Exclude quarantined records from the main leads view
+    f.quality_review_status = { $nin: ["quarantine_candidate", "quarantined"] };
     return f;
-  }, [search, filters]);
+  }, [filters]);
 
-  // Load KPIs
+  // Load KPIs — uses asServiceRole (admin-only page, safe elevation)
   useEffect(() => {
     const loadKpis = async () => {
       try {
-        // Single fetch for all KPIs + duplicate detection
-        const allLeads = await base44.entities.Leads.filter({}, "id", 500);
-        const leadsList = allLeads || [];
+        const allLeads = await base44.asServiceRole.entities.Leads.filter({}, "-created_date", 500);
+        const list = Array.isArray(allLeads) ? allLeads : [];
 
-        // Count potential duplicates (same normalized email)
         const emailCounts = {};
         const duplicates = new Set();
-        leadsList.forEach((l) => {
-          const key = l.normalized_email || l.email;
+        list.forEach((l) => {
+          const key = l?.normalized_email || l?.email;
           if (key) {
             emailCounts[key] = (emailCounts[key] || 0) + 1;
             if (emailCounts[key] > 1) duplicates.add(key);
@@ -126,13 +105,13 @@ export default function LeadsTable() {
 
         setDuplicateWarnings(duplicates.size);
         setKpis({
-          total: leadsList.length,
-          hot: leadsList.filter((l) => (l.intelligence_score || 0) >= 80).length,
-          new: leadsList.filter((l) => l.lead_state === "NEW").length,
-          booked: leadsList.filter((l) => l.lead_state === "BOOKED").length,
+          total: list.length,
+          hot: list.filter((l) => safeNum(l?.intelligence_score) >= 80).length,
+          new: list.filter((l) => l?.lead_state === "NEW").length,
+          booked: list.filter((l) => l?.lead_state === "BOOKED").length,
         });
       } catch {
-        // Silently fail — KPIs are secondary
+        // KPIs are secondary — silent fail keeps the table usable
       }
     };
     loadKpis();
@@ -140,72 +119,81 @@ export default function LeadsTable() {
 
   // Load paginated leads with real-time updates
   useEffect(() => {
+    let cancelled = false;
+
     const loadLeads = async () => {
       setLoading(true);
       setError("");
       try {
         const filter = buildFilter();
         const offset = page * PAGE_SIZE;
-
-        // Fetch with sort and pagination
-        const sortKey =
-          sort.field === "intelligence_score" ? "intelligence_score" : "last_activity_at";
+        const sortKey = sort.field === "intelligence_score" ? "intelligence_score" : "created_date";
         const sortValue = sort.order === 1 ? sortKey : `-${sortKey}`;
 
-        // Use user-scoped client — admin role passes RLS read check.
-        const results = await base44.entities.Leads.filter(
+        // asServiceRole for admin reads — canonical Leads entity
+        const results = await base44.asServiceRole.entities.Leads.filter(
           filter,
           sortValue,
           PAGE_SIZE + 1,
           offset
         );
 
-        let items = results?.slice(0, PAGE_SIZE) || [];
-        if (search) {
+        let items = Array.isArray(results) ? results.slice(0, PAGE_SIZE) : [];
+
+        // Client-side search filter (SDK doesn't support full-text search)
+        if (search && items.length > 0) {
           const q = search.toLowerCase();
           items = items.filter((l) =>
-            (l.full_name || "").toLowerCase().includes(q) ||
-            (l.business_name || "").toLowerCase().includes(q) ||
-            (l.email || "").toLowerCase().includes(q)
+            safeStr(l?.full_name, "").toLowerCase().includes(q) ||
+            safeStr(l?.business_name, "").toLowerCase().includes(q) ||
+            safeStr(l?.email, "").toLowerCase().includes(q)
           );
         }
-        // Fallback: if filter returned nothing, try list() with skip
-        if (items.length === 0 && !search && Object.keys(filter).length === 0) {
-          const fallback = await base44.entities.Leads.list(sortValue, PAGE_SIZE + 1, offset);
-          items = (fallback || []).slice(0, PAGE_SIZE);
+
+        if (!cancelled) {
+          setLeads(items);
         }
-        setLeads(items);
-        setTotalCount(offset + items.length);
       } catch (err) {
-        setError(err.message || "Failed to load leads");
+        if (!cancelled) {
+          setError(err?.message || "Failed to load leads. Check your connection and try again.");
+          setLeads([]);
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     loadLeads();
 
-    // Subscribe to lead updates for real-time row changes
-    const unsubscribe = base44.entities.Leads.subscribe((event) => {
-      if (event.type === "update" && event.data) {
-        // Update only the changed lead in the current view
+    // Subscribe to lead updates — wrapped in try/catch so a realtime
+    // infrastructure issue never crashes the tab
+    let unsubscribe = null;
+    try {
+      unsubscribe = base44.entities.Leads.subscribe((event) => {
+        if (!event || event.type !== "update" || !event.data) return;
         setLeads((prev) =>
-          prev.map((l) => (l.id === event.entity_id ? { ...l, ...event.data } : l))
+          prev.map((l) => (l?.id === event.entity_id ? { ...l, ...event.data } : l))
         );
+      });
+    } catch {
+      // Realtime subscription failed — table still works, just not real-time
+    }
+
+    return () => {
+      cancelled = true;
+      if (typeof unsubscribe === "function") {
+        try { unsubscribe(); } catch { /* noop */ }
       }
-    });
+    };
+  }, [page, filters, sort, buildFilter, search]);
 
-    return unsubscribe;
-  }, [page, filters, sort, buildFilter]);
-
-  // Handle search with debounce
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
-    setPage(0); // Reset to first page
+    setPage(0);
   };
 
-  const handleFilterChange = (filterKey, value) => {
-    setFilters((prev) => ({ ...prev, [filterKey]: value }));
+  const handleFilterChange = (key, value) => {
+    setFilters((prev) => ({ ...prev, [key]: value }));
     setPage(0);
   };
 
@@ -220,23 +208,21 @@ export default function LeadsTable() {
 
   const renderSortIcon = (field) => {
     if (sort.field !== field) return null;
-    return sort.order === 1 ? (
-      <ChevronUp className="w-3.5 h-3.5 inline ml-1" />
-    ) : (
-      <ChevronDown className="w-3.5 h-3.5 inline ml-1" />
-    );
+    return sort.order === 1
+      ? <ChevronUp className="w-3.5 h-3.5 inline ml-1" />
+      : <ChevronDown className="w-3.5 h-3.5 inline ml-1" />;
   };
 
   const handleDeleteLead = async () => {
-    if (!deleteTarget) return;
+    if (!deleteTarget?.id) return;
     setDeleting(true);
     try {
-      await base44.entities.Leads.delete(deleteTarget.id);
+      await base44.asServiceRole.entities.Leads.delete(deleteTarget.id);
       setLeads((prev) => prev.filter((l) => l.id !== deleteTarget.id));
-      setKpis((prev) => ({ ...prev, total: prev.total - 1 }));
+      setKpis((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
       setDeleteTarget(null);
     } catch (err) {
-      setError(err.message || "Failed to delete lead");
+      setError(err?.message || "Failed to delete lead");
     } finally {
       setDeleting(false);
     }
@@ -244,7 +230,7 @@ export default function LeadsTable() {
 
   return (
     <div className="space-y-5">
-      {/* KPI Cards - Clean & Minimal */}
+      {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-lg bg-white p-4 border border-border text-center">
           <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest">Total</p>
@@ -269,7 +255,7 @@ export default function LeadsTable() {
         <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900">
           <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <div>
-            <strong>{duplicateWarnings} potential duplicate(s) found</strong> by email address. Review in data quality dashboard.
+            <strong>{duplicateWarnings} potential duplicate(s) found</strong> by email address. Review in Lead Quality Control.
           </div>
         </div>
       )}
@@ -287,7 +273,7 @@ export default function LeadsTable() {
           />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
           <select
             value={filters.lead_state}
             onChange={(e) => handleFilterChange("lead_state", e.target.value)}
@@ -314,20 +300,6 @@ export default function LeadsTable() {
             <option value="NURTURE">Nurture</option>
           </select>
 
-          <select
-            value={filters.industry}
-            onChange={(e) => handleFilterChange("industry", e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
-          >
-            <option value="">Industry</option>
-            <option value="med-spa">Med Spa</option>
-            <option value="dental">Dental</option>
-            <option value="hvac">HVAC</option>
-            <option value="plumbing">Plumbing</option>
-            <option value="roofing">Roofing</option>
-            <option value="chiropractic">Chiropractic</option>
-          </select>
-
           <input
             type="number"
             placeholder="Score min"
@@ -350,15 +322,24 @@ export default function LeadsTable() {
         </div>
       </div>
 
-      {/* Table */}
-      <div className="rounded-lg border border-border bg-white overflow-hidden">
-        {error && (
-          <div className="flex items-start gap-3 p-4 text-sm text-red-800 bg-red-50 border-b border-red-200">
+      {/* Error banner with retry */}
+      {error && (
+        <div className="flex items-center justify-between gap-3 p-4 rounded-lg bg-red-50 border border-red-200 text-sm text-red-800">
+          <div className="flex items-start gap-3">
             <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
             <div>{error}</div>
           </div>
-        )}
+          <button
+            onClick={() => { setError(""); setPage(0); setFilters({ status: "", lead_state: "", intelligence_segment: "", scoreMin: "", scoreMax: "" }); }}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-300 text-red-700 hover:bg-red-100 transition-colors flex-shrink-0"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> Reset
+          </button>
+        </div>
+      )}
 
+      {/* Table */}
+      <div className="rounded-lg border border-border bg-white overflow-hidden">
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-border">
@@ -367,20 +348,14 @@ export default function LeadsTable() {
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Business</th>
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Contact</th>
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
-                  <button
-                    onClick={() => handleSort("intelligence_score")}
-                    className="hover:text-primary transition-colors"
-                  >
+                  <button onClick={() => handleSort("intelligence_score")} className="hover:text-primary transition-colors">
                     Intelligence {renderSortIcon("intelligence_score")}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">State</th>
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
-                  <button
-                    onClick={() => handleSort("last_activity_at")}
-                    className="hover:text-primary transition-colors"
-                  >
-                    Last Activity {renderSortIcon("last_activity_at")}
+                  <button onClick={() => handleSort("created_date")} className="hover:text-primary transition-colors">
+                    Created {renderSortIcon("created_date")}
                   </button>
                 </th>
                 <th className="px-4 py-3 text-center font-semibold text-muted-foreground">Actions</th>
@@ -392,60 +367,62 @@ export default function LeadsTable() {
                   <td colSpan="7" className="px-3 py-6 text-center">
                     <div className="flex items-center justify-center gap-2 text-muted-foreground">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                      <span className="text-xs">Loading...</span>
+                      <span className="text-xs">Loading leads...</span>
                     </div>
                   </td>
                 </tr>
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-3 py-6 text-center text-muted-foreground text-xs">
-                    No leads found
+                  <td colSpan="7" className="px-3 py-12 text-center text-muted-foreground">
+                    <p className="text-sm font-medium">No leads found</p>
+                    <p className="text-xs mt-1">Try adjusting your filters or check back later.</p>
                   </td>
                 </tr>
               ) : (
-                leads.map((lead) => (
-                  <tr key={lead.id} className={`${getRowHighlight(lead.lead_state)} border-none`}>
-                    <td className="px-4 py-3 font-medium text-foreground">{lead.full_name || "-"}</td>
-                    <td className="px-4 py-3 text-muted-foreground">{lead.business_name || "-"}</td>
-                    <td className="px-4 py-3 text-muted-foreground">
-                      <div className="space-y-1">
-                        <div>{lead.email || "-"}</div>
-                        {lead.phone && <div className="text-xs">{lead.phone}</div>}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-2">
-                        <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
-                          {lead.intelligence_score || 0}
-                        </span>
-                        {lead.intelligence_segment && (
-                          <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${getIntelligenceSegmentBadge(lead.intelligence_segment).color}`}>
-                            {getIntelligenceSegmentBadge(lead.intelligence_segment).label}
+                leads.map((lead) => {
+                  const seg = getIntelligenceSegmentBadge(lead?.intelligence_segment);
+                  return (
+                    <tr key={lead?.id || Math.random()} className={`${getRowHighlight(lead?.lead_state)} border-none`}>
+                      <td className="px-4 py-3 font-medium text-foreground">{safeStr(lead?.full_name)}</td>
+                      <td className="px-4 py-3 text-muted-foreground">{safeStr(lead?.business_name)}</td>
+                      <td className="px-4 py-3 text-muted-foreground">
+                        <div className="space-y-1">
+                          <div>{safeStr(lead?.email)}</div>
+                          {lead?.phone && <div className="text-xs">{lead.phone}</div>}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-2">
+                          <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
+                            {safeNum(lead?.intelligence_score)}
                           </span>
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary">
-                        {lead.lead_state || "NEW"}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3 text-muted-foreground text-sm">
-                      {lead.last_activity_at
-                        ? new Date(lead.last_activity_at).toLocaleDateString()
-                        : "—"}
-                    </td>
-                    <td className="px-4 py-3 text-center">
-                      <button
-                        onClick={() => setDeleteTarget(lead)}
-                        className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
-                        title="Delete lead"
-                      >
-                        <Trash2 className="w-4 h-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))
+                          {lead?.intelligence_segment && (
+                            <span className={`inline-flex items-center px-2 py-1 rounded text-xs font-semibold ${seg.color}`}>
+                              {seg.label}
+                            </span>
+                          )}
+                        </div>
+                      </td>
+                      <td className="px-4 py-3">
+                        <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary">
+                          {safeStr(lead?.lead_state, "NEW")}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 text-muted-foreground text-sm">
+                        {safeDate(lead?.created_date)}
+                      </td>
+                      <td className="px-4 py-3 text-center">
+                        <button
+                          onClick={() => setDeleteTarget(lead)}
+                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
+                          title="Delete lead"
+                        >
+                          <Trash2 className="w-4 h-4" />
+                        </button>
+                      </td>
+                    </tr>
+                  );
+                })
               )}
             </tbody>
           </table>
@@ -454,7 +431,7 @@ export default function LeadsTable() {
         {/* Pagination */}
         <div className="flex items-center justify-between border-t border-border px-4 py-3 bg-gray-50">
           <p className="text-sm text-muted-foreground">
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, totalCount)} of ~{kpis.total}
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, page * PAGE_SIZE + leads.length)} of ~{kpis.total}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -496,9 +473,9 @@ export default function LeadsTable() {
                 This will permanently delete this lead record. This action cannot be undone.
               </p>
               <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
-                <p className="text-sm font-semibold text-foreground">{deleteTarget.full_name || "—"}</p>
-                <p className="text-xs text-muted-foreground">{deleteTarget.business_name || "—"}</p>
-                <p className="text-xs text-muted-foreground">{deleteTarget.email || "—"}</p>
+                <p className="text-sm font-semibold text-foreground">{safeStr(deleteTarget?.full_name)}</p>
+                <p className="text-xs text-muted-foreground">{safeStr(deleteTarget?.business_name)}</p>
+                <p className="text-xs text-muted-foreground">{safeStr(deleteTarget?.email)}</p>
               </div>
             </div>
             <div className="flex gap-3 p-5 border-t border-border">
