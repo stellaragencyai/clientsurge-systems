@@ -162,7 +162,7 @@ export default function ThreeSystemsSection() {
                   <h3 className="font-titles text-black text-xl md:text-2xl font-bold mb-2 mt-4">
                     {pkg.title}
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-7">{pkg.description}</p>
+                  <p className="text-sm text-foreground/70 mb-7">{pkg.description}</p>
 
                   {/* Feature list */}
                   <ul className="space-y-3.5 w-full text-left flex-1 mb-6">
@@ -178,9 +178,9 @@ export default function ThreeSystemsSection() {
                   <div className="mb-6 w-full">
                     <div className="flex items-baseline justify-center gap-1.5">
                       <span className="text-3xl md:text-4xl font-extrabold tracking-tight text-black">{pkg.price}</span>
-                      <span className="text-sm text-muted-foreground font-semibold">/mo</span>
+                      <span className="text-sm text-foreground/70 font-semibold">/mo</span>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-1.5">{pkg.setup}</p>
+                    <p className="text-xs text-foreground/60 mt-1.5">{pkg.setup}</p>
                   </div>
 
                   {/* CTA at bottom */}
@@ -199,7 +199,7 @@ export default function ThreeSystemsSection() {
 
         {/* Guidance text */}
         <div className="text-center mt-10 mb-2">
-          <p className="text-sm text-foreground/60 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm text-foreground/75 max-w-2xl mx-auto leading-relaxed">
             <strong>Not sure which system fits?</strong> Most local service businesses start with Growth — it includes nurture sequences and AI scheduling for the fastest path to more booked appointments.
           </p>
         </div>
@@ -228,7 +228,7 @@ export default function ThreeSystemsSection() {
         </div>
 
         {/* Bottom note */}
-        <p className="text-center text-xs text-muted-foreground mt-8">
+        <p className="text-center text-xs text-foreground/60 mt-8">
           All packages include done-for-you setup. No long-term contracts. Cancel anytime.
         </p>
       </div>

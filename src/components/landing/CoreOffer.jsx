@@ -58,7 +58,7 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
         </div>
       </div>
       <div className="px-5 pb-3">
-        <p className="text-sm leading-relaxed text-foreground/75">{system.shortDescription}</p>
+        <p className="text-sm leading-relaxed text-foreground/80">{system.shortDescription}</p>
       </div>
       <div className="px-5 pb-5 flex gap-2">
         <button
@@ -158,7 +158,7 @@ function CoreOfferCTA({ onBookDemo }) {
       <p className="font-display text-2xl md:text-3xl font-semibold text-foreground leading-tight">
          Start recovering revenue now.
        </p>
-       <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground md:text-base">
+       <p className="mx-auto mt-2 max-w-2xl text-sm leading-relaxed text-foreground/70 md:text-base">
          Get a free system diagnostic to see exactly how much revenue you can recover.
        </p>
       <div className="mt-6 flex w-full flex-col items-center justify-center gap-2 sm:w-auto sm:flex-row">

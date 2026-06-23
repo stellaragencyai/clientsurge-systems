@@ -270,7 +270,7 @@ export default function AutomationSystemsGrid() {
                         >
                           {impact}
                         </span>
-                        <span className="text-[10px] font-semibold text-muted-foreground mt-0.5 leading-none">
+                        <span className="text-[10px] font-semibold text-foreground/60 mt-0.5 leading-none">
                           {impactSub}
                         </span>
                       </div>
@@ -279,7 +279,7 @@ export default function AutomationSystemsGrid() {
                     {/* Text */}
                     <div className="flex-1">
                       <h3 className="text-base font-bold text-foreground mb-2">{title}</h3>
-                      <p className="text-sm text-muted-foreground leading-relaxed">{outcome}</p>
+                      <p className="text-sm text-foreground/70 leading-relaxed">{outcome}</p>
                     </div>
 
                     {/* CTA */}
@@ -333,7 +333,7 @@ export default function AutomationSystemsGrid() {
                   <span className="text-xs font-semibold text-foreground text-center whitespace-nowrap">{step}</span>
                 </div>
                 {i < PROCESS_STEPS.length - 1 && (
-                  <ChevronRight className="w-5 h-5 text-muted-foreground/40 flex-shrink-0 mb-4" />
+                  <ChevronRight className="w-5 h-5 text-foreground/30 flex-shrink-0 mb-4" />
                 )}
               </div>
             ))}
@@ -364,7 +364,7 @@ export default function AutomationSystemsGrid() {
       <section className="py-12 px-6 bg-white border-t border-border">
         <div className="max-w-5xl mx-auto text-center">
           <h3 className="text-lg font-bold text-foreground mb-2">Built Around a Real Automation Operating System</h3>
-          <p className="text-sm text-muted-foreground mb-6">The ClientSurge platform is built on a real automation infrastructure foundation — not a collection of disconnected tools.</p>
+          <p className="text-sm text-foreground/70 mb-6">The ClientSurge platform is built on a real automation infrastructure foundation — not a collection of disconnected tools.</p>
           <div className="flex flex-wrap justify-center gap-3">
             {PROOF_POINTS.map((point) => (
               <span

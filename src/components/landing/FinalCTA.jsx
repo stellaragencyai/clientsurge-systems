@@ -25,12 +25,12 @@ export default function FinalCTA() {
               <div key={item.step} className="flex flex-col gap-2">
                 <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
                 <p className="font-semibold text-foreground text-sm">{item.title}</p>
-                <p className="text-muted-foreground text-xs leading-relaxed">{item.body}</p>
+                <p className="text-foreground/70 text-xs leading-relaxed">{item.body}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-6 text-xs text-muted-foreground/60">
+          <p className="mt-6 text-xs text-foreground/60">
             Live in 5–7 business days · No commitment required · Cancel anytime, month-to-month
           </p>
         </div>
@@ -69,11 +69,11 @@ export default function FinalCTA() {
           </div>
         {/* Trust signals below buttons */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <a href="tel:+16025843227" className="text-xs text-muted-foreground/70 font-medium hover:text-primary transition-colors" style={{ textDecoration: "none" }}>📞 (602) 584-3227</a>
-          <span className="hidden sm:block text-muted-foreground/30">|</span>
-          <span className="text-xs text-muted-foreground/70 font-medium">🛡 30-day performance review included</span>
-          <span className="hidden sm:block text-muted-foreground/30">|</span>
-          <span className="text-xs text-muted-foreground/70 font-medium">⚡ Live in 5–7 business days</span>
+          <a href="tel:+16025843227" className="text-xs text-foreground/70 font-medium hover:text-primary transition-colors" style={{ textDecoration: "none" }}>📞 (602) 584-3227</a>
+          <span className="hidden sm:block text-foreground/30">|</span>
+          <span className="text-xs text-foreground/70 font-medium">🛡 30-day performance review included</span>
+          <span className="hidden sm:block text-foreground/30">|</span>
+          <span className="text-xs text-foreground/70 font-medium">⚡ Live in 5–7 business days</span>
         </div>
         </div>
       </section>

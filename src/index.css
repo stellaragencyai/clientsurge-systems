@@ -11,7 +11,7 @@
     /* ClientSurge Electric Blue Theme — unified to #00AEEF */
     --background: 210 100% 99%;
     /* Pure black foreground — solid, sharp, zero fade */
-    --foreground: 0 0% 0%;
+    --foreground: 0 0% 10%;
     --card: 210 60% 98%;
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
@@ -21,8 +21,8 @@
     --primary-foreground: 0 0% 100%;
     --secondary: 210 60% 95%;
     --secondary-foreground: 0 0% 0%;
-    --muted: 210 50% 96%;
-    --muted-foreground: 215 35% 20%;
+    --muted: 210 60% 98%;
+    --muted-foreground: 0 0% 25%;
     --accent: 199 100% 47%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
