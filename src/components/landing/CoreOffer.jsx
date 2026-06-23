@@ -249,7 +249,7 @@ export default function CoreOffer() {
   return (
     <section
       id="how-it-works"
-      className="pt-12 md:pt-16 pb-6 md:pb-8 px-4 md:px-6 bg-gradient-to-b from-card via-background via-70% to-slate-50/30 relative"
+      className="pt-12 md:pt-16 pb-6 md:pb-8 px-4 md:px-6 bg-white relative"
       style={{ overflowX: "hidden" }}>
       
       <div

@@ -311,7 +311,7 @@ export default function AutomationSystemsGrid() {
       </section>
 
       {/* ── Section 2: How the AI Brain Works ── */}
-      <section className="py-20 px-6" style={{ background: "hsl(var(--muted))" }}>
+      <section className="py-20 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <SectionHeader
             eyebrow="Remote Setup Engine"
@@ -361,7 +361,7 @@ export default function AutomationSystemsGrid() {
       </section>
 
       {/* ── Section 3: Proof Strip ── */}
-      <section className="py-12 px-6 bg-background border-t border-border">
+      <section className="py-12 px-6 bg-white border-t border-border">
         <div className="max-w-5xl mx-auto text-center">
           <h3 className="text-lg font-bold text-foreground mb-2">Built Around a Real Automation Operating System</h3>
           <p className="text-sm text-muted-foreground mb-6">The ClientSurge platform is built on a real automation infrastructure foundation — not a collection of disconnected tools.</p>
