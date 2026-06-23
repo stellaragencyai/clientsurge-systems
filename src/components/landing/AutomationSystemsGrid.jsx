@@ -199,7 +199,7 @@ export default function AutomationSystemsGrid() {
   return (
     <>
       {/* ── Section 1: Browse Systems ── */}
-      <section id="automation-systems" className="py-20 px-6 bg-background" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+      <section id="automation-systems" className="py-20 px-6 bg-white" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
         <div className="max-w-6xl mx-auto">
           <SectionHeader
             eyebrow="AI Automation Marketplace"

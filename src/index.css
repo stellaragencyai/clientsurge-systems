@@ -617,7 +617,7 @@ body {
 }
 
 .nebula-pricing {
-  background: hsl(var(--background)) !important;
+  background: #ffffff !important;
 }
 
 .nebula-testimonials {
