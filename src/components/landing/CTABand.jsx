@@ -54,7 +54,7 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-base text-white/60 max-w-xl mx-auto mb-8 leading-relaxed"
+          className="text-base text-white/85 max-w-xl mx-auto mb-8 leading-relaxed"
         >
           {subcopy}
         </motion.p>

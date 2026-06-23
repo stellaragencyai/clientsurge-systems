@@ -27,7 +27,7 @@ function Badge({ item }) {
       {item.logoUrl ? (
         <LogoImg item={item} />
       ) : (
-        <span className="text-base md:text-lg font-bold text-white/40 whitespace-nowrap">{item.name}</span>
+        <span className="text-base md:text-lg font-bold text-white/75 whitespace-nowrap">{item.name}</span>
       )}
     </div>
   );
@@ -40,7 +40,7 @@ export default function IntegrationCarousel() {
   return (
     <section className="py-12 md:py-16 relative overflow-hidden" style={{ background: "#0A0E27" }}>
       <div className="max-w-7xl mx-auto px-6">
-        <p className="text-center text-sm md:text-base text-white/50 font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-center text-sm md:text-base text-white/80 font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
           Built to connect with the tools modern businesses already use.
         </p>
 
@@ -55,7 +55,7 @@ export default function IntegrationCarousel() {
                 {item.logoUrl ? (
                   <LogoImg item={item} />
                 ) : (
-                  <span className="text-sm md:text-base font-bold text-white/40 text-center">{item.name}</span>
+                  <span className="text-sm md:text-base font-bold text-white/75 text-center">{item.name}</span>
                 )}
               </div>
             ))}

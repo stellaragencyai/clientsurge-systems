@@ -36,7 +36,7 @@ export default function WhatHappensAfter() {
           >
             What Happens After You Start
           </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
             A clear, proven process — not a black box. Here's exactly how we get your lead response system live.
           </p>
         </div>
@@ -83,7 +83,7 @@ export default function WhatHappensAfter() {
                 <h3 className="text-base font-bold text-white mb-2 leading-snug" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   {step.title}
                 </h3>
-                <p className="text-sm text-white/55 leading-relaxed">{step.desc}</p>
+                <p className="text-sm text-white/80 leading-relaxed">{step.desc}</p>
               </motion.div>
             );
           })}

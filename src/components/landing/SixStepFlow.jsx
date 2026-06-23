@@ -60,7 +60,7 @@ export default function SixStepFlow() {
           >
             Six Steps From Lead to Revenue
           </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
             Every step is tied to an existing ClientSurge automation — working together as one system.
           </p>
         </div>
@@ -107,7 +107,7 @@ export default function SixStepFlow() {
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-white/55 leading-relaxed mb-3">{step.desc}</p>
+                <p className="text-sm text-white/80 leading-relaxed mb-3">{step.desc}</p>
 
                 {/* Service tag */}
                 <span

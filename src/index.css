@@ -22,7 +22,7 @@
     --secondary: 210 60% 95%;
     --secondary-foreground: 0 0% 0%;
     --muted: 210 50% 96%;
-    --muted-foreground: 215 25% 40%;
+    --muted-foreground: 215 35% 20%;
     --accent: 199 100% 47%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
@@ -57,7 +57,7 @@
 
     /* ── Semantic color aliases (map to hsl tokens above) ── */
     --color-text-primary: hsl(0, 0%, 0%);
-    --color-text-muted: hsl(215, 25%, 40%);
+    --color-text-muted: hsl(215, 35%, 20%);
     --color-text-heading: #000000;
     --color-surface: hsl(210, 100%, 99%);
     --color-surface-card: hsl(210, 60%, 98%);

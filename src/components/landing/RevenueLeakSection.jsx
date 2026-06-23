@@ -52,7 +52,7 @@ export default function RevenueLeakSection() {
           >
             The Revenue Leak Most Businesses Don't See
           </h2>
-          <p className="text-base md:text-lg text-white/60 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
             These everyday gaps create lost appointments and lost revenue — quietly, every single day.
           </p>
         </div>
@@ -86,7 +86,7 @@ export default function RevenueLeakSection() {
                 >
                   {leak.title}
                 </h3>
-                <p className="text-sm text-white/55 leading-relaxed">{leak.desc}</p>
+                <p className="text-sm text-white/80 leading-relaxed">{leak.desc}</p>
               </motion.div>
             );
           })}

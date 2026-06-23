@@ -56,7 +56,7 @@ export default function BeforeAfterComparison() {
               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "rgba(239,68,68,0.12)" }}>
                 <X className="w-5 h-5 text-red-400" />
               </div>
-              <h3 className="text-xl font-bold text-white/70" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <h3 className="text-xl font-bold text-white/90" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                 Before ClientSurge
               </h3>
             </div>
@@ -65,8 +65,8 @@ export default function BeforeAfterComparison() {
                 const Icon = item.icon;
                 return (
                   <li key={item.text} className="flex items-start gap-3">
-                    <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 text-white/30" />
-                    <span className="text-sm text-white/40 leading-relaxed">{item.text}</span>
+                    <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 text-white/60" />
+                    <span className="text-sm text-white/75 leading-relaxed">{item.text}</span>
                   </li>
                 );
               })}
@@ -101,7 +101,7 @@ export default function BeforeAfterComparison() {
                 return (
                   <li key={item.text} className="flex items-start gap-3">
                     <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#00AEEF" }} />
-                    <span className="text-sm text-white/80 leading-relaxed">{item.text}</span>
+                    <span className="text-sm text-white/95 leading-relaxed">{item.text}</span>
                   </li>
                 );
               })}

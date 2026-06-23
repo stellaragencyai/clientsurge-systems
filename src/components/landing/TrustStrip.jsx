@@ -22,13 +22,13 @@ export default function TrustStrip() {
       <div className="max-w-5xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2 justify-center">
         <div className="flex items-center gap-2 flex-shrink-0">
           <ShieldCheck className="w-4 h-4 text-primary" />
-          <span className="text-xs font-bold uppercase tracking-[0.14em] text-muted-foreground">
+          <span className="text-xs font-bold uppercase tracking-[0.14em] text-foreground">
             Built With Honest Automation Infrastructure
           </span>
         </div>
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1 justify-center">
           {POINTS.map((pt, i) => (
-            <span key={pt} className="flex items-center gap-2 text-xs font-semibold text-foreground/70">
+            <span key={pt} className="flex items-center gap-2 text-xs font-semibold text-foreground">
               {i > 0 && <span className="text-border">·</span>}
               {pt}
             </span>
