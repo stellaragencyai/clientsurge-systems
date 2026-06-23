@@ -129,6 +129,14 @@ async function sendResendEmail(base44, leadId, toEmail, firstName, businessName)
       provider_message_id: result.id || null,
       metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
     });
+    base44.asServiceRole.functions.invoke('logCommunication', {
+      related_entity_type: "WebsiteLead", related_entity_id: leadId,
+      lead_email: toEmail, channel: "email", provider: "resend", direction: "outbound",
+      trigger_name: "initial_response", to_address: toEmail, from_address: safeResendFrom(),
+      subject: subject, body_preview: body.slice(0, 200),
+      provider_message_id: result.id || null, provider_status: "sent",
+      delivery_status: "sent", skip_lead_update: true,
+    }).catch(() => {});
   } catch (emailError) {
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: leadId,
@@ -142,6 +150,12 @@ async function sendResendEmail(base44, leadId, toEmail, firstName, businessName)
       error_message: emailError.message,
       metadata_json: JSON.stringify({ service_key: "instant_lead_response", timestamp: new Date().toISOString() }),
     });
+    base44.asServiceRole.functions.invoke('logCommunication', {
+      related_entity_type: "WebsiteLead", related_entity_id: leadId,
+      lead_email: toEmail, channel: "email", provider: "resend", direction: "outbound",
+      trigger_name: "initial_response", to_address: toEmail,
+      delivery_status: "failed", error_message: emailError.message, skip_lead_update: true,
+    }).catch(() => {});
   }
 }
 
@@ -175,11 +189,25 @@ Deno.serve(async (req) => {
     // Consent guard
     if (leadData.do_not_contact === true) {
       await logSmsEvent(base44, lead_id, "failed", null, "Lead has do_not_contact flag");
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead_id,
+        lead_phone: leadData.phone_number, lead_name: leadData.full_name,
+        channel: "sms", provider: "twilio", direction: "outbound",
+        trigger_name: "initial_response", delivery_status: "skipped",
+        error_message: "Lead has do_not_contact flag", skip_lead_update: true,
+      }).catch(() => {});
       return json({ error: "Lead has do_not_contact flag", sms_sent: false }, 200);
     }
 
     if (!leadData.phone_number) {
       await logSmsEvent(base44, lead_id, "failed", null, "Missing phone number");
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead_id,
+        lead_name: leadData.full_name,
+        channel: "sms", provider: "twilio", direction: "outbound",
+        trigger_name: "initial_response", delivery_status: "skipped",
+        error_message: "Missing phone number", skip_lead_update: true,
+      }).catch(() => {});
       return json({ success: false, error: "Phone number missing" }, 400);
     }
 
@@ -204,6 +232,13 @@ Deno.serve(async (req) => {
       messageSid = await sendTwilioSms(leadData.phone_number, messageBody);
     } catch (smsError) {
       await logSmsEvent(base44, lead_id, "failed", null, smsError.message);
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead_id,
+        lead_phone: leadData.phone_number, lead_name: leadData.full_name,
+        channel: "sms", provider: "twilio", direction: "outbound",
+        trigger_name: "initial_response", to_address: leadData.phone_number,
+        delivery_status: "failed", error_message: smsError.message, skip_lead_update: true,
+      }).catch(() => {});
       return json({ error: smsError.message }, 500);
     }
 
@@ -221,6 +256,16 @@ Deno.serve(async (req) => {
     } catch (_) {}
 
     await logSmsEvent(base44, lead_id, "sent", messageSid);
+    base44.asServiceRole.functions.invoke('logCommunication', {
+      related_entity_type: "WebsiteLead", related_entity_id: lead_id,
+      lead_email: leadData.email, lead_phone: leadData.phone_number, lead_name: leadData.full_name,
+      channel: "sms", provider: "twilio", direction: "outbound",
+      trigger_name: "initial_response", to_address: leadData.phone_number,
+      from_address: Deno.env.get("TWILIO_PHONE_NUMBER"),
+      body_preview: messageBody.slice(0, 200),
+      provider_message_id: messageSid, provider_status: "queued",
+      delivery_status: "sent", skip_lead_update: true,
+    }).catch(() => {});
 
     // Send email if address present
     if (leadData.email) {

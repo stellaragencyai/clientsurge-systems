@@ -1,0 +1,96 @@
+{
+  "name": "AutomationHealthSnapshot",
+  "type": "object",
+  "title": "Automation Health Snapshot",
+  "description": "Point-in-time snapshot of automation messaging health metrics for the admin dashboard.",
+  "properties": {
+    "snapshot_at": {
+      "type": "string",
+      "title": "Snapshot At",
+      "format": "date-time"
+    },
+    "total_website_leads": {
+      "type": "number",
+      "title": "Total Website Leads",
+      "default": 0
+    },
+    "leads_waiting_initial_response": {
+      "type": "number",
+      "title": "Leads Waiting Initial Response",
+      "default": 0
+    },
+    "sms_sent_24h": {
+      "type": "number",
+      "title": "SMS Sent (24h)",
+      "default": 0
+    },
+    "sms_failed_24h": {
+      "type": "number",
+      "title": "SMS Failed (24h)",
+      "default": 0
+    },
+    "email_sent_24h": {
+      "type": "number",
+      "title": "Emails Sent (24h)",
+      "default": 0
+    },
+    "email_failed_24h": {
+      "type": "number",
+      "title": "Emails Failed (24h)",
+      "default": 0
+    },
+    "latest_sms_at": {
+      "type": "string",
+      "title": "Latest SMS At",
+      "format": "date-time"
+    },
+    "latest_email_at": {
+      "type": "string",
+      "title": "Latest Email At",
+      "format": "date-time"
+    },
+    "latest_failure_at": {
+      "type": "string",
+      "title": "Latest Failure At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "snapshot_at"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

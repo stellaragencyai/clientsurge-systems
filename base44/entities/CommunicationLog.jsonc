@@ -1,0 +1,206 @@
+{
+  "name": "CommunicationLog",
+  "type": "object",
+  "title": "Communication Log",
+  "description": "Durable provider log for every Twilio SMS and Resend email send attempt. Proves what sent, what failed, and what leads are stuck.",
+  "properties": {
+    "related_entity_type": {
+      "type": "string",
+      "title": "Related Entity Type",
+      "description": "WebsiteLead, Leads, Order, etc."
+    },
+    "related_entity_id": {
+      "type": "string",
+      "title": "Related Entity ID"
+    },
+    "lead_email": {
+      "type": "string",
+      "title": "Lead Email"
+    },
+    "lead_phone": {
+      "type": "string",
+      "title": "Lead Phone"
+    },
+    "lead_name": {
+      "type": "string",
+      "title": "Lead Name"
+    },
+    "channel": {
+      "type": "string",
+      "title": "Channel",
+      "enum": [
+        "sms",
+        "email",
+        "voice",
+        "system"
+      ],
+      "default": "sms"
+    },
+    "provider": {
+      "type": "string",
+      "title": "Provider",
+      "enum": [
+        "twilio",
+        "resend",
+        "base44",
+        "internal"
+      ],
+      "default": "twilio"
+    },
+    "direction": {
+      "type": "string",
+      "title": "Direction",
+      "enum": [
+        "outbound",
+        "inbound"
+      ],
+      "default": "outbound"
+    },
+    "trigger_name": {
+      "type": "string",
+      "title": "Trigger Name",
+      "description": "initial_response, missed_call_text_back, nurture_follow_up, booking_link, manual_test, etc."
+    },
+    "template_name": {
+      "type": "string",
+      "title": "Template Name"
+    },
+    "to_address": {
+      "type": "string",
+      "title": "To Address"
+    },
+    "from_address": {
+      "type": "string",
+      "title": "From Address"
+    },
+    "subject": {
+      "type": "string",
+      "title": "Subject"
+    },
+    "body_preview": {
+      "type": "string",
+      "title": "Body Preview",
+      "maxLength": 500
+    },
+    "provider_message_id": {
+      "type": "string",
+      "title": "Provider Message ID"
+    },
+    "provider_status": {
+      "type": "string",
+      "title": "Provider Status"
+    },
+    "delivery_status": {
+      "type": "string",
+      "title": "Delivery Status",
+      "enum": [
+        "queued",
+        "sent",
+        "delivered",
+        "failed",
+        "skipped",
+        "unknown"
+      ],
+      "default": "unknown"
+    },
+    "error_code": {
+      "type": "string",
+      "title": "Error Code"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "request_payload_redacted": {
+      "type": "string",
+      "title": "Request Payload (Redacted)",
+      "description": "API request payload with all secrets/tokens redacted"
+    },
+    "response_payload_redacted": {
+      "type": "string",
+      "title": "Response Payload (Redacted)",
+      "description": "API response payload with all secrets/tokens redacted"
+    },
+    "sent_at": {
+      "type": "string",
+      "title": "Sent At",
+      "format": "date-time"
+    },
+    "delivered_at": {
+      "type": "string",
+      "title": "Delivered At",
+      "format": "date-time"
+    },
+    "failed_at": {
+      "type": "string",
+      "title": "Failed At",
+      "format": "date-time"
+    },
+    "environment": {
+      "type": "string",
+      "title": "Environment",
+      "enum": [
+        "production",
+        "preview",
+        "test"
+      ],
+      "default": "production"
+    }
+  },
+  "required": [
+    "channel",
+    "provider",
+    "direction",
+    "trigger_name",
+    "delivery_status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

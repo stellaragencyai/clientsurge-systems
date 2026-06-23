@@ -542,6 +542,16 @@ Deno.serve(async (req) => {
           }),
         });
         console.log(`[MissedCall] Logged SMS response for lead ${lead.id}`);
+        base44.asServiceRole.functions.invoke('logCommunication', {
+          related_entity_type: "Leads", related_entity_id: lead.id,
+          lead_phone: normalizedPhone,
+          channel: "sms", provider: "twilio", direction: "outbound",
+          trigger_name: "missed_call_text_back", to_address: normalizedPhone,
+          from_address: TWILIO_FROM_NUMBER,
+          body_preview: messageBody.slice(0, 200),
+          provider_message_id: messageSid, provider_status: "queued",
+          delivery_status: "sent", skip_lead_update: true,
+        }).catch(() => {});
       } catch (e) {
         console.warn(`[MissedCall] Failed to log SMS event: ${e.message}`);
       }

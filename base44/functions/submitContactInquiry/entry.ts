@@ -413,6 +413,16 @@ Deno.serve(async (req) => {
         intake_type: INTAKE_TYPE,
       },
     });
+    base44.asServiceRole.functions.invoke('logCommunication', {
+      related_entity_type: "Leads", related_entity_id: leadId,
+      lead_email: contact.email, lead_name: contact.full_name,
+      channel: "email", provider: "resend", direction: "outbound",
+      trigger_name: "contact_form_response", to_address: "nolan@clientsurgesystems.com",
+      subject: `New Contact: ${contact.full_name} - ${contact.business_type}`,
+      delivery_status: notification.sent ? "sent" : "failed",
+      error_message: notification.sent ? null : String(notification.reason || ""),
+      skip_lead_update: true,
+    }).catch(() => {});
 
     await logCommunicationEvent(base44, {
       lead_id: leadId,
@@ -431,6 +441,16 @@ Deno.serve(async (req) => {
         business_type: contact.business_type,
       },
     });
+    base44.asServiceRole.functions.invoke('logCommunication', {
+      related_entity_type: "Leads", related_entity_id: leadId,
+      lead_email: contact.email, lead_name: contact.full_name,
+      channel: "email", provider: "resend", direction: "outbound",
+      trigger_name: "contact_form_response", to_address: contact.email,
+      subject: `Thank You for Your Message, ${contact.full_name.split(' ')[0]}!`,
+      delivery_status: thankYouEmail.sent ? "sent" : "failed",
+      error_message: thankYouEmail.sent ? null : String(thankYouEmail.reason || ""),
+      skip_lead_update: true,
+    }).catch(() => {});
 
     // Track contact form completion
     try {

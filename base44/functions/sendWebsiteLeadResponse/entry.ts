@@ -323,6 +323,15 @@ Or just reply to this email with any questions.
           console.log(
             `[sendWebsiteLeadResponse] SMS sent for lead ${lead.id}`
           );
+          base44.asServiceRole.functions.invoke('logCommunication', {
+            related_entity_type: "WebsiteLead", related_entity_id: lead.id,
+            lead_email: lead.email, lead_phone: lead.phone_number, lead_name: lead.full_name,
+            channel: "sms", provider: "twilio", direction: "outbound",
+            trigger_name: "initial_response", to_address: lead.phone_number,
+            from_address: fromNumber, body_preview: outboundSmsBody.slice(0, 200),
+            provider_message_id: smsResult.messageId, provider_status: "queued",
+            delivery_status: "sent", skip_lead_update: true,
+          }).catch(() => {});
         } else {
           console.log(
             `[sendWebsiteLeadResponse] SMS already sent for lead ${lead.id}`
@@ -359,9 +368,22 @@ Or just reply to this email with any questions.
           step: 0,
           stepKey: "initial_sms",
         });
+        base44.asServiceRole.functions.invoke('logCommunication', {
+          related_entity_type: "WebsiteLead", related_entity_id: lead.id,
+          lead_phone: lead.phone_number, lead_name: lead.full_name,
+          channel: "sms", provider: "twilio", direction: "outbound",
+          trigger_name: "initial_response", to_address: lead.phone_number,
+          delivery_status: "failed", error_message: err.message, skip_lead_update: true,
+        }).catch(() => {});
       }
     } else {
       console.log(`[sendWebsiteLeadResponse] No phone for lead ${lead.id}`);
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead.id,
+        channel: "sms", provider: "twilio", direction: "outbound",
+        trigger_name: "initial_response", delivery_status: "skipped",
+        error_message: "No phone number on lead", skip_lead_update: true,
+      }).catch(() => {});
       await base44.asServiceRole.entities.CommunicationEvent.create({
         context_id: lead.id,
         context_type: "website_lead",
@@ -421,6 +443,15 @@ Or just reply to this email with any questions.
           console.log(
             `[sendWebsiteLeadResponse] Email sent for lead ${lead.id}`
           );
+          base44.asServiceRole.functions.invoke('logCommunication', {
+            related_entity_type: "WebsiteLead", related_entity_id: lead.id,
+            lead_email: lead.email, lead_name: lead.full_name,
+            channel: "email", provider: "resend", direction: "outbound",
+            trigger_name: "initial_response", to_address: lead.email,
+            from_address: fromEmail, subject: subject, body_preview: body.slice(0, 200),
+            provider_message_id: emailResult.messageId, provider_status: "sent",
+            delivery_status: "sent", skip_lead_update: true,
+          }).catch(() => {});
         } else {
           console.log(
             `[sendWebsiteLeadResponse] Email already sent for lead ${lead.id}`
@@ -458,9 +489,22 @@ Or just reply to this email with any questions.
           step: 0,
           stepKey: "initial_email",
         });
+        base44.asServiceRole.functions.invoke('logCommunication', {
+          related_entity_type: "WebsiteLead", related_entity_id: lead.id,
+          lead_email: lead.email, lead_name: lead.full_name,
+          channel: "email", provider: "resend", direction: "outbound",
+          trigger_name: "initial_response", to_address: lead.email,
+          delivery_status: "failed", error_message: err.message, skip_lead_update: true,
+        }).catch(() => {});
       }
     } else {
       console.log(`[sendWebsiteLeadResponse] No email for lead ${lead.id}`);
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead.id,
+        channel: "email", provider: "resend", direction: "outbound",
+        trigger_name: "initial_response", delivery_status: "skipped",
+        error_message: "No email address on lead", skip_lead_update: true,
+      }).catch(() => {});
       await base44.asServiceRole.entities.CommunicationEvent.create({
         context_id: lead.id,
         context_type: "website_lead",
@@ -481,13 +525,26 @@ Or just reply to this email with any questions.
     // Update lead
     const sentAny = results.sms_sent || results.email_sent;
     if (sentAny) {
-      await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+      const now = new Date().toISOString();
+      const updateData = {
         lead_status: "contacted",
-        initial_response_sent_at: new Date().toISOString(),
+        initial_response_sent_at: now,
         follow_up_step: 0,
         next_follow_up_at: new Date(Date.now() + 10 * 60 * 1000).toISOString(),
-        last_message_sent: new Date().toISOString(),
-      });
+        last_message_sent: now,
+        last_engagement_at: now,
+      };
+      if (results.sms_sent) {
+        updateData.sms_attempt_count = (lead.sms_attempt_count || 0) + 1;
+        updateData.last_engagement_type = "sms";
+      }
+      if (results.email_sent) {
+        updateData.email_attempt_count = (lead.email_attempt_count || 0) + 1;
+        if (!results.sms_sent) {
+          updateData.last_engagement_type = "email";
+        }
+      }
+      await base44.asServiceRole.entities.WebsiteLead.update(lead.id, updateData);
     }
 
     return secureJson({
