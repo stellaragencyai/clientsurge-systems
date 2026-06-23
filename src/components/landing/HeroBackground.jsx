@@ -1,155 +1,135 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useState } from "react";
+import { motion, useReducedMotion } from "framer-motion";
 
-export default function HeroBackground() {
-  const canvasRef = useRef(null);
+/**
+ * Reusable cinematic hero background.
+ * - If videoUrl is provided AND user is on desktop AND no reduced motion: render looping muted video.
+ * - Otherwise: animated fallback with dark gradients, blue/purple glow, blurred dashboard shapes, grid texture.
+ * - Dark overlay always applied for text readability.
+ */
+export default function HeroBackground({ videoUrl, posterUrl }) {
+  const shouldReduceMotion = useReducedMotion();
+  const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-
-    let animFrame;
-    let particles = [];
-    let w, h;
-
-    function resize() {
-      w = canvas.width = window.innerWidth;
-      h = canvas.height = window.innerHeight;
-    }
-
-    function createParticles() {
-      particles = [];
-      const count = Math.floor((w * h) / 7000);
-      for (let i = 0; i < count; i++) {
-        particles.push({
-          x: Math.random() * w,
-          y: Math.random() * h,
-          r: Math.random() * 1.6 + 0.3,
-          speed: Math.random() * 0.25 + 0.05,
-          opacity: Math.random() * 0.6 + 0.2,
-          drift: (Math.random() - 0.5) * 0.12,
-          pulse: Math.random() * Math.PI * 2,
-        });
-      }
-    }
-
-    let t = 0;
-
-    function draw() {
-      ctx.clearRect(0, 0, w, h);
-
-      // Deep space gradient base
-      const grad = ctx.createLinearGradient(0, 0, w, h);
-      grad.addColorStop(0, "#020818");
-      grad.addColorStop(0.35, "#030d24");
-      grad.addColorStop(0.65, "#050f30");
-      grad.addColorStop(1, "#020a1a");
-      ctx.fillStyle = grad;
-      ctx.fillRect(0, 0, w, h);
-
-      // Nebula glow — top left
-      const glow1 = ctx.createRadialGradient(w * 0.08, h * 0.12, 0, w * 0.08, h * 0.12, w * 0.55);
-      glow1.addColorStop(0, "rgba(0,120,255,0.13)");
-      glow1.addColorStop(0.5, "rgba(0,80,200,0.06)");
-      glow1.addColorStop(1, "transparent");
-      ctx.fillStyle = glow1;
-      ctx.fillRect(0, 0, w, h);
-
-      // Nebula glow — right
-      const glow2 = ctx.createRadialGradient(w * 0.85, h * 0.3, 0, w * 0.85, h * 0.3, w * 0.45);
-      glow2.addColorStop(0, "rgba(0,174,239,0.1)");
-      glow2.addColorStop(0.5, "rgba(0,100,200,0.04)");
-      glow2.addColorStop(1, "transparent");
-      ctx.fillStyle = glow2;
-      ctx.fillRect(0, 0, w, h);
-
-      // Bottom aurora glow
-      const aurora = ctx.createLinearGradient(0, h * 0.7, 0, h);
-      aurora.addColorStop(0, "transparent");
-      aurora.addColorStop(0.5, "rgba(0,80,160,0.07)");
-      aurora.addColorStop(1, "rgba(0,40,100,0.12)");
-      ctx.fillStyle = aurora;
-      ctx.fillRect(0, 0, w, h);
-
-      // Grid lines — horizontal
-      ctx.strokeStyle = "rgba(0,174,239,0.04)";
-      ctx.lineWidth = 1;
-      const gridSize = 72;
-      for (let gx = 0; gx < w; gx += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(gx, 0);
-        ctx.lineTo(gx, h);
-        ctx.stroke();
-      }
-      for (let gy = 0; gy < h; gy += gridSize) {
-        ctx.beginPath();
-        ctx.moveTo(0, gy);
-        ctx.lineTo(w, gy);
-        ctx.stroke();
-      }
-
-      // Animated horizontal scan line
-      const scanY = ((t * 0.4) % (h + 100)) - 50;
-      const scanGrad = ctx.createLinearGradient(0, scanY - 60, 0, scanY + 60);
-      scanGrad.addColorStop(0, "transparent");
-      scanGrad.addColorStop(0.5, "rgba(0,174,239,0.06)");
-      scanGrad.addColorStop(1, "transparent");
-      ctx.fillStyle = scanGrad;
-      ctx.fillRect(0, scanY - 60, w, 120);
-
-      // Draw particles (stars)
-      t += 0.8;
-      for (let p of particles) {
-        p.y -= p.speed;
-        p.x += p.drift;
-        p.pulse += 0.02;
-        if (p.y < -5) { p.y = h + 5; p.x = Math.random() * w; }
-        if (p.x < -5) p.x = w + 5;
-        if (p.x > w + 5) p.x = -5;
-
-        const pulsedOpacity = p.opacity * (0.75 + 0.25 * Math.sin(p.pulse));
-        ctx.beginPath();
-        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-        ctx.fillStyle = `rgba(180,220,255,${pulsedOpacity})`;
-        ctx.fill();
-
-        // Bright core for larger stars
-        if (p.r > 1.2) {
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.r * 0.4, 0, Math.PI * 2);
-          ctx.fillStyle = `rgba(255,255,255,${pulsedOpacity * 0.9})`;
-          ctx.fill();
-        }
-      }
-
-      animFrame = requestAnimationFrame(draw);
-    }
-
-    resize();
-    createParticles();
-    draw();
-
-    const handleResize = () => { resize(); createParticles(); };
-    window.addEventListener("resize", handleResize);
-
-    return () => {
-      cancelAnimationFrame(animFrame);
-      window.removeEventListener("resize", handleResize);
-    };
+    const mq = window.matchMedia("(max-width: 768px)");
+    const handler = () => setIsMobile(mq.matches);
+    handler();
+    mq.addEventListener("change", handler);
+    return () => mq.removeEventListener("change", handler);
   }, []);
 
+  const showVideo = videoUrl && !shouldReduceMotion && !isMobile;
+
+  if (showVideo) {
+    return (
+      <div className="absolute inset-0 overflow-hidden">
+        <video
+          autoPlay
+          muted
+          loop
+          playsInline
+          poster={posterUrl}
+          className="w-full h-full object-cover"
+        >
+          <source src={videoUrl} type="video/mp4" />
+        </video>
+        <div
+          className="absolute inset-0"
+          style={{ background: "linear-gradient(180deg, rgba(10,14,39,0.72) 0%, rgba(10,14,39,0.88) 100%)" }}
+        />
+      </div>
+    );
+  }
+
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
-      }}
-    />
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "#0A0E27" }}>
+      {/* Base radial gradients — blue + purple glow */}
+      <div
+        className="absolute inset-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 18% 25%, rgba(0,174,239,0.16) 0%, transparent 50%), radial-gradient(ellipse at 82% 70%, rgba(124,58,237,0.18) 0%, transparent 50%)",
+        }}
+      />
+
+      {/* Animated glow orbs */}
+      {!shouldReduceMotion && (
+        <>
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              top: "12%",
+              left: "8%",
+              width: 340,
+              height: 340,
+              background: "radial-gradient(circle, rgba(0,174,239,0.22), transparent 70%)",
+              filter: "blur(60px)",
+            }}
+            animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
+            transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <motion.div
+            className="absolute rounded-full"
+            style={{
+              bottom: "8%",
+              right: "6%",
+              width: 380,
+              height: 380,
+              background: "radial-gradient(circle, rgba(124,58,237,0.22), transparent 70%)",
+              filter: "blur(70px)",
+            }}
+            animate={{ x: [0, -25, 0], y: [0, -18, 0] }}
+            transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
+          />
+        </>
+      )}
+
+      {/* Blurred dashboard shapes */}
+      <div
+        className="absolute hidden md:block"
+        style={{
+          top: "22%",
+          right: "14%",
+          width: 220,
+          height: 130,
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.035)",
+          border: "1px solid rgba(255,255,255,0.06)",
+          filter: "blur(3px)",
+        }}
+      />
+      <div
+        className="absolute hidden md:block"
+        style={{
+          bottom: "18%",
+          left: "10%",
+          width: 170,
+          height: 110,
+          borderRadius: 12,
+          background: "rgba(255,255,255,0.025)",
+          border: "1px solid rgba(255,255,255,0.05)",
+          filter: "blur(4px)",
+        }}
+      />
+
+      {/* Grid texture */}
+      <div
+        className="absolute inset-0"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+          backgroundSize: "60px 60px",
+          maskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
+          WebkitMaskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
+        }}
+      />
+
+      {/* Dark overlay for readability */}
+      <div
+        className="absolute inset-0"
+        style={{ background: "linear-gradient(180deg, rgba(10,14,39,0.35) 0%, rgba(10,14,39,0.55) 100%)" }}
+      />
+    </div>
   );
 }

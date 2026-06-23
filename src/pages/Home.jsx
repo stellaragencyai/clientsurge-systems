@@ -1,7 +1,10 @@
 import { useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
-import Hero from "../components/landing/Hero.jsx";
+import CinematicHero from "../components/landing/CinematicHero.jsx";
+import IntegrationCarousel from "../components/landing/IntegrationCarousel.jsx";
+import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
+import SixStepFlow from "../components/landing/SixStepFlow.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
 import ChatBubble from "../components/landing/ChatBubble";
@@ -112,16 +115,23 @@ export default function Home() {
         <VisualFlawsPatch60 />
         <Navbar />
 
-        {/* 1. Hero */}
-        <Hero />
+        {/* 1. Cinematic Hero */}
+        <CinematicHero />
 
-        {/* 1b. Breathing room between hero and problem statement */}
-        <div className="h-2 md:h-4 bg-foreground" aria-hidden="true" />
+        {/* 1b. Integration Carousel */}
+        <IntegrationCarousel />
+
+        {/* 1c. Revenue Leak Section */}
+        <RevenueLeakSection />
+
+        {/* 1d. Six-Step ClientSurge Flow */}
+        <SixStepFlow />
 
         {/* 2. Problem Section */}
         <ProblemSection />
 
         {/* 3. Automation Systems Preview */}
+        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <AutomationSystemsGrid />
 
         {/* 4. How It Works Teaser */}
