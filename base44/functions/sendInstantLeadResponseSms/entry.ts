@@ -251,7 +251,7 @@ Deno.serve(async (req) => {
       } catch (_) {}
     }
 
-    // ── RESOLVE TWILIO SENDER FROM ADMINSETTINGS ──
+    // ── RESOLVE TWILIO SENDER FROM ADMINSETTINGS (ENFORCED) ──
     let fromNumber = null;
     try {
       const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
@@ -266,6 +266,25 @@ Deno.serve(async (req) => {
     }
     if (fromNumber) {
       fromNumber = normalizePhoneToE164(fromNumber);
+    }
+
+    // Hard-block deprecated toll-free sender
+    if (fromNumber === "+18778123630") {
+      const errorMsg = "SMS sender +18778123630 is BLOCKED. Toll-free verification failed (Twilio 30032 compliance). Use +16025843227.";
+      console.error(`[sendInstantLeadResponseSms] ${errorMsg}`);
+      await logSmsEvent(base44, lead_id, "failed", null, errorMsg);
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead_id,
+        lead_phone: rawPhone, lead_name: leadData.full_name,
+        channel: "sms", provider: "twilio", direction: "outbound",
+        trigger_name: "initial_response", delivery_status: "skipped",
+        error_message: errorMsg, skip_lead_update: true,
+      }).catch(() => {});
+      return json({ error: errorMsg, blocked_sender: true }, 400);
+    }
+
+    if (!fromNumber) {
+      return json({ error: "Twilio SMS sender not configured" }, 500);
     }
 
     // ── E.164 NORMALIZATION ──
@@ -315,6 +334,7 @@ Deno.serve(async (req) => {
     } catch (_) {}
 
     await logSmsEvent(base44, lead_id, "sent", messageSid);
+    const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
     base44.asServiceRole.functions.invoke('logCommunication', {
       related_entity_type: "WebsiteLead", related_entity_id: lead_id,
       lead_email: leadData.email, lead_phone: rawPhone, lead_name: leadData.full_name,
@@ -324,6 +344,21 @@ Deno.serve(async (req) => {
       body_preview: messageBody.slice(0, 200),
       provider_message_id: messageSid, provider_status: "queued",
       delivery_status: "queued", skip_lead_update: true,
+      request_payload_redacted: JSON.stringify({
+        From: fromNumber,
+        To: normalizedPhone,
+        Body: "[MESSAGE_BODY_REDACTED]",
+        StatusCallback: statusCallbackUrl ? "[REDACTED_CALLBACK_URL]" : null,
+      }),
+      metadata_json: JSON.stringify({
+        service_key: "instant_lead_response",
+        sender_from: fromNumber,
+        sender_source: "AdminSettings.twilio_from_number",
+        normalized_phone: normalizedPhone,
+        raw_phone: rawPhone,
+        status_callback_present: !!statusCallbackUrl,
+        timestamp: new Date().toISOString(),
+      }),
     }).catch(() => {});
 
     // Send email if address present

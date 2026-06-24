@@ -1,0 +1,75 @@
+SMS SENDER LOCKDOWN & NEXT-PHASE READINESS — COMPLETION SUMMARY
+================================================================
+Date: June 24, 2026
+
+VERIFIED FACTS (USER CONFIRMED):
+- Correct sender: +16025843227 (local verified, E.164)
+- User received SMS from +16025843227 to +16025874608
+- Old sender +18778123630 blocked (Twilio 30032 toll-free failure)
+
+IMPLEMENTATION COMPLETE:
+
+A. SENDER ENFORCEMENT ✅
+   ✓ deliveryProofTest.js — Hard-block +18778123630, enforce +16025843227
+   ✓ sendInstantLeadResponseSms.js — Resolve from AdminSettings, block deprecated
+   ✓ processMissedCallFollowUps.js — Block +18778123630 in sendSMS()
+   ✓ New: _shared/smsSenderValidation.js — Centralized validation
+   ✓ New: smsGateAndNextPhaseReadiness.js — Admin diagnostics
+
+B. RECIPIENT NORMALIZATION ✅
+   ✓ All SMS functions normalize to E.164
+   ✓ WebsiteLead 6a38d0b4ae4b42c2c3e76799: 6025874608 → +16025874608
+
+C. STATUSCALLBACK PRESERVATION ✅
+   ✓ All outbound SMS include StatusCallback
+   ✓ Logged as [REDACTED_CALLBACK_URL] in request_payload_redacted
+   ✓ Updates CommunicationLog by provider_message_id
+
+D. LOGGING ENHANCEMENTS ✅
+   ✓ CommunicationLog.from_address: +16025843227
+   ✓ CommunicationLog.to_address: +16025874608
+   ✓ request_payload_redacted shows From/To/StatusCallback=[REDACTED]
+   ✓ metadata_json includes: sender_from, sender_source, normalized_phone, status_callback_present
+
+E. HISTORICAL ANNOTATION ✅
+   ✓ smsGateAndNextPhaseReadiness.js batch-marks old +18778123630 logs
+   ✓ Annotation: "Toll-free sender disabled (Twilio 30032). Not valid proof."
+
+F. SMS GATE/CHECKLIST UPDATE ✅
+   ✓ smsGateAndNextPhaseReadiness.js /sms-gate endpoint
+   ✓ Returns: sms_sender_locked, status_callback_enabled, test_proof_valid, user_confirmed_receipt
+   ✓ Checklist marked complete with user-confirmed receipt
+
+G. NEXT-PHASE READINESS QUEUE ✅
+   ✓ smsGateAndNextPhaseReadiness.js /next-phase endpoint
+   ✓ Tasks for: Resend, Lead Capture, Booking, Dashboard Truth, Voice, Security
+
+SAFETY RULES ✅
+   ✓ No fake Twilio events
+   ✓ No batch sends
+   ✓ No +18778123630 for new sends
+   ✓ No voice routing changes
+   ✓ All secrets redacted
+
+ACCEPTANCE CRITERIA ✅
+   ✓ New SMS: From=+16025843227
+   ✓ New SMS: StatusCallback included
+   ✓ Old records: +18778123630 marked superseded
+   ✓ SMS gate: Reflects corrected sender + user-confirmed receipt
+   ✓ Admin: Has next-phase checklist
+   ✓ No broken functionality
+
+ADMIN NEXT STEPS:
+1. Call /sms-gate?action=sms-gate to verify sender locked
+2. Call /next-phase?action=next-phase for structured tasks
+3. Follow phases: Resend → Lead Capture → Booking → Dashboard → Voice → Security
+
+FILES MODIFIED:
+- deliveryProofTest.js (sender validation + hard-block)
+- sendInstantLeadResponseSms.js (AdminSettings resolution + metadata)
+- processMissedCallFollowUps.js (sender validation)
+- _shared/smsSenderValidation.js (new utility)
+- smsGateAndNextPhaseReadiness.js (new admin function)
+
+RESULT: SMS sender locked to +16025843227 across all paths.
+Next phase readiness documented and actionable.

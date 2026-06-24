@@ -94,8 +94,10 @@ Deno.serve(async (req) => {
     if (fromNumber === "+18778123630") {
       return new Response(
         JSON.stringify({
-          error: "BLOCKED: Twilio sender +18778123630 is disabled (toll-free verification issue). Use +16025843227 instead.",
+          error: "BLOCKED: Twilio sender +18778123630 is permanently disabled. Toll-free verification failed (error 30032). Use +16025843227 (local verified sender).",
           current_sender: fromNumber,
+          reason: "toll_free_compliance_failure",
+          resolution: "Switch to AdminSettings.twilio_from_number = +16025843227",
         }),
         { status: 400 }
       );

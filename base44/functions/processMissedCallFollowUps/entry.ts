@@ -143,6 +143,13 @@ async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
     throw new Error("Twilio credentials missing");
   }
 
+  // Hard-block deprecated toll-free sender
+  if (fromNumber === "+18778123630") {
+    throw new Error(
+      "SMS sender +18778123630 BLOCKED: Toll-free verification failed (Twilio 30032). Use +16025843227."
+    );
+  }
+
   // ── E.164 NORMALIZATION ──
   const normalizedPhone = normalizePhoneToE164(lead.phone);
   if (!normalizedPhone) {
