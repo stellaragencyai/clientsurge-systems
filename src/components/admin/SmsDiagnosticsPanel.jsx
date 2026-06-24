@@ -9,7 +9,7 @@ export default function SmsDiagnosticsPanel() {
   const [deliveryProof, setDeliveryProof] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-  const fromNumber = import.meta.env.VITE_TWILIO_FROM_NUMBER || "+18778123630";
+  const fromNumber = import.meta.env.VITE_TWILIO_FROM_NUMBER || "+16025843227";
 
   const runDeliveryProof = async () => {
     setLoading(true);
