@@ -70,8 +70,11 @@ Deno.serve(async (req) => {
       return Response.json({ success: false, skipped: true, error: 'invalid_email_address', job_id, recipient_email: recipientEmail });
     }
 
-    // 4. Get safe canonical sender — never construct from business_name or user input
-    const fromEmail = getSafeResendFrom();
+    // 4. Resolve sender from AdminSettings
+    const settings = await base44.asServiceRole.entities.AdminSettings.list().then(s => s?.[0]);
+    const senderInfo = await resolveSenderFromSettings(base44, settings);
+    const fromEmail = senderInfo.from_address;
+    
     if (!fromEmail || !fromEmail.includes('@')) {
       await base44.asServiceRole.entities.CommunicationEvent.create({
         lead_id: job.lead_id,
@@ -84,14 +87,13 @@ Deno.serve(async (req) => {
         status: 'failed',
         subject: 'Email skipped — invalid sender address',
         error_message: 'invalid_resend_from_address',
-        metadata_json: JSON.stringify({ job_id }),
+        metadata_json: JSON.stringify({ job_id, sender_source: senderInfo.sender_source }),
         environment: getEnvironment(),
       });
       return Response.json({ success: false, skipped: true, error: 'invalid_resend_from_address', job_id });
     }
 
-    // 5. Get admin settings and template
-    const settings = await base44.asServiceRole.entities.AdminSettings.list().then(s => s?.[0]);
+    // 5. Get email template
     const emailTemplate = settings?.email_confirmation_template ||
       'Thank you for reaching out! We received your inquiry and will get back to you shortly with more information.';
 
@@ -107,7 +109,7 @@ Deno.serve(async (req) => {
       status: 'pending',
       subject: 'Confirmation email send attempt via Resend',
       message_body: emailTemplate,
-      metadata_json: JSON.stringify({ job_id, recipient_email: recipientEmail, from_address: fromEmail }),
+      metadata_json: JSON.stringify({ job_id, recipient_email: recipientEmail, from_address: fromEmail, sender_from: senderInfo.from_address, sender_source: senderInfo.sender_source }),
       environment: getEnvironment(),
     });
 
@@ -129,7 +131,7 @@ Deno.serve(async (req) => {
         subject: 'Confirmation email sent successfully',
         message_body: emailTemplate,
         provider_message_id: resendResult.message_id,
-        metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, recipient_email: recipientEmail }),
+        metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, recipient_email: recipientEmail, sender_from: senderInfo.from_address, sender_source: senderInfo.sender_source }),
         environment: getEnvironment(),
       });
 
@@ -159,6 +161,7 @@ Deno.serve(async (req) => {
         subject: 'Confirmation email send failed',
         message_body: emailTemplate,
         error_message: resendResult.error,
+        metadata_json: JSON.stringify({ sender_from: senderInfo.from_address, sender_source: senderInfo.sender_source }),
         metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, recipient_email: recipientEmail, error_code: resendResult.error_code }),
         environment: getEnvironment(),
       });
@@ -186,16 +189,32 @@ Deno.serve(async (req) => {
   }
 });
 
-// ── Safe canonical Resend sender ──
-// Always uses display-name + email format. Falls back to system@clientsurgesystems.com.
-// Never constructs from address from business_name or user input.
-function getSafeResendFrom() {
-  const configured = String(Deno.env.get('RESEND_FROM_EMAIL') || '').trim();
-  if (configured && configured.includes('@')) {
-    if (configured.includes('<')) return configured;
-    return `ClientSurge Systems <${configured}>`;
+// ── Resolve sender from AdminSettings or fallback ──
+async function resolveSenderFromSettings(base44, settings) {
+  try {
+    const configuredEmail = settings?.resend_from_email;
+    const fallbackEmail = 'noreply@clientsurgesystems.com';
+
+    // Use configured sender if valid
+    if (configuredEmail && configuredEmail.includes('@')) {
+      return {
+        from_address: configuredEmail,
+        sender_source: 'admin_settings',
+      };
+    }
+
+    // Fall back to verified sender
+    return {
+      from_address: fallbackEmail,
+      sender_source: 'fallback_verified',
+    };
+  } catch (error) {
+    console.warn('[executeConfirmationEmail] Failed to resolve sender:', error.message);
+    return {
+      from_address: 'noreply@clientsurgesystems.com',
+      sender_source: 'fallback_verified',
+    };
   }
-  return 'ClientSurge Systems <system@clientsurgesystems.com>';
 }
 
 function isValidEmail(email) {

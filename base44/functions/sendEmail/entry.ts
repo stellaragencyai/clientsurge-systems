@@ -14,13 +14,40 @@ function env(name) {
   return String(Deno.env.get(name) || "").trim();
 }
 
-function safeResendFrom() {
-  const configured = env("RESEND_FROM_EMAIL");
-  if (configured && configured.includes("@")) {
-    if (configured.includes("<")) return configured;
-    return `ClientSurge Systems <${configured}>`;
+/**
+ * Resolve Resend sender from AdminSettings or fallback.
+ * Returns { sender, from_address, sender_source }
+ */
+async function resolveResendSender(base44) {
+  try {
+    const settings = await base44.asServiceRole.entities.AdminSettings.list();
+    const configuredEmail = settings?.[0]?.resend_from_email;
+    const fallbackEmail = 'noreply@clientsurgesystems.com';
+
+    // Use configured sender if valid
+    if (configuredEmail && configuredEmail.includes("@")) {
+      return {
+        sender: configuredEmail,
+        from_address: configuredEmail,
+        sender_source: 'admin_settings',
+      };
+    }
+
+    // Fall back to verified sender
+    return {
+      sender: fallbackEmail,
+      from_address: fallbackEmail,
+      sender_source: 'fallback_verified',
+    };
+  } catch (error) {
+    console.warn('[sendEmail] Failed to resolve sender from AdminSettings:', error.message);
+    // Safe fallback
+    return {
+      sender: 'noreply@clientsurgesystems.com',
+      from_address: 'noreply@clientsurgesystems.com',
+      sender_source: 'fallback_verified',
+    };
   }
-  return "ClientSurge Systems <system@clientsurgesystems.com>";
 }
 
 function isSafeTestSend(email, subject) {
@@ -65,6 +92,11 @@ Deno.serve(async (req) => {
       }, 403);
     }
 
+    const base44 = createClientFromRequest(req);
+    
+    // Resolve sender from AdminSettings
+    const senderInfo = await resolveResendSender(base44);
+
     const response = await fetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
@@ -72,7 +104,7 @@ Deno.serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        from: safeResendFrom(),
+        from: senderInfo.from_address,
         reply_to: env("RESEND_REPLY_TO_LEADS") || env("ADMIN_EMAIL") || `nolan@${CLIENTSURGE_DOMAIN}`,
         to: email,
         subject,
@@ -86,9 +118,10 @@ Deno.serve(async (req) => {
       return json({ error: 'Failed to send email', details: data }, 500);
     }
 
-    const base44 = createClientFromRequest(req);
+    // Resend 'sent' status = provider accepted, not final delivery
+    const deliveryStatus = data.id ? 'sent' : 'unknown';
 
-    // Log CommunicationEvent for observability
+    // Log CommunicationEvent with sender info
     try {
       await base44.asServiceRole.entities.CommunicationEvent.create({
         lead_id: leadId || undefined,
@@ -96,10 +129,14 @@ Deno.serve(async (req) => {
         direction: 'outbound',
         event_type: 'email_sent',
         provider: 'resend',
-        status: 'sent',
+        status: deliveryStatus,
         subject: subject,
         message_body: body,
         provider_message_id: data.id || null,
+        metadata_json: JSON.stringify({
+          sender_from: senderInfo.from_address,
+          sender_source: senderInfo.sender_source,
+        }),
       });
     } catch (_) {
       // Non-blocking: event log failure should not break the main flow
@@ -114,13 +151,15 @@ Deno.serve(async (req) => {
           subject,
           body,
           status: 'sent',
+          from_address: senderInfo.from_address,
+          sender_source: senderInfo.sender_source,
         });
       } catch (_) {
         // Non-blocking
       }
     }
 
-    return json({ success: true, emailId: data.id });
+    return json({ success: true, emailId: data.id, sender_source: senderInfo.sender_source });
   } catch (error) {
     return json({ error: error.message }, 500);
   }
