@@ -132,7 +132,7 @@ const industries = [
 },
 {
   id: "personal-injury",
-  routePath: "/industries?industry=personal-injury",
+  routePath: "/personal-injury",
   icon: Scale,
   name: "Personal Injury Law",
   accent: {

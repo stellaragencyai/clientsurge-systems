@@ -629,6 +629,90 @@ export const INDUSTRY_MARKETING_DATA = {
     ],
   },
 
+  'property-services': {
+    slug: 'property-services',
+    industry_name: 'Property Services',
+    display_name: 'Property Services Automation System',
+    hero_headline: 'Capture Every Property Inquiry Before Competitors Do',
+    hero_subheadline: 'Property service businesses that respond in under 5 minutes win 70% of leads. Our AI responds in 60 seconds.',
+    hero_description:
+      'Property management, rental, and maintenance teams lose leads to slow response every day. Our AI captures every inquiry instantly, follows up automatically, schedules site visits, recovers missed calls, and reactivates old inquiries—so no opportunity slips through.',
+    primary_cta: 'Book Demo',
+    secondary_cta: 'See Pricing',
+
+    pain_points: [
+      { title: 'Inquiry Leakage', desc: 'Missed calls and slow email replies send prospects to the next property manager.' },
+      { title: 'Manual Follow-Up Gaps', desc: 'Inquiries sit unanswered for hours or days while your team juggles tasks.' },
+      { title: 'Scheduling Friction', desc: 'Back-and-forth to book site visits and tours slows down the pipeline.' },
+      { title: 'Stale Lead Graveyard', desc: 'Past inquiries and old prospects are forgotten with no reactivation path.' },
+    ],
+
+    use_cases: [
+      {
+        title: 'Instant Lead Capture',
+        description: 'AI responds to every call, form, or message within 60 seconds and captures the prospect\'s details.',
+        icon: 'MessageSquare',
+        metrics: '91% response rate | leads captured before competitors reply',
+      },
+      {
+        title: 'Inquiry Follow-Up',
+        description: 'Automated SMS + email sequences nurture every inquiry with answers, next steps, and availability.',
+        icon: 'Send',
+        metrics: '+34% inquiry-to-tour rate | no manual chasing',
+      },
+      {
+        title: 'Scheduling Automation',
+        description: 'Prospects self-book site visits and property tours directly into your calendar with reminders.',
+        icon: 'Calendar',
+        metrics: '62% self-booking | −70% scheduling back-and-forth',
+      },
+      {
+        title: 'Missed Call Recovery',
+        description: 'Missed calls trigger an instant text-back with booking options so no caller is lost.',
+        icon: 'Phone',
+        metrics: 'Recovers 22% of missed calls | $3K–8K MRR recovered',
+      },
+      {
+        title: 'Old Lead Reactivation',
+        description: 'Automated campaigns re-engage past inquiries and dormant prospects to bring them back into the pipeline.',
+        icon: 'RotateCw',
+        metrics: '+18% reactivation rate | $5K–15K recovered per campaign',
+      },
+    ],
+
+    roi_metrics: {
+      avg_inquiry_value: '$500–3,000',
+      missed_call_recovery: '$3K–8K MRR',
+      reactivation_revenue: '$5K–15K per campaign',
+      time_to_payoff: '2–3 weeks',
+    },
+
+    testimonials: [
+      {
+        name: 'Daniel Foster',
+        business: 'Foster Property Management, Dallas',
+        quote: 'We were losing inquiries left and right. Now every call gets a text back instantly. Bookings are up 40%.',
+        metric: '+40% site visits',
+      },
+      {
+        name: 'Lisa Chang',
+        business: 'Summit Rentals, Seattle',
+        quote: 'Old inquiries we forgot about are coming back. The reactivation campaigns alone added $12K last quarter.',
+        metric: '+$12K reactivation',
+      },
+    ],
+
+    recommended_plan: 'growth_system',
+    key_features: [
+      'Instant Lead Capture (SMS + Email)',
+      'Automated Inquiry Follow-Up Sequences',
+      'Site Visit & Tour Scheduling',
+      'Missed Call Text-Back Recovery',
+      'Old Lead Reactivation Campaigns',
+      'Pipeline Analytics Dashboard',
+    ],
+  },
+
   'personal-injury': {
     slug: 'personal-injury',
     industry_name: 'Personal Injury Law',

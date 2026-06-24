@@ -148,6 +148,7 @@ const INDUSTRY_ROUTE_SLUGS = [
   "contractors",
   "real-estate",
   "personal-injury",
+  "property-services",
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [
@@ -428,6 +429,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/" element={<Home />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
+      <Route path="/signup" element={<LazyRoute Component={ProductSignup} />} />
       <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
       <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
