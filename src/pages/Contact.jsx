@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight } from "lucide-react";
+import { Loader2, CheckCircle2, ArrowRight, Phone, Mail, MapPin } from "lucide-react";
 import { Link } from "react-router-dom";
 import FormInput from "../components/forms/FormInput";
 import { base44 } from "@/api/base44Client";
@@ -8,6 +8,7 @@ import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
+import ReadyToStartSection from "../components/landing/ReadyToStartSection";
 import { setPageMetadata } from "@/lib/seo";
 
 const INDUSTRY_CONTEXT = {
@@ -133,62 +134,9 @@ export default function Contact() {
       {/* Full-height split layout — accounts for navbar */}
       <div className="flex flex-1" style={{ minHeight: "calc(100vh - var(--cs-nav-height, 76px))" }}>
 
-        {/* ── LEFT: Dark sidebar — content vertically distributed ── */}
-        <aside className="hidden lg:flex lg:w-[40%] xl:w-[40%] flex-col justify-between p-10 xl:p-16 flex-shrink-0" style={{ background: "#0A1628" }}>
-          {/* Top block */}
-          <div>
-            {/* Logo / Brand */}
-            <div className="flex items-center gap-3 mb-12">
-              <div className="w-1.5 h-10 bg-primary rounded-sm flex-shrink-0" />
-              <span className="text-2xl font-titles font-black tracking-tight text-white">ClientSurge</span>
-            </div>
-
-            {/* Divider */}
-            <div className="border-t border-white/10 pt-10 mb-10 space-y-7">
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <Phone className="w-4 h-4 text-primary" />
-                </div>
-                <a href="tel:+16025843227" className="text-base text-slate-200 hover:text-primary transition-colors duration-300">
-                  (602) 584-3227
-                </a>
-              </div>
-              <div className="flex items-start gap-4">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <Mail className="w-4 h-4 text-primary" />
-                </div>
-                <div>
-                  <p className="cs-eyebrow text-slate-500 mb-1">Email</p>
-                  <a href="mailto:support@clientsurgesystems.com" className="text-base text-slate-200 hover:text-primary transition-colors duration-300 break-all">
-                    support@clientsurgesystems.com
-                  </a>
-                </div>
-              </div>
-              <div className="flex items-center gap-4">
-                <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-4 h-4 text-primary" />
-                </div>
-                <span className="text-base text-slate-200">Phoenix, Arizona</span>
-              </div>
-            </div>
-
-            {/* Description */}
-            <p className="text-slate-400 text-base leading-relaxed max-w-sm">
-              {industryContext
-                ? `Need help automating your ${industryContext.label.toLowerCase()}? We're here to discuss your lead flow and recommend the right stack.`
-                : "Have questions or ready to get started? Send us a message and we'll be in touch within one business day."}
-            </p>
-          </div>
-
-          {/* Bottom: social icons */}
-          <div className="flex items-center gap-4">
-            <a href="https://facebook.com/clientsurge" target="_blank" rel="noopener noreferrer" aria-label="Facebook" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300">
-              <Facebook className="w-4 h-4" />
-            </a>
-            <a href="https://instagram.com/clientsurge" target="_blank" rel="noopener noreferrer" aria-label="Instagram" className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center text-primary hover:bg-primary hover:text-white transition-all duration-300">
-              <Instagram className="w-4 h-4" />
-            </a>
-          </div>
+        {/* ── LEFT: Premium "Ready to Start?" dark panel ── */}
+        <aside className="hidden lg:block lg:w-[40%] xl:w-[42%] flex-shrink-0">
+          <ReadyToStartSection />
         </aside>
 
         {/* ── RIGHT: Form ── */}
