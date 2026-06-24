@@ -1,8 +1,16 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
-import CompactAutomationPills from "./CompactAutomationPills.jsx";
 import HeroTrustLogos from "./HeroTrustLogos.jsx";
+
+const AUTOMATION_PILLS = [
+  { label: "Lead Capture", icon: "📥" },
+  { label: "Missed-Call Recovery", icon: "☎️" },
+  { label: "Instant Follow-Up", icon: "⚡" },
+  { label: "AI Booking", icon: "📅" },
+  { label: "Review Requests", icon: "⭐" },
+  { label: "Lead Reactivation", icon: "🔄" },
+];
 
 export default function CinematicHero({ videoUrl, posterUrl }) {
   const shouldReduceMotion = useReducedMotion();
@@ -15,8 +23,9 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
 
   return (
     <section
-      className="hero-section relative flex items-center justify-center overflow-hidden"
+      className="relative flex items-center justify-center overflow-hidden"
       style={{ minHeight: "calc(100svh - var(--cs-nav-height))", background: "#061025" }}
+      aria-label="AI Automation Command Center"
     >
       {/* Dark cinematic background */}
       <div className="absolute inset-0 overflow-hidden">
@@ -75,84 +84,195 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
         )}
       </div>
 
-      {/* Content */}
+      {/* Content — HARD ISOLATED, NO INHERITANCE */}
       <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 md:py-20 text-center flex flex-col items-center justify-center min-h-screen">
-        {/* Accent line */}
-        <motion.p
+        
+        {/* EYEBROW — Pure cyan, no class inheritance */}
+        <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="font-semibold mb-6 max-w-2xl mx-auto"
-          style={{ fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)", color: "#35BDF1", lineHeight: 1.5, textShadow: "0 0 16px rgba(53,189,241,0.4)" }}
+          style={{
+            fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)",
+            fontWeight: 700,
+            letterSpacing: "0.2em",
+            color: "#35BDF1",
+            textShadow: "0 0 16px rgba(53,189,241,0.4)",
+            textTransform: "uppercase",
+            margin: "0 0 24px 0",
+            fontFamily: "'Inter', sans-serif",
+          }}
         >
-          Websites, AI follow-up, booking, missed-call recovery, reviews, and lead reactivation working as one system.
-        </motion.p>
+          AI Automation Command Center
+        </motion.div>
 
-        {/* Headline */}
+        {/* TITLE — HARD WHITE GUARANTEE, ZERO INHERITANCE */}
         <motion.h1
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08 }}
-          className="font-black mb-6 tracking-tight"
           style={{
             fontFamily: "'Montserrat', sans-serif",
-            color: "#FFFFFF",
             fontSize: "clamp(2.2rem, 6.8vw, 4rem)",
+            fontWeight: 900,
             lineHeight: 1.12,
+            letterSpacing: "-0.035em",
+            color: "#FFFFFF",
             WebkitTextFillColor: "#FFFFFF",
             WebkitFontSmoothing: "antialiased",
             MozOsxFontSmoothing: "grayscale",
+            margin: "0 0 24px 0",
+            textWrap: "balance",
+            textShadow: "0 2px 12px rgba(0, 0, 0, 0.3)",
           }}
         >
-          AI Automation Built Around Your Lead Flow.
+          AI Automation Built<br />Around Your Lead Flow.
         </motion.h1>
 
-        {/* Supporting copy */}
+        {/* SUBCOPY — Pure light blue/gray, NOT dark */}
         <motion.p
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.18 }}
-          className="font-normal max-w-2xl mx-auto mb-10"
-          style={{ fontSize: "clamp(1rem, 1.9vw, 1.15rem)", color: "#D4D8E0", lineHeight: 1.7 }}
+          style={{
+            fontFamily: "'Inter', sans-serif",
+            fontSize: "clamp(1rem, 1.9vw, 1.15rem)",
+            fontWeight: 400,
+            lineHeight: 1.7,
+            color: "#D4D8E0",
+            maxWidth: "560px",
+            margin: "0 auto 40px auto",
+            letterSpacing: "-0.011em",
+          }}
         >
           Capture missed calls, follow up instantly, and turn more inquiries into booked appointments — without adding more staff.
         </motion.p>
 
-        {/* CTAs */}
+        {/* PRIMARY CTA BUTTONS */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.28 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-3 w-full sm:w-auto"
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto mb-12"
         >
           <button
             onClick={() => scrollToSection("pricing", "hero_compare_packages_click")}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-bold transition-all duration-300 min-h-[44px]"
+            type="button"
             style={{
+              width: "100%",
+              maxWidth: "280px",
+              height: "48px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              padding: "0 32px",
+              borderRadius: "9999px",
+              border: "none",
               background: "linear-gradient(135deg, #0079CC 0%, #00AEEF 100%)",
               color: "#FFFFFF",
+              fontSize: "clamp(0.875rem, 1.1vw, 1rem)",
+              fontWeight: 700,
+              fontFamily: "'Montserrat', sans-serif",
+              cursor: "pointer",
               boxShadow: "0 0 32px rgba(53, 189, 241, 0.45), 0 8px 24px rgba(0, 121, 193, 0.35)",
+              transition: "all 300ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.boxShadow = "0 0 48px rgba(53, 189, 241, 0.6), 0 12px 32px rgba(0, 121, 193, 0.45)";
+              e.target.style.transform = "translateY(-2px)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.boxShadow = "0 0 32px rgba(53, 189, 241, 0.45), 0 8px 24px rgba(0, 121, 193, 0.35)";
+              e.target.style.transform = "translateY(0)";
             }}
           >
-            Compare Packages <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            Compare Packages <ArrowRight className="w-4 h-4" />
           </button>
           <button
             onClick={() => scrollToSection("automations", "hero_view_automations_click")}
-            className="w-full sm:w-auto inline-flex items-center justify-center gap-2 px-6 sm:px-8 py-3.5 sm:py-4 rounded-full text-sm sm:text-base font-semibold transition-all duration-300 hover:border-white/40 hover:bg-white/8 min-h-[44px]"
+            type="button"
             style={{
-              background: "rgba(8, 20, 44, 0.6)",
+              width: "100%",
+              maxWidth: "280px",
+              height: "48px",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
+              gap: "8px",
+              padding: "0 32px",
+              borderRadius: "9999px",
               border: "1.5px solid rgba(53, 189, 241, 0.35)",
+              background: "rgba(8, 20, 44, 0.6)",
               color: "#FFFFFF",
+              fontSize: "clamp(0.875rem, 1.1vw, 1rem)",
+              fontWeight: 600,
+              fontFamily: "'Montserrat', sans-serif",
+              cursor: "pointer",
               backdropFilter: "blur(12px)",
               WebkitBackdropFilter: "blur(12px)",
+              transition: "all 300ms ease",
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.borderColor = "rgba(53, 189, 241, 0.6)";
+              e.target.style.background = "rgba(8, 20, 44, 0.8)";
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.borderColor = "rgba(53, 189, 241, 0.35)";
+              e.target.style.background = "rgba(8, 20, 44, 0.6)";
             }}
           >
-            View Automations <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
+            View Automations <ArrowRight className="w-4 h-4" />
           </button>
         </motion.div>
 
-        {/* Compact Automation Pills */}
-        <CompactAutomationPills />
+        {/* COMPACT AUTOMATION PILLS — Direct inline, pure white */}
+        <motion.div
+          initial={{ opacity: 0, y: 16 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.38 }}
+          className="flex flex-wrap justify-center gap-2 mb-16 max-w-3xl"
+        >
+          {AUTOMATION_PILLS.map((pill) => (
+            <button
+              key={pill.label}
+              type="button"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                gap: "6px",
+                height: "40px",
+                padding: "0 16px",
+                borderRadius: "20px",
+                border: "1px solid rgba(53, 189, 241, 0.25)",
+                background: "rgba(53, 189, 241, 0.08)",
+                color: "#FFFFFF",
+                fontSize: "0.8125rem",
+                fontWeight: 600,
+                fontFamily: "'Inter', sans-serif",
+                cursor: "pointer",
+                backdropFilter: "blur(8px)",
+                WebkitBackdropFilter: "blur(8px)",
+                transition: "all 200ms ease",
+                boxShadow: "0 0 12px rgba(53, 189, 241, 0.15)",
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.borderColor = "rgba(53, 189, 241, 0.5)";
+                e.target.style.background = "rgba(53, 189, 241, 0.15)";
+                e.target.style.boxShadow = "0 0 24px rgba(53, 189, 241, 0.35)";
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.borderColor = "rgba(53, 189, 241, 0.25)";
+                e.target.style.background = "rgba(53, 189, 241, 0.08)";
+                e.target.style.boxShadow = "0 0 12px rgba(53, 189, 241, 0.15)";
+              }}
+            >
+              <span style={{ fontSize: "1.2em" }}>{pill.icon}</span>
+              <span>{pill.label}</span>
+            </button>
+          ))}
+        </motion.div>
 
         {/* Trust Logos */}
         <HeroTrustLogos />
