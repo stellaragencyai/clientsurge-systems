@@ -18,46 +18,18 @@ import SectionHeader from "@/components/design-system/SectionHeader";
 
 const industries = [
 {
-  id: "med-spa",
-  routePath: "/med-spa",
-  icon: Sparkles,
-  name: "Med Spas & Aesthetic Clinics",
+  id: "roofing",
+  routePath: "/roofing",
+  icon: Home,
+  name: "Roofing & Restoration",
   accent: {
-    color: "#38bdf8",
-    soft: "rgba(56,189,248,0.18)",
-    glow: "rgba(56,189,248,0.28)",
-    iconBg: "rgba(56,189,248,0.18)"
+    color: "#075985",
+    soft: "rgba(7,89,133,0.18)",
+    glow: "rgba(7,89,133,0.28)",
+    iconBg: "rgba(7,89,133,0.18)"
   },
   image:
-  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
-},
-{
-  id: "dental",
-  routePath: "/dental",
-  icon: Heart,
-  name: "Dental & Orthodontics",
-  accent: {
-    color: "#0ea5e9",
-    soft: "rgba(14,165,233,0.18)",
-    glow: "rgba(14,165,233,0.28)",
-    iconBg: "rgba(14,165,233,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
-},
-{
-  id: "chiro-pt",
-  routePath: "/chiropractic",
-  icon: Building2,
-  name: "Chiropractic & Physical Therapy",
-  accent: {
-    color: "#2563eb",
-    soft: "rgba(37,99,235,0.16)",
-    glow: "rgba(37,99,235,0.24)",
-    iconBg: "rgba(37,99,235,0.16)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
 },
 {
   id: "hvac",
@@ -88,18 +60,46 @@ const industries = [
   "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=95"
 },
 {
-  id: "roofing",
-  routePath: "/roofing",
-  icon: Home,
-  name: "Roofing & Restoration",
+  id: "dental",
+  routePath: "/dental",
+  icon: Heart,
+  name: "Dental & Orthodontics",
   accent: {
-    color: "#075985",
-    soft: "rgba(7,89,133,0.18)",
-    glow: "rgba(7,89,133,0.28)",
-    iconBg: "rgba(7,89,133,0.18)"
+    color: "#0ea5e9",
+    soft: "rgba(14,165,233,0.18)",
+    glow: "rgba(14,165,233,0.28)",
+    iconBg: "rgba(14,165,233,0.18)"
   },
   image:
-  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
+  "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
+},
+{
+  id: "med-spa",
+  routePath: "/med-spa",
+  icon: Sparkles,
+  name: "Med Spas & Aesthetic Clinics",
+  accent: {
+    color: "#38bdf8",
+    soft: "rgba(56,189,248,0.18)",
+    glow: "rgba(56,189,248,0.28)",
+    iconBg: "rgba(56,189,248,0.18)"
+  },
+  image:
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
+},
+{
+  id: "chiro-pt",
+  routePath: "/chiropractic",
+  icon: Building2,
+  name: "Chiropractic & Physical Therapy",
+  accent: {
+    color: "#2563eb",
+    soft: "rgba(37,99,235,0.16)",
+    glow: "rgba(37,99,235,0.24)",
+    iconBg: "rgba(37,99,235,0.16)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
 },
 {
   id: "contractors",
