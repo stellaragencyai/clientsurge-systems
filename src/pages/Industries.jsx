@@ -107,14 +107,14 @@ const industries = [
 },
 {
   id: "legal-services",
-  title: "Legal & Personal Injury",
+  title: "Personal-Injury",
   status: "Live",
   icon: Scale,
   accent: "text-[#005f99]",
   accentBg: "bg-primary/10 border-primary/20",
   ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
   description:
-  "Built for law firms and personal injury practices that need faster intake, consistent follow-up, and more signed cases.",
+  "Tailored for personal injury law firms that need faster intake, missed-call recovery, and consistent follow-up with potential clients.",
   href: "/personal-injury"
 }];
 
