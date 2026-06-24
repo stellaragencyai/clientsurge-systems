@@ -115,7 +115,20 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
         </div>
 
         {/* Content */}
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-4 sm:px-6 md:px-8 py-12 md:py-20 text-center flex flex-col items-center justify-center min-h-screen">
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-10 md:py-16 flex flex-col items-center justify-center min-h-screen">
+          {/* Uniform glass card — clean text contrast against dark background */}
+          <div
+            className="w-full flex flex-col items-center text-center"
+            style={{
+              background: "rgba(8, 20, 44, 0.55)",
+              backdropFilter: "blur(24px) saturate(1.3)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.3)",
+              borderRadius: "1.5rem",
+              border: "1px solid rgba(53, 189, 241, 0.15)",
+              boxShadow: "0 8px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
+              padding: "clamp(1.5rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem)",
+            }}
+          >
           
           {/* EYEBROW */}
           <motion.div
@@ -307,6 +320,8 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
 
           {/* Trust Logos */}
           <HeroTrustLogos />
+          </div>
+          {/* End glass card */}
         </div>
       </section>
     </>
