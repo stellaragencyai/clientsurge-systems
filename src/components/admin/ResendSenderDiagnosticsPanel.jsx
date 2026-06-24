@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { AlertTriangle, CheckCircle, Mail } from "lucide-react";
+import { AlertTriangle, CheckCircle, Mail, ArrowRight } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 export default function ResendSenderDiagnosticsPanel() {
   const [configuredEmail, setConfiguredEmail] = useState(null);
-  const [logs, setLogs] = useState([]);
+  const [actualSender, setActualSender] = useState(null);
+  const [recentEvents, setRecentEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -20,13 +21,28 @@ export default function ResendSenderDiagnosticsPanel() {
           setConfiguredEmail(settings[0].resend_from_email || "Not configured");
         }
 
-        // Fetch latest Resend CommunicationLog entries
-        const recentLogs = await base44.asServiceRole.entities.CommunicationLog.filter(
-          { provider: "resend" },
+        // Fetch latest CommunicationEvent entries (Resend emails)
+        const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+          { provider: "resend", channel: "email" },
           "-created_date",
-          20
+          30
         );
-        setLogs(recentLogs || []);
+        setRecentEvents(events || []);
+
+        // Extract actual sender from latest event metadata
+        if (events?.length > 0) {
+          for (const event of events) {
+            try {
+              const metadata = event.metadata_json ? JSON.parse(event.metadata_json) : {};
+              if (metadata.sender_source && metadata.sender_source !== "fallback") {
+                setActualSender(metadata.from_address || null);
+                break;
+              }
+            } catch (_e) {
+              // Skip parse errors
+            }
+          }
+        }
       } catch (err) {
         console.error("[ResendSenderDiagnosticsPanel]", err);
         setError(err.message);
@@ -38,11 +54,8 @@ export default function ResendSenderDiagnosticsPanel() {
     loadData();
   }, []);
 
-  // Extract unique from_address values from logs
-  const uniqueFromAddresses = Array.from(new Set(logs.map((log) => log.from_address).filter(Boolean)));
-
-  // Check if any from_address differs from configured
-  const hasMismatch = uniqueFromAddresses.some((addr) => addr !== configuredEmail && configuredEmail);
+  // Check if actual sender differs from configured
+  const hasMismatch = actualSender && configuredEmail && actualSender !== configuredEmail;
 
   if (loading) {
     return (
@@ -67,15 +80,15 @@ export default function ResendSenderDiagnosticsPanel() {
       )}
 
       {/* Configured Sender */}
-      <div>
+      <div className="pb-4 border-b border-border">
         <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-          Configured From Address (AdminSettings)
+          Configured Sender (AdminSettings.resend_from_email)
         </p>
         <div className="flex items-center gap-2">
           {configuredEmail && configuredEmail !== "Not configured" ? (
             <>
               <CheckCircle className="w-4 h-4 text-green-600" />
-              <code className="text-sm font-mono text-foreground bg-muted px-3 py-1.5 rounded">
+              <code className="text-sm font-mono text-foreground bg-muted px-3 py-2 rounded">
                 {configuredEmail}
               </code>
             </>
@@ -85,75 +98,78 @@ export default function ResendSenderDiagnosticsPanel() {
         </div>
       </div>
 
+      {/* Actual Sender from Recent Events */}
+      <div className="pb-4 border-b border-border">
+        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
+          Latest Actual Sender (from CommunicationEvent)
+        </p>
+        <div className="flex items-center gap-2">
+          {actualSender ? (
+            <>
+              {hasMismatch ? (
+                <AlertTriangle className="w-4 h-4 text-yellow-600" />
+              ) : (
+                <CheckCircle className="w-4 h-4 text-green-600" />
+              )}
+              <code className="text-sm font-mono text-foreground bg-muted px-3 py-2 rounded">
+                {actualSender}
+              </code>
+            </>
+          ) : (
+            <p className="text-sm text-muted-foreground italic">No recent Resend events found</p>
+          )}
+        </div>
+      </div>
+
       {/* Mismatch Warning */}
       {hasMismatch && (
         <div className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg flex gap-3">
           <AlertTriangle className="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" />
-          <div className="text-sm text-yellow-900">
-            <p className="font-semibold mb-1">Sender Mismatch Detected</p>
-            <p className="text-xs">Recent logs show from_address values that differ from AdminSettings. Verify sender configuration before approving automations.</p>
+          <div className="text-sm text-yellow-900 space-y-1">
+            <p className="font-semibold">Sender Mismatch Detected</p>
+            <p className="text-xs">
+              Configured sender <code className="bg-white/50 px-1.5 py-0.5 rounded text-[0.7rem] font-mono">{configuredEmail}</code> does not match actual sender in recent events <code className="bg-white/50 px-1.5 py-0.5 rounded text-[0.7rem] font-mono">{actualSender}</code>
+            </p>
           </div>
         </div>
       )}
 
-      {/* Recent From Addresses */}
-      <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-          Recent From Addresses (Last 20 Logs)
+      {/* Delivery Status Info */}
+      <div className="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+        <p className="text-xs font-semibold text-blue-900 mb-2">Current Resend Proof Level</p>
+        <p className="text-xs text-blue-900 mb-3">
+          ✓ Provider accepted/sent only (no full delivery confirmation yet)
         </p>
-        {uniqueFromAddresses.length > 0 ? (
-          <div className="space-y-1.5">
-            {uniqueFromAddresses.map((addr) => (
-              <div key={addr} className="flex items-center gap-2 text-sm">
-                {addr === configuredEmail ? (
-                  <CheckCircle className="w-4 h-4 text-green-600 flex-shrink-0" />
-                ) : (
-                  <AlertTriangle className="w-4 h-4 text-yellow-600 flex-shrink-0" />
-                )}
-                <code className="font-mono text-foreground">{addr}</code>
-                {addr !== configuredEmail && configuredEmail && (
-                  <span className="text-xs text-muted-foreground ml-auto">(mismatch)</span>
-                )}
-              </div>
-            ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground italic">No Resend logs found</p>
-        )}
+        <p className="text-[0.75rem] text-blue-800 leading-relaxed">
+          Current events show status=<strong>sent</strong>, meaning Resend accepted the message. Full delivery confirmation from recipient inbox is not yet captured.
+        </p>
       </div>
 
-      {/* Recent Provider Message IDs */}
-      <div>
-        <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-          Recent Provider Message IDs (Last 10)
+      {/* Next Action */}
+      <div className="p-4 bg-purple-50 border border-purple-200 rounded-lg space-y-3">
+        <p className="text-xs font-semibold text-purple-900 flex items-center gap-2">
+          <ArrowRight className="w-4 h-4" />
+          Next Action: Verify Sender in Resend
         </p>
-        {logs.filter((l) => l.provider_message_id).length > 0 ? (
-          <div className="space-y-1.5 max-h-40 overflow-y-auto">
-            {logs
-              .filter((l) => l.provider_message_id)
-              .slice(0, 10)
-              .map((log, idx) => (
-                <div key={idx} className="text-xs">
-                  <p className="font-mono text-foreground break-all">{log.provider_message_id}</p>
-                  <p className="text-muted-foreground text-[0.7rem]">
-                    {log.delivery_status} · {new Date(log.created_date).toLocaleString()}
-                  </p>
-                </div>
-              ))}
-          </div>
-        ) : (
-          <p className="text-sm text-muted-foreground italic">No provider IDs found</p>
-        )}
+        <div className="text-xs text-purple-900 space-y-2">
+          <p className="font-medium">Option 1: Update AdminSettings</p>
+          <p className="text-[0.8rem] text-purple-800">
+            If actual sender <code className="bg-white/30 px-1 rounded text-[0.7rem] font-mono">{actualSender || "noreply@clientsurgesystems.com"}</code> is verified in Resend and working, update <strong>AdminSettings.resend_from_email</strong> to match.
+          </p>
+          <p className="font-medium mt-2">Option 2: Update Send Path</p>
+          <p className="text-[0.8rem] text-purple-800">
+            If <code className="bg-white/30 px-1 rounded text-[0.7rem] font-mono">system@clientsurgesystems.com</code> is the correct authorized sender in Resend, verify the domain/sender identity in Resend console, then force all send paths to use it.
+          </p>
+        </div>
       </div>
 
-      {/* Info Note */}
-      <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg text-xs text-blue-900">
-        <p className="font-semibold mb-1">Status Meanings</p>
-        <ul className="space-y-0.5 text-[0.8rem]">
-          <li>• <strong>sent</strong> = Resend provider accepted (not fully delivered to recipient inbox)</li>
-          <li>• <strong>delivered</strong> = Final delivery confirmed by carrier</li>
-          <li>• <strong>failed</strong> = Provider rejected or carrier returned</li>
-          <li>• <strong>queued</strong> = Pending provider pickup</li>
+      {/* Status Legend */}
+      <div className="text-xs text-muted-foreground space-y-1.5 pt-2">
+        <p className="font-semibold">Status Legend:</p>
+        <ul className="space-y-1 ml-2">
+          <li>• <strong>sent</strong> = Resend provider accepted (not fully inbox-delivered)</li>
+          <li>• <strong>delivered</strong> = Recipient inbox confirmed</li>
+          <li>• <strong>failed</strong> = Provider rejected or bounced</li>
         </ul>
       </div>
     </div>
