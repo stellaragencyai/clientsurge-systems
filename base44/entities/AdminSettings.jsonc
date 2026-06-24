@@ -95,6 +95,11 @@
       "title": "Twilio Missed Call Webhook URL",
       "description": "Full public URL for missed-call text-back \u2014 paste into Twilio Console voice fallback or status callback"
     },
+    "sms_status_callback_url": {
+      "type": "string",
+      "title": "Twilio SMS Status Callback URL",
+      "description": "Full public URL for SMS delivery status callbacks \u2014 Twilio posts MessageStatus updates here"
+    },
     "last_webhook_test_result": {
       "type": "string",
       "title": "Last Webhook Test Result"

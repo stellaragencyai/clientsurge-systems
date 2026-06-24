@@ -108,6 +108,8 @@ Deno.serve(async (req) => {
     }
 
     const auth = btoa(`${accountSid}:${authToken}`);
+    const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');
+    
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',
       headers: {
@@ -118,6 +120,7 @@ Deno.serve(async (req) => {
         From: fromNumber,
         To: normalizedPhone,
         Body: appendSmsOptOut(message),
+        ...(statusCallbackUrl && { StatusCallback: statusCallbackUrl }),
       }).toString(),
     });
 
@@ -137,11 +140,11 @@ Deno.serve(async (req) => {
             status: 'failed',
             message_body: message,
             error_message: data.message || `Twilio error ${response.status}`,
-            metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone }),
-          });
-        } catch (_) {}
-      }
-      return json({ error: 'Failed to send SMS', details: data, normalized_phone: normalizedPhone }, 500);
+            metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone, status_callback_url: statusCallbackUrl }),
+             });
+            } catch (_) {}
+            }
+            return json({ error: 'Failed to send SMS', details: data, normalized_phone: normalizedPhone }, 500);
     }
 
     // Log success
@@ -157,10 +160,10 @@ Deno.serve(async (req) => {
           status: 'sent',
           message_body: message,
           provider_message_id: data.sid || null,
-          metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone }),
-        });
+          metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone, status_callback_url: statusCallbackUrl }),
+          });
 
-        await base44.entities.Messages.create({
+          await base44.entities.Messages.create({
           lead_id: leadId,
           direction: 'outbound',
           channel: 'sms',

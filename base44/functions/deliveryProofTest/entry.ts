@@ -57,13 +57,16 @@ Deno.serve(async (req) => {
 
     // 4. Send real SMS
     const testMessage = "ClientSurge internal Twilio delivery proof test. Reply STOP to opt out.";
+    const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');
+    
     const requestPayload = {
       to: normalizedPhone,
       from: fromNumber,
       body: testMessage,
+      statusCallback: statusCallbackUrl,
     };
 
-    console.log(`[deliveryProofTest] Sending SMS to ${normalizedPhone} from ${fromNumber}`);
+    console.log(`[deliveryProofTest] Sending SMS to ${normalizedPhone} from ${fromNumber} with statusCallback=${statusCallbackUrl}`);
 
     let twilioResponse = null;
     let twilioError = null;
@@ -100,7 +103,7 @@ Deno.serve(async (req) => {
       delivery_status: providerStatus === "queued" || providerStatus === "sent" ? "queued" : "failed",
       error_code: twilioError ? "TWILIO_ERROR" : null,
       error_message: twilioError || null,
-      request_payload_redacted: redactPayload({ To: normalizedPhone, From: fromNumber, Body: testMessage }),
+      request_payload_redacted: redactPayload({ To: normalizedPhone, From: fromNumber, Body: testMessage, StatusCallback: statusCallbackUrl }),
       response_payload_redacted: twilioResponse ? redactPayload(twilioResponse) : JSON.stringify({ error: twilioError }),
       sent_at: new Date().toISOString(),
       environment: "production",
@@ -128,6 +131,7 @@ Deno.serve(async (req) => {
       metadata_json: JSON.stringify({
         raw_phone: rawPhone,
         normalized_phone: normalizedPhone,
+        status_callback_url: statusCallbackUrl,
         test_type: "delivery_proof_test",
       }),
       environment: "production",
@@ -153,6 +157,7 @@ Deno.serve(async (req) => {
         metadata_json: JSON.stringify({
           raw_phone: rawPhone,
           normalized_phone: normalizedPhone,
+          status_callback_url: statusCallbackUrl,
           twilio_status: providerStatus,
           test_type: "delivery_proof_test",
         }),
