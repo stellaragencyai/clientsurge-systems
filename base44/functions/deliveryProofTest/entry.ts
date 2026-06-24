@@ -1,6 +1,14 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import twilio from "npm:twilio@4.10.0";
 
+// Twilio error code mapping
+const TWILIO_ERROR_30032 = {
+  code: 30032,
+  category: "sender_compliance_block",
+  title: "Toll-Free Verification Required",
+  explanation: "The toll-free sender number is not verified/approved for SMS traffic.",
+};
+
 // Normalize phone to E.164 format
 function normalizePhoneE164(rawPhone) {
   if (!rawPhone) return null;
@@ -9,6 +17,13 @@ function normalizePhoneE164(rawPhone) {
   if (digits.length === 11 && digits[0] === "1") return `+${digits}`;
   if (digits.length > 0) return `+${digits}`;
   return null;
+}
+
+// Extract Twilio error code from error message
+function extractTwilioErrorCode(twilioErrorString) {
+  if (!twilioErrorString) return null;
+  const match = String(twilioErrorString).match(/\b(\d{5})\b/);
+  return match ? parseInt(match[1], 10) : null;
 }
 
 // Redact secrets from payload
@@ -80,8 +95,12 @@ Deno.serve(async (req) => {
       console.log(`[deliveryProofTest] Twilio accepted message SID: ${providerMessageId}, status: ${providerStatus}`);
     } catch (e) {
       twilioError = e.message || String(e);
-      console.error(`[deliveryProofTest] Twilio failed: ${twilioError}`);
+      const errorCode = extractTwilioErrorCode(twilioError);
+      console.error(`[deliveryProofTest] Twilio failed (code: ${errorCode}): ${twilioError}`);
     }
+
+    // Extract error code for diagnostic categorization
+    const errorCode = twilioError ? extractTwilioErrorCode(twilioError) : null;
 
     // 5. Create CommunicationLog
     const commLog = await base44.asServiceRole.entities.CommunicationLog.create({
@@ -101,7 +120,7 @@ Deno.serve(async (req) => {
       provider_message_id: providerMessageId || null,
       provider_status: providerStatus,
       delivery_status: providerStatus === "queued" || providerStatus === "sent" ? "queued" : "failed",
-      error_code: twilioError ? "TWILIO_ERROR" : null,
+      error_code: errorCode ? String(errorCode) : (twilioError ? "TWILIO_ERROR_UNMAPPED" : null),
       error_message: twilioError || null,
       request_payload_redacted: redactPayload({ To: normalizedPhone, From: fromNumber, Body: testMessage, StatusCallback: statusCallbackUrl }),
       response_payload_redacted: twilioResponse ? redactPayload(twilioResponse) : JSON.stringify({ error: twilioError }),
@@ -192,6 +211,25 @@ Deno.serve(async (req) => {
       events.push({ type: "provider_send_failed", id: failedEvent?.id });
     }
 
+    // Build diagnostic for the proof
+    let diagnostic = null;
+    if (errorCode === 30032) {
+      diagnostic = {
+        error_code: 30032,
+        title: "Toll-Free Verification Required",
+        category: "sender_compliance_block",
+        explanation: "The toll-free sender number is not verified/approved for US/Canada SMS traffic.",
+        next_action: [
+          "Open Twilio Console > Phone Numbers > Manage > Active Numbers",
+          "Select the toll-free sender: " + fromNumber,
+          "Check Regulatory Information / Toll-Free Verification status",
+          "Complete or fix the verification process",
+          "Do not retry production SMS until verification is approved",
+        ],
+        is_launch_blocker: true,
+      };
+    }
+
     // Return proof
     const proof = {
       test_type: "delivery_proof_test",
@@ -205,10 +243,12 @@ Deno.serve(async (req) => {
       delivery_status: commLog?.delivery_status || "failed",
       communication_log_id: commLog?.id,
       events: events,
+      error_code: errorCode,
       error: twilioError,
+      diagnostic: diagnostic,
       message: providerMessageId
         ? `✓ SMS accepted by Twilio (SID: ${providerMessageId}). Awaiting delivery confirmation via status callback.`
-        : `✗ SMS rejected by Twilio: ${twilioError}`,
+        : `✗ SMS rejected by Twilio (Code ${errorCode}): ${twilioError}`,
     };
 
     console.log(`[deliveryProofTest] PROOF: ${JSON.stringify(proof, null, 2)}`);
