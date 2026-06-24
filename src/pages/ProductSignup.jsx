@@ -16,8 +16,6 @@ const PACKAGES = {
     monthly: 497,
     description: 'Instant lead response + missed-call recovery foundation.',
     services: ['Instant Lead Response', 'Missed-Call Text-Back'],
-    features: ['Instant Lead Response', 'Missed-Call Text-Back', 'Basic setup guidance', 'Remote setup workflow'],
-    cta: 'Choose Starter',
   },
   growth_system: {
     name: 'Growth System',
@@ -25,8 +23,6 @@ const PACKAGES = {
     monthly: 997,
     description: 'Complete lead-to-booking system with AI nurture and booking agent.',
     services: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent'],
-    features: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Remote setup and testing workflow'],
-    cta: 'Choose Growth',
   },
   pro_system: {
     name: 'Pro System',
@@ -34,8 +30,6 @@ const PACKAGES = {
     monthly: 1997,
     description: 'Full revenue recovery engine with reviews, reactivation, and the entire stack.',
     services: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Lead Reactivation', 'Review Request Automation'],
-    features: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Lead Reactivation', 'Review Request Automation', 'Higher-touch remote setup and launch support'],
-    cta: 'Choose Pro',
   },
 };
 
@@ -54,21 +48,18 @@ const PACKAGE_ALIASES = {
  */
 function safePackageData(raw) {
   if (!raw || typeof raw !== 'object') {
-    return { name: 'System', setup: 0, monthly: 0, description: '', services: [], features: [], cta: 'Continue to Payment' };
+    return { name: 'System', setup: 0, monthly: 0, description: '', services: [] };
   }
   const num = (v) => {
     const n = Number(v);
     return Number.isFinite(n) ? n : 0;
   };
-  const strArr = (v) => Array.isArray(v) ? v.filter((s) => typeof s === 'string') : [];
   return {
     name: typeof raw.name === 'string' && raw.name ? raw.name : 'System',
     setup: num(raw.setup),
     monthly: num(raw.monthly),
     description: typeof raw.description === 'string' ? raw.description : '',
-    services: strArr(raw.services),
-    features: strArr(raw.features),
-    cta: typeof raw.cta === 'string' && raw.cta ? raw.cta : 'Continue to Payment',
+    services: Array.isArray(raw.services) ? raw.services.filter((s) => typeof s === 'string') : [],
   };
 }
 
@@ -84,10 +75,10 @@ export default function ProductSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const rawPackage = (searchParams.get('package') || '').toLowerCase();
-  const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : 'starter_system');
-  const packageKey = resolvedKey;
-  const pkg = safePackageData(PACKAGES[resolvedKey]);
+  const rawPackage = searchParams.get('package') || '';
+  const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
+  const packageKey = resolvedKey || 'starter_system';
+  const pkg = safePackageData(PACKAGES[packageKey]);
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);
@@ -106,10 +97,6 @@ export default function ProductSignup() {
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleCheckout = async () => {
-    if (!pkg) {
-      setError('No package selected. Please choose a package to get started.');
-      return;
-    }
     if (!form.name.trim() || !form.email.trim() || !form.business.trim()) {
       setError('Please fill in your name, email, and business name.');
       return;
