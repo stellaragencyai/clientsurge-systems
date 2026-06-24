@@ -41,13 +41,11 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
               transition={{ delay: 0.7 + i * 0.15, duration: 0.5 }}
             >
               <motion.div
-                className="flex items-center gap-3 px-4 py-3 rounded-xl"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl cs-card-shadow"
                 style={{
                   minWidth: 200,
-                  background: "rgba(255,255,255,0.07)",
-                  backdropFilter: "blur(16px)",
-                  WebkitBackdropFilter: "blur(16px)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "#ffffff",
+                  border: "1px solid rgba(0,174,239,0.15)",
                 }}
                 animate={shouldReduceMotion ? undefined : { y: [0, -8, 0] }}
                 transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
@@ -59,8 +57,8 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
                   <Icon className="w-4 h-4" style={{ color: "#00AEEF" }} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white">{card.title}</p>
-                  <p className="text-[10px] text-white/60">{card.desc}</p>
+                  <p className="text-xs font-bold text-foreground">{card.title}</p>
+                  <p className="text-[10px] text-muted-foreground">{card.desc}</p>
                 </div>
               </motion.div>
             </motion.div>
@@ -75,7 +73,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="text-xs md:text-sm font-semibold text-white/70 mb-6 leading-relaxed max-w-2xl mx-auto"
+          className="text-xs md:text-sm font-semibold text-muted-foreground mb-6 leading-relaxed max-w-2xl mx-auto"
         >
           Websites, AI follow-up, booking, missed-call recovery, reviews, and lead reactivation working as one system.
         </motion.p>
@@ -85,7 +83,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight"
+          className="text-4xl md:text-5xl lg:text-6xl font-black text-foreground mb-5 leading-[1.08] tracking-tight"
           style={{ fontFamily: "'Montserrat', sans-serif" }}
         >
           AI Automation Built Around Your Lead Flow.
@@ -96,7 +94,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.18 }}
-          className="text-base md:text-lg font-normal text-white/80 max-w-2xl mx-auto mb-8 leading-relaxed"
+          className="text-base md:text-lg font-normal text-muted-foreground max-w-2xl mx-auto mb-8 leading-relaxed"
         >
           Capture missed calls, follow up instantly, and turn more inquiries into booked appointments — without adding more staff.
         </motion.p>
@@ -117,11 +115,10 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           </button>
           <button
             onClick={() => scrollToSection("automations", "hero_view_automations_click")}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white transition-all duration-300 hover:bg-white/10"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground transition-all duration-300 hover:bg-muted"
             style={{
-              background: "rgba(255,255,255,0.08)",
-              border: "1.5px solid rgba(255,255,255,0.3)",
-              backdropFilter: "blur(8px)",
+              background: "#ffffff",
+              border: "1.5px solid rgba(0,174,239,0.3)",
             }}
           >
             View Automations <ArrowRight className="w-5 h-5" />

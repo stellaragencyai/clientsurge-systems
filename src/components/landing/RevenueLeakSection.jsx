@@ -30,14 +30,14 @@ export default function RevenueLeakSection() {
   return (
     <section
       className="relative py-16 md:py-24 overflow-hidden"
-      style={{ background: "#0D1430" }}
+      style={{ background: "#ffffff" }}
     >
       {/* Subtle glow accents */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 15% 50%, rgba(0,174,239,0.08) 0%, transparent 50%), radial-gradient(ellipse at 85% 50%, rgba(0,174,239,0.08) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 15% 50%, rgba(0,174,239,0.04) 0%, transparent 50%), radial-gradient(ellipse at 85% 50%, rgba(0,174,239,0.04) 0%, transparent 50%)",
         }}
       />
 
@@ -46,10 +46,10 @@ export default function RevenueLeakSection() {
           <p className="cs-eyebrow mb-4 text-primary">
             Stop Losing Revenue
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4 leading-tight tracking-tight">
             The Revenue Leak Most Businesses Don't See
           </h2>
-          <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
             These everyday gaps create lost appointments and lost revenue — quietly, every single day.
           </p>
         </div>
@@ -64,20 +64,19 @@ export default function RevenueLeakSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="rounded-2xl p-6"
+                className="rounded-2xl p-6 cs-card-shadow"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  backdropFilter: "blur(8px)",
+                  background: "#ffffff",
+                  border: "1px solid rgba(0,174,239,0.12)",
                 }}
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="text-lg font-bold text-white mb-2">
+                <h3 className="text-lg font-bold text-foreground mb-2">
                   {leak.title}
                 </h3>
-                <p className="text-sm text-white/80 leading-relaxed">{leak.desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{leak.desc}</p>
               </motion.div>
             );
           })}

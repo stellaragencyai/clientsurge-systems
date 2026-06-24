@@ -36,20 +36,20 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
         </video>
         <div
           className="absolute inset-0"
-          style={{ background: "linear-gradient(180deg, rgba(10,14,39,0.72) 0%, rgba(10,14,39,0.88) 100%)" }}
+          style={{ background: "linear-gradient(180deg, rgba(255,255,255,0.72) 0%, rgba(255,255,255,0.92) 100%)" }}
         />
       </div>
     );
   }
 
   return (
-    <div className="absolute inset-0 overflow-hidden" style={{ background: "#0A0E27" }}>
-      {/* Base radial gradients — blue + purple glow */}
+    <div className="absolute inset-0 overflow-hidden" style={{ background: "#ffffff" }}>
+      {/* Base radial gradients — subtle blue glow on white */}
       <div
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 18% 25%, rgba(0,174,239,0.16) 0%, transparent 50%), radial-gradient(ellipse at 82% 70%, rgba(0,174,239,0.18) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 18% 25%, rgba(0,174,239,0.06) 0%, transparent 50%), radial-gradient(ellipse at 82% 70%, rgba(0,174,239,0.08) 0%, transparent 50%)",
         }}
       />
 
@@ -63,7 +63,7 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
               left: "8%",
               width: 340,
               height: 340,
-              background: "radial-gradient(circle, rgba(0,174,239,0.22), transparent 70%)",
+              background: "radial-gradient(circle, rgba(0,174,239,0.10), transparent 70%)",
               filter: "blur(60px)",
             }}
             animate={{ x: [0, 30, 0], y: [0, 20, 0] }}
@@ -76,7 +76,7 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
               right: "6%",
               width: 380,
               height: 380,
-              background: "radial-gradient(circle, rgba(0,174,239,0.22), transparent 70%)",
+              background: "radial-gradient(circle, rgba(0,174,239,0.10), transparent 70%)",
               filter: "blur(70px)",
             }}
             animate={{ x: [0, -25, 0], y: [0, -18, 0] }}
@@ -94,8 +94,8 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
           width: 220,
           height: 130,
           borderRadius: 12,
-          background: "rgba(255,255,255,0.035)",
-          border: "1px solid rgba(255,255,255,0.06)",
+          background: "rgba(0,174,239,0.04)",
+          border: "1px solid rgba(0,174,239,0.10)",
           filter: "blur(3px)",
         }}
       />
@@ -107,8 +107,8 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
           width: 170,
           height: 110,
           borderRadius: 12,
-          background: "rgba(255,255,255,0.025)",
-          border: "1px solid rgba(255,255,255,0.05)",
+          background: "rgba(0,174,239,0.03)",
+          border: "1px solid rgba(0,174,239,0.08)",
           filter: "blur(4px)",
         }}
       />
@@ -118,7 +118,7 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
         className="absolute inset-0"
         style={{
           backgroundImage:
-            "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
+            "linear-gradient(rgba(0,174,239,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0,174,239,0.04) 1px, transparent 1px)",
           backgroundSize: "60px 60px",
           maskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
           WebkitMaskImage: "radial-gradient(ellipse at center, black 25%, transparent 75%)",
@@ -128,7 +128,7 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
       {/* Dark overlay for readability */}
       <div
         className="absolute inset-0"
-        style={{ background: "linear-gradient(180deg, rgba(10,14,39,0.35) 0%, rgba(10,14,39,0.55) 100%)" }}
+        style={{ background: "linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(255,255,255,0.6) 100%)" }}
       />
     </div>
   );

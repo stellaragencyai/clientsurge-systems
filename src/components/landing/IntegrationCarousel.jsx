@@ -27,7 +27,7 @@ function Badge({ item }) {
       {item.logoUrl ? (
         <LogoImg item={item} />
       ) : (
-        <span className="text-sm md:text-base font-bold text-white/75 whitespace-nowrap px-4 py-1.5 rounded-lg" style={{ background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)" }}>{item.name}</span>
+        <span className="text-sm md:text-base font-bold text-foreground whitespace-nowrap px-4 py-1.5 rounded-lg" style={{ background: "rgba(0,174,239,0.05)", border: "1px solid rgba(0,174,239,0.12)" }}>{item.name}</span>
       )}
     </div>
   );
@@ -38,9 +38,9 @@ export default function IntegrationCarousel() {
   const items = [...INTEGRATIONS, ...INTEGRATIONS];
 
   return (
-    <section className="py-12 md:py-16 relative overflow-hidden" style={{ background: "#0A0E27" }}>
+    <section className="py-12 md:py-16 relative overflow-hidden" style={{ background: "#ffffff" }}>
       <div className="max-w-7xl mx-auto px-6">
-        <p className="text-center text-sm md:text-base text-white/80 font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-center text-sm md:text-base text-muted-foreground font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
           Built to connect with the tools modern businesses already use.
         </p>
 
@@ -49,13 +49,13 @@ export default function IntegrationCarousel() {
             {INTEGRATIONS.map((item) => (
               <div
                 key={item.name}
-                className="flex items-center justify-center px-4 py-4 rounded-xl border border-white/10"
-                style={{ background: "rgba(255,255,255,0.03)" }}
+                className="flex items-center justify-center px-4 py-4 rounded-xl border border-primary/10"
+                style={{ background: "rgba(0,174,239,0.03)" }}
               >
                 {item.logoUrl ? (
                   <LogoImg item={item} />
                 ) : (
-                  <span className="text-sm md:text-base font-bold text-white/75 text-center">{item.name}</span>
+                  <span className="text-sm md:text-base font-bold text-foreground text-center">{item.name}</span>
                 )}
               </div>
             ))}
@@ -63,8 +63,8 @@ export default function IntegrationCarousel() {
         ) : (
           <div className="relative overflow-hidden">
             {/* Edge fades */}
-            <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, #0A0E27, transparent)" }} />
-            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none" style={{ background: "linear-gradient(to left, #0A0E27, transparent)" }} />
+            <div className="absolute left-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none" style={{ background: "linear-gradient(to right, #ffffff, transparent)" }} />
+            <div className="absolute right-0 top-0 bottom-0 w-16 md:w-24 z-10 pointer-events-none" style={{ background: "linear-gradient(to left, #ffffff, transparent)" }} />
 
             {/* Marquee track */}
             <style>{`
