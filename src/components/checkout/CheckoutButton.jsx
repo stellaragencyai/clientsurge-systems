@@ -4,18 +4,30 @@ import { AlertCircle, Loader2 } from 'lucide-react';
 
 /**
  * Stripe Checkout Button — Production Ready
- * 
+ *
  * Handles:
  * - Iframe sandbox detection (blocks checkout in editor preview)
+ * - Customer info collection (public app — no login required)
  * - Stripe session creation via backend
  * - Redirection to Stripe Checkout
  * - Error display
+ *
+ * Props:
+ * - packageKey: 'starter_system' | 'growth_system' | 'pro_system' (or aliases like 'starter', 'elite')
+ * - label: button text
  */
-export default function CheckoutButton({ planType, billingMode = 'monthly', label = 'Get Started' }) {
+export default function CheckoutButton({ packageKey, label = 'Get Started' }) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showForm, setShowForm] = useState(false);
+  const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
 
   const handleCheckout = async () => {
+    if (!form.name.trim() || !form.email.trim() || !form.business.trim()) {
+      setError('Please fill in your name, email, and business name.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
@@ -27,15 +39,18 @@ export default function CheckoutButton({ planType, billingMode = 'monthly', labe
         return;
       }
 
-      // Create checkout session
       const response = await base44.functions.invoke('createCheckoutSession', {
-        plan_type: planType,
-        billing_mode: billingMode,
+        package_key: packageKey,
+        customer_name: form.name,
+        customer_email: form.email,
+        customer_phone: form.phone,
+        business_name: form.business,
+        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${window.location.origin}/pricing`,
       });
 
-      if (response.data?.checkout_url) {
-        // Redirect to Stripe Checkout
-        window.location.href = response.data.checkout_url;
+      if (response.data?.url) {
+        window.location.href = response.data.url;
       } else {
         setError(response.data?.error || 'Failed to create checkout session.');
       }
@@ -46,8 +61,62 @@ export default function CheckoutButton({ planType, billingMode = 'monthly', labe
     }
   };
 
+  if (!showForm) {
+    return (
+      <div className="w-full">
+        <button
+          onClick={() => setShowForm(true)}
+          className="cs-btn-primary w-full flex items-center justify-center gap-2"
+          style={{ minHeight: 'unset', minWidth: 'unset' }}
+        >
+          {label}
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <div className="w-full">
+    <div className="w-full space-y-3">
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Full Name *</label>
+        <input
+          type="text"
+          value={form.name}
+          onChange={(e) => setForm({ ...form, name: e.target.value })}
+          placeholder="Jane Smith"
+          className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Email *</label>
+        <input
+          type="email"
+          value={form.email}
+          onChange={(e) => setForm({ ...form, email: e.target.value })}
+          placeholder="owner@yourbusiness.com"
+          className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Business Name *</label>
+        <input
+          type="text"
+          value={form.business}
+          onChange={(e) => setForm({ ...form, business: e.target.value })}
+          placeholder="ABC Roofing Co."
+          className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
+      <div>
+        <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Phone (optional)</label>
+        <input
+          type="tel"
+          value={form.phone}
+          onChange={(e) => setForm({ ...form, phone: e.target.value })}
+          placeholder="(602) 555-0100"
+          className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
+        />
+      </div>
       <button
         onClick={handleCheckout}
         disabled={loading}
@@ -60,11 +129,11 @@ export default function CheckoutButton({ planType, billingMode = 'monthly', labe
             Processing...
           </>
         ) : (
-          label
+          'Continue to Payment'
         )}
       </button>
       {error && (
-        <div className="mt-3 flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
           <p>{error}</p>
         </div>
