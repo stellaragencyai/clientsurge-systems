@@ -15,6 +15,65 @@ function detectEnvironment(req) {
   return "production";
 }
 
+// Test/internal lead detection — shared with processWebsiteLeadInitialResponse
+function isTestLead(l) {
+  const email = (l.email || "").toLowerCase();
+  const source = (l.source || "").toLowerCase();
+  const phone = l.phone_number || "";
+  const fullName = String(l.full_name || l.first_name || "");
+  const businessName = String(l.business_name || "");
+
+  return (
+    email.includes("example.com") ||
+    email.includes("clientsurge.test") ||
+    email.includes("clientsurge-install.internal") ||
+    email.includes("@test.") ||
+    email.includes("smoke") ||
+    email.includes("backfill-test") ||
+    email.includes("qa") ||
+    source.includes("smoke_test") ||
+    source.includes("crm_live_smoke_test") ||
+    source.includes("twilio_missed_call_test") ||
+    source.includes("admin_test_lead") ||
+    source.includes("backfill") ||
+    source.includes("test") ||
+    fullName.includes("Backfill Test") ||
+    fullName.includes("Smoke") ||
+    fullName.includes("QA") ||
+    fullName.includes("Proof") ||
+    fullName.includes("Runtime") ||
+    businessName.includes("Backfill") ||
+    businessName.includes("Smoke") ||
+    businessName.includes("QA") ||
+    businessName.includes("Proof") ||
+    businessName.includes("Runtime") ||
+    (phone && phone.replace(/\D/g, "").includes("555"))
+  );
+}
+
+// Test lead detection for CommunicationLog rows — checks lead_name and lead_email
+function isTestLeadFromLog(l) {
+  const email = (l.lead_email || "").toLowerCase();
+  const name = String(l.lead_name || "");
+  const trigger = String(l.trigger_name || "");
+
+  return (
+    email.includes("example.com") ||
+    email.includes("clientsurge.test") ||
+    email.includes("clientsurge-install.internal") ||
+    email.includes("@test.") ||
+    email.includes("smoke") ||
+    email.includes("backfill-test") ||
+    email.includes("qa") ||
+    name.includes("Backfill Test") ||
+    name.includes("Smoke") ||
+    name.includes("QA") ||
+    name.includes("Proof") ||
+    name.includes("Runtime") ||
+    trigger.includes("manual_test")
+  );
+}
+
 /**
  * Returns real-time automation health data and persists an AutomationHealthSnapshot.
  * Provider readiness includes: config present, last test pass/fail, last test time,
@@ -141,6 +200,18 @@ Deno.serve(async (req) => {
     );
     const initialResponseWorking = initialResponseLogs.length > 0 ? "pass" : (logs || []).length > 0 ? "fail" : "unknown";
 
+    // ── 3d. Warning: initial_response SMS sent to test/backfill/QA leads ──
+    const testLeadSmsWarnings = (logs || []).filter(
+      (l) =>
+        l.trigger_name === "initial_response" &&
+        l.delivery_status !== "skipped" &&
+        isTestLeadFromLog(l)
+    );
+    const testLeadSmsWarning =
+      testLeadSmsWarnings.length > 0
+        ? `⚠️ ${testLeadSmsWarnings.length} initial_response message(s) were sent to test/backfill/QA leads in the last 24h. These should have been skipped.`
+        : null;
+
     // ── 4. Provider readiness (config + last test result) ──
     const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
     const twilioFromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
@@ -195,6 +266,7 @@ Deno.serve(async (req) => {
       real_leads_waiting_initial_response: realLeadsWaiting,
       test_internal_leads: testLeads.length,
       initial_response_working: initialResponseWorking,
+      test_lead_sms_warnings_24h: testLeadSmsWarnings.length,
     };
 
     // ── 7. Persist AutomationHealthSnapshot ──
@@ -233,6 +305,7 @@ Deno.serve(async (req) => {
       stuck_leads: stuckLeadDetails,
       provider_readiness: providerReadiness,
       launch_blocker_warning: launchBlockerWarning,
+      test_lead_sms_warning: testLeadSmsWarning,
       test_internal_leads: testLeads.length,
       initial_response_working: initialResponseWorking,
       snapshot_at: now.toISOString(),

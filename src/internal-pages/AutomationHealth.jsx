@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck, Server, Wrench, FlaskConical, Zap } from "lucide-react";
+import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck, Server, Wrench, FlaskConical, Zap, ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 
@@ -198,11 +198,14 @@ export default function AutomationHealth() {
     }
   };
 
-  const repairStuckLeads = async () => {
+  const repairStuckLeads = async (mode) => {
     setRepairing(true);
     setRepairResult(null);
     try {
-      const res = await base44.functions.invoke("processWebsiteLeadInitialResponse", { action: "repair_stuck" });
+      const payload = { action: "repair_stuck" };
+      if (mode === "dry_run") payload.dry_run = true;
+      if (mode === "confirm") payload.confirm = true;
+      const res = await base44.functions.invoke("processWebsiteLeadInitialResponse", payload);
       setRepairResult(res.data);
       setTimeout(() => fetchData(), 1000);
     } catch (err) {
@@ -257,6 +260,7 @@ export default function AutomationHealth() {
   const stuck = data?.stuck_leads || [];
   const readiness = data?.provider_readiness || {};
   const warning = data?.launch_blocker_warning;
+  const testSmsWarning = data?.test_lead_sms_warning;
 
   return (
     <div className="min-h-screen bg-background p-4 md:p-6 max-w-7xl mx-auto">
@@ -290,6 +294,18 @@ export default function AutomationHealth() {
         </div>
       )}
 
+      {/* Test Lead SMS Warning */}
+      {testSmsWarning && (
+        <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 p-4 flex items-start gap-3">
+          <ShieldAlert className="w-5 h-5 text-amber-600 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="text-sm font-bold text-amber-800">Test Lead Messages Detected</p>
+            <p className="text-sm text-amber-700 mt-1">{testSmsWarning}</p>
+            <p className="text-xs text-amber-600 mt-1">These are audit-evidence records only — no data has been deleted. The exclusion guard now prevents future sends.</p>
+          </div>
+        </div>
+      )}
+
       {/* Section 1: Status Cards */}
       <h2 className="text-lg font-bold text-foreground mb-3">Status Cards (Last 24h)</h2>
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-8">
@@ -309,6 +325,12 @@ export default function AutomationHealth() {
         />
         <StatusCard icon={AlertTriangle} label="Real Leads Waiting" value={s.real_leads_waiting_initial_response ?? 0} accent="amber" />
         <StatusCard icon={ShieldCheck} label="Test/Internal Leads" value={data?.test_internal_leads ?? s.test_internal_leads ?? 0} accent="gray" />
+        <StatusCard
+          icon={ShieldAlert}
+          label="Test Lead SMS Warnings (24h)"
+          value={s.test_lead_sms_warnings_24h ?? 0}
+          accent={s.test_lead_sms_warnings_24h > 0 ? "amber" : "gray"}
+        />
       </div>
 
       {/* Section 2: Recent Communication Logs */}
@@ -426,24 +448,46 @@ export default function AutomationHealth() {
             <h3 className="font-bold text-foreground">Repair Stuck Leads</h3>
           </div>
           <p className="text-xs text-foreground/50 mb-4">
-            Finds all WebsiteLead records with automation on, no response, older than 5 min. Sends real SMS/email only to safe, consented, non-test leads. Creates skipped logs for ineligible ones.
+            Finds all WebsiteLead records with automation on, no response, older than 5 min. Dry-run first to see a safe preview, then confirm to send real SMS/email only to eligible non-test leads.
           </p>
-          <button onClick={repairStuckLeads} disabled={repairing} className="cs-btn-primary w-full">
-            {repairing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wrench className="w-4 h-4" />}
-            <span className="ml-1">{repairing ? "Repairing…" : "Repair Stuck Leads"}</span>
-          </button>
+          <div className="flex gap-2">
+            <button onClick={() => repairStuckLeads("dry_run")} disabled={repairing} className="cs-btn-primary flex-1">
+              {repairing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wrench className="w-4 h-4" />}
+              <span className="ml-1">{repairing ? "Running…" : "Dry-Run Preview"}</span>
+            </button>
+            {repairResult?.mode === "dry_run" && repairResult.real_eligible_leads > 0 && (
+              <button onClick={() => repairStuckLeads("confirm")} disabled={repairing} className="inline-flex items-center justify-center gap-1 px-4 py-2 rounded-full text-sm font-semibold text-white bg-red-600 hover:bg-red-700 transition-colors">
+                <Send className="w-4 h-4" />
+                Confirm & Send
+              </button>
+            )}
+          </div>
           {repairResult && (
             <div className={`mt-3 p-3 rounded-lg text-sm border ${repairResult.success !== false ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-red-50 text-red-700 border-red-200"}`}>
               {repairResult.success !== false ? (
                 <>
-                  <p className="font-bold mb-2">Repair Complete</p>
-                  <div className="grid grid-cols-2 gap-2 text-xs">
-                    <div>Total Processed: <strong>{repairResult.total_processed}</strong></div>
-                    <div>SMS Sent: <strong className="text-green-600">{repairResult.sent_sms}</strong></div>
-                    <div>Email Sent: <strong className="text-green-600">{repairResult.sent_email}</strong></div>
-                    <div>Skipped: <strong className="text-amber-600">{repairResult.skipped}</strong></div>
-                    <div>Failed: <strong className="text-red-600">{repairResult.failed}</strong></div>
-                  </div>
+                  <p className="font-bold mb-2">
+                    {repairResult.mode === "dry_run" ? "Dry-Run Preview" : repairResult.mode === "requires_confirmation" ? "Confirmation Required" : "Repair Complete"}
+                  </p>
+                  {repairResult.preview && (
+                    <div className="grid grid-cols-2 gap-2 text-xs mb-2">
+                      <div>Would Send SMS: <strong className="text-green-600">{repairResult.preview.would_send_sms}</strong></div>
+                      <div>Would Send Email: <strong className="text-green-600">{repairResult.preview.would_send_email}</strong></div>
+                      <div>Skip (Test/QA/Backfill): <strong className="text-gray-600">{repairResult.preview.would_skip_internal_test}</strong></div>
+                      <div>Skip (No Consent): <strong className="text-amber-600">{repairResult.preview.would_skip_no_consent}</strong></div>
+                      <div>Skip (Invalid Phone): <strong className="text-amber-600">{repairResult.preview.would_skip_invalid_phone}</strong></div>
+                      <div>Skip (Invalid Email): <strong className="text-amber-600">{repairResult.preview.would_skip_invalid_email}</strong></div>
+                    </div>
+                  )}
+                  {repairResult.mode === "confirmed" && (
+                    <div className="grid grid-cols-2 gap-2 text-xs">
+                      <div>Total Processed: <strong>{repairResult.total_processed}</strong></div>
+                      <div>SMS Sent: <strong className="text-green-600">{repairResult.sent_sms}</strong></div>
+                      <div>Email Sent: <strong className="text-green-600">{repairResult.sent_email}</strong></div>
+                      <div>Skipped: <strong className="text-amber-600">{repairResult.skipped}</strong></div>
+                      <div>Failed: <strong className="text-red-600">{repairResult.failed}</strong></div>
+                    </div>
+                  )}
                   {repairResult.details && repairResult.details.length > 0 && (
                     <details className="mt-2">
                       <summary className="text-xs font-semibold cursor-pointer">View {repairResult.details.length} details</summary>

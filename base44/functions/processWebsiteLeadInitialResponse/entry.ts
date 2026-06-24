@@ -84,6 +84,59 @@ function isTestSource(source) {
   return TEST_SOURCE_PATTERNS.some((s) => lower.includes(s));
 }
 
+// ═══════════════════════════════════════════
+// SHARED EXCLUSION HELPER
+// Returns true for test/backfill/QA/smoke/internal leads.
+// These records must never receive automatic initial_response SMS or email.
+// The admin manual test panel (trigger_name=manual_test) bypasses this.
+// ═══════════════════════════════════════════
+
+const ADMIN_TEST_NUMBERS = [
+  "+16025874608", "6025874608",
+  "+16025843227", "6025843227",
+  "+16025550001", "+16025550099",
+];
+
+const EXCLUDE_NAME_PATTERNS = [
+  "Backfill Test", "Smoke", "QA", "Stripe Webhook Proof",
+  "ClientSurge Smoke", "ClientSurge QA", "Sarah Smoke Test",
+  "Runtime", "Proof",
+];
+
+const EXCLUDE_BUSINESS_PATTERNS = [
+  "Backfill", "Smoke", "QA", "Stripe Webhook Proof",
+  "ClientSurge Smoke", "ClientSurge QA", "Runtime", "Proof",
+];
+
+const EXCLUDE_SOURCE_PATTERNS = [
+  "smoke", "smoke_test", "crm_live_smoke_test",
+  "twilio_missed_call_test", "test", "qa", "backfill",
+];
+
+const EXCLUDE_EMAIL_PATTERNS = [
+  "example.com", "clientsurge.test", "clientsurge-install.internal",
+  "backfill-test", "smoke", "qa",
+];
+
+function shouldExcludeFromAutomaticInitialResponse(lead, opts = {}) {
+  // Admin manual test panel bypasses exclusion
+  if (opts.allowAdminTestNumber === true) return false;
+
+  const fullName = String(lead.full_name || lead.first_name || "");
+  const businessName = String(lead.business_name || "");
+  const source = String(lead.source || "").toLowerCase();
+  const email = String(lead.email || "").toLowerCase();
+  const phone = String(lead.phone_number || "").replace(/\D/g, "");
+
+  if (EXCLUDE_NAME_PATTERNS.some((p) => fullName.includes(p))) return true;
+  if (EXCLUDE_BUSINESS_PATTERNS.some((p) => businessName.includes(p))) return true;
+  if (EXCLUDE_SOURCE_PATTERNS.some((p) => source.includes(p))) return true;
+  if (EXCLUDE_EMAIL_PATTERNS.some((p) => email.includes(p))) return true;
+  if (ADMIN_TEST_NUMBERS.some((n) => phone === n.replace(/\D/g, ""))) return true;
+
+  return false;
+}
+
 function isValidEmail(email) {
   return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
 }
@@ -320,6 +373,59 @@ async function processLead(base44, lead, env) {
     };
   }
 
+  // ── SHARED EXCLUSION CHECK ──
+  // Test/backfill/QA/smoke/internal records never receive automatic initial_response.
+  // Do not call Twilio, do not call Resend, do not update lead fields.
+  if (shouldExcludeFromAutomaticInitialResponse(lead)) {
+    // Create skipped CommunicationLog rows for available channels as audit evidence
+    if (leadPhone) {
+      await createCommLog(base44, {
+        related_entity_type: "WebsiteLead",
+        related_entity_id: leadId,
+        lead_email: leadEmail,
+        lead_phone: leadPhone,
+        lead_name: leadName,
+        channel: "sms",
+        provider: "twilio",
+        direction: "outbound",
+        trigger_name: "initial_response",
+        to_address: leadPhone,
+        body_preview: SMS_BODY.slice(0, 200),
+        delivery_status: "skipped",
+        error_message: "internal_test_lead",
+        environment: env,
+      });
+    }
+    if (leadEmail) {
+      await createCommLog(base44, {
+        related_entity_type: "WebsiteLead",
+        related_entity_id: leadId,
+        lead_email: leadEmail,
+        lead_phone: leadPhone,
+        lead_name: leadName,
+        channel: "email",
+        provider: "resend",
+        direction: "outbound",
+        trigger_name: "initial_response",
+        to_address: leadEmail,
+        subject: EMAIL_SUBJECT,
+        body_preview: EMAIL_BODY.slice(0, 200),
+        delivery_status: "skipped",
+        error_message: "internal_test_lead",
+        environment: env,
+      });
+    }
+    return {
+      lead_id: leadId,
+      skipped: true,
+      reason: "internal_test_lead",
+      sms: { eligible: false, sent: false, skip_reason: "internal_test_lead" },
+      email: { eligible: false, sent: false, skip_reason: "internal_test_lead" },
+      lead_updated: false,
+      initial_response_sent: false,
+    };
+  }
+
   const smsEligibility = checkSmsEligibility(lead);
   const emailEligibility = checkEmailEligibility(lead);
 
@@ -487,9 +593,11 @@ async function processLead(base44, lead, env) {
 // REPAIR STUCK LEADS
 // ═══════════════════════════════════════════
 
-async function repairStuckLeads(base44, env) {
+async function repairStuckLeads(base44, env, opts = {}) {
   const now = new Date();
   const fiveMinAgo = now.getTime() - 5 * 60 * 1000;
+  const dryRun = opts.dry_run === true;
+  const confirmed = opts.confirmed === true;
 
   const allLeads = await base44.asServiceRole.entities.WebsiteLead.filter(
     { archived: false },
@@ -501,13 +609,77 @@ async function repairStuckLeads(base44, env) {
     (l) => l.automation_enabled === true && !l.initial_response_sent_at && new Date(l.created_date).getTime() < fiveMinAgo
   );
 
+  // ── DRY-RUN PREVIEW: classify each stuck lead without sending ──
+  const preview = {
+    would_send_sms: 0,
+    would_send_email: 0,
+    would_skip_internal_test: 0,
+    would_skip_no_consent: 0,
+    would_skip_invalid_phone: 0,
+    would_skip_invalid_email: 0,
+  };
+  const realStuckLeads = [];
+
+  for (const lead of stuckLeads) {
+    if (shouldExcludeFromAutomaticInitialResponse(lead)) {
+      preview.would_skip_internal_test++;
+      continue;
+    }
+    const smsElig = checkSmsEligibility(lead);
+    const emailElig = checkEmailEligibility(lead);
+
+    if (smsElig.eligible) {
+      preview.would_send_sms++;
+    } else if (smsElig.reason === "no_consent" || smsElig.reason === "no_sms_permission") {
+      preview.would_skip_no_consent++;
+    } else if (smsElig.reason === "missing_phone" || smsElig.reason === "invalid_phone") {
+      preview.would_skip_invalid_phone++;
+    }
+
+    if (emailElig.eligible) {
+      preview.would_send_email++;
+    } else if (emailElig.reason === "invalid_email" || emailElig.reason === "missing_email") {
+      preview.would_skip_invalid_email++;
+    }
+
+    // Only include leads where at least one channel is eligible
+    if (smsElig.eligible || emailElig.eligible) {
+      realStuckLeads.push(lead);
+    }
+  }
+
+  // ── If dry-run, return preview only — no sends ──
+  if (dryRun) {
+    return {
+      success: true,
+      mode: "dry_run",
+      total_stuck: stuckLeads.length,
+      preview,
+      real_eligible_leads: realStuckLeads.length,
+      message: "Dry-run preview. Pass confirm=true to send to eligible real leads.",
+    };
+  }
+
+  // ── If not confirmed, refuse to send — require explicit confirmation ──
+  if (!confirmed) {
+    return {
+      success: false,
+      mode: "requires_confirmation",
+      total_stuck: stuckLeads.length,
+      preview,
+      real_eligible_leads: realStuckLeads.length,
+      message: "Repair requires confirmation. Call with dry_run=true first, then confirm=true to execute.",
+    };
+  }
+
+  // ── CONFIRMED: process only real eligible leads (test/QA/backfill already filtered) ──
   let sentSms = 0;
   let sentEmail = 0;
   let skipped = 0;
   let failed = 0;
   const details = [];
 
-  for (const lead of stuckLeads) {
+  for (const lead of realStuckLeads) {
     try {
       const result = await processLead(base44, lead, env);
       if (result.sms?.sent) sentSms++;
@@ -543,11 +715,15 @@ async function repairStuckLeads(base44, env) {
 
   return {
     success: true,
-    total_processed: stuckLeads.length,
+    mode: "confirmed",
+    total_stuck: stuckLeads.length,
+    real_eligible_leads: realStuckLeads.length,
+    total_processed: realStuckLeads.length,
     sent_sms: sentSms,
     sent_email: sentEmail,
     skipped,
     failed,
+    preview,
     details: details.slice(0, 50),
   };
 }
@@ -608,7 +784,10 @@ Deno.serve(async (req) => {
       if (user.role !== "admin" && user.role !== "super_admin") {
         return json({ error: "Forbidden — admin access required" }, 403);
       }
-      const result = await repairStuckLeads(base44, env);
+      const result = await repairStuckLeads(base44, env, {
+        dry_run: body.dry_run === true,
+        confirmed: body.confirm === true,
+      });
       return json(result);
     }
 
