@@ -59,13 +59,46 @@ Deno.serve(async (req) => {
 
     console.log(`[deliveryProofTest] Normalized ${rawPhone} → ${normalizedPhone}`);
 
-    // 3. Initialize Twilio
+    // 3. Initialize Twilio & Load AdminSettings sender
     const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
     const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-    const fromNumber = Deno.env.get("TWILIO_FROM_NUMBER");
 
-    if (!accountSid || !authToken || !fromNumber) {
+    if (!accountSid || !authToken) {
       return new Response(JSON.stringify({ error: "Twilio credentials missing" }), { status: 500 });
+    }
+
+    // ── CRITICAL: Resolve sender from AdminSettings, not env fallback ──
+    let fromNumber = null;
+    try {
+      const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+      if (settings?.[0]?.twilio_from_number) {
+        fromNumber = normalizePhoneE164(settings[0].twilio_from_number);
+      }
+    } catch (e) {
+      console.warn(`[deliveryProofTest] Failed to load AdminSettings: ${e.message}`);
+    }
+
+    // Fall back to env var only if AdminSettings empty
+    if (!fromNumber) {
+      fromNumber = Deno.env.get("TWILIO_FROM_NUMBER");
+      if (fromNumber) {
+        fromNumber = normalizePhoneE164(fromNumber);
+      }
+    }
+
+    if (!fromNumber) {
+      return new Response(JSON.stringify({ error: "Twilio FROM sender not configured" }), { status: 500 });
+    }
+
+    // Hard-block the deprecated toll-free sender
+    if (fromNumber === "+18778123630") {
+      return new Response(
+        JSON.stringify({
+          error: "BLOCKED: Twilio sender +18778123630 is disabled (toll-free verification issue). Use +16025843227 instead.",
+          current_sender: fromNumber,
+        }),
+        { status: 400 }
+      );
     }
 
     const client = twilio(accountSid, authToken);

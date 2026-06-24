@@ -1,4 +1,9 @@
-import { secureJson } from "../_shared/response.ts";
+function secureJson(data, opts = {}) {
+  return new Response(JSON.stringify(data), {
+    status: opts.status || 200,
+    headers: { "Content-Type": "application/json" },
+  });
+}
 /**
  * Missed-Call Follow-Up Processor (Minute-Precision)
  * Scheduled: Every 5 minutes
@@ -248,9 +253,24 @@ Deno.serve(async (req) => {
       );
     const settings = settingsRecords?.[0] || {};
 
-    const fromNumber =
-      settings.twilio_from_number ||
-      Deno.env.get("TWILIO_PHONE_NUMBER");
+    // ── CRITICAL: Resolve sender from AdminSettings.twilio_from_number ──
+    let fromNumber = settings.twilio_from_number;
+    if (!fromNumber) {
+      fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+    }
+    if (fromNumber) {
+      fromNumber = normalizePhoneToE164(fromNumber);
+    }
+    if (!fromNumber) {
+      return secureJson({ error: "Twilio FROM sender not configured" }, { status: 500 });
+    }
+    // Hard-block the deprecated sender
+    if (fromNumber === "+18778123630") {
+      return secureJson({
+        error: "BLOCKED: Twilio sender +18778123630 is disabled. Use +16025843227 instead.",
+        sender: fromNumber,
+      }, { status: 400 });
+    }
     const fromEmail = getApprovedEmailSender(settings, { preferLeads: true });
     const bookingLink = settings.booking_link_default || "";
 

@@ -50,13 +50,21 @@ function formatSmsTemplate(template, lead) {
     .replace("{business_name}", lead.business_name || "your business");
 }
 
-async function sendTwilioSms(toNumber, messageBody) {
+async function sendTwilioSms(toNumber, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 
-  if (!accountSid || !authToken || !fromNumber) {
+  if (!accountSid || !authToken) {
     throw new Error("Twilio credentials not configured");
+  }
+
+  if (!fromNumber) {
+    throw new Error("Twilio FROM sender not provided");
+  }
+
+  // Hard-block the deprecated toll-free sender
+  if (fromNumber === "+18778123630") {
+    throw new Error("Twilio sender +18778123630 is BLOCKED (toll-free verification issue). Use +16025843227.");
   }
 
   const auth = btoa(`${accountSid}:${authToken}`);
@@ -243,6 +251,23 @@ Deno.serve(async (req) => {
       } catch (_) {}
     }
 
+    // ── RESOLVE TWILIO SENDER FROM ADMINSETTINGS ──
+    let fromNumber = null;
+    try {
+      const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+      if (settings?.[0]?.twilio_from_number) {
+        fromNumber = settings[0].twilio_from_number;
+      }
+    } catch (e) {
+      console.warn(`[sendInstantLeadResponseSms] Failed to load AdminSettings: ${e.message}`);
+    }
+    if (!fromNumber) {
+      fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+    }
+    if (fromNumber) {
+      fromNumber = normalizePhoneToE164(fromNumber);
+    }
+
     // ── E.164 NORMALIZATION ──
     const rawPhone = leadData.phone_number;
     const normalizedPhone = normalizePhoneToE164(rawPhone);
@@ -263,7 +288,7 @@ Deno.serve(async (req) => {
     const messageBody = formatSmsTemplate(smsTemplate, leadData);
     let messageSid;
     try {
-      messageSid = await sendTwilioSms(normalizedPhone, messageBody);
+      messageSid = await sendTwilioSms(normalizedPhone, messageBody, fromNumber);
     } catch (smsError) {
       await logSmsEvent(base44, lead_id, "failed", null, smsError.message);
       base44.asServiceRole.functions.invoke('logCommunication', {
@@ -295,7 +320,7 @@ Deno.serve(async (req) => {
       lead_email: leadData.email, lead_phone: rawPhone, lead_name: leadData.full_name,
       channel: "sms", provider: "twilio", direction: "outbound",
       trigger_name: "initial_response", to_address: normalizedPhone, canonical_to_address: normalizedPhone,
-      from_address: Deno.env.get("TWILIO_PHONE_NUMBER"),
+      from_address: fromNumber,
       body_preview: messageBody.slice(0, 200),
       provider_message_id: messageSid, provider_status: "queued",
       delivery_status: "queued", skip_lead_update: true,
