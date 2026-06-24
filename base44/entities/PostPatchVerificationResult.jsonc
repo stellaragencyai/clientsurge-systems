@@ -1,0 +1,111 @@
+{
+  "name": "PostPatchVerificationResult",
+  "type": "object",
+  "title": "Post-Patch Verification Result",
+  "description": "Stores the result of a post-patch verification run that proves the WebsiteLead initial-response automation correctly sends to safe eligible leads and skips internal/test leads.",
+  "properties": {
+    "run_at": {
+      "type": "string",
+      "title": "Run At",
+      "format": "date-time"
+    },
+    "safe_lead_id": {
+      "type": "string",
+      "title": "Safe Lead ID",
+      "description": "WebsiteLead ID of the safe eligible verification lead"
+    },
+    "internal_test_lead_id": {
+      "type": "string",
+      "title": "Internal Test Lead ID",
+      "description": "WebsiteLead ID of the internal/test verification lead"
+    },
+    "safe_sms_pass": {
+      "type": "boolean",
+      "title": "Safe SMS Pass",
+      "default": false
+    },
+    "safe_email_pass": {
+      "type": "boolean",
+      "title": "Safe Email Pass",
+      "default": false
+    },
+    "internal_sms_skip_pass": {
+      "type": "boolean",
+      "title": "Internal SMS Skip Pass",
+      "default": false
+    },
+    "internal_email_skip_pass": {
+      "type": "boolean",
+      "title": "Internal Email Skip Pass",
+      "default": false
+    },
+    "leaked_internal_send_detected": {
+      "type": "boolean",
+      "title": "Leaked Internal Send Detected",
+      "default": false
+    },
+    "overall_status": {
+      "type": "string",
+      "title": "Overall Status",
+      "enum": [
+        "pass",
+        "fail",
+        "partial"
+      ]
+    },
+    "safe_sms_log_id": {
+      "type": "string",
+      "title": "Safe SMS CommunicationLog ID"
+    },
+    "safe_email_log_id": {
+      "type": "string",
+      "title": "Safe Email CommunicationLog ID"
+    },
+    "internal_sms_log_id": {
+      "type": "string",
+      "title": "Internal SMS CommunicationLog ID"
+    },
+    "internal_email_log_id": {
+      "type": "string",
+      "title": "Internal Email CommunicationLog ID"
+    },
+    "safe_sms_provider_id": {
+      "type": "string",
+      "title": "Safe SMS Provider Message ID (Twilio SID)"
+    },
+    "safe_email_provider_id": {
+      "type": "string",
+      "title": "Safe Email Provider Message ID (Resend ID)"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "run_at",
+    "overall_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

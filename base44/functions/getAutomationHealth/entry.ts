@@ -299,6 +299,38 @@ Deno.serve(async (req) => {
     // ── 8. Recent logs for table ──
     const recentForTable = (logs || []).slice(0, 50);
 
+    // ── 9. Latest Post-Patch Verification ──
+    let latestVerification = null;
+    try {
+      const verResults = await base44.asServiceRole.entities.PostPatchVerificationResult.list(
+        "-created_date",
+        1
+      );
+      if (verResults && verResults.length > 0) {
+        const v = verResults[0];
+        latestVerification = {
+          run_at: v.run_at,
+          overall_status: v.overall_status,
+          safe_sms_pass: v.safe_sms_pass,
+          safe_email_pass: v.safe_email_pass,
+          internal_sms_skip_pass: v.internal_sms_skip_pass,
+          internal_email_skip_pass: v.internal_email_skip_pass,
+          leaked_internal_send_detected: v.leaked_internal_send_detected,
+          safe_lead_id: v.safe_lead_id,
+          internal_test_lead_id: v.internal_test_lead_id,
+          safe_sms_log_id: v.safe_sms_log_id,
+          safe_email_log_id: v.safe_email_log_id,
+          internal_sms_log_id: v.internal_sms_log_id,
+          internal_email_log_id: v.internal_email_log_id,
+          safe_sms_provider_id: v.safe_sms_provider_id,
+          safe_email_provider_id: v.safe_email_provider_id,
+          notes: v.notes,
+        };
+      }
+    } catch (e) {
+      console.warn("[getAutomationHealth] Verification lookup failed:", e.message);
+    }
+
     return json({
       status_cards: statusCards,
       recent_logs: recentForTable,
@@ -308,6 +340,7 @@ Deno.serve(async (req) => {
       test_lead_sms_warning: testLeadSmsWarning,
       test_internal_leads: testLeads.length,
       initial_response_working: initialResponseWorking,
+      latest_verification: latestVerification,
       snapshot_at: now.toISOString(),
       environment: env,
     });

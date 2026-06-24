@@ -2,6 +2,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck, Server, Wrench, FlaskConical, Zap, ShieldAlert } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
+import PostPatchVerificationCard from "@/components/admin/PostPatchVerificationCard";
 
 function StatusCard({ icon: Icon, label, value, accent }) {
   const colorMap = {
@@ -145,6 +146,8 @@ export default function AutomationHealth() {
   const [testLeadPhone, setTestLeadPhone] = useState("");
   const [creatingTestLead, setCreatingTestLead] = useState(false);
   const [testLeadResult, setTestLeadResult] = useState(null);
+  const [verifying, setVerifying] = useState(false);
+  const [verificationResult, setVerificationResult] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -234,6 +237,22 @@ export default function AutomationHealth() {
     }
   };
 
+  const runVerification = async () => {
+    setVerifying(true);
+    setVerificationResult(null);
+    try {
+      const res = await base44.functions.invoke("processWebsiteLeadInitialResponse", {
+        action: "run_post_patch_verification",
+      });
+      setVerificationResult(res.data);
+      setTimeout(() => fetchData(), 1500);
+    } catch (err) {
+      setVerificationResult({ success: false, error: err.response?.data?.error || err.message });
+    } finally {
+      setVerifying(false);
+    }
+  };
+
   if (loading && !data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
@@ -305,6 +324,13 @@ export default function AutomationHealth() {
           </div>
         </div>
       )}
+
+      {/* Post-Patch Verification */}
+      <PostPatchVerificationCard
+        verification={verificationResult || data?.latest_verification}
+        verifying={verifying}
+        onRun={runVerification}
+      />
 
       {/* Section 1: Status Cards */}
       <h2 className="text-lg font-bold text-foreground mb-3">Status Cards (Last 24h)</h2>
