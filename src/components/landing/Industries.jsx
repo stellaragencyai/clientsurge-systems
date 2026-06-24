@@ -224,7 +224,7 @@ export default function Industries() {
               className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
                 activeFilter === f.id
                   ? "text-white border-transparent shadow-sm"
-                  : "bg-background/80 text-muted-foreground border-border hover:text-foreground hover:border-[#00AEEF] hover:bg-[rgba(0,174,239,0.08)] hover:shadow-[0_0_14px_rgba(0,174,239,0.35)]"
+                  : "bg-white text-foreground border-border hover:text-foreground hover:border-[#00AEEF] hover:bg-[rgba(0,174,239,0.08)] hover:shadow-[0_0_14px_rgba(0,174,239,0.35)]"
               }`}
             style={activeFilter === f.id ? { background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-sm)" } : { borderColor: "rgba(0,174,239,0.22)" }}
             >

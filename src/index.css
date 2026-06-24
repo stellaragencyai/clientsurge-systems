@@ -9,20 +9,20 @@
     --font-titles: 'Montserrat', sans-serif;
 
     /* ClientSurge Electric Blue Theme — unified to #00AEEF */
-    --background: 210 100% 99%;
+    --background: 0 0% 100%;
     /* Pure black foreground — solid, sharp, zero fade */
-    --foreground: 0 0% 10%;
-    --card: 210 60% 98%;
+    --foreground: 0 0% 0%;
+    --card: 0 0% 100%;
     --card-foreground: 0 0% 0%;
     --popover: 0 0% 100%;
     --popover-foreground: 0 0% 0%;
     /* Primary locked to #00AEEF — hsl(199, 100%, 47%) */
     --primary: 199 100% 47%;
     --primary-foreground: 0 0% 100%;
-    --secondary: 210 60% 95%;
+    --secondary: 0 0% 97%;
     --secondary-foreground: 0 0% 0%;
-    --muted: 210 60% 98%;
-    --muted-foreground: 0 0% 25%;
+    --muted: 0 0% 97%;
+    --muted-foreground: 0 0% 15%;
     --accent: 199 100% 47%;
     --accent-foreground: 0 0% 100%;
     --destructive: 0 84.2% 60.2%;
@@ -40,7 +40,7 @@
     --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 199 100% 47%;
     --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 210 60% 95%;
+    --sidebar-accent: 0 0% 97%;
     --sidebar-accent-foreground: 0 0% 0%;
     --sidebar-border: 199 40% 88%;
     --sidebar-ring: 199 100% 47%;
@@ -57,10 +57,10 @@
 
     /* ── Semantic color aliases (map to hsl tokens above) ── */
     --color-text-primary: hsl(0, 0%, 0%);
-    --color-text-muted: hsl(215, 35%, 20%);
+    --color-text-muted: hsl(0, 0%, 15%);
     --color-text-heading: #000000;
-    --color-surface: hsl(210, 100%, 99%);
-    --color-surface-card: hsl(210, 60%, 98%);
+    --color-surface: hsl(0, 0%, 100%);
+    --color-surface-card: hsl(0, 0%, 100%);
     --color-border-default: hsl(199, 40%, 88%);
     --color-accent: #00AEEF;
 
@@ -605,11 +605,11 @@ body {
 
 /* Section-specific nebula tints */
 .nebula-faq {
-  background: hsl(var(--background)) !important;
+  background: #ffffff !important;
 }
 
 .nebula-cta {
-  background: hsl(var(--card)) !important;
+  background: #ffffff !important;
 }
 
 .nebula-hero {
@@ -621,11 +621,11 @@ body {
 }
 
 .nebula-testimonials {
-  background: hsl(var(--background)) !important;
+  background: #ffffff !important;
 }
 
 .nebula-problem {
-  background: hsl(var(--background)) !important;
+  background: #ffffff !important;
 }
 
 body::before {

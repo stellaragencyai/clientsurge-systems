@@ -80,7 +80,7 @@ export default function PricingPackageGrid({ onSelectPackage }) {
   return (
     <section className="py-16 px-6 bg-white">
       <div className="max-w-7xl mx-auto">
-        <h2 className="text-4xl font-bold text-slate-900 text-center mb-12">
+        <h2 className="text-4xl font-bold text-black text-center mb-12" style={{ fontFamily: "'Montserrat', sans-serif" }}>
           Choose Your Automation System
         </h2>
 

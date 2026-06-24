@@ -92,7 +92,7 @@ export default function SixStepFlow() {
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-muted-foreground leading-relaxed mb-3">{step.desc}</p>
+                <p className="text-sm text-foreground leading-relaxed mb-3">{step.desc}</p>
 
                 {/* Service tag */}
                 <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">

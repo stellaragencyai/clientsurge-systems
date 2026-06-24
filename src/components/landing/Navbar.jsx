@@ -34,9 +34,7 @@ export default function Navbar() {
 
   // Pages with dark/photo hero backgrounds get a transparent navbar at top
   const INDUSTRY_HERO_SLUGS = ['roofing', 'hvac', 'plumbing', 'dental', 'med-spa', 'chiropractic', 'contractors', 'real-estate', 'personal-injury'];
-  const isIndustryHeroPage = INDUSTRY_HERO_SLUGS.some(s => location.pathname === `/${s}`);
-  const isHomePage = location.pathname === "/";
-  const navbarTransparentAtTop = (isIndustryHeroPage || isHomePage) && !scrolled && !open;
+  const navbarTransparentAtTop = false;
 
   const mobileUserName = user?.full_name || user?.email?.split("@")[0] || null;
   const mobileUserRole = user?.role ? user.role.replace(/_/g, " ") : null;

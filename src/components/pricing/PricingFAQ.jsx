@@ -31,21 +31,21 @@ const faqItems = [
 
 function FAQItem({ question, answer, isOpen, onToggle }) {
   return (
-    <div className="border border-slate-200 rounded-lg mb-4">
+    <div className="border border-border rounded-lg mb-4">
       <button
         onClick={onToggle}
-        className="w-full px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition"
+        className="w-full px-6 py-4 flex items-center justify-between hover:bg-primary/5 transition"
       >
-        <span className="font-semibold text-slate-900 text-left">{question}</span>
+        <span className="font-semibold text-black text-left">{question}</span>
         <ChevronDown
-          className={`w-5 h-5 text-slate-600 flex-shrink-0 transition ${
+          className={`w-5 h-5 text-primary flex-shrink-0 transition ${
             isOpen ? 'rotate-180' : ''
           }`}
         />
       </button>
       {isOpen && (
-        <div className="px-6 pb-4 bg-slate-50 border-t border-slate-200">
-          <p className="text-slate-600 text-sm leading-relaxed">{answer}</p>
+        <div className="px-6 pb-4 border-t border-border" style={{ background: "rgba(0,174,239,0.03)" }}>
+          <p className="text-foreground text-sm leading-relaxed">{answer}</p>
         </div>
       )}
     </div>
@@ -56,9 +56,9 @@ export default function PricingFAQ() {
   const [openIndex, setOpenIndex] = useState(null);
 
   return (
-    <section className="py-16 px-6 bg-slate-50">
+    <section className="py-16 px-6 bg-white">
       <div className="max-w-3xl mx-auto">
-        <h2 className="text-4xl font-bold text-slate-900 text-center mb-12">
+        <h2 className="text-4xl font-bold text-black text-center mb-12" style={{ fontFamily: "'Montserrat', sans-serif" }}>
           Frequently Asked Questions
         </h2>
 

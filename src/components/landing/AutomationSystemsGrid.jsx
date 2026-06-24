@@ -213,7 +213,7 @@ export default function AutomationSystemsGrid() {
               return (
                 <div
                   key={title}
-                  className="group rounded-2xl bg-card flex flex-col gap-0 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 overflow-hidden"
+                  className="group rounded-2xl bg-white flex flex-col gap-0 hover:-translate-y-1.5 hover:shadow-xl transition-all duration-300 overflow-hidden"
                   style={{
                     border: "1px solid rgba(0,174,239,0.14)",
                     boxShadow: "0 2px 12px rgba(0,0,0,0.05)",

@@ -6,7 +6,7 @@ import SectionHeader from "@/components/design-system/SectionHeader";
 
 export default function FinalCTA() {
   return (
-      <section id="build-stack" className="nebula-cta pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
+      <section id="build-stack" className="bg-white pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center">
@@ -26,12 +26,12 @@ export default function FinalCTA() {
               <div key={item.step} className="flex flex-col gap-2">
                 <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
                 <p className="font-semibold text-foreground text-sm">{item.title}</p>
-                <p className="text-foreground/70 text-xs leading-relaxed">{item.body}</p>
+                <p className="text-foreground text-xs leading-relaxed">{item.body}</p>
               </div>
             ))}
           </div>
 
-          <p className="mt-6 text-xs text-foreground/60">
+          <p className="mt-6 text-xs text-foreground">
             Live in 5–7 business days · No commitment required · Cancel anytime, month-to-month
           </p>
         </div>
@@ -56,23 +56,23 @@ export default function FinalCTA() {
             <Link
               to="/store"
               onClick={() => trackCTA("browse_automation_store", "final_cta")}
-              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-200">
+              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-white text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-200">
               Browse Automation Store
             </Link>
             <Link
               to="/contact"
               onClick={() => trackCTA("contact_support", "final_cta")}
-              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border border-border bg-background/70 text-sm font-semibold text-foreground hover:bg-muted transition-all duration-200">
+              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border border-border bg-white text-sm font-semibold text-foreground hover:bg-primary/5 transition-all duration-200">
               Contact
             </Link>
           </div>
         {/* Trust signals below buttons */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <a href="tel:+16025843227" className="text-xs text-foreground/70 font-medium hover:text-primary transition-colors inline-flex items-center gap-1" style={{ textDecoration: "none" }}><Phone className="w-3.5 h-3.5" /> (602) 584-3227</a>
+          <a href="tel:+16025843227" className="text-xs text-foreground font-medium hover:text-primary transition-colors inline-flex items-center gap-1" style={{ textDecoration: "none" }}><Phone className="w-3.5 h-3.5" /> (602) 584-3227</a>
           <span className="hidden sm:block text-foreground/30">|</span>
-          <span className="text-xs text-foreground/70 font-medium inline-flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> 30-day performance review included</span>
+          <span className="text-xs text-foreground font-medium inline-flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> 30-day performance review included</span>
           <span className="hidden sm:block text-foreground/30">|</span>
-          <span className="text-xs text-foreground/70 font-medium inline-flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Live in 5–7 business days</span>
+          <span className="text-xs text-foreground font-medium inline-flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Live in 5–7 business days</span>
         </div>
         </div>
       </section>

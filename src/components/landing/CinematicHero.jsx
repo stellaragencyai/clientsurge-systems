@@ -115,7 +115,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           </button>
           <button
             onClick={() => scrollToSection("automations", "hero_view_automations_click")}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground transition-all duration-300 hover:bg-muted"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground transition-all duration-300 hover:bg-primary/5"
             style={{
               background: "#ffffff",
               border: "1.5px solid rgba(0,174,239,0.3)",

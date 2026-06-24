@@ -40,7 +40,7 @@ export default function IntegrationCarousel() {
   return (
     <section className="py-12 md:py-16 relative overflow-hidden" style={{ background: "#ffffff" }}>
       <div className="max-w-7xl mx-auto px-6">
-        <p className="text-center text-sm md:text-base text-muted-foreground font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
+        <p className="text-center text-sm md:text-base text-foreground font-medium mb-8 max-w-2xl mx-auto leading-relaxed">
           Built to connect with the tools modern businesses already use.
         </p>
 

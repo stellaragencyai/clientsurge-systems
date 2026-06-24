@@ -77,7 +77,7 @@ export default function WhatHappensAfter() {
                 <h3 className="text-base font-bold text-foreground mb-2 leading-snug" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   {step.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
+                <p className="text-sm text-foreground leading-relaxed">{step.desc}</p>
               </motion.div>
             );
           })}
@@ -95,7 +95,7 @@ export default function WhatHappensAfter() {
           </a>
           <button
             onClick={() => scrollToSection("pricing", "compare_packages", "what_happens_after")}
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-foreground transition-all duration-300 hover:bg-muted"
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-foreground transition-all duration-300 hover:bg-primary/5"
             style={{ background: "#ffffff", border: "1.5px solid rgba(0,174,239,0.3)", minHeight: "unset", minWidth: "unset" }}
           >
             Compare Packages

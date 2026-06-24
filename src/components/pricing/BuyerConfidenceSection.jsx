@@ -22,7 +22,7 @@ export default function BuyerConfidenceSection() {
   return (
     <section className="py-16 px-6 bg-white">
       <div className="max-w-4xl mx-auto">
-        <h2 className="text-3xl font-bold text-slate-900 text-center mb-12">
+        <h2 className="text-3xl font-bold text-black text-center mb-12" style={{ fontFamily: "'Montserrat', sans-serif" }}>
           Why Customers Choose ClientSurge
         </h2>
 
@@ -32,14 +32,14 @@ export default function BuyerConfidenceSection() {
             return (
               <div key={idx} className="text-center">
                 <div className="flex justify-center mb-4">
-                  <div className="bg-blue-100 p-3 rounded-full">
-                    <Icon className="w-6 h-6 text-blue-600" />
+                  <div className="bg-primary/10 p-3 rounded-full border border-primary/20">
+                    <Icon className="w-6 h-6 text-primary" />
                   </div>
                 </div>
-                <h3 className="text-lg font-semibold text-slate-900 mb-2">
+                <h3 className="text-lg font-semibold text-black mb-2">
                   {point.title}
                 </h3>
-                <p className="text-slate-600 text-sm leading-relaxed">
+                <p className="text-foreground text-sm leading-relaxed">
                   {point.description}
                 </p>
               </div>

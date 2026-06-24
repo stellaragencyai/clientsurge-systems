@@ -16,7 +16,7 @@ const POINTS = [
 export default function TrustStrip() {
   return (
     <div
-      className="w-full border-t border-b border-border py-4 px-4 md:px-6 bg-background"
+      className="w-full border-t border-b border-border py-4 px-4 md:px-6 bg-white"
     >
       <div className="max-w-5xl mx-auto flex flex-wrap items-center gap-x-6 gap-y-2 justify-center">
         <div className="flex items-center gap-2 flex-shrink-0">

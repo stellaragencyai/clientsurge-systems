@@ -72,7 +72,7 @@ export default function RevenueLeakSection() {
                 <h3 className="text-lg font-bold text-foreground mb-2">
                   {leak.title}
                 </h3>
-                <p className="text-sm text-muted-foreground leading-relaxed">{leak.desc}</p>
+                <p className="text-sm text-foreground leading-relaxed">{leak.desc}</p>
               </motion.div>
             );
           })}

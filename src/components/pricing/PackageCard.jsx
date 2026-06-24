@@ -17,14 +17,14 @@ export default function PackageCard({
     <div
       className={`rounded-xl border-2 transition-all ${
         highlighted
-          ? 'border-blue-600 bg-blue-50 shadow-lg scale-105'
-          : 'border-slate-200 bg-white hover:shadow-md'
+          ? 'border-primary bg-primary/5 shadow-lg scale-105'
+          : 'border-border bg-white hover:shadow-md'
       }`}
     >
       {/* Badges */}
       {isRecommended && (
         <div className="flex justify-center pt-4">
-          <span className="bg-blue-600 text-white text-xs font-bold px-3 py-1 rounded-full">
+          <span className="bg-primary text-white text-xs font-bold px-3 py-1 rounded-full">
             RECOMMENDED
           </span>
         </div>
@@ -40,43 +40,43 @@ export default function PackageCard({
       {/* Content */}
       <div className="p-8">
         {/* Package Name */}
-        <h3 className="text-2xl font-bold text-slate-900 mb-2">{name}</h3>
+        <h3 className="text-2xl font-bold text-black mb-2">{name}</h3>
 
         {/* Best For */}
-        <p className="text-sm text-slate-600 mb-6 leading-relaxed">{description}</p>
+        <p className="text-sm text-foreground mb-6 leading-relaxed">{description}</p>
 
         {/* Pricing */}
-        <div className="mb-6 pb-6 border-b border-slate-200">
+        <div className="mb-6 pb-6 border-b border-border">
           <div className="flex items-baseline gap-2 mb-2">
             {setupFee && (
               <>
-                <span className="text-3xl font-bold text-slate-900">${setupFee}</span>
-                <span className="text-sm text-slate-600">setup</span>
+                <span className="text-3xl font-bold text-black">${setupFee}</span>
+                <span className="text-sm text-foreground">setup</span>
               </>
             )}
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-bold text-slate-900">${monthlyFee}</span>
-            <span className="text-sm text-slate-600">/month</span>
+            <span className="text-3xl font-bold text-black">${monthlyFee}</span>
+            <span className="text-sm text-foreground">/month</span>
           </div>
         </div>
 
         {/* Outcome */}
-        <p className="font-semibold text-slate-900 mb-6">
+        <p className="font-semibold text-black mb-6">
           {outcome ? `Outcome: ${outcome}` : ''}
         </p>
 
         {/* Automations */}
         {automations.length > 0 && (
           <div className="mb-8">
-            <p className="text-xs font-semibold text-slate-600 uppercase tracking-wide mb-4">
+            <p className="text-xs font-semibold text-foreground uppercase tracking-wide mb-4">
               Included Automations
             </p>
             <ul className="space-y-3">
               {automations.map((automation, i) => (
                 <li key={i} className="flex items-start gap-3">
                   <Check className="w-5 h-5 text-green-600 flex-shrink-0 mt-0.5" />
-                  <span className="text-sm text-slate-700">{automation}</span>
+                  <span className="text-sm text-foreground">{automation}</span>
                 </li>
               ))}
             </ul>
@@ -88,8 +88,8 @@ export default function PackageCard({
           onClick={ctaAction}
           className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition ${
             highlighted
-              ? 'bg-blue-600 text-white hover:bg-blue-700'
-              : 'bg-slate-200 text-slate-900 hover:bg-slate-300'
+              ? 'bg-primary text-white hover:bg-primary/90'
+              : 'bg-primary/10 text-primary hover:bg-primary/20'
           }`}
         >
           {ctaLabel}

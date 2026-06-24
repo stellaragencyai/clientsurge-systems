@@ -161,7 +161,7 @@ export default function Footer() {
         .cs-footer {
           background: #ffffff;
           border-top: 1px solid rgba(0, 174, 239, 0.12);
-          color: #0a1628;
+          color: #000000;
           padding-bottom: env(safe-area-inset-bottom, 0px);
         }
 
@@ -169,7 +169,7 @@ export default function Footer() {
           content: '';
           position: absolute;
           inset: 0;
-          background: linear-gradient(180deg, rgba(245, 248, 252, 0.4) 0%, rgba(245, 248, 252, 0) 100%);
+          background: transparent;
           pointer-events: none;
           z-index: 0;
         }
