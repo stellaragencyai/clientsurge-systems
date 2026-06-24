@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, ArrowRight, Loader2, AlertCircle, Shield, Zap } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
@@ -69,7 +69,107 @@ function formatPhone(value) {
 const SUPPORT_EMAIL = 'support@clientsurgesystems.com';
 const SUPPORT_PHONE = '(602) 584-3227';
 
+// ── Page-level error boundary ──
+// Catches any render-time exception and shows the basic Starter signup
+// screen instead of a broken error page.
+function ProductSignupBoundaryFallback() {
+  const starter = getPackage('starter_system');
+  const [fbForm, setFbForm] = useState({ name: '', email: '', business: '', phone: '' });
+  return (
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <TrustStrip />
+      <main className="px-4 pb-24 pt-[calc(var(--cs-nav-height)+32px)] md:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="mb-8 text-center">
+            <p className="cs-section-eyebrow mb-3">Product Signup</p>
+            <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
+              Complete Your {starter.name} Signup
+            </h1>
+            <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+              Something went wrong loading your page. You can still complete your signup below, or contact us at {SUPPORT_EMAIL} or {SUPPORT_PHONE}.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <div className="flex items-center gap-2 mb-4">
+                <Zap className="w-5 h-5 text-primary" />
+                <h2 className="font-titles text-lg font-bold text-foreground">Package Summary</h2>
+              </div>
+              <div className="rounded-lg bg-primary/5 border border-primary/15 p-4 mb-5">
+                <p className="text-sm font-bold text-foreground mb-3">{starter.name}</p>
+                <div className="flex items-baseline gap-1.5 mb-1">
+                  <span className="text-2xl font-extrabold text-foreground">${starter.monthly.toLocaleString()}</span>
+                  <span className="text-xs text-muted-foreground font-semibold">/mo</span>
+                </div>
+                <p className="text-xs text-muted-foreground">${starter.setup.toLocaleString()} one-time setup fee</p>
+              </div>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Included Services</p>
+              <ul className="space-y-2">
+                {starter.services.map((service) => (
+                  <li key={service} className="flex items-start gap-2.5">
+                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                    <span className="text-sm text-foreground/85">{service}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
+              <h2 className="font-titles text-lg font-bold text-foreground mb-4">Your Details</h2>
+              <div className="space-y-4">
+                <input type="text" placeholder="Full Name" autoComplete="name" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.name} onChange={(e) => setFbForm({ ...fbForm, name: e.target.value })} />
+                <input type="email" placeholder="Email" autoComplete="email" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.email} onChange={(e) => setFbForm({ ...fbForm, email: e.target.value })} />
+                <input type="text" placeholder="Business Name" autoComplete="organization" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.business} onChange={(e) => setFbForm({ ...fbForm, business: e.target.value })} />
+                <input type="tel" placeholder="(602) 555-0100" autoComplete="tel" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.phone} onChange={(e) => setFbForm({ ...fbForm, phone: formatPhone(e.target.value) })} />
+              </div>
+              <a href={`/product-signup?package=starter_system`} className="cs-btn-primary w-full flex items-center justify-center gap-2 mt-6" style={{ minHeight: 'unset', minWidth: 'unset', textDecoration: 'none' }}>
+                Reload Signup <ArrowRight className="w-4 h-4" />
+              </a>
+              <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                <Shield className="w-3.5 h-3.5" />
+                <span>Secure checkout powered by Stripe</span>
+              </div>
+            </div>
+          </div>
+          <div className="text-center mt-8">
+            <a href="/pricing" className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer" style={{ minHeight: 'unset', minWidth: 'unset' }}>← Back to Pricing</a>
+          </div>
+        </div>
+      </main>
+      <Footer />
+      <MobileCallBar />
+    </div>
+  );
+}
+
+class ProductSignupErrorBoundary extends React.Component {
+  constructor(props) {
+    super(props);
+    this.state = { hasError: false };
+  }
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+  componentDidCatch(error, info) {
+    console.error('ProductSignup render error:', error, info);
+  }
+  render() {
+    if (this.state.hasError) {
+      return <ProductSignupBoundaryFallback />;
+    }
+    return this.props.children;
+  }
+}
+
 export default function ProductSignup() {
+  return (
+    <ProductSignupErrorBoundary>
+      <ProductSignupInner />
+    </ProductSignupErrorBoundary>
+  );
+}
+
+function ProductSignupInner() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 

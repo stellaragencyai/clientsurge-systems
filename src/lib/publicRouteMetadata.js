@@ -127,6 +127,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation.",
   },
+  "/personal-injury": {
+    key: "personal-injury",
+    title: "Personal Injury Law Firm Automation Systems | ClientSurge Systems",
+    description:
+      "AI automation for personal injury law firms: immediate lead response, case type routing, consultation scheduling, missed-call recovery, and old lead reactivation.",
+  },
   "/privacy-policy": {
     key: "privacy",
     title: "Privacy Policy | ClientSurge Systems",
@@ -260,6 +266,7 @@ export const PUBLIC_ROUTE_PATHS = [
   "/roofing",
   "/contractors",
   "/chiropractic",
+  "/personal-injury",
   "/lead-capture-automation",
   "/missed-call-text-back",
   "/ai-lead-follow-up",
