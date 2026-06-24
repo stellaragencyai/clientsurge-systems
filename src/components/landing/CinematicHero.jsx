@@ -1,7 +1,16 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Zap, Phone, MessageSquare, Calendar, Star, RefreshCw } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import FloatingAutomationProofCards from "./FloatingAutomationProofCards.jsx";
+
+const AUTOMATIONS = [
+  { label: "Lead Capture", icon: Zap, id: "automations" },
+  { label: "Missed-Call Recovery", icon: Phone, id: "automations" },
+  { label: "Instant Follow-Up", icon: MessageSquare, id: "automations" },
+  { label: "AI Booking", icon: Calendar, id: "automations" },
+  { label: "Review Requests", icon: Star, id: "automations" },
+  { label: "Lead Reactivation", icon: RefreshCw, id: "automations" },
+];
 
 export default function CinematicHero({ videoUrl, posterUrl }) {
   const shouldReduceMotion = useReducedMotion();
@@ -96,7 +105,14 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08 }}
           className="font-black mb-5 leading-[1.08] tracking-tight"
-          style={{ fontFamily: "'Montserrat', sans-serif", color: "#FFFFFF", fontSize: "clamp(2rem, 6.5vw, 3.75rem)" }}
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            color: "#FFFFFF",
+            fontSize: "clamp(2rem, 6.5vw, 3.75rem)",
+            WebkitTextFillColor: "#FFFFFF",
+            WebkitFontSmoothing: "antialiased",
+            MozOsxFontSmoothing: "grayscale",
+          }}
         >
           AI Automation Built Around Your Lead Flow.
         </motion.h1>
@@ -143,6 +159,45 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           >
             View Automations <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
+        </motion.div>
+
+        {/* Six Automation Buttons */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.38 }}
+          className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 sm:gap-2.5 w-full max-w-5xl mt-8 sm:mt-10"
+        >
+          {AUTOMATIONS.map((auto) => {
+            const Icon = auto.icon;
+            return (
+              <motion.button
+                key={auto.label}
+                onClick={() => scrollToSection(auto.id, `hero_automation_${auto.label.toLowerCase().replace(/\s+/g, "_")}`)}
+                whileHover={shouldReduceMotion ? {} : { y: -2 }}
+                className="inline-flex items-center justify-center gap-1.5 px-3 sm:px-4 py-2.5 sm:py-3 rounded-full text-xs sm:text-sm font-semibold transition-all duration-300 group min-h-[40px]"
+                style={{
+                  background: "rgba(6, 16, 37, 0.65)",
+                  border: "1px solid rgba(53, 189, 241, 0.32)",
+                  color: "#FFFFFF",
+                  backdropFilter: "blur(10px)",
+                  WebkitBackdropFilter: "blur(10px)",
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow =
+                    "0 0 20px rgba(53, 189, 241, 0.4), inset 0 1px 0 rgba(255,255,255,0.1)";
+                  e.currentTarget.style.borderColor = "rgba(53, 189, 241, 0.6)";
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = "none";
+                  e.currentTarget.style.borderColor = "rgba(53, 189, 241, 0.32)";
+                }}
+              >
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-cyan-400 flex-shrink-0" />
+                <span className="hidden xs:inline leading-tight">{auto.label}</span>
+              </motion.button>
+            );
+          })}
         </motion.div>
 
         {/* Mobile compact proof cards — inline below CTAs */}
