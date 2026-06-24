@@ -245,10 +245,10 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: navbarTransparentAtTop ? "transparent" : "rgba(255,255,255,0.95)",
-        backdropFilter: navbarTransparentAtTop ? "none" : "blur(8px) saturate(1.2)",
-        WebkitBackdropFilter: navbarTransparentAtTop ? "none" : "blur(8px) saturate(1.2)",
-        borderBottom: navbarTransparentAtTop ? "none" : "1px solid rgba(0,0,0,0.08)",
+        background: "rgba(6, 16, 37, 0.7)",
+        backdropFilter: "blur(12px) saturate(1.1)",
+        WebkitBackdropFilter: "blur(12px) saturate(1.1)",
+        borderBottom: "1px solid rgba(53, 189, 241, 0.08)",
         overflow: "visible",
       }}
     >
@@ -292,10 +292,10 @@ export default function Navbar() {
                 navigate(link.href);
               }}
               className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
-              style={{ color: navbarTransparentAtTop ? (isActivePage(link.href) ? "#00AEEF" : "#ffffff") : (isActivePage(link.href) ? "#00AEEF" : "#000000"), textDecoration: "none", textShadow: navbarTransparentAtTop ? "0 1px 4px rgba(0,0,0,0.5)" : "none" }}
+              style={{ color: isActivePage(link.href) ? "#35BDF1" : "#ffffff", textDecoration: "none" }}
             >
               {link.label}
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </a>
           ))}
 
@@ -308,10 +308,10 @@ export default function Navbar() {
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
               className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: navbarTransparentAtTop ? (industriesOpen ? "#00AEEF" : "#ffffff") : (industriesOpen ? "#00AEEF" : "#000000"), textShadow: navbarTransparentAtTop ? "0 1px 4px rgba(0,0,0,0.5)" : "none" }}
+              style={{ color: industriesOpen ? "#35BDF1" : "#ffffff" }}
             >
               Industries
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.7)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </button>
             {IndustriesDropdown}
           </div>
@@ -340,9 +340,8 @@ export default function Navbar() {
               style={{
                 minHeight: "unset",
                 minWidth: "unset",
-                color: navbarTransparentAtTop ? "#ffffff" : "rgba(10,22,40,0.7)",
-                borderColor: navbarTransparentAtTop ? "rgba(255,255,255,0.3)" : "rgba(255,255,255,0.2)",
-                textShadow: navbarTransparentAtTop ? "0 1px 4px rgba(0,0,0,0.5)" : "none",
+                color: "#ffffff",
+                borderColor: "rgba(53, 189, 241, 0.3)",
               }}
             >
               Login
@@ -370,9 +369,9 @@ export default function Navbar() {
           className="xl:hidden w-10 h-10 rounded-full border backdrop-blur-[3px] flex items-center justify-center shadow-sm transition-colors"
           onClick={() => setOpen(!open)}
           style={{
-            borderColor: navbarTransparentAtTop ? "rgba(255,255,255,0.35)" : "rgba(0,174,239,0.22)",
-            background: navbarTransparentAtTop ? "rgba(255,255,255,0.12)" : "rgba(255,255,255,0.15)",
-            color: navbarTransparentAtTop ? "#ffffff" : undefined,
+            borderColor: "rgba(53, 189, 241, 0.3)",
+            background: "rgba(53, 189, 241, 0.1)",
+            color: "#ffffff",
           }}
           aria-label={open ? "Close navigation menu" : "Open navigation menu"}
           aria-expanded={open}
