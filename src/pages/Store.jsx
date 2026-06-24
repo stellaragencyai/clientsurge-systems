@@ -920,9 +920,13 @@ function StoreInner() {
                   { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
                   { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
                 ].map((pkg) => (
-                  <a
+                  <button
                     key={pkg.key}
-                    href={`/product-signup?package=${pkg.key}`}
+                    type="button"
+                    onClick={() => {
+                      trackCTA(`store_package_${pkg.key}`, "store");
+                      navigate(`/product-signup?package=${pkg.key}`);
+                    }}
                     style={{
                       display: "flex",
                       flexDirection: "column",
@@ -934,6 +938,8 @@ function StoreInner() {
                       textDecoration: "none",
                       boxShadow: pkg.highlight ? "0 4px 16px rgba(0,174,239,0.2)" : "none",
                       position: "relative",
+                      cursor: "pointer",
+                      textAlign: "left",
                     }}
                   >
                     {pkg.badge && (
@@ -943,7 +949,7 @@ function StoreInner() {
                     )}
                     <span style={{ fontSize: "14px", fontWeight: 800, color: "#0A1628", marginTop: pkg.badge ? "6px" : 0 }}>{pkg.name}</span>
                     <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.55)" }}>{pkg.price}</span>
-                  </a>
+                  </button>
                 ))}
               </div>
             </section>
