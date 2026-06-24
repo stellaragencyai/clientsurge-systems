@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { CheckCircle2, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
 
 const formatPhoneNumber = (value) => {
@@ -201,12 +201,13 @@ export default function Start() {
 
           {/* Page Header */}
           <div className="mb-8 text-left">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">
-              Business AI Automation Store
-            </p>
-            <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground leading-tight mb-3">
-              Start Remote AI Automation Setup
-            </h1>
+            <p className="cs-section-eyebrow mb-3">Business AI Automation Store</p>
+            <div className="flex items-center gap-4 mb-3">
+              <span className="cs-section-bar" style={{ height: "40px" }} aria-hidden="true" />
+              <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground leading-tight">
+                Start Remote AI Automation Setup
+              </h1>
+            </div>
             <p className="text-muted-foreground text-base leading-relaxed max-w-2xl">
               Choose your package or automation system, answer a guided setup intake, and ClientSurge will organize the remote configuration path for your business.
             </p>
@@ -318,7 +319,7 @@ export default function Start() {
                 </div>
 
                 <p className="text-xs text-muted-foreground">
-                  Not sure? <a href="/pricing" className="text-primary underline">Compare packages</a> or <a href="/book" className="text-primary underline">book a free audit</a>.
+                  Not sure? <Link to="/pricing" className="text-primary underline">Compare packages</Link> or <Link to="/book" className="text-primary underline">book a free audit</Link>.
                 </p>
               </div>
             )}
@@ -527,11 +528,11 @@ function ConfirmationView({ form }) {
 
   return (
     <div className="space-y-6 text-center py-4">
-      <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
-        <CheckCircle2 className="w-9 h-9 text-green-600" />
-      </div>
-      <div>
-        <h2 className="text-2xl font-bold text-foreground mb-2">Remote Setup Intake Received</h2>
+    <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
+    <CheckCircle2 className="w-9 h-9 text-green-600" />
+    </div>
+    <div>
+    <h2 className="font-titles text-2xl font-bold text-foreground mb-2">Remote Setup Intake Received</h2>
         <p className="text-muted-foreground text-sm leading-relaxed max-w-md mx-auto">
           Your remote setup intake has been received. ClientSurge will review your selected package or automation system, business details, lead sources, and required setup access. Your next step is to complete any missing access checklist items so the automation can be configured and tested.
         </p>
@@ -559,19 +560,19 @@ function ConfirmationView({ form }) {
       </div>
 
       <div className="flex flex-col sm:flex-row gap-3 justify-center pt-2">
-        <a
-          href="/login"
+        <Link
+          to="/login"
           className="inline-flex items-center justify-center rounded-lg border border-border bg-white px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
         >
           Client Login
-        </a>
-        <a
-          href="/contact"
+        </Link>
+        <Link
+          to="/contact"
           className="cs-btn-primary"
           style={{ minHeight: 'unset', minWidth: 'unset', fontSize: '0.875rem' }}
         >
           Contact Support
-        </a>
+        </Link>
       </div>
 
       <p className="text-xs text-muted-foreground">
@@ -586,7 +587,7 @@ function ConfirmationView({ form }) {
 function StepHeader({ title, subtitle }) {
   return (
     <div className="mb-2">
-      <h2 className="text-xl font-bold text-foreground">{title}</h2>
+      <h2 className="font-titles text-xl font-bold text-foreground">{title}</h2>
       {subtitle && <p className="text-sm text-muted-foreground mt-1">{subtitle}</p>}
     </div>
   );

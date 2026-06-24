@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 import { Loader2, CheckCircle2, Mail, Phone, MapPin, Facebook, Instagram, ArrowRight } from "lucide-react";
+import { Link } from "react-router-dom";
 import FormInput from "../components/forms/FormInput";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
@@ -214,12 +215,9 @@ export default function Contact() {
                 <p className="text-muted-foreground text-base leading-relaxed mb-10 max-w-xs mx-auto">
                   Thanks for reaching out. We'll respond within one business day.
                 </p>
-                <a
-                  href="/"
-                  className="cs-btn-primary"
-                >
+                <Link to="/" className="cs-btn-primary">
                   Back to Home <ArrowRight className="w-4 h-4" />
-                </a>
+                </Link>
               </motion.div>
             ) : (
               /* ── Form ── */

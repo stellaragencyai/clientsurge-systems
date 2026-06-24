@@ -125,7 +125,7 @@ const SERVICES = [
 ];
 
 const BRAND = {
-  color: "#0088CC",
+  color: "#00AEEF",
   gradientFrom: "#00AEEF",
   gradientTo: "#003B8F",
 };
@@ -163,7 +163,7 @@ function VideoPlaceholder({ service, onClose }) {
             >
               <Play className="w-7 h-7 text-white ml-1" fill="white" />
             </div>
-            <h3 className="text-2xl font-bold mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>{service.title}</h3>
+            <h3 className="font-titles text-2xl font-bold mb-2">{service.title}</h3>
             <p className="text-sm text-white/60 max-w-md mb-6">
               Explore this workflow — see how it captures and converts leads for businesses like yours.
             </p>
@@ -247,7 +247,7 @@ function ServiceCard({ service }) {
 
         {/* Content */}
         <div className="p-6 flex flex-col flex-1">
-          <h2 className="text-lg font-bold text-foreground mb-1" style={{ fontFamily: "Montserrat, sans-serif" }}>
+          <h2 className="font-titles text-lg font-bold text-foreground mb-1">
             {service.title}
           </h2>
           <p className="text-xs font-semibold mb-3 text-primary">
@@ -263,7 +263,7 @@ function ServiceCard({ service }) {
             <div className="space-y-3">
               {service.stats.map((stat) => (
                 <div key={stat.label} className="flex items-start gap-3">
-                  <span className="text-base font-black flex-shrink-0" style={{ color: BRAND.color, minWidth: "56px" }}>
+                  <span className="text-base font-titles font-black flex-shrink-0 text-primary" style={{ minWidth: "56px" }}>
                     {stat.value}
                   </span>
                   <div>
@@ -281,7 +281,7 @@ function ServiceCard({ service }) {
             <ul className="space-y-2">
               {service.whatYouGet.map((item) => (
                 <li key={item} className="flex items-start gap-2">
-                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: BRAND.color }} />
+                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-primary" />
                   <span className="text-xs text-muted-foreground leading-snug">{item}</span>
                 </li>
               ))}
@@ -329,13 +329,10 @@ export default function Automations() {
         >
           Included Automation Modules
         </div>
-        <h1
-          className="text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5"
-          style={{ fontFamily: "Montserrat, sans-serif" }}
-        >
+        <h1 className="font-titles text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5">
           Automation Modules Included
           <br />
-          <span style={{ color: BRAND.color }}>Across Every Package</span>
+          <span className="text-primary">Across Every Package</span>
         </h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
           ClientSurge packages are powered by a catalog of automation modules — each one designed to capture, follow up with, schedule, and convert more leads for your local service business.
@@ -349,8 +346,7 @@ export default function Automations() {
           ].map((b) => (
             <span
               key={b.text}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs"
-              style={{ background: "rgba(0,136,204,0.07)", border: "1px solid rgba(0,136,204,0.18)", color: "#0050A0" }}
+              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs bg-primary/5 border border-primary/15 text-primary"
             >
               {b.icon} {b.text}
             </span>
@@ -372,7 +368,7 @@ export default function Automations() {
           style={{ background: "linear-gradient(135deg,#eaf8ff 0%,#dff5ff 60%,#f8fbff 100%)", border: "1px solid rgba(0,136,204,0.14)" }}
         >
           <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Choose Your System</p>
-          <h2 className="font-titles text-[#001B44] text-3xl md:text-4xl font-bold mb-4">
+          <h2 className="font-titles text-foreground text-3xl md:text-4xl font-bold mb-4">
             Pick the Package That Fits Your Business
           </h2>
           <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">

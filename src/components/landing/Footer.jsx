@@ -1,6 +1,6 @@
 import { ArrowUp, Mail, Phone, Shield, Zap, Calendar, RefreshCw, Star, Headphones } from "lucide-react";
 
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const AUTOMATIONS = [
   { label: "AI Voice Agents", desc: "AI phone receptionist for inbound lead capture.", href: "/automations", icon: Headphones },
@@ -64,17 +64,16 @@ export default function Footer() {
               <p className="cs-footer-eyebrow">Included Automation Modules</p>
               <h3 id="footer-system-heading">Every automation included across our three growth systems, powered by a catalog of modules.</h3>
             </div>
-            <a className="cs-footer-system-cta" href="/pricing" onClick={(e) => handleNavClick(e, "/pricing")}>
+            <Link className="cs-footer-system-cta" to="/pricing">
               Compare Packages
-            </a>
+            </Link>
           </div>
 
           <div className="cs-footer-automation-grid">
             {AUTOMATIONS.map(({ label, desc, href, icon: Icon }) => (
-              <a
+              <Link
                 key={label}
-                href={href}
-                onClick={(e) => handleNavClick(e, href)}
+                to={href}
                 className="cs-footer-automation-link"
               >
                 <span className="cs-footer-automation-icon" aria-hidden="true"><Icon /></span>
@@ -82,7 +81,7 @@ export default function Footer() {
                   <strong>{label}</strong>
                   <span>{desc}</span>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         </div>
@@ -122,9 +121,9 @@ export default function Footer() {
               <ul>
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <a href={link.href} onClick={(e) => handleNavClick(e, link.href)}>
+                    <Link to={link.href}>
                       {link.label}
-                    </a>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -136,9 +135,9 @@ export default function Footer() {
           <div className="cs-footer-legal">
             <span style={{ display: "flex", alignItems: "center", gap: "12px" }}>Copyright {new Date().getFullYear()} ClientSurge Systems</span>
             <span aria-hidden="true">/</span>
-            <a href="/privacy-policy" onClick={(e) => handleNavClick(e, "/privacy-policy")} style={{ display: "flex", alignItems: "center" }}>Privacy</a>
+            <Link to="/privacy-policy" style={{ display: "flex", alignItems: "center" }}>Privacy</Link>
             <span aria-hidden="true">/</span>
-            <a href="/terms" onClick={(e) => handleNavClick(e, "/terms")} style={{ display: "flex", alignItems: "center" }}>Terms</a>
+            <Link to="/terms" style={{ display: "flex", alignItems: "center" }}>Terms</Link>
           </div>
 
           <div className="cs-footer-status">

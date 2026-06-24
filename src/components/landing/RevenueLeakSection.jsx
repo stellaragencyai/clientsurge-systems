@@ -43,13 +43,10 @@ export default function RevenueLeakSection() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>
+          <p className="cs-eyebrow mb-4 text-primary">
             Stop Losing Revenue
           </p>
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
             The Revenue Leak Most Businesses Don't See
           </h2>
           <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
@@ -74,16 +71,10 @@ export default function RevenueLeakSection() {
                   backdropFilter: "blur(8px)",
                 }}
               >
-                <div
-                  className="w-12 h-12 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: "rgba(0,174,239,0.12)" }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
+                <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <h3
-                  className="text-lg font-bold text-white mb-2"
-                  style={{ fontFamily: "'Montserrat', sans-serif" }}
-                >
+                <h3 className="text-lg font-bold text-white mb-2">
                   {leak.title}
                 </h3>
                 <p className="text-sm text-white/80 leading-relaxed">{leak.desc}</p>

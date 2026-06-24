@@ -1,6 +1,7 @@
 /**
  * LegalPage.jsx — Privacy Policy & Terms of Service
- * Rebuilt to match main site: Montserrat headings, #000000 text, electric blue accents, blue bar hero.
+ * Refactored: all inline styles removed, uses global design system classes.
+ * Typography enforced by index.css: Montserrat headings, Inter body, #000 text.
  */
 import { useEffect, useState, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
@@ -9,6 +10,7 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import MobileCallBar from "@/components/landing/MobileCallBar";
+import SectionHeader from "@/components/design-system/SectionHeader";
 import { ChevronDown, ChevronRight, Shield, Lock, PhoneCall, BadgeCheck, ScrollText } from "lucide-react";
 
 /* ──────────── Content Data ──────────── */
@@ -158,21 +160,13 @@ const COMPLIANCE_BADGES = [
 
 function SummaryCard({ items }) {
   return (
-    <div style={{
-      borderRadius: "0.75rem",
-      border: "1px solid rgba(0,174,239,0.15)",
-      padding: "24px",
-      marginBottom: "40px",
-      background: "linear-gradient(135deg, rgba(0,136,204,0.05) 0%, rgba(0,59,143,0.03) 100%)",
-    }}>
-      <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.15em", textTransform: "uppercase", color: "#00AEEF", marginBottom: "16px" }}>
-        At a Glance
-      </p>
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "12px" }}>
+    <div className="rounded-xl border border-primary/15 p-6 mb-10 bg-primary/5">
+      <p className="cs-section-eyebrow mb-4">At a Glance</p>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         {items.map(({ icon: Icon, text }) => (
-          <div key={text} style={{ display: "flex", alignItems: "flex-start", gap: "10px" }}>
-            <Icon style={{ width: "16px", height: "16px", color: "#00AEEF", flexShrink: 0, marginTop: "2px" }} />
-            <span style={{ fontSize: "14px", fontWeight: 500, color: "#000000", lineHeight: 1.5 }}>{text}</span>
+          <div key={text} className="flex items-start gap-2.5">
+            <Icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+            <span className="text-sm font-medium text-foreground leading-relaxed">{text}</span>
           </div>
         ))}
       </div>
@@ -184,71 +178,47 @@ function SectionBlock({ section, isActive }) {
   return (
     <div
       id={section.id}
+      className="mb-10 transition-all"
       style={{
         scrollMarginTop: "calc(var(--cs-nav-height) + 24px)",
-        borderLeft: isActive ? "3px solid #00AEEF" : "3px solid transparent",
-        paddingLeft: isActive ? "16px" : "0",
+        borderLeft: isActive ? "3px solid hsl(var(--primary))" : "3px solid transparent",
+        paddingLeft: isActive ? "1rem" : "0",
         transition: "border-color 0.2s, padding-left 0.2s",
-        marginBottom: "40px",
       }}
     >
       {/* Section heading row */}
-      <div style={{ display: "flex", alignItems: "baseline", gap: "12px", marginBottom: "12px" }}>
-        <span style={{
-          fontSize: "12px",
-          fontWeight: 800,
-          color: "#00AEEF",
-          fontFamily: "'Montserrat', sans-serif",
-          minWidth: "20px",
-          flexShrink: 0,
-        }}>
+      <div className="flex items-baseline gap-3 mb-3">
+        <span className="text-xs font-bold text-primary font-titles min-w-[20px] flex-shrink-0">
           {section.number}.
         </span>
-        <h2 style={{
-          fontFamily: "'Montserrat', sans-serif",
-          fontSize: "clamp(1rem, 2.5vw, 1.25rem)",
-          fontWeight: 800,
-          color: "#000000",
-          lineHeight: 1.2,
-          margin: 0,
-          letterSpacing: "-0.01em",
-        }}>
+        <h2 className="cs-section-title" style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem) !important" }}>
           {section.title}
         </h2>
       </div>
 
       {section.body && (
-        <p style={{
-          fontSize: "15px",
-          color: "#000000",
-          lineHeight: 1.75,
-          paddingLeft: "32px",
-          maxWidth: "68ch",
-          margin: 0,
-          fontFamily: "'Inter', sans-serif",
-          fontWeight: 400,
-        }}>
+        <p className="text-[15px] text-foreground leading-relaxed pl-8 max-w-[68ch] font-inter">
           {section.body}
         </p>
       )}
 
       {section.contact && (
-        <div style={{ paddingLeft: "32px" }}>
-          <p style={{ fontSize: "15px", color: "#000000", lineHeight: 1.7, marginBottom: "8px", fontFamily: "'Inter', sans-serif" }}>
+        <div className="pl-8">
+          <p className="text-[15px] text-foreground leading-relaxed mb-2 font-inter">
             Questions? Reach us at:
           </p>
-          <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", gap: "8px" }}>
-            <a href="mailto:support@clientsurgesystems.com" style={{
-              fontSize: "14px", fontWeight: 700, color: "#00AEEF", textDecoration: "none",
-              borderBottom: "1px solid rgba(0,174,239,0.3)", paddingBottom: "1px",
-            }}>
+          <div className="flex flex-wrap items-center gap-2">
+            <a
+              href="mailto:support@clientsurgesystems.com"
+              className="text-sm font-bold text-primary border-b border-primary/30 hover:border-primary transition-colors pb-px"
+            >
               support@clientsurgesystems.com
             </a>
-            <span style={{ color: "#6b7280", fontSize: "13px" }}>or</span>
-            <a href="tel:+16025843227" style={{
-              fontSize: "14px", fontWeight: 700, color: "#00AEEF", textDecoration: "none",
-              borderBottom: "1px solid rgba(0,174,239,0.3)", paddingBottom: "1px",
-            }}>
+            <span className="text-muted-foreground text-xs">or</span>
+            <a
+              href="tel:+16025843227"
+              className="text-sm font-bold text-primary border-b border-primary/30 hover:border-primary transition-colors pb-px"
+            >
               (602) 584-3227
             </a>
           </div>
@@ -261,10 +231,10 @@ function SectionBlock({ section, isActive }) {
 function TableOfContents({ sections, activeId }) {
   return (
     <nav aria-label="Page sections">
-      <p style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6b7280", marginBottom: "12px" }}>
+      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground mb-3">
         On This Page
       </p>
-      <div style={{ display: "flex", flexDirection: "column", gap: "2px" }}>
+      <div className="flex flex-col gap-0.5">
         {sections.map((s) => (
           <a
             key={s.id}
@@ -274,24 +244,15 @@ function TableOfContents({ sections, activeId }) {
               const el = document.getElementById(s.id);
               if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
             }}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              gap: "8px",
-              padding: "6px 8px",
-              borderRadius: "6px",
-              fontSize: "13px",
-              fontWeight: activeId === s.id ? 700 : 500,
-              color: activeId === s.id ? "#00AEEF" : "#1a1a1a",
-              background: activeId === s.id ? "rgba(0,174,239,0.06)" : "transparent",
-              textDecoration: "none",
-              transition: "all 0.15s ease",
-              borderLeft: activeId === s.id ? "2px solid #00AEEF" : "2px solid transparent",
-            }}
+            className={`flex items-center gap-2 px-2 py-1.5 rounded-md text-[13px] transition-all border-l-2 ${
+              activeId === s.id
+                ? "font-bold text-primary bg-primary/5 border-primary"
+                : "font-medium text-foreground/80 border-transparent hover:text-primary hover:bg-primary/5"
+            }`}
           >
-            <span style={{ fontSize: "10px", fontWeight: 700, color: "#9ca3af", minWidth: "16px" }}>{s.number}</span>
-            <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{s.title}</span>
-            {activeId === s.id && <ChevronRight style={{ width: "12px", height: "12px", marginLeft: "auto", flexShrink: 0 }} />}
+            <span className="text-[10px] font-bold text-muted-foreground min-w-[16px]">{s.number}</span>
+            <span className="overflow-hidden text-ellipsis whitespace-nowrap">{s.title}</span>
+            {activeId === s.id && <ChevronRight className="w-3 h-3 ml-auto flex-shrink-0" />}
           </a>
         ))}
       </div>
@@ -301,27 +262,20 @@ function TableOfContents({ sections, activeId }) {
 
 function ComplianceBadgeBar() {
   return (
-    <div style={{ background: "#f8fafc", borderTop: "1px solid rgba(0,174,239,0.10)", padding: "48px 24px" }}>
-      <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
-        <p style={{ fontSize: "10px", fontWeight: 800, letterSpacing: "0.18em", textTransform: "uppercase", color: "#6b7280", textAlign: "center", marginBottom: "20px" }}>
+    <div className="bg-muted/50 border-t border-primary/10 py-12 px-6">
+      <div className="max-w-5xl mx-auto">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground text-center mb-5">
           Compliance &amp; Trust
         </p>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(180px, 1fr))", gap: "12px" }}>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {COMPLIANCE_BADGES.map(({ label, desc }) => (
-            <div key={label} style={{
-              borderRadius: "0.75rem",
-              border: "1px solid rgba(0,174,239,0.12)",
-              padding: "16px",
-              textAlign: "center",
-              background: "#ffffff",
-              display: "flex",
-              flexDirection: "column",
-              alignItems: "center",
-              gap: "8px",
-            }}>
-              <Shield style={{ width: "20px", height: "20px", color: "#00AEEF" }} />
-              <span style={{ fontSize: "12px", fontWeight: 700, color: "#000000", lineHeight: 1.3 }}>{label}</span>
-              <span style={{ fontSize: "11px", color: "#6b7280", lineHeight: 1.4 }}>{desc}</span>
+            <div
+              key={label}
+              className="rounded-xl border border-primary/12 p-4 text-center bg-white flex flex-col items-center gap-2"
+            >
+              <Shield className="w-5 h-5 text-primary" />
+              <span className="text-xs font-bold text-foreground leading-tight">{label}</span>
+              <span className="text-[11px] text-muted-foreground leading-relaxed">{desc}</span>
             </div>
           ))}
         </div>
@@ -369,114 +323,53 @@ export default function LegalPage({ fixedType, canonicalPath }) {
 
   return (
     <DemoBookingProvider>
-      <div style={{ minHeight: "100vh", background: "#ffffff" }}>
+      <div className="min-h-screen bg-background">
         <Navbar />
 
-        {/* ── Hero — matches main site contact/about hero style ── */}
-        <section style={{
-          background: "linear-gradient(180deg, rgba(0,174,239,0.06) 0%, #ffffff 100%)",
-          paddingTop: "calc(var(--cs-nav-height) + 48px)",
-          paddingBottom: "40px",
-          paddingLeft: "clamp(1.5rem, 6vw, 80px)",
-          paddingRight: "clamp(1.5rem, 6vw, 80px)",
-        }}>
-          <div style={{ maxWidth: "1024px", margin: "0 auto" }}>
+        {/* ── Hero — matches main site hero pattern ── */}
+        <section
+          className="px-4 sm:px-6 lg:px-8"
+          style={{
+            background: "linear-gradient(180deg, rgba(0,174,239,0.06) 0%, hsl(var(--background)) 100%)",
+            paddingTop: "calc(var(--cs-nav-height) + 3rem)",
+            paddingBottom: "2.5rem",
+          }}
+        >
+          <div className="max-w-5xl mx-auto">
             {/* Eyebrow */}
-            <p style={{
-              fontSize: "11px",
-              fontWeight: 800,
-              letterSpacing: "0.18em",
-              textTransform: "uppercase",
-              color: "#00AEEF",
-              marginBottom: "14px",
-              fontFamily: "'Montserrat', sans-serif",
-            }}>
-              Legal
-            </p>
+            <p className="cs-section-eyebrow mb-3">Legal</p>
 
-            {/* Title row — blue bar + heading */}
-            <div style={{ display: "flex", alignItems: "center", gap: "18px", marginBottom: "16px" }}>
-              <div style={{
-                width: "5px",
-                height: "52px",
-                background: "#00AEEF",
-                borderRadius: "3px",
-                flexShrink: 0,
-                boxShadow: "0 0 14px rgba(0,174,239,0.6)",
-              }} />
-              <h1 style={{
-                fontFamily: "'Montserrat', sans-serif",
-                fontSize: "clamp(2rem, 5vw, 3rem)",
-                fontWeight: 900,
-                lineHeight: 1.05,
-                letterSpacing: "-0.025em",
-                textTransform: "uppercase",
-                margin: 0,
-                background: "none",
-                backgroundImage: "none",
-                WebkitBackgroundClip: "unset",
-                backgroundClip: "unset",
-                WebkitTextFillColor: "#000000",
-                color: "#000000",
-              }}>
-                <span style={{
-                  color: "#000000",
-                  WebkitTextFillColor: "#000000",
-                  background: "none",
-                  backgroundImage: "none",
-                  WebkitBackgroundClip: "unset",
-                  backgroundClip: "unset",
-                  display: "inline",
-                }}>
-                  {title}
-                </span>
+            {/* Title row — blue bar + heading (matches SectionHeader pattern) */}
+            <div className="flex items-center gap-4 mb-4">
+              <span className="cs-section-bar" style={{ height: "52px" }} aria-hidden="true" />
+              <h1 className="cs-section-title" style={{ fontSize: "clamp(2rem, 5vw, 3rem) !important" }}>
+                {title}
               </h1>
             </div>
 
             {/* Last updated + tab switcher */}
-            <div style={{ display: "flex", flexWrap: "wrap", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-              <p style={{ fontSize: "12px", fontWeight: 500, color: "#6b7280" }}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <p className="text-xs font-medium text-muted-foreground">
                 Last updated: {updated}
               </p>
-              <div style={{
-                display: "flex",
-                gap: "4px",
-                borderRadius: "8px",
-                border: "1px solid rgba(0,174,239,0.2)",
-                padding: "3px",
-                background: "#f9fafb",
-              }}>
+              <div className="flex gap-1 rounded-lg border border-primary/20 p-0.5 bg-muted/50">
                 <button
                   onClick={() => navigate("/privacy-policy")}
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                    background: type === "privacy" ? "#ffffff" : "transparent",
-                    color: type === "privacy" ? "#00AEEF" : "#6b7280",
-                    boxShadow: type === "privacy" ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                  }}
+                  className={`px-3.5 py-1.5 rounded-md text-xs font-bold border-none cursor-pointer transition-all ${
+                    type === "privacy"
+                      ? "bg-white text-primary shadow-sm"
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   Privacy
                 </button>
                 <button
                   onClick={() => navigate("/terms")}
-                  style={{
-                    padding: "6px 14px",
-                    borderRadius: "6px",
-                    fontSize: "12px",
-                    fontWeight: 700,
-                    border: "none",
-                    cursor: "pointer",
-                    transition: "all 0.15s",
-                    background: type === "terms" ? "#ffffff" : "transparent",
-                    color: type === "terms" ? "#00AEEF" : "#6b7280",
-                    boxShadow: type === "terms" ? "0 1px 4px rgba(0,0,0,0.08)" : "none",
-                  }}
+                  className={`px-3.5 py-1.5 rounded-md text-xs font-bold border-none cursor-pointer transition-all ${
+                    type === "terms"
+                      ? "bg-white text-primary shadow-sm"
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  }`}
                 >
                   Terms
                 </button>
@@ -488,57 +381,43 @@ export default function LegalPage({ fixedType, canonicalPath }) {
         {/* ── Main content ── */}
         <main
           ref={contentRef}
-          style={{
-            maxWidth: "1024px",
-            margin: "0 auto",
-            padding: "40px 24px 64px",
-          }}
+          className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-16"
         >
           {/* Summary card */}
           <SummaryCard items={summary} />
 
           {/* Mobile TOC toggle */}
-          <div style={{ display: "block", marginBottom: "24px" }} className="lg:hidden">
+          <div className="block mb-6 lg:hidden">
             <button
               onClick={() => setMobileTocOpen(!mobileTocOpen)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: "8px",
-                width: "100%",
-                padding: "12px 16px",
-                borderRadius: "10px",
-                border: "1px solid rgba(0,174,239,0.2)",
-                background: "#f9fafb",
-                fontSize: "13px",
-                fontWeight: 700,
-                color: "#000000",
-                cursor: "pointer",
-              }}
+              className="flex items-center gap-2 w-full px-4 py-3 rounded-lg border border-primary/20 bg-muted/50 text-xs font-bold text-foreground cursor-pointer"
             >
-              <ScrollText style={{ width: "15px", height: "15px", color: "#00AEEF" }} />
+              <ScrollText className="w-4 h-4 text-primary" />
               On This Page
-              <ChevronDown style={{ width: "15px", height: "15px", marginLeft: "auto", transform: mobileTocOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }} />
+              <ChevronDown
+                className="w-4 h-4 ml-auto text-muted-foreground"
+                style={{ transform: mobileTocOpen ? "rotate(180deg)" : "none", transition: "transform 0.2s" }}
+              />
             </button>
             {mobileTocOpen && (
-              <div style={{ marginTop: "8px", padding: "16px", borderRadius: "10px", border: "1px solid rgba(0,174,239,0.15)", background: "#ffffff" }}>
+              <div className="mt-2 p-4 rounded-lg border border-primary/15 bg-white">
                 <TableOfContents sections={sections} activeId={activeId} />
               </div>
             )}
           </div>
 
           {/* Content + Desktop TOC */}
-          <div style={{ display: "flex", gap: "56px", alignItems: "flex-start" }}>
+          <div className="flex gap-8 lg:gap-14 items-start">
             {/* Sections */}
-            <div style={{ flex: 1, minWidth: 0 }}>
+            <div className="flex-1 min-w-0">
               {sections.map((section) => (
                 <SectionBlock key={section.id} section={section} isActive={activeId === section.id} />
               ))}
             </div>
 
             {/* Desktop sticky TOC */}
-            <aside className="hidden lg:block" style={{ width: "220px", flexShrink: 0 }}>
-              <div style={{ position: "sticky", top: "calc(var(--cs-nav-height) + 32px)" }}>
+            <aside className="hidden lg:block w-[220px] flex-shrink-0">
+              <div className="sticky" style={{ top: "calc(var(--cs-nav-height) + 32px)" }}>
                 <TableOfContents sections={sections} activeId={activeId} />
               </div>
             </aside>

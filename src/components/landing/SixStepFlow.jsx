@@ -53,11 +53,8 @@ export default function SixStepFlow() {
     <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0A0E27" }}>
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>The ClientSurge Flow</p>
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
+          <p className="cs-eyebrow mb-4 text-primary">The ClientSurge Flow</p>
+          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight">
             Six Steps From Lead to Revenue
           </h2>
           <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
@@ -83,26 +80,17 @@ export default function SixStepFlow() {
                 }}
               >
                 {/* Step number */}
-                <span
-                  className="absolute top-4 right-4 text-3xl font-black opacity-10"
-                  style={{ fontFamily: "'Montserrat', sans-serif", color: "#00AEEF" }}
-                >
+                <span className="absolute top-4 right-4 text-3xl font-titles font-black opacity-10 text-[#00AEEF]">
                   {step.num}
                 </span>
 
                 {/* Icon */}
-                <div
-                  className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
-                  style={{ background: "rgba(0,174,239,0.10)" }}
-                >
-                  <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
+                <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">
+                  <Icon className="w-5 h-5 text-primary" />
                 </div>
 
                 {/* Title */}
-                <h3
-                  className="text-lg font-bold text-white mb-2"
-                  style={{ fontFamily: "'Montserrat', sans-serif" }}
-                >
+                <h3 className="text-lg font-bold text-white mb-2">
                   {step.title}
                 </h3>
 
@@ -110,10 +98,7 @@ export default function SixStepFlow() {
                 <p className="text-sm text-white/80 leading-relaxed mb-3">{step.desc}</p>
 
                 {/* Service tag */}
-                <span
-                  className="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full"
-                  style={{ background: "rgba(0,174,239,0.08)", color: "#00AEEF" }}
-                >
+                <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">
                   {step.service}
                 </span>
               </motion.div>
