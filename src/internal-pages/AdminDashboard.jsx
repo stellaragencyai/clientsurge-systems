@@ -65,6 +65,7 @@ import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 import ProductionHardeningPanel from '../components/admin/ProductionHardeningPanel';
 import LeadQualityControl from '../components/admin/LeadQualityControl';
 import TabErrorBoundary from '../components/admin/TabErrorBoundary.jsx';
+import ResendSenderDiagnosticsPanel from '../components/admin/ResendSenderDiagnosticsPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -152,6 +153,7 @@ const NAV_GROUPS = [
       { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
+      { id: 'resend-diagnostics', label: 'Resend Sender Diagnostics', icon: Mail },
       { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
       { id: 'settings', label: 'Settings', icon: Settings },
     ],
@@ -319,6 +321,7 @@ export default function AdminDashboard() {
       case 'website-leads': return <WebsiteLeadsDashboard />;
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
+      case 'resend-diagnostics': return <ResendSenderDiagnosticsPanel />;
       case 'failed-jobs': return <AdminFailedJobsPanel />;
       case 'instant-response': return <InstantLeadResponseDebugPanel />;
       case 'audit-log': return <AuditLogPanel />;
