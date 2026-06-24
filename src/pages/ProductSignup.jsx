@@ -95,16 +95,17 @@ export default function ProductSignup() {
         return;
       }
 
-      trackCTA(`product_signup_checkout_${packageKey}`, 'product-signup');
+      const checkoutKey = safePkg === PACKAGES.starter_system && !resolvedKey ? 'starter_system' : packageKey;
+      trackCTA(`product_signup_checkout_${checkoutKey}`, 'product-signup');
 
       const response = await base44.functions.invoke('createCheckoutSession', {
-        package_key: packageKey,
+        package_key: checkoutKey,
         customer_name: form.name,
         customer_email: form.email,
         customer_phone: form.phone,
         business_name: form.business,
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/product-signup?package=${packageKey}`,
+        cancel_url: `${window.location.origin}/product-signup?package=${checkoutKey}`,
       });
 
       if (response.data?.url) {
@@ -119,16 +120,20 @@ export default function ProductSignup() {
     }
   };
 
-  if (!pkg || !pkg.services || !Array.isArray(pkg.services) || !pkg.name || !pkg.setup || !pkg.monthly) {
+  const safePkg = (pkg && pkg.services && Array.isArray(pkg.services) && pkg.name && pkg.setup && pkg.monthly)
+    ? pkg
+    : PACKAGES.starter_system;
+
+  if (!safePkg) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
         <main className="px-6 pb-24 pt-[calc(var(--cs-nav-height)+48px)]">
           <div className="max-w-lg mx-auto text-center">
             <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h1 className="font-titles text-2xl font-bold text-foreground mb-3">No Package Selected</h1>
+            <h1 className="font-titles text-2xl font-bold text-foreground mb-3">Something Went Wrong</h1>
             <p className="text-muted-foreground text-sm mb-6">
-              Choose a package from the pricing page to get started.
+              We couldn't load package data. Please try the pricing page.
             </p>
             <button
               onClick={() => navigate('/pricing')}
@@ -155,10 +160,10 @@ export default function ProductSignup() {
           <div className="mb-8 text-center">
             <p className="cs-section-eyebrow mb-3">Product Signup</p>
             <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-              Complete Your {pkg.name} Signup
+              Complete Your {safePkg.name} Signup
             </h1>
             <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
-              {pkg.description} Enter your details below and continue to secure Stripe checkout.
+              {safePkg.description} Enter your details below and continue to secure Stripe checkout.
             </p>
           </div>
 
@@ -171,17 +176,17 @@ export default function ProductSignup() {
               </div>
 
               <div className="rounded-lg bg-primary/5 border border-primary/15 p-4 mb-5">
-                <p className="text-sm font-bold text-foreground mb-3">{pkg.name}</p>
+                <p className="text-sm font-bold text-foreground mb-3">{safePkg.name}</p>
                 <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-2xl font-extrabold text-foreground">${pkg.monthly.toLocaleString()}</span>
+                  <span className="text-2xl font-extrabold text-foreground">${safePkg.monthly.toLocaleString()}</span>
                   <span className="text-xs text-muted-foreground font-semibold">/mo</span>
                 </div>
-                <p className="text-xs text-muted-foreground">${pkg.setup.toLocaleString()} one-time setup fee</p>
+                <p className="text-xs text-muted-foreground">${safePkg.setup.toLocaleString()} one-time setup fee</p>
               </div>
 
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Included Services</p>
               <ul className="space-y-2">
-                {pkg.services.map((service) => (
+                {safePkg.services.map((service) => (
                   <li key={service} className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                     <span className="text-sm text-foreground/85">{service}</span>
@@ -192,11 +197,11 @@ export default function ProductSignup() {
               <div className="mt-5 pt-5 border-t border-border space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">One-time setup</span>
-                  <span className="font-semibold text-foreground">${pkg.setup.toLocaleString()}</span>
+                  <span className="font-semibold text-foreground">${safePkg.setup.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Monthly service</span>
-                  <span className="font-semibold text-primary">${pkg.monthly.toLocaleString()}/mo</span>
+                  <span className="font-semibold text-primary">${safePkg.monthly.toLocaleString()}/mo</span>
                 </div>
               </div>
             </div>
