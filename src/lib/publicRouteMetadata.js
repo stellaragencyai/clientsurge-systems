@@ -79,12 +79,6 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Complete your ClientSurge automation package signup and proceed to secure Stripe checkout for your chosen Starter, Growth, or Pro system.",
   },
-  "/signup": {
-    key: "signup",
-    title: "Sign Up — AI Automation Package | ClientSurge Systems",
-    description:
-      "Complete your ClientSurge automation package signup and proceed to secure Stripe checkout.",
-  },
   "/industries": {
     key: "industries",
     title: "Industries We Help | ClientSurge Systems",

@@ -916,17 +916,14 @@ function StoreInner() {
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
                 {[
-                  { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false },
-                  { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
-                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
+                  { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false, href: "/product-signup?package=starter_system" },
+                  { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended", href: "/product-signup?package=growth_system" },
+                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false, href: "/product-signup?package=pro_system" },
                 ].map((pkg) => (
-                  <button
+                  <a
                     key={pkg.key}
-                    type="button"
-                    onClick={() => {
-                      trackCTA(`store_package_${pkg.key}`, "store");
-                      navigate(`/product-signup?package=${pkg.key}`);
-                    }}
+                    href={pkg.href}
+                    onClick={() => trackCTA(`store_package_${pkg.key}`, "store")}
                     style={{
                       display: "flex",
                       flexDirection: "column",
@@ -949,7 +946,7 @@ function StoreInner() {
                     )}
                     <span style={{ fontSize: "14px", fontWeight: 800, color: "#0A1628", marginTop: pkg.badge ? "6px" : 0 }}>{pkg.name}</span>
                     <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.55)" }}>{pkg.price}</span>
-                  </button>
+                  </a>
                 ))}
               </div>
             </section>
