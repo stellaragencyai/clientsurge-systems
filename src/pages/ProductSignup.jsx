@@ -41,6 +41,28 @@ const PACKAGE_ALIASES = {
   elite_system: 'pro_system',
 };
 
+/**
+ * Returns a validated package object with safe defaults for every field.
+ * Prevents crashes if PACKAGES is modified or a field is missing/non-numeric.
+ * Ensures the page always renders usable Starter, Growth, and Pro details.
+ */
+function safePackageData(raw) {
+  if (!raw || typeof raw !== 'object') {
+    return { name: 'System', setup: 0, monthly: 0, description: '', services: [] };
+  }
+  const num = (v) => {
+    const n = Number(v);
+    return Number.isFinite(n) ? n : 0;
+  };
+  return {
+    name: typeof raw.name === 'string' && raw.name ? raw.name : 'System',
+    setup: num(raw.setup),
+    monthly: num(raw.monthly),
+    description: typeof raw.description === 'string' ? raw.description : '',
+    services: Array.isArray(raw.services) ? raw.services.filter((s) => typeof s === 'string') : [],
+  };
+}
+
 function formatPhone(value) {
   const digits = value.replace(/\D/g, '');
   if (digits.length === 0) return '';
@@ -57,7 +79,10 @@ export default function ProductSignup() {
   const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
   const hasValidPackage = Boolean(resolvedKey) && PACKAGES[resolvedKey];
   const packageKey = hasValidPackage ? resolvedKey : '';
-  const pkg = hasValidPackage ? PACKAGES[resolvedKey] : null;
+  const pkg = hasValidPackage ? safePackageData(PACKAGES[resolvedKey]) : null;
+
+  // Always-available validated package list for the fallback picker.
+  const allPackages = Object.entries(PACKAGES).map(([key, data]) => [key, safePackageData(data)]);
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);
@@ -140,7 +165,7 @@ export default function ProductSignup() {
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {Object.entries(PACKAGES).map(([key, data]) => (
+              {allPackages.map(([key, data]) => (
                 <div
                   key={key}
                   className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col"

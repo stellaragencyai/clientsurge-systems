@@ -204,7 +204,6 @@ export default function Industries() {
 
   return (
     <section
-      id="industries"
       ref={sectionRef}
       className="pt-16 md:pt-24 pb-16 md:pb-24 px-0 bg-white">
       
