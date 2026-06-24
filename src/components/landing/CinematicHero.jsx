@@ -4,12 +4,12 @@ import { trackCTA } from "@/lib/analytics";
 import FloatingAutomationProofCards from "./FloatingAutomationProofCards.jsx";
 
 const AUTOMATIONS = [
-  { label: "Lead Capture", icon: Zap, id: "automations" },
-  { label: "Missed-Call Recovery", icon: Phone, id: "automations" },
-  { label: "Instant Follow-Up", icon: MessageSquare, id: "automations" },
-  { label: "AI Booking", icon: Calendar, id: "automations" },
-  { label: "Review Requests", icon: Star, id: "automations" },
-  { label: "Lead Reactivation", icon: RefreshCw, id: "automations" },
+  { label: "Lead Capture", icon: Zap, id: "automation-lead-capture" },
+  { label: "Missed-Call Recovery", icon: Phone, id: "automation-missed-call" },
+  { label: "Instant Follow-Up", icon: MessageSquare, id: "automation-follow-up" },
+  { label: "AI Booking", icon: Calendar, id: "automation-booking" },
+  { label: "Review Requests", icon: Star, id: "automation-reviews" },
+  { label: "Lead Reactivation", icon: RefreshCw, id: "automation-reactivation" },
 ];
 
 export default function CinematicHero({ videoUrl, posterUrl }) {

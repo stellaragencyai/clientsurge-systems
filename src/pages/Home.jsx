@@ -18,6 +18,7 @@ import TrustStrip from "../components/landing/TrustStrip";
 import WhatHappensAfter from "../components/landing/WhatHappensAfter";
 import BeforeAfterComparison from "../components/landing/BeforeAfterComparison";
 import CTABand from "../components/landing/CTABand";
+import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
@@ -119,6 +120,9 @@ export default function Home() {
         {/* 1. Cinematic Hero */}
         <CinematicHero />
 
+        {/* 1b. Six Automations Premium Section */}
+        <SixAutomationsSection />
+
         {/* 1c. Revenue Leak Section */}
         <RevenueLeakSection />
 
@@ -130,6 +134,17 @@ export default function Home() {
 
         {/* 1f. Before ClientSurge vs After ClientSurge */}
         <BeforeAfterComparison />
+
+        {/* 1h. CTA Band After Six Automations */}
+        <CTABand
+          headline="Ready to turn your website into a response system?"
+          subcopy="ClientSurge connects capture, follow-up, booking, reviews, and reactivation into one operating flow."
+          primaryLabel="Get Your Free Audit"
+          primaryAction="contact"
+          secondaryLabel="Compare Packages"
+          secondaryAction="pricing"
+          location="cta_band_six_automations"
+        />
 
         {/* 1g. CTA Band 1 */}
         <CTABand
