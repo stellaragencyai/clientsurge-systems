@@ -55,8 +55,9 @@ export default function ProductSignup() {
 
   const rawPackage = searchParams.get('package') || '';
   const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
-  const packageKey = resolvedKey || 'starter_system';
-  const pkg = PACKAGES[packageKey] || PACKAGES.starter_system;
+  const hasValidPackage = Boolean(resolvedKey) && PACKAGES[resolvedKey];
+  const packageKey = hasValidPackage ? resolvedKey : '';
+  const pkg = hasValidPackage ? PACKAGES[resolvedKey] : null;
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);
@@ -75,8 +76,8 @@ export default function ProductSignup() {
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleCheckout = async () => {
-    if (!packageKey) {
-      setError('No package selected. Please choose a package from the pricing page.');
+    if (!hasValidPackage || !pkg) {
+      setError('No package selected. Please choose a package below to get started.');
       return;
     }
     if (!form.name.trim() || !form.email.trim() || !form.business.trim()) {
@@ -95,17 +96,16 @@ export default function ProductSignup() {
         return;
       }
 
-      const checkoutKey = safePkg === PACKAGES.starter_system && !resolvedKey ? 'starter_system' : packageKey;
-      trackCTA(`product_signup_checkout_${checkoutKey}`, 'product-signup');
+      trackCTA(`product_signup_checkout_${packageKey}`, 'product-signup');
 
       const response = await base44.functions.invoke('createCheckoutSession', {
-        package_key: checkoutKey,
+        package_key: packageKey,
         customer_name: form.name,
         customer_email: form.email,
         customer_phone: form.phone,
         business_name: form.business,
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/product-signup?package=${checkoutKey}`,
+        cancel_url: `${window.location.origin}/product-signup?package=${packageKey}`,
       });
 
       if (response.data?.url) {
@@ -120,31 +120,78 @@ export default function ProductSignup() {
     }
   };
 
-  const safePkg = (pkg && pkg.services && Array.isArray(pkg.services) && pkg.name && pkg.setup && pkg.monthly)
-    ? pkg
-    : PACKAGES.starter_system;
-
-  if (!safePkg) {
+  // When no valid package is resolved from the URL, show all three default packages
+  // so the user can pick one instead of seeing a blank or failed page.
+  if (!hasValidPackage || !pkg) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
-        <main className="px-6 pb-24 pt-[calc(var(--cs-nav-height)+48px)]">
-          <div className="max-w-lg mx-auto text-center">
-            <AlertCircle className="w-12 h-12 text-amber-500 mx-auto mb-4" />
-            <h1 className="font-titles text-2xl font-bold text-foreground mb-3">Something Went Wrong</h1>
-            <p className="text-muted-foreground text-sm mb-6">
-              We couldn't load package data. Please try the pricing page.
-            </p>
-            <button
-              onClick={() => navigate('/pricing')}
-              className="cs-btn-primary inline-flex items-center gap-2"
-              style={{ minHeight: 'unset', minWidth: 'unset' }}
-            >
-              View Packages <ArrowRight className="w-4 h-4" />
-            </button>
+        <TrustStrip />
+        <main className="px-4 pb-24 pt-[calc(var(--cs-nav-height)+32px)] md:px-6">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-10 text-center">
+              <p className="cs-section-eyebrow mb-3">Product Signup</p>
+              <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
+                Choose Your Package
+              </h1>
+              <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
+                Select a package to continue. All systems include remote setup, testing, and launch support.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {Object.entries(PACKAGES).map(([key, data]) => (
+                <div
+                  key={key}
+                  className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col"
+                >
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="w-5 h-5 text-primary" />
+                    <h2 className="font-titles text-lg font-bold text-foreground">{data.name}</h2>
+                  </div>
+                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{data.description}</p>
+
+                  <div className="mb-4">
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-2xl font-extrabold text-foreground">${data.monthly.toLocaleString()}</span>
+                      <span className="text-xs text-muted-foreground font-semibold">/mo</span>
+                    </div>
+                    <p className="text-xs text-muted-foreground mt-1">${data.setup.toLocaleString()} one-time setup</p>
+                  </div>
+
+                  <ul className="space-y-2 mb-6 flex-1">
+                    {data.services.map((service) => (
+                      <li key={service} className="flex items-start gap-2.5">
+                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-foreground/85">{service}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => navigate(`/product-signup?package=${key}`)}
+                    className="cs-btn-primary w-full flex items-center justify-center gap-2"
+                    style={{ minHeight: 'unset', minWidth: 'unset' }}
+                  >
+                    Choose {data.name.replace(' System', '')} <ArrowRight className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
+            </div>
+
+            <div className="text-center mt-8">
+              <button
+                onClick={() => navigate('/pricing')}
+                className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer"
+                style={{ minHeight: 'unset', minWidth: 'unset' }}
+              >
+                ← Back to Pricing
+              </button>
+            </div>
           </div>
         </main>
         <Footer />
+        <MobileCallBar />
       </div>
     );
   }
@@ -160,10 +207,10 @@ export default function ProductSignup() {
           <div className="mb-8 text-center">
             <p className="cs-section-eyebrow mb-3">Product Signup</p>
             <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-              Complete Your {safePkg.name} Signup
+              Complete Your {pkg.name} Signup
             </h1>
             <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
-              {safePkg.description} Enter your details below and continue to secure Stripe checkout.
+              {pkg.description} Enter your details below and continue to secure Stripe checkout.
             </p>
           </div>
 
@@ -176,17 +223,17 @@ export default function ProductSignup() {
               </div>
 
               <div className="rounded-lg bg-primary/5 border border-primary/15 p-4 mb-5">
-                <p className="text-sm font-bold text-foreground mb-3">{safePkg.name}</p>
+                <p className="text-sm font-bold text-foreground mb-3">{pkg.name}</p>
                 <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-2xl font-extrabold text-foreground">${safePkg.monthly.toLocaleString()}</span>
+                  <span className="text-2xl font-extrabold text-foreground">${pkg.monthly.toLocaleString()}</span>
                   <span className="text-xs text-muted-foreground font-semibold">/mo</span>
                 </div>
-                <p className="text-xs text-muted-foreground">${safePkg.setup.toLocaleString()} one-time setup fee</p>
+                <p className="text-xs text-muted-foreground">${pkg.setup.toLocaleString()} one-time setup fee</p>
               </div>
 
               <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Included Services</p>
               <ul className="space-y-2">
-                {safePkg.services.map((service) => (
+                {pkg.services.map((service) => (
                   <li key={service} className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                     <span className="text-sm text-foreground/85">{service}</span>
@@ -197,11 +244,11 @@ export default function ProductSignup() {
               <div className="mt-5 pt-5 border-t border-border space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">One-time setup</span>
-                  <span className="font-semibold text-foreground">${safePkg.setup.toLocaleString()}</span>
+                  <span className="font-semibold text-foreground">${pkg.setup.toLocaleString()}</span>
                 </div>
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">Monthly service</span>
-                  <span className="font-semibold text-primary">${safePkg.monthly.toLocaleString()}/mo</span>
+                  <span className="font-semibold text-primary">${pkg.monthly.toLocaleString()}/mo</span>
                 </div>
               </div>
             </div>
