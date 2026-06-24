@@ -1,15 +1,15 @@
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone, MessageSquare, Zap, Calendar, Star, RotateCcw } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import { motion, useReducedMotion } from "framer-motion";
 
-const FEATURE_CHIPS = [
-  "Lead Capture",
-  "Missed-Call Recovery",
-  "AI Follow-Up",
-  "Booking Automation",
-  "Review Requests",
-  "Lead Reactivation",
+const AUTOMATIONS = [
+  { title: "AI Voice Agents", desc: "Answer calls 24/7 instantly", icon: Phone },
+  { title: "Missed-Call Recovery", desc: "Auto text-back every missed call", icon: MessageSquare },
+  { title: "Lead Follow-Up", desc: "Smart multi-channel sequences", icon: Zap },
+  { title: "Appointment Booking", desc: "Converts conversations to bookings", icon: Calendar },
+  { title: "Review Requests", desc: "Trigger automatic review campaigns", icon: Star },
+  { title: "Lead Reactivation", desc: "Win back cold leads on autopilot", icon: RotateCcw },
 ];
 
 export default function Hero() {
@@ -22,7 +22,7 @@ export default function Hero() {
       style={{
         minHeight: "100svh",
         paddingTop: "var(--cs-nav-height)",
-        background: "#0A0A0A",
+        background: "radial-gradient(ellipse at 50% -20%, #172554 0%, #0A0F1E 50%, #020617 100%)",
         isolation: "isolate",
       }}
     >
@@ -83,10 +83,16 @@ export default function Hero() {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-black text-white mb-5 leading-[1.08] tracking-tight relative"
-          style={{ fontFamily: "'Montserrat', sans-serif" }}
+          className="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-[1.02] tracking-tight relative"
+          style={{
+            fontFamily: "'Montserrat', sans-serif",
+            background: "linear-gradient(to right, #FFFFFF 0%, #FFFFFF 60%, #7DD3FC 100%)",
+            WebkitBackgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            backgroundClip: "text",
+          }}
         >
-          The Business AI Automation Store — Pick Your System, We Install It Remotely
+          You're Already Getting Leads. Let's Convert Every One.
         </motion.h1>
 
         {/* Subheadline */}
@@ -94,80 +100,115 @@ export default function Hero() {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="text-base md:text-lg font-normal text-white/85 max-w-3xl mx-auto mb-8 leading-relaxed"
+          className="text-base md:text-lg font-normal max-w-3xl mx-auto mb-6 leading-relaxed"
+          style={{ color: "#94A3B8" }}
         >
-          ClientSurge helps businesses browse, choose, and activate AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, reactivation, and operations — through a guided AI-powered remote setup process.
+          Book a free 15-minute strategy call. We'll map exactly where your business is leaking bookings and show you what the system looks like for your specific situation.
         </motion.p>
+
+        {/* Trust Signals */}
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="flex flex-wrap items-center justify-center gap-2 mb-8"
+        >
+          {["No contracts", "Live in 48 hrs", "Done-for-you", "30-day guarantee"].map((badge) => (
+            <span
+              key={badge}
+              className="inline-flex px-3 py-1.5 rounded-full text-xs font-semibold border"
+              style={{
+                background: "rgba(0,174,239,0.1)",
+                border: "1px solid rgba(0,174,239,0.3)",
+                color: "#38BDF8",
+              }}
+            >
+              ✓ {badge}
+            </span>
+          ))}
+        </motion.div>
 
         {/* CTAs */}
         <motion.div
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-10"
+          transition={{ duration: 0.5, delay: 0.35 }}
+          className="flex flex-col sm:flex-row items-center justify-center gap-3 mb-16"
         >
           <button
             onClick={() => {
-              trackCTA("browse_automation_systems", "hero");
-              navigate("/store");
+              trackCTA("compare_packages", "hero");
+              navigate("/pricing");
             }}
-            className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white transition-all duration-300 hover:scale-105 hover:shadow-xl"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white transition-all duration-300 hover:scale-105"
             style={{
+              background: "linear-gradient(135deg, #0079c1 0%, #005691 100%)",
+              boxShadow: "0 0 20px rgba(0, 174, 239, 0.45)",
               minHeight: "unset",
               minWidth: "unset",
-              boxShadow: "0 4px 20px rgba(0,121,193,0.45)",
             }}
           >
-            Browse AI Automation Systems <ArrowRight className="w-5 h-5" />
+            Compare Packages <ArrowRight className="w-5 h-5" />
           </button>
           <button
             onClick={() => {
-              trackCTA("start_remote_setup", "hero");
-              navigate("/book");
+              trackCTA("view_automations", "hero");
+              navigate("/store");
             }}
-            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-white transition-all duration-300 hover:bg-white/25"
+            className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold transition-all duration-300 hover:border-sky-300"
             style={{
-              background: "rgba(255,255,255,0.15)",
-              border: "1.5px solid rgba(255,255,255,0.45)",
+              background: "transparent",
+              border: "1px solid rgba(148, 163, 184, 0.3)",
+              color: "#F0F4F8",
               backdropFilter: "blur(8px)",
               minHeight: "unset",
               minWidth: "unset",
             }}
           >
-            Start Remote Setup <ArrowRight className="w-5 h-5" />
+            View Automations <ArrowRight className="w-5 h-5" />
           </button>
         </motion.div>
 
-        {/* Trust line */}
-        <motion.p
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          className="text-sm font-medium text-white/75 mb-6"
-        >
-          Built for service businesses, clinics, contractors, agencies, and local operators that need faster response, better follow-up, and fewer lost opportunities.
-        </motion.p>
-
-        {/* Feature chips */}
+        {/* Automation Showcase Grid */}
         <motion.div
-          initial={{ opacity: 0, y: 12 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          className="flex flex-wrap items-center justify-center gap-2"
+          transition={{ duration: 0.6, delay: 0.45 }}
+          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 w-full"
         >
-          {FEATURE_CHIPS.map((chip) => (
-            <span
-              key={chip}
-              className="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold"
-              style={{
-                background: "rgba(255,255,255,0.1)",
-                border: "1px solid rgba(255,255,255,0.15)",
-                color: "rgba(255,255,255,0.85)",
-              }}
-            >
-              {chip}
-            </span>
-          ))}
+          {AUTOMATIONS.map((auto, idx) => {
+            const Icon = auto.icon;
+            return (
+              <motion.div
+                key={auto.title}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.5 + idx * 0.05 }}
+                className="group rounded-lg p-4 transition-all duration-300 border backdrop-blur-md cursor-default hover:border-sky-400/50"
+                style={{
+                  background: "rgba(255,255,255,0.08)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+                }}
+              >
+                <div className="flex items-start gap-3">
+                  <div
+                    className="rounded-lg p-2.5 flex-shrink-0 group-hover:scale-110 transition-transform"
+                    style={{
+                      background: "rgba(0,174,239,0.12)",
+                      border: "1px solid rgba(0,174,239,0.25)",
+                    }}
+                  >
+                    <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
+                  </div>
+                  <div className="text-left min-w-0">
+                    <h4 className="text-sm font-semibold text-white leading-snug">{auto.title}</h4>
+                    <p className="text-xs text-slate-400 mt-0.5">{auto.desc}</p>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
         </motion.div>
       </div>
     </section>
