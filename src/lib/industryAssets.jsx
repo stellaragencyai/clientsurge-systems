@@ -83,6 +83,16 @@ export const industryPatterns = {
       <rect width="100%" height="100%" fill="url(#pat-law)"/>
     </svg>
   ),
+  "property-services": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-property" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+        <rect x="4" y="8" width="24" height="20" fill="none" stroke="white" strokeWidth="1"/>
+        <rect x="10" y="14" width="4" height="4" fill="white"/>
+        <rect x="18" y="14" width="4" height="4" fill="white"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-property)"/>
+    </svg>
+  ),
 };
 
 export const FILTER_TAGS = [
@@ -102,4 +112,5 @@ export const INDUSTRY_TAGS = {
   "contractors": "home",
   "real-estate": "professional",
   "personal-injury": "professional",
+  "property-services": "home",
 };
