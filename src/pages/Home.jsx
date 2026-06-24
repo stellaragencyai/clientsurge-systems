@@ -13,6 +13,7 @@ import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import VisualFlawsPatch60 from "../components/landing/VisualFlawsPatch60";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
+import LogoCarousel from "../components/landing/LogoCarousel";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import TrustStrip from "../components/landing/TrustStrip";
@@ -119,6 +120,9 @@ export default function Home() {
 
         {/* 1. Cinematic Hero */}
         <CinematicHero />
+
+        {/* 1a. Logo Carousel */}
+        <LogoCarousel />
 
         {/* 1b. Integration Carousel */}
         <IntegrationCarousel />

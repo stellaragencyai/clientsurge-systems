@@ -26,16 +26,41 @@ export default function Hero() {
         isolation: "isolate",
       }}
     >
-      {/* Subtle grid texture */}
-      <div
-        className="absolute inset-0 pointer-events-none"
-        style={{
-          backgroundImage: "linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px)",
-          backgroundSize: "60px 60px",
-          maskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
-          WebkitMaskImage: "radial-gradient(ellipse at center, black 30%, transparent 70%)",
-        }}
-      />
+      {/* Subtle orbital rings + particle dots background */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {/* Faint orbit rings */}
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+          style={{
+            width: "400px",
+            height: "400px",
+            border: "1px solid rgba(0, 174, 239, 0.08)",
+          }}
+        />
+        <div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+          style={{
+            width: "600px",
+            height: "600px",
+            border: "1px solid rgba(0, 174, 239, 0.04)",
+          }}
+        />
+        {/* Particle dots */}
+        {[...Array(12)].map((_, i) => (
+          <div
+            key={i}
+            className="absolute rounded-full"
+            style={{
+              width: "2px",
+              height: "2px",
+              background: "rgba(0, 174, 239, 0.3)",
+              top: `${20 + (i % 4) * 20}%`,
+              left: `${15 + (i % 3) * 25}%`,
+              opacity: 0.4 + Math.random() * 0.3,
+            }}
+          />
+        ))}
+      </div>
 
       <div className="relative z-10 w-full max-w-5xl mx-auto px-6 py-12 md:py-20 text-center">
         {/* Eyebrow */}
@@ -59,7 +84,7 @@ export default function Hero() {
           </span>
         </motion.div>
 
-        {/* Headline with glow backdrop — skipped when prefers-reduced-motion */}
+        {/* Cyan glow backdrop */}
         {!shouldReduceMotion && (
           <motion.div
             initial={{ opacity: 0 }}
@@ -71,10 +96,10 @@ export default function Hero() {
               top: "50%",
               left: "50%",
               transform: "translate(-50%, -50%)",
-              width: "120%",
-              height: "200px",
-              background: "radial-gradient(ellipse at center, rgba(0,174,239,0.15), transparent 70%)",
-              filter: "blur(40px)",
+              width: "100%",
+              height: "250px",
+              background: "radial-gradient(ellipse at center, rgba(0,174,239,0.12), transparent 60%)",
+              filter: "blur(50px)",
               zIndex: -1,
             }}
           />
@@ -83,16 +108,23 @@ export default function Hero() {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-4xl md:text-5xl lg:text-6xl font-black mb-5 leading-[1.02] tracking-tight relative"
+          className="text-4xl md:text-5xl lg:text-6xl font-black mb-6 leading-[1.1] tracking-tight relative"
           style={{
             fontFamily: "'Montserrat', sans-serif",
-            background: "linear-gradient(to right, #FFFFFF 0%, #FFFFFF 60%, #7DD3FC 100%)",
-            WebkitBackgroundClip: "text",
-            WebkitTextFillColor: "transparent",
-            backgroundClip: "text",
+            color: "#FFFFFF",
           }}
         >
-          You're Already Getting Leads. Let's Convert Every One.
+          You're Already Getting Leads.<br />
+          <span
+            style={{
+              background: "linear-gradient(90deg, #00AEEF 0%, #0088CC 100%)",
+              WebkitBackgroundClip: "text",
+              WebkitTextFillColor: "transparent",
+              backgroundClip: "text",
+            }}
+          >
+            Let's Convert Every One.
+          </span>
         </motion.h1>
 
         {/* Subheadline */}
@@ -169,12 +201,12 @@ export default function Hero() {
           </button>
         </motion.div>
 
-        {/* Automation Showcase Grid */}
+        {/* Feature Pills Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.45 }}
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3 w-full"
+          className="grid grid-cols-2 md:grid-cols-3 gap-2 w-full max-w-3xl mx-auto"
         >
           {AUTOMATIONS.map((auto, idx) => {
             const Icon = auto.icon;
@@ -184,26 +216,25 @@ export default function Hero() {
                 initial={{ opacity: 0, y: 12 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4, delay: 0.5 + idx * 0.05 }}
-                className="group rounded-lg p-4 transition-all duration-300 border backdrop-blur-md cursor-default hover:border-sky-400/50"
+                className="group rounded-lg p-3 transition-all duration-300 border backdrop-blur-md cursor-default hover:border-cyan-400/60 hover:bg-cyan-900/10"
                 style={{
-                  background: "rgba(255,255,255,0.08)",
-                  border: "1px solid rgba(255,255,255,0.12)",
-                  boxShadow: "inset 0 1px 0 rgba(255,255,255,0.1)",
+                  background: "rgba(30, 30, 40, 0.6)",
+                  border: "1px solid rgba(0, 174, 239, 0.2)",
+                  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.3)",
                 }}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-center gap-2">
                   <div
-                    className="rounded-lg p-2.5 flex-shrink-0 group-hover:scale-110 transition-transform"
+                    className="rounded-md p-2 flex-shrink-0 transition-transform"
                     style={{
-                      background: "rgba(0,174,239,0.12)",
-                      border: "1px solid rgba(0,174,239,0.25)",
+                      background: "rgba(0,174,239,0.15)",
+                      border: "1px solid rgba(0,174,239,0.3)",
                     }}
                   >
-                    <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
+                    <Icon className="w-4 h-4" style={{ color: "#00AEEF" }} />
                   </div>
                   <div className="text-left min-w-0">
-                    <h4 className="text-sm font-semibold text-white leading-snug">{auto.title}</h4>
-                    <p className="text-xs text-slate-400 mt-0.5">{auto.desc}</p>
+                    <p className="text-xs font-semibold text-white leading-tight">{auto.title}</p>
                   </div>
                 </div>
               </motion.div>
