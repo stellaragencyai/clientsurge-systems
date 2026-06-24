@@ -17,12 +17,12 @@ export default function HeroTrustLogos() {
       transition={{ duration: 0.6, delay: 0.5 }}
       className="mt-14 sm:mt-20 w-full max-w-5xl"
     >
-      {/* Label */}
+      {/* Label — keep minimal in hero */}
       <p
         className="text-xs md:text-sm font-semibold uppercase tracking-wider text-center mb-6 md:mb-8"
-        style={{ color: "#AEB8C8" }}
+        style={{ color: "#5A6577", fontSize: "0.7rem" }}
       >
-        Integrates with the tools modern businesses already use
+        Works with your favorite tools
       </p>
 
       {/* Logos Grid */}

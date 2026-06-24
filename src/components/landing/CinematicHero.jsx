@@ -1,7 +1,7 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
-import PremiumHeroAutomationCards from "./PremiumHeroAutomationCards.jsx";
+import CompactAutomationPills from "./CompactAutomationPills.jsx";
 import HeroTrustLogos from "./HeroTrustLogos.jsx";
 
 export default function CinematicHero({ videoUrl, posterUrl }) {
@@ -83,7 +83,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
           className="font-semibold mb-6 max-w-2xl mx-auto"
-          style={{ fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)", color: "#D4D8E0", lineHeight: 1.5 }}
+          style={{ fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)", color: "#35BDF1", lineHeight: 1.5, textShadow: "0 0 16px rgba(53,189,241,0.4)" }}
         >
           Websites, AI follow-up, booking, missed-call recovery, reviews, and lead reactivation working as one system.
         </motion.p>
@@ -151,8 +151,8 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           </button>
         </motion.div>
 
-        {/* Premium Automation Cards */}
-        <PremiumHeroAutomationCards />
+        {/* Compact Automation Pills */}
+        <CompactAutomationPills />
 
         {/* Trust Logos */}
         <HeroTrustLogos />
