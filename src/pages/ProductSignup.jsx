@@ -66,6 +66,9 @@ function formatPhone(value) {
   return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
 }
 
+const SUPPORT_EMAIL = 'support@clientsurgesystems.com';
+const SUPPORT_PHONE = '(602) 584-3227';
+
 export default function ProductSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
@@ -94,6 +97,7 @@ export default function ProductSignup() {
     setLoading(true);
     setError(null);
 
+    let response;
     try {
       // Lazy import — never blocks page render
       const { base44 } = await import('@/api/base44Client');
@@ -101,7 +105,7 @@ export default function ProductSignup() {
 
       try { trackCTA(`product_signup_checkout_${packageKey}`, 'product-signup'); } catch (_) { /* non-critical */ }
 
-      const response = await base44.functions.invoke('createCheckoutSession', {
+      response = await base44.functions.invoke('createCheckoutSession', {
         package_key: packageKey,
         customer_name: form.name,
         customer_email: form.email,
@@ -110,16 +114,18 @@ export default function ProductSignup() {
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/product-signup?package=${packageKey}`,
       });
-
-      if (response.data?.url) {
-        window.location.href = response.data.url;
-      } else {
-        setError(response.data?.error || 'Failed to start checkout. Please try again.');
-      }
     } catch (err) {
-      setError(err.message || 'Checkout failed. Please try again or contact support.');
-    } finally {
+      setError(`We couldn't start checkout right now. Please try again, or contact us at ${SUPPORT_EMAIL} or ${SUPPORT_PHONE}.`);
       setLoading(false);
+      return;
+    }
+
+    setLoading(false);
+
+    if (response?.data?.url) {
+      window.location.href = response.data.url;
+    } else {
+      setError(response?.data?.error || `We couldn't start checkout right now. Please try again, or contact us at ${SUPPORT_EMAIL} or ${SUPPORT_PHONE}.`);
     }
   };
 
@@ -244,9 +250,17 @@ export default function ProductSignup() {
               </button>
 
               {error && (
-                <div className="mt-3 flex items-start gap-2 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
-                  <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                  <p>{error}</p>
+                <div className="mt-3 p-3 rounded-lg bg-red-50 border border-red-200 text-red-800 text-sm">
+                  <div className="flex items-start gap-2">
+                    <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                    <p>{error}</p>
+                  </div>
+                  {(error.includes(SUPPORT_EMAIL) || error.includes('contact')) && (
+                    <div className="mt-2 flex flex-col gap-1 pl-6 text-xs font-semibold">
+                      <a href={`mailto:${SUPPORT_EMAIL}`} className="text-red-700 hover:underline">{SUPPORT_EMAIL}</a>
+                      <a href={`tel:+1${SUPPORT_PHONE.replace(/\D/g, '')}`} className="text-red-700 hover:underline">{SUPPORT_PHONE}</a>
+                    </div>
+                  )}
                 </div>
               )}
 
