@@ -12,6 +12,24 @@ import { resendFetch } from "../_shared/resendFetch.js";
 import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
 
+// ── E.164 PHONE NORMALIZATION ──
+function normalizePhoneToE164(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 0) return null;
+  if (cleaned.length === 10) {
+    if (cleaned[0] === '0' || cleaned[0] === '1') return null;
+    return `+1${cleaned}`;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    const tenDigits = cleaned.slice(1);
+    if (tenDigits[0] === '0' || tenDigits[0] === '1') return null;
+    return `+${cleaned}`;
+  }
+  if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+  return null;
+}
+
 const FOLLOW_UP_STEPS = [
   { step: 1, minutesAfter: 2, channel: "sms", key: "missed_call_sms_2min" },
   { step: 2, minutesAfter: 10, channel: "email", key: "missed_call_email_10min" },
@@ -120,7 +138,13 @@ async function sendSMS(base44, lead, messageBody, fromNumber, stepKey) {
     throw new Error("Twilio credentials missing");
   }
 
-  const params = { To: lead.phone, From: fromNumber, Body: messageBody };
+  // ── E.164 NORMALIZATION ──
+  const normalizedPhone = normalizePhoneToE164(lead.phone);
+  if (!normalizedPhone) {
+    throw new Error("invalid_phone_number");
+  }
+
+  const params = { To: normalizedPhone, From: fromNumber, Body: messageBody };
   if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
   const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,

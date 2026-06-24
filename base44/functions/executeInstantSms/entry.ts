@@ -117,9 +117,27 @@ Deno.serve(async (req) => {
         subject: 'SMS sent successfully',
         message_body: template,
         provider_message_id: twilioResult.message_id,
-        metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, normalized_phone: normalizedPhone }),
+        metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, normalized_phone: normalizedPhone, raw_phone: rawPhone }),
         environment: getEnvironment(),
       });
+
+      // Also create CommunicationLog with canonical_to_address
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: lead_type,
+        related_entity_id: job.lead_id,
+        lead_phone: rawPhone,
+        lead_name: lead.full_name || lead.business_name || null,
+        channel: 'sms', provider: 'twilio', direction: 'outbound',
+        trigger_name: 'instant_sms',
+        to_address: normalizedPhone,
+        canonical_to_address: normalizedPhone,
+        from_address: fromNumber,
+        body_preview: template.slice(0, 200),
+        provider_message_id: twilioResult.message_id,
+        provider_status: 'queued',
+        delivery_status: 'queued',
+        skip_lead_update: true,
+      }).catch(() => {});
 
       // Update lead tracking
       const updateData = {
@@ -147,9 +165,27 @@ Deno.serve(async (req) => {
         subject: 'SMS send failed',
         message_body: template,
         error_message: twilioResult.error,
-        metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, normalized_phone: normalizedPhone, error_code: twilioResult.error_code }),
+        metadata_json: JSON.stringify({ job_id, attempt_event_id: attemptEvent.id, normalized_phone: normalizedPhone, raw_phone: rawPhone, error_code: twilioResult.error_code }),
         environment: getEnvironment(),
       });
+
+      // Also log failure to CommunicationLog
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: lead_type,
+        related_entity_id: job.lead_id,
+        lead_phone: rawPhone,
+        lead_name: lead.full_name || lead.business_name || null,
+        channel: 'sms', provider: 'twilio', direction: 'outbound',
+        trigger_name: 'instant_sms',
+        to_address: normalizedPhone,
+        canonical_to_address: normalizedPhone,
+        from_address: fromNumber,
+        body_preview: template.slice(0, 200),
+        delivery_status: 'failed',
+        error_code: twilioResult.error_code || null,
+        error_message: twilioResult.error,
+        skip_lead_update: true,
+      }).catch(() => {});
 
       // Update attempt count even on failure
       const updateData = { sms_attempt_count: (lead.sms_attempt_count || 0) + 1 };
@@ -199,11 +235,13 @@ async function sendViaTwilio(fromNumber, toNumber, message) {
       return { success: false, error: 'Twilio credentials not set' };
     }
 
+    const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');
     const body = new URLSearchParams({
       From: fromNumber,
       To: toNumber,
       Body: message,
     });
+    if (statusCallbackUrl) body.append('StatusCallback', statusCallbackUrl);
 
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',

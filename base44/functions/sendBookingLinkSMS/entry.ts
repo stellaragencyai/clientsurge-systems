@@ -33,6 +33,7 @@ Deno.serve(async (req) => {
     if (statusToQualified) {
       const bookingMessage = `Perfect — here's a quick link to grab a time: ${bookingLink}`;
 
+      // sendSMS now normalizes to E.164 internally before calling Twilio
       await base44.functions.invoke('sendSMS', {
         phone: lead.phone,
         message: bookingMessage,

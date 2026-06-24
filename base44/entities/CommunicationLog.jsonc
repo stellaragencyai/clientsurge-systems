@@ -19,7 +19,13 @@
     },
     "lead_phone": {
       "type": "string",
-      "title": "Lead Phone"
+      "title": "Lead Phone",
+      "description": "Raw phone as stored on the lead record (for reference)"
+    },
+    "canonical_to_address": {
+      "type": "string",
+      "title": "Canonical To Address (E.164)",
+      "description": "Normalized E.164 phone actually sent to provider. For SMS this is the exact To= value in the Twilio request."
     },
     "lead_name": {
       "type": "string",
@@ -67,7 +73,8 @@
     },
     "to_address": {
       "type": "string",
-      "title": "To Address"
+      "title": "To Address",
+      "description": "Normalized E.164 for SMS, email address for email"
     },
     "from_address": {
       "type": "string",
@@ -88,7 +95,8 @@
     },
     "provider_status": {
       "type": "string",
-      "title": "Provider Status"
+      "title": "Provider Status",
+      "description": "Raw provider status: queued, sent, delivered, undelivered, failed"
     },
     "delivery_status": {
       "type": "string",
@@ -101,7 +109,8 @@
         "skipped",
         "unknown"
       ],
-      "default": "unknown"
+      "default": "unknown",
+      "description": "queued = provider accepted; sent = carrier accepted upstream; delivered = final delivery confirmed; failed = undelivered/failed"
     },
     "error_code": {
       "type": "string",
@@ -114,7 +123,7 @@
     "request_payload_redacted": {
       "type": "string",
       "title": "Request Payload (Redacted)",
-      "description": "API request payload with all secrets/tokens redacted"
+      "description": "API request payload with all secrets/tokens redacted. Must show To= in E.164 format."
     },
     "response_payload_redacted": {
       "type": "string",
@@ -129,12 +138,14 @@
     "delivered_at": {
       "type": "string",
       "title": "Delivered At",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Set only when Twilio status callback reports delivered"
     },
     "failed_at": {
       "type": "string",
       "title": "Failed At",
-      "format": "date-time"
+      "format": "date-time",
+      "description": "Set when Twilio reports undelivered/failed"
     },
     "environment": {
       "type": "string",
@@ -145,6 +156,11 @@
         "test"
       ],
       "default": "production"
+    },
+    "superseded_note": {
+      "type": "string",
+      "title": "Superseded Note",
+      "description": "Admin-visible annotation when this log record used a stale/incorrect phone and is not valid proof."
     }
   },
   "required": [

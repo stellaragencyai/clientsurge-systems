@@ -82,6 +82,7 @@ Deno.serve(async (req) => {
       related_entity_id: payload.related_entity_id || null,
       lead_email: payload.lead_email || null,
       lead_phone: payload.lead_phone || null,
+      canonical_to_address: payload.canonical_to_address || payload.to_address || null,
       lead_name: payload.lead_name || null,
       channel: payload.channel || "system",
       provider: payload.provider || "internal",

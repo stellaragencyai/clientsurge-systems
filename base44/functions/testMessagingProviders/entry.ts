@@ -337,11 +337,13 @@ async function sendViaTwilio(fromNumber, toNumber, message) {
       return { success: false, error: 'Twilio credentials not set' };
     }
 
+    const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');
     const body = new URLSearchParams({
       From: fromNumber,
       To: toNumber,
       Body: message,
     });
+    if (statusCallbackUrl) body.append('StatusCallback', statusCallbackUrl);
 
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',

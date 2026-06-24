@@ -14,6 +14,24 @@ function appendSmsOptOut(message) {
   return `${trimmed}\n\nReply STOP to opt out.`;
 }
 
+// ── E.164 PHONE NORMALIZATION ──
+function normalizePhoneToE164(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 0) return null;
+  if (cleaned.length === 10) {
+    if (cleaned[0] === '0' || cleaned[0] === '1') return null;
+    return `+1${cleaned}`;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    const tenDigits = cleaned.slice(1);
+    if (tenDigits[0] === '0' || tenDigits[0] === '1') return null;
+    return `+${cleaned}`;
+  }
+  if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+  return null;
+}
+
 function safeResendFrom() {
   const configured = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
   if (configured && configured.includes("@")) {
@@ -225,21 +243,37 @@ Deno.serve(async (req) => {
       } catch (_) {}
     }
 
+    // ── E.164 NORMALIZATION ──
+    const rawPhone = leadData.phone_number;
+    const normalizedPhone = normalizePhoneToE164(rawPhone);
+
+    if (!normalizedPhone) {
+      await logSmsEvent(base44, lead_id, "failed", null, "Invalid phone number — cannot normalize to E.164");
+      base44.asServiceRole.functions.invoke('logCommunication', {
+        related_entity_type: "WebsiteLead", related_entity_id: lead_id,
+        lead_phone: rawPhone, lead_name: leadData.full_name,
+        channel: "sms", provider: "twilio", direction: "outbound",
+        trigger_name: "initial_response", to_address: null, canonical_to_address: null,
+        delivery_status: "skipped", error_message: "invalid_phone_number", skip_lead_update: true,
+      }).catch(() => {});
+      return json({ error: "Invalid phone number — cannot normalize to E.164", sms_sent: false, normalized_phone: null }, 400);
+    }
+
     // Format and send SMS
     const messageBody = formatSmsTemplate(smsTemplate, leadData);
     let messageSid;
     try {
-      messageSid = await sendTwilioSms(leadData.phone_number, messageBody);
+      messageSid = await sendTwilioSms(normalizedPhone, messageBody);
     } catch (smsError) {
       await logSmsEvent(base44, lead_id, "failed", null, smsError.message);
       base44.asServiceRole.functions.invoke('logCommunication', {
         related_entity_type: "WebsiteLead", related_entity_id: lead_id,
-        lead_phone: leadData.phone_number, lead_name: leadData.full_name,
+        lead_phone: rawPhone, lead_name: leadData.full_name,
         channel: "sms", provider: "twilio", direction: "outbound",
-        trigger_name: "initial_response", to_address: leadData.phone_number,
+        trigger_name: "initial_response", to_address: normalizedPhone, canonical_to_address: normalizedPhone,
         delivery_status: "failed", error_message: smsError.message, skip_lead_update: true,
       }).catch(() => {});
-      return json({ error: smsError.message }, 500);
+      return json({ error: smsError.message, normalized_phone: normalizedPhone }, 500);
     }
 
     // Update WebsiteLead
@@ -258,13 +292,13 @@ Deno.serve(async (req) => {
     await logSmsEvent(base44, lead_id, "sent", messageSid);
     base44.asServiceRole.functions.invoke('logCommunication', {
       related_entity_type: "WebsiteLead", related_entity_id: lead_id,
-      lead_email: leadData.email, lead_phone: leadData.phone_number, lead_name: leadData.full_name,
+      lead_email: leadData.email, lead_phone: rawPhone, lead_name: leadData.full_name,
       channel: "sms", provider: "twilio", direction: "outbound",
-      trigger_name: "initial_response", to_address: leadData.phone_number,
+      trigger_name: "initial_response", to_address: normalizedPhone, canonical_to_address: normalizedPhone,
       from_address: Deno.env.get("TWILIO_PHONE_NUMBER"),
       body_preview: messageBody.slice(0, 200),
       provider_message_id: messageSid, provider_status: "queued",
-      delivery_status: "sent", skip_lead_update: true,
+      delivery_status: "queued", skip_lead_update: true,
     }).catch(() => {});
 
     // Send email if address present
@@ -274,7 +308,7 @@ Deno.serve(async (req) => {
       await sendResendEmail(base44, lead_id, leadData.email, firstName, businessName);
     }
 
-    return json({ success: true, message_id: messageSid });
+    return json({ success: true, message_id: messageSid, normalized_phone: normalizedPhone });
   } catch (error) {
     return json({ error: error.message }, 500);
   }

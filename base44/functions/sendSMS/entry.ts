@@ -14,12 +14,61 @@ function appendSmsOptOut(message) {
   return `${trimmed}\n\nReply STOP to opt out.`;
 }
 
+// ── E.164 PHONE NORMALIZATION ──
+// Inlined shared utility — every SMS path must call this before building
+// the Twilio request payload. Returns null if invalid.
+function normalizePhoneToE164(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 0) return null;
+  // US 10-digit → +1 + 10 digits
+  if (cleaned.length === 10) {
+    if (cleaned[0] === '0' || cleaned[0] === '1') return null;
+    return `+1${cleaned}`;
+  }
+  // US 11-digit starting with 1 → +1XXXXXXXXXX
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    const tenDigits = cleaned.slice(1);
+    if (tenDigits[0] === '0' || tenDigits[0] === '1') return null;
+    return `+${cleaned}`;
+  }
+  // International 11–15 digits → +
+  if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+  return null;
+}
+
 Deno.serve(async (req) => {
   try {
     const { phone, message, leadId } = await req.json();
 
     if (!phone || !message) {
       return json({ error: 'Phone and message required' }, 400);
+    }
+
+    // ── E.164 NORMALIZATION ──
+    // Every SMS path must normalize before building the Twilio payload.
+    const rawPhone = phone;
+    const normalizedPhone = normalizePhoneToE164(rawPhone);
+
+    if (!normalizedPhone) {
+      // Invalid phone — do NOT call Twilio
+      if (leadId) {
+        try {
+          const base44 = createClientFromRequest(req);
+          await base44.asServiceRole.entities.CommunicationEvent.create({
+            lead_id: leadId,
+            channel: 'sms',
+            direction: 'outbound',
+            event_type: 'sms_skipped',
+            provider: 'twilio',
+            status: 'failed',
+            subject: 'SMS skipped — invalid phone number',
+            error_message: 'invalid_phone_number',
+            metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: null }),
+          });
+        } catch (_) {}
+      }
+      return json({ error: 'Invalid phone number', sms_sent: false, reason: 'invalid_phone_number', raw_phone: rawPhone, normalized_phone: null }, 400);
     }
 
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -67,7 +116,7 @@ Deno.serve(async (req) => {
       },
       body: new URLSearchParams({
         From: fromNumber,
-        To: phone,
+        To: normalizedPhone,
         Body: appendSmsOptOut(message),
       }).toString(),
     });
@@ -88,10 +137,11 @@ Deno.serve(async (req) => {
             status: 'failed',
             message_body: message,
             error_message: data.message || `Twilio error ${response.status}`,
+            metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone }),
           });
         } catch (_) {}
       }
-      return json({ error: 'Failed to send SMS', details: data }, 500);
+      return json({ error: 'Failed to send SMS', details: data, normalized_phone: normalizedPhone }, 500);
     }
 
     // Log success
@@ -107,6 +157,7 @@ Deno.serve(async (req) => {
           status: 'sent',
           message_body: message,
           provider_message_id: data.sid || null,
+          metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone }),
         });
 
         await base44.entities.Messages.create({
@@ -119,7 +170,7 @@ Deno.serve(async (req) => {
       } catch (_) {}
     }
 
-    return json({ success: true, messageSid: data.sid });
+    return json({ success: true, messageSid: data.sid, normalized_phone: normalizedPhone });
   } catch (error) {
     return json({ error: error.message }, 500);
   }

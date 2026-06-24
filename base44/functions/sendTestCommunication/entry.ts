@@ -27,6 +27,24 @@ function safeResendFrom() {
   return "ClientSurge Systems <system@clientsurgesystems.com>";
 }
 
+// ── E.164 PHONE NORMALIZATION ──
+function normalizePhoneToE164(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 0) return null;
+  if (cleaned.length === 10) {
+    if (cleaned[0] === '0' || cleaned[0] === '1') return null;
+    return `+1${cleaned}`;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    const tenDigits = cleaned.slice(1);
+    if (tenDigits[0] === '0' || tenDigits[0] === '1') return null;
+    return `+${cleaned}`;
+  }
+  if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+  return null;
+}
+
 function detectEnvironment(req) {
   try {
     const url = new URL(req.url);
@@ -44,6 +62,7 @@ async function createCommLog(base44, payload) {
       related_entity_id: payload.related_entity_id || null,
       lead_email: payload.lead_email || null,
       lead_phone: payload.lead_phone || null,
+      canonical_to_address: payload.canonical_to_address || payload.to_address || null,
       lead_name: payload.lead_name || null,
       channel: payload.channel || "system",
       provider: payload.provider || "internal",
@@ -236,9 +255,10 @@ Deno.serve(async (req) => {
     // TEST SMS via Twilio
     // ═══════════════════════════════════════════
     if (action === "sms") {
-      const toPhone = (recipient_phone || "").trim();
-      if (!toPhone || toPhone.replace(/\D/g, "").length < 10) {
-        return json({ error: "A valid recipient phone number is required" }, 400);
+      const rawPhone = (recipient_phone || "").trim();
+      const normalizedPhone = normalizePhoneToE164(rawPhone);
+      if (!normalizedPhone) {
+        return json({ error: "Invalid phone number — cannot normalize to E.164", normalized_phone: null }, 400);
       }
 
       const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -256,7 +276,8 @@ Deno.serve(async (req) => {
 
         const logPayload = {
           channel: "sms", provider: "twilio", direction: "outbound",
-          trigger_name: "manual_test", to_address: toPhone,
+          trigger_name: "manual_test", to_address: normalizedPhone, canonical_to_address: normalizedPhone,
+          lead_phone: rawPhone,
           from_address: fromNumber || "not_configured",
           body_preview: smsBody.slice(0, 200),
           delivery_status: "failed", error_code: "MISSING_CONFIG", error_message: errorMsg,
@@ -274,7 +295,9 @@ Deno.serve(async (req) => {
       }
 
       const auth = btoa(`${accountSid}:${authToken}`);
-      const params = new URLSearchParams({ From: fromNumber, To: toPhone, Body: smsBody });
+      const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
+      const params = new URLSearchParams({ From: fromNumber, To: normalizedPhone, Body: smsBody });
+      if (statusCallbackUrl) params.append("StatusCallback", statusCallbackUrl);
 
       try {
         const res = await fetch(
@@ -296,7 +319,8 @@ Deno.serve(async (req) => {
 
           const logPayload = {
             channel: "sms", provider: "twilio", direction: "outbound",
-            trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
+            trigger_name: "manual_test", to_address: normalizedPhone, canonical_to_address: normalizedPhone, from_address: fromNumber,
+            lead_phone: rawPhone,
             body_preview: smsBody.slice(0, 200), delivery_status: "failed",
             error_code: errorCode, error_message: errorMsg,
             request_payload_redacted: params.toString(), response_payload_redacted: responseText,
@@ -322,7 +346,8 @@ Deno.serve(async (req) => {
         if (!messageSid) {
           const logPayload = {
             channel: "sms", provider: "twilio", direction: "outbound",
-            trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
+            trigger_name: "manual_test", to_address: normalizedPhone, canonical_to_address: normalizedPhone, from_address: fromNumber,
+            lead_phone: rawPhone,
             body_preview: smsBody.slice(0, 200),
             delivery_status: "failed", error_message: "Twilio returned 200 but no Message SID in response body",
             request_payload_redacted: params.toString(), response_payload_redacted: responseText,
@@ -341,7 +366,8 @@ Deno.serve(async (req) => {
 
         const logPayload = {
           channel: "sms", provider: "twilio", direction: "outbound",
-          trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
+          trigger_name: "manual_test", to_address: normalizedPhone, canonical_to_address: normalizedPhone, from_address: fromNumber,
+          lead_phone: rawPhone,
           body_preview: smsBody.slice(0, 200),
           provider_message_id: messageSid, provider_status: providerStatus,
           delivery_status: providerStatus === "queued" ? "queued" : "sent",
@@ -357,14 +383,16 @@ Deno.serve(async (req) => {
           message_sid: messageSid,
           provider_message_id: messageSid,
           provider_status: providerStatus,
-          sent_to: toPhone,
+          sent_to: normalizedPhone,
+          normalized_phone: normalizedPhone,
           communication_log_id: logId,
         });
       } catch (err) {
         // Network error — provider unreachable
         const logPayload = {
           channel: "sms", provider: "twilio", direction: "outbound",
-          trigger_name: "manual_test", to_address: toPhone, from_address: fromNumber,
+          trigger_name: "manual_test", to_address: normalizedPhone, canonical_to_address: normalizedPhone, from_address: fromNumber,
+          lead_phone: rawPhone,
           body_preview: smsBody.slice(0, 200),
           delivery_status: "failed", error_code: "NETWORK_ERROR", error_message: err.message,
           environment: env,

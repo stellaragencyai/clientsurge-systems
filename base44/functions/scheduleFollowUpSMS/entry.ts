@@ -15,6 +15,24 @@ function minutesSince(isoDate) {
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);
 }
 
+// ── E.164 PHONE NORMALIZATION ──
+function normalizePhoneToE164(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 0) return null;
+  if (cleaned.length === 10) {
+    if (cleaned[0] === '0' || cleaned[0] === '1') return null;
+    return `+1${cleaned}`;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    const tenDigits = cleaned.slice(1);
+    if (tenDigits[0] === '0' || tenDigits[0] === '1') return null;
+    return `+${cleaned}`;
+  }
+  if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+  return null;
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -113,8 +131,27 @@ Deno.serve(async (req) => {
           messageBody += "\n\nReply STOP to unsubscribe.";
         }
 
+        // ── E.164 NORMALIZATION ──
+        const normalizedPhone = normalizePhoneToE164(lead.phone);
+        if (!normalizedPhone) {
+          console.warn(`[scheduleFollowUpSMS] Invalid phone "${lead.phone}" for lead ${lead.id} — skipping`);
+          await base44.asServiceRole.entities.CommunicationEvent.create({
+            lead_id: lead.id,
+            channel: "sms",
+            direction: "outbound",
+            event_type: "sms_skipped",
+            provider: "twilio",
+            status: "failed",
+            subject: "Follow-up SMS skipped — invalid phone",
+            error_message: "invalid_phone_number",
+            metadata_json: JSON.stringify({ raw_phone: lead.phone, normalized_phone: null }),
+          });
+          results.skipped++;
+          continue;
+        }
+
         // Send via Twilio
-        const params = { To: lead.phone, From: fromNumber, Body: messageBody };
+        const params = { To: normalizedPhone, From: fromNumber, Body: messageBody };
         if (statusCallbackUrl) params.StatusCallback = statusCallbackUrl;
 
         const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
@@ -171,7 +208,7 @@ Deno.serve(async (req) => {
           last_contacted_at: new Date().toISOString(),
         });
 
-        console.log(`[scheduleFollowUpSMS] Sent SMS to lead ${lead.id} (${lead.phone})`);
+        console.log(`[scheduleFollowUpSMS] Sent SMS to lead ${lead.id} (${normalizedPhone})`);
         results.sent++;
         results.processed++;
       } catch (leadErr) {

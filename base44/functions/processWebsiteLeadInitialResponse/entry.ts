@@ -35,6 +35,24 @@ function safeResendFrom() {
   return "ClientSurge Systems <system@clientsurgesystems.com>";
 }
 
+// ── E.164 PHONE NORMALIZATION ──
+function normalizePhoneToE164(phone) {
+  if (!phone || typeof phone !== 'string') return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 0) return null;
+  if (cleaned.length === 10) {
+    if (cleaned[0] === '0' || cleaned[0] === '1') return null;
+    return `+1${cleaned}`;
+  }
+  if (cleaned.length === 11 && cleaned.startsWith('1')) {
+    const tenDigits = cleaned.slice(1);
+    if (tenDigits[0] === '0' || tenDigits[0] === '1') return null;
+    return `+${cleaned}`;
+  }
+  if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+  return null;
+}
+
 // ═══════════════════════════════════════════
 // ELIGIBILITY CHECKS
 // ═══════════════════════════════════════════
@@ -321,6 +339,7 @@ async function createCommLog(base44, payload) {
       related_entity_id: payload.related_entity_id || null,
       lead_email: payload.lead_email || null,
       lead_phone: payload.lead_phone || null,
+      canonical_to_address: payload.canonical_to_address || payload.to_address || null,
       lead_name: payload.lead_name || null,
       channel: payload.channel || "system",
       provider: payload.provider || "internal",
@@ -441,40 +460,66 @@ async function processLead(base44, lead, env) {
 
   // ── SMS ──
   if (smsEligibility.eligible) {
-    const smsOutcome = await sendTwilioSms(leadPhone, SMS_BODY);
-    if (smsOutcome.success) {
-      smsResult.sent = true;
-      smsResult.provider_message_id = smsOutcome.provider_message_id;
-      smsResult.provider_status = smsOutcome.provider_status;
-      anyProviderAccepted = true;
-      lastAcceptedTimestamp = new Date().toISOString();
-      lastEngagementType = "sms";
+    // E.164 normalization — must happen before Twilio call
+    const normalizedPhone = normalizePhoneToE164(leadPhone);
+    if (!normalizedPhone) {
+      smsResult.error = 'invalid_phone_number';
+      smsResult.error_code = 'invalid_phone_number';
+      await createCommLog(base44, {
+        related_entity_type: "WebsiteLead",
+        related_entity_id: leadId,
+        lead_email: leadEmail,
+        lead_phone: leadPhone,
+        lead_name: leadName,
+        channel: "sms",
+        provider: "twilio",
+        direction: "outbound",
+        trigger_name: "initial_response",
+        to_address: null,
+        canonical_to_address: null,
+        body_preview: SMS_BODY.slice(0, 200),
+        delivery_status: "skipped",
+        error_message: "invalid_phone_number",
+        environment: env,
+      });
     } else {
-      smsResult.error = smsOutcome.error_message;
-      smsResult.error_code = smsOutcome.error_code;
+      const smsOutcome = await sendTwilioSms(normalizedPhone, SMS_BODY);
+      if (smsOutcome.success) {
+        smsResult.sent = true;
+        smsResult.provider_message_id = smsOutcome.provider_message_id;
+        smsResult.provider_status = smsOutcome.provider_status;
+        smsResult.normalized_phone = normalizedPhone;
+        anyProviderAccepted = true;
+        lastAcceptedTimestamp = new Date().toISOString();
+        lastEngagementType = "sms";
+      } else {
+        smsResult.error = smsOutcome.error_message;
+        smsResult.error_code = smsOutcome.error_code;
+      }
+      await createCommLog(base44, {
+        related_entity_type: "WebsiteLead",
+        related_entity_id: leadId,
+        lead_email: leadEmail,
+        lead_phone: leadPhone,
+        lead_name: leadName,
+        channel: "sms",
+        provider: "twilio",
+        direction: "outbound",
+        trigger_name: "initial_response",
+        to_address: normalizedPhone,
+        canonical_to_address: normalizedPhone,
+        from_address: smsOutcome.from_address || Deno.env.get("TWILIO_PHONE_NUMBER") || null,
+        body_preview: SMS_BODY.slice(0, 200),
+        provider_message_id: smsResult.provider_message_id || null,
+        provider_status: smsResult.provider_status || null,
+        delivery_status: smsResult.sent ? (smsResult.provider_status === "queued" ? "queued" : "sent") : "failed",
+        error_code: smsResult.error_code || null,
+        error_message: smsResult.error || null,
+        request_payload: smsOutcome.request_payload || "",
+        response_payload: smsOutcome.response_payload || "",
+        environment: env,
+      });
     }
-    await createCommLog(base44, {
-      related_entity_type: "WebsiteLead",
-      related_entity_id: leadId,
-      lead_email: leadEmail,
-      lead_phone: leadPhone,
-      lead_name: leadName,
-      channel: "sms",
-      provider: "twilio",
-      direction: "outbound",
-      trigger_name: "initial_response",
-      to_address: leadPhone,
-      from_address: smsOutcome.from_address || Deno.env.get("TWILIO_PHONE_NUMBER") || null,
-      body_preview: SMS_BODY.slice(0, 200),
-      provider_message_id: smsResult.provider_message_id || null,
-      provider_status: smsResult.provider_status || null,
-      delivery_status: smsResult.sent ? (smsResult.provider_status === "queued" ? "queued" : "sent") : "failed",
-      error_code: smsResult.error_code || null,
-      error_message: smsResult.error || null,
-      request_payload: smsOutcome.request_payload || "",
-      response_payload: smsOutcome.response_payload || "",
-      environment: env,
-    });
   } else {
     smsResult.skip_reason = smsEligibility.reason;
     await createCommLog(base44, {

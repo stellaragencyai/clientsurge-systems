@@ -150,7 +150,7 @@ function mapTwilioStatus(twilioStatus) {
     case "sent":        return "sent";
     case "queued":
     case "accepted":
-    case "sending":     return "pending";
+    case "sending":     return "queued";
     default:            return null;
   }
 }
@@ -242,6 +242,38 @@ Deno.serve(async (req) => {
         : (mappedStatus === "delivered" ? null : event.error_message),
       metadata_json: JSON.stringify(updatedMeta),
     });
+
+    // ── Also update CommunicationLog records by provider_message_id ──
+    const nowIso = new Date().toISOString();
+    const logUpdate = {
+      provider_status: messageStatus,
+      delivery_status: mappedStatus,
+    };
+    if (mappedStatus === "delivered") {
+      logUpdate.delivered_at = nowIso;
+    } else if (mappedStatus === "failed") {
+      logUpdate.failed_at = nowIso;
+    }
+    if (errorCode) {
+      logUpdate.error_code = errorCode;
+      logUpdate.error_message = `Twilio ${messageStatus} (code ${errorCode}): ${errorMessage || ""}`;
+    }
+
+    try {
+      const logMatches = await base44.asServiceRole.entities.CommunicationLog.filter(
+        { provider_message_id: messageSid },
+        "-created_date",
+        10
+      );
+      if (logMatches && logMatches.length > 0) {
+        for (const logRec of logMatches) {
+          await base44.asServiceRole.entities.CommunicationLog.update(logRec.id, logUpdate).catch(() => {});
+        }
+        console.log(`[SmsStatusCallback] Updated ${logMatches.length} CommunicationLog record(s) for SID ${messageSid} → delivery_status=${mappedStatus}`);
+      }
+    } catch (logErr) {
+      console.warn(`[SmsStatusCallback] CommunicationLog update failed: ${logErr.message}`);
+    }
 
     console.log(`[SmsStatusCallback] Updated CommunicationEvent ${event.id} → status=${mappedStatus} (SID=${messageSid})`);
     return json({ status: "ok_updated", event_id: event.id, mapped_status: mappedStatus });
