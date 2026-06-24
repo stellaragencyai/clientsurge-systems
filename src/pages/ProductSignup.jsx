@@ -54,8 +54,9 @@ export default function ProductSignup() {
   const navigate = useNavigate();
 
   const rawPackage = searchParams.get('package') || '';
-  const packageKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
-  const pkg = PACKAGES[packageKey];
+  const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
+  const packageKey = resolvedKey || 'starter_system';
+  const pkg = PACKAGES[packageKey] || PACKAGES.starter_system;
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);

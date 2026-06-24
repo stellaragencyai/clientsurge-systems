@@ -185,8 +185,8 @@ export default function Home() {
         <TrustStrip />
 
         {/* 7. Industries Preview */}
+        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <Industries />
         </LazyHomepageSection>
 
