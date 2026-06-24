@@ -16,6 +16,8 @@ const PACKAGES = {
     monthly: 497,
     description: 'Instant lead response + missed-call recovery foundation.',
     services: ['Instant Lead Response', 'Missed-Call Text-Back'],
+    features: ['Instant Lead Response', 'Missed-Call Text-Back', 'Basic setup guidance', 'Remote setup workflow'],
+    cta: 'Choose Starter',
   },
   growth_system: {
     name: 'Growth System',
@@ -23,6 +25,8 @@ const PACKAGES = {
     monthly: 997,
     description: 'Complete lead-to-booking system with AI nurture and booking agent.',
     services: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent'],
+    features: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Remote setup and testing workflow'],
+    cta: 'Choose Growth',
   },
   pro_system: {
     name: 'Pro System',
@@ -30,6 +34,8 @@ const PACKAGES = {
     monthly: 1997,
     description: 'Full revenue recovery engine with reviews, reactivation, and the entire stack.',
     services: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Lead Reactivation', 'Review Request Automation'],
+    features: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Lead Reactivation', 'Review Request Automation', 'Higher-touch remote setup and launch support'],
+    cta: 'Choose Pro',
   },
 };
 
@@ -48,18 +54,21 @@ const PACKAGE_ALIASES = {
  */
 function safePackageData(raw) {
   if (!raw || typeof raw !== 'object') {
-    return { name: 'System', setup: 0, monthly: 0, description: '', services: [] };
+    return { name: 'System', setup: 0, monthly: 0, description: '', services: [], features: [], cta: 'Continue to Payment' };
   }
   const num = (v) => {
     const n = Number(v);
     return Number.isFinite(n) ? n : 0;
   };
+  const strArr = (v) => Array.isArray(v) ? v.filter((s) => typeof s === 'string') : [];
   return {
     name: typeof raw.name === 'string' && raw.name ? raw.name : 'System',
     setup: num(raw.setup),
     monthly: num(raw.monthly),
     description: typeof raw.description === 'string' ? raw.description : '',
-    services: Array.isArray(raw.services) ? raw.services.filter((s) => typeof s === 'string') : [],
+    services: strArr(raw.services),
+    features: strArr(raw.features),
+    cta: typeof raw.cta === 'string' && raw.cta ? raw.cta : 'Continue to Payment',
   };
 }
 
@@ -75,14 +84,10 @@ export default function ProductSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const rawPackage = searchParams.get('package') || '';
-  const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
-  const hasValidPackage = Boolean(resolvedKey) && PACKAGES[resolvedKey];
-  const packageKey = hasValidPackage ? resolvedKey : '';
-  const pkg = hasValidPackage ? safePackageData(PACKAGES[resolvedKey]) : null;
-
-  // Always-available validated package list for the fallback picker.
-  const allPackages = Object.entries(PACKAGES).map(([key, data]) => [key, safePackageData(data)]);
+  const rawPackage = (searchParams.get('package') || '').toLowerCase();
+  const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : 'starter_system');
+  const packageKey = resolvedKey;
+  const pkg = safePackageData(PACKAGES[resolvedKey]);
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);
@@ -101,8 +106,8 @@ export default function ProductSignup() {
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
   const handleCheckout = async () => {
-    if (!hasValidPackage || !pkg) {
-      setError('No package selected. Please choose a package below to get started.');
+    if (!pkg) {
+      setError('No package selected. Please choose a package to get started.');
       return;
     }
     if (!form.name.trim() || !form.email.trim() || !form.business.trim()) {
@@ -144,82 +149,6 @@ export default function ProductSignup() {
       setLoading(false);
     }
   };
-
-  // When no valid package is resolved from the URL, show all three default packages
-  // so the user can pick one instead of seeing a blank or failed page.
-  if (!hasValidPackage || !pkg) {
-    return (
-      <div className="min-h-screen bg-background">
-        <Navbar />
-        <TrustStrip />
-        <main className="px-4 pb-24 pt-[calc(var(--cs-nav-height)+32px)] md:px-6">
-          <div className="max-w-4xl mx-auto">
-            <div className="mb-10 text-center">
-              <p className="cs-section-eyebrow mb-3">Product Signup</p>
-              <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-                Choose Your Package
-              </h1>
-              <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
-                Select a package to continue. All systems include remote setup, testing, and launch support.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-              {allPackages.map(([key, data]) => (
-                <div
-                  key={key}
-                  className="rounded-xl border border-border bg-card p-6 shadow-sm flex flex-col"
-                >
-                  <div className="flex items-center gap-2 mb-3">
-                    <Zap className="w-5 h-5 text-primary" />
-                    <h2 className="font-titles text-lg font-bold text-foreground">{data.name}</h2>
-                  </div>
-                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">{data.description}</p>
-
-                  <div className="mb-4">
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-2xl font-extrabold text-foreground">${data.monthly.toLocaleString()}</span>
-                      <span className="text-xs text-muted-foreground font-semibold">/mo</span>
-                    </div>
-                    <p className="text-xs text-muted-foreground mt-1">${data.setup.toLocaleString()} one-time setup</p>
-                  </div>
-
-                  <ul className="space-y-2 mb-6 flex-1">
-                    {data.services.map((service) => (
-                      <li key={service} className="flex items-start gap-2.5">
-                        <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-foreground/85">{service}</span>
-                      </li>
-                    ))}
-                  </ul>
-
-                  <button
-                    onClick={() => navigate(`/product-signup?package=${key}`)}
-                    className="cs-btn-primary w-full flex items-center justify-center gap-2"
-                    style={{ minHeight: 'unset', minWidth: 'unset' }}
-                  >
-                    Choose {data.name.replace(' System', '')} <ArrowRight className="w-4 h-4" />
-                  </button>
-                </div>
-              ))}
-            </div>
-
-            <div className="text-center mt-8">
-              <button
-                onClick={() => navigate('/pricing')}
-                className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer"
-                style={{ minHeight: 'unset', minWidth: 'unset' }}
-              >
-                ← Back to Pricing
-              </button>
-            </div>
-          </div>
-        </main>
-        <Footer />
-        <MobileCallBar />
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
