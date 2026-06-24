@@ -10,6 +10,7 @@ import {
   Droplets,
   Hammer,
   HardHat,
+  Scale,
 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -103,6 +104,18 @@ const industries = [
   description:
   "Great for teams that need to respond quickly, follow up on quote requests, and convert more web leads into booked jobs.",
   href: "/contractors"
+},
+{
+  id: "legal-services",
+  title: "Legal & Personal Injury",
+  status: "Live",
+  icon: Scale,
+  accent: "text-[#005f99]",
+  accentBg: "bg-primary/10 border-primary/20",
+  ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
+  description:
+  "Built for law firms and personal injury practices that need faster intake, consistent follow-up, and more signed cases.",
+  href: "/personal-injury"
 }];
 
 

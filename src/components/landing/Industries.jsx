@@ -148,7 +148,7 @@ const industries = [
   id: "property-services",
   routePath: "/industries?industry=property-services",
   icon: Building,
-  name: "Property Services & Management",
+  name: "Real Estate",
   accent: {
     color: "#059669",
     soft: "rgba(5,150,105,0.18)",
