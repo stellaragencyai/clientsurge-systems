@@ -1,5 +1,6 @@
 import { Star, TrendingUp, ArrowRight, Quote, Sparkles } from "lucide-react";
 import { useNavigate } from "react-router-dom";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const MED_SPA_STORIES = [
   {
@@ -89,17 +90,13 @@ export default function IndustrySuccessGallery({ industry = {}, industrySlug = "
 
       <div className="max-w-6xl mx-auto relative z-10">
         {/* Header */}
-        <div className="text-center mb-14">
-          <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full mb-4" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)" }}>
-            <Sparkles className="w-3.5 h-3.5 text-primary" />
-            <span className="text-xs font-bold text-primary uppercase tracking-widest">Verified Results</span>
-          </div>
-          <h2 className="font-display text-3xl md:text-5xl font-extrabold text-foreground mb-4" style={{ fontFamily: "Montserrat, sans-serif" }}>
-            Real {label}. Real Revenue.
-          </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
-            These {label.toLowerCase()} transformed their patient flow in 90 days. Here's exactly what happened.
-          </p>
+        <div className="mb-14">
+          <SectionHeader
+            eyebrow="Verified Results"
+            title={`Real ${label}. Real Revenue.`}
+            subtitle={`These ${label.toLowerCase()} transformed their patient flow in 90 days. Here's exactly what happened.`}
+            align="center"
+          />
         </div>
 
         {/* Immersive Success Stories */}

@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 function scrollToSection(id, ctaName, location) {
   trackCTA(ctaName, location);
@@ -39,24 +40,12 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
       />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <motion.h2
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5 }}
-          className="cs-section-title mb-4"
-        >
-          {headline}
-        </motion.h2>
-        <motion.p
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true, margin: "-50px" }}
-          transition={{ duration: 0.5, delay: 0.1 }}
-          className="cs-section-subtitle mx-auto mb-8"
-        >
-          {subcopy}
-        </motion.p>
+        <SectionHeader
+          title={headline}
+          subtitle={subcopy}
+          align="center"
+        />
+        <div className="mb-8" />
         <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           {primaryLabel && (
             <button

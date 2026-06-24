@@ -1,6 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Search, Map, Link2, TestTube, Rocket } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const STEPS = [
   { num: "01", icon: Search, title: "Audit Your Lead Flow", desc: "We review where leads enter, where they stall, and where follow-up breaks." },
@@ -28,15 +29,12 @@ export default function WhatHappensAfter() {
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>Implementation Process</p>
-          <h2 className="cs-section-title mb-4">
-            What Happens After You Start
-          </h2>
-          <p className="cs-section-subtitle mx-auto">
-            A clear, proven process — not a black box. Here's exactly how we get your lead response system live.
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Implementation Process"
+          title="What Happens After You Start"
+          subtitle="A clear, proven process — not a black box. Here's exactly how we get your lead response system live."
+          align="center"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-5">
           {STEPS.map((step, i) => {

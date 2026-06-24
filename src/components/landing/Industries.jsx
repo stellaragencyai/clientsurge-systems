@@ -206,7 +206,7 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="pt-16 md:pt-24 pb-16 md:pb-24 px-0 bg-gradient-to-b from-card via-background via-70% to-muted/40">
+      className="pt-16 md:pt-24 pb-16 md:pb-24 px-0 bg-white">
       
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
          <SectionHeader

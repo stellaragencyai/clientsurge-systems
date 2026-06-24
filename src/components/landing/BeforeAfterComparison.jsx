@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { X, Check, PhoneOff, Clock, Archive, UserX, Phone, Zap, RefreshCw, CalendarCheck, EyeOff, Eye } from "lucide-react";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const BEFORE_ITEMS = [
   { icon: PhoneOff, text: "Missed calls disappear" },
@@ -28,12 +29,11 @@ export default function BeforeAfterComparison() {
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>The Difference</p>
-          <h2 className="cs-section-title mb-4">
-            Before ClientSurge vs. After ClientSurge
-          </h2>
-        </div>
+        <SectionHeader
+          eyebrow="The Difference"
+          title="Before vs. After ClientSurge"
+          align="center"
+        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {/* Before card — muted, problem-focused */}

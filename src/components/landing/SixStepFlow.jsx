@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Target, Zap, Filter, CalendarCheck, Star, RefreshCw } from "lucide-react";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const STEPS = [
   {
@@ -52,15 +53,12 @@ export default function SixStepFlow() {
   return (
     <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#ffffff" }}>
       <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4 text-primary">The ClientSurge Flow</p>
-          <h2 className="cs-section-title mb-4">
-            Six Steps From Lead to Revenue
-          </h2>
-          <p className="cs-section-subtitle mx-auto">
-            Every step is tied to an existing ClientSurge automation — working together as one system.
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="The ClientSurge Flow"
+          title="Six Steps From Lead to Revenue"
+          subtitle="Every step is tied to an existing ClientSurge automation — working together as one system."
+          align="center"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-5">
           {STEPS.map((step, i) => {

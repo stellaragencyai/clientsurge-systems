@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { PhoneOff, Clock, FileText, Users } from "lucide-react";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const LEAKS = [
   {
@@ -42,17 +43,12 @@ export default function RevenueLeakSection() {
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <div className="text-center mb-12">
-          <p className="cs-eyebrow mb-4 text-primary">
-            Stop Losing Revenue
-          </p>
-          <h2 className="cs-section-title mb-4">
-            The Revenue Leak Most Businesses Don't See
-          </h2>
-          <p className="cs-section-subtitle mx-auto">
-            These everyday gaps create lost appointments and lost revenue — quietly, every single day.
-          </p>
-        </div>
+        <SectionHeader
+          eyebrow="Stop Losing Revenue"
+          title="The Revenue Leak You Don't See"
+          subtitle="These everyday gaps create lost appointments and lost revenue — quietly, every single day."
+          align="center"
+        />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
           {LEAKS.map((leak, i) => {

@@ -99,7 +99,7 @@ export default function IndustryPageTemplate() {
           <SectionHeader
             eyebrow="The Problem"
             title={`The ${industry.industry_name} Problem`}
-            align="left"
+            align="center"
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6 md:mt-8">
             {industry.pain_points.map((point, i) => (
@@ -113,12 +113,12 @@ export default function IndustryPageTemplate() {
       </section>
 
       {/* USE CASES */}
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-muted/20">
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <SectionHeader
             eyebrow="How It Works"
             title={`How ${industry.industry_name} Automation Works`}
-            align="left"
+            align="center"
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8">
             {industry.use_cases.map((useCase, i) => {
@@ -150,7 +150,7 @@ export default function IndustryPageTemplate() {
           <SectionHeader
             eyebrow="Expected Returns"
             title={`Typical ROI For ${industry.industry_name}`}
-            align="left"
+            align="center"
           />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6 md:mt-8">
             {Object.entries(industry.roi_metrics).map(([key, value]) => (
@@ -170,12 +170,12 @@ export default function IndustryPageTemplate() {
 
       {/* TESTIMONIALS */}
       {industry.testimonials?.length > 0 && (
-        <section className="py-12 md:py-20 px-4 md:px-6 bg-muted/20">
+        <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
           <div className="max-w-5xl mx-auto">
             <SectionHeader
               eyebrow="Real Results"
               title={`Real Results From ${industry.industry_name} Leaders`}
-              align="left"
+              align="center"
             />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8">
               {industry.testimonials.map((testimonial, i) => (
@@ -203,7 +203,7 @@ export default function IndustryPageTemplate() {
           <SectionHeader
             eyebrow="What's Included"
             title={`Your ${industry.industry_name} System Includes`}
-            align="left"
+            align="center"
           />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-2xl mx-auto mt-6 md:mt-8">
             {industry.key_features.map((feature, i) => (
@@ -219,14 +219,13 @@ export default function IndustryPageTemplate() {
       {/* INDUSTRY QUALIFICATION FORM */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-6 md:mb-8 text-center">
-            <p className="cs-section-eyebrow mb-3">Free Automation Audit</p>
-            <h2 className="cs-section-title mb-3" style={{ fontSize: "clamp(1.5rem, 3vw, 2rem) !important" }}>
-              Is Your {industry.industry_name} Business Ready to Automate?
-            </h2>
-            <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
-              Answer 4 quick questions and we'll tell you exactly which automation system fits your volume, budget, and goals — free, no obligation.
-            </p>
+          <div className="mb-6 md:mb-8">
+            <SectionHeader
+              eyebrow="Free Automation Audit"
+              title={`Is Your ${industry.industry_name} Business Ready?`}
+              subtitle="Answer 4 quick questions and we'll tell you exactly which automation system fits your volume, budget, and goals — free, no obligation."
+              align="center"
+            />
           </div>
           <div className="rounded-2xl border border-border bg-white shadow-sm p-5 md:p-8">
             <IndustryQualificationForm
@@ -238,14 +237,15 @@ export default function IndustryPageTemplate() {
       </section>
 
       {/* FINAL CTA */}
-      <section className="py-12 md:py-20 px-4 md:px-6" style={{ background: "linear-gradient(135deg, hsl(199 100% 47%) 0%, hsl(217 100% 40%) 100%)" }}>
+      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="font-titles text-2xl md:text-4xl font-bold text-white mb-4 md:mb-6">
-            Ready to Transform Your {industry.industry_name} Business?
-          </h2>
-          <p className="text-base md:text-xl text-white/90 mb-6 md:mb-8">
-            Start your automation system today. First consultation is free.
-          </p>
+          <SectionHeader
+            eyebrow="Get Started"
+            title={`Ready to Transform Your ${industry.industry_name} Business?`}
+            subtitle="Start your automation system today. First consultation is free."
+            align="center"
+          />
+          <div className="mb-6 md:mb-8" />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <button
               onClick={() => navigate('/book')}
