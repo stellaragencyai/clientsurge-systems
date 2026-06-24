@@ -50,6 +50,7 @@ import CanonicalSystemMap from '../components/admin/CanonicalSystemMap';
 import TemplatesView from '../components/admin/TemplatesView';
 import PipelineProofAuditButton from '../components/admin/PipelineProofAuditButton';
 import AdminReconciliationButton from '../components/admin/AdminReconciliationButton';
+import MessagingProviderRegressionTest from '../components/admin/MessagingProviderRegressionTest';
 import { AdminQuickActions, ChurnRiskPanel, InstallStatusTable, LTVCard } from '../components/admin/AdminDashboardCards';
 import WebsiteCopyPanel from '../components/admin/WebsiteCopyPanel';
 import SocialMediaEngine from '../components/admin/SocialMediaEngine';
@@ -160,6 +161,7 @@ const NAV_GROUPS = [
     items: [
       { id: 'canonical-map', label: 'System Map', icon: Database },
       { id: 'resource-library', label: 'Resource Library', icon: BookOpen },
+      { id: 'messaging-regression', label: 'Messaging Provider Test', icon: Send },
       { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
       { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
       { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
@@ -291,6 +293,7 @@ export default function AdminDashboard() {
       case 'resource-library': return <ResourceLibrary />;
       case 'canonical-map': return <CanonicalSystemMap />;
       case 'templates': return <TemplatesView />;
+      case 'messaging-regression': return <MessagingProviderRegressionTest />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'twilio-health': return <TwilioRuntimeHealth />;
       case 'health': return <IntegrationHealth />;
