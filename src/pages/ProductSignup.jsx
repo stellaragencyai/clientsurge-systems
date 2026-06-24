@@ -118,7 +118,7 @@ export default function ProductSignup() {
     }
   };
 
-  if (!pkg) {
+  if (!pkg || !pkg.services || !Array.isArray(pkg.services) || !pkg.name || !pkg.setup || !pkg.monthly) {
     return (
       <div className="min-h-screen bg-background">
         <Navbar />
