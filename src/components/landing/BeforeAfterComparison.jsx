@@ -21,19 +21,16 @@ export default function BeforeAfterComparison() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0A0E27" }}>
+    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#ffffff" }}>
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.08) 0%, transparent 50%)" }}
+        style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.04) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.04) 0%, transparent 50%)" }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <div className="text-center mb-12">
           <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>The Difference</p>
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
+          <h2 className="cs-section-title mb-4">
             Before ClientSurge vs. After ClientSurge
           </h2>
         </div>
@@ -45,18 +42,17 @@ export default function BeforeAfterComparison() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl p-8"
+            className="rounded-2xl p-8 cs-card-shadow"
             style={{
-              background: "rgba(255,255,255,0.03)",
-              border: "1px solid rgba(255,255,255,0.06)",
-              backdropFilter: "blur(8px)",
+              background: "#ffffff",
+              border: "1px solid rgba(0,0,0,0.08)",
             }}
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "rgba(239,68,68,0.12)" }}>
                 <X className="w-5 h-5 text-red-400" />
               </div>
-              <h3 className="text-xl font-bold text-white/90" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                 Before ClientSurge
               </h3>
             </div>
@@ -65,8 +61,8 @@ export default function BeforeAfterComparison() {
                 const Icon = item.icon;
                 return (
                   <li key={item.text} className="flex items-start gap-3">
-                    <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 text-white/60" />
-                    <span className="text-sm text-white/75 leading-relaxed">{item.text}</span>
+                    <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 text-muted-foreground" />
+                    <span className="text-sm text-muted-foreground leading-relaxed">{item.text}</span>
                   </li>
                 );
               })}
@@ -79,19 +75,17 @@ export default function BeforeAfterComparison() {
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true, margin: "-50px" }}
             transition={{ duration: 0.5 }}
-            className="rounded-2xl p-8"
+            className="rounded-2xl p-8 cs-card-shadow"
             style={{
-              background: "rgba(0,174,239,0.06)",
+              background: "rgba(0,174,239,0.04)",
               border: "1px solid rgba(0,174,239,0.20)",
-              backdropFilter: "blur(8px)",
-              boxShadow: "0 0 40px rgba(0,174,239,0.06)",
             }}
           >
             <div className="flex items-center gap-3 mb-6">
               <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "rgba(0,174,239,0.18)" }}>
                 <Check className="w-5 h-5" style={{ color: "#00AEEF" }} />
               </div>
-              <h3 className="text-xl font-bold text-white" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+              <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                 After ClientSurge
               </h3>
             </div>
@@ -101,7 +95,7 @@ export default function BeforeAfterComparison() {
                 return (
                   <li key={item.text} className="flex items-start gap-3">
                     <Icon className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#00AEEF" }} />
-                    <span className="text-sm text-white/95 leading-relaxed">{item.text}</span>
+                    <span className="text-sm text-foreground leading-relaxed">{item.text}</span>
                   </li>
                 );
               })}

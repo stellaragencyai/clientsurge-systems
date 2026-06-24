@@ -46,10 +46,10 @@ export default function RevenueLeakSection() {
           <p className="cs-eyebrow mb-4 text-primary">
             Stop Losing Revenue
           </p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4 leading-tight tracking-tight">
+          <h2 className="cs-section-title mb-4">
             The Revenue Leak Most Businesses Don't See
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="cs-section-subtitle mx-auto">
             These everyday gaps create lost appointments and lost revenue — quietly, every single day.
           </p>
         </div>

@@ -20,23 +20,20 @@ export default function WhatHappensAfter() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0D1430" }}>
-      {/* Subtle purple glow */}
+    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#ffffff" }}>
+      {/* Subtle blue glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(0,174,239,0.10) 0%, transparent 60%)" }}
+        style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(0,174,239,0.04) 0%, transparent 60%)" }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <p className="cs-eyebrow mb-4" style={{ color: "#00AEEF" }}>Implementation Process</p>
-          <h2
-            className="text-3xl md:text-4xl lg:text-5xl font-black text-white mb-4 leading-tight tracking-tight"
-            style={{ fontFamily: "'Montserrat', sans-serif" }}
-          >
+          <h2 className="cs-section-title mb-4">
             What Happens After You Start
           </h2>
-          <p className="text-base md:text-lg text-white/85 max-w-2xl mx-auto leading-relaxed">
+          <p className="cs-section-subtitle mx-auto">
             A clear, proven process — not a black box. Here's exactly how we get your lead response system live.
           </p>
         </div>
@@ -51,11 +48,10 @@ export default function WhatHappensAfter() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="relative rounded-2xl p-6"
+                className="relative rounded-2xl p-6 cs-card-shadow"
                 style={{
-                  background: "rgba(255,255,255,0.04)",
-                  border: "1px solid rgba(255,255,255,0.08)",
-                  backdropFilter: "blur(8px)",
+                  background: "#ffffff",
+                  border: "1px solid rgba(0,174,239,0.12)",
                 }}
               >
                 {/* Connector line — desktop only */}
@@ -80,10 +76,10 @@ export default function WhatHappensAfter() {
                   <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
                 </div>
 
-                <h3 className="text-base font-bold text-white mb-2 leading-snug" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                <h3 className="text-base font-bold text-foreground mb-2 leading-snug" style={{ fontFamily: "'Montserrat', sans-serif" }}>
                   {step.title}
                 </h3>
-                <p className="text-sm text-white/80 leading-relaxed">{step.desc}</p>
+                <p className="text-sm text-muted-foreground leading-relaxed">{step.desc}</p>
               </motion.div>
             );
           })}
@@ -101,8 +97,8 @@ export default function WhatHappensAfter() {
           </a>
           <button
             onClick={() => scrollToSection("pricing", "compare_packages", "what_happens_after")}
-            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10"
-            style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.3)", minHeight: "unset", minWidth: "unset" }}
+            className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-foreground transition-all duration-300 hover:bg-muted"
+            style={{ background: "#ffffff", border: "1.5px solid rgba(0,174,239,0.3)", minHeight: "unset", minWidth: "unset" }}
           >
             Compare Packages
           </button>

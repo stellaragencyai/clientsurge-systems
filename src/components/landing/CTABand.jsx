@@ -28,13 +28,13 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
   };
 
   return (
-    <section className="relative py-14 md:py-20 overflow-hidden" style={{ background: "#0D1430" }}>
-      {/* Glow gradient background */}
+    <section className="relative py-14 md:py-20 overflow-hidden" style={{ background: "#ffffff" }}>
+      {/* Subtle glow gradient background */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.14) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.12) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.05) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.04) 0%, transparent 60%)",
         }}
       />
 
@@ -44,8 +44,7 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5 }}
-          className="text-2xl md:text-3xl lg:text-4xl font-black text-white mb-4 leading-tight tracking-tight"
-          style={{ fontFamily: "'Montserrat', sans-serif" }}
+          className="cs-section-title mb-4"
         >
           {headline}
         </motion.h2>
@@ -54,7 +53,7 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-50px" }}
           transition={{ duration: 0.5, delay: 0.1 }}
-          className="text-base text-white/85 max-w-xl mx-auto mb-8 leading-relaxed"
+          className="cs-section-subtitle mx-auto mb-8"
         >
           {subcopy}
         </motion.p>
@@ -71,8 +70,8 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
           {secondaryLabel && (
             <button
               onClick={handleSecondary}
-              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-white transition-all duration-300 hover:bg-white/10 w-full sm:w-auto"
-              style={{ background: "rgba(255,255,255,0.08)", border: "1.5px solid rgba(255,255,255,0.3)", minHeight: "unset", minWidth: "unset" }}
+              className="inline-flex items-center gap-2 px-7 py-3.5 rounded-full text-sm font-semibold text-foreground transition-all duration-300 hover:bg-muted w-full sm:w-auto"
+              style={{ background: "#ffffff", border: "1.5px solid rgba(0,174,239,0.3)", minHeight: "unset", minWidth: "unset" }}
             >
               {secondaryLabel}
             </button>

@@ -54,10 +54,10 @@ export default function SixStepFlow() {
       <div className="max-w-7xl mx-auto px-6">
         <div className="text-center mb-12">
           <p className="cs-eyebrow mb-4 text-primary">The ClientSurge Flow</p>
-          <h2 className="text-3xl md:text-4xl lg:text-5xl font-black text-foreground mb-4 leading-tight tracking-tight">
+          <h2 className="cs-section-title mb-4">
             Six Steps From Lead to Revenue
           </h2>
-          <p className="text-base md:text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          <p className="cs-section-subtitle mx-auto">
             Every step is tied to an existing ClientSurge automation — working together as one system.
           </p>
         </div>
