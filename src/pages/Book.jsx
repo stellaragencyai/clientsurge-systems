@@ -24,7 +24,7 @@ export default function Book() {
   }, []);
 
   return (
-    <div className="book-page min-h-screen bg-gradient-to-br from-background via-card to-background">
+    <div className="book-page min-h-screen" style={{ background: "#061025" }}>
         <Navbar />
         <main className="px-4 pb-32 pt-[calc(var(--cs-nav-height)+28px)] md:px-6 md:pb-20 md:pt-[calc(var(--cs-nav-height)+44px)]">
           <div className="mx-auto w-full max-w-6xl">
@@ -36,10 +36,10 @@ export default function Book() {
                     <span className="book-kicker-dot" />
                     Free Automation Audit
                   </div>
-                  <h1 className="font-display text-3xl font-semibold tracking-tight text-foreground md:text-5xl">
+                  <h1 className="font-display text-3xl font-semibold tracking-tight md:text-5xl" style={{ color: "#FFFFFF" }}>
                     Not Sure What to Choose? Book a Free Automation Audit
                   </h1>
-                  <p className="mt-4 max-w-2xl text-base leading-relaxed text-muted-foreground md:text-lg">
+                  <p className="mt-4 max-w-2xl text-base leading-relaxed md:text-lg" style={{ color: "#AEB8C8" }}>
                     If you're not sure which automation system or package fits your business, book a free audit. ClientSurge will review your lead capture, missed-call flow, booking process, follow-up gaps, and automation opportunities.
                   </p>
                   <a
@@ -79,10 +79,10 @@ export default function Book() {
               <div className="book-content-panel">
                 <div className="max-w-2xl">
                   <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-3">What's Inside Each Package</p>
-                  <h2 className="font-display text-2xl md:text-3xl font-semibold text-foreground">
+                  <h2 className="font-display text-2xl md:text-3xl font-semibold" style={{ color: "#FFFFFF" }}>
                     What your AI growth system includes
                   </h2>
-                  <p className="mt-3 text-sm md:text-base text-muted-foreground">
+                  <p className="mt-3 text-sm md:text-base" style={{ color: "#AEB8C8" }}>
                     Built for roofers, HVAC companies, dental practices, med spas, chiropractic clinics, contractors, and other local service businesses.
                   </p>
                 </div>
@@ -96,7 +96,7 @@ export default function Book() {
                   "Lead reactivation engine",
                   "Review request automation",
                   ].map((item) => (
-                    <div key={item} className="book-check-card rounded-lg border border-primary/15 bg-white/76 px-4 py-3 text-sm font-semibold text-foreground">
+                    <div key={item} className="book-check-card rounded-lg px-4 py-3 text-sm font-semibold" style={{ border: "1px solid rgba(53, 189, 241, 0.2)", background: "rgba(8, 20, 44, 0.6)", color: "#FFFFFF" }}>
                       {item}
                     </div>
                   ))}
@@ -122,12 +122,12 @@ export default function Book() {
                   ].map((step, index) => {
                     const Icon = step.icon;
                     return (
-                      <div key={step.title} className="book-step-card rounded-lg border border-primary/15 bg-white/82 p-5 text-left shadow-sm" style={{ "--book-step-index": index }}>
-                        <div className="w-11 h-11 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center mb-4">
-                          <Icon className="w-5 h-5 text-primary" />
+                      <div key={step.title} className="book-step-card rounded-lg p-5 text-left" style={{ "--book-step-index": index, border: "1px solid rgba(53, 189, 241, 0.2)", background: "rgba(8, 20, 44, 0.6)" }}>
+                        <div className="w-11 h-11 rounded-lg flex items-center justify-center mb-4" style={{ border: "1px solid rgba(53, 189, 241, 0.25)", background: "rgba(53, 189, 241, 0.1)" }}>
+                          <Icon className="w-5 h-5" style={{ color: "#35BDF1" }} />
                         </div>
-                        <h3 className="text-base font-semibold text-foreground mb-2">{step.title}</h3>
-                        <p className="text-sm text-muted-foreground leading-relaxed">{step.body}</p>
+                        <h3 className="text-base font-semibold mb-2" style={{ color: "#FFFFFF" }}>{step.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ color: "#AEB8C8" }}>{step.body}</p>
                       </div>
                     );
                   })}

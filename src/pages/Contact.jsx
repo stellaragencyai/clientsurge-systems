@@ -30,7 +30,7 @@ function detectIndustryFromReferrer() {
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
 
-const textareaClass = "w-full bg-white border border-border rounded-xl px-4 py-3 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_hsla(199,100%,47%,0.12)] resize-none";
+
 
 function Field({ label, required, error, children }) {
   return (
@@ -46,19 +46,21 @@ function Field({ label, required, error, children }) {
   );
 }
 
+const textInputClass = "w-full bg-transparent border border-[rgba(53,189,241,0.25)] rounded-xl px-4 py-3 text-base text-white placeholder:text-[#7F8DA3] outline-none transition-all duration-300 focus:border-[#35BDF1] focus:shadow-[0_0_0_4px_rgba(53,189,241,0.12)] resize-none";
+
 export default function Contact() {
-  const [form, setForm] = useState({
-    full_name: "",
-    email: "",
-    phone: "",
-    business_type: "",
-    message: "",
-    website_url: "",
-    utm_source: "",
-    utm_medium: "",
-    utm_campaign: "",
-    utm_content: "",
-    referrer: "",
+   const [form, setForm] = useState({
+     full_name: "",
+     email: "",
+     phone: "",
+     business_type: "",
+     message: "",
+     website_url: "",
+     utm_source: "",
+     utm_medium: "",
+     utm_campaign: "",
+     utm_content: "",
+     referrer: "",
     pain_points: "",
   });
 
@@ -253,7 +255,7 @@ export default function Contact() {
                     onChange={handleChange}
                     rows={5}
                     aria-invalid={Boolean(errors.message)}
-                    className={textareaClass}
+                    className="w-full bg-transparent border border-[rgba(53,189,241,0.25)] rounded-xl px-4 py-3 text-base text-white placeholder:text-[#7F8DA3] outline-none transition-all duration-300 focus:border-[#35BDF1] focus:shadow-[0_0_0_4px_rgba(53,189,241,0.12)] resize-none"
                   />
                   {/* Character counter */}
                   <p className="text-right text-xs text-muted-foreground mt-1.5">

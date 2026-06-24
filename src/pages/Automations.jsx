@@ -6,6 +6,7 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import MobileCallBar from "@/components/landing/MobileCallBar";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const SERVICES = [
   {
@@ -189,14 +190,14 @@ function ServiceCard({ service }) {
   return (
     <>
       <div
-        className="flex flex-col rounded-lg overflow-hidden transition-all duration-300"
+        className="flex flex-col rounded-xl overflow-hidden transition-all duration-300"
         style={{
-          background: "hsl(var(--card))",
-          border: hovered ? `1.5px solid ${BRAND.color}44` : "1.5px solid rgba(0,0,0,0.07)",
+          background: "rgba(8, 20, 44, 0.6)",
+          border: hovered ? `1.5px solid rgba(53, 189, 241, 0.4)` : "1.5px solid rgba(53, 189, 241, 0.15)",
           boxShadow: hovered
-            ? `0 24px 64px rgba(0,136,204,0.14), 0 4px 20px rgba(0,0,0,0.08)`
-            : "0 2px 16px rgba(0,0,0,0.05)",
-          transform: hovered ? "translateY(-5px)" : "translateY(0)",
+            ? `0 24px 64px rgba(53, 189, 241, 0.15), 0 0 0 1px rgba(53, 189, 241, 0.1)`
+            : "0 4px 16px rgba(0, 0, 0, 0.3)",
+          transform: hovered ? "translateY(-4px)" : "translateY(0)",
         }}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
@@ -247,28 +248,28 @@ function ServiceCard({ service }) {
 
         {/* Content */}
         <div className="p-6 flex flex-col flex-1">
-          <h2 className="font-titles text-lg font-bold text-foreground mb-1">
+          <h2 className="font-titles text-lg font-bold mb-1" style={{ color: "#FFFFFF" }}>
             {service.title}
           </h2>
-          <p className="text-xs font-semibold mb-3 text-primary">
+          <p className="text-xs font-semibold mb-3" style={{ color: "#35BDF1" }}>
             {service.tagline}
           </p>
-          <p className="text-sm text-muted-foreground leading-relaxed mb-5">
+          <p className="text-sm leading-relaxed mb-5" style={{ color: "#AEB8C8" }}>
             {service.description}
           </p>
 
           {/* Stats */}
-          <div className="rounded-lg p-4 mb-5 border border-primary/15 bg-primary/5">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-3">System Signals</p>
+          <div className="rounded-lg p-4 mb-5" style={{ border: "1px solid rgba(53, 189, 241, 0.2)", background: "rgba(53, 189, 241, 0.06)" }}>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-3" style={{ color: "#7F8DA3" }}>System Signals</p>
             <div className="space-y-3">
               {service.stats.map((stat) => (
                 <div key={stat.label} className="flex items-start gap-3">
-                  <span className="text-base font-titles font-black flex-shrink-0 text-primary" style={{ minWidth: "56px" }}>
+                  <span className="text-base font-titles font-black flex-shrink-0" style={{ minWidth: "56px", color: "#35BDF1" }}>
                     {stat.value}
                   </span>
                   <div>
-                    <p className="text-xs text-foreground font-medium leading-tight">{stat.label}</p>
-                    <p className="text-[10px] text-muted-foreground mt-0.5">Source: {stat.source}</p>
+                    <p className="text-xs font-medium leading-tight" style={{ color: "#FFFFFF" }}>{stat.label}</p>
+                    <p className="text-[10px] mt-0.5" style={{ color: "#7F8DA3" }}>Source: {stat.source}</p>
                   </div>
                 </div>
               ))}
@@ -277,12 +278,12 @@ function ServiceCard({ service }) {
 
           {/* What you get */}
           <div className="mb-6 flex-1">
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mb-2">What's included</p>
+            <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#7F8DA3" }}>What's included</p>
             <ul className="space-y-2">
               {service.whatYouGet.map((item) => (
                 <li key={item} className="flex items-start gap-2">
-                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5 text-primary" />
-                  <span className="text-xs text-muted-foreground leading-snug">{item}</span>
+                  <CheckCircle className="w-3.5 h-3.5 flex-shrink-0 mt-0.5" style={{ color: "#35BDF1" }} />
+                  <span className="text-xs leading-snug" style={{ color: "#AEB8C8" }}>{item}</span>
                 </li>
               ))}
             </ul>
@@ -318,61 +319,46 @@ export default function Automations() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen" style={{ background: "#061025" }}>
       <Navbar />
 
       {/* Hero */}
       <main className="pt-[var(--cs-nav-height)]">
-      <div className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center">
-        <div
-          className="inline-flex items-center gap-2 text-xs font-bold px-4 py-2 rounded-full mb-5 uppercase tracking-widest border border-primary/20 bg-primary/10 text-primary"
-        >
-          Included Automation Modules
-        </div>
-        <h1 className="font-titles text-4xl md:text-5xl font-bold tracking-tight text-foreground mb-5">
-          Automation Modules Included
-          <br />
-          <span className="text-primary">Across Every Package</span>
-        </h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed mb-8">
-          ClientSurge packages are powered by a catalog of automation modules — each one designed to capture, follow up with, schedule, and convert more leads for your local service business.
-        </p>
-        <div className="flex flex-wrap items-center justify-center gap-3 text-sm">
-          {[
-            { icon: "AI", text: "Voice agents + lead follow-up" },
-            { icon: "60s", text: "Instant response workflows" },
-            { icon: "DFY", text: "Fully done-for-you setup" },
-            { icon: "ROI", text: "Results tracked in your dashboard" },
-          ].map((b) => (
-            <span
-              key={b.text}
-              className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full font-semibold text-xs bg-primary/5 border border-primary/15 text-primary"
-            >
-              {b.icon} {b.text}
-            </span>
-          ))}
-        </div>
-      </div>
+      <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
+        <SectionHeader
+          eyebrow="Automation Modules"
+          title="Six Automations Included Across Every Package"
+          subtitle="Each module is designed to capture, respond, qualify, book, review, and reactivate leads for your service business."
+          align="center"
+          variant="dark"
+        />
+      </section>
 
       {/* Grid */}
-      <div className="max-w-7xl mx-auto px-6 pb-24">
+      <section className="max-w-7xl mx-auto px-6 pb-24">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {SERVICES.map((service) => (
             <ServiceCard key={service.id} service={service} />
           ))}
         </div>
 
-        {/* Bottom CTA */}
+        {/* Bottom CTA Section */}
         <div
-          className="mt-16 rounded-3xl p-10 md:p-14 text-center"
-          style={{ background: "linear-gradient(135deg,#eaf8ff 0%,#dff5ff 60%,#f8fbff 100%)", border: "1px solid rgba(0,136,204,0.14)" }}
+          className="mt-16 rounded-2xl p-10 md:p-14 text-center"
+          style={{
+            background: "linear-gradient(135deg, rgba(0,79,156,0.12), rgba(0,59,143,0.08))",
+            border: "1px solid rgba(53, 189, 241, 0.2)",
+            backdropFilter: "blur(12px)",
+          }}
         >
-          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Choose Your System</p>
-          <h2 className="font-titles text-foreground text-3xl md:text-4xl font-bold mb-4">
-            Pick the Package That Fits Your Business
+          <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#35BDF1" }}>
+            Compare Packages
+          </p>
+          <h2 className="font-titles text-3xl md:text-4xl font-bold mb-4" style={{ color: "#FFFFFF" }}>
+            Pick the System That Fits Your Business
           </h2>
-          <p className="text-muted-foreground text-base max-w-xl mx-auto mb-8 leading-relaxed">
-            These automation modules are included across our Starter, Growth, and Pro packages. Compare packages to see exactly what each one includes.
+          <p className="text-base max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: "#AEB8C8" }}>
+            These automation modules are included across our Starter, Growth, and Pro packages. Compare to see exactly what each one includes.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
@@ -384,14 +370,21 @@ export default function Automations() {
             </Link>
             <Link
               to="/book"
-              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold text-foreground border-2 border-border hover:border-primary/40 transition-colors"
+              className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold transition-all"
+              style={{
+                color: "#FFFFFF",
+                border: "1.5px solid rgba(53, 189, 241, 0.3)",
+                background: "rgba(8, 20, 44, 0.5)",
+              }}
             >
               Get Help Choosing
             </Link>
           </div>
-          <p className="mt-5 text-xs text-muted-foreground">No credit card required · Typical setup time: 24–48 hours</p>
+          <p className="mt-5 text-xs" style={{ color: "#7F8DA3" }}>
+            No credit card required · Typical setup time: 24–48 hours
+          </p>
         </div>
-      </div>
+      </section>
       </main>
       <Footer />
       <MobileCallBar />
