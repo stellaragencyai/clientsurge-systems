@@ -1,14 +1,12 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, ArrowRight, Loader2, AlertCircle, Shield, Zap } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import MobileCallBar from '@/components/landing/MobileCallBar';
 import TrustStrip from '@/components/landing/TrustStrip';
-import { setPageMetadata } from '@/lib/seo';
-import { trackCTA } from '@/lib/analytics';
-import { base44 } from '@/api/base44Client';
 
+// ── Local static plan data — no external config, entities, or API calls ──
 const PACKAGES = {
   starter_system: {
     name: 'Starter System',
@@ -41,30 +39,27 @@ const PACKAGE_ALIASES = {
   elite_system: 'pro_system',
 };
 
-/**
- * Returns a validated package object with safe defaults for every field.
- * Prevents crashes if PACKAGES is modified or a field is missing/non-numeric.
- * Ensures the page always renders usable Starter, Growth, and Pro details.
- */
-function safePackageData(raw) {
-  if (!raw || typeof raw !== 'object') {
-    return { name: 'System', setup: 0, monthly: 0, description: '', services: [] };
-  }
-  const num = (v) => {
-    const n = Number(v);
-    return Number.isFinite(n) ? n : 0;
-  };
+function resolvePackageKey(raw) {
+  if (!raw) return 'starter_system';
+  const lower = String(raw).toLowerCase();
+  if (PACKAGE_ALIASES[lower]) return PACKAGE_ALIASES[lower];
+  if (PACKAGES[lower]) return lower;
+  return 'starter_system';
+}
+
+function getPackage(key) {
+  const pkg = PACKAGES[key] || PACKAGES.starter_system;
   return {
-    name: typeof raw.name === 'string' && raw.name ? raw.name : 'System',
-    setup: num(raw.setup),
-    monthly: num(raw.monthly),
-    description: typeof raw.description === 'string' ? raw.description : '',
-    services: Array.isArray(raw.services) ? raw.services.filter((s) => typeof s === 'string') : [],
+    name: pkg.name,
+    setup: Number(pkg.setup) || 0,
+    monthly: Number(pkg.monthly) || 0,
+    description: pkg.description,
+    services: Array.isArray(pkg.services) ? pkg.services.filter((s) => typeof s === 'string') : [],
   };
 }
 
 function formatPhone(value) {
-  const digits = value.replace(/\D/g, '');
+  const digits = String(value || '').replace(/\D/g, '');
   if (digits.length === 0) return '';
   if (digits.length <= 3) return digits;
   if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
@@ -75,24 +70,12 @@ export default function ProductSignup() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const rawPackage = searchParams.get('package') || '';
-  const resolvedKey = PACKAGE_ALIASES[rawPackage] || (PACKAGES[rawPackage] ? rawPackage : '');
-  const packageKey = resolvedKey || 'starter_system';
-  const pkg = safePackageData(PACKAGES[packageKey]);
+  const packageKey = resolvePackageKey(searchParams.get('package'));
+  const pkg = getPackage(packageKey);
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
-
-  useEffect(() => {
-    setPageMetadata({
-      title: 'Sign Up — AI Automation Package | ClientSurge Systems',
-      description: 'Complete your ClientSurge automation package signup and proceed to secure Stripe checkout.',
-      canonicalPath: '/product-signup',
-      ogTitle: 'Sign Up for ClientSurge Automation',
-      ogDescription: 'Choose your package and complete secure checkout for your AI automation system.',
-    });
-  }, []);
 
   const update = (field, value) => setForm((prev) => ({ ...prev, [field]: value }));
 
@@ -102,18 +85,21 @@ export default function ProductSignup() {
       return;
     }
 
+    // Iframe sandbox check — block checkout in editor preview
+    if (window.self !== window.top) {
+      setError('Checkout only works on the published app, not in the editor preview.');
+      return;
+    }
+
     setLoading(true);
     setError(null);
 
     try {
-      // Iframe sandbox check
-      if (window.self !== window.top) {
-        setError('Checkout only works on the published app, not in the editor preview.');
-        setLoading(false);
-        return;
-      }
+      // Lazy import — never blocks page render
+      const { base44 } = await import('@/api/base44Client');
+      const { trackCTA } = await import('@/lib/analytics');
 
-      trackCTA(`product_signup_checkout_${packageKey}`, 'product-signup');
+      try { trackCTA(`product_signup_checkout_${packageKey}`, 'product-signup'); } catch (_) { /* non-critical */ }
 
       const response = await base44.functions.invoke('createCheckoutSession', {
         package_key: packageKey,

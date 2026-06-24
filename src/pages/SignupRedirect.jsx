@@ -1,15 +1,8 @@
-import { useEffect } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import ProductSignup from './ProductSignup';
 
-// /signup → /product-signup (preserving query params)
+// /signup — renders the same safe self-contained Product Signup screen.
+// Query params (e.g. ?package=growth) are read inside ProductSignup,
+// so selected-plan behavior is identical to /product-signup.
 export default function SignupRedirect() {
-  const navigate = useNavigate();
-  const [searchParams] = useSearchParams();
-
-  useEffect(() => {
-    const qs = searchParams.toString();
-    navigate(`/product-signup${qs ? `?${qs}` : ''}`, { replace: true });
-  }, [navigate, searchParams]);
-
-  return null;
+  return <ProductSignup />;
 }
