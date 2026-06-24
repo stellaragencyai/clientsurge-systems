@@ -1,0 +1,646 @@
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+}
+
+function detectEnvironment(req) {
+  try {
+    const url = new URL(req.url);
+    if (url.hostname.includes("preview") || url.hostname.includes("sandbox")) return "preview";
+  } catch (_) {}
+  return "production";
+}
+
+function redactSecrets(text) {
+  if (!text || typeof text !== "string") return "";
+  return text
+    .replace(/(Bearer\s+)[A-Za-z0-9\-_.]+/gi, "$1[REDACTED]")
+    .replace(/(Basic\s+)[A-Za-z0-9+/=]+/gi, "$1[REDACTED]")
+    .replace(/re_[A-Za-z0-9]{8,}/gi, "[REDACTED]")
+    .replace(/SK[A-Za-z0-9]{20,}/g, "[REDACTED]")
+    .replace(/AC[a-f0-9]{32}/gi, "[REDACTED]")
+    .slice(0, 2000);
+}
+
+function safeResendFrom() {
+  const configured = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
+  if (configured && configured.includes("@")) {
+    if (configured.includes("<")) return configured;
+    return `ClientSurge Systems <${configured}>`;
+  }
+  return "ClientSurge Systems <system@clientsurgesystems.com>";
+}
+
+// ═══════════════════════════════════════════
+// ELIGIBILITY CHECKS
+// ═══════════════════════════════════════════
+
+const TEST_EMAIL_PATTERNS = [
+  "example.com",
+  "clientsurge.test",
+  "clientsurge-install.internal",
+  "@test.",
+  "@test.com",
+  "@test.org",
+  "smoke",
+  "qa@",
+  "demo@",
+  "fake@",
+  "noreply@",
+  "no-reply@",
+  ".test",
+  "synthetic",
+];
+
+const TEST_SOURCE_PATTERNS = [
+  "smoke_test",
+  "crm_live_smoke_test",
+  "twilio_missed_call_test",
+  "synthetic_smoke",
+];
+
+function isTestEmail(email) {
+  if (!email) return true;
+  const lower = email.toLowerCase();
+  return TEST_EMAIL_PATTERNS.some((p) => lower.includes(p));
+}
+
+function isTestPhone(phone) {
+  if (!phone) return true;
+  const digits = phone.replace(/\D/g, "");
+  if (digits.length < 10) return true;
+  if (digits.includes("555")) return true;
+  if (/^(\d)\1+$/.test(digits)) return true;
+  return false;
+}
+
+function isTestSource(source) {
+  if (!source) return false;
+  const lower = String(source).toLowerCase();
+  return TEST_SOURCE_PATTERNS.some((s) => lower.includes(s));
+}
+
+function isValidEmail(email) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email || "");
+}
+
+function checkSmsEligibility(lead) {
+  if (!lead.phone_number) return { eligible: false, reason: "missing_phone" };
+  if (isTestPhone(lead.phone_number)) return { eligible: false, reason: "invalid_phone" };
+  if (lead.sms_permission !== true) return { eligible: false, reason: "no_sms_permission" };
+  if (lead.consent_given !== true) return { eligible: false, reason: "no_consent" };
+  if (lead.cadence_paused === true) return { eligible: false, reason: "cadence_paused" };
+  if (lead.do_not_contact === true) return { eligible: false, reason: "do_not_contact" };
+  if (isTestSource(lead.source)) return { eligible: false, reason: "internal_test_lead" };
+  return { eligible: true };
+}
+
+function checkEmailEligibility(lead) {
+  if (!lead.email) return { eligible: false, reason: "missing_email" };
+  if (!isValidEmail(lead.email)) return { eligible: false, reason: "invalid_email" };
+  if (isTestEmail(lead.email)) return { eligible: false, reason: "internal_test_lead" };
+  if (lead.do_not_contact === true) return { eligible: false, reason: "do_not_contact" };
+  if (isTestSource(lead.source)) return { eligible: false, reason: "internal_test_lead" };
+  return { eligible: true };
+}
+
+// ═══════════════════════════════════════════
+// PROVIDER SEND FUNCTIONS
+// ═══════════════════════════════════════════
+
+async function sendTwilioSms(toPhone, body) {
+  const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
+  const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
+  const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
+
+  if (!accountSid || !authToken || !fromNumber) {
+    return {
+      success: false,
+      error_code: "provider_not_configured",
+      error_message: "Twilio credentials not configured (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER missing)",
+    };
+  }
+
+  const auth = btoa(`${accountSid}:${authToken}`);
+  const params = new URLSearchParams({ From: fromNumber, To: toPhone, Body: body });
+  const statusCallback = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
+  if (statusCallback) params.append("StatusCallback", statusCallback);
+
+  try {
+    const res = await fetch(
+      `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+      {
+        method: "POST",
+        headers: { Authorization: `Basic ${auth}`, "Content-Type": "application/x-www-form-urlencoded" },
+        body: params.toString(),
+      }
+    );
+    const responseText = await res.text();
+
+    if (!res.ok) {
+      let parsed = null;
+      try { parsed = JSON.parse(responseText); } catch (_) {}
+      return {
+        success: false,
+        error_code: parsed?.code ? String(parsed.code) : String(res.status),
+        error_message: parsed?.message || `Twilio API error: ${res.status}`,
+        response_payload: responseText,
+        request_payload: params.toString(),
+      };
+    }
+
+    const result = JSON.parse(responseText);
+    const messageSid = result.sid;
+    if (!messageSid) {
+      return {
+        success: false,
+        error_code: "no_provider_id",
+        error_message: "Twilio returned 200 but no Message SID in response",
+        response_payload: responseText,
+        request_payload: params.toString(),
+      };
+    }
+
+    return {
+      success: true,
+      provider_message_id: messageSid,
+      provider_status: result.status || "queued",
+      from_address: fromNumber,
+      response_payload: responseText,
+      request_payload: params.toString(),
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error_code: "network_error",
+      error_message: err.message,
+      request_payload: params.toString(),
+    };
+  }
+}
+
+async function sendResendEmail(toEmail, subject, body) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  const fromEmail = safeResendFrom();
+
+  if (!resendKey) {
+    return {
+      success: false,
+      error_code: "provider_not_configured",
+      error_message: "RESEND_API_KEY environment variable is not set",
+      from_address: fromEmail,
+    };
+  }
+
+  const requestBody = JSON.stringify({ from: fromEmail, to: toEmail, subject, text: body });
+
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+      body: requestBody,
+    });
+    const responseText = await res.text();
+
+    if (!res.ok) {
+      let parsed = null;
+      try { parsed = JSON.parse(responseText); } catch (_) {}
+      return {
+        success: false,
+        error_code: String(res.status),
+        error_message: parsed?.message || `Resend API error: ${res.status}`,
+        from_address: fromEmail,
+        response_payload: responseText,
+        request_payload: requestBody,
+      };
+    }
+
+    const result = JSON.parse(responseText);
+    const messageId = result.id;
+    if (!messageId) {
+      return {
+        success: false,
+        error_code: "no_provider_id",
+        error_message: "Resend returned 200 but no email id in response",
+        from_address: fromEmail,
+        response_payload: responseText,
+        request_payload: requestBody,
+      };
+    }
+
+    return {
+      success: true,
+      provider_message_id: messageId,
+      provider_status: "sent",
+      from_address: fromEmail,
+      response_payload: responseText,
+      request_payload: requestBody,
+    };
+  } catch (err) {
+    return {
+      success: false,
+      error_code: "network_error",
+      error_message: err.message,
+      from_address: fromEmail,
+      request_payload: requestBody,
+    };
+  }
+}
+
+// ═══════════════════════════════════════════
+// COMMUNICATION LOG CREATION
+// ═══════════════════════════════════════════
+
+async function createCommLog(base44, payload) {
+  try {
+    const now = new Date().toISOString();
+    const ds = payload.delivery_status || "unknown";
+    const created = await base44.asServiceRole.entities.CommunicationLog.create({
+      related_entity_type: payload.related_entity_type || "WebsiteLead",
+      related_entity_id: payload.related_entity_id || null,
+      lead_email: payload.lead_email || null,
+      lead_phone: payload.lead_phone || null,
+      lead_name: payload.lead_name || null,
+      channel: payload.channel || "system",
+      provider: payload.provider || "internal",
+      direction: payload.direction || "outbound",
+      trigger_name: payload.trigger_name || "initial_response",
+      template_name: payload.template_name || null,
+      to_address: payload.to_address || null,
+      from_address: payload.from_address || null,
+      subject: payload.subject || null,
+      body_preview: (payload.body_preview || "").slice(0, 500),
+      provider_message_id: payload.provider_message_id || null,
+      provider_status: payload.provider_status || null,
+      delivery_status: ds,
+      error_code: payload.error_code || null,
+      error_message: payload.error_message || null,
+      request_payload_redacted: redactSecrets(payload.request_payload || ""),
+      response_payload_redacted: redactSecrets(payload.response_payload || ""),
+      sent_at: ds === "sent" || ds === "queued" ? now : null,
+      delivered_at: ds === "delivered" ? now : null,
+      failed_at: ds === "failed" ? now : null,
+      environment: payload.environment || "production",
+    });
+    return created?.id || null;
+  } catch (e) {
+    console.warn("[processWebsiteLeadInitialResponse] createCommLog failed:", e.message);
+    return null;
+  }
+}
+
+// ═══════════════════════════════════════════
+// CORE PROCESSING LOGIC
+// ═══════════════════════════════════════════
+
+const SMS_BODY = "Thanks for reaching out to ClientSurge Systems. We got your request and will review your automation needs shortly.\n\nReply STOP to opt out.";
+const EMAIL_SUBJECT = "We received your ClientSurge request";
+const EMAIL_BODY = "Thanks for reaching out to ClientSurge Systems. We received your request and will review your automation needs shortly.";
+
+async function processLead(base44, lead, env) {
+  const leadId = lead.id;
+  const leadName = lead.full_name || lead.first_name || "";
+  const leadEmail = lead.email || null;
+  const leadPhone = lead.phone_number || null;
+
+  // Idempotency: skip if already responded
+  if (lead.initial_response_sent_at) {
+    return {
+      lead_id: leadId,
+      skipped: true,
+      reason: "already_responded",
+      sms: { eligible: false, sent: false, skip_reason: "already_responded" },
+      email: { eligible: false, sent: false, skip_reason: "already_responded" },
+      lead_updated: false,
+      initial_response_sent: false,
+    };
+  }
+
+  const smsEligibility = checkSmsEligibility(lead);
+  const emailEligibility = checkEmailEligibility(lead);
+
+  let smsResult = { eligible: smsEligibility.eligible, sent: false };
+  let emailResult = { eligible: emailEligibility.eligible, sent: false };
+  let anyProviderAccepted = false;
+  let lastAcceptedTimestamp = null;
+  let lastEngagementType = "none";
+
+  // ── SMS ──
+  if (smsEligibility.eligible) {
+    const smsOutcome = await sendTwilioSms(leadPhone, SMS_BODY);
+    if (smsOutcome.success) {
+      smsResult.sent = true;
+      smsResult.provider_message_id = smsOutcome.provider_message_id;
+      smsResult.provider_status = smsOutcome.provider_status;
+      anyProviderAccepted = true;
+      lastAcceptedTimestamp = new Date().toISOString();
+      lastEngagementType = "sms";
+    } else {
+      smsResult.error = smsOutcome.error_message;
+      smsResult.error_code = smsOutcome.error_code;
+    }
+    await createCommLog(base44, {
+      related_entity_type: "WebsiteLead",
+      related_entity_id: leadId,
+      lead_email: leadEmail,
+      lead_phone: leadPhone,
+      lead_name: leadName,
+      channel: "sms",
+      provider: "twilio",
+      direction: "outbound",
+      trigger_name: "initial_response",
+      to_address: leadPhone,
+      from_address: smsOutcome.from_address || Deno.env.get("TWILIO_PHONE_NUMBER") || null,
+      body_preview: SMS_BODY.slice(0, 200),
+      provider_message_id: smsResult.provider_message_id || null,
+      provider_status: smsResult.provider_status || null,
+      delivery_status: smsResult.sent ? (smsResult.provider_status === "queued" ? "queued" : "sent") : "failed",
+      error_code: smsResult.error_code || null,
+      error_message: smsResult.error || null,
+      request_payload: smsOutcome.request_payload || "",
+      response_payload: smsOutcome.response_payload || "",
+      environment: env,
+    });
+  } else {
+    smsResult.skip_reason = smsEligibility.reason;
+    await createCommLog(base44, {
+      related_entity_type: "WebsiteLead",
+      related_entity_id: leadId,
+      lead_email: leadEmail,
+      lead_phone: leadPhone,
+      lead_name: leadName,
+      channel: "sms",
+      provider: "twilio",
+      direction: "outbound",
+      trigger_name: "initial_response",
+      to_address: leadPhone,
+      body_preview: SMS_BODY.slice(0, 200),
+      delivery_status: "skipped",
+      error_message: smsEligibility.reason,
+      environment: env,
+    });
+  }
+
+  // ── Email ──
+  if (emailEligibility.eligible) {
+    const emailOutcome = await sendResendEmail(leadEmail, EMAIL_SUBJECT, EMAIL_BODY);
+    if (emailOutcome.success) {
+      emailResult.sent = true;
+      emailResult.provider_message_id = emailOutcome.provider_message_id;
+      emailResult.provider_status = emailOutcome.provider_status;
+      anyProviderAccepted = true;
+      lastAcceptedTimestamp = new Date().toISOString();
+      // If both sent, email is last — document in log
+      lastEngagementType = "email";
+    } else {
+      emailResult.error = emailOutcome.error_message;
+      emailResult.error_code = emailOutcome.error_code;
+    }
+    await createCommLog(base44, {
+      related_entity_type: "WebsiteLead",
+      related_entity_id: leadId,
+      lead_email: leadEmail,
+      lead_phone: leadPhone,
+      lead_name: leadName,
+      channel: "email",
+      provider: "resend",
+      direction: "outbound",
+      trigger_name: "initial_response",
+      to_address: leadEmail,
+      from_address: emailOutcome.from_address || safeResendFrom(),
+      subject: EMAIL_SUBJECT,
+      body_preview: EMAIL_BODY.slice(0, 200),
+      provider_message_id: emailResult.provider_message_id || null,
+      provider_status: emailResult.provider_status || null,
+      delivery_status: emailResult.sent ? "sent" : "failed",
+      error_code: emailResult.error_code || null,
+      error_message: emailResult.error || null,
+      request_payload: emailOutcome.request_payload || "",
+      response_payload: emailOutcome.response_payload || "",
+      environment: env,
+    });
+  } else {
+    emailResult.skip_reason = emailEligibility.reason;
+    await createCommLog(base44, {
+      related_entity_type: "WebsiteLead",
+      related_entity_id: leadId,
+      lead_email: leadEmail,
+      lead_phone: leadPhone,
+      lead_name: leadName,
+      channel: "email",
+      provider: "resend",
+      direction: "outbound",
+      trigger_name: "initial_response",
+      to_address: leadEmail,
+      subject: EMAIL_SUBJECT,
+      body_preview: EMAIL_BODY.slice(0, 200),
+      delivery_status: "skipped",
+      error_message: emailEligibility.reason,
+      environment: env,
+    });
+  }
+
+  // ── Update WebsiteLead ──
+  let leadUpdated = false;
+  if (anyProviderAccepted) {
+    const updatePayload = {
+      initial_response_sent_at: lastAcceptedTimestamp,
+      last_message_sent: lastAcceptedTimestamp,
+      last_engagement_type: lastEngagementType,
+      last_engagement_at: lastAcceptedTimestamp,
+      lead_status: "contacted",
+      sms_attempt_count: (lead.sms_attempt_count || 0) + (smsEligibility.eligible ? 1 : 0),
+      email_attempt_count: (lead.email_attempt_count || 0) + (emailEligibility.eligible ? 1 : 0),
+    };
+    try {
+      await base44.asServiceRole.entities.WebsiteLead.update(leadId, updatePayload);
+      leadUpdated = true;
+    } catch (e) {
+      console.warn("[processWebsiteLeadInitialResponse] Lead update failed:", e.message);
+    }
+  } else {
+    // Both skipped/failed — increment attempt counts for attempted sends, keep status new
+    const updatePayload = {
+      sms_attempt_count: (lead.sms_attempt_count || 0) + (smsEligibility.eligible ? 1 : 0),
+      email_attempt_count: (lead.email_attempt_count || 0) + (emailEligibility.eligible ? 1 : 0),
+    };
+    try {
+      await base44.asServiceRole.entities.WebsiteLead.update(leadId, updatePayload);
+    } catch (_) {}
+  }
+
+  return {
+    lead_id: leadId,
+    skipped: false,
+    sms: smsResult,
+    email: emailResult,
+    lead_updated: leadUpdated,
+    initial_response_sent: anyProviderAccepted,
+  };
+}
+
+// ═══════════════════════════════════════════
+// REPAIR STUCK LEADS
+// ═══════════════════════════════════════════
+
+async function repairStuckLeads(base44, env) {
+  const now = new Date();
+  const fiveMinAgo = now.getTime() - 5 * 60 * 1000;
+
+  const allLeads = await base44.asServiceRole.entities.WebsiteLead.filter(
+    { archived: false },
+    "-created_date",
+    500
+  ).catch(() => []);
+
+  const stuckLeads = (allLeads || []).filter(
+    (l) => l.automation_enabled === true && !l.initial_response_sent_at && new Date(l.created_date).getTime() < fiveMinAgo
+  );
+
+  let sentSms = 0;
+  let sentEmail = 0;
+  let skipped = 0;
+  let failed = 0;
+  const details = [];
+
+  for (const lead of stuckLeads) {
+    try {
+      const result = await processLead(base44, lead, env);
+      if (result.sms?.sent) sentSms++;
+      if (result.email?.sent) sentEmail++;
+      if (!result.initial_response_sent) {
+        if (result.sms?.error || result.email?.error) failed++;
+        else skipped++;
+      }
+      details.push({
+        lead_id: lead.id,
+        name: lead.full_name || "—",
+        email: lead.email || "—",
+        phone: lead.phone_number || "—",
+        source: lead.source || "—",
+        sms_sent: result.sms?.sent || false,
+        email_sent: result.email?.sent || false,
+        sms_skip_reason: result.sms?.skip_reason || null,
+        email_skip_reason: result.email?.skip_reason || null,
+        sms_error: result.sms?.error || null,
+        email_error: result.email?.error || null,
+        initial_response_sent: result.initial_response_sent,
+      });
+    } catch (err) {
+      failed++;
+      details.push({
+        lead_id: lead.id,
+        name: lead.full_name || "—",
+        error: err.message,
+        initial_response_sent: false,
+      });
+    }
+  }
+
+  return {
+    success: true,
+    total_processed: stuckLeads.length,
+    sent_sms: sentSms,
+    sent_email: sentEmail,
+    skipped,
+    failed,
+    details: details.slice(0, 50),
+  };
+}
+
+// ═══════════════════════════════════════════
+// CREATE SAFE TEST LEAD
+// ═══════════════════════════════════════════
+
+async function createSafeTestLead(base44, body, env) {
+  const { test_email, test_phone, test_name } = body;
+
+  if (!test_email && !test_phone) {
+    return json({ error: "At least one of test_email or test_phone is required" }, 400);
+  }
+
+  const now = new Date().toISOString();
+  const lead = await base44.asServiceRole.entities.WebsiteLead.create({
+    full_name: test_name || "Admin Test Lead",
+    first_name: (test_name || "Admin Test Lead").split(" ")[0],
+    email: (test_email || "").toLowerCase().trim() || null,
+    phone_number: test_phone || null,
+    business_name: "ClientSurge Admin Test",
+    business_type: "Test",
+    message: "Admin-created test lead for automation health verification.",
+    source: "admin_test_lead",
+    lead_status: "new",
+    automation_enabled: true,
+    consent_given: true,
+    consent_given_at: now,
+    consent_source: "admin_test_panel",
+    sms_permission: true,
+  });
+
+  const result = await processLead(base44, lead, env);
+
+  return {
+    success: true,
+    lead_id: lead.id,
+    processing_result: result,
+  };
+}
+
+// ═══════════════════════════════════════════
+// MAIN HANDLER
+// ═══════════════════════════════════════════
+
+Deno.serve(async (req) => {
+  try {
+    const base44 = createClientFromRequest(req);
+    const env = detectEnvironment(req);
+    const body = await req.json().catch(() => ({}));
+    const action = body.action || "process";
+
+    // ── REPAIR STUCK LEADS (admin only) ──
+    if (action === "repair_stuck") {
+      const user = await base44.auth.me();
+      if (!user) return json({ error: "Unauthorized" }, 401);
+      if (user.role !== "admin" && user.role !== "super_admin") {
+        return json({ error: "Forbidden — admin access required" }, 403);
+      }
+      const result = await repairStuckLeads(base44, env);
+      return json(result);
+    }
+
+    // ── CREATE SAFE TEST LEAD (admin only) ──
+    if (action === "create_test_lead") {
+      const user = await base44.auth.me();
+      if (!user) return json({ error: "Unauthorized" }, 401);
+      if (user.role !== "admin" && user.role !== "super_admin") {
+        return json({ error: "Forbidden — admin access required" }, 403);
+      }
+      const result = await createSafeTestLead(base44, body, env);
+      return json(result);
+    }
+
+    // ── PROCESS SINGLE LEAD (no auth required — called from creation paths + entity automation) ──
+    // Support both entity automation format and direct call format
+    const isEntityAutomation = body?.event?.type === "create";
+    const leadId = isEntityAutomation ? body.event.entity_id : body.lead_id;
+
+    if (!leadId) {
+      return json({ error: "lead_id is required (or event.entity_id for entity automation)" }, 400);
+    }
+
+    const lead = await base44.asServiceRole.entities.WebsiteLead.get(leadId).catch(() => null);
+    if (!lead) {
+      return json({ error: "Lead not found", lead_id: leadId }, 404);
+    }
+
+    const result = await processLead(base44, lead, env);
+    return json(result);
+  } catch (error) {
+    console.error("[processWebsiteLeadInitialResponse] Error:", error.message);
+    return json({ error: error.message }, 500);
+  }
+});

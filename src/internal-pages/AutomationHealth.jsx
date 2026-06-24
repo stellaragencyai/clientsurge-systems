@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck, Server } from "lucide-react";
+import { AlertTriangle, Mail, MessageSquare, Activity, CheckCircle, XCircle, Clock, RefreshCw, Send, Loader2, ExternalLink, ShieldCheck, Server, Wrench, FlaskConical, Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { Link } from "react-router-dom";
 
@@ -137,6 +137,15 @@ export default function AutomationHealth() {
   const [sendingEmail, setSendingEmail] = useState(false);
   const [sendingSms, setSendingSms] = useState(false);
 
+  // Repair + test lead state
+  const [repairing, setRepairing] = useState(false);
+  const [repairResult, setRepairResult] = useState(null);
+  const [testLeadName, setTestLeadName] = useState("");
+  const [testLeadEmail, setTestLeadEmail] = useState("");
+  const [testLeadPhone, setTestLeadPhone] = useState("");
+  const [creatingTestLead, setCreatingTestLead] = useState(false);
+  const [testLeadResult, setTestLeadResult] = useState(null);
+
   const fetchData = useCallback(async () => {
     setLoading(true);
     setError(null);
@@ -186,6 +195,39 @@ export default function AutomationHealth() {
       setSmsResult({ success: false, passed: false, provider: "twilio", error: err.response?.data?.error || err.message });
     } finally {
       setSendingSms(false);
+    }
+  };
+
+  const repairStuckLeads = async () => {
+    setRepairing(true);
+    setRepairResult(null);
+    try {
+      const res = await base44.functions.invoke("processWebsiteLeadInitialResponse", { action: "repair_stuck" });
+      setRepairResult(res.data);
+      setTimeout(() => fetchData(), 1000);
+    } catch (err) {
+      setRepairResult({ success: false, error: err.response?.data?.error || err.message });
+    } finally {
+      setRepairing(false);
+    }
+  };
+
+  const createTestLead = async () => {
+    setCreatingTestLead(true);
+    setTestLeadResult(null);
+    try {
+      const res = await base44.functions.invoke("processWebsiteLeadInitialResponse", {
+        action: "create_test_lead",
+        test_name: testLeadName || undefined,
+        test_email: testLeadEmail || undefined,
+        test_phone: testLeadPhone || undefined,
+      });
+      setTestLeadResult(res.data);
+      setTimeout(() => fetchData(), 1000);
+    } catch (err) {
+      setTestLeadResult({ success: false, error: err.response?.data?.error || err.message });
+    } finally {
+      setCreatingTestLead(false);
     }
   };
 
@@ -259,6 +301,14 @@ export default function AutomationHealth() {
         <StatusCard icon={Clock} label="Latest Email" value={formatDate(s.latest_email_at)} accent="blue" />
         <StatusCard icon={AlertTriangle} label="Waiting Initial Response" value={s.leads_waiting_initial_response ?? 0} accent="amber" />
         <StatusCard icon={AlertTriangle} label="Stuck (Auto On, No Response)" value={s.leads_stuck_with_automation ?? 0} accent="red" />
+        <StatusCard
+          icon={Zap}
+          label="Initial Response Working"
+          value={data?.initial_response_working || s.initial_response_working || "unknown"}
+          accent={(data?.initial_response_working || s.initial_response_working) === "pass" ? "green" : (data?.initial_response_working || s.initial_response_working) === "fail" ? "red" : "amber"}
+        />
+        <StatusCard icon={AlertTriangle} label="Real Leads Waiting" value={s.real_leads_waiting_initial_response ?? 0} accent="amber" />
+        <StatusCard icon={ShieldCheck} label="Test/Internal Leads" value={data?.test_internal_leads ?? s.test_internal_leads ?? 0} accent="gray" />
       </div>
 
       {/* Section 2: Recent Communication Logs */}
@@ -348,7 +398,12 @@ export default function AutomationHealth() {
               <tbody>
                 {stuck.map((lead) => (
                   <tr key={lead.id} className="border-b border-border/50 hover:bg-muted/30">
-                    <td className="p-3 text-xs font-medium text-foreground">{lead.full_name || "—"}</td>
+                    <td className="p-3 text-xs font-medium text-foreground">
+                      {lead.full_name || "—"}
+                      {lead.is_test && (
+                        <span className="ml-1 inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold bg-gray-100 text-gray-600">TEST</span>
+                      )}
+                    </td>
                     <td className="p-3 text-xs text-foreground/60">{lead.email || "—"}</td>
                     <td className="p-3 text-xs text-foreground/60">{lead.phone_number || "—"}</td>
                     <td className="p-3 text-xs text-foreground/60">{lead.business_name || "—"}</td>
@@ -360,6 +415,115 @@ export default function AutomationHealth() {
             </table>
           </div>
         )}
+      </div>
+
+      {/* Section 3b: Repair Stuck Leads + Create Test Lead */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
+        {/* Repair Stuck Leads */}
+        <div className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <Wrench className="w-5 h-5 text-primary" />
+            <h3 className="font-bold text-foreground">Repair Stuck Leads</h3>
+          </div>
+          <p className="text-xs text-foreground/50 mb-4">
+            Finds all WebsiteLead records with automation on, no response, older than 5 min. Sends real SMS/email only to safe, consented, non-test leads. Creates skipped logs for ineligible ones.
+          </p>
+          <button onClick={repairStuckLeads} disabled={repairing} className="cs-btn-primary w-full">
+            {repairing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Wrench className="w-4 h-4" />}
+            <span className="ml-1">{repairing ? "Repairing…" : "Repair Stuck Leads"}</span>
+          </button>
+          {repairResult && (
+            <div className={`mt-3 p-3 rounded-lg text-sm border ${repairResult.success !== false ? "bg-blue-50 text-blue-700 border-blue-200" : "bg-red-50 text-red-700 border-red-200"}`}>
+              {repairResult.success !== false ? (
+                <>
+                  <p className="font-bold mb-2">Repair Complete</p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <div>Total Processed: <strong>{repairResult.total_processed}</strong></div>
+                    <div>SMS Sent: <strong className="text-green-600">{repairResult.sent_sms}</strong></div>
+                    <div>Email Sent: <strong className="text-green-600">{repairResult.sent_email}</strong></div>
+                    <div>Skipped: <strong className="text-amber-600">{repairResult.skipped}</strong></div>
+                    <div>Failed: <strong className="text-red-600">{repairResult.failed}</strong></div>
+                  </div>
+                  {repairResult.details && repairResult.details.length > 0 && (
+                    <details className="mt-2">
+                      <summary className="text-xs font-semibold cursor-pointer">View {repairResult.details.length} details</summary>
+                      <div className="mt-2 max-h-48 overflow-y-auto space-y-1">
+                        {repairResult.details.map((d, i) => (
+                          <div key={i} className="text-xs text-foreground/70 border-l-2 border-border pl-2">
+                            <span className="font-medium">{d.name || d.lead_id?.slice(0, 8)}</span>
+                            {" — "}
+                            {d.initial_response_sent ? (
+                              <span className="text-green-600">✓ Sent</span>
+                            ) : (
+                              <span className="text-amber-600">
+                                Skipped: {[d.sms_skip_reason, d.email_skip_reason].filter(Boolean).join(", ") || "no reason"}
+                              </span>
+                            )}
+                          </div>
+                        ))}
+                      </div>
+                    </details>
+                  )}
+                </>
+              ) : (
+                <p className="text-red-700">Error: {repairResult.error}</p>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Create Safe Test Lead */}
+        <div className="rounded-xl border border-border bg-card p-5">
+          <div className="flex items-center gap-2 mb-3">
+            <FlaskConical className="w-5 h-5 text-primary" />
+            <h3 className="font-bold text-foreground">Create Safe Test Lead</h3>
+          </div>
+          <p className="text-xs text-foreground/50 mb-3">
+            Creates a clearly marked test WebsiteLead (source=admin_test_lead), immediately runs initial response, and logs real provider results. Uses your real entered contact info.
+          </p>
+          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Name (optional)</label>
+          <input type="text" value={testLeadName} onChange={(e) => setTestLeadName(e.target.value)} placeholder="Test Lead Name" className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-2 bg-background" />
+          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Email</label>
+          <input type="email" value={testLeadEmail} onChange={(e) => setTestLeadEmail(e.target.value)} placeholder="real-email@example.com" className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-2 bg-background" />
+          <label className="block text-xs font-semibold uppercase tracking-wide text-foreground/60 mb-1">Phone</label>
+          <input type="tel" value={testLeadPhone} onChange={(e) => setTestLeadPhone(e.target.value)} placeholder="+1XXXXXXXXXX" className="w-full rounded-lg border border-border px-3 py-2 text-sm mb-3 bg-background" />
+          <button onClick={createTestLead} disabled={creatingTestLead || (!testLeadEmail && !testLeadPhone)} className="cs-btn-primary w-full">
+            {creatingTestLead ? <Loader2 className="w-4 h-4 animate-spin" /> : <FlaskConical className="w-4 h-4" />}
+            <span className="ml-1">{creatingTestLead ? "Creating…" : "Create Test Lead & Run Response"}</span>
+          </button>
+          {testLeadResult && (
+            <div className={`mt-3 p-3 rounded-lg text-sm border ${testLeadResult.success !== false ? "bg-green-50 text-green-700 border-green-200" : "bg-red-50 text-red-700 border-red-200"}`}>
+              {testLeadResult.success !== false ? (
+                <>
+                  <div className="flex items-center gap-2 mb-2">
+                    <CheckCircle className="w-4 h-4" />
+                    <span className="font-bold">Test Lead Created & Processed</span>
+                  </div>
+                  <div className="space-y-1 text-xs">
+                    <div>Lead ID: <code className="font-mono bg-black/5 px-1 rounded">{testLeadResult.lead_id?.slice(0, 12)}…</code></div>
+                    {testLeadResult.processing_result?.sms && (
+                      <div>SMS: {testLeadResult.processing_result.sms.sent ? (
+                        <span className="text-green-600 font-medium">✓ Sent — {testLeadResult.processing_result.sms.provider_message_id?.slice(0, 20)}…</span>
+                      ) : (
+                        <span className="text-amber-600">Skipped: {testLeadResult.processing_result.sms.skip_reason}</span>
+                      )}</div>
+                    )}
+                    {testLeadResult.processing_result?.email && (
+                      <div>Email: {testLeadResult.processing_result.email.sent ? (
+                        <span className="text-green-600 font-medium">✓ Sent — {testLeadResult.processing_result.email.provider_message_id?.slice(0, 20)}…</span>
+                      ) : (
+                        <span className="text-amber-600">Skipped: {testLeadResult.processing_result.email.skip_reason}</span>
+                      )}</div>
+                    )}
+                    <div>Initial Response Sent: <strong>{testLeadResult.processing_result?.initial_response_sent ? "Yes" : "No"}</strong></div>
+                  </div>
+                </>
+              ) : (
+                <p className="text-red-700">Error: {testLeadResult.error}</p>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Section 4: Test Panel */}

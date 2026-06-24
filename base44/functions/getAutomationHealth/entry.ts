@@ -85,12 +85,23 @@ Deno.serve(async (req) => {
       if (lead.cadence_paused === true) reasons.push("cadence_paused");
       if (lead.do_not_contact === true) reasons.push("do_not_contact");
 
-      // Check if any CommunicationLog exists for this lead
+      // Check CommunicationLog rows for this lead
       const leadLogs = (recentLogs || []).filter(
         (l) => l.related_entity_type === "WebsiteLead" && l.related_entity_id === lead.id
       );
       if (leadLogs.length === 0) {
         reasons.push("no_communication_log_found");
+      } else {
+        // Extract skip reasons from skipped logs
+        const skippedLogs = leadLogs.filter((l) => l.delivery_status === "skipped");
+        const failedLogs = leadLogs.filter((l) => l.delivery_status === "failed");
+        if (skippedLogs.length > 0) {
+          const skipReasons = [...new Set(skippedLogs.map((l) => l.error_message).filter(Boolean))];
+          reasons.push(...skipReasons);
+        }
+        if (failedLogs.length > 0) {
+          reasons.push("provider_failed");
+        }
       }
 
       if (reasons.length === 0) reasons.push("unknown");
@@ -107,6 +118,7 @@ Deno.serve(async (req) => {
         cadence_paused: lead.cadence_paused,
         created_date: lead.created_date,
         automation_enabled: lead.automation_enabled,
+        is_test: isTestLead(lead),
         reason: reasons.join(", "),
       };
     });
@@ -115,6 +127,19 @@ Deno.serve(async (req) => {
     const leadsWaiting = (allLeads || []).filter(
       (l) => l.automation_enabled === true && !l.initial_response_sent_at
     ).length;
+
+    // ── 3b. Test/internal lead detection ──
+    const testLeads = (allLeads || []).filter(isTestLead);
+    const realLeadsWaiting = (allLeads || []).filter(
+      (l) => l.automation_enabled === true && !l.initial_response_sent_at && !isTestLead(l)
+    ).length;
+
+    // ── 3c. Initial response working check ──
+    // Pass only if a non-test WebsiteLead has a real CommunicationLog with trigger_name=initial_response and delivery_status sent/queued/delivered
+    const initialResponseLogs = (logs || []).filter(
+      (l) => l.trigger_name === "initial_response" && ["sent", "queued", "delivered"].includes(l.delivery_status)
+    );
+    const initialResponseWorking = initialResponseLogs.length > 0 ? "pass" : (logs || []).length > 0 ? "fail" : "unknown";
 
     // ── 4. Provider readiness (config + last test result) ──
     const twilioAccountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -151,8 +176,8 @@ Deno.serve(async (req) => {
 
     // ── 5. Launch blocker warning ──
     const launchBlockerWarning =
-      leadsWaiting > 0 && (logs || []).length === 0
-        ? "⚠️ Leads waiting for initial response but no CommunicationLog rows exist in 24h. Automation path is bypassing the messaging layer."
+      realLeadsWaiting > 0 && (logs || []).filter((l) => l.trigger_name === "initial_response").length === 0
+        ? "⚠️ Real (non-test) leads waiting for initial response but no initial_response CommunicationLog rows exist in 24h. The lead-response workflow is not firing."
         : null;
 
     // ── 6. Build status cards ──
@@ -167,6 +192,9 @@ Deno.serve(async (req) => {
       leads_waiting_initial_response: leadsWaiting,
       leads_stuck_with_automation: stuckLeadDetails.length,
       total_website_leads: totalLeads,
+      real_leads_waiting_initial_response: realLeadsWaiting,
+      test_internal_leads: testLeads.length,
+      initial_response_working: initialResponseWorking,
     };
 
     // ── 7. Persist AutomationHealthSnapshot ──
@@ -205,6 +233,8 @@ Deno.serve(async (req) => {
       stuck_leads: stuckLeadDetails,
       provider_readiness: providerReadiness,
       launch_blocker_warning: launchBlockerWarning,
+      test_internal_leads: testLeads.length,
+      initial_response_working: initialResponseWorking,
       snapshot_at: now.toISOString(),
       environment: env,
     });

@@ -94,6 +94,11 @@ Deno.serve(async (req) => {
 
       console.log(`Lead created successfully: ${newLead.id}`);
 
+      // Fire initial response automation — non-blocking
+      base44.asServiceRole.functions.invoke('processWebsiteLeadInitialResponse', { lead_id: newLead.id }).catch((err) =>
+        console.warn('[submitLeadCapture] Initial response trigger failed (non-blocking):', err.message)
+      );
+
       return Response.json({
         success: true,
         lead_id: newLead.id,

@@ -1,5 +1,44 @@
-import { secureJson } from "../_shared/response.ts";
-import { validateWebhookSignature, normalizePhoneNumber } from "../_shared/webhookHandlerCore.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
+      ...(init.headers || {}),
+    },
+  });
+}
+
+async function validateWebhookSignature(body, signature, secret, algorithm = 'sha256') {
+  if (!signature || !secret) throw new Error('Missing signature or secret');
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret),
+    { name: 'HMAC', hash: algorithm === 'sha256' ? 'SHA-256' : 'SHA-1' },
+    false, ['sign']
+  );
+  const bodyBytes = typeof body === 'string' ? encoder.encode(body) : body;
+  const signatureBytes = await crypto.subtle.sign('HMAC', key, bodyBytes);
+  const computed = Array.from(new Uint8Array(signatureBytes))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+  const provided = signature.replace(/^sha256=|^sha1=/, '');
+  if (computed.length !== provided.length) return false;
+  let match = true;
+  for (let i = 0; i < computed.length; i++) {
+    if (computed[i] !== provided[i]) match = false;
+  }
+  return match;
+}
+
+function normalizePhoneNumber(phone) {
+  if (!phone) return null;
+  const cleaned = phone.replace(/\D/g, '');
+  if (cleaned.length === 10) return `+1${cleaned}`;
+  if (cleaned.length === 11 && cleaned.startsWith('1')) return `+${cleaned}`;
+  if (cleaned.length >= 11) return `+${cleaned}`;
+  return null;
+}
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 /**
@@ -410,6 +449,11 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     last_triggered_at: now,
     last_error: "",
   }).catch(() => {});
+
+  // Fire initial response automation — non-blocking
+  base44.asServiceRole.functions.invoke('processWebsiteLeadInitialResponse', { lead_id: websiteLead.id }).catch((err) =>
+    console.warn('[webhookLeadCapture] Initial response trigger failed (non-blocking):', err.message)
+  );
 
   await base44.asServiceRole.entities.CommunicationEvent.create({
     lead_id: crmLead.id,
