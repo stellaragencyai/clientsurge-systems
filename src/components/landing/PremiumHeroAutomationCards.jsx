@@ -109,16 +109,25 @@ export default function PremiumHeroAutomationCards() {
 
           {/* Title */}
           <h3
-            className="font-semibold text-sm md:text-base mb-1"
-            style={{ color: "#FFFFFF", fontFamily: "'Montserrat', sans-serif" }}
+            style={{
+              color: "#FFFFFF",
+              fontFamily: "'Montserrat', sans-serif",
+              fontSize: "0.9375rem",
+              fontWeight: 700,
+              lineHeight: 1.35,
+              marginBottom: "0.35rem",
+            }}
           >
             {label}
           </h3>
 
           {/* Description */}
           <p
-            className="text-xs md:text-sm leading-relaxed"
-            style={{ color: "#AEB8C8" }}
+            style={{
+              color: "#AEB8C8",
+              fontSize: "0.825rem",
+              lineHeight: 1.65,
+            }}
           >
             {description}
           </p>

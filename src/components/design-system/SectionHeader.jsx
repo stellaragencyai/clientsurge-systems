@@ -38,7 +38,7 @@ export default function SectionHeader({
         <h2
           className="cs-section-title"
           style={isDark
-            ? { color: '#ffffff !important', WebkitTextFillColor: '#ffffff !important' }
+            ? { color: '#ffffff', WebkitTextFillColor: '#ffffff' }
             : undefined
           }
         >

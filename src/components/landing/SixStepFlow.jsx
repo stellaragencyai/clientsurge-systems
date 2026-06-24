@@ -87,12 +87,12 @@ export default function SixStepFlow() {
                 </div>
 
                 {/* Title */}
-                <h3 className="text-lg font-bold text-foreground mb-2">
+                <h3 className="font-bold mb-2" style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "1rem", lineHeight: 1.3, color: "#111318" }}>
                   {step.title}
                 </h3>
 
                 {/* Description */}
-                <p className="text-sm text-foreground leading-relaxed mb-3">{step.desc}</p>
+                <p className="mb-3" style={{ fontSize: "0.85rem", lineHeight: 1.7, color: "#3a3d47" }}>{step.desc}</p>
 
                 {/* Service tag */}
                 <span className="inline-block text-[11px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full bg-primary/10 text-primary">

@@ -69,10 +69,10 @@ export default function RevenueLeakSection() {
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">
                   <Icon className="w-5 h-5 text-primary" />
                 </div>
-                <h3 className="text-lg font-bold text-foreground mb-2">
+                <h3 className="font-bold mb-2" style={{ fontSize: "1.05rem", lineHeight: 1.3, color: "#111318" }}>
                   {leak.title}
                 </h3>
-                <p className="text-sm text-foreground leading-relaxed">{leak.desc}</p>
+                <p style={{ fontSize: "0.9rem", lineHeight: 1.68, color: "#3a3d47" }}>{leak.desc}</p>
               </motion.div>
             );
           })}

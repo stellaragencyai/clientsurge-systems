@@ -82,8 +82,8 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.4 }}
-          className="font-semibold mb-6 leading-relaxed max-w-2xl mx-auto"
-          style={{ fontSize: "clamp(0.75rem, 1.2vw, 0.95rem)", color: "#D4D8E0" }}
+          className="font-semibold mb-6 max-w-2xl mx-auto"
+          style={{ fontSize: "clamp(0.8rem, 1.1vw, 0.95rem)", color: "#D4D8E0", lineHeight: 1.5 }}
         >
           Websites, AI follow-up, booking, missed-call recovery, reviews, and lead reactivation working as one system.
         </motion.p>
@@ -93,11 +93,12 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.08 }}
-          className="font-black mb-5 leading-[1.08] tracking-tight"
+          className="font-black mb-6 tracking-tight"
           style={{
             fontFamily: "'Montserrat', sans-serif",
             color: "#FFFFFF",
-            fontSize: "clamp(2rem, 6.5vw, 3.75rem)",
+            fontSize: "clamp(2.2rem, 6.8vw, 4rem)",
+            lineHeight: 1.12,
             WebkitTextFillColor: "#FFFFFF",
             WebkitFontSmoothing: "antialiased",
             MozOsxFontSmoothing: "grayscale",
@@ -111,8 +112,8 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, delay: 0.18 }}
-          className="font-normal max-w-2xl mx-auto mb-8 leading-relaxed"
-          style={{ fontSize: "clamp(0.95rem, 2vw, 1.125rem)", color: "#D4D8E0" }}
+          className="font-normal max-w-2xl mx-auto mb-10"
+          style={{ fontSize: "clamp(1rem, 1.9vw, 1.15rem)", color: "#D4D8E0", lineHeight: 1.7 }}
         >
           Capture missed calls, follow up instantly, and turn more inquiries into booked appointments — without adding more staff.
         </motion.p>

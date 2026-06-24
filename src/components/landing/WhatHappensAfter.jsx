@@ -74,10 +74,10 @@ export default function WhatHappensAfter() {
                   <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
                 </div>
 
-                <h3 className="text-base font-bold text-foreground mb-2 leading-snug" style={{ fontFamily: "'Montserrat', sans-serif" }}>
+                <h3 className="font-bold mb-2" style={{ fontFamily: "'Montserrat', sans-serif", fontSize: "1rem", lineHeight: 1.35, color: "#111318" }}>
                   {step.title}
                 </h3>
-                <p className="text-sm text-foreground leading-relaxed">{step.desc}</p>
+                <p style={{ fontSize: "0.88rem", lineHeight: 1.7, color: "#3a3d47" }}>{step.desc}</p>
               </motion.div>
             );
           })}

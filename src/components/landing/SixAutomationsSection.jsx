@@ -90,17 +90,18 @@ export default function SixAutomationsSection() {
         >
           <h2
             id="six-automations-title"
-            className="font-titles font-black text-white mb-4"
-            style={{ fontSize: "clamp(2rem, 5vw, 3.5rem)" }}
+            className="font-titles font-black text-white mb-5"
+            style={{ fontSize: "clamp(2rem, 4.8vw, 3.25rem)", lineHeight: 1.15, letterSpacing: "-0.025em" }}
           >
             Six Automations. One Lead-Response System.
           </h2>
           <p
-            className="mx-auto leading-relaxed"
+            className="mx-auto"
             style={{
-              maxWidth: "700px",
+              maxWidth: "660px",
               color: "#AEB8C8",
-              fontSize: "clamp(1rem, 1.6vw, 1.125rem)",
+              fontSize: "clamp(1rem, 1.5vw, 1.08rem)",
+              lineHeight: 1.72,
             }}
           >
             ClientSurge connects the critical pieces of your front-end sales flow so new
@@ -159,8 +160,8 @@ export default function SixAutomationsSection() {
 
               {/* Title */}
               <h3
-                className="font-titles font-black text-white mb-3"
-                style={{ fontSize: "1.25rem" }}
+                className="font-titles font-black text-white mb-2"
+                style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}
               >
                 {label}
               </h3>
@@ -169,8 +170,8 @@ export default function SixAutomationsSection() {
               <p
                 style={{
                   color: "#AEB8C8",
-                  fontSize: "0.95rem",
-                  lineHeight: 1.6,
+                  fontSize: "0.9rem",
+                  lineHeight: 1.68,
                 }}
               >
                 {description}
