@@ -28,13 +28,13 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
   };
 
   return (
-    <section className="relative py-14 md:py-20 overflow-hidden" style={{ background: "#0A0E27" }}>
+    <section className="relative py-14 md:py-20 overflow-hidden" style={{ background: "#0D1430" }}>
       {/* Glow gradient background */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.14) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(124,58,237,0.12) 0%, transparent 60%)",
+            "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.14) 0%, transparent 60%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.12) 0%, transparent 60%)",
         }}
       />
 

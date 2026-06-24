@@ -135,29 +135,17 @@ export default function ThreeSystemsSection() {
               )}
 
               <div
-               className="flex flex-col rounded-xl overflow-hidden transition-all duration-300"
-               style={{
-                 background: "#ffffff",
-                 border: `1.5px solid ${pkg.accentBorder}`,
-                 boxShadow: pkg.highlight
-                   ? `0 12px 40px ${pkg.accentGlow}, 0 0 0 1px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.05)`
-                   : "0 4px 16px rgba(0,0,0,0.06)",
-                 height: "100%",
-               }}
-                onMouseEnter={(e) => {
-                  e.currentTarget.style.boxShadow = `0 0 0 1px ${pkg.accentGlow}, 0 0 32px ${pkg.accentGlow}, 0 8px 32px ${pkg.accentGlow}`;
-                  e.currentTarget.style.transform = "translateY(-4px)";
-                  e.currentTarget.style.borderColor = pkg.accent;
+                className="flex flex-col rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                style={{
+                  background: "#ffffff",
+                  border: `1.5px solid ${pkg.accentBorder}`,
+                  boxShadow: pkg.highlight
+                    ? `0 12px 40px ${pkg.accentGlow}, 0 0 0 1px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.05)`
+                    : "0 4px 16px rgba(0,0,0,0.06)",
+                  height: "100%",
                 }}
-                onMouseLeave={(e) => {
-                  e.currentTarget.style.boxShadow = pkg.highlight
-                    ? `0 8px 32px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.04)`
-                    : "0 2px 12px rgba(0,0,0,0.04)";
-                  e.currentTarget.style.transform = "translateY(0)";
-                  e.currentTarget.style.borderColor = pkg.accentBorder;
-                }}
-              >
-                <div className="p-8 md:p-10 flex flex-col flex-1 items-center text-center" style={{ minHeight: "580px" }}>
+               >
+                <div className="p-8 md:p-10 flex flex-col flex-1 items-center text-center">
                   {/* Title + subtitle */}
                   <h3 className="font-titles text-black text-xl md:text-2xl font-bold mb-2 mt-4">
                     {pkg.title}
@@ -169,7 +157,7 @@ export default function ThreeSystemsSection() {
                     {pkg.includes.map((item) => (
                       <li key={item} className="flex items-start gap-2.5">
                         <CheckCircle2 data-checkicon="true" aria-hidden="true" className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent, strokeWidth: 2.5 }} />
-                        <span className="text-sm text-[#0A1628] leading-snug">{item}</span>
+                        <span className="text-sm text-foreground leading-snug">{item}</span>
                       </li>
                     ))}
                   </ul>

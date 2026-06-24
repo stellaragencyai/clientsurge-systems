@@ -49,7 +49,7 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
         className="absolute inset-0"
         style={{
           background:
-            "radial-gradient(ellipse at 18% 25%, rgba(0,174,239,0.16) 0%, transparent 50%), radial-gradient(ellipse at 82% 70%, rgba(124,58,237,0.18) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 18% 25%, rgba(0,174,239,0.16) 0%, transparent 50%), radial-gradient(ellipse at 82% 70%, rgba(0,174,239,0.18) 0%, transparent 50%)",
         }}
       />
 
@@ -76,7 +76,7 @@ export default function HeroBackground({ videoUrl, posterUrl }) {
               right: "6%",
               width: 380,
               height: 380,
-              background: "radial-gradient(circle, rgba(124,58,237,0.22), transparent 70%)",
+              background: "radial-gradient(circle, rgba(0,174,239,0.22), transparent 70%)",
               filter: "blur(70px)",
             }}
             animate={{ x: [0, -25, 0], y: [0, -18, 0] }}

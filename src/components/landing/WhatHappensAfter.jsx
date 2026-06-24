@@ -20,11 +20,11 @@ export default function WhatHappensAfter() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0A0E27" }}>
+    <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0D1430" }}>
       {/* Subtle purple glow */}
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(124,58,237,0.10) 0%, transparent 60%)" }}
+        style={{ background: "radial-gradient(ellipse at 50% 0%, rgba(0,174,239,0.10) 0%, transparent 60%)" }}
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
@@ -61,7 +61,7 @@ export default function WhatHappensAfter() {
                 {/* Connector line — desktop only */}
                 {i < STEPS.length - 1 && (
                   <div
-                    className="hidden lg:block absolute top-1/2 -right-3 w-6 h-px"
+                    className="hidden lg:block absolute top-12 -right-3 w-6 h-px"
                     style={{ background: "linear-gradient(90deg, rgba(0,174,239,0.4), transparent)" }}
                   />
                 )}

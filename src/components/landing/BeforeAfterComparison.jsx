@@ -1,12 +1,12 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { X, Check, PhoneOff, Clock, Archive, UserX, Phone, Zap, RefreshCw, CalendarCheck, Eye } from "lucide-react";
+import { X, Check, PhoneOff, Clock, Archive, UserX, Phone, Zap, RefreshCw, CalendarCheck, EyeOff, Eye } from "lucide-react";
 
 const BEFORE_ITEMS = [
   { icon: PhoneOff, text: "Missed calls disappear" },
   { icon: Clock, text: "Leads wait hours or days" },
   { icon: Archive, text: "Old leads sit untouched" },
   { icon: UserX, text: "Staff manually follows up" },
-  { icon: Eye, text: "No clear booking path" },
+  { icon: EyeOff, text: "No clear booking path" },
 ];
 
 const AFTER_ITEMS = [
@@ -24,7 +24,7 @@ export default function BeforeAfterComparison() {
     <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#0A0E27" }}>
       <div
         className="absolute inset-0 pointer-events-none"
-        style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(124,58,237,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.08) 0%, transparent 50%)" }}
+        style={{ background: "radial-gradient(ellipse at 30% 50%, rgba(0,174,239,0.08) 0%, transparent 50%), radial-gradient(ellipse at 70% 50%, rgba(0,174,239,0.08) 0%, transparent 50%)" }}
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">

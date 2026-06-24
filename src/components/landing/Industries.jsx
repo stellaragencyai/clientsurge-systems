@@ -206,7 +206,7 @@ export default function Industries() {
     <section
       id="industries"
       ref={sectionRef}
-      className="pt-16 md:pt-24 pb-32 md:pb-40 px-0 bg-gradient-to-b from-card via-background via-70% to-slate-50/40">
+      className="pt-16 md:pt-24 pb-16 md:pb-24 px-0 bg-gradient-to-b from-card via-background via-70% to-muted/40">
       
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
          <SectionHeader
@@ -235,7 +235,7 @@ export default function Industries() {
       </div>
 
       <div
-        className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3 relative z-10"
+        className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3 relative z-10 px-4 md:px-6"
         style={{ overflowX: "hidden" }}>
         {filteredIndustries.map((industry, index) => {
           const Icon = industry.icon;

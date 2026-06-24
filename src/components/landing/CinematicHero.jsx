@@ -59,7 +59,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
                   <Icon className="w-4 h-4" style={{ color: "#00AEEF" }} />
                 </div>
                 <div>
-                  <p className="text-xs font-bold text-white whitespace-nowrap">{card.title}</p>
+                  <p className="text-xs font-bold text-white">{card.title}</p>
                   <p className="text-[10px] text-white/60">{card.desc}</p>
                 </div>
               </motion.div>
@@ -111,7 +111,7 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           <button
             onClick={() => scrollToSection("pricing", "hero_compare_packages_click")}
             className="cs-btn-primary inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-bold text-white"
-            style={{ minHeight: "unset", minWidth: "unset", boxShadow: "0 4px 20px rgba(0,121,193,0.45)" }}
+            style={{ boxShadow: "0 4px 20px rgba(0,121,193,0.45)" }}
           >
             Compare Packages <ArrowRight className="w-5 h-5" />
           </button>
@@ -122,8 +122,6 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
               background: "rgba(255,255,255,0.08)",
               border: "1.5px solid rgba(255,255,255,0.3)",
               backdropFilter: "blur(8px)",
-              minHeight: "unset",
-              minWidth: "unset",
             }}
           >
             View Automations <ArrowRight className="w-5 h-5" />

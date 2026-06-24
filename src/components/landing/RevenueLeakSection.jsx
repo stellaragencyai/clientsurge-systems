@@ -30,14 +30,14 @@ export default function RevenueLeakSection() {
   return (
     <section
       className="relative py-16 md:py-24 overflow-hidden"
-      style={{ background: "#0A0E27" }}
+      style={{ background: "#0D1430" }}
     >
       {/* Subtle glow accents */}
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
           background:
-            "radial-gradient(ellipse at 15% 50%, rgba(0,174,239,0.08) 0%, transparent 50%), radial-gradient(ellipse at 85% 50%, rgba(124,58,237,0.08) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 15% 50%, rgba(0,174,239,0.08) 0%, transparent 50%), radial-gradient(ellipse at 85% 50%, rgba(0,174,239,0.08) 0%, transparent 50%)",
         }}
       />
 

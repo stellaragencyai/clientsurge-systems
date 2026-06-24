@@ -289,7 +289,7 @@ export default function AutomationSystemsGrid() {
                         navigate(href);
                       }}
                       className="inline-flex items-center gap-1.5 text-sm font-semibold transition-colors self-start group-hover:gap-2.5"
-                      style={{ color: accentColor, minHeight: "unset", minWidth: "unset" }}
+                      style={{ color: isGold ? "#B8941F" : accentColor, minHeight: "unset", minWidth: "unset" }}
                     >
                       {cta} <ArrowRight className="w-4 h-4 transition-transform group-hover:translate-x-0.5" />
                     </button>
@@ -311,7 +311,7 @@ export default function AutomationSystemsGrid() {
       </section>
 
       {/* ── Section 2: How the AI Brain Works ── */}
-      <section className="py-20 px-6 bg-white">
+      <section className="py-20 px-6 bg-white border-t border-border">
         <div className="max-w-6xl mx-auto">
           <SectionHeader
             eyebrow="Remote Setup Engine"

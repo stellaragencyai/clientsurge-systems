@@ -36,7 +36,7 @@ function SystemCard({ system, selected, onSelect, onAddToStack }) {
       tabIndex={0}
       onClick={() => onSelect(system.id)}
       onKeyDown={(e) => e.key === "Enter" && onSelect(system.id)}
-      className="w-full text-left rounded-[20px] overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
+      className="w-full text-left rounded-xl overflow-hidden cursor-pointer transition-all duration-200 hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-primary/50"
       style={{
         background: "rgba(255,255,255,0.82)",
         border: selected ? "1.5px solid rgba(0,174,239,0.4)" : "1px solid rgba(148, 163, 184, 0.18)",
@@ -249,7 +249,7 @@ export default function CoreOffer() {
   return (
     <section
       id="how-it-works"
-      className="pt-12 md:pt-16 pb-6 md:pb-8 px-4 md:px-6 bg-white relative"
+      className="pt-16 md:pt-24 pb-6 md:pb-8 px-4 md:px-6 bg-white relative"
       style={{ overflowX: "hidden" }}>
       
       <div

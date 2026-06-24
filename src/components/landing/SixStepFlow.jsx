@@ -95,7 +95,7 @@ export default function SixStepFlow() {
                   className="w-11 h-11 rounded-xl flex items-center justify-center mb-4"
                   style={{ background: "rgba(0,174,239,0.10)" }}
                 >
-                  <Icon className="w-5 h-5 text-primary" />
+                  <Icon className="w-5 h-5" style={{ color: "#00AEEF" }} />
                 </div>
 
                 {/* Title */}

@@ -1,5 +1,6 @@
 import StardustOverlay from "./StardustOverlay";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Phone, Shield, Zap } from "lucide-react";
+import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
@@ -37,43 +38,41 @@ export default function FinalCTA() {
 
         <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-            <a
-              href="/pricing"
+            <Link
+              to="/pricing"
               onClick={() => {
                 trackCTA("compare_packages", "final_cta");
               }}
-              className="focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-              className="cs-btn-primary"
+              className="cs-btn-primary focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
               style={{
-               padding: "0 40px",
-               height: "56px",
-               fontSize: "1rem",
+                padding: "0 40px",
+                height: "56px",
+                fontSize: "1rem",
               }}
-              >
+            >
               See Plans &amp; Pricing
               <ArrowRight className="w-5 h-5" />
-            </a>
-            <a
-              href="/pricing"
-              onClick={() => trackCTA("view_pricing", "final_cta")}
-              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/8 hover:border-primary/50 transition-all duration-200">
-              
-              View Pricing
-            </a>
-            <a
-              href="/contact"
+            </Link>
+            <Link
+              to="/store"
+              onClick={() => trackCTA("browse_automation_store", "final_cta")}
+              className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-background/80 text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-200">
+              Browse Automation Store
+            </Link>
+            <Link
+              to="/contact"
               onClick={() => trackCTA("contact_support", "final_cta")}
               className="inline-flex items-center justify-center h-14 px-6 rounded-lg border border-border bg-background/70 text-sm font-semibold text-foreground hover:bg-muted transition-all duration-200">
               Contact
-            </a>
+            </Link>
           </div>
         {/* Trust signals below buttons */}
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <a href="tel:+16025843227" className="text-xs text-foreground/70 font-medium hover:text-primary transition-colors" style={{ textDecoration: "none" }}>📞 (602) 584-3227</a>
+          <a href="tel:+16025843227" className="text-xs text-foreground/70 font-medium hover:text-primary transition-colors inline-flex items-center gap-1" style={{ textDecoration: "none" }}><Phone className="w-3.5 h-3.5" /> (602) 584-3227</a>
           <span className="hidden sm:block text-foreground/30">|</span>
-          <span className="text-xs text-foreground/70 font-medium">🛡 30-day performance review included</span>
+          <span className="text-xs text-foreground/70 font-medium inline-flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> 30-day performance review included</span>
           <span className="hidden sm:block text-foreground/30">|</span>
-          <span className="text-xs text-foreground/70 font-medium">⚡ Live in 5–7 business days</span>
+          <span className="text-xs text-foreground/70 font-medium inline-flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Live in 5–7 business days</span>
         </div>
         </div>
       </section>
