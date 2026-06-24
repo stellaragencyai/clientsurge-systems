@@ -2,7 +2,6 @@ import { useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "../components/landing/Navbar";
 import CinematicHero from "../components/landing/CinematicHero.jsx";
-import IntegrationCarousel from "../components/landing/IntegrationCarousel.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import SixStepFlow from "../components/landing/SixStepFlow.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -13,7 +12,6 @@ import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import VisualFlawsPatch60 from "../components/landing/VisualFlawsPatch60";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
-import LogoCarousel from "../components/landing/LogoCarousel";
 import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import TrustStrip from "../components/landing/TrustStrip";
@@ -120,12 +118,6 @@ export default function Home() {
 
         {/* 1. Cinematic Hero */}
         <CinematicHero />
-
-        {/* 1a. Logo Carousel */}
-        <LogoCarousel />
-
-        {/* 1b. Integration Carousel */}
-        <IntegrationCarousel />
 
         {/* 1c. Revenue Leak Section */}
         <RevenueLeakSection />

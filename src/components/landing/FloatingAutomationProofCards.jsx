@@ -9,27 +9,27 @@ const PROOF_CARDS = [
   { title: "Revenue Leak Closed", desc: "Old lead reactivated.", icon: TrendingUp },
 ];
 
-// Desktop absolute positions — distributed around hero edges, never blocking center content
+// Desktop absolute positions — closer to center, balanced framing
 const DESKTOP_POSITIONS = [
-  { top: "15%", left: "2%" },
-  { top: "24%", right: "2%" },
-  { top: "47%", left: "1.5%" },
-  { top: "55%", right: "1.5%" },
-  { bottom: "14%", left: "3%" },
+  { top: "20%", left: "4%" },
+  { top: "22%", right: "5%" },
+  { top: "50%", left: "3%" },
+  { top: "52%", right: "4%" },
+  { bottom: "18%", left: "5%" },
 ];
 
 const GLASS_CARD = {
   display: "flex",
   alignItems: "center",
   gap: "12px",
-  padding: "12px 16px",
-  borderRadius: "12px",
-  background: "rgba(12, 28, 56, 0.72)",
-  backdropFilter: "blur(16px) saturate(1.4)",
-  WebkitBackdropFilter: "blur(16px) saturate(1.4)",
-  border: "1px solid rgba(0, 174, 239, 0.22)",
-  boxShadow: "0 8px 32px rgba(0, 0, 0, 0.35), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
-  minWidth: "200px",
+  padding: "10px 14px",
+  borderRadius: "10px",
+  background: "rgba(6, 16, 37, 0.75)",
+  backdropFilter: "blur(12px) saturate(1.3)",
+  WebkitBackdropFilter: "blur(12px) saturate(1.3)",
+  border: "1px solid rgba(53, 189, 241, 0.28)",
+  boxShadow: "0 8px 24px rgba(0, 0, 0, 0.40), inset 0 1px 0 rgba(53, 189, 241, 0.08)",
+  minWidth: "180px",
 };
 
 const ICON_WRAPPER = {
@@ -39,8 +39,8 @@ const ICON_WRAPPER = {
   width: "32px",
   height: "32px",
   borderRadius: "8px",
-  background: "rgba(0, 174, 239, 0.18)",
-  border: "1px solid rgba(0, 174, 239, 0.28)",
+  background: "rgba(53, 189, 241, 0.14)",
+  border: "1px solid rgba(53, 189, 241, 0.32)",
   flexShrink: 0,
 };
 
@@ -71,11 +71,11 @@ export default function FloatingAutomationProofCards({ variant = "desktop" }) {
                 gap: "8px",
                 padding: "8px 12px",
                 borderRadius: "10px",
-                background: "rgba(12, 28, 56, 0.72)",
+                background: "rgba(6, 16, 37, 0.75)",
                 backdropFilter: "blur(12px) saturate(1.3)",
                 WebkitBackdropFilter: "blur(12px) saturate(1.3)",
-                border: "1px solid rgba(0, 174, 239, 0.20)",
-                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.25)",
+                border: "1px solid rgba(53, 189, 241, 0.26)",
+                boxShadow: "0 4px 16px rgba(0, 0, 0, 0.30)",
               }}
             >
               <div
@@ -86,9 +86,9 @@ export default function FloatingAutomationProofCards({ variant = "desktop" }) {
                   borderRadius: "7px",
                 }}
               >
-                <Icon style={{ width: 14, height: 14, color: "#00AEEF" }} />
+                <Icon style={{ width: 14, height: 14, color: "#35BDF1" }} />
               </div>
-              <span style={{ fontSize: "11px", fontWeight: 700, color: "#ffffff", whiteSpace: "nowrap" }}>
+              <span style={{ fontSize: "11px", fontWeight: 700, color: "#FFFFFF", whiteSpace: "nowrap" }}>
                 {card.title}
               </span>
             </motion.div>
@@ -118,13 +118,13 @@ export default function FloatingAutomationProofCards({ variant = "desktop" }) {
               transition={{ duration: 4 + i * 0.5, repeat: Infinity, ease: "easeInOut", delay: i * 0.3 }}
             >
               <div style={ICON_WRAPPER}>
-                <Icon style={{ width: 18, height: 18, color: "#00AEEF" }} />
+                <Icon style={{ width: 18, height: 18, color: "#35BDF1" }} />
               </div>
               <div>
-                <p style={{ fontSize: "12px", fontWeight: 700, color: "#ffffff", lineHeight: 1.2, margin: 0 }}>
+                <p style={{ fontSize: "12px", fontWeight: 700, color: "#FFFFFF", lineHeight: 1.2, margin: 0 }}>
                   {card.title}
                 </p>
-                <p style={{ fontSize: "10px", color: "rgba(255,255,255,0.6)", lineHeight: 1.3, margin: "2px 0 0" }}>
+                <p style={{ fontSize: "10px", color: "#AEB8C8", lineHeight: 1.3, margin: "2px 0 0" }}>
                   {card.desc}
                 </p>
               </div>
