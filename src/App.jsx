@@ -69,6 +69,7 @@ const Book = lazy(() => import("./pages/Book"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ProductLanding = lazy(() => import("./pages/ProductLanding"));
 const ProductSignup = lazy(() => import("./pages/ProductSignup"));
+const SignupRedirect = lazy(() => import("./pages/SignupRedirect"));
 const ClientDashboardEntry = lazy(() => import("./pages/ClientDashboardEntry"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const OurSystemPage = lazy(() => import("./pages/OurSystemPage"));
@@ -428,7 +429,9 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/" element={<Home />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
-      <Route path="/signup" element={<LazyRoute Component={ProductSignup} />} />
+      <Route path="/signup" element={<LazyRoute Component={SignupRedirect} />} />
+      <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
+      <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
       <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />

@@ -131,7 +131,7 @@ export default function PricingPageContent() {
 
   const handlePackageCTA = (pkg) => {
     trackCTA(`package_${pkg.key}`, "pricing_page");
-    navigate(`/start?package=${pkg.key}`);
+    navigate(`/product-signup?package=${pkg.key}`);
   };
 
   return (
@@ -185,7 +185,7 @@ export default function PricingPageContent() {
             ].map((opt) => (
               <button
                 key={opt.pkg}
-                onClick={() => { trackCTA(`quick_select_${opt.pkg.toLowerCase()}`, "pricing_page"); navigate(`/start?package=${opt.pkg.toLowerCase()}_system`); }}
+                onClick={() => { trackCTA(`quick_select_${opt.pkg.toLowerCase()}`, "pricing_page"); navigate(`/product-signup?package=${opt.pkg.toLowerCase()}_system`); }}
                 className={`rounded-lg border p-3 text-left transition-all hover:border-primary/50 hover:bg-primary/5 ${opt.highlight ? "border-primary/40 bg-primary/5" : "border-border bg-background"}`}
                 style={{ minHeight: "unset", minWidth: "unset" }}
               >
@@ -243,7 +243,7 @@ export default function PricingPageContent() {
                 </ul>
 
                 <a
-                  href={`/start?package=${pkg.key}`}
+                  href={`/product-signup?package=${pkg.key}`}
                   onClick={() => trackCTA(`package_${pkg.key}`, "pricing_page")}
                   className={pkg.ctaStyle === "primary" ? "cs-btn-primary w-full text-center justify-center" : "w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors py-3 px-4"}
                   style={{ minHeight: "unset", minWidth: "unset" }}

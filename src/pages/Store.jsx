@@ -12,8 +12,9 @@ import { getPackageOffer } from "@/lib/salesCatalog";
 import GuidedPathToggle from "@/components/store/GuidedPathToggle";
 import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
+import { trackCTA } from "@/lib/analytics";
 import Footer from "@/components/landing/Footer";
-import { useSearchParams } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
 // Lazy load heavy store components
@@ -195,6 +196,7 @@ function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
 
 function StoreInner() {
   const [searchParams, setSearchParams] = useSearchParams();
+  const navigate = useNavigate();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
   const [searchInput, setSearchInput] = useState("");
@@ -722,7 +724,10 @@ function StoreInner() {
             {selectedPackageOffer ? (
               <PackageReviewBanner
                 packageOffer={selectedPackageOffer}
-                onContinue={() => setCartOpen(true)}
+                onContinue={() => {
+                  trackCTA("store_package_checkout", "store");
+                  navigate(`/product-signup?package=${selectedPackageOffer.package_key}`);
+                }}
                 onBrowseAll={() => {
                   const nextParams = new URLSearchParams(searchParams);
                   nextParams.delete("package");
@@ -913,11 +918,11 @@ function StoreInner() {
                 {[
                   { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false },
                   { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
-                  { name: "Elite System", key: "elite_system", price: "$2,497 setup + $1,997/mo", highlight: false },
+                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
                 ].map((pkg) => (
                   <a
                     key={pkg.key}
-                    href={`/pricing`}
+                    href={`/product-signup?package=${pkg.key}`}
                     style={{
                       display: "flex",
                       flexDirection: "column",

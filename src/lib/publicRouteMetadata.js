@@ -73,6 +73,18 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Compare Starter, Growth, and Pro packages to choose the AI growth system built for your local business lead flow.",
   },
+  "/product-signup": {
+    key: "product-signup",
+    title: "Sign Up — AI Automation Package | ClientSurge Systems",
+    description:
+      "Complete your ClientSurge automation package signup and proceed to secure Stripe checkout for your chosen Starter, Growth, or Pro system.",
+  },
+  "/signup": {
+    key: "signup",
+    title: "Sign Up — AI Automation Package | ClientSurge Systems",
+    description:
+      "Complete your ClientSurge automation package signup and proceed to secure Stripe checkout.",
+  },
   "/industries": {
     key: "industries",
     title: "Industries We Help | ClientSurge Systems",
@@ -198,6 +210,7 @@ export const STATIC_ROUTE_ALIASES = {
   "/industries/contractors": "/contractors",
   "/legal/privacy": "/privacy-policy",
   "/legal/terms": "/terms",
+  "/signup": "/product-signup",
 };
 
 export const LEGACY_REDIRECTS = [
@@ -239,6 +252,7 @@ export const LEGACY_REDIRECTS = [
   ["/privacy", "/privacy-policy"],
   ["/product-landing", "/product"],
   ["/client-dashboard-entry", "/dashboard-entry"],
+  ["/signup", "/product-signup"],
 ];
 
 export const PUBLIC_ROUTE_PATHS = [
@@ -259,6 +273,8 @@ export const PUBLIC_ROUTE_PATHS = [
   "/review-automation",
   "/customer-reactivation",
   "/start",
+  "/product-signup",
+  "/signup",
   "/book",
   "/book-demo",
   "/industries",
@@ -332,6 +348,8 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/login",
   // /store and /pricing are indexable public product pages — intentionally NOT noindexed
   "/start",
+  "/product-signup",
+  "/signup",
   "/book-demo",
   ...AUTHENTICATED_ROUTE_PREFIXES,
   ...ADMIN_ROUTE_PREFIXES,
