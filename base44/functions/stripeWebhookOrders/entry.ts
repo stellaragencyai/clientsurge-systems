@@ -97,7 +97,25 @@ Deno.serve(async (req) => {
       }
 
       if (!order) {
+        // FIX #7: Order not found for this session — create a recovery record and notify admin
         order = await base44.asServiceRole.entities.Order.create(orderData);
+        
+        const adminEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
+        const resendKey = Deno.env.get('RESEND_API_KEY');
+        const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'support@clientsurgesystems.com';
+        if (resendKey && adminEmail && !session.metadata?.order_id) {
+          // Only notify when no order_id in metadata (genuine orphan, not a lookup miss)
+          await fetch('https://api.resend.com/emails', {
+            method: 'POST',
+            headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              from: `ClientSurge Systems <${fromEmail}>`,
+              to: [adminEmail],
+              subject: `⚠️ Stripe Payment Received — No Matching Order Found`,
+              html: `<p>A Stripe checkout completed but no matching Order record was found in the database.</p><p><strong>Session:</strong> ${session.id}<br><strong>Email:</strong> ${orderData.customer_email}<br><strong>Amount:</strong> $${orderData.total_setup}<br><strong>Recovery Order Created:</strong> ${order.id}</p><p>Please review and reconcile manually.</p>`,
+            }),
+          }).catch(e => console.error('[stripeWebhookOrders] Admin orphan notification failed:', e.message));
+        }
       }
 
       console.log(`[stripeWebhookOrders] Order ${order.id} created/updated from checkout session ${session.id}`);
