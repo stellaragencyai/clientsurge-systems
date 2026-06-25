@@ -262,7 +262,7 @@ export const LEGACY_REDIRECTS = [
   ["/privacy", "/privacy-policy"],
   ["/product-landing", "/product"],
   ["/client-dashboard-entry", "/dashboard-entry"],
-  ["/signup", "/product-signup"],
+  // NOTE: /signup is handled directly in App.jsx to preserve query params
 ];
 
 export const PUBLIC_DIRECTORY_PAGES = [

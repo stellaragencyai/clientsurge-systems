@@ -268,6 +268,12 @@ function AppInner() {
   return null;
 }
 
+// Forward /signup → /product-signup, preserving any ?package= query param
+function SignupForward() {
+  const location = useLocation();
+  return <Navigate to={`/product-signup${location.search}`} replace />;
+}
+
 // Redirect section aliases to the homepage hash without giving them their own metadata.
 function HashRedirect({ hash }) {
   const navigate = useNavigate();
@@ -433,7 +439,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/" element={<Home />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
-      <Route path="/signup" element={<Navigate to="/product-signup" replace />} />
+      <Route path="/signup" element={<SignupForward />} />
       <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
       <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />

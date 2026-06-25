@@ -78,8 +78,14 @@ const PLANS = [
 ];
 
 export default function ProductSignup() {
-  // Get ?package= parameter
-  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  // Read ?package= synchronously so there's never a null/flash state
+  const [selectedPlanId, setSelectedPlanId] = useState(() => {
+    const params = new URLSearchParams(
+      typeof window !== "undefined" ? window.location.search : ""
+    );
+    const pkg = params.get("package");
+    return PLANS.some(p => p.id === pkg) ? pkg : "starter_system";
+  });
   const [formData, setFormData] = useState({
     fullName: "",
     businessName: "",
@@ -89,13 +95,6 @@ export default function ProductSignup() {
   });
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
-
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const pkg = params.get("package");
-    const valid = PLANS.some(p => p.id === pkg);
-    setSelectedPlanId(valid ? pkg : "starter_system");
-  }, []);
 
   const selectedPlan = PLANS.find(p => p.id === selectedPlanId);
 
