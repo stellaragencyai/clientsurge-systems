@@ -487,6 +487,11 @@ const AuthenticatedAppWithTenant = () => {
       ))}
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
 
+      {/* EMERGENCY: Catch-all to block Base44 Pages directory before admin routes */}
+      <Route path="/_generated/*" element={<Navigate to="/" replace />} />
+      <Route path="/pages" element={<Navigate to="/" replace />} />
+      <Route path="/pages/*" element={<Navigate to="/" replace />} />
+
       <Route
         element={
           <ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />

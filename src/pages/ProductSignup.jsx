@@ -78,14 +78,18 @@ const PLANS = [
 ];
 
 export default function ProductSignup() {
-  // Read ?package= synchronously so there's never a null/flash state
-  const [selectedPlanId, setSelectedPlanId] = useState(() => {
-    const params = new URLSearchParams(
-      typeof window !== "undefined" ? window.location.search : ""
-    );
-    const pkg = params.get("package");
-    return PLANS.some(p => p.id === pkg) ? pkg : "starter_system";
-  });
+   // Read ?package= synchronously with null safety
+   const [selectedPlanId, setSelectedPlanId] = useState(() => {
+     if (typeof window === "undefined") return "starter_system";
+     try {
+       const params = new URLSearchParams(window.location.search);
+       const pkg = params?.get?.("package");
+       if (!pkg || typeof pkg !== "string") return "starter_system";
+       return PLANS.some(p => p.id === pkg) ? pkg : "starter_system";
+     } catch (e) {
+       return "starter_system";
+     }
+   });
   const [formData, setFormData] = useState({
     fullName: "",
     businessName: "",
