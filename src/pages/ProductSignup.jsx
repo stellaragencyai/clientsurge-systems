@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { CheckCircle2, ArrowRight, Loader2, AlertCircle, Shield, Zap } from 'lucide-react';
 import Navbar from '@/components/landing/Navbar';
@@ -6,175 +6,54 @@ import Footer from '@/components/landing/Footer';
 import MobileCallBar from '@/components/landing/MobileCallBar';
 import TrustStrip from '@/components/landing/TrustStrip';
 
-// ── Local static plan data — no external config, entities, or API calls ──
 const PACKAGES = {
   starter_system: {
     name: 'Starter System',
     setup: 797,
     monthly: 497,
     description: 'Instant lead response + missed-call recovery foundation.',
-    services: ['Instant Lead Response', 'Missed-Call Text-Back'],
+    features: ['Instant Lead Response', 'Missed-Call Text-Back'],
   },
   growth_system: {
     name: 'Growth System',
     setup: 1297,
     monthly: 997,
     description: 'Complete lead-to-booking system with AI nurture and booking agent.',
-    services: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent'],
+    features: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent'],
   },
   pro_system: {
     name: 'Pro System',
     setup: 2497,
     monthly: 1997,
     description: 'Full revenue recovery engine with reviews, reactivation, and the entire stack.',
-    services: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Lead Reactivation', 'Review Request Automation'],
+    features: ['Instant Lead Response', 'Missed-Call Text-Back', '14-Day Nurture Sequence', 'AI Booking Agent', 'Lead Reactivation', 'Review Request Automation'],
   },
 };
 
-const PACKAGE_ALIASES = {
-  starter: 'starter_system',
-  growth: 'growth_system',
-  pro: 'pro_system',
-  elite: 'pro_system',
-  elite_system: 'pro_system',
-};
+const ALIASES = { starter: 'starter_system', growth: 'growth_system', pro: 'pro_system', elite: 'pro_system', elite_system: 'pro_system' };
 
 function resolvePackageKey(raw) {
   if (!raw) return 'starter_system';
-  const lower = String(raw).toLowerCase();
-  if (PACKAGE_ALIASES[lower]) return PACKAGE_ALIASES[lower];
-  if (PACKAGES[lower]) return lower;
-  return 'starter_system';
-}
-
-function getPackage(key) {
-  const pkg = PACKAGES[key] || PACKAGES.starter_system;
-  return {
-    name: pkg.name,
-    setup: Number(pkg.setup) || 0,
-    monthly: Number(pkg.monthly) || 0,
-    description: pkg.description,
-    services: Array.isArray(pkg.services) ? pkg.services.filter((s) => typeof s === 'string') : [],
-  };
-}
-
-function formatPhone(value) {
-  const digits = String(value || '').replace(/\D/g, '');
-  if (digits.length === 0) return '';
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6, 10)}`;
+  const key = String(raw).toLowerCase();
+  return PACKAGES[key] ? key : (ALIASES[key] || 'starter_system');
 }
 
 const SUPPORT_EMAIL = 'support@clientsurgesystems.com';
 const SUPPORT_PHONE = '(602) 584-3227';
 
-// ── Page-level error boundary ──
-// Catches any render-time exception and shows the basic Starter signup
-// screen instead of a broken error page.
-function ProductSignupBoundaryFallback() {
-  const starter = getPackage('starter_system');
-  const [fbForm, setFbForm] = useState({ name: '', email: '', business: '', phone: '' });
-  return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <TrustStrip />
-      <main className="px-4 pb-24 pt-[calc(var(--cs-nav-height)+32px)] md:px-6">
-        <div className="max-w-4xl mx-auto">
-          <div className="mb-8 text-center">
-            <p className="cs-section-eyebrow mb-3">Product Signup</p>
-            <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
-              Complete Your {starter.name} Signup
-            </h1>
-            <p className="text-muted-foreground text-base max-w-xl mx-auto leading-relaxed">
-              Something went wrong loading your page. You can still complete your signup below, or contact us at {SUPPORT_EMAIL} or {SUPPORT_PHONE}.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <div className="flex items-center gap-2 mb-4">
-                <Zap className="w-5 h-5 text-primary" />
-                <h2 className="font-titles text-lg font-bold text-foreground">Package Summary</h2>
-              </div>
-              <div className="rounded-lg bg-primary/5 border border-primary/15 p-4 mb-5">
-                <p className="text-sm font-bold text-foreground mb-3">{starter.name}</p>
-                <div className="flex items-baseline gap-1.5 mb-1">
-                  <span className="text-2xl font-extrabold text-foreground">${starter.monthly.toLocaleString()}</span>
-                  <span className="text-xs text-muted-foreground font-semibold">/mo</span>
-                </div>
-                <p className="text-xs text-muted-foreground">${starter.setup.toLocaleString()} one-time setup fee</p>
-              </div>
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Included Services</p>
-              <ul className="space-y-2">
-                {starter.services.map((service) => (
-                  <li key={service} className="flex items-start gap-2.5">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-foreground/85">{service}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-            <div className="rounded-xl border border-border bg-card p-6 shadow-sm">
-              <h2 className="font-titles text-lg font-bold text-foreground mb-4">Your Details</h2>
-              <div className="space-y-4">
-                <input type="text" placeholder="Full Name" autoComplete="name" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.name} onChange={(e) => setFbForm({ ...fbForm, name: e.target.value })} />
-                <input type="email" placeholder="Email" autoComplete="email" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.email} onChange={(e) => setFbForm({ ...fbForm, email: e.target.value })} />
-                <input type="text" placeholder="Business Name" autoComplete="organization" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.business} onChange={(e) => setFbForm({ ...fbForm, business: e.target.value })} />
-                <input type="tel" placeholder="(602) 555-0100" autoComplete="tel" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" value={fbForm.phone} onChange={(e) => setFbForm({ ...fbForm, phone: formatPhone(e.target.value) })} />
-              </div>
-              <a href={`/product-signup?package=starter_system`} className="cs-btn-primary w-full flex items-center justify-center gap-2 mt-6" style={{ minHeight: 'unset', minWidth: 'unset', textDecoration: 'none' }}>
-                Reload Signup <ArrowRight className="w-4 h-4" />
-              </a>
-              <div className="mt-4 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                <Shield className="w-3.5 h-3.5" />
-                <span>Secure checkout powered by Stripe</span>
-              </div>
-            </div>
-          </div>
-          <div className="text-center mt-8">
-            <a href="/pricing" className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer" style={{ minHeight: 'unset', minWidth: 'unset' }}>← Back to Pricing</a>
-          </div>
-        </div>
-      </main>
-      <Footer />
-      <MobileCallBar />
-    </div>
-  );
-}
-
-class ProductSignupErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-  static getDerivedStateFromError() {
-    return { hasError: true };
-  }
-  componentDidCatch(error, info) {
-    console.error('ProductSignup render error:', error, info);
-  }
-  render() {
-    if (this.state.hasError) {
-      return <ProductSignupBoundaryFallback />;
-    }
-    return this.props.children;
-  }
+function formatPhone(value) {
+  const d = String(value || '').replace(/\D/g, '');
+  if (d.length <= 3) return d;
+  if (d.length <= 6) return `(${d.slice(0, 3)}) ${d.slice(3)}`;
+  return `(${d.slice(0, 3)}) ${d.slice(3, 6)}-${d.slice(6, 10)}`;
 }
 
 export default function ProductSignup() {
-  return (
-    <ProductSignupErrorBoundary>
-      <ProductSignupInner />
-    </ProductSignupErrorBoundary>
-  );
-}
-
-function ProductSignupInner() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
   const packageKey = resolvePackageKey(searchParams.get('package'));
-  const pkg = getPackage(packageKey);
+  const pkg = PACKAGES[packageKey];
 
   const [form, setForm] = useState({ name: '', email: '', business: '', phone: '' });
   const [loading, setLoading] = useState(false);
@@ -187,25 +66,15 @@ function ProductSignupInner() {
       setError('Please fill in your name, email, and business name.');
       return;
     }
-
-    // Iframe sandbox check — block checkout in editor preview
     if (window.self !== window.top) {
       setError('Checkout only works on the published app, not in the editor preview.');
       return;
     }
-
     setLoading(true);
     setError(null);
-
-    let response;
     try {
-      // Lazy import — never blocks page render
       const { base44 } = await import('@/api/base44Client');
-      const { trackCTA } = await import('@/lib/analytics');
-
-      try { trackCTA(`product_signup_checkout_${packageKey}`, 'product-signup'); } catch (_) { /* non-critical */ }
-
-      response = await base44.functions.invoke('createCheckoutSession', {
+      const res = await base44.functions.invoke('createCheckoutSession', {
         package_key: packageKey,
         customer_name: form.name,
         customer_email: form.email,
@@ -214,18 +83,15 @@ function ProductSignupInner() {
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/product-signup?package=${packageKey}`,
       });
+      if (res?.data?.url) {
+        window.location.href = res.data.url;
+      } else {
+        setError(res?.data?.error || `We couldn't start checkout. Please try again or contact ${SUPPORT_EMAIL}.`);
+      }
     } catch (err) {
-      setError(`We couldn't start checkout right now. Please try again, or contact us at ${SUPPORT_EMAIL} or ${SUPPORT_PHONE}.`);
+      setError(`We couldn't start checkout right now. Please try again, or contact ${SUPPORT_EMAIL} / ${SUPPORT_PHONE}.`);
+    } finally {
       setLoading(false);
-      return;
-    }
-
-    setLoading(false);
-
-    if (response?.data?.url) {
-      window.location.href = response.data.url;
-    } else {
-      setError(response?.data?.error || `We couldn't start checkout right now. Please try again, or contact us at ${SUPPORT_EMAIL} or ${SUPPORT_PHONE}.`);
     }
   };
 
@@ -236,7 +102,6 @@ function ProductSignupInner() {
 
       <main className="px-4 pb-24 pt-[calc(var(--cs-nav-height)+32px)] md:px-6">
         <div className="max-w-4xl mx-auto">
-          {/* Header */}
           <div className="mb-8 text-center">
             <p className="cs-section-eyebrow mb-3">Product Signup</p>
             <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground mb-3">
@@ -254,7 +119,6 @@ function ProductSignupInner() {
                 <Zap className="w-5 h-5 text-primary" />
                 <h2 className="font-titles text-lg font-bold text-foreground">Package Summary</h2>
               </div>
-
               <div className="rounded-lg bg-primary/5 border border-primary/15 p-4 mb-5">
                 <p className="text-sm font-bold text-foreground mb-3">{pkg.name}</p>
                 <div className="flex items-baseline gap-1.5 mb-1">
@@ -263,17 +127,15 @@ function ProductSignupInner() {
                 </div>
                 <p className="text-xs text-muted-foreground">${pkg.setup.toLocaleString()} one-time setup fee</p>
               </div>
-
-              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Included Services</p>
+              <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">Included Features</p>
               <ul className="space-y-2">
-                {pkg.services.map((service) => (
-                  <li key={service} className="flex items-start gap-2.5">
+                {pkg.features.map((feature) => (
+                  <li key={feature} className="flex items-start gap-2.5">
                     <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-                    <span className="text-sm text-foreground/85">{service}</span>
+                    <span className="text-sm text-foreground/85">{feature}</span>
                   </li>
                 ))}
               </ul>
-
               <div className="mt-5 pt-5 border-t border-border space-y-2">
                 <div className="flex justify-between text-sm">
                   <span className="text-muted-foreground">One-time setup</span>
@@ -292,61 +154,24 @@ function ProductSignupInner() {
               <div className="space-y-4">
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Full Name *</label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => update('name', e.target.value)}
-                    placeholder="Jane Smith"
-                    autoComplete="name"
-                    className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
+                  <input type="text" value={form.name} onChange={(e) => update('name', e.target.value)} placeholder="Jane Smith" autoComplete="name" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Email *</label>
-                  <input
-                    type="email"
-                    value={form.email}
-                    onChange={(e) => update('email', e.target.value)}
-                    placeholder="owner@yourbusiness.com"
-                    autoComplete="email"
-                    className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
+                  <input type="email" value={form.email} onChange={(e) => update('email', e.target.value)} placeholder="owner@yourbusiness.com" autoComplete="email" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Business Name *</label>
-                  <input
-                    type="text"
-                    value={form.business}
-                    onChange={(e) => update('business', e.target.value)}
-                    placeholder="ABC Roofing Co."
-                    autoComplete="organization"
-                    className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
+                  <input type="text" value={form.business} onChange={(e) => update('business', e.target.value)} placeholder="ABC Roofing Co." autoComplete="organization" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
                 <div>
                   <label className="text-xs font-bold uppercase tracking-wider text-muted-foreground mb-1 block">Phone (optional)</label>
-                  <input
-                    type="tel"
-                    value={form.phone}
-                    onChange={(e) => update('phone', formatPhone(e.target.value))}
-                    placeholder="(602) 555-0100"
-                    autoComplete="tel"
-                    className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30"
-                  />
+                  <input type="tel" value={form.phone} onChange={(e) => update('phone', formatPhone(e.target.value))} placeholder="(602) 555-0100" autoComplete="tel" className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30" />
                 </div>
               </div>
 
-              <button
-                onClick={handleCheckout}
-                disabled={loading}
-                className="cs-btn-primary w-full flex items-center justify-center gap-2 mt-6 disabled:opacity-60"
-                style={{ minHeight: 'unset', minWidth: 'unset' }}
-              >
-                {loading ? (
-                  <><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>
-                ) : (
-                  <>Continue to Payment <ArrowRight className="w-4 h-4" /></>
-                )}
+              <button onClick={handleCheckout} disabled={loading} className="cs-btn-primary w-full flex items-center justify-center gap-2 mt-6 disabled:opacity-60" style={{ minHeight: 'unset', minWidth: 'unset' }}>
+                {loading ? (<><Loader2 className="w-4 h-4 animate-spin" /> Processing...</>) : (<>Continue to Checkout <ArrowRight className="w-4 h-4" /></>)}
               </button>
 
               {error && (
@@ -372,13 +197,7 @@ function ProductSignupInner() {
           </div>
 
           <div className="text-center mt-8">
-            <button
-              onClick={() => navigate('/pricing')}
-              className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer"
-              style={{ minHeight: 'unset', minWidth: 'unset' }}
-            >
-              ← Back to Pricing
-            </button>
+            <button onClick={() => navigate('/pricing')} className="text-sm text-primary font-semibold hover:underline bg-transparent border-none cursor-pointer" style={{ minHeight: 'unset', minWidth: 'unset' }}>← Back to Pricing</button>
           </div>
         </div>
       </main>
