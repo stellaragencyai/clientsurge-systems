@@ -1,6 +1,28 @@
 import { useState, useEffect } from "react";
 import { ArrowRight, AlertCircle } from "lucide-react";
 
+// Canonical product_ids per plan — used as primary checkout input
+const PLAN_PRODUCT_IDS = {
+  starter_system: [
+    "prod_UNi5RHiKNSTfQl",
+    "prod_UNi5QL0bQl98If",
+  ],
+  growth_system: [
+    "prod_UNi5RHiKNSTfQl",
+    "prod_UNi5QL0bQl98If",
+    "prod_UNi5N0l5MtaV0R",
+    "prod_UNi5fLL2SyJJdP",
+  ],
+  pro_system: [
+    "prod_UNi5RHiKNSTfQl",
+    "prod_UNi5QL0bQl98If",
+    "prod_UNi5N0l5MtaV0R",
+    "prod_UNi5fLL2SyJJdP",
+    "prod_UNi5PWv05ECzXI",
+    "prod_UNi5dvOUm6Fi9i",
+  ],
+};
+
 // Inline plan data — no external imports of config
 const PLANS = [
   {
@@ -102,7 +124,9 @@ export default function ProductSignup() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          package: selectedPlanId,
+          product_ids: PLAN_PRODUCT_IDS[selectedPlanId],
+          package_key: selectedPlanId,
+          selected_package_type: selectedPlanId,
           fullName: formData.fullName,
           businessName: formData.businessName,
           email: formData.email,
