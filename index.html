@@ -429,15 +429,19 @@
         ];
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         var canonicalPath = aliases[path] || path;
-        var meta = routeMap[canonicalPath] || routeMap["/"];
         var canonicalUrl = "https://clientsurgesystems.com" + canonicalPath;
-        var robotsContent = noindexPrefixes.some(function (prefix) {
+        // Determine if this is a known public route
+        var isKnownPublic = !!publicPages[canonicalPath];
+        var isNoindexPrefix = noindexPrefixes.some(function (prefix) {
           return canonicalPath === prefix || canonicalPath.indexOf(prefix + "/") === 0;
-        }) ? "noindex,nofollow" : "index,follow";
-        // Noindex any route not explicitly listed in publicPages (catches admin, internal, and unlisted paths)
-        if (!publicPages[canonicalPath]) {
-          robotsContent = "noindex,nofollow";
-        }
+        });
+        var robotsContent = (isNoindexPrefix || !isKnownPublic) ? "noindex,nofollow" : "index,follow";
+        // Use route-specific metadata for known routes; for unknown/internal routes use minimal safe defaults
+        var meta = routeMap[canonicalPath] || {
+          key: "fallback",
+          title: "ClientSurge Systems",
+          description: "AI automation systems for local service businesses."
+        };
         document.documentElement.setAttribute("data-static-route", meta.key);
         document.title = meta.title;
         var description = document.querySelector('meta[name="description"]');
