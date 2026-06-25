@@ -49,7 +49,12 @@ export default function CredentialsSetup() {
   };
 
   const handleComplete = () => {
-    setSubmitted(true);
+    // Redirect to setup status tracker (task 407d)
+    if (orderId) {
+      navigate(`/setup/status/${orderId}`);
+    } else {
+      setSubmitted(true);
+    }
   };
 
   if (loading) {

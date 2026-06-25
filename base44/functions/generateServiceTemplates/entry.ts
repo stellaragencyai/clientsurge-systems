@@ -1,68 +1,159 @@
-import { secureJson } from "../_shared/response.ts";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
 /**
- * generateServiceTemplates — #413
- * AI personalization layer for ClientSurge service activation.
- *
- * Reads industry + business_name + tone_of_voice from Order.install_configuration.
- * Generates personalized: instant SMS, missed call SMS, nurture Day 1 email,
- * review request SMS. Writes generated templates back to install_configuration.
+ * generateServiceTemplates — #413 #413a #413b #413c #413d
+ * FIX: Removed TypeScript type annotations from .js file.
+ * FIX: Now uses InvokeLLM for AI-personalized templates (not static strings).
+ * FIX: Added 160-char hard limit validation on all SMS output (#413c).
+ * FIX: Static fallback templates per industry when LLM fails (#413d).
  */
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-
-const TONE_MAP = {
-  Professional: { greeting: "Hello", sign_off: "Best regards" },
-  Friendly:     { greeting: "Hey there", sign_off: "Talk soon" },
-  Luxury:       { greeting: "Good day", sign_off: "With warm regards" },
-  Casual:       { greeting: "Hey", sign_off: "Cheers" },
-  Energetic:    { greeting: "Hi", sign_off: "Let's go" },
+// #413d: Static fallback templates per industry
+const INDUSTRY_FALLBACKS = {
+  med_spa: {
+    instant_lead_sms: "Hi! Thanks for reaching out to {biz}. We received your inquiry and will be in touch shortly. Book: {book} — Reply STOP to opt out.",
+    missed_call_sms: "Hi! You just called {biz} — sorry we missed you! Text back or book: {book}. We'll be in touch soon! — Reply STOP to opt out.",
+  },
+  dental: {
+    instant_lead_sms: "Hi! Thanks for contacting {biz}. We'll be in touch shortly to discuss your dental care needs. Book: {book} — Reply STOP to opt out.",
+    missed_call_sms: "Hi! You called {biz} — sorry we missed you! We'd love to help with your dental needs. Book: {book} — Reply STOP to opt out.",
+  },
+  hvac: {
+    instant_lead_sms: "Hi! Thanks for reaching out to {biz}. We're on it and will call you back soon. For urgent service: {book} — Reply STOP to opt out.",
+    missed_call_sms: "Hi! You called {biz} — sorry we missed you! For emergency HVAC service book here: {book}. We'll call back shortly! — Reply STOP to opt out.",
+  },
+  roofing: {
+    instant_lead_sms: "Hi! Thanks for contacting {biz}. We got your roofing inquiry and will be in touch soon. Schedule a free estimate: {book} — Reply STOP to opt out.",
+    missed_call_sms: "Hi! You called {biz} about your roof — sorry we missed you! Get a free estimate: {book}. We'll follow up shortly! — Reply STOP to opt out.",
+  },
 };
 
-function buildTemplates(business_name: string, industry: string, tone: string, booking_link: string) {
-  const t = TONE_MAP[tone] || TONE_MAP["Friendly"];
-  const biz = business_name || "our business";
-  const book = booking_link || "our booking page";
+function buildFallbackTemplates(business_name, industry, booking_link) {
+  const biz = business_name || "us";
+  const book = booking_link || "our website";
+  const industryFallback = INDUSTRY_FALLBACKS[industry] || {};
+
+  const instant = (industryFallback.instant_lead_sms || "Hi! Thanks for reaching out to {biz}. We'll be in touch shortly. Book: {book} — Reply STOP to opt out.")
+    .replace("{biz}", biz).replace("{book}", book);
+  const missed = (industryFallback.missed_call_sms || "Hi! You just called {biz} and we missed you. Text back or book here: {book} — Reply STOP to opt out.")
+    .replace("{biz}", biz).replace("{book}", book);
 
   return {
-    instant_lead_sms: `${t.greeting}! Thanks for reaching out to ${biz}. We received your inquiry and will be in touch within minutes. Book directly here: ${book} — ${t.sign_off}, ${biz} Team`,
-
-    missed_call_sms: `Hi! You just called ${biz} and we missed you — sorry about that! Reply here or book online: ${book}. We'll get back to you ASAP. — ${biz}`,
-
+    instant_lead_sms: truncateSms(instant),
+    missed_call_sms: truncateSms(missed),
+    review_request_sms: truncateSms(`Hi! It was great working with ${biz}. Would you mind leaving a Google review? It helps us a lot: [REVIEW_LINK] — Reply STOP to opt out.`),
+    appointment_reminder_sms: truncateSms(`Reminder: You have an upcoming appointment with ${biz}. Reply CONFIRM to confirm or CANCEL to cancel. Reschedule: ${book} — Reply STOP to opt out.`),
     nurture_day1_email: {
-      subject: `Your inquiry to ${biz} — here's what happens next`,
-      body: `${t.greeting},\n\nThank you for reaching out to ${biz}. We specialize in ${industry} services and we'd love to help.\n\nHere's what to expect:\n• We'll review your inquiry within 1 business day\n• A team member will reach out to discuss your needs\n• We'll get you scheduled at a time that works for you\n\nIn the meantime, feel free to book directly: ${book}\n\n${t.sign_off},\nThe ${biz} Team`,
+      subject: `Your inquiry to ${biz} — what happens next`,
+      body: `Hi,\n\nThank you for reaching out to ${biz}. We specialize in ${industry || "our field"} and would love to help.\n\nHere's what to expect:\n• We'll review your inquiry within 1 business day\n• A team member will reach out directly\n• We'll get you scheduled at a time that works\n\nBook directly: ${book}\n\nTalk soon,\nThe ${biz} Team`,
     },
-
-    review_request_sms: `Hi! It was great working with you at ${biz}. If you had a positive experience, we'd really appreciate a quick Google review — it helps us a ton: [REVIEW_LINK]. Thank you! — ${biz}`,
-
-    appointment_reminder_sms: `Reminder: You have an upcoming appointment with ${biz}. Reply CONFIRM to confirm or CANCEL to cancel. Book/reschedule: ${book}`,
   };
+}
+
+// #413c: Truncate SMS to 160 chars max
+function truncateSms(text) {
+  if (!text || typeof text !== "string") return "";
+  if (text.length <= 160) return text;
+  return text.slice(0, 157) + "...";
+}
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
 }
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
-    const { order_id } = await req.json();
+    const { order_id } = await req.json().catch(() => ({}));
 
-    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return json({ error: "order_id required" }, 400);
 
-    const order = await base44.asServiceRole.entities.Order.get(order_id);
-    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
+    const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
+    if (!order) return json({ error: "Order not found" }, 404);
 
     const cfg = order.install_configuration || {};
     const brand = cfg.brand || {};
     const messaging = cfg.messaging || {};
 
     const business_name = brand.business_name || order.business_name || "";
-    const industry      = brand.industry || order.industry || "your industry";
-    const tone          = brand.brand_voice || "Friendly";
-    const booking_link  = messaging.booking_link || "";
+    const industry = brand.industry || order.industry || "general";
+    const tone = brand.brand_voice || brand.tone_of_voice || "Friendly";
+    const booking_link = messaging.booking_link || cfg.services?.ai_booking_agent?.booking_link || "";
 
     if (!business_name) {
-      return secureJson({ error: "install_configuration.brand.business_name is required" }, { status: 422 });
+      return json({ error: "install_configuration.brand.business_name is required" }, 422);
     }
 
-    const templates = buildTemplates(business_name, industry, tone, booking_link);
+    // Start with fallback templates
+    let templates = buildFallbackTemplates(business_name, industry, booking_link);
+    let aiGenerated = false;
+
+    // #413a: Use InvokeLLM for AI-personalized templates
+    try {
+      const prompt = `Generate personalized AI automation message templates for a ${industry} business called "${business_name}".
+Tone: ${tone}. Booking/contact link: ${booking_link || "not provided yet"}.
+
+Rules:
+- All SMS templates MUST be under 155 characters (leaving room for opt-out)
+- End every SMS with "— Reply STOP to opt out."
+- Be warm, professional, and industry-specific
+- Mention the business name naturally
+
+Return ONLY valid JSON with these exact keys:
+{
+  "instant_lead_sms": "(under 155 chars, warm greeting, mention ${business_name}, invite them to book)",
+  "missed_call_sms": "(under 155 chars, apologize for missing call, invite to text back or book)",
+  "review_request_sms": "(under 155 chars, thank them, ask for Google review, use [REVIEW_LINK] placeholder)",
+  "appointment_reminder_sms": "(under 155 chars, confirm appointment, offer CONFIRM or CANCEL reply)",
+  "nurture_day1_subject": "(compelling email subject line for Day 1 follow-up)",
+  "nurture_day1_body": "(3-4 sentence nurture email body, warm and helpful)"
+}`;
+
+      const aiResult = await base44.asServiceRole.integrations.Core.InvokeLLM({
+        prompt,
+        response_json_schema: {
+          type: "object",
+          properties: {
+            instant_lead_sms: { type: "string" },
+            missed_call_sms: { type: "string" },
+            review_request_sms: { type: "string" },
+            appointment_reminder_sms: { type: "string" },
+            nurture_day1_subject: { type: "string" },
+            nurture_day1_body: { type: "string" },
+          },
+        },
+      });
+
+      if (aiResult && aiResult.instant_lead_sms) {
+        // #413b: Enforce 160-char limit on all SMS
+        templates = {
+          instant_lead_sms: truncateSms(aiResult.instant_lead_sms),
+          missed_call_sms: truncateSms(aiResult.missed_call_sms || templates.missed_call_sms),
+          review_request_sms: truncateSms(aiResult.review_request_sms || templates.review_request_sms),
+          appointment_reminder_sms: truncateSms(aiResult.appointment_reminder_sms || templates.appointment_reminder_sms),
+          nurture_day1_email: {
+            subject: aiResult.nurture_day1_subject || templates.nurture_day1_email.subject,
+            body: aiResult.nurture_day1_body || templates.nurture_day1_email.body,
+          },
+        };
+        aiGenerated = true;
+        console.log(`[generateServiceTemplates] AI templates generated for ${business_name}`);
+      }
+    } catch (aiErr) {
+      console.warn("[generateServiceTemplates] InvokeLLM failed, using fallback:", aiErr.message);
+    }
+
+    // #413c: Final validation — ensure no SMS exceeds 160 chars
+    const smsFields = ["instant_lead_sms", "missed_call_sms", "review_request_sms", "appointment_reminder_sms"];
+    for (const field of smsFields) {
+      if (templates[field] && templates[field].length > 160) {
+        console.warn(`[generateServiceTemplates] ${field} too long (${templates[field].length} chars), truncating`);
+        templates[field] = truncateSms(templates[field]);
+      }
+    }
 
     // Write templates back into install_configuration
     const updated_cfg = {
@@ -72,24 +163,17 @@ Deno.serve(async (req) => {
         generated_at: new Date().toISOString(),
         tone_used: tone,
         industry_used: industry,
+        ai_generated: aiGenerated,
       },
     };
 
-    await base44.asServiceRole.entities.Order.update(order_id, {
-      install_configuration: updated_cfg,
-    });
+    await base44.asServiceRole.entities.Order.update(order_id, { install_configuration: updated_cfg });
 
-    console.log(`[generateServiceTemplates] Templates generated for order ${order_id} — tone: ${tone}, industry: ${industry}`);
+    console.log(`[generateServiceTemplates] Done for order ${order_id} — industry: ${industry}, tone: ${tone}, ai: ${aiGenerated}`);
 
-    return secureJson({
-      success: true,
-      order_id,
-      templates,
-      tone_used: tone,
-      industry_used: industry,
-    });
+    return json({ success: true, order_id, templates, tone_used: tone, industry_used: industry, ai_generated: aiGenerated });
   } catch (err) {
     console.error("[generateServiceTemplates] Error:", err.message);
-    return secureJson({ error: err.message }, { status: 500 });
+    return json({ error: err.message }, 500);
   }
 });

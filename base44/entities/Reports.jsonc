@@ -1,0 +1,136 @@
+{
+  "name": "Reports",
+  "type": "object",
+  "title": "Monthly Performance Reports",
+  "description": "Stores AI-generated monthly performance reports for Elite/Pro tier clients. Created by generateMonthlyPerformanceReport.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID",
+      "description": "Reference to the paid Order this report is for"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "client_name": {
+      "type": "string",
+      "title": "Client Name"
+    },
+    "report_month": {
+      "type": "string",
+      "title": "Report Month",
+      "description": "Human-readable period e.g. June 2026"
+    },
+    "report_period_start": {
+      "type": "string",
+      "title": "Report Period Start",
+      "format": "date"
+    },
+    "report_period_end": {
+      "type": "string",
+      "title": "Report Period End",
+      "format": "date"
+    },
+    "total_leads": {
+      "type": "integer",
+      "title": "Total Leads",
+      "default": 0
+    },
+    "leads_contacted": {
+      "type": "integer",
+      "title": "Leads Contacted",
+      "default": 0
+    },
+    "bookings_created": {
+      "type": "integer",
+      "title": "Bookings Created",
+      "default": 0
+    },
+    "response_rate": {
+      "type": "number",
+      "title": "Response Rate (%)",
+      "default": 0
+    },
+    "booking_rate": {
+      "type": "number",
+      "title": "Booking Rate (%)",
+      "default": 0
+    },
+    "revenue_attributed": {
+      "type": "number",
+      "title": "Revenue Attributed ($)",
+      "default": 0
+    },
+    "avg_response_time_minutes": {
+      "type": "number",
+      "title": "Avg Response Time (minutes)",
+      "default": 0
+    },
+    "sms_sent": {
+      "type": "integer",
+      "title": "SMS Sent",
+      "default": 0
+    },
+    "emails_sent": {
+      "type": "integer",
+      "title": "Emails Sent",
+      "default": 0
+    },
+    "report_html": {
+      "type": "string",
+      "title": "Report HTML",
+      "description": "Full HTML content of the report as sent to the client"
+    },
+    "delivered_at": {
+      "type": "string",
+      "title": "Delivered At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    }
+  },
+  "required": [
+    "order_id",
+    "client_email",
+    "report_month"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        },
+        {
+          "data.order_id": {
+            "$in": [
+              "{{orders.id}}"
+            ]
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

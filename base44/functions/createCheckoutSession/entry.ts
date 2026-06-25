@@ -312,6 +312,7 @@ Deno.serve(async (req) => {
       total_monthly: totalMonthly,
       payment_status: "pending",
       order_status: "pending_payment",
+      package_key: pkgOffer?.package_key || null,
       selected_package_type: pkgOffer?.package_key || null,
       package_type: pkgOffer?.package_key || null,
       plan_type: packageLabel,
