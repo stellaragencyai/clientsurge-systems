@@ -61,7 +61,7 @@ export default function BeforeAfterComparison() {
                 const Icon = item.icon;
                 return (
                   <li key={item.text} className="flex items-start gap-3">
-                    <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 text-foreground" />
+                    <Icon className="w-4 h-4 flex-shrink-0 mt-0.5 text-foreground/70" />
                     <span className="text-sm text-foreground leading-relaxed">{item.text}</span>
                   </li>
                 );

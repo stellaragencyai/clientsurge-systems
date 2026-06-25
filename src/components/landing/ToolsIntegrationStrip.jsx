@@ -36,7 +36,7 @@ export default function ToolsIntegrationStrip() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="text-xs font-bold uppercase tracking-[0.22em] mb-8 md:mb-10"
-          style={{ color: "rgba(10,22,40,0.42)" }}
+          style={{ color: "rgba(10,22,40,0.65)" }}
         >
           Works With Your Favorite Tools
         </motion.p>
@@ -70,7 +70,7 @@ export default function ToolsIntegrationStrip() {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.55, duration: 0.5 }}
           className="mt-8 text-xs"
-          style={{ color: "rgba(10,22,40,0.38)" }}
+          style={{ color: "rgba(10,22,40,0.6)" }}
         >
           Connects to the tools you already use — no tech stack change required
         </motion.p>

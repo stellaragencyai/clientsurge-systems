@@ -1,5 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw } from "lucide-react";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 const AUTOMATION_CARDS = [
   {
@@ -80,33 +81,20 @@ export default function SixAutomationsSection() {
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Header */}
         <motion.div
-          className="text-center mb-16 md:mb-20"
+          className="mb-16 md:mb-20"
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
           whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
           transition={{ duration: 0.6 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <h2
-            id="six-automations-title"
-            className="font-titles font-black text-white mb-5"
-            style={{ fontSize: "clamp(2rem, 4.8vw, 3.25rem)", lineHeight: 1.15, letterSpacing: "-0.025em" }}
-          >
-            Six Automations. One Lead-Response System.
-          </h2>
-          <p
-            className="mx-auto"
-            style={{
-              maxWidth: "660px",
-              color: "#AEB8C8",
-              fontSize: "clamp(1rem, 1.5vw, 1.08rem)",
-              lineHeight: 1.72,
-            }}
-          >
-            ClientSurge connects the critical pieces of your front-end sales flow so new
-            leads, missed calls, old leads, and booking requests do not sit untouched.
-          </p>
+          <SectionHeader
+            eyebrow="Core Automation Stack"
+            title="Six Automations. One Lead-Response System."
+            subtitle="ClientSurge connects the critical pieces of your front-end sales flow so new leads, missed calls, old leads, and booking requests do not sit untouched."
+            align="center"
+            variant="dark"
+          />
         </motion.div>
 
         {/* Cards Grid */}
@@ -169,7 +157,7 @@ export default function SixAutomationsSection() {
               {/* Description */}
               <p
                 style={{
-                  color: "#AEB8C8",
+                  color: "rgba(255,255,255,0.82)",
                   fontSize: "0.9rem",
                   lineHeight: 1.68,
                 }}

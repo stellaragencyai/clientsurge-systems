@@ -158,14 +158,14 @@ export default function ThreeSystemsSection() {
                   <h3 className="font-titles text-black font-bold mb-3 mt-3" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }}>
                     {pkg.title}
                   </h3>
-                  <p className="text-sm text-foreground/65 mb-8 leading-relaxed">{pkg.description}</p>
+                  <p className="text-sm text-foreground/80 mb-8 leading-relaxed">{pkg.description}</p>
 
                   {/* Feature list — flex-1 pushes price/CTA to bottom */}
                   <ul className="space-y-4 w-full text-left flex-1 mb-8">
                     {pkg.includes.map((item) => (
                       <li key={item} className="flex items-start gap-3">
                         <CheckCircle2 data-checkicon="true" aria-hidden="true" className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent, strokeWidth: 2.5 }} />
-                        <span className="text-sm text-foreground/80 leading-snug">{item}</span>
+                        <span className="text-sm text-foreground/85 leading-snug">{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -176,7 +176,7 @@ export default function ThreeSystemsSection() {
                       <span className="font-extrabold tracking-tight text-black" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)" }}>{pkg.price}</span>
                       <span className="text-sm text-foreground/60 font-semibold">/mo</span>
                     </div>
-                    <p className="text-xs text-foreground/50 mt-2">{pkg.setup}</p>
+                    <p className="text-xs text-foreground/70 mt-2">{pkg.setup}</p>
                   </div>
 
                   {/* CTA at bottom */}
@@ -206,7 +206,7 @@ export default function ThreeSystemsSection() {
 
         {/* Guidance text */}
         <div className="text-center mt-10 mb-2">
-          <p className="text-sm text-foreground/75 max-w-2xl mx-auto leading-relaxed">
+          <p className="text-sm text-foreground/85 max-w-2xl mx-auto leading-relaxed">
             <strong>Not sure which system fits?</strong> Most local service businesses start with Growth — it includes nurture sequences and AI scheduling for the fastest path to more booked appointments.
           </p>
         </div>
@@ -235,7 +235,7 @@ export default function ThreeSystemsSection() {
         </div>
 
         {/* Bottom note */}
-        <p className="text-center text-xs text-foreground/50 mt-6 mx-auto" style={{ maxWidth: "420px" }}>
+        <p className="text-center text-xs text-foreground/70 mt-6 mx-auto" style={{ maxWidth: "420px" }}>
           All packages include done-for-you setup. No long-term contracts. Cancel anytime.
         </p>
       </div>
