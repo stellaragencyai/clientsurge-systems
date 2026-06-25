@@ -81,8 +81,6 @@ export default function LeadsTable() {
       if (filters.scoreMin) f.intelligence_score.$gte = parseInt(filters.scoreMin, 10);
       if (filters.scoreMax) f.intelligence_score.$lte = parseInt(filters.scoreMax, 10);
     }
-    // Exclude quarantined records from the main leads view
-    f.quality_review_status = { $nin: ["quarantine_candidate", "quarantined"] };
     return f;
   }, [filters]);
 
@@ -353,6 +351,7 @@ export default function LeadsTable() {
                   </button>
                 </th>
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">State</th>
+                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Quality</th>
                 <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
                   <button onClick={() => handleSort("created_date")} className="hover:text-primary transition-colors">
                     Created {renderSortIcon("created_date")}
@@ -364,7 +363,7 @@ export default function LeadsTable() {
             <tbody className="divide-y divide-border">
               {loading ? (
                 <tr>
-                  <td colSpan="7" className="px-3 py-6 text-center">
+                  <td colSpan="8" className="px-3 py-6 text-center">
                     <div className="flex items-center justify-center gap-2 text-muted-foreground">
                       <Loader2 className="w-3.5 h-3.5 animate-spin" />
                       <span className="text-xs">Loading leads...</span>
@@ -373,7 +372,7 @@ export default function LeadsTable() {
                 </tr>
               ) : leads.length === 0 ? (
                 <tr>
-                  <td colSpan="7" className="px-3 py-12 text-center text-muted-foreground">
+                  <td colSpan="8" className="px-3 py-12 text-center text-muted-foreground">
                     <p className="text-sm font-medium">No leads found</p>
                     <p className="text-xs mt-1">Try adjusting your filters or check back later.</p>
                   </td>
@@ -407,6 +406,18 @@ export default function LeadsTable() {
                         <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary">
                           {safeStr(lead?.lead_state, "NEW")}
                         </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {(() => {
+                          const qs = lead?.quality_review_status;
+                          if (qs === "quarantine_candidate" || qs === "quarantined") {
+                            return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800" title={lead?.quality_reason || "Flagged for review"}>⚠ Test/Internal</span>;
+                          }
+                          if (qs === "verified_outbound_ready") {
+                            return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">✓ Verified</span>;
+                          }
+                          return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-600">{safeStr(qs, "active")}</span>;
+                        })()}
                       </td>
                       <td className="px-4 py-3 text-muted-foreground text-sm">
                         {safeDate(lead?.created_date)}
