@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
 import { ArrowRight, AlertCircle } from "lucide-react";
+import { base44 } from "@/api/base44Client";
 
 // Canonical product_ids per plan — used as primary checkout input
 const PLAN_PRODUCT_IDS = {
@@ -114,32 +115,23 @@ export default function ProductSignup() {
     setCheckoutLoading(true);
 
     try {
-      // Lazy-load checkout code only after button click
-      const response = await fetch("/api/functions/createCheckoutSession", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          product_ids: PLAN_PRODUCT_IDS[selectedPlanId],
-          package_key: selectedPlanId,
-          customer_name: formData.fullName,
-          customer_email: formData.email,
-          customer_phone: formData.phone,
-          business_name: formData.businessName,
-          success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-          cancel_url: `${window.location.origin}/product-signup?package=${selectedPlanId}`,
-        }),
+      const response = await base44.functions.invoke("createCheckoutSession", {
+        product_ids: PLAN_PRODUCT_IDS[selectedPlanId],
+        package_key: selectedPlanId,
+        selected_package_type: selectedPlanId,
+        customer_name: formData.fullName,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        business_name: formData.businessName,
+        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+        cancel_url: `${window.location.origin}/product-signup?package=${selectedPlanId}`,
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Checkout failed. Please try again.");
-      }
-
-      const { url } = await response.json();
+      const url = response?.data?.url;
       if (url) {
         window.location.href = url;
       } else {
-        throw new Error("No checkout URL returned.");
+        throw new Error(response?.data?.error || "No checkout URL returned.");
       }
     } catch (err) {
       setCheckoutError(err.message || "Something went wrong. Please try again.");
