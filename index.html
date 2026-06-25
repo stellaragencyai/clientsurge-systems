@@ -403,8 +403,6 @@
           "/signup": "/product-signup"
         };
         var noindexPrefixes = [
-          "/login",
-          "/store",
           "/start",
           "/book-demo",
           "/client-portal",
@@ -414,12 +412,7 @@
           "/setup/credentials",
           "/setup/status",
           "/admin",
-          "/admin/leads",
-          "/admin/automations",
-          "/admin/onboarding",
-          "/admin/install-guide",
-          "/admin/ai-sales",
-          "/admin/performance-wars",
+          "/admin/",
           "/dashboard",
           "/admin-settings",
           "/lead-intelligence",
@@ -431,8 +424,13 @@
           "/order-success",
           "/success",
           "/thank-you",
-          "/setup-lookup"
+          "/mission-control",
+          "/saas/admin"
         ];
+        // Filter out admin/internal pages from public directory by checking publicPages map
+        if (!publicPages[canonicalPath]) {
+          robotsContent = "noindex,nofollow";
+        }
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         var canonicalPath = aliases[path] || path;
         var meta = routeMap[canonicalPath] || routeMap["/"];
