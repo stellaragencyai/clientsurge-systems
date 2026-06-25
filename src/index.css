@@ -607,47 +607,16 @@ body {
    Deep-space multi-layered radial gradients
    ============================================ */
 
-/* Nebula base layer — sits behind all sections */
-.nebula-bg {
-  position: relative;
-  isolation: isolate;
-  z-index: 0;
-}
-.nebula-bg::before {
-  display: none !important;
-}
-.nebula-bg > * {
-  position: relative;
-  z-index: 10;
-}
-
-/* Section-specific nebula tints */
-.nebula-faq {
-  background: #ffffff !important;
-}
-
-.nebula-cta {
-  background: #ffffff !important;
-}
-
-.nebula-hero {
-  background: transparent !important;
-}
-
-.nebula-pricing {
-  background: #ffffff !important;
-}
-
-.nebula-testimonials {
-  background: #ffffff !important;
-}
-
+/* FIX #23: Removed defunct nebula-bg overlay system — was conflicting with industry hero images.
+   Industry hero backgrounds now render cleanly without any z-index interference. */
+.nebula-bg,
+.nebula-faq,
+.nebula-cta,
+.nebula-hero,
+.nebula-pricing,
+.nebula-testimonials,
 .nebula-problem {
-  background: #ffffff !important;
-}
-
-body::before {
-  display: none !important;
+  /* Preserved as no-op classes to avoid breaking any JSX that still references them */
 }
 
 /* body > * z-index cap REMOVED — was forcing all content below the
@@ -1074,13 +1043,27 @@ p, li, td, th, label, span {
   padding-bottom: max(16px, env(safe-area-inset-bottom));
 }
 
-/* ============================================
-   PILLAR 1 TASK 82 — Submit button focus ring (accessibility)
-   ============================================ */
-button[type="submit"]:focus-visible {
+/* FIX #24: Accessibility — Unified focus ring for ALL interactive elements */
+button[type="submit"]:focus-visible,
+button:focus-visible,
+a:focus-visible,
+[role="button"]:focus-visible,
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+[tabindex]:focus-visible {
   outline: 2px solid hsl(var(--primary));
   outline-offset: 3px;
-  box-shadow: 0 0 0 4px hsla(var(--primary), 0.2);
+  box-shadow: 0 0 0 4px hsla(199, 100%, 47%, 0.2);
+}
+
+/* Ensure CTA buttons never miss focus ring */
+.cs-btn-primary:focus-visible,
+.hero-primary-cta:focus-visible,
+.cs-footer-cta:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.5);
 }
 
 /* ============================================
