@@ -16,7 +16,8 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
       trackCTA("free_audit_cta_click", location);
       window.location.href = "/contact";
     } else if (primaryAction === "pricing") {
-      scrollToSection("pricing", "compare_packages", location);
+      trackCTA("compare_packages", location);
+      window.location.href = "/product-signup";
     }
   };
 
@@ -24,7 +25,8 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
     if (secondaryAction === "automations") {
       scrollToSection("automations", "view_automations", location);
     } else if (secondaryAction === "pricing") {
-      scrollToSection("pricing", "compare_packages", location);
+      trackCTA("compare_packages", location);
+      window.location.href = "/product-signup";
     }
   };
 
