@@ -121,12 +121,12 @@ export default function ProductSignup() {
         body: JSON.stringify({
           product_ids: PLAN_PRODUCT_IDS[selectedPlanId],
           package_key: selectedPlanId,
-          selected_package_type: selectedPlanId,
-          fullName: formData.fullName,
-          businessName: formData.businessName,
-          email: formData.email,
-          phone: formData.phone,
-          industry: formData.industry,
+          customer_name: formData.fullName,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          business_name: formData.businessName,
+          success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
+          cancel_url: `${window.location.origin}/product-signup?package=${selectedPlanId}`,
         }),
       });
 
