@@ -427,10 +427,6 @@
           "/mission-control",
           "/saas/admin"
         ];
-        // Filter out admin/internal pages from public directory by checking publicPages map
-        if (!publicPages[canonicalPath]) {
-          robotsContent = "noindex,nofollow";
-        }
         var path = window.location.pathname.replace(/\/+$/, "") || "/";
         var canonicalPath = aliases[path] || path;
         var meta = routeMap[canonicalPath] || routeMap["/"];
@@ -438,6 +434,10 @@
         var robotsContent = noindexPrefixes.some(function (prefix) {
           return canonicalPath === prefix || canonicalPath.indexOf(prefix + "/") === 0;
         }) ? "noindex,nofollow" : "index,follow";
+        // Noindex any route not explicitly listed in publicPages (catches admin, internal, and unlisted paths)
+        if (!publicPages[canonicalPath]) {
+          robotsContent = "noindex,nofollow";
+        }
         document.documentElement.setAttribute("data-static-route", meta.key);
         document.title = meta.title;
         var description = document.querySelector('meta[name="description"]');
