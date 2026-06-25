@@ -119,6 +119,8 @@ const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
 const SystemObservabilityDashboard = lazy(() => import("./components/mission-control/SystemObservabilityDashboard"));
 const FunnelOptimizationPage = lazy(() => import("./components/admin/FunnelOptimizationDashboard"));
+const RealEstate = lazy(() => import("./pages/RealEstate"));
+const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 

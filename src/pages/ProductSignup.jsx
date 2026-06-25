@@ -1,297 +1,297 @@
-import { useState } from 'react';
+import { useState, useEffect } from "react";
+import { ArrowRight, AlertCircle } from "lucide-react";
 
-const PLAN_DATA = {
-  starter_system: {
-    key: 'starter_system',
-    shortName: 'Starter',
-    name: 'Starter System',
-    setup: 797,
-    monthly: 497,
-    description: 'Core lead capture, instant response, and missed-call recovery for local service businesses that need the money path working fast.',
+// Inline plan data — no external imports of config
+const PLANS = [
+  {
+    id: "starter_system",
+    name: "Starter",
+    title: "Starter System",
+    price: "$497",
+    setup: "$797 one-time",
+    description: "Essential lead capture and response.",
     features: [
-      'Instant lead response',
-      'Missed-call text-back',
-      'Lead capture handoff',
-      'Basic follow-up workflow',
+      "AI landing page setup",
+      "Lead capture & notification",
+      "Instant lead response SMS",
+      "Missed-call text-back",
+      "CRM handoff",
+      "Basic follow-up",
     ],
   },
-  growth_system: {
-    key: 'growth_system',
-    shortName: 'Growth',
-    name: 'Growth System',
-    setup: 1297,
-    monthly: 997,
-    description: 'Lead response, missed-call recovery, nurture, booking, and review workflows for businesses that want more appointments booked.',
+  {
+    id: "growth_system",
+    name: "Growth",
+    title: "Growth System",
+    price: "$997",
+    setup: "$1,297 one-time",
+    description: "Lead response, booking, and follow-up.",
     features: [
-      'Everything in Starter',
-      '14-day nurture sequence',
-      'AI booking support',
-      'Review request workflow',
+      "Everything in Starter",
+      "AI scheduling agent",
+      "Multi-step SMS/email follow-up",
+      "Booking automation",
+      "Review request system",
+      "Client dashboard",
+    ],
+    recommended: true,
+  },
+  {
+    id: "pro_system",
+    name: "Pro",
+    title: "Pro System",
+    price: "$1,997",
+    setup: "$2,497 one-time",
+    description: "Complete lead recovery and automation.",
+    features: [
+      "Everything in Growth",
+      "Full website design & build",
+      "Lead reactivation system",
+      "Advanced analytics & reporting",
+      "Priority support & setup",
+      "Expanded automation stack",
     ],
   },
-  pro_system: {
-    key: 'pro_system',
-    shortName: 'Pro',
-    name: 'Pro System',
-    setup: 2497,
-    monthly: 1997,
-    description: 'Full-stack lead recovery with voice, booking, review, reactivation, and priority support for serious growth operations.',
-    features: [
-      'Everything in Growth',
-      'AI voice-agent workflow',
-      'Lead reactivation campaign',
-      'Priority implementation support',
-    ],
-  },
-};
-
-const PLAN_ALIASES = {
-  starter: 'starter_system',
-  growth: 'growth_system',
-  pro: 'pro_system',
-  elite: 'pro_system',
-  elite_system: 'pro_system',
-};
-
-const SUPPORT_EMAIL = 'support@clientsurgesystems.com';
-const SUPPORT_PHONE = '(602) 584-3227';
-
-function getSelectedPlanKey() {
-  if (typeof window === 'undefined') return 'starter_system';
-
-  try {
-    const params = new URLSearchParams(window.location.search || '');
-    const raw = String(params.get('package') || params.get('plan') || '').toLowerCase();
-    if (PLAN_DATA[raw]) return raw;
-    if (PLAN_ALIASES[raw]) return PLAN_ALIASES[raw];
-  } catch (_) {
-    return 'starter_system';
-  }
-
-  return 'starter_system';
-}
-
-function money(amount) {
-  return `$${Number(amount || 0).toLocaleString()}`;
-}
-
-function normalizePhone(value) {
-  const digits = String(value || '').replace(/\D/g, '').slice(0, 10);
-  if (digits.length <= 3) return digits;
-  if (digits.length <= 6) return `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
-  return `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
-}
+];
 
 export default function ProductSignup() {
-  const [selectedKey, setSelectedKey] = useState(getSelectedPlanKey);
-  const [form, setForm] = useState({
-    name: '',
-    email: '',
-    business: '',
-    phone: '',
+  // Get ?package= parameter
+  const [selectedPlanId, setSelectedPlanId] = useState(null);
+  const [formData, setFormData] = useState({
+    fullName: "",
+    businessName: "",
+    email: "",
+    phone: "",
+    industry: "",
   });
-  const [loading, setLoading] = useState(false);
-  const [message, setMessage] = useState(null);
+  const [checkoutLoading, setCheckoutLoading] = useState(false);
+  const [checkoutError, setCheckoutError] = useState(null);
 
-  const selectedPlan = PLAN_DATA[selectedKey] || PLAN_DATA.starter_system;
-
-  const updateForm = (field, value) => {
-    setForm((current) => ({ ...current, [field]: value }));
-  };
-
-  const selectPlan = (key) => {
-    const safeKey = PLAN_DATA[key] ? key : 'starter_system';
-    setSelectedKey(safeKey);
-    if (typeof window !== 'undefined') {
-      const nextUrl = `/product-signup?package=${safeKey}`;
-      window.history.replaceState({}, '', nextUrl);
+  useEffect(() => {
+    // Parse URL param
+    const params = new URLSearchParams(window.location.search);
+    const pkg = params.get("package");
+    if (pkg && PLANS.some(p => p.id === pkg)) {
+      setSelectedPlanId(pkg);
+    } else {
+      // Default to Growth
+      setSelectedPlanId("growth_system");
     }
+  }, []);
+
+  const selectedPlan = PLANS.find(p => p.id === selectedPlanId);
+
+  const handleFieldChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }));
   };
 
   const handleCheckout = async () => {
-    if (!form.name.trim() || !form.email.trim() || !form.business.trim()) {
-      setMessage({
-        type: 'error',
-        text: 'Fill in your name, email, and business name before checkout.',
-      });
+    setCheckoutError(null);
+    
+    // Validate form
+    if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !selectedPlanId) {
+      setCheckoutError("Please fill in all required fields.");
       return;
     }
 
-    setLoading(true);
-    setMessage(null);
+    setCheckoutLoading(true);
 
     try {
-      const { base44 } = await import('@/api/base44Client');
-      const result = await base44.functions.invoke('createCheckoutSession', {
-        package_key: selectedPlan.key,
-        selected_package_type: selectedPlan.key,
-        customer_name: form.name.trim(),
-        customer_email: form.email.trim(),
-        customer_phone: form.phone.trim(),
-        business_name: form.business.trim(),
-        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/product-signup?package=${selectedPlan.key}`,
+      // Lazy-load checkout code only after button click
+      const response = await fetch("/api/functions/createCheckoutSession", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          package: selectedPlanId,
+          fullName: formData.fullName,
+          businessName: formData.businessName,
+          email: formData.email,
+          phone: formData.phone,
+          industry: formData.industry,
+        }),
       });
 
-      const checkoutUrl = result?.data?.url || result?.url;
-      if (checkoutUrl) {
-        window.location.href = checkoutUrl;
-        return;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Checkout failed. Please try again.");
       }
 
-      throw new Error(result?.data?.error || 'Checkout did not return a URL.');
-    } catch (error) {
-      setMessage({
-        type: 'error',
-        text: `Checkout could not start safely. Email ${SUPPORT_EMAIL} or call ${SUPPORT_PHONE} and mention ${selectedPlan.name}.`,
-      });
-    } finally {
-      setLoading(false);
+      const { url } = await response.json();
+      if (url) {
+        window.location.href = url;
+      } else {
+        throw new Error("No checkout URL returned.");
+      }
+    } catch (err) {
+      setCheckoutError(err.message || "Something went wrong. Please try again.");
+      setCheckoutLoading(false);
     }
   };
 
   return (
-    <main className="min-h-screen bg-slate-950 text-white">
-      <section className="mx-auto max-w-6xl px-5 py-8 md:px-8 md:py-12">
-        <header className="mb-10 flex flex-col gap-4 border-b border-white/10 pb-6 md:flex-row md:items-center md:justify-between">
-          <a href="/" className="text-lg font-black tracking-tight text-white no-underline">
-            ClientSurge Systems
-          </a>
-          <nav className="flex flex-wrap gap-4 text-sm text-slate-300">
-            <a className="hover:text-white" href="/pricing">Pricing</a>
-            <a className="hover:text-white" href="/store">Store</a>
-            <a className="hover:text-white" href="/industries">Industries</a>
-            <a className="hover:text-white" href="/contact">Contact</a>
-          </nav>
-        </header>
-
-        <div className="mb-8 max-w-3xl">
-          <p className="mb-3 text-sm font-bold uppercase tracking-[0.25em] text-cyan-300">Product Signup</p>
-          <h1 className="mb-4 text-4xl font-black tracking-tight md:text-5xl">
-            Choose your AI growth system and continue to checkout.
-          </h1>
-          <p className="text-lg leading-8 text-slate-300">
-            This page is intentionally self-contained so buyers can reach the package selection flow even if optional marketing data is unavailable.
-          </p>
+    <div className="min-h-screen bg-white">
+      {/* Simple header */}
+      <div className="border-b border-gray-200">
+        <div className="max-w-6xl mx-auto px-4 py-6">
+          <h1 className="text-2xl font-bold text-black">Choose Your Plan</h1>
+          <p className="text-gray-600 mt-1">Select the system that fits your needs.</p>
         </div>
+      </div>
 
-        <section className="mb-8 grid gap-4 md:grid-cols-3">
-          {Object.values(PLAN_DATA).map((plan) => {
-            const active = plan.key === selectedPlan.key;
-            return (
+      {/* Main content */}
+      <div className="max-w-6xl mx-auto px-4 py-12">
+        <div className="grid md:grid-cols-2 gap-12 items-start">
+          {/* Left: Plan selection cards */}
+          <div className="space-y-4">
+            <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide mb-6">
+              Select a plan
+            </p>
+            {PLANS.map((plan) => (
               <button
-                key={plan.key}
-                type="button"
-                onClick={() => selectPlan(plan.key)}
-                className={`rounded-2xl border p-5 text-left transition ${active ? 'border-cyan-300 bg-cyan-300/10 shadow-lg shadow-cyan-950/40' : 'border-white/10 bg-white/5 hover:border-white/30'}`}
+                key={plan.id}
+                onClick={() => {
+                  setSelectedPlanId(plan.id);
+                  window.history.replaceState(null, "", `?package=${plan.id}`);
+                }}
+                className="w-full text-left p-6 rounded-lg border-2 transition-all"
+                style={{
+                  borderColor: selectedPlanId === plan.id ? "#00AEEF" : "#e5e7eb",
+                  background: selectedPlanId === plan.id ? "#f0f9ff" : "#ffffff",
+                }}
               >
-                <div className="mb-2 flex items-center justify-between gap-3">
-                  <h2 className="text-xl font-black text-white">{plan.name}</h2>
-                  {active && <span className="rounded-full bg-cyan-300 px-3 py-1 text-xs font-black text-slate-950">Selected</span>}
+                {plan.recommended && (
+                  <span className="inline-block mb-2 px-3 py-1 text-xs font-bold bg-green-100 text-green-700 rounded-full">
+                    Recommended
+                  </span>
+                )}
+                <h3 className="font-bold text-lg text-black">{plan.title}</h3>
+                <p className="text-sm text-gray-600 mt-1">{plan.description}</p>
+                <div className="mt-4">
+                  <p className="text-2xl font-bold text-black">{plan.price}</p>
+                  <p className="text-xs text-gray-500 mt-1">{plan.setup} setup</p>
                 </div>
-                <p className="mb-4 text-sm leading-6 text-slate-300">{plan.description}</p>
-                <div className="text-2xl font-black text-white">{money(plan.monthly)}<span className="text-sm font-semibold text-slate-400">/mo</span></div>
-                <div className="text-sm text-slate-400">{money(plan.setup)} setup</div>
               </button>
-            );
-          })}
-        </section>
-
-        <section className="grid gap-6 lg:grid-cols-[1fr_0.9fr]">
-          <div className="rounded-3xl border border-white/10 bg-white/5 p-6 md:p-8">
-            <h2 className="mb-4 text-2xl font-black">{selectedPlan.name}</h2>
-            <p className="mb-6 text-slate-300">{selectedPlan.description}</p>
-            <ul className="grid gap-3 md:grid-cols-2">
-              {selectedPlan.features.map((feature) => (
-                <li key={feature} className="rounded-xl border border-white/10 bg-slate-900/70 p-4 text-sm text-slate-200">
-                  <span className="mr-2 text-cyan-300">✓</span>{feature}
-                </li>
-              ))}
-            </ul>
-            <div className="mt-6 rounded-2xl border border-cyan-300/30 bg-cyan-300/10 p-5">
-              <div className="flex justify-between gap-4 text-sm text-slate-300">
-                <span>One-time setup</span>
-                <strong className="text-white">{money(selectedPlan.setup)}</strong>
-              </div>
-              <div className="mt-2 flex justify-between gap-4 text-sm text-slate-300">
-                <span>Monthly management</span>
-                <strong className="text-white">{money(selectedPlan.monthly)}/mo</strong>
-              </div>
-            </div>
+            ))}
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-white p-6 text-slate-950 shadow-2xl md:p-8">
-            <h2 className="mb-2 text-2xl font-black">Buyer details</h2>
-            <p className="mb-6 text-sm leading-6 text-slate-600">Enter the business contact information for checkout and setup handoff.</p>
+          {/* Right: Selected plan summary + form */}
+          {selectedPlan && (
+            <div className="space-y-8">
+              {/* Plan summary */}
+              <div className="p-6 bg-gray-50 rounded-lg border border-gray-200">
+                <h4 className="font-bold text-black mb-4">What's included:</h4>
+                <ul className="space-y-2">
+                  {selectedPlan.features.map((feature) => (
+                    <li key={feature} className="text-sm text-gray-700 flex items-start gap-2">
+                      <span className="text-green-600 font-bold mt-0.5">✓</span>
+                      {feature}
+                    </li>
+                  ))}
+                </ul>
+              </div>
 
-            <div className="space-y-4">
-              <label className="block text-sm font-bold">
-                Full name *
-                <input
-                  className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500"
-                  value={form.name}
-                  onChange={(event) => updateForm('name', event.target.value)}
-                  autoComplete="name"
-                  placeholder="Jane Smith"
-                />
-              </label>
-              <label className="block text-sm font-bold">
-                Email *
-                <input
-                  className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500"
-                  value={form.email}
-                  onChange={(event) => updateForm('email', event.target.value)}
-                  autoComplete="email"
-                  placeholder="owner@business.com"
-                  type="email"
-                />
-              </label>
-              <label className="block text-sm font-bold">
-                Business name *
-                <input
-                  className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500"
-                  value={form.business}
-                  onChange={(event) => updateForm('business', event.target.value)}
-                  autoComplete="organization"
-                  placeholder="ABC Roofing Co."
-                />
-              </label>
-              <label className="block text-sm font-bold">
-                Phone
-                <input
-                  className="mt-1 w-full rounded-xl border border-slate-300 px-4 py-3 text-base outline-none focus:border-cyan-500"
-                  value={form.phone}
-                  onChange={(event) => updateForm('phone', normalizePhone(event.target.value))}
-                  autoComplete="tel"
-                  placeholder="(602) 555-0100"
-                  type="tel"
-                />
-              </label>
-            </div>
+              {/* Form */}
+              <div className="space-y-4">
+                <p className="text-sm font-semibold text-gray-700 uppercase tracking-wide">
+                  Your information
+                </p>
 
-            <button
-              type="button"
-              onClick={handleCheckout}
-              disabled={loading}
-              className="mt-6 w-full rounded-xl bg-slate-950 px-5 py-4 text-base font-black text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-60"
-            >
-              {loading ? 'Starting checkout…' : `Continue to Checkout — ${selectedPlan.shortName}`}
-            </button>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Full Name *
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="John Doe"
+                    value={formData.fullName}
+                    onChange={(e) => handleFieldChange("fullName", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                  />
+                </div>
 
-            {message && (
-              <div className={`mt-4 rounded-xl border p-4 text-sm ${message.type === 'error' ? 'border-red-200 bg-red-50 text-red-800' : 'border-green-200 bg-green-50 text-green-800'}`}>
-                {message.text}
-                <div className="mt-2 flex flex-col gap-1 font-bold">
-                  <a href={`mailto:${SUPPORT_EMAIL}`}>{SUPPORT_EMAIL}</a>
-                  <a href="tel:+16025843227">{SUPPORT_PHONE}</a>
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Business Name
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="Your Business"
+                    value={formData.businessName}
+                    onChange={(e) => handleFieldChange("businessName", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Email *
+                  </label>
+                  <input
+                    type="email"
+                    placeholder="you@example.com"
+                    value={formData.email}
+                    onChange={(e) => handleFieldChange("email", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Phone *
+                  </label>
+                  <input
+                    type="tel"
+                    placeholder="+1 (555) 123-4567"
+                    value={formData.phone}
+                    onChange={(e) => handleFieldChange("phone", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-sm font-semibold text-gray-700 mb-1">
+                    Industry
+                  </label>
+                  <input
+                    type="text"
+                    placeholder="e.g., HVAC, Roofing, Dental"
+                    value={formData.industry}
+                    onChange={(e) => handleFieldChange("industry", e.target.value)}
+                    className="w-full px-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-black"
+                  />
                 </div>
               </div>
-            )}
 
-            <p className="mt-4 text-center text-xs text-slate-500">Secure checkout powered by Stripe.</p>
-          </div>
-        </section>
-      </section>
-    </main>
+              {/* Error message */}
+              {checkoutError && (
+                <div className="p-4 bg-red-50 border border-red-200 rounded-lg flex gap-3">
+                  <AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-sm text-red-700">{checkoutError}</p>
+                </div>
+              )}
+
+              {/* Checkout button */}
+              <button
+                onClick={handleCheckout}
+                disabled={checkoutLoading || !selectedPlanId}
+                className="w-full px-6 py-3 rounded-lg font-bold text-white transition-all flex items-center justify-center gap-2"
+                style={{
+                  background: checkoutLoading ? "#999" : "#00AEEF",
+                  opacity: checkoutLoading || !selectedPlanId ? 0.7 : 1,
+                  cursor: checkoutLoading || !selectedPlanId ? "not-allowed" : "pointer",
+                }}
+              >
+                {checkoutLoading ? "Processing..." : "Continue to Checkout"}
+                {!checkoutLoading && <ArrowRight className="w-4 h-4" />}
+              </button>
+
+              <p className="text-xs text-gray-500 text-center">
+                Secure Stripe checkout. No long-term contract. Month-to-month billing.
+              </p>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
   );
 }
