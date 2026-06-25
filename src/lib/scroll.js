@@ -45,10 +45,15 @@ export function scrollToTop() {
 }
 
 /**
- * Re-assert the top position across the browser's route/layout settling window.
+ * FIX #16: Re-assert the top position across the browser's route/layout settling window.
+ * Clears hash first to prevent browser auto-restoring scroll to anchors.
  * Returns a cleanup function for React effects.
  */
 export function forceScrollToTop({ delays = [0, 50, 150, 350, 700] } = {}) {
+  // Clear hash without triggering a navigation so browser won't re-scroll to anchor
+  if (typeof window !== "undefined" && window.location.hash) {
+    window.history.replaceState(null, "", window.location.pathname + window.location.search);
+  }
   if (typeof window === "undefined" || typeof document === "undefined") {
     return () => {};
   }

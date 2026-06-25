@@ -106,6 +106,12 @@ export default function ProductSignup() {
   const handleCheckout = async () => {
     setCheckoutError(null);
     
+    // FIX #5: Block checkout in iframe/preview context
+    if (window.self !== window.top || window.location.hostname.includes("preview-sandbox")) {
+      setCheckoutError("Checkout is not available in preview mode. Please publish your app to accept payments.");
+      return;
+    }
+    
     // Validate form
     if (!formData.fullName.trim() || !formData.email.trim() || !formData.phone.trim() || !selectedPlanId) {
       setCheckoutError("Please fill in all required fields.");
