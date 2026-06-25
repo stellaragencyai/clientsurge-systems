@@ -19,6 +19,7 @@ import WhatHappensAfter from "../components/landing/WhatHappensAfter";
 import BeforeAfterComparison from "../components/landing/BeforeAfterComparison";
 import CTABand from "../components/landing/CTABand";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
+import ToolsIntegrationStrip from "../components/landing/ToolsIntegrationStrip.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
@@ -119,6 +120,9 @@ export default function Home() {
 
         {/* 1. Cinematic Hero */}
         <CinematicHero />
+
+        {/* 1a. Tools Integration Strip */}
+        <ToolsIntegrationStrip />
 
         {/* 1b. Six Automations Premium Section */}
         <SixAutomationsSection />

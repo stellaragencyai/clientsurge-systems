@@ -1,7 +1,6 @@
 import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
-import HeroTrustLogos from "./HeroTrustLogos.jsx";
 
 const AUTOMATION_PILLS = [
   { label: "Lead Capture", icon: "📥" },
@@ -156,18 +155,18 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
             transition={{ duration: 0.5, delay: 0.08 }}
             style={{
               fontFamily: "'Montserrat', sans-serif",
-              fontSize: "clamp(2.2rem, 6.8vw, 4rem)",
+              fontSize: "clamp(2.6rem, 7.5vw, 4.75rem)",
               fontWeight: 900,
-              lineHeight: 1.12,
-              letterSpacing: "-0.035em",
+              lineHeight: 1.07,
+              letterSpacing: "-0.04em",
               margin: "0 0 24px 0",
               textWrap: "balance",
-              textShadow: "0 2px 20px rgba(0, 0, 0, 0.5)",
-              maxWidth: "900px",
+              textShadow: "0 2px 24px rgba(0, 0, 0, 0.6)",
+              maxWidth: "960px",
             }}
           >
-            <span style={{ color: "#FFFFFF" }}>You're Already Getting Leads.<br /></span>
-            <span style={{ color: "#00AEEF", textShadow: "0 0 20px rgba(0,174,239,0.3)" }}>Let's Convert Every One.</span>
+            <span style={{ display: "block", color: "#FFFFFF" }}>You're Already Getting Leads.</span>
+            <span style={{ display: "block", color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.45), 0 2px 12px rgba(0,0,0,0.4)" }}>Let's Convert Every One.</span>
           </motion.h1>
 
           {/* SUBCOPY */}
@@ -332,8 +331,6 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
             ))}
           </motion.div>
 
-          {/* Trust Logos */}
-          <HeroTrustLogos />
           </div>
           {/* End glass card */}
         </div>

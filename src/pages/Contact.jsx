@@ -46,8 +46,6 @@ function Field({ label, required, error, children }) {
   );
 }
 
-const textInputClass = "w-full bg-transparent border border-[rgba(53,189,241,0.25)] rounded-xl px-4 py-3 text-base text-white placeholder:text-[#7F8DA3] outline-none transition-all duration-300 focus:border-[#35BDF1] focus:shadow-[0_0_0_4px_rgba(53,189,241,0.12)] resize-none";
-
 export default function Contact() {
    const [form, setForm] = useState({
       full_name: "",
@@ -142,8 +140,8 @@ export default function Contact() {
         </aside>
 
         {/* ── RIGHT: Form ── */}
-        <main className="flex-1 bg-background flex flex-col justify-center px-6 py-16 sm:px-10 md:px-12 lg:px-16 xl:px-20 overflow-y-auto">
-          <div className="w-full max-w-2xl mx-auto">
+        <main className="flex-1 bg-background flex flex-col justify-center px-6 py-12 pt-[calc(var(--cs-nav-height)+2rem)] lg:pt-12 sm:px-10 md:px-12 lg:px-16 xl:px-20 overflow-y-auto">
+          <div className="w-full max-w-xl mx-auto lg:max-w-2xl">
 
             {success ? (
               /* ── Success state ── */
@@ -171,7 +169,7 @@ export default function Contact() {
               </motion.div>
             ) : (
               /* ── Form ── */
-              <form onSubmit={handleSubmit} noValidate className="space-y-10">
+              <form onSubmit={handleSubmit} noValidate className="space-y-6">
 
                 {/* HEADER */}
                 <div>
@@ -180,18 +178,17 @@ export default function Contact() {
                     Get In Touch
                   </p>
 
-                  {/* #5/#6 — Bold heading with accent bar, using font-titles class */}
-                  <div className="flex items-center gap-5 mb-5">
-                    <div className="w-1.5 h-14 bg-primary rounded-sm flex-shrink-0" />
-                    <h1 className="text-5xl md:text-6xl font-titles font-black text-foreground leading-none tracking-tight">CONTACT</h1>
+                  {/* Section header — consistent with rest of site */}
+                  <div className="flex items-center gap-4 mb-5">
+                    <div className="w-1.5 rounded-full flex-shrink-0" style={{ height: "52px", background: "#00AEEF", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
+                    <h1 className="font-titles font-black text-foreground leading-none tracking-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)" }}>Contact Us</h1>
                   </div>
 
-                  {/* #11 — Consistent leading with global body text */}
-                  <p className="text-base font-semibold text-foreground mb-1 leading-relaxed">
-                    We'd love to hear from you!
+                  <p className="text-base font-medium text-foreground mb-1 leading-relaxed">
+                    We'd love to hear from you.
                   </p>
                   <p className="text-sm text-muted-foreground leading-relaxed">
-                    Send us a message and we'll get right back in touch.
+                    Send a message and we'll respond within one business day.
                   </p>
                 </div>
 
@@ -265,7 +262,7 @@ export default function Contact() {
                     onChange={handleChange}
                     rows={5}
                     aria-invalid={Boolean(errors.message)}
-                    className="w-full bg-transparent border border-[rgba(53,189,241,0.25)] rounded-xl px-4 py-3 text-base text-white placeholder:text-[#7F8DA3] outline-none transition-all duration-300 focus:border-[#35BDF1] focus:shadow-[0_0_0_4px_rgba(53,189,241,0.12)] resize-none"
+                    className="w-full bg-background border border-border rounded-xl px-4 py-3 text-base text-foreground placeholder:text-muted-foreground outline-none transition-all duration-300 focus:border-primary focus:shadow-[0_0_0_4px_hsla(199,100%,47%,0.12)] resize-none"
                   />
                   {/* Character counter */}
                   <p className="text-right text-xs text-muted-foreground mt-1.5">
@@ -273,43 +270,54 @@ export default function Contact() {
                   </p>
                 </Field>
 
-                {/* #4/#19 — Unified CTA button with disabled feedback */}
+                {/* Submit button */}
                 <div className="pt-2">
                   <button
                     type="submit"
                     disabled={loading}
-                    className="cs-btn-primary disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ minHeight: "unset", minWidth: "unset" }}
+                    className="cs-btn-primary disabled:opacity-60 disabled:cursor-not-allowed w-full sm:w-auto"
+                    style={{ minHeight: "52px", paddingLeft: "2rem", paddingRight: "2rem" }}
                   >
                     {loading
                       ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</>
                       : <><span>Send Message</span><ArrowRight className="w-4 h-4" /></>
                     }
                   </button>
+                  <p className="mt-3 text-xs text-muted-foreground">
+                    No spam, no pressure — just a thoughtful reply from our team.
+                  </p>
                 </div>
-
-                <p className="text-xs text-muted-foreground">
-                  No spam, no pressure — just a thoughtful reply from our team.
-                </p>
               </form>
             )}
           </div>
         </main>
       </div>
 
-      {/* #7/#12 — Mobile contact info with safe-area awareness */}
-      <div className="lg:hidden bg-[#0A1628] text-white px-6 py-10 space-y-5 safe-bottom">
+      {/* Mobile contact info */}
+      <div
+        className="lg:hidden px-6 py-10 space-y-4 safe-bottom"
+        style={{ background: "linear-gradient(135deg, #0A1628, #0d1e38)", borderTop: "1px solid rgba(0,174,239,0.15)" }}
+      >
+        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-5" style={{ color: "rgba(0,174,239,0.8)" }}>
+          Get In Touch
+        </p>
         <div className="flex items-center gap-3">
-          <Phone className="w-4 h-4 text-primary flex-shrink-0" />
-          <a href="tel:+16025843227" className="text-sm text-slate-200">(602) 584-3227</a>
+          <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.2)" }}>
+            <Phone className="w-4 h-4" style={{ color: "#00AEEF" }} />
+          </span>
+          <a href="tel:+16025843227" className="text-sm font-medium" style={{ color: "#e2e8f0" }}>(602) 584-3227</a>
         </div>
         <div className="flex items-center gap-3">
-          <Mail className="w-4 h-4 text-primary flex-shrink-0" />
-          <a href="mailto:support@clientsurgesystems.com" className="text-sm text-slate-200 break-all">support@clientsurgesystems.com</a>
+          <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.2)" }}>
+            <Mail className="w-4 h-4" style={{ color: "#00AEEF" }} />
+          </span>
+          <a href="mailto:support@clientsurgesystems.com" className="text-sm font-medium break-all" style={{ color: "#e2e8f0" }}>support@clientsurgesystems.com</a>
         </div>
         <div className="flex items-center gap-3">
-          <MapPin className="w-4 h-4 text-primary flex-shrink-0" />
-          <span className="text-sm text-slate-200">Phoenix, Arizona</span>
+          <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.2)" }}>
+            <MapPin className="w-4 h-4" style={{ color: "#00AEEF" }} />
+          </span>
+          <span className="text-sm font-medium" style={{ color: "#e2e8f0" }}>Phoenix, Arizona</span>
         </div>
       </div>
 

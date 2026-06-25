@@ -105,12 +105,12 @@ export default function ThreeSystemsSection() {
         </div>
 
         {/* Package cards */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-5 items-stretch">
           {PACKAGES.map((pkg, idx) => (
             <motion.div
               key={pkg.name}
-              className="relative"
-              style={{ paddingTop: pkg.highlight ? "28px" : 0 }}
+              className="relative flex flex-col"
+              style={{ paddingTop: pkg.highlight ? "32px" : 0 }}
               initial={{ opacity: 0, y: 40 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, amount: 0.2 }}
@@ -120,64 +120,83 @@ export default function ThreeSystemsSection() {
               {pkg.highlight && (
                 <div className="absolute top-0 left-1/2 -translate-x-1/2 z-10">
                   <span
-                    className="inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-xs font-bold"
+                    className="inline-flex items-center gap-1.5 rounded-full px-5 py-2 text-xs font-bold"
                     style={{
-                      background: "rgba(255,255,255,0.95)",
-                      border: "1px solid rgba(0,174,239,0.25)",
-                      color: "#006BB0",
-                      boxShadow: "0 2px 12px rgba(0,174,239,0.18), 0 0 0 2px rgba(0,174,239,0.06)",
+                      background: "linear-gradient(135deg, #0079c1, #005691)",
+                      color: "#ffffff",
+                      boxShadow: "0 4px 18px rgba(0,121,193,0.45)",
                     }}
                   >
-                    <Sparkles className="w-3 h-3" style={{ color: "#00AEEF" }} />
+                    <Sparkles className="w-3 h-3" />
                     Recommended
                   </span>
                 </div>
               )}
 
               <div
-                className="flex flex-col rounded-xl overflow-hidden transition-all duration-300 hover:-translate-y-1"
+                className="flex flex-col flex-1 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1.5"
                 style={{
-                  background: "#ffffff",
-                  border: `1.5px solid ${pkg.accentBorder}`,
+                  background: pkg.highlight
+                    ? "linear-gradient(160deg, #f0f9ff 0%, #ffffff 50%)"
+                    : "#ffffff",
+                  border: pkg.highlight
+                    ? "2px solid rgba(0,174,239,0.55)"
+                    : `1.5px solid ${pkg.accentBorder}`,
                   boxShadow: pkg.highlight
-                    ? `0 12px 40px ${pkg.accentGlow}, 0 0 0 1px ${pkg.accentGlow}, 0 2px 8px rgba(0,0,0,0.05)`
-                    : "0 4px 16px rgba(0,0,0,0.06)",
-                  height: "100%",
+                    ? `0 20px 60px rgba(0,174,239,0.22), 0 0 0 1px rgba(0,174,239,0.1), 0 4px 12px rgba(0,0,0,0.06)`
+                    : "0 6px 24px rgba(0,0,0,0.07), 0 1px 4px rgba(0,0,0,0.04)",
+                  minHeight: "580px",
                 }}
-               >
-                <div className="p-8 md:p-10 flex flex-col flex-1 items-center text-center">
+              >
+                {/* Top accent bar for highlighted card */}
+                {pkg.highlight && (
+                  <div style={{ height: "4px", background: "linear-gradient(90deg, #0079c1, #00AEEF)", flexShrink: 0 }} />
+                )}
+
+                <div className="p-9 md:p-11 flex flex-col flex-1 items-center text-center">
                   {/* Title + subtitle */}
-                  <h3 className="font-titles text-black text-xl md:text-2xl font-bold mb-2 mt-4">
+                  <h3 className="font-titles text-black font-bold mb-3 mt-3" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }}>
                     {pkg.title}
                   </h3>
-                  <p className="text-sm text-foreground/70 mb-7">{pkg.description}</p>
+                  <p className="text-sm text-foreground/65 mb-8 leading-relaxed">{pkg.description}</p>
 
-                  {/* Feature list */}
-                  <ul className="space-y-3.5 w-full text-left flex-1 mb-6">
+                  {/* Feature list — flex-1 pushes price/CTA to bottom */}
+                  <ul className="space-y-4 w-full text-left flex-1 mb-8">
                     {pkg.includes.map((item) => (
-                      <li key={item} className="flex items-start gap-2.5">
+                      <li key={item} className="flex items-start gap-3">
                         <CheckCircle2 data-checkicon="true" aria-hidden="true" className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent, strokeWidth: 2.5 }} />
-                        <span className="text-sm text-foreground leading-snug">{item}</span>
+                        <span className="text-sm text-foreground/80 leading-snug">{item}</span>
                       </li>
                     ))}
                   </ul>
 
                   {/* Price */}
-                  <div className="mb-6 w-full">
+                  <div className="mb-7 w-full pt-4" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="text-3xl md:text-4xl font-extrabold tracking-tight text-black">{pkg.price}</span>
-                      <span className="text-sm text-foreground/70 font-semibold">/mo</span>
+                      <span className="font-extrabold tracking-tight text-black" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)" }}>{pkg.price}</span>
+                      <span className="text-sm text-foreground/60 font-semibold">/mo</span>
                     </div>
-                    <p className="text-xs text-foreground/60 mt-1.5">{pkg.setup}</p>
+                    <p className="text-xs text-foreground/50 mt-2">{pkg.setup}</p>
                   </div>
 
                   {/* CTA at bottom */}
                   <Link
                     to={pkg.href}
                     onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
-                    className="cs-btn-primary w-full text-center"
+                    className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200"
+                    style={pkg.highlight ? {
+                      background: "linear-gradient(90deg, #0079c1, #005691)",
+                      color: "#fff",
+                      padding: "14px 24px",
+                      boxShadow: "0 4px 18px rgba(0,121,193,0.4)",
+                    } : {
+                      background: "transparent",
+                      color: "#0079c1",
+                      padding: "13px 24px",
+                      border: "1.5px solid rgba(0,174,239,0.35)",
+                    }}
                   >
-                    {pkg.cta} <ArrowRight className="w-4 h-4 inline ml-1" />
+                    {pkg.cta} <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
               </div>
@@ -216,7 +235,7 @@ export default function ThreeSystemsSection() {
         </div>
 
         {/* Bottom note */}
-        <p className="text-center text-xs text-foreground/60 mt-8">
+        <p className="text-center text-xs text-foreground/50 mt-6 mx-auto" style={{ maxWidth: "420px" }}>
           All packages include done-for-you setup. No long-term contracts. Cancel anytime.
         </p>
       </div>

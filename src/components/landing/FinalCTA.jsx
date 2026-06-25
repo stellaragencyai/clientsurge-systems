@@ -10,11 +10,19 @@ export default function FinalCTA() {
         <StardustOverlay seed={13} opacity={0.6} />
 
         <div className="relative z-10 max-w-3xl mx-auto flex flex-col items-center text-center">
-          <SectionHeader
-            eyebrow="Ready to Automate Your Lead Flow?"
-            title="Build Your AI Automation Stack"
-            subtitle="Select the automations your business needs. We handle setup, provider connections, and go-live in 5–7 business days — your stack runs 24/7."
-          />
+          {/* Custom tight header — keeps title on one row, bar flush to title */}
+          <div className="cs-section-header cs-section-header--center" style={{ marginBottom: "0" }}>
+            <p className="cs-section-eyebrow">Ready to Automate Your Lead Flow?</p>
+            <div className="cs-section-title-row justify-center" style={{ gap: "10px" }}>
+              <span className="cs-section-bar" aria-hidden="true" />
+              <h2 className="cs-section-title" style={{ whiteSpace: "nowrap", fontSize: "clamp(1.5rem, 3.8vw, 2.5rem)" }}>
+                Build Your AI Automation Stack
+              </h2>
+            </div>
+            <p className="cs-section-subtitle mx-auto">
+              Select the automations your business needs. We handle setup, provider connections, and go-live in 5–7 business days — your stack runs 24/7.
+            </p>
+          </div>
 
           {/* How the demo works - 3 steps */}
           <div className="mt-12 mb-2 grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-2xl text-center">

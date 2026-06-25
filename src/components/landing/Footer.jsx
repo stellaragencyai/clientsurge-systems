@@ -206,6 +206,18 @@ export default function Footer() {
           padding: 34px 0;
         }
 
+        /* Force all text inside the blue system section to white for contrast */
+        .cs-footer-system,
+        .cs-footer-system h3,
+        .cs-footer-system p,
+        .cs-footer-system span,
+        .cs-footer-system a,
+        .cs-footer-system strong,
+        .cs-footer-system li {
+          color: #ffffff !important;
+          -webkit-text-fill-color: #ffffff !important;
+        }
+
         .cs-footer-system-header {
           display: grid;
           grid-template-columns: minmax(0, 1fr) auto;
