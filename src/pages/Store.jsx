@@ -916,14 +916,14 @@ function StoreInner() {
               </p>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
                 {[
-                  { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false, href: "/product-signup?package=starter_system" },
-                  { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended", href: "/product-signup?package=growth_system" },
-                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false, href: "/product-signup?package=pro_system" },
+                  { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false },
+                  { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
+                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
                 ].map((pkg) => (
-                  <a
+                  <button
+                    type="button"
                     key={pkg.key}
-                    href={pkg.href}
-                    onClick={() => trackCTA(`store_package_${pkg.key}`, "store")}
+                    onClick={() => { trackCTA(`store_package_${pkg.key}`, "store"); navigate(`/product-signup?package=${pkg.key}`); }}
                     style={{
                       display: "flex",
                       flexDirection: "column",
@@ -932,11 +932,13 @@ function StoreInner() {
                       border: pkg.highlight ? "1.5px solid rgba(0,174,239,0.6)" : "1.5px solid rgba(0,174,239,0.18)",
                       background: pkg.highlight ? "rgba(0,174,239,0.08)" : "#ffffff",
                       padding: "16px",
-                      textDecoration: "none",
                       boxShadow: pkg.highlight ? "0 4px 16px rgba(0,174,239,0.2)" : "none",
                       position: "relative",
                       cursor: "pointer",
                       textAlign: "left",
+                      font: "inherit",
+                      minHeight: "unset",
+                      minWidth: "unset",
                     }}
                   >
                     {pkg.badge && (
@@ -946,7 +948,7 @@ function StoreInner() {
                     )}
                     <span style={{ fontSize: "14px", fontWeight: 800, color: "#0A1628", marginTop: pkg.badge ? "6px" : 0 }}>{pkg.name}</span>
                     <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.55)" }}>{pkg.price}</span>
-                  </a>
+                  </button>
                 ))}
               </div>
             </section>
