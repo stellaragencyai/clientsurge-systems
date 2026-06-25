@@ -131,23 +131,23 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           >
           
           {/* EYEBROW */}
-          <motion.div
-            className="cs-hero-eyebrow"
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.4 }}
-            style={{
-              fontSize: "clamp(0.75rem, 1.1vw, 0.875rem)",
-              fontWeight: 700,
-              letterSpacing: "0.25em",
-              textShadow: "0 0 16px rgba(53,189,241,0.4)",
-              textTransform: "uppercase",
-              margin: "0 0 28px 0",
-              fontFamily: "'Inter', sans-serif",
-            }}
-          >
-            AI Automation Command Center
-          </motion.div>
+           <motion.div
+             className="cs-hero-eyebrow"
+             initial={{ opacity: 0, y: 12 }}
+             animate={{ opacity: 1, y: 0 }}
+             transition={{ duration: 0.4 }}
+             style={{
+               fontSize: "clamp(0.75rem, 1.1vw, 0.875rem)",
+               fontWeight: 700,
+               letterSpacing: "0.25em",
+               textShadow: "0 0 16px rgba(53,189,241,0.4)",
+               textTransform: "uppercase",
+               margin: "0 0 28px 0",
+               fontFamily: "'Inter', sans-serif",
+             }}
+           >
+             READY TO START?
+           </motion.div>
 
           {/* TITLE */}
           <motion.h1
@@ -166,7 +166,8 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
               maxWidth: "900px",
             }}
           >
-            AI Automation Built<br />Around Your Lead Flow.
+            <span style={{ color: "#FFFFFF" }}>You're Already Getting Leads.<br /></span>
+            <span style={{ color: "#00AEEF", textShadow: "0 0 20px rgba(0,174,239,0.3)" }}>Let's Convert Every One.</span>
           </motion.h1>
 
           {/* SUBCOPY */}
@@ -181,12 +182,25 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
               fontWeight: 400,
               lineHeight: 1.7,
               maxWidth: "560px",
-              margin: "0 auto 40px auto",
+              margin: "0 auto 20px auto",
               letterSpacing: "-0.011em",
             }}
           >
-            Capture missed calls, follow up instantly, and turn more inquiries into booked appointments — without adding more staff.
+            Book a free 15-minute strategy call. We'll map exactly where your business is leaking bookings and show you what the system looks like for your specific situation.
           </motion.p>
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.22 }}
+            style={{ marginBottom: "20px" }}
+          >
+            <p style={{ color: "#D4D8E0", fontSize: "0.9rem", fontWeight: 600, marginBottom: "8px" }}>
+              Most clients are live in 48 hours. No contracts. No fluff.
+            </p>
+            <p style={{ color: "#7C8A9D", fontSize: "0.85rem", marginBottom: "12px" }}>
+              Free 15-minute call · no commitment required · live in 24–48 hours
+            </p>
+          </motion.div>
 
           {/* PRIMARY CTA BUTTONS */}
           <motion.div
@@ -227,10 +241,10 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              Compare Packages <ArrowRight className="w-4 h-4" />
+              Get Your Free Audit <ArrowRight className="w-4 h-4" />
             </button>
             <button
-              onClick={() => scrollToSection("automations", "hero_view_automations_click")}
+              onClick={() => scrollToSection("pricing", "hero_free_lead_audit_click")}
               type="button"
               style={{
                 width: "100%",
@@ -264,12 +278,12 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
-              View Automations <ArrowRight className="w-4 h-4" />
+              Free Lead Audit
             </button>
           </motion.div>
 
-          {/* COMPACT AUTOMATION PILLS */}
-          <motion.div
+          {/* COMPACT AUTOMATION PILLS — HIDDEN */}
+          <motion.div style={{ display: "none" }}
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.38 }}
