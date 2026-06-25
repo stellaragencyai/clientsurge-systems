@@ -11,6 +11,7 @@ import {
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
+import AdminOverlay from "@/components/admin/AdminOverlay";
 const CookieConsent = lazy(() =>
   import("@/components/landing/CookieConsent").catch(() => ({ default: () => null }))
 );
@@ -407,9 +408,10 @@ function AccessDeniedPage() {
 }
 
 const AuthenticatedAppWithTenant = () => {
-  const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
+  const { isLoadingAuth, isLoadingPublicSettings, authError, user } = useAuth();
   const location = useLocation();
   const publicRoute = isPublicPath(location.pathname);
+  const isAdminPage = location.pathname.startsWith('/admin');
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
     return (
@@ -424,6 +426,10 @@ const AuthenticatedAppWithTenant = () => {
   }
 
   return (
+    <>
+      {/* Admin Overlay — shows on all pages when logged in and is admin, except on /admin pages */}
+      {user && user.role === 'admin' && !isAdminPage && <AdminOverlay />}
+      
     <Routes>
       {LEGACY_REDIRECTS.map(({ from, to }) => (
         <Route
@@ -565,6 +571,7 @@ const AuthenticatedAppWithTenant = () => {
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>
+    </>
   );
 };
 

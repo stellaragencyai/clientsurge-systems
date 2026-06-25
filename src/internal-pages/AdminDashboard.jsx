@@ -347,118 +347,22 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background">
       <StripeTestModeBanner />
-      {/* Sidebar */}
-      <div
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 ${
-          sidebarOpen ? 'translate-x-0' : '-translate-x-full'
-        } flex flex-col`}
-      >
-        {/* Logo */}
-        <div className="p-4 border-b border-border bg-background">
-          <h1 className="font-display text-lg font-semibold text-foreground">
-            ClientSurge <span className="text-primary">Admin</span>
-          </h1>
-        </div>
-
-        {/* Global Search */}
-        <div className="px-3 py-2 border-b border-border">
-          <AdminGlobalSearch onNavigate={(tab) => handleTabChange(tab)} />
-        </div>
-
-        {/* Navigation */}
-        <nav className="flex-1 p-3 overflow-y-auto space-y-4">
-          {NAV_GROUPS.map(({ group, items }) => (
-            <div key={group}>
-              <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">{group}</p>
-              <div className="space-y-0.5">
-                {items.map((item) => {
-                  const Icon = item.icon;
-                  const isActive = activeTab === item.id;
-                  const unread = item.badge === 'inbox'
-                    ? inboxUnread
-                    : item.badge === 'webhook-errors'
-                    ? webhookErrorCount
-                    : 0;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => handleTabChange(item.id, item.external, item.externalPath)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
-                        isActive
-                          ? 'bg-primary text-primary-foreground'
-                          : 'text-foreground hover:bg-muted'
-                      }`}
-                    >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
-                      <span className="flex-1 text-left">{item.label}</span>
-                      {unread > 0 && (
-                        <span className={`rounded-full text-[10px] font-bold px-1.5 py-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-primary text-primary-foreground'}`}>
-                          {unread}
-                        </span>
-                      )}
-                      {item.external && (
-                        <span className="text-[10px] text-muted-foreground opacity-60">↗</span>
-                      )}
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
-        </nav>
-
-        {/* User Section */}
-        <div className="p-4 border-t border-border space-y-3">
-          <div className="px-4 py-2">
-            <p className="text-xs text-muted-foreground">Signed in as</p>
-            <p className="text-sm font-semibold text-foreground truncate">{user?.full_name || 'Admin'}</p>
-          </div>
-          <button
-            onClick={handlePreviewAsClient}
-            disabled={previewingAsClient}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-primary/30 bg-primary/8 text-primary font-medium hover:bg-primary/15 transition-colors text-sm disabled:opacity-60"
-          >
-            {previewingAsClient ? <Loader2 className="w-4 h-4 animate-spin" /> : <Eye className="w-4 h-4" />}
-            {previewingAsClient ? 'Opening...' : 'Preview as Client'}
-          </button>
-          <button
-            onClick={handleLogout}
-            disabled={loggingOut}
-            className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg border border-border text-foreground font-medium hover:bg-muted transition-colors text-sm disabled:opacity-60"
-          >
-            {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
-            {loggingOut ? 'Signing out...' : 'Logout'}
-          </button>
-        </div>
-      </div>
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
+      {/* Main Content — full width, no sidebar */}
+      <div className="flex flex-col min-w-0">
+        {/* Top Bar — minimal, just the current tab label */}
         <div className="bg-background border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-3">
+          <h2 className="text-base font-semibold text-foreground">{currentTabLabel}</h2>
+          {inboxUnread > 0 && activeTab !== 'inbox' && (
             <button
-              onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+              onClick={() => handleTabChange('inbox')}
+              className="flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
             >
-              {sidebarOpen ? <X className="w-5 h-5 text-foreground" /> : <Menu className="w-5 h-5 text-foreground" />}
+              <Inbox className="w-3.5 h-3.5" />
+              {inboxUnread} unread
             </button>
-            <h2 className="text-base font-semibold text-foreground">{currentTabLabel}</h2>
-          </div>
-          <div className="flex items-center gap-2">
-            {/* Inbox quick badge */}
-            {inboxUnread > 0 && activeTab !== 'inbox' && (
-              <button
-                onClick={() => handleTabChange('inbox')}
-                className="flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
-              >
-                <Inbox className="w-3.5 h-3.5" />
-                {inboxUnread} unread
-              </button>
-            )}
-          </div>
+          )}
         </div>
 
         {/* Page Content — wrapped in TabErrorBoundary so a single tab crash never takes down the dashboard */}
@@ -470,14 +374,6 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
-
-      {/* Mobile Overlay */}
-      {sidebarOpen && (
-        <div
-          onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/20 z-30 lg:hidden"
-        />
-      )}
 
       {loggingOut && (
         <div className="fixed inset-0 z-[9998] bg-black/30 backdrop-blur-sm flex items-center justify-center">
@@ -559,18 +455,18 @@ function OverviewDashboard({ onNavigate }) {
         </div>
       </div>
 
-      {/* Stats Grid */}
+      {/* Stats Grid — monochromatic, no colored backgrounds */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, idx) => (
           <button
             key={idx}
             onClick={() => onNavigate(stat.tab)}
-            className={`rounded-xl border border-border p-6 text-left hover:shadow-md transition-shadow cursor-pointer ${stat.color}`}
+            className="rounded-xl border border-border bg-card p-6 text-left hover:shadow-md transition-shadow cursor-pointer hover:border-primary/30"
           >
-            <p className="text-sm font-medium opacity-75">{stat.label}</p>
-            <p className="text-4xl font-bold mt-2">
+            <p className="text-xs font-semibold uppercase text-muted-foreground">{stat.label}</p>
+            <p className="text-4xl font-bold mt-3 text-foreground">
               {loading
-                ? <span className="inline-block w-10 h-8 rounded bg-current opacity-10 animate-pulse" />
+                ? <span className="inline-block w-10 h-8 rounded bg-muted animate-pulse" />
                 : stat.value}
             </p>
           </button>
