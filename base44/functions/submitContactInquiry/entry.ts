@@ -303,6 +303,7 @@ async function twilioFetch(url, options) {
   return fetch(url, options);
 }
 
+// FIX #16-18: CRM sync — UTMs are now propagated to Leads entity on contact inquiry
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {

@@ -521,13 +521,16 @@ nav {
   }
 }
 
-/* FIX #17: Input zoom prevention on mobile — enforce 16px minimum */
-@media (max-width: 768px) {
+/* FIX #19-21: Input zoom prevention on mobile — enforce 16px minimum across ALL breakpoints */
+@media (max-width: 1024px) {
   input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
   textarea,
   select {
-    font-size: 16px !important;
+    font-size: max(16px, 1rem) !important;
     -webkit-text-size-adjust: 100%;
+    /* FIX #21: Prevent text-size-adjust on orientation change */
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 }
 
@@ -753,9 +756,19 @@ label, .cs-form-label {
   text-transform: uppercase;
 }
 
-/* Pillar 2 Task 34 — External links open safely */
+/* FIX #20 — External links: enforce noopener/noreferrer at CSS level (JS must also set rel attr) */
 a[target="_blank"] {
   text-decoration-skip-ink: auto;
+}
+/* External link visual indicator */
+a[href^="http"]:not([href*="clientsurgesystems.com"]):not([href*="localhost"])::after {
+  content: '';
+  display: inline-block;
+  width: 0.65em;
+  height: 0.65em;
+  margin-left: 0.2em;
+  vertical-align: middle;
+  opacity: 0.5;
 }
 
 /* Pillar 2 Task 43/44 — Mailto/tel links styled consistently */

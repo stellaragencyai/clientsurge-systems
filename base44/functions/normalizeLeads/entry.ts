@@ -14,7 +14,8 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
  * Non-destructive: only fills missing fields, never overwrites existing data.
  */
 
-function generateCanonicalId(email, phone, businessName) {
+// FIX #4-6: SHA-256 deduplication hashing to prevent collision on partial matches
+async function generateCanonicalId(email, phone, businessName) {
   const parts = [];
   if (email) parts.push(email.toLowerCase().trim());
   if (phone) parts.push(phone.replace(/\D/g, ''));
@@ -22,15 +23,14 @@ function generateCanonicalId(email, phone, businessName) {
   
   if (parts.length === 0) return null;
   
-  // Simple hash: concatenate parts with delimiter
-  // In production, ideally use a proper hash, but for now use the first 24 chars of concatenated normalized values
   const combined = parts.join('|');
-  let hash = 0;
-  for (let i = 0; i < Math.min(combined.length, 50); i++) {
-    hash = ((hash << 5) - hash) + combined.charCodeAt(i);
-    hash = hash & hash; // Convert to 32bit integer
-  }
-  return Math.abs(hash).toString(36).padStart(12, '0').substring(0, 24);
+  // Use SubtleCrypto for SHA-256 hash (secure + collision-resistant)
+  const encoder = new TextEncoder();
+  const data = encoder.encode(combined);
+  const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+  const hashArray = Array.from(new Uint8Array(hashBuffer));
+  const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+  return hashHex.substring(0, 24);
 }
 
 function normalizeEmail(email) {
@@ -86,9 +86,9 @@ Deno.serve(async (req) => {
     for (const lead of leads) {
       const updates = {};
 
-      // Generate canonical_lead_id if missing
+      // Generate canonical_lead_id if missing (FIX #4-6: SHA-256 hashing)
       if (!lead.canonical_lead_id) {
-        const cid = generateCanonicalId(lead.email, lead.phone, lead.business_name);
+        const cid = await generateCanonicalId(lead.email, lead.phone, lead.business_name);
         if (cid) updates.canonical_lead_id = cid;
       }
 
