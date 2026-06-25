@@ -69,8 +69,6 @@ const Book = lazy(() => import("./pages/Book"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ProductLanding = lazy(() => import("./pages/ProductLanding"));
 const ProductSignup = lazy(() => import("./pages/ProductSignup"));
-const RealEstate = lazy(() => import("./pages/RealEstate"));
-const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
 const ClientDashboardEntry = lazy(() => import("./pages/ClientDashboardEntry"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const OurSystemPage = lazy(() => import("./pages/OurSystemPage"));
@@ -121,6 +119,8 @@ const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
 const SystemObservabilityDashboard = lazy(() => import("./components/mission-control/SystemObservabilityDashboard"));
 const FunnelOptimizationPage = lazy(() => import("./components/admin/FunnelOptimizationDashboard"));
+const RealEstate = lazy(() => import("./pages/RealEstate"));
+const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -427,6 +427,8 @@ const AuthenticatedAppWithTenant = () => {
           element={<Navigate to={to} replace />}
         />
       ))}
+      <Route path="/industries/real-estate" element={<Navigate to="/real-estate" replace />} />
+      <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
@@ -465,7 +467,9 @@ const AuthenticatedAppWithTenant = () => {
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
       ))}
-      {INDUSTRY_ROUTE_SLUGS.map((slug) => (
+      <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
+      <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
+      {INDUSTRY_ROUTE_SLUGS.filter(slug => slug !== "real-estate" && slug !== "personal-injury").map((slug) => (
         <Route
           key={slug}
           path={`/${slug}`}
