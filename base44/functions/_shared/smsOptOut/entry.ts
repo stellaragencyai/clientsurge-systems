@@ -16,8 +16,16 @@ export function appendSmsOptOut(message) {
  */
 export function canSendSms(lead) {
   if (!lead) return { canSend: false, reason: "lead_data_missing" };
+  
+  // FIX #11: SMS opt-out enforced on do_not_contact, email_unsubscribed acting as SMS block, and outreach_status
   if (lead.do_not_contact === true) {
     return { canSend: false, reason: "lead_do_not_contact" };
+  }
+  if (lead.outreach_status === "do_not_contact" || lead.outreach_status === "bounced") {
+    return { canSend: false, reason: `lead_outreach_blocked_${lead.outreach_status}` };
+  }
+  if (lead.cadence_paused === true) {
+    return { canSend: false, reason: "lead_cadence_paused" };
   }
   if (lead.consent_given === false) {
     return { canSend: false, reason: "lead_consent_not_given" };

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
+import { normalizePhoneToE164, isValidE164Phone } from "@/lib/phoneNormalization";
 
 export default function LeadCaptureForm() {
   const [loading, setLoading] = useState(false);
@@ -36,11 +37,20 @@ export default function LeadCaptureForm() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError("");
+
+    // FIX #8: Normalize phone to E.164 before submission
+    const normalizedPhone = normalizePhoneToE164(formData.phone);
+    if (formData.phone && !normalizedPhone) {
+      setError("Please enter a valid phone number (e.g. +1 555 123-4567).");
+      return;
+    }
+
     setLoading(true);
 
     try {
       const result = await base44.functions.invoke("submitLeadCapture", {
         ...formData,
+        phone: normalizedPhone || formData.phone,
         source: "lead_capture_page",
         source_page: typeof window !== "undefined" ? window.location.pathname : "/capture-leads",
         requested_channels: ["sms", "email"],
