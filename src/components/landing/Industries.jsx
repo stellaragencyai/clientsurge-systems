@@ -157,6 +157,20 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=95"
+},
+{
+  id: "legal-services",
+  routePath: "/industries?industry=legal-services",
+  icon: Scale,
+  name: "Personal-Injury",
+  accent: {
+    color: "#7c3aed",
+    soft: "rgba(124,58,237,0.18)",
+    glow: "rgba(124,58,237,0.28)",
+    iconBg: "rgba(124,58,237,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&q=95"
 }];
 
 
