@@ -2,6 +2,18 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { AlertCircle, Loader2 } from 'lucide-react';
 
+// Canonical product_ids mapping per package
+const PRODUCT_IDS_MAP = {
+  starter_system: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If'],
+  starter: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If'],
+  growth_system: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If', 'prod_UNi5N0l5MtaV0R', 'prod_UNi5fLL2SyJJdP'],
+  growth: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If', 'prod_UNi5N0l5MtaV0R', 'prod_UNi5fLL2SyJJdP'],
+  pro_system: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If', 'prod_UNi5N0l5MtaV0R', 'prod_UNi5fLL2SyJJdP', 'prod_UNi5PWv05ECzXI', 'prod_UNi5dvOUm6Fi9i'],
+  pro: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If', 'prod_UNi5N0l5MtaV0R', 'prod_UNi5fLL2SyJJdP', 'prod_UNi5PWv05ECzXI', 'prod_UNi5dvOUm6Fi9i'],
+  elite_system: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If', 'prod_UNi5N0l5MtaV0R', 'prod_UNi5fLL2SyJJdP', 'prod_UNi5PWv05ECzXI', 'prod_UNi5dvOUm6Fi9i'],
+  elite: ['prod_UNi5RHiKNSTfQl', 'prod_UNi5QL0bQl98If', 'prod_UNi5N0l5MtaV0R', 'prod_UNi5fLL2SyJJdP', 'prod_UNi5PWv05ECzXI', 'prod_UNi5dvOUm6Fi9i'],
+};
+
 /**
  * Stripe Checkout Button — Production Ready
  *
@@ -40,7 +52,9 @@ export default function CheckoutButton({ packageKey, label = 'Get Started' }) {
       }
 
       const response = await base44.functions.invoke('createCheckoutSession', {
+        product_ids: PRODUCT_IDS_MAP[packageKey],
         package_key: packageKey,
+        selected_package_type: packageKey,
         customer_name: form.name,
         customer_email: form.email,
         customer_phone: form.phone,
