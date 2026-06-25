@@ -144,173 +144,230 @@
     </script>
     <script>
       (function () {
+        var publicPages = {
+           "/": true, "/about": true, "/automations": true, "/blog": true, "/book": true,
+           "/contact": true, "/faq": true, "/industries": true, "/library": true, "/login": true,
+           "/our-system": true, "/pricing": true, "/product": true, "/product-signup": true, "/register": true,
+           "/reset-password": true, "/start": true, "/store": true, "/testimonials": true, "/legal": true,
+           "/missed-call-text-back": true, "/lead-capture-automation": true, "/ai-lead-follow-up": true,
+           "/appointment-booking-automation": true, "/review-automation": true, "/customer-reactivation": true,
+           "/roofing": true, "/hvac": true, "/plumbing": true, "/dental": true, "/med-spa": true,
+           "/chiropractic": true, "/contractors": true, "/personal-injury": true, "/real-estate": true,
+           "/privacy-policy": true, "/terms": true, "/setup-lookup": true, "/how-it-works": true,
+           "/proof": true, "/success": true, "/order-success": true, "/thank-you": true
+         };
         var routeMap = {
-          "/": {
-            "key": "home",
-            "title": "AI Growth Systems for Local Service Businesses | ClientSurge Systems",
-            "description": "ClientSurge combines web design, CRM handoff, missed-call recovery, AI follow-up, booking, reviews, and reactivation into three systems you can compare and choose."
-          },
-          "/automations": {
-            "key": "automations",
-            "title": "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
-            "description": "ClientSurge installs AI automation systems that capture, follow up with, qualify, book, and reactivate leads for local service businesses."
-          },
-          "/missed-call-text-back": {
-            "key": "missed-call-text-back",
-            "title": "Missed-Call Text-Back Automation | ClientSurge Systems",
-            "description": "When a business misses a call, the system instantly texts the lead so they do not call a competitor. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
-          },
-          "/lead-capture-automation": {
-            "key": "lead-capture-automation",
-            "title": "Lead Capture Automation | ClientSurge Systems",
-            "description": "Turns website visitors, form fills, ad traffic, and phone inquiries into organized leads inside your CRM or pipeline. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
-          },
-          "/ai-lead-follow-up": {
-            "key": "ai-lead-follow-up",
-            "title": "AI Lead Follow-Up Automation | ClientSurge Systems",
-            "description": "Automatically follows up with new leads by SMS and email until they reply, book, or opt out. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
-          },
-          "/appointment-booking-automation": {
-            "key": "appointment-booking-automation",
-            "title": "Appointment Booking Automation | ClientSurge Systems",
-            "description": "Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
-          },
-          "/review-automation": {
-            "key": "review-automation",
-            "title": "Review & Reputation Automation | ClientSurge Systems",
-            "description": "Requests reviews after completed jobs and helps build stronger Google reputation over time. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
-          },
-          "/customer-reactivation": {
-            "key": "customer-reactivation",
-            "title": "Reactivation / Win-Back Automation | ClientSurge Systems",
-            "description": "Re-engages old leads, past customers, no-shows, unbooked quotes, and cold opportunities with targeted campaigns. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
-          },
-          "/about": {
-            "key": "about",
-            "title": "About ClientSurge Systems | AI Automation for Local Businesses",
-            "description": "Learn how ClientSurge Systems combines conversion-focused websites, AI voice agents, lead follow-up, booking automation, and recovery workflows for local service businesses."
-          },
-          "/book": {
-            "key": "book",
-            "title": "Get Help Choosing Your AI Growth System | ClientSurge Systems",
-            "description": "Not sure whether Starter, Growth, or Pro is right for your business? Get help choosing the best ClientSurge package for your lead flow."
-          },
-          "/contact": {
-            "key": "contact",
-            "title": "Contact ClientSurge Systems | AI Automation Questions",
-            "description": "Contact ClientSurge Systems about AI voice agents, lead capture, missed-call recovery, booking automation, and local service business automation."
-          },
-          "/pricing": {
-            "key": "pricing",
-            "title": "Pricing | ClientSurge Systems",
-            "description": "Compare ClientSurge automation packages, setup pricing, monthly management, and what is included for local service businesses."
-          },
-          "/faq": {
-            "key": "faq",
-            "title": "Frequently Asked Questions | ClientSurge Systems",
-            "description": "Answers about ClientSurge setup, pricing, integrations, support, billing, cancellation, and SMS compliance."
-          },
-          "/our-system": {
-            "key": "our-system",
-            "title": "Our System | ClientSurge Systems",
-            "description": "See how the ClientSurge system captures leads, follows up faster, recovers missed calls, books appointments, and reactivates old opportunities."
-          },
-          "/testimonials": {
-            "key": "testimonials",
-            "title": "Launch Scenarios & Testimonials | ClientSurge Systems",
-            "description": "See the launch scenarios, workflow outcomes, and proof-oriented testimonial framing ClientSurge uses for med spas, HVAC, dental, and local service businesses."
-          },
-          "/blog": {
-            "key": "blog",
-            "title": "ClientSurge Blog | AI Automation for Local Service Businesses",
-            "description": "Guides on missed-call recovery, AI lead follow-up, AI voice agents, local service business automation, conversion systems, and booking automation."
-          },
-          "/store": {
-            "key": "store",
-            "title": "Compare Packages | ClientSurge Systems",
-            "description": "Compare Starter, Growth, and Pro systems — each combines web design, CRM handoff, and automation modules into one complete lead recovery engine."
-          },
-          "/start": {
-            "key": "start",
-            "title": "Get Help Choosing Your AI Growth System | ClientSurge Systems",
-            "description": "Compare Starter, Growth, and Pro packages to choose the AI growth system built for your local business lead flow."
-          },
-          "/product-signup": {
-            "key": "product-signup",
-            "title": "Sign Up — AI Automation Package | ClientSurge Systems",
-            "description": "Complete your ClientSurge automation package signup and proceed to secure Stripe checkout for your chosen Starter, Growth, or Pro system."
-          },
-          "/industries": {
-            "key": "industries",
-            "title": "Industries We Help | ClientSurge Systems",
-            "description": "AI automation systems for roofing, HVAC, dental, med spa, chiropractic, contractor, and local service businesses."
-          },
-          "/roofing": {
-            "key": "roofing",
-            "title": "Roofing Automation Systems | ClientSurge Systems",
-            "description": "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, storm-damage routing, and old estimate reactivation."
-          },
-          "/hvac": {
-            "key": "hvac",
-            "title": "HVAC Automation Systems | ClientSurge Systems",
-            "description": "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service reminders, and maintenance plan automation."
-          },
-          "/plumbing": {
-            "key": "plumbing",
-            "title": "Plumbing Automation Systems | ClientSurge Systems",
-            "description": "AI automation for plumbing companies: emergency leak calls, drain repair requests, water heater inquiries, missed-call recovery, after-hours lead capture, and dispatch handoff."
-          },
-          "/dental": {
-            "key": "dental",
-            "title": "Dental Automation Systems | ClientSurge Systems",
-            "description": "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation."
-          },
-          "/med-spa": {
-            "key": "med-spa",
-            "title": "Med Spa Automation Systems | ClientSurge Systems",
-            "description": "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation."
-          },
-          "/chiropractic": {
-            "key": "chiropractic",
-            "title": "Chiropractic Automation Systems | ClientSurge Systems",
-            "description": "AI automation for chiropractic clinics: new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation."
-          },
-          "/contractors": {
-            "key": "contractors",
-            "title": "Contractor Automation Systems | ClientSurge Systems",
-            "description": "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation."
-          },
-          "/personal-injury": {
-            "key": "personal-injury",
-            "title": "Personal Injury Law Firm Automation Systems | ClientSurge Systems",
-            "description": "AI automation for personal injury law firms: immediate lead response, case type routing, consultation scheduling, missed-call recovery, and old lead reactivation."
-          },
-          "/real-estate": {
-            "key": "real-estate",
-            "title": "Real Estate Automation Systems | ClientSurge Systems",
-            "description": "AI automation for real estate agents and brokers: faster lead response, automated follow-up, and more scheduled showings."
-          },
-          "/privacy-policy": {
-            "key": "privacy",
-            "title": "Privacy Policy | ClientSurge Systems",
-            "description": "Read the ClientSurge Systems privacy policy, including what data we collect, how data is used, cookies, third-party services, and contact information."
-          },
-          "/terms": {
-            "key": "terms",
-            "title": "Terms of Service | ClientSurge Systems",
-            "description": "Review the ClientSurge Systems terms governing service access, billing, platform usage, and customer responsibilities."
-          },
-          "/login": {
-            "key": "login",
-            "title": "Client Login | ClientSurge Systems",
-            "description": "ClientSurge Systems client login for existing customers accessing their portal and automation dashboard."
-          },
-          "/setup-lookup": {
-            "key": "setup-lookup",
-            "title": "Check Your Setup Progress | ClientSurge Systems",
-            "description": "Enter your email or order ID to see exactly where your AI automation system setup stands. No login required."
-          }
-        };
+           "/": {
+             "key": "home",
+             "title": "AI Growth Systems for Local Service Businesses | ClientSurge Systems",
+             "description": "ClientSurge combines web design, CRM handoff, missed-call recovery, AI follow-up, booking, reviews, and reactivation into three systems you can compare and choose."
+           },
+           "/automations": {
+             "key": "automations",
+             "title": "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
+             "description": "ClientSurge installs AI automation systems that capture, follow up with, qualify, book, and reactivate leads for local service businesses."
+           },
+           "/missed-call-text-back": {
+             "key": "missed-call-text-back",
+             "title": "Missed-Call Text-Back Automation | ClientSurge Systems",
+             "description": "When a business misses a call, the system instantly texts the lead so they do not call a competitor. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
+           },
+           "/lead-capture-automation": {
+             "key": "lead-capture-automation",
+             "title": "Lead Capture Automation | ClientSurge Systems",
+             "description": "Turns website visitors, form fills, ad traffic, and phone inquiries into organized leads inside your CRM or pipeline. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
+           },
+           "/ai-lead-follow-up": {
+             "key": "ai-lead-follow-up",
+             "title": "AI Lead Follow-Up Automation | ClientSurge Systems",
+             "description": "Automatically follows up with new leads by SMS and email until they reply, book, or opt out. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
+           },
+           "/appointment-booking-automation": {
+             "key": "appointment-booking-automation",
+             "title": "Appointment Booking Automation | ClientSurge Systems",
+             "description": "Helps convert interested leads into booked appointments with reminders, confirmations, qualification, and calendar sync. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
+           },
+           "/review-automation": {
+             "key": "review-automation",
+             "title": "Review & Reputation Automation | ClientSurge Systems",
+             "description": "Requests reviews after completed jobs and helps build stronger Google reputation over time. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
+           },
+           "/customer-reactivation": {
+             "key": "customer-reactivation",
+             "title": "Reactivation / Win-Back Automation | ClientSurge Systems",
+             "description": "Re-engages old leads, past customers, no-shows, unbooked quotes, and cold opportunities with targeted campaigns. See what it does, what triggers it, who it helps, and how it fits into the ClientSurge automation stack."
+           },
+           "/about": {
+             "key": "about",
+             "title": "About ClientSurge Systems | AI Automation for Local Businesses",
+             "description": "Learn how ClientSurge Systems combines conversion-focused websites, AI voice agents, lead follow-up, booking automation, and recovery workflows for local service businesses."
+           },
+           "/book": {
+             "key": "book",
+             "title": "Get Help Choosing Your AI Growth System | ClientSurge Systems",
+             "description": "Not sure whether Starter, Growth, or Pro is right for your business? Get help choosing the best ClientSurge package for your lead flow."
+           },
+           "/contact": {
+             "key": "contact",
+             "title": "Contact ClientSurge Systems | AI Automation Questions",
+             "description": "Contact ClientSurge Systems about AI voice agents, lead capture, missed-call recovery, booking automation, and local service business automation."
+           },
+           "/pricing": {
+             "key": "pricing",
+             "title": "Pricing | ClientSurge Systems",
+             "description": "Compare ClientSurge automation packages, setup pricing, monthly management, and what is included for local service businesses."
+           },
+           "/faq": {
+             "key": "faq",
+             "title": "Frequently Asked Questions | ClientSurge Systems",
+             "description": "Answers about ClientSurge setup, pricing, integrations, support, billing, cancellation, and SMS compliance."
+           },
+           "/our-system": {
+             "key": "our-system",
+             "title": "Our System | ClientSurge Systems",
+             "description": "See how the ClientSurge system captures leads, follows up faster, recovers missed calls, books appointments, and reactivates old opportunities."
+           },
+           "/testimonials": {
+             "key": "testimonials",
+             "title": "Launch Scenarios & Testimonials | ClientSurge Systems",
+             "description": "See the launch scenarios, workflow outcomes, and proof-oriented testimonial framing ClientSurge uses for med spas, HVAC, dental, and local service businesses."
+           },
+           "/blog": {
+             "key": "blog",
+             "title": "ClientSurge Blog | AI Automation for Local Service Businesses",
+             "description": "Guides on missed-call recovery, AI lead follow-up, AI voice agents, local service business automation, conversion systems, and booking automation."
+           },
+           "/store": {
+             "key": "store",
+             "title": "Compare Packages | ClientSurge Systems",
+             "description": "Compare Starter, Growth, and Pro systems — each combines web design, CRM handoff, and automation modules into one complete lead recovery engine."
+           },
+           "/start": {
+             "key": "start",
+             "title": "Get Help Choosing Your AI Growth System | ClientSurge Systems",
+             "description": "Compare Starter, Growth, and Pro packages to choose the AI growth system built for your local business lead flow."
+           },
+           "/product-signup": {
+             "key": "product-signup",
+             "title": "Sign Up — AI Automation Package | ClientSurge Systems",
+             "description": "Complete your ClientSurge automation package signup and proceed to secure Stripe checkout for your chosen Starter, Growth, or Pro system."
+           },
+           "/industries": {
+             "key": "industries",
+             "title": "Industries We Help | ClientSurge Systems",
+             "description": "AI automation systems for roofing, HVAC, dental, med spa, chiropractic, contractor, and local service businesses."
+           },
+           "/roofing": {
+             "key": "roofing",
+             "title": "Roofing Automation Systems | ClientSurge Systems",
+             "description": "AI automation for roofing companies: storm-season lead surges, missed-call recovery, inspection booking, estimate follow-up, storm-damage routing, and old estimate reactivation."
+           },
+           "/hvac": {
+             "key": "hvac",
+             "title": "HVAC Automation Systems | ClientSurge Systems",
+             "description": "AI automation for HVAC companies: emergency call handling, seasonal demand spikes, missed-call recovery, estimate follow-up, service reminders, and maintenance plan automation."
+           },
+           "/plumbing": {
+             "key": "plumbing",
+             "title": "Plumbing Automation Systems | ClientSurge Systems",
+             "description": "AI automation for plumbing companies: emergency leak calls, drain repair requests, water heater inquiries, missed-call recovery, after-hours lead capture, and dispatch handoff."
+           },
+           "/dental": {
+             "key": "dental",
+             "title": "Dental Automation Systems | ClientSurge Systems",
+             "description": "AI automation for dental practices: new patient booking, emergency dental inquiries, missed appointment recovery, treatment-plan follow-up, and review automation."
+           },
+           "/med-spa": {
+             "key": "med-spa",
+             "title": "Med Spa Automation Systems | ClientSurge Systems",
+             "description": "AI automation for med spas: consultation booking, package lead nurture, membership follow-up, no-show reduction, review requests, and old inquiry reactivation."
+           },
+           "/chiropractic": {
+             "key": "chiropractic",
+             "title": "Chiropractic Automation Systems | ClientSurge Systems",
+             "description": "AI automation for chiropractic clinics: new patient intake, appointment reminders, unfinished care plan follow-up, reactivation campaigns, and review automation."
+           },
+           "/contractors": {
+             "key": "contractors",
+             "title": "Contractor Automation Systems | ClientSurge Systems",
+             "description": "AI automation for contractors: project inquiry routing, quote follow-up, missed-call recovery, estimate nurturing, and old opportunity reactivation."
+           },
+           "/personal-injury": {
+             "key": "personal-injury",
+             "title": "Personal Injury Law Firm Automation Systems | ClientSurge Systems",
+             "description": "AI automation for personal injury law firms: immediate lead response, case type routing, consultation scheduling, missed-call recovery, and old lead reactivation."
+           },
+           "/real-estate": {
+             "key": "real-estate",
+             "title": "Real Estate Automation Systems | ClientSurge Systems",
+             "description": "AI automation for real estate agents and brokers: faster lead response, automated follow-up, and more scheduled showings."
+           },
+           "/privacy-policy": {
+             "key": "privacy",
+             "title": "Privacy Policy | ClientSurge Systems",
+             "description": "Read the ClientSurge Systems privacy policy, including what data we collect, how data is used, cookies, third-party services, and contact information."
+           },
+           "/terms": {
+             "key": "terms",
+             "title": "Terms of Service | ClientSurge Systems",
+             "description": "Review the ClientSurge Systems terms governing service access, billing, platform usage, and customer responsibilities."
+           },
+           "/login": {
+             "key": "login",
+             "title": "Client Login | ClientSurge Systems",
+             "description": "ClientSurge Systems client login for existing customers accessing their portal and automation dashboard."
+           },
+           "/setup-lookup": {
+             "key": "setup-lookup",
+             "title": "Check Your Setup Progress | ClientSurge Systems",
+             "description": "Enter your email or order ID to see exactly where your AI automation system setup stands. No login required."
+           },
+           "/register": {
+             "key": "register",
+             "title": "Register | ClientSurge Systems",
+             "description": "Create a new account with ClientSurge Systems."
+           },
+           "/reset-password": {
+             "key": "reset-password",
+             "title": "Reset Password | ClientSurge Systems",
+             "description": "Reset your ClientSurge account password."
+           },
+           "/library": {
+             "key": "library",
+             "title": "Resource Library | ClientSurge Systems",
+             "description": "Access ClientSurge's resource library for guides and documentation."
+           },
+           "/product": {
+             "key": "product",
+             "title": "Product | ClientSurge Systems",
+             "description": "Learn about ClientSurge's AI automation product."
+           },
+           "/how-it-works": {
+             "key": "how-it-works",
+             "title": "How It Works | ClientSurge Systems",
+             "description": "Discover how ClientSurge AI automation works."
+           },
+           "/proof": {
+             "key": "proof",
+             "title": "Proof | ClientSurge Systems",
+             "description": "See proof of ClientSurge's AI automation platform."
+           },
+           "/success": {
+             "key": "success",
+             "title": "Success | ClientSurge Systems",
+             "description": "Your operation was successful."
+           },
+           "/order-success": {
+             "key": "order-success",
+             "title": "Order Successful | ClientSurge Systems",
+             "description": "Your order has been completed successfully."
+           },
+           "/thank-you": {
+             "key": "thank-you",
+             "title": "Thank You | ClientSurge Systems",
+             "description": "Thank you for your interest in ClientSurge Systems."
+           }
+         };
         var aliases = {
           "/Blog": "/blog",
           "/book-demo": "/book",
