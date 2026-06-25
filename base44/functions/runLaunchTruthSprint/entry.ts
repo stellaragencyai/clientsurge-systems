@@ -139,6 +139,15 @@ Deno.serve(async (req) => {
       try { leadCommLogs = await base44.asServiceRole.entities.CommunicationLog.filter({ related_entity_id: latestLead.id }, "-created_date", 10) || []; }
       catch { leadCommLogs = []; }
     }
+    let leadCommEvents = [];
+    if (latestLead) {
+      try { leadCommEvents = await base44.asServiceRole.entities.CommunicationEvent.filter({ lead_id: latestLead.id }, "-created_date", 10) || []; }
+      catch { leadCommEvents = []; }
+    }
+    const leadSmsLogs = leadCommLogs.filter(l => l.channel === "sms");
+    const leadEmailLogs = leadCommLogs.filter(l => l.channel === "email");
+    const latestLeadSms = leadSmsLogs[0] || null;
+    const latestLeadEmail = leadEmailLogs[0] || null;
 
     evidence.lead_capture = {
       latest_website_lead: latestLead ? {
@@ -159,7 +168,24 @@ Deno.serve(async (req) => {
       } : null,
       linked_comm_logs: leadCommLogs.length > 0 ? leadCommLogs.map(l => ({
         id: l.id, channel: l.channel, delivery_status: l.delivery_status,
-        trigger_name: l.trigger_name || "—",
+        trigger_name: l.trigger_name || "—", sent_at: l.sent_at,
+        provider_message_id: l.provider_message_id || "—",
+      })) : [],
+      latest_lead_sms: latestLeadSms ? {
+        id: latestLeadSms.id, delivery_status: latestLeadSms.delivery_status,
+        to_address: latestLeadSms.to_address || latestLeadSms.canonical_to_address || "—",
+        provider_message_id: latestLeadSms.provider_message_id || "—",
+        sent_at: latestLeadSms.sent_at, trigger_name: latestLeadSms.trigger_name || "—",
+      } : null,
+      latest_lead_email: latestLeadEmail ? {
+        id: latestLeadEmail.id, delivery_status: latestLeadEmail.delivery_status,
+        to_address: latestLeadEmail.to_address || "—",
+        provider_message_id: latestLeadEmail.provider_message_id || "—",
+        sent_at: latestLeadEmail.sent_at, subject: latestLeadEmail.subject || "—",
+      } : null,
+      latest_comm_events: leadCommEvents.length > 0 ? leadCommEvents.map(e => ({
+        id: e.id, event_type: e.event_type, status: e.status,
+        channel: e.channel, direction: e.direction, created_date: e.created_date,
       })) : [],
       total_website_leads_checked: (allWebsiteLeads || []).length,
       production_trusted_leads: safeLeads.length,
@@ -262,7 +288,17 @@ Deno.serve(async (req) => {
         payment_status: latestPaidOrder.payment_status || "—",
         stripe_session_id: latestPaidOrder.stripe_session_id || null,
         stripe_customer_id: latestPaidOrder.stripe_customer_id || null,
+        stripe_subscription_id: latestPaidOrder.stripe_subscription_id || null,
+        subscription_id: latestPaidOrder.subscription_id || null,
         has_stripe_ids: Boolean(hasStripeIds),
+        has_stripe_subscription: Boolean(latestPaidOrder.stripe_subscription_id),
+        order_status: latestPaidOrder.order_status || "—",
+        pipeline_status: latestPaidOrder.pipeline_status || "—",
+        environment: latestPaidOrder.environment || "unknown",
+        exclusion_reason: latestPaidOrder.dashboard_exclusion_reason || null,
+        client_id: latestPaidOrder.client_id || null,
+        client_project_id: latestPaidOrder.client_project_id || null,
+        onboarding_client_id: latestPaidOrder.onboarding_client_id || null,
         created_date: latestPaidOrder.created_date,
       } : null,
       paid_but_excluded: paidButExcluded.slice(0, 5),
@@ -396,6 +432,15 @@ Deno.serve(async (req) => {
     const hasTrackingProof = recentTrackingEvents.length > 0;
     const ga4Active = hasGa4Record && hasMeasurementId && measurementIdLooksValid && trackingEnabled && setupStatus === "active";
 
+    // ── F2. CONVERSION TRACKING EVENTS (for GA4 proof) ──
+    let recentConversionEvents = [];
+    try { recentConversionEvents = await base44.asServiceRole.entities.ConversionTrackingEvent.list("-timestamp", 20) || []; }
+    catch { recentConversionEvents = []; }
+    const conversionPageViews = recentConversionEvents.filter(e => e.event_type === "page_view");
+    const conversionCtaClicks = recentConversionEvents.filter(e => e.event_type === "cta_click");
+    const latestConversionEvent = recentConversionEvents[0] || null;
+    const hasRealConversionEvents = conversionPageViews.length > 0 && conversionCtaClicks.length > 0;
+
     evidence.ga4 = {
       record_exists: hasGa4Record,
       measurement_id: ga4Config?.measurement_id || null,
@@ -406,7 +451,21 @@ Deno.serve(async (req) => {
       expected_events: EXPECTED_GA4_EVENTS,
       missing_events: missingExpectedEvents,
       has_tracking_proof: hasTrackingProof,
-      status: ga4Active ? (hasTrackingProof ? "ready_for_proof" : "partial") : "blocked",
+      has_real_conversion_events: hasRealConversionEvents,
+      latest_conversion_event: latestConversionEvent ? {
+        event_id: latestConversionEvent.event_id, event_type: latestConversionEvent.event_type,
+        page_key: latestConversionEvent.page_key, event_label: latestConversionEvent.event_label || "—",
+        timestamp: latestConversionEvent.timestamp,
+        device_type: latestConversionEvent.metadata?.device_type || "—",
+      } : null,
+      page_view_count: conversionPageViews.length,
+      cta_click_count: conversionCtaClicks.length,
+      recent_conversion_events: recentConversionEvents.slice(0, 5).map(e => ({
+        event_type: e.event_type, page_key: e.page_key,
+        event_label: e.event_label || "—", timestamp: e.timestamp,
+        device_type: e.metadata?.device_type || "—",
+      })),
+      status: ga4Active ? (hasRealConversionEvents ? "ready_for_proof" : "partial") : "blocked",
       next_action: !hasGa4Record
         ? "Create a GA4 web stream in Google Analytics, paste the Measurement ID into Admin Settings, enable tracking, generate page_view and cta_click test events, then rerun analytics proof"
         : !measurementIdLooksValid ? "Measurement ID does not look valid (expected format G-XXXXXXX). Update in Admin Settings."
@@ -417,7 +476,7 @@ Deno.serve(async (req) => {
     };
 
     if (!ga4Active) productionBlockers.push({ gate: "analytics_gate", message: "GA4 not configured, not enabled, or not active", severity: "launch_blocker" });
-    else if (!hasTrackingProof) warnings.push({ gate: "analytics_gate", message: "GA4 configured but no recent tracking proof events found", severity: "advisory" });
+    else if (!hasRealConversionEvents) warnings.push({ gate: "analytics_gate", message: "GA4 configured but no real ConversionTrackingEvent records (page_view + cta_click)", severity: "advisory" });
 
     // ── Pre-fetch post-call records for elevenlabs gate ──
     let postCallRecords = [];
@@ -497,10 +556,10 @@ Deno.serve(async (req) => {
         }
         case "analytics_gate":
           if (ga4Active) {
-            completion = 70; proof = hasTrackingProof ? 50 : 30;
-            status = hasTrackingProof ? "ready_for_proof" : "partial";
-            evidenceSummary = `GA4 ID: ${ga4Config.measurement_id}. Enabled: ${ga4Config.enabled}. Setup: ${ga4Config.setup_status}. Tracked: ${(ga4Config.tracked_events || []).join(", ")}. Missing: ${missingExpectedEvents.join(", ") || "none"}. Tracking proof: ${hasTrackingProof ? "found" : "not found"}.`;
-            nextAction = hasTrackingProof ? "Verify events in GA4 Realtime dashboard, then approve" : "Generate page_view and cta_click test events, verify in GA4 Realtime, then rerun";
+            completion = 70; proof = hasRealConversionEvents ? 50 : 30;
+            status = hasRealConversionEvents ? "ready_for_proof" : "partial";
+            evidenceSummary = `GA4 ID: ${ga4Config.measurement_id}. Enabled: ${ga4Config.enabled}. Setup: ${ga4Config.setup_status}. Tracked: ${(ga4Config.tracked_events || []).join(", ")}. Missing: ${missingExpectedEvents.join(", ") || "none"}. Conversion events: ${conversionPageViews.length} page_view, ${conversionCtaClicks.length} cta_click.`;
+            nextAction = hasRealConversionEvents ? "Verify events in GA4 Realtime dashboard, then approve" : "Visit public homepage and click a CTA to generate page_view + cta_click ConversionTrackingEvents, then rerun";
           } else { status = "blocked"; completion = 10; proof = 0; blocker = "GA4 not configured, not enabled, or setup_status not active"; nextAction = evidence.ga4.next_action; }
           break;
         case "security_gate":
@@ -642,6 +701,15 @@ Deno.serve(async (req) => {
         automation_job_audit: evidence.automation_job_audit,
         dashboard_truth: evidence.dashboard_truth,
         ga4: evidence.ga4,
+        booking_proof: {
+          booking_link_default: adminSettings?.booking_link_default || null,
+          link_present: Boolean(adminSettings?.booking_link_default),
+          link_looks_valid: Boolean(adminSettings?.booking_link_default) && /^https?:\/\/.+/.test(adminSettings.booking_link_default),
+          status: adminSettings?.booking_link_default ? "ready_for_proof" : "blocked",
+          next_action: adminSettings?.booking_link_default
+            ? "Open the booking link, verify calendar/page loads, complete a test booking or click, then mark as proof_passed"
+            : "Set DEFAULT_BOOKING_LINK in Admin Settings, verify booking page loads, complete a test booking",
+        },
       },
       gates: gateResults,
       production_blockers: productionBlockers,

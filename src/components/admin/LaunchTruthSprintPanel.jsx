@@ -1,6 +1,13 @@
 import { useState, useEffect, useCallback } from "react";
 import { Loader2, RefreshCw, ShieldCheck, AlertTriangle, AlertCircle, CheckCircle2, Clock, XCircle, ExternalLink, Filter } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import SingleNextAction from "./launch-truth/SingleNextAction";
+import ProductionTrustFilterExplainer from "./launch-truth/ProductionTrustFilterExplainer";
+import StripeProofCard from "./launch-truth/StripeProofCard";
+import GA4ProofCard from "./launch-truth/GA4ProofCard";
+import CTAProofCard from "./launch-truth/CTAProofCard";
+import LeadCaptureProofCard from "./launch-truth/LeadCaptureProofCard";
+import BookingProofCard from "./launch-truth/BookingProofCard";
 
 const STATUS_CONFIG = {
   locked: { label: "Locked", color: "bg-gray-100 text-gray-700", icon: XCircle },
@@ -130,6 +137,7 @@ export default function LaunchTruthSprintPanel() {
   const aj = s.automation_job_audit || {};
   const ga = s.ga4 || {};
   const ps = s.public_site || {};
+  const bp = s.booking_proof || {};
 
   return (
     <div className="space-y-6">
@@ -162,6 +170,9 @@ export default function LaunchTruthSprintPanel() {
         </div>
       </div>
 
+      {/* Single Next Action */}
+      <SingleNextAction report={report} onRerun={runSprint} />
+
       {/* Top Summary Cards */}
       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
         <SummaryCard label="Total Gates" value={report.total_gates} color="text-gray-700" icon={ShieldCheck} />
@@ -170,6 +181,23 @@ export default function LaunchTruthSprintPanel() {
         <SummaryCard label="Passed/Approved" value={report.gates_proof_passed + report.gates_approved} color="text-green-600" icon={CheckCircle2} />
         <SummaryCard label="Prod Blockers" value={report.production_blocker_count} color="text-red-600" icon={AlertTriangle} />
         <SummaryCard label="Internal Cleanup" value={report.internal_cleanup_count} color="text-yellow-600" icon={AlertCircle} />
+      </div>
+
+      {/* Production Trust Filter Explainer */}
+      <ProductionTrustFilterExplainer />
+
+      {/* ═══ Production Proof Assistant ═══ */}
+      <div className="pt-2">
+        <h2 className="text-lg font-bold text-foreground mb-1">Production Proof Assistant</h2>
+        <p className="text-sm text-muted-foreground mb-4">Guided workflow for completing manual/external proof steps. No gate is marked as passed without real evidence.</p>
+      </div>
+
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-5">
+        <StripeProofCard stripeData={s.stripe_payment} onboardingData={s.payment_onboarding} onRerun={runSprint} loading={loading} />
+        <GA4ProofCard ga4Data={s.ga4} loading={loading} />
+        <CTAProofCard publicSiteData={s.public_site} onRerun={runSprint} loading={loading} />
+        <LeadCaptureProofCard leadCaptureData={s.lead_capture} />
+        <BookingProofCard bookingData={s.booking_proof} onRerun={runSprint} loading={loading} />
       </div>
 
       {/* A. Public Site Cleanliness */}
