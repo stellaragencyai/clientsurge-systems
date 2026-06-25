@@ -26,14 +26,21 @@ export function normalizePhoneE164(rawPhone) {
 export async function resolveSmsFromAddress(base44, fallbackEnvVar = "TWILIO_PHONE_NUMBER") {
   let fromNumber = null;
 
-  // Step 1: Resolve from AdminSettings
+  // FIX #10: Check AdminSettings.twilio_enabled BEFORE resolving sender
   try {
     const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
-    if (settings?.[0]?.twilio_from_number) {
-      fromNumber = normalizePhoneE164(settings[0].twilio_from_number);
+    const adminSettings = settings?.[0];
+    
+    if (adminSettings?.twilio_enabled === false) {
+      throw new Error("SMS sending is disabled. Enable Twilio in AdminSettings to send SMS.");
+    }
+    
+    if (adminSettings?.twilio_from_number) {
+      fromNumber = normalizePhoneE164(adminSettings.twilio_from_number);
       console.log(`[resolveSmsFromAddress] Resolved from AdminSettings: ${fromNumber}`);
     }
   } catch (e) {
+    if (e.message.includes("SMS sending is disabled")) throw e;
     console.warn(`[resolveSmsFromAddress] Failed to load AdminSettings: ${e.message}`);
   }
 

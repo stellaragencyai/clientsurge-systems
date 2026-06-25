@@ -215,10 +215,20 @@ Deno.serve(async (req) => {
 
     const event = matches[0];
 
-    // Idempotency: skip if already terminal
-    if (["delivered", "failed"].includes(event.status) && event.status === mappedStatus) {
-      console.log(`[SmsStatusCallback] Already terminal "${event.status}" for SID ${messageSid} — skipping`);
+    // FIX #9: Out-of-order protection — never downgrade a terminal status
+    // delivered > sent > queued; failed is always terminal
+    const STATUS_RANK = { delivered: 4, failed: 4, sent: 3, queued: 2, unknown: 1 };
+    const currentRank = STATUS_RANK[event.status] ?? 0;
+    const incomingRank = STATUS_RANK[mappedStatus] ?? 0;
+    
+    if (currentRank >= incomingRank && event.status === mappedStatus) {
+      console.log(`[SmsStatusCallback] Idempotent — already "${event.status}" for SID ${messageSid}`);
       return json({ status: "ok_idempotent" });
+    }
+    
+    if (currentRank > incomingRank) {
+      console.log(`[SmsStatusCallback] Out-of-order — ignoring "${mappedStatus}" for SID ${messageSid} (already at "${event.status}")`);
+      return json({ status: "ok_out_of_order_ignored" });
     }
 
     let existingMeta = {};

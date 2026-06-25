@@ -50,19 +50,19 @@ const textInputClass = "w-full bg-transparent border border-[rgba(53,189,241,0.2
 
 export default function Contact() {
    const [form, setForm] = useState({
-     full_name: "",
-     email: "",
-     phone: "",
-     business_type: "",
-     message: "",
-     website_url: "",
-     utm_source: "",
-     utm_medium: "",
-     utm_campaign: "",
-     utm_content: "",
-     referrer: "",
-    pain_points: "",
-  });
+      full_name: "",
+      business_name: "",
+      email: "",
+      phone: "",
+      business_type: "",
+      message: "",
+      website_url: "",
+      utm_source: "",
+      utm_medium: "",
+      utm_campaign: "",
+      utm_content: "",
+      referrer: "",
+   });
 
   const [industryContext, setIndustryContext] = useState(null);
   const [loading, setLoading] = useState(false);
@@ -207,24 +207,34 @@ export default function Contact() {
                 {/* #15 — Consistent gap between form field rows */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                   <FormInput
-                    label="First Name"
+                    label="Full Name"
                     name="full_name"
                     value={form.full_name}
                     onChange={handleChange}
                     error={errors.full_name}
                     required
-                    autoComplete="given-name"
+                    autoComplete="name"
                   />
                   <FormInput
-                    label="Last Name"
-                    name="business_type"
-                    value={form.business_type}
+                    label="Business Name"
+                    name="business_name"
+                    value={form.business_name}
                     onChange={handleChange}
-                    autoComplete="family-name"
+                    autoComplete="organization"
                   />
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                  <FormInput
+                    label="Email Address"
+                    type="email"
+                    name="email"
+                    value={form.email}
+                    onChange={handleChange}
+                    error={errors.email}
+                    required
+                    autoComplete="email"
+                  />
                   <FormInput
                     label="Phone No."
                     type="tel"
@@ -235,15 +245,15 @@ export default function Contact() {
                     placeholder="(123) 456-7890"
                     autoComplete="tel"
                   />
+                </div>
+
+                <div>
                   <FormInput
-                    label="Email Address"
-                    type="email"
-                    name="email"
-                    value={form.email}
+                    label="Business Type / Industry"
+                    name="business_type"
+                    value={form.business_type}
                     onChange={handleChange}
-                    error={errors.email}
-                    required
-                    autoComplete="email"
+                    placeholder="e.g., HVAC, Dental, Roofing"
                   />
                 </div>
 
