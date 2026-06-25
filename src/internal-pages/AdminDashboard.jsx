@@ -66,6 +66,7 @@ import ProductionHardeningPanel from '../components/admin/ProductionHardeningPan
 import LeadQualityControl from '../components/admin/LeadQualityControl';
 import TabErrorBoundary from '../components/admin/TabErrorBoundary.jsx';
 import ResendSenderDiagnosticsPanel from '../components/admin/ResendSenderDiagnosticsPanel';
+import LaunchTruthSprintPanel from '../components/admin/LaunchTruthSprintPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -148,6 +149,7 @@ const NAV_GROUPS = [
   {
     group: 'System Health',
     items: [
+      { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
       { id: 'data-quality', label: 'Data Quality', icon: Activity },
       { id: 'platform-clients', label: 'Platform Clients', icon: Users },
       { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
@@ -322,6 +324,7 @@ export default function AdminDashboard() {
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'resend-diagnostics': return <ResendSenderDiagnosticsPanel />;
+      case 'launch-truth-sprint': return <LaunchTruthSprintPanel />;
       case 'failed-jobs': return <AdminFailedJobsPanel />;
       case 'instant-response': return <InstantLeadResponseDebugPanel />;
       case 'audit-log': return <AuditLogPanel />;
