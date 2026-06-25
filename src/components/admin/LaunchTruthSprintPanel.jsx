@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { Loader2, RefreshCw, ShieldCheck, AlertTriangle, AlertCircle, CheckCircle2, Clock, XCircle, ExternalLink } from "lucide-react";
+import { Loader2, RefreshCw, ShieldCheck, AlertTriangle, AlertCircle, CheckCircle2, Clock, XCircle, ExternalLink, Filter } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const STATUS_CONFIG = {
@@ -14,6 +14,14 @@ const STATUS_CONFIG = {
   waived: { label: "Waived", color: "bg-gray-100 text-gray-700", icon: XCircle },
 };
 
+const GATE_FILTERS = [
+  { id: "all", label: "All" },
+  { id: "blocked", label: "Blocked" },
+  { id: "ready_for_proof", label: "Ready for Proof" },
+  { id: "approved", label: "Approved" },
+  { id: "needs_manual_action", label: "Needs Manual Action" },
+];
+
 function StatusBadge({ status }) {
   const cfg = STATUS_CONFIG[status] || STATUS_CONFIG.locked;
   const Icon = cfg.icon;
@@ -22,6 +30,18 @@ function StatusBadge({ status }) {
       <Icon className="w-3 h-3" />
       {cfg.label}
     </span>
+  );
+}
+
+function SummaryCard({ label, value, color, icon: Icon }) {
+  return (
+    <div className="rounded-lg border border-border bg-card p-4 text-center">
+      <div className="flex items-center justify-center gap-1.5 mb-1">
+        {Icon && <Icon className={`w-4 h-4 ${color}`} />}
+        <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{label}</p>
+      </div>
+      <p className={`text-3xl font-bold ${color}`}>{value}</p>
+    </div>
   );
 }
 
@@ -51,6 +71,7 @@ export default function LaunchTruthSprintPanel() {
   const [report, setReport] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [gateFilter, setGateFilter] = useState("all");
 
   const runSprint = useCallback(async () => {
     setLoading(true);
@@ -59,15 +80,22 @@ export default function LaunchTruthSprintPanel() {
       const res = await base44.functions.invoke("runLaunchTruthSprint", {});
       setReport(res.data);
     } catch (err) {
-      setError(err?.message || "Failed to run Launch Truth Sprint. Check function logs.");
+      setError(err?.message || "Failed to run Launch Truth Sprint.");
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    runSprint();
-  }, [runSprint]);
+  useEffect(() => { runSprint(); }, [runSprint]);
+
+  const filteredGates = (report?.gates || []).filter(g => {
+    if (gateFilter === "all") return true;
+    if (gateFilter === "blocked") return g.status === "blocked";
+    if (gateFilter === "ready_for_proof") return g.status === "ready_for_proof";
+    if (gateFilter === "approved") return g.status === "approved" || g.status === "proof_passed";
+    if (gateFilter === "needs_manual_action") return g.status === "ready_for_proof" || g.status === "partial";
+    return true;
+  });
 
   if (loading && !report) {
     return (
@@ -97,7 +125,9 @@ export default function LaunchTruthSprintPanel() {
   const dt = s.dashboard_truth || {};
   const lc = s.lead_capture || {};
   const msg = s.messaging || {};
+  const sp = s.stripe_payment || {};
   const po = s.payment_onboarding || {};
+  const aj = s.automation_job_audit || {};
   const ga = s.ga4 || {};
   const ps = s.public_site || {};
 
@@ -107,37 +137,23 @@ export default function LaunchTruthSprintPanel() {
       <div className="flex items-start justify-between flex-wrap gap-4">
         <div>
           <h2 className="text-2xl font-bold text-foreground">Launch Truth Sprint</h2>
-          <p className="text-sm text-muted-foreground mt-1">
-            Real evidence for the lead-to-payment-to-onboarding path. No fake passes.
-          </p>
+          <p className="text-sm text-muted-foreground mt-1">Real evidence for the lead-to-payment-to-onboarding path. No fake passes.</p>
         </div>
-        <div className="flex items-center gap-3">
-          <button
-            onClick={runSprint}
-            disabled={loading}
-            className="cs-btn-primary inline-flex items-center gap-2 disabled:opacity-60"
-          >
-            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
-            {loading ? "Running..." : "Re-run Sprint"}
-          </button>
-        </div>
+        <button onClick={runSprint} disabled={loading} className="cs-btn-primary inline-flex items-center gap-2 disabled:opacity-60">
+          {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+          {loading ? "Running..." : "Re-run Sprint"}
+        </button>
       </div>
 
       {/* Safe to Launch Banner */}
       <div className={`rounded-xl border p-5 flex items-center gap-4 ${report.safe_to_launch ? "border-green-200 bg-green-50" : "border-red-200 bg-red-50"}`}>
-        {report.safe_to_launch ? (
-          <ShieldCheck className="w-8 h-8 text-green-600 flex-shrink-0" />
-        ) : (
-          <AlertTriangle className="w-8 h-8 text-red-600 flex-shrink-0" />
-        )}
+        {report.safe_to_launch ? <ShieldCheck className="w-8 h-8 text-green-600 flex-shrink-0" /> : <AlertTriangle className="w-8 h-8 text-red-600 flex-shrink-0" />}
         <div className="flex-1">
           <p className={`text-lg font-bold ${report.safe_to_launch ? "text-green-900" : "text-red-900"}`}>
             {report.safe_to_launch ? "Safe to Launch" : "NOT Safe to Launch"}
           </p>
           <p className={`text-sm ${report.safe_to_launch ? "text-green-800" : "text-red-800"}`}>
-            {report.safe_to_launch
-              ? "All gates passed or are ready for proof with no blockers."
-              : `${report.blocker_count} blocker(s) and ${report.warning_count} warning(s) must be resolved.`}
+            {report.safe_to_launch ? "All gates passed or ready for proof with no production blockers." : `${report.production_blocker_count} production blocker(s) and ${report.internal_cleanup_count} internal/test cleanup item(s).`}
           </p>
         </div>
         <div className="text-right">
@@ -146,19 +162,14 @@ export default function LaunchTruthSprintPanel() {
         </div>
       </div>
 
-      {/* Gate Summary */}
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {[
-          { label: "Blocked", value: report.gates_blocked, color: "text-red-600" },
-          { label: "Ready for Proof", value: report.gates_ready_for_proof, color: "text-blue-600" },
-          { label: "Proof Passed", value: report.gates_proof_passed, color: "text-green-600" },
-          { label: "Approved", value: report.gates_approved, color: "text-emerald-600" },
-        ].map((stat) => (
-          <div key={stat.label} className="rounded-lg border border-border bg-card p-4 text-center">
-            <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground">{stat.label}</p>
-            <p className={`text-3xl font-bold mt-1 ${stat.color}`}>{stat.value}</p>
-          </div>
-        ))}
+      {/* Top Summary Cards */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <SummaryCard label="Total Gates" value={report.total_gates} color="text-gray-700" icon={ShieldCheck} />
+        <SummaryCard label="Blocked" value={report.gates_blocked} color="text-red-600" icon={AlertCircle} />
+        <SummaryCard label="Ready for Proof" value={report.gates_ready_for_proof} color="text-blue-600" icon={Clock} />
+        <SummaryCard label="Passed/Approved" value={report.gates_proof_passed + report.gates_approved} color="text-green-600" icon={CheckCircle2} />
+        <SummaryCard label="Prod Blockers" value={report.production_blocker_count} color="text-red-600" icon={AlertTriangle} />
+        <SummaryCard label="Internal Cleanup" value={report.internal_cleanup_count} color="text-yellow-600" icon={AlertCircle} />
       </div>
 
       {/* A. Public Site Cleanliness */}
@@ -169,7 +180,20 @@ export default function LaunchTruthSprintPanel() {
           <EvidenceRow label="Sitemap Status" value={ps.sitemap_status} />
           <EvidenceRow label="Robots Status" value={ps.robots_status} />
           <EvidenceRow label="CTA Status" value={ps.cta_status} />
-          {ps.notes && <p className="text-xs text-muted-foreground italic mt-2">{ps.notes}</p>}
+          {ps.cta_checks && (
+            <div className="mt-3 space-y-1">
+              <p className="text-xs font-bold uppercase text-muted-foreground mb-1">CTA Proof Checklist (desktop + mobile)</p>
+              {ps.cta_checks.map((c, i) => (
+                <div key={i} className="flex items-center justify-between text-xs bg-muted/20 rounded px-2 py-1.5">
+                  <span className="text-foreground font-medium">{c.route}: {c.cta}</span>
+                  <span className="flex gap-1">
+                    <span className={c.desktop_proof ? "text-green-600" : "text-gray-400"}>Desktop {c.desktop_proof ? "✓" : "○"}</span>
+                    <span className={c.mobile_proof ? "text-green-600" : "text-gray-400"}>Mobile {c.mobile_proof ? "✓" : "○"}</span>
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       </SectionCard>
 
@@ -182,9 +206,7 @@ export default function LaunchTruthSprintPanel() {
               <EvidenceRow label="Lead ID" value={lc.latest_website_lead.id} />
               <EvidenceRow label="Source" value={lc.latest_website_lead.source} />
             </>
-          ) : (
-            <p className="text-sm text-red-600">⚠ No production-trusted WebsiteLead records found</p>
-          )}
+          ) : <p className="text-sm text-red-600">⚠ No production-trusted WebsiteLead records found</p>}
           {lc.latest_canonical_lead && (
             <>
               <EvidenceRow label="Canonical Lead" value={`${lc.latest_canonical_lead.name} — ${lc.latest_canonical_lead.lead_state}`} />
@@ -196,8 +218,17 @@ export default function LaunchTruthSprintPanel() {
               <EvidenceRow label="Consent Given" value={lc.consent_proof.consent_given ? "✓ Yes" : "✗ No"} />
               <EvidenceRow label="Consent At" value={lc.consent_proof.consent_given_at ? new Date(lc.consent_proof.consent_given_at).toLocaleString() : "—"} />
             </>
-          ) : (
-            <p className="text-sm text-yellow-700">⚠ Consent fields not captured on latest lead</p>
+          ) : <p className="text-sm text-yellow-700">⚠ Consent fields not captured on latest lead</p>}
+          {lc.linked_comm_logs?.length > 0 && (
+            <div className="mt-2">
+              <p className="text-xs font-bold uppercase text-muted-foreground mb-1">Linked Communication Logs</p>
+              {lc.linked_comm_logs.map((log, i) => (
+                <div key={i} className="text-xs bg-muted/20 rounded px-2 py-1.5 mb-1 flex items-center justify-between">
+                  <span className="text-foreground">{log.channel} — {log.trigger_name}</span>
+                  <span className={log.delivery_status === "delivered" ? "text-green-600 font-semibold" : "text-yellow-700"}>{log.delivery_status}</span>
+                </div>
+              ))}
+            </div>
           )}
           <div className="pt-2 border-t border-border">
             <EvidenceRow label="Production Trusted Leads" value={lc.production_trusted_leads} />
@@ -208,7 +239,7 @@ export default function LaunchTruthSprintPanel() {
       </SectionCard>
 
       {/* C. Messaging Proof */}
-      <SectionCard title="C. Messaging Proof (SMS + Email)" status={msg.status}>
+      <SectionCard title="C. Messaging Proof (SMS + Email)" status={msg.sms_status === "blocked" || msg.email_status === "blocked" ? "blocked" : "ready_for_proof"}>
         <div className="grid md:grid-cols-2 gap-4">
           <div className="space-y-2">
             <p className="text-xs font-bold uppercase text-muted-foreground">SMS</p>
@@ -219,9 +250,7 @@ export default function LaunchTruthSprintPanel() {
                 <EvidenceRow label="Provider ID" value={msg.latest_sms.provider_message_id} />
                 <EvidenceRow label="Trigger" value={msg.latest_sms.trigger_name} />
               </>
-            ) : (
-              <p className="text-sm text-red-600">No SMS records</p>
-            )}
+            ) : <p className="text-sm text-red-600">No SMS records</p>}
             <div className="pt-1">
               <EvidenceRow label="Delivered" value={msg.sms_delivered_count} />
               <EvidenceRow label="Sent" value={msg.sms_sent_count} />
@@ -237,9 +266,7 @@ export default function LaunchTruthSprintPanel() {
                 <EvidenceRow label="Provider ID" value={msg.latest_email.provider_message_id} />
                 <EvidenceRow label="Subject" value={msg.latest_email.subject} />
               </>
-            ) : (
-              <p className="text-sm text-red-600">No email records</p>
-            )}
+            ) : <p className="text-sm text-red-600">No email records</p>}
             <div className="pt-1">
               <EvidenceRow label="Sent" value={msg.email_sent_count} />
               <EvidenceRow label="Failed" value={msg.email_failed_count} />
@@ -252,31 +279,84 @@ export default function LaunchTruthSprintPanel() {
         <p className="text-sm text-primary font-semibold mt-2">Next: {msg.next_action}</p>
       </SectionCard>
 
-      {/* D. Payment + Onboarding Proof */}
-      <SectionCard title="D. Payment + Onboarding Proof" status={po.status}>
+      {/* D. Stripe Payment Proof */}
+      <SectionCard title="D. Stripe Payment Proof" status={sp.status}>
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-3">
+          <div className="text-center p-2 rounded-lg bg-green-50 border border-green-200">
+            <p className="text-xs text-muted-foreground">Prod Trusted Paid</p>
+            <p className="text-xl font-bold text-green-700">{sp.production_trusted_paid_count}</p>
+          </div>
+          <div className="text-center p-2 rounded-lg bg-yellow-50 border border-yellow-200">
+            <p className="text-xs text-muted-foreground">Paid but Excluded</p>
+            <p className="text-xl font-bold text-yellow-700">{sp.paid_but_excluded_count}</p>
+          </div>
+          <div className="text-center p-2 rounded-lg bg-blue-50 border border-blue-200">
+            <p className="text-xs text-muted-foreground">Pending</p>
+            <p className="text-xl font-bold text-blue-700">{sp.pending_payment_count}</p>
+          </div>
+          <div className="text-center p-2 rounded-lg bg-red-50 border border-red-200">
+            <p className="text-xs text-muted-foreground">Failed</p>
+            <p className="text-xl font-bold text-red-700">{sp.failed_payment_count}</p>
+          </div>
+          <div className="text-center p-2 rounded-lg bg-gray-50 border border-gray-200">
+            <p className="text-xs text-muted-foreground">Internal/Test Excluded</p>
+            <p className="text-xl font-bold text-gray-600">{sp.internal_test_excluded_count}</p>
+          </div>
+        </div>
+        <div className="space-y-2">
+          {sp.latest_paid_order ? (
+            <>
+              <EvidenceRow label="Latest Paid Order" value={`${sp.latest_paid_order.business_name} — ${sp.latest_paid_order.customer_email}`} />
+              <EvidenceRow label="Order ID" value={sp.latest_paid_order.id} />
+              <EvidenceRow label="Package" value={sp.latest_paid_order.selected_package_type} />
+              <EvidenceRow label="Payment Status" value={sp.latest_paid_order.payment_status} />
+              <EvidenceRow label="Has Stripe IDs" value={sp.latest_paid_order.has_stripe_ids ? "✓ Yes" : "✗ No"} />
+            </>
+          ) : <p className="text-sm text-red-600">⚠ No production-trusted paid Order records found</p>}
+        </div>
+        {sp.paid_but_excluded?.length > 0 && (
+          <div className="mt-3">
+            <p className="text-xs font-bold uppercase text-yellow-700 mb-1">Paid but Excluded (not production proof)</p>
+            {sp.paid_but_excluded.map((o, i) => (
+              <div key={i} className="text-xs bg-yellow-50 border border-yellow-200 rounded px-2 py-1.5 mb-1">
+                <span className="font-semibold text-foreground">{o.business_name}</span>
+                <span className="text-yellow-700"> — {o.exclusion_reason}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        {sp.internal_test_excluded?.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs font-bold uppercase text-muted-foreground mb-1">Internal/Test Excluded</p>
+            {sp.internal_test_excluded.slice(0, 3).map((o, i) => (
+              <div key={i} className="text-xs bg-muted/20 rounded px-2 py-1.5 mb-1">
+                <span className="font-semibold text-foreground">{o.business_name}</span>
+                <span className="text-muted-foreground"> — {o.exclusion_reason}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-sm text-primary font-semibold mt-2">Next: {sp.next_action}</p>
+      </SectionCard>
+
+      {/* D2. Payment + Onboarding Proof */}
+      <SectionCard title="D2. Payment + Onboarding Proof" status={po.status}>
         <div className="space-y-2">
           {po.latest_paid_order ? (
             <>
               <EvidenceRow label="Latest Paid Order" value={`${po.latest_paid_order.business_name} — ${po.latest_paid_order.customer_email}`} />
               <EvidenceRow label="Order ID" value={po.latest_paid_order.id} />
               <EvidenceRow label="Package" value={po.latest_paid_order.selected_package_type} />
-              <EvidenceRow label="Payment Status" value={po.latest_paid_order.payment_status} />
             </>
-          ) : (
-            <p className="text-sm text-red-600">⚠ No production-trusted paid Order records found</p>
-          )}
-          {po.latest_client_project && (
-            <EvidenceRow label="Client Project" value={`${po.latest_client_project.business_name} — ${po.latest_client_project.status}`} />
-          )}
+          ) : <p className="text-sm text-red-600">⚠ No production-trusted paid Order records found</p>}
+          {po.latest_client_project && <EvidenceRow label="Client Project" value={`${po.latest_client_project.business_name} — ${po.latest_client_project.status}`} />}
           {po.latest_install_os ? (
             <>
               <EvidenceRow label="Install OS" value={`${po.latest_install_os.business_name} — ${po.latest_install_os.workflow_stage}`} />
               <EvidenceRow label="Activation Status" value={po.latest_install_os.activation_status} />
               <EvidenceRow label="Checklist %" value={`${po.latest_install_os.checklist_completion_percent}%`} />
             </>
-          ) : (
-            <p className="text-sm text-yellow-700">⚠ No ClientInstallationOS record linked to latest order</p>
-          )}
+          ) : <p className="text-sm text-yellow-700">⚠ No ClientInstallationOS record linked to latest order</p>}
           {po.latest_automation_checklist && (
             <>
               <EvidenceRow label="Automation Checklist" value={`${po.latest_automation_checklist.business_name} — ${po.latest_automation_checklist.service_key}`} />
@@ -288,33 +368,84 @@ export default function LaunchTruthSprintPanel() {
         <p className="text-sm text-primary font-semibold mt-2">Next: {po.next_action}</p>
       </SectionCard>
 
-      {/* E. Dashboard Truth */}
-      <SectionCard title="E. Dashboard Truth" status={dt.safe_to_launch ? "proof_passed" : "blocked"}>
+      {/* E. Automation Job Truth Audit */}
+      <SectionCard title="E. Automation Job Truth Audit" status={dt.safe_to_launch ? "proof_passed" : "blocked"}>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-3">
           <div className="text-center p-2 rounded-lg bg-muted/30">
-            <p className="text-xs text-muted-foreground">Failed Jobs</p>
-            <p className={`text-xl font-bold ${dt.failed_jobs > 0 ? "text-red-600" : "text-green-600"}`}>{dt.failed_jobs}</p>
+            <p className="text-xs text-muted-foreground">Queued</p>
+            <p className="text-xl font-bold text-gray-700">{aj.total_by_status?.queued || 0}</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/30">
-            <p className="text-xs text-muted-foreground">Stuck Jobs</p>
-            <p className={`text-xl font-bold ${dt.stuck_jobs > 0 ? "text-red-600" : "text-green-600"}`}>{dt.stuck_jobs}</p>
+            <p className="text-xs text-muted-foreground">Processing</p>
+            <p className="text-xl font-bold text-blue-600">{aj.total_by_status?.processing || 0}</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/30">
-            <p className="text-xs text-muted-foreground">Queue Backlog</p>
-            <p className={`text-xl font-bold ${dt.event_queue_backlog > 10 ? "text-red-600" : "text-green-600"}`}>{dt.event_queue_backlog}</p>
+            <p className="text-xs text-muted-foreground">Completed</p>
+            <p className="text-xl font-bold text-green-600">{aj.total_by_status?.completed || 0}</p>
           </div>
           <div className="text-center p-2 rounded-lg bg-muted/30">
-            <p className="text-xs text-muted-foreground">Dead Letters</p>
-            <p className={`text-xl font-bold ${dt.dead_letter_count > 0 ? "text-red-600" : "text-green-600"}`}>{dt.dead_letter_count}</p>
+            <p className="text-xs text-muted-foreground">Failed</p>
+            <p className="text-xl font-bold text-red-600">{aj.total_by_status?.failed || 0}</p>
           </div>
         </div>
-        <div className="space-y-2 pt-2 border-t border-border">
+        <div className="grid md:grid-cols-2 gap-4 mb-3">
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase text-red-700">Production-Trusted</p>
+            <EvidenceRow label="Failed" value={aj.production_trusted?.failed || 0} />
+            <EvidenceRow label="Stuck" value={aj.production_trusted?.stuck || 0} />
+            <EvidenceRow label="Dead Letters" value={aj.production_trusted?.dead_letters || 0} />
+          </div>
+          <div className="space-y-2">
+            <p className="text-xs font-bold uppercase text-yellow-700">Internal/Test (Cleanup)</p>
+            <EvidenceRow label="Failed" value={aj.internal_test?.failed || 0} />
+            <EvidenceRow label="Stuck" value={aj.internal_test?.stuck || 0} />
+            <EvidenceRow label="Dead Letters" value={aj.internal_test?.dead_letters || 0} />
+          </div>
+        </div>
+        {aj.top_production_failed?.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs font-bold uppercase text-red-700 mb-1">Top Production Failed Jobs (max 10)</p>
+            {aj.top_production_failed.map((j, i) => (
+              <div key={i} className="text-xs bg-red-50 border border-red-200 rounded px-2 py-1.5 mb-1">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground">{j.job_type}</span>
+                  <span className="text-red-600">{new Date(j.created_date).toLocaleDateString()}</span>
+                </div>
+                <p className="text-red-700 mt-0.5 text-[11px]">Error: {j.last_error}</p>
+                <p className="text-muted-foreground mt-0.5 text-[11px]">Lead ID: {j.lead_id} — {j.next_action}</p>
+              </div>
+            ))}
+          </div>
+        )}
+        {aj.top_internal_failed?.length > 0 && (
+          <div className="mt-2">
+            <p className="text-xs font-bold uppercase text-yellow-700 mb-1">Top Internal/Test Failed (cleanup, not blockers)</p>
+            {aj.top_internal_failed.map((j, i) => (
+              <div key={i} className="text-xs bg-yellow-50 border border-yellow-200 rounded px-2 py-1.5 mb-1">
+                <span className="font-semibold text-foreground">{j.job_type}</span>
+                <span className="text-yellow-700"> — {j.exclusion_reason}</span>
+              </div>
+            ))}
+          </div>
+        )}
+        <p className="text-xs text-muted-foreground italic mt-2">{aj.note}</p>
+      </SectionCard>
+
+      {/* E2. Dashboard Truth Summary */}
+      <SectionCard title="E2. Dashboard Truth" status={dt.safe_to_launch ? "proof_passed" : "blocked"}>
+        <div className="space-y-2">
           <EvidenceRow label="Safe to Show Client" value={dt.safe_to_show_client ? "✓ Yes" : "✗ No"} />
           <EvidenceRow label="Safe to Show Admin" value={dt.safe_to_show_admin ? "✓ Yes" : "✗ No"} />
           <EvidenceRow label="Safe to Launch" value={dt.safe_to_launch ? "✓ Yes" : "✗ No"} />
           <EvidenceRow label="Test Pollution Detected" value={dt.test_pollution_detected ? "Yes (excluded)" : "No"} />
           <EvidenceRow label="Production Orders" value={dt.production_orders} />
           <EvidenceRow label="Test Orders Excluded" value={dt.test_orders_excluded} />
+          <EvidenceRow label="Production Leads" value={dt.production_leads} />
+          <EvidenceRow label="Test Leads Excluded" value={dt.test_leads_excluded} />
+          <EvidenceRow label="Failed Jobs (Total)" value={dt.failed_jobs_total} />
+          <EvidenceRow label="Failed Jobs (Production)" value={dt.failed_jobs_production} />
+          <EvidenceRow label="Failed Jobs (Internal)" value={dt.failed_jobs_internal} />
+          <EvidenceRow label="Event Queue Backlog" value={dt.event_queue_backlog} />
         </div>
         <p className="text-xs text-muted-foreground italic mt-2">{dt.note}</p>
       </SectionCard>
@@ -322,12 +453,24 @@ export default function LaunchTruthSprintPanel() {
       {/* F. GA4 / Analytics */}
       <SectionCard title="F. GA4 / Conversion Tracking" status={ga.status}>
         <div className="space-y-2">
-          <EvidenceRow label="Configured" value={ga.configured ? "✓ Yes" : "✗ No"} />
+          <EvidenceRow label="GA4 Record Exists" value={ga.record_exists ? "✓ Yes" : "✗ No"} />
           <EvidenceRow label="Measurement ID" value={ga.measurement_id || "Not configured"} />
+          <EvidenceRow label="ID Format Valid" value={ga.measurement_id_valid ? "✓ Yes" : "✗ No (expected G-XXXXXXX)"} />
+          <EvidenceRow label="Tracking Enabled" value={ga.tracking_enabled ? "✓ Yes" : "✗ No"} />
           <EvidenceRow label="Setup Status" value={ga.setup_status} />
-          <EvidenceRow label="Enabled" value={ga.enabled ? "✓ Yes" : "✗ No"} />
-          {ga.tracked_events?.length > 0 && (
-            <EvidenceRow label="Tracked Events" value={ga.tracked_events.join(", ")} />
+          <EvidenceRow label="Has Tracking Proof" value={ga.has_tracking_proof ? "✓ Yes" : "✗ No"} />
+        </div>
+        <div className="mt-3">
+          <p className="text-xs font-bold uppercase text-muted-foreground mb-1">Expected Events</p>
+          <div className="flex flex-wrap gap-1.5">
+            {ga.expected_events?.map(ev => (
+              <span key={ev} className={`text-xs px-2 py-0.5 rounded-full font-medium ${ga.tracked_events?.includes(ev) ? "bg-green-100 text-green-700" : "bg-red-100 text-red-700"}`}>
+                {ga.tracked_events?.includes(ev) ? "✓" : "✗"} {ev}
+              </span>
+            ))}
+          </div>
+          {ga.missing_events?.length > 0 && (
+            <p className="text-xs text-red-600 mt-1">Missing: {ga.missing_events.join(", ")}</p>
           )}
         </div>
         <p className="text-sm text-primary font-semibold mt-2">Next: {ga.next_action}</p>
@@ -335,33 +478,48 @@ export default function LaunchTruthSprintPanel() {
 
       {/* G. Launch Gates Table */}
       <div className="rounded-xl border border-border bg-card overflow-hidden">
-        <div className="p-4 border-b border-border">
+        <div className="p-4 border-b border-border flex items-center justify-between flex-wrap gap-3">
           <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">G. Launch Gates — Truth Status</h3>
+          <div className="flex items-center gap-1.5 flex-wrap">
+            <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+            {GATE_FILTERS.map(f => (
+              <button
+                key={f.id}
+                onClick={() => setGateFilter(f.id)}
+                className={`text-xs px-2.5 py-1 rounded-full font-medium transition-colors ${gateFilter === f.id ? "bg-gray-900 text-white" : "bg-muted text-muted-foreground hover:bg-muted/70"}`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs">Gate</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs">Status</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs">Blocker</th>
-                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs">Next Action</th>
-                <th className="px-3 py-2 text-center font-semibold text-muted-foreground text-xs">Completion</th>
-                <th className="px-3 py-2 text-center font-semibold text-muted-foreground text-xs">Proof</th>
+                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs whitespace-nowrap">Gate</th>
+                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs whitespace-nowrap">Status</th>
+                <th className="px-3 py-2 text-left font-semibold text-muted-foreground text-xs min-w-[200px]">Blocker / Next Action</th>
+                <th className="px-3 py-2 text-center font-semibold text-muted-foreground text-xs whitespace-nowrap">Completion</th>
+                <th className="px-3 py-2 text-center font-semibold text-muted-foreground text-xs whitespace-nowrap">Proof</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {report.gates?.map((gate) => (
+              {filteredGates.length === 0 ? (
+                <tr><td colSpan="5" className="px-3 py-6 text-center text-muted-foreground text-sm">No gates match this filter</td></tr>
+              ) : filteredGates.map(gate => (
                 <tr key={gate.gate_key} className="hover:bg-muted/20 transition-colors">
                   <td className="px-3 py-2">
                     <p className="font-medium text-foreground text-xs">{gate.gate_name}</p>
                     <p className="text-[10px] text-muted-foreground">{gate.section_label}</p>
                   </td>
                   <td className="px-3 py-2"><StatusBadge status={gate.status} /></td>
-                  <td className="px-3 py-2 text-xs text-red-700">{gate.current_blocker || "—"}</td>
-                  <td className="px-3 py-2 text-xs text-foreground">{gate.next_action}</td>
-                  <td className="px-3 py-2 text-center text-xs font-semibold text-foreground">{gate.completion_percent}%</td>
-                  <td className="px-3 py-2 text-center text-xs font-semibold text-foreground">{gate.proof_percent}%</td>
+                  <td className="px-3 py-2 text-xs">
+                    {gate.current_blocker && <p className="text-red-700 mb-0.5"><strong>Blocker:</strong> {gate.current_blocker}</p>}
+                    <p className="text-foreground"><strong>Next:</strong> {gate.next_action}</p>
+                  </td>
+                  <td className="px-3 py-2 text-center text-xs font-semibold text-foreground whitespace-nowrap">{gate.completion_percent}%</td>
+                  <td className="px-3 py-2 text-center text-xs font-semibold text-foreground whitespace-nowrap">{gate.proof_percent}%</td>
                 </tr>
               ))}
             </tbody>
@@ -369,17 +527,34 @@ export default function LaunchTruthSprintPanel() {
         </div>
       </div>
 
-      {/* Blockers Summary */}
-      {report.blockers?.length > 0 && (
+      {/* Production Launch Blockers */}
+      {report.production_blockers?.length > 0 && (
         <div className="rounded-xl border border-red-200 bg-red-50 p-5">
-          <h3 className="text-sm font-bold text-red-900 uppercase tracking-wide mb-3">Blockers Requiring Action</h3>
+          <h3 className="text-sm font-bold text-red-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <AlertTriangle className="w-4 h-4" /> Production Launch Blockers
+          </h3>
           <div className="space-y-2">
-            {report.blockers.map((b, i) => (
+            {report.production_blockers.map((b, i) => (
               <div key={i} className="flex items-start gap-2 text-sm text-red-800">
                 <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                <div>
-                  <span className="font-semibold">{b.gate}:</span> {b.message}
-                </div>
+                <div><span className="font-semibold">{b.gate}:</span> {b.message}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Internal/Test Cleanup Items */}
+      {report.internal_cleanup_items?.length > 0 && (
+        <div className="rounded-xl border border-yellow-200 bg-yellow-50 p-5">
+          <h3 className="text-sm font-bold text-yellow-900 uppercase tracking-wide mb-3 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4" /> Internal/Test Cleanup Items (not launch blockers)
+          </h3>
+          <div className="space-y-2">
+            {report.internal_cleanup_items.map((item, i) => (
+              <div key={i} className="flex items-start gap-2 text-sm text-yellow-800">
+                <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
+                <div><span className="font-semibold">{item.gate}:</span> {item.message}</div>
               </div>
             ))}
           </div>
