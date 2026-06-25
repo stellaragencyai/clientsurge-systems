@@ -90,15 +90,10 @@ export default function ProductSignup() {
   const [checkoutError, setCheckoutError] = useState(null);
 
   useEffect(() => {
-    // Parse URL param
     const params = new URLSearchParams(window.location.search);
     const pkg = params.get("package");
-    if (pkg && PLANS.some(p => p.id === pkg)) {
-      setSelectedPlanId(pkg);
-    } else {
-      // Default to Growth
-      setSelectedPlanId("growth_system");
-    }
+    const valid = PLANS.some(p => p.id === pkg);
+    setSelectedPlanId(valid ? pkg : "starter_system");
   }, []);
 
   const selectedPlan = PLANS.find(p => p.id === selectedPlanId);
