@@ -242,14 +242,13 @@ export default function PricingPageContent() {
                   ))}
                 </ul>
 
-                <a
-                  href={`/product-signup?package=${pkg.key}`}
-                  onClick={() => trackCTA(`package_${pkg.key}`, "pricing_page")}
-                  className={pkg.ctaStyle === "primary" ? "cs-btn-primary w-full text-center justify-center" : "w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors py-3 px-4"}
-                  style={{ minHeight: "unset", minWidth: "unset", textDecoration: "none" }}
-                >
-                  {pkg.cta}
-                </a>
+                <button
+                   onClick={() => handlePackageCTA(pkg)}
+                   className={pkg.ctaStyle === "primary" ? "cs-btn-primary w-full text-center justify-center" : "w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors py-3 px-4"}
+                   style={{ minHeight: "unset", minWidth: "unset" }}
+                 >
+                   {pkg.cta}
+                 </button>
               </div>
             </div>
           ))}
