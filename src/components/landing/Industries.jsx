@@ -117,34 +117,6 @@ const industries = [
   "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
 },
 {
-  id: "real-estate",
-  routePath: "/industries?industry=real-estate",
-  icon: KeyRound,
-  name: "Real Estate Agents",
-  accent: {
-    color: "#10b981",
-    soft: "rgba(16,185,129,0.18)",
-    glow: "rgba(16,185,129,0.28)",
-    iconBg: "rgba(16,185,129,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=95"
-},
-{
-  id: "personal-injury",
-  routePath: "/personal-injury",
-  icon: Scale,
-  name: "Personal Injury Law",
-  accent: {
-    color: "#8b5cf6",
-    soft: "rgba(139,92,246,0.18)",
-    glow: "rgba(139,92,246,0.28)",
-    iconBg: "rgba(139,92,246,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
-},
-{
   id: "property-services",
   routePath: "/industries?industry=property-services",
   icon: Building,
@@ -156,7 +128,21 @@ const industries = [
     iconBg: "rgba(5,150,105,0.18)"
   },
   image:
-  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=95"
+    "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=95"
+},
+{
+  id: "legal-services",
+  routePath: "/industries?industry=legal-services",
+  icon: Scale,
+  name: "Legal Services",
+  accent: {
+    color: "#8b5cf6",
+    soft: "rgba(139,92,246,0.18)",
+    glow: "rgba(139,92,246,0.28)",
+    iconBg: "rgba(139,92,246,0.18)"
+  },
+  image:
+    "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
 }];
 
 
