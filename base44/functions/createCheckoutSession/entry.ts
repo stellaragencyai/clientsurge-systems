@@ -290,11 +290,19 @@ Deno.serve(async (req) => {
       totalMonthly,
     });
 
-    // Create Order record
+    // FIX #8: Enforce E.164 phone normalization before persisting
+    const { normalizePhoneToE164 } = await import("../lib/phoneNormalization.js");
+    const normalizedPhone = customer_phone ? normalizePhoneToE164(customer_phone) : "";
+    
+    if (customer_phone && !normalizedPhone) {
+      return secureJson({ error: "Invalid phone number format", request_id: requestId }, { status: 400 });
+    }
+
+    // Create Order record with idempotency + normalized phone
     const order = await base44.asServiceRole.entities.Order.create({
       customer_email,
       customer_name: customer_name || "",
-      customer_phone: customer_phone || "",
+      customer_phone: normalizedPhone,
       lead_id: lead_id || crm_lead_id || "",
       crm_lead_id: crm_lead_id || lead_id || "",
       website_lead_id: website_lead_id || "",
@@ -307,6 +315,7 @@ Deno.serve(async (req) => {
       selected_package_type: pkgOffer?.package_key || null,
       package_type: pkgOffer?.package_key || null,
       plan_type: packageLabel,
+      idempotency_key: requestId,
     });
     createdOrderId = order.id;
 
@@ -314,6 +323,7 @@ Deno.serve(async (req) => {
     const finalSuccessUrl = success_url || `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancel_url || `${origin}/store`;
 
+    // FIX #6: Ensure Stripe metadata includes app_id + request_id for traceability + idempotency
     const sessionMetadata = {
       order_id: order.id,
       lead_id: lead_id || crm_lead_id || "",
@@ -321,12 +331,13 @@ Deno.serve(async (req) => {
       website_lead_id: website_lead_id || "",
       base44_app_id: Deno.env.get("BASE44_APP_ID"),
       customer_name: customer_name || "",
-      customer_phone: customer_phone || "",
+      customer_phone: normalizedPhone,
       business_name: business_name || "",
       package_key: pkgOffer?.package_key || "",
       package_type: pkgOffer?.package_key || "",
       plan_type: packageLabel,
       request_id: requestId,
+      idempotency_key: requestId,
       deploy_immediately: deploy_immediately ? "true" : "false",
     };
 

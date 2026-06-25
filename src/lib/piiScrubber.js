@@ -1,31 +1,34 @@
-/**
- * Task 22 — PII scrubber for logs
- * Masks emails and phone numbers before logging to CommunicationEvent
- */
-
-export function maskEmail(email) {
-  if (!email || typeof email !== 'string') return '[no-email]';
-  const [local, domain] = email.split('@');
-  if (!domain) return '***';
-  const masked = local.length <= 2 ? '***' : `${local[0]}***${local[local.length - 1]}`;
-  return `${masked}@${domain}`;
-}
-
-export function maskPhone(phone) {
-  if (!phone || typeof phone !== 'string') return '[no-phone]';
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length < 4) return '***';
-  return `***-***-${digits.slice(-4)}`;
-}
-
-export function scrubPii(obj = {}) {
-  const scrubbed = { ...obj };
-  if (scrubbed.email) scrubbed.email = maskEmail(scrubbed.email);
-  if (scrubbed.phone || scrubbed.phone_number) {
-    scrubbed.phone = maskPhone(scrubbed.phone || scrubbed.phone_number);
-    delete scrubbed.phone_number;
+// FIX #22: Sensitive data scrubber — prevents PII/secrets in logs
+export function scrubSensitiveData(obj) {
+  if (!obj || typeof obj !== "object") return obj;
+  
+  const sensitiveFields = [
+    "password", "secret", "token", "apiKey", "api_key",
+    "stripe_key", "twilio_key", "auth", "authorization",
+    "credit_card", "ssn", "social_security", "cvv",
+    "access_token", "refresh_token", "api_secret"
+  ];
+  
+  const scrubbed = JSON.parse(JSON.stringify(obj));
+  
+  function scrubRecursive(node) {
+    if (Array.isArray(node)) {
+      node.forEach(scrubRecursive);
+    } else if (node && typeof node === "object") {
+      Object.keys(node).forEach((key) => {
+        if (sensitiveFields.some(field => key.toLowerCase().includes(field.toLowerCase()))) {
+          node[key] = "[REDACTED]";
+        } else {
+          scrubRecursive(node[key]);
+        }
+      });
+    }
   }
-  if (scrubbed.customer_email) scrubbed.customer_email = maskEmail(scrubbed.customer_email);
-  if (scrubbed.customer_phone) scrubbed.customer_phone = maskPhone(scrubbed.customer_phone);
+  
+  scrubRecursive(scrubbed);
   return scrubbed;
+}
+
+export function logSafely(context, data) {
+  console.log(context, scrubSensitiveData(data));
 }

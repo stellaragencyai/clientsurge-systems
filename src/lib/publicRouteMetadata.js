@@ -133,6 +133,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "AI automation for personal injury law firms: immediate lead response, case type routing, consultation scheduling, missed-call recovery, and old lead reactivation.",
   },
+  "/real-estate": {
+    key: "real-estate",
+    title: "Real Estate Automation Systems | ClientSurge Systems",
+    description:
+      "AI automation for real estate agents and brokers: faster lead response, automated follow-up, consultation booking, missed-call recovery, and old inquiry reactivation.",
+  },
   "/privacy-policy": {
     key: "privacy",
     title: "Privacy Policy | ClientSurge Systems",
