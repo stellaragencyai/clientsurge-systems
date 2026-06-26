@@ -1,35 +1,20 @@
-import { secureJson } from "../_shared/response.ts";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+
 /**
  * generateWebsiteSpec — #416a #416b #416c #416d
  * Generates a structured WebsiteSpec JSON for a client based on tier + industry.
  * Starter: 1-page | Growth: 3-page | Elite: 5-page
  */
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
-// #416a: WebsiteSpec JSON schema
-interface WebsiteSpec {
-  order_id: string;
-  package_key: string;
-  industry: string;
-  pages: Page[];
-  brand: { primary_color: string; logo_url?: string; business_name: string };
-  status: "draft" | "approved" | "built";
-}
-
-interface Page {
-  name: string;
-  slug: string;
-  sections: Section[];
-}
-
-interface Section {
-  type: string;
-  copy_blocks?: Record<string, string>;
-  cta?: string;
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "X-Frame-Options": "DENY" },
+  });
 }
 
 // #416b: Starter 1-page spec (Hero + Problem + Solution + 2 Automations)
-function starterSpec(brand: any, industry: string): Page[] {
+function starterSpec(brand, industry) {
   return [{
     name: "Home",
     slug: "/",
@@ -44,7 +29,7 @@ function starterSpec(brand: any, industry: string): Page[] {
 }
 
 // #416c: Growth 3-page spec (Home + Services + Book Now)
-function growthSpec(brand: any, industry: string): Page[] {
+function growthSpec(brand, industry) {
   return [
     {
       name: "Home", slug: "/",
@@ -72,7 +57,7 @@ function growthSpec(brand: any, industry: string): Page[] {
 }
 
 // #416d: Elite 5-page spec (Home + Services + Industry Landing + Client Portal Login + Book)
-function eliteSpec(brand: any, industry: string): Page[] {
+function eliteSpec(brand, industry) {
   return [
     {
       name: "Home", slug: "/",
@@ -84,56 +69,60 @@ function eliteSpec(brand: any, industry: string): Page[] {
       ],
     },
     { name: "Services", slug: "/services", sections: [{ type: "services_detail" }, { type: "pricing_grid" }] },
-    { name: industry.replace("_", " ").replace(/\b\w/g, l => l.toUpperCase()), slug: `/${industry}`, sections: [{ type: "industry_hero" }, { type: "industry_pain_points" }, { type: "industry_solution" }, { type: "lead_capture_form" }] },
+    { name: industry.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()), slug: `/${industry}`, sections: [{ type: "industry_hero" }, { type: "industry_pain_points" }, { type: "industry_solution" }, { type: "lead_capture_form" }] },
     { name: "Client Portal", slug: "/client-portal", sections: [{ type: "portal_login" }] },
     { name: "Book Now", slug: "/book", sections: [{ type: "booking_embed" }] },
   ];
 }
 
-const SPEC_BY_TIER: Record<string, (brand: any, industry: string) => Page[]> = {
+const SPEC_BY_TIER = {
   starter: starterSpec,
+  starter_system: starterSpec,
   growth: growthSpec,
+  growth_system: growthSpec,
   elite: eliteSpec,
+  pro: eliteSpec,
+  pro_system: eliteSpec,
 };
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const { order_id } = await req.json();
-    if (!order_id) return secureJson({ error: "order_id required" }, { status: 400 });
+    if (!order_id) return json({ error: "order_id required" }, 400);
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
+    if (!order) return json({ error: "Order not found" }, 404);
 
-    const package_key = order.package_key || "starter";
+    const package_key = order.package_key || order.package_type || "starter";
     const industry = order.industry || "default";
     const brand = {
-      business_name: order.client_name || "Your Business",
-      primary_color: order.install_configuration?.brand?.primary_color || "#00D4FF",
+      business_name: order.customer_name || order.business_name || "Your Business",
+      primary_color: order.install_configuration?.brand?.primary_color || "#00AEEF",
       logo_url: order.install_configuration?.brand?.logo_url || null,
     };
 
     const pagesFn = SPEC_BY_TIER[package_key] || starterSpec;
     const pages = pagesFn(brand, industry);
 
-    const spec: WebsiteSpec = { order_id, package_key, industry, pages, brand, status: "draft" };
+    const spec = { order_id, package_key, industry, pages, brand, status: "draft" };
 
     // Save to WebsiteSpec entity
     const existing = await base44.asServiceRole.entities.WebsiteSpec.filter({ order_id }).catch(() => []);
-    let specId: string;
+    let specId;
     if (existing?.length > 0) {
-      await base44.asServiceRole.entities.WebsiteSpec.update(existing[0].id, { pages, brand, status: "draft" });
+      await base44.asServiceRole.entities.WebsiteSpec.update(existing[0].id, { pages: JSON.stringify(pages), brand: JSON.stringify(brand), status: "draft" });
       specId = existing[0].id;
     } else {
-      const created = await base44.asServiceRole.entities.WebsiteSpec.create({ order_id, package_key: package_key, industry, pages: JSON.stringify(pages), brand: JSON.stringify(brand), status: "draft" });
+      const created = await base44.asServiceRole.entities.WebsiteSpec.create({ order_id, package_key, industry, pages: JSON.stringify(pages), brand: JSON.stringify(brand), status: "draft" });
       specId = created.id;
     }
 
     // Advance workflow stage
-    await base44.asServiceRole.entities.Order.update(order_id, { workflow_stage: "Website Spec Generated" });
+    await base44.asServiceRole.entities.Order.update(order_id, { workflow_stage: "Website Spec Generated" }).catch(() => {});
 
-    return secureJson({ success: true, spec_id: specId, spec, page_count: pages.length });
+    return json({ success: true, spec_id: specId, spec, page_count: pages.length });
   } catch (err) {
-    return secureJson({ error: err.message }, { status: 500 });
+    return json({ error: err.message }, 500);
   }
 });

@@ -1,10 +1,17 @@
-import { secureJson } from "../_shared/response.ts";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+
 /**
  * applyWebsiteSpec — #441
  * Converts WebsiteSpec JSON into a structured, pasteable prompt for the site builder.
  * After approval (#440): auto-Telegrams Nolan with spec summary + deep link.
  */
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "X-Frame-Options": "DENY" },
+  });
+}
 
 Deno.serve(async (req) => {
   try {
@@ -12,19 +19,19 @@ Deno.serve(async (req) => {
     const { spec_id, order_id } = await req.json();
 
     const specId = spec_id || (await base44.asServiceRole.entities.WebsiteSpec.filter({ order_id }).catch(() => []))[0]?.id;
-    if (!specId) return secureJson({ error: "WebsiteSpec not found" }, { status: 404 });
+    if (!specId) return json({ error: "WebsiteSpec not found" }, 404);
 
     const spec = await base44.asServiceRole.entities.WebsiteSpec.get(specId).catch(() => null);
-    if (!spec) return secureJson({ error: "Spec not found" }, { status: 404 });
+    if (!spec) return json({ error: "Spec not found" }, 404);
 
     const pages = typeof spec.pages === "string" ? JSON.parse(spec.pages) : spec.pages;
     const brand = typeof spec.brand === "string" ? JSON.parse(spec.brand) : spec.brand;
 
     // #441: build structured pasteable prompt
-    const lines: string[] = [
+    const lines = [
       `# Website Build Spec — ${brand?.business_name || "Client"}`,
       `## Tier: ${spec.package_key} | Industry: ${spec.industry}`,
-      `## Brand Color: ${brand?.primary_color || "#00D4FF"}`,
+      `## Brand Color: ${brand?.primary_color || "#00AEEF"}`,
       `## Logo: ${brand?.logo_url || "Not provided"}`,
       "",
     ];
@@ -53,7 +60,7 @@ Deno.serve(async (req) => {
     // #440: Telegram Nolan with spec summary + deep link
     const botToken = Deno.env.get("TELEGRAM_BOT_TOKEN");
     if (botToken) {
-      const pageNames = (pages || []).map((p: any) => p.name).join(", ");
+      const pageNames = (pages || []).map((p) => p.name).join(", ");
       await fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
         method: "POST", headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
@@ -64,8 +71,8 @@ Deno.serve(async (req) => {
       }).catch(() => {});
     }
 
-    return secureJson({ success: true, spec_id: specId, prompt, page_count: pages?.length || 0 });
+    return json({ success: true, spec_id: specId, prompt, page_count: pages?.length || 0 });
   } catch (err) {
-    return secureJson({ error: err.message }, { status: 500 });
+    return json({ error: err.message }, 500);
   }
 });

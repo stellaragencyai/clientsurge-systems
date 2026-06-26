@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { Link } from "react-router-dom";
 import { ArrowRight, LockKeyhole, ShieldCheck } from "lucide-react";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
@@ -47,13 +48,13 @@ export default function Login() {
                 Sign In To Portal
                 <ArrowRight className="h-4 w-4" />
               </button>
-              <a
-                href="/contact"
+              <Link
+                to="/contact"
                 className="inline-flex min-h-12 items-center justify-center rounded-full border px-6 text-sm font-bold no-underline"
                 style={{ borderColor: "rgba(0,107,176,0.24)", color: "#006BB0" }}
               >
                 Need Help?
-              </a>
+              </Link>
             </div>
           </div>
 
