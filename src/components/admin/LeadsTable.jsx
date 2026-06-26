@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X, RefreshCw } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { fetchLeadPipelineSummary } from "@/lib/leadPipelineApi";
 
 const PAGE_SIZE = 25;
 
@@ -84,30 +85,22 @@ export default function LeadsTable() {
     return f;
   }, [filters]);
 
-  // Load KPIs — uses asServiceRole (admin-only page, safe elevation)
+  // Load KPIs — uses fetchLeadPipelineSummary which paginates through all leads
   useEffect(() => {
     const loadKpis = async () => {
       try {
-        const allLeads = await base44.entities.Leads.filter({}, "-created_date", 500);
-        const list = Array.isArray(allLeads) ? allLeads : [];
+        const data = await fetchLeadPipelineSummary({ limit: 1, offset: 0 });
+        const summary = data?.summary || {};
+        const statusCounts = summary.status_counts || {};
+        const total = summary.total_leads || 0;
 
-        const emailCounts = {};
-        const duplicates = new Set();
-        list.forEach((l) => {
-          const key = l?.normalized_email || l?.email;
-          if (key) {
-            emailCounts[key] = (emailCounts[key] || 0) + 1;
-            if (emailCounts[key] > 1) duplicates.add(key);
-          }
-        });
-
-        setDuplicateWarnings(duplicates.size);
         setKpis({
-          total: list.length,
-          hot: list.filter((l) => safeNum(l?.intelligence_score) >= 80).length,
-          new: list.filter((l) => l?.lead_state === "NEW").length,
-          booked: list.filter((l) => l?.lead_state === "BOOKED").length,
+          total,
+          hot: summary.segment_counts?.hot || 0,
+          new: statusCounts["New"] || 0,
+          booked: statusCounts["Booked"] || 0,
         });
+        setDuplicateWarnings(0);
       } catch {
         // KPIs are secondary — silent fail keeps the table usable
       }
@@ -338,26 +331,26 @@ export default function LeadsTable() {
 
       {/* Table */}
       <div className="rounded-lg border border-border bg-white overflow-hidden">
-        <div className="overflow-x-auto">
-          <table className="w-full text-sm">
+        <div className="overflow-x-auto" style={{ overflowX: "auto", WebkitOverflowScrolling: "touch" }}>
+          <table className="text-sm" style={{ minWidth: "1100px", width: "100%" }}>
             <thead className="bg-gray-50 border-b border-border">
               <tr>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Name</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Business</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Contact</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "120px" }}>Name</th>
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "140px" }}>Business</th>
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "180px" }}>Contact</th>
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "130px" }}>
                   <button onClick={() => handleSort("intelligence_score")} className="hover:text-primary transition-colors">
                     Intelligence {renderSortIcon("intelligence_score")}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">State</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">Quality</th>
-                <th className="px-4 py-3 text-left font-semibold text-muted-foreground">
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "90px" }}>State</th>
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "110px" }}>Quality</th>
+                <th className="px-3 py-3 text-left font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "100px" }}>
                   <button onClick={() => handleSort("created_date")} className="hover:text-primary transition-colors">
                     Created {renderSortIcon("created_date")}
                   </button>
                 </th>
-                <th className="px-4 py-3 text-center font-semibold text-muted-foreground">Actions</th>
+                <th className="px-3 py-3 text-center font-semibold text-muted-foreground whitespace-nowrap" style={{ minWidth: "70px" }}>Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
@@ -382,15 +375,15 @@ export default function LeadsTable() {
                   const seg = getIntelligenceSegmentBadge(lead?.intelligence_segment);
                   return (
                     <tr key={lead?.id || Math.random()} className={`${getRowHighlight(lead?.lead_state)} border-none`}>
-                      <td className="px-4 py-3 font-medium text-foreground">{safeStr(lead?.full_name)}</td>
-                      <td className="px-4 py-3 text-muted-foreground">{safeStr(lead?.business_name)}</td>
-                      <td className="px-4 py-3 text-muted-foreground">
+                      <td className="px-3 py-3 font-medium text-foreground whitespace-nowrap">{safeStr(lead?.full_name)}</td>
+                      <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">{safeStr(lead?.business_name)}</td>
+                      <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">
                         <div className="space-y-1">
-                          <div>{safeStr(lead?.email)}</div>
+                          <div className="truncate" style={{ maxWidth: "180px" }}>{safeStr(lead?.email)}</div>
                           {lead?.phone && <div className="text-xs">{lead.phone}</div>}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <div className="flex items-center gap-2">
                           <span className="inline-flex items-center px-2 py-1 rounded text-xs font-semibold bg-blue-100 text-blue-700">
                             {safeNum(lead?.intelligence_score)}
@@ -402,16 +395,16 @@ export default function LeadsTable() {
                           )}
                         </div>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-primary/10 text-primary">
                           {safeStr(lead?.lead_state, "NEW")}
                         </span>
                       </td>
-                      <td className="px-4 py-3">
+                      <td className="px-3 py-3 whitespace-nowrap">
                         {(() => {
                           const qs = lead?.quality_review_status;
                           if (qs === "quarantine_candidate" || qs === "quarantined") {
-                            return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800" title={lead?.quality_reason || "Flagged for review"}>⚠ Test/Internal</span>;
+                            return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800" title={lead?.quality_reason || "Flagged for review"}>⚠ Test</span>;
                           }
                           if (qs === "verified_outbound_ready") {
                             return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">✓ Verified</span>;
@@ -419,10 +412,10 @@ export default function LeadsTable() {
                           return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-600">{safeStr(qs, "active")}</span>;
                         })()}
                       </td>
-                      <td className="px-4 py-3 text-muted-foreground text-sm">
+                      <td className="px-3 py-3 text-muted-foreground text-sm whitespace-nowrap">
                         {safeDate(lead?.created_date)}
                       </td>
-                      <td className="px-4 py-3 text-center">
+                      <td className="px-3 py-3 text-center whitespace-nowrap">
                         <button
                           onClick={() => setDeleteTarget(lead)}
                           className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"

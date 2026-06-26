@@ -1,15 +1,19 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { stripeFetch, twilioFetch } from "../_shared/providerFetch.js";
-import { getStripeSecretKey, safeStripeError } from "../_shared/stripeInit.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+
+function getStripeSecretKey() {
+  const mode = (Deno.env.get("STRIPE_MODE") || "live").toLowerCase();
+  if (mode === "test") {
+    return Deno.env.get("STRIPE_TEST_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY") || "";
+  }
+  return Deno.env.get("STRIPE_LIVE_SECRET_KEY") || Deno.env.get("STRIPE_SECRET_KEY") || "";
+}
 
 async function pingTwilio() {
   const sid = Deno.env.get('TWILIO_ACCOUNT_SID');
   const token = Deno.env.get('TWILIO_AUTH_TOKEN');
-  if (!sid || !token) return { ok: false, error: 'Credentials not configured' };
+  if (!sid || !token) return { ok: false, error: 'TWILIO_ACCOUNT_SID or TWILIO_AUTH_TOKEN not set' };
   try {
-    const res = await twilioFetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
+    const res = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${sid}.json`, {
       headers: { 'Authorization': 'Basic ' + btoa(`${sid}:${token}`) },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -20,7 +24,7 @@ async function pingResend() {
   const key = Deno.env.get('RESEND_API_KEY');
   if (!key) return { ok: false, error: 'RESEND_API_KEY not set' };
   try {
-    const res = await resendFetch('https://api.resend.com/domains', {
+    const res = await fetch('https://api.resend.com/domains', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -28,15 +32,10 @@ async function pingResend() {
 }
 
 async function pingStripe() {
-  let key;
+  const key = getStripeSecretKey();
+  if (!key) return { ok: false, error: 'Stripe secret key not configured' };
   try {
-    key = getStripeSecretKey();
-  } catch (e) {
-    const safeError = safeStripeError(e);
-    return { ok: false, error: safeError.userMessage, code: safeError.code };
-  }
-  try {
-    const res = await stripeFetch('https://api.stripe.com/v1/balance', {
+    const res = await fetch('https://api.stripe.com/v1/balance', {
       headers: { 'Authorization': `Bearer ${key}` },
     });
     return res.ok ? { ok: true } : { ok: false, error: `HTTP ${res.status}` };
@@ -48,12 +47,11 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
     if (!user || user.role !== "admin") {
-      return secureJson({ error: "Admin access required" }, { status: 403 });
+      return Response.json({ error: "Admin access required" }, { status: 403 });
     }
 
-    // Parallel: settings, events, live pings
     const [settingsRecords, events, twilioResult, resendResult, stripeResult] = await Promise.all([
-      base44.asServiceRole.entities.AdminSettings.list(null, 1),
+      base44.asServiceRole.entities.AdminSettings.list("-created_date", 1),
       base44.asServiceRole.entities.CommunicationEvent.list("-created_date", 100),
       pingTwilio(),
       pingResend(),
@@ -124,7 +122,7 @@ Deno.serve(async (req) => {
     const totalCount = successCount + errorCount;
     const allHealthy = integrations.every(i => i.derived_status === 'healthy');
 
-    return secureJson({
+    return Response.json({
       success: true,
       generated_at: new Date().toISOString(),
       integrations,
@@ -143,6 +141,6 @@ Deno.serve(async (req) => {
     });
   } catch (error) {
     console.error("[getIntegrationHealth] Error:", error);
-    return secureJson({ error: "Failed to load integration health" }, { status: 500 });
+    return Response.json({ error: "Failed to load integration health" }, { status: 500 });
   }
 });

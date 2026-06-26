@@ -69,6 +69,7 @@ import ResendSenderDiagnosticsPanel from '../components/admin/ResendSenderDiagno
 import LaunchTruthSprintPanel from '../components/admin/LaunchTruthSprintPanel';
 import LaunchProofDashboard from '../components/admin/LaunchProofDashboard';
 import SystemIdentityPanel from '../components/admin/SystemIdentityPanel';
+import GuidedOnboarding from '../components/admin/GuidedOnboarding';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -113,10 +114,11 @@ const NAV_GROUPS = [
   {
     group: 'Clients & Onboarding',
     items: [
+      { id: 'guided-onboarding', label: 'Launch Guide', icon: Zap },
       { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
-      { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: Zap },
+      { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: ClipboardList },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
       { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
       { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
@@ -291,6 +293,7 @@ export default function AdminDashboard() {
           <LeadsRecentChanges />
         </div>
       );
+      case 'guided-onboarding': return <GuidedOnboarding onNavigate={(tab) => handleTabChange(tab)} />;
       case 'lead-intelligence': return <LeadIntelligenceDashboard />;
       case 'lead-quality': return <LeadQualityControl />;
       case 'crm-health': return <CrmHealthDashboard />;
@@ -522,7 +525,7 @@ function OverviewDashboard({ onNavigate }) {
     try {
       const [response, orderRecords, onboardingRecords] = await Promise.all([
         fetchLeadPipelineSummary({ limit: 10, offset: 0 }),
-        base44.asServiceRole.entities.Order.filter({ payment_status: "paid" }, "-created_date", 200).catch(() => []),
+        base44.entities.Order.filter({ payment_status: "paid" }, "-created_date", 200).catch(() => []),
         base44.entities.OnboardingClient.list("-created_date", 100).catch(() => []),
       ]);
       setSnapshot(response);
