@@ -60,6 +60,14 @@
     <meta name="twitter:image" content="https://clientsurgesystems.com/og-image.png" />
     <link rel="canonical" href="https://clientsurgesystems.com/" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <!-- Google tag (gtag.js) — GA4 Measurement ID: G-XRYMZ1M31K -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-XRYMZ1M31K"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-XRYMZ1M31K', { send_page_view: true });
+    </script>
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' 'unsafe-inline' https: https://assets.calendly.com https://calendly.com; style-src 'self' 'unsafe-inline' https:; img-src 'self' data: https:; frame-src https://calendly.com https://assets.calendly.com;" />
     <script type="application/ld+json" data-schema-id="static-homepage">
       {
@@ -766,7 +774,7 @@
     </div>
     <!-- Tracking pixels: hidden from assistive technology -->
     <img src="" alt="" role="presentation" aria-hidden="true" style="display:none;width:1px;height:1px;" />
-    <!-- GA4 loads from the React bootstrap when VITE_GA4_MEASUREMENT_ID is configured. -->
+    <!-- GA4 gtag.js loaded in <head> with hardcoded G-XRYMZ1M31K. React app also installs via lib/ga4.js. -->
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

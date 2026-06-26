@@ -19,7 +19,7 @@ export function getGa4MeasurementId(env = getDefaultEnv()) {
     env.VITE_GA4_MEASUREMENT_ID ||
       env.VITE_GOOGLE_ANALYTICS_ID ||
       env.VITE_GA_MEASUREMENT_ID ||
-      ""
+      "G-XRYMZ1M31K"
   )
     .trim()
     .toUpperCase();
