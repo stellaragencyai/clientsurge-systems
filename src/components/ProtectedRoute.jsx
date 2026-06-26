@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { Outlet } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
+import { useSessionValidation } from "@/hooks/useSessionValidation";
 
 const DefaultFallback = () => (
   <div className="fixed inset-0 flex items-center justify-center">
@@ -52,5 +53,11 @@ export default function ProtectedRoute({
     return unauthorizedElement || null;
   }
 
+  // Validate session on protected routes — catches revoked tokens
+  return <ProtectedOutlet />;
+}
+
+function ProtectedOutlet() {
+  useSessionValidation();
   return <Outlet />;
 }
