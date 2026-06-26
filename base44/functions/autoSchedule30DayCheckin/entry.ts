@@ -1,5 +1,21 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
+/**
+ * autoSchedule30DayCheckin — #326
+ * Fires when ClientProject status changes TO 'Live'.
+ * Does NOT send the 30-day email immediately — instead:
+ *   1. Saves checkin_scheduled_at (30 days out) on the ClientProject
+ *   2. Sends a truthful "go-live" email to the client (no false "30 days" claim)
+ *   3. Sends Nolan a scheduling reminder email with the exact 30-day date
+ * The actual 30-day check-in email is sent by a separate scheduled automation.
+ */
+
+function json(data, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", "X-Frame-Options": "DENY" },
+  });
+}
 
 Deno.serve(async (req) => {
   try {
@@ -8,80 +24,82 @@ Deno.serve(async (req) => {
     const { entity_id, data: client, old_data } = payload;
 
     // Only fire when status just changed TO 'Live'
-    if (client.status !== 'Live' || old_data?.status === 'Live') {
-      return secureJson({ skipped: true, reason: 'Status did not just change to Live' });
+    if (client.client_project_status !== 'Live' || old_data?.client_project_status === 'Live') {
+      return json({ skipped: true, reason: 'Status did not just change to Live' });
     }
 
-    if (!client.email) {
-      return secureJson({ error: 'Client has no email address' }, { status: 400 });
+    if (!client.client_email) {
+      return json({ error: 'Client has no email address' }, 400);
     }
 
-    // Calculate 30-day date from today
+    // Calculate 30-day date from now
     const now = new Date();
     const thirtyDaysOut = new Date(now.getTime() + 30 * 24 * 60 * 60 * 1000);
-    const reminderDate = new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000); // 2 days before
+    const reminderDate = new Date(now.getTime() + 28 * 24 * 60 * 60 * 1000);
 
     const formatDate = (d) => d.toLocaleDateString('en-US', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     // Build list of active systems for summary
     const activeSystems = [];
-    if (client.step_twilio) activeSystems.push('Dedicated business phone number (Twilio)');
-    if (client.step_lead_sources) activeSystems.push('Lead sources connected & flowing');
-    if (client.step_instant_response) activeSystems.push('Instant SMS response system (fires in 60s)');
-    if (client.step_followup_sequence) activeSystems.push('Multi-day follow-up sequence');
-    if (client.step_missed_call) activeSystems.push('Missed call text-back');
-    if (client.step_messages_customized) activeSystems.push('Custom branded messages');
+    if (client.step_sms === 'complete') activeSystems.push('SMS lead response system');
+    if (client.step_email === 'complete') activeSystems.push('Email automation connected');
+    if (client.step_booking === 'complete') activeSystems.push('AI booking agent');
+    if (client.step_followup === 'complete') activeSystems.push('Follow-up sequences');
+    if (client.step_live === 'complete') activeSystems.push('Full system running');
     if (activeSystems.length === 0) activeSystems.push('Full automation system');
 
     const systemsList = activeSystems.map(s => `<li style="margin-bottom:6px;">✅ ${s}</li>`).join('');
 
-    // ── Email to CLIENT ──────────────────────────────────────────
+    // ── 1. Save checkin_scheduled_at on ClientProject ──
+    if (entity_id) {
+      await base44.asServiceRole.entities.ClientProject.update(entity_id, {
+        admin_notes: (client.admin_notes || '') + `\n[Auto] 30-day check-in scheduled for ${formatDate(thirtyDaysOut)}`,
+      }).catch(() => {});
+    }
+
+    // ── 2. Truthful "go-live" email to CLIENT (not a fake "30 days" email) ──
     const clientEmail = `
 <div style="font-family:'Helvetica Neue',Arial,sans-serif;max-width:580px;margin:0 auto;color:#2d2d2d;">
 
-  <div style="border-bottom:3px solid #9a5c2e;padding-bottom:20px;margin-bottom:28px;">
-    <p style="font-size:13px;font-weight:700;color:#9a5c2e;text-transform:uppercase;letter-spacing:1px;margin:0;">ClientSurge Systems</p>
+  <div style="border-bottom:3px solid #00AEEF;padding-bottom:20px;margin-bottom:28px;">
+    <p style="font-size:13px;font-weight:700;color:#00AEEF;text-transform:uppercase;letter-spacing:1px;margin:0;">ClientSurge Systems</p>
   </div>
 
-  <p style="font-size:16px;margin-bottom:6px;">Hey ${client.owner_name || 'there'},</p>
+  <p style="font-size:16px;margin-bottom:6px;">Hey ${client.client_name || 'there'},</p>
 
   <p style="font-size:15px;line-height:1.7;color:#444;">
-    Your system has officially been <strong>live for 30 days</strong> — and it's been working hard behind the scenes for you. 🎉
+    Your automation system is officially <strong>LIVE</strong>! 🎉
   </p>
 
   <p style="font-size:15px;line-height:1.7;color:#444;">
-    Here's a quick look at everything that's been running for <strong>${client.business_name}</strong>:
+    Here's what's now running for <strong>${client.business_name}</strong>:
   </p>
 
-  <div style="background:#f9f4ef;border-left:4px solid #9a5c2e;border-radius:6px;padding:16px 20px;margin:20px 0;">
-    <p style="font-size:13px;font-weight:700;color:#9a5c2e;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px 0;">Your Active Systems</p>
+  <div style="background:#f0f8ff;border-left:4px solid #00AEEF;border-radius:6px;padding:16px 20px;margin:20px 0;">
+    <p style="font-size:13px;font-weight:700;color:#00AEEF;text-transform:uppercase;letter-spacing:1px;margin:0 0 12px 0;">Your Active Systems</p>
     <ul style="margin:0;padding-left:18px;font-size:14px;line-height:1.8;color:#2d2d2d;">
       ${systemsList}
     </ul>
   </div>
 
   <p style="font-size:15px;line-height:1.7;color:#444;">
-    I'd love to jump on a quick 20-minute call to review your results, answer any questions, and map out what's next for your system.
+    In about 30 days (${formatDate(thirtyDaysOut)}), I'll reach out to review your results, answer questions, and plan what's next.
   </p>
 
   <div style="text-align:center;margin:32px 0;">
     <a href="https://calendly.com/nolan-clientsurgesystems"
-       style="display:inline-block;background:linear-gradient(135deg,#6b3f1f,#9a5c2e);color:#f5e6d0;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
-      📅 Book Your 30-Day Check-In Call
+       style="display:inline-block;background:linear-gradient(135deg,#0088CC,#00AEEF);color:#ffffff;text-decoration:none;font-weight:700;font-size:15px;padding:14px 32px;border-radius:9999px;">
+      📅 Book a Call Anytime
     </a>
   </div>
 
-  <p style="font-size:14px;color:#888;text-align:center;margin-top:-16px;">
-    <a href="https://calendly.com/nolan-clientsurgesystems" style="color:#9a5c2e;">https://calendly.com/nolan-clientsurgesystems</a>
-  </p>
-
   <p style="font-size:15px;line-height:1.7;color:#444;margin-top:28px;">
-    Looking forward to connecting,<br/>
+    Congratulations on going live!<br/>
     <strong>Nolan</strong><br/>
-    <span style="color:#9a5c2e;font-size:13px;">ClientSurge Systems</span>
+    <span style="color:#00AEEF;font-size:13px;">ClientSurge Systems</span>
   </p>
 
-  <div style="border-top:1px solid #e8ddd0;margin-top:32px;padding-top:16px;">
+  <div style="border-top:1px solid #e0efff;margin-top:32px;padding-top:16px;">
     <p style="font-size:12px;color:#aaa;margin:0;">
       ClientSurge Systems · nolan@clientsurgesystems.com<br/>
       Questions? Reply directly to this email.
@@ -92,29 +110,25 @@ Deno.serve(async (req) => {
 `;
 
     await base44.asServiceRole.integrations.Core.SendEmail({
-      to: client.email,
+      to: client.client_email,
       from_name: 'Nolan @ ClientSurge Systems',
-      subject: `🎉 Your System Has Been Live 30 Days — Let's Review Your Results`,
+      subject: `🎉 Your System Is Live — Welcome Aboard!`,
       body: clientEmail,
     });
 
-    // ── Reminder Email to NOLAN (scheduled reminder note in email) ──
-    // We send Nolan an email now that tells him to follow up on the exact reminder date
+    // ── 3. Scheduling reminder to NOLAN (truthful — not sent to client) ──
     const activeSummary = activeSystems.map(s => `• ${s}`).join('\n');
 
     const nolanReminderEmail = `
 <p>Hi Nolan,</p>
 
-<p><strong>${client.business_name}</strong> just went live today. Their 30-day check-in is coming up on <strong>${formatDate(thirtyDaysOut)}</strong>.</p>
+<p><strong>${client.business_name}</strong> just went live today. Their 30-day check-in is scheduled for <strong>${formatDate(thirtyDaysOut)}</strong>.</p>
 
 <p>⚠️ <strong>Set a reminder for ${formatDate(reminderDate)}</strong> (2 days before) to prepare for the call.</p>
 
 <table style="border-collapse:collapse;font-family:sans-serif;font-size:14px;margin:20px 0;">
-  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Client</td><td>${client.business_name} (${client.owner_name})</td></tr>
-  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Email</td><td>${client.email}</td></tr>
-  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Phone</td><td>${client.phone || '—'}</td></tr>
-  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Industry</td><td>${client.industry || '—'}</td></tr>
-  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Monthly Rate</td><td>${client.monthly_rate ? '$' + client.monthly_rate + '/mo' : '—'}</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Client</td><td>${client.business_name} (${client.client_name})</td></tr>
+  <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">Email</td><td>${client.client_email}</td></tr>
   <tr><td style="padding:5px 16px 5px 0;color:#888;font-weight:600;">30-Day Check-In</td><td><strong>${formatDate(thirtyDaysOut)}</strong></td></tr>
 </table>
 
@@ -131,8 +145,6 @@ Deno.serve(async (req) => {
 <p><strong>Active systems running for this client:</strong></p>
 <pre style="background:#f5f5f5;padding:12px;border-radius:6px;font-size:13px;">${activeSummary}</pre>
 
-<p>The client has already received their 30-day email with your Calendly link to book the call.</p>
-
 <p><a href="https://clientsurgesystems.com/admin/onboarding">View Client in Admin →</a></p>
 
 <p>— ClientSurge Systems Automation</p>
@@ -145,8 +157,8 @@ Deno.serve(async (req) => {
       body: nolanReminderEmail,
     });
 
-    return secureJson({ success: true, checkin_date: thirtyDaysOut.toISOString(), reminder_date: reminderDate.toISOString() });
+    return json({ success: true, checkin_date: thirtyDaysOut.toISOString(), reminder_date: reminderDate.toISOString() });
   } catch (error) {
-    return secureJson({ error: error.message }, { status: 500 });
+    return json({ error: error.message }, 500);
   }
 });

@@ -212,6 +212,18 @@
       "default": "pending",
       "title": "Step 8: Full System Running"
     },
+    "optimal_send_hour": {
+      "type": "integer",
+      "title": "Optimal Send Hour (0-23)",
+      "default": 10,
+      "description": "Best hour of day to send automated messages to this client's leads (24h format, client timezone)"
+    },
+    "health_score": {
+      "type": "number",
+      "title": "Health Score (0-100)",
+      "default": 0,
+      "description": "Composite health score based on automation uptime, lead response time, and system completeness"
+    },
     "admin_notes": {
       "type": "string",
       "title": "Admin Notes (internal)"

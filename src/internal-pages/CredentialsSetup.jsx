@@ -59,10 +59,25 @@ export default function CredentialsSetup() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <div className="text-center space-y-3">
-          <Loader2 className="w-8 h-8 animate-spin text-primary mx-auto" />
-          <p className="text-sm text-muted-foreground">Verifying your order...</p>
+      <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+        <div className="max-w-2xl mx-auto px-6 py-12">
+          <div className="text-center mb-8">
+            <div className="w-10 h-10 rounded-full border-4 border-slate-200 border-t-[#00AEEF] animate-spin mx-auto mb-4" />
+            <p className="text-sm font-semibold text-slate-600">Verifying your order...</p>
+          </div>
+          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
+            <div className="p-6 space-y-4">
+              <div className="h-6 w-48 rounded-lg bg-slate-100 animate-pulse" />
+              <div className="h-4 w-full rounded-lg bg-slate-100 animate-pulse" />
+              <div className="h-4 w-3/4 rounded-lg bg-slate-100 animate-pulse" />
+              <div className="space-y-3 pt-4">
+                <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
+                <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
+                <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
+              </div>
+              <div className="h-12 w-full rounded-xl bg-slate-100 animate-pulse" />
+            </div>
+          </div>
         </div>
       </div>
     );

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { ArrowRight, Zap, Mail, Calendar, Star, RefreshCw, X, Play, CheckCircle, Headphones } from "lucide-react";
 import { Link } from "react-router-dom";
 import { setPageMetadata } from "@/lib/seo";
@@ -132,8 +132,25 @@ const BRAND = {
 };
 
 function VideoPlaceholder({ service, onClose }) {
+  const dialogRef = useRef(null);
+
+  useEffect(() => {
+    const handleEscape = (e) => {
+      if (e.key === "Escape") onClose();
+    };
+    document.addEventListener("keydown", handleEscape);
+    // Focus the close button on mount
+    const closeBtn = dialogRef.current?.querySelector("button[aria-label]");
+    closeBtn?.focus();
+    return () => document.removeEventListener("keydown", handleEscape);
+  }, [onClose]);
+
   return (
     <div
+      ref={dialogRef}
+      role="dialog"
+      aria-modal="true"
+      aria-label={`${service.title} preview`}
       className="fixed inset-0 z-50 flex items-center justify-center p-4"
       style={{ background: "rgba(0,0,0,0.88)", backdropFilter: "blur(10px)" }}
       onClick={onClose}

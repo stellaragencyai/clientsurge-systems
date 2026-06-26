@@ -359,6 +359,18 @@
       "type": "string",
       "title": "Last Install Event At"
     },
+    "activation_started_at": {
+      "type": "string",
+      "title": "Activation Started At",
+      "format": "date-time",
+      "description": "Timestamp when service activation/install began"
+    },
+    "activation_completed_at": {
+      "type": "string",
+      "title": "Activation Completed At",
+      "format": "date-time",
+      "description": "Timestamp when all services were fully activated/live"
+    },
     "install_configuration": {
       "type": "object",
       "title": "Install Configuration",
