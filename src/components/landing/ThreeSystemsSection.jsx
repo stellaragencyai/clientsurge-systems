@@ -1,6 +1,5 @@
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Wallet } from "lucide-react";
 import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import SectionHeader from "@/components/design-system/SectionHeader";
@@ -118,13 +117,10 @@ export default function ThreeSystemsSection() {
         {/* Package cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-5 items-stretch">
           {PACKAGES.map((pkg, idx) => (
-            <motion.div
+            <div
               key={pkg.name}
-              className="relative flex flex-col"
-              style={{ paddingTop: pkg.highlight ? "32px" : 0 }}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+              className="relative flex flex-col animate-fade-in-up"
+              style={{ paddingTop: pkg.highlight ? "32px" : 0, animationDelay: `${idx * 0.1}s` }}
             >
               {/* Floating "Recommended" pill badge */}
               {pkg.highlight && (
@@ -190,8 +186,8 @@ export default function ThreeSystemsSection() {
                   </div>
 
                   {/* CTA at bottom */}
-                  <Link
-                    to={pkg.href}
+                  <a
+                    href={pkg.href}
                     onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.href.split("=")[1] })}
                     className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200"
                     style={pkg.highlight ? {
@@ -207,11 +203,11 @@ export default function ThreeSystemsSection() {
                     }}
                   >
                     {pkg.cta} <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  </a>
                 </div>
               </div>
-            </motion.div>
-          ))}
+            </div>
+            ))}
         </div>
 
         {/* Guidance text */}
