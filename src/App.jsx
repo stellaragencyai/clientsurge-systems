@@ -121,6 +121,7 @@ const SystemObservabilityDashboard = lazy(() => import("./components/mission-con
 const FunnelOptimizationPage = lazy(() => import("./components/admin/FunnelOptimizationDashboard"));
 const RealEstate = lazy(() => import("./pages/RealEstate"));
 const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
+const LaunchControl = lazy(() => import("./pages/LaunchControl"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -166,6 +167,7 @@ const HIDDEN_PUBLIC_ROUTES = [
   { route: routePath("setup", "status"), Component: SetupStatus },
   { route: routePath("setup", "preview", dynamicParam("specId")), Component: WebsitePreview },
   { route: routePath("setup", "preview"), Component: WebsitePreview },
+  { route: routePath("launch-control"), Component: LaunchControl },
 ];
 
 const isPublicPath = (pathname) =>

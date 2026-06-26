@@ -1,0 +1,222 @@
+{
+  "name": "AIInstallBlueprint",
+  "type": "object",
+  "title": "AI Install Blueprint",
+  "description": "Client-specific installation blueprint generated from website scan + onboarding details.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "industry": {
+      "type": "string",
+      "title": "Industry"
+    },
+    "package_key": {
+      "type": "string",
+      "title": "Package Key"
+    },
+    "blueprint_status": {
+      "type": "string",
+      "title": "Blueprint Status",
+      "enum": [
+        "draft",
+        "generated",
+        "client_review",
+        "approved",
+        "changes_requested"
+      ],
+      "default": "draft"
+    },
+    "detected_lead_paths": {
+      "type": "array",
+      "title": "Detected Lead Paths",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "automation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "required_integrations": {
+      "type": "array",
+      "title": "Required Integrations",
+      "items": {
+        "type": "string"
+      }
+    },
+    "six_automations": {
+      "type": "array",
+      "title": "Six Canonical Automations",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service_key": {
+            "type": "string"
+          },
+          "display_name": {
+            "type": "string"
+          },
+          "config_summary": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "message_template_plan": {
+      "type": "object",
+      "title": "Message Template Plan",
+      "properties": {
+        "sms_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "service_key": {
+                "type": "string"
+              },
+              "template": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "email_templates": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "service_key": {
+                "type": "string"
+              },
+              "subject": {
+                "type": "string"
+              },
+              "body": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "booking_rules": {
+      "type": "string",
+      "title": "Booking Rules"
+    },
+    "sms_phone_rules": {
+      "type": "string",
+      "title": "SMS / Phone Rules"
+    },
+    "email_domain_rules": {
+      "type": "string",
+      "title": "Email / Domain Rules"
+    },
+    "test_plan": {
+      "type": "array",
+      "title": "Test Plan",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario": {
+            "type": "string"
+          },
+          "service_key": {
+            "type": "string"
+          },
+          "expected_outcome": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "launch_blockers": {
+      "type": "array",
+      "title": "Launch Blockers",
+      "items": {
+        "type": "string"
+      }
+    },
+    "generated_at": {
+      "type": "string",
+      "title": "Generated At",
+      "format": "date-time"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By"
+    },
+    "raw_blueprint": {
+      "type": "string",
+      "title": "Raw Blueprint JSON"
+    }
+  },
+  "required": [
+    "order_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

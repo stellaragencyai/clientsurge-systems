@@ -1,4 +1,10 @@
-import { secureJson } from "../_shared/response.ts";
+function secureJson(data, options = {}) {
+  const status = options.status || 200;
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+}
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 
 /**
@@ -10,17 +16,19 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
  * using predefined step templates. Skips steps that already exist (step_id dedup).
  */
 
-// ─── Step templates (mirrors lib/automationChecklistSteps.js) ───────────────
-//
-// IMPORTANT: TEMPORARY MIRROR OF lib/automationChecklistSteps.js
-// Base44 Deno functions are deployed independently and cannot reliably import
-// frontend/lib files. When editing checklist templates, update BOTH this
-// inlined map AND lib/automationChecklistSteps.js to keep them in sync.
-//
-// Template version constant — bump this (and the copy in lib/automationChecklistSteps.js)
-// whenever step content changes so drift is immediately visible in logs.
-const BACKEND_TEMPLATE_VERSION = "2026-04-29-v1";
+const BACKEND_TEMPLATE_VERSION = "2026-06-26-v1";
 
+// Standard 6 steps for every Pro activation checklist
+const STANDARD_CHECKLIST_STEPS = [
+  { id: "configured", label: "Service Configured", order: 1 },
+  { id: "connected", label: "Integration Connected", order: 2 },
+  { id: "tested", label: "Tested", order: 3 },
+  { id: "provider_log_verified", label: "Provider Log Verified", order: 4 },
+  { id: "client_approved", label: "Client Approved", order: 5 },
+  { id: "live", label: "Live", order: 6 },
+];
+
+// Legacy per-service step templates (kept for backward compat only)
 const CHECKLIST_STEPS_BY_SERVICE = {
   instant_lead_response: [
     { id: "lead_form_connected",    label: "Lead form connected",                   order: 1 },
@@ -90,14 +98,12 @@ const CHECKLIST_STEPS_BY_SERVICE = {
  * Idempotent: fetches existing steps first, only creates missing ones.
  * Returns { created, skipped } counts.
  */
-async function createChecklistSteps(base44, checklistId, orderId, serviceKey) {
-  const templates = CHECKLIST_STEPS_BY_SERVICE[serviceKey];
+async function createStandardChecklistSteps(base44, checklistId, orderId, serviceKey) {
+  const templates = STANDARD_CHECKLIST_STEPS;
   if (!templates?.length) {
-    console.warn(`[Install OS] No step templates found for service_key: "${serviceKey}"`);
     return { created: 0, skipped: 0 };
   }
 
-  // Fetch existing steps for this checklist to enable idempotency
   const existingSteps = await base44.asServiceRole.entities.AutomationChecklistStep.filter(
     { automation_checklist_id: checklistId },
     "step_order",
@@ -125,7 +131,7 @@ async function createChecklistSteps(base44, checklistId, orderId, serviceKey) {
     created++;
   }
 
-  console.log(`[Install OS] Steps for "${serviceKey}" [template v${BACKEND_TEMPLATE_VERSION}]: ${created} created, ${skipped} skipped (already existed)`);
+  console.log(`[Install OS] Standard steps for "${serviceKey}" [v${BACKEND_TEMPLATE_VERSION}]: ${created} created, ${skipped} skipped`);
   return { created, skipped };
 }
 // #371: verified — called from stripeWebhookOrders when new Order is created
@@ -173,16 +179,63 @@ Deno.serve(async (req) => {
     console.log(`[Install OS] Initializing Client Installation OS for order ${order_id}`);
 
     // ─────────────────────────────────────
-    // VALID SERVICE KEYS (from canonical registry)
+    // CANONICAL PRO ACTIVATION KEYS (fulfillment truth — not billing truth)
+    // For pro_system orders, we seed exactly these six, regardless of Stripe line items.
     // ─────────────────────────────────────
-    const VALID_SERVICE_KEYS = new Set([
+    const CANONICAL_PRO_SERVICE_KEYS = [
       "instant_lead_response",
       "missed_call_text_back",
       "nurture_sequence_14d",
       "ai_booking_agent",
-      "lead_reactivation",
-      "review_request",
-    ]);
+      "daily_lead_digest",
+      "inbound_sms_assistant",
+    ];
+
+    // Legacy alias normalization (centralized here — do not duplicate elsewhere)
+    const LEGACY_ALIAS_MAP = {
+      missed_call_textback: "missed_call_text_back",
+      appointment_booking: "ai_booking_agent",
+      followup_sequences: "nurture_sequence_14d",
+      elite_system: "pro_system",
+    };
+
+    function normalizeServiceKey(raw) {
+      if (!raw) return raw;
+      const key = String(raw).trim().toLowerCase();
+      return LEGACY_ALIAS_MAP[key] || key;
+    }
+
+    function resolvePackageKey(order) {
+      const raw = order.package_key || order.package_type || order.selected_package_type || "";
+      const key = String(raw).trim().toLowerCase();
+      if (key.includes("pro") || key === "elite_system") return "pro_system";
+      if (key.includes("growth")) return "growth_system";
+      if (key.includes("starter") || key.includes("basic")) return "starter_system";
+      return null;
+    }
+
+    function getFulfillmentServiceKeys(order) {
+      const pkgKey = resolvePackageKey(order);
+      if (pkgKey === "pro_system") {
+        // Pro orders always get the six canonical keys
+        return CANONICAL_PRO_SERVICE_KEYS;
+      }
+      // Non-package orders: use line-item service keys (normalized)
+      const keys = (order.items || [])
+        .map((item) => normalizeServiceKey(item.service_key))
+        .filter(Boolean);
+      return [...new Set(keys)];
+    }
+
+    // Standard 6 steps for every Pro activation checklist
+    const STANDARD_CHECKLIST_STEPS = [
+      { id: "configured", label: "Service Configured", order: 1 },
+      { id: "connected", label: "Integration Connected", order: 2 },
+      { id: "tested", label: "Tested", order: 3 },
+      { id: "provider_log_verified", label: "Provider Log Verified", order: 4 },
+      { id: "client_approved", label: "Client Approved", order: 5 },
+      { id: "live", label: "Live", order: 6 },
+    ];
 
     // Create ClientInstallationOS
     const installOS = await base44.asServiceRole.entities.ClientInstallationOS.create({
@@ -196,33 +249,22 @@ Deno.serve(async (req) => {
       activation_status: "not_ready",
     });
 
-    // Create AutomationChecklist + AutomationChecklistStep records for each service
-    // DEFENSIVE: validate and deduplicate service_keys
+    // ── Determine fulfillment service keys ────────────────────────────────
+    // For pro_system packages: always seed the six canonical keys.
+    // For non-package orders: use normalized line-item service keys.
+    const fulfillmentKeys = getFulfillmentServiceKeys(order);
+    console.log(`[Install OS] Fulfillment keys for order ${order_id}: [${fulfillmentKeys.join(", ")}]`);
+
     const allChecklistIds = [];
     const seenServiceKeys = new Set();
-    const stepSummary = []; // per-service step creation summary
+    const stepSummary = [];
 
-    for (const item of order.items || []) {
-      const serviceKey = item.service_key;
-
-      // Validate service_key exists
-      if (!serviceKey) {
-        console.warn(`[Install OS] Skipped item with missing service_key`);
-        continue;
-      }
-
-      // Validate service_key is known
-      if (!VALID_SERVICE_KEYS.has(serviceKey)) {
-        console.warn(`[Install OS] Skipped invalid service_key: "${serviceKey}" (not in canonical registry)`);
-        continue;
-      }
-
-      // Deduplicate: skip if already processed
+    for (const serviceKey of fulfillmentKeys) {
+      if (!serviceKey) continue;
       if (seenServiceKeys.has(serviceKey)) {
         console.warn(`[Install OS] Skipped duplicate service_key: "${serviceKey}"`);
         continue;
       }
-
       seenServiceKeys.add(serviceKey);
       console.log(`[Install OS] Processing service_key: "${serviceKey}"`);
 
@@ -238,8 +280,8 @@ Deno.serve(async (req) => {
       allChecklistIds.push(checklist.id);
       console.log(`[Install OS] Checklist created for service_key: "${serviceKey}" (id: ${checklist.id})`);
 
-      // ── Auto-create AutomationChecklistStep records ──────────────────────
-      const stepResult = await createChecklistSteps(base44, checklist.id, order_id, serviceKey);
+      // ── Create the six standard checklist steps ───────────────────────────
+      const stepResult = await createStandardChecklistSteps(base44, checklist.id, order_id, serviceKey);
       stepSummary.push({ service_key: serviceKey, checklist_id: checklist.id, ...stepResult });
     }
 

@@ -1,0 +1,189 @@
+{
+  "name": "SimulationRun",
+  "type": "object",
+  "title": "Simulation Run",
+  "description": "AI Simulation Lab run containing multiple scenario results. Must pass before go-live.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "run_status": {
+      "type": "string",
+      "title": "Run Status",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Started At",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    },
+    "total_scenarios": {
+      "type": "integer",
+      "title": "Total Scenarios",
+      "default": 0
+    },
+    "passed_scenarios": {
+      "type": "integer",
+      "title": "Passed Scenarios",
+      "default": 0
+    },
+    "failed_scenarios": {
+      "type": "integer",
+      "title": "Failed Scenarios",
+      "default": 0
+    },
+    "scenario_results": {
+      "type": "array",
+      "title": "Scenario Results",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario_id": {
+            "type": "string"
+          },
+          "scenario_name": {
+            "type": "string"
+          },
+          "service_key": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "pass",
+              "fail",
+              "pending"
+            ]
+          },
+          "lead_capture_verified": {
+            "type": "boolean"
+          },
+          "intent_classification_verified": {
+            "type": "boolean"
+          },
+          "sms_response_verified": {
+            "type": "boolean"
+          },
+          "email_response_verified": {
+            "type": "boolean"
+          },
+          "crm_sync_verified": {
+            "type": "boolean"
+          },
+          "nurture_enrollment_verified": {
+            "type": "boolean"
+          },
+          "booking_cta_verified": {
+            "type": "boolean"
+          },
+          "stop_handling_verified": {
+            "type": "boolean"
+          },
+          "digest_inclusion_verified": {
+            "type": "boolean"
+          },
+          "proof_log_created": {
+            "type": "boolean"
+          },
+          "failure_reason": {
+            "type": "string"
+          },
+          "repair_action": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "repair_tasks": {
+      "type": "array",
+      "title": "Repair Tasks Generated",
+      "items": {
+        "type": "object",
+        "properties": {
+          "scenario_id": {
+            "type": "string"
+          },
+          "task": {
+            "type": "string"
+          },
+          "priority": {
+            "type": "string",
+            "enum": [
+              "low",
+              "medium",
+              "high",
+              "critical"
+            ]
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "order_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

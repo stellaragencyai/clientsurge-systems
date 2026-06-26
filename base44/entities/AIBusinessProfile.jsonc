@@ -1,0 +1,189 @@
+{
+  "name": "AIBusinessProfile",
+  "type": "object",
+  "title": "AI Business Profile",
+  "description": "Client-specific AI brand voice profile. No AI-generated messages go live until approved.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "business_summary": {
+      "type": "string",
+      "title": "Business Summary"
+    },
+    "brand_tone": {
+      "type": "string",
+      "title": "Brand Tone"
+    },
+    "ideal_lead_types": {
+      "type": "array",
+      "title": "Ideal Lead Types",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approved_vocabulary": {
+      "type": "array",
+      "title": "Approved Vocabulary",
+      "items": {
+        "type": "string"
+      }
+    },
+    "blocked_topics": {
+      "type": "array",
+      "title": "Blocked Topics",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sms_templates": {
+      "type": "array",
+      "title": "SMS Templates",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service_key": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "template": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "email_templates": {
+      "type": "array",
+      "title": "Email Templates",
+      "items": {
+        "type": "object",
+        "properties": {
+          "service_key": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "subject": {
+            "type": "string"
+          },
+          "body": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "booking_prompts": {
+      "type": "array",
+      "title": "Booking Prompts",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nurture_copy": {
+      "type": "string",
+      "title": "Nurture Copy"
+    },
+    "daily_digest_tone": {
+      "type": "string",
+      "title": "Daily Digest Tone"
+    },
+    "escalation_rules": {
+      "type": "string",
+      "title": "Escalation Rules"
+    },
+    "lead_qualification_questions": {
+      "type": "array",
+      "title": "Lead Qualification Questions",
+      "items": {
+        "type": "string"
+      }
+    },
+    "approval_status": {
+      "type": "string",
+      "title": "Approval Status",
+      "enum": [
+        "pending",
+        "approved",
+        "changes_requested"
+      ],
+      "default": "pending"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    },
+    "approved_by": {
+      "type": "string",
+      "title": "Approved By"
+    },
+    "generated_at": {
+      "type": "string",
+      "title": "Generated At",
+      "format": "date-time"
+    },
+    "raw_profile": {
+      "type": "string",
+      "title": "Raw AI Profile JSON"
+    }
+  },
+  "required": [
+    "order_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

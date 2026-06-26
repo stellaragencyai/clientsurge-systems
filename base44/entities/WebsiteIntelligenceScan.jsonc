@@ -1,0 +1,262 @@
+{
+  "name": "WebsiteIntelligenceScan",
+  "type": "object",
+  "title": "Website Intelligence Scan",
+  "description": "AI-powered pre-scan of client website detecting pages, forms, CTAs, lead paths, and tracking gaps.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "website_url": {
+      "type": "string",
+      "title": "Website URL"
+    },
+    "scan_status": {
+      "type": "string",
+      "title": "Scan Status",
+      "enum": [
+        "pending",
+        "in_progress",
+        "completed",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "scanned_at": {
+      "type": "string",
+      "title": "Scanned At",
+      "format": "date-time"
+    },
+    "pages": {
+      "type": "array",
+      "title": "Detected Pages",
+      "items": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "page_type": {
+            "type": "string"
+          },
+          "has_form": {
+            "type": "boolean"
+          },
+          "has_cta": {
+            "type": "boolean"
+          },
+          "has_phone": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "forms": {
+      "type": "array",
+      "title": "Detected Forms",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page_url": {
+            "type": "string"
+          },
+          "form_id": {
+            "type": "string"
+          },
+          "fields": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "has_consent_checkbox": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "cta_buttons": {
+      "type": "array",
+      "title": "Detected CTA Buttons",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": {
+            "type": "string"
+          },
+          "page_url": {
+            "type": "string"
+          },
+          "link": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "phone_numbers": {
+      "type": "array",
+      "title": "Detected Phone Numbers",
+      "items": {
+        "type": "string"
+      }
+    },
+    "email_addresses": {
+      "type": "array",
+      "title": "Detected Email Addresses",
+      "items": {
+        "type": "string"
+      }
+    },
+    "booking_links": {
+      "type": "array",
+      "title": "Detected Booking Links",
+      "items": {
+        "type": "string"
+      }
+    },
+    "visible_services": {
+      "type": "array",
+      "title": "Visible Services",
+      "items": {
+        "type": "string"
+      }
+    },
+    "detected_industry": {
+      "type": "string",
+      "title": "Detected Industry"
+    },
+    "lead_paths": {
+      "type": "array",
+      "title": "Detected Lead Paths",
+      "items": {
+        "type": "object",
+        "properties": {
+          "page_url": {
+            "type": "string"
+          },
+          "page_title": {
+            "type": "string"
+          },
+          "lead_intent": {
+            "type": "string"
+          },
+          "confidence": {
+            "type": "number"
+          },
+          "confirmed": {
+            "type": "boolean",
+            "default": false
+          },
+          "edited_intent": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "missing_consent_language": {
+      "type": "boolean",
+      "title": "Missing Consent Language"
+    },
+    "tracking_gaps": {
+      "type": "array",
+      "title": "Tracking Gaps",
+      "items": {
+        "type": "string"
+      }
+    },
+    "mobile_cta_issues": {
+      "type": "array",
+      "title": "Mobile CTA Issues",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Confidence Score (0-100)",
+      "default": 0
+    },
+    "recommended_lead_path_mapping": {
+      "type": "array",
+      "title": "Recommended Lead Path Mapping",
+      "items": {
+        "type": "object",
+        "properties": {
+          "source": {
+            "type": "string"
+          },
+          "intent": {
+            "type": "string"
+          },
+          "automation": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "raw_scan_result": {
+      "type": "string",
+      "title": "Raw AI Scan Result"
+    }
+  },
+  "required": [
+    "order_id",
+    "website_url"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

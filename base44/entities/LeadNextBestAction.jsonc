@@ -1,0 +1,127 @@
+{
+  "name": "LeadNextBestAction",
+  "type": "object",
+  "title": "Lead Next-Best-Action",
+  "description": "Predictive lead value and next-best-action calculated for every new lead.",
+  "properties": {
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "lead_name": {
+      "type": "string",
+      "title": "Lead Name"
+    },
+    "lead_email": {
+      "type": "string",
+      "title": "Lead Email"
+    },
+    "lead_phone": {
+      "type": "string",
+      "title": "Lead Phone"
+    },
+    "lead_intent": {
+      "type": "string",
+      "title": "Lead Intent"
+    },
+    "urgency": {
+      "type": "string",
+      "title": "Urgency Level",
+      "enum": [
+        "low",
+        "medium",
+        "high",
+        "critical"
+      ],
+      "default": "medium"
+    },
+    "estimated_opportunity": {
+      "type": "number",
+      "title": "Estimated Opportunity ($)",
+      "default": 0
+    },
+    "likelihood_to_book": {
+      "type": "number",
+      "title": "Likelihood to Book (%)",
+      "default": 0
+    },
+    "risk_of_going_cold": {
+      "type": "number",
+      "title": "Risk of Going Cold (%)",
+      "default": 0
+    },
+    "best_next_action": {
+      "type": "string",
+      "title": "Best Next Action"
+    },
+    "human_should_call": {
+      "type": "boolean",
+      "title": "Human Should Call",
+      "default": false
+    },
+    "automation_should_continue": {
+      "type": "boolean",
+      "title": "Automation Should Continue",
+      "default": true
+    },
+    "confidence_score": {
+      "type": "number",
+      "title": "Confidence Score (0-100)",
+      "default": 0
+    },
+    "reason_summary": {
+      "type": "string",
+      "title": "Reason Summary",
+      "maxLength": 500
+    },
+    "calculated_at": {
+      "type": "string",
+      "title": "Calculated At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "lead_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.lead_id": {
+            "$in": [
+              "{{leads.id}}"
+            ]
+          }
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

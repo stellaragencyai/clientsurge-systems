@@ -1,0 +1,152 @@
+{
+  "name": "ActivationWizardSession",
+  "type": "object",
+  "title": "Activation Wizard Session",
+  "description": "Durable state record tracking the client's progress through the Pro Activation Wizard.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "package_key": {
+      "type": "string",
+      "title": "Package Key"
+    },
+    "current_step": {
+      "type": "integer",
+      "title": "Current Step Number",
+      "default": 0
+    },
+    "completed_steps": {
+      "type": "array",
+      "title": "Completed Steps",
+      "items": {
+        "type": "integer"
+      }
+    },
+    "blockers": {
+      "type": "array",
+      "title": "Blockers",
+      "items": {
+        "type": "object",
+        "properties": {
+          "step": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "identified_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      }
+    },
+    "status": {
+      "type": "string",
+      "title": "Session Status",
+      "enum": [
+        "in_progress",
+        "completed",
+        "blocked",
+        "abandoned"
+      ],
+      "default": "in_progress"
+    },
+    "last_updated_at": {
+      "type": "string",
+      "title": "Last Updated At",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    },
+    "setup_authorization_id": {
+      "type": "string",
+      "title": "Setup Authorization ID"
+    },
+    "website_scan_id": {
+      "type": "string",
+      "title": "Website Intelligence Scan ID"
+    },
+    "blueprint_id": {
+      "type": "string",
+      "title": "AI Install Blueprint ID"
+    },
+    "business_profile_id": {
+      "type": "string",
+      "title": "AI Business Profile ID"
+    },
+    "simulation_run_id": {
+      "type": "string",
+      "title": "Simulation Run ID"
+    }
+  },
+  "required": [
+    "order_id",
+    "current_step",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

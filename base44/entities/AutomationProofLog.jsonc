@@ -1,0 +1,137 @@
+{
+  "name": "AutomationProofLog",
+  "type": "object",
+  "title": "Automation Proof Log",
+  "description": "Go-live decision record proving each Pro automation passed its required test before go-live.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "service_key": {
+      "type": "string",
+      "title": "Service Key",
+      "enum": [
+        "instant_lead_response",
+        "missed_call_text_back",
+        "nurture_sequence_14d",
+        "ai_booking_agent",
+        "daily_lead_digest",
+        "inbound_sms_assistant",
+        "ai_voice_receptionist",
+        "lead_reactivation",
+        "review_request"
+      ]
+    },
+    "test_type": {
+      "type": "string",
+      "title": "Test Type",
+      "enum": [
+        "form_submission",
+        "missed_call_test",
+        "enrollment_test",
+        "booking_cta_test",
+        "digest_delivery_test",
+        "inbound_reply_classification_test",
+        "stop_reply_test",
+        "incomplete_form_test",
+        "high_intent_booking_test"
+      ]
+    },
+    "status": {
+      "type": "string",
+      "title": "Proof Status",
+      "enum": [
+        "pending",
+        "pass",
+        "fail"
+      ],
+      "default": "pending"
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary",
+      "maxLength": 1000
+    },
+    "communication_event_id": {
+      "type": "string",
+      "title": "CommunicationEvent ID"
+    },
+    "communication_log_id": {
+      "type": "string",
+      "title": "CommunicationLog ID"
+    },
+    "provider_message_id": {
+      "type": "string",
+      "title": "Provider Message ID"
+    },
+    "tested_at": {
+      "type": "string",
+      "title": "Tested At",
+      "format": "date-time"
+    },
+    "tested_by": {
+      "type": "string",
+      "title": "Tested By"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason"
+    },
+    "repair_action": {
+      "type": "string",
+      "title": "Repair Action"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    }
+  },
+  "required": [
+    "order_id",
+    "service_key",
+    "test_type",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

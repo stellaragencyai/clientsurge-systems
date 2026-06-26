@@ -1,0 +1,152 @@
+{
+  "name": "SmartAccessRequest",
+  "type": "object",
+  "title": "Smart Access Request",
+  "description": "Tracks per-provider access requests with least-privilege default. Raw credentials are fallback only.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "provider": {
+      "type": "string",
+      "title": "Provider",
+      "enum": [
+        "website_cms",
+        "dns_provider",
+        "domain_registrar",
+        "email_domain",
+        "booking_calendar",
+        "crm",
+        "twilio_phone",
+        "google_analytics",
+        "google_search_console"
+      ]
+    },
+    "access_type": {
+      "type": "string",
+      "title": "Access Type",
+      "enum": [
+        "collaborator_invite",
+        "oauth_connect",
+        "guided_dns_records",
+        "temp_credentials_fallback"
+      ]
+    },
+    "recommended_method": {
+      "type": "string",
+      "title": "Recommended Method",
+      "enum": [
+        "collaborator_invite",
+        "oauth_connect",
+        "guided_dns_records",
+        "temp_credentials_fallback"
+      ]
+    },
+    "client_instructions": {
+      "type": "string",
+      "title": "Client Instructions"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "not_requested",
+        "requested",
+        "submitted",
+        "verified",
+        "failed",
+        "skipped"
+      ],
+      "default": "not_requested"
+    },
+    "verification_status": {
+      "type": "string",
+      "title": "Verification Status",
+      "enum": [
+        "pending",
+        "verified",
+        "failed"
+      ],
+      "default": "pending"
+    },
+    "blocker_reason": {
+      "type": "string",
+      "title": "Blocker Reason"
+    },
+    "submitted_at": {
+      "type": "string",
+      "title": "Submitted At",
+      "format": "date-time"
+    },
+    "verified_at": {
+      "type": "string",
+      "title": "Verified At",
+      "format": "date-time"
+    },
+    "verified_by": {
+      "type": "string",
+      "title": "Verified By"
+    },
+    "repair_instructions": {
+      "type": "string",
+      "title": "Repair Instructions"
+    }
+  },
+  "required": [
+    "order_id",
+    "provider"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

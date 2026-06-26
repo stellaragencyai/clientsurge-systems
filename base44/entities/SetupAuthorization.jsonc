@@ -1,0 +1,110 @@
+{
+  "name": "SetupAuthorization",
+  "type": "object",
+  "title": "Setup Authorization Agreement",
+  "description": "Durable record of client acceptance of the Setup Authorization Agreement. Blocks access collection until accepted.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "accepted_at": {
+      "type": "string",
+      "title": "Accepted At",
+      "format": "date-time"
+    },
+    "accepted_by_email": {
+      "type": "string",
+      "title": "Accepted By Email"
+    },
+    "accepted_ip": {
+      "type": "string",
+      "title": "Accepted IP Address"
+    },
+    "user_agent": {
+      "type": "string",
+      "title": "User Agent"
+    },
+    "agreement_version": {
+      "type": "string",
+      "title": "Agreement Version",
+      "default": "2026-06-26-v1"
+    },
+    "accepted_scopes": {
+      "type": "array",
+      "title": "Accepted Authorization Scopes",
+      "items": {
+        "type": "string"
+      },
+      "description": "Scopes: website_form_edits, dns_records, email_authentication, sms_email_automation, tracking_scripts, twilio_call_forwarding, booking_integration, test_leads, temp_credentials_fallback, client_go_live_approval"
+    },
+    "authorization_status": {
+      "type": "string",
+      "title": "Authorization Status",
+      "enum": [
+        "pending",
+        "accepted",
+        "revoked"
+      ],
+      "default": "pending"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    }
+  },
+  "required": [
+    "order_id",
+    "accepted_by_email",
+    "agreement_version",
+    "authorization_status"
+  ],
+  "rls": {
+    "create": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
