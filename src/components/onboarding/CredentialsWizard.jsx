@@ -298,12 +298,9 @@ export default function CredentialsWizard({ order, onComplete }) {
 
   useEffect(() => {
     // Check if authorization already accepted
-    base44.functions.invoke("checkSetupAuthorization", {}).then(() => {}).catch(() => {});
-    // Use the order_id to check
     const checkAuth = async () => {
       try {
-        const res = await fetch(`/api/functions/checkSetupAuthorization?order_id=${order?.id}`);
-        const result = await res.json();
+        const result = await base44.functions.invoke("checkSetupAuthorization", { order_id: order?.id });
         if (result?.authorized) {
           setAuthorized(true);
           setCurrentStep(1);

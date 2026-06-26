@@ -11,7 +11,15 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const url = new URL(req.url);
-    const order_id = url.searchParams.get("order_id");
+    let order_id = url.searchParams.get("order_id");
+
+    // Also accept order_id from request body (for SDK invoke calls)
+    if (!order_id) {
+      try {
+        const body = await req.json();
+        order_id = body?.order_id;
+      } catch {}
+    }
 
     if (!order_id) return json({ error: "order_id required" }, 400);
 

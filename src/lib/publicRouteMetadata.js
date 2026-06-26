@@ -169,6 +169,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Enter your email or order ID to see exactly where your AI automation system setup stands. No login required.",
   },
+  "/launch-control": {
+    key: "launch-control",
+    title: "Launch Control Center | ClientSurge Systems",
+    description:
+      "Real-time visibility into your automation setup progress, checklist completion, proof logs, and go-live readiness.",
+  },
   "/login": {
     key: "login",
     title: "Client Login | ClientSurge Systems",
@@ -308,6 +314,7 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/success",
   "/order-success",
   "/thank-you",
+  "/launch-control",
 ];
 
 export const PUBLIC_ROUTE_PATHS = [
@@ -392,6 +399,7 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/success",
   "/thank-you",
   "/setup-lookup",
+  "/launch-control",
 ];
 
 export const SITEMAP_STATIC_PATHS = [

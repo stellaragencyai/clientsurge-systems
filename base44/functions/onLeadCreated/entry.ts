@@ -1,5 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+
+function secureJson(data, opts = {}) {
+  return new Response(JSON.stringify(data), {
+    status: opts.status || 200,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store" },
+  });
+}
 
 Deno.serve(async (req) => {
   try {
@@ -157,6 +163,18 @@ Deno.serve(async (req) => {
       console.log(`[onLeadCreated] AI intelligence score: ${intelligenceScore?.score} tier=${intelligenceScore?.tier}`);
     } catch (intelligenceErr) {
       console.log('[onLeadCreated] AI scoring failed (non-blocking):', intelligenceErr.message);
+    }
+
+    // ─────────────────────────────────────────────────────
+    // STEP Y: Compute LeadNextBestAction — predictive value + next-best-action
+    // ─────────────────────────────────────────────────────
+    try {
+      await base44.asServiceRole.functions.invoke('computeLeadNextBestAction', {
+        lead_id: data.id,
+      });
+      console.log(`[onLeadCreated] Next-best-action computed for lead ${data.id}`);
+    } catch (nbaErr) {
+      console.log('[onLeadCreated] Next-best-action failed (non-blocking):', nbaErr.message);
     }
 
         return secureJson({ success: true, payload });
