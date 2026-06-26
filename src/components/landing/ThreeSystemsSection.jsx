@@ -1,5 +1,5 @@
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Wallet } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import SectionHeader from "@/components/design-system/SectionHeader";
@@ -70,6 +70,7 @@ const PACKAGES = [
 ];
 
 export default function ThreeSystemsSection() {
+  const navigate = useNavigate();
   return (
     <section
       id="pricing"
@@ -119,8 +120,8 @@ export default function ThreeSystemsSection() {
           {PACKAGES.map((pkg, idx) => (
             <div
               key={pkg.name}
-              className="relative flex flex-col animate-fade-in-up"
-              style={{ paddingTop: pkg.highlight ? "32px" : 0, animationDelay: `${idx * 0.1}s` }}
+              className="relative flex flex-col"
+              style={{ paddingTop: pkg.highlight ? "32px" : 0 }}
             >
               {/* Floating "Recommended" pill badge */}
               {pkg.highlight && (
@@ -186,10 +187,13 @@ export default function ThreeSystemsSection() {
                   </div>
 
                   {/* CTA at bottom */}
-                  <a
-                    href={pkg.href}
-                    onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.href.split("=")[1] })}
-                    className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200"
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.href.split("=")[1] });
+                      navigate(pkg.href);
+                    }}
+                    className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200 cursor-pointer border-none"
                     style={pkg.highlight ? {
                       background: "linear-gradient(90deg, #0079c1, #005691)",
                       color: "#fff",
@@ -203,7 +207,7 @@ export default function ThreeSystemsSection() {
                     }}
                   >
                     {pkg.cta} <ArrowRight className="w-4 h-4" />
-                  </a>
+                  </button>
                 </div>
               </div>
             </div>
