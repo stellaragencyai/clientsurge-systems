@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router-dom";
 import { ArrowRight, AlertCircle } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
@@ -78,18 +79,14 @@ const PLANS = [
 ];
 
 export default function ProductSignup() {
-   // Read ?package= synchronously with null safety
-   const [selectedPlanId, setSelectedPlanId] = useState(() => {
-     if (typeof window === "undefined") return "starter_system";
-     try {
-       const params = new URLSearchParams(window.location.search);
-       const pkg = params?.get?.("package");
-       if (!pkg || typeof pkg !== "string") return "starter_system";
-       return PLANS.some(p => p.id === pkg) ? pkg : "starter_system";
-     } catch (e) {
-       return "starter_system";
-     }
-   });
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  // Reactively read ?package= from URL — updates when URL changes
+  const pkgParam = searchParams.get("package");
+  const selectedPlanId = PLANS.some(p => p.id === pkgParam) ? pkgParam : "starter_system";
+  const setSelectedPlanId = (planId) => {
+    setSearchParams({ package: planId }, { replace: true });
+  };
   const [formData, setFormData] = useState({
     fullName: "",
     businessName: "",
@@ -171,7 +168,6 @@ export default function ProductSignup() {
                 key={plan.id}
                 onClick={() => {
                   setSelectedPlanId(plan.id);
-                  window.history.replaceState(null, "", `?package=${plan.id}`);
                 }}
                 className="w-full text-left p-6 rounded-lg border-2 transition-all"
                 style={{

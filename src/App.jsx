@@ -181,8 +181,8 @@ const isPublicPath = (pathname) =>
 // PathNormalizer — single source of truth for all path normalization
 // Handles: uppercase → lowercase, legacy admin aliases, industry slug aliases
 const PATH_EXPLICIT_MAP = {
-  "/Dashboard": "/mission-control",
-  "/AdminSettings": "/mission-control",
+  "/Dashboard": "/admin",
+  "/AdminSettings": "/admin",
   "/AdminLeadDetail": "/admin?tab=leads",
   "/LeadIntelligence": "/admin",
   "/Sam": "/admin",

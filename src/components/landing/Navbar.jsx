@@ -126,7 +126,7 @@ export default function Navbar() {
       return;
     }
     navigate("/");
-    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }), 0);
+    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }), 50);
   };
 
   // ── Dropdown menu item style with blue vertical spine ──

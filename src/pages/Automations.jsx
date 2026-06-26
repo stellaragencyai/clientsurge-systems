@@ -291,7 +291,7 @@ function ServiceCard({ service }) {
 
           {/* CTA */}
           <Link
-            to="/book"
+            to={`/book?service=${service.id}`}
             className="cs-btn-primary w-full"
           >
             Get This System <ArrowRight className="w-4 h-4" />

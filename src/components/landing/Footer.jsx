@@ -1,6 +1,7 @@
 import { ArrowUp, Mail, Phone, Shield, Zap, Calendar, RefreshCw, Star, Headphones } from "lucide-react";
 
 import { Link, useNavigate } from "react-router-dom";
+import { trackCTA } from "@/lib/analytics";
 
 const AUTOMATIONS = [
   { label: "AI Voice Agents", desc: "AI phone receptionist for inbound lead capture.", href: "/automations", icon: Headphones },
@@ -120,7 +121,10 @@ export default function Footer() {
               <ul>
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <Link to={link.href}>
+                    <Link
+                      to={link.href}
+                      onClick={() => trackCTA(`footer_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "footer")}
+                    >
                       {link.label}
                     </Link>
                   </li>
