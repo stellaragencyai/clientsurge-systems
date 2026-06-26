@@ -326,7 +326,7 @@ export default function LaunchTruthSprintPanel() {
         <p className="text-sm text-primary font-semibold mt-2">Next: {msg.next_action}</p>
       </SectionCard>
 
-      {/* D. Stripe Payment Proof */}
+      {/* D. Stripe Payment Proof — Summary (full detail in Production Proof Assistant above) */}
       <SectionCard title="D. Stripe Payment Proof" status={sp.status}>
         <div className="grid grid-cols-2 md:grid-cols-5 gap-3 mb-3">
           <div className="text-center p-2 rounded-lg bg-green-50 border border-green-200">
@@ -350,40 +350,15 @@ export default function LaunchTruthSprintPanel() {
             <p className="text-xl font-bold text-gray-600">{sp.internal_test_excluded_count}</p>
           </div>
         </div>
-        <div className="space-y-2">
-          {sp.latest_paid_order ? (
-            <>
-              <EvidenceRow label="Latest Paid Order" value={`${sp.latest_paid_order.business_name} — ${sp.latest_paid_order.customer_email}`} />
-              <EvidenceRow label="Order ID" value={sp.latest_paid_order.id} />
-              <EvidenceRow label="Package" value={sp.latest_paid_order.selected_package_type} />
-              <EvidenceRow label="Payment Status" value={sp.latest_paid_order.payment_status} />
-              <EvidenceRow label="Has Stripe IDs" value={sp.latest_paid_order.has_stripe_ids ? "✓ Yes" : "✗ No"} />
-            </>
-          ) : <p className="text-sm text-red-600">⚠ No production-trusted paid Order records found</p>}
-        </div>
-        {sp.paid_but_excluded?.length > 0 && (
-          <div className="mt-3">
-            <p className="text-xs font-bold uppercase text-yellow-700 mb-1">Paid but Excluded (not production proof)</p>
-            {sp.paid_but_excluded.map((o, i) => (
-              <div key={i} className="text-xs bg-yellow-50 border border-yellow-200 rounded px-2 py-1.5 mb-1">
-                <span className="font-semibold text-foreground">{o.business_name}</span>
-                <span className="text-yellow-700"> — {o.exclusion_reason}</span>
-              </div>
-            ))}
-          </div>
+        <EvidenceRow label="Evidence Status" value={sp.evidence_status || "unknown"} />
+        {sp.missing_handoff_fields?.length > 0 && (
+          <EvidenceRow label="Missing Handoff Fields" value={sp.missing_handoff_fields.join(", ")} />
         )}
-        {sp.internal_test_excluded?.length > 0 && (
-          <div className="mt-2">
-            <p className="text-xs font-bold uppercase text-muted-foreground mb-1">Internal/Test Excluded</p>
-            {sp.internal_test_excluded.slice(0, 3).map((o, i) => (
-              <div key={i} className="text-xs bg-muted/20 rounded px-2 py-1.5 mb-1">
-                <span className="font-semibold text-foreground">{o.business_name}</span>
-                <span className="text-muted-foreground"> — {o.exclusion_reason}</span>
-              </div>
-            ))}
-          </div>
-        )}
-        <p className="text-sm text-primary font-semibold mt-2">Next: {sp.next_action}</p>
+        {sp.latest_paid_order ? (
+          <EvidenceRow label="Latest Paid Order" value={`${sp.latest_paid_order.business_name} — ${sp.latest_paid_order.customer_email}`} />
+        ) : <p className="text-sm text-red-600">⚠ No production-trusted paid Order records found</p>}
+        <p className="text-xs text-muted-foreground italic mt-2">Full order detail, handoff fields, and recent orders table are in the Production Proof Assistant card above.</p>
+        <p className="text-sm text-primary font-semibold mt-1">Next: {sp.next_action}</p>
       </SectionCard>
 
       {/* D2. Payment + Onboarding Proof */}

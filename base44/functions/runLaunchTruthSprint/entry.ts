@@ -272,7 +272,128 @@ Deno.serve(async (req) => {
     const projectPartition = partitionTrusted(allClientProjects || []);
     const latestClientProject = projectPartition.trusted[0];
 
+    // ── HANDOFF FIELDS ──
+    const HANDOFF_FIELDS = [
+      { key: "client_id", label: "client_id" },
+      { key: "client_project_id", label: "client_project_id" },
+      { key: "onboarding_client_id", label: "onboarding_client_id" },
+      { key: "subscription_id", label: "subscription_id", alt: "stripe_subscription_id" },
+      { key: "install_initialized_at", label: "install_initialized_at" },
+      { key: "pipeline_status", label: "pipeline_status" },
+    ];
+
+    function getMissingHandoffFields(order) {
+      if (!order) return HANDOFF_FIELDS.map(f => f.label);
+      const missing = [];
+      for (const f of HANDOFF_FIELDS) {
+        const val = order[f.key] || (f.alt ? order[f.alt] : null);
+        if (!val || val === "—" || val === "") missing.push(f.label);
+      }
+      return missing;
+    }
+
+    function classifyStripeEvidence(order) {
+      if (!order) {
+        return {
+          evidence_status: "blocked",
+          missing_handoff_fields: HANDOFF_FIELDS.map(f => f.label),
+          next_action: "Complete one live Stripe checkout with a non-test customer email and real business name, then rerun payment proof.",
+        };
+      }
+      // Must be paid
+      if (order.payment_status !== "paid") {
+        return {
+          evidence_status: "blocked",
+          missing_handoff_fields: getMissingHandoffFields(order),
+          next_action: "Complete one live Stripe checkout with a non-test customer email and real business name, then rerun payment proof.",
+        };
+      }
+      // Must have stripe_session_id
+      if (!order.stripe_session_id) {
+        return {
+          evidence_status: "blocked",
+          missing_handoff_fields: getMissingHandoffFields(order),
+          next_action: "Order is marked paid but stripe_session_id is missing. Verify the Stripe webhook fired and the session ID was stored.",
+        };
+      }
+      // Environment must not be test/smoke/internal/qa/demo/unknown
+      const env = order.environment || "unknown";
+      if (env !== "production" && env !== "unknown") {
+        return {
+          evidence_status: "blocked",
+          missing_handoff_fields: getMissingHandoffFields(order),
+          next_action: `Order environment is "${env}" — not production. Complete a live Stripe checkout with a real customer.`,
+        };
+      }
+      // Check for test email patterns
+      const emailLower = (order.customer_email || "").toLowerCase();
+      const TEST_EMAIL_KEYWORDS = ["test", "example", "smoke", "qa", "demo", "internal", "admin", "proof", "backfill", "sample", "placeholder"];
+      for (const kw of TEST_EMAIL_KEYWORDS) {
+        if (emailLower.includes(kw)) {
+          return {
+            evidence_status: "blocked",
+            missing_handoff_fields: getMissingHandoffFields(order),
+            next_action: `Customer email "${order.customer_email}" appears to be a test/internal email. Complete a checkout with a real customer email.`,
+          };
+        }
+      }
+      // Check for test business name patterns
+      const bizLower = (order.business_name || "").toLowerCase();
+      const TEST_BIZ_KEYWORDS = ["test", "demo", "sample", "internal", "smoke", "qa", "placeholder"];
+      for (const kw of TEST_BIZ_KEYWORDS) {
+        if (bizLower.includes(kw)) {
+          return {
+            evidence_status: "blocked",
+            missing_handoff_fields: getMissingHandoffFields(order),
+            next_action: `Business name "${order.business_name}" appears to be a test/demo business. Complete a checkout with a real business name.`,
+          };
+        }
+      }
+
+      // Paid + valid → check handoff fields
+      const missing = getMissingHandoffFields(order);
+      if (missing.length === 0) {
+        return {
+          evidence_status: "trusted",
+          missing_handoff_fields: [],
+          next_action: "Payment proof verified. All handoff fields present. Verify onboarding pipeline is progressing.",
+        };
+      }
+      return {
+        evidence_status: "warning",
+        missing_handoff_fields: missing,
+        next_action: `Paid order exists but handoff fields are missing: ${missing.join(", ")}. Trigger the post-payment orchestrator or manually link the missing records.`,
+      };
+    }
+
+    const stripeClassification = classifyStripeEvidence(latestPaidOrder);
     const hasStripeIds = latestPaidOrder && (latestPaidOrder.stripe_session_id || latestPaidOrder.stripe_customer_id);
+
+    // ── RECENT ORDERS TABLE (10 most recent, any status) ──
+    const recentOrdersRaw = (allOrders || []).slice(0, 10);
+    const recentOrders = recentOrdersRaw.map(o => {
+      const isTrusted = isProductionTrustedRecord(o);
+      const isProdEvidence = o.payment_status === "paid"
+        && Boolean(o.stripe_session_id)
+        && isTrusted
+        && !(NON_PROD_ENVS.includes(o.environment) || (!o.environment));
+      const orderMissing = getMissingHandoffFields(o);
+      return {
+        id: o.id,
+        created_date: o.created_date,
+        customer_email: o.customer_email || "—",
+        business_name: o.business_name || o.customer_name || "—",
+        payment_status: o.payment_status || "—",
+        order_status: o.order_status || "—",
+        billing_status: o.billing_status || "—",
+        pipeline_status: o.pipeline_status || "—",
+        environment: o.environment || "unknown",
+        package_type: o.selected_package_type || o.package_type || "—",
+        production_evidence: isProdEvidence,
+        exclusion_reason: isTrusted ? null : getExclusionReason(o),
+        missing_handoff_fields: orderMissing,
+      };
+    });
 
     evidence.stripe_payment = {
       production_trusted_paid_count: productionTrustedPaid.length,
@@ -280,8 +401,11 @@ Deno.serve(async (req) => {
       pending_payment_count: pendingPayment.length,
       failed_payment_count: failedPayment.length,
       internal_test_excluded_count: internalTestExcluded.length,
+      evidence_status: stripeClassification.evidence_status,
+      missing_handoff_fields: stripeClassification.missing_handoff_fields,
       latest_paid_order: latestPaidOrder ? {
         id: latestPaidOrder.id,
+        customer_name: latestPaidOrder.customer_name || "—",
         business_name: latestPaidOrder.business_name || latestPaidOrder.customer_name || "—",
         customer_email: latestPaidOrder.customer_email || "—",
         selected_package_type: latestPaidOrder.selected_package_type || latestPaidOrder.package_type || "—",
@@ -293,20 +417,26 @@ Deno.serve(async (req) => {
         has_stripe_ids: Boolean(hasStripeIds),
         has_stripe_subscription: Boolean(latestPaidOrder.stripe_subscription_id),
         order_status: latestPaidOrder.order_status || "—",
+        billing_status: latestPaidOrder.billing_status || "—",
         pipeline_status: latestPaidOrder.pipeline_status || "—",
         environment: latestPaidOrder.environment || "unknown",
         exclusion_reason: latestPaidOrder.dashboard_exclusion_reason || null,
         client_id: latestPaidOrder.client_id || null,
         client_project_id: latestPaidOrder.client_project_id || null,
         onboarding_client_id: latestPaidOrder.onboarding_client_id || null,
+        install_initialized_at: latestPaidOrder.install_initialized_at || null,
+        last_install_event_at: latestPaidOrder.last_install_event_at || null,
         created_date: latestPaidOrder.created_date,
+        updated_date: latestPaidOrder.updated_date,
       } : null,
+      recent_orders: recentOrders,
       paid_but_excluded: paidButExcluded.slice(0, 5),
       internal_test_excluded: internalTestExcluded.slice(0, 5),
-      status: latestPaidOrder ? "ready_for_proof" : "blocked",
-      next_action: latestPaidOrder
-        ? (latestInstallOS ? "Verify ClientInstallationOS linked to this order" : "Create ClientInstallationOS for this paid order")
-        : "Complete a real Stripe checkout with a non-test customer email and real business name, then rerun Stripe proof",
+      status: stripeClassification.evidence_status === "trusted" ? "proof_passed"
+        : stripeClassification.evidence_status === "warning" ? "partial"
+        : stripeClassification.evidence_status === "blocked" ? "blocked"
+        : "ready_for_proof",
+      next_action: stripeClassification.next_action,
     };
 
     evidence.payment_onboarding = {
