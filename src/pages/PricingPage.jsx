@@ -4,6 +4,8 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import TrustStrip from "../components/landing/TrustStrip";
 import PricingPageContent from "@/components/pricing/PricingPageContent";
+import CartSidebar from "@/components/store/CartSidebar";
+import { CartProvider } from "@/lib/cartContext";
 import { setPageMetadata } from "@/lib/seo";
 
 export default function PricingPage() {
@@ -20,12 +22,15 @@ export default function PricingPage() {
   }, []);
 
   return (
-    <div className="min-h-screen bg-background">
-      <Navbar />
-      <TrustStrip />
-      <PricingPageContent />
-      <Footer />
-      <MobileCallBar />
-    </div>
+    <CartProvider>
+      <div className="min-h-screen bg-background">
+        <Navbar />
+        <TrustStrip />
+        <PricingPageContent />
+        <Footer />
+        <MobileCallBar />
+        <CartSidebar />
+      </div>
+    </CartProvider>
   );
 }

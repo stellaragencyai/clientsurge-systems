@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Check, X, ChevronRight, CheckCircle2, ShieldCheck, Wallet, HelpCircle } from "lucide-react";
+import { Check, X, ChevronRight, CheckCircle2, ShieldCheck, Wallet, HelpCircle, ShoppingCart, Calendar } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import { getSelectedIndustryRecommendation, INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
+import { useCart } from "@/lib/cartContext";
+import { getPackageServices } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 
 const PACKAGES = [
@@ -20,7 +22,7 @@ const PACKAGES = [
       "Owner notification / CRM handoff where supported",
       "Remote setup workflow",
     ],
-    cta: "Choose Starter",
+    cta: "Add to Cart",
     ctaStyle: "secondary",
   },
   {
@@ -38,7 +40,7 @@ const PACKAGES = [
       "Stronger lead routing and follow-up structure",
       "Remote setup and testing workflow",
     ],
-    cta: "Choose Growth",
+    cta: "Add to Cart",
     ctaStyle: "primary",
   },
   {
@@ -55,7 +57,7 @@ const PACKAGES = [
       "Advanced automation setup coverage",
       "Higher-touch remote setup and launch support",
     ],
-    cta: "Choose Pro",
+    cta: "Add to Cart",
     ctaStyle: "secondary",
   },
 ];
@@ -116,6 +118,7 @@ function ComparisonCell({ value }) {
 
 export default function PricingPageContent() {
   const navigate = useNavigate();
+  const { replaceItems, setCartOpen } = useCart();
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [openFaq, setOpenFaq] = useState(null);
 
@@ -131,7 +134,9 @@ export default function PricingPageContent() {
 
   const handlePackageCTA = (pkg) => {
     trackCTA(`package_${pkg.key}`, "pricing_page");
-    navigate(`/product-signup?package=${pkg.key}`);
+    const services = getPackageServices(pkg.key);
+    replaceItems(services);
+    setCartOpen(true);
   };
 
   return (
@@ -185,7 +190,7 @@ export default function PricingPageContent() {
             ].map((opt) => (
               <button
                 key={opt.pkg}
-                onClick={() => { trackCTA(`quick_select_${opt.pkg.toLowerCase()}`, "pricing_page"); navigate(`/product-signup?package=${opt.pkg.toLowerCase()}_system`); }}
+                onClick={() => { trackCTA(`quick_select_${opt.pkg.toLowerCase()}`, "pricing_page"); const services = getPackageServices(`${opt.pkg.toLowerCase()}_system`); replaceItems(services); setCartOpen(true); }}
                 className={`rounded-lg border p-3 text-left transition-all hover:border-primary/50 hover:bg-primary/5 ${opt.highlight ? "border-primary/40 bg-primary/5" : "border-border bg-background"}`}
                 style={{ minHeight: "unset", minWidth: "unset" }}
               >
@@ -247,7 +252,14 @@ export default function PricingPageContent() {
                    className={pkg.ctaStyle === "primary" ? "cs-btn-primary w-full text-center justify-center" : "w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors py-3 px-4"}
                    style={{ minHeight: "unset", minWidth: "unset" }}
                  >
-                   {pkg.cta}
+                   <ShoppingCart className="w-4 h-4 mr-1.5" /> {pkg.cta}
+                 </button>
+                 <button
+                   onClick={() => { trackCTA("book_demo_pricing", "pricing_page"); navigate("/book"); }}
+                   className="w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-xs font-semibold text-muted-foreground hover:bg-muted transition-colors py-2.5 px-4 mt-2"
+                   style={{ minHeight: "unset", minWidth: "unset" }}
+                 >
+                   <Calendar className="w-3.5 h-3.5 mr-1.5" /> Book a Demo
                  </button>
               </div>
             </div>

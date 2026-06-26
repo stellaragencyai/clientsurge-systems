@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
-import { CheckCircle2, ArrowRight } from "lucide-react";
-import { Link } from "react-router-dom";
+import { CheckCircle2, ArrowRight, Rocket } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
+import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import PostPurchaseWhatNext from "@/components/portal/PostPurchaseWhatNext";
@@ -11,7 +12,9 @@ const noIndexMeta = document.querySelector('meta[name="robots"]');
 if (noIndexMeta) noIndexMeta.setAttribute("content", "noindex,nofollow");
 
 export default function OrderSuccess() {
+  const navigate = useNavigate();
   const [orderSummary, setOrderSummary] = useState(null);
+  const [orderInfo, setOrderInfo] = useState(null);
 
   useEffect(() => {
     // Read pre-checkout summary saved to sessionStorage before Stripe redirect
@@ -23,6 +26,19 @@ export default function OrderSuccess() {
       }
       sessionStorage.removeItem("clientsurge:cart");
     } catch {}
+
+    // Resolve order from Stripe session_id so we can link to the setup wizard
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    if (!sessionId) return;
+
+    base44.functions.invoke("getOrderStatus", { session_id: sessionId })
+      .then((result) => {
+        if (result?.eligible && result?.order?.id) {
+          setOrderInfo(result.order);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   return (
@@ -170,37 +186,71 @@ export default function OrderSuccess() {
           </div>
 
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
-            <Link
-              to="/client-portal"
-              style={{
-                display: "inline-flex",
-                alignItems: "center",
-                gap: "8px",
-                borderRadius: "9999px",
-                padding: "2px",
-                background:
-                  "linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%)",
-                textDecoration: "none",
-                boxShadow: "0 4px 18px rgba(0,174,239,0.3)",
-              }}
-            >
-              <span
+            {orderInfo ? (
+              <button
+                onClick={() => navigate(`/setup/credentials?order_id=${orderInfo.id}`)}
                 style={{
-                  display: "flex",
+                  display: "inline-flex",
                   alignItems: "center",
                   gap: "8px",
-                  height: "48px",
-                  padding: "0 28px",
                   borderRadius: "9999px",
-                  background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
-                  color: "#ffffff",
-                  fontWeight: "700",
-                  fontSize: "14px",
+                  padding: "2px",
+                  border: "none",
+                  cursor: "pointer",
+                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%)",
+                  textDecoration: "none",
+                  boxShadow: "0 4px 18px rgba(0,174,239,0.3)",
                 }}
               >
-                Get Instant Access <ArrowRight style={{ width: "14px", height: "14px" }} />
-              </span>
-            </Link>
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    height: "48px",
+                    padding: "0 28px",
+                    borderRadius: "9999px",
+                    background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+                    color: "#ffffff",
+                    fontWeight: "700",
+                    fontSize: "14px",
+                  }}
+                >
+                  <Rocket style={{ width: "16px", height: "16px" }} /> Complete Your Setup <ArrowRight style={{ width: "14px", height: "14px" }} />
+                </span>
+              </button>
+            ) : (
+              <Link
+                to="/client-portal"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: "8px",
+                  borderRadius: "9999px",
+                  padding: "2px",
+                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%)",
+                  textDecoration: "none",
+                  boxShadow: "0 4px 18px rgba(0,174,239,0.3)",
+                }}
+              >
+                <span
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    height: "48px",
+                    padding: "0 28px",
+                    borderRadius: "9999px",
+                    background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
+                    color: "#ffffff",
+                    fontWeight: "700",
+                    fontSize: "14px",
+                  }}
+                >
+                  Get Instant Access <ArrowRight style={{ width: "14px", height: "14px" }} />
+                </span>
+              </Link>
+            )}
             <Link
               to="/store"
               style={{

@@ -162,7 +162,7 @@ export default function CartSidebar() {
         lead_id: leadAttribution.lead_id || leadAttribution.crm_lead_id || "",
         crm_lead_id: leadAttribution.crm_lead_id || leadAttribution.lead_id || "",
         website_lead_id: leadAttribution.website_lead_id || "",
-        success_url: `${window.location.origin}/client-portal?session_id={CHECKOUT_SESSION_ID}&new=1`, // #309: redirect to portal post-checkout,
+        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/store`,
       });
 

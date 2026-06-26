@@ -6,7 +6,7 @@ import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
 
 export default function CredentialsSetup() {
   const navigate = useNavigate();
-  const [orderId] = useState(() => {
+  const [orderId, setOrderId] = useState(() => {
     const params = new URLSearchParams(window.location.search);
     return params.get("order_id") || null;
   });
@@ -17,17 +17,42 @@ export default function CredentialsSetup() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    if (!orderId) {
-      navigate("/pricing");
+    if (orderId) {
+      validateOrder(orderId);
       return;
     }
-    validateOrder();
-  }, [orderId]);
 
-  const validateOrder = async () => {
+    // No order_id — try resolving from Stripe session_id
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get("session_id");
+    if (sessionId) {
+      resolveOrderFromSession(sessionId);
+    } else {
+      navigate("/pricing");
+    }
+  }, []);
+
+  const resolveOrderFromSession = async (sessionId) => {
     try {
       const result = await base44.functions.invoke("getOrderStatus", {
-        order_id: orderId,
+        session_id: sessionId,
+      });
+      if (result?.eligible && result?.order?.id) {
+        setOrderId(result.order.id);
+        validateOrder(result.order.id);
+      } else {
+        navigate("/pricing");
+      }
+    } catch {
+      setError("Unable to verify your order. Please try again or contact support.");
+      setLoading(false);
+    }
+  };
+
+  const validateOrder = async (id) => {
+    try {
+      const result = await base44.functions.invoke("getOrderStatus", {
+        order_id: id,
       });
 
       if (!result?.order) {
@@ -49,9 +74,8 @@ export default function CredentialsSetup() {
   };
 
   const handleComplete = () => {
-    // Redirect to setup status tracker (task 407d)
-    if (orderId) {
-      navigate(`/setup/status/${orderId}`);
+    if (order?.id || orderId) {
+      navigate(`/setup/status/${order?.id || orderId}`);
     } else {
       setSubmitted(true);
     }
