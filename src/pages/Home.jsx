@@ -4,7 +4,6 @@ import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import CinematicHero from "../components/landing/CinematicHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
-import SixStepFlow from "../components/landing/SixStepFlow.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
 import ChatBubble from "../components/landing/ChatBubble";
@@ -13,17 +12,10 @@ import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import VisualFlawsPatch60 from "../components/landing/VisualFlawsPatch60";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
-import AutomationSystemsGrid from "../components/landing/AutomationSystemsGrid";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
-import TrustStrip from "../components/landing/TrustStrip";
-import WhatHappensAfter from "../components/landing/WhatHappensAfter";
-import BeforeAfterComparison from "../components/landing/BeforeAfterComparison";
-import CTABand from "../components/landing/CTABand";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
-import ToolsIntegrationStrip from "../components/landing/ToolsIntegrationStrip.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
-const CoreOffer = lazy(() => import("../components/landing/CoreOffer"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
 
 import {
@@ -120,83 +112,27 @@ export default function Home() {
         <VisualFlawsPatch60 />
         <Navbar />
 
-        {/* 1. Cinematic Hero */}
+        {/* 1. Cinematic Hero — primary value prop + CTA */}
         <CinematicHero />
 
-        {/* 1a. Tools Integration Strip */}
-        <ToolsIntegrationStrip />
-
-        {/* 1b. Six Automations Premium Section */}
+        {/* 2. Six Core Automations — what the system does */}
+        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SixAutomationsSection />
 
-        {/* 1c. Revenue Leak Section */}
+        {/* 3. Revenue Leak — problem framing */}
         <RevenueLeakSection />
 
-        {/* 1d. Six-Step ClientSurge Flow */}
-        <SixStepFlow />
-
-        {/* 1e. What Happens After You Start */}
-        <WhatHappensAfter />
-
-        {/* 1f. Before ClientSurge vs After ClientSurge */}
-        <BeforeAfterComparison />
-
-        {/* 1h. CTA Band After Six Automations */}
-        <CTABand
-          headline="Ready to turn your website into a response system?"
-          subcopy="ClientSurge connects capture, follow-up, booking, reviews, and reactivation into one operating flow."
-          primaryLabel="Get Your Free Audit"
-          primaryAction="contact"
-          secondaryLabel="Compare Packages"
-          secondaryAction="pricing"
-          location="cta_band_six_automations"
-        />
-
-        {/* 1g. CTA Band 1 */}
-        <CTABand
-          headline="Every missed lead is a delayed sale."
-          subcopy="Install the response system before more inquiries go cold."
-          primaryLabel="Request Free Automation Audit"
-          primaryAction="contact"
-          secondaryLabel="Compare Packages"
-          secondaryAction="pricing"
-          location="cta_band_1"
-        />
-
-        {/* 3. Automation Systems Preview */}
-        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <AutomationSystemsGrid />
-
-        {/* 4. How It Works Teaser */}
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
-          <CoreOffer />
-        </LazyHomepageSection>
-
-        {/* 5. Package Preview */}
+        {/* 4. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <ThreeSystemsSection />
 
-        {/* 5b. CTA Band 2 */}
-        <CTABand
-          headline="Ready to turn your website into a lead-response system?"
-          subcopy="ClientSurge connects capture, follow-up, booking, reviews, and reactivation into one operating flow."
-          primaryLabel="View Automations"
-          primaryAction="automations"
-          secondaryLabel="Compare Packages"
-          secondaryAction="pricing"
-          location="cta_band_2"
-        />
-
-        {/* 6. Compact Trust Strip */}
-        <TrustStrip />
-
-        {/* 7. Industries Preview */}
+        {/* 5. Industries — user finds their vertical */}
         <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <Industries />
         </LazyHomepageSection>
 
-        {/* 8. Final CTA */}
+        {/* 6. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton />}>
           <FinalCTA />
         </LazyHomepageSection>

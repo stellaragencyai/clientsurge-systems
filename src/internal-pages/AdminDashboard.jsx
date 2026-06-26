@@ -213,8 +213,8 @@ export default function AdminDashboard() {
     const loadUnread = async () => {
       try {
         const [msgs, failedEvents] = await Promise.all([
-          base44.asServiceRole.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
-          base44.asServiceRole.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
+          base44.entities.SupportMessage.filter({ read: false }, "-created_date", 200),
+          base44.entities.CommunicationEvent.filter({ status: "failed" }, "-created_date", 200),
         ]);
         setInboxUnread((msgs || []).length);
         setWebhookErrorCount(countWebhookErrorEvents(failedEvents || []));

@@ -88,7 +88,7 @@ export default function LeadsTable() {
   useEffect(() => {
     const loadKpis = async () => {
       try {
-        const allLeads = await base44.asServiceRole.entities.Leads.filter({}, "-created_date", 500);
+        const allLeads = await base44.entities.Leads.filter({}, "-created_date", 500);
         const list = Array.isArray(allLeads) ? allLeads : [];
 
         const emailCounts = {};
@@ -128,8 +128,8 @@ export default function LeadsTable() {
         const sortKey = sort.field === "intelligence_score" ? "intelligence_score" : "created_date";
         const sortValue = sort.order === 1 ? sortKey : `-${sortKey}`;
 
-        // asServiceRole for admin reads — canonical Leads entity
-        const results = await base44.asServiceRole.entities.Leads.filter(
+        // Admin reads via user-scoped SDK (RLS allows admin to read all Leads)
+        const results = await base44.entities.Leads.filter(
           filter,
           sortValue,
           PAGE_SIZE + 1,
@@ -215,7 +215,7 @@ export default function LeadsTable() {
     if (!deleteTarget?.id) return;
     setDeleting(true);
     try {
-      await base44.asServiceRole.entities.Leads.delete(deleteTarget.id);
+      await base44.entities.Leads.delete(deleteTarget.id);
       setLeads((prev) => prev.filter((l) => l.id !== deleteTarget.id));
       setKpis((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
       setDeleteTarget(null);
