@@ -371,21 +371,23 @@ export default function AdminDashboard() {
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
       >
-        {/* Site logo + back to site link */}
+        {/* Admin logo — no public-facing links in admin nav */}
         <div className="px-4 pt-5 pb-3 border-b border-gray-100">
-          <a href="/" className="block mb-3">
+          <div className="block mb-3">
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge"
               style={{ height: 40, width: 'auto' }}
             />
-          </a>
-          <a
-            href="/"
+          </div>
+          <button
+            onClick={handleLogout}
+            disabled={loggingOut}
             className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors"
           >
-            ← Back to website
-          </a>
+            <LogOut className="w-3 h-3" />
+            {loggingOut ? 'Signing out...' : 'Sign out'}
+          </button>
         </div>
 
         {/* Search */}

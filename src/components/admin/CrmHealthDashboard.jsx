@@ -114,7 +114,7 @@ export default function CrmHealthDashboard({ initialLeads = null } = {}) {
     setLoading(true);
     setError("");
     try {
-      const records = await base44.asServiceRole.entities.Leads.list("-created_date", CRM_HEALTH_MAX_FETCH);
+      const records = await base44.entities.Leads.list("-created_date", CRM_HEALTH_MAX_FETCH);
       setLeads(records || []);
     } catch (err) {
       setError(err?.message || "Unable to load CRM health data.");

@@ -15,14 +15,14 @@ export default function ResendSenderDiagnosticsPanel() {
         setLoading(true);
         setError(null);
 
-        // Fetch AdminSettings
-        const settings = await base44.asServiceRole.entities.AdminSettings.list();
+        // Fetch AdminSettings (admin-scoped via RLS — no asServiceRole needed)
+        const settings = await base44.entities.AdminSettings.list();
         if (settings?.length > 0) {
           setConfiguredEmail(settings[0].resend_from_email || "Not configured");
         }
 
         // Fetch latest CommunicationEvent entries (Resend emails)
-        const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
+        const events = await base44.entities.CommunicationEvent.filter(
           { provider: "resend", channel: "email" },
           "-created_date",
           30

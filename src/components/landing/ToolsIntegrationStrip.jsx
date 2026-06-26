@@ -34,15 +34,24 @@ export default function ToolsIntegrationStrip() {
         aria-hidden="true"
       />
 
-      <div className="relative max-w-6xl mx-auto px-6 text-center">
+      <div className="relative max-w-6xl mx-auto px-6 text-center overflow-visible">
         <motion.p
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-xs font-bold uppercase tracking-[0.22em] mb-8 md:mb-10"
+          className="text-xs font-bold uppercase tracking-[0.22em] mb-3"
           style={{ color: "rgba(10,22,40,0.65)" }}
         >
           Works With Your Favorite Tools
+        </motion.p>
+        <motion.p
+          initial={shouldReduceMotion ? {} : { opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.1 }}
+          className="text-sm md:text-base font-medium leading-relaxed mb-8 md:mb-10 max-w-2xl mx-auto"
+          style={{ color: "rgba(10,22,40,0.5)" }}
+        >
+          Connects to the tools you already use — no tech stack change required
         </motion.p>
       </div>
 
