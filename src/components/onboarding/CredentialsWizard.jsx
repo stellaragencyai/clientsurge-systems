@@ -1,10 +1,13 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   ArrowLeft, ArrowRight, Loader2, CheckCircle2,
   Building2, Palette, MessageSquare, Globe, Rocket, Plug,
 } from "lucide-react";
 import IntegrationStatusStep from "@/components/onboarding/IntegrationStatusStep";
+
+// #407d — sessionStorage persistence so refresh doesn't lose wizard progress
+const STORAGE_KEY_PREFIX = "clientsurge:credentials-wizard:";
 
 // ── Step definitions ─────────────────────────────────────────────────────────
 const STEPS = [
@@ -445,42 +448,85 @@ export default function CredentialsWizard({ order, onComplete }) {
   const [logoUploading, setLogoUploading] = useState(false);
   const [error, setError] = useState("");
 
-  const [data, setData] = useState({
-    // Business
-    business_name: order?.business_name || "",
-    industry: "",
-    contact_name: order?.customer_name || "",
-    business_phone: order?.customer_phone || "",
-    business_email: order?.customer_email || "",
-    website: "",
-    address: "",
-    brand_voice: "",
-    business_hours: "",
-    // Brand
-    logo_url: "",
-    primary_color: "#00AEEF",
-    secondary_color: "#003B8F",
-    tagline: "",
-    google_business_url: "",
-    // Messaging
-    twilio_business_phone: "",
-    booking_link: "",
-    lead_notification_email: order?.customer_email || "",
-    requires_consultation: "",
-    after_hours_behavior: "",
-    customer_questions: "",
-    // Integrations
-    facebook_page_id: "",
-    google_ads_id: "",
-    other_lead_sources: "",
-    crm_system: "",
-    crm_api_key: "",
-    google_review_link: "",
-    other_review_link: "",
-    special_notes: "",
+  // #407d — Restore from sessionStorage on mount
+  const storageKey = STORAGE_KEY_PREFIX + (order?.id || "anon");
+
+  const [data, setData] = useState(() => {
+    const defaultData = {
+      // Business
+      business_name: order?.business_name || "",
+      industry: "",
+      contact_name: order?.customer_name || "",
+      business_phone: order?.customer_phone || "",
+      business_email: order?.customer_email || "",
+      website: "",
+      address: "",
+      brand_voice: "",
+      business_hours: "",
+      // Brand
+      logo_url: "",
+      primary_color: "#00AEEF",
+      secondary_color: "#003B8F",
+      tagline: "",
+      google_business_url: "",
+      // Messaging
+      twilio_business_phone: "",
+      booking_link: "",
+      lead_notification_email: order?.customer_email || "",
+      requires_consultation: "",
+      after_hours_behavior: "",
+      customer_questions: "",
+      // Integrations
+      facebook_page_id: "",
+      google_ads_id: "",
+      other_lead_sources: "",
+      crm_system: "",
+      crm_api_key: "",
+      google_review_link: "",
+      other_review_link: "",
+      special_notes: "",
+    };
+
+    try {
+      const saved = sessionStorage.getItem(storageKey);
+      if (saved) {
+        const parsed = JSON.parse(saved);
+        // Merge saved data over defaults — preserves order-prefilled fields
+        return { ...defaultData, ...parsed };
+      }
+    } catch {}
+    return defaultData;
   });
 
-  const onChange = (field, value) => setData(prev => ({ ...prev, [field]: value }));
+  // #407d — Persist to sessionStorage on every data change
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(storageKey, JSON.stringify(data));
+    } catch {}
+  }, [data, storageKey]);
+
+  // #407d — Also persist current step
+  useEffect(() => {
+    try {
+      sessionStorage.setItem(storageKey + ":step", String(currentStep));
+    } catch {}
+  }, [currentStep, storageKey]);
+
+  // #407d — Restore step on mount
+  useEffect(() => {
+    try {
+      const savedStep = sessionStorage.getItem(storageKey + ":step");
+      if (savedStep) {
+        const stepNum = parseInt(savedStep, 10);
+        if (!isNaN(stepNum) && stepNum >= 0 && stepNum < STEPS.length) {
+          setCurrentStep(stepNum);
+        }
+      }
+    } catch {}
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const onChange = useCallback((field, value) => setData(prev => ({ ...prev, [field]: value })), []);
 
   const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0];
@@ -589,6 +635,13 @@ export default function CredentialsWizard({ order, onComplete }) {
 
       // #408d — Advance workflow_stage to "Ready for Install" via saveClientCredentials response
       // saveClientCredentials already handles this internally — confirmed in backend function
+
+      // #407d — Clear sessionStorage on successful submit
+      try {
+        sessionStorage.removeItem(storageKey);
+        sessionStorage.removeItem(storageKey + ":step");
+      } catch {}
+
       onComplete?.();
     } catch {
       setError("Failed to save your information. Please try again.");
