@@ -151,6 +151,12 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Review the ClientSurge Systems terms governing service access, billing, platform usage, and customer responsibilities.",
   },
+  "/refund-policy": {
+    key: "refund",
+    title: "Refund & Cancellation Policy | ClientSurge Systems",
+    description:
+      "Read the ClientSurge Systems refund and cancellation policy covering setup fees, monthly subscriptions, the 30-day review window, and cancellation procedures.",
+  },
   "/how-it-works": {
     key: "how-it-works",
     title: "How It Works — AI-Guided Remote Setup | ClientSurge Systems",
@@ -293,6 +299,7 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/testimonials",
   "/privacy-policy",
   "/terms",
+  "/refund-policy",
   "/how-it-works",
   "/proof",
   "/setup-lookup",
@@ -428,6 +435,7 @@ export const SITEMAP_STATIC_PATHS = [
   "/customer-reactivation",
   "/privacy-policy",
   "/terms",
+  "/refund-policy",
   "/setup-lookup",
   "/how-it-works",
   "/proof",

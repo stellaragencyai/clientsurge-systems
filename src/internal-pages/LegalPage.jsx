@@ -11,7 +11,7 @@ import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import MobileCallBar from "@/components/landing/MobileCallBar";
 import SectionHeader from "@/components/design-system/SectionHeader";
-import { ChevronDown, ChevronRight, Shield, Lock, PhoneCall, BadgeCheck, ScrollText } from "lucide-react";
+import { ChevronDown, ChevronRight, Shield, Lock, PhoneCall, BadgeCheck, ScrollText, RotateCcw, CalendarClock, Ban } from "lucide-react";
 
 /* ──────────── Content Data ──────────── */
 
@@ -124,6 +124,67 @@ const TERMS_SECTIONS = [
   },
 ];
 
+const REFUND_SECTIONS = [
+  {
+    id: "services-overview",
+    number: "1",
+    title: "Services Overview",
+    body: "ClientSurge Systems provides custom AI automation setup, software configuration, workflow implementation, AI agent setup, and recurring monthly automation support services. Because our work involves custom setup, configuration, and digital service delivery, we do not accept physical returns or exchanges.",
+  },
+  {
+    id: "refund-eligibility",
+    number: "2",
+    title: "Refund Eligibility",
+    body: "Setup fees, installation fees, and onboarding fees are generally non-refundable once work has begun. This includes account configuration, workflow planning, AI setup, automation installation, software integration, client onboarding, or any other implementation work performed for the customer. Monthly subscription charges may be canceled before the next billing cycle. Cancellation stops future billing but does not automatically refund prior charges.",
+  },
+  {
+    id: "review-window",
+    number: "3",
+    title: "30-Day Review Window",
+    body: "Customers may contact ClientSurge Systems within 30 days of purchase if they believe there was a billing error, duplicate charge, service access issue, or failure to deliver the purchased service. Refund requests are reviewed case by case.",
+    lists: [
+      {
+        title: "A refund may be approved if:",
+        items: [
+          "The customer was charged incorrectly.",
+          "The customer was charged more than once for the same service.",
+          "ClientSurge Systems is unable to begin or deliver the purchased service.",
+          "A written refund exception is approved by ClientSurge Systems.",
+        ],
+      },
+      {
+        title: "A refund may be denied if:",
+        items: [
+          "Custom setup work has already begun.",
+          "The customer failed to provide required access, approvals, business information, or third-party account permissions.",
+          "The customer changed their mind after onboarding or implementation started.",
+          "The service was delivered or made available as described.",
+          "The customer violated the Terms of Service.",
+        ],
+      },
+    ],
+  },
+  {
+    id: "cancellations",
+    number: "4",
+    title: "Cancellations",
+    body: "Customers may request cancellation of their monthly subscription by contacting support@clientsurgesystems.com. Cancellation requests should be submitted before the next billing date. Once canceled, the customer will not be billed for future monthly service periods.",
+  },
+  {
+    id: "no-returns",
+    number: "5",
+    title: "No Returns or Exchanges",
+    body: "ClientSurge Systems does not sell physical goods. Returns and exchanges do not apply.",
+  },
+  {
+    id: "contact",
+    number: "6",
+    title: "Contact",
+    body: null,
+    contact: true,
+  },
+];
+
 const LEGAL_META = {
   privacy: {
     title: "Privacy Policy",
@@ -145,6 +206,17 @@ const LEGAL_META = {
       { icon: Shield, text: "Setup fees and paid months are non-refundable" },
       { icon: Lock, text: "You control customer consent and opt-outs" },
       { icon: ScrollText, text: "Governed by Arizona law" },
+    ],
+  },
+  refund: {
+    title: "Refund & Cancellation Policy",
+    updated: "June 26, 2026",
+    sections: REFUND_SECTIONS,
+    summary: [
+      { icon: RotateCcw, text: "Setup fees are non-refundable once work begins" },
+      { icon: CalendarClock, text: "Monthly billing canceled before the next cycle" },
+      { icon: Shield, text: "30-day window for billing errors and access issues" },
+      { icon: Ban, text: "No physical returns or exchanges — digital services" },
     ],
   },
 };
@@ -200,6 +272,26 @@ function SectionBlock({ section, isActive }) {
         <p className="text-[15px] text-foreground leading-relaxed pl-8 max-w-[68ch] font-inter">
           {section.body}
         </p>
+      )}
+
+      {section.lists && (
+        <div className="pl-8 mt-3 space-y-5 max-w-[68ch]">
+          {section.lists.map((list, idx) => (
+            <div key={idx}>
+              {list.title && (
+                <p className="text-sm font-bold text-foreground mb-2 font-inter">{list.title}</p>
+              )}
+              <ul className="space-y-1.5">
+                {list.items.map((item, i) => (
+                  <li key={i} className="flex items-start gap-2 text-[15px] text-foreground leading-relaxed font-inter">
+                    <span className="text-primary font-bold mt-0.5 flex-shrink-0">•</span>
+                    <span>{item}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
       )}
 
       {section.contact && (
@@ -372,6 +464,16 @@ export default function LegalPage({ fixedType, canonicalPath }) {
                   }`}
                 >
                   Terms
+                </button>
+                <button
+                  onClick={() => navigate("/refund-policy")}
+                  className={`px-3.5 py-1.5 rounded-md text-xs font-bold border-none cursor-pointer transition-all ${
+                    type === "refund"
+                      ? "bg-white text-primary shadow-sm"
+                      : "bg-transparent text-muted-foreground hover:text-foreground"
+                  }`}
+                >
+                  Refunds
                 </button>
               </div>
             </div>
