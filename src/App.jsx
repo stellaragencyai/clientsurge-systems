@@ -218,6 +218,10 @@ function ScrollToTop() {
 function AppInner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
+    // FLAW #97: Force manual scroll restoration to prevent Safari conflicts
+    if ("scrollRestoration" in history) {
+      history.scrollRestoration = "manual";
+    }
     if (window.location.hostname.includes("preview-sandbox")) return;
     installGa4();
     initializeAnalyticsObserver();

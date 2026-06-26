@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
+import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import CinematicHero from "../components/landing/CinematicHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
@@ -51,6 +52,7 @@ function LazyHomepageSection({ children, fallback }) {
 
 export default function Home() {
   const location = useLocation();
+  useHashNavigation();
   useEffect(() => {
     if (!location.hash) {
       return undefined;

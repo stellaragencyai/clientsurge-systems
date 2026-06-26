@@ -1,7 +1,17 @@
 /*
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  Security & SEO Headers — fixes FLAW #39, #90
+  Applied to all routes via Netlify/Cloudflare _headers file
+*/
+
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://cdn.worldvectorlogo.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://region1.google-analytics.com wss: ws:; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://api.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests
+  X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  X-Frame-Options: SAMEORIGIN
-  X-XSS-Protection: 1; mode=block
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=()
+  Permissions-Policy: camera=(), microphone=(), geolocation=()
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+  X-XSS-Protection: 1; mode=block
+
+# Force HTTPS redirect
+/*
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload

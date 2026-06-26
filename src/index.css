@@ -1619,3 +1619,141 @@ button.icon-only,
 .clip-delay-5 { animation-delay: 0.5s; }
 .clip-delay-6 { animation-delay: 0.6s; }
 .clip-delay-7 { animation-delay: 0.7s; }
+
+/* ============================================
+   FLAW #96: Prevent double-tap double-submissions
+   ============================================ */
+button[data-submitting="true"],
+button[type="submit"][disabled] {
+  pointer-events: none;
+  opacity: 0.65;
+  cursor: not-allowed;
+}
+
+/* ============================================
+   FLAW #17: Pricing badge mobile positioning fix
+   ============================================ */
+@media (max-width: 640px) {
+  .pricing-card .absolute.top-0,
+  [class*="pricing"] .absolute.top-0 {
+    position: relative !important;
+    top: 0 !important;
+    left: 0 !important;
+    transform: none !important;
+    margin-bottom: 12px;
+  }
+}
+
+/* ============================================
+   FLAW #64: Standardize transition timing to 200ms globally
+   ============================================ */
+button:not(.cs-btn-primary):not(.hero-primary-cta),
+a:not(.cs-btn-primary):not(.hero-primary-cta):not(.nav-link),
+[role="button"]:not(.cs-btn-primary) {
+  transition: all 200ms cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+/* ============================================
+   FLAW #62: Reduce GPU load from glow effects on older devices
+   ============================================ */
+@media (prefers-reduced-motion: reduce) {
+  .cs-glow-sm,
+  .cs-glow-md,
+  .cs-glow-lg,
+  .hero-orb,
+  .cs-beam {
+    box-shadow: none !important;
+    animation: none !important;
+  }
+}
+
+/* ============================================
+   FLAW #100: Low Data Mode — skip heavy background media on cellular
+   ============================================ */
+@media (prefers-reduced-data: reduce) {
+  video,
+  .hero-video,
+  .cinematic-bg-video,
+  .background-video {
+    display: none !important;
+  }
+  .hero-orb {
+    opacity: 0.3 !important;
+  }
+}
+
+/* ============================================
+   FLAW #65: Prevent image aspect-ratio shift during lazy-loading
+   ============================================ */
+img[loading="lazy"] {
+  aspect-ratio: var(--img-aspect-ratio, 16 / 9);
+  background: linear-gradient(90deg, rgba(226,238,248,0.4), rgba(255,255,255,0.6), rgba(226,238,248,0.4));
+  background-size: 220% 100%;
+  animation: csSkeletonSheen 2.2s ease-in-out infinite;
+}
+img[loading="lazy"].loaded {
+  background: none;
+  animation: none;
+}
+
+/* ============================================
+   FLAW #51: Safari landscape pricing card layout fix
+   ============================================ */
+@media (max-height: 500px) and (orientation: landscape) {
+  .pricing-cards,
+  .pricing-cards-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 12px !important;
+  }
+}
+
+/* ============================================
+   FLAW #53: Fix React Leaflet touch-scrolling on mobile
+   ============================================ */
+@media (max-width: 768px) {
+  .leaflet-container {
+    touch-action: pan-x pan-y;
+  }
+}
+
+/* ============================================
+   FLAW #55: Prevent keyboard from overlapping inputs on mobile
+   ============================================ */
+@media (max-width: 768px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]):focus,
+  textarea:focus,
+  select:focus {
+    scroll-margin-bottom: 300px;
+  }
+}
+
+/* ============================================
+   FLAW #59: Prevent long business names from breaking table layouts
+   ============================================ */
+table td,
+.list-item-primary {
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+@media (max-width: 768px) {
+  table td,
+  .list-item-primary {
+    max-width: 180px;
+  }
+}
+
+/* ============================================
+   FLAW #60: Enhance hover state visibility on list items
+   ============================================ */
+.list-item:hover {
+  background: hsl(var(--primary), 0.06);
+  border-color: hsl(var(--primary), 0.2);
+  transform: translateX(2px);
+}
+@media (pointer: coarse) {
+  .list-item:hover {
+    transform: none;
+  }
+}

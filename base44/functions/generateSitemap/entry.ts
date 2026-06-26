@@ -30,14 +30,22 @@ Deno.serve(async (_req) => {
       { path: '/plumbing', priority: '0.8', changefreq: 'weekly' },
       { path: '/roofing', priority: '0.8', changefreq: 'weekly' },
       { path: '/contractors', priority: '0.8', changefreq: 'weekly' },
+      { path: '/real-estate', priority: '0.8', changefreq: 'weekly' },
+      { path: '/personal-injury', priority: '0.8', changefreq: 'weekly' },
     ];
+
+    // FLAW #74: Filter out any admin/internal routes that might have been added by mistake
+    const BLOCKED_PATTERNS = [/^\/admin/, /^\/mission-control/, /^\/dashboard/, /^\/setup/, /^\/onboarding/, /^\/client-/, /^\/saas\/admin/, /^\/_generated/, /^\/pages/, /^\/login/, /^\/register/, /^\/reset-/, /^\/forgot-/, /^\/opt-out/, /^\/legal\//, /^\/leads\/capture/, /^\/order-success/, /^\/thank-you/, /^\/success$/];
+    const safeRoutes = routes.filter(r => !BLOCKED_PATTERNS.some(p => p.test(r.path)));
 
     let xml = '<?xml version="1.0" encoding="UTF-8"?>\n';
     xml += '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n';
 
-    routes.forEach(({ path, priority, changefreq }) => {
+    // FLAW #72: Ensure consistent trailing slashes (no trailing slash except root)
+    safeRoutes.forEach(({ path, priority, changefreq }) => {
+      const normalizedPath = path === '/' ? '/' : path.replace(/\/+$/, '');
       xml += '  <url>\n';
-      xml += `    <loc>${baseUrl}${path}</loc>\n`;
+      xml += `    <loc>${baseUrl}${normalizedPath}</loc>\n`;
       xml += `    <lastmod>${today}</lastmod>\n`;
       xml += `    <changefreq>${changefreq}</changefreq>\n`;
       xml += `    <priority>${priority}</priority>\n`;

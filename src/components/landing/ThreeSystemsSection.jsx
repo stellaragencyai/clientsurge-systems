@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import SectionHeader from "@/components/design-system/SectionHeader";
+import IndustryContextBanner from "./IndustryContextBanner";
 
 const PACKAGES = [
   {
@@ -82,6 +83,9 @@ export default function ThreeSystemsSection() {
           title="Choose Your AI Growth System"
           subtitle="Choose the package that matches how much of your lead flow you want ClientSurge to handle — from essential capture and response to a complete website, follow-up, booking, review, and reactivation system."
         />
+
+        {/* Industry context banner */}
+        <IndustryContextBanner />
 
         {/* Verification support line */}
         <div className="text-center mb-6">
