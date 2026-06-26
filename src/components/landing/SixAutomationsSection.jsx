@@ -66,18 +66,10 @@ export default function SixAutomationsSection() {
 
   return (
     <section
-      className="relative py-20 md:py-32"
-      style={{ background: "#061025" }}
+      className="relative py-20 md:py-32 bg-white"
+      style={{ background: "#ffffff" }}
       aria-labelledby="six-automations-title"
     >
-      {/* Subtle accent background */}
-      <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "radial-gradient(ellipse at top, rgba(53,189,241,0.03), transparent 50%)",
-        }}
-      />
 
       {/* Content */}
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -93,7 +85,7 @@ export default function SixAutomationsSection() {
             title="Six Automations. One Lead-Response System."
             subtitle="ClientSurge connects the critical pieces of your front-end sales flow so new leads, missed calls, old leads, and booking requests do not sit untouched."
             align="center"
-            variant="dark"
+            variant="light"
           />
         </motion.div>
 
@@ -112,22 +104,20 @@ export default function SixAutomationsSection() {
               variants={shouldReduceMotion ? {} : cardVariants}
               className="group rounded-xl p-6 md:p-8 transition-all duration-300"
               style={{
-                background: "rgba(8,20,44,0.6)",
-                border: "1px solid rgba(53,189,241,0.15)",
-                backdropFilter: "blur(8px)",
-                WebkitBackdropFilter: "blur(8px)",
+                background: "#ffffff",
+                border: "1px solid rgba(0,174,239,0.18)",
+                boxShadow: "0 2px 8px rgba(0,0,0,0.04)",
                 scrollMarginTop: "var(--cs-anchor-offset)",
               }}
               onMouseEnter={(e) => {
-                e.currentTarget.style.borderColor = "rgba(53,189,241,0.35)";
+                e.currentTarget.style.borderColor = "rgba(0,174,239,0.35)";
                 e.currentTarget.style.boxShadow =
-                  "0 0 24px rgba(53,189,241,0.2), inset 0 1px 0 rgba(255,255,255,0.08)";
+                  "0 8px 32px rgba(0,174,239,0.12), 0 1px 4px rgba(0,0,0,0.04)";
                 e.currentTarget.style.transform = "translateY(-4px)";
               }}
               onMouseLeave={(e) => {
-                e.currentTarget.style.borderColor = "rgba(53,189,241,0.15)";
-                e.currentTarget.style.boxShadow =
-                  "inset 0 1px 0 rgba(255,255,255,0.04)";
+                e.currentTarget.style.borderColor = "rgba(0,174,239,0.18)";
+                e.currentTarget.style.boxShadow = "0 2px 8px rgba(0,0,0,0.04)";
                 e.currentTarget.style.transform = "translateY(0)";
               }}
             >
@@ -148,7 +138,7 @@ export default function SixAutomationsSection() {
 
               {/* Title */}
               <h3
-                className="font-titles font-black text-white mb-2"
+                className="font-titles font-black text-black mb-2"
                 style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}
               >
                 {label}
@@ -157,7 +147,7 @@ export default function SixAutomationsSection() {
               {/* Description */}
               <p
                 style={{
-                  color: "rgba(255,255,255,0.82)",
+                  color: "rgba(10,22,40,0.7)",
                   fontSize: "0.9rem",
                   lineHeight: 1.68,
                 }}

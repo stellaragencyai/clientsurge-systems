@@ -1,15 +1,19 @@
 import { motion, useReducedMotion } from "framer-motion";
 
 const TOOLS = [
-  { name: "Twilio", url: "https://cdn.worldvectorlogo.com/logos/twilio-2.svg", width: 90 },
-  { name: "Stripe", url: "https://cdn.worldvectorlogo.com/logos/stripe-2.svg", width: 80 },
-  { name: "Google", url: "https://cdn.worldvectorlogo.com/logos/google-2015.svg", width: 80 },
-  { name: "Zapier", url: "https://cdn.worldvectorlogo.com/logos/zapier-2.svg", width: 80 },
-  { name: "OpenAI", url: "https://cdn.worldvectorlogo.com/logos/openai-2.svg", width: 100 },
+  { name: "Twilio", url: "https://cdn.worldvectorlogo.com/logos/twilio-2.svg", width: 135 },
+  { name: "Stripe", url: "https://cdn.worldvectorlogo.com/logos/stripe-2.svg", width: 120 },
+  { name: "OpenAI", url: "https://cdn.worldvectorlogo.com/logos/openai-2.svg", width: 150 },
+  { name: "Zapier", url: "https://cdn.worldvectorlogo.com/logos/zapier-2.svg", width: 120 },
+  { name: "Resend", url: "https://resend.com/favicon.ico", width: 120 },
+  { name: "Calendly", url: "https://cdn.worldvectorlogo.com/logos/calendly.svg", width: 120 },
 ];
 
 export default function ToolsIntegrationStrip() {
   const shouldReduceMotion = useReducedMotion();
+
+  // Duplicate the list for seamless infinite scroll
+  const marqueeTools = [...TOOLS, ...TOOLS];
 
   return (
     <section
@@ -30,7 +34,7 @@ export default function ToolsIntegrationStrip() {
         aria-hidden="true"
       />
 
-      <div className="relative max-w-5xl mx-auto px-6 text-center">
+      <div className="relative max-w-6xl mx-auto px-6 text-center">
         <motion.p
           initial={shouldReduceMotion ? {} : { opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -40,40 +44,45 @@ export default function ToolsIntegrationStrip() {
         >
           Works With Your Favorite Tools
         </motion.p>
+      </div>
 
-        <div className="flex flex-wrap items-center justify-center gap-8 md:gap-14 lg:gap-16">
-          {TOOLS.map(({ name, url, width }, idx) => (
-            <motion.div
-              key={name}
-              initial={shouldReduceMotion ? {} : { opacity: 0, y: 12 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 + idx * 0.07, duration: 0.5 }}
-              whileHover={shouldReduceMotion ? {} : { y: -2, opacity: 1 }}
-              style={{ opacity: 0.5, transition: "opacity 0.25s ease, transform 0.25s ease" }}
-              onMouseEnter={(e) => { e.currentTarget.style.opacity = "0.85"; }}
-              onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.5"; }}
+      {/* Carousel marquee */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          maskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+          WebkitMaskImage: "linear-gradient(to right, transparent, black 8%, black 92%, transparent)",
+        }}
+      >
+        <motion.div
+          className="flex items-center"
+          style={{ gap: "5rem", width: "max-content" }}
+          animate={shouldReduceMotion ? {} : { x: ["0%", "-50%"] }}
+          transition={{
+            duration: 30,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          {marqueeTools.map(({ name, url, width }, idx) => (
+            <div
+              key={`${name}-${idx}`}
+              className="flex items-center justify-center flex-shrink-0"
+              style={{ opacity: 0.6, transition: "opacity 0.25s ease" }}
+              onMouseEnter={(e) => { e.currentTarget.style.opacity = "1"; }}
+              onMouseLeave={(e) => { e.currentTarget.style.opacity = "0.6"; }}
             >
               <img
                 src={url}
                 alt={`${name} integration`}
                 loading="lazy"
                 decoding="async"
-                className="h-7 md:h-9 object-contain"
-                style={{ width: "auto", maxWidth: `${width}px` }}
+                className="object-contain"
+                style={{ height: "clamp(36px, 4.5vw, 52px)", width: "auto", maxWidth: `${width}px` }}
               />
-            </motion.div>
+            </div>
           ))}
-        </div>
-
-        <motion.p
-          initial={shouldReduceMotion ? {} : { opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 0.55, duration: 0.5 }}
-          className="mt-8 text-xs"
-          style={{ color: "rgba(10,22,40,0.6)" }}
-        >
-          Connects to the tools you already use — no tech stack change required
-        </motion.p>
+        </motion.div>
       </div>
     </section>
   );

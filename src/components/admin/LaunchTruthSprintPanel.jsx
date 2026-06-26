@@ -95,14 +95,33 @@ export default function LaunchTruthSprintPanel() {
 
   useEffect(() => { runSprint(); }, [runSprint]);
 
-  const filteredGates = (report?.gates || []).filter(g => {
-    if (gateFilter === "all") return true;
-    if (gateFilter === "blocked") return g.status === "blocked";
-    if (gateFilter === "ready_for_proof") return g.status === "ready_for_proof";
-    if (gateFilter === "approved") return g.status === "approved" || g.status === "proof_passed";
-    if (gateFilter === "needs_manual_action") return g.status === "ready_for_proof" || g.status === "partial";
-    return true;
-  });
+  // Sort priority: blocked first, then needs action, then approved
+  const GATE_SORT_PRIORITY = {
+    blocked: 0,
+    proof_failed: 1,
+    partial: 2,
+    ready_for_proof: 3,
+    proof_running: 4,
+    locked: 5,
+    waived: 6,
+    proof_passed: 7,
+    approved: 8,
+  };
+
+  const filteredGates = (report?.gates || [])
+    .filter(g => {
+      if (gateFilter === "all") return true;
+      if (gateFilter === "blocked") return g.status === "blocked";
+      if (gateFilter === "ready_for_proof") return g.status === "ready_for_proof";
+      if (gateFilter === "approved") return g.status === "approved" || g.status === "proof_passed";
+      if (gateFilter === "needs_manual_action") return g.status === "ready_for_proof" || g.status === "partial";
+      return true;
+    })
+    .sort((a, b) => {
+      const pa = GATE_SORT_PRIORITY[a.status] ?? 9;
+      const pb = GATE_SORT_PRIORITY[b.status] ?? 9;
+      return pa - pb;
+    });
 
   if (loading && !report) {
     return (

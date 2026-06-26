@@ -67,6 +67,8 @@ import LeadQualityControl from '../components/admin/LeadQualityControl';
 import TabErrorBoundary from '../components/admin/TabErrorBoundary.jsx';
 import ResendSenderDiagnosticsPanel from '../components/admin/ResendSenderDiagnosticsPanel';
 import LaunchTruthSprintPanel from '../components/admin/LaunchTruthSprintPanel';
+import LaunchProofDashboard from '../components/admin/LaunchProofDashboard';
+import SystemIdentityPanel from '../components/admin/SystemIdentityPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -149,6 +151,7 @@ const NAV_GROUPS = [
   {
     group: 'System Health',
     items: [
+      { id: 'launch-proof', label: 'Launch Proof', icon: ShieldCheck },
       { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
       { id: 'data-quality', label: 'Data Quality', icon: Activity },
       { id: 'platform-clients', label: 'Platform Clients', icon: Users },
@@ -324,6 +327,12 @@ export default function AdminDashboard() {
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'resend-diagnostics': return <ResendSenderDiagnosticsPanel />;
+      case 'launch-proof': return (
+        <div className="space-y-6">
+          <SystemIdentityPanel />
+          <LaunchProofDashboard />
+        </div>
+      );
       case 'launch-truth-sprint': return <LaunchTruthSprintPanel />;
       case 'failed-jobs': return <AdminFailedJobsPanel />;
       case 'instant-response': return <InstantLeadResponseDebugPanel />;

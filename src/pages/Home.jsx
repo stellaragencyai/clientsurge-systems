@@ -89,11 +89,11 @@ export default function Home() {
     let cleanupFaq = () => {};
 
     try { cleanupMetadata = setPageMetadata({
-      title: "Business AI Automation Store — Pick Your System, We Install It Remotely | ClientSurge Systems",
-      description: "Browse, choose, and activate AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Remotely installed and tested for service businesses.",
+      title: "Stop Losing Leads from Missed Calls & Slow Follow-Up | ClientSurge Systems",
+      description: "Stop losing leads from missed calls, slow follow-up, and unbooked inquiries. ClientSurge captures every lead, responds instantly, and books appointments automatically.",
       canonicalPath: "/",
-      ogTitle: "The Business AI Automation Store — Pick Your System, We Install It Remotely",
-      ogDescription: "ClientSurge helps businesses browse, choose, and activate AI automation systems through a guided AI-powered remote setup process.",
+      ogTitle: "Stop Losing Leads — Convert Every Call and Inquiry",
+      ogDescription: "ClientSurge captures every lead, responds instantly, and books appointments automatically. Stop losing leads from missed calls, slow follow-up, and unbooked inquiries.",
     }); } catch (_e) {}
     try { cleanupOrg = setJsonLd("organization", getOrganizationSchema()); } catch (_e) {}
     try { cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema()); } catch (_e) {}

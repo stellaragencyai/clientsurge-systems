@@ -113,22 +113,9 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
           )}
         </div>
 
-        {/* Content */}
-        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 py-10 md:py-16 flex flex-col items-center justify-center min-h-screen">
-          {/* Uniform glass card — clean text contrast against dark background */}
-          <div
-            className="w-full flex flex-col items-center text-center"
-            style={{
-              background: "rgba(8, 20, 44, 0.55)",
-              backdropFilter: "blur(24px) saturate(1.3)",
-              WebkitBackdropFilter: "blur(24px) saturate(1.3)",
-              borderRadius: "1.5rem",
-              border: "1px solid rgba(53, 189, 241, 0.15)",
-              boxShadow: "0 8px 48px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.06)",
-              padding: "clamp(1.5rem, 5vw, 3.5rem) clamp(1.25rem, 4vw, 3rem)",
-            }}
-          >
-          
+        {/* Content — title placed closer to nav, no glass card container */}
+        <div className="relative z-10 w-full max-w-4xl mx-auto px-4 sm:px-6 md:px-8 flex flex-col items-center text-center pt-20 md:pt-24 pb-12 md:pb-16">
+
           {/* EYEBROW */}
            <motion.div
              className="cs-hero-eyebrow"
@@ -136,12 +123,12 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
              animate={{ opacity: 1, y: 0 }}
              transition={{ duration: 0.4 }}
              style={{
-               fontSize: "clamp(0.75rem, 1.1vw, 0.875rem)",
+               fontSize: "clamp(0.7rem, 1vw, 0.8rem)",
                fontWeight: 700,
                letterSpacing: "0.25em",
                textShadow: "0 0 16px rgba(53,189,241,0.4)",
                textTransform: "uppercase",
-               margin: "0 0 28px 0",
+               margin: "0 0 16px 0",
                fontFamily: "'Inter', sans-serif",
              }}
            >
@@ -155,14 +142,14 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
             transition={{ duration: 0.5, delay: 0.08 }}
             style={{
               fontFamily: "'Montserrat', sans-serif",
-              fontSize: "clamp(2.6rem, 7.5vw, 4.75rem)",
+              fontSize: "clamp(2rem, 5vw, 3.5rem)",
               fontWeight: 900,
               lineHeight: 1.07,
               letterSpacing: "-0.04em",
-              margin: "0 0 24px 0",
+              margin: "0 0 20px 0",
               textWrap: "balance",
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.6)",
-              maxWidth: "960px",
+              maxWidth: "900px",
             }}
           >
             <span style={{ display: "block", color: "#FFFFFF" }}>You're Already Getting Leads.</span>
@@ -331,8 +318,6 @@ export default function CinematicHero({ videoUrl, posterUrl }) {
             ))}
           </motion.div>
 
-          </div>
-          {/* End glass card */}
         </div>
       </section>
     </>

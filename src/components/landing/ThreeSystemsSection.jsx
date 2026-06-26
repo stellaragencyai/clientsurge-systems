@@ -83,6 +83,13 @@ export default function ThreeSystemsSection() {
           subtitle="Choose the package that matches how much of your lead flow you want ClientSurge to handle — from essential capture and response to a complete website, follow-up, booking, review, and reactivation system."
         />
 
+        {/* Verification support line */}
+        <div className="text-center mb-6">
+          <p className="text-sm font-semibold text-foreground/80 max-w-3xl mx-auto leading-relaxed">
+            Every system is marked live only after lead capture, SMS/email response, booking path, and dashboard proof are verified.
+          </p>
+        </div>
+
         {/* Trust badges */}
         <div className="flex flex-wrap justify-center gap-3 mb-10">
           {[

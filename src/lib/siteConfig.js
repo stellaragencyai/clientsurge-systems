@@ -44,10 +44,10 @@ export const SITE_CONFIG = {
   },
   navigation: {
     sections: [
-      { label: "Automation Store", href: "/store", isPage: true },
-      { label: "Packages", href: "/pricing", isPage: true },
-      { label: "Industries", href: "/industries", isPage: true },
-      { label: "How It Works", href: "/how-it-works", isPage: true },
+      { label: "Home", href: "/", isPage: true },
+      { label: "Automations", href: "/automations", isPage: true },
+      { label: "Pricing", href: "/pricing", isPage: true },
+      { label: "Proof", href: "/proof", isPage: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [
