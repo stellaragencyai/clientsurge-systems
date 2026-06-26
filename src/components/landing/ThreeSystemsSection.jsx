@@ -122,10 +122,9 @@ export default function ThreeSystemsSection() {
               key={pkg.name}
               className="relative flex flex-col"
               style={{ paddingTop: pkg.highlight ? "32px" : 0 }}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, amount: 0.2 }}
-              transition={{ duration: 0.6, delay: idx * 0.12, ease: [0.22, 1, 0.36, 1] }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
             >
               {/* Floating "Recommended" pill badge */}
               {pkg.highlight && (
@@ -193,7 +192,7 @@ export default function ThreeSystemsSection() {
                   {/* CTA at bottom */}
                   <Link
                     to={pkg.href}
-                    onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section")}
+                    onClick={() => trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.href.split("=")[1] })}
                     className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200"
                     style={pkg.highlight ? {
                       background: "linear-gradient(90deg, #0079c1, #005691)",
