@@ -9,6 +9,8 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import DemoBookingModal from "../components/forms/DemoBookingModal";
 import ReadyToStartSection from "../components/landing/ReadyToStartSection";
+import SectionHeader from "../components/design-system/SectionHeader";
+import ManualVsAIComparison from "../components/landing/ManualVsAIComparison";
 import { setPageMetadata } from "@/lib/seo";
 
 const INDUSTRY_CONTEXT = {
@@ -146,7 +148,7 @@ export default function Contact() {
             {success ? (
               /* ── Success state ── */
               <motion.div
-                className="text-center py-8 md:py-16 px-4"
+                className="text-center py-8 md:py-16 px-4 cs-interactive-card rounded-2xl border border-border bg-card p-8 md:p-12"
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.4 }}
@@ -171,26 +173,13 @@ export default function Contact() {
               /* ── Form ── */
               <form onSubmit={handleSubmit} noValidate className="space-y-6">
 
-                {/* HEADER */}
-                <div>
-                  {/* #9 — Consistent cs-eyebrow label */}
-                  <p className="cs-eyebrow mb-4 text-primary">
-                    Get In Touch
-                  </p>
-
-                  {/* Section header — consistent with rest of site */}
-                  <div className="flex items-center gap-4 mb-5">
-                    <div className="w-1.5 rounded-full flex-shrink-0" style={{ height: "52px", background: "#00AEEF", boxShadow: "0 0 14px rgba(0,174,239,0.5)" }} />
-                    <h1 className="font-titles font-black text-foreground leading-none tracking-tight" style={{ fontSize: "clamp(2.5rem, 6vw, 3.5rem)" }}>Contact Us</h1>
-                  </div>
-
-                  <p className="text-base font-medium text-foreground mb-1 leading-relaxed">
-                    We'd love to hear from you.
-                  </p>
-                  <p className="text-sm text-muted-foreground leading-relaxed">
-                    Send a message and we'll respond within one business day.
-                  </p>
-                </div>
+                {/* HEADER — unified SectionHeader system */}
+                <SectionHeader
+                  eyebrow="Get In Touch"
+                  title="Contact Us"
+                  subtitle="Send a message and we'll respond within one business day."
+                  align="left"
+                />
 
                 {errors.submit && (
                   <div className="bg-red-50 border border-red-200 rounded-xl p-4 text-sm text-red-700">
@@ -270,8 +259,8 @@ export default function Contact() {
                   </p>
                 </Field>
 
-                {/* Submit button */}
-                <div className="pt-2">
+                {/* Submit button — standardized alignment */}
+                <div className="flex flex-col gap-3 pt-2">
                   <button
                     type="submit"
                     disabled={loading}
@@ -283,7 +272,7 @@ export default function Contact() {
                       : <><span>Send Message</span><ArrowRight className="w-4 h-4" /></>
                     }
                   </button>
-                  <p className="mt-3 text-xs text-muted-foreground">
+                  <p className="text-xs text-muted-foreground">
                     No spam, no pressure — just a thoughtful reply from our team.
                   </p>
                 </div>
@@ -293,33 +282,35 @@ export default function Contact() {
         </main>
       </div>
 
-      {/* Mobile contact info */}
+      {/* Mobile contact info — unified branding */}
       <div
         className="lg:hidden px-6 py-10 space-y-4 safe-bottom"
-        style={{ background: "linear-gradient(135deg, #0A1628, #0d1e38)", borderTop: "1px solid rgba(0,174,239,0.15)" }}
+        style={{ background: "var(--cs-gradient)", borderTop: "1px solid rgba(0,174,239,0.15)" }}
       >
-        <p className="text-xs font-bold uppercase tracking-[0.2em] mb-5" style={{ color: "rgba(0,174,239,0.8)" }}>
+        <p className="cs-section-eyebrow mb-5" style={{ color: "rgba(0,174,239,0.85)" }}>
           Get In Touch
         </p>
         <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.2)" }}>
-            <Phone className="w-4 h-4" style={{ color: "#00AEEF" }} />
+          <span className="cs-footer-contact-icon" aria-hidden="true">
+            <Phone className="w-4 h-4" />
           </span>
           <a href="tel:+16025843227" className="text-sm font-medium" style={{ color: "#e2e8f0" }}>(602) 584-3227</a>
         </div>
         <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.2)" }}>
-            <Mail className="w-4 h-4" style={{ color: "#00AEEF" }} />
+          <span className="cs-footer-contact-icon" aria-hidden="true">
+            <Mail className="w-4 h-4" />
           </span>
           <a href="mailto:support@clientsurgesystems.com" className="text-sm font-medium break-all" style={{ color: "#e2e8f0" }}>support@clientsurgesystems.com</a>
         </div>
         <div className="flex items-center gap-3">
-          <span className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: "rgba(0,174,239,0.12)", border: "1px solid rgba(0,174,239,0.2)" }}>
-            <MapPin className="w-4 h-4" style={{ color: "#00AEEF" }} />
+          <span className="cs-footer-contact-icon" aria-hidden="true">
+            <MapPin className="w-4 h-4" />
           </span>
           <span className="text-sm font-medium" style={{ color: "#e2e8f0" }}>Phoenix, Arizona</span>
         </div>
       </div>
+
+      <ManualVsAIComparison />
 
       <Footer />
       <MobileCallBar />
