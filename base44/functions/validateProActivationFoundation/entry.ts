@@ -39,6 +39,8 @@ const EXPECTED_PACKAGE_ALIASES = {
   pro: "pro_system",
   "pro system": "pro_system",
   pro_system: "pro_system",
+  "pro_website_plus_six_automations": "pro_system",
+  pro_website_plus_six_automations: "pro_system",
 };
 
 const EXPECTED_STANDARD_STEPS = [

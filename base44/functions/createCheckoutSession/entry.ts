@@ -110,6 +110,8 @@ const PACKAGE_KEY_ALIASES = {
   pro: "pro_system",
   "pro system": "pro_system",
   pro_system: "pro_system",
+  "pro_website_plus_six_automations": "pro_system",
+  pro_website_plus_six_automations: "pro_system",
 };
 
 const SERVICE_BY_PRODUCT_ID = Object.fromEntries(

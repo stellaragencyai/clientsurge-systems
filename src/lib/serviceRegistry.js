@@ -100,6 +100,7 @@ export const SERVICE_METADATA = {
 export const PACKAGE_FULFILLMENT_KEYS = {
   pro_system: CANONICAL_PRO_SERVICE_KEYS,
   elite_system: CANONICAL_PRO_SERVICE_KEYS, // legacy alias
+  "pro_website_plus_six_automations": CANONICAL_PRO_SERVICE_KEYS, // legacy alias
   growth_system: [
     "instant_lead_response",
     "missed_call_text_back",
@@ -288,6 +289,8 @@ const PACKAGE_KEY_ALIASES = {
   "starter system": "starter_system",
   starter_system: "starter_system",
   basic: "starter_system",
+  "pro_website_plus_six_automations": "pro_system",
+  pro_website_plus_six_automations: "pro_system",
 };
 
 export function normalizePackageKey(raw) {
