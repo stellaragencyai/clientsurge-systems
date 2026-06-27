@@ -327,6 +327,12 @@ export default function CredentialsWizard({ order, onComplete }) {
     finally { setLogoUploading(false); }
   };
 
+  // Defensive guard: if authorized but somehow still on step 0, bump to step 1.
+  // This prevents any state corruption from exposing business details before authorization.
+  if (authorized && currentStep === 0) {
+    setCurrentStep(1);
+  }
+
   const step = STEPS[currentStep];
   const isLast = currentStep === STEPS.length - 1;
 
