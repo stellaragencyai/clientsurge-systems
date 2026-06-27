@@ -1,7 +1,7 @@
 /**
  * testVoiceWebhookHealth — Admin health-check for the Twilio Voice webhook.
  *
- * Verifies that /api/receiveInboundVoiceCall:
+ * Verifies that /functions/receiveInboundVoiceCall:
  *   1. Returns HTTP 200
  *   2. Has Content-Type: text/xml
  *   3. Contains a root <Response> element

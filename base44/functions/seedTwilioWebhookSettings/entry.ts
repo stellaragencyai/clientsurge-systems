@@ -26,9 +26,9 @@ Deno.serve(async (req) => {
     }
 
     const base = appUrl.replace(/\/$/, '');
-    const voiceWebhookUrl = `${base}/api/receiveInboundVoiceCall`;
-    const smsWebhookUrl = `${base}/api/receiveTwilioInboundSms`;
-    const missedCallWebhookUrl = `${base}/api/receiveTwilioMissedCallWebhook`;
+    const voiceWebhookUrl = `${base}/functions/receiveInboundVoiceCall`;
+    const smsWebhookUrl = `${base}/functions/receiveTwilioInboundSms`;
+    const missedCallWebhookUrl = `${base}/functions/receiveTwilioMissedCallWebhook`;
 
     // ── Lightweight route health checks (GET, no payload, no side effects) ──
     const routeChecks = await Promise.allSettled([
