@@ -1,19 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * startDripCampaign — enrolls a lead into the drip campaign.
- *
- * Called automatically by entity automation when a lead's status
- * changes to "Contacted", or manually by admin.
- *
- * Payload (automation): { event, data, old_data }
- * Payload (direct):     { lead_id }
- *
- * Guards:
- *  - Won't enroll if lead is already Qualified, Booked, or Closed
- *  - Won't create a duplicate active campaign for the same lead
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 const SKIP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed"];
 

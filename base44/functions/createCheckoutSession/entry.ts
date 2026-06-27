@@ -295,8 +295,23 @@ Deno.serve(async (req) => {
       totalMonthly,
     });
 
-    // FIX #8: Enforce E.164 phone normalization before persisting
-    const { normalizePhoneToE164 } = await import("../lib/phoneNormalization.js");
+    // FIX #8: Enforce E.164 phone normalization before persisting (inlined — no local imports)
+    function normalizePhoneToE164(phone) {
+      if (!phone || typeof phone !== "string") return null;
+      const cleaned = phone.replace(/\D/g, "");
+      if (cleaned.length === 0) return null;
+      if (cleaned.length === 10) {
+        if (cleaned[0] === "0" || cleaned[0] === "1") return null;
+        return `+1${cleaned}`;
+      }
+      if (cleaned.length === 11 && cleaned.startsWith("1")) {
+        const ten = cleaned.slice(1);
+        if (ten[0] === "0" || ten[0] === "1") return null;
+        return `+${cleaned}`;
+      }
+      if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
+      return null;
+    }
     const normalizedPhone = customer_phone ? normalizePhoneToE164(customer_phone) : "";
     
     if (customer_phone && !normalizedPhone) {

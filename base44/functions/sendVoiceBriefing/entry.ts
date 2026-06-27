@@ -1,31 +1,15 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * sendVoiceBriefing — USE CASE #7
- * Scheduled: Daily 7am MST (Phoenix)
- *
- * Calls Nolan's phone number via ElevenLabs TTS + Twilio outbound call.
- * Reads a 60-second AI-generated morning briefing:
- *   - New leads overnight
- *   - HOT leads needing immediate action
- *   - Overdue follow-ups
- *   - Any stalled clients
- *   - Payment failures
- *
- * Fallback: if call fails or voice_briefing_enabled=false, sends SMS summary instead.
- *
- * Required:
- *   - ADMIN_NOTIFICATION_PHONE secret (Nolan's phone)
- *   - ELEVENLABS_API_KEY secret
- *   - AdminSettings.voice_briefing_enabled = true
- *   - AdminSettings.elevenlabs_agent_ids.briefing = ElevenLabs agent ID for briefing
- *
- * The ElevenLabs "briefing" agent should be configured with:
- *   - System prompt: "You are Nolan's AI assistant. Read the following briefing clearly and concisely, then hang up."
- *   - Use a professional male voice
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { twilioFetch } from "../_shared/providerFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
 
 const PHOENIX_OFFSET_HOURS = 7; // UTC-7, no DST
 

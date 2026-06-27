@@ -1,12 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Enroll Missed-Call Leads into Follow-Up Drip Campaign
- * Triggered: When initial SMS is sent to a missed-call lead
- * Purpose: Create and enroll a DripCampaign for the 4-step missed-call follow-up sequence
- * (2min SMS #2, 10min email, 1hour SMS #3, 24h email final)
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 Deno.serve(async (req) => {
   try {

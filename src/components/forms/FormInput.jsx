@@ -52,7 +52,7 @@ export default function FormInput({
 
   return (
     <div className="group">
-      <label className="cs-eyebrow block mb-2 text-foreground">
+      <label className="block mb-2 text-sm font-semibold text-foreground" style={{ textTransform: 'none', letterSpacing: '0.01em', fontSize: '0.875rem' }}>
         {label} {required && <span className="text-primary">*</span>}
       </label>
       

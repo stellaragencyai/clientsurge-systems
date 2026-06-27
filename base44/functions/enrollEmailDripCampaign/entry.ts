@@ -1,11 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Enroll Lead in Email Drip Campaign
- * Triggered by lead intent classification
- * Does NOT override existing SMS automations
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 Deno.serve(async (req) => {
   try {

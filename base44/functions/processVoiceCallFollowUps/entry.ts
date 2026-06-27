@@ -1,25 +1,19 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * processVoiceCallFollowUps — USE CASE #2
- * Scheduled: Hourly
- *
- * Finds leads where:
- *   - voice_call_attempted = true
- *   - voice_call_outcome IN [no_answer, busy, failed]
- *   - next_follow_up_at <= now (set by entity automation when outcome written)
- *   - voice_call_followup_sent != true (idempotency)
- *   - status NOT IN [Booked, Closed]
- *
- * Sends:
- *   1. Personalized SMS (AI-generated via generateIndustryFirstSMS or template fallback)
- *   2. Email if lead.email is present
- *   3. Logs CommunicationEvent for both
- *   4. Marks lead.voice_call_followup_sent = true
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { resendFetch } from "../_shared/resendFetch.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
 
 const QUIET_START = 20; // 8pm Phoenix
 const QUIET_END = 8;   // 8am Phoenix

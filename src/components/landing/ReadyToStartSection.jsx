@@ -20,21 +20,22 @@ export default function ReadyToStartSection() {
       {/* Eyebrow */}
       <p
         className="mb-5 text-xs font-bold uppercase tracking-[0.2em]"
-        style={{ color: "#00a2ff" }}
+        style={{ color: "#00a2ff !important", position: "relative", zIndex: 1 }}
       >
         Ready to Start?
       </p>
 
       {/* Headline */}
-      <h2 className="mb-6 font-titles text-4xl font-black leading-[1.1] tracking-tight text-white md:text-[2.75rem]">
+      <h2 className="mb-6 font-titles text-4xl font-black leading-[1.1] tracking-tight md:text-[2.75rem]" style={{ color: "#ffffff !important", position: "relative", zIndex: 1 }}>
         You're Already Getting Leads.
         <br />
         <span
-          className="text-transparent"
           style={{
             backgroundImage: "linear-gradient(90deg, #005bb5, #00a2ff)",
             WebkitBackgroundClip: "text",
             backgroundClip: "text",
+            WebkitTextFillColor: "transparent",
+            color: "#00a2ff",
           }}
         >
           Let's Convert Every One.
@@ -42,24 +43,24 @@ export default function ReadyToStartSection() {
       </h2>
 
       {/* Sub-headline */}
-      <p className="mb-6 max-w-md text-sm leading-relaxed text-slate-400 md:text-base">
+      <p className="mb-6 max-w-md text-sm leading-relaxed md:text-base" style={{ color: "#94a3b8 !important", position: "relative", zIndex: 1 }}>
         Book a free 15-minute strategy call. We'll map exactly where your
         business is leaking bookings and show you what the system looks like
         for your specific situation.
       </p>
 
       {/* Emphasis */}
-      <p className="mb-6 text-sm font-bold text-white md:text-base">
+      <p className="mb-6 text-sm font-bold md:text-base" style={{ color: "#ffffff !important", position: "relative", zIndex: 1 }}>
         Most clients are live in 48 hours. No contracts. No fluff.
       </p>
 
       {/* Pills */}
-      <div className="mb-8 flex flex-wrap justify-center gap-2.5">
+      <div className="mb-8 flex flex-wrap justify-center gap-2.5" style={{ position: "relative", zIndex: 1 }}>
         {PILLS.map((pill) => (
           <span
             key={pill}
-            className="inline-flex items-center gap-1.5 rounded-full border border-white/10 px-3 py-1.5 text-[11px] font-semibold text-white/70"
-            style={{ background: "#1a2035" }}
+            className="inline-flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-[11px] font-semibold"
+            style={{ background: "#1a2035", borderColor: "rgba(255,255,255,0.1)", color: "rgba(255,255,255,0.7)" }}
           >
             <span
               className="inline-block h-1.5 w-1.5 rounded-full"
@@ -91,7 +92,7 @@ export default function ReadyToStartSection() {
       </div>
 
       {/* Disclaimer */}
-      <p className="mt-6 text-[11px] text-slate-500">
+      <p className="mt-6 text-[11px]" style={{ color: "#64748b !important", position: "relative", zIndex: 1 }}>
         Free 15-minute call · no commitment required · live in 24–48 hours
       </p>
     </div>

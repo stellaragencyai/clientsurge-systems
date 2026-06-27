@@ -1,16 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * startNurtureCampaign — enrolls a lead into the 30-day nurture email sequence.
- *
- * Called by entity automation when a Lead's tags array contains "Nurture",
- * OR directly with { lead_id }.
- *
- * Guards:
- *  - Won't enroll if lead is already Booked or Closed
- *  - Won't create a duplicate active/paused campaign for the same lead
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 // Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
 function constantTimeEqual(left, right) {
   if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
