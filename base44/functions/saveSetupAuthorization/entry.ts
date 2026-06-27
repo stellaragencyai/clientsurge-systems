@@ -76,6 +76,42 @@ Deno.serve(async (req) => {
 
     console.log(`[saveSetupAuthorization] Authorization accepted for order ${order_id} by ${client_email}`);
 
+    // FIX 1A.4-3: Update or create ActivationWizardSession on authorization acceptance
+    const existingSession = await base44.asServiceRole.entities.ActivationWizardSession.filter(
+      { order_id }, "-created_date", 1
+    ).catch(() => []);
+
+    const now = new Date().toISOString();
+    if (existingSession?.length > 0) {
+      const session = existingSession[0];
+      const completedSteps = session.completed_steps || [];
+      if (!completedSteps.includes(0)) completedSteps.push(0);
+      await base44.asServiceRole.entities.ActivationWizardSession.update(session.id, {
+        setup_authorization_id: auth.id,
+        completed_steps: completedSteps,
+        current_step: Math.max(session.current_step || 0, 1),
+        status: "in_progress",
+        last_updated_at: now,
+      });
+      console.log(`[saveSetupAuthorization] ActivationWizardSession updated for order ${order_id}`);
+    } else {
+      await base44.asServiceRole.entities.ActivationWizardSession.create({
+        order_id,
+        client_id: client_id || "",
+        client_project_id: client_project_id || "",
+        client_email: client_email || "",
+        business_name: business_name || "",
+        package_key: "",
+        current_step: 1,
+        completed_steps: [0],
+        blockers: [],
+        status: "in_progress",
+        last_updated_at: now,
+        setup_authorization_id: auth.id,
+      });
+      console.log(`[saveSetupAuthorization] ActivationWizardSession created for order ${order_id}`);
+    }
+
     return json({
       success: true,
       authorization_id: auth.id,

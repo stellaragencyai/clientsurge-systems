@@ -122,28 +122,22 @@ Deno.serve(async (req) => {
       results.subscription_id = order.subscription_id;
     }
 
-    // STEP 4: Initialize ClientInstallationOS workflow
-    const osRecords = await base44.asServiceRole.entities.ClientInstallationOS.filter(
-      { client_id: clientId },
-      '-created_date',
-      1
-    );
-
-    if (osRecords.length === 0) {
-      const installationOS = await base44.asServiceRole.entities.ClientInstallationOS.create({
+    // STEP 4: Delegate to initializeInstallOS for canonical Pro activation foundation
+    // FIX 1A.4-1: Previously created ClientInstallationOS without checklists/steps/session.
+    // Now delegates to initializeInstallOS which is idempotent and seeds:
+    //   - ClientInstallationOS
+    //   - Six canonical Pro AutomationChecklist records
+    //   - Six standard AutomationChecklistStep records per checklist
+    //   - ActivationWizardSession
+    try {
+      const installResult = await base44.asServiceRole.functions.invoke("initializeInstallOS", {
         order_id: order.id,
-        client_id: clientId,
-        client_email: order.customer_email,
-        business_name: order.business_name,
-        workflow_stage: 'intake_received',
-        activation_status: 'not_ready',
-        admin_notes: `[ORCHESTRATION] Workflow initialized from Order ${order.id} | Package: ${order.selected_package_type}`,
       });
-      results.installation_os_id = installationOS.id;
-
-      console.log(`[orchestrateOrderToOnboarding] Created ClientInstallationOS ${installationOS.id}`);
-    } else {
-      results.installation_os_id = osRecords[0].id;
+      results.installation_os_id = installResult?.install_os_id || null;
+      console.log(`[orchestrateOrderToOnboarding] initializeInstallOS completed for order ${order.id}`);
+    } catch (installError) {
+      console.error(`[orchestrateOrderToOnboarding] initializeInstallOS failed: ${installError.message}`);
+      results.install_error = installError.message;
     }
 
     // STEP 5: Update Order install status

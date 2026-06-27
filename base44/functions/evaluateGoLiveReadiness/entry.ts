@@ -1,5 +1,8 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+// DRIFT-PROTECTION: This list MUST match lib/serviceRegistry.js CANONICAL_PRO_SERVICE_KEYS.
+// Deno functions cannot import from lib/, so this is duplicated intentionally.
+// Run validateProActivationFoundation to verify consistency.
 const CANONICAL_PRO_SERVICE_KEYS = [
   "instant_lead_response",
   "missed_call_text_back",

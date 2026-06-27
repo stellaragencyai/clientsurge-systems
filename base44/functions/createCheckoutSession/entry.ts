@@ -94,6 +94,9 @@ const PACKAGE_DEFINITIONS = [
   },
 ];
 
+// DRIFT-PROTECTION: This map MUST match lib/serviceRegistry.js PACKAGE_KEY_ALIASES.
+// Deno functions cannot import from lib/, so this is duplicated intentionally.
+// Run validateProActivationFoundation to verify consistency.
 const PACKAGE_KEY_ALIASES = {
   starter: "starter_system",
   "starter system": "starter_system",

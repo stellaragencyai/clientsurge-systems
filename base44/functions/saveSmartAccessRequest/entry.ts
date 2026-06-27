@@ -30,6 +30,14 @@ Deno.serve(async (req) => {
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) return json({ error: "Order not found" }, 404);
 
+    // FIX 1A.4-4: Server-side authorization gate — blocks access requests until SetupAuthorization accepted
+    const authCheck = await base44.asServiceRole.entities.SetupAuthorization.filter(
+      { order_id, authorization_status: "accepted" }, "-created_date", 1
+    ).catch(() => []);
+    if (!authCheck || authCheck.length === 0) {
+      return json({ error: "Setup Authorization Agreement must be accepted before submitting access requests.", code: "authorization_required" }, 403);
+    }
+
     const defaults = PROVIDER_DEFAULTS[provider] || {};
     const resolvedMethod = access_type || defaults.recommended_method || "collaborator_invite";
 

@@ -69,6 +69,16 @@ Deno.serve(async (req) => {
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) return json({ error: "Order not found" }, 404);
 
+    // FIX 1A.4-4: Server-side authorization gate — blocks sensitive setup data until SetupAuthorization accepted
+    if (!isAdminBypass) {
+      const authCheck = await base44.asServiceRole.entities.SetupAuthorization.filter(
+        { order_id, authorization_status: "accepted" }, "-created_date", 1
+      ).catch(() => []);
+      if (!authCheck || authCheck.length === 0) {
+        return json({ error: "Setup Authorization Agreement must be accepted before submitting setup data.", code: "authorization_required" }, 403);
+      }
+    }
+
     // Determine tier for field validation
     const pkgKey = resolvePackageKey(order.package_key || order.package_type || order.selected_package_type);
     const requiredFields = REQUIRED_FIELDS_BY_TIER[pkgKey] || REQUIRED_FIELDS_BY_TIER.starter_system;

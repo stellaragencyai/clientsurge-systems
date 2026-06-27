@@ -267,4 +267,33 @@ export function isValidActivationStatus(status) {
   return ALLOWED_ACTIVATION_STATUSES.includes(status);
 }
 
-export { CANONICAL_SERVICE_KEYS, LEGACY_ALIAS_MAP, ALLOWED_ACTIVATION_STATUSES };
+/**
+ * Normalize a package key to its canonical form.
+ * Maps legacy aliases and case variants to canonical package keys.
+ * This is the single source of truth for package key normalization.
+ * Backend functions that cannot import this file must inline an equivalent
+ * function with a drift-protection comment referencing this location.
+ */
+const PACKAGE_KEY_ALIASES = {
+  elite: "pro_system",
+  "elite system": "pro_system",
+  elite_system: "pro_system",
+  pro: "pro_system",
+  "pro system": "pro_system",
+  pro_system: "pro_system",
+  growth: "growth_system",
+  "growth system": "growth_system",
+  growth_system: "growth_system",
+  starter: "starter_system",
+  "starter system": "starter_system",
+  starter_system: "starter_system",
+  basic: "starter_system",
+};
+
+export function normalizePackageKey(raw) {
+  if (!raw || typeof raw !== "string") return null;
+  const key = raw.trim().toLowerCase();
+  return PACKAGE_KEY_ALIASES[key] || null;
+}
+
+export { CANONICAL_SERVICE_KEYS, LEGACY_ALIAS_MAP, ALLOWED_ACTIVATION_STATUSES, PACKAGE_KEY_ALIASES };

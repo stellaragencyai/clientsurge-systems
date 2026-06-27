@@ -205,10 +205,13 @@ Deno.serve(async (req) => {
       return LEGACY_ALIAS_MAP[key] || key;
     }
 
+    // DRIFT-PROTECTION: This function MUST match lib/serviceRegistry.js normalizePackageKey.
+    // Deno functions cannot import from lib/, so this is duplicated intentionally.
+    // Run validateProActivationFoundation to verify consistency.
     function resolvePackageKey(order) {
       const raw = order.package_key || order.package_type || order.selected_package_type || "";
       const key = String(raw).trim().toLowerCase();
-      if (key.includes("pro") || key === "elite_system") return "pro_system";
+      if (key.includes("pro") || key === "elite_system" || key === "elite") return "pro_system";
       if (key.includes("growth")) return "growth_system";
       if (key.includes("starter") || key.includes("basic")) return "starter_system";
       return null;
@@ -289,6 +292,31 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.entities.ClientInstallationOS.update(installOS.id, {
       all_automations_checklists: allChecklistIds,
     });
+
+    // FIX 1A.4-2: Create or resolve ActivationWizardSession (idempotent by order_id)
+    const existingSession = await base44.asServiceRole.entities.ActivationWizardSession.filter(
+      { order_id }, "-created_date", 1
+    ).catch(() => []);
+
+    if (existingSession?.length === 0) {
+      const resolvedPkg = resolvePackageKey(order) || order.selected_package_type || "";
+      await base44.asServiceRole.entities.ActivationWizardSession.create({
+        order_id,
+        client_id: order.client_id || "",
+        client_project_id: order.client_project_id || "",
+        client_email: order.customer_email || "",
+        business_name: order.business_name || "",
+        package_key: resolvedPkg,
+        current_step: 0,
+        completed_steps: [],
+        blockers: [],
+        status: "in_progress",
+        last_updated_at: new Date().toISOString(),
+      });
+      console.log(`[Install OS] ActivationWizardSession created for order ${order_id}`);
+    } else {
+      console.log(`[Install OS] ActivationWizardSession already exists for order ${order_id}`);
+    }
 
     const totalStepsCreated = stepSummary.reduce((sum, s) => sum + s.created, 0);
     console.log(`[Install OS] Created successfully for order ${order_id}: ${allChecklistIds.length} checklists, ${totalStepsCreated} steps`);
