@@ -1,13 +1,23 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * handleNewLead — redeployed 2026-05-02
- * Entity automation: triggered on Leads create
- * Purpose: Send instant SMS to the new lead + notify admin
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { appendSmsOptOut } from "../_shared/smsOptOut.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+function appendSmsOptOut(message) {
+  if (!message) return "";
+  const trimmed = message.trim();
+  if (/\bSTOP\b/i.test(trimmed)) return trimmed;
+  return `${trimmed}\n\nReply STOP to opt out.`;
+}
+
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
 
 function renderTemplate(template, lead) {
   return template

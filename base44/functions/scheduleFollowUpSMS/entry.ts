@@ -1,14 +1,25 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * scheduleFollowUpSMS — redeployed 2026-05-02
- * Scheduled: Every 15 minutes
- * Purpose: Send the initial 15-minute follow-up SMS to new CRM leads
- *          that have a phone number and haven't been contacted yet.
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { canSendFollowUpSms } from "../shared/followUpSmsHours.ts";
-import { twilioFetch } from "../_shared/providerFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+function canSendFollowUpSms() {
+  // Quiet hours: 8pm - 8am Phoenix time (MST, UTC-7)
+  const nowUTC = new Date();
+  const phoenixHour = (nowUTC.getUTCHours() - 7 + 24) % 24;
+  if (phoenixHour >= 20 || phoenixHour < 8) {
+    return { canSend: false, reason: "quiet_hours" };
+  }
+  return { canSend: true, reason: "" };
+}
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
 
 function minutesSince(isoDate) {
   if (!isoDate) return 0;

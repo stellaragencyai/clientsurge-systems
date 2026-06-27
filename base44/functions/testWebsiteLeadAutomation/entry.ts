@@ -1,11 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Test Website Lead Automation
- * Manual testing function for all 9 test scenarios
- * Run via: base44.functions.invoke('testWebsiteLeadAutomation', {test: 'test_a', delay_minutes: 0})
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 async function delay(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));

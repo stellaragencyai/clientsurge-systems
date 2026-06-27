@@ -1,10 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Test Instant Lead Response SMS End-to-End
- * Admin-only endpoint to verify SMS sending works
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 Deno.serve(async (req) => {
   try {

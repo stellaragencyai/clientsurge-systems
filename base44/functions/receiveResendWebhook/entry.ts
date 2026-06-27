@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
 
 /**
  * Resend Webhook Receiver — fully self-contained (no local imports).
@@ -58,15 +58,19 @@ function mapEventType(resendType) {
       return { event_type: 'email_sent', status: 'sent' };
     case 'email.delivered':
       return { event_type: 'email_sent', status: 'delivered' };
+    case 'email.delivery_delayed':
+      return { event_type: 'email_skipped', status: 'pending' };
     case 'email.bounced':
     case 'email.failed':
       return { event_type: 'email_failed', status: 'failed' };
+    case 'email.complained':
+      return { event_type: 'email_failed', status: 'failed' };
+    case 'email.suppressed':
+      return { event_type: 'email_skipped', status: 'skipped' };
     case 'email.opened':
       return { event_type: 'status_update', status: 'opened' };
     case 'email.clicked':
       return { event_type: 'status_update', status: 'processed' };
-    case 'email.complained':
-      return { event_type: 'email_failed', status: 'failed' };
     default:
       return { event_type: 'status_update', status: 'processed' };
   }
@@ -120,10 +124,20 @@ Deno.serve(async (req) => {
             updates.delivered_at = new Date().toISOString();
           } else if (type === 'email.sent') {
             updates.delivery_status = 'sent';
+          } else if (type === 'email.delivery_delayed') {
+            updates.delivery_status = 'queued';
+            updates.error_message = 'Delivery delayed by provider';
           } else if (type === 'email.bounced' || type === 'email.failed') {
             updates.delivery_status = 'failed';
             updates.failed_at = new Date().toISOString();
             updates.error_message = data?.bounce?.message || data?.error || type;
+          } else if (type === 'email.complained') {
+            updates.delivery_status = 'failed';
+            updates.failed_at = new Date().toISOString();
+            updates.error_message = 'Recipient complained (spam report)';
+          } else if (type === 'email.suppressed') {
+            updates.delivery_status = 'skipped';
+            updates.error_message = 'Recipient suppressed by provider';
           }
 
           if (updates.delivery_status && updates.delivery_status !== log.delivery_status) {

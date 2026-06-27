@@ -1,5 +1,9 @@
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { twilioFetch } from "../_shared/providerFetch.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
+
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
 
 function secureJson(data = {}, init = {}) {
   return new Response(JSON.stringify(data), {

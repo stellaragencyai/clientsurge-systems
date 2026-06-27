@@ -49,14 +49,16 @@ Deno.serve(async (req) => {
     const attributionByUTM = {};
     let totalRevenue = 0;
 
-    // Placeholder: simulate revenue from orders
+    // Calculate revenue from actual order amounts
     for (const order of orders || []) {
-      const estimatedRevenue = 1000; // Placeholder: would use actual order amount
-      totalRevenue += estimatedRevenue;
+      // Use actual order totals: setup fee + first month of monthly fees
+      const setupRevenue = order.total_setup || order.pricing_summary?.total_setup || 0;
+      const monthlyRevenue = order.total_monthly || order.pricing_summary?.total_monthly || 0;
+      const orderRevenue = setupRevenue + monthlyRevenue;
+      totalRevenue += orderRevenue;
 
-      // Try to link to lead by client_project_id
-      // In real scenario, would have explicit link
-      const source = 'direct'; // Placeholder
+      // Attribute to lead source if linked
+      const source = order.lead_id ? 'lead_pipeline' : 'direct';
       if (!attributionBySource[source]) {
         attributionBySource[source] = {
           revenue_total: 0,
@@ -64,8 +66,22 @@ Deno.serve(async (req) => {
           average_order_value: 0,
         };
       }
-      attributionBySource[source].revenue_total += estimatedRevenue;
+      attributionBySource[source].revenue_total += orderRevenue;
       attributionBySource[source].conversion_count++;
+
+      // Attribute by UTM if available
+      if (order.utm_source) {
+        const utmKey = order.utm_source;
+        if (!attributionByUTM[utmKey]) {
+          attributionByUTM[utmKey] = {
+            revenue_total: 0,
+            conversion_count: 0,
+            average_order_value: 0,
+          };
+        }
+        attributionByUTM[utmKey].revenue_total += orderRevenue;
+        attributionByUTM[utmKey].conversion_count++;
+      }
     }
 
     // Calculate AOV

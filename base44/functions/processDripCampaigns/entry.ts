@@ -1,22 +1,28 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * processDripCampaigns — hourly runner that fires overdue drip steps.
- *
- * For each active DripCampaign:
- *  1. Load the lead — if status is Qualified/Booked/Closed, stop the campaign
- *  2. Check each step interval since enrolled_at:
- *     - Day 1 (≥ 24h)  → send if day1_status = "pending"
- *     - Day 3 (≥ 72h)  → send if day3_status = "pending"
- *     - Day 7 (≥ 168h) → send if day7_status = "pending"
- *  3. Send SMS via Twilio (falls back to email via Resend if no phone)
- *  4. Update DripCampaign step status + sent_at
- *  5. If all 3 steps sent → mark campaign "completed"
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { appendSmsOptOut } from "../_shared/smsOptOut.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
+
+function appendSmsOptOut(message) {
+  if (!message) return "";
+  const trimmed = message.trim();
+  if (/\bSTOP\b/i.test(trimmed)) return trimmed;
+  return `${trimmed}\n\nReply STOP to opt out.`;
+}
+
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
 
 const STOP_STATUSES = ["Qualified", "Booking Prompt Sent", "Booked", "Closed", "Won", "Lost", "opted_out"]; // #96
 const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);

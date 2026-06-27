@@ -1,13 +1,18 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * sendMilestoneEmail — #118 #231
- * Triggered by entity automation when ClientProject.workflow_stage changes.
- * Sends a personalized milestone email for each stage transition.
- */
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-const MILESTONE_EMAILS: Record<string, { subject: string; headline: string; body: string }> = {
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
+
+const MILESTONE_EMAILS = {
   "In Progress": {
     subject: "Your ClientSurge setup is underway! 🚀",
     headline: "We're building your system",

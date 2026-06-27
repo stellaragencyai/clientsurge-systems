@@ -1,13 +1,23 @@
-import { secureJson } from "../_shared/response.ts";
-// redeployed 2026-05-02
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { resendFetch } from "../_shared/resendFetch.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-// Inline: allow scheduler/automation calls that have no authenticated user
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      ...(init.headers || {}),
+    },
+  });
+}
+
 function allowAnonymousAutomation(req) {
   const ua = req.headers.get('user-agent') || '';
   const auth = req.headers.get('authorization') || '';
-  return ua.includes('base44') || auth.startsWith('Bearer ');
+  const sharedSecret = Deno.env.get("AUTOMATION_SHARED_SECRET");
+  if (sharedSecret && auth.includes(`Bearer ${sharedSecret}`)) return true;
+  if (req.headers.get('x-internal') === 'true') return true;
+  return ua.includes('base44') || ua.includes('Base44') || auth.startsWith('Bearer ');
 }
 
 const LEAD_LIMIT = 5000;
@@ -39,7 +49,6 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
 
-    // Allow scheduled runs (no user) or admin users
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
     if (user && user.role !== 'admin') {
@@ -56,23 +65,11 @@ Deno.serve(async (req) => {
       Deno.env.get('ADMIN_EMAIL');
 
     if (!notificationEmail) {
-      console.error(
-        '[sendDailyDigest] No admin email resolved. ' +
-        `AdminSettings.lead_notification_email=${settings?.lead_notification_email ?? 'not set'}, ` +
-        `ADMIN_NOTIFICATION_EMAIL env=${Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ?? 'not set'}, ` +
-        `ADMIN_EMAIL env=${Deno.env.get('ADMIN_EMAIL') ?? 'not set'}`
-      );
       return secureJson(
         { error: 'No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret.' },
         { status: 400 }
       );
     }
-
-    const emailSource =
-      settings?.lead_notification_email ? 'AdminSettings' :
-      Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ? 'ADMIN_NOTIFICATION_EMAIL env' :
-      'ADMIN_EMAIL env';
-    console.log(`[sendDailyDigest] Resolved notification email from: ${emailSource}`);
 
     const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
     const now = Date.now();
@@ -98,7 +95,7 @@ Deno.serve(async (req) => {
 
     const body = `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-  <h2 style="color:#9a5c2e;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
+  <h2 style="color:#003B8F;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
   
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
     <div style="background:#eff6ff;border-radius:8px;padding:16px;text-align:center;">
@@ -120,9 +117,9 @@ Deno.serve(async (req) => {
   </div>
 
   ${hotLeads.length > 0 ? `
-  <h3 style="color:#7a4825;">🔥 Top Hot Leads — Act Now</h3>
+  <h3 style="color:#003B8F;">🔥 Top Hot Leads — Act Now</h3>
   <table style="width:100%;border-collapse:collapse;font-size:13px;">
-    <thead><tr style="background:#fef3e2;">
+    <thead><tr style="background:#eff6ff;">
       <th style="padding:8px 12px;text-align:left;">Name</th>
       <th style="padding:8px 12px;text-align:left;">Business</th>
       <th style="padding:8px 12px;text-align:left;">Status</th>
@@ -137,41 +134,34 @@ Deno.serve(async (req) => {
   </p>
 </div>`;
 
-    console.log(`[sendDailyDigest] Preparing digest — total leads: ${allLeads.length}, new today: ${newToday}, hot: ${hotLeads.length}, overdue: ${overdueFollowUp.length}, replied: ${replied.length}`);
-
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
       return secureJson({ error: 'RESEND_API_KEY not set' }, { status: 500 });
     }
     const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
 
-    try {
-      const res = await resendFetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: notificationEmail,
-          subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
-          html: body,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.message || `Resend error ${res.status}`);
-      }
-      console.log(`[sendDailyDigest] ✓ Digest sent successfully to ${notificationEmail}`);
-    } catch (emailError) {
-      console.error(`[sendDailyDigest] ✗ SendEmail failed: ${emailError.message}`);
-      throw emailError;
+    const res = await fetch('https://api.resend.com/emails', {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        from: fromEmail,
+        to: notificationEmail,
+        subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
+        html: body,
+      }),
+    });
+
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.message || `Resend error ${res.status}`);
     }
 
     return secureJson({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
-    console.error('[sendDailyDigest] sendDailyDigest error:', error);
+    console.error('[sendDailyDigest] error:', error);
     return secureJson({ error: error.message }, { status: 500 });
   }
 });

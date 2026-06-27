@@ -1,6 +1,16 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { resendFetch } from "../_shared/resendFetch.js";
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
 
 Deno.serve(async (req) => {
   try {

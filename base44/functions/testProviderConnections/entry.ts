@@ -1,6 +1,20 @@
-import { secureJson } from "../_shared/response.ts";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
+
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
+
 /**
  * testProviderConnections — #172
  * Tests Twilio and Resend credentials live. Returns {success, message}.

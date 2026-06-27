@@ -26,17 +26,17 @@ Deno.serve(async (req) => {
     const leads = await base44.asServiceRole.entities.WebsiteLead.filter({
       automation_enabled: true,
       cadence_paused: false,
-      reply_received: false,
+      archived: false,
     }, "-created_date", 100);
 
     for (const lead of (leads || [])) {
       try {
-        // Check opt-out
-        if (lead.sms_opted_out || lead.email_unsubscribed) {
+        // Check opt-out / pause conditions
+        if (lead.cadence_paused || lead.archived) {
           results.skipped++;
           continue;
         }
-        if (lead.status === "Booked" || lead.do_not_contact) {
+        if (lead.lead_status === "booked" || lead.lead_status === "closed") {
           results.skipped++;
           continue;
         }
@@ -58,7 +58,7 @@ Deno.serve(async (req) => {
         }
 
         // Check idempotency — don't send if already sent this step
-        if (lead.last_follow_up_step >= nextStep.step) {
+        if ((lead.follow_up_step || 0) >= nextStep.step) {
           results.skipped++;
           continue;
         }
@@ -106,9 +106,8 @@ Deno.serve(async (req) => {
 
         // Update lead follow-up step
         await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
-          last_follow_up_step: nextStep.step,
           follow_up_step: nextStep.step,
-          last_follow_up_at: now.toISOString(),
+          last_message_sent: now.toISOString(),
         });
 
         // Log communication event

@@ -1,14 +1,24 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { executeOrderServiceRuntime, RuntimeExecutionError } from "../_shared/installRuntime.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
-  const user = await base44.auth.me();
-  if (!user || user.role !== "admin") {
-    throw new Error("Admin access required");
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+class RuntimeExecutionError extends Error {
+  constructor(message, details, status = 409) {
+    super(message);
+    this.details = details;
+    this.status = status;
   }
 }
 
+/**
+ * sendTestLead — Admin-only test function that sends a test lead through the instant response pipeline.
+ * Delegates to handleInstantLeadResponse for runtime execution.
+ */
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
@@ -16,17 +26,13 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    await requireAdmin(base44);
+    const user = await base44.auth.me();
+    if (!user || user.role !== "admin") {
+      return secureJson({ error: "Admin access required" }, { status: 403 });
+    }
 
     const payload = await req.json().catch(() => ({}));
-    const {
-      order_id,
-      target_phone,
-      lead_name,
-      lead_phone,
-      consent_granted = true,
-      business_is_open = true,
-    } = payload || {};
+    const { order_id, target_phone, lead_name, lead_phone } = payload || {};
 
     if (!order_id) {
       return secureJson({ error: "order_id is required" }, { status: 400 });
@@ -37,23 +43,17 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
-    const result = await executeOrderServiceRuntime({
-      base44,
-      order,
-      serviceKey: "instant_lead_response",
-      runtimeType: "test_lead",
-      recipientPhone: target_phone || lead_phone || order.customer_phone,
-      runtimeData: {
-        lead_name: lead_name || "Test Lead",
-        lead_phone: lead_phone || target_phone || order.customer_phone,
-      },
-      businessIsOpen: Boolean(business_is_open),
-      consentGranted: Boolean(consent_granted),
+    // Delegate to the instant lead response handler
+    const result = await base44.functions.invoke("handleInstantLeadResponse", {
+      order_id,
+      lead_name: lead_name || "Test Lead",
+      lead_phone: lead_phone || target_phone || order.customer_phone || "",
+      test_mode: true,
     });
 
     return secureJson({
       success: true,
-      result,
+      result: result.data || result,
     });
   } catch (error) {
     const message = error instanceof Error ? error.message : "Failed to send test lead";
@@ -61,15 +61,8 @@ Deno.serve(async (req) => {
       message === "Admin access required" ? 403 :
       message === "Order not found" ? 404 :
       message === "order_id is required" ? 400 :
-      error instanceof RuntimeExecutionError ? error.status || 409 :
       500;
 
-    return secureJson(
-      {
-        error: message,
-        details: error instanceof RuntimeExecutionError ? error.details : undefined,
-      },
-      { status }
-    );
+    return secureJson({ error: message }, { status });
   }
 });

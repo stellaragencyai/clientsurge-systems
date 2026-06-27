@@ -1,5 +1,4 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
 
 function escapeHtml(value) {
   return String(value ?? '')
@@ -8,6 +7,17 @@ function escapeHtml(value) {
     .replace(/>/g, '&gt;')
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#39;');
+}
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      ...(init.headers || {}),
+    },
+  });
 }
 
 Deno.serve(async (req) => {
@@ -45,13 +55,13 @@ Deno.serve(async (req) => {
   <style>
     body { font-family: Arial, sans-serif; color: #2d2d2d; }
     .container { max-width: 600px; margin: 0 auto; padding: 20px; }
-    .header { background: linear-gradient(135deg, #6b3f1f 0%, #9a5c2e 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
+    .header { background: linear-gradient(135deg, #003B8F 0%, #00AEEF 100%); color: white; padding: 20px; border-radius: 8px; text-align: center; }
     .content { padding: 20px; background: #f9f7f5; margin: 20px 0; border-radius: 8px; }
     .metric { display: inline-block; margin: 10px 20px 10px 0; }
-    .metric-value { font-size: 24px; font-weight: bold; color: #9a5c2e; }
+    .metric-value { font-size: 24px; font-weight: bold; color: #00AEEF; }
     .metric-label { font-size: 12px; color: #666; text-transform: uppercase; }
     .footer { text-align: center; font-size: 12px; color: #999; margin-top: 30px; }
-    a { color: #9a5c2e; text-decoration: none; }
+    a { color: #00AEEF; text-decoration: none; }
   </style>
 </head>
 <body>
@@ -86,7 +96,7 @@ Deno.serve(async (req) => {
       <p style="margin-top: 20px;">This is a key milestone in your sales pipeline. The lead is now confirmed and ready for their appointment.</p>
 
       <p style="text-align: center; margin-top: 30px;">
-        <a href="#" style="background: linear-gradient(135deg, #6b3f1f, #9a5c2e); color: white; padding: 10px 20px; border-radius: 6px; display: inline-block;">
+        <a href="#" style="background: linear-gradient(135deg, #003B8F, #00AEEF); color: white; padding: 10px 20px; border-radius: 6px; display: inline-block;">
           View Lead Details
         </a>
       </p>

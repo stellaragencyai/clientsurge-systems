@@ -1,7 +1,37 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { resendFetch } from "../_shared/resendFetch.js";
-import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      ...(init.headers || {}),
+    },
+  });
+}
+
+const FALLBACK_SENDER = "noreply@clientsurgesystems.com";
+
+function getApprovedEmailSender(settings = {}) {
+  const configured = String(settings?.resend_from_email || "").trim();
+  if (configured && configured.includes("@")) return configured;
+  const envSender = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
+  if (envSender && envSender.includes("@")) return envSender;
+  return FALLBACK_SENDER;
+}
+
+function getEmailOutreachGate(context = "email outreach") {
+  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
+  if (["verified", "passed", "production_verified"].includes(proofStatus)) {
+    return { ok: true, reason: null, proof_status: proofStatus || "verified" };
+  }
+  return {
+    ok: false,
+    reason: `Email outreach blocked: deliverability proof not complete (context: ${context}).`,
+    proof_status: proofStatus || "missing",
+  };
+}
 
 Deno.serve(async (req) => {
   try {
@@ -12,44 +42,42 @@ Deno.serve(async (req) => {
       return secureJson({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    // Get automation job
-    const job = await base44.entities.AutomationJob.get(automation_job_id);
+    const job = await base44.asServiceRole.entities.AutomationJob.get(automation_job_id);
     if (!job) {
       return secureJson({ error: 'Job not found' }, { status: 404 });
     }
 
-    // Get lead
-    const lead = await base44.entities.Lead.get(job.lead_id);
+    const lead = await base44.asServiceRole.entities.Leads.get(job.lead_id);
     if (!lead || !lead.email) {
       return secureJson({ error: 'Lead or email not found' }, { status: 404 });
     }
 
-    // Get admin settings for template
-    const settings = await base44.entities.AdminSettings.list();
-    const adminSettings = settings[0] || {};
+    const settings = await base44.asServiceRole.entities.AdminSettings.list();
+    const adminSettings = settings?.[0] || {};
 
-    // Select template based on follow_up_type
     let subject, body;
     if (follow_up_type === 'email_followup_24h') {
       subject = 'Just checking in — still interested?';
-      body = 'Hi ' + (lead.name || 'there') + ', we wanted to follow up on your inquiry. Are you still interested in learning more? Let us know!';
+      body = 'Hi ' + (lead.full_name || 'there') + ', we wanted to follow up on your inquiry. Are you still interested in learning more? Let us know!';
     } else if (follow_up_type === 'email_followup_3d') {
       subject = 'Want help getting started?';
-      body = 'Hi ' + (lead.name || 'there') + ', we haven\'t heard back from you. We\'d love to help you move forward. Reply to this email or book a time that works for you.';
+      body = 'Hi ' + (lead.full_name || 'there') + ', we haven\'t heard back from you. We\'d love to help you move forward. Reply to this email or book a time that works for you.';
+    } else {
+      subject = 'Following up';
+      body = 'Hi ' + (lead.full_name || 'there') + ', just checking in!';
     }
 
-    // Send via Resend if configured
     let emailResult = null;
     if (adminSettings.resend_enabled && Deno.env.get('RESEND_API_KEY')) {
       const sendGate = getEmailOutreachGate('direct follow-up email');
       if (!sendGate.ok) {
-        await base44.entities.CommunicationEvent.create({
+        await base44.asServiceRole.entities.CommunicationEvent.create({
           lead_id: job.lead_id,
           channel: 'email',
           direction: 'outbound',
-          event_type: 'email_blocked',
+          event_type: 'email_skipped',
           provider: 'resend',
-          status: 'blocked',
+          status: 'skipped',
           subject,
           message_body: body,
           error_message: sendGate.reason,
@@ -70,14 +98,14 @@ Deno.serve(async (req) => {
         }, { status: 403 });
       }
 
-      const resendResponse = await resendFetch('https://api.resend.com/emails', {
+      const resendResponse = await fetch('https://api.resend.com/emails', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${Deno.env.get('RESEND_API_KEY')}`,
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          from: getApprovedEmailSender(adminSettings, { preferLeads: true }),
+          from: getApprovedEmailSender(adminSettings),
           to: lead.email,
           subject,
           html: `<p>${body}</p>`,
@@ -99,8 +127,7 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Create communication event
-    await base44.entities.CommunicationEvent.create({
+    await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: job.lead_id,
       channel: 'email',
       direction: 'outbound',
@@ -113,8 +140,7 @@ Deno.serve(async (req) => {
       error_message: emailResult?.error?.message || null,
     });
 
-    // Update job status
-    await base44.entities.AutomationJob.update(automation_job_id, {
+    await base44.asServiceRole.entities.AutomationJob.update(automation_job_id, {
       status: 'completed',
       processed_at: new Date().toISOString(),
       result_metadata: JSON.stringify(emailResult),

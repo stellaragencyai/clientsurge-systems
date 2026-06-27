@@ -1,10 +1,11 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Admin test function for inbound SMS reply handler
- * Validates end-to-end SMS reply capture, lead matching, and automation stop
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 async function simulateInboundSms(fromNumber, body, messageSid) {
   const smsPayload = new FormData();

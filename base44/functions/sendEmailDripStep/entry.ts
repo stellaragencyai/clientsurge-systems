@@ -1,12 +1,19 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Send Email Drip Step
- * Called by automation job when email is due
- * Uses Resend API for reliable delivery
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+function getEmailOutreachGate(context = "email outreach") {
+  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
+  if (["verified", "passed", "production_verified"].includes(proofStatus)) {
+    return { ok: true, reason: null, proof_status: proofStatus || "verified" };
+  }
+  return { ok: false, reason: `Email outreach blocked: deliverability proof not complete (context: ${context}).`, proof_status: proofStatus || "missing" };
+}
 
 Deno.serve(async (req) => {
   try {

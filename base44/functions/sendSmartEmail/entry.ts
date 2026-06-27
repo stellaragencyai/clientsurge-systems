@@ -1,12 +1,16 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * Send Smart Email
- * Generates AI subject line + sends email via Resend
- * Integrates subject line generation into email workflow
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
 
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
 
