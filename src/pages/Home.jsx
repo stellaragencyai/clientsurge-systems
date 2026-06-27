@@ -1,4 +1,4 @@
-import { useEffect, lazy, Suspense } from "react";
+import { useEffect, useMemo, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
@@ -10,10 +10,10 @@ import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
 import { SectionSkeleton } from "../components/landing/SkeletonLoader";
-import VisualFlawsPatch60 from "../components/landing/VisualFlawsPatch60";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
+import SectionErrorBoundary from "../components/SectionErrorBoundary.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
@@ -32,27 +32,30 @@ function isEditorSandbox() {
     const h = window.location.hostname;
     return h.includes("preview-sandbox") || h.includes("base44");
   } catch {
-    return true; // fail-safe: treat unknown environments as sandboxed
+    return true;
   }
 }
 
-
-
 function LazyHomepageSection({ children, fallback }) {
-  return <Suspense fallback={fallback}>{children}</Suspense>;
+  return (
+    <SectionErrorBoundary sectionName="lazy-section">
+      <Suspense fallback={fallback}>{children}</Suspense>
+    </SectionErrorBoundary>
+  );
 }
 
 export default function Home() {
   const location = useLocation();
   useHashNavigation();
+
+  // Optimized hash-scroll: uses requestAnimationFrame with a max attempt count
+  // to avoid redundant setTimeout chains when multiple sections mount.
   useEffect(() => {
-    if (!location.hash) {
-      return undefined;
-    }
+    if (!location.hash) return undefined;
 
     const id = decodeURIComponent(location.hash.slice(1));
     let attempts = 0;
-    let timeoutId;
+    let rafId;
 
     const scrollToHashTarget = () => {
       const target = document.getElementById(id);
@@ -60,86 +63,93 @@ export default function Home() {
         target.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
-
       if (attempts < 24) {
         attempts += 1;
-        timeoutId = window.setTimeout(scrollToHashTarget, 125);
+        rafId = window.requestAnimationFrame(scrollToHashTarget);
       }
     };
 
-    timeoutId = window.setTimeout(scrollToHashTarget, 0);
-    return () => window.clearTimeout(timeoutId);
+    rafId = window.requestAnimationFrame(scrollToHashTarget);
+    return () => window.cancelAnimationFrame(rafId);
   }, [location.hash]);
+
+  // Memoize SEO schemas so they only compute once per mount.
+  const schemas = useMemo(() => ({
+    organization: getOrganizationSchema(),
+    localBusiness: getLocalBusinessSchema(),
+    service: getServiceSchema(),
+    website: getWebsiteSchema(),
+    faq: getFAQSchema(FAQ_ITEMS),
+  }), []);
 
   useEffect(() => {
     if (isEditorSandbox()) return () => {};
     if (typeof document === "undefined" || !document.head) return () => {};
 
-    let cleanupMetadata = () => {};
-    let cleanupOrg = () => {};
-    let cleanupBusiness = () => {};
-    let cleanupService = () => {};
-    let cleanupWebsite = () => {};
-    let cleanupFaq = () => {};
+    const cleanups = [];
 
-    try { cleanupMetadata = setPageMetadata({
-      title: "Stop Losing Leads from Missed Calls & Slow Follow-Up | ClientSurge Systems",
-      description: "Stop losing leads from missed calls, slow follow-up, and unbooked inquiries. ClientSurge captures every lead, responds instantly, and books appointments automatically.",
-      canonicalPath: "/",
-      ogTitle: "Stop Losing Leads — Convert Every Call and Inquiry",
-      ogDescription: "ClientSurge captures every lead, responds instantly, and books appointments automatically. Stop losing leads from missed calls, slow follow-up, and unbooked inquiries.",
-    }); } catch (_e) {}
-    try { cleanupOrg = setJsonLd("organization", getOrganizationSchema()); } catch (_e) {}
-    try { cleanupBusiness = setJsonLd("local-business", getLocalBusinessSchema()); } catch (_e) {}
-    try { cleanupService = setJsonLd("service", getServiceSchema()); } catch (_e) {}
-    try { cleanupWebsite = setJsonLd("website", getWebsiteSchema()); } catch (_e) {}
-    try { cleanupFaq = setJsonLd("faq", getFAQSchema(FAQ_ITEMS)); } catch (_e) {}
+    try {
+      cleanups.push(setPageMetadata({
+        title: "Stop Losing Leads from Missed Calls & Slow Follow-Up | ClientSurge Systems",
+        description: "Stop losing leads from missed calls, slow follow-up, and unbooked inquiries. ClientSurge captures every lead, responds instantly, and books appointments automatically.",
+        canonicalPath: "/",
+        ogTitle: "Stop Losing Leads — Convert Every Call and Inquiry",
+        ogDescription: "ClientSurge captures every lead, responds instantly, and books appointments automatically. Stop losing leads from missed calls, slow follow-up, and unbooked inquiries.",
+      }));
+    } catch (_e) {}
+
+    try { cleanups.push(setJsonLd("organization", schemas.organization)); } catch (_e) {}
+    try { cleanups.push(setJsonLd("local-business", schemas.localBusiness)); } catch (_e) {}
+    try { cleanups.push(setJsonLd("service", schemas.service)); } catch (_e) {}
+    try { cleanups.push(setJsonLd("website", schemas.website)); } catch (_e) {}
+    try { cleanups.push(setJsonLd("faq", schemas.faq)); } catch (_e) {}
 
     return () => {
-      try { cleanupFaq(); } catch (_e) {}
-      try { cleanupService(); } catch (_e) {}
-      try { cleanupBusiness(); } catch (_e) {}
-      try { cleanupOrg(); } catch (_e) {}
-      try { cleanupWebsite(); } catch (_e) {}
-      try { cleanupMetadata(); } catch (_e) {}
+      cleanups.forEach((fn) => { try { fn(); } catch (_e) {} });
     };
-  }, []);
+  }, [schemas]);
 
   return (
     <DemoBookingProvider>
       <div className="min-h-screen">
         <ScrollProgressBar />
-        <VisualFlawsPatch60 />
         <Navbar />
 
         {/* 1. Cinematic Hero — primary value prop + CTA */}
-        <CinematicHero />
+        <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
+          <CinematicHero />
+        </SectionErrorBoundary>
 
         {/* 2. Six Core Automations — what the system does */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SixAutomationsSection />
+        <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
+          <SixAutomationsSection />
+        </SectionErrorBoundary>
 
         {/* 3. Revenue Leak — problem framing */}
-        <RevenueLeakSection />
+        <SectionErrorBoundary sectionName="revenue-leak">
+          <RevenueLeakSection />
+        </SectionErrorBoundary>
 
         {/* 4. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <ThreeSystemsSection />
+        <SectionErrorBoundary sectionName="pricing">
+          <ThreeSystemsSection />
+        </SectionErrorBoundary>
 
         {/* 5. Industries — user finds their vertical */}
         <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
+        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
           <Industries />
         </LazyHomepageSection>
 
         {/* 6. Final CTA — booking conversion */}
-        <LazyHomepageSection fallback={<SectionSkeleton />}>
+        <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>
 
         <Footer />
         <ChatBubble />
-
       </div>
     </DemoBookingProvider>
   );

@@ -1757,3 +1757,77 @@ table td,
     transform: none;
   }
 }
+
+/* ============================================
+   VISUAL FLAWS PATCH — migrated from VisualFlawsPatch60 component
+   Unique rules not already covered elsewhere in this file
+   ============================================ */
+
+/* Loading state feedback for modal-trigger buttons */
+.cs-btn-primary[data-loading="true"],
+button[data-loading="true"] {
+  opacity: 0.7;
+  pointer-events: none;
+  cursor: progress;
+}
+
+/* Gradient text must remain visible on dark backgrounds */
+@media (prefers-color-scheme: dark) {
+  [class*="bg-clip-text"],
+  [style*="background-clip: text"],
+  [style*="backgroundClip"] {
+    -webkit-text-fill-color: currentColor !important;
+    background: none !important;
+  }
+}
+
+/* Consistent checkmark icon weight in feature lists */
+.feature-card svg[data-checkicon="true"],
+.pricing-card svg[data-checkicon="true"] {
+  stroke-width: 2.5;
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+}
+
+/* Prevent layout shift from staggered animations */
+.feature-card,
+.pricing-card,
+[class*="animate-fade-in-up"],
+[data-framer-motion] {
+  will-change: transform, opacity;
+  contain: layout style;
+}
+
+/* Toast sizing */
+[class*="toast"], [class*="Toaster"] {
+  max-width: 420px;
+  font-size: 0.875rem;
+}
+
+/* Secondary CTA contrast boost */
+.btn-secondary {
+  color: hsl(215, 25%, 35%) !important;
+}
+
+/* Status indicators must not rely on color alone */
+.badge-success, .badge-warning, .badge-error, .badge-info {
+  font-weight: 700 !important;
+  border: 1px solid currentColor;
+}
+
+/* Industries dropdown keyboard nav highlight */
+[role="menuitem"]:focus-visible {
+  background: rgba(0, 174, 239, 0.08) !important;
+}
+
+/* Tab order visibility */
+[tabindex="0"]:focus-visible {
+  outline: 2px solid #00AEEF;
+  outline-offset: 4px;
+}
+
+/* GPU containment for hero to prevent CLS */
+.cs-hero-shield {
+  contain: layout paint style;
+}
