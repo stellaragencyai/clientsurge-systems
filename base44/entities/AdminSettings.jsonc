@@ -275,6 +275,11 @@
       "title": "Voice Briefing Phone Number",
       "description": "Phone number to call for daily briefing (defaults to ADMIN_NOTIFICATION_PHONE secret)"
     },
+    "voice_forwarding_phone": {
+      "type": "string",
+      "title": "Inbound Voice Forwarding Phone",
+      "description": "Phone number that inbound calls forward to when AI inbound voice is disabled or unavailable. Must NOT be the Twilio from number (no loopback). Used as the Dial target in fallback TwiML."
+    },
     "elevenlabs_agent_ids": {
       "type": "object",
       "title": "ElevenLabs Agent IDs",
