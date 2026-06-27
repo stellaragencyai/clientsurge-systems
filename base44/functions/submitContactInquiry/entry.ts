@@ -147,16 +147,22 @@ function isRecentContactInquiry(existingLead: Record<string, unknown>, contact: 
   return isWithinWindow && sameName && sameInquiryType;
 }
 
-async function sendAdminSMS(contact: ReturnType<typeof normalizeContactInput>) {
+async function sendAdminSMS(contact: ReturnType<typeof normalizeContactInput>, fromNumber: string) {
   const TWILIO_ACCOUNT_SID = Deno.env.get('TWILIO_ACCOUNT_SID');
   const TWILIO_AUTH_TOKEN = Deno.env.get('TWILIO_AUTH_TOKEN');
-  const TWILIO_FROM = Deno.env.get('TWILIO_PHONE_NUMBER') || '+16025843227';
   const NOLAN_CELL = '+16025874608'; // (602) 587-4608
 
   if (!TWILIO_ACCOUNT_SID || !TWILIO_AUTH_TOKEN) {
     console.warn('[submitContactInquiry] Twilio not configured — skipping SMS alert');
     return { sent: false, reason: 'missing_twilio_credentials' };
   }
+
+  if (!fromNumber) {
+    console.warn('[submitContactInquiry] Twilio From number not resolved — skipping SMS alert');
+    return { sent: false, reason: 'from_number_not_configured' };
+  }
+
+  const TWILIO_FROM = fromNumber;
 
   const body = `🔥 New Lead — ClientSurge
 Name: ${contact.full_name}
@@ -392,8 +398,32 @@ Deno.serve(async (req) => {
     });
 
     const notification = await sendAdminNotification(contact);
+    // ── Resolve Twilio From from AdminSettings (source of truth) ──
+    let resolvedFromNumber = null;
+    try {
+      const smsSettings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+      if (smsSettings?.[0]?.twilio_from_number) {
+        let fn = smsSettings[0].twilio_from_number;
+        const fnDigits = String(fn).replace(/\D/g, '');
+        if (fnDigits.length === 10) resolvedFromNumber = `+1${fnDigits}`;
+        else if (fnDigits.length === 11 && fnDigits.startsWith('1')) resolvedFromNumber = `+${fnDigits}`;
+        else if (fnDigits.length > 0) resolvedFromNumber = `+${fnDigits}`;
+      }
+    } catch (e) {
+      console.warn('[submitContactInquiry] AdminSettings load failed:', e.message);
+    }
+    if (!resolvedFromNumber) {
+      const envFn = Deno.env.get('TWILIO_FROM_NUMBER') || Deno.env.get('TWILIO_PHONE_NUMBER');
+      if (envFn) {
+        const fnDigits = String(envFn).replace(/\D/g, '');
+        if (fnDigits.length === 10) resolvedFromNumber = `+1${fnDigits}`;
+        else if (fnDigits.length === 11 && fnDigits.startsWith('1')) resolvedFromNumber = `+${fnDigits}`;
+        else if (fnDigits.length > 0) resolvedFromNumber = `+${fnDigits}`;
+      }
+    }
+    if (resolvedFromNumber === '+18778123630') resolvedFromNumber = null;
     // Fire SMS to Nolan's cell immediately — non-blocking
-    sendAdminSMS(contact).catch((err) =>
+    sendAdminSMS(contact, resolvedFromNumber).catch((err) =>
       console.warn('[submitContactInquiry] SMS alert error (non-blocking):', err)
     );
     const thankYouEmail = await sendUserThankYouEmail(contact);

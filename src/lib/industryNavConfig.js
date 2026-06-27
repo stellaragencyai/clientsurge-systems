@@ -16,6 +16,7 @@ export const INDUSTRY_GROUPS = [
       { label: "Med Spas & Aesthetic Clinics", href: "/med-spa" },
       { label: "Dental & Orthodontics", href: "/dental" },
       { label: "Chiropractic & Physical Therapy", href: "/chiropractic" },
+      { label: "Veterinary Clinics", href: "/veterinary" },
     ],
   },
   {

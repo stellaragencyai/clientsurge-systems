@@ -667,6 +667,106 @@ export const INDUSTRY_CONFIG = {
     testimonialPlaceholder: 'Chiropractic practice case study',
     cta: 'Compare Packages',
   },
+
+  veterinary: {
+    slug: 'veterinary',
+    name: 'Veterinary Clinics',
+    title: 'Veterinary Clinic Automation | ClientSurge',
+    description: 'Automate appointment requests, missed-call text-back, after-hours inquiry capture, reminders, and lead follow-up for veterinary practices.',
+    heroTitle: 'Never miss an appointment request or after-hours inquiry.',
+    heroSubtitle: 'AI responds to missed calls, captures after-hours appointment requests, sends automated reminders, and follows up with pet owners — automatically.',
+    painStatement: 'Pet owners call when their animal is sick or needs an appointment. Missed calls and slow follow-up mean lost patients and lost revenue.',
+    painCalculation: {
+      avgVisitValue: 250,
+      missedCallsPerMonth: 14,
+      conversionRate: 0.35,
+      monthlyRevenueLoss: function() {
+        return this.avgVisitValue * this.missedCallsPerMonth * this.conversionRate;
+      },
+    },
+    problemTitle: 'Veterinary Practices Lose Patients to Missed Calls and Slow Follow-Up',
+    problems: [
+      {
+        title: 'After-hours calls go unanswered',
+        description: 'Pet owners calling after hours about sick or injured animals often move on to the next clinic if nobody responds.',
+      },
+      {
+        title: 'Missed calls mean missed appointments',
+        description: 'Every missed call is a potential appointment that never gets booked. No text-back means no second chance.',
+      },
+      {
+        title: 'Reminders and follow-up are manual',
+        description: 'Your front desk can\'t call every patient for reminders and follow-ups. No-shows and drop-off hurt revenue.',
+      },
+    ],
+    solutionTitle: 'Automate Missed Call Recovery, Reminders, and Lead Follow-Up',
+    features: [
+      {
+        icon: 'Phone',
+        title: 'Missed Call Text-Back',
+        description: 'When a pet owner calls and nobody answers, an automatic SMS goes out within 60 seconds to capture the inquiry.',
+      },
+      {
+        icon: 'Calendar',
+        title: 'Appointment Reminders',
+        description: 'Automated SMS and email reminders reduce no-shows and keep your schedule full.',
+      },
+      {
+        icon: 'MessageSquare',
+        title: 'Lead Follow-Up',
+        description: 'New appointment inquiries get instant response and nurturing follow-up until booked.',
+      },
+    ],
+    howItWorks: [
+      {
+        number: '1',
+        title: 'Pet owner reaches out',
+        description: 'A call, form, or message comes in for an appointment, after-hours inquiry, or follow-up.',
+      },
+      {
+        number: '2',
+        title: 'AI responds instantly',
+        description: 'Missed calls get text-back, inquiries get instant response, and reminders go out automatically.',
+      },
+      {
+        number: '3',
+        title: 'Appointment booked',
+        description: 'Pet owners book or get follow-up. Your team sees only qualified, ready-to-book patients.',
+      },
+    ],
+    systemMapping: {
+      starter: {
+        label: 'Veterinary Starter',
+        price: '$497/month',
+        features: [
+          'Missed Call Text-Back',
+          'Appointment Inquiry Capture',
+        ],
+      },
+      growth: {
+        label: 'Veterinary Growth',
+        price: '$997/month',
+        features: [
+          'SMS + Email Follow-Up',
+          'Appointment Reminders',
+          'After-Hours Inquiry Capture',
+          'Booking Link Handoff',
+        ],
+      },
+      pro: {
+        label: 'Veterinary Pro',
+        price: 'Custom',
+        features: [
+          'All Growth features',
+          'Voice AI Receptionist',
+          'Patient Reactivation Campaigns',
+          'Custom Treatment Workflows',
+        ],
+      },
+    },
+    testimonialPlaceholder: 'Veterinary clinic case study',
+    cta: 'Compare Packages',
+  },
 };
 
 /**

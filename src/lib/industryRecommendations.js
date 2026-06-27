@@ -247,6 +247,43 @@ const INDUSTRY_CONFIG = [
     },
     addOnProductIds: ["prod_UNi5nfHZ3XKzzZ", "prod_UNi5aQjPk58U4o"],
   },
+  {
+    id: "veterinary",
+    name: "Veterinary Clinics",
+    shortName: "Veterinary",
+    recommendedPackageKey: "growth_system",
+    priorityServiceKeys: [
+      "missed_call_text_back",
+      "instant_lead_response",
+      "ai_booking_agent",
+    ],
+    summary:
+      "Best when missed calls, after-hours inquiries, appointment reminders, and follow-up all need to work together for pet owners.",
+    whyItWorks:
+      "Veterinary practices depend on fast response to appointment requests, reliable reminders, and consistent follow-up to keep schedules full and pets healthy.",
+    pressurePoints: [
+      "After-hours calls about sick or injured pets often go unanswered.",
+      "Missed calls mean missed appointments — pet owners move on to the next clinic.",
+      "Manual reminders and follow-up don't scale, leading to no-shows and patient drop-off.",
+    ],
+    recommendedServiceKeys: [
+      "instant_lead_response",
+      "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+    ],
+    serviceReasons: {
+      instant_lead_response:
+        "Responds to new appointment inquiries immediately, even when the front desk is busy with patients.",
+      missed_call_text_back:
+        "Captures pet owners who call when lines are busy or after hours, preventing them from going elsewhere.",
+      nurture_sequence_14d:
+        "Keeps undecided pet owners engaged with helpful follow-up until they are ready to book.",
+      ai_booking_agent:
+        "Moves ready-to-book pet owners toward an appointment without requiring front-desk phone tag.",
+    },
+    addOnProductIds: ["prod_UNi5ybXQSG6QkX", "prod_UNi5Df5KWsS4lW"],
+  },
 ];
 
 function getProductById(productId) {

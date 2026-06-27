@@ -73,10 +73,40 @@ Deno.serve(async (req) => {
 
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
     const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-    const fromNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
 
-    if (!accountSid || !authToken || !fromNumber) {
+    if (!accountSid || !authToken) {
       return json({ error: 'Twilio credentials not configured' }, 500);
+    }
+
+    // ── Resolve From number from AdminSettings (source of truth) ──
+    // Falls back to env var. Blocks +18778123630 (toll-free, Twilio 30032).
+    const base44 = createClientFromRequest(req);
+    let fromNumber = null;
+    try {
+      const settings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+      if (settings?.[0]?.twilio_from_number) {
+        fromNumber = settings[0].twilio_from_number;
+      }
+    } catch (e) {
+      console.warn('[sendSMS] AdminSettings load failed:', e.message);
+    }
+    if (!fromNumber) {
+      fromNumber = Deno.env.get('TWILIO_FROM_NUMBER') || Deno.env.get('TWILIO_PHONE_NUMBER');
+    }
+    // Normalize to E.164
+    if (fromNumber) {
+      const digits = String(fromNumber).replace(/\D/g, '');
+      if (digits.length === 10) fromNumber = `+1${digits}`;
+      else if (digits.length === 11 && digits.startsWith('1')) fromNumber = `+${digits}`;
+      else if (digits.length > 0) fromNumber = `+${digits}`;
+      else fromNumber = null;
+    }
+    // Block deprecated toll-free sender
+    if (fromNumber === '+18778123630') {
+      return json({ error: 'Twilio sender +18778123630 is BLOCKED. Use +16025843227. Update AdminSettings.twilio_from_number.' }, 500);
+    }
+    if (!fromNumber) {
+      return json({ error: 'Twilio FROM number not configured. Set AdminSettings.twilio_from_number.' }, 500);
     }
 
     // Consent guard: if leadId provided, check lead consent before sending

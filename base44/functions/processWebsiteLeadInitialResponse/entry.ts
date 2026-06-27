@@ -187,16 +187,15 @@ function checkEmailEligibility(lead) {
 // PROVIDER SEND FUNCTIONS
 // ═══════════════════════════════════════════
 
-async function sendTwilioSms(toPhone, body) {
+async function sendTwilioSms(toPhone, body, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const fromNumber = Deno.env.get("TWILIO_PHONE_NUMBER");
 
   if (!accountSid || !authToken || !fromNumber) {
     return {
       success: false,
       error_code: "provider_not_configured",
-      error_message: "Twilio credentials not configured (TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_PHONE_NUMBER missing)",
+      error_message: "Twilio credentials or From number not configured (AdminSettings.twilio_from_number or env var missing)",
     };
   }
 
@@ -483,7 +482,33 @@ async function processLead(base44, lead, env) {
         environment: env,
       });
     } else {
-      const smsOutcome = await sendTwilioSms(normalizedPhone, SMS_BODY);
+      // ── Resolve From number from AdminSettings (source of truth) ──
+      let resolvedFromNumber = null;
+      try {
+        const smsSettings = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+        if (smsSettings?.[0]?.twilio_from_number) {
+          let fn = smsSettings[0].twilio_from_number;
+          const fnDigits = String(fn).replace(/\D/g, '');
+          if (fnDigits.length === 10) resolvedFromNumber = `+1${fnDigits}`;
+          else if (fnDigits.length === 11 && fnDigits.startsWith('1')) resolvedFromNumber = `+${fnDigits}`;
+          else if (fnDigits.length > 0) resolvedFromNumber = `+${fnDigits}`;
+        }
+      } catch (e) {
+        console.warn("[processLead] AdminSettings load failed:", e.message);
+      }
+      if (!resolvedFromNumber) {
+        const envFn = Deno.env.get("TWILIO_FROM_NUMBER") || Deno.env.get("TWILIO_PHONE_NUMBER");
+        if (envFn) {
+          const fnDigits = String(envFn).replace(/\D/g, '');
+          if (fnDigits.length === 10) resolvedFromNumber = `+1${fnDigits}`;
+          else if (fnDigits.length === 11 && fnDigits.startsWith('1')) resolvedFromNumber = `+${fnDigits}`;
+          else if (fnDigits.length > 0) resolvedFromNumber = `+${fnDigits}`;
+        }
+      }
+      // Block deprecated toll-free sender
+      if (resolvedFromNumber === '+18778123630') resolvedFromNumber = null;
+
+      const smsOutcome = await sendTwilioSms(normalizedPhone, SMS_BODY, resolvedFromNumber);
       if (smsOutcome.success) {
         smsResult.sent = true;
         smsResult.provider_message_id = smsOutcome.provider_message_id;

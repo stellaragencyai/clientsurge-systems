@@ -93,6 +93,17 @@ export const industryPatterns = {
       <rect width="100%" height="100%" fill="url(#pat-property)"/>
     </svg>
   ),
+  "veterinary": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-vet" x="0" y="0" width="36" height="36" patternUnits="userSpaceOnUse">
+        <circle cx="18" cy="12" r="4" fill="none" stroke="white" strokeWidth="1"/>
+        <circle cx="10" cy="20" r="4" fill="none" stroke="white" strokeWidth="1"/>
+        <circle cx="26" cy="20" r="4" fill="none" stroke="white" strokeWidth="1"/>
+        <ellipse cx="18" cy="26" rx="5" ry="3" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-vet)"/>
+    </svg>
+  ),
 };
 
 export const FILTER_TAGS = [
@@ -113,4 +124,5 @@ export const INDUSTRY_TAGS = {
   "real-estate": "professional",
   "personal-injury": "professional",
   "property-services": "home",
+  "veterinary": "health",
 };

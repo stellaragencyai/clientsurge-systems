@@ -12,6 +12,7 @@ import {
   HardHat,
   Scale,
   Building2,
+  PawPrint,
 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -130,6 +131,18 @@ const industries = [
       "Tailored for personal injury law firms that need faster intake, missed-call recovery, consultation scheduling, and consistent follow-up with potential clients.",
     href: "/personal-injury",
   },
+  {
+    id: "veterinary",
+    title: "Veterinary Clinics",
+    status: "Live",
+    icon: PawPrint,
+    accent: "text-[#005f99]",
+    accentBg: "bg-primary/10 border-primary/20",
+    ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
+    description:
+      "Built for veterinary practices that need faster response to appointment requests, missed-call text-back, after-hours inquiry capture, automated reminders, and consistent lead follow-up.",
+    href: "/veterinary",
+  },
 ];
 
 export default function Industries() {
@@ -145,7 +158,7 @@ export default function Industries() {
     return setPageMetadata({
       title: "Industries We Serve | ClientSurge Systems",
       description:
-        "Explore the nine industries ClientSurge Systems serves: roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, and personal injury.",
+        "Explore the industries ClientSurge Systems serves: roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, personal injury, and veterinary clinics.",
       canonicalPath: "/industries",
       ogTitle: "Industries We Serve | ClientSurge Systems",
       ogDescription:
