@@ -152,37 +152,28 @@ export default function CartSidebar() {
     }
 
     try {
-      const leadAttribution = readCheckoutLeadAttribution();
-      const response = await base44.functions.invoke("createCheckoutSession", {
-        items,
-        customer_name: form.name,
-        customer_email: form.email,
-        customer_phone: form.phone,
-        business_name: form.business,
-        lead_id: leadAttribution.lead_id || leadAttribution.crm_lead_id || "",
-        crm_lead_id: leadAttribution.crm_lead_id || leadAttribution.lead_id || "",
-        website_lead_id: leadAttribution.website_lead_id || "",
-        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/store`,
-      });
+      const packageOffer = pricingSummary?.package_offer;
+      const checkoutUrl = packageOffer?.checkout_url;
 
-      if (response.data?.url) {
+      if (!checkoutUrl) {
         clearTimeout(timeoutId);
-        // Save order summary so OrderSuccess can display what was purchased
-        try {
-          sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
-            items: items.map(i => ({ icon: i.icon, name: i.name, setup_fee: i.setup_fee, monthly_fee: i.monthly_fee })),
-            totalSetup,
-            totalMonthly,
-          }));
-        } catch {}
-        window.location.href = response.data.url;
+        setError("Checkout is not available for this selection. Please choose a complete package.");
+        setStep("info");
         return;
       }
 
+      // Save order summary so OrderSuccess can display what was purchased
+      try {
+        sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
+          items: items.map(i => ({ icon: i.icon, name: i.name, setup_fee: i.setup_fee, monthly_fee: i.monthly_fee })),
+          totalSetup,
+          totalMonthly,
+        }));
+      } catch {}
+
       clearTimeout(timeoutId);
-      setError("Could not start checkout. Please try again.");
-      setStep("info");
+      window.location.href = checkoutUrl;
+      return;
     } catch (e) {
       clearTimeout(timeoutId);
       setError(e.message || "Checkout failed.");

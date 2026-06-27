@@ -30,9 +30,9 @@ export const PLAN_REGISTRY = {
     monthly_fee_usd: 997,
     description: 'Starter plus 14-day nurture sequence and AI booking agent for growing businesses.',
   },
-  elite_system: {
-    plan_type: 'elite_system',
-    display_name: 'Elite System',
+  pro_system: {
+    plan_type: 'pro_system',
+    display_name: 'Pro System',
     tier_order: 3,
     setup_fee_usd: 2497,
     monthly_fee_usd: 1997,
@@ -83,8 +83,8 @@ export const PLAN_FEATURE_MAPPING = {
       automations_per_month: 6,
     },
   },
-  elite_system: {
-    plan_type: 'elite_system',
+  pro_system: {
+    plan_type: 'pro_system',
     feature_keys: [
       'instant_lead_response',
       'missed_call_text_back',
@@ -142,8 +142,8 @@ export const UPGRADE_LOGIC_RULES = [
     rule_type: 'usage_limit',
     metric_key: 'leads_per_month',
     threshold_percent: 80,
-    suggested_plan: 'elite_system',
-    message: "You've used 80% of your monthly lead limit. Upgrade to Elite for 3× more capacity.",
+    suggested_plan: 'pro_system',
+    message: "You've used 80% of your monthly lead limit. Upgrade to Pro for 3× more capacity.",
     is_active: true,
   },
   // Feature-blocked rules
@@ -170,8 +170,8 @@ export const UPGRADE_LOGIC_RULES = [
     applies_to_plan: 'starter_system',
     rule_type: 'feature_blocked',
     blocked_feature_key: 'review_request_automation',
-    suggested_plan: 'elite_system',
-    message: 'Review Request Automation is available on the Elite plan.',
+    suggested_plan: 'pro_system',
+    message: 'Review Request Automation is available on the Pro plan.',
     is_active: true,
   },
   {
@@ -179,8 +179,8 @@ export const UPGRADE_LOGIC_RULES = [
     applies_to_plan: 'starter_system',
     rule_type: 'feature_blocked',
     blocked_feature_key: 'lead_reactivation',
-    suggested_plan: 'elite_system',
-    message: 'Lead Reactivation is available on the Elite plan. Upgrade to win back old opportunities.',
+    suggested_plan: 'pro_system',
+    message: 'Lead Reactivation is available on the Pro plan. Upgrade to win back old opportunities.',
     is_active: true,
   },
   {
@@ -188,8 +188,8 @@ export const UPGRADE_LOGIC_RULES = [
     applies_to_plan: 'growth_system',
     rule_type: 'feature_blocked',
     blocked_feature_key: 'review_request_automation',
-    suggested_plan: 'elite_system',
-    message: 'Review Request Automation is available on the Elite plan.',
+    suggested_plan: 'pro_system',
+    message: 'Review Request Automation is available on the Pro plan.',
     is_active: true,
   },
   {
@@ -197,8 +197,8 @@ export const UPGRADE_LOGIC_RULES = [
     applies_to_plan: 'growth_system',
     rule_type: 'feature_blocked',
     blocked_feature_key: 'lead_reactivation',
-    suggested_plan: 'elite_system',
-    message: 'Lead Reactivation is available on the Elite plan. Upgrade to unlock win-back campaigns.',
+    suggested_plan: 'pro_system',
+    message: 'Lead Reactivation is available on the Pro plan. Upgrade to unlock win-back campaigns.',
     is_active: true,
   },
   {
@@ -206,8 +206,8 @@ export const UPGRADE_LOGIC_RULES = [
     applies_to_plan: 'growth_system',
     rule_type: 'feature_blocked',
     blocked_feature_key: 'ai_voice_agent',
-    suggested_plan: 'elite_system',
-    message: 'AI Voice Agent is available on the Elite plan for inbound call handling and missed-call triaging.',
+    suggested_plan: 'pro_system',
+    message: 'AI Voice Agent is available on the Pro plan for inbound call handling and missed-call triaging.',
     is_active: true,
   },
 ];
@@ -221,9 +221,9 @@ export const STRIPE_MAPPING_REFERENCE = [
   // Growth System
   { stripe_product_id: 'prod_UReWhZsWks1HuA', price_type: 'one_time',  amount_usd: 1297, mapped_plan: 'growth_system',  notes: 'Growth one-time setup fee' },
   { stripe_product_id: 'prod_UReWhZsWks1HuA', price_type: 'recurring', amount_usd: 997,  mapped_plan: 'growth_system',  notes: 'Growth monthly retainer' },
-  // Elite System (prod_UReW1LmsVbn4BZ maps to elite — same as "Pro" in Stripe catalog)
-  { stripe_product_id: 'prod_UReW1LmsVbn4BZ', price_type: 'one_time',  amount_usd: 2497, mapped_plan: 'elite_system',   notes: 'Elite one-time setup fee' },
-  { stripe_product_id: 'prod_UReW1LmsVbn4BZ', price_type: 'recurring', amount_usd: 1997, mapped_plan: 'elite_system',   notes: 'Elite monthly retainer' },
+  // Pro System (prod_UReW1LmsVbn4BZ — same product as legacy "Elite")
+  { stripe_product_id: 'prod_UReW1LmsVbn4BZ', price_type: 'one_time',  amount_usd: 2497, mapped_plan: 'pro_system',   notes: 'Pro one-time setup fee' },
+  { stripe_product_id: 'prod_UReW1LmsVbn4BZ', price_type: 'recurring', amount_usd: 1997, mapped_plan: 'pro_system',   notes: 'Pro monthly retainer' },
 ];
 
 // ─── Helper utilities ─────────────────────────────────────────────────────────

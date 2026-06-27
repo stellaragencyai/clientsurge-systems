@@ -93,17 +93,20 @@ export const STRIPE_PRODUCTS = {
     id: "prod_UReWMpnZsCnfcL",
     setup: 797,
     monthly: 497,
+    checkout_url: "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
   },
   growth: {
     name: "Growth System",
     id: "prod_UReWhZsWks1HuA",
     setup: 1297,
     monthly: 997,
+    checkout_url: "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
   },
   pro: {
     name: "Pro System",
     id: "prod_UReW1LmsVbn4BZ",
     setup: 2497,
     monthly: 1997,
+    checkout_url: "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
   },
 };

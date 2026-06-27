@@ -36,7 +36,7 @@ const packages = [
     highlighted: true,
   },
   {
-    name: 'Elite System',
+    name: 'Pro System',
     description: 'Best for businesses that want the full automation stack, AI voice, reactivation, analytics, and optimization.',
     setupFee: 2497,
     monthlyFee: 1997,
@@ -54,7 +54,7 @@ const packages = [
       'Daily lead digest',
       'Client portal',
     ],
-    ctaLabel: 'Start Elite',
+    ctaLabel: 'Start Pro',
     isRecommended: false,
   },
   {
@@ -66,7 +66,7 @@ const packages = [
     automations: [
       'Manage unlimited clients',
       'White-label branding',
-      'All Starter + Growth + Elite features',
+      'All Starter + Growth + Pro features',
       'Agency performance dashboard',
       'Client provisioning pipeline',
       'Dedicated support',

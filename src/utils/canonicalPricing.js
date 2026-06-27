@@ -33,10 +33,10 @@ export const CANONICAL_PRICING = {
     monthly_rate: byKey("pro_system").monthly_total,
     services: byKey("pro_system").included_service_keys.length,
   },
-  elite_system: byKey("elite_system") && {
-    setup_fee: byKey("elite_system").setup_total,
-    monthly_rate: byKey("elite_system").monthly_total,
-    services: byKey("elite_system").included_service_keys.length,
+  pro_website_plus_six_automations: byKey("pro_system") && {
+    setup_fee: byKey("pro_system").setup_total,
+    monthly_rate: byKey("pro_system").monthly_total,
+    services: byKey("pro_system").included_service_keys.length,
     legacy_alias_for: "pro_system",
   },
 };

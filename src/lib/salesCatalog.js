@@ -292,6 +292,7 @@ export const PACKAGE_DEFINITIONS = [
     stripe_product_id: "prod_UReWMpnZsCnfcL",
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
+    checkout_url: "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
     setup_total: 797,
     monthly_total: 497,
@@ -318,6 +319,7 @@ export const PACKAGE_DEFINITIONS = [
     stripe_product_id: "prod_UReWhZsWks1HuA",
     setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
     monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
+    checkout_url: "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -348,11 +350,11 @@ export const PACKAGE_DEFINITIONS = [
       current_public_package: true,
       package_family: "controlled_launch",
       sales_position: "full response, reactivation, and review package",
-      legacy_public_name: "Elite",
     },
     stripe_product_id: "prod_UReW1LmsVbn4BZ",
     setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
     monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
+    checkout_url: "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
     included_service_keys: [
       "instant_lead_response",
       "missed_call_text_back",
@@ -379,6 +381,8 @@ export const PACKAGE_KEY_ALIASES = {
   pro: "pro_system",
   "pro system": "pro_system",
   pro_system: "pro_system",
+  "pro_website_plus_six_automations": "pro_system",
+  pro_website_plus_six_automations: "pro_system",
 };
 
 const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";

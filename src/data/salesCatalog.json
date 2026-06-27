@@ -1,30 +1,27 @@
 {
-  "_comment": "#470 CRITICAL — canonical price list. Kill all $97/$297 wrong values. Only these are valid.",
+  "_comment": "Canonical price list. Only these are valid. Legacy $97/$297 wrong values are purged.",
   "tiers": {
     "starter": {
       "monthly_fee": 497,
       "setup_fee": 797,
-      "label": "Starter",
-      "stripe_price_id_monthly": "price_starter_monthly",
-      "stripe_price_id_setup": "price_starter_setup",
+      "label": "Starter System",
+      "checkout_url": "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
       "services": ["Instant Lead Response", "Missed Call Text-Back"],
       "service_count": 2
     },
     "growth": {
       "monthly_fee": 997,
       "setup_fee": 1297,
-      "label": "Growth",
-      "stripe_price_id_monthly": "price_growth_monthly",
-      "stripe_price_id_setup": "price_growth_setup",
+      "label": "Growth System",
+      "checkout_url": "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"],
       "service_count": 4
     },
     "pro": {
       "monthly_fee": 1997,
       "setup_fee": 2497,
-      "label": "Pro",
-      "stripe_price_id_monthly": "price_pro_monthly",
-      "stripe_price_id_setup": "price_pro_setup",
+      "label": "Pro System",
+      "checkout_url": "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking", "Review Request AI", "Reactivation Campaign"],
       "service_count": 6
     }
