@@ -6,6 +6,7 @@ import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import PostPurchaseWhatNext from "@/components/portal/PostPurchaseWhatNext";
 import GuaranteeCard from "@/components/portal/GuaranteeCard";
+import { trackEvent } from "@/lib/analytics";
 
 // Prevent search engines from indexing the order success page
 const noIndexMeta = document.querySelector('meta[name="robots"]');
@@ -40,6 +41,39 @@ export default function OrderSuccess() {
       })
       .catch(() => {});
   }, []);
+
+  // GA4 purchase tracking — fires once when order is confirmed, idempotent
+  useEffect(() => {
+    if (!orderInfo?.id) return;
+
+    // Skip test orders
+    const email = (orderInfo.customer_email || "").toLowerCase();
+    const testPatterns = [
+      /@example\.com/i, /@clientsurge\.test/i, /@clientsurge-install\.internal/i,
+      /runtime\.checkout/i, /test-/i, /stripe-.*-proof/i,
+      /pricing-live-checkout/i, /postfix-live-checkout/i, /proof@/i,
+    ];
+    if (!email || testPatterns.some(p => p.test(email))) return;
+
+    // Idempotency — prevent double-counting on page refresh
+    const fireKey = `clientsurge:ga4-purchase-fired:${orderInfo.id}`;
+    if (sessionStorage.getItem(fireKey)) return;
+    sessionStorage.setItem(fireKey, "1");
+
+    const totalValue = Number(orderInfo.total_setup || 0) + Number(orderInfo.total_monthly || 0);
+
+    trackEvent("purchase", {
+      transaction_id: orderInfo.stripe_session_id || orderInfo.id,
+      value: totalValue,
+      currency: "USD",
+      items: (orderInfo.items || []).map((item, idx) => ({
+        item_id: item.product_id || item.service_key || `item-${idx}`,
+        item_name: item.product_name || item.service_key || "Service",
+        price: Number(item.setup_fee || 0) + Number(item.monthly_fee || 0),
+        quantity: 1,
+      })),
+    });
+  }, [orderInfo]);
 
   return (
     <DemoBookingProvider>

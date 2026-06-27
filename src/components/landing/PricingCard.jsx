@@ -1,4 +1,5 @@
 import { ArrowRight, Zap, TrendingUp, Crown } from "lucide-react";
+import CheckoutButton from "@/components/checkout/CheckoutButton";
 import { getPackageStorePath } from "@/lib/salesCatalog";
 import PageCheckIcon from "@/components/ui/PageCheckIcon";
 
@@ -149,22 +150,10 @@ export default function PricingCard({ plan, isRecommended, selectedIndustry }) {
 
         {/* CTA */}
          <div className="space-y-2.5">
-           {isRecommended ? (
-             <a
-                             href={getPackageStorePath(plan.packageKey)}
-                             className="cs-btn-primary w-full"
-                             aria-label={`Start with ${plan.name} plan at ${plan.monthly}/month`}
-                           >
-                             Start Now <ArrowRight className="w-4 h-4" />
-                           </a>
-           ) : (
-             <a
-               href={getPackageStorePath(plan.packageKey)}
-               className="w-full inline-flex items-center justify-center gap-2 h-12 rounded-xl border-2 border-foreground/20 bg-white text-sm font-bold text-foreground hover:border-primary/40 hover:bg-primary/3 transition-all focus:ring-2 focus:ring-primary focus:outline-none"
-             >
-               Choose Plan <ArrowRight className="w-4 h-4" />
-             </a>
-           )}
+           <CheckoutButton
+             packageKey={plan.packageKey}
+             label={isRecommended ? "Start Now" : "Choose Plan"}
+           />
            <a
              href="/book"
              className="w-full inline-flex items-center justify-center h-10 rounded-lg text-xs font-semibold text-primary hover:text-primary/80 hover:underline transition-colors"
