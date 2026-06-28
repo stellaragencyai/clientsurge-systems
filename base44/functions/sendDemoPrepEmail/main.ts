@@ -1,5 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      'X-Frame-Options': 'DENY',
+      ...(init.headers || {}),
+    },
+  });
+}
+
 function safeResendFrom() {
   const configured = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
   if (configured && configured.includes("@")) {
