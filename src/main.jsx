@@ -7,9 +7,11 @@ import '@/design-system.css'
 import '@/theme-restore.css'
 import { installLightThemeGuard } from '@/lib/restoreLightTheme'
 import { installScrollExperienceGuard } from '@/lib/scrollExperienceGuard'
+import { installAnimationRestoreGuard } from '@/lib/restoreAnimations'
 
 installLightThemeGuard()
 installScrollExperienceGuard()
+installAnimationRestoreGuard()
 
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
