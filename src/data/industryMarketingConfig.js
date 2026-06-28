@@ -994,6 +994,74 @@ export const INDUSTRY_MARKETING_DATA = {
       'Lead Reactivation',
     ],
   },
+
+  'property-services': {
+    slug: 'property-services',
+    industry_name: 'Property Services',
+    display_name: 'Property Services Automation System',
+    hero_headline: 'Capture More Property Service Leads and Book More Jobs',
+    hero_subheadline: 'AI automation for property management, cleaning, and home service businesses.',
+    hero_description:
+      'Property service businesses lose revenue to missed calls, slow follow-up, and no-shows. Our AI system texts missed callers instantly, follows up on inquiries, and books service appointments automatically.',
+    primary_cta: 'Book Demo',
+    secondary_cta: 'See Pricing',
+
+    pain_points: [
+      { title: 'Missed Calls', desc: 'Property owners call the next provider when you do not answer.' },
+      { title: 'Slow Follow-Up', desc: 'Inquiries go cold while you are on job sites.' },
+      { title: 'No-Show Appointments', desc: 'Unconfirmed slots waste time and disrupt schedules.' },
+      { title: 'Manual Scheduling', desc: 'Phone tag costs jobs and frustrates clients.' },
+    ],
+
+    use_cases: [
+      {
+        title: 'Missed Call Text-Back',
+        description: 'Texts missed callers: "Hi! We got your call. Book your service here → [link]"',
+        icon: 'Phone',
+      },
+      {
+        title: 'Inquiry Follow-Up',
+        description: 'Automatically follows up on service inquiries until the client books.',
+        icon: 'Zap',
+      },
+      {
+        title: 'Appointment Booking',
+        description: 'Lets clients book service appointments online without phone tag.',
+        icon: 'Calendar',
+      },
+      {
+        title: 'Review Requests',
+        description: 'Automatically requests reviews after completed jobs.',
+        icon: 'Smile',
+      },
+    ],
+
+    roi_metrics: {
+      monthly_revenue_at_risk: '$4K-14K',
+      missed_calls_weekly: '15-30',
+      response_time_before: '2-6 hours',
+      response_time_after: 'Under 60 seconds',
+    },
+
+    testimonials: [
+      {
+        name: 'James Parker',
+        business: 'Parker Property Services, Tucson',
+        quote: 'We stopped losing leads to missed calls. Bookings are up and the schedule is always full.',
+        metric: '+27% booked jobs',
+      },
+    ],
+
+    recommended_plan: 'growth_system',
+    key_features: [
+      'Missed Call Text-Back',
+      'Inquiry Follow-Up Automation',
+      'Online Appointment Booking',
+      'Service Reminders',
+      'Review Request Automation',
+      'Lead Reactivation',
+    ],
+  },
 };
 
 /**

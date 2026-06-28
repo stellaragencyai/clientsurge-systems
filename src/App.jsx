@@ -479,9 +479,9 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/how-it-works-page" element={<LazyRoute Component={HowItWorksPage} />} />
 
       {/* Legal pages */}
-      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} />} />
-      <Route path="/terms" element={<LazyRoute Component={LegalPage} />} />
-      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} />} />
+      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" />} />
+      <Route path="/terms" element={<LazyRoute Component={LegalPage} fixedType="terms" />} />
+      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} fixedType="refund" />} />
 
       {/* Industry routes */}
       {INDUSTRY_ROUTE_SLUGS.filter(slug => slug !== "real-estate" && slug !== "personal-injury").map(slug => (

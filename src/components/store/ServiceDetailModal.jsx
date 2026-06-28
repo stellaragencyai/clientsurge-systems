@@ -250,7 +250,7 @@ export default function ServiceDetailModal({ product, inCart, onToggle, onClose 
               }}>
                 {inCart
                   ? <><Check style={{ width: "14px", height: "14px" }} /> Remove from Cart</>
-                  : <><Plus style={{ width: "14px", height: "14px" }} /> Add to Cart — ${product.monthly_fee}/mo</>}
+                  : <><Plus style={{ width: "14px", height: "14px" }} /> Start My Automation Setup — ${product.monthly_fee}/mo</>}
               </span>
             </button>
 
