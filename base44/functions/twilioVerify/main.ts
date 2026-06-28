@@ -38,16 +38,16 @@ Deno.serve(async (req) => {
       const data = await response.json();
 
       if (!response.ok) {
-        return Response.json({ error: 'Failed to send verification code', details: data }, { status: 500 });
+        return Response.json({ error: 'Failed to send code', details: data }, { status: 500 });
       }
 
-      return Response.json({ success: true, sid: data.sid, message: 'Verification code sent' });
+      return Response.json({ success: true, sid: data.sid, message: 'Code sent' });
     }
 
     // Check OTP
     if (action === 'check') {
       if (!code) {
-        return Response.json({ error: 'Verification code required' }, { status: 400 });
+        return Response.json({ error: 'Code required' }, { status: 400 });
       }
 
       const response = await fetch(
@@ -68,11 +68,11 @@ Deno.serve(async (req) => {
       const data = await response.json();
 
       if (!response.ok) {
-        return Response.json({ error: 'Invalid verification code', details: data }, { status: 400 });
+        return Response.json({ error: 'Invalid code', details: data }, { status: 400 });
       }
 
       if (data.status === 'approved') {
-        // Log verification in database
+        // Log success in database
         const base44 = createClientFromRequest(req);
         await base44.entities.CommunicationEvent.create({
           channel: 'sms',
