@@ -1,0 +1,127 @@
+/*
+ * ClientSurge light-theme restore guard.
+ *
+ * This file intentionally loads after the legacy/global design CSS. It removes
+ * the regression where an audit/App Store pass forced text and sections into a
+ * black-on-black state. The public site is light by default; intentionally dark
+ * hero sections must control their own text locally.
+ */
+
+:root,
+html,
+body {
+  color-scheme: light !important;
+}
+
+html,
+body,
+#root {
+  background-color: #ffffff;
+}
+
+body {
+  color: hsl(var(--foreground));
+}
+
+/* Do not let the previous global paragraph rule force black text everywhere. */
+p {
+  color: inherit;
+}
+
+/* If Base44 or an external scan adds dark flags, neutralize the token values. */
+html.dark,
+body.dark,
+html[data-theme="dark"],
+body[data-theme="dark"],
+html[data-color-scheme="dark"],
+body[data-color-scheme="dark"],
+html[data-client-surge-dark-disabled],
+body[data-client-surge-dark-disabled] {
+  color-scheme: light !important;
+  --background: 0 0% 100%;
+  --foreground: 222 47% 8%;
+  --card: 0 0% 100%;
+  --card-foreground: 222 47% 8%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 222 47% 8%;
+  --secondary: 210 40% 97%;
+  --secondary-foreground: 222 47% 8%;
+  --muted: 210 40% 97%;
+  --muted-foreground: 215 18% 35%;
+  --border: 199 40% 88%;
+  --input: 199 40% 88%;
+  background-color: #ffffff !important;
+}
+
+/* Restore local text ownership inside dark/gradient sections. */
+.cs-hero-shield,
+.landing-hero,
+.cs-industry-hero,
+.cs-on-dark,
+[data-theme="dark"],
+[class*="bg-black"],
+[class*="bg-slate-950"],
+[class*="bg-slate-900"],
+[class*="bg-gray-950"],
+[class*="bg-neutral-950"],
+[class*="from-slate-950"],
+[class*="from-gray-950"],
+[class*="from-neutral-950"],
+[class*="from-[#0A1628]"],
+[class*="from-[#0a1628]"],
+[class*="bg-[#061025]"],
+[class*="bg-[#040C1C]"],
+[class*="bg-[#040c1c]"] {
+  color: #ffffff;
+}
+
+.cs-hero-shield h1,
+.cs-hero-shield h2,
+.cs-hero-shield h3,
+.cs-hero-shield h4,
+.cs-hero-shield h5,
+.cs-hero-shield h6,
+.cs-hero-shield p,
+.cs-hero-shield li,
+.cs-hero-shield span,
+.landing-hero h1,
+.landing-hero h2,
+.landing-hero h3,
+.landing-hero h4,
+.landing-hero h5,
+.landing-hero h6,
+.landing-hero p,
+.landing-hero li,
+.landing-hero span,
+.cs-industry-hero h1,
+.cs-industry-hero h2,
+.cs-industry-hero h3,
+.cs-industry-hero h4,
+.cs-industry-hero h5,
+.cs-industry-hero h6,
+.cs-industry-hero p,
+.cs-industry-hero li,
+.cs-industry-hero span,
+.cs-on-dark h1,
+.cs-on-dark h2,
+.cs-on-dark h3,
+.cs-on-dark h4,
+.cs-on-dark h5,
+.cs-on-dark h6,
+.cs-on-dark p,
+.cs-on-dark li,
+.cs-on-dark span {
+  color: inherit !important;
+  -webkit-text-fill-color: currentColor !important;
+}
+
+/* Text utility classes must win over the old heading !important reset. */
+.text-white,
+[class*="text-white/"] {
+  -webkit-text-fill-color: currentColor !important;
+}
+
+.text-transparent,
+[class*="bg-clip-text"] {
+  -webkit-text-fill-color: transparent !important;
+}
