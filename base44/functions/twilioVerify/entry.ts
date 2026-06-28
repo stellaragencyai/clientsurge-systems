@@ -2,9 +2,17 @@ import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
 
 Deno.serve(async (req) => {
   try {
-    const { phone, action, code } = await req.json();
+    const raw = await req.json();
+
+    // Support both direct calls ({ phone, action, code }) and entity-automation
+    // payloads ({ event: { type, entity_name, entity_id }, data: { ...lead } }).
+    const isEntityAutomation = !!(raw?.event?.entity_id || raw?.data?.id);
+    const phone = raw?.phone || raw?.data?.phone || raw?.data?.customer_phone || '';
+    const action = raw?.action || (isEntityAutomation ? 'send' : 'send');
+    const code = raw?.code || '';
 
     if (!phone) {
+      console.warn('[twilioVerify] No phone number found in payload');
       return Response.json({ error: 'Phone number required' }, { status: 400 });
     }
 
