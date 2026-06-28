@@ -125,3 +125,69 @@ body[data-client-surge-dark-disabled] {
 [class*="bg-clip-text"] {
   -webkit-text-fill-color: transparent !important;
 }
+
+/* Scroll + layout restore: undo app-store/iOS shell compression. */
+html,
+body {
+  min-height: 100%;
+  overflow-x: clip;
+  overflow-y: auto;
+  overscroll-behavior-y: auto;
+  touch-action: auto;
+}
+
+#root {
+  min-height: 100svh;
+}
+
+@supports selector(:has(*)) {
+  body.nav-open:not(:has(.mobile-nav-drawer)):not(:has([role="dialog"][aria-modal="true"])) {
+    position: static !important;
+    overflow-y: auto !important;
+    width: auto !important;
+    top: auto !important;
+  }
+}
+
+/* Restore breathing room if Base44/iOS checks compact the public page. */
+#root > div > section,
+.public-page-shell section,
+.landing-main section,
+main section {
+  padding-top: max(var(--section-pt, 0px), clamp(4.5rem, 7vw, 7.5rem));
+  padding-bottom: max(var(--section-pb, 0px), clamp(4.5rem, 7vw, 7.5rem));
+}
+
+#root > div > section:first-of-type,
+.landing-hero,
+.cs-hero-shield {
+  padding-top: max(var(--section-pt, 0px), clamp(6rem, 8vw, 8.5rem));
+}
+
+@media (max-width: 640px) {
+  #root > div > section,
+  .public-page-shell section,
+  .landing-main section,
+  main section {
+    padding-top: max(var(--section-pt, 0px), 3.5rem);
+    padding-bottom: max(var(--section-pb, 0px), 3.5rem);
+  }
+}
+
+/* Do not let app-store compatibility scans globally disable motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html:not([data-clientsurge-motion-disabled]) .animate-fade-in-up {
+    animation: fadeInUp 0.6s ease-out forwards;
+  }
+
+  html:not([data-clientsurge-motion-disabled]) .animate-fade-in {
+    animation: fadeIn 0.4s ease-out;
+  }
+
+  html:not([data-clientsurge-motion-disabled]) .cs-hover-lift,
+  html:not([data-clientsurge-motion-disabled]) .pricing-card,
+  html:not([data-clientsurge-motion-disabled]) .feature-card,
+  html:not([data-clientsurge-motion-disabled]) [class*="transition-"] {
+    transition-duration: revert-layer;
+  }
+}
