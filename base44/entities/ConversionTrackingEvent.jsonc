@@ -15,7 +15,7 @@
     "session_id": {
       "type": "string",
       "title": "Session ID",
-      "description": "Browser session identifier"
+      "description": "Anonymous browser session identifier. Do not store personal data here."
     },
     "client_project_id": {
       "type": "string",
@@ -38,7 +38,7 @@
         "chiropractic",
         "pricing"
       ],
-      "description": "Which landing page triggered the event"
+      "description": "Which public landing page triggered the event"
     },
     "event_type": {
       "type": "string",
@@ -57,7 +57,7 @@
     "event_label": {
       "type": "string",
       "title": "Event Label",
-      "description": "Human-readable label (e.g., 'Get Started Button', 'See Pricing')"
+      "description": "Human-readable non-sensitive label, such as Get Started Button or See Pricing"
     },
     "timestamp": {
       "type": "string",
@@ -68,7 +68,7 @@
     "metadata": {
       "type": "object",
       "title": "Metadata",
-      "description": "Additional context about the event",
+      "description": "Additional non-sensitive context about the event",
       "properties": {
         "device_type": {
           "type": "string",
@@ -96,6 +96,9 @@
         "referrer": {
           "type": "string"
         },
+        "destination": {
+          "type": "string"
+        },
         "scroll_depth": {
           "type": "integer",
           "description": "Scroll depth percentage (0-100)"
@@ -111,20 +114,7 @@
     "timestamp"
   ],
   "rls": {
-    "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
-      ]
-    },
+    "create": true,
     "read": {
       "$or": [
         {
