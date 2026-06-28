@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { canAccessOrder, cleanString, forbiddenOrderResponse } from "../_shared/orderAccess.ts";
 
 const PACKAGE_KEY_ALIASES = {
   starter: "starter_system",
@@ -20,10 +21,6 @@ function normalizePackageKey(raw) {
   return PACKAGE_KEY_ALIASES[String(raw).trim().toLowerCase()] || null;
 }
 
-function cleanString(value) {
-  return typeof value === "string" ? value.trim() : "";
-}
-
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
@@ -35,11 +32,12 @@ Deno.serve(async (req) => {
     const orderId = cleanString(payload?.order_id);
     const sessionId = cleanString(payload?.session_id);
     const email = cleanString(payload?.email);
+    const setupToken = cleanString(payload?.setup_token || payload?.token || payload?.access_token);
 
     if (!orderId && !sessionId && !email) {
       return Response.json(
         { error: "order_id, session_id, or email is required" },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -51,14 +49,14 @@ Deno.serve(async (req) => {
       const matches = await base44.asServiceRole.entities.Order.filter(
         { stripe_session_id: sessionId },
         "-created_date",
-        5
+        5,
       ).catch(() => []);
       order = matches?.[0] || null;
     } else if (email) {
       const matches = await base44.asServiceRole.entities.Order.filter(
         { customer_email: email },
         "-created_date",
-        5
+        5,
       ).catch(() => []);
       order = matches?.[0] || null;
     }
@@ -67,11 +65,15 @@ Deno.serve(async (req) => {
       return Response.json({ error: "Order not found" }, { status: 404 });
     }
 
+    if (!canAccessOrder(base44, order, setupToken)) {
+      return forbiddenOrderResponse();
+    }
+
     const packageKey = normalizePackageKey(
       cleanString(order.pricing_summary?.package_key) ||
         cleanString(order.selected_package_type) ||
         cleanString(order.package_type) ||
-        cleanString(order.plan_type)
+        cleanString(order.plan_type),
     );
 
     const safeOrder = {
@@ -102,7 +104,7 @@ Deno.serve(async (req) => {
     console.error("[getOrderStatus] error:", error instanceof Error ? error.message : String(error));
     return Response.json(
       { error: "Unable to look up order status. Please try again or contact support." },
-      { status: 500 }
+      { status: 500 },
     );
   }
 });
