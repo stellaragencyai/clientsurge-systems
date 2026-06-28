@@ -89,29 +89,14 @@
           }
         },
         {
-          "data.order_id": {
-            "$in": [
-              "{{client_projects.order_id}}"
-            ]
-          }
+          "created_by_id": "{{user.id}}"
         }
       ]
     },
     "update": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "data.order_id": {
-            "$in": [
-              "{{client_projects.order_id}}"
-            ]
-          }
-        }
-      ]
+      "user_condition": {
+        "role": "admin"
+      }
     },
     "delete": {
       "user_condition": {
