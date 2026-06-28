@@ -1,0 +1,4 @@
+{
+  "name": "sendCompliantSms",
+  "entry": "entry.ts"
+}
