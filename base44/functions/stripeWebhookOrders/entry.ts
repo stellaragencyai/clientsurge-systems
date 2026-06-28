@@ -68,17 +68,20 @@ Deno.serve(async (req) => {
         stripe_customer_id: session.customer || null,
         stripe_event_id: event.id,
         stripe_subscription_id: session.subscription || null,
+        subscription_id: session.subscription || null,
+        subscription_status: 'active',
+        billing_status: 'active',
         payment_status: 'paid',
         payment_source: 'stripe',
         order_status: 'paid_setup_in_progress',
-        package_key: session.metadata?.package_key || session.metadata?.package_type || null,
+        selected_package_type: session.metadata?.package_key || session.metadata?.package_type || null,
         package_type: session.metadata?.package_key || session.metadata?.selected_package_type || null,
         plan_type: session.metadata?.plan_type || null,
         lead_id: session.metadata?.lead_id || '',
         items: [],
         total_setup: (session.amount_total || 0) / 100,
         total_monthly: 0,
-        notes: `Stripe checkout session ${session.id}`,
+        notes: `Recovery order from Stripe checkout session ${session.id} (no pre-created Order found)`,
       };
 
       // Try to find existing Order first (created by createCheckoutSession)
@@ -88,10 +91,18 @@ Deno.serve(async (req) => {
         if (order) {
           await base44.asServiceRole.entities.Order.update(order.id, {
             payment_status: 'paid',
+            payment_source: 'stripe',
             order_status: 'paid_setup_in_progress',
+            stripe_session_id: session.id,
             stripe_customer_id: session.customer || null,
             stripe_subscription_id: session.subscription || null,
+            subscription_id: session.subscription || null,
+            subscription_status: 'active',
+            billing_status: 'active',
             stripe_event_id: event.id,
+            selected_package_type: session.metadata?.package_key || session.metadata?.package_type || order.selected_package_type || null,
+            package_type: session.metadata?.package_key || session.metadata?.package_type || order.package_type || null,
+            plan_type: session.metadata?.plan_type || order.plan_type || null,
           });
         }
       }
@@ -147,6 +158,26 @@ Deno.serve(async (req) => {
       }
 
       console.log(`[stripeWebhookOrders] Order ${order.id} created/updated from checkout session ${session.id}`);
+
+      // Initialize the full fulfillment chain (Client, ClientProject, OnboardingClient, AutomationChecklists, etc.)
+      try {
+        const installResult = await base44.functions.invoke("installPipeline", {
+          action: "initialize",
+          order_id: order.id,
+        });
+        const installData = installResult?.data || installResult || {};
+        if (installData.success) {
+          console.log(`[stripeWebhookOrders] Install pipeline initialized for order ${order.id}`, {
+            client_id: installData.client?.id || null,
+            client_project_id: installData.project?.id || null,
+            onboarding_client_id: installData.onboarding_client?.id || null,
+          });
+        } else {
+          console.error(`[stripeWebhookOrders] Install pipeline returned failure for order ${order.id}:`, installData.error || "Unknown error");
+        }
+      } catch (installError) {
+        console.error(`[stripeWebhookOrders] Install pipeline failed for order ${order.id}:`, installError.message);
+      }
 
       // PL-63: Send SMS confirmation to customer
       const customerPhone = session.customer_details?.phone || session.metadata?.customer_phone;
@@ -208,7 +239,7 @@ Deno.serve(async (req) => {
         if (orders?.length > 0) {
           await base44.asServiceRole.entities.Order.update(orders[0].id, {
             billing_status: 'past_due',
-            order_status: 'payment_failed',
+            stripe_event_id: event.id,
           });
 
           // Send recovery email with Stripe payment update link
@@ -254,8 +285,9 @@ Deno.serve(async (req) => {
 
       if (orders?.length > 0) {
         await base44.asServiceRole.entities.Order.update(orders[0].id, {
-          order_status: 'cancelled',
           billing_status: 'cancelled',
+          subscription_status: 'cancelled',
+          stripe_event_id: event.id,
         });
 
         // Notify admin
@@ -290,13 +322,88 @@ Deno.serve(async (req) => {
       return Response.json({ received: true, processed: true });
     }
 
+    // ─── Handle customer.subscription.created / updated ──────────────────────
+    if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
+      const subscription = event.data.object;
+      const subscriptionId = subscription.id;
+
+      if (subscriptionId) {
+        const orders = await base44.asServiceRole.entities.Order.filter({
+          stripe_subscription_id: subscriptionId,
+        }, '-created_date', 1).catch(() => []);
+
+        if (orders?.length > 0) {
+          const order = orders[0];
+          const billingPatch = {};
+          if (subscription.status) billingPatch.subscription_status = subscription.status;
+          if (subscription.status) billingPatch.billing_status = subscription.status;
+          if (subscription.current_period_start) {
+            billingPatch.current_period_start = new Date(subscription.current_period_start * 1000).toISOString();
+          }
+          if (subscription.current_period_end) {
+            billingPatch.current_period_end = new Date(subscription.current_period_end * 1000).toISOString();
+          }
+          billingPatch.stripe_event_id = event.id;
+
+          await base44.asServiceRole.entities.Order.update(order.id, billingPatch);
+          console.log(`[stripeWebhookOrders] Order ${order.id} subscription ${event.type}: ${subscription.status}`);
+        }
+      }
+
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        provider_message_id: event.id,
+        event_type: `subscription_${event.type}`,
+        provider: 'stripe',
+        channel: 'webhook',
+        direction: 'inbound',
+        status: 'processed',
+      }).catch(() => {});
+
+      return Response.json({ received: true, processed: true });
+    }
+
+    // ─── Handle invoice.paid / invoice.payment_succeeded ─────────────────────
+    if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') {
+      const invoice = event.data.object;
+      const subscriptionId = invoice.subscription;
+
+      if (subscriptionId) {
+        const orders = await base44.asServiceRole.entities.Order.filter({
+          stripe_subscription_id: subscriptionId,
+        }, '-created_date', 1).catch(() => []);
+
+        if (orders?.length > 0) {
+          await base44.asServiceRole.entities.Order.update(orders[0].id, {
+            billing_status: 'active',
+            stripe_event_id: event.id,
+            current_period_start: invoice.period_start ? new Date(invoice.period_start * 1000).toISOString() : undefined,
+            current_period_end: invoice.period_end ? new Date(invoice.period_end * 1000).toISOString() : undefined,
+          });
+          console.log(`[stripeWebhookOrders] Order ${orders[0].id} invoice ${event.type}: billing active`);
+        }
+      }
+
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        provider_message_id: event.id,
+        event_type: `invoice_${event.type}`,
+        provider: 'stripe',
+        channel: 'webhook',
+        direction: 'inbound',
+        status: 'processed',
+      }).catch(() => {});
+
+      return Response.json({ received: true, processed: true });
+    }
+
     // ─── Handle checkout.session.expired ─────────────────────────────────────
     if (event.type === 'checkout.session.expired') {
       const session = event.data.object;
       if (session.metadata?.order_id) {
         await base44.asServiceRole.entities.Order.update(session.metadata.order_id, {
-          payment_status: 'expired',
-          order_status: 'expired',
+          payment_status: 'failed',
+          order_status: 'pending_payment',
+          pipeline_error: 'Stripe checkout session expired',
+          stripe_event_id: event.id,
         }).catch(() => {});
       }
 
