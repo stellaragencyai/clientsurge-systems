@@ -1,10 +1,7 @@
 import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { normalizePackageKey } from "../../../src/lib/salesCatalog.js";
-
-function cleanString(value: unknown) {
-  return typeof value === "string" ? value.trim() : "";
-}
+import { canAccessOrder, cleanString } from "../_shared/orderAccess.ts";
 
 function buildSafeOrderSummary(order: any) {
   const packageKey = normalizePackageKey(
@@ -35,6 +32,7 @@ Deno.serve(async (req) => {
   const payload = await req.json().catch(() => ({}));
   const orderId = cleanString(payload?.order_id);
   const sessionId = cleanString(payload?.session_id);
+  const setupToken = cleanString(payload?.setup_token || payload?.token || payload?.access_token);
 
   if (!orderId && !sessionId) {
     return secureJson({ error: "order_id or session_id is required" }, { status: 400 });
@@ -55,6 +53,10 @@ Deno.serve(async (req) => {
 
   if (!order) {
     return secureJson({ error: "Order not found" }, { status: 404 });
+  }
+
+  if (!canAccessOrder(base44, order, setupToken)) {
+    return secureJson({ error: "Not authorized to access this order. Sign in or use a valid setup link." }, { status: 403 });
   }
 
   const safeOrder = buildSafeOrderSummary(order);
