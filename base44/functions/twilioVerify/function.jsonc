@@ -4,9 +4,9 @@
   "automations": [
     {
       "name": "Trigger Twilio Verify on Lead Creation",
-      "description": "Auto-send Twilio verification code when a new lead is captured to validate phone number quality immediately\"",
+      "description": "Disabled because this action must be initiated by the public form after consent, not automatically after a record is created.",
       "function_args": null,
-      "is_active": true,
+      "is_active": false,
       "type": "entity",
       "entity_name": "Leads",
       "event_types": [
