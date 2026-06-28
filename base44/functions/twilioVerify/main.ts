@@ -49,11 +49,13 @@ async function writeVerificationLog(req: Request, phoneE164: string, status: str
     await base44.asServiceRole.entities.CommunicationEvent.create({
       channel: 'sms',
       direction: 'system',
-      event_type: status === 'approved' ? 'phone_check_approved' : 'phone_check_attempted',
+      event_type: 'status_update',
       provider: 'twilio',
-      status: status === 'approved' ? 'processed' : 'pending',
-      message_body: `Twilio phone check status: ${status}`,
-      context_type: 'phone_check',
+      status: status === 'approved' ? 'processed' : status === 'failed' ? 'failed' : 'pending',
+      subject: 'Phone verification status',
+      message_body: `Twilio phone verification status: ${status}`,
+      context_type: 'phone_verification',
+      context_id: phoneE164,
       metadata_json: JSON.stringify({ phone_e164: phoneE164, twilio_status: status, ...details }),
     });
   } catch (error) {
