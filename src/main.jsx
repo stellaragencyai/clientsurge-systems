@@ -8,10 +8,12 @@ import '@/theme-restore.css'
 import { installLightThemeGuard } from '@/lib/restoreLightTheme'
 import { installScrollExperienceGuard } from '@/lib/scrollExperienceGuard'
 import { installAnimationRestoreGuard } from '@/lib/restoreAnimations'
+import { installIosThemeArtifactGuard } from '@/lib/neutralizeIosThemeArtifacts'
 
 installLightThemeGuard()
 installScrollExperienceGuard()
 installAnimationRestoreGuard()
+installIosThemeArtifactGuard()
 
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
