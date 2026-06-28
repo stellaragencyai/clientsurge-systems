@@ -4,6 +4,70 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import Stripe from 'npm:stripe@14.21.0';
 
+function isTerminalStripeEventLog(eventLog) {
+  return ['processed', 'acknowledged', 'sent', 'delivered'].includes(eventLog?.status);
+}
+
+async function createStripeEventLog(base44, payload) {
+  return base44.asServiceRole.entities.CommunicationEvent.create({
+    provider: 'stripe',
+    channel: 'webhook',
+    direction: 'inbound',
+    ...payload,
+  }).catch(() => null);
+}
+
+async function getOrder(base44, orderId) {
+  if (!orderId) return null;
+  return base44.asServiceRole.entities.Order.get(orderId).catch(() => null);
+}
+
+async function invokeFunction(base44, functionName, payload) {
+  const invoker = base44.asServiceRole?.functions || base44.functions;
+  if (!invoker?.invoke) {
+    throw new Error(`Base44 function invoker unavailable for ${functionName}`);
+  }
+  return invoker.invoke(functionName, payload);
+}
+
+async function ensurePaidOrderProvisioned(base44, orderId) {
+  let order = await getOrder(base44, orderId);
+  if (!order) {
+    return { success: false, error: `Order ${orderId} not found after payment`, order: null };
+  }
+
+  if (order.client_project_id) {
+    return { success: true, order, source: 'existing_client_project' };
+  }
+
+  try {
+    const orchestrationResult = await invokeFunction(base44, 'postPaymentOrchestrator', { order_id: orderId });
+    const orchestrationData = orchestrationResult?.data || orchestrationResult || {};
+    if (orchestrationData?.error) {
+      throw new Error(orchestrationData.error);
+    }
+  } catch (error) {
+    await base44.asServiceRole.entities.Order.update(orderId, {
+      pipeline_error: `postPaymentOrchestrator failed: ${error.message}`,
+    }).catch(() => null);
+
+    return {
+      success: false,
+      error: `postPaymentOrchestrator failed: ${error.message}`,
+      order,
+    };
+  }
+
+  order = await getOrder(base44, orderId);
+  if (!order?.client_project_id) {
+    const error = 'Payment processed but no ClientProject was linked after installPipeline + postPaymentOrchestrator';
+    await base44.asServiceRole.entities.Order.update(orderId, { pipeline_error: error }).catch(() => null);
+    return { success: false, error, order };
+  }
+
+  return { success: true, order, source: 'post_payment_orchestrator' };
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -23,7 +87,6 @@ Deno.serve(async (req) => {
     const body = await req.text();
     const signature = req.headers.get('stripe-signature');
 
-    // Verify webhook signature
     let event;
     try {
       event = await stripe.webhooks.constructEventAsync(body, signature, stripeWebhookSecret);
@@ -34,28 +97,25 @@ Deno.serve(async (req) => {
 
     console.log(`[stripeWebhookOrders] Received event: ${event.type} (${event.id})`);
 
-    // Idempotency check — skip already-processed events
+    // Idempotency check: only terminal records should block retries.
+    // A previous `processing` receipt can exist if fulfillment crashed mid-run;
+    // Stripe retries must be allowed to repair paid orders instead of being skipped.
     const existing = await base44.asServiceRole.entities.CommunicationEvent.filter({
       provider_message_id: event.id,
       provider: 'stripe',
-    }, '-created_date', 1).catch(() => []);
+    }, '-created_date', 10).catch(() => []);
 
-    if (existing?.length > 0) {
-      console.log(`[stripeWebhookOrders] Event ${event.id} already processed — skipping`);
-      return Response.json({ received: true, processed: false, reason: 'duplicate' });
+    if ((existing || []).some(isTerminalStripeEventLog)) {
+      console.log(`[stripeWebhookOrders] Event ${event.id} already terminal-processed — skipping`);
+      return Response.json({ received: true, processed: false, reason: 'duplicate_terminal_event' });
     }
 
-    // Log receipt
-    await base44.asServiceRole.entities.CommunicationEvent.create({
+    await createStripeEventLog(base44, {
       provider_message_id: event.id,
       event_type: `stripe_${event.type}`,
-      provider: 'stripe',
-      channel: 'webhook',
-      direction: 'inbound',
       status: 'processing',
-    }).catch(() => {});
+    });
 
-    // ─── Handle checkout.session.completed ───────────────────────────────────
     if (event.type === 'checkout.session.completed') {
       const session = event.data.object;
 
@@ -84,10 +144,9 @@ Deno.serve(async (req) => {
         notes: `Recovery order from Stripe checkout session ${session.id} (no pre-created Order found)`,
       };
 
-      // Try to find existing Order first (created by createCheckoutSession)
       let order;
       if (session.metadata?.order_id) {
-        order = await base44.asServiceRole.entities.Order.get(session.metadata.order_id).catch(() => null);
+        order = await getOrder(base44, session.metadata.order_id);
         if (order) {
           await base44.asServiceRole.entities.Order.update(order.id, {
             payment_status: 'paid',
@@ -108,16 +167,14 @@ Deno.serve(async (req) => {
       }
 
       if (!order) {
-        // FIX #1-3: Order not found for this session — implement retry-loop before escalation
         let retryCount = 0;
         const maxRetries = 3;
-        const retryDelayMs = 5000; // 5 second delay between retries
+        const retryDelayMs = 5000;
 
         while (retryCount < maxRetries && !order) {
           try {
             if (session.metadata?.order_id) {
-              // Retry lookup for order
-              order = await base44.asServiceRole.entities.Order.get(session.metadata.order_id).catch(() => null);
+              order = await getOrder(base44, session.metadata.order_id);
               if (order) {
                 console.log(`[stripeWebhookOrders] Found Order on retry ${retryCount + 1}`);
                 break;
@@ -125,7 +182,7 @@ Deno.serve(async (req) => {
             }
             retryCount++;
             if (retryCount < maxRetries) {
-              await new Promise(r => setTimeout(r, retryDelayMs));
+              await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
             }
           } catch (e) {
             console.warn(`[stripeWebhookOrders] Retry ${retryCount} failed: ${e.message}`);
@@ -133,12 +190,10 @@ Deno.serve(async (req) => {
           }
         }
 
-        // If still not found, create recovery record
         if (!order) {
           order = await base44.asServiceRole.entities.Order.create(orderData);
-          console.log(`[stripeWebhookOrders] Created recovery Order (orphan): ${order.id}`);
+          console.log(`[stripeWebhookOrders] Created recovery Order: ${order.id}`);
 
-          // Notify admin of orphaned payment
           const adminEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
           const resendKey = Deno.env.get('RESEND_API_KEY');
           const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'support@clientsurgesystems.com';
@@ -149,7 +204,7 @@ Deno.serve(async (req) => {
               body: JSON.stringify({
                 from: `ClientSurge Systems <${fromEmail}>`,
                 to: [adminEmail],
-                subject: `⚠️ Stripe Payment Received — No Matching Order Found (Recovery Created)`,
+                subject: '⚠️ Stripe Payment Received — No Matching Order Found (Recovery Created)',
                 html: `<p>A Stripe checkout completed but no matching Order record was found after 3 retry attempts.</p><p><strong>Session:</strong> ${session.id}<br><strong>Email:</strong> ${orderData.customer_email}<br><strong>Amount:</strong> $${orderData.total_setup}<br><strong>Recovery Order ID:</strong> ${order.id}</p><p>Please review and reconcile manually if needed.</p>`,
               }),
             }).catch(e => console.error('[stripeWebhookOrders] Admin orphan notification failed:', e.message));
@@ -159,10 +214,9 @@ Deno.serve(async (req) => {
 
       console.log(`[stripeWebhookOrders] Order ${order.id} created/updated from checkout session ${session.id}`);
 
-      // Initialize the full fulfillment chain (Client, ClientProject, OnboardingClient, AutomationChecklists, etc.)
       try {
-        const installResult = await base44.functions.invoke("installPipeline", {
-          action: "initialize",
+        const installResult = await invokeFunction(base44, 'installPipeline', {
+          action: 'initialize',
           order_id: order.id,
         });
         const installData = installResult?.data || installResult || {};
@@ -173,13 +227,33 @@ Deno.serve(async (req) => {
             onboarding_client_id: installData.onboarding_client?.id || null,
           });
         } else {
-          console.error(`[stripeWebhookOrders] Install pipeline returned failure for order ${order.id}:`, installData.error || "Unknown error");
+          console.error(`[stripeWebhookOrders] Install pipeline returned failure for order ${order.id}:`, installData.error || 'Unknown error');
         }
       } catch (installError) {
         console.error(`[stripeWebhookOrders] Install pipeline failed for order ${order.id}:`, installError.message);
       }
 
-      // PL-63: Send SMS confirmation to customer
+      const provisionResult = await ensurePaidOrderProvisioned(base44, order.id);
+      if (!provisionResult.success) {
+        await createStripeEventLog(base44, {
+          provider_message_id: event.id,
+          event_type: 'post_payment_provisioning_failed',
+          status: 'failed',
+          order_id: order.id,
+          context_id: order.id,
+          error_message: provisionResult.error,
+          message_body: provisionResult.error,
+        });
+        console.error(`[stripeWebhookOrders] Post-payment truth gate failed for order ${order.id}: ${provisionResult.error}`);
+        return Response.json({
+          received: true,
+          processed: false,
+          order_id: order.id,
+          error: provisionResult.error,
+        }, { status: 500 });
+      }
+      order = provisionResult.order || order;
+
       const customerPhone = session.customer_details?.phone || session.metadata?.customer_phone;
       if (customerPhone) {
         const twilioSid = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -195,7 +269,6 @@ Deno.serve(async (req) => {
         }
       }
 
-      // PL-26: Send email confirmation
       const resendKey = Deno.env.get('RESEND_API_KEY');
       const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'support@clientsurgesystems.com';
       if (resendKey && (session.customer_email || session.customer_details?.email)) {
@@ -211,22 +284,28 @@ Deno.serve(async (req) => {
         }).catch(e => console.error('[stripeWebhookOrders] Email confirmation failed:', e.message));
       }
 
-      // Mark as processed
-      await base44.asServiceRole.entities.CommunicationEvent.create({
+      await createStripeEventLog(base44, {
         provider_message_id: event.id,
         event_type: 'order_paid',
-        provider: 'stripe',
-        channel: 'webhook',
-        direction: 'inbound',
         status: 'processed',
         context_id: order.id,
         order_id: order.id,
-      }).catch(() => {});
+        client_id: order.client_id,
+        client_project_id: order.client_project_id,
+        metadata_json: JSON.stringify({
+          provision_source: provisionResult.source,
+          client_project_id: order.client_project_id,
+        }),
+      });
 
-      return Response.json({ received: true, processed: true, order_id: order.id });
+      return Response.json({
+        received: true,
+        processed: true,
+        order_id: order.id,
+        client_project_id: order.client_project_id,
+      });
     }
 
-    // ─── Handle invoice.payment_failed ───────────────────────────────────────
     if (event.type === 'invoice.payment_failed') {
       const invoice = event.data.object;
       const subscriptionId = invoice.subscription;
@@ -242,7 +321,6 @@ Deno.serve(async (req) => {
             stripe_event_id: event.id,
           });
 
-          // Send recovery email with Stripe payment update link
           const resendKey = Deno.env.get('RESEND_API_KEY');
           const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'support@clientsurgesystems.com';
           if (resendKey && invoice.customer_email) {
@@ -263,19 +341,15 @@ Deno.serve(async (req) => {
         }
       }
 
-      await base44.asServiceRole.entities.CommunicationEvent.create({
+      await createStripeEventLog(base44, {
         provider_message_id: event.id,
         event_type: 'payment_failed',
-        provider: 'stripe',
-        channel: 'webhook',
-        direction: 'inbound',
         status: 'processed',
-      }).catch(() => {});
+      });
 
       return Response.json({ received: true, processed: true });
     }
 
-    // ─── Handle customer.subscription.deleted ────────────────────────────────
     if (event.type === 'customer.subscription.deleted') {
       const subscription = event.data.object;
 
@@ -290,7 +364,6 @@ Deno.serve(async (req) => {
           stripe_event_id: event.id,
         });
 
-        // Notify admin
         const adminEmail = Deno.env.get('ADMIN_NOTIFICATION_EMAIL') || Deno.env.get('ADMIN_EMAIL');
         const resendKey = Deno.env.get('RESEND_API_KEY');
         const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'support@clientsurgesystems.com';
@@ -310,19 +383,15 @@ Deno.serve(async (req) => {
         console.log(`[stripeWebhookOrders] Order ${orders[0].id} marked cancelled`);
       }
 
-      await base44.asServiceRole.entities.CommunicationEvent.create({
+      await createStripeEventLog(base44, {
         provider_message_id: event.id,
         event_type: 'subscription_cancelled',
-        provider: 'stripe',
-        channel: 'webhook',
-        direction: 'inbound',
         status: 'processed',
-      }).catch(() => {});
+      });
 
       return Response.json({ received: true, processed: true });
     }
 
-    // ─── Handle customer.subscription.created / updated ──────────────────────
     if (event.type === 'customer.subscription.created' || event.type === 'customer.subscription.updated') {
       const subscription = event.data.object;
       const subscriptionId = subscription.id;
@@ -350,19 +419,15 @@ Deno.serve(async (req) => {
         }
       }
 
-      await base44.asServiceRole.entities.CommunicationEvent.create({
+      await createStripeEventLog(base44, {
         provider_message_id: event.id,
         event_type: `subscription_${event.type}`,
-        provider: 'stripe',
-        channel: 'webhook',
-        direction: 'inbound',
         status: 'processed',
-      }).catch(() => {});
+      });
 
       return Response.json({ received: true, processed: true });
     }
 
-    // ─── Handle invoice.paid / invoice.payment_succeeded ─────────────────────
     if (event.type === 'invoice.paid' || event.type === 'invoice.payment_succeeded') {
       const invoice = event.data.object;
       const subscriptionId = invoice.subscription;
@@ -383,19 +448,15 @@ Deno.serve(async (req) => {
         }
       }
 
-      await base44.asServiceRole.entities.CommunicationEvent.create({
+      await createStripeEventLog(base44, {
         provider_message_id: event.id,
         event_type: `invoice_${event.type}`,
-        provider: 'stripe',
-        channel: 'webhook',
-        direction: 'inbound',
         status: 'processed',
-      }).catch(() => {});
+      });
 
       return Response.json({ received: true, processed: true });
     }
 
-    // ─── Handle checkout.session.expired ─────────────────────────────────────
     if (event.type === 'checkout.session.expired') {
       const session = event.data.object;
       if (session.metadata?.order_id) {
@@ -407,27 +468,20 @@ Deno.serve(async (req) => {
         }).catch(() => {});
       }
 
-      await base44.asServiceRole.entities.CommunicationEvent.create({
+      await createStripeEventLog(base44, {
         provider_message_id: event.id,
         event_type: 'checkout_expired',
-        provider: 'stripe',
-        channel: 'webhook',
-        direction: 'inbound',
         status: 'processed',
-      }).catch(() => {});
+      });
 
       return Response.json({ received: true, processed: true });
     }
 
-    // All other events — just acknowledge
-    await base44.asServiceRole.entities.CommunicationEvent.create({
+    await createStripeEventLog(base44, {
       provider_message_id: event.id,
       event_type: `stripe_${event.type}`,
-      provider: 'stripe',
-      channel: 'webhook',
-      direction: 'inbound',
       status: 'acknowledged',
-    }).catch(() => {});
+    });
 
     return Response.json({ received: true, processed: false, event_type: event.type });
 
