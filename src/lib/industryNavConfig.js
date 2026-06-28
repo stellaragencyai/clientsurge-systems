@@ -7,7 +7,7 @@ export const INDUSTRY_GROUPS = [
       { label: "Plumbing & Drain Services", href: "/plumbing" },
       { label: "Contractors & Trades", href: "/contractors" },
       { label: "Real Estate", href: "/real-estate" },
-      { label: "Property Services", href: "/property-services" },
+      { label: "Automotive Services", href: "/automotive" },
       { label: "Landscaping & Lawn Care", href: "/landscaping" },
     ],
   },

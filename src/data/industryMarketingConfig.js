@@ -780,7 +780,7 @@ export const INDUSTRY_MARKETING_DATA = {
       },
     ],
 
-    recommended_plan: 'elite_system',
+    recommended_plan: 'pro_system',
     key_features: [
       'Immediate Lead Response',
       'Case Type Qualification',
@@ -788,6 +788,210 @@ export const INDUSTRY_MARKETING_DATA = {
       'Consultation Scheduling + Reminders',
       'Follow-Up Sequences',
       'Case Pipeline Analytics',
+    ],
+  },
+
+  'veterinary': {
+    slug: 'veterinary',
+    industry_name: 'Veterinary & Vet Care',
+    display_name: 'Veterinary & Vet Care Automation System',
+    hero_headline: 'Recover Missed Calls and Help Pet Owners Get Fast Responses',
+    hero_subheadline: 'AI automation for veterinary practices that captures every inquiry and books appointments automatically.',
+    hero_description:
+      'Veterinary practices lose clients to missed calls and slow follow-up. Our AI system texts missed callers within 60 seconds, books appointments 24/7, sends automated reminders, and keeps pet owners engaged.',
+    primary_cta: 'Book Demo',
+    secondary_cta: 'See Pricing',
+
+    pain_points: [
+      { title: 'Missed Calls', desc: 'Pet owners call the next vet when you do not answer.' },
+      { title: 'After-Hours Inquiries', desc: 'Questions go unanswered when the clinic is closed.' },
+      { title: 'No-Show Appointments', desc: 'Unconfirmed slots cost revenue and waste staff time.' },
+      { title: 'Manual Reminders', desc: 'Staff spends hours calling to confirm appointments.' },
+    ],
+
+    use_cases: [
+      {
+        title: 'Missed Call Text-Back',
+        description: 'Texts missed callers: "Hi! We got your call. Book your pet\'s appointment here → [link]"',
+        icon: 'Phone',
+      },
+      {
+        title: 'Appointment Reminders',
+        description: 'Sends automated SMS and email reminders to reduce no-shows.',
+        icon: 'Calendar',
+      },
+      {
+        title: 'After-Hours Capture',
+        description: 'Captures inquiries when the clinic is closed and follows up the next morning.',
+        icon: 'MessageSquare',
+      },
+      {
+        title: 'Lead Follow-Up',
+        description: 'Keeps new inquiries warm with timed follow-up messages until booked.',
+        icon: 'Zap',
+      },
+    ],
+
+    roi_metrics: {
+      monthly_revenue_at_risk: '$8K-20K',
+      missed_calls_weekly: '25-40',
+      response_time_before: '2-4 hours',
+      response_time_after: 'Under 60 seconds',
+    },
+
+    testimonials: [
+      {
+        name: 'Dr. Sarah Mitchell',
+        business: 'Pawsome Veterinary Clinic, Denver',
+        quote: 'We stopped losing new clients to missed calls. Appointments are up, no-shows are down, and the front desk can breathe.',
+        metric: '+34% booked appointments',
+      },
+    ],
+
+    recommended_plan: 'growth_system',
+    key_features: [
+      'Missed Call Text-Back',
+      'Appointment Reminders',
+      'After-Hours Inquiry Capture',
+      'Lead Follow-Up Sequences',
+      'Automated Booking',
+      'Review Requests',
+    ],
+  },
+
+  'automotive': {
+    slug: 'automotive',
+    industry_name: 'Automotive Services',
+    display_name: 'Automotive Services Automation System',
+    hero_headline: 'Keep Your Bays Full with Faster Quote Follow-Up and Booking',
+    hero_subheadline: 'AI automation for auto repair shops, dealerships, and mobile detailers that captures every lead.',
+    hero_description:
+      'Auto service businesses lose revenue to missed calls, slow quote follow-up, and no-shows. Our AI system texts missed callers instantly, follows up on quote requests, and books service appointments automatically.',
+    primary_cta: 'Book Demo',
+    secondary_cta: 'See Pricing',
+
+    pain_points: [
+      { title: 'Missed Calls', desc: 'Every missed call is a customer going to the shop down the street.' },
+      { title: 'Slow Quote Follow-Up', desc: 'Quote requests sit in the inbox while competitors respond first.' },
+      { title: 'No-Show Appointments', desc: 'Empty bays cost money and disrupt the schedule.' },
+      { title: 'Seasonal Spikes', desc: 'Busy seasons overwhelm the front desk and leads slip through.' },
+    ],
+
+    use_cases: [
+      {
+        title: 'Missed Call Text-Back',
+        description: 'Texts missed callers: "Hi! We got your call. Book your service appointment here → [link]"',
+        icon: 'Phone',
+      },
+      {
+        title: 'Quote Follow-Up',
+        description: 'Automatically follows up on quote requests until the customer books or declines.',
+        icon: 'Zap',
+      },
+      {
+        title: 'Appointment Booking',
+        description: 'Lets customers book service appointments online without phone tag.',
+        icon: 'Calendar',
+      },
+      {
+        title: 'Review Requests',
+        description: 'Automatically requests reviews after completed service to build reputation.',
+        icon: 'Smile',
+      },
+    ],
+
+    roi_metrics: {
+      monthly_revenue_at_risk: '$5K-15K',
+      missed_calls_weekly: '20-35',
+      response_time_before: '1-3 hours',
+      response_time_after: 'Under 60 seconds',
+    },
+
+    testimonials: [
+      {
+        name: 'Mike Reynolds',
+        business: 'Reynolds Auto Repair, Phoenix',
+        quote: 'Missed calls used to mean lost customers. Now they get an instant text and most book right away. Bays are fuller.',
+        metric: '+28% service bookings',
+      },
+    ],
+
+    recommended_plan: 'growth_system',
+    key_features: [
+      'Missed Call Text-Back',
+      'Quote Follow-Up Automation',
+      'Online Appointment Booking',
+      'Service Reminders',
+      'Review Request Automation',
+      'Lead Reactivation',
+    ],
+  },
+
+  'landscaping': {
+    slug: 'landscaping',
+    industry_name: 'Landscaping & Lawn Care',
+    display_name: 'Landscaping & Lawn Care Automation System',
+    hero_headline: 'Capture More Leads and Keep Your Schedule Full',
+    hero_subheadline: 'AI automation for landscaping and lawn care businesses that turns inquiries into booked jobs.',
+    hero_description:
+      'Landscaping businesses lose revenue to missed calls, slow quote follow-up, and seasonal lead gaps. Our AI system texts missed callers instantly, follows up on estimate requests, and books consultations automatically.',
+    primary_cta: 'Book Demo',
+    secondary_cta: 'See Pricing',
+
+    pain_points: [
+      { title: 'Missed Calls', desc: 'Homeowners call the next landscaper when you do not answer.' },
+      { title: 'Slow Estimate Follow-Up', desc: 'Estimate requests go cold while you are out on job sites.' },
+      { title: 'Seasonal Gaps', desc: 'Off-season leads disappear without follow-up.' },
+      { title: 'Manual Scheduling', desc: 'Phone tag wastes time and loses jobs.' },
+    ],
+
+    use_cases: [
+      {
+        title: 'Missed Call Text-Back',
+        description: 'Texts missed callers: "Hi! We got your call. Book your free estimate here → [link]"',
+        icon: 'Phone',
+      },
+      {
+        title: 'Estimate Follow-Up',
+        description: 'Automatically follows up on estimate requests until the customer books.',
+        icon: 'Zap',
+      },
+      {
+        title: 'Seasonal Lead Capture',
+        description: 'Captures and nurtures leads during peak and off-seasons.',
+        icon: 'Calendar',
+      },
+      {
+        title: 'Review Requests',
+        description: 'Automatically requests reviews after completed jobs.',
+        icon: 'Smile',
+      },
+    ],
+
+    roi_metrics: {
+      monthly_revenue_at_risk: '$4K-12K',
+      missed_calls_weekly: '15-30',
+      response_time_before: '2-6 hours',
+      response_time_after: 'Under 60 seconds',
+    },
+
+    testimonials: [
+      {
+        name: 'Tom Gallagher',
+        business: 'Gallagher Landscaping, Scottsdale',
+        quote: 'We used to lose leads because we were out on job sites. Now every call gets a text back and estimates are up.',
+        metric: '+31% estimate requests',
+      },
+    ],
+
+    recommended_plan: 'starter_system',
+    key_features: [
+      'Missed Call Text-Back',
+      'Estimate Follow-Up',
+      'Online Booking',
+      'Seasonal Lead Nurturing',
+      'Review Requests',
+      'Lead Reactivation',
     ],
   },
 };
