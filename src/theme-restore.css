@@ -1,10 +1,10 @@
 /*
- * ClientSurge light-theme restore guard.
+ * ClientSurge public-site light theme restore.
  *
- * This file intentionally loads after the legacy/global design CSS. It removes
- * the regression where an audit/App Store pass forced text and sections into a
- * black-on-black state. The public site is light by default; intentionally dark
- * hero sections must control their own text locally.
+ * Keep the public marketing site browser-native and light by default. This file
+ * only neutralizes forced dark/iOS app-shell artifacts; it must not convert
+ * normal content sections into dark app panels or globally rewrite section
+ * spacing.
  */
 
 :root,
@@ -23,12 +23,10 @@ body {
   color: hsl(var(--foreground));
 }
 
-/* Do not let the previous global paragraph rule force black text everywhere. */
 p {
   color: inherit;
 }
 
-/* If Base44 or an external scan adds dark flags, neutralize the token values. */
 html.dark,
 body.dark,
 html[data-theme="dark"],
@@ -36,7 +34,13 @@ body[data-theme="dark"],
 html[data-color-scheme="dark"],
 body[data-color-scheme="dark"],
 html[data-client-surge-dark-disabled],
-body[data-client-surge-dark-disabled] {
+body[data-client-surge-dark-disabled],
+html[data-client-surge-dark],
+body[data-client-surge-dark],
+html[data-force-dark],
+body[data-force-dark],
+html[data-app-store-dark],
+body[data-app-store-dark] {
   color-scheme: light !important;
   --background: 0 0% 100%;
   --foreground: 222 47% 8%;
@@ -53,69 +57,22 @@ body[data-client-surge-dark-disabled] {
   background-color: #ffffff !important;
 }
 
-/* Restore local text ownership inside dark/gradient sections. */
+/* Only these explicitly cinematic areas are allowed to own white text. */
 .cs-hero-shield,
 .landing-hero,
 .cs-industry-hero,
-.cs-on-dark,
-[data-theme="dark"],
-[class*="bg-black"],
-[class*="bg-slate-950"],
-[class*="bg-slate-900"],
-[class*="bg-gray-950"],
-[class*="bg-neutral-950"],
-[class*="from-slate-950"],
-[class*="from-gray-950"],
-[class*="from-neutral-950"],
-[class*="from-[#0A1628]"],
-[class*="from-[#0a1628]"],
-[class*="bg-[#061025]"],
-[class*="bg-[#040C1C]"],
-[class*="bg-[#040c1c]"] {
+.cs-on-dark {
   color: #ffffff;
 }
 
-.cs-hero-shield h1,
-.cs-hero-shield h2,
-.cs-hero-shield h3,
-.cs-hero-shield h4,
-.cs-hero-shield h5,
-.cs-hero-shield h6,
-.cs-hero-shield p,
-.cs-hero-shield li,
-.cs-hero-shield span,
-.landing-hero h1,
-.landing-hero h2,
-.landing-hero h3,
-.landing-hero h4,
-.landing-hero h5,
-.landing-hero h6,
-.landing-hero p,
-.landing-hero li,
-.landing-hero span,
-.cs-industry-hero h1,
-.cs-industry-hero h2,
-.cs-industry-hero h3,
-.cs-industry-hero h4,
-.cs-industry-hero h5,
-.cs-industry-hero h6,
-.cs-industry-hero p,
-.cs-industry-hero li,
-.cs-industry-hero span,
-.cs-on-dark h1,
-.cs-on-dark h2,
-.cs-on-dark h3,
-.cs-on-dark h4,
-.cs-on-dark h5,
-.cs-on-dark h6,
-.cs-on-dark p,
-.cs-on-dark li,
-.cs-on-dark span {
+.cs-hero-shield :where(h1,h2,h3,h4,h5,h6,p,li,span),
+.landing-hero :where(h1,h2,h3,h4,h5,h6,p,li,span),
+.cs-industry-hero :where(h1,h2,h3,h4,h5,h6,p,li,span),
+.cs-on-dark :where(h1,h2,h3,h4,h5,h6,p,li,span) {
   color: inherit !important;
   -webkit-text-fill-color: currentColor !important;
 }
 
-/* Text utility classes must win over the old heading !important reset. */
 .text-white,
 [class*="text-white/"] {
   -webkit-text-fill-color: currentColor !important;
@@ -126,7 +83,6 @@ body[data-client-surge-dark-disabled] {
   -webkit-text-fill-color: transparent !important;
 }
 
-/* Scroll + layout restore: undo app-store/iOS shell compression. */
 html,
 body {
   min-height: 100%;
@@ -149,32 +105,6 @@ body {
   }
 }
 
-/* Restore breathing room if Base44/iOS checks compact the public page. */
-#root > div > section,
-.public-page-shell section,
-.landing-main section,
-main section {
-  padding-top: max(var(--section-pt, 0px), clamp(4.5rem, 7vw, 7.5rem));
-  padding-bottom: max(var(--section-pb, 0px), clamp(4.5rem, 7vw, 7.5rem));
-}
-
-#root > div > section:first-of-type,
-.landing-hero,
-.cs-hero-shield {
-  padding-top: max(var(--section-pt, 0px), clamp(6rem, 8vw, 8.5rem));
-}
-
-@media (max-width: 640px) {
-  #root > div > section,
-  .public-page-shell section,
-  .landing-main section,
-  main section {
-    padding-top: max(var(--section-pt, 0px), 3.5rem);
-    padding-bottom: max(var(--section-pb, 0px), 3.5rem);
-  }
-}
-
-/* Do not let app-store compatibility scans globally disable motion. */
 @media (prefers-reduced-motion: no-preference) {
   html:not([data-clientsurge-motion-disabled]) .animate-fade-in-up {
     animation: fadeInUp 0.6s ease-out forwards;
@@ -182,12 +112,5 @@ main section {
 
   html:not([data-clientsurge-motion-disabled]) .animate-fade-in {
     animation: fadeIn 0.4s ease-out;
-  }
-
-  html:not([data-clientsurge-motion-disabled]) .cs-hover-lift,
-  html:not([data-clientsurge-motion-disabled]) .pricing-card,
-  html:not([data-clientsurge-motion-disabled]) .feature-card,
-  html:not([data-clientsurge-motion-disabled]) [class*="transition-"] {
-    transition-duration: revert-layer;
   }
 }
