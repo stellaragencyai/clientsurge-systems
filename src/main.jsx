@@ -4,6 +4,10 @@ import App from '@/App.jsx'
 import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
+import '@/theme-restore.css'
+import { installLightThemeGuard } from '@/lib/restoreLightTheme'
+
+installLightThemeGuard()
 
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
