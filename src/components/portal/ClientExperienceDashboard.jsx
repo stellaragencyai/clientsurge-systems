@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Loader2, TrendingUp, Users, Zap, DollarSign, AlertTriangle } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 
@@ -48,10 +48,22 @@ function StatusAlert({ type, title, message }) {
   );
 }
 
+function parseTruthJson(portal) {
+  if (!portal?.data_truth_json) return null;
+  try {
+    return JSON.parse(portal.data_truth_json);
+  } catch {
+    return null;
+  }
+}
+
 export default function ClientExperienceDashboard() {
   const [portal, setPortal] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+
+  const dataTruth = useMemo(() => parseTruthJson(portal), [portal]);
+  const metricsVerified = portal?.metrics_verified === true || dataTruth?.performance_verified === true;
 
   useEffect(() => {
     fetchPortal();
@@ -112,7 +124,6 @@ export default function ClientExperienceDashboard() {
 
   return (
     <div className="space-y-8 p-6 max-w-6xl mx-auto">
-      {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-foreground">{portal.business_name}</h1>
         <p className="text-muted-foreground mt-1">Your automation performance dashboard</p>
@@ -121,7 +132,14 @@ export default function ClientExperienceDashboard() {
         )}
       </div>
 
-      {/* Status Alerts */}
+      {(portal.data_truth_status && portal.data_truth_status !== 'verified') && (
+        <StatusAlert
+          type="warning"
+          title="Dashboard Data Not Fully Verified"
+          message={dataTruth?.warning || 'Some dashboard values are waiting on source records. Empty metrics should not be treated as confirmed zero activity.'}
+        />
+      )}
+
       {portal.blockers_count > 0 && (
         <StatusAlert
           type="error"
@@ -130,11 +148,11 @@ export default function ClientExperienceDashboard() {
         />
       )}
 
-      {portal.onboarding_stage === 'live' && portal.automation_health_status === 'healthy' && (
+      {portal.onboarding_stage === 'live' && portal.automation_health_status === 'healthy' && metricsVerified && (
         <StatusAlert
           type="success"
           title="System Active"
-          message="Your automations are live and performing well."
+          message="Your automations are live and backed by recent activity records."
         />
       )}
 
@@ -146,94 +164,39 @@ export default function ClientExperienceDashboard() {
         />
       )}
 
-      {/* Key Metrics */}
       {portal.show_overview && (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-          <MetricCard
-            icon={Users}
-            label="Leads Received"
-            value={portal.total_leads_received}
-            subtitle={`${portal.leads_contacted} contacted`}
-          />
-          <MetricCard
-            icon={TrendingUp}
-            label="Booking Rate"
-            value={`${portal.conversion_rate}%`}
-            subtitle={`${portal.leads_booked} booked`}
-            color="text-green-600"
-          />
-          <MetricCard
-            icon={DollarSign}
-            label="Revenue Generated"
-            value={`$${portal.revenue_generated?.toFixed(0) || '0'}`}
-            subtitle="Total attributed"
-            color="text-emerald-600"
-          />
-          <MetricCard
-            icon={Zap}
-            label="Response Time"
-            value={`${portal.avg_response_time_minutes}m`}
-            subtitle="Average"
-            color="text-orange-600"
-          />
-          <MetricCard
-            icon={AlertTriangle}
-            label="System Health"
-            value={portal.automation_health_status}
-            subtitle="Current status"
-            color={portal.automation_health_status === 'healthy' ? 'text-green-600' : 'text-yellow-600'}
-          />
+          <MetricCard icon={Users} label="Leads Received" value={portal.total_leads_received} subtitle={metricsVerified ? `${portal.leads_contacted} contacted` : 'Awaiting verified source data'} />
+          <MetricCard icon={TrendingUp} label="Booking Rate" value={`${portal.conversion_rate}%`} subtitle={metricsVerified ? `${portal.leads_booked} booked` : 'Not yet verified'} color="text-green-600" />
+          <MetricCard icon={DollarSign} label="Revenue Generated" value={`$${portal.revenue_generated?.toFixed(0) || '0'}`} subtitle={metricsVerified ? 'Total attributed' : 'Not yet verified'} color="text-emerald-600" />
+          <MetricCard icon={Zap} label="Response Time" value={`${portal.avg_response_time_minutes}m`} subtitle={metricsVerified ? 'Average' : 'Not yet verified'} color="text-orange-600" />
+          <MetricCard icon={AlertTriangle} label="System Health" value={portal.automation_health_status} subtitle={metricsVerified ? 'Current status' : 'Awaiting activity'} color={portal.automation_health_status === 'healthy' && metricsVerified ? 'text-green-600' : 'text-yellow-600'} />
         </div>
       )}
 
-      {/* Onboarding Progress */}
       {portal.show_onboarding_progress && (
         <div className="rounded-lg border border-border bg-card p-6">
           <h3 className="text-lg font-semibold text-foreground mb-6">Setup Progress</h3>
           <div className="space-y-4">
             <ProgressBar label="Setup Completion" value={portal.onboarding_completion_percent} color="bg-blue-600" />
             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-xs mt-6">
-              <div className="text-center">
-                <p className="font-semibold text-foreground">{portal.onboarding_stage}</p>
-                <p className="text-muted-foreground">Current Stage</p>
-              </div>
-              <div className="text-center">
-                <p className="font-semibold text-foreground">{portal.activation_status}</p>
-                <p className="text-muted-foreground">Activation</p>
-              </div>
-              <div className="text-center">
-                <p className="font-semibold text-foreground">{portal.blockers_count}</p>
-                <p className="text-muted-foreground">Open Issues</p>
-              </div>
-              <div className="text-center">
-                <p className="font-semibold text-foreground">{portal.automation_health_status}</p>
-                <p className="text-muted-foreground">System Health</p>
-              </div>
+              <div className="text-center"><p className="font-semibold text-foreground">{portal.onboarding_stage}</p><p className="text-muted-foreground">Current Stage</p></div>
+              <div className="text-center"><p className="font-semibold text-foreground">{portal.activation_status}</p><p className="text-muted-foreground">Activation</p></div>
+              <div className="text-center"><p className="font-semibold text-foreground">{portal.blockers_count}</p><p className="text-muted-foreground">Open Issues</p></div>
+              <div className="text-center"><p className="font-semibold text-foreground">{portal.automation_health_status}</p><p className="text-muted-foreground">System Health</p></div>
             </div>
           </div>
         </div>
       )}
 
-      {/* AI Summary & Recommendations */}
       {(portal.ai_summary || portal.ai_recommendations) && (
         <div className="rounded-lg border border-border bg-card p-6 space-y-4">
           <h3 className="text-lg font-semibold text-foreground">Insights & Recommendations</h3>
-          {portal.ai_summary && (
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Summary</p>
-              <p className="text-foreground">{portal.ai_summary}</p>
-            </div>
-          )}
-          {portal.ai_recommendations && (
-            <div>
-              <p className="text-sm text-muted-foreground mb-2">Next Steps</p>
-              <p className="text-foreground">{portal.ai_recommendations}</p>
-            </div>
-          )}
+          {portal.ai_summary && <div><p className="text-sm text-muted-foreground mb-2">Summary</p><p className="text-foreground">{portal.ai_summary}</p></div>}
+          {portal.ai_recommendations && <div><p className="text-sm text-muted-foreground mb-2">Next Steps</p><p className="text-foreground">{portal.ai_recommendations}</p></div>}
         </div>
       )}
 
-      {/* Activity Summary */}
       {portal.recent_activity_summary && (
         <div className="rounded-lg border border-border bg-card p-6">
           <h3 className="text-lg font-semibold text-foreground mb-3">Recent Activity</h3>
