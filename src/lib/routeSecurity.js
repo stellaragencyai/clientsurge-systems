@@ -13,11 +13,55 @@ export const ROUTE_ACCESS = {
   INTERNAL: "internal",
 };
 
+const FORCED_ADMIN_PREFIXES = [
+  "/launch-control",
+  "/mission-control",
+  "/saas/admin",
+  "/funnel-optimization",
+  "/system-observability",
+  "/dashboard",
+  "/admin-settings",
+  "/lead-intelligence",
+  "/sam",
+  "/medspa-dashboard",
+];
+
+const FORCED_AUTHENTICATED_PREFIXES = [
+  "/dashboard-entry",
+  "/setup",
+  "/setup/status",
+  "/setup/preview",
+  "/setup/credentials",
+  "/onboarding",
+];
+
+const FORCED_NOINDEX_PREFIXES = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/product-signup",
+  "/signup",
+  "/setup-lookup",
+  "/success",
+  "/order-success",
+  "/thank-you",
+  "/launch-control",
+  "/dashboard-entry",
+  "/mission-control",
+  "/saas/admin",
+  "/funnel-optimization",
+  "/system-observability",
+  "/function-audit",
+  ...FORCED_AUTHENTICATED_PREFIXES,
+  ...FORCED_ADMIN_PREFIXES,
+];
+
 export const PUBLIC_ROUTES = PUBLIC_ROUTE_PATHS;
-export const AUTHENTICATED_ROUTES = AUTHENTICATED_ROUTE_PREFIXES;
-export const ADMIN_ROUTES = ADMIN_ROUTE_PREFIXES;
+export const AUTHENTICATED_ROUTES = [...AUTHENTICATED_ROUTE_PREFIXES, ...FORCED_AUTHENTICATED_PREFIXES];
+export const ADMIN_ROUTES = [...ADMIN_ROUTE_PREFIXES, ...FORCED_ADMIN_PREFIXES];
 export const INTERNAL_ROUTES = INTERNAL_ROUTE_PREFIXES;
-export const NOINDEX_PREFIXES = NOINDEX_ROUTE_PREFIXES;
+export const NOINDEX_PREFIXES = [...NOINDEX_ROUTE_PREFIXES, ...FORCED_NOINDEX_PREFIXES];
 
 function normalize(pathname = "/") {
   const value = String(pathname || "/").split("?")[0].split("#")[0].toLowerCase();
