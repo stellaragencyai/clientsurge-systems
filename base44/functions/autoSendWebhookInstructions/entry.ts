@@ -19,7 +19,7 @@ const WEBHOOK_INSTRUCTIONS_EMAIL = `
   <li>✅ Check your email for setup progress updates</li>
 </ul>
 
-<p>Questions? Reply to this email or call <a href="tel:+16025843227">(602) 584-3227</a></p>
+<p>Questions? Reply to this email or visit <a href="https://clientsurgesystems.com/contact">clientsurgesystems.com/contact</a>.</p>
 <p><em>— The ClientSurge Systems Team</em></p>
 `;
 
@@ -77,6 +77,7 @@ Deno.serve(async (req) => {
           to: [customerEmail],
           subject: "Your AI Systems Are Being Activated — Next Steps",
           html: `<p>Hi ${customerName},</p>${WEBHOOK_INSTRUCTIONS_EMAIL}`,
+          reply_to: Deno.env.get("RESEND_REPLY_TO_EMAIL") || "support@clientsurgesystems.com",
         }),
       });
     }
