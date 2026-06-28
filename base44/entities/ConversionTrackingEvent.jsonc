@@ -27,6 +27,14 @@
       "title": "Page Key",
       "enum": [
         "homepage",
+        "pricing",
+        "store",
+        "product_signup",
+        "start",
+        "automations",
+        "industries",
+        "contact",
+        "about",
         "med_spa",
         "dental",
         "hvac",
@@ -35,10 +43,9 @@
         "real_estate",
         "personal_injury",
         "plumbing",
-        "chiropractic",
-        "pricing"
+        "chiropractic"
       ],
-      "description": "Which public landing page triggered the event"
+      "description": "Which public page triggered the event"
     },
     "event_type": {
       "type": "string",
@@ -72,33 +79,15 @@
       "properties": {
         "device_type": {
           "type": "string",
-          "enum": [
-            "mobile",
-            "tablet",
-            "desktop"
-          ]
+          "enum": ["mobile", "tablet", "desktop"]
         },
-        "browser": {
-          "type": "string"
-        },
-        "utm_source": {
-          "type": "string"
-        },
-        "utm_medium": {
-          "type": "string"
-        },
-        "utm_campaign": {
-          "type": "string"
-        },
-        "utm_content": {
-          "type": "string"
-        },
-        "referrer": {
-          "type": "string"
-        },
-        "destination": {
-          "type": "string"
-        },
+        "browser": { "type": "string" },
+        "utm_source": { "type": "string" },
+        "utm_medium": { "type": "string" },
+        "utm_campaign": { "type": "string" },
+        "utm_content": { "type": "string" },
+        "referrer": { "type": "string" },
+        "destination": { "type": "string" },
         "scroll_depth": {
           "type": "integer",
           "description": "Scroll depth percentage (0-100)"
@@ -106,50 +95,24 @@
       }
     }
   },
-  "required": [
-    "event_id",
-    "session_id",
-    "page_key",
-    "event_type",
-    "timestamp"
-  ],
+  "required": ["event_id", "session_id", "page_key", "event_type", "timestamp"],
   "rls": {
     "create": true,
     "read": {
       "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "data.client_project_id": "{{client_project_id}}"
-        }
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
+        { "data.client_project_id": "{{client_project_id}}" }
       ]
     },
     "update": {
       "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } }
       ]
     },
     "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "user_condition": { "role": "admin" }
     }
   }
 }
