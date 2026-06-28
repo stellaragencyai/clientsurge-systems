@@ -63,7 +63,10 @@ Deno.serve(async (req) => {
     const customerEmail = order.customer_email;
     const customerName = order.customer_name || "there";
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "support@clientsurgesystems.com";
+    const configuredFromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "";
+    const fromEmail = configuredFromEmail && !configuredFromEmail.toLowerCase().includes("noreply@")
+      ? configuredFromEmail
+      : "support@clientsurgesystems.com";
 
     if (resendApiKey && customerEmail) {
       await fetch("https://api.resend.com/emails", {
