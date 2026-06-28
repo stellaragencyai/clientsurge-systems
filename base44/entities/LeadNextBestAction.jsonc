@@ -4,6 +4,11 @@
   "title": "Lead Next-Best-Action",
   "description": "Predictive lead value and next-best-action calculated for every new lead.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "lead_id": {
       "type": "string",
       "title": "Lead ID"

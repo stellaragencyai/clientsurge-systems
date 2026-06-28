@@ -4,6 +4,11 @@
   "title": "Automation Proof Log",
   "description": "Go-live decision record proving each Pro automation passed its required test before go-live.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

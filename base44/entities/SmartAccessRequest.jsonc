@@ -4,6 +4,11 @@
   "title": "Smart Access Request",
   "description": "Tracks per-provider access requests with least-privilege default. Raw credentials are fallback only.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

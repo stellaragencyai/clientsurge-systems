@@ -1,4 +1,5 @@
 import { lazy, Suspense, useEffect } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   BrowserRouter as Router,
