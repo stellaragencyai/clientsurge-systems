@@ -1,10 +1,13 @@
 import { Clock, CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { base44 } from "@/api/base44Client";
+import PullToRefresh from "@/components/ui/PullToRefresh";
 
 export default function DashboardMetricsBar({ activeServices, project }) {
   const [snapshot, setSnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
+
+  const [refreshTick, setRefreshTick] = useState(0);
 
   useEffect(() => {
     const fetchSnapshot = async () => {
@@ -27,9 +30,13 @@ export default function DashboardMetricsBar({ activeServices, project }) {
     };
 
     fetchSnapshot();
-    const interval = setInterval(fetchSnapshot, 60000); // Refresh every minute
+    const interval = setInterval(fetchSnapshot, 60000);
     return () => clearInterval(interval);
-  }, [project?.order_id]);
+  }, [project?.order_id, refreshTick]);
+
+  const handleRefresh = useCallback(async () => {
+    setRefreshTick((t) => t + 1);
+  }, []);
 
   // Use snapshot data if available, fall back to activeServices
   const totalServices = activeServices.length;
@@ -45,6 +52,7 @@ export default function DashboardMetricsBar({ activeServices, project }) {
   ];
 
   return (
+    <PullToRefresh onRefresh={handleRefresh}>
     <div style={{
       display: "grid",
       gridTemplateColumns: "repeat(auto-fit, minmax(min(100%, 200px), 1fr))",
@@ -92,5 +100,6 @@ export default function DashboardMetricsBar({ activeServices, project }) {
         );
       })}
     </div>
+    </PullToRefresh>
   );
 }

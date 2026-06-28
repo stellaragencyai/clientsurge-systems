@@ -2,6 +2,8 @@ import { useState, useEffect, useCallback } from "react";
 import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X, RefreshCw } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { fetchLeadPipelineSummary } from "@/lib/leadPipelineApi";
+import BottomSheetSelect from "@/components/ui/BottomSheetSelect";
+import PullToRefresh from "@/components/ui/PullToRefresh";
 
 const PAGE_SIZE = 25;
 
@@ -70,6 +72,7 @@ export default function LeadsTable() {
   const [sort, setSort] = useState({ field: "created_date", order: -1 });
   const [kpis, setKpis] = useState({ total: 0, hot: 0, new: 0, booked: 0 });
   const [duplicateWarnings, setDuplicateWarnings] = useState(0);
+  const [refreshKey, setRefreshKey] = useState(0);
 
   // Build query filter for the canonical Leads entity
   const buildFilter = useCallback(() => {
@@ -106,7 +109,7 @@ export default function LeadsTable() {
       }
     };
     loadKpis();
-  }, []);
+  }, [refreshKey]);
 
   // Load paginated leads with real-time updates
   useEffect(() => {
@@ -176,7 +179,7 @@ export default function LeadsTable() {
         try { unsubscribe(); } catch { /* noop */ }
       }
     };
-  }, [page, filters, sort, buildFilter, search]);
+  }, [page, filters, sort, buildFilter, search, refreshKey]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -219,8 +222,12 @@ export default function LeadsTable() {
     }
   };
 
+  const handleRefresh = async () => {
+    setRefreshKey((k) => k + 1);
+  };
+
   return (
-    <div className="space-y-5">
+    <PullToRefresh onRefresh={handleRefresh} className="space-y-5">
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-lg bg-white p-4 border border-border text-center">
@@ -265,31 +272,33 @@ export default function LeadsTable() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
-          <select
+          <BottomSheetSelect
             value={filters.lead_state}
-            onChange={(e) => handleFilterChange("lead_state", e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
-          >
-            <option value="">State</option>
-            <option value="NEW">New</option>
-            <option value="QUALIFIED">Qualified</option>
-            <option value="ENGAGED">Engaged</option>
-            <option value="HOT">Hot</option>
-            <option value="BOOKED">Booked</option>
-            <option value="WON">Won</option>
-          </select>
+            onChange={(val) => handleFilterChange("lead_state", val)}
+            placeholder="State"
+            label="Filter by Lead State"
+            options={[
+              { value: "NEW", label: "New" },
+              { value: "QUALIFIED", label: "Qualified" },
+              { value: "ENGAGED", label: "Engaged" },
+              { value: "HOT", label: "Hot" },
+              { value: "BOOKED", label: "Booked" },
+              { value: "WON", label: "Won" },
+            ]}
+          />
 
-          <select
+          <BottomSheetSelect
             value={filters.intelligence_segment}
-            onChange={(e) => handleFilterChange("intelligence_segment", e.target.value)}
-            className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
-          >
-            <option value="">Segment</option>
-            <option value="HOT_LEADS">Hot</option>
-            <option value="HIGH_INTENT">High Intent</option>
-            <option value="ENGAGED">Engaged</option>
-            <option value="NURTURE">Nurture</option>
-          </select>
+            onChange={(val) => handleFilterChange("intelligence_segment", val)}
+            placeholder="Segment"
+            label="Filter by Segment"
+            options={[
+              { value: "HOT_LEADS", label: "Hot" },
+              { value: "HIGH_INTENT", label: "High Intent" },
+              { value: "ENGAGED", label: "Engaged" },
+              { value: "NURTURE", label: "Nurture" },
+            ]}
+          />
 
           <input
             type="number"
@@ -507,6 +516,6 @@ export default function LeadsTable() {
           </div>
         </div>
       )}
-    </div>
+    </PullToRefresh>
   );
 }

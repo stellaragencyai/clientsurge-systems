@@ -1,11 +1,12 @@
 import { useEffect, useMemo, useState } from "react";
-import { CalendarDays, HeartPulse, Loader2, Save, Webhook } from "lucide-react";
+import { CalendarDays, HeartPulse, Loader2, Save, Webhook, Trash2, AlertTriangle, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import WebhookSettings from "./WebhookSettings";
 
 const SETTINGS_SECTIONS = [
   { id: "timeline", label: "Timeline", icon: CalendarDays },
   { id: "webhooks", label: "Webhooks", icon: Webhook },
+  { id: "account", label: "Account", icon: Trash2 },
 ];
 
 function formatDisplayDate(value) {
@@ -371,7 +372,151 @@ export default function PortalSettings({ project, user, onUpdated }) {
         {activeSection === "webhooks" && (
           <WebhookSettings project={project} />
         )}
+
+        {activeSection === "account" && (
+          <DeleteAccountSection user={user} />
+        )}
       </div>
+    </div>
+  );
+}
+
+function DeleteAccountSection({ user }) {
+  const [showConfirm, setShowConfirm] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+
+  const handleDelete = async () => {
+    if (confirmText !== "DELETE") {
+      setError('Type "DELETE" to confirm.');
+      return;
+    }
+    setDeleting(true);
+    setError("");
+    try {
+      const res = await base44.functions.invoke("deactivateUserAccount", {
+        confirmation: "DELETE",
+      });
+      if (res?.data?.success) {
+        setDone(true);
+        setTimeout(() => {
+          base44.auth.logout("/");
+        }, 2500);
+      } else {
+        setError(res?.data?.error || "Failed to deactivate account.");
+      }
+    } catch (err) {
+      setError(err?.data?.error || err?.message || "Failed to deactivate account.");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  if (done) {
+    return (
+      <div className="rounded-[28px] border border-green-200 bg-green-50 p-8 text-center">
+        <div className="w-12 h-12 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
+          <HeartPulse className="h-6 w-6 text-green-600" />
+        </div>
+        <h3 className="text-xl font-semibold text-foreground mb-2">Account Deactivation Processed</h3>
+        <p className="text-sm text-muted-foreground">You will be signed out momentarily.</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="rounded-[28px] border border-red-200 bg-red-50 p-6">
+        <div className="flex items-start gap-4">
+          <div className="w-11 h-11 rounded-2xl bg-red-100 flex items-center justify-center flex-shrink-0">
+            <AlertTriangle className="h-5 w-5 text-red-600" />
+          </div>
+          <div>
+            <h2 className="text-xl font-semibold text-foreground">Delete Account</h2>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">
+              Permanently deactivate your account. This will revoke access to the client portal,
+              dashboards, and all automation data tied to your email. This action cannot be undone.
+            </p>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-xl border border-red-200 bg-white px-4 py-3 text-sm text-red-700">
+          <p className="font-semibold">What happens when you delete your account:</p>
+          <ul className="mt-2 space-y-1 list-disc list-inside text-muted-foreground">
+            <li>You will be signed out immediately.</li>
+            <li>Portal access will be revoked.</li>
+            <li>Your lead and project records will be retained for audit purposes.</li>
+            <li>Active automations may continue unless cancelled separately.</li>
+          </ul>
+        </div>
+
+        <button
+          type="button"
+          onClick={() => setShowConfirm(true)}
+          className="mt-6 inline-flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          style={{ background: "linear-gradient(135deg, #dc2626, #b91c1c)" }}
+        >
+          <Trash2 className="h-4 w-4" />
+          Delete My Account
+        </button>
+      </div>
+
+      {showConfirm && (
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <div className="w-full max-w-md bg-background rounded-2xl shadow-2xl overflow-hidden">
+            <div className="flex items-center justify-between p-5 border-b border-border">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
+                  <AlertTriangle className="w-5 h-5 text-red-600" />
+                </div>
+                <h3 className="text-lg font-bold text-foreground">Confirm Deletion</h3>
+              </div>
+              <button onClick={() => { setShowConfirm(false); setConfirmText(""); setError(""); }} className="text-muted-foreground hover:text-foreground p-1">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5">
+              <p className="text-sm text-muted-foreground mb-3">
+                This action is permanent and cannot be undone. To confirm, type{" "}
+                <strong className="text-foreground">DELETE</strong> below.
+              </p>
+              <input
+                type="text"
+                value={confirmText}
+                onChange={(e) => { setConfirmText(e.target.value); setError(""); }}
+                placeholder="Type DELETE to confirm"
+                className="w-full rounded-xl border border-border bg-background px-4 py-3 text-sm text-foreground outline-none focus:border-red-500"
+                autoComplete="off"
+              />
+              {error && <p className="text-red-500 text-xs mt-2">{error}</p>}
+            </div>
+            <div className="flex gap-3 p-5 border-t border-border">
+              <button
+                onClick={() => { setShowConfirm(false); setConfirmText(""); setError(""); }}
+                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleDelete}
+                disabled={deleting}
+                className="flex-1 px-4 py-2.5 rounded-lg text-white text-sm font-semibold transition-colors disabled:opacity-60"
+                style={{ background: "linear-gradient(135deg, #dc2626, #b91c1c)" }}
+              >
+                {deleting ? (
+                  <span className="flex items-center justify-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
+                  </span>
+                ) : (
+                  "Delete Permanently"
+                )}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

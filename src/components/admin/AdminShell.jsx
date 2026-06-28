@@ -14,6 +14,7 @@ import {
   Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck, ListChecks,
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
+import NavigationBackButton from "@/components/ui/NavigationBackButton";
 
 const NAV_GROUPS = [
   {
@@ -218,12 +219,7 @@ export default function AdminShell({ children, title, activeId }) {
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
-            <button
-              onClick={() => navigate("/admin")}
-              className="hidden lg:flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
-            >
-              <ArrowLeft className="w-3.5 h-3.5" /> Main Menu
-            </button>
+            <NavigationBackButton fallbackPath="/admin" label="Back" />
             <span className="hidden lg:block text-muted-foreground/40">|</span>
             <h2 className="text-base font-semibold text-foreground">{title}</h2>
           </div>
