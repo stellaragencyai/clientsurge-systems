@@ -153,6 +153,7 @@ const INDUSTRY_ROUTE_SLUGS = [
   "personal-injury",
   "property-services",
   "veterinary",
+  "landscaping",
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [

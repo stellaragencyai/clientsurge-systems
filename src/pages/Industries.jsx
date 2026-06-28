@@ -143,6 +143,30 @@ const industries = [
       "Built for veterinary practices that need faster response to appointment requests, missed-call text-back, after-hours inquiry capture, automated reminders, and consistent lead follow-up.",
     href: "/veterinary",
   },
+  {
+    id: "property-services",
+    title: "Property Services & Management",
+    status: "Live",
+    icon: Building2,
+    accent: "text-[#005f99]",
+    accentBg: "bg-primary/10 border-primary/20",
+    ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
+    description:
+      "Built for property management companies and service teams that need faster tenant inquiry response, maintenance request routing, missed-call recovery, and consistent follow-up.",
+    href: "/property-services",
+  },
+  {
+    id: "landscaping",
+    title: "Landscaping & Lawn Care",
+    status: "Live",
+    icon: Droplets,
+    accent: "text-[#005f99]",
+    accentBg: "bg-primary/10 border-primary/20",
+    ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
+    description:
+      "Built for landscaping and lawn care businesses that need faster quote follow-up, seasonal lead capture, missed-call text-back, and appointment booking automation.",
+    href: "/landscaping",
+  },
 ];
 
 export default function Industries() {
@@ -158,7 +182,7 @@ export default function Industries() {
     return setPageMetadata({
       title: "Industries We Serve | ClientSurge Systems",
       description:
-        "Explore the industries ClientSurge Systems serves: roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, personal injury, and veterinary clinics.",
+        "Explore the industries ClientSurge Systems serves: roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, personal injury, veterinary, property services, and landscaping.",
       canonicalPath: "/industries",
       ogTitle: "Industries We Serve | ClientSurge Systems",
       ogDescription:

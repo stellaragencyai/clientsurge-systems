@@ -233,6 +233,12 @@ export default function Contact() {
                   />
                 </div>
 
+                {/* SMS consent + Privacy Policy link */}
+                <p className="text-xs text-muted-foreground leading-relaxed">
+                  By providing your phone number, you consent to receive SMS messages from ClientSurge Systems. Message frequency varies. Reply STOP to opt out. See our{" "}
+                  <Link to="/privacy-policy" className="text-primary font-semibold hover:underline">Privacy Policy</Link>.
+                </p>
+
                 <div>
                   <FormInput
                     label="Business Type / Industry"
