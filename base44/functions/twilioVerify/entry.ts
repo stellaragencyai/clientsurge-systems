@@ -1,105 +1,163 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+
+function normalizePhoneToE164(input: unknown): string | null {
+  if (typeof input !== 'string') return null;
+  const trimmed = input.trim();
+  if (!trimmed) return null;
+
+  const digits = trimmed.replace(/\D/g, '');
+  if (trimmed.startsWith('+') && digits.length >= 8 && digits.length <= 15) return `+${digits}`;
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith('1')) return `+${digits}`;
+
+  return null;
+}
+
+function getRequestedPhone(body: Record<string, any>): string | null {
+  const entityData = body?.data || {};
+  return normalizePhoneToE164(
+    body?.phone_e164 ||
+    body?.phone ||
+    body?.phone_number ||
+    body?.customer_phone ||
+    entityData?.phone_e164 ||
+    entityData?.phone ||
+    entityData?.phone_number ||
+    entityData?.customer_phone ||
+    ''
+  );
+}
+
+async function callTwilio(accountSid: string, authToken: string, serviceSid: string, endpoint: 'Verifications' | 'VerificationCheck', params: Record<string, string>) {
+  const auth = btoa(`${accountSid}:${authToken}`);
+  const response = await fetch(`https://verify.twilio.com/v2/Services/${serviceSid}/${endpoint}`, {
+    method: 'POST',
+    headers: {
+      Authorization: `Basic ${auth}`,
+      'Content-Type': 'application/x-www-form-urlencoded',
+    },
+    body: new URLSearchParams(params).toString(),
+  });
+
+  const data = await response.json().catch(() => ({}));
+  return { response, data };
+}
+
+async function writeVerificationLog(req: Request, phoneE164: string, status: string, details: Record<string, any> = {}) {
+  try {
+    const base44 = createClientFromRequest(req);
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      channel: 'sms',
+      direction: 'system',
+      event_type: status === 'approved' ? 'phone_check_approved' : 'phone_check_attempted',
+      provider: 'twilio',
+      status: status === 'approved' ? 'processed' : 'pending',
+      message_body: `Twilio phone check status: ${status}`,
+      context_type: 'phone_check',
+      metadata_json: JSON.stringify({ phone_e164: phoneE164, twilio_status: status, ...details }),
+    });
+  } catch (error) {
+    console.warn('[twilioVerify] Audit log failed:', error?.message || error);
+  }
+}
 
 Deno.serve(async (req) => {
   try {
-    const raw = await req.json();
+    if (req.method !== 'POST') {
+      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+    }
 
-    // Support both direct calls ({ phone, action, code }) and entity-automation
-    // payloads ({ event: { type, entity_name, entity_id }, data: { ...lead } }).
-    const isEntityAutomation = !!(raw?.event?.entity_id || raw?.data?.id);
-    const phone = raw?.phone || raw?.data?.phone || raw?.data?.customer_phone || '';
-    const action = raw?.action || (isEntityAutomation ? 'send' : 'send');
-    const code = raw?.code || '';
+    const body = await req.json().catch(() => ({}));
+    const phoneE164 = getRequestedPhone(body);
+    const requestedAction = String(body?.action || 'start').toLowerCase();
+    const action = requestedAction === 'send' ? 'start' : requestedAction;
+    const code = String(body?.code || body?.verification_code || '').trim();
 
-    if (!phone) {
-      console.warn('[twilioVerify] No phone number found in payload');
-      return Response.json({ error: 'Phone number required' }, { status: 400 });
+    if (!phoneE164) {
+      return Response.json({ error: 'Valid phone number required' }, { status: 400 });
     }
 
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
     const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
-    const verifyServiceSid = Deno.env.get('TWILIO_VERIFY_SERVICE_SID');
+    const serviceSid = Deno.env.get('TWILIO_VERIFY_SERVICE_SID');
 
-    if (!accountSid || !authToken || !verifyServiceSid) {
+    if (!accountSid || !authToken || !serviceSid) {
       return Response.json({ error: 'Twilio Verify not configured' }, { status: 500 });
     }
 
-    const auth = btoa(`${accountSid}:${authToken}`);
-
-    // Send OTP
-    if (action === 'send') {
-      const response = await fetch(
-        `https://verify.twilio.com/v2/Services/${verifyServiceSid}/Verifications`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            To: phone,
-            Channel: 'sms',
-          }).toString(),
-        }
-      );
-
-      const data = await response.json();
+    if (action === 'start') {
+      const { response, data } = await callTwilio(accountSid, authToken, serviceSid, 'Verifications', {
+        To: phoneE164,
+        Channel: 'sms',
+      });
 
       if (!response.ok) {
-        return Response.json({ error: 'Failed to send verification code', details: data }, { status: 500 });
+        await writeVerificationLog(req, phoneE164, 'failed', { twilio_error: data });
+        return Response.json({
+          success: false,
+          approved: false,
+          phone_verified: false,
+          phone_e164: phoneE164,
+          status: 'failed',
+          error: 'Could not send the phone check message',
+          details: data,
+        }, { status: 502 });
       }
 
-      return Response.json({ success: true, sid: data.sid, message: 'Verification code sent' });
+      await writeVerificationLog(req, phoneE164, data?.status || 'pending', { twilio_sid: data?.sid || null });
+      return Response.json({
+        success: true,
+        approved: false,
+        phone_verified: false,
+        phone_e164: phoneE164,
+        status: data?.status || 'pending',
+        sid: data?.sid || null,
+        message: 'Phone check started',
+      });
     }
 
-    // Check OTP
     if (action === 'check') {
       if (!code) {
-        return Response.json({ error: 'Verification code required' }, { status: 400 });
+        return Response.json({ error: 'Code required' }, { status: 400 });
       }
 
-      const response = await fetch(
-        `https://verify.twilio.com/v2/Services/${verifyServiceSid}/VerificationCheck`,
-        {
-          method: 'POST',
-          headers: {
-            'Authorization': `Basic ${auth}`,
-            'Content-Type': 'application/x-www-form-urlencoded',
-          },
-          body: new URLSearchParams({
-            To: phone,
-            Code: code,
-          }).toString(),
-        }
-      );
-
-      const data = await response.json();
+      const { response, data } = await callTwilio(accountSid, authToken, serviceSid, 'VerificationCheck', {
+        To: phoneE164,
+        Code: code,
+      });
 
       if (!response.ok) {
-        return Response.json({ error: 'Invalid verification code', details: data }, { status: 400 });
+        await writeVerificationLog(req, phoneE164, data?.status || 'failed', { twilio_error: data });
+        return Response.json({
+          success: false,
+          approved: false,
+          verified: false,
+          phone_verified: false,
+          phone_e164: phoneE164,
+          status: data?.status || 'failed',
+          error: 'Code was not accepted',
+          details: data,
+        }, { status: 400 });
       }
 
-      if (data.status === 'approved') {
-        // Log verification in database
-        const base44 = createClientFromRequest(req);
-        await base44.entities.CommunicationEvent.create({
-          channel: 'sms',
-          direction: 'system',
-          event_type: 'verification_code_approved',
-          provider: 'twilio',
-          status: 'processed',
-          message_body: `Phone ${phone} verified successfully`,
-          metadata_json: JSON.stringify({ phone_verified: true, verified_at: new Date().toISOString() }),
-        });
-        return Response.json({ success: true, verified: true, message: 'Phone number verified' });
-      }
+      const approved = data?.status === 'approved';
+      await writeVerificationLog(req, phoneE164, data?.status || 'unknown', { twilio_sid: data?.sid || null });
 
-      return Response.json({ success: false, verified: false, message: 'Verification failed' });
+      return Response.json({
+        success: approved,
+        approved,
+        verified: approved,
+        phone_verified: approved,
+        phone_e164: phoneE164,
+        status: data?.status || 'unknown',
+        checked_at: new Date().toISOString(),
+        message: approved ? 'Phone number approved' : 'Phone number not approved',
+      }, { status: approved ? 200 : 400 });
     }
 
-    return Response.json({ error: 'Invalid action. Use "send" or "check"' }, { status: 400 });
+    return Response.json({ error: 'Invalid action. Use "start" or "check".' }, { status: 400 });
   } catch (error) {
-    console.error('Twilio Verify Error:', error.message);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error('[twilioVerify] Error:', error?.message || error);
+    return Response.json({ error: error?.message || 'Twilio Verify failed' }, { status: 500 });
   }
 });
