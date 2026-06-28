@@ -93,10 +93,7 @@
     },
     "read": {
       "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
+        "role": "admin"
       }
     },
     "update": {
