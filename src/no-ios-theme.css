@@ -1,4 +1,7 @@
-.book-page {
+.book-page,
+div[style*="#061025"],
+section[style*="#061025"],
+main[style*="#061025"] {
   background: linear-gradient(135deg, #f7fbff 0%, #ffffff 42%, #eef8ff 100%) !important;
   color: hsl(var(--foreground)) !important;
 }
@@ -11,7 +14,13 @@
 .book-page h6,
 .book-page p,
 .book-page li,
-.book-page span {
+.book-page span,
+div[style*="#061025"] h1,
+div[style*="#061025"] h2,
+div[style*="#061025"] h3,
+div[style*="#061025"] p,
+div[style*="#061025"] li,
+div[style*="#061025"] span {
   color: inherit !important;
   -webkit-text-fill-color: currentColor !important;
 }
