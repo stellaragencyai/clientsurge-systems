@@ -444,7 +444,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
-      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
+      <Route path="/product" element={<Navigate to="/" replace />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
       <Route path="/signup" element={<SignupForward />} />
       <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
