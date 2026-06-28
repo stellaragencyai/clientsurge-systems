@@ -1,8 +1,5 @@
-// Canonical Stripe webhook entrypoint.
-// The previous main.ts created paid Order records without provisioning ClientProject,
-// ClientInstallationOS, portal invite, or automation checklists. Keep all runtimes on
-// the shared handler so checkout.session.completed uses the same full fulfillment path.
+// Compatibility wrapper for Base44 runtimes that execute main.ts.
+// Keep main.ts on the hardened entry implementation so payment success cannot
+// create an Order without also passing the post-payment provisioning truth gate.
 
-import { handleCanonicalStripeWebhook } from "../_shared/stripeOrderWebhook.js";
-
-Deno.serve((req) => handleCanonicalStripeWebhook(req, { source: "stripeWebhookOrders.main" }));
+import "./entry.ts";
