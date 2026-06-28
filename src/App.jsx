@@ -450,7 +450,94 @@ const AuthenticatedAppWithTenant = () => {
           element={<Navigate to={to} replace />}
         />
       ))}
-...
+      <Route path="/industries/real-estate" element={<Navigate to="/real-estate" replace />} />
+      <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
+      <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
+      <Route path="/" element={<Home />} />
+
+      {/* Public pages */}
+      <Route path="/start" element={<LazyRoute Component={Start} />} />
+      <Route path="/book" element={<LazyRoute Component={Book} />} />
+      <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
+      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
+      <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
+      <Route path="/signup" element={<SignupForward />} />
+      <Route path="/faq" element={<LazyRoute Component={FAQPage} />} />
+      <Route path="/our-system" element={<LazyRoute Component={OurSystemPage} />} />
+      <Route path="/testimonials" element={<LazyRoute Component={TestimonialsPage} />} />
+      <Route path="/contact" element={<LazyRoute Component={Contact} />} />
+      <Route path="/industries" element={<LazyRoute Component={Industries} />} />
+      <Route path="/blog" element={<LazyRoute Component={Blog} />} />
+      <Route path="/about" element={<LazyRoute Component={About} />} />
+      <Route path="/automations" element={<LazyRoute Component={Automations} />} />
+      <Route path="/library" element={<LazyRoute Component={Library} />} />
+      <Route path="/store" element={<LazyRoute Component={Store} />} />
+      <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
+      <Route path="/proof" element={<LazyRoute Component={ProofPage} />} />
+      <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
+      <Route path="/dashboard-entry" element={<LazyRoute Component={ClientDashboardEntry} />} />
+      <Route path="/how-it-works-page" element={<LazyRoute Component={HowItWorksPage} />} />
+
+      {/* Legal pages */}
+      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} />} />
+      <Route path="/terms" element={<LazyRoute Component={LegalPage} />} />
+      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} />} />
+
+      {/* Industry routes */}
+      {INDUSTRY_ROUTE_SLUGS.filter(slug => slug !== "real-estate" && slug !== "personal-injury").map(slug => (
+        <Route key={slug} path={`/${slug}`} element={<LazyRoute Component={IndustryPageTemplate} />} />
+      ))}
+      <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
+      <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
+
+      {/* Hidden public routes */}
+      {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => (
+        <Route key={route} path={route} element={<LazyRoute Component={Component} />} />
+      ))}
+
+      {/* Automation service pages */}
+      {AUTOMATION_SERVICE_ROUTES.map(route => (
+        <Route key={route} path={route} element={<LazyRoute Component={AutomationServicePage} />} />
+      ))}
+
+      {/* Auth pages */}
+      <Route path="/login" element={<LazyRoute Component={Login} />} />
+      <Route path="/register" element={<LazyRoute Component={Register} />} />
+      <Route path="/forgot-password" element={<LazyRoute Component={ForgotPassword} />} />
+      <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
+
+      {/* Protected client routes */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/client-portal" element={<LazyRoute Component={ClientPortal} />} />
+        <Route path="/client-dashboard" element={<LazyRoute Component={ClientSaasDashboard} />} />
+      </Route>
+
+      {/* Protected admin routes */}
+      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
+        <Route path="/admin" element={<LazyRoute Component={AdminDashboard} />} />
+        <Route path="/admin/leads/:leadId" element={<LazyRoute Component={AdminLeadDetail} />} />
+        <Route path="/admin/automation" element={<LazyRoute Component={AdminAutomation} />} />
+        <Route path="/admin/onboarding" element={<LazyRoute Component={AdminOnboarding} />} />
+        <Route path="/admin/install-guide" element={<LazyRoute Component={AdminInstallGuide} />} />
+        <Route path="/admin/sales-command-center" element={<LazyRoute Component={AISalesCommandCenter} />} />
+        <Route path="/admin/performance-wars" element={<LazyRoute Component={PerformanceWars} />} />
+        <Route path="/admin/onboarding-pipeline" element={<LazyRoute Component={OnboardingPipeline} />} />
+        <Route path="/admin/reconciliation" element={<LazyRoute Component={AdminReconciliation} />} />
+        <Route path="/admin/function-audit" element={<LazyRoute Component={FunctionAudit} />} />
+        <Route path="/admin/opportunity-review" element={<LazyRoute Component={OpportunityReviewQueue} />} />
+        <Route path="/saas/admin" element={<LazyRoute Component={SaaSAdminPanel} />} />
+        <Route path="/mission-control" element={<LazyRoute Component={MissionControlDashboard} />} />
+        <Route path="/mission-control/logs" element={<LazyRoute Component={MissionControlLogs} />} />
+        <Route path="/launch-control" element={<LazyRoute Component={LaunchControl} />} />
+        <Route path="/funnel-optimization" element={<LazyRoute Component={FunnelOptimizationPage} />} />
+        <Route path="/system-observability" element={<LazyRoute Component={SystemObservabilityDashboard} />} />
+      </Route>
+
+      {/* Hash redirects */}
+      <Route path="/problem" element={<HashRedirect hash="#problem" />} />
+      <Route path="/solution" element={<HashRedirect hash="#solution" />} />
+      <Route path="/pricing-section" element={<HashRedirect hash="#pricing" />} />
+
       <Route path="*" element={<PageNotFound />} />
     </Routes>
     </motion.div>
