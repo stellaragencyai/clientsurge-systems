@@ -6,6 +6,8 @@ import {
   buildPricingSummaryForProducts,
   buildStoredPricingSummary,
   buildStripeLineItemsForPricingSummary,
+  getPackageOffer,
+  getPackageServices,
 } from "./salesCatalog.shared.js";
 
 function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
@@ -44,6 +46,7 @@ Deno.serve(async (req) => {
     const {
       items,
       product_ids,
+      package_key,
       customer_name,
       customer_email,
       customer_phone,
@@ -56,14 +59,42 @@ Deno.serve(async (req) => {
       deploy_immediately,
     } = await req.json();
 
-    const requestedProductIds = Array.isArray(product_ids) && product_ids.length
+    // Product Signup sends package_key only. Resolve it here so /product-signup
+    // and older cart/product_ids payloads both hit the same canonical checkout path.
+    const requestedPackage = package_key ? getPackageOffer(package_key) : null;
+    if (package_key && !requestedPackage) {
+      return secureJson(
+        {
+          error: `Unknown package selected: ${package_key}`,
+          code: "unknown_package",
+          request_id: requestId,
+        },
+        { status: 400 }
+      );
+    }
+
+    const requestedProductIds = requestedPackage
+      ? getPackageServices(requestedPackage.package_key)
+          .map((service) => service?.product_id)
+          .filter(Boolean)
+      : Array.isArray(product_ids) && product_ids.length
       ? product_ids
       : Array.isArray(items)
       ? items.map((item) => item?.product_id || item).filter(Boolean)
       : [];
 
-    if (!requestedProductIds.length || !customer_email) {
-      return secureJson({ error: "Missing required fields" }, { status: 400 });
+    if (!customer_email) {
+      return secureJson(
+        { error: "Customer email is required", code: "customer_email_required", request_id: requestId },
+        { status: 400 }
+      );
+    }
+
+    if (!requestedProductIds.length) {
+      return secureJson(
+        { error: "Select at least one product or package", code: "checkout_selection_required", request_id: requestId },
+        { status: 400 }
+      );
     }
 
     const capacity = await assertCheckoutCapacityAvailable({ base44 });
@@ -95,6 +126,7 @@ Deno.serve(async (req) => {
     console.log("[createCheckoutSession] checkout request accepted", {
       requestId,
       requestedProductCount: requestedProductIds.length,
+      requestedPackageKey: requestedPackage?.package_key || "",
       packageType,
       livemode,
       stripeMode,
@@ -163,6 +195,7 @@ Deno.serve(async (req) => {
       selected_package_type: pricingSummary.package_offer?.package_key || "",
       plan_type: packageLabel,
       package_stripe_product_id: pricingSummary.package_offer?.stripe_product_id || "",
+      requested_package_key: requestedPackage?.package_key || "",
       request_id: requestId,
       deploy_immediately: deploy_immediately ? "true" : "false",
     };
