@@ -5,12 +5,6 @@ import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import SectionHeader from "@/components/design-system/SectionHeader";
 import IndustryContextBanner from "./IndustryContextBanner";
 
-const PACKAGE_CHECKOUT_URLS = {
-  starter_system: "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
-  growth_system: "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
-  pro_system: "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
-};
-
 const PACKAGES = [
   {
     name: "Starter",
@@ -74,6 +68,8 @@ const PACKAGES = [
     accentGlow: "rgba(0,59,143,0.16)",
   },
 ];
+
+const getPackageCheckoutPath = (packageId) => `/store?package=${encodeURIComponent(packageId)}`;
 
 export default function ThreeSystemsSection() {
   return (
@@ -196,7 +192,7 @@ export default function ThreeSystemsSection() {
                     type="button"
                     onClick={() => {
                       trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.packageId });
-                      window.location.href = PACKAGE_CHECKOUT_URLS[pkg.packageId] || "/pricing";
+                      window.location.href = getPackageCheckoutPath(pkg.packageId);
                     }}
                     className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200 cursor-pointer border-none"
                     style={pkg.highlight ? {
