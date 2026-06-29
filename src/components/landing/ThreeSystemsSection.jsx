@@ -1,9 +1,15 @@
 import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Wallet } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
 import SectionHeader from "@/components/design-system/SectionHeader";
 import IndustryContextBanner from "./IndustryContextBanner";
+
+const PACKAGE_CHECKOUT_URLS = {
+  starter_system: "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
+  growth_system: "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
+  pro_system: "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
+};
 
 const PACKAGES = [
   {
@@ -21,7 +27,7 @@ const PACKAGES = [
       "Basic follow-up",
     ],
     cta: "Start With Starter",
-    href: "/product-signup?package=starter_system",
+    packageId: "starter_system",
     highlight: false,
     accent: "#00AEEF",
     accentBorder: "rgba(0,174,239,0.12)",
@@ -41,7 +47,7 @@ const PACKAGES = [
       "Client dashboard",
     ],
     cta: "Start With Growth",
-    href: "/product-signup?package=growth_system",
+    packageId: "growth_system",
     highlight: true,
     accent: "#00AEEF",
     accentBorder: "rgba(0,174,239,0.45)",
@@ -61,7 +67,7 @@ const PACKAGES = [
       "Expanded automation stack",
     ],
     cta: "Start With Pro",
-    href: "/product-signup?package=pro_system",
+    packageId: "pro_system",
     highlight: false,
     accent: "#003B8F",
     accentBorder: "rgba(0,59,143,0.18)",
@@ -70,7 +76,6 @@ const PACKAGES = [
 ];
 
 export default function ThreeSystemsSection() {
-  const navigate = useNavigate();
   return (
     <section
       id="pricing"
@@ -117,7 +122,7 @@ export default function ThreeSystemsSection() {
 
         {/* Package cards */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 pt-5 items-stretch">
-          {PACKAGES.map((pkg, idx) => (
+          {PACKAGES.map((pkg) => (
             <div
               key={pkg.name}
               className="relative flex flex-col"
@@ -190,8 +195,8 @@ export default function ThreeSystemsSection() {
                   <button
                     type="button"
                     onClick={() => {
-                      trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.href.split("=")[1] });
-                      navigate(pkg.href);
+                      trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.packageId });
+                      window.location.href = PACKAGE_CHECKOUT_URLS[pkg.packageId] || "/pricing";
                     }}
                     className="w-full text-center inline-flex items-center justify-center gap-2 rounded-full font-bold text-sm transition-all duration-200 cursor-pointer border-none"
                     style={pkg.highlight ? {
