@@ -22,17 +22,21 @@ function initApp() {
     console.error('Critical error rendering App:', err);
     const root = document.getElementById('root');
     if (root) {
-      root.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>⚠️ App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
+      root.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
     }
   }
 }
 
 initApp()
 
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+// Launch hardening: do not register a service worker while custom-domain routing
+// and Base44 publishing are being stabilized. A stale worker can keep serving old
+// app shells after rollback/publish events. Clear existing workers safely.
+if ('serviceWorker' in navigator) {
   window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then((registration) => {
-      registration.update().catch(() => {});
-    }).catch(() => {});
+    navigator.serviceWorker
+      .getRegistrations()
+      .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
+      .catch(() => {});
   });
 }
