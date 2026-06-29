@@ -25,6 +25,11 @@ The app was reverted to a previous working Base44 version after the custom domai
    - Stopped registering the service worker during launch hardening.
    - Unregisters existing service workers on load to prevent stale cached app shells from surviving rollback/publish events.
 
+3. `README_ENV.md`
+   - Added explicit production/test Stripe mode requirements.
+   - Added analytics environment variable requirements and canonical production GA4 id.
+   - Documented that `OPENAI_API_KEY` is server-side only and required by AI functions.
+
 ## Remaining P0 launch blockers
 
 1. Public app shell
