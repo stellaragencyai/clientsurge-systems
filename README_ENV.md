@@ -56,6 +56,13 @@ This document lists the production environment variables the app and Base44 func
 - `GOOGLE_PLACES_API_KEY`
 - `CALENDLY_SCHEDULING_URL`
 
+## Public Shell Notes
+
+- `index.html` must not include duplicate GA4 measurement IDs.
+- The public shell should only reference `G-H6QT342ZN9` unless a future migration intentionally changes the production property.
+- The public fallback must not expose admin, mission-control, setup, reconciliation, observability, or other internal route names.
+- PWA/iOS app-shell behavior should stay disabled until there is a deliberate PWA release plan.
+
 ## Notes
 
 - Stripe production deploys should use live keys only.
