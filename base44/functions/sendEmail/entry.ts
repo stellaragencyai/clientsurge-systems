@@ -1,4 +1,4 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
 
 const CLIENTSURGE_DOMAIN = "clientsurgesystems.com";
 const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
