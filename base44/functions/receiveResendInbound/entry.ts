@@ -78,7 +78,27 @@ Deno.serve(async (req) => {
     const base44 = createClientFromRequest(req);
     const rawPayload = await req.text();
 
-    // ── Verify Svix signature (if secret is configured) ──
+    // ── Parse body first to distinguish webhook events from scheduled triggers ──
+    // Resend delivers inbound replies via webhooks (not a polling API), so scheduled
+    // calls have no event payload. We no-op those instead of failing.
+    let body = {};
+    if (rawPayload && rawPayload.trim() !== '') {
+      try {
+        body = JSON.parse(rawPayload);
+      } catch {
+        return Response.json({ success: true, event: 'scheduled_poll', message: 'Non-webhook trigger ignored.' });
+      }
+    }
+
+    const { type, email, message_id, bounced, created_at } = body;
+
+    // No Resend event type → scheduled/automation trigger, not a webhook → no-op
+    if (!type) {
+      return Response.json({ success: true, event: 'scheduled_poll', message: 'No webhook event — Resend inbound replies are delivered via webhook, not polling.' });
+    }
+
+    // ── Verify Svix signature for real webhook events ──
+    // Any payload with a Resend event type must pass signature verification.
     const secret = Deno.env.get('RESEND_WEBHOOK_SECRET');
     if (secret) {
       const verification = await verifySvixSignature(rawPayload, req.headers, secret);
@@ -86,15 +106,10 @@ Deno.serve(async (req) => {
         console.warn('[receiveResendInbound] Rejected webhook:', verification.reason);
         return Response.json({ error: 'Invalid signature' }, { status: 401 });
       }
-    } else {
-      console.warn('[receiveResendInbound] No RESEND_WEBHOOK_SECRET set — skipping verification');
     }
 
-    const body = JSON.parse(rawPayload);
-    const { type, email, message_id, bounced, created_at } = body;
-
     if (!email && !body?.data?.to) {
-      return Response.json({ error: 'Email required in webhook' }, { status: 400 });
+      return Response.json({ success: true, event: type, message: 'No recipient email in webhook — ignored.' });
     }
 
     const recipientEmail = email || body?.data?.to;
