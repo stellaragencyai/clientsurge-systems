@@ -4,12 +4,29 @@ This document lists the production environment variables the app and Base44 func
 
 ## Payments
 
+- `STRIPE_MODE`
+  - Required. Use `live` for production and `test` only for controlled test proofing.
+- `STRIPE_LIVE_SECRET_KEY`
+  - Required for production checkout/webhooks. Must start with `sk_live_`.
+- `STRIPE_TEST_SECRET_KEY`
+  - Required for test proofing. Must start with `sk_test_`.
 - `STRIPE_SECRET_KEY`
+  - Legacy fallback used by some older functions. Prefer explicit live/test keys above.
 - `STRIPE_PUBLISHABLE_KEY`
 - `STRIPE_WEBHOOK_SECRET`
+- `STRIPE_TEST_WEBHOOK_SECRET`
 - `STRIPE_PRICE_STARTER_SYSTEM`
 - `STRIPE_PRICE_GROWTH_SYSTEM`
 - `STRIPE_PRICE_ELITE_SYSTEM`
+
+## Analytics
+
+- `VITE_GA4_MEASUREMENT_ID`
+  - Production value: `G-H6QT342ZN9`.
+- `VITE_GOOGLE_ANALYTICS_ID`
+  - Optional alias. Keep aligned with `VITE_GA4_MEASUREMENT_ID` if used.
+- `VITE_GA_MEASUREMENT_ID`
+  - Optional alias. Keep aligned with `VITE_GA4_MEASUREMENT_ID` if used.
 
 ## Messaging
 
@@ -23,6 +40,7 @@ This document lists the production environment variables the app and Base44 func
 ## AI / LLM
 
 - `OPENAI_API_KEY`
+  - Server-side only. Required by chatBubbleAI, classifyLeadIntent, runSniperSearch, template generation, and lead magnet/website generation functions.
 - `ELEVENLABS_API_KEY`
 
 ## Monitoring / Internal Ops
@@ -42,4 +60,5 @@ This document lists the production environment variables the app and Base44 func
 
 - Stripe production deploys should use live keys only.
 - Twilio and Resend credentials must be set in the deployed Base44 environment, not just local dev.
+- OpenAI keys must never be exposed to client-side code.
 - If a feature uses a vendor callback URL, the callback must point at the currently deployed Base44 function URL.
