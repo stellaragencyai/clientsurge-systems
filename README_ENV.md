@@ -64,6 +64,7 @@ This document lists the production environment variables the app and Base44 func
 - The public fallback must not expose admin, mission-control, setup, reconciliation, observability, or other internal route names.
 - The fallback is allowed to link only to public marketing, login, privacy, and terms routes.
 - PWA/iOS app-shell behavior should stay disabled until there is a deliberate PWA release plan.
+- After any public shell change, publish through Base44 and purge Cloudflare cache before judging the live domain.
 
 ## Notes
 
