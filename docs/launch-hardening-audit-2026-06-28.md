@@ -30,6 +30,13 @@ The app was reverted to a previous working Base44 version after the custom domai
    - Added analytics environment variable requirements and canonical production GA4 id.
    - Documented that `OPENAI_API_KEY` is server-side only and required by AI functions.
 
+4. `index.html`
+   - Removed the duplicate hardcoded GA4 property and kept only `G-H6QT342ZN9`.
+   - Added `data-ga4-measurement-id` to the static GA4 script so the React GA4 installer can detect the existing script and avoid duplicate page views.
+   - Removed PWA/iOS app shell meta and manifest tags from the public shell.
+   - Replaced the large static route-directory fallback with a public-safe marketing fallback that excludes internal/admin routes.
+   - Kept the React/Vite entry script intact: `/src/main.jsx`.
+
 ## Remaining P0 launch blockers
 
 1. Public app shell
@@ -37,8 +44,8 @@ The app was reverted to a previous working Base44 version after the custom domai
    - Confirm Base44 no longer exposes internal page-directory output on the public domain.
 
 2. Analytics
-   - `index.html` still contains two GA4 IDs. Keep `G-H6QT342ZN9`; remove `G-XRYMZ1M31K` after confirming no older property is required.
    - Confirm page view, CTA click, pricing view, checkout click, and form submit events appear in GA4 and Base44 `ConversionTrackingEvent`.
+   - Confirm only `G-H6QT342ZN9` receives new production events.
 
 3. Stripe checkout
    - Verify package price IDs in `src/lib/salesCatalog.js` match actual Stripe products/prices.
@@ -55,20 +62,12 @@ The app was reverted to a previous working Base44 version after the custom domai
    - Verify Twilio voice URL: `https://clientsurgesystems.com/functions/receiveInboundVoiceCall`.
    - Review recent Twilio error code `30032` and the missing `params['to']` error in historical logs.
 
-6. Public route privacy
-   - Remove public exposure of admin, mission-control, setup, reconciliation, and system-observability route names from any fallback/directory shell.
-
-7. PWA/iOS behavior
-   - Remove or neutralize the manifest and iOS web-app meta tags unless there is a deliberate PWA release plan.
-   - Keep service worker disabled until deployment is stable.
-
 ## Remaining P1/P2 launch hardening
 
 - Validate `/`, `/pricing`, `/store`, `/automations`, `/contact`, `/product-signup`, `/order-success`, `/login`, and `/admin` manually.
 - Confirm mobile scroll, nav close, checkout modal/sidebar, and forms do not lock body scroll.
 - Confirm Cloudflare cache is purged after final publish.
 - Confirm only one production analytics property is active.
-- Build a clean emergency fallback that looks like the real homepage without exposing internal routes.
 
 ## Recommendation
 
