@@ -13,7 +13,6 @@ import {
   Scale,
   Building2,
   PawPrint,
-  Car,
 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -134,39 +133,15 @@ const industries = [
   },
   {
     id: "veterinary",
-    title: "Veterinary & Vet Care",
+    title: "Veterinary Clinics",
     status: "Live",
     icon: PawPrint,
     accent: "text-[#005f99]",
     accentBg: "bg-primary/10 border-primary/20",
     ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
     description:
-      "Recover missed calls, automate appointment follow-up, and help pet owners get fast responses.",
+      "Built for veterinary practices that need faster response to appointment requests, missed-call text-back, after-hours inquiry capture, automated reminders, and consistent lead follow-up.",
     href: "/veterinary",
-  },
-  {
-    id: "automotive",
-    title: "Automotive Services",
-    status: "Live",
-    icon: Car,
-    accent: "text-[#005f99]",
-    accentBg: "bg-primary/10 border-primary/20",
-    ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
-    description:
-      "Built for auto repair shops, dealerships, and mobile detailers that need faster quote follow-up, appointment booking automation, and missed-call recovery to keep bays full.",
-    href: "/automotive",
-  },
-  {
-    id: "landscaping",
-    title: "Landscaping & Lawn Care",
-    status: "Live",
-    icon: Droplets,
-    accent: "text-[#005f99]",
-    accentBg: "bg-primary/10 border-primary/20",
-    ctaClass: "border-primary/25 bg-primary/5 text-primary hover:bg-primary/10",
-    description:
-      "Built for landscaping and lawn care businesses that need faster quote follow-up, seasonal lead capture, missed-call text-back, and appointment booking automation.",
-    href: "/landscaping",
   },
 ];
 
@@ -183,7 +158,7 @@ export default function Industries() {
     return setPageMetadata({
       title: "Industries We Serve | ClientSurge Systems",
       description:
-        "Explore the industries ClientSurge Systems serves: roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, personal injury, veterinary, automotive, and landscaping.",
+        "Explore the industries ClientSurge Systems serves: roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, personal injury, and veterinary clinics.",
       canonicalPath: "/industries",
       ogTitle: "Industries We Serve | ClientSurge Systems",
       ogDescription:

@@ -139,12 +139,6 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "AI automation for real estate agents and brokers: faster lead response, automated follow-up, consultation booking, missed-call recovery, and old inquiry reactivation.",
   },
-  "/veterinary": {
-    key: "veterinary",
-    title: "Veterinary Clinic Automation Systems | ClientSurge Systems",
-    description:
-      "AI automation for veterinary clinics: missed-call recovery, appointment request capture, after-hours inquiry handling, reminders, and lead follow-up.",
-  },
   "/privacy-policy": {
     key: "privacy",
     title: "Privacy Policy | ClientSurge Systems",
@@ -292,9 +286,11 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/contact",
   "/faq",
   "/industries",
+  "/library",
   "/login",
   "/our-system",
   "/pricing",
+  "/product",
   "/product-signup",
   "/register",
   "/reset-password",
@@ -322,7 +318,6 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/contractors",
   "/personal-injury",
   "/real-estate",
-  "/veterinary",
   "/success",
   "/order-success",
   "/thank-you",
@@ -343,7 +338,6 @@ export const PUBLIC_ROUTE_PATHS = [
   "/industries/chiropractic",
   "/industries/personal-injury",
   "/industries/real-estate",
-  "/industries/veterinary",
 ];
 
 // App shell behavior is slightly broader than indexable/public SEO routes.
@@ -433,7 +427,6 @@ export const SITEMAP_STATIC_PATHS = [
   "/contractors",
   "/personal-injury",
   "/real-estate",
-  "/veterinary",
   "/lead-capture-automation",
   "/missed-call-text-back",
   "/ai-lead-follow-up",

@@ -64,7 +64,7 @@ export default function FeatureComparisonTable() {
                   Growth
                 </th>
                 <th className="text-center py-4 px-6 font-semibold text-black">
-                  Pro System
+                  Elite
                 </th>
                 <th className="text-center py-4 px-6 font-semibold text-black">
                   Agency

@@ -1,40 +1,38 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
+import App from '@/App.jsx'
 import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
-import '@/theme-restore.css'
-import '@/no-ios-theme.css'
-import App from './App.jsx'
-import { installLightThemeGuard } from '@/lib/restoreLightTheme'
-import { installScrollExperienceGuard } from '@/lib/scrollExperienceGuard'
-import { installAnimationRestoreGuard } from '@/lib/restoreAnimations'
-import { installIosThemeArtifactGuard } from '@/lib/neutralizeIosThemeArtifacts'
 
-installLightThemeGuard()
-installScrollExperienceGuard()
-installAnimationRestoreGuard()
-installIosThemeArtifactGuard()
-
-document.documentElement.classList.add('app-hydrated')
-document.documentElement.classList.remove('no-js')
-document.documentElement.classList.add('js')
-
-if (typeof navigator !== 'undefined' && 'serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations?.().then((registrations) => {
-    registrations.forEach((registration) => registration.unregister?.().catch(() => {}))
-  }).catch(() => {})
+// Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
+const staticFallback = document.querySelector('.static-fallback');
+if (staticFallback) {
+  staticFallback.style.display = 'none';
 }
 
-if (typeof caches !== 'undefined') {
-  caches.keys?.().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {})
+// Initialize with error boundary for debugging
+function initApp() {
+  try {
+    const app = <App />
+    ReactDOM.createRoot(document.getElementById('root')).render(
+      import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
+    )
+  } catch (err) {
+    console.error('Critical error rendering App:', err);
+    const root = document.getElementById('root');
+    if (root) {
+      root.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>⚠️ App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
+    }
+  }
 }
 
-const root = document.getElementById('root')
-if (!root) {
-  throw new Error('ClientSurge boot failed: missing #root element')
-}
+initApp()
 
-ReactDOM.createRoot(root).render(
-  import.meta.env.DEV ? <React.StrictMode><App /></React.StrictMode> : <App />
-)
+if (import.meta.env.PROD && 'serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js').then((registration) => {
+      registration.update().catch(() => {});
+    }).catch(() => {});
+  });
+}

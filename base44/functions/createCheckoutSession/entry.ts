@@ -318,39 +318,6 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Invalid phone number format", request_id: requestId }, { status: 400 });
     }
 
-    // Resolve origin early for handoff URLs
-    const origin = req.headers.get("origin") || "https://clientsurgesystems.com";
-
-    // Build pricing summary for audit trail
-    const pricingSummary = pkgOffer ? {
-      pricing_version: "2026-06-28-v1",
-      package_key: pkgOffer.package_key,
-      package_name: pkgOffer.name,
-      package_service_keys: pkgOffer.included_service_keys,
-      add_on_service_keys: [],
-      selected_service_keys: pkgOffer.included_service_keys,
-      selected_product_ids: orderItems.map(item => item.product_id),
-      total_setup_before_discount: totalSetup,
-      total_monthly_before_discount: totalMonthly,
-      total_setup: totalSetup,
-      total_monthly: totalMonthly,
-      setup_discount_total: 0,
-      monthly_discount_total: 0,
-    } : null;
-
-    // Build purchase onboarding handoff stub
-    const purchaseOnboardingHandoff = pkgOffer ? {
-      package_key: pkgOffer.package_key,
-      package_name: pkgOffer.name,
-      customer_email,
-      business_name: business_name || "",
-      next_step_url: `${origin}/setup/credentials`,
-      client_portal_url: `${origin}/client-portal`,
-      included_service_keys: pkgOffer.included_service_keys,
-      created_at: new Date().toISOString(),
-      source: "stripe_checkout",
-    } : null;
-
     // Create Order record with idempotency + normalized phone
     const order = await base44.asServiceRole.entities.Order.create({
       customer_email,
@@ -363,10 +330,9 @@ Deno.serve(async (req) => {
       items: orderItems,
       total_setup: totalSetup,
       total_monthly: totalMonthly,
-      pricing_summary: pricingSummary,
-      purchase_onboarding_handoff: purchaseOnboardingHandoff,
       payment_status: "pending",
       order_status: "pending_payment",
+      package_key: pkgOffer?.package_key || null,
       selected_package_type: pkgOffer?.package_key || null,
       package_type: pkgOffer?.package_key || null,
       plan_type: packageLabel,
@@ -374,6 +340,7 @@ Deno.serve(async (req) => {
     });
     createdOrderId = order.id;
 
+    const origin = req.headers.get("origin") || "https://app.clientsurgesystems.com";
     const finalSuccessUrl = success_url || `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`;
     const finalCancelUrl = cancel_url || `${origin}/store`;
 
@@ -389,9 +356,7 @@ Deno.serve(async (req) => {
       business_name: business_name || "",
       package_key: pkgOffer?.package_key || "",
       package_type: pkgOffer?.package_key || "",
-      selected_package_type: pkgOffer?.package_key || "",
       plan_type: packageLabel,
-      package_stripe_product_id: pkgOffer?.stripe_product_id || "",
       request_id: requestId,
       idempotency_key: requestId,
       deploy_immediately: deploy_immediately ? "true" : "false",
@@ -406,8 +371,6 @@ Deno.serve(async (req) => {
         metadata: {
           order_id: order.id,
           package_key: pkgOffer?.package_key || "",
-          package_type: pkgOffer?.package_key || "",
-          selected_package_type: pkgOffer?.package_key || "",
           plan_type: packageLabel,
           request_id: requestId,
         },

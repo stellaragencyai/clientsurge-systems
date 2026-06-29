@@ -19,7 +19,7 @@ const WEBHOOK_INSTRUCTIONS_EMAIL = `
   <li>✅ Check your email for setup progress updates</li>
 </ul>
 
-<p>Questions? Reply to this email or visit <a href="https://clientsurgesystems.com/contact">clientsurgesystems.com/contact</a>.</p>
+<p>Questions? Reply to this email or call <a href="tel:+16025843227">(602) 584-3227</a></p>
 <p><em>— The ClientSurge Systems Team</em></p>
 `;
 
@@ -63,10 +63,7 @@ Deno.serve(async (req) => {
     const customerEmail = order.customer_email;
     const customerName = order.customer_name || "there";
     const resendApiKey = Deno.env.get("RESEND_API_KEY");
-    const configuredFromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "";
-    const fromEmail = configuredFromEmail && !configuredFromEmail.toLowerCase().includes("noreply@")
-      ? configuredFromEmail
-      : "support@clientsurgesystems.com";
+    const fromEmail = Deno.env.get("RESEND_FROM_EMAIL") || "support@clientsurgesystems.com";
 
     if (resendApiKey && customerEmail) {
       await fetch("https://api.resend.com/emails", {
@@ -80,7 +77,6 @@ Deno.serve(async (req) => {
           to: [customerEmail],
           subject: "Your AI Systems Are Being Activated — Next Steps",
           html: `<p>Hi ${customerName},</p>${WEBHOOK_INSTRUCTIONS_EMAIL}`,
-          reply_to: Deno.env.get("RESEND_REPLY_TO_EMAIL") || "support@clientsurgesystems.com",
         }),
       });
     }

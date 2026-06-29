@@ -14,7 +14,7 @@ const PAGE_META = {
   },
   "/pricing": {
     title: "Pricing & Packages | ClientSurge Systems",
-    description: "Simple month-to-month pricing. Starter, Growth, and Pro System automation packages with no long-term contracts. One-time setup + monthly service.",
+    description: "Simple month-to-month pricing. Starter, Growth, and Elite automation packages with no long-term contracts. One-time setup + monthly service.",
     ogTitle: "Transparent AI Automation Pricing | ClientSurge Systems",
   },
   "/automations": {

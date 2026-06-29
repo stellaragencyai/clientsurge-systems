@@ -16,36 +16,6 @@ function getLockState() {
   return window[LOCK_STATE_KEY];
 }
 
-function unlockBody({ restoreScroll = true } = {}) {
-  if (typeof window === "undefined" || typeof document === "undefined") {
-    return;
-  }
-
-  const body = document.body;
-  const state = getLockState();
-  if (!body || !state) return;
-
-  const restoreY = state.scrollY || window.scrollY || window.pageYOffset || 0;
-
-  state.tokens.clear();
-  state.scrollY = 0;
-  body.classList.remove("nav-open");
-  body.style.removeProperty("--scroll-lock-top");
-
-  if (restoreScroll) {
-    window.requestAnimationFrame(() => window.scrollTo(0, restoreY));
-  }
-}
-
-export function releaseAllBodyScrollLocks(options) {
-  unlockBody(options);
-}
-
-export function hasActiveBodyScrollLocks() {
-  const state = getLockState();
-  return Boolean(state?.tokens?.size);
-}
-
 export function acquireBodyScrollLock(reason = "overlay") {
   if (typeof window === "undefined" || typeof document === "undefined") {
     return () => {};
@@ -83,6 +53,10 @@ export function acquireBodyScrollLock(reason = "overlay") {
       return;
     }
 
-    unlockBody({ restoreScroll: true });
+    const restoreY = state.scrollY;
+    body.classList.remove("nav-open");
+    body.style.removeProperty("--scroll-lock-top");
+    state.scrollY = 0;
+    window.scrollTo(0, restoreY);
   };
 }

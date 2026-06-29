@@ -1,5 +1,4 @@
 import { lazy, Suspense, useEffect } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import { QueryClientProvider } from "@tanstack/react-query";
 import {
   BrowserRouter as Router,
@@ -154,7 +153,6 @@ const INDUSTRY_ROUTE_SLUGS = [
   "personal-injury",
   "property-services",
   "veterinary",
-  "landscaping",
 ];
 
 const HIDDEN_PUBLIC_ROUTES = [
@@ -433,15 +431,7 @@ const AuthenticatedAppWithTenant = () => {
   }
 
   return (
-    <AnimatePresence mode="wait">
-    <motion.div
-      key={location.pathname}
-      initial={{ opacity: 0, x: 12 }}
-      animate={{ opacity: 1, x: 0 }}
-      exit={{ opacity: 0, x: -12 }}
-      transition={{ duration: 0.18, ease: "easeInOut" }}
-    >
-    <Routes location={location}>
+    <Routes>
       {LEGACY_REDIRECTS.map(({ from, to }) => (
         <Route
           key={from}
@@ -454,94 +444,140 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
-
-      {/* Public pages */}
+      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
+      <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
+      <Route path="/signup" element={<SignupForward />} />
+      <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
+      <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
       <Route path="/book" element={<LazyRoute Component={Book} />} />
-      <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
-      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
-      <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
-      <Route path="/signup" element={<SignupForward />} />
-      <Route path="/faq" element={<LazyRoute Component={FAQPage} />} />
-      <Route path="/our-system" element={<LazyRoute Component={OurSystemPage} />} />
-      <Route path="/testimonials" element={<LazyRoute Component={TestimonialsPage} />} />
-      <Route path="/contact" element={<LazyRoute Component={Contact} />} />
+      <Route path="/book-demo" element={<Navigate to="/book" replace />} />
       <Route path="/industries" element={<LazyRoute Component={Industries} />} />
-      <Route path="/blog" element={<LazyRoute Component={Blog} />} />
-      <Route path="/about" element={<LazyRoute Component={About} />} />
-      <Route path="/automations" element={<LazyRoute Component={Automations} />} />
-      <Route path="/library" element={<LazyRoute Component={Library} />} />
-      <Route path="/store" element={<LazyRoute Component={Store} />} />
-      <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
-      <Route path="/proof" element={<LazyRoute Component={ProofPage} />} />
-      <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
-      <Route path="/dashboard-entry" element={<LazyRoute Component={ClientDashboardEntry} />} />
-      <Route path="/how-it-works-page" element={<LazyRoute Component={HowItWorksPage} />} />
-
-      {/* Legal pages */}
-      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" />} />
-      <Route path="/terms" element={<LazyRoute Component={LegalPage} fixedType="terms" />} />
-      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} fixedType="refund" />} />
-
-      {/* Industry routes */}
-      {INDUSTRY_ROUTE_SLUGS.filter(slug => slug !== "real-estate" && slug !== "personal-injury").map(slug => (
-        <Route key={slug} path={`/${slug}`} element={<LazyRoute Component={IndustryPageTemplate} />} />
-      ))}
-      <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
-      <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
-
-      {/* Hidden public routes */}
-      {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => (
-        <Route key={route} path={route} element={<LazyRoute Component={Component} />} />
-      ))}
-
-      {/* Automation service pages */}
-      {AUTOMATION_SERVICE_ROUTES.map(route => (
-        <Route key={route} path={route} element={<LazyRoute Component={AutomationServicePage} />} />
-      ))}
-
-      {/* Auth pages */}
+      <Route path={routePath("faq")} element={<LazyRoute Component={FAQPage} />} />
+      <Route path={routePath("our-system")} element={<LazyRoute Component={OurSystemPage} />} />
+      <Route path={routePath("testimonials")} element={<LazyRoute Component={TestimonialsPage} />} />
+      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy-policy" />} />
+      <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
+      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} fixedType="refund" canonicalPath="/refund-policy" />} />
       <Route path="/login" element={<LazyRoute Component={Login} />} />
       <Route path="/register" element={<LazyRoute Component={Register} />} />
       <Route path="/forgot-password" element={<LazyRoute Component={ForgotPassword} />} />
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
+      <Route path="/opt-out" element={<LazyRoute Component={lazy(() => import("./pages/OptOut"))} />} />
+      <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
+      <Route path="/contact" element={<LazyRoute Component={Contact} />} />
+      <Route path="/blog" element={<LazyRoute Component={Blog} />} />
+      <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />
+      <Route path="/library" element={<LazyRoute Component={Library} />} />
+      <Route
+        path="/store"
+        element={<LazyRoute Component={Store} />}
+      />
+      <Route path="/about" element={<LazyRoute Component={About} />} />
+      <Route path="/automations" element={<LazyRoute Component={Automations} />} />
+      <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
+      <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
+      <Route path="/proof" element={<LazyRoute Component={ProofPage} />} />
+      {AUTOMATION_SERVICE_ROUTES.map((path) => (
+        <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
+      ))}
+      <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
+      <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
+      {INDUSTRY_ROUTE_SLUGS.filter(slug => slug !== "real-estate" && slug !== "personal-injury").map((slug) => (
+        <Route
+          key={slug}
+          path={`/${slug}`}
+          element={<LazyRoute Component={IndustryPageTemplate} />}
+        />
+      ))}
+      {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => (
+        <Route key={route} path={route} element={<LazyRoute Component={Component} />} />
+      ))}
+      <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
 
-      {/* Protected client routes */}
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/client-portal" element={<LazyRoute Component={ClientPortal} />} />
-        <Route path="/client-dashboard" element={<LazyRoute Component={ClientSaasDashboard} />} />
+      {/* EMERGENCY: Catch-all to block Base44 Pages directory before admin routes */}
+      <Route path="/_generated/*" element={<Navigate to="/" replace />} />
+      <Route path="/pages" element={<Navigate to="/" replace />} />
+      <Route path="/pages/*" element={<Navigate to="/" replace />} />
+
+      <Route
+        element={
+          <ProtectedRoute unauthenticatedElement={<AuthRedirectFallback />} />
+        }
+      >
+        {[
+          { route: routePath("client-portal"), Component: ClientPortal },
+          { route: routePath("client-dashboard"), Component: ClientDashboard },
+          { route: routePath("client-saas"), Component: ClientSaasDashboard },
+          { route: routePath("dashboard-entry"), Component: ClientDashboardEntry },
+        ].map(({ route, Component }) => (
+          <Route
+            key={route}
+            path={route}
+            element={
+              <Suspense fallback={<RouteLoadingSkeleton />}>
+                <Component />
+              </Suspense>
+            }
+          />
+        ))}
       </Route>
 
-      {/* Protected admin routes */}
-      <Route element={<ProtectedRoute unauthenticatedElement={<Navigate to="/login" replace />} />}>
-        <Route path="/admin" element={<LazyRoute Component={AdminDashboard} />} />
-        <Route path="/admin/leads/:leadId" element={<LazyRoute Component={AdminLeadDetail} />} />
-        <Route path="/admin/automation" element={<LazyRoute Component={AdminAutomation} />} />
-        <Route path="/admin/onboarding" element={<LazyRoute Component={AdminOnboarding} />} />
-        <Route path="/admin/install-guide" element={<LazyRoute Component={AdminInstallGuide} />} />
-        <Route path="/admin/sales-command-center" element={<LazyRoute Component={AISalesCommandCenter} />} />
-        <Route path="/admin/performance-wars" element={<LazyRoute Component={PerformanceWars} />} />
-        <Route path="/admin/onboarding-pipeline" element={<LazyRoute Component={OnboardingPipeline} />} />
-        <Route path="/admin/reconciliation" element={<LazyRoute Component={AdminReconciliation} />} />
-        <Route path="/admin/function-audit" element={<LazyRoute Component={FunctionAudit} />} />
-        <Route path="/admin/opportunity-review" element={<LazyRoute Component={OpportunityReviewQueue} />} />
-        <Route path="/saas/admin" element={<LazyRoute Component={SaaSAdminPanel} />} />
-        <Route path="/mission-control" element={<LazyRoute Component={MissionControlDashboard} />} />
-        <Route path="/mission-control/logs" element={<LazyRoute Component={MissionControlLogs} />} />
-        <Route path="/launch-control" element={<LazyRoute Component={LaunchControl} />} />
-        <Route path="/funnel-optimization" element={<LazyRoute Component={FunnelOptimizationPage} />} />
-        <Route path="/system-observability" element={<LazyRoute Component={SystemObservabilityDashboard} />} />
+      <Route
+        element={
+          <ProtectedRoute
+            allowedRoles={["admin", "super_admin"]}
+            unauthenticatedElement={<AuthRedirectFallback />}
+            unauthorizedElement={<AccessDeniedPage />}
+          />
+        }
+      >
+        {[
+          { route: routePath("dashboard"), Component: AdminDashboard },
+          { route: routePath("admin-settings"), Component: AdminDashboard },
+          { route: routePath("mission-control"), element: <Navigate to="/admin" replace /> },
+          { route: routePath("admin"), Component: AdminDashboard },
+          { route: routePath("admin", "leads"), element: <Navigate to={`${routePath("admin")}?tab=leads`} replace /> },
+          { route: routePath("admin", "leads", dynamicParam("leadId")), Component: AdminLeadDetail },
+          { route: routePath("admin", "automations"), Component: AdminAutomation },
+          { route: routePath("lead-intelligence"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("sam"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("medspa-dashboard"), element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("admin", "onboarding"), Component: AdminOnboarding },
+          { route: routePath("admin", "install-guide"), Component: AdminInstallGuide },
+          { route: routePath("admin", "ai-sales"), Component: AISalesCommandCenter },
+          { route: routePath("admin", "AIStatusDashboard"), caseSensitive: true, element: <Navigate to={routePath("admin")} replace /> },
+          { route: routePath("admin", "performance-wars"), Component: PerformanceWars },
+          { route: routePath("admin", "onboarding-pipeline"), Component: OnboardingPipeline },
+          { route: routePath("admin", "logs"), Component: MissionControlLogs },
+          { route: routePath("saas", "admin"), Component: SaaSAdminPanel },
+          { route: routePath("admin", "opportunity-review"), Component: OpportunityReviewQueue },
+          { route: routePath("admin", "audit"), Component: FunctionAudit },
+          { route: routePath("admin", "reconciliation"), Component: AdminReconciliation },
+          { route: routePath("admin", "system-observability"), Component: SystemObservabilityDashboard },
+          { route: routePath("admin", "funnel-optimization"), Component: FunnelOptimizationPage },
+           { route: routePath("admin", "conversion-insights"), Component: lazy(() => import("./pages/admin/ConversionInsights")) },
+           { route: routePath("admin", "task-status"), Component: lazy(() => import("./pages/admin/TaskStatusDashboard")) },
+           { route: routePath("admin", "runbook"), Component: lazy(() => import("./pages/admin/SystemRunbook")) },
+           { route: routePath("admin", "automation-health"), Component: lazy(() => import("./internal-pages/AutomationHealth")) },
+        ].map(({ route, Component, element, caseSensitive }) => (
+          <Route
+            key={route}
+            caseSensitive={caseSensitive}
+            path={route}
+            element={
+              element || (
+                <Suspense fallback={<AdminLoadingSkeleton />}>
+                  <Component />
+                </Suspense>
+              )
+            }
+          />
+        ))}
       </Route>
-
-      {/* Hash redirects */}
-      <Route path="/problem" element={<HashRedirect hash="#problem" />} />
-      <Route path="/solution" element={<HashRedirect hash="#solution" />} />
-      <Route path="/pricing-section" element={<HashRedirect hash="#pricing" />} />
 
       <Route path="*" element={<PageNotFound />} />
     </Routes>
-    </motion.div>
-    </AnimatePresence>
   );
 };
 

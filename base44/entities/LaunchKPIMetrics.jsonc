@@ -2,11 +2,6 @@
   "name": "LaunchKPIMetrics",
   "type": "object",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "launch_id": {
       "type": "string",
       "title": "Launch ID"

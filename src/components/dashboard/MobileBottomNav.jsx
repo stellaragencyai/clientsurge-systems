@@ -1,36 +1,16 @@
-import { LayoutDashboard, Users, MessageSquare } from "lucide-react";
+import { LayoutDashboard, Package, Headphones, Home } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-/**
- * MobileBottomNav — persistent bottom navigation bar for mobile devices only.
- * Shows on screens ≤640px. Hidden on desktop.
- *
- * Props:
- *   onNavigate?: (tabId: string) => void  — if provided, calls this instead of route navigation
- *   activeTab?: string                     — current active tab ID (when using onNavigate)
- */
-export default function MobileBottomNav({ onNavigate, activeTab }) {
+export default function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
   const tabs = [
-    { id: "overview", icon: LayoutDashboard, label: "Overview", path: "/client-portal", tabId: "progress" },
-    { id: "leads", icon: Users, label: "Leads", path: "/client-portal?tab=leads", tabId: "leads" },
-    { id: "messages", icon: MessageSquare, label: "Messages", path: "/client-portal?tab=support", tabId: "support" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/client-dashboard" },
+    { icon: Package, label: "Services", path: "/client-dashboard?tab=services" },
+    { icon: Headphones, label: "Support", path: "/client-dashboard?tab=support" },
+    { icon: Home, label: "Home", path: "/" },
   ];
-
-  const handleTabClick = (tab) => {
-    if (onNavigate) {
-      onNavigate(tab.tabId);
-    } else {
-      navigate(tab.path);
-    }
-  };
-
-  const isTabActive = (tab) => {
-    if (activeTab) return activeTab === tab.tabId;
-    return location.pathname === tab.path.split("?")[0];
-  };
 
   return (
     <>
@@ -52,16 +32,14 @@ export default function MobileBottomNav({ onNavigate, activeTab }) {
           .mobile-bottom-nav { display: flex; }
         }
       `}</style>
-      <nav className="mobile-bottom-nav" aria-label="Mobile bottom navigation">
+      <div className="mobile-bottom-nav">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = isTabActive(tab);
+          const isActive = location.pathname === tab.path;
           return (
             <button
-              key={tab.id}
-              onClick={() => handleTabClick(tab)}
-              aria-label={tab.label}
-              aria-current={isActive ? "page" : undefined}
+              key={tab.label}
+              onClick={() => navigate(tab.path)}
               style={{
                 flex: 1,
                 display: "flex",
@@ -85,7 +63,7 @@ export default function MobileBottomNav({ onNavigate, activeTab }) {
             </button>
           );
         })}
-      </nav>
+      </div>
     </>
   );
 }

@@ -7,11 +7,6 @@
     "tenant_scoped": "client_id"
   },
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

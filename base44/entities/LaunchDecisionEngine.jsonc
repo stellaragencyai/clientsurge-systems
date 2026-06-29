@@ -2,11 +2,6 @@
   "name": "LaunchDecisionEngine",
   "type": "object",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "decision_id": {
       "type": "string",
       "title": "Decision ID"

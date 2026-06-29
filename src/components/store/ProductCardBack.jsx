@@ -85,7 +85,7 @@ export default function ProductCardBack({ product, inCart, onToggle }) {
         }}>
           {inCart
             ? <><Check style={{ width: "12px", height: "12px" }} /> In Cart</>
-            : <><Plus style={{ width: "12px", height: "12px" }} /> Start My Automation Setup — ${product.monthly_fee}/mo</>}
+            : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart — ${product.monthly_fee}/mo</>}
         </span>
       </button>
     </div>

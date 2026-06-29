@@ -5,7 +5,7 @@ import { useLocation, useNavigate } from "react-router-dom";
 import PortalLoginModal from "../forms/PortalLoginModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
-import { acquireBodyScrollLock, releaseAllBodyScrollLocks } from "@/lib/bodyScrollLock";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
 import { SITE_CONFIG } from "@/lib/siteConfig";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
@@ -76,25 +76,6 @@ export default function Navbar() {
       if (solutionsCloseTimerRef.current) clearTimeout(solutionsCloseTimerRef.current);
       if (industriesCloseTimerRef.current) clearTimeout(industriesCloseTimerRef.current);
     };
-  }, []);
-
-  // ── Close mobile drawer on route changes so body scroll never stays locked ──
-  useEffect(() => {
-    setOpen(false);
-  }, [location.pathname, location.hash]);
-
-  // ── If viewport returns to desktop, release any stale mobile scroll lock ──
-  useEffect(() => {
-    const unlockDesktop = () => {
-      if (window.matchMedia("(min-width: 1280px)").matches) {
-        setOpen(false);
-        releaseAllBodyScrollLocks({ restoreScroll: false });
-      }
-    };
-
-    unlockDesktop();
-    window.addEventListener("resize", unlockDesktop, { passive: true });
-    return () => window.removeEventListener("resize", unlockDesktop);
   }, []);
 
   // ── Scroll detection ──

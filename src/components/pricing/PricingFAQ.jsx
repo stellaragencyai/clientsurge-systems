@@ -25,7 +25,7 @@ const faqItems = [
   {
     question: 'Can I upgrade later?',
     answer:
-      "Yes. You can upgrade from Starter to Growth to Pro System at any time. Your setup fee is credited toward the new plan, and we'll activate new features within 24 hours.",
+      "Yes. You can upgrade from Starter to Growth to Elite at any time. Your setup fee is credited toward the new plan, and we'll activate new features within 24 hours.",
   },
 ];
 

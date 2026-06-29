@@ -4,11 +4,6 @@
   "title": "Activation Wizard Session",
   "description": "Durable state record tracking the client's progress through the Pro Activation Wizard.",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

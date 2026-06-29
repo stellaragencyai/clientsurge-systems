@@ -4,11 +4,6 @@
   "title": "AI Business Profile",
   "description": "Client-specific AI brand voice profile. No AI-generated messages go live until approved.",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

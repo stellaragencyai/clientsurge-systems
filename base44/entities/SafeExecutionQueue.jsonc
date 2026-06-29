@@ -7,11 +7,6 @@
     "tenant_scoped": "client_project_id"
   },
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "action_id": {
       "type": "string",
       "title": "Action ID",

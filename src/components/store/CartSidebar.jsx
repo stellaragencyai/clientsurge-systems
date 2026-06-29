@@ -153,37 +153,11 @@ export default function CartSidebar() {
 
     try {
       const packageOffer = pricingSummary?.package_offer;
-      const attribution = readCheckoutLeadAttribution();
-
-      if (!packageOffer) {
-        clearTimeout(timeoutId);
-        setError("Checkout requires a Starter, Growth, or Pro package. Choose a complete package before continuing.");
-        setStep("info");
-        return;
-      }
-
-      const productIds = items.map(i => i.product_id).filter(Boolean);
-
-      const response = await base44.functions.invoke("createCheckoutSession", {
-        product_ids: productIds,
-        package_key: packageOffer.package_key,
-        customer_name: form.name,
-        customer_email: form.email,
-        customer_phone: form.phone || undefined,
-        business_name: form.business,
-        lead_id: attribution.lead_id || undefined,
-        crm_lead_id: attribution.crm_lead_id || undefined,
-        website_lead_id: attribution.website_lead_id || undefined,
-        success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${window.location.origin}/store`,
-      });
-
-      const checkoutUrl = response?.data?.url;
+      const checkoutUrl = packageOffer?.checkout_url;
 
       if (!checkoutUrl) {
         clearTimeout(timeoutId);
-        const errorMsg = response?.data?.error || "Checkout session could not be created. Please try again or contact support.";
-        setError(errorMsg);
+        setError("Checkout is not available for this selection. Please choose a complete package.");
         setStep("info");
         return;
       }
@@ -199,9 +173,10 @@ export default function CartSidebar() {
 
       clearTimeout(timeoutId);
       window.location.href = checkoutUrl;
+      return;
     } catch (e) {
       clearTimeout(timeoutId);
-      setError(e.message || "Checkout failed. Please try again or contact support.");
+      setError(e.message || "Checkout failed.");
       setStep("info");
     }
   };

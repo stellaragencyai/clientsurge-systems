@@ -1,41 +1,82 @@
 /**
- * GA4 Event Tracking Helpers
- * Track forms, links, page engagement, and conversions
+ * GA4 Event Tracking - Forms, Links, and Page Engagement
+ * Integrates with window.gtag() for comprehensive analytics
  */
 
-function gtag(...args) {
+export function trackFormSubmission(formName, formData = {}) {
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag(...args);
+    window.gtag('event', 'form_submit', {
+      form_name: formName,
+      form_id: formData.id || '',
+      ...Object.keys(formData).reduce((acc, key) => {
+        if (!['password', 'token'].includes(key)) {
+          acc[`form_${key}`] = String(formData[key]).substring(0, 100);
+        }
+        return acc;
+      }, {})
+    });
   }
 }
 
-function getMeasurementId() {
-  // The measurement ID is configured in index.html and lib/ga4.js
-  // gtag('config', ...) with a page_path triggers a pageview in GA4
-  // We read it from the data attribute on the script tag, or fall back
-  try {
-    if (typeof document !== 'undefined') {
-      const script = document.querySelector('script[data-ga4-measurement-id]');
-      if (script) return script.dataset.ga4MeasurementId;
-    }
-  } catch {}
-  return 'G-XRYMZ1M31K';
+export function trackLinkClick(linkUrl, linkText = '', category = 'outbound_link') {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', 'click', {
+      link_url: linkUrl,
+      link_text: linkText,
+      event_category: category,
+    });
+  }
 }
 
-export function trackFormSubmit(formName) {
-  gtag('event', 'form_submit', { form_name: formName });
+export function trackPageEngagement(engagementType, details = {}) {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', engagementType, {
+      page_path: window.location.pathname,
+      page_title: document.title,
+      ...details,
+    });
+  }
 }
 
-export function trackLinkClick(url, text) {
-  gtag('event', 'link_click', { link_url: url, link_text: text });
+export function trackConversion(conversionName, value = 0) {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', 'conversion', {
+      conversion_name: conversionName,
+      value: value,
+      page_path: window.location.pathname,
+    });
+  }
 }
 
-export function trackConversion(name, value = 0) {
-  gtag('event', 'conversion', { event_name: name, value });
+export function trackSignup(email, industry = '') {
+  if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
+    window.gtag('event', 'sign_up', {
+      method: 'form',
+      industry: industry,
+    });
+  }
 }
 
-export function trackPageView() {
+export function trackScroll(threshold = 0.75) {
   if (typeof window === 'undefined') return;
-  const measurementId = getMeasurementId();
-  gtag('config', measurementId, { page_path: window.location.pathname });
+  
+  let hasTracked = false;
+  const handleScroll = () => {
+    if (hasTracked) return;
+    
+    const scrollTop = window.scrollY;
+    const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollPercent = scrollTop / docHeight;
+    
+    if (scrollPercent >= threshold && typeof window.gtag === 'function') {
+      window.gtag('event', 'scroll_depth', {
+        scroll_percentage: Math.round(scrollPercent * 100),
+        page_path: window.location.pathname,
+      });
+      hasTracked = true;
+      window.removeEventListener('scroll', handleScroll);
+    }
+  };
+  
+  window.addEventListener('scroll', handleScroll, { passive: true });
 }

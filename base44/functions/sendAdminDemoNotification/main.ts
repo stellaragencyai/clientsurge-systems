@@ -1,17 +1,5 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-function secureJson(data = {}, init = {}) {
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers: {
-      'Content-Type': 'application/json',
-      'Cache-Control': 'no-store',
-      'X-Frame-Options': 'DENY',
-      ...(init.headers || {}),
-    },
-  });
-}
-
 function safeResendFrom() {
   const configured = String(Deno.env.get("RESEND_FROM_EMAIL") || "").trim();
   if (configured && configured.includes("@")) {
@@ -132,7 +120,7 @@ Deno.serve(async (req) => {
       return secureJson({ error: data.message || 'Email send failed' }, { status: 500 });
     }
 
-    return secureJson({ success: true, email_id: data.id || null, sent_to: adminEmail });
+    return secureJson({ success: true });
   } catch (error) {
     return secureJson({ error: error.message }, { status: 500 });
   }

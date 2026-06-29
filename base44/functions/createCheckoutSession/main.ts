@@ -6,8 +6,6 @@ import {
   buildPricingSummaryForProducts,
   buildStoredPricingSummary,
   buildStripeLineItemsForPricingSummary,
-  getPackageServices,
-  normalizePackageKey,
 } from "./salesCatalog.shared.js";
 
 function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
@@ -46,7 +44,6 @@ Deno.serve(async (req) => {
     const {
       items,
       product_ids,
-      package_key,
       customer_name,
       customer_email,
       customer_phone,
@@ -59,24 +56,14 @@ Deno.serve(async (req) => {
       deploy_immediately,
     } = await req.json();
 
-    let requestedProductIds = Array.isArray(product_ids) && product_ids.length
+    const requestedProductIds = Array.isArray(product_ids) && product_ids.length
       ? product_ids
       : Array.isArray(items)
       ? items.map((item) => item?.product_id || item).filter(Boolean)
       : [];
 
-    if (!requestedProductIds.length && package_key) {
-      const normalizedPackageKey = normalizePackageKey(package_key);
-      const packageServices = getPackageServices(normalizedPackageKey);
-      requestedProductIds = packageServices.map((service) => service.product_id).filter(Boolean);
-    }
-
-    if (!customer_email) {
-      return secureJson({ error: "Customer email is required", request_id: requestId }, { status: 400 });
-    }
-
-    if (!requestedProductIds.length) {
-      return secureJson({ error: "Select a valid Starter, Growth, or Pro package before checkout.", request_id: requestId }, { status: 400 });
+    if (!requestedProductIds.length || !customer_email) {
+      return secureJson({ error: "Missing required fields" }, { status: 400 });
     }
 
     const capacity = await assertCheckoutCapacityAvailable({ base44 });

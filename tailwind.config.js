@@ -1,11 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-    // Do not use `.dark`, browser preference, or the old dark-disabled flag.
-    // Dark utilities should only activate if this explicit opt-in attribute is present.
-    darkMode: ["selector", "[data-clientsurge-dark-mode='enabled']"],
+    darkMode: ["selector", "[data-client-surge-dark-disabled]"],
     content: ["./index.html", "./src/**/*.{ts,tsx,js,jsx}"],
   theme: {
-   	extend: {
+  	extend: {
   		fontFamily: {
   			inter: ['var(--font-inter)', 'system-ui', 'sans-serif'],
   			display: ['Montserrat', 'system-ui', 'sans-serif'],

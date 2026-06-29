@@ -4,11 +4,6 @@
   "title": "Website Intelligence Scan",
   "description": "AI-powered pre-scan of client website detecting pages, forms, CTAs, lead paths, and tracking gaps.",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

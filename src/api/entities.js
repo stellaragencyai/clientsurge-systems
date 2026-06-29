@@ -6,7 +6,6 @@ import { base44 } from "@/api/base44Client";
 // alias to `Leads` and should not be treated as a canonical entity name.
 export const AutomationJob = base44.entities.AutomationJob;
 export const ClientOnboarding = base44.entities.OnboardingClient;
-export const ConversionTrackingEvent = base44.entities.ConversionTrackingEvent;
 export const DemoRequest = base44.entities.DemoRequest;
 export const LaunchApproval = base44.entities.LaunchApproval;
 export const LaunchGate = base44.entities.LaunchGate;
@@ -17,7 +16,6 @@ export const WebsiteLead = base44.entities.WebsiteLead;
 export default {
   AutomationJob,
   ClientOnboarding,
-  ConversionTrackingEvent,
   DemoRequest,
   LaunchApproval,
   LaunchGate,

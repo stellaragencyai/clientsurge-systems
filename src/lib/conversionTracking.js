@@ -1,18 +1,16 @@
 /**
  * Conversion Tracking & GA4 Integration Utilities
  * Handles frontend event tracking for landing pages
- *
- * Browser-safe: uses crypto.randomUUID() and window.gtag + base44.analytics.track
  */
+
+import { v4 as uuidv4 } from 'https://deno.land/std@0.208.0/uuid/mod.ts';
 
 // Session ID stored in session storage for consistency
 const getSessionId = () => {
-  if (typeof sessionStorage === 'undefined') return null;
+  if (typeof sessionStorage === 'undefined') return uuidv4();
   let sid = sessionStorage.getItem('cs_session_id');
   if (!sid) {
-    sid = (typeof crypto !== 'undefined' && crypto.randomUUID)
-      ? crypto.randomUUID()
-      : 'sess_' + Date.now() + '_' + Math.random().toString(36).slice(2);
+    sid = uuidv4();
     sessionStorage.setItem('cs_session_id', sid);
   }
   return sid;
@@ -23,10 +21,10 @@ export const getUTMParams = () => {
   if (typeof window === 'undefined') return {};
   const params = new URLSearchParams(window.location.search);
   return {
-    utm_source: params.get('utm_source') || null,
-    utm_medium: params.get('utm_medium') || null,
-    utm_campaign: params.get('utm_campaign') || null,
-    utm_content: params.get('utm_content') || null,
+    utm_source: params.get('utm_source'),
+    utm_medium: params.get('utm_medium'),
+    utm_campaign: params.get('utm_campaign'),
+    utm_content: params.get('utm_content'),
   };
 };
 
@@ -39,32 +37,7 @@ export const getDeviceType = () => {
   return 'desktop';
 };
 
-// Fire event to GA4 via gtag (if available)
-function fireGa4Event(eventType, params = {}) {
-  try {
-    if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-      window.gtag('event', eventType, params);
-    }
-  } catch (e) {
-    // Analytics must never break user interactions
-  }
-}
-
-// Fire event to Base44 analytics (if available)
-function fireBase44Event(eventName, properties = {}) {
-  try {
-    if (typeof window === 'undefined') return;
-    import('@/api/base44Client').then(({ base44 }) => {
-      if (base44?.analytics?.track) {
-        Promise.resolve(base44.analytics.track({ eventName, properties })).catch(() => {});
-      }
-    }).catch(() => {});
-  } catch {
-    // silent
-  }
-}
-
-// Send conversion event to both GA4 and Base44 analytics
+// Send conversion event to backend
 export const trackConversionEvent = async (
   pageKey,
   eventType,
@@ -72,27 +45,42 @@ export const trackConversionEvent = async (
   metadata = {}
 ) => {
   try {
+    const base44 = await import('@/api/base44Client').then((m) => m.base44);
+    if (!base44) return;
+
     const sessionId = getSessionId();
     const utmParams = getUTMParams();
 
-    const eventParams = {
-      page_key: pageKey,
-      event_label: eventLabel || eventType,
+    const eventPayload = {
+      event_id: uuidv4(),
       session_id: sessionId,
-      ...utmParams,
-      ...metadata,
+      page_key: pageKey,
+      event_type: eventType,
+      event_label: eventLabel || eventType,
+      timestamp: new Date().toISOString(),
+      metadata: {
+        device_type: getDeviceType(),
+        browser: navigator.userAgent,
+        ...utmParams,
+        referrer: typeof document !== 'undefined' ? document.referrer : null,
+        ...metadata,
+      },
     };
 
-    // Fire to GA4
-    fireGa4Event(eventType, eventParams);
+    // Store event in ConversionTrackingEvent entity
+    await base44.asServiceRole.entities.ConversionTrackingEvent.create(eventPayload)
+      .catch((err) => console.error('[trackConversionEvent]', err));
 
-    // Fire to Base44 analytics
-    fireBase44Event(eventType, {
-      ...eventParams,
-      timestamp: new Date().toISOString(),
-    });
+    // Send to GA4 if configured
+    if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
+      window.gtag('event', eventType, {
+        page_key: pageKey,
+        event_label: eventLabel,
+        ...metadata,
+      });
+    }
   } catch (err) {
-    // Analytics must never break user interactions
+    console.error('[trackConversionEvent]', err);
   }
 };
 
@@ -145,7 +133,7 @@ export const trackDemoBooking = (pageKey) => {
   trackConversionEvent(pageKey, 'demo_booking_click', 'Demo Booking Initiated');
 };
 
-// Page view (called on mount and SPA route change)
+// Page view (called on mount)
 export const trackPageView = (pageKey) => {
   trackConversionEvent(pageKey, 'page_view', `${pageKey} page viewed`);
 };

@@ -10,119 +10,32 @@ import { resendFetch } from "../_shared/resendFetch.js";
 
 const ADMIN_PORTAL_URL = Deno.env.get("APP_URL") || "https://clientsurgesystems.com";
 const RESEND_API_KEY = Deno.env.get("RESEND_API_KEY");
-
-const DEFAULT_FROM_EMAIL = "noreply@clientsurgesystems.com";
-const DEFAULT_ADMIN_NOTIFICATION_EMAIL = "nolan@clientsurgesystems.com";
-
-function normalizeString(value: unknown): string {
-  return typeof value === "string" ? value.trim() : "";
-}
-
-function isValidEmail(value: unknown): value is string {
-  const email = normalizeString(value);
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-}
-
-function splitEmailList(value: unknown): string[] {
-  if (!value) return [];
-
-  return String(value)
-    .split(/[,;\s]+/)
-    .map((email) => email.trim())
-    .filter(Boolean);
-}
-
-function getValidEmailList(...values: unknown[]): string[] {
-  const emails = values
-    .flatMap(splitEmailList)
-    .filter(isValidEmail);
-
-  return emails.length ? Array.from(new Set(emails)) : [DEFAULT_ADMIN_NOTIFICATION_EMAIL];
-}
-
-function getFromEmail(): string {
-  const configuredFrom = normalizeString(Deno.env.get("RESEND_FROM_EMAIL"));
-  return isValidEmail(configuredFrom) ? configuredFrom : DEFAULT_FROM_EMAIL;
-}
-
-function normalizeStatus(value: unknown): string {
-  return normalizeString(value).toLowerCase();
-}
-
-function escapeHtml(value: unknown): string {
-  return String(value ?? "")
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
-function cleanSubjectValue(value: unknown, fallback = "New Client"): string {
-  const cleaned = normalizeString(value).replace(/[\r\n]+/g, " ").slice(0, 120);
-  return cleaned || fallback;
-}
-
-const FROM_EMAIL = getFromEmail();
-const ADMIN_NOTIFICATION_EMAILS = getValidEmailList(
-  Deno.env.get("ADMIN_NOTIFICATION_EMAIL"),
-  Deno.env.get("ADMIN_EMAIL"),
-);
+const FROM_EMAIL = Deno.env.get("RESEND_FROM_EMAIL") || "noreply@clientsurgesystems.com";
+const ADMIN_NOTIFICATION_EMAIL = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || Deno.env.get("ADMIN_EMAIL");
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const payload = await req.json().catch(() => ({}));
 
-    // Base44 entity automation payload shape:
-    // { event, data, old_data, payload_too_large }
-    const event = payload.event || {};
-    const data = payload.data || payload;
-    const oldData = payload.old_data || payload.oldData || {};
-    const submissionData = data.submission_data || {};
-    const oldSubmissionData = oldData.submission_data || {};
+    const { lead_id, order_id, client_email, business_name, status, event } = payload;
 
-    const eventType = normalizeString(event?.type || payload.event_type || payload.type).toLowerCase();
-    const currentStatus = normalizeStatus(data.status || submissionData.status);
-    const previousStatus = normalizeStatus(oldData.status || oldSubmissionData.status);
-
-    const isCreate = eventType === "create" || eventType === "created";
-    const isUpdate = eventType === "update" || eventType === "updated";
-
-    // Notify when the onboarding submission is created, because creation means the form was submitted.
-    // Also notify later if an existing submission is moved into completed status.
-    const updatedToCompleted = isUpdate && currentStatus === "completed" && previousStatus !== "completed";
-    const manualCompletedSmokeTest = !eventType && currentStatus === "completed" && previousStatus !== "completed";
-
-    if (!isCreate && !updatedToCompleted && !manualCompletedSmokeTest) {
-      return secureJson({
-        skipped: true,
-        reason: "Submission was not newly created and did not move to completed",
-        eventType,
-        currentStatus,
-        previousStatus,
-      });
+    // Only fire on completed status
+    if (status && status !== "completed" && event?.type !== "create") {
+      return secureJson({ skipped: true, reason: "Status not completed" });
     }
 
     if (!RESEND_API_KEY) {
       console.error("[notifyOnboardingComplete] RESEND_API_KEY not set");
-      return secureJson({ error: "Email provider not configured. Missing RESEND_API_KEY." }, { status: 500 });
+      return secureJson({ error: "Email provider not configured" }, { status: 500 });
     }
 
-    const id = data.id || data._id || null;
-    const lead_id = data.lead_id || data.leadId || submissionData.lead_id || null;
-    const order_id = data.order_id || data.orderId || submissionData.order_id || null;
-    const client_id = data.client_id || data.clientId || submissionData.client_id || null;
-    const client_email = data.client_email || data.email || submissionData.client_email || submissionData.email || "";
-    const business_name = data.business_name || submissionData.business_name || "";
-
-    const safeBusinessName = escapeHtml(business_name || "Not provided");
-    const safeClientEmail = escapeHtml(client_email || "Not provided");
-    const safeOrderId = escapeHtml(order_id || "");
-    const displayName = cleanSubjectValue(business_name || client_email || "New Client");
+    if (!ADMIN_NOTIFICATION_EMAIL) {
+      console.error("[notifyOnboardingComplete] ADMIN_NOTIFICATION_EMAIL not set");
+      return secureJson({ error: "Admin email not configured" }, { status: 500 });
+    }
 
     const adminTrackingUrl = `${ADMIN_PORTAL_URL}/admin?tab=automation-tracking`;
-    const installQueueUrl = `${ADMIN_PORTAL_URL}/admin?tab=install-queue`;
     const submissionDate = new Date().toLocaleString("en-US", { timeZone: "America/Phoenix" });
 
     const emailHtml = `
@@ -141,15 +54,15 @@ Deno.serve(async (req) => {
           <table style="width: 100%; border-collapse: collapse;">
             <tr>
               <td style="font-size: 12px; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 0; width: 40%;">Business</td>
-              <td style="font-size: 14px; font-weight: 600; color: #0A1628; padding: 5px 0;">${safeBusinessName}</td>
+              <td style="font-size: 14px; font-weight: 600; color: #0A1628; padding: 5px 0;">${business_name || "Not provided"}</td>
             </tr>
             <tr>
               <td style="font-size: 12px; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 0;">Client Email</td>
-              <td style="font-size: 14px; color: #0A1628; padding: 5px 0;">${safeClientEmail}</td>
+              <td style="font-size: 14px; color: #0A1628; padding: 5px 0;">${client_email || "Not provided"}</td>
             </tr>
             ${order_id ? `<tr>
               <td style="font-size: 12px; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 0;">Order ID</td>
-              <td style="font-size: 14px; color: #0A1628; padding: 5px 0; font-family: monospace;">${safeOrderId}</td>
+              <td style="font-size: 14px; color: #0A1628; padding: 5px 0; font-family: monospace;">${order_id}</td>
             </tr>` : ""}
             <tr>
               <td style="font-size: 12px; color: #666; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; padding: 5px 0;">Submitted</td>
@@ -167,7 +80,7 @@ Deno.serve(async (req) => {
 
         <p style="font-size: 13px; color: #666; text-align: center; line-height: 1.6;">
           Next step: Review the submission details and begin service configuration in the admin panel.<br>
-          <a href="${installQueueUrl}" style="color: #0088CC; text-decoration: none; font-weight: 600;">Open Install Queue</a>
+          <a href="${ADMIN_PORTAL_URL}/admin?tab=install-queue" style="color: #0088CC; text-decoration: none; font-weight: 600;">Open Install Queue</a>
         </p>
 
         <hr style="border: none; border-top: 1px solid #e5eaf0; margin: 24px 0;" />
@@ -177,21 +90,6 @@ Deno.serve(async (req) => {
       </div>
     `;
 
-    const emailText = `
-New onboarding submission completed.
-
-Business: ${business_name || "Not provided"}
-Client Email: ${client_email || "Not provided"}
-Order ID: ${order_id || "Not provided"}
-Submitted: ${submissionDate} MST
-
-View Automation Tracking:
-${adminTrackingUrl}
-
-Open Install Queue:
-${installQueueUrl}
-    `.trim();
-
     const emailRes = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -200,10 +98,9 @@ ${installQueueUrl}
       },
       body: JSON.stringify({
         from: `ClientSurge Systems <${FROM_EMAIL}>`,
-        to: ADMIN_NOTIFICATION_EMAILS,
-        subject: `🟢 New Onboarding Submission — ${displayName}`,
+        to: [ADMIN_NOTIFICATION_EMAIL],
+        subject: `🟢 New Onboarding Submission — ${business_name || client_email || "New Client"}`,
         html: emailHtml,
-        text: emailText,
         tags: [{ name: "category", value: "onboarding_notification" }],
       }),
     });
@@ -211,62 +108,26 @@ ${installQueueUrl}
     if (!emailRes.ok) {
       const errText = await emailRes.text();
       console.error("[notifyOnboardingComplete] Resend error:", errText);
-      return secureJson({
-        error: "Email send failed",
-        detail: errText,
-        from: FROM_EMAIL,
-        to: ADMIN_NOTIFICATION_EMAILS,
-      }, { status: 500 });
+      return secureJson({ error: "Email send failed", detail: errText }, { status: 500 });
     }
 
-    let providerMessageId: string | null = null;
-    try {
-      const providerPayload = await emailRes.clone().json();
-      providerMessageId = typeof providerPayload?.id === "string" ? providerPayload.id : null;
-    } catch (_) {
-      providerMessageId = null;
-    }
-
+    // Log the event
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: lead_id || null,
-      order_id: order_id || null,
-      client_id: client_id || null,
-      context_type: "onboarding_submission",
-      context_id: id || null,
       channel: "email",
       direction: "system",
       event_type: "status_update",
       provider: "resend",
       status: "sent",
-      subject: `Onboarding submission complete — ${displayName}`,
-      message_body: `Admin notification sent for completed onboarding: ${client_email || "No client email provided"}`,
-      provider_message_id: providerMessageId || undefined,
-      metadata_json: JSON.stringify({
-        notified: ADMIN_NOTIFICATION_EMAILS,
-        from: FROM_EMAIL,
-        eventType,
-        currentStatus,
-        previousStatus,
-      }),
-      environment: "production",
-      dashboard_truth_status: "trusted",
-      dashboard_truth_notes: "Resend accepted admin onboarding completion notification.",
-    }).catch((logError: Error) => {
-      console.warn("[notifyOnboardingComplete] CommunicationEvent log failed:", logError?.message);
-    });
+      subject: `Onboarding submission complete — ${business_name || client_email}`,
+      message_body: `Admin notification sent for completed onboarding: ${client_email}`,
+    }).catch(() => {});
 
-    console.log(
-      `[notifyOnboardingComplete] Notification sent to ${ADMIN_NOTIFICATION_EMAILS.join(", ")} for ${displayName}`,
-    );
+    console.log(`[notifyOnboardingComplete] Notification sent to ${ADMIN_NOTIFICATION_EMAIL} for ${business_name || client_email}`);
+    return secureJson({ success: true, notified: ADMIN_NOTIFICATION_EMAIL });
 
-    return secureJson({
-      success: true,
-      notified: ADMIN_NOTIFICATION_EMAILS,
-      from: FROM_EMAIL,
-      provider_message_id: providerMessageId,
-    });
   } catch (error) {
-    console.error("[notifyOnboardingComplete] Error:", error?.message || error);
-    return secureJson({ error: error?.message || "Unknown error" }, { status: 500 });
+    console.error("[notifyOnboardingComplete] Error:", error.message);
+    return secureJson({ error: error.message }, { status: 500 });
   }
 });

@@ -12,13 +12,11 @@ export default function ProductCard({ product }) {
 
   const toggle = (e) => {
     e.stopPropagation();
-    // Coming soon or checkout-disabled products cannot be added to cart
+    // Coming soon products cannot be added to cart
     if (product.coming_soon || !product.checkout_enabled) return;
     if (inCart) removeItem(product.product_id);
     else addItem(product);
   };
-
-  const isUnavailable = product.coming_soon || !product.checkout_enabled;
 
   const handleExpandToggle = (e) => {
     e.stopPropagation();
@@ -173,8 +171,8 @@ export default function ProductCard({ product }) {
       `}</style>
 
       <motion.div
-        className={`pcard${inCart ? " in-cart" : ""}${isUnavailable ? " coming-soon-card" : ""}`}
-        onClick={() => !isUnavailable && setModalOpen(true)}
+        className={`pcard${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
+        onClick={() => !product.coming_soon && setModalOpen(true)}
         variants={{
           hidden: { opacity: 0, y: 32 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
@@ -246,7 +244,7 @@ export default function ProductCard({ product }) {
 
         {/* Full-Width CTA Footer */}
         <div style={{ marginTop: "auto", paddingTop: "2px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {!isUnavailable && (
+          {!product.coming_soon && (
             <motion.button
               onClick={toggle}
               whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
@@ -268,12 +266,12 @@ export default function ProductCard({ product }) {
                 color: "#fff", fontWeight: "700", whiteSpace: "nowrap",
                 pointerEvents: "none",
               }}>
-                {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Setup</> : <><Plus style={{ width: "12px", height: "12px" }} /> Choose This System</>}
+                {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}
               </span>
             </motion.button>
           )}
 
-          {isUnavailable && (
+          {product.coming_soon && (
             <>
               <span style={{ fontSize: "11px", fontWeight: "700", color: "#003B8F", background: "rgba(0,174,239,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,174,239,0.15)", whiteSpace: "nowrap", textAlign: "center" }}>
                 <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#00AEEF",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
@@ -284,7 +282,7 @@ export default function ProductCard({ product }) {
           )}
         </div>
 
-        {product.popular && !isUnavailable && (
+        {product.popular && !product.coming_soon && (
           <div style={{
             position: "absolute", top: "-10px", right: "10px", zIndex: 10,
             background: "linear-gradient(135deg,#0088CC,#00AEEF)",
@@ -297,7 +295,7 @@ export default function ProductCard({ product }) {
           </div>
         )}
 
-        {!isUnavailable && <span className="pcard-click-hint">tap for details →</span>}
+        {!product.coming_soon && <span className="pcard-click-hint">tap for details →</span>}
       </motion.div>
 
       {modalOpen && (

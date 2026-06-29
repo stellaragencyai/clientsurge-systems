@@ -108,9 +108,13 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        }
+      ]
     },
     "read": {
       "$or": [
@@ -118,9 +122,6 @@
           "user_condition": {
             "role": "admin"
           }
-        },
-        {
-          "data.agency_id": "{{user.data.agency_id}}"
         }
       ]
     },
@@ -130,9 +131,6 @@
           "user_condition": {
             "role": "admin"
           }
-        },
-        {
-          "data.agency_id": "{{user.data.agency_id}}"
         }
       ]
     },

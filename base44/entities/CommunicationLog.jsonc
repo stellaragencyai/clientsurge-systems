@@ -4,11 +4,6 @@
   "title": "Communication Log",
   "description": "Durable provider log for every Twilio SMS and Resend email send attempt. Proves what sent, what failed, and what leads are stuck.",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "related_entity_type": {
       "type": "string",
       "title": "Related Entity Type",

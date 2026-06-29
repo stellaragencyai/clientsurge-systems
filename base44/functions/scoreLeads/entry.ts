@@ -1,11 +1,6 @@
-function secureJson(data = {}, init = {}) {
-  return new Response(JSON.stringify(data), {
-    ...init,
-    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
-  });
-}
+import { secureJson } from "../_shared/response.ts";
 /**
- * scoreLeads — redeployed 2026-06-29
+ * scoreLeads — redeployed 2026-05-02
  * Batch re-scores ALL Leads and persists lead_score + activation_priority.
  * Admin-only. Called manually from Priority Queue "Re-Score" button or on a schedule.
  *
@@ -26,7 +21,7 @@ function secureJson(data = {}, init = {}) {
  *   "Low"    → below 45
  */
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 // Inlined from _shared/automationSecurity.js (relative imports not supported in deployed Deno runtime)
 function constantTimeEqual(left, right) {
   if (typeof left !== "string" || typeof right !== "string" || left.length !== right.length) return false;
@@ -49,9 +44,9 @@ function allowAnonymousAutomation(req) {
   return constantTimeEqual(candidateSecret || "", configuredSecret);
 }
 
-const LEAD_LIMIT = 200;
-const EVENT_LIMIT = 200;
-const EMAIL_RECIPIENT_LIMIT = 200;
+const LEAD_LIMIT = 25000;
+const EVENT_LIMIT = 25000;
+const EMAIL_RECIPIENT_LIMIT = 25000;
 
 const STATUS_SCORE = {
   New: 5, Contacted: 10, Replied: 18, Qualified: 22,
@@ -153,12 +148,13 @@ Deno.serve(async (req) => {
 
     console.log(`[scoreLeads] Starting batch score${leadIdFilter ? ` for lead ${leadIdFilter}` : " for all leads"}`);
 
-    // Load sequentially to avoid rate limits from parallel large queries
-    const leads = leadIdFilter
-      ? await base44.asServiceRole.entities.Leads.filter({ id: leadIdFilter })
-      : await base44.asServiceRole.entities.Leads.list("-created_date", LEAD_LIMIT);
-    const events = await base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT);
-    const emailRecipients = await base44.asServiceRole.entities.EmailCampaignRecipient.list("-created_date", EMAIL_RECIPIENT_LIMIT);
+    const [leads, events, emailRecipients] = await Promise.all([
+      leadIdFilter
+        ? base44.asServiceRole.entities.Leads.filter({ id: leadIdFilter })
+        : base44.asServiceRole.entities.Leads.list("-created_date", LEAD_LIMIT),
+      base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT),
+      base44.asServiceRole.entities.EmailCampaignRecipient.list("-created_date", EMAIL_RECIPIENT_LIMIT),
+    ]);
 
     if (!leads?.length) {
       return secureJson({ success: true, scored: 0, message: "No leads to score" });
@@ -187,9 +183,8 @@ Deno.serve(async (req) => {
       return { lead, score, priority };
     });
 
-    // Batch-write only changed records (5 at a time to avoid rate limits)
-    const BATCH = 5;
-    const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+    // Batch-write only changed records (20 at a time)
+    const BATCH = 20;
     let updated = 0;
     for (let i = 0; i < updates.length; i += BATCH) {
       const batch = updates.slice(i, i + BATCH);
@@ -203,7 +198,6 @@ Deno.serve(async (req) => {
           });
         })
       );
-      if (i + BATCH < updates.length) await sleep(200);
     }
 
     console.log(`[scoreLeads] Done — scored ${updates.length} leads, updated ${updated}`);

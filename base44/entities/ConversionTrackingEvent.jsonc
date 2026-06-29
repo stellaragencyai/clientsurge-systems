@@ -2,11 +2,6 @@
   "name": "ConversionTrackingEvent",
   "type": "object",
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
     "event_id": {
       "type": "string",
       "title": "Event ID",
@@ -15,7 +10,7 @@
     "session_id": {
       "type": "string",
       "title": "Session ID",
-      "description": "Anonymous browser session identifier. Do not store personal data here."
+      "description": "Browser session identifier"
     },
     "client_project_id": {
       "type": "string",
@@ -27,14 +22,6 @@
       "title": "Page Key",
       "enum": [
         "homepage",
-        "pricing",
-        "store",
-        "product_signup",
-        "start",
-        "automations",
-        "industries",
-        "contact",
-        "about",
         "med_spa",
         "dental",
         "hvac",
@@ -43,9 +30,10 @@
         "real_estate",
         "personal_injury",
         "plumbing",
-        "chiropractic"
+        "chiropractic",
+        "pricing"
       ],
-      "description": "Which public page triggered the event"
+      "description": "Which landing page triggered the event"
     },
     "event_type": {
       "type": "string",
@@ -64,7 +52,7 @@
     "event_label": {
       "type": "string",
       "title": "Event Label",
-      "description": "Human-readable non-sensitive label, such as Get Started Button or See Pricing"
+      "description": "Human-readable label (e.g., 'Get Started Button', 'See Pricing')"
     },
     "timestamp": {
       "type": "string",
@@ -75,19 +63,34 @@
     "metadata": {
       "type": "object",
       "title": "Metadata",
-      "description": "Additional non-sensitive context about the event",
+      "description": "Additional context about the event",
       "properties": {
         "device_type": {
           "type": "string",
-          "enum": ["mobile", "tablet", "desktop"]
+          "enum": [
+            "mobile",
+            "tablet",
+            "desktop"
+          ]
         },
-        "browser": { "type": "string" },
-        "utm_source": { "type": "string" },
-        "utm_medium": { "type": "string" },
-        "utm_campaign": { "type": "string" },
-        "utm_content": { "type": "string" },
-        "referrer": { "type": "string" },
-        "destination": { "type": "string" },
+        "browser": {
+          "type": "string"
+        },
+        "utm_source": {
+          "type": "string"
+        },
+        "utm_medium": {
+          "type": "string"
+        },
+        "utm_campaign": {
+          "type": "string"
+        },
+        "utm_content": {
+          "type": "string"
+        },
+        "referrer": {
+          "type": "string"
+        },
         "scroll_depth": {
           "type": "integer",
           "description": "Scroll depth percentage (0-100)"
@@ -95,24 +98,49 @@
       }
     }
   },
-  "required": ["event_id", "session_id", "page_key", "event_type", "timestamp"],
+  "required": [
+    "event_id",
+    "session_id",
+    "page_key",
+    "event_type",
+    "timestamp"
+  ],
   "rls": {
-    "create": true,
+    "create": {
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
+    },
     "read": {
       "$or": [
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "role": "super_admin" } },
-        { "data.client_project_id": "{{client_project_id}}" }
+        {
+          "user_condition": {
+            "role": [
+              "admin",
+              "super_admin"
+            ]
+          }
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
       ]
     },
     "update": {
-      "$or": [
-        { "user_condition": { "role": "admin" } },
-        { "user_condition": { "role": "super_admin" } }
-      ]
+      "user_condition": {
+        "role": [
+          "admin",
+          "super_admin"
+        ]
+      }
     },
     "delete": {
-      "user_condition": { "role": "admin" }
+      "user_condition": {
+        "role": "admin"
+      }
     }
   }
 }
