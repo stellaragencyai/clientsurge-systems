@@ -1,6 +1,5 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from '@/App.jsx'
 import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
@@ -34,11 +33,14 @@ function clearStaleServiceWorkerCaches() {
   }).catch(() => {})
 }
 
-// Initialize with error boundary for debugging.
-function initApp() {
+async function initApp() {
   const root = document.getElementById('root')
   try {
     if (!root) throw new Error('Missing #root element')
+
+    const module = await import('@/App.jsx')
+    const App = module.default
+    if (!App) throw new Error('App module loaded without a default export')
 
     const app = <App />
     ReactDOM.createRoot(root).render(
@@ -46,11 +48,9 @@ function initApp() {
     )
     hideStaticShellIfAppMounted(root)
   } catch (err) {
-    console.error('Critical error rendering App:', err)
+    console.error('ClientSurge interactive app failed to load. Static public shell remains visible.', err)
     document.documentElement.classList.remove('app-hydrated')
-    if (root) {
-      root.innerHTML = ''
-    }
+    if (root) root.innerHTML = ''
   }
 }
 
