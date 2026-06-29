@@ -1,9 +1,9 @@
 import { useState } from 'react';
 import { ArrowRight, AlertCircle, Loader2 } from 'lucide-react';
-import { getPackageOffer, normalizePackageKey } from '@/lib/salesCatalog';
+import { getPackageStorePath, normalizePackageKey } from '@/lib/salesCatalog';
 
 /**
- * Stripe Checkout Button — redirects to canonical Stripe Payment Link.
+ * Stripe Checkout Button — routes to the app checkout flow.
  *
  * Props:
  * - packageKey: 'starter_system' | 'growth_system' | 'pro_system' (or aliases)
@@ -23,15 +23,13 @@ export default function CheckoutButton({ packageKey, label = 'Get Started' }) {
     }
 
     const normalizedKey = normalizePackageKey(packageKey);
-    const offer = getPackageOffer(normalizedKey);
-
-    if (!offer?.checkout_url) {
+    if (!normalizedKey) {
       setError('Checkout is not available for this package. Please contact support.');
       return;
     }
 
     setLoading(true);
-    window.location.href = offer.checkout_url;
+    window.location.href = getPackageStorePath(normalizedKey);
   };
 
   return (
