@@ -1,6 +1,7 @@
 const GA4_MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{4,}$/i;
 const GA4_SCRIPT_BASE = "https://www.googletagmanager.com/gtag/js";
 const CONSENT_STORAGE_KEYS = ["cookie-consent", "cs_cookie_consent"];
+const PRODUCTION_GA4_MEASUREMENT_ID = "G-H6QT342ZN9";
 
 function getDefaultEnv() {
   return import.meta.env || {};
@@ -19,7 +20,7 @@ export function getGa4MeasurementId(env = getDefaultEnv()) {
     env.VITE_GA4_MEASUREMENT_ID ||
       env.VITE_GOOGLE_ANALYTICS_ID ||
       env.VITE_GA_MEASUREMENT_ID ||
-      "G-XRYMZ1M31K"
+      PRODUCTION_GA4_MEASUREMENT_ID
   )
     .trim()
     .toUpperCase();
