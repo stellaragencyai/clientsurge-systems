@@ -16,24 +16,36 @@ installScrollExperienceGuard()
 installAnimationRestoreGuard()
 installIosThemeArtifactGuard()
 
-// Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
-const staticFallback = document.querySelector('.static-fallback');
-if (staticFallback) {
-  staticFallback.style.display = 'none';
+function hideStaticShell() {
+  document.documentElement.classList.add('app-hydrated')
+  document.querySelectorAll('.static-fallback, .static-shell').forEach((node) => {
+    node.setAttribute('aria-hidden', 'true')
+    node.style.display = 'none'
+  })
 }
+
+// Hide static fallback immediately if the bundle is executing.
+hideStaticShell()
 
 // Initialize with error boundary for debugging
 function initApp() {
   try {
+    const root = document.getElementById('root')
+    if (!root) throw new Error('Missing #root element')
+
+    // Clear emergency fallback before mounting so React does not coexist with stale static HTML.
+    root.innerHTML = ''
+
     const app = <App />
-    ReactDOM.createRoot(document.getElementById('root')).render(
+    ReactDOM.createRoot(root).render(
       import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
     )
+    requestAnimationFrame(hideStaticShell)
   } catch (err) {
     console.error('Critical error rendering App:', err);
     const root = document.getElementById('root');
     if (root) {
-      root.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>⚠️ App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
+      root.innerHTML = `<div style="min-height:100vh;padding:32px;font-family:Inter,system-ui,sans-serif;background:#f8fafc;color:#0f172a"><h1>ClientSurge Systems</h1><p>The interactive app is having trouble loading. Use the public navigation links or contact support@clientsurgesystems.com.</p><pre style="white-space:pre-wrap;color:#b91c1c">${err.stack || err.message}</pre></div>`;
     }
   }
 }
