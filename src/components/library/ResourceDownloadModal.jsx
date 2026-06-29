@@ -2,6 +2,8 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { X, Download, CheckCircle2, Loader2, BookOpen } from "lucide-react";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ResourceDownloadModal({ resource, onClose }) {
   const [email, setEmail] = useState("");
   const [name, setName] = useState("");
@@ -11,13 +13,15 @@ export default function ResourceDownloadModal({ resource, onClose }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email.trim()) { setError("Email is required."); return; }
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!normalizedEmail) { setError("Email is required."); return; }
+    if (!EMAIL_REGEX.test(normalizedEmail)) { setError("Enter a valid email address."); return; }
     setLoading(true);
     setError("");
     try {
       // Capture as a website lead
       await base44.entities.WebsiteLead.create({
-        email: email.trim(),
+        email: normalizedEmail,
         full_name: name.trim() || undefined,
         source: "website_form",
         source_page: `/library`,
@@ -117,6 +121,7 @@ export default function ResourceDownloadModal({ resource, onClose }) {
                   onChange={e => { setEmail(e.target.value); setError(""); }}
                   placeholder="you@example.com"
                   required
+                  aria-invalid={Boolean(error)}
                   className="w-full px-4 py-2.5 rounded-xl border border-border bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary/40"
                 />
               </div>
