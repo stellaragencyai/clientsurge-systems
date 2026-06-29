@@ -29,13 +29,26 @@ export default function FormInput({
   autoComplete = '',
   onBlur = null,
 }) {
-  // Auto-format phone on change
-  const handleChange = (e) => {
-    let newValue = e.target.value;
-    if (type === 'tel') {
-      newValue = formatPhoneNumber(newValue);
-    }
-    onChange({ ...e, target: { ...e.target, value: newValue } });
+  // Keep controlled inputs editable by preserving the field name when forwarding
+  // a normalized event to parent forms. The old spread-based event clone dropped
+  // non-enumerable DOM fields like `target.name`, so Contact.jsx updated
+  // form.undefined instead of the intended field and the visible value stayed blank.
+  const handleChange = (event) => {
+    const { name: inputName, value: inputValue, type: inputType } = event.target;
+    const nextValue = type === 'tel' ? formatPhoneNumber(inputValue) : inputValue;
+
+    onChange({
+      target: {
+        name: inputName,
+        value: nextValue,
+        type: inputType,
+      },
+      currentTarget: {
+        name: inputName,
+        value: nextValue,
+        type: inputType,
+      },
+    });
   };
 
   // Determine validity indicator
