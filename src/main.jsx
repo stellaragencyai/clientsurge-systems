@@ -15,28 +15,50 @@ installScrollExperienceGuard()
 installAnimationRestoreGuard()
 installIosThemeArtifactGuard()
 
-function hideStaticShellIfAppMounted(root) {
-  window.setTimeout(() => {
-    if (!root || root.childElementCount === 0) return
-    document.documentElement.classList.add('app-hydrated')
-    document.querySelectorAll('#static-root, .static-fallback, .static-shell').forEach((node) => {
-      node.setAttribute('aria-hidden', 'true')
-      node.style.display = 'none'
-    })
-  }, 1200)
+function markAppHydrated() {
+  document.documentElement.classList.add('app-hydrated')
+  document.documentElement.classList.remove('no-js')
+  document.documentElement.classList.add('js')
 }
 
-function clearStaleServiceWorkerCaches() {
+function hideStaticShell() {
+  markAppHydrated()
+  document.querySelectorAll('#static-root, .static-fallback, .static-shell').forEach((node) => {
+    node.setAttribute('aria-hidden', 'true')
+    node.style.display = 'none'
+    node.style.visibility = 'hidden'
+    node.style.pointerEvents = 'none'
+  })
+}
+
+function hideStaticShellIfAppMounted(root) {
+  const attempts = [0, 50, 150, 500, 1200]
+  attempts.forEach((delay) => {
+    window.setTimeout(() => {
+      if (!root || root.childElementCount === 0) return
+      hideStaticShell()
+    }, delay)
+  })
+}
+
+function disableStaleServiceWorkerCaches() {
   if (typeof navigator === 'undefined' || !('serviceWorker' in navigator)) return
+
   navigator.serviceWorker.getRegistrations?.().then((registrations) => {
-    registrations.forEach((registration) => registration.update?.().catch(() => {}))
+    registrations.forEach((registration) => registration.unregister?.().catch(() => {}))
   }).catch(() => {})
+
+  if (typeof caches !== 'undefined') {
+    caches.keys?.().then((keys) => Promise.all(keys.map((key) => caches.delete(key)))).catch(() => {})
+  }
 }
 
 async function initApp() {
   const root = document.getElementById('root')
   try {
     if (!root) throw new Error('Missing #root element')
+
+    markAppHydrated()
 
     const module = await import('@/App.jsx')
     const App = module.default
@@ -54,13 +76,5 @@ async function initApp() {
   }
 }
 
-clearStaleServiceWorkerCaches()
+disableStaleServiceWorkerCaches()
 initApp()
-
-if (import.meta.env.PROD && 'serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('/sw.js').then((registration) => {
-      registration.update().catch(() => {})
-    }).catch(() => {})
-  })
-}
