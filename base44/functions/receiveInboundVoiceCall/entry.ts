@@ -6,21 +6,38 @@
  *   2. Always returns valid TwiML with a <Response> root element
  *   3. Accepts POST (form-urlencoded / JSON / query string) and GET probes
  *   4. Full handler wrapped in defensive try/catch — no uncaught exceptions
- *   5. Writes a CommunicationEvent (voice/inbound/twilio) for every attempt
+ *   5. Writes a CommunicationEvent (voice/inbound/twilio) for every real Twilio attempt
  *   6. AI handoff (ElevenLabs Connect+Stream) when inbound_voice_enabled AND agent configured
  *   7. Safe fallback: greeting + Dial forwarding phone (never dials itself) OR graceful Hangup
  *
- * Twilio Console → Phone Numbers → Voice & Fax → A Call Comes In → POST
- * URL: https://clientsurgesystems.com/api/receiveInboundVoiceCall
+ * Twilio Console → Phone Numbers → Voice & Fax → A Call Comes In → Webhook → POST
+ * Canonical URL: https://clientsurgesystems.com/functions/receiveInboundVoiceCall
+ * Also use the same URL for Call Status Changes → POST.
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 
 // ── Constants ──
 const SELF_NUMBER = "+16025843227";
+const CANONICAL_FUNCTION_PATH = "/functions/receiveInboundVoiceCall";
+const DEFAULT_APP_URL = "https://clientsurgesystems.com";
 const GREETING = "Thank you for calling ClientSurge Systems. Please hold while we connect your call.";
 const CALLBACK_MSG = "Thank you for calling ClientSurge Systems. All our team members are currently helping other callers. Please leave a voicemail after the tone, or try again shortly, and we will call you back. Thank you.";
 const ERROR_MSG = "Thank you for calling ClientSurge Systems. We are experiencing a brief technical issue. Please call again in a moment.";
+
+// ── URL helpers ──
+function canonicalWebhookUrl() {
+  const base = (Deno.env.get("APP_URL") || Deno.env.get("VITE_BASE44_APP_BASE_URL") || DEFAULT_APP_URL).replace(/\/$/, "");
+  return `${base}${CANONICAL_FUNCTION_PATH}`;
+}
+
+function requestPath(req) {
+  try {
+    return new URL(req.url).pathname || CANONICAL_FUNCTION_PATH;
+  } catch (_) {
+    return CANONICAL_FUNCTION_PATH;
+  }
+}
 
 // ── TwiML helpers ──
 function wrapTwiml(inner) {
@@ -33,6 +50,7 @@ function xmlResponse(inner, status = 200) {
     headers: {
       "Content-Type": "text/xml; charset=utf-8",
       "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
     },
   });
 }
@@ -217,7 +235,9 @@ async function logCallAsync(req, params, parseMode, contentType, fallbackMode, e
         fallback_mode: fallbackMode || "none",
         smoke: isSmoke,
         live_call: !isSmoke,
-        source_route: "/api/receiveInboundVoiceCall",
+        source_route: CANONICAL_FUNCTION_PATH,
+        request_path: requestPath(req),
+        canonical_webhook_url: canonicalWebhookUrl(),
         exception: exceptionMsg || null,
       }),
     });
@@ -231,6 +251,7 @@ async function logCallAsync(req, params, parseMode, contentType, fallbackMode, e
       );
       if (regs?.length > 0) {
         await base44.asServiceRole.entities.WebhookRegistration.update(regs[0].id, {
+          webhook_url: canonicalWebhookUrl(),
           last_triggered_at: now,
           last_error: exceptionMsg || null,
           status: "active",
