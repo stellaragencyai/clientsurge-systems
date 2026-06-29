@@ -8,6 +8,7 @@ const TARGET_PATHS = new Set(["/", "/med-spa", "/industries", "/contact", "/book
 const STORAGE_KEY = "clientsurge-exit-intent-dismissed";
 const SESSION_KEY = "clientsurge-exit-intent-session";
 const MANUAL_HASH = "#free-audit-popup";
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 function safeGetSessionItem(key) {
   try {
@@ -154,13 +155,23 @@ export default function ExitIntentPopup({ pathname }) {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
+    const normalizedEmail = form.email.trim().toLowerCase();
+    if (!form.full_name.trim()) {
+      setError("Enter your full name.");
+      return;
+    }
+    if (!normalizedEmail || !EMAIL_REGEX.test(normalizedEmail)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+
     setLoading(true);
     setError("");
 
     try {
       const result = await base44.functions.invoke("submitContactInquiry", {
-        full_name: form.full_name,
-        email: form.email,
+        full_name: form.full_name.trim(),
+        email: normalizedEmail,
         phone: "",
         business_type: form.business_type,
         message: `Exit-intent lead capture from ${pathname}. Requested a free lead leak audit.`,
@@ -231,6 +242,7 @@ export default function ExitIntentPopup({ pathname }) {
                 value={form.full_name}
                 onChange={(event) => setForm((prev) => ({ ...prev, full_name: event.target.value }))}
                 required
+                aria-invalid={Boolean(error && !form.full_name.trim())}
                 className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="Jane Smith"
               />
@@ -242,6 +254,7 @@ export default function ExitIntentPopup({ pathname }) {
                 value={form.email}
                 onChange={(event) => setForm((prev) => ({ ...prev, email: event.target.value }))}
                 required
+                aria-invalid={Boolean(error && !EMAIL_REGEX.test(form.email.trim()))}
                 className="h-12 w-full rounded-2xl border border-amber-200/80 bg-white/92 px-4 text-sm text-slate-900 shadow-[inset_0_1px_0_rgba(255,255,255,0.8)] focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 placeholder="jane@business.com"
               />
