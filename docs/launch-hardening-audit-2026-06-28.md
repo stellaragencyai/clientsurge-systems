@@ -36,6 +36,7 @@ The app was reverted to a previous working Base44 version after the custom domai
    - Added `data-ga4-measurement-id` to the static GA4 script so the React GA4 installer can detect the existing script and avoid duplicate page views.
    - Removed PWA/iOS app shell meta and manifest tags from the public shell.
    - Replaced the large static route-directory fallback with a public-safe marketing fallback that excludes internal/admin routes.
+   - Confirmed fallback links are limited to public marketing, login, privacy, and terms routes.
    - Kept the React/Vite entry script intact: `/src/main.jsx`.
 
 ## Remaining P0 launch blockers
