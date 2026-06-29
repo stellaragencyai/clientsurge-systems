@@ -20,8 +20,18 @@ Deno.serve(async (req) => {
     return json({ error: "Invalid JSON body" }, 400);
   }
 
-  const { order_id, stage, checklist_id } = body;
+  // Support both direct invocations ({ order_id }) and entity automation payloads
+  // ({ event: { entity_id }, data: { id, ... }, changed_fields: [...] })
+  const order_id = body.order_id || body.data?.id || body.event?.entity_id;
   if (!order_id) return json({ error: "order_id required" }, 400);
+
+  // If triggered by an entity automation on Order, infer the stage from the
+  // current pipeline_status so downstream gates still fire correctly.
+  let stage = body.stage;
+  if (!stage && body.data?.pipeline_status) {
+    stage = body.data.pipeline_status;
+  }
+  const checklist_id = body.checklist_id;
 
   const base44 = createClientFromRequest(req);
   const tasks = [];
