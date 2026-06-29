@@ -29,7 +29,7 @@ The app was reverted to a previous working Base44 version after the custom domai
    - Added explicit production/test Stripe mode requirements.
    - Added analytics environment variable requirements and canonical production GA4 id.
    - Documented that `OPENAI_API_KEY` is server-side only and required by AI functions.
-   - Added public shell rules for single GA4 property, public-safe fallback, and disabled PWA/iOS behavior.
+   - Added public shell rules for single GA4 property, duplicate install prevention, public-safe fallback, and disabled PWA/iOS behavior.
 
 4. `index.html`
    - Removed the duplicate hardcoded GA4 property and kept only `G-H6QT342ZN9`.
