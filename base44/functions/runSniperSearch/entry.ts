@@ -1,4 +1,9 @@
-import { secureJson } from "../_shared/response.ts";
+function secureJson(data, opts = {}) {
+  return Response.json(data, {
+    status: opts.status || 200,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
 /**
  * runSniperSearch
  * Autonomous AI sniper: finds established businesses with strong reviews
@@ -44,12 +49,17 @@ async function invokeLLM(prompt, jsonSchema = null) {
   return content;
 }
 
-async function searchBusiness(niche, city, searchTerm) {
-  const prompt = `You are a business intelligence sniper for a digital marketing agency. Your job is to find REAL established local businesses in "${city}" in the "${niche.label}" niche that have:
+async function searchAllNichesInCity(niches, city) {
+  const nicheList = niches.map(n =>
+    `- ${n.key}: ${n.label} (search terms: ${n.search_terms.join(', ')})`
+  ).join('\n');
+
+  const prompt = `You are a business intelligence sniper for a digital marketing agency. Your job is to find REAL established local businesses in "${city}" across ${niches.length} niches that have:
 - LOTS of positive reviews (50+ reviews, 4.0+ stars on Google or Yelp)
 - BUT a bad, outdated, or nonexistent website
 
-Search term: "${searchTerm} ${city}"
+Niches to cover (find businesses for EACH niche):
+${nicheList}
 
 Return a JSON object with this structure:
 {
@@ -69,7 +79,7 @@ Return a JSON object with this structure:
       "review_count": number,
       "review_rating": number,
       "review_platform": "Google|Yelp|both",
-      "niche": "${niche.key}",
+      "niche": "one of: ${niches.map(n => n.key).join(', ')}",
       "outreach_insight": "1-2 sentence insight on why they'd want to upgrade their web presence",
       "estimated_responsiveness": "high|medium|low",
       "tags": ["array of relevant tags"]
@@ -82,7 +92,7 @@ Rules:
 - DO NOT include businesses with modern, professional websites — they are not our target
 - Focus on businesses that would clearly benefit from a new website + lead automation
 - Generate realistic, plausible data for businesses that match this profile in ${city}
-- Return 4-6 businesses maximum
+- Return 2-4 businesses per niche (max ${niches.length * 4} total)
 - Make the website_upgrade_pitch highly specific to the business type`;
 
   return invokeLLM(prompt, true);
@@ -125,11 +135,18 @@ Deno.serve(async (req) => {
     }
 
     const body = await req.json().catch(() => ({}));
-    const targetCities = body.cities || DEFAULT_CITIES.slice(0, 3); // default 3 cities per run
     const targetNiches = body.niches || NICHES.map(n => n.key);
+
+    // Default: rotate through one city per day so all 10 cities are covered every 10 days.
+    // Manual/admin calls can pass `body.cities` to override.
+    let targetCities = body.cities;
+    if (!targetCities) {
+      const dayOfYear = Math.floor((Date.now() - new Date(new Date().getFullYear(), 0, 0)) / 86400000);
+      targetCities = [DEFAULT_CITIES[dayOfYear % DEFAULT_CITIES.length]];
+    }
     const minSniperScore = body.min_score || 40;
 
-    console.log(`[Sniper] Starting hunt: ${targetCities.length} cities × ${targetNiches.length} niches`);
+    console.log(`[Sniper] Starting hunt: ${targetCities.length} cities × ${targetNiches.length} niches (cities: ${targetCities.join(', ')})`);
 
     // Load existing leads to deduplicate
     const existingLeads = await base44.asServiceRole.entities.Lead.list('-created_date', 500);
@@ -140,81 +157,78 @@ Deno.serve(async (req) => {
 
     const selectedNiches = NICHES.filter(n => targetNiches.includes(n.key));
 
+    // One LLM call per city covers all niches at once, keeping the run within the
+    // function timeout. Daily automation rotates cities so coverage stays broad.
     for (const city of targetCities) {
-      for (const niche of selectedNiches) {
-        // Pick one search term per niche per city
-        const searchTerm = niche.search_terms[Math.floor(Math.random() * niche.search_terms.length)];
-        console.log(`[Sniper] Hunting: ${searchTerm} in ${city}`);
+      console.log(`[Sniper] Hunting ${selectedNiches.length} niches in ${city}`);
+      try {
+        const result = await searchAllNichesInCity(selectedNiches, city);
+        const businesses = result.businesses || [];
 
-        try {
-          const result = await searchBusiness(niche, city, searchTerm);
-          const businesses = result.businesses || [];
+        for (const biz of businesses) {
+          const sniperScore = calcSniperScore(biz);
 
-          for (const biz of businesses) {
-            const sniperScore = calcSniperScore(biz);
-
-            if (sniperScore < minSniperScore) {
-              results.skipped_low_score++;
-              continue;
-            }
-
-            // Deduplicate
-            const domain = biz.website ? new URL(biz.website.startsWith('http') ? biz.website : `https://${biz.website}`).hostname.replace('www.', '') : null;
-            if (domain && existingDomains.has(domain)) {
-              results.skipped_duplicate++;
-              continue;
-            }
-            if (biz.phone && existingPhones.has(biz.phone)) {
-              results.skipped_duplicate++;
-              continue;
-            }
-
-            // Save to Lead entity
-            const leadData = {
-              business_name: biz.business_name,
-              phone: biz.phone || '',
-              city: biz.city || city.split(' ')[0],
-              state: biz.state || city.split(' ')[1] || 'AZ',
-              address: biz.address || '',
-              website: biz.website || '',
-              email: '',
-              niche: biz.niche || niche.key,
-              has_website: biz.has_website !== false,
-              website_quality: biz.website_quality || 'unknown',
-              website_age_estimate: biz.website_age_estimate || '',
-              website_issues: biz.website_issues || [],
-              website_upgrade_pitch: biz.website_upgrade_pitch || '',
-              review_count: biz.review_count || 0,
-              review_rating: biz.review_rating || 0,
-              review_platform: biz.review_platform || 'Google',
-              sniper_score: sniperScore,
-              lead_score: sniperScore,
-              lead_quality_label: sniperScore >= 70 ? 'High' : sniperScore >= 50 ? 'Medium' : 'Low',
-              status: 'New',
-              source: 'sniper_agent',
-              outreach_insight: biz.outreach_insight || '',
-              estimated_responsiveness: biz.estimated_responsiveness || 'unknown',
-              tags: [...(biz.tags || []), 'sniper', niche.key],
-              domain: domain || '',
-              last_enriched_at: new Date().toISOString(),
-            };
-
-            await base44.asServiceRole.entities.Lead.create(leadData);
-
-            if (domain) existingDomains.add(domain);
-            if (biz.phone) existingPhones.add(biz.phone);
-
-            results.saved++;
-            results.targets.push({ business_name: biz.business_name, city: biz.city, niche: niche.key, sniper_score: sniperScore });
-            console.log(`[Sniper] SAVED: ${biz.business_name} — Score: ${sniperScore}`);
+          if (sniperScore < minSniperScore) {
+            results.skipped_low_score++;
+            continue;
           }
-        } catch (err) {
-          console.error(`[Sniper] Error for ${searchTerm} in ${city}:`, err.message);
-          results.errors++;
-        }
 
-        // Brief pause between calls
-        await new Promise(r => setTimeout(r, 500));
+          // Deduplicate
+          let domain = null;
+          try {
+            domain = biz.website ? new URL(biz.website.startsWith('http') ? biz.website : `https://${biz.website}`).hostname.replace('www.', '') : null;
+          } catch { domain = null; }
+          if (domain && existingDomains.has(domain)) {
+            results.skipped_duplicate++;
+            continue;
+          }
+          if (biz.phone && existingPhones.has(biz.phone)) {
+            results.skipped_duplicate++;
+            continue;
+          }
+
+          const nicheKey = biz.niche || selectedNiches[0].key;
+          const leadData = {
+            business_name: biz.business_name,
+            phone: biz.phone || '',
+            city: biz.city || city.split(' ')[0],
+            state: biz.state || city.split(' ')[1] || 'AZ',
+            address: biz.address || '',
+            website: biz.website || '',
+            email: '',
+            niche: nicheKey,
+            has_website: biz.has_website !== false,
+            website_quality: biz.website_quality || 'unknown',
+            website_age_estimate: biz.website_age_estimate || '',
+            website_issues: biz.website_issues || [],
+            website_upgrade_pitch: biz.website_upgrade_pitch || '',
+            review_count: biz.review_count || 0,
+            review_rating: biz.review_rating || 0,
+            review_platform: biz.review_platform || 'Google',
+            sniper_score: sniperScore,
+            lead_score: sniperScore,
+            lead_quality_label: sniperScore >= 70 ? 'High' : sniperScore >= 50 ? 'Medium' : 'Low',
+            status: 'New',
+            source: 'sniper_agent',
+            outreach_insight: biz.outreach_insight || '',
+            estimated_responsiveness: biz.estimated_responsiveness || 'unknown',
+            tags: [...(biz.tags || []), 'sniper', nicheKey],
+            domain: domain || '',
+            last_enriched_at: new Date().toISOString(),
+          };
+
+          await base44.asServiceRole.entities.Lead.create(leadData);
+
+          if (domain) existingDomains.add(domain);
+          if (biz.phone) existingPhones.add(biz.phone);
+
+          results.saved++;
+          results.targets.push({ business_name: biz.business_name, city: biz.city, niche: nicheKey, sniper_score: sniperScore });
+          console.log(`[Sniper] SAVED: ${biz.business_name} — Score: ${sniperScore}`);
+        }
+      } catch (err) {
+        console.error(`[Sniper] Error for ${city}:`, err.message);
+        results.errors++;
       }
     }
 
