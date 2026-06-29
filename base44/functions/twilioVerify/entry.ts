@@ -24,6 +24,8 @@ function getRequestedPhone(body: Record<string, any>): string | null {
     entityData?.phone ||
     entityData?.phone_number ||
     entityData?.customer_phone ||
+    entityData?.normalized_phone ||
+    entityData?.canonical_phone ||
     ''
   );
 }
@@ -75,8 +77,11 @@ Deno.serve(async (req) => {
     const action = requestedAction === 'send' ? 'start' : requestedAction;
     const code = String(body?.code || body?.verification_code || '').trim();
 
+    // Entity automations fire on every Lead create — not all leads have a valid
+    // US-format phone. Gracefully skip instead of failing the automation.
     if (!phoneE164) {
-      return Response.json({ error: 'Valid phone number required' }, { status: 400 });
+      console.log('[twilioVerify] Skipping — no valid phone number in payload');
+      return Response.json({ success: true, skipped: true, reason: 'no_valid_phone', message: 'Lead has no valid phone number — verification skipped.' });
     }
 
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
@@ -84,7 +89,8 @@ Deno.serve(async (req) => {
     const serviceSid = Deno.env.get('TWILIO_VERIFY_SERVICE_SID');
 
     if (!accountSid || !authToken || !serviceSid) {
-      return Response.json({ error: 'Twilio Verify not configured' }, { status: 500 });
+      console.warn('[twilioVerify] Skipping — TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, or TWILIO_VERIFY_SERVICE_SID not set');
+      return Response.json({ success: true, skipped: true, reason: 'not_configured', message: 'Twilio Verify not configured — set TWILIO_VERIFY_SERVICE_SID to enable.' });
     }
 
     if (action === 'start') {
