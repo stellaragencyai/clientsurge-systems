@@ -22,6 +22,66 @@ function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {})
   });
 }
 
+function toStripeAmount(amount) {
+  return Math.round(Number(amount || 0) * 100);
+}
+
+function buildTestStripeLineItems(pricingSummary) {
+  const packageOffer = pricingSummary?.package_offer || null;
+  const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
+
+  if (!packageOffer?.package_key) {
+    throw new Error("Test checkout currently requires a Starter, Growth, or Pro package bundle.");
+  }
+
+  if (addOnServiceKeys.length > 0) {
+    throw new Error("Test checkout currently supports package bundles only; add-on checkout is not enabled.");
+  }
+
+  const metadata = {
+    catalog_version: "canonical_sales_catalog_v1",
+    package_key: packageOffer.package_key,
+    package_display_name: packageOffer.name,
+    stripe_mode: "test",
+  };
+
+  return [
+    {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: `${packageOffer.name} Setup and Installation [TEST]`,
+          metadata: {
+            ...metadata,
+            charge_type: "setup_fee",
+            billing_phase: "initial",
+          },
+        },
+        unit_amount: toStripeAmount(pricingSummary.total_setup),
+      },
+      quantity: 1,
+    },
+    {
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: `${packageOffer.name} Monthly Support [TEST]`,
+          metadata: {
+            ...metadata,
+            charge_type: "monthly_subscription",
+            billing_phase: "recurring",
+          },
+        },
+        recurring: {
+          interval: "month",
+        },
+        unit_amount: toStripeAmount(pricingSummary.total_monthly),
+      },
+      quantity: 1,
+    },
+  ];
+}
+
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
   let createdOrderId = null;
@@ -172,7 +232,9 @@ Deno.serve(async (req) => {
     });
     createdOrderId = order.id;
 
-    const line_items = buildStripeLineItemsForPricingSummary(pricingSummary);
+    const line_items = stripeMode === "test"
+      ? buildTestStripeLineItems(pricingSummary)
+      : buildStripeLineItemsForPricingSummary(pricingSummary);
 
     const sessionMetadata = {
       order_id: order.id,
@@ -194,8 +256,10 @@ Deno.serve(async (req) => {
       package_type: pricingSummary.package_offer?.package_key || "",
       selected_package_type: pricingSummary.package_offer?.package_key || "",
       plan_type: packageLabel,
-      package_stripe_product_id: pricingSummary.package_offer?.stripe_product_id || "",
+      package_stripe_product_id: stripeMode === "test" ? "price_data_test_mode" : pricingSummary.package_offer?.stripe_product_id || "",
       requested_package_key: requestedPackage?.package_key || "",
+      stripe_mode: stripeMode,
+      stripe_livemode: livemode ? "true" : "false",
       request_id: requestId,
       deploy_immediately: deploy_immediately ? "true" : "false",
     };
@@ -215,6 +279,8 @@ Deno.serve(async (req) => {
           package_key: pricingSummary.package_offer?.package_key || "",
           package_type: pricingSummary.package_offer?.package_key || "",
           selected_package_type: pricingSummary.package_offer?.package_key || "",
+          stripe_mode: stripeMode,
+          stripe_livemode: livemode ? "true" : "false",
           services_json: JSON.stringify(
             pricingSummary.priced_items.map((item) => ({
               product_id: item.product_id,
@@ -240,9 +306,10 @@ Deno.serve(async (req) => {
       status: session.status,
       livemode: session.livemode,
       packageType,
+      stripeMode,
     });
 
-    return secureJson({ url: session.url, session_id: session.id, request_id: requestId });
+    return secureJson({ url: session.url, session_id: session.id, request_id: requestId, stripe_mode: stripeMode, livemode });
   } catch (error) {
     if (createdOrderId) {
       try {
