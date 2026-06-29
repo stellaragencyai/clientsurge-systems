@@ -60,6 +60,7 @@ This document lists the production environment variables the app and Base44 func
 
 - `index.html` must not include duplicate GA4 measurement IDs.
 - The public shell should only reference `G-H6QT342ZN9` unless a future migration intentionally changes the production property.
+- The static GA4 script should include `data-ga4-measurement-id` so React can detect it and avoid duplicate installs.
 - The public fallback must not expose admin, mission-control, setup, reconciliation, observability, or other internal route names.
 - PWA/iOS app-shell behavior should stay disabled until there is a deliberate PWA release plan.
 
