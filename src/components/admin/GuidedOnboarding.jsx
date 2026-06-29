@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import {
-  CheckCircle2, Circle, Loader2, CreditCard, MessageSquare, Calendar,
+  CheckCircle2, Loader2, CreditCard, MessageSquare, Calendar,
   Users, Zap, ShieldCheck, Rocket, ArrowRight, RefreshCw, AlertCircle, Settings,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
