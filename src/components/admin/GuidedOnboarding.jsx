@@ -5,6 +5,11 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+// TEMPORARY INTERNAL BYPASS ONLY.
+// This lets downstream launch testing continue while preserving the truth that
+// Stripe is not verified until a real production-trusted paid Order exists.
+const TEMPORARY_STRIPE_WAIVER_ENABLED = true;
+
 const STEPS = [
   {
     id: 1,
@@ -82,13 +87,23 @@ export default function GuidedOnboarding({ onNavigate }) {
 
   useEffect(() => { fetchAll(); }, []);
 
+  const getGate = (gateKey) => {
+    const gates = sprintData?.gates || [];
+    return gates.find(g => g.gate_key === gateKey) || null;
+  };
+
+  const isStepSatisfied = (status) => status === "done" || status === "waived";
+
   const getStepStatus = (step) => {
     if (!sprintData) return "pending";
 
     if (step.checkKey === "stripe") {
       const sp = sprintData.sections?.stripe_payment || {};
-      if (sp.evidence_status === "trusted") return "done";
-      if (sp.production_trusted_paid_count > 0) return "done";
+      const stripeGate = getGate("stripe_payment_gate");
+      const realStripeProofPassed = sp.evidence_status === "trusted" || sp.status === "proof_passed";
+
+      if (realStripeProofPassed) return "done";
+      if (TEMPORARY_STRIPE_WAIVER_ENABLED || stripeGate?.status === "waived") return "waived";
       return "pending";
     }
     if (step.checkKey === "leads") {
@@ -115,9 +130,7 @@ export default function GuidedOnboarding({ onNavigate }) {
       return "pending";
     }
     if (step.checkKey === "launch_truth") {
-      if (sprintData.safe_to_launch) return "done";
-      if (sprintData.production_blocker_count === 0) return "done";
-      return "pending";
+      return sprintData.safe_to_launch ? "done" : "pending";
     }
     if (step.checkKey === "go_live") {
       return sprintData.safe_to_launch ? "done" : "pending";
@@ -125,9 +138,14 @@ export default function GuidedOnboarding({ onNavigate }) {
     return "pending";
   };
 
-  const completedCount = STEPS.filter(s => getStepStatus(s) === "done").length;
-  const progressPercent = Math.round((completedCount / STEPS.length) * 100);
-  const currentStep = STEPS.find(s => getStepStatus(s) !== "done");
+  const stepStatuses = STEPS.map(s => ({ step: s, status: getStepStatus(s) }));
+  const realCompletedCount = stepStatuses.filter(s => s.status === "done").length;
+  const waivedCount = stepStatuses.filter(s => s.status === "waived").length;
+  const progressedCount = stepStatuses.filter(s => isStepSatisfied(s.status)).length;
+  const progressPercent = Math.round((progressedCount / STEPS.length) * 100);
+  const currentStep = STEPS.find(s => !isStepSatisfied(getStepStatus(s)));
+  const stripeStatus = getStepStatus(STEPS[0]);
+  const stripeTemporarilyWaived = stripeStatus === "waived";
 
   return (
     <div className="space-y-6">
@@ -149,7 +167,9 @@ export default function GuidedOnboarding({ onNavigate }) {
       <div className="rounded-xl border border-border bg-card p-5">
         <div className="flex items-center justify-between mb-3">
           <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">Launch Progress</h3>
-          <span className="text-sm font-bold text-primary">{completedCount} / {STEPS.length} complete</span>
+          <span className="text-sm font-bold text-primary">
+            {realCompletedCount} complete{waivedCount > 0 ? ` + ${waivedCount} waived` : ""} / {STEPS.length}
+          </span>
         </div>
         <div className="w-full h-3 rounded-full bg-muted overflow-hidden">
           <div
@@ -158,11 +178,23 @@ export default function GuidedOnboarding({ onNavigate }) {
           />
         </div>
         <p className="text-xs text-muted-foreground mt-2">
-          {progressPercent === 100
+          {progressPercent === 100 && !stripeTemporarilyWaived
             ? "✅ All steps complete — your system is ready to launch!"
-            : `Next step: ${currentStep?.title || "All done"}`}
+            : `Next step: ${currentStep?.title || (stripeTemporarilyWaived ? "Real Stripe proof still required" : "All done")}`}
         </p>
       </div>
+
+      {stripeTemporarilyWaived && (
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-amber-50 border border-amber-200 text-sm text-amber-900">
+          <AlertCircle className="w-5 h-5 flex-shrink-0 mt-0.5" />
+          <div>
+            <p className="font-bold">Stripe is temporarily waived, not verified.</p>
+            <p className="mt-1">
+              Real live Stripe payment proof is still required before external production launch. Use this mode only for downstream launch testing.
+            </p>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="flex items-center gap-3 p-4 rounded-lg bg-red-50 border border-red-200 text-sm text-red-800">
@@ -177,7 +209,9 @@ export default function GuidedOnboarding({ onNavigate }) {
           const status = getStepStatus(step);
           const Icon = step.icon;
           const isDone = status === "done";
-          const isCurrent = !isDone && STEPS.slice(0, idx).every(s => getStepStatus(s) === "done");
+          const isWaived = status === "waived";
+          const isSatisfied = isStepSatisfied(status);
+          const isCurrent = !isSatisfied && STEPS.slice(0, idx).every(s => isStepSatisfied(getStepStatus(s)));
 
           return (
             <div
@@ -185,6 +219,8 @@ export default function GuidedOnboarding({ onNavigate }) {
               className={`rounded-xl border p-5 transition-all ${
                 isDone
                   ? "border-green-200 bg-green-50/50"
+                  : isWaived
+                  ? "border-amber-200 bg-amber-50/60"
                   : isCurrent
                   ? "border-primary/40 bg-primary/5 ring-1 ring-primary/20"
                   : "border-border bg-card opacity-60"
@@ -197,6 +233,8 @@ export default function GuidedOnboarding({ onNavigate }) {
                     <Loader2 className="w-6 h-6 text-muted-foreground animate-spin" />
                   ) : isDone ? (
                     <CheckCircle2 className="w-6 h-6 text-green-600" />
+                  ) : isWaived ? (
+                    <AlertCircle className="w-6 h-6 text-amber-600" />
                   ) : (
                     <div className={`w-6 h-6 rounded-full border-2 flex items-center justify-center ${
                       isCurrent ? "border-primary" : "border-gray-300"
@@ -209,18 +247,27 @@ export default function GuidedOnboarding({ onNavigate }) {
                 {/* Content */}
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
-                    <Icon className={`w-4 h-4 ${isDone ? "text-green-600" : isCurrent ? "text-primary" : "text-muted-foreground"}`} />
-                    <h3 className={`text-sm font-bold ${isDone ? "text-green-900" : isCurrent ? "text-foreground" : "text-muted-foreground"}`}>
+                    <Icon className={`w-4 h-4 ${isDone ? "text-green-600" : isWaived ? "text-amber-600" : isCurrent ? "text-primary" : "text-muted-foreground"}`} />
+                    <h3 className={`text-sm font-bold ${isDone ? "text-green-900" : isWaived ? "text-amber-900" : isCurrent ? "text-foreground" : "text-muted-foreground"}`}>
                       {step.title}
                     </h3>
                     {isDone && (
                       <span className="text-xs font-semibold text-green-700 bg-green-100 px-2 py-0.5 rounded-full">Complete</span>
+                    )}
+                    {isWaived && (
+                      <span className="text-xs font-semibold text-amber-800 bg-amber-100 px-2 py-0.5 rounded-full">Waived Temporarily</span>
                     )}
                     {isCurrent && (
                       <span className="text-xs font-semibold text-primary bg-primary/10 px-2 py-0.5 rounded-full">In Progress</span>
                     )}
                   </div>
                   <p className="text-sm text-muted-foreground">{step.description}</p>
+
+                  {isWaived && step.checkKey === "stripe" && (
+                    <p className="mt-2 text-xs font-medium text-amber-900">
+                      Bypassed only for internal downstream testing. Real paid Stripe proof must pass before external launch.
+                    </p>
+                  )}
 
                   {/* Step-specific detail */}
                   {isCurrent && step.checkKey === "stripe" && (
