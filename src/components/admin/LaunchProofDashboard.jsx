@@ -4,6 +4,7 @@ import { base44 } from "@/api/base44Client";
 
 const STATUS_CONFIG = {
   trusted: { label: "Trusted", icon: ShieldCheck, color: "text-green-700", bg: "bg-green-50", border: "border-green-200" },
+  ready: { label: "Ready", icon: ShieldCheck, color: "text-blue-700", bg: "bg-blue-50", border: "border-blue-200" },
   warning: { label: "Warning", icon: AlertTriangle, color: "text-yellow-700", bg: "bg-yellow-50", border: "border-yellow-200" },
   blocked: { label: "Blocked", icon: XCircle, color: "text-red-700", bg: "bg-red-50", border: "border-red-200" },
   unknown: { label: "Unknown", icon: HelpCircle, color: "text-gray-600", bg: "bg-gray-50", border: "border-gray-200" },
@@ -78,7 +79,7 @@ export default function LaunchProofDashboard() {
         const blocked = gate?.status === "blocked" || (gate?.blockers?.length > 0);
         if (proofPassed) return { status: "trusted", nextAction: "" };
         if (blocked) return { status: "blocked", nextAction: "Complete a real Stripe checkout. Verify payment_status=paid on a production order." };
-        if (gate?.status === "ready_for_proof") return { status: "warning", nextAction: "Run a live test checkout to generate proof." };
+        if (gate?.status === "ready_for_proof") return { status: "ready", nextAction: "Run a live test checkout to generate proof." };
         return { status: "unknown", nextAction: "Stripe payment proof has not been verified yet." };
       }
       case "analytics": {
@@ -105,7 +106,7 @@ export default function LaunchProofDashboard() {
         if (ga4Active && hasRealConversionEvents) return { status: "trusted", nextAction: "" };
         if (ga4Active && !hasRealConversionEvents) {
           return {
-            status: "warning",
+            status: "ready",
             nextAction: ga4.next_action || "GA4 is configured, but no real page_view + cta_click proof has been recorded yet. Generate traffic and verify in GA4 Realtime.",
           };
         }
@@ -115,20 +116,53 @@ export default function LaunchProofDashboard() {
         };
       }
       case "dashboard_truth": {
-        const leadCapture = data.evidence?.lead_capture;
-        const hasTrustedLead = leadCapture?.latest_website_lead?.is_production_trusted;
-        if (hasTrustedLead) return { status: "trusted", nextAction: "" };
-        if (leadCapture?.latest_website_lead) return { status: "warning", nextAction: "Latest lead exists but is not production-trusted. Verify it is a real customer inquiry." };
-        return { status: "unknown", nextAction: "No leads captured yet. Submit a real lead through the website form." };
+        const gate = data.gates?.find(g => g.gate_key === "dashboard_truth_gate");
+        const dashboardTruth = data.evidence?.dashboard_truth || data.sections?.dashboard_truth || {};
+        const leadCapture = data.evidence?.lead_capture || data.sections?.lead_capture || {};
+        const productionFailed = Number(dashboardTruth.failed_jobs_production || 0);
+        const productionStuck = Number(dashboardTruth.stuck_jobs_production || 0);
+        const productionDeadLetters = Number(dashboardTruth.dead_letter_production || 0);
+        const unresolvedProductionIssues = productionFailed + productionStuck + productionDeadLetters;
+        const hasTrustedLead = Boolean(leadCapture?.latest_website_lead?.is_production_trusted);
+
+        if (gate?.status === "approved" || gate?.status === "proof_passed") {
+          return { status: "trusted", nextAction: "" };
+        }
+        if (
+          gate?.status === "ready_for_proof" ||
+          (
+            dashboardTruth.safe_to_show_admin === true &&
+            dashboardTruth.safe_to_launch === true &&
+            unresolvedProductionIssues === 0
+          )
+        ) {
+          return {
+            status: "ready",
+            nextAction: gate?.next_action || "Admin approval required after reviewing dashboard truth evidence.",
+          };
+        }
+        if (gate?.status === "blocked" || unresolvedProductionIssues > 0) {
+          return {
+            status: "blocked",
+            nextAction: gate?.next_action || "Resolve production-trusted failed/stuck jobs and dead-letter records before launch.",
+          };
+        }
+        if (hasTrustedLead || dashboardTruth.safe_to_show_admin === true || leadCapture?.latest_website_lead) {
+          return {
+            status: "warning",
+            nextAction: gate?.next_action || "Dashboard truth evidence exists, but it is not ready for proof yet.",
+          };
+        }
+        return { status: "unknown", nextAction: "No dashboard truth evidence returned yet. Run Re-verify All." };
       }
       case "voice": {
         const gate = data.gates?.find(g => g.gate_key === "elevenlabs_voice");
         if (gate?.proof_passed || gate?.status === "approved") return { status: "trusted", nextAction: "" };
-        if (gate?.status === "ready_for_proof") return { status: "warning", nextAction: "Voice agent is configured. Place a test call to verify." };
+        if (gate?.status === "ready_for_proof") return { status: "ready", nextAction: "Voice agent is configured. Place a test call to verify." };
         return { status: "blocked", nextAction: "Configure ElevenLabs agent and phone number for voice automation." };
       }
       case "booking": {
-        const booking = data.evidence?.booking_proof;
+        const booking = data.evidence?.booking_proof || data.sections?.booking_proof;
         if (booking?.has_booking_link && booking?.link_valid) return { status: "trusted", nextAction: "" };
         if (booking?.has_booking_link && !booking?.link_valid) return { status: "warning", nextAction: "Booking link is set but appears invalid. Update in Admin Settings." };
         return { status: "blocked", nextAction: "Set a valid booking link (Calendly or similar) in Admin Settings." };
@@ -144,16 +178,17 @@ export default function LaunchProofDashboard() {
     }
   };
 
-  // Sort cards: blocked first, then unknown, then warning, then trusted
-  const statusOrder = { blocked: 0, unknown: 1, warning: 2, trusted: 3 };
+  // Sort cards: blocked first, then unknown, warning, ready, trusted
+  const statusOrder = { blocked: 0, unknown: 1, warning: 2, ready: 3, trusted: 4 };
   const sortedCards = [...PROOF_CARDS].sort((a, b) => {
-    const sa = statusOrder[getCardStatus(a.key).status] ?? 4;
-    const sb = statusOrder[getCardStatus(b.key).status] ?? 4;
+    const sa = statusOrder[getCardStatus(a.key).status] ?? 5;
+    const sb = statusOrder[getCardStatus(b.key).status] ?? 5;
     return sa - sb;
   });
 
   const blockedCount = PROOF_CARDS.filter(c => getCardStatus(c.key).status === "blocked").length;
   const warningCount = PROOF_CARDS.filter(c => getCardStatus(c.key).status === "warning").length;
+  const readyCount = PROOF_CARDS.filter(c => getCardStatus(c.key).status === "ready").length;
   const trustedCount = PROOF_CARDS.filter(c => getCardStatus(c.key).status === "trusted").length;
 
   return (
@@ -175,7 +210,7 @@ export default function LaunchProofDashboard() {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-3 gap-3">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-center">
           <p className="text-2xl font-bold text-red-700">{blockedCount}</p>
           <p className="text-xs font-semibold uppercase text-red-700 tracking-wide">Blocked</p>
@@ -183,6 +218,10 @@ export default function LaunchProofDashboard() {
         <div className="rounded-lg border border-yellow-200 bg-yellow-50 p-3 text-center">
           <p className="text-2xl font-bold text-yellow-700">{warningCount}</p>
           <p className="text-xs font-semibold uppercase text-yellow-700 tracking-wide">Warning</p>
+        </div>
+        <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 text-center">
+          <p className="text-2xl font-bold text-blue-700">{readyCount}</p>
+          <p className="text-xs font-semibold uppercase text-blue-700 tracking-wide">Ready</p>
         </div>
         <div className="rounded-lg border border-green-200 bg-green-50 p-3 text-center">
           <p className="text-2xl font-bold text-green-700">{trustedCount}</p>
