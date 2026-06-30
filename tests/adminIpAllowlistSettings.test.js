@@ -21,6 +21,16 @@ test("admin settings endpoints use the shared normalized settings save path", ()
   assert.match(updateEntry, /payload\?\.settings \|\| payload/);
 });
 
+test("admin settings shared helper allows every admin settings field exposed by the dashboard", () => {
+  const helper = read("base44/functions/_shared/adminSettings.js");
+
+  assert.match(helper, /missed_call_sms_template/);
+  assert.match(helper, /follow_up_day1_sms/);
+  assert.match(helper, /nurture_step8_body/);
+  assert.match(helper, /sms_status_callback_url/);
+  assert.match(helper, /voice_forwarding_phone/);
+});
+
 test("admin settings panel exposes the IP allowlist editor", () => {
   const panel = read("src/components/admin/AdminSettingsPanel.jsx");
 
@@ -30,9 +40,12 @@ test("admin settings panel exposes the IP allowlist editor", () => {
   assert.match(panel, /split\(\/\[\\n,\]\//);
 });
 
-test("frontend settings API unwraps settings payloads", () => {
+test("frontend settings API unwraps function settings payloads and falls back to AdminSettings entity on 404", () => {
   const api = read("src/lib/adminSettingsApi.js");
 
   assert.match(api, /response\?\.data\?\.settings \|\| response\?\.data/);
   assert.match(api, /invoke\("updateAdminSettings", \{ settings \}\)/);
+  assert.match(api, /isAdminSettingsFunctionNotFound/);
+  assert.match(api, /base44\?\.entities\?\.AdminSettings/);
+  assert.match(api, /entity\.list\("-created_date", 1\)/);
 });
