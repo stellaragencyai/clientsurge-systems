@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { isLeadVisibleInSalesViews } from "@/lib/leadCleanupGuards";
 
 const DIRECT_LEADS_PAGE_SIZE = 5000;
 const DIRECT_LEADS_MAX_ROWS = 25000;
@@ -111,6 +112,10 @@ function matchesFilter(lead, filters = {}) {
   return true;
 }
 
+function scopeTrustedLeads(leads, filters = {}) {
+  return filters.includeFlagged === true ? leads : leads.filter(isLeadVisibleInSalesViews);
+}
+
 async function fetchDirectLeadsSnapshot(filters = {}) {
   const allLeads = [];
 
@@ -121,26 +126,30 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
   }
 
   const normalized = allLeads.map(normalizeLead);
-  const filtered = normalized.filter((lead) => matchesFilter(lead, filters));
+  const trustedScope = scopeTrustedLeads(normalized, filters);
+  const filtered = trustedScope.filter((lead) => matchesFilter(lead, filters));
   const limit = Math.min(Math.max(Number(filters.limit) || 100, 1), 250);
   const offset = Math.max(Number(filters.offset) || 0, 0);
   const leads = filtered.slice(offset, offset + limit);
-  const recentLeadActivity = [...normalized]
+  const recentLeadActivity = [...trustedScope]
     .sort((left, right) => new Date(right.updated_date || right.created_date || 0) - new Date(left.updated_date || left.created_date || 0))
     .slice(0, 8);
 
   return {
     generated_at: new Date().toISOString(),
     summary: {
-      total_leads: normalized.length,
+      raw_total_leads: normalized.length,
+      total_leads: trustedScope.length,
+      trusted_leads: trustedScope.length,
+      hidden_junk_leads: Math.max(0, normalized.length - trustedScope.length),
       filtered_leads: filtered.length,
       actionable_leads: filtered.filter((lead) => lead.status !== "Closed").length,
-      status_counts: countBy(normalized, "status"),
-      crm_stage_counts: countBy(normalized, "crm_stage"),
-      stage_counts: countBy(normalized, "stage_group"),
-      source_counts: countBy(normalized, "source"),
-      intake_counts: countBy(normalized, "intake_type"),
-      industry_counts: countBy(normalized, "industry"),
+      status_counts: countBy(trustedScope, "status"),
+      crm_stage_counts: countBy(trustedScope, "crm_stage"),
+      stage_counts: countBy(trustedScope, "stage_group"),
+      source_counts: countBy(trustedScope, "source"),
+      intake_counts: countBy(trustedScope, "intake_type"),
+      industry_counts: countBy(trustedScope, "industry"),
       segment_counts: {},
       recommended_offer_counts: {},
       recent_imports: [],
@@ -163,14 +172,16 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
       statuses: LEAD_STATUSES,
       crm_stages: CRM_STAGES,
       stage_groups: STAGE_GROUPS,
-      intake_types: Object.keys(countBy(normalized, "intake_type")).sort(),
+      intake_types: Object.keys(countBy(trustedScope, "intake_type")).sort(),
       segments: [],
-      sources: Object.keys(countBy(normalized, "source")).sort(),
-      industries: Object.keys(countBy(normalized, "industry")).sort(),
+      sources: Object.keys(countBy(trustedScope, "source")).sort(),
+      industries: Object.keys(countBy(trustedScope, "industry")).sort(),
     },
     data_window: {
       direct_entity_fallback: true,
       rows_loaded: normalized.length,
+      trusted_rows_loaded: trustedScope.length,
+      hidden_junk_rows: Math.max(0, normalized.length - trustedScope.length),
       max_rows: DIRECT_LEADS_MAX_ROWS,
     },
   };
@@ -178,6 +189,40 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
 
 function isEmptySummary(data) {
   return !data?.leads?.length && Number(data?.summary?.total_leads || 0) === 0;
+}
+
+function applyTrustedLeadScope(data, filters = {}) {
+  if (filters.includeFlagged === true) return data;
+
+  const leads = Array.isArray(data.leads) ? data.leads.filter(isLeadVisibleInSalesViews) : [];
+  const priorityQueue = Array.isArray(data.summary?.priority_queue)
+    ? data.summary.priority_queue.filter(isLeadVisibleInSalesViews)
+    : [];
+  const recentLeadActivity = Array.isArray(data.summary?.recent_lead_activity)
+    ? data.summary.recent_lead_activity.filter(isLeadVisibleInSalesViews)
+    : [];
+
+  const rawTotal = Number(data.summary?.raw_total_leads ?? data.summary?.total_leads ?? 0);
+  const trustedEstimate = Number(data.summary?.trusted_leads ?? data.summary?.filtered_leads ?? leads.length);
+
+  return {
+    ...data,
+    leads,
+    summary: {
+      ...(data.summary || {}),
+      raw_total_leads: rawTotal,
+      trusted_leads: trustedEstimate,
+      hidden_junk_note: "Normal sales views hide quarantined/test/duplicate leads by default.",
+      filtered_leads: leads.length,
+      actionable_leads: leads.filter((lead) => lead.status !== "Closed").length,
+      priority_queue: priorityQueue,
+      recent_lead_activity: recentLeadActivity,
+    },
+    pagination: {
+      ...(data.pagination || {}),
+      returned: leads.length,
+    },
+  };
 }
 
 export async function fetchLeadPipelineSummary(filters = {}) {
@@ -192,6 +237,8 @@ export async function fetchLeadPipelineSummary(filters = {}) {
   if (isEmptySummary(data)) {
     data = await fetchDirectLeadsSnapshot(filters);
   }
+
+  data = applyTrustedLeadScope(data, filters);
 
   // Sort lead list and priority queue by lead_score descending (high-intent first)
   if (Array.isArray(data.leads)) {
