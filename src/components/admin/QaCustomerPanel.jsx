@@ -2,6 +2,7 @@ import { useMemo, useState } from "react";
 import { CheckCircle2, Copy, Loader2, ShieldCheck, UserRoundPlus } from "lucide-react";
 import { PACKAGE_OFFERS } from "@/lib/aiProducts";
 import { createQaCustomerFixture, getAdminQaError } from "@/lib/adminQaApi";
+import QaLeadProofPanel from "./QaLeadProofPanel";
 
 function copyText(value) {
   if (!value || typeof navigator === "undefined" || !navigator.clipboard?.writeText) {
@@ -11,7 +12,7 @@ function copyText(value) {
   navigator.clipboard.writeText(value).catch(() => {});
 }
 
-export default function QaCustomerPanel() {
+function QaCustomerFixtureCard() {
   const packageOptions = useMemo(
     () =>
       PACKAGE_OFFERS.map((offer) => ({
@@ -221,6 +222,15 @@ export default function QaCustomerPanel() {
           </div>
         </div>
       ) : null}
+    </div>
+  );
+}
+
+export default function QaCustomerPanel() {
+  return (
+    <div className="space-y-6">
+      <QaLeadProofPanel />
+      <QaCustomerFixtureCard />
     </div>
   );
 }

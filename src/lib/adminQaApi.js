@@ -8,3 +8,8 @@ export async function createQaCustomerFixture(payload) {
   const response = await base44.functions.invoke("createQaCustomerFixture", payload);
   return response?.data || null;
 }
+
+export async function generateQaLeadProofSet(payload) {
+  const response = await base44.functions.invoke("generateQaLeadProofSet", payload);
+  return response?.data || null;
+}
