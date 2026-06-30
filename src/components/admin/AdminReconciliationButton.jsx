@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { RefreshCw, CheckCircle2, AlertCircle, AlertTriangle } from 'lucide-react';
+import { RefreshCw, CheckCircle2, AlertCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export default function AdminReconciliationButton({ onComplete }) {
   const [running, setRunning] = useState(false);
@@ -18,6 +18,27 @@ export default function AdminReconciliationButton({ onComplete }) {
         message: d?.success
           ? `Reconciliation complete. ${d.results.eventQueuesCreated} queues created, ${d.results.eventQueuesAlreadyExisted} existed. Truth: ${d.truth_status}.`
           : d?.error || 'Reconciliation failed.',
+      });
+      if (onComplete) onComplete();
+    } catch (err) {
+      setResult({ success: false, message: `Error: ${err.message}` });
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const handleTrackC = async () => {
+    setRunning(true);
+    setResult(null);
+    try {
+      const res = await base44.functions.invoke('trackCLeadTruthCleanup', { dry_run: false });
+      const d = res?.data || res;
+      setResult({
+        success: d?.success,
+        truthStatus: d?.success ? 'trusted' : 'blocked',
+        message: d?.success
+          ? `Track C cleanup complete. Updated ${d.updated || 0}; already done ${d.already_quarantined || 0}; failed ${d.failed || 0}.`
+          : d?.error || 'Track C cleanup failed.',
       });
       if (onComplete) onComplete();
     } catch (err) {
@@ -45,15 +66,26 @@ export default function AdminReconciliationButton({ onComplete }) {
 
   return (
     <div className="space-y-3">
-      <button
-        onClick={handleRun}
-        disabled={running}
-        className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-muted text-foreground font-semibold text-sm hover:bg-muted/80 transition-opacity disabled:opacity-60"
-        style={{ minHeight: 'unset', minWidth: 'unset' }}
-      >
-        <RefreshCw className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
-        {running ? 'Reconciling...' : 'Admin Reconciliation'}
-      </button>
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={handleRun}
+          disabled={running}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-muted text-foreground font-semibold text-sm hover:bg-muted/80 transition-opacity disabled:opacity-60"
+          style={{ minHeight: 'unset', minWidth: 'unset' }}
+        >
+          <RefreshCw className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
+          {running ? 'Working...' : 'Admin Reconciliation'}
+        </button>
+        <button
+          onClick={handleTrackC}
+          disabled={running}
+          className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 font-semibold text-sm hover:bg-blue-100 transition-opacity disabled:opacity-60"
+          style={{ minHeight: 'unset', minWidth: 'unset' }}
+        >
+          <ShieldCheck className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
+          Track C Cleanup
+        </button>
+      </div>
 
       {result && (
         <div className={`flex items-start gap-2.5 rounded-lg border p-3 text-sm ${statusColor}`}>
