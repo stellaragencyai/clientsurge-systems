@@ -71,6 +71,7 @@ function getPageAttribution() {
   const params = new URLSearchParams(window.location.search);
   return {
     source_page: window.location.pathname || "/book",
+    service_context: params.get("service") || "",
     utm_source: params.get("utm_source") || "",
     utm_medium: params.get("utm_medium") || "",
     utm_campaign: params.get("utm_campaign") || "",
@@ -79,7 +80,15 @@ function getPageAttribution() {
   };
 }
 
-export default function DemoBookingInline({ prefillIndustry = "" }) {
+export default function DemoBookingInline({
+  prefillIndustry = "",
+  theme = "dark",
+  mode = "audit",
+  serviceInterest = "automation_audit",
+  serviceLabel = "",
+}) {
+  const isLight = theme === "light";
+  const flowLabel = mode === "system_match" ? "System Match" : "Audit";
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
     first_name: "", last_name: "", business_name: "", email: "",
@@ -153,11 +162,12 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         business_type: form.industry,
         industry_slug: industrySlug,
         crm_tag: crmTagForIndustry(industrySlug),
-        service_interest: "automation_audit",
+        service_interest: serviceInterest,
+        service_label: serviceLabel,
         biggest_issue: form.biggest_issue,
         consent_given: form.consent_given === true,
-        consent_source: "book_inline_scheduler",
-        consent_text_version: "audit_inline_explicit_checkbox_v1",
+        consent_source: mode === "system_match" ? "book_system_match_inline" : "book_inline_scheduler",
+        consent_text_version: mode === "system_match" ? "system_match_inline_explicit_checkbox_v1" : "audit_inline_explicit_checkbox_v1",
         website_url: form.website_url,
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
@@ -171,23 +181,31 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
     } finally { setSaving(false); }
   };
 
-  const inputCls = (key) =>
-    `w-full h-10 rounded-xl border px-3 text-sm bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition ${errors[key] ? "border-red-500" : "border-white/10"}`;
+  const labelCls = isLight ? "block text-xs font-bold text-slate-700 mb-1.5" : "block text-xs font-semibold text-white/60 mb-1";
+  const helperCls = isLight ? "text-center text-xs text-slate-500" : "text-center text-xs text-white/60";
+  const errorCls = isLight ? "text-xs font-semibold text-red-600" : "text-xs text-red-400";
+  const inputCls = (key) => isLight
+    ? `w-full h-11 rounded-xl border px-3 text-sm bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition ${errors[key] ? "border-red-500" : "border-slate-200"}`
+    : `w-full h-10 rounded-xl border px-3 text-sm bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition ${errors[key] ? "border-red-500" : "border-white/10"}`;
+  const primaryButtonCls = isLight
+    ? "w-full h-12 flex items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-50"
+    : "w-full h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50";
+  const primaryButtonStyle = isLight ? undefined : { background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" };
 
   if (success) {
     return (
       <div className="py-10 flex flex-col items-center text-center">
-        <div className="w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4">
-          <CheckCircle2 className="w-8 h-8 text-green-400" />
+        <div className={isLight ? "w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4" : "w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4"}>
+          <CheckCircle2 className={isLight ? "w-8 h-8 text-green-700" : "w-8 h-8 text-green-400"} />
         </div>
-        <h3 className="text-xl font-semibold text-white mb-2">You're all set.</h3>
-        <p className="text-sm text-white/50">Nolan will confirm your audit within 24 hours.</p>
-        <p className="mt-3 text-xs text-white/45 max-w-sm">
+        <h3 className={isLight ? "text-xl font-bold text-[#001B44] mb-2" : "text-xl font-semibold text-white mb-2"}>You're all set.</h3>
+        <p className={isLight ? "text-sm text-slate-600" : "text-sm text-white/50"}>Nolan will confirm your {flowLabel.toLowerCase()} within 24 hours.</p>
+        <p className={isLight ? "mt-3 text-xs text-slate-500 max-w-sm" : "mt-3 text-xs text-white/45 max-w-sm"}>
           Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.
         </p>
         {submitWarnings.length > 0 && (
-          <p className="mt-3 text-xs text-amber-300 max-w-sm">
-            Your audit request was saved, but one or more follow-up actions still need review.
+          <p className={isLight ? "mt-3 text-xs text-amber-700 max-w-sm" : "mt-3 text-xs text-amber-300 max-w-sm"}>
+            Your request was saved, but one or more follow-up actions still need review.
           </p>
         )}
       </div>
@@ -196,7 +214,7 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
 
   if (step === 1) {
     return (
-      <form onSubmit={handleStep1} className="space-y-3">
+      <form onSubmit={handleStep1} className="space-y-4">
         <input
           type="text"
           name="website_url"
@@ -207,52 +225,58 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           className="hidden"
           aria-hidden="true"
         />
-        <div className="grid grid-cols-2 gap-3">
+        {serviceLabel && isLight && (
+          <div className="rounded-xl border border-primary/15 bg-white p-3 text-sm text-slate-700">
+            <span className="font-bold text-primary">Selected focus:</span> {serviceLabel}
+          </div>
+        )}
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-semibold text-white/60 mb-1">First Name *</label>
+            <label className={labelCls}>First Name *</label>
             <input name="first_name" value={form.first_name} onChange={set} placeholder="Jane" className={inputCls("first_name")} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-white/60 mb-1">Last Name *</label>
+            <label className={labelCls}>Last Name *</label>
             <input name="last_name" value={form.last_name} onChange={set} placeholder="Smith" className={inputCls("last_name")} />
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Business Name *</label>
+          <label className={labelCls}>Business Name *</label>
           <input name="business_name" value={form.business_name} onChange={set} placeholder="My Business" className={inputCls("business_name")} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Industry *</label>
+          <label className={labelCls}>Industry *</label>
           <select name="industry" value={form.industry} onChange={set} className={`${inputCls("industry")} cursor-pointer`}>
             <option value="">Select...</option>
             {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
           </select>
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid gap-3 sm:grid-cols-2">
           <div>
-            <label className="block text-xs font-semibold text-white/60 mb-1">Email *</label>
+            <label className={labelCls}>Email *</label>
             <input name="email" type="email" value={form.email} onChange={set} placeholder="jane@biz.com" className={inputCls("email")} />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-white/60 mb-1">Phone *</label>
+            <label className={labelCls}>Phone *</label>
             <input name="phone" type="tel" value={form.phone} onChange={set} placeholder="(555) 000-0000" className={inputCls("phone")} />
           </div>
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Website *</label>
+          <label className={labelCls}>Website *</label>
           <input name="website" value={form.website} onChange={set} placeholder="https://mybusiness.com" className={inputCls("website")} />
         </div>
         <div>
-          <label className="block text-xs font-semibold text-white/60 mb-1">Biggest challenge right now? *</label>
+          <label className={labelCls}>Biggest challenge right now? *</label>
           <select name="biggest_issue" value={form.biggest_issue} onChange={set} className={`${inputCls("biggest_issue")} cursor-pointer`}>
             <option value="">Select one...</option>
+            {serviceLabel && <option value={`Need ${serviceLabel}`}>Need {serviceLabel}</option>}
             <option value="Slow response time">Slow response time</option>
             <option value="Missed calls not being followed up">Missed calls not followed up</option>
             <option value="No follow-up system">No follow-up system</option>
             <option value="Low booking conversions">Low booking conversions</option>
           </select>
         </div>
-        <label className={`flex items-start gap-2.5 rounded-xl border px-3 py-2 text-xs leading-relaxed text-white/60 ${errors.consent_given ? "border-red-500" : "border-white/10"}`}>
+        <label className={`flex items-start gap-2.5 rounded-xl border px-3 py-3 text-xs leading-relaxed ${isLight ? "bg-white text-slate-600" : "text-white/60"} ${errors.consent_given ? "border-red-500" : isLight ? "border-slate-200" : "border-white/10"}`}>
           <input
             type="checkbox"
             checked={form.consent_given}
@@ -260,31 +284,27 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
               setForm((f) => ({ ...f, consent_given: e.target.checked }));
               setErrors((current) => ({ ...current, consent_given: undefined }));
             }}
-            className="mt-0.5 h-4 w-4 rounded accent-amber-500"
+            className={isLight ? "mt-0.5 h-4 w-4 rounded accent-primary" : "mt-0.5 h-4 w-4 rounded accent-amber-500"}
           />
-          <span>I agree to receive automated SMS and email messages from ClientSurge Systems about my audit request. Reply STOP to opt out.</span>
+          <span>I agree to receive automated SMS and email messages from ClientSurge Systems about my {flowLabel.toLowerCase()} request. Reply STOP to opt out.</span>
         </label>
         {Object.keys(errors).length > 0 && (
-          <p className="text-xs text-red-400">Please fill in all required fields.</p>
+          <p className={errorCls}>Please fill in all required fields.</p>
         )}
-        <button
-          type="submit"
-          className="w-full h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90"
-          style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
-        >
-          Next: Choose Audit Time <ArrowRight className="w-4 h-4" />
+        <button type="submit" className={primaryButtonCls} style={primaryButtonStyle}>
+          Next: Choose {flowLabel} Time <ArrowRight className="w-4 h-4" />
         </button>
-        <p className="text-center text-xs text-white/60">No spam. No pressure. Just a tailored walkthrough of your business.</p>
+        <p className={helperCls}>No spam. No pressure. Just a practical recommendation for your business.</p>
       </form>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-3">
-      {errors.scheduling && <p className="text-xs text-red-400">{errors.scheduling}</p>}
-      {errors.submit && <p className="text-xs text-red-400">{errors.submit}</p>}
+    <form onSubmit={handleSubmit} className="space-y-4">
+      {errors.scheduling && <p className={errorCls}>{errors.scheduling}</p>}
+      {errors.submit && <p className={errorCls}>{errors.submit}</p>}
       <div>
-        <label className="block text-xs font-semibold text-white/60 mb-1">Select Audit Date *</label>
+        <label className={labelCls}>Select {flowLabel} Date *</label>
         <input
           type="date"
           value={scheduling.date}
@@ -294,8 +314,8 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
         />
       </div>
       <div>
-        <label className="block text-xs font-semibold text-white/60 mb-1">
-          Select Audit Time * {loadingSlots && <span className="font-normal text-white/30 ml-1">Loading...</span>}
+        <label className={labelCls}>
+          Select {flowLabel} Time * {loadingSlots && <span className={isLight ? "font-normal text-slate-400 ml-1" : "font-normal text-white/30 ml-1"}>Loading...</span>}
         </label>
         <select
           value={scheduling.time}
@@ -303,27 +323,26 @@ export default function DemoBookingInline({ prefillIndustry = "" }) {
           disabled={!scheduling.date || loadingSlots}
           className={`${inputCls("scheduling")} disabled:opacity-40 cursor-pointer`}
         >
-          <option value="">{!scheduling.date ? "Select a date first..." : "Choose an audit time..."}</option>
+          <option value="">{!scheduling.date ? "Select a date first..." : `Choose a ${flowLabel.toLowerCase()} time...`}</option>
           {TIME_SLOTS.map(({ value, label }) => {
             const booked = bookedSlots.includes(value);
             return <option key={value} value={value} disabled={booked}>{label}{booked ? " - Reserved" : ""}</option>;
           })}
         </select>
       </div>
-      <div className="flex gap-3">
-        <button type="button" onClick={() => { setStep(1); setErrors({}); }} className="flex-1 h-11 rounded-full border border-white/10 text-white/60 font-semibold hover:bg-white/5 transition">
+      <div className="flex flex-col gap-3 sm:flex-row">
+        <button
+          type="button"
+          onClick={() => { setStep(1); setErrors({}); }}
+          className={isLight ? "h-11 flex-1 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 transition hover:bg-slate-50" : "flex-1 h-11 rounded-full border border-white/10 text-white/60 font-semibold hover:bg-white/5 transition"}
+        >
           Back
         </button>
-        <button
-          type="submit"
-          disabled={saving}
-          className="flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50"
-          style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" }}
-        >
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule Audit <ArrowRight className="w-4 h-4" /></>}
+        <button type="submit" disabled={saving} className={isLight ? primaryButtonCls.replace("w-full", "flex-1") : "flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50"} style={primaryButtonStyle}>
+          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule {flowLabel} <ArrowRight className="w-4 h-4" /></>}
         </button>
       </div>
-      <p className="text-center text-xs text-white/60">No spam. No pressure. Just a tailored walkthrough of your business.</p>
+      <p className={helperCls}>No spam. No pressure. Just a practical recommendation for your business.</p>
     </form>
   );
 }
