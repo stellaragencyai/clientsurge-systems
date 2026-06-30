@@ -10,6 +10,37 @@ function normalizePhone(phone) {
   return null;
 }
 
+function text(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function classifyIntake(body, normalizedPhone) {
+  const joined = [
+    body.full_name,
+    body.email,
+    normalizedPhone || body.phone_number,
+    body.business_name,
+    body.message,
+    body.source,
+    body.routing_key,
+    body.consent_source,
+    body.source_page,
+  ].map(text).join(' ');
+  const phoneDigits = String(normalizedPhone || body.phone_number || '').replace(/\D/g, '');
+  const markers = [];
+
+  if (joined.includes('clientsurge.test') || joined.includes('clientsurge-install.internal') || joined.includes('@clientsurge.test') || joined.includes('.internal')) markers.push('internal_email_domain');
+  if (joined.includes('backfill-test') || joined.includes('post_patch_verification') || joined.includes('runaibraininstallerbackfill')) markers.push('internal_backfill_run');
+  if (joined.includes('crm_live_smoke_test') || joined.includes('smoke') || joined.includes('install_test') || joined.includes('admin_test_lead')) markers.push('internal_validation_run');
+  if (joined.includes('sarah smoke') || joined.includes('client surge smoke') || joined.includes('clientsurge smoke') || joined.includes('test owner')) markers.push('internal_validation_name');
+  if (phoneDigits.length >= 7 && phoneDigits.includes('555')) markers.push('reserved_phone_pattern');
+
+  return {
+    nonProduction: markers.length > 0,
+    markers: [...new Set(markers)],
+  };
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
@@ -47,6 +78,8 @@ Deno.serve(async (req) => {
       );
     }
 
+    const intakeQuality = classifyIntake(body, normalizedPhone);
+
     // Check for duplicate: normalized email + phone (multi-layer dedup)
     const normalizedEmail = email.toLowerCase().trim();
     const existingByEmailPhone = normalizedPhone ? await base44.asServiceRole.entities.WebsiteLead.filter({
@@ -73,23 +106,30 @@ Deno.serve(async (req) => {
       console.log(`Email duplicate detected for ${email}. Continuing with new record.`);
     }
 
-    // Create new lead with normalized data
+    // Create new lead with normalized data. Non-production markers keep records available
+    // for QA proof while keeping them out of normal outreach and trusted dashboards.
     try {
+      const now = new Date().toISOString();
       const newLead = await base44.asServiceRole.entities.WebsiteLead.create({
         full_name: full_name.trim(),
         email: email.toLowerCase().trim(),
-        phone_number: normalizedPhone || phone_number, // Use normalized or original
+        phone_number: normalizedPhone || phone_number,
         business_name: business_name.trim(),
         message: message || '',
         source: source || 'website_form',
         routing_key: routing_key || null,
-        lead_status: 'new',
+        lead_status: intakeQuality.nonProduction ? 'ignored' : 'new',
         reply_status: 'none',
         booking_status: 'none',
-        automation_enabled: true,
+        automation_enabled: !intakeQuality.nonProduction,
+        cadence_paused: intakeQuality.nonProduction,
+        cadence_paused_at: intakeQuality.nonProduction ? now : null,
+        archived: intakeQuality.nonProduction,
+        archived_at: intakeQuality.nonProduction ? now : null,
+        quality_notes: intakeQuality.nonProduction ? `non_production:${intakeQuality.markers.join(',')}` : '',
         engagement_score: 0,
         consent_given: true,
-        consent_given_at: new Date().toISOString(),
+        consent_given_at: now,
       });
 
       console.log(`Lead created successfully: ${newLead.id}`);
@@ -97,7 +137,9 @@ Deno.serve(async (req) => {
       return Response.json({
         success: true,
         lead_id: newLead.id,
-        action: 'created',
+        action: intakeQuality.nonProduction ? 'created_archived_non_production' : 'created',
+        non_production: intakeQuality.nonProduction,
+        markers: intakeQuality.markers,
       });
     } catch (createError) {
       // Handle race condition: another request created this lead between our check and create
