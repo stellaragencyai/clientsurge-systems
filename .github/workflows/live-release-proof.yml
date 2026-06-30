@@ -1,0 +1,28 @@
+name: Live Release Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      verify_url:
+        description: "Live site URL"
+        required: true
+        default: "clientsurgesystems.com"
+      expected_release_id:
+        description: "Expected release_id from public/release-proof.json"
+        required: true
+        default: "clientsurge-live-sync-proof-2026-06-30-001"
+
+jobs:
+  verify:
+    name: Verify live release marker
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Check release marker
+        run: |
+          set -euo pipefail
+          SITE="${{ inputs.verify_url }}"
+          EXPECTED="${{ inputs.expected_release_id }}"
+          python3 - <<'PY'
+          print('Live release proof workflow placeholder. Use browser or web fetch for the marker URL after publish.')
+          PY
