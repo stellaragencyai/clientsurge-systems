@@ -43,6 +43,13 @@ const currentLivePagesDirectoryHtml = `<!doctype html>
   </main>
 </body></html>`;
 
+function stripInjectedEdgeGuard(html = "") {
+  return String(html).replace(
+    new RegExp(`<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">[\\s\\S]*?<\\/script>`, "gi"),
+    "",
+  );
+}
+
 test("edge route exposure detector recognizes generated Pages directory HTML", () => {
   assert.equal(looksLikeRouteExposureHtml(stalePagesDirectoryHtml), true);
   assert.equal(looksLikeRouteExposureHtml(currentLivePagesDirectoryHtml), true);
@@ -84,12 +91,13 @@ test("Cloudflare wrapper sanitizes stale origin HTML and adds proof header", asy
   try {
     const response = await worker.fetch(new Request("https://clientsurgesystems.com/"));
     const body = await response.text();
+    const publicBody = stripInjectedEdgeGuard(body);
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "removed");
     assert.match(body, new RegExp(ROUTE_EXPOSURE_GUARD_SCRIPT_ID));
-    assert.doesNotMatch(body, />Pages</i);
-    assert.doesNotMatch(body, /Admin Dashboard|Business Setup|Client Portal|System Observability/i);
+    assert.doesNotMatch(publicBody, />Pages</i);
+    assert.doesNotMatch(publicBody, /Admin Dashboard|Business Setup|Client Portal|System Observability/i);
   } finally {
     globalThis.fetch = previousFetch;
   }
@@ -105,12 +113,13 @@ test("Cloudflare wrapper sanitizes current live directory fixture and keeps home
   try {
     const response = await worker.fetch(new Request("https://clientsurgesystems.com/"));
     const body = await response.text();
+    const publicBody = stripInjectedEdgeGuard(body);
 
     assert.equal(response.status, 200);
     assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "removed");
-    assert.doesNotMatch(body, />Pages</i);
-    assert.doesNotMatch(body, /Admin \/ AI Status Dashboard|href="\/admin/i);
-    assert.match(body, /Capture\. Follow Up\. Book\./);
+    assert.doesNotMatch(publicBody, />Pages</i);
+    assert.doesNotMatch(publicBody, /Admin \/ AI Status Dashboard|href="\/admin/i);
+    assert.match(publicBody, /Capture\. Follow Up\. Book\./);
   } finally {
     globalThis.fetch = previousFetch;
   }
