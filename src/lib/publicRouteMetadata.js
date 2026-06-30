@@ -1,7 +1,7 @@
 export const PUBLIC_ROUTE_METADATA = {
   "/": {
     key: "home",
-    title: "AI Automation Systems for Local Service Businesses | ClientSurge Systems",
+    title: "ClientSurge Systems | AI Automation for Local Businesses",
     description:
       "ClientSurge Systems installs AI automation for local service businesses, including lead capture, missed-call recovery, AI follow-up, appointment booking, review requests, and reactivation workflows.",
   },
@@ -19,9 +19,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/contact": {
     key: "contact",
-    title: "Contact ClientSurge Systems | AI Automation Setup",
+    title: "Contact ClientSurge Systems | Questions and Demo Requests",
     description:
-      "Contact ClientSurge Systems about AI automation setup, lead capture, missed-call recovery, appointment booking, SMS follow-up, and local business automation.",
+      "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
   },
   "/privacy": {
     key: "privacy",

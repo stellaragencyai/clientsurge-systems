@@ -12,6 +12,7 @@ import {
 } from "../src/lib/publicRouteMetadata.js";
 
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+const contactPageSource = readFileSync(new URL("../src/pages/Contact.jsx", import.meta.url), "utf8");
 
 const INTENDED_PUBLIC_ROUTES = [
   "/",
@@ -22,6 +23,17 @@ const INTENDED_PUBLIC_ROUTES = [
   "/terms",
   "/sms-terms",
   "/refund-policy",
+];
+
+const HOMEPAGE_TITLE = "ClientSurge Systems | AI Automation for Local Businesses";
+const CONTACT_TITLE = "Contact ClientSurge Systems | Questions and Demo Requests";
+
+const BANNED_CONTACT_COPY = [
+  "Need Help?",
+  "Questions Before Choosing a System?",
+  "Send a Setup Question",
+  "Tell us what you need help choosing, connecting, or understanding.",
+  "Compare Packages → Guided Intake → Checkout",
 ];
 
 test("shared public route arrays stay aligned to the Track A whitelist", () => {
@@ -43,4 +55,21 @@ test("static fallback does not contain generated route map or public Pages direc
   assert.doesNotMatch(indexHtml, /var routeMap\s*=/);
   assert.doesNotMatch(indexHtml, />Pages</i);
   assert.doesNotMatch(indexHtml, /Admin Dashboard|Business Setup|Client Portal|Internal|Function Audit/i);
+});
+
+test("public copy lock protects homepage and contact metadata", () => {
+  assert.equal(PUBLIC_ROUTE_METADATA["/"].title, HOMEPAGE_TITLE);
+  assert.equal(PUBLIC_ROUTE_METADATA["/contact"].title, CONTACT_TITLE);
+  assert.ok(indexHtml.includes(`<title>${HOMEPAGE_TITLE}</title>`));
+  assert.doesNotMatch(indexHtml, /AI Growth Systems for Local Service Businesses/);
+});
+
+test("contact page keeps approved Contact Us wording and blocks setup-only drift", () => {
+  assert.match(contactPageSource, /title="Contact Us"/);
+  assert.match(contactPageSource, /subtitle="Send a message and we'll respond within one business day\."/);
+  assert.match(contactPageSource, /Thanks for reaching out\. We'll respond within one business day\./);
+
+  for (const phrase of BANNED_CONTACT_COPY) {
+    assert.ok(!contactPageSource.includes(phrase), `Contact page should not contain banned copy: ${phrase}`);
+  }
 });
