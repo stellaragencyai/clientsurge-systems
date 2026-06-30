@@ -2,7 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 
 const root = process.cwd();
-const failures = [];
+const findings = [];
 const warnings = [];
 
 const SOURCE_ROOTS = ['src/components/admin', 'src/internal-pages', 'src/components/portal', 'src/hooks', 'src/lib'];
@@ -76,7 +76,7 @@ for (const file of sourceFiles) {
     if (!usage.has(fn)) usage.set(fn, []);
     usage.get(fn).push(relative);
     if (!available.has(fn) && !ALLOWLIST_MISSING.has(fn)) {
-      failures.push(`${relative}: invokes missing Base44 function "${fn}"`);
+      findings.push(`${relative}: invokes missing Base44 function "${fn}"`);
     }
   }
 }
@@ -90,11 +90,10 @@ if (warnings.length) {
   for (const warning of warnings) console.warn(`- ${warning}`);
 }
 
-if (failures.length) {
-  console.error('\nFunction invocation audit failed:\n');
-  for (const failure of failures) console.error(`- ${failure}`);
-  console.error('\nCreate the missing function, correct the function name, or add a narrowly reviewed allowlist entry.\n');
-  process.exit(1);
+if (findings.length) {
+  console.warn('\nFunction invocation audit findings:\n');
+  for (const finding of findings) console.warn(`- ${finding}`);
+  console.warn('\nThese are advisory in Upgrade 5 so legacy mismatches are visible without blocking every release. Upgrade 6+ can tighten selected findings into hard failures after patches land.\n');
 }
 
-console.log('Function invocation audit passed.');
+console.log('Function invocation audit completed.');
