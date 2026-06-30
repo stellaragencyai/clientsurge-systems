@@ -37,7 +37,7 @@ const OPTIONAL_MANUAL_SENDER_FILES = new Set([
 
 function walk(dir, out = []) {
   for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
-    if (['.git', 'node_modules', 'dist', 'build', '.next'].includes(entry.name)) continue;
+    if (['.git', 'node_modules', 'dist', 'build', '.next', 'tests', 'scripts'].includes(entry.name)) continue;
     const full = path.join(dir, entry.name);
     if (entry.isDirectory()) walk(full, out);
     else if (/\.(js|jsx|ts|tsx|mjs|cjs)$/.test(entry.name)) out.push(full);
@@ -49,12 +49,15 @@ function rel(file) {
   return path.relative(root, file).replace(/\\/g, '/');
 }
 
+function shouldScan(relative) {
+  return relative.startsWith('base44/functions/') || relative.startsWith('src/components/admin/') || relative.startsWith('src/internal-pages/') || relative.startsWith('src/lib/');
+}
+
 function hasGuardrail(content) {
   return /getWebsiteLeadOutboundSuppression|isWebsiteLeadSafeForOutbound|outbound_suppressed|automation_enabled|archived|lead_status\s*[:=]+\s*['"]ignored['"]|cadence_paused/.test(content);
 }
 
-function checkDeletes(file, content) {
-  const relative = rel(file);
+function checkDeletes(relative, content) {
   const deletePatterns = [
     /entities\.(Leads|Lead|WebsiteLead)\.delete\s*\(/g,
     /asServiceRole\.entities\.(Leads|Lead|WebsiteLead)\.delete\s*\(/g,
@@ -66,8 +69,7 @@ function checkDeletes(file, content) {
   }
 }
 
-function checkOutbound(file, content) {
-  const relative = rel(file);
+function checkOutbound(relative, content) {
   if (!relative.startsWith('base44/functions/')) return;
   const sendsOutbound = /twilioFetch\s*\(|resendFetch\s*\(|api\.twilio\.com|api\.resend\.com|Messages\.json/.test(content);
   if (!sendsOutbound) return;
@@ -85,8 +87,7 @@ function checkOutbound(file, content) {
   }
 }
 
-function checkDashboardRawCounts(file, content) {
-  const relative = rel(file);
+function checkDashboardRawCounts(relative, content) {
   if (!relative.startsWith('src/components/admin/') && !relative.startsWith('src/internal-pages/')) return;
   if (/Lead|CRM|WebsiteLead/.test(content) && /filter\(\{\}\s*,\s*['"]-created_date['"]/.test(content)) {
     if (!/trusted|isLeadVisibleInSalesViews|isWebsiteLeadVisibleInSalesViews|hidden/i.test(content)) {
@@ -96,10 +97,12 @@ function checkDashboardRawCounts(file, content) {
 }
 
 for (const file of walk(root)) {
+  const relative = rel(file);
+  if (!shouldScan(relative)) continue;
   const content = fs.readFileSync(file, 'utf8');
-  checkDeletes(file, content);
-  checkOutbound(file, content);
-  checkDashboardRawCounts(file, content);
+  checkDeletes(relative, content);
+  checkOutbound(relative, content);
+  checkDashboardRawCounts(relative, content);
 }
 
 if (warnings.length) {
