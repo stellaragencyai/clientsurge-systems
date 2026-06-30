@@ -10,6 +10,7 @@ import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { appendSmsOptOut } from "../_shared/smsOptOut.js";
 import { twilioFetch } from "../_shared/providerFetch.js";
+import { getWebsiteLeadOutboundSuppression, logSuppressedWebsiteLeadOutbound } from "../_shared/outboundLeadGuards.js";
 
 async function sendSMS(base44, lead, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -148,15 +149,22 @@ Deno.serve(async (req) => {
       );
     }
 
-    // Check automation enabled
-    if (!lead.automation_enabled) {
+    const suppression = getWebsiteLeadOutboundSuppression(lead);
+    if (suppression.suppressed) {
       console.log(
-        `[sendWebsiteLeadResponse] Automation disabled for lead ${lead.id}`
+        `[sendWebsiteLeadResponse] Outbound suppressed for lead ${lead.id}: ${suppression.reasons.join(', ')}`
       );
+      await logSuppressedWebsiteLeadOutbound(base44, {
+        lead,
+        source: "sendWebsiteLeadResponse",
+        channel: "internal",
+        reason: suppression.reasons,
+      });
       return secureJson({
         success: true,
         skipped: true,
-        reason: "automation_disabled",
+        reason: "outbound_suppressed",
+        reasons: suppression.reasons,
       });
     }
 
