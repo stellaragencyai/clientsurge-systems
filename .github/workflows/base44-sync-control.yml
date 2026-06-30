@@ -67,6 +67,9 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: CRM release guard
+        run: npm run ci:crm-release-guards
+
       - name: Build app
         run: npm run build
 
