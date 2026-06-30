@@ -2,6 +2,7 @@ import edgeWorker from "./clientsurge-security-edge-worker.mjs";
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
+export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T07-20Z";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
@@ -110,6 +111,7 @@ export default {
     const guardedHtml = injectEdgeRouteExposureGuard(sanitizedHtml);
     const headers = new Headers(response.headers);
     headers.set(ROUTE_EXPOSURE_SANITIZED_HEADER, looksLikeRouteExposureHtml(html) ? "removed" : "armed");
+    headers.set("x-clientsurge-route-exposure-version", ROUTE_EXPOSURE_SANITIZER_VERSION);
     headers.set("Cache-Control", "no-store, max-age=0");
 
     return new Response(guardedHtml, {
