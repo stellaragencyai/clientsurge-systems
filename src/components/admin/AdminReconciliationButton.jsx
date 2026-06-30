@@ -1,27 +1,40 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { RefreshCw, CheckCircle2, AlertCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { RefreshCw, ShieldCheck } from 'lucide-react';
+import AdminActionResult from './AdminActionResult';
+import { errorToAdminActionResult, normalizeAdminActionResult } from '@/lib/adminActionResult';
 
 export default function AdminReconciliationButton({ onComplete }) {
   const [running, setRunning] = useState(false);
   const [result, setResult] = useState(null);
+  const [lastAction, setLastAction] = useState(null);
 
   const handleRun = async () => {
     setRunning(true);
+    setLastAction(() => handleRun);
     setResult(null);
     try {
       const res = await base44.functions.invoke('runAdminReconciliation', {});
-      const d = res.data;
-      setResult({
-        success: d?.success,
-        truthStatus: d?.truth_status,
+      const d = res.data || res;
+      const created = Number(d?.results?.eventQueuesCreated || 0);
+      const existed = Number(d?.results?.eventQueuesAlreadyExisted || 0);
+      setResult(normalizeAdminActionResult({
+        action: 'Admin Reconciliation',
+        success: Boolean(d?.success),
+        status: d?.success ? (d?.truth_status === 'warning' ? 'warning' : 'success') : 'error',
         message: d?.success
-          ? `Reconciliation complete. ${d.results.eventQueuesCreated} queues created, ${d.results.eventQueuesAlreadyExisted} existed. Truth: ${d.truth_status}.`
+          ? `Reconciliation complete. Truth status: ${d.truth_status || 'unknown'}.`
           : d?.error || 'Reconciliation failed.',
-      });
+        affected: created + existed,
+        skipped: existed,
+        failed: d?.success ? 0 : 1,
+        details: [`${created} queue(s) created`, `${existed} queue(s) already existed`],
+        retry: d?.success ? 'Review Launch Proof and Communication Logs for resulting evidence.' : undefined,
+        raw: d,
+      }));
       if (onComplete) onComplete();
     } catch (err) {
-      setResult({ success: false, message: `Error: ${err.message}` });
+      setResult(errorToAdminActionResult('Admin Reconciliation', err, 'Reconciliation failed.'));
     } finally {
       setRunning(false);
     }
@@ -29,40 +42,33 @@ export default function AdminReconciliationButton({ onComplete }) {
 
   const handleTrackC = async () => {
     setRunning(true);
+    setLastAction(() => handleTrackC);
     setResult(null);
     try {
       const res = await base44.functions.invoke('trackCLeadTruthCleanup', { dry_run: false });
       const d = res?.data || res;
-      setResult({
-        success: d?.success,
-        truthStatus: d?.success ? 'trusted' : 'blocked',
-        message: d?.success
-          ? `Track C complete. Updated ${d.updated || 0}; already done ${d.already_quarantined || 0}; failed ${d.failed || 0}.`
-          : d?.error || 'Track C action failed.',
-      });
+      const updated = Number(d?.updated || 0);
+      const alreadyDone = Number(d?.already_quarantined || 0);
+      const failed = Number(d?.failed || 0);
+      setResult(normalizeAdminActionResult({
+        action: 'Track C Cleanup',
+        success: Boolean(d?.success),
+        status: d?.success && failed > 0 ? 'partial' : d?.success ? 'success' : 'error',
+        message: d?.success ? 'Track C cleanup action completed.' : d?.error || 'Track C action failed.',
+        affected: updated + alreadyDone + failed,
+        skipped: alreadyDone,
+        failed,
+        details: [`${updated} record(s) updated`, `${alreadyDone} already handled`, `${failed} failed`],
+        retry: d?.success && failed === 0 ? 'Open CRM Data Quality to verify updated counts.' : undefined,
+        raw: d,
+      }));
       if (onComplete) onComplete();
     } catch (err) {
-      setResult({ success: false, message: `Error: ${err.message}` });
+      setResult(errorToAdminActionResult('Track C Cleanup', err, 'Track C action failed.'));
     } finally {
       setRunning(false);
     }
   };
-
-  const statusColor = result?.truthStatus === 'trusted'
-    ? 'border-green-200 bg-green-50 text-green-800'
-    : result?.truthStatus === 'warning'
-      ? 'border-yellow-200 bg-yellow-50 text-yellow-800'
-      : result?.truthStatus === 'blocked'
-        ? 'border-red-200 bg-red-50 text-red-800'
-        : result?.success === false
-          ? 'border-red-200 bg-red-50 text-red-800'
-          : 'border-green-200 bg-green-50 text-green-800';
-
-  const StatusIcon = result?.truthStatus === 'trusted'
-    ? CheckCircle2
-    : result?.truthStatus === 'warning'
-      ? AlertTriangle
-      : AlertCircle;
 
   return (
     <div className="space-y-3">
@@ -87,12 +93,7 @@ export default function AdminReconciliationButton({ onComplete }) {
         </button>
       </div>
 
-      {result && (
-        <div className={`flex items-start gap-2.5 rounded-lg border p-3 text-sm ${statusColor}`}>
-          <StatusIcon className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          <p>{result.message}</p>
-        </div>
-      )}
+      <AdminActionResult result={result} onRetry={!running && lastAction ? lastAction : null} onDismiss={() => setResult(null)} />
     </div>
   );
 }
