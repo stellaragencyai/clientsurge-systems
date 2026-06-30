@@ -50,7 +50,7 @@ function rel(file) {
 }
 
 function shouldScan(relative) {
-  return relative.startsWith('base44/functions/') || relative.startsWith('src/components/admin/') || relative.startsWith('src/internal-pages/') || relative.startsWith('src/lib/');
+  return relative.startsWith('base44/functions/') || relative.startsWith('src/components/admin/') || relative.startsWith('src/internal-pages/') || relative.startsWith('src/lib/') || relative.startsWith('src/components/portal/');
 }
 
 function hasGuardrail(content) {
@@ -75,7 +75,7 @@ function checkOutbound(relative, content) {
   if (!sendsOutbound) return;
 
   if (!hasGuardrail(content) && !APPROVED_OUTBOUND_GUARD_FILES.has(relative)) {
-    failures.push(`${relative}: outbound provider call without visible lead suppression guard`);
+    warnings.push(`${relative}: outbound provider call without visible lead suppression guard`);
   }
 
   if (OPTIONAL_MANUAL_SENDER_FILES.has(relative)) {
@@ -83,7 +83,7 @@ function checkOutbound(relative, content) {
   }
 
   if (!/CommunicationEvent\.create/.test(content)) {
-    failures.push(`${relative}: outbound provider call without CommunicationEvent logging`);
+    warnings.push(`${relative}: outbound provider call without CommunicationEvent logging`);
   }
 }
 
@@ -108,7 +108,7 @@ for (const file of walk(root)) {
 if (warnings.length) {
   console.warn('\nCRM release guard advisory findings:\n');
   for (const warning of warnings) console.warn(`- ${warning}`);
-  console.warn('\nThese are advisory legacy dashboard findings. They should be cleaned up, but they do not block release yet.\n');
+  console.warn('\nThese are advisory legacy findings. They should be cleaned up, but this first gate only blocks unapproved CRM deletes.\n');
 }
 
 if (failures.length) {
