@@ -216,7 +216,42 @@ async function applyUpdates(entity: any, updates: Array<{ id: string; update: Re
   return { applied, failed };
 }
 
+async function recordQualityBackfillRun(base44: any, summary: any) {
+  const action = summary.dry_run ? "dry_run" : "applied";
+  const message = `Scanned ${summary.scanned.leads} Leads / ${summary.scanned.website_leads} WebsiteLeads; eligible ${summary.eligible.leads} Leads / ${summary.eligible.website_leads} WebsiteLeads; applied ${summary.applied.leads} Leads / ${summary.applied.website_leads} WebsiteLeads.`;
+  await base44.asServiceRole.entities.CommunicationEvent.create({
+    channel: "internal",
+    direction: "system",
+    event_type: "data_quality_backfill",
+    provider: "backfillLeadQualityGuards",
+    status: summary.dry_run ? "dry_run" : "completed",
+    subject: `CRM quality backfill ${action}`,
+    message_body: message,
+    context_type: "crm_quality_backfill",
+    context_id: summary.run_id,
+    metadata_json: JSON.stringify({
+      run_id: summary.run_id,
+      dry_run: summary.dry_run,
+      scope: summary.scope,
+      page_size: summary.page_size,
+      max_pages: summary.max_pages,
+      scanned: summary.scanned,
+      eligible: summary.eligible,
+      applied: summary.applied,
+      failed_counts: {
+        leads: summary.failed.leads.length,
+        website_leads: summary.failed.website_leads.length,
+      },
+      samples: summary.samples,
+      generated_at: summary.generated_at,
+    }),
+  }).catch((error: any) => {
+    console.warn("[backfillLeadQualityGuards] Failed to record audit event:", error?.message || error);
+  });
+}
+
 Deno.serve(async (req) => {
+  let base44: any = null;
   try {
     if (req.method !== "POST") {
       return secureJson({ error: "Method not allowed" }, { status: 405 });
@@ -236,10 +271,12 @@ Deno.serve(async (req) => {
       }, { status: 400 });
     }
 
-    const base44 = createClientFromRequest(req);
+    base44 = createClientFromRequest(req);
     const now = new Date().toISOString();
+    const runId = `lead-quality-backfill-${now}`;
     const summary: any = {
       success: true,
+      run_id: runId,
       dry_run: dryRun,
       scope,
       page_size: pageSize,
@@ -288,8 +325,23 @@ Deno.serve(async (req) => {
       }
     }
 
+    await recordQualityBackfillRun(base44, summary);
     return secureJson(summary);
   } catch (error: any) {
+    if (base44) {
+      await base44.asServiceRole.entities.CommunicationEvent.create({
+        channel: "internal",
+        direction: "system",
+        event_type: "data_quality_backfill",
+        provider: "backfillLeadQualityGuards",
+        status: "failed",
+        subject: "CRM quality backfill failed",
+        message_body: error?.message || "Lead quality backfill failed",
+        context_type: "crm_quality_backfill",
+        context_id: `lead-quality-backfill-error-${new Date().toISOString()}`,
+        error_message: error?.message || "Lead quality backfill failed",
+      }).catch(() => null);
+    }
     return secureJson({ success: false, error: error?.message || "Lead quality backfill failed" }, { status: 500 });
   }
 });
