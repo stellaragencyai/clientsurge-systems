@@ -24,10 +24,23 @@ export default function SectionHeader({
       className={`cs-section-header ${isCentered ? 'cs-section-header--center' : 'cs-section-header--left'} ${className}`}
       data-variant={variant}
     >
+      <style>{`
+        .cs-section-header[data-variant="dark"] .cs-section-title {
+          color: #ffffff !important;
+          -webkit-text-fill-color: #ffffff !important;
+        }
+
+        .cs-section-header[data-variant="dark"] .cs-section-subtitle,
+        .cs-section-header[data-variant="dark"] .cs-section-eyebrow {
+          color: rgba(255, 255, 255, 0.82) !important;
+          -webkit-text-fill-color: rgba(255, 255, 255, 0.82) !important;
+        }
+      `}</style>
+
       {eyebrow && (
         <p
           className="cs-section-eyebrow"
-          style={isDark ? { color: 'rgba(0,174,239,0.85)' } : undefined}
+          style={isDark ? { color: 'rgba(255,255,255,0.82)' } : undefined}
         >
           {eyebrow}
         </p>
@@ -49,7 +62,7 @@ export default function SectionHeader({
       {subtitle && (
         <p
           className="cs-section-subtitle"
-          style={isDark ? { color: 'rgba(255,255,255,0.72)' } : undefined}
+          style={isDark ? { color: 'rgba(255,255,255,0.82)' } : undefined}
         >
           {subtitle}
         </p>
