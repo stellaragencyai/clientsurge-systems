@@ -2,7 +2,7 @@ import edgeWorker from "./clientsurge-security-edge-worker.mjs";
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
-export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T21-20Z";
+export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T23-12Z";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
@@ -29,8 +29,8 @@ const INTERNAL_ROUTE_WORDS = [
   "Automation Health",
 ];
 
-const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates/i;
-const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*<)/i;
+const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates/i;
+const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*<)/i;
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
 const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Client Setup Lookup|Setup Status|Website Preview|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline|Opportunity Review Queue|Automation Health/i;
 const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|reconciliation|saas|lead-intelligence|sam|medspa-dashboard)[^"']*["'][\s\S]*?<\/a>/gi;
@@ -56,18 +56,25 @@ export function sanitizeGeneratedPagesDirectoryHtml(html = "") {
   const internalTermsSource = INTERNAL_ROUTE_TERMS.source;
   const generatedCopySource = GENERATED_BASE44_COPY.source;
 
-  // Remove complete generated app-builder directory wrappers when the Pages heading
-  // and internal route terms appear inside the same wrapper.
+  // Remove full generated app-builder wrappers when possible.
   nextHtml = removePatterns(nextHtml, [
     new RegExp(`<section\\b[^>]*>[\\s\\S]{0,12000}<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>[\\s\\S]{0,24000}?(?:${internalTermsSource})[\\s\\S]{0,12000}?<\\/section>`, "gi"),
     new RegExp(`<main\\b[^>]*>[\\s\\S]{0,12000}<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>[\\s\\S]{0,24000}?(?:${internalTermsSource})[\\s\\S]{0,12000}?<\\/main>`, "gi"),
   ]);
 
-  // Remove the common Base44 public directory shape while preserving the real
-  // marketing content that follows it in the same main document.
+  // Remove the common Base44 generated intro that appears immediately before the Pages directory.
+  nextHtml = nextHtml.replace(
+    new RegExp(`<h[1-4][^>]*>\\s*ClientSurge Systems\\s*<\\/h[1-4]>\\s*<(?:p|div)[^>]*>[\\s\\S]{0,2600}?(?:${generatedCopySource})[\\s\\S]{0,2600}?<\\/(?:p|div)>\\s*(?=<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>)`, "gi"),
+    "",
+  );
+
+  // Hard remove any generated Pages list. There should be no public-facing Pages
+  // directory on the production homepage, regardless of whether the list includes
+  // only public links or a mix of public and internal links.
   nextHtml = removePatterns(nextHtml, [
+    /<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(ul|ol)\b[^>]*>[\s\S]*?<\/\1>/gi,
+    new RegExp(`<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>\\s*<(nav|section|div)\\b[^>]*>[\\s\\S]{0,36000}?(?:${internalTermsSource})[\\s\\S]{0,36000}?<\\/\\1>`, "gi"),
     new RegExp(`(?:<h[1-4][^>]*>\\s*ClientSurge Systems\\s*<\\/h[1-4]>\\s*<(?:p|div)[^>]*>[\\s\\S]{0,2400}?(?:${generatedCopySource})[\\s\\S]{0,2400}?<\\/(?:p|div)>\\s*)?<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>\\s*<(ul|ol|nav|section|div)\\b[^>]*>[\\s\\S]{0,36000}?(?:${internalTermsSource})[\\s\\S]{0,36000}?<\\/\\1>`, "gi"),
-    new RegExp(`<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>\\s*<(?:ul|ol|nav|div|section)\\b[^>]*>[\\s\\S]{0,24000}?(?:${internalTermsSource})[\\s\\S]{0,24000}?<\\/(?:ul|ol|nav|div|section)>`, "gi"),
   ]);
 
   // If the generated intro survived because the list was removed separately,
@@ -89,8 +96,8 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
   window.__clientsurgeEdgeRouteExposureGuard = true;
   const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|$)/i;
   const INTERNAL_TEXT = /\b(Admin Dashboard|Admin\s*\/\s*AI Status Dashboard|Admin\s*\/\s*System Runbook|Admin\s*\/\s*Task Status Dashboard|Admin\s*\/\s*Conversion Insights|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Client Setup Lookup|Function Audit|System Observability|Reconciliation|Onboarding Pipeline|Install Guide|Mission Control|SaaS Admin|AI Status Dashboard|Performance Wars|Admin Settings|Lead Intelligence|Credentials Setup|Website Preview|Automation Health|Opportunity Review Queue)\b/i;
-  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates/i;
-  const MARKETING_START = /Automate Your Lead Flow|Capture\. Follow Up\. Book\.|Compare Packages|Included Automations/i;
+  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates/i;
+  const MARKETING_START = /Automate Your Lead Flow|AI automation for local service businesses|Capture\. Follow Up\. Book\.|Compare Packages|Included Automations/i;
   const text = (node) => (node && node.textContent || '').replace(/\s+/g, ' ').trim();
   const hasInternalLink = (root) => Array.from(root.querySelectorAll?.('a[href]') || []).some((a) => {
     try { return INTERNAL_PATH.test(new URL(a.getAttribute('href'), location.origin).pathname); } catch { return false; }
@@ -100,9 +107,7 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
     for (const heading of headings) {
       if (text(heading).toLowerCase() !== 'pages') continue;
       const next = heading.nextElementSibling;
-      const nextText = text(next);
-      const looksGenerated = next && (hasInternalLink(next) || INTERNAL_TEXT.test(nextText) || GENERATED_COPY.test(nextText));
-      if (looksGenerated) {
+      if (next && /^(UL|OL|NAV|SECTION|DIV)$/i.test(next.tagName)) {
         let prev = heading.previousElementSibling;
         const previousNodes = [];
         while (prev && previousNodes.length < 3 && (GENERATED_COPY.test(text(prev)) || /^ClientSurge Systems$/i.test(text(prev)))) {
