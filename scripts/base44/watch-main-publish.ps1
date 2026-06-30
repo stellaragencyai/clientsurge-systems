@@ -161,9 +161,8 @@ function Invoke-ProductionPublish {
         Invoke-Step 'npm run build'
     }
     if (-not $SkipTests) {
-        Invoke-Step 'npm run test:node'
+        Invoke-Step 'npm run test:release-gate:node'
         Invoke-Step 'npm run test:deno'
-        Invoke-Step 'node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js'
     }
 
     if ($DryRun) {
