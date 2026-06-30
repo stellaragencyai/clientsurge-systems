@@ -2,7 +2,7 @@ import edgeWorker from "./clientsurge-security-edge-worker.mjs";
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
-export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T20-42Z";
+export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T21-20Z";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
@@ -30,7 +30,7 @@ const INTERNAL_ROUTE_WORDS = [
 ];
 
 const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates/i;
-const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*</i;
+const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*<)/i;
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
 const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Client Setup Lookup|Setup Status|Website Preview|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline|Opportunity Review Queue|Automation Health/i;
 const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|reconciliation|saas|lead-intelligence|sam|medspa-dashboard)[^"']*["'][\s\S]*?<\/a>/gi;
