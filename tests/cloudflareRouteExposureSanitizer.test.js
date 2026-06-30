@@ -24,8 +24,24 @@ const stalePagesDirectoryHtml = `<!doctype html>
   </main>
 </body></html>`;
 
+const currentLivePagesDirectoryHtml = `<!doctype html>
+<html><head><title>ClientSurge Systems</title></head><body>
+  <main>
+    <h1>ClientSurge Systems</h1>
+    <p>Premium AI-driven automation systems built to increase bookings.</p>
+    <h2>Pages</h2>
+    <ul>
+      <li><a href="/about">About</a></li>
+      <li><a href="/automations">Automations</a></li>
+      <li><a href="/admin">Admin / AI Status Dashboard</a></li>
+    </ul>
+    <section><h1>AI Automation Systems That Help Local Businesses</h1></section>
+  </main>
+</body></html>`;
+
 test("edge route exposure detector recognizes generated Pages directory HTML", () => {
   assert.equal(looksLikeRouteExposureHtml(stalePagesDirectoryHtml), true);
+  assert.equal(looksLikeRouteExposureHtml(currentLivePagesDirectoryHtml), true);
   assert.equal(looksLikeRouteExposureHtml("<main><h1>ClientSurge Systems</h1><p>Real homepage</p></main>"), false);
 });
 
@@ -35,6 +51,14 @@ test("edge route exposure sanitizer removes generated Pages directory from raw H
   assert.doesNotMatch(sanitized, />Pages</i);
   assert.doesNotMatch(sanitized, /Admin Dashboard|Business Setup|Client Portal|System Observability/i);
   assert.doesNotMatch(sanitized, /href="\/(admin|setup|client-portal)/i);
+});
+
+test("edge route exposure sanitizer removes current live Pages directory shape", () => {
+  const sanitized = sanitizeGeneratedPagesDirectoryHtml(currentLivePagesDirectoryHtml);
+
+  assert.doesNotMatch(sanitized, />Pages</i);
+  assert.doesNotMatch(sanitized, /Admin \/ AI Status Dashboard|href="\/admin/i);
+  assert.match(sanitized, /AI Automation Systems That Help Local Businesses/);
 });
 
 test("edge route exposure guard injection is idempotent", () => {
