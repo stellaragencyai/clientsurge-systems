@@ -1,0 +1,3 @@
+Live Release Proof workflow added in this branch.
+Expected release id: clientsurge-live-sync-proof-2026-06-30-001
+Expected source repo: stellaragencyai/clientsurge-systems
