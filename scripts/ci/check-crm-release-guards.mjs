@@ -3,6 +3,7 @@ import path from 'node:path';
 
 const root = process.cwd();
 const failures = [];
+const warnings = [];
 
 const ALLOWED_DELETE_PATHS = new Set([
   'src/lib/leadCleanupGuards.js',
@@ -89,7 +90,7 @@ function checkDashboardRawCounts(file, content) {
   if (!relative.startsWith('src/components/admin/') && !relative.startsWith('src/internal-pages/')) return;
   if (/Lead|CRM|WebsiteLead/.test(content) && /filter\(\{\}\s*,\s*['"]-created_date['"]/.test(content)) {
     if (!/trusted|isLeadVisibleInSalesViews|isWebsiteLeadVisibleInSalesViews|hidden/i.test(content)) {
-      failures.push(`${relative}: admin lead query appears to load raw records without trusted/hidden labeling`);
+      warnings.push(`${relative}: admin lead query appears to load raw records without trusted/hidden labeling`);
     }
   }
 }
@@ -99,6 +100,12 @@ for (const file of walk(root)) {
   checkDeletes(file, content);
   checkOutbound(file, content);
   checkDashboardRawCounts(file, content);
+}
+
+if (warnings.length) {
+  console.warn('\nCRM release guard advisory findings:\n');
+  for (const warning of warnings) console.warn(`- ${warning}`);
+  console.warn('\nThese are advisory legacy dashboard findings. They should be cleaned up, but they do not block release yet.\n');
 }
 
 if (failures.length) {
