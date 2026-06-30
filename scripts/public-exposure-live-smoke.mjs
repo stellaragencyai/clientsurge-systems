@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Trigger Cloudflare security-edge workflow with the current sanitizer build.
-// Trigger: 2026-06-30T22-59Z
+// Trigger: 2026-06-30T23-05Z
 const args = process.argv.slice(2);
 function getArg(name, fallback) {
   const index = args.indexOf(name);
@@ -14,7 +14,7 @@ url.searchParams.set("v", String(Date.now()));
 
 const EDGE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
 const INTERNAL_TEXT = /Admin Dashboard|Business Setup|Client Portal|Client Dashboard|Setup Status|Website Preview|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline/i;
-const GENERATED_PAGES = /<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*</i;
+const GENERATED_PAGES = /(?:<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*<)/i;
 const INTERNAL_HREF = /href=["']\/(admin|dashboard|client-portal|client-dashboard|setup|internal|functions|mission-control|observability|reconciliation)(\/|["'?])/i;
 
 function stripInjectedEdgeGuard(html = "") {
