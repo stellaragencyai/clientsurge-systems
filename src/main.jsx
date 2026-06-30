@@ -5,6 +5,7 @@ import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
 import '@/admin-mobile-hotfix.css'
+import { installAdminMobileRuntime } from '@/lib/adminMobileRuntime'
 
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
@@ -49,6 +50,7 @@ function initApp() {
       import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
     )
     closeInitialAdminMobileDrawer();
+    installAdminMobileRuntime();
   } catch (err) {
     console.error('Critical error rendering App:', err);
     const root = document.getElementById('root');
