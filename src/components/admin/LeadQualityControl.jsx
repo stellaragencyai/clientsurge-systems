@@ -55,6 +55,13 @@ function downloadLeadCsv(rows, filenamePrefix) {
   URL.revokeObjectURL(url);
 }
 
+function summarizeBackfill(result) {
+  const scanned = result?.scanned || {};
+  const eligible = result?.eligible || {};
+  const applied = result?.applied || {};
+  return `Scanned ${scanned.leads || 0} Leads / ${scanned.website_leads || 0} WebsiteLeads · Eligible ${eligible.leads || 0} Leads / ${eligible.website_leads || 0} WebsiteLeads · Applied ${applied.leads || 0} Leads / ${applied.website_leads || 0} WebsiteLeads`;
+}
+
 export default function LeadQualityControl() {
   const [activeTab, setActiveTab] = useState('overview');
   const [leads, setLeads] = useState([]);
@@ -62,6 +69,7 @@ export default function LeadQualityControl() {
   const [auditLoading, setAuditLoading] = useState(false);
   const [actionLoading, setActionLoading] = useState(false);
   const [enrichLoading, setEnrichLoading] = useState(false);
+  const [backfillLoading, setBackfillLoading] = useState(false);
   const [selectedIds, setSelectedIds] = useState(new Set());
   const [counts, setCounts] = useState({
     total: 0,
@@ -78,6 +86,7 @@ export default function LeadQualityControl() {
   });
   const [auditResult, setAuditResult] = useState(null);
   const [cleanupResult, setCleanupResult] = useState(null);
+  const [backfillResult, setBackfillResult] = useState(null);
 
   const loadLeads = useCallback(async () => {
     setLoading(true);
@@ -87,7 +96,6 @@ export default function LeadQualityControl() {
       const trustedVisible = list.filter(isLeadVisibleInSalesViews);
       const cleanupEligible = list.filter((l) => getLeadCleanupEligibility(l).eligible);
 
-      // Compute counts
       const c = {
         total: list.length,
         active: list.filter(l => (l.quality_review_status || 'active') === 'active').length,
@@ -102,7 +110,6 @@ export default function LeadQualityControl() {
         outbound_ready: list.filter(l => l.quality_review_status === 'verified_outbound_ready').length,
       };
 
-      // Count duplicate groups
       const dupGroups = {};
       list.forEach(l => {
         if (l.quality_review_status === 'duplicate_candidate' || l.dedupe_status === 'duplicate_candidate') {
@@ -166,6 +173,35 @@ export default function LeadQualityControl() {
     }
   };
 
+  const runQualityBackfill = async ({ apply = false } = {}) => {
+    if (apply) {
+      const phrase = window.prompt('This will quarantine/archive obvious existing junk records without deleting them. Type BACKFILL JUNK to apply the non-destructive backfill.');
+      if (phrase !== 'BACKFILL JUNK') {
+        setBackfillResult({ cancelled: true, dry_run: false, message: 'Backfill cancelled before apply.' });
+        return;
+      }
+    }
+
+    setBackfillLoading(true);
+    setBackfillResult(null);
+    try {
+      const res = await base44.functions.invoke('backfillLeadQualityGuards', {
+        scope: 'both',
+        apply,
+        confirm_phrase: apply ? 'BACKFILL JUNK' : undefined,
+        page_size: 500,
+        max_pages: 10,
+      });
+      const data = res?.data || res;
+      setBackfillResult(data);
+      await loadLeads();
+    } catch (err) {
+      setBackfillResult({ success: false, error: err?.message || 'Backfill failed' });
+    } finally {
+      setBackfillLoading(false);
+    }
+  };
+
   const runEnrichment = async () => {
     setEnrichLoading(true);
     try {
@@ -223,7 +259,6 @@ export default function LeadQualityControl() {
       downloadLeadCsv(eligible, 'clientsurge-verified-junk-delete-backup');
       for (const lead of eligible) {
         try {
-          // Guard is intentionally re-evaluated at execution time.
           const eligibility = getLeadCleanupEligibility(lead);
           if (!eligibility.eligible) {
             failed.push({ id: lead.id, business_name: lead.business_name, error: 'became ineligible before delete' });
@@ -329,16 +364,33 @@ export default function LeadQualityControl() {
 
   return (
     <div className="space-y-5">
-      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 flex items-start gap-3">
-        <ShieldCheck className="w-4 h-4 mt-0.5 flex-shrink-0" />
-        <div>
-          <p className="font-semibold">Trusted lead views now hide junk/test/duplicate records by default.</p>
-          <p className="text-xs mt-1">Hard deletion is blocked unless the selected record has strict junk signals and no booking, reply, payment, conversion, or revenue evidence.</p>
-          <p className="text-xs mt-1">Current loaded sample: {counts.trusted_visible} trusted visible · {counts.hidden_from_sales} hidden from sales · {counts.cleanup_eligible} eligible for verified-junk deletion.</p>
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 flex items-start justify-between gap-3 flex-wrap">
+        <div className="flex items-start gap-3">
+          <ShieldCheck className="w-4 h-4 mt-0.5 flex-shrink-0" />
+          <div>
+            <p className="font-semibold">Trusted lead views now hide junk/test/duplicate records by default.</p>
+            <p className="text-xs mt-1">Hard deletion is blocked unless the selected record has strict junk signals and no booking, reply, payment, conversion, or revenue evidence.</p>
+            <p className="text-xs mt-1">Current loaded sample: {counts.trusted_visible} trusted visible · {counts.hidden_from_sales} hidden from sales · {counts.cleanup_eligible} eligible for verified-junk deletion.</p>
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => runQualityBackfill({ apply: false })}
+            disabled={backfillLoading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-blue-300 text-blue-800 hover:bg-blue-100 disabled:opacity-40 transition-colors"
+          >
+            {backfillLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />} Dry-Run Existing Backfill
+          </button>
+          <button
+            onClick={() => runQualityBackfill({ apply: true })}
+            disabled={backfillLoading}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-blue-700 text-white border border-blue-800 hover:bg-blue-800 disabled:opacity-40 transition-colors"
+          >
+            Apply Non-Destructive Backfill
+          </button>
         </div>
       </div>
 
-      {/* Tab bar */}
       <div className="flex items-center gap-1 border-b border-border overflow-x-auto">
         {TABS.map(tab => (
           <button
@@ -355,7 +407,6 @@ export default function LeadQualityControl() {
         ))}
       </div>
 
-      {/* Audit result banner */}
       {auditResult && (
         <div className={`rounded-lg p-4 text-sm ${auditResult.error ? 'bg-red-50 text-red-700 border border-red-200' : auditLoading ? 'bg-blue-50 text-blue-700 border border-blue-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
           {auditResult.error ? (
@@ -366,6 +417,19 @@ export default function LeadQualityControl() {
               <p>Total: {auditResult.summary?.total_audited || 0} · Quarantine candidates: {auditResult.summary?.quarantine_candidates || 0} · Duplicate candidates: {auditResult.summary?.duplicate_candidates || 0} · Enrichment needed: {auditResult.summary?.enrichment_needed || 0}</p>
               {auditLoading && auditResult.progress && <p className="text-xs opacity-70">{auditResult.progress}</p>}
             </div>
+          )}
+        </div>
+      )}
+
+      {backfillResult && (
+        <div className={`rounded-lg p-4 text-sm ${backfillResult.error ? 'bg-red-50 text-red-700 border border-red-200' : backfillResult.cancelled ? 'bg-gray-50 text-gray-700 border border-gray-200' : backfillResult.dry_run ? 'bg-blue-50 text-blue-800 border border-blue-200' : 'bg-green-50 text-green-700 border border-green-200'}`}>
+          <p className="font-semibold">{backfillResult.cancelled ? 'Backfill Cancelled' : backfillResult.dry_run ? 'Existing Records Backfill Dry Run' : 'Existing Records Backfill Applied'}</p>
+          {backfillResult.error ? <p>{backfillResult.error}</p> : <p>{backfillResult.message || summarizeBackfill(backfillResult)}</p>}
+          {backfillResult.samples?.leads?.length > 0 && (
+            <p className="mt-2 text-xs">Lead samples: {backfillResult.samples.leads.slice(0, 5).map((item) => item.name || item.id).join(', ')}</p>
+          )}
+          {backfillResult.samples?.website_leads?.length > 0 && (
+            <p className="mt-1 text-xs">WebsiteLead samples: {backfillResult.samples.website_leads.slice(0, 5).map((item) => item.name || item.id).join(', ')}</p>
           )}
         </div>
       )}
@@ -384,7 +448,6 @@ export default function LeadQualityControl() {
         </div>
       )}
 
-      {/* Tab content */}
       {activeTab === 'overview' && (
         <QualityOverview counts={counts} onRunAudit={runAudit} auditLoading={auditLoading} onNavigateTab={setActiveTab} />
       )}
