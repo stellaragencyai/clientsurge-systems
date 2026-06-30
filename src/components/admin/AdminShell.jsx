@@ -70,14 +70,28 @@ const NAV_GROUPS = [
   },
 ];
 
+const isDesktopViewport = () => typeof window === "undefined" || window.innerWidth >= 1024;
+const MOBILE_QUICK_NAV = [
+  { id: "overview", label: "Overview", path: "/admin" },
+  { id: "leads", label: "Leads", path: "/admin", tab: "leads" },
+  { id: "inbox", label: "Inbox", path: "/admin", tab: "inbox" },
+  { id: "settings", label: "Settings", path: "/admin", tab: "settings" },
+];
+
 export default function AdminShell({ children, title, activeId }) {
   const { user } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(isDesktopViewport);
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
   const [webhookErrorCount, setWebhookErrorCount] = useState(0);
+
+  useEffect(() => {
+    const handleResize = () => setSidebarOpen(isDesktopViewport());
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   useEffect(() => {
     const loadUnread = async () => {
@@ -122,10 +136,10 @@ export default function AdminShell({ children, title, activeId }) {
   };
 
   return (
-    <div className="min-h-screen bg-background flex">
+    <div className="min-h-screen bg-background flex overflow-x-hidden">
       {/* Sidebar */}
       <div
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 ${
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-[min(20rem,86vw)] lg:w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 shadow-2xl lg:shadow-none pt-[env(safe-area-inset-top)] lg:pt-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } flex flex-col`}
       >
@@ -150,7 +164,7 @@ export default function AdminShell({ children, title, activeId }) {
         </div>
 
         {/* Nav */}
-        <nav className="flex-1 p-3 overflow-y-auto space-y-4">
+        <nav className="flex-1 p-3 overflow-y-auto space-y-4 overscroll-contain">
           {NAV_GROUPS.map(({ group, items }) => (
             <div key={group}>
               <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
@@ -169,7 +183,7 @@ export default function AdminShell({ children, title, activeId }) {
                     <button
                       key={item.id}
                       onClick={() => handleNavClick(item)}
-                      className={`w-full flex items-center gap-3 px-4 py-2.5 rounded-lg transition-colors font-medium text-sm ${
+                      className={`w-full flex items-center gap-3 px-4 py-3 lg:py-2.5 rounded-lg transition-colors font-medium text-sm ${
                         active
                           ? "bg-primary text-primary-foreground"
                           : "text-foreground hover:bg-muted"
@@ -191,7 +205,7 @@ export default function AdminShell({ children, title, activeId }) {
         </nav>
 
         {/* User */}
-        <div className="p-4 border-t border-border space-y-3">
+        <div className="p-4 border-t border-border space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="px-4 py-2">
             <p className="text-xs text-muted-foreground">Signed in as</p>
             <p className="text-sm font-semibold text-foreground truncate">{user?.full_name || "Admin"}</p>
@@ -210,13 +224,16 @@ export default function AdminShell({ children, title, activeId }) {
       {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top Bar */}
-        <div className="bg-background border-b border-border px-6 py-3 flex items-center justify-between sticky top-0 z-10">
-          <div className="flex items-center gap-3">
+        <div className="bg-background/95 backdrop-blur border-b border-border px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-10 pt-[max(0.625rem,env(safe-area-inset-top))] lg:pt-3">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
-              className="lg:hidden p-2 hover:bg-muted rounded-lg transition-colors"
+              className="lg:hidden inline-flex items-center gap-2 px-3 py-2 hover:bg-muted rounded-lg transition-colors text-sm font-semibold"
+              aria-label={sidebarOpen ? "Close admin navigation" : "Open admin navigation"}
+              aria-expanded={sidebarOpen}
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              <span>Menu</span>
             </button>
             <button
               onClick={() => navigate("/admin")}
@@ -225,24 +242,43 @@ export default function AdminShell({ children, title, activeId }) {
               <ArrowLeft className="w-3.5 h-3.5" /> Main Menu
             </button>
             <span className="hidden lg:block text-muted-foreground/40">|</span>
-            <h2 className="text-base font-semibold text-foreground">{title}</h2>
+            <h2 className="truncate text-sm sm:text-base font-semibold text-foreground">{title}</h2>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-shrink-0">
             {inboxUnread > 0 && (
               <button
                 onClick={() => navigate("/admin?tab=inbox")}
-                className="flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
+                className="flex items-center gap-1.5 rounded-lg bg-primary/10 border border-primary/20 px-2.5 sm:px-3 py-1.5 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors"
               >
                 <Inbox className="w-3.5 h-3.5" />
-                {inboxUnread} unread
+                <span className="hidden xs:inline">{inboxUnread} unread</span>
+                <span className="xs:hidden">{inboxUnread}</span>
               </button>
             )}
           </div>
         </div>
 
+        <div className="lg:hidden border-b border-border bg-background/95 px-3 py-2 overflow-x-auto">
+          <div className="flex gap-2 min-w-max">
+            {MOBILE_QUICK_NAV.map((item) => (
+              <button
+                key={item.id}
+                onClick={() => handleNavClick(item)}
+                className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
+                  isActive(item)
+                    ? "border-primary bg-primary text-primary-foreground"
+                    : "border-border bg-card text-foreground"
+                }`}
+              >
+                {item.label}
+              </button>
+            ))}
+          </div>
+        </div>
+
         {/* Content */}
-        <div className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">{children}</div>
+        <div className="flex-1 overflow-auto p-3 sm:p-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
+          <div className="max-w-7xl mx-auto min-w-0">{children}</div>
         </div>
       </div>
 
@@ -250,7 +286,7 @@ export default function AdminShell({ children, title, activeId }) {
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
-          className="fixed inset-0 bg-black/20 z-30 lg:hidden"
+          className="fixed inset-0 bg-black/35 backdrop-blur-[2px] z-30 lg:hidden"
         />
       )}
 
