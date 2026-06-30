@@ -1,7 +1,7 @@
 import { base44 } from "@/api/base44Client";
 import { isLeadVisibleInSalesViews } from "@/lib/leadCleanupGuards";
 
-const DIRECT_LEADS_PAGE_SIZE = 5000;
+const DIRECT_LEADS_PAGE_SIZE = 500;
 const DIRECT_LEADS_MAX_ROWS = 25000;
 const LEAD_STATUSES = [
   "New",
@@ -121,8 +121,9 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
 
   for (let skip = 0; skip < DIRECT_LEADS_MAX_ROWS; skip += DIRECT_LEADS_PAGE_SIZE) {
     const page = await base44.entities.Leads.list("-created_date", DIRECT_LEADS_PAGE_SIZE, skip);
-    allLeads.push(...(page || []));
-    if (!page || page.length < DIRECT_LEADS_PAGE_SIZE) break;
+    const safePage = Array.isArray(page) ? page : [];
+    allLeads.push(...safePage);
+    if (safePage.length < DIRECT_LEADS_PAGE_SIZE) break;
   }
 
   const normalized = allLeads.map(normalizeLead);
@@ -159,6 +160,7 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
         .slice(0, 12),
       activation_segments: [],
       last7Days: [],
+      truth_source: "client_direct_leads_fallback",
     },
     leads,
     pagination: {
@@ -182,13 +184,18 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
       rows_loaded: normalized.length,
       trusted_rows_loaded: trustedScope.length,
       hidden_junk_rows: Math.max(0, normalized.length - trustedScope.length),
+      page_size: DIRECT_LEADS_PAGE_SIZE,
       max_rows: DIRECT_LEADS_MAX_ROWS,
+      truncated: normalized.length >= DIRECT_LEADS_MAX_ROWS,
     },
   };
 }
 
 function isEmptySummary(data) {
-  return !data?.leads?.length && Number(data?.summary?.total_leads || 0) === 0;
+  const total = Number(data?.summary?.total_leads || 0);
+  const rawTotal = Number(data?.summary?.raw_total_leads || 0);
+  const rowsLoaded = Number(data?.data_window?.rows_loaded?.leads || data?.data_window?.rows_loaded || 0);
+  return !data?.leads?.length && total === 0 && rawTotal === 0 && rowsLoaded === 0;
 }
 
 function applyTrustedLeadScope(data, filters = {}) {
@@ -202,8 +209,16 @@ function applyTrustedLeadScope(data, filters = {}) {
     ? data.summary.recent_lead_activity.filter(isLeadVisibleInSalesViews)
     : [];
 
-  const rawTotal = Number(data.summary?.raw_total_leads ?? data.summary?.total_leads ?? 0);
-  const trustedEstimate = Number(data.summary?.trusted_leads ?? data.summary?.filtered_leads ?? leads.length);
+  const rawTotal = Number(
+    data.summary?.raw_total_leads ??
+    data.data_window?.rows_loaded?.leads ??
+    data.data_window?.rows_loaded ??
+    data.summary?.total_leads ??
+    0
+  );
+  const backendTotal = Number(data.summary?.total_leads || 0);
+  const trustedEstimate = Number(data.summary?.trusted_leads ?? data.summary?.filtered_leads ?? backendTotal ?? leads.length);
+  const hiddenJunk = Number(data.summary?.hidden_junk_leads ?? Math.max(0, rawTotal - trustedEstimate));
 
   return {
     ...data,
@@ -211,12 +226,15 @@ function applyTrustedLeadScope(data, filters = {}) {
     summary: {
       ...(data.summary || {}),
       raw_total_leads: rawTotal,
+      total_leads: trustedEstimate,
       trusted_leads: trustedEstimate,
+      hidden_junk_leads: hiddenJunk,
       hidden_junk_note: "Normal sales views hide quarantined/test/duplicate leads by default.",
       filtered_leads: leads.length,
       actionable_leads: leads.filter((lead) => lead.status !== "Closed").length,
       priority_queue: priorityQueue,
       recent_lead_activity: recentLeadActivity,
+      truth_source: data.summary?.truth_source || "getLeadPipelineSummary",
     },
     pagination: {
       ...(data.pagination || {}),

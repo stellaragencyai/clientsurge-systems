@@ -8,6 +8,7 @@ import {
 const DEFAULT_LIMIT = 100;
 const MAX_LIMIT = 250;
 const EVENT_LIMIT = 5000;
+const LEADS_PAGE_SIZE = 500;
 
 function clampPageLimit(value: unknown) {
   return Math.min(Math.max(Number(value) || DEFAULT_LIMIT, 1), MAX_LIMIT);
@@ -15,6 +16,22 @@ function clampPageLimit(value: unknown) {
 
 function clampOffset(value: unknown) {
   return Math.max(Number(value) || 0, 0);
+}
+
+async function listAllLeads(base44: any) {
+  const rows: any[] = [];
+
+  for (let skip = 0; skip < LEAD_PIPELINE_MAX_FETCH; skip += LEADS_PAGE_SIZE) {
+    const page = await base44.asServiceRole.entities.Leads.list("-updated_date", LEADS_PAGE_SIZE, skip);
+    const safePage = Array.isArray(page) ? page : [];
+    rows.push(...safePage);
+
+    if (safePage.length < LEADS_PAGE_SIZE) {
+      break;
+    }
+  }
+
+  return rows;
 }
 
 Deno.serve(async (req) => {
@@ -35,16 +52,14 @@ Deno.serve(async (req) => {
     const offset = clampOffset(filters.offset);
 
     const [leads, events] = await Promise.all([
-      base44.asServiceRole.entities.Leads.list("-updated_date", LEAD_PIPELINE_MAX_FETCH),
+      listAllLeads(base44),
       base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT).catch(() => []),
     ]);
 
-    const scopedLeads = user.role === "super_admin"
-      ? leads || []
-      : (leads || []).filter((lead) => !lead.assigned_to || lead.assigned_to === user.email);
-
+    // This endpoint is admin-only. Admin dashboard totals must represent the real org-wide Lead store,
+    // not only records assigned to the current admin account.
     const snapshot = buildLeadPipelineSnapshot({
-      leads: scopedLeads,
+      leads: leads || [],
       events: events || [],
       filters,
       limit,
@@ -57,6 +72,11 @@ Deno.serve(async (req) => {
         limits: {
           leads: LEAD_PIPELINE_MAX_FETCH,
           events: EVENT_LIMIT,
+          lead_page_size: LEADS_PAGE_SIZE,
+        },
+        rows_loaded: {
+          leads: (leads || []).length,
+          events: (events || []).length,
         },
         truncated: {
           leads_capped: (leads || []).length >= LEAD_PIPELINE_MAX_FETCH,
