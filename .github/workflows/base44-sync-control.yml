@@ -13,16 +13,8 @@ on:
         description: "Live URL to verify"
         required: true
         default: "https://clientsurgesystems.com"
-      run_base44_safety_tests:
-        description: "Run focused Base44 publish safety tests"
-        required: true
-        type: choice
-        default: "false"
-        options:
-          - "false"
-          - "true"
-      run_deno_tests:
-        description: "Run Deno function tests"
+      run_live_smoke:
+        description: "Run live-domain smoke checks"
         required: true
         type: choice
         default: "false"
@@ -68,21 +60,18 @@ jobs:
       - name: Build app
         run: npm run build
 
+      - name: Run focused Base44 publish safety tests
+        run: node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js
+
       - name: Run full Node tests
         run: npm run test:node
 
-      - name: Run focused Base44 publish safety tests
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_base44_safety_tests == 'true' }}
-        run: node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js
-
       - name: Set up Deno
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_deno_tests == 'true' }}
         uses: denoland/setup-deno@v2
         with:
           deno-version: v2.x
 
       - name: Run Deno function tests
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_deno_tests == 'true' }}
         run: npm run test:deno
 
   live-smoke:
@@ -90,7 +79,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 10
     needs: validate
-    if: ${{ github.event_name == 'workflow_dispatch' }}
+    if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_live_smoke == 'true' }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
