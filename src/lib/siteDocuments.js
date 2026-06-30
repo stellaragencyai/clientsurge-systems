@@ -1,54 +1,27 @@
 import {
-  BLOG_SITEMAP_PATHS,
   ROBOTS_DISALLOW_PATHS,
+  SITEMAP_STATIC_PATHS,
 } from "./publicRouteMetadata.js";
 
 const CANONICAL_ORIGIN = "https://clientsurgesystems.com";
 
 const SITEMAP_ROUTE_META = {
   "/": { changefreq: "weekly", priority: "1.0" },
-  "/automations": { changefreq: "monthly", priority: "0.9" },
-  "/industries": { changefreq: "monthly", priority: "0.8" },
-  "/about": { changefreq: "monthly", priority: "0.7" },
+  "/pricing": { changefreq: "monthly", priority: "0.9" },
+  "/automations": { changefreq: "monthly", priority: "0.8" },
   "/contact": { changefreq: "monthly", priority: "0.8" },
-  "/blog": { changefreq: "weekly", priority: "0.7" },
-  "/pricing": { changefreq: "monthly", priority: "0.8" },
-  "/book": { changefreq: "monthly", priority: "0.7" },
-  "/privacy-policy": { changefreq: "yearly", priority: "0.4" },
+  "/privacy": { changefreq: "yearly", priority: "0.4" },
   "/terms": { changefreq: "yearly", priority: "0.4" },
+  "/sms-terms": { changefreq: "yearly", priority: "0.4" },
+  "/refund-policy": { changefreq: "yearly", priority: "0.4" },
 };
 
-const SITEMAP_SECTIONS = [
-  ["/", "/automations", "/industries", "/about", "/contact", "/blog", "/pricing"],
-  BLOG_SITEMAP_PATHS,
-  [
-    "/med-spa",
-    "/dental",
-    "/hvac",
-    "/plumbing",
-    "/roofing",
-    "/chiropractic",
-    "/contractors",
-    "/lead-capture-automation",
-    "/missed-call-text-back",
-    "/ai-lead-follow-up",
-    "/appointment-booking-automation",
-    "/review-automation",
-    "/customer-reactivation",
-    "/book",
-    "/privacy-policy",
-    "/terms",
-  ],
-];
-
 function sitemapMetaFor(pathname) {
-  if (SITEMAP_ROUTE_META[pathname]) return SITEMAP_ROUTE_META[pathname];
-  if (pathname.startsWith("/blog/")) return { changefreq: "monthly", priority: "0.7" };
-  return { changefreq: "monthly", priority: "0.8" };
+  return SITEMAP_ROUTE_META[pathname] || { changefreq: "monthly", priority: "0.7" };
 }
 
 export function buildSitemapXml() {
-  const entries = SITEMAP_SECTIONS.flat().map((pathname) => {
+  const entries = SITEMAP_STATIC_PATHS.map((pathname) => {
     const meta = sitemapMetaFor(pathname);
     return [
       "  <url>",

@@ -29,38 +29,6 @@ import {
 import { shouldNoindexRoute } from "@/lib/routeSecurity";
 import { forceScrollToTop } from "@/lib/scroll";
 
-/**
- * ═══════════════════════════════════════════════════════════════════
- * AREA 1 — ROUTE CLASSIFICATION QA CHECKLIST
- * ═══════════════════════════════════════════════════════════════════
- *
- * PUBLIC (no auth required, indexed for SEO):
- *   /  /automations  /pricing  /store  /book  /contact  /about
- *   /industries  /blog  /blog/:slug  /faq  /testimonials  /library
- *   /our-system  /product  /signup  /start  /privacy-policy  /terms
- *   /setup-lookup  /thank-you  /success  /leads/capture  /order-success
- *   /lead-capture-automation  /missed-call-text-back  /ai-lead-follow-up
- *   /appointment-booking-automation  /review-automation  /customer-reactivation
- *   /roofing  /hvac  /plumbing  /dental  /med-spa  /chiropractic  /contractors
- *
- * AUTH_PUBLIC (no auth required, noindex):
- *   /login  /register  /forgot-password  /reset-password
- *
- * PROTECTED_CLIENT (auth required, any role):
- *   /client-portal  /client-dashboard  /dashboard-entry
- *
- * PROTECTED_ADMIN (auth required, admin or super_admin only):
- *   /mission-control  /admin/*  /saas/admin  /dashboard  /admin-settings
- *   /lead-intelligence  /sam  /medspa-dashboard
- *
- * LEGACY REDIRECTS (clean 301-style redirects):
- *   /privacy → /privacy-policy   /product-landing → /product
- *   /client-dashboard-entry → /dashboard-entry
- *   (see lib/publicRouteMetadata.js for full list)
- *
- * ═══════════════════════════════════════════════════════════════════
- */
-
 // Analytics observer initialized inside AppInner useEffect — see below
 import Home from "./pages/Home";
 
@@ -88,6 +56,7 @@ const Onboarding = lazy(() => import("./internal-pages/Onboarding"));
 const CaptureLeads = lazy(() => import("./internal-pages/CaptureLeads"));
 const Success = lazy(() => import("./internal-pages/Success"));
 const LegalPage = lazy(() => import("./internal-pages/LegalPage"));
+const SmsTermsPage = lazy(() => import("./pages/SmsTermsPage"));
 const AutomationServicePage = lazy(() => import("./internal-pages/AutomationServicePage"));
 const OrderSuccess = lazy(() => import("./internal-pages/OrderSuccess"));
 const BusinessSetup = lazy(() => import("./internal-pages/BusinessSetup"));
@@ -107,14 +76,12 @@ const ClientSaasDashboard = lazy(() => import("./pages/ClientSaasDashboard"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 const Library = lazy(() => import("./pages/Library"));
 const OnboardingPipeline = lazy(() => import("./internal-pages/OnboardingPipeline"));
-const MissionControlDashboard = lazy(() => import("./internal-pages/MissionControlDashboard"));
 const MissionControlLogs = lazy(() => import("./internal-pages/MissionControlLogs"));
 const SaaSAdminPanel = lazy(() => import("./internal-pages/SaaSAdminPanel"));
 const OpportunityReviewQueue = lazy(() => import("./internal-pages/OpportunityReviewQueue"));
 const ClientSetupLookup = lazy(() => import("./pages/ClientSetupLookup"));
-const HowItWorksPage = lazy(() => import("./pages/HowItWorksPage"));
-const ProofPage = lazy(() => import("./pages/ProofPage"));
 const HowItWorks = lazy(() => import("./pages/HowItWorks"));
+const ProofPage = lazy(() => import("./pages/ProofPage"));
 const FunctionAudit = lazy(() => import("./internal-pages/FunctionAudit"));
 const AdminReconciliation = lazy(() => import("./internal-pages/AdminReconciliation"));
 const SystemObservabilityDashboard = lazy(() => import("./components/mission-control/SystemObservabilityDashboard"));
@@ -129,7 +96,6 @@ const routePath = (...segments) => `/${segments.join("/")}`;
 const dynamicParam = (name) => `:${name}`;
 
 // Legacy redirect rules for old URL paths — review quarterly for removal
-// DEPRECATED: Remove redirects that haven't been hit in >30 days
 const LEGACY_REDIRECTS = PUBLIC_ROUTE_REDIRECTS.map(([from, to]) => ({ from, to }));
 
 const AUTOMATION_SERVICE_ROUTES = [
@@ -155,19 +121,14 @@ const INDUSTRY_ROUTE_SLUGS = [
   "veterinary",
 ];
 
+// These are functional, noindex utility routes. Setup/onboarding are intentionally
+// excluded here and protected below so they do not render as public app pages.
 const HIDDEN_PUBLIC_ROUTES = [
   { route: routePath("success"), Component: Success },
-  { route: routePath("onboarding"), Component: Onboarding },
   { route: routePath("leads", "capture"), Component: CaptureLeads },
   { route: routePath("legal", dynamicParam("type")), Component: LegalPage },
   { route: routePath("order-success"), Component: OrderSuccess },
-  { route: routePath("setup"), Component: BusinessSetup },
   { route: routePath("thank-you"), Component: ThankYou },
-  { route: routePath("setup", "credentials"), Component: CredentialsSetup },
-  { route: routePath("setup", "status", dynamicParam("orderId")), Component: SetupStatus },
-  { route: routePath("setup", "status"), Component: SetupStatus },
-  { route: routePath("setup", "preview", dynamicParam("specId")), Component: WebsitePreview },
-  { route: routePath("setup", "preview"), Component: WebsitePreview },
   { route: routePath("launch-control"), Component: LaunchControl },
 ];
 
@@ -181,8 +142,6 @@ const isPublicPath = (pathname) =>
     );
   });
 
-// PathNormalizer — single source of truth for all path normalization
-// Handles: uppercase → lowercase, legacy admin aliases, industry slug aliases
 const PATH_EXPLICIT_MAP = {
   "/Dashboard": "/admin",
   "/AdminSettings": "/admin",
@@ -206,11 +165,9 @@ function PathNormalizer() {
   return null;
 }
 
-// Fix 1: ScrollToTop — resets scroll position on every route change
 function ScrollToTop() {
   const location = useLocation();
   useEffect(() => {
-    // Don't scroll to top if navigating to a hash anchor
     if (!location.hash) {
       return forceScrollToTop();
     }
@@ -221,20 +178,18 @@ function ScrollToTop() {
 function AppInner() {
   useEffect(() => {
     if (typeof window === "undefined") return;
-    // FLAW #97: Force manual scroll restoration to prevent Safari conflicts
     if ("scrollRestoration" in history) {
       history.scrollRestoration = "manual";
     }
     if (window.location.hostname.includes("preview-sandbox")) return;
     installGa4();
     initializeAnalyticsObserver();
-    
-    // Track all form submissions
+
     const trackFormSubmits = () => {
-      document.querySelectorAll('form').forEach(form => {
-        form.addEventListener('submit', () => {
+      document.querySelectorAll("form").forEach((form) => {
+        form.addEventListener("submit", () => {
           if (window.gtag) {
-            window.gtag('event', 'form_submit', {
+            window.gtag("event", "form_submit", {
               form_id: form.id || form.name,
               page_path: window.location.pathname,
             });
@@ -242,54 +197,40 @@ function AppInner() {
         });
       });
     };
-    
-    // Track link clicks
+
     const trackLinks = () => {
-      document.querySelectorAll('a[href]').forEach(link => {
-        if (link.href.includes('http') && !link.href.includes(window.location.hostname)) {
-          link.addEventListener('click', () => {
+      document.querySelectorAll("a[href]").forEach((link) => {
+        if (link.href.includes("http") && !link.href.includes(window.location.hostname)) {
+          link.addEventListener("click", () => {
             if (window.gtag) {
-              window.gtag('event', 'link_click', {
+              window.gtag("event", "link_click", {
                 link_url: link.href,
                 link_text: link.textContent,
-                link_type: 'external',
+                link_type: "external",
               });
             }
           });
         }
       });
     };
-    
+
     trackFormSubmits();
     trackLinks();
-    
-    // Re-track on navigation
+
     const observer = new MutationObserver(() => {
       trackFormSubmits();
       trackLinks();
     });
     observer.observe(document.body, { childList: true, subtree: true });
-    
+
     return () => observer.disconnect();
   }, []);
   return null;
 }
 
-// Forward /signup → /product-signup, preserving any ?package= query param
 function SignupForward() {
   const location = useLocation();
   return <Navigate to={`/product-signup${location.search}`} replace />;
-}
-
-// Redirect section aliases to the homepage hash without giving them their own metadata.
-function HashRedirect({ hash }) {
-  const navigate = useNavigate();
-
-  useEffect(() => {
-    navigate({ pathname: "/", hash }, { replace: true });
-  }, [hash, navigate]);
-
-  return null;
 }
 
 function AdminLoadingSkeleton() {
@@ -355,7 +296,6 @@ function RouteIndexingGuard() {
 
 function PublicCookieConsent() {
   const location = useLocation();
-  // Never render in the Base44 visual editor sandbox — the module request itself gets blocked
   if (typeof window !== "undefined" && window.location.hostname.includes("preview-sandbox")) return null;
   if (!isPublicPath(location.pathname)) return null;
   return (
@@ -444,8 +384,15 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
-      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
+      <Route path="/privacy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy" />} />
+      <Route path="/privacy-policy" element={<Navigate to="/privacy" replace />} />
+      <Route path="/terms" element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
+      <Route path="/sms-terms" element={<LazyRoute Component={SmsTermsPage} />} />
+      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} fixedType="refund" canonicalPath="/refund-policy" />} />
+      <Route path="/contact" element={<LazyRoute Component={Contact} />} />
+      <Route path="/automations" element={<LazyRoute Component={Automations} />} />
+      <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/signup" element={<SignupForward />} />
       <Route path="/product-signup" element={<LazyRoute Component={ProductSignup} />} />
       <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
@@ -456,25 +403,17 @@ const AuthenticatedAppWithTenant = () => {
       <Route path={routePath("faq")} element={<LazyRoute Component={FAQPage} />} />
       <Route path={routePath("our-system")} element={<LazyRoute Component={OurSystemPage} />} />
       <Route path={routePath("testimonials")} element={<LazyRoute Component={TestimonialsPage} />} />
-      <Route path="/privacy-policy" element={<LazyRoute Component={LegalPage} fixedType="privacy" canonicalPath="/privacy-policy" />} />
-      <Route path={routePath("terms")} element={<LazyRoute Component={LegalPage} fixedType="terms" canonicalPath="/terms" />} />
-      <Route path="/refund-policy" element={<LazyRoute Component={LegalPage} fixedType="refund" canonicalPath="/refund-policy" />} />
       <Route path="/login" element={<LazyRoute Component={Login} />} />
       <Route path="/register" element={<LazyRoute Component={Register} />} />
       <Route path="/forgot-password" element={<LazyRoute Component={ForgotPassword} />} />
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
       <Route path="/opt-out" element={<LazyRoute Component={lazy(() => import("./pages/OptOut"))} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
-      <Route path="/contact" element={<LazyRoute Component={Contact} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
       <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />
       <Route path="/library" element={<LazyRoute Component={Library} />} />
-      <Route
-        path="/store"
-        element={<LazyRoute Component={Store} />}
-      />
+      <Route path="/store" element={<LazyRoute Component={Store} />} />
       <Route path="/about" element={<LazyRoute Component={About} />} />
-      <Route path="/automations" element={<LazyRoute Component={Automations} />} />
       <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
       <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
       <Route path="/proof" element={<LazyRoute Component={ProofPage} />} />
@@ -483,7 +422,7 @@ const AuthenticatedAppWithTenant = () => {
       ))}
       <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
       <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
-      {INDUSTRY_ROUTE_SLUGS.filter(slug => slug !== "real-estate" && slug !== "personal-injury").map((slug) => (
+      {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => (
         <Route
           key={slug}
           path={`/${slug}`}
@@ -495,7 +434,6 @@ const AuthenticatedAppWithTenant = () => {
       ))}
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
 
-      {/* EMERGENCY: Catch-all to block Base44 Pages directory before admin routes */}
       <Route path="/_generated/*" element={<Navigate to="/" replace />} />
       <Route path="/pages" element={<Navigate to="/" replace />} />
       <Route path="/pages/*" element={<Navigate to="/" replace />} />
@@ -510,6 +448,13 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("client-dashboard"), Component: ClientDashboard },
           { route: routePath("client-saas"), Component: ClientSaasDashboard },
           { route: routePath("dashboard-entry"), Component: ClientDashboardEntry },
+          { route: routePath("onboarding"), Component: Onboarding },
+          { route: routePath("setup"), Component: BusinessSetup },
+          { route: routePath("setup", "credentials"), Component: CredentialsSetup },
+          { route: routePath("setup", "status", dynamicParam("orderId")), Component: SetupStatus },
+          { route: routePath("setup", "status"), Component: SetupStatus },
+          { route: routePath("setup", "preview", dynamicParam("specId")), Component: WebsitePreview },
+          { route: routePath("setup", "preview"), Component: WebsitePreview },
         ].map(({ route, Component }) => (
           <Route
             key={route}
@@ -556,10 +501,10 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "reconciliation"), Component: AdminReconciliation },
           { route: routePath("admin", "system-observability"), Component: SystemObservabilityDashboard },
           { route: routePath("admin", "funnel-optimization"), Component: FunnelOptimizationPage },
-           { route: routePath("admin", "conversion-insights"), Component: lazy(() => import("./pages/admin/ConversionInsights")) },
-           { route: routePath("admin", "task-status"), Component: lazy(() => import("./pages/admin/TaskStatusDashboard")) },
-           { route: routePath("admin", "runbook"), Component: lazy(() => import("./pages/admin/SystemRunbook")) },
-           { route: routePath("admin", "automation-health"), Component: lazy(() => import("./internal-pages/AutomationHealth")) },
+          { route: routePath("admin", "conversion-insights"), Component: lazy(() => import("./pages/admin/ConversionInsights")) },
+          { route: routePath("admin", "task-status"), Component: lazy(() => import("./pages/admin/TaskStatusDashboard")) },
+          { route: routePath("admin", "runbook"), Component: lazy(() => import("./pages/admin/SystemRunbook")) },
+          { route: routePath("admin", "automation-health"), Component: lazy(() => import("./internal-pages/AutomationHealth")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
