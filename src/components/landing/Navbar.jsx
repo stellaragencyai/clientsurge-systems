@@ -389,6 +389,9 @@ export default function Navbar() {
             className="xl:hidden px-5 pb-8 pt-2 relative z-50 mobile-nav-drawer"
             style={{
               maxWidth: "min(420px, 90vw)",
+              maxHeight: "calc(100vh - var(--cs-nav-height) - env(safe-area-inset-top))",
+              overflowY: "auto",
+              WebkitOverflowScrolling: "touch",
               paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
               background: "rgba(255,255,255,0.98)",
               backdropFilter: "blur(16px)",
@@ -416,6 +419,38 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
+            </div>
+
+            {/* Mobile account action — kept above the long Industries list so it is visible immediately */}
+            <div className="mt-2 mb-3 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
+              {mobileUserName ? (
+                <>
+                  <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
+                  <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
+                  <button
+                    onClick={() => { trackCTA("client_dashboard", "mobile_nav"); navigate("/client-dashboard"); setOpen(false); }}
+                    className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-white text-[13px] font-bold transition-all hover:-translate-y-0.5"
+                    style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)" }}
+                  >
+                    Go to Dashboard →
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => { trackCTA("login", "mobile_nav"); setOpen(false); setShowLoginModal(true); }}
+                  className="w-full inline-flex items-center justify-center rounded-xl border text-[14px] font-bold transition-all hover:-translate-y-0.5 focus:ring-2 focus:ring-primary focus:outline-none"
+                  style={{
+                    minHeight: "48px",
+                    color: "#ffffff",
+                    background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+                    borderColor: "rgba(53, 189, 241, 0.35)",
+                    boxShadow: "0 8px 22px rgba(0,174,239,0.22)",
+                  }}
+                >
+                  Login to Client Portal
+                </button>
+              )}
             </div>
 
             {/* Industries compact section — grouped by category */}
@@ -456,21 +491,6 @@ export default function Navbar() {
                 View All Industries →
               </a>
             </div>
-
-            {mobileUserName && (
-              <div className="mt-4 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
-                <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
-                <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
-                <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
-                <button
-                  onClick={() => { trackCTA("client_dashboard", "mobile_nav"); navigate("/client-dashboard"); setOpen(false); }}
-                  className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-white text-[13px] font-bold transition-all hover:-translate-y-0.5"
-                  style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)" }}
-                >
-                  Go to Dashboard →
-                </button>
-              </div>
-            )}
 
             <div className="mt-5 flex gap-2">
               <button
