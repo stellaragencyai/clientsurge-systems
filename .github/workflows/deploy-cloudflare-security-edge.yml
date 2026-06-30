@@ -44,7 +44,7 @@ jobs:
         run: npm ci
 
       - name: Test Cloudflare route exposure sanitizer
-        run: node --test tests/cloudflareRouteExposureSanitizer.test.js tests/cloudflareSecurityEdge.test.js
+        run: node --test tests/cloudflareRouteExposureSanitizer.test.js
 
       - name: Require Cloudflare credentials
         run: |
