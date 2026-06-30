@@ -101,9 +101,12 @@ test("static fallback is crawlable and does not expose app-builder route directo
   }
 });
 
-test("public route exposure guard is loaded and targets the generated Pages directory risk", () => {
-  assert.match(indexHtml, /src="\/clientsurge-public-route-exposure-guard\.js" defer/);
+test("public route exposure guard is loaded early and targets generated Pages directory risk", () => {
+  assert.match(indexHtml, /<script src="\/clientsurge-public-route-exposure-guard\.js"><\/script>/);
+  assert.doesNotMatch(indexHtml, /src="\/clientsurge-public-route-exposure-guard\.js" defer/);
   assert.match(routeExposureGuard, /looksLikeGeneratedPagesDirectory/);
+  assert.match(routeExposureGuard, /removeLooseGeneratedPagesDirectory/);
+  assert.match(routeExposureGuard, /GENERATED_COPY_PATTERN/);
   assert.match(routeExposureGuard, /INTERNAL_PATH_PATTERN/);
   assert.match(routeExposureGuard, /Admin Dashboard/);
   assert.match(routeExposureGuard, /Business Setup/);
