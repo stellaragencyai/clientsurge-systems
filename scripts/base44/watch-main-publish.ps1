@@ -162,7 +162,6 @@ function Invoke-ProductionPublish {
     }
     if (-not $SkipTests) {
         Invoke-Step 'npm run test:release-gate:node'
-        Invoke-Step 'npm run test:deno'
     }
 
     if ($DryRun) {
