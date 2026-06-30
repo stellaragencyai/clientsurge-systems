@@ -1,8 +1,12 @@
-import edgeWorker from "./clientsurge-security-edge-worker.mjs";
+import edgeWorker, {
+  repairPublicRouteMetadata,
+} from "./clientsurge-security-edge-worker.mjs";
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
 export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T23-12Z";
+export const APP_SHELL_FALLBACK_HEADER = "x-clientsurge-app-shell-fallback";
+export const APP_SHELL_FALLBACK_VERSION = "2026-06-30T23-47Z";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
@@ -34,6 +38,79 @@ const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data typ
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
 const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Client Setup Lookup|Setup Status|Website Preview|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline|Opportunity Review Queue|Automation Health/i;
 const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|reconciliation|saas|lead-intelligence|sam|medspa-dashboard)[^"']*["'][\s\S]*?<\/a>/gi;
+
+const APP_SHELL_BLOCKED_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard|motion-lab)(?:\/|$)/i;
+const APP_SHELL_ASSET_PATH_PATTERN = /\.(?:js|mjs|css|map|json|png|jpe?g|gif|svg|webp|ico|txt|xml|woff2?|ttf|otf|wasm|pdf|zip)(?:$|\?)/i;
+
+function normalizePathname(pathname = "/") {
+  const value = String(pathname || "/").split("?")[0].split("#")[0];
+  const normalized = value.length > 1 && value.endsWith("/") ? value.slice(0, -1) : value;
+  return normalized || "/";
+}
+
+function acceptsHtmlNavigation(request) {
+  const accept = request.headers.get("accept") || "";
+  const mode = request.headers.get("sec-fetch-mode") || "";
+  return accept.includes("text/html") || mode === "navigate" || accept === "";
+}
+
+function isAppShellFallbackEligibleRequest(request) {
+  if (request.method !== "GET" && request.method !== "HEAD") return false;
+  if (!acceptsHtmlNavigation(request)) return false;
+
+  const url = new URL(request.url);
+  const pathname = normalizePathname(url.pathname);
+  if (pathname === "/") return false;
+  if (APP_SHELL_ASSET_PATH_PATTERN.test(pathname)) return false;
+  if (APP_SHELL_BLOCKED_PATH_PATTERN.test(pathname)) return false;
+  if (pathname.startsWith("/.well-known/")) return false;
+  return true;
+}
+
+function shouldUseAppShellFallback(request, response, error = null) {
+  if (!isAppShellFallbackEligibleRequest(request)) return false;
+  if (error) return true;
+  if (!response) return true;
+
+  const contentType = response.headers.get("content-type") || "";
+  if (response.status >= 400) return true;
+  if (contentType.includes("text/plain") && /cache|miss|not found|error/i.test(response.statusText || "")) return true;
+  return false;
+}
+
+async function fetchAppShellFallback(request, env, ctx) {
+  const originalUrl = new URL(request.url);
+  const originalPathname = normalizePathname(originalUrl.pathname);
+  const fallbackUrl = new URL(request.url);
+  fallbackUrl.pathname = "/";
+  fallbackUrl.search = "";
+  fallbackUrl.hash = "";
+
+  const fallbackRequest = new Request(fallbackUrl.toString(), request);
+  const fallbackResponse = await edgeWorker.fetch(fallbackRequest, env, ctx);
+  const headers = new Headers(fallbackResponse.headers);
+  const contentType = headers.get("content-type") || "";
+
+  headers.set(APP_SHELL_FALLBACK_HEADER, `${APP_SHELL_FALLBACK_VERSION}; from=${originalPathname}`);
+  headers.set("Cache-Control", "no-store, max-age=0");
+
+  if (!contentType.includes("text/html")) {
+    return new Response(fallbackResponse.body, {
+      status: fallbackResponse.status,
+      statusText: fallbackResponse.statusText,
+      headers,
+    });
+  }
+
+  let html = await fallbackResponse.text();
+  html = repairPublicRouteMetadata(html, originalPathname);
+
+  return new Response(html, {
+    status: 200,
+    statusText: "OK",
+    headers,
+  });
+}
 
 export function looksLikeRouteExposureHtml(html = "") {
   const text = String(html || "");
@@ -158,7 +235,18 @@ function shouldSanitizeHtml(request, response) {
 
 export default {
   async fetch(request, env, ctx) {
-    const response = await edgeWorker.fetch(request, env, ctx);
+    let response;
+    try {
+      response = await edgeWorker.fetch(request, env, ctx);
+    } catch (error) {
+      if (!shouldUseAppShellFallback(request, null, error)) throw error;
+      response = await fetchAppShellFallback(request, env, ctx);
+    }
+
+    if (shouldUseAppShellFallback(request, response)) {
+      response = await fetchAppShellFallback(request, env, ctx);
+    }
+
     if (!shouldSanitizeHtml(request, response)) return response;
 
     const html = await response.text();
