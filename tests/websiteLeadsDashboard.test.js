@@ -11,18 +11,21 @@ import {
   normalizeWebsiteLeadPage,
 } from "../src/lib/websiteLeadsDashboard.js";
 
-test("website lead query keeps all leads unfiltered and scopes status filters", () => {
-  assert.deepEqual(buildWebsiteLeadQuery("all"), {});
-  assert.deepEqual(buildWebsiteLeadQuery("new"), { lead_status: "new" });
-  assert.deepEqual(buildWebsiteLeadQuery("booked"), { lead_status: "booked" });
+test("website lead query excludes non-production records and scopes status filters", () => {
+  const allQuery = buildWebsiteLeadQuery("all");
+  assert.ok(Array.isArray(allQuery.$nor));
+  assert.ok(allQuery.$nor.length > 0);
+  assert.equal(buildWebsiteLeadQuery("new").$and[0].lead_status, "new");
+  assert.equal(buildWebsiteLeadQuery("booked").$and[0].lead_status, "booked");
 });
 
-test("website leads pagination supports 50+ lead review", () => {
+test("website leads pagination supports 50+ lead review with fetch buffer", () => {
   const leads = Array.from({ length: 53 }, (_, index) => ({ id: `lead-${index + 1}` }));
 
   assert.equal(WEBSITE_LEADS_PAGE_SIZE, 25);
-  assert.equal(getWebsiteLeadFetchLimit(1), 26);
-  assert.equal(getWebsiteLeadFetchLimit(2), 51);
+  assert.equal(getWebsiteLeadFetchLimit(1), 104);
+  assert.equal(getWebsiteLeadFetchLimit(2), 204);
+  assert.equal(getWebsiteLeadFetchLimit(1, WEBSITE_LEADS_PAGE_SIZE, false), 26);
   assert.equal(getWebsiteLeadPage(leads, 1).length, 25);
   assert.equal(getWebsiteLeadPage(leads, 2)[0].id, "lead-26");
   assert.equal(getWebsiteLeadPage(leads, 3).length, 3);
