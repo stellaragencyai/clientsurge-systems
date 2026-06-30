@@ -125,10 +125,7 @@ export default function CinematicHero() {
               maxWidth: "980px",
             }}
           >
-            <span style={{ display: "block", color: "#FFFFFF" }}>You already get leads.</span>
-            <span style={{ display: "block", color: "#00AEEF", textShadow: "0 0 32px rgba(0,174,239,0.45), 0 2px 12px rgba(0,0,0,0.4)" }}>
-              ClientSurge makes sure they get answered, followed up, and booked.
-            </span>
+            <span style={{ display: "block", color: "#FFFFFF" }}>Capture. Follow Up. Book.</span>
           </motion.h1>
 
           <motion.p
