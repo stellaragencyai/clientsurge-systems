@@ -31,7 +31,7 @@ export default function Automations() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen" style={{ background: "#061025" }}>
+      <div className="min-h-screen text-slate-950" style={{ background: "#FFFFFF" }}>
         <Navbar />
         <main className="pt-[var(--cs-nav-height)]">
           <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
@@ -40,7 +40,7 @@ export default function Automations() {
               title="Explore the ClientSurge Automation Stack"
               subtitle="Starter, Growth, and Pro include different combinations of these systems depending on how much of your lead flow you want ClientSurge to handle."
               align="center"
-              variant="dark"
+              variant="light"
             />
           </section>
 
@@ -49,15 +49,23 @@ export default function Automations() {
               {SERVICES.map((service) => {
                 const Icon = service.icon;
                 return (
-                  <article key={service.id} className="rounded-xl overflow-hidden border p-6 flex flex-col" style={{ background: "rgba(8,20,44,0.72)", borderColor: "rgba(53,189,241,0.2)" }}>
+                  <article
+                    key={service.id}
+                    className="rounded-xl overflow-hidden border p-6 flex flex-col shadow-sm"
+                    style={{
+                      background: "#FFFFFF",
+                      borderColor: "rgba(0,79,156,0.16)",
+                      boxShadow: "0 18px 45px rgba(6,16,37,0.08)",
+                    }}
+                  >
                     <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)" }}>
-                      <Icon className="w-5 h-5" style={{ color: "#35BDF1" }} />
+                      <Icon className="w-5 h-5" style={{ color: "#0077B6" }} />
                     </div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#7F8DA3" }}>What this protects</p>
-                    <h2 className="font-titles text-lg font-bold mb-2" style={{ color: "#FFFFFF" }}>{service.title}</h2>
-                    <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "#AEB8C8" }}>{service.tagline}</p>
-                    <div className="rounded-lg p-3 mb-5" style={{ border: "1px solid rgba(53,189,241,0.2)", background: "rgba(53,189,241,0.06)" }}>
-                      <p className="text-xs font-semibold" style={{ color: "#FFFFFF" }}><CheckCircle className="w-3.5 h-3.5 inline mr-1" style={{ color: "#35BDF1" }} /> {service.included}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#53647A" }}>What this protects</p>
+                    <h2 className="font-titles text-lg font-bold mb-2" style={{ color: "#061025" }}>{service.title}</h2>
+                    <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "#334155" }}>{service.tagline}</p>
+                    <div className="rounded-lg p-3 mb-5" style={{ border: "1px solid rgba(0,119,182,0.18)", background: "#EFF8FF" }}>
+                      <p className="text-xs font-semibold" style={{ color: "#061025" }}><CheckCircle className="w-3.5 h-3.5 inline mr-1" style={{ color: "#0077B6" }} /> {service.included}</p>
                     </div>
                     <Link to={`/book?service=${service.id}`} className="cs-btn-primary w-full">See Packages With This System <ArrowRight className="w-4 h-4" /></Link>
                   </article>
@@ -65,13 +73,20 @@ export default function Automations() {
               })}
             </div>
 
-            <div className="mt-16 rounded-2xl p-10 md:p-14 text-center" style={{ background: "linear-gradient(135deg, rgba(0,79,156,0.12), rgba(0,59,143,0.08))", border: "1px solid rgba(53,189,241,0.2)", backdropFilter: "blur(12px)" }}>
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#35BDF1" }}>Compare Packages</p>
-              <h2 className="font-titles text-3xl md:text-4xl font-bold mb-4" style={{ color: "#FFFFFF" }}>Not Every Business Needs the Full Stack on Day One</h2>
-              <p className="text-base max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: "#AEB8C8" }}>Compare Starter, Growth, and Pro to choose the amount of lead flow you want ClientSurge to handle.</p>
+            <div
+              className="mt-16 rounded-2xl p-10 md:p-14 text-center"
+              style={{
+                background: "linear-gradient(135deg, rgba(239,248,255,0.96), rgba(255,255,255,0.98))",
+                border: "1px solid rgba(0,79,156,0.16)",
+                boxShadow: "0 22px 60px rgba(6,16,37,0.08)",
+              }}
+            >
+              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#0077B6" }}>Compare Packages</p>
+              <h2 className="font-titles text-3xl md:text-4xl font-bold mb-4" style={{ color: "#061025" }}>Not Every Business Needs the Full Stack on Day One</h2>
+              <p className="text-base max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: "#334155" }}>Compare Starter, Growth, and Pro to choose the amount of lead flow you want ClientSurge to handle.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link to="/pricing" className="cs-btn-primary" style={{ padding: "0 40px", height: "56px", fontSize: "1rem" }}>Compare Packages <ArrowRight className="w-5 h-5" /></Link>
-                <Link to="/book" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold transition-all" style={{ color: "#FFFFFF", border: "1.5px solid rgba(53, 189, 241, 0.3)", background: "rgba(8, 20, 44, 0.5)" }}>Get Help Choosing</Link>
+                <Link to="/book" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold transition-all" style={{ color: "#004F9C", border: "1.5px solid rgba(0, 119, 182, 0.28)", background: "#FFFFFF" }}>Get Help Choosing</Link>
               </div>
             </div>
           </section>
