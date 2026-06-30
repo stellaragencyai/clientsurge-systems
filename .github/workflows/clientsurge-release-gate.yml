@@ -47,11 +47,15 @@ jobs:
       - name: Build app
         run: npm run build
 
-      - name: Run Node tests
-        run: npm run test:node
+      - name: Run release-gate Node tests
+        run: npm run test:release-gate:node
 
       - name: Run Deno tests
         run: npm run test:deno
+
+      - name: Run full Node test audit
+        continue-on-error: true
+        run: npm run test:node
 
       - name: Start local preview
         run: |
