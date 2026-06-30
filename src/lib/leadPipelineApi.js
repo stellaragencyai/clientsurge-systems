@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { isLeadProductionTrusted } from "@/lib/crmTruth";
 
 const DIRECT_LEADS_PAGE_SIZE = 5000;
 const DIRECT_LEADS_MAX_ROWS = 25000;
@@ -120,7 +121,8 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
     if (!page || page.length < DIRECT_LEADS_PAGE_SIZE) break;
   }
 
-  const normalized = allLeads.map(normalizeLead);
+  const trustedLeads = allLeads.filter(isLeadProductionTrusted);
+  const normalized = trustedLeads.map(normalizeLead);
   const filtered = normalized.filter((lead) => matchesFilter(lead, filters));
   const limit = Math.min(Math.max(Number(filters.limit) || 100, 1), 250);
   const offset = Math.max(Number(filters.offset) || 0, 0);
@@ -171,6 +173,7 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
     data_window: {
       direct_entity_fallback: true,
       rows_loaded: normalized.length,
+      rows_hidden_by_track_c: allLeads.length - trustedLeads.length,
       max_rows: DIRECT_LEADS_MAX_ROWS,
     },
   };
@@ -193,14 +196,16 @@ export async function fetchLeadPipelineSummary(filters = {}) {
     data = await fetchDirectLeadsSnapshot(filters);
   }
 
-  // Sort lead list and priority queue by lead_score descending (high-intent first)
   if (Array.isArray(data.leads)) {
-    data.leads = [...data.leads].sort((a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0));
+    data.leads = [...data.leads].filter(isLeadProductionTrusted).sort((a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0));
   }
   if (Array.isArray(data.summary?.priority_queue)) {
-    data.summary.priority_queue = [...data.summary.priority_queue].sort(
-      (a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0)
-    );
+    data.summary.priority_queue = [...data.summary.priority_queue]
+      .filter(isLeadProductionTrusted)
+      .sort((a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0));
+  }
+  if (Array.isArray(data.summary?.recent_lead_activity)) {
+    data.summary.recent_lead_activity = data.summary.recent_lead_activity.filter(isLeadProductionTrusted);
   }
 
   return data;
@@ -218,68 +223,9 @@ export function subscribeToLeadPipelineChanges({ onChange, onError } = {}) {
         onChange?.(event);
       }
     });
-
-    return () => subscription?.unsubscribe?.();
+    return subscription;
   } catch (error) {
     onError?.(error);
     return null;
   }
-}
-
-export async function previewLeadImport({ rows, import_source = "manual_import" }) {
-  const response = await base44.functions.invoke("importLeads", {
-    rows,
-    import_source,
-    dry_run: true,
-  });
-
-  return response?.data?.preview || null;
-}
-
-export async function executeLeadImport({ rows, import_source = "manual_import" }) {
-  const response = await base44.functions.invoke("importLeads", {
-    rows,
-    import_source,
-    dry_run: false,
-  });
-
-  return response?.data?.result || null;
-}
-
-export async function triggerLeadScoring(lead_id = null) {
-  const response = await base44.functions.invoke("scoreLeads", lead_id ? { lead_id } : {});
-  return response?.data || {};
-}
-
-export async function runLeadDeduplication({ dry_run = true } = {}) {
-  const response = await base44.functions.invoke("deduplicateLeads", { dry_run });
-  return response?.data || {};
-}
-
-export async function prepareLeadOutreachQueue() {
-  const dedupe = await runLeadDeduplication({ dry_run: false });
-  const scoring = await triggerLeadScoring();
-  return { dedupe, scoring };
-}
-
-export async function saveLeadStatus({ lead_id, status, note = "" }) {
-  const response = await base44.functions.invoke("updateLeadStatus", {
-    lead_id,
-    status,
-    note,
-  });
-
-  return response?.data || {};
-}
-
-export async function bridgeCrmWon({ lead_id, package_key, payment_source, follow_up_date = "", note = "" }) {
-  const response = await base44.functions.invoke("crmWonBridge", {
-    lead_id,
-    package_key,
-    payment_source,
-    follow_up_date,
-    note,
-  });
-
-  return response?.data || {};
 }
