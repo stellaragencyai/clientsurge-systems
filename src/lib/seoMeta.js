@@ -8,9 +8,9 @@ const DEFAULT_OG_IMAGE = "https://media.base44.com/images/public/69dc4a79656fdba
 
 const PAGE_META = {
   "/": {
-    title: "AI Automation Systems for Local Leads | ClientSurge Systems",
+    title: "ClientSurge Systems | AI Automation for Local Businesses",
     description: "Six done-for-you automations for lead capture, missed-call recovery, AI follow-up, appointment booking, review generation, and customer reactivation for local service businesses.",
-    ogTitle: "AI Automation Systems That Turn More Local Leads Into Booked Jobs",
+    ogTitle: "ClientSurge Systems | AI Automation for Local Businesses",
   },
   "/pricing": {
     title: "Pricing & Packages | ClientSurge Systems",
@@ -28,9 +28,9 @@ const PAGE_META = {
     ogTitle: "About ClientSurge Systems — Built by Operators, for Operators",
   },
   "/contact": {
-    title: "Contact ClientSurge Systems",
-    description: "Get in touch with the ClientSurge team. We'll help you identify the right automation stack for your business.",
-    ogTitle: "Talk to a ClientSurge Automation Specialist",
+    title: "Contact ClientSurge Systems | Questions and Demo Requests",
+    description: "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
+    ogTitle: "Contact ClientSurge Systems",
   },
   "/faq": {
     title: "FAQ | ClientSurge Systems",
