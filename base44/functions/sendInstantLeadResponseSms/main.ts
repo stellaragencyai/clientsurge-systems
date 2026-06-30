@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { getWebsiteLeadOutboundSuppression, logSuppressedWebsiteLeadOutbound } from "../_shared/outboundLeadGuards.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -165,6 +166,23 @@ Deno.serve(async (req) => {
 
     if (!leadData) {
       return json({ error: "Lead not found" }, 404);
+    }
+
+    const leadHold = getWebsiteLeadOutboundSuppression(leadData);
+    if (leadHold.suppressed) {
+      await logSuppressedWebsiteLeadOutbound(base44, {
+        lead: leadData,
+        source: "sendInstantLeadResponseSms",
+        channel: "internal",
+        reason: leadHold.reasons,
+      });
+      return json({
+        success: true,
+        skipped: true,
+        reason: "outbound_guardrail",
+        reasons: leadHold.reasons,
+        sms_sent: false,
+      }, 200);
     }
 
     // Idempotency guard
