@@ -89,7 +89,19 @@ export default function LaunchProofDashboard() {
     switch (cardKey) {
       case "stripe": {
         const gate = findGate(data.gates, "stripe_payment_gate", "stripe_payments");
-        const status = gateStatusToCardStatus(gate);
+        const stripe = data.evidence?.stripe_payment || data.sections?.stripe_payment || {};
+        const hasProductionPaidOrder = Boolean(stripe.latest_paid_order || Number(stripe.production_trusted_paid_count || 0) > 0);
+        const missingPaidOrderOnly =
+          gate?.status === "blocked" &&
+          String(gate?.current_blocker || gate?.evidence_summary || "")
+            .toLowerCase()
+            .includes("no real non-test paid order");
+        const status = hasProductionPaidOrder
+          ? "trusted"
+          : missingPaidOrderOnly
+            ? "ready"
+            : gateStatusToCardStatus(gate);
+
         return {
           status,
           nextAction: status === "trusted" ? "" : gate?.next_action || "Complete a real Stripe checkout. Verify payment_status=paid on a production order.",
