@@ -1,9 +1,11 @@
 /**
  * TwilioRuntimeHealth — Admin panel for Twilio/Voice infrastructure observability.
  *
- * This panel must not show stale hardcoded failure claims. It renders current
- * evidence from CommunicationEvent, WebhookRegistration, LaunchGate,
- * AdminSettings, and AutomationChecklist records.
+ * Rules:
+ * - Do not show hardcoded stale failures.
+ * - Red means current stored evidence says failure.
+ * - Amber means unverified/needs proof.
+ * - Known service-key aliases are normalized at runtime and shown as info, not as a scary data failure.
  */
 
 import { useState, useEffect, useCallback } from 'react';
@@ -57,6 +59,10 @@ const VOICE_WEBHOOK_DIRECT_URL = `${BASE44_FUNCTION_BASE}/receiveInboundVoiceCal
 const CUSTOM_VOICE_WEBHOOK_URL = `${APP_URL}/api/receiveInboundVoiceCall`;
 const CUSTOM_SMS_WEBHOOK_URL = `${APP_URL}/api/receiveTwilioInboundSms`;
 
+function hasFailureText(value) {
+  return /fail|error|timeout|twilio application|\b4\d\d\b|\b5\d\d\b/i.test(String(value || ''));
+}
+
 function CopyButton({ text }) {
   const [copied, setCopied] = useState(false);
   const copy = () => {
@@ -105,10 +111,6 @@ function UrlRow({ label, url, method = 'POST', description, tone = 'slate' }) {
   );
 }
 
-function hasFailureText(value) {
-  return /fail|error|timeout|twilio application|\b4\d\d\b|\b5\d\d\b/i.test(String(value || ''));
-}
-
 function getVoiceEvidence(data) {
   const runtimeProof = data?.latestVoiceEvent || data?.voiceWebhookReg?.last_triggered_at;
   const failureEvidence = [
@@ -121,7 +123,7 @@ function getVoiceEvidence(data) {
     return {
       status: 'trusted',
       title: 'Voice runtime proof exists',
-      message: 'A real voice CommunicationEvent or WebhookRegistration trigger has been recorded. Keep using the currently verified Twilio URL.',
+      message: 'A real voice CommunicationEvent or WebhookRegistration trigger has been recorded.',
       evidence: failureEvidence,
     };
   }
@@ -130,7 +132,7 @@ function getVoiceEvidence(data) {
     return {
       status: 'blocked',
       title: 'Voice route has current failure evidence',
-      message: 'The dashboard is showing a blocker because the stored route data contains a recent failure signal. Use the direct Base44 URL or run a fresh live call proof after updating Twilio.',
+      message: 'The dashboard is red because stored route data currently contains a failure signal. Update Twilio to a verified URL and run a fresh live call proof.',
       evidence: failureEvidence,
     };
   }
@@ -138,7 +140,7 @@ function getVoiceEvidence(data) {
   return {
     status: 'warning',
     title: 'Voice route awaiting live proof',
-    message: 'No live Twilio call proof has been recorded yet. This is not a confirmed failure; it is an unverified state until a real call reaches the handler.',
+    message: 'No live Twilio call proof has been recorded yet. This is unverified, not a confirmed failure.',
     evidence: failureEvidence,
   };
 }
@@ -194,9 +196,7 @@ export default function TwilioRuntimeHealth() {
       ]);
 
       const adminSettings = adminSettingsList?.[0] || null;
-      const SMS_SOURCE_NAME_ALIASES = new Set([
-        'twilio_sms', 'sms_inbound', 'inbound_sms', 'missed_call_textback', 'missed_call_text_back',
-      ]);
+      const SMS_SOURCE_NAME_ALIASES = new Set(['twilio_sms', 'sms_inbound', 'inbound_sms', 'missed_call_textback', 'missed_call_text_back']);
       const voiceWebhookReg = webhookRegs?.find(r => r.source_name === 'twilio_voice') || null;
       const smsWebhookReg = webhookRegs?.find(r => SMS_SOURCE_NAME_ALIASES.has(r.source_name)) || null;
       const smsGate = launchGates?.find(g => g.gate_key === 'twilio_sms_gate') || null;
@@ -287,55 +287,30 @@ export default function TwilioRuntimeHealth() {
             Twilio Runtime Health
           </h2>
           <p className="text-sm text-slate-500 mt-0.5">
-            Current infrastructure status from live records. Red states require stored evidence, not hardcoded assumptions.
+            Current infrastructure status from live records. Known aliases are normalized at runtime; only unknown keys are warnings.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <button
-            onClick={load}
-            disabled={loading}
-            className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors"
-          >
+          <button onClick={load} disabled={loading} className="flex items-center gap-1.5 px-3 py-2 border border-slate-200 rounded-lg text-xs font-semibold text-slate-600 hover:bg-slate-50 transition-colors">
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin' : ''}`} />
             Refresh
           </button>
-          <button
-            onClick={runProof}
-            disabled={proofRunning}
-            className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
-          >
+          <button onClick={runProof} disabled={proofRunning} className="flex items-center gap-1.5 px-3 py-2 bg-blue-600 text-white rounded-lg text-xs font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50">
             {proofRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Zap className="w-3.5 h-3.5" />}
             Run Proof Check
           </button>
         </div>
       </div>
 
-      {error && (
-        <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
-          <AlertTriangle className="w-4 h-4 flex-shrink-0" />
-          {error}
-        </div>
-      )}
+      {error && <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"><AlertTriangle className="w-4 h-4 flex-shrink-0" />{error}</div>}
 
-      <VoiceFrontLinePanel
-        frontlineGate={data?.frontlineGate || null}
-        postCallGate={data?.postCallGate || null}
-        onRefresh={load}
-      />
+      <VoiceFrontLinePanel frontlineGate={data?.frontlineGate || null} postCallGate={data?.postCallGate || null} onRefresh={load} />
 
       <EvidenceBanner data={data} />
 
       {proofResult && (
         <div className={`rounded-lg border p-4 text-sm ${proofResult.error ? 'border-red-200 bg-red-50 text-red-800' : 'border-green-200 bg-green-50 text-green-800'}`}>
-          {proofResult.error ? (
-            <p><strong>Proof check failed:</strong> {proofResult.error}</p>
-          ) : (
-            <div className="space-y-1">
-              <p className="font-semibold">Proof check completed at {proofResult.ran_at ? new Date(proofResult.ran_at).toLocaleString() : 'just now'}</p>
-              <p>SMS gate: <strong>{proofResult.sms_gate?.completion_percent ?? '—'}%</strong> complete, <strong>{proofResult.sms_gate?.proof_percent ?? '—'}%</strong> proof</p>
-              <p>Voice gate: <strong>{proofResult.voice_gate?.completion_percent ?? '—'}%</strong> complete, <strong>{proofResult.voice_gate?.proof_percent ?? '—'}%</strong> proof</p>
-            </div>
-          )}
+          {proofResult.error ? <p><strong>Proof check failed:</strong> {proofResult.error}</p> : <p><strong>Proof check completed.</strong> SMS proof {proofResult.sms_gate?.proof_percent ?? '—'}%; voice proof {proofResult.voice_gate?.proof_percent ?? '—'}%.</p>}
         </div>
       )}
 
@@ -347,7 +322,7 @@ export default function TwilioRuntimeHealth() {
             <div className="flex items-center gap-2"><StatusDot ok /><span className="text-slate-700">TWILIO_AUTH_TOKEN</span></div>
             <div className="flex items-center gap-2"><StatusDot ok /><span className="text-slate-700">TWILIO_PHONE_NUMBER</span></div>
           </div>
-          <p className="text-[11px] text-slate-400">Backend secrets are checked by server-side proof functions; values are never exposed here.</p>
+          <p className="text-[11px] text-slate-400">Backend proof functions check secret presence. Values are never exposed here.</p>
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
@@ -360,17 +335,7 @@ export default function TwilioRuntimeHealth() {
               <p><strong>status:</strong> {data.smsWebhookReg.status}</p>
               <p><strong>last_triggered:</strong> {data.smsWebhookReg.last_triggered_at ? new Date(data.smsWebhookReg.last_triggered_at).toLocaleString() : 'not yet recorded'}</p>
             </div>
-          ) : (
-            <p className="text-xs text-amber-700">No SMS WebhookRegistration found. This is unverified until an SMS proof run or real inbound SMS succeeds.</p>
-          )}
-          <div className="border-t border-slate-100 pt-2 space-y-1">
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Latest SMS CommunicationEvent</p>
-            {data?.latestSmsEvent ? (
-              <p className="text-xs text-slate-600">{new Date(data.latestSmsEvent.created_date).toLocaleString()} · {data.latestSmsEvent.event_type} · {data.latestSmsEvent.status}</p>
-            ) : (
-              <p className="text-xs text-amber-700">None found yet.</p>
-            )}
-          </div>
+          ) : <p className="text-xs text-amber-700">No SMS registration found yet.</p>}
         </div>
 
         <div className="rounded-lg border border-slate-200 bg-white p-4 space-y-3">
@@ -382,143 +347,55 @@ export default function TwilioRuntimeHealth() {
               <p className="text-xs text-slate-500">Status: {data.latestVoiceEvent.status}</p>
               <p className="text-xs text-slate-500">Type: {data.latestVoiceEvent.event_type}</p>
             </div>
-          ) : (
-            <p className="text-xs text-amber-700">No voice CommunicationEvents yet. This means live voice is unproven unless another provider is intentionally first responder.</p>
-          )}
-          {data?.voiceWebhookReg && (
-            <div className="text-[11px] space-y-0.5 border-t border-slate-100 pt-2">
-              <p>WebhookRegistration: <span className={data.voiceWebhookReg.status === 'active' ? 'text-green-600 font-semibold' : 'text-amber-600 font-semibold'}>{data.voiceWebhookReg.status}</span></p>
-              <p>Last triggered: {data.voiceWebhookReg.last_triggered_at ? new Date(data.voiceWebhookReg.last_triggered_at).toLocaleString() : 'not yet recorded'}</p>
-              {data.voiceWebhookReg.last_error && <p className="text-red-600">Last error: {data.voiceWebhookReg.last_error}</p>}
-              {data.voiceWebhookReg.failure_count > 0 && <p className="text-red-600">Failure count: {data.voiceWebhookReg.failure_count}</p>}
-            </div>
-          )}
+          ) : <p className="text-xs text-amber-700">No voice CommunicationEvents yet. This is unproven, not automatically failed.</p>}
         </div>
       </div>
 
       <div className="rounded-xl border border-slate-200 bg-white p-5 space-y-4">
-        <div className="flex items-center gap-2">
-          <ExternalLink className="w-4 h-4 text-slate-600" />
-          <h3 className="font-semibold text-slate-900 text-sm">Twilio Console URL Guidance</h3>
-        </div>
-        <p className="text-xs text-slate-500">
-          Use direct Base44 function URLs for Twilio first-response tests unless a fresh live proof confirms the custom domain proxy path works. This panel no longer labels custom-domain routes as failed without current stored evidence.
-        </p>
+        <div className="flex items-center gap-2"><ExternalLink className="w-4 h-4 text-slate-600" /><h3 className="font-semibold text-slate-900 text-sm">Twilio Console URL Guidance</h3></div>
+        <p className="text-xs text-slate-500">Use direct Base44 function URLs for first-response tests unless a fresh live proof confirms the custom domain proxy path works.</p>
         <div className="grid gap-3 md:grid-cols-2">
-          <UrlRow
-            label="Recommended Voice Ping"
-            url={VOICE_PING_URL}
-            method="POST"
-            tone="green"
-            description="Bare-minimum TwiML response. Test this first in Twilio before using the full handler."
-          />
-          <UrlRow
-            label="Full Voice Handler"
-            url={VOICE_WEBHOOK_DIRECT_URL}
-            method="POST"
-            tone="green"
-            description="Use after Voice Ping is confirmed. Handles inbound voice and async logging."
-          />
-          <UrlRow
-            label="Custom Domain Voice Route"
-            url={CUSTOM_VOICE_WEBHOOK_URL}
-            method="POST"
-            tone="amber"
-            description="Advisory only. Do not use unless a fresh live Twilio test proves this exact route works."
-          />
-          <UrlRow
-            label="Custom Domain SMS Route"
-            url={CUSTOM_SMS_WEBHOOK_URL}
-            method="POST"
-            tone="amber"
-            description="Advisory only. Prefer the route proven by WebhookRegistration and CommunicationEvent evidence."
-          />
+          <UrlRow label="Recommended Voice Ping" url={VOICE_PING_URL} method="POST" tone="green" description="Bare-minimum TwiML response. Test this first." />
+          <UrlRow label="Full Voice Handler" url={VOICE_WEBHOOK_DIRECT_URL} method="POST" tone="green" description="Use after Voice Ping is confirmed." />
+          <UrlRow label="Custom Domain Voice Route" url={CUSTOM_VOICE_WEBHOOK_URL} method="POST" tone="amber" description="Advisory only. Do not use unless fresh live Twilio proof passes." />
+          <UrlRow label="Custom Domain SMS Route" url={CUSTOM_SMS_WEBHOOK_URL} method="POST" tone="amber" description="Advisory only. Verify with real inbound SMS proof." />
         </div>
-        {data?.adminSettings?.last_webhook_test_result && (
-          <div className="rounded-lg bg-slate-50 border border-slate-200 p-3">
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Last Route Health Check</p>
-            <p className="text-xs text-slate-700 font-mono break-all">{data.adminSettings.last_webhook_test_result}</p>
-          </div>
-        )}
+        {data?.adminSettings?.last_webhook_test_result && <div className="rounded-lg bg-slate-50 border border-slate-200 p-3"><p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest mb-1">Last Route Health Check</p><p className="text-xs text-slate-700 font-mono break-all">{data.adminSettings.last_webhook_test_result}</p></div>}
       </div>
 
-      {(data?.legacyKeyIssues?.length > 0 || data?.unknownKeyIssues?.length > 0) && (
-        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-4">
+      {data?.legacyKeyIssues?.length > 0 && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50 p-5 space-y-4">
           <div className="flex items-center justify-between flex-wrap gap-3">
             <div className="flex items-center gap-2">
-              <AlertTriangle className="w-4 h-4 text-amber-600" />
-              <h3 className="font-semibold text-amber-900 text-sm">
-                AutomationChecklist Service Key Review ({(data.legacyKeyIssues?.length || 0) + (data.unknownKeyIssues?.length || 0)} records)
-              </h3>
+              <Info className="w-4 h-4 text-blue-600" />
+              <h3 className="font-semibold text-blue-900 text-sm">Runtime-normalized legacy service-key aliases ({data.legacyKeyIssues.length} records)</h3>
             </div>
-            {data.legacyKeyIssues?.length > 0 && (
-              <button
-                onClick={runChecklistRepair}
-                disabled={repairRunning}
-                className="flex items-center gap-1.5 rounded-lg bg-amber-600 px-3 py-2 text-xs font-semibold text-white hover:bg-amber-700 disabled:opacity-50"
-              >
-                {repairRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-                Canonicalize Legacy Keys
-              </button>
-            )}
+            <button onClick={runChecklistRepair} disabled={repairRunning} className="flex items-center gap-1.5 rounded-lg bg-blue-600 px-3 py-2 text-xs font-semibold text-white hover:bg-blue-700 disabled:opacity-50">
+              {repairRunning ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+              Canonicalize Database Rows
+            </button>
           </div>
-          <p className="text-xs text-amber-700">
-            These are live records with non-canonical keys. Known aliases can be safely rewritten to canonical keys; records are not deleted.
-          </p>
-
-          {repairResult && (
-            <div className={`rounded-lg border p-3 text-xs ${repairResult.error ? 'border-red-200 bg-red-50 text-red-800' : 'border-green-200 bg-green-50 text-green-800'}`}>
-              {repairResult.error ? (
-                <p><strong>Repair failed:</strong> {repairResult.error}</p>
-              ) : (
-                <p><strong>Repair complete:</strong> {repairResult.checklists_updated || 0} checklist records and {repairResult.steps_updated || 0} step records updated. Failed: {repairResult.failed || 0}.</p>
-              )}
-            </div>
-          )}
-
-          {data.legacyKeyIssues?.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-bold text-amber-800 uppercase tracking-wide">Known aliases:</p>
-              {data.legacyKeyIssues.map(issue => (
-                <div key={issue.id} className="flex items-center gap-2 text-xs text-amber-800 bg-white rounded-lg px-3 py-2 border border-amber-200">
-                  <span className="font-mono bg-red-100 text-red-700 px-1.5 py-0.5 rounded">{issue.legacy_key}</span>
-                  <span>→</span>
-                  <span className="font-mono bg-green-100 text-green-700 px-1.5 py-0.5 rounded">{issue.canonical_key}</span>
-                  <span className="text-amber-600 ml-2">{issue.business_name}</span>
-                </div>
-              ))}
-            </div>
-          )}
-
-          {data.unknownKeyIssues?.length > 0 && (
-            <div className="space-y-2">
-              <p className="text-xs font-bold text-amber-800 uppercase tracking-wide">Unknown service keys requiring manual review:</p>
-              {data.unknownKeyIssues.map(issue => (
-                <div key={issue.id} className="flex items-center gap-2 text-xs text-amber-800 bg-white rounded-lg px-3 py-2 border border-amber-200">
-                  <span className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">{issue.service_key}</span>
-                  <span className="text-amber-600 ml-2">{issue.business_name}</span>
-                </div>
-              ))}
-            </div>
-          )}
+          <p className="text-xs text-blue-700">These known aliases are mapped to canonical service keys by the dashboard/proof layer. They are not counted as broken dashboard data. Use the button to clean the stored rows when Base44 permits the write.</p>
+          {repairResult && <div className={`rounded-lg border p-3 text-xs ${repairResult.error ? 'border-red-200 bg-red-50 text-red-800' : 'border-green-200 bg-green-50 text-green-800'}`}>{repairResult.error ? <p><strong>Repair failed:</strong> {repairResult.error}</p> : <p><strong>Repair complete:</strong> {repairResult.checklists_updated || 0} checklist records and {repairResult.steps_updated || 0} step records updated. Failed: {repairResult.failed || 0}.</p>}</div>}
+          <div className="space-y-2">
+            {data.legacyKeyIssues.map(issue => <div key={issue.id} className="flex items-center gap-2 text-xs text-blue-800 bg-white rounded-lg px-3 py-2 border border-blue-200"><span className="font-mono bg-blue-100 px-1.5 py-0.5 rounded">{issue.legacy_key}</span><span>→</span><span className="font-mono bg-green-100 text-green-700 px-1.5 py-0.5 rounded">{issue.canonical_key}</span><span className="text-blue-600 ml-2">{issue.business_name}</span></div>)}
+          </div>
         </div>
       )}
 
-      {data?.legacyKeyIssues?.length === 0 && data?.unknownKeyIssues?.length === 0 && (
-        <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-800">
-          <CheckCircle2 className="w-4 h-4" />
-          All {data?.checklist_count} AutomationChecklist records use canonical service keys.
+      {data?.unknownKeyIssues?.length > 0 && (
+        <div className="rounded-xl border border-amber-200 bg-amber-50 p-5 space-y-3">
+          <div className="flex items-center gap-2"><AlertTriangle className="w-4 h-4 text-amber-600" /><h3 className="font-semibold text-amber-900 text-sm">Unknown AutomationChecklist service keys ({data.unknownKeyIssues.length})</h3></div>
+          <p className="text-xs text-amber-700">These keys do not have known canonical mappings and require manual review.</p>
+          {data.unknownKeyIssues.map(issue => <div key={issue.id} className="flex items-center gap-2 text-xs text-amber-800 bg-white rounded-lg px-3 py-2 border border-amber-200"><span className="font-mono bg-slate-100 text-slate-700 px-1.5 py-0.5 rounded">{issue.service_key}</span><span className="text-amber-600 ml-2">{issue.business_name}</span></div>)}
         </div>
       )}
+
+      {data?.legacyKeyIssues?.length === 0 && data?.unknownKeyIssues?.length === 0 && <div className="flex items-center gap-2 rounded-lg border border-green-200 bg-green-50 p-3 text-xs text-green-800"><CheckCircle2 className="w-4 h-4" />All {data?.checklist_count} AutomationChecklist records use canonical service keys.</div>}
 
       <div className="rounded-lg border border-slate-200 bg-white p-4">
-        <div className="flex items-center gap-2 mb-2">
-          <Info className="w-4 h-4 text-slate-500" />
-          <p className="text-sm font-semibold text-slate-700">Asana Integration</p>
-        </div>
-        <p className="text-xs text-slate-500">
-          Status: <strong className="text-slate-700">Not verified.</strong> No Asana connector is registered in this workspace and no ASANA_API_KEY secret is configured.
-        </p>
+        <div className="flex items-center gap-2 mb-2"><Info className="w-4 h-4 text-slate-500" /><p className="text-sm font-semibold text-slate-700">Asana Integration</p></div>
+        <p className="text-xs text-slate-500">Status: <strong className="text-slate-700">Not verified.</strong> No Asana connector is registered in this workspace and no ASANA_API_KEY secret is configured.</p>
       </div>
     </div>
   );
