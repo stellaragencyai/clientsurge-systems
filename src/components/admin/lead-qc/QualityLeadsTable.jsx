@@ -1,5 +1,5 @@
-import { CheckCircle2, AlertTriangle, Copy, Shield, Send, Loader2 } from "lucide-react";
-import { base44 } from "@/api/base44Client";
+import { CheckCircle2, Shield, Send, Loader2, Trash2 } from "lucide-react";
+import { getLeadCleanupEligibility } from "@/lib/leadCleanupGuards";
 
 const STATUS_STYLES = {
   active: "bg-green-100 text-green-700",
@@ -10,8 +10,20 @@ const STATUS_STYLES = {
   verified_outbound_ready: "bg-blue-100 text-blue-700",
 };
 
-export default function QualityLeadsTable({ leads, loading, selectedIds, onToggleSelect, onToggleSelectAll, onAction, actionLoading }) {
+export default function QualityLeadsTable({
+  leads,
+  loading,
+  selectedIds,
+  selectedLeads = [],
+  onToggleSelect,
+  onToggleSelectAll,
+  onAction,
+  actionLoading,
+}) {
   const allSelected = leads.length > 0 && selectedIds.size === leads.length;
+  const selectedEligibility = selectedLeads.map((lead) => getLeadCleanupEligibility(lead));
+  const deleteEligibleCount = selectedEligibility.filter((item) => item.eligible).length;
+  const deleteBlockedCount = Math.max(0, selectedLeads.length - deleteEligibleCount);
 
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
@@ -41,6 +53,19 @@ export default function QualityLeadsTable({ leads, loading, selectedIds, onToggl
         >
           <Send className="w-3.5 h-3.5" /> Mark Outbound Ready
         </button>
+        <button
+          onClick={() => onAction('delete_verified_junk')}
+          disabled={selectedIds.size === 0 || actionLoading || deleteEligibleCount === 0}
+          title={selectedIds.size === 0 ? 'Select flagged leads first' : `${deleteEligibleCount} eligible, ${deleteBlockedCount} blocked by cleanup guardrails`}
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-red-600 text-white border border-red-700 hover:bg-red-700 disabled:opacity-40 transition-colors"
+        >
+          <Trash2 className="w-3.5 h-3.5" /> Delete Verified Junk{deleteEligibleCount > 0 ? ` (${deleteEligibleCount})` : ''}
+        </button>
+        {deleteBlockedCount > 0 && selectedIds.size > 0 && (
+          <span className="text-[11px] text-muted-foreground">
+            {deleteBlockedCount} selected record(s) blocked from hard delete
+          </span>
+        )}
         {actionLoading && <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />}
       </div>
 
@@ -58,76 +83,88 @@ export default function QualityLeadsTable({ leads, loading, selectedIds, onToggl
               <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground">Location</th>
               <th className="px-3 py-2.5 text-center font-semibold text-muted-foreground">Confidence</th>
               <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground">Status</th>
+              <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground">Cleanup Guard</th>
               <th className="px-3 py-2.5 text-left font-semibold text-muted-foreground">Reason Codes</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border">
             {loading ? (
-              <tr><td colSpan="8" className="px-3 py-8 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin mx-auto" /></td></tr>
+              <tr><td colSpan="9" className="px-3 py-8 text-center text-muted-foreground"><Loader2 className="w-5 h-5 animate-spin mx-auto" /></td></tr>
             ) : leads.length === 0 ? (
-              <tr><td colSpan="8" className="px-3 py-8 text-center text-muted-foreground text-sm">No leads in this view</td></tr>
+              <tr><td colSpan="9" className="px-3 py-8 text-center text-muted-foreground text-sm">No leads in this view</td></tr>
             ) : (
-              leads.map((lead) => (
-                <tr key={lead.id} className="hover:bg-muted/20 transition-colors">
-                  <td className="px-3 py-2.5">
-                    <input
-                      type="checkbox"
-                      checked={selectedIds.has(lead.id)}
-                      onChange={() => onToggleSelect(lead.id)}
-                      className="rounded"
-                    />
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <p className="font-medium text-foreground text-sm">{lead.business_name || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{lead.full_name || "—"}</p>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <p className="text-xs text-muted-foreground">{lead.email || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{lead.phone || "—"}</p>
-                    {lead.canonical_website_url && (
-                      <p className="text-xs text-blue-600 truncate max-w-[150px]">{lead.canonical_website_url}</p>
-                    )}
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <p className="text-xs text-muted-foreground">{lead.source || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{lead.business_type || "—"}</p>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <p className="text-xs text-muted-foreground">{lead.city || "—"}</p>
-                    <p className="text-xs text-muted-foreground">{lead.state || "—"}</p>
-                  </td>
-                  <td className="px-3 py-2.5 text-center">
-                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-bold ${
-                      lead.quality_confidence >= 80 ? "bg-red-50 text-red-600" :
-                      lead.quality_confidence >= 50 ? "bg-yellow-50 text-yellow-600" :
-                      "bg-gray-50 text-gray-500"
-                    }`}>
-                      {lead.quality_confidence || 0}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    <span className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold ${STATUS_STYLES[lead.quality_review_status] || "bg-gray-100 text-gray-700"}`}>
-                      {lead.quality_review_status || "active"}
-                    </span>
-                  </td>
-                  <td className="px-3 py-2.5">
-                    {lead.quality_reason_codes && lead.quality_reason_codes.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {lead.quality_reason_codes.slice(0, 3).map((code, i) => (
-                          <span key={i} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-orange-50 text-orange-600">
-                            {code}
-                          </span>
-                        ))}
-                        {lead.quality_reason_codes.length > 3 && (
-                          <span className="text-[10px] text-muted-foreground">+{lead.quality_reason_codes.length - 3}</span>
-                        )}
-                      </div>
-                    ) : (
-                      <span className="text-xs text-muted-foreground">—</span>
-                    )}
-                  </td>
-                </tr>
-              ))
+              leads.map((lead) => {
+                const eligibility = getLeadCleanupEligibility(lead);
+                return (
+                  <tr key={lead.id} className="hover:bg-muted/20 transition-colors">
+                    <td className="px-3 py-2.5">
+                      <input
+                        type="checkbox"
+                        checked={selectedIds.has(lead.id)}
+                        onChange={() => onToggleSelect(lead.id)}
+                        className="rounded"
+                      />
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <p className="font-medium text-foreground text-sm">{lead.business_name || "—"}</p>
+                      <p className="text-xs text-muted-foreground">{lead.full_name || "—"}</p>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <p className="text-xs text-muted-foreground">{lead.email || "—"}</p>
+                      <p className="text-xs text-muted-foreground">{lead.phone || "—"}</p>
+                      {lead.canonical_website_url && (
+                        <p className="text-xs text-blue-600 truncate max-w-[150px]">{lead.canonical_website_url}</p>
+                      )}
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <p className="text-xs text-muted-foreground">{lead.source || "—"}</p>
+                      <p className="text-xs text-muted-foreground">{lead.business_type || "—"}</p>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <p className="text-xs text-muted-foreground">{lead.city || "—"}</p>
+                      <p className="text-xs text-muted-foreground">{lead.state || "—"}</p>
+                    </td>
+                    <td className="px-3 py-2.5 text-center">
+                      <span className={`inline-flex px-2 py-0.5 rounded text-xs font-bold ${
+                        lead.quality_confidence >= 80 ? "bg-red-50 text-red-600" :
+                        lead.quality_confidence >= 50 ? "bg-yellow-50 text-yellow-600" :
+                        "bg-gray-50 text-gray-500"
+                      }`}>
+                        {lead.quality_confidence || 0}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      <span className={`inline-flex px-2 py-0.5 rounded text-xs font-semibold ${STATUS_STYLES[lead.quality_review_status] || "bg-gray-100 text-gray-700"}`}>
+                        {lead.quality_review_status || "active"}
+                      </span>
+                    </td>
+                    <td className="px-3 py-2.5 max-w-[220px]">
+                      <span className={`inline-flex px-2 py-0.5 rounded text-[10px] font-semibold ${eligibility.eligible ? 'bg-red-50 text-red-700' : 'bg-gray-100 text-gray-600'}`}>
+                        {eligibility.eligible ? 'delete eligible' : 'delete blocked'}
+                      </span>
+                      <p className="mt-1 text-[10px] text-muted-foreground truncate" title={[...eligibility.blockers, ...eligibility.signals].join('; ')}>
+                        {eligibility.eligible ? eligibility.signals[0] || 'verified junk' : eligibility.blockers[0] || 'manual review required'}
+                      </p>
+                    </td>
+                    <td className="px-3 py-2.5">
+                      {lead.quality_reason_codes && lead.quality_reason_codes.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {lead.quality_reason_codes.slice(0, 3).map((code, i) => (
+                            <span key={i} className="inline-flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] font-medium bg-orange-50 text-orange-600">
+                              {code}
+                            </span>
+                          ))}
+                          {lead.quality_reason_codes.length > 3 && (
+                            <span className="text-[10px] text-muted-foreground">+{lead.quality_reason_codes.length - 3}</span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </td>
+                  </tr>
+                );
+              })
             )}
           </tbody>
         </table>
