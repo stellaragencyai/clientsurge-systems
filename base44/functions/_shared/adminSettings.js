@@ -1,38 +1,69 @@
 export const DEFAULT_ADMIN_SETTINGS = {
-  lead_notification_email: "",
-  resend_from_email: "",
-  twilio_from_number: "",
+  description: "",
   twilio_enabled: false,
-  resend_enabled: false,
-  webhook_enabled: false,
-  webhook_url: "",
-  allowed_admin_ips: [],
-  booking_link_default: "",
-  sms_template: "",
-  email_confirmation_template: "",
-  admin_notification_template: "",
+  twilio_from_number: "",
   twilio_account_sid_present: false,
   twilio_auth_token_present: false,
+  whatsapp_enabled: false,
+  whatsapp_from_number: "",
+  resend_enabled: false,
+  resend_from_email: "",
+  gmail_enabled: false,
+  gmail_from_email: "",
+  lead_notification_email: "",
+  booking_link_default: "",
+  allowed_admin_ips: [],
+  webhook_enabled: false,
+  webhook_url: "",
+  voice_webhook_url: "",
+  sms_webhook_url: "",
+  missed_call_webhook_url: "",
+  sms_status_callback_url: "",
   last_webhook_test_result: "",
   last_webhook_test_at: "",
+  sms_template: "",
+  email_confirmation_template: "",
+  missed_call_sms_template: "",
+  follow_up_day1_sms: "",
+  follow_up_day3_sms: "",
+  follow_up_day7_sms: "",
+  missed_call_followup_email_1: "",
+  missed_call_followup_email_2: "",
+  follow_up_booking_prompt_sms: "",
+  follow_up_booking_prompt_email: "",
+  admin_notification_template: "",
+  nurture_step1_subject: "",
+  nurture_step1_body: "",
+  nurture_step2_subject: "",
+  nurture_step2_body: "",
+  nurture_step3_subject: "",
+  nurture_step3_body: "",
+  nurture_step4_subject: "",
+  nurture_step4_body: "",
+  nurture_step5_subject: "",
+  nurture_step5_body: "",
+  nurture_step6_subject: "",
+  nurture_step6_body: "",
+  nurture_step7_subject: "",
+  nurture_step7_body: "",
+  nurture_step8_subject: "",
+  nurture_step8_body: "",
+  cadence_default_mode: "auto",
+  cadence_switch_attempts: 3,
+  cadence_pause_on_reply: true,
+  cadence_engagement_threshold: 50,
+  cadence_max_attempts: 6,
+  voice_calls_enabled: false,
+  inbound_voice_enabled: false,
+  payment_recovery_voice_enabled: false,
+  voice_briefing_enabled: false,
+  voice_briefing_phone: "",
+  voice_forwarding_phone: "",
+  elevenlabs_agent_ids: {},
+  elevenlabs_phone_number_ids: {},
 };
 
-export const ADMIN_SETTINGS_MUTABLE_FIELDS = [
-  "lead_notification_email",
-  "resend_from_email",
-  "twilio_from_number",
-  "twilio_enabled",
-  "resend_enabled",
-  "webhook_enabled",
-  "webhook_url",
-  "allowed_admin_ips",
-  "booking_link_default",
-  "sms_template",
-  "email_confirmation_template",
-  "admin_notification_template",
-  "last_webhook_test_result",
-  "last_webhook_test_at",
-];
+export const ADMIN_SETTINGS_MUTABLE_FIELDS = Object.freeze(Object.keys(DEFAULT_ADMIN_SETTINGS));
 
 function hasOwn(object, key) {
   return Object.prototype.hasOwnProperty.call(object, key);
@@ -58,7 +89,7 @@ export function buildAdminSettingsPatch(input = {}) {
 }
 
 export async function loadAdminSettings(base44) {
-  const records = await base44.asServiceRole.entities.AdminSettings.list();
+  const records = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
   const record = Array.isArray(records) && records.length > 0 ? records[0] : null;
 
   return {
@@ -84,6 +115,8 @@ export async function logAdminSettingsChange({ base44, actor, changedFields }) {
       context_type: "admin_settings",
       changed_fields: changedFields,
     }),
+  }).catch((error) => {
+    console.error("Failed to log admin settings change:", error?.message || error);
   });
 }
 
@@ -91,6 +124,10 @@ export async function saveAdminSettings({ base44, actor, patch }) {
   const filteredPatch = buildAdminSettingsPatch(patch);
   const changedFields = Object.keys(filteredPatch);
   const { record, settings: currentSettings } = await loadAdminSettings(base44);
+
+  if (!changedFields.length) {
+    return currentSettings;
+  }
 
   let savedRecord;
   if (record?.id) {
