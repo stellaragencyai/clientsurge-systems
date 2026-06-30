@@ -19,6 +19,20 @@ const PROOF_CARDS = [
   { key: "site_readiness", label: "Site Readiness Proof", icon: Globe },
 ];
 
+const findGate = (gates, ...gateKeys) => {
+  if (!Array.isArray(gates)) return null;
+  return gateKeys.map((key) => gates.find((gate) => gate.gate_key === key)).find(Boolean) || null;
+};
+
+const gateStatusToCardStatus = (gate) => {
+  if (!gate) return "unknown";
+  if (gate.status === "approved" || gate.status === "proof_passed") return "trusted";
+  if (gate.status === "ready_for_proof") return "ready";
+  if (gate.status === "partial" || gate.status === "proof_running") return "warning";
+  if (gate.status === "blocked" || gate.status === "proof_failed" || gate.status === "locked") return "blocked";
+  return "unknown";
+};
+
 function ProofCard({ card, status, nextAction }) {
   const config = STATUS_CONFIG[status] || STATUS_CONFIG.unknown;
   const Icon = card.icon;
@@ -74,13 +88,12 @@ export default function LaunchProofDashboard() {
 
     switch (cardKey) {
       case "stripe": {
-        const gate = data.gates?.find(g => g.gate_key === "stripe_payments");
-        const proofPassed = gate?.proof_passed || gate?.status === "approved";
-        const blocked = gate?.status === "blocked" || (gate?.blockers?.length > 0);
-        if (proofPassed) return { status: "trusted", nextAction: "" };
-        if (blocked) return { status: "blocked", nextAction: "Complete a real Stripe checkout. Verify payment_status=paid on a production order." };
-        if (gate?.status === "ready_for_proof") return { status: "ready", nextAction: "Run a live test checkout to generate proof." };
-        return { status: "unknown", nextAction: "Stripe payment proof has not been verified yet." };
+        const gate = findGate(data.gates, "stripe_payment_gate", "stripe_payments");
+        const status = gateStatusToCardStatus(gate);
+        return {
+          status,
+          nextAction: status === "trusted" ? "" : gate?.next_action || "Complete a real Stripe checkout. Verify payment_status=paid on a production order.",
+        };
       }
       case "analytics": {
         const ga4 = data.evidence?.ga4 || data.sections?.ga4 || {};
@@ -116,7 +129,7 @@ export default function LaunchProofDashboard() {
         };
       }
       case "dashboard_truth": {
-        const gate = data.gates?.find(g => g.gate_key === "dashboard_truth_gate");
+        const gate = findGate(data.gates, "dashboard_truth_gate");
         const dashboardTruth = data.evidence?.dashboard_truth || data.sections?.dashboard_truth || {};
         const leadCapture = data.evidence?.lead_capture || data.sections?.lead_capture || {};
         const productionFailed = Number(dashboardTruth.failed_jobs_production || 0);
@@ -156,16 +169,37 @@ export default function LaunchProofDashboard() {
         return { status: "unknown", nextAction: "No dashboard truth evidence returned yet. Run Re-verify All." };
       }
       case "voice": {
-        const gate = data.gates?.find(g => g.gate_key === "elevenlabs_voice");
-        if (gate?.proof_passed || gate?.status === "approved") return { status: "trusted", nextAction: "" };
-        if (gate?.status === "ready_for_proof") return { status: "ready", nextAction: "Voice agent is configured. Place a test call to verify." };
-        return { status: "blocked", nextAction: "Configure ElevenLabs agent and phone number for voice automation." };
+        const gate = findGate(data.gates, "voice_frontline_gate", "twilio_voice_gate", "elevenlabs_postcall_logging_gate", "elevenlabs_voice");
+        const status = gateStatusToCardStatus(gate);
+        return {
+          status,
+          nextAction: status === "trusted" ? "" : gate?.next_action || "Configure ElevenLabs/Twilio voice, make a real inbound test call, then rerun proof.",
+        };
       }
       case "booking": {
-        const booking = data.evidence?.booking_proof || data.sections?.booking_proof;
-        if (booking?.has_booking_link && booking?.link_valid) return { status: "trusted", nextAction: "" };
-        if (booking?.has_booking_link && !booking?.link_valid) return { status: "warning", nextAction: "Booking link is set but appears invalid. Update in Admin Settings." };
-        return { status: "blocked", nextAction: "Set a valid booking link (Calendly or similar) in Admin Settings." };
+        const gate = findGate(data.gates, "booking_flow_gate");
+        const booking = data.evidence?.booking_proof || data.sections?.booking_proof || {};
+        const linkPresent = Boolean(booking.has_booking_link || booking.link_present || booking.booking_link_default);
+        const linkValid = Boolean(booking.link_valid || booking.link_looks_valid || booking.status === "ready_for_proof");
+        const gateStatus = gateStatusToCardStatus(gate);
+
+        if (gateStatus === "trusted") return { status: "trusted", nextAction: "" };
+        if (gateStatus === "ready" || (linkPresent && linkValid)) {
+          return {
+            status: "ready",
+            nextAction: gate?.next_action || booking.next_action || "Open the booking link, verify the calendar loads, complete a test booking/click, then approve proof.",
+          };
+        }
+        if (linkPresent && !linkValid) {
+          return {
+            status: "warning",
+            nextAction: gate?.next_action || booking.next_action || "Booking link is set but appears invalid. Update in Admin Settings.",
+          };
+        }
+        return {
+          status: "blocked",
+          nextAction: gate?.next_action || booking.next_action || "Set a valid booking link (Calendly or similar) in Admin Settings.",
+        };
       }
       case "site_readiness": {
         const publicSite = data.sections?.public_site;
