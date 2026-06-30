@@ -70,6 +70,9 @@ jobs:
       - name: Build app
         run: npm run build
 
+      - name: Scan UI theme drift
+        run: node scripts/audit/theme-drift-scan.mjs || echo "Theme drift findings recorded; not blocking build."
+
       - name: Run Base44 publish safety tests
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_base44_safety_tests == 'true' }}
         run: node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js
