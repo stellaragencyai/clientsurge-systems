@@ -3,7 +3,7 @@ import { secureJson } from "../_shared/response.ts";
  * Missed-Call Follow-Up Processor (Minute-Precision)
  * Scheduled: Every 5 minutes
  * Purpose: Send 2min SMS, 10min email, 1hr SMS, 24hr email to missed-call leads
- * 
+ *
  * Separate from generic drip system — designed for urgent recovery timing
  */
 
@@ -19,13 +19,11 @@ const FOLLOW_UP_STEPS = [
   { step: 4, minutesAfter: 1440, channel: "email", key: "missed_call_email_24hr" },
 ];
 
-// #128: opt-out footer
 function appendOptOut(msg) {
   if ((msg || "").toLowerCase().includes("reply stop")) return msg;
   return msg + "\n\nReply STOP to unsubscribe.";
 }
 
-// #129: idempotent step increment — re-reads before writing
 async function incrementStepSafely(base44, leadId, field, currentVal) {
   const fresh = await base44.asServiceRole.entities.SpaLead.get(leadId).catch(() => null);
   if (!fresh || fresh[field] !== currentVal) {
@@ -39,6 +37,49 @@ async function incrementStepSafely(base44, leadId, field, currentVal) {
 function minutesSince(isoDate) {
   if (!isoDate) return 0;
   return (Date.now() - new Date(isoDate).getTime()) / (1000 * 60);
+}
+
+function clean(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function digits(value) {
+  return String(value || "").replace(/\D/g, "");
+}
+
+function includesAny(text, patterns) {
+  return patterns.some((pattern) => text.includes(pattern));
+}
+
+const TEST_EMAIL_PATTERNS = ["clientsurge.test", "clientsurge-install.internal", "@clientsurge.test", ".internal", "test@example.com", "backfill-test"];
+const TEST_SOURCE_PATTERNS = ["crm_live_smoke_test", "smoke", "install_test", "post_patch_verification", "runaibraininstallerbackfill", "admin_test_lead", "testwebsiteleadautomation", "launch audit", "backfill", "qa_lead_proof_generator"];
+const TEST_NAME_PATTERNS = ["clientsurge smoke qa", "clientsurge crm smoke", "client surge smoke", "sarah smoke test", "admin test lead", "install test", "test owner", "crm smoke", "backfill test", "test hvac co", "qa duplicate", "qa raw import"];
+const HELD_QUALITY_STATUSES = new Set(["quarantine_candidate", "quarantined", "duplicate_candidate"]);
+const HELD_DEDUPE_STATUSES = new Set(["duplicate_candidate", "merged_duplicate"]);
+
+function getLeadOutboundHold(lead = {}) {
+  const reasons = [];
+  const emailText = clean(lead.email || lead.normalized_email || lead.canonical_email);
+  const sourceText = [lead.source, lead.import_source, lead.consent_source, lead.source_page, lead.page_submitted_from, lead.quality_reason, ...(lead.quality_reason_codes || [])].map(clean).join(" ");
+  const nameText = [lead.business_name, lead.full_name, lead.owner_contact_name].map(clean).join(" ");
+  const phoneDigits = digits(lead.phone || lead.normalized_phone || lead.canonical_phone);
+  const qualityStatus = clean(lead.quality_review_status);
+  const dedupeStatus = clean(lead.dedupe_status);
+
+  if (!lead || !lead.id) reasons.push("missing_lead");
+  if (lead.do_not_contact === true) reasons.push("do_not_contact");
+  if (clean(lead.sms_opt_out_status) === "opted_out") reasons.push("sms_opt_out");
+  if (clean(lead.email_opt_out_status) === "opted_out") reasons.push("email_opt_out");
+  if (HELD_QUALITY_STATUSES.has(qualityStatus)) reasons.push(`quality_status:${qualityStatus}`);
+  if (HELD_DEDUPE_STATUSES.has(dedupeStatus)) reasons.push(`dedupe_status:${dedupeStatus}`);
+  if (lead.dedupe_duplicate_of) reasons.push("duplicate_keeper_linked");
+  if (includesAny(emailText, TEST_EMAIL_PATTERNS)) reasons.push("test_email_marker");
+  if (includesAny(sourceText, TEST_SOURCE_PATTERNS)) reasons.push("test_source_marker");
+  if (includesAny(nameText, TEST_NAME_PATTERNS)) reasons.push("test_name_marker");
+  if (phoneDigits.length >= 7 && phoneDigits.includes("555")) reasons.push("reserved_phone_pattern");
+  if (clean(lead.business_type) === "test") reasons.push("test_business_type");
+
+  return { held: reasons.length > 0, reasons: [...new Set(reasons)] };
 }
 
 async function checkAlreadySent(base44, leadId, stepKey) {
@@ -70,6 +111,8 @@ function buildMissedCallEvent({
 }) {
   return {
     lead_id: lead.id,
+    context_id: lead.id,
+    context_type: "lead",
     channel,
     direction,
     event_type,
@@ -186,7 +229,6 @@ Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
 
-    // Allow scheduled automation (no user) or admin
     let user = null;
     try {
       user = await base44.auth.me();
@@ -195,9 +237,6 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Forbidden" }, { status: 403 });
     }
 
-    // ─────────────────────────────────────────────────────
-    // STEP 1: Find all leads with missed-call initial SMS sent, no reply yet
-    // ─────────────────────────────────────────────────────
     const leads = await base44.asServiceRole.entities.Leads.filter(
       {
         status: { $in: ["Contacted"] },
@@ -216,7 +255,6 @@ Deno.serve(async (req) => {
       });
     }
 
-    // Load admin settings once for templates and booking link
     const settingsRecords =
       await base44.asServiceRole.entities.AdminSettings.list(
         "-created_date",
@@ -230,7 +268,6 @@ Deno.serve(async (req) => {
     const fromEmail = getApprovedEmailSender(settings, { preferLeads: true });
     const bookingLink = settings.booking_link_default || "";
 
-    // Hard-coded templates (can be overridden by AdminSettings if added)
     const templates = {
       missed_call_sms_2min:
         "Just wanted to follow up — we can usually get you taken care of pretty quickly.\n\nWhat's going on?",
@@ -251,27 +288,22 @@ Deno.serve(async (req) => {
       sent: 0,
       skipped: 0,
       stopped: 0,
+      held: 0,
       failed: 0,
     };
 
-    // ─────────────────────────────────────────────────────
-    // STEP 2: Process each lead
-    // ─────────────────────────────────────────────────────
     for (const lead of leads) {
       try {
         const minutesElapsed = minutesSince(lead.last_contacted_at);
 
-        // Re-check stop conditions
         if (lead.missed_call_sequence_complete || Number(lead.missed_call_step_sent || 0) >= FOLLOW_UP_STEPS.length) {
           results.skipped++;
           results.processed++;
           continue;
         }
 
-        if (!["Contacted"].includes(lead.status)) {
-          console.log(
-            `[processMissedCallFollowUps] Lead ${lead.id} status changed to ${lead.status} — stopping`
-          );
+        if (!['Contacted'].includes(lead.status)) {
+          console.log(`[processMissedCallFollowUps] Lead ${lead.id} status changed to ${lead.status} — stopping`);
           results.stopped++;
           continue;
         }
@@ -283,51 +315,53 @@ Deno.serve(async (req) => {
           continue;
         }
 
-        // Process only the next due step. This prevents a delayed scheduled
-        // run from sending several overdue follow-ups at once.
         for (const stepConfig of [nextDueStep]) {
           try {
-            // Check if enough time has passed
             if (minutesElapsed < stepConfig.minutesAfter) {
-              continue; // Not due yet
+              continue;
             }
 
-            // Check if already sent (idempotency)
-            const alreadySent = await checkAlreadySent(
-              base44,
-              lead.id,
-              stepConfig.key
-            );
+            const alreadySent = await checkAlreadySent(base44, lead.id, stepConfig.key);
             if (alreadySent) {
-              console.log(
-                `[processMissedCallFollowUps] Step ${stepConfig.step} already sent for lead ${lead.id} — skipping`
-              );
+              console.log(`[processMissedCallFollowUps] Step ${stepConfig.step} already sent for lead ${lead.id} — skipping`);
               await recordProcessedStep(base44, lead, stepConfig);
               results.skipped++;
               continue;
             }
 
-            // Re-check lead status before send
-            const freshLead = await base44.asServiceRole.entities.Leads.get(
-              lead.id
-            );
+            const freshLead = await base44.asServiceRole.entities.Leads.get(lead.id);
             if (!freshLead || !["Contacted"].includes(freshLead.status)) {
-              console.log(
-                `[processMissedCallFollowUps] Lead ${lead.id} no longer in Contacted status — stopping`
-              );
+              console.log(`[processMissedCallFollowUps] Lead ${lead.id} no longer in Contacted status — stopping`);
               await base44.asServiceRole.entities.CommunicationEvent.create(
                 buildMissedCallEvent({
                   lead,
                   stepConfig,
                   subject: `Missed-call follow-up stopped at step ${stepConfig.step}`,
                   message_body: "Lead status changed or lead not found",
-                  metadata: {
-                    reason: "status_changed_or_not_found",
-                    previous_status: lead.status,
-                  },
+                  metadata: { reason: "status_changed_or_not_found", previous_status: lead.status },
                 })
               );
               results.stopped++;
+              continue;
+            }
+
+            const hold = getLeadOutboundHold(freshLead);
+            if (hold.held) {
+              await base44.asServiceRole.entities.CommunicationEvent.create(
+                buildMissedCallEvent({
+                  lead: freshLead,
+                  stepConfig,
+                  channel: stepConfig.channel,
+                  direction: "outbound",
+                  event_type: "outbound_hold",
+                  provider: "internal_guardrail",
+                  status: "skipped",
+                  subject: `Missed-call follow-up held at step ${stepConfig.step}`,
+                  message_body: hold.reasons.join(", "),
+                  metadata: { reason: "lead_outbound_hold", reasons: hold.reasons, intended_channel: stepConfig.channel },
+                })
+              );
+              results.held++;
               continue;
             }
 
@@ -335,22 +369,16 @@ Deno.serve(async (req) => {
             let messageId = null;
             let error = null;
 
-            // Send SMS steps
             if (stepConfig.channel === "sms") {
               if (!freshLead.phone) {
-                console.log(
-                  `[processMissedCallFollowUps] No phone for lead ${lead.id} at step ${stepConfig.step}`
-                );
+                console.log(`[processMissedCallFollowUps] No phone for lead ${lead.id} at step ${stepConfig.step}`);
                 await base44.asServiceRole.entities.CommunicationEvent.create(
                   buildMissedCallEvent({
                     lead: freshLead,
                     stepConfig,
                     subject: `Missed-call SMS step ${stepConfig.step} skipped`,
                     message_body: "No phone number on lead",
-                    metadata: {
-                      intended_channel: "sms",
-                      reason: "no_phone",
-                    },
+                    metadata: { intended_channel: "sms", reason: "no_phone" },
                   })
                 );
                 await recordProcessedStep(base44, freshLead, stepConfig);
@@ -360,30 +388,16 @@ Deno.serve(async (req) => {
 
               try {
                 const template = templates[stepConfig.key] || "";
-                const messageBody = renderTemplate(
-                  template,
-                  freshLead,
-                  bookingLink
-                );
-                const smsResult = await sendSMS(
-                  base44,
-                  freshLead,
-                  messageBody,
-                  fromNumber,
-                  stepConfig.key
-                );
+                const messageBody = renderTemplate(template, freshLead, bookingLink);
+                const smsResult = await sendSMS(base44, freshLead, messageBody, fromNumber, stepConfig.key);
                 sent = true;
                 messageId = smsResult.messageId;
               } catch (err) {
                 error = err.message;
-                console.error(
-                  `[processMissedCallFollowUps] SMS step ${stepConfig.step} failed for lead ${lead.id}:`,
-                  err.message
-                );
+                console.error(`[processMissedCallFollowUps] SMS step ${stepConfig.step} failed for lead ${lead.id}:`, err.message);
               }
             }
 
-            // Send EMAIL steps
             if (stepConfig.channel === "email") {
               const sendGate = getEmailOutreachGate("missed-call email follow-up");
               if (!sendGate.ok) {
@@ -398,12 +412,7 @@ Deno.serve(async (req) => {
                     status: "blocked",
                     subject: `Missed-call email step ${stepConfig.step} blocked`,
                     message_body: sendGate.reason,
-                    metadata: {
-                      intended_channel: "email",
-                      reason: "deliverability_gate",
-                      proof_status: sendGate.proof_status,
-                      requires_owner_action: true,
-                    },
+                    metadata: { intended_channel: "email", reason: "deliverability_gate", proof_status: sendGate.proof_status, requires_owner_action: true },
                   })
                 );
                 results.skipped++;
@@ -411,19 +420,14 @@ Deno.serve(async (req) => {
               }
 
               if (!freshLead.email) {
-                console.log(
-                  `[processMissedCallFollowUps] No email for lead ${lead.id} at step ${stepConfig.step}`
-                );
+                console.log(`[processMissedCallFollowUps] No email for lead ${lead.id} at step ${stepConfig.step}`);
                 await base44.asServiceRole.entities.CommunicationEvent.create(
                   buildMissedCallEvent({
                     lead: freshLead,
                     stepConfig,
                     subject: `Missed-call email step ${stepConfig.step} skipped`,
                     message_body: "No email address on lead",
-                    metadata: {
-                      intended_channel: "email",
-                      reason: "no_email",
-                    },
+                    metadata: { intended_channel: "email", reason: "no_email" },
                   })
                 );
                 await recordProcessedStep(base44, freshLead, stepConfig);
@@ -433,30 +437,15 @@ Deno.serve(async (req) => {
 
               try {
                 const emailConfig = templates[stepConfig.key] || {};
-                const emailResult = await sendEmail(
-                  base44,
-                  freshLead,
-                  emailConfig.subject || "Follow-up",
-                  renderTemplate(
-                    emailConfig.body || "",
-                    freshLead,
-                    bookingLink
-                  ),
-                  fromEmail,
-                  stepConfig.key
-                );
+                const emailResult = await sendEmail(base44, freshLead, emailConfig.subject || "Follow-up", renderTemplate(emailConfig.body || "", freshLead, bookingLink), fromEmail, stepConfig.key);
                 sent = true;
                 messageId = emailResult.messageId;
               } catch (err) {
                 error = err.message;
-                console.error(
-                  `[processMissedCallFollowUps] Email step ${stepConfig.step} failed for lead ${lead.id}:`,
-                  err.message
-                );
+                console.error(`[processMissedCallFollowUps] Email step ${stepConfig.step} failed for lead ${lead.id}:`, err.message);
               }
             }
 
-            // Log result
             if (sent) {
               await base44.asServiceRole.entities.CommunicationEvent.create(
                 buildMissedCallEvent({
@@ -464,22 +453,16 @@ Deno.serve(async (req) => {
                   stepConfig,
                   channel: stepConfig.channel,
                   direction: "outbound",
-                  event_type:
-                    stepConfig.channel === "sms" ? "sms_sent" : "email_sent",
+                  event_type: stepConfig.channel === "sms" ? "sms_sent" : "email_sent",
                   provider: stepConfig.channel === "sms" ? "twilio" : "resend",
                   status: "sent",
                   subject: `Missed-call follow-up step ${stepConfig.step}`,
-                  message_body: templates[stepConfig.key]?.body ||
-                    templates[stepConfig.key] || "(message body)",
+                  message_body: templates[stepConfig.key]?.body || templates[stepConfig.key] || "(message body)",
                   provider_message_id: messageId,
                 })
               );
 
-              // Update lead last_contacted_at
-              await recordProcessedStep(base44, freshLead, stepConfig, {
-                last_contacted_at: new Date().toISOString(),
-              });
-
+              await recordProcessedStep(base44, freshLead, stepConfig, { last_contacted_at: new Date().toISOString() });
               results.sent++;
             } else if (error) {
               await base44.asServiceRole.entities.CommunicationEvent.create(
@@ -499,20 +482,14 @@ Deno.serve(async (req) => {
               results.failed++;
             }
           } catch (stepError) {
-            console.error(
-              `[processMissedCallFollowUps] Step ${stepConfig.step} error for lead ${lead.id}:`,
-              stepError.message
-            );
+            console.error(`[processMissedCallFollowUps] Step ${stepConfig.step} error for lead ${lead.id}:`, stepError.message);
             results.failed++;
           }
         }
 
         results.processed++;
       } catch (leadError) {
-        console.error(
-          `[processMissedCallFollowUps] Lead ${lead.id} error:`,
-          leadError.message
-        );
+        console.error(`[processMissedCallFollowUps] Lead ${lead.id} error:`, leadError.message);
         results.failed++;
       }
     }
@@ -520,9 +497,6 @@ Deno.serve(async (req) => {
     return secureJson({ success: true, ...results });
   } catch (error) {
     console.error("[processMissedCallFollowUps] Fatal error:", error.message);
-    return secureJson(
-      { error: error.message || "Failed to process missed-call follow-ups" },
-      { status: 500 }
-    );
+    return secureJson({ error: error.message || "Failed to process missed-call follow-ups" }, { status: 500 });
   }
 });

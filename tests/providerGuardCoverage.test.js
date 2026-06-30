@@ -28,13 +28,14 @@ test('WebsiteLead provider senders use outboundLeadGuards', () => {
   }
 });
 
-test('remaining Lead provider senders are inventoried for guardrail migration', () => {
-  const expectedLegacyFiles = [
+test('Lead provider senders apply local outbound hold guard', () => {
+  for (const file of [
     'base44/functions/processMissedCallFollowUps/main.ts',
     'base44/functions/processQualifiedFollowUps/main.ts',
-  ];
-  for (const file of expectedLegacyFiles) {
+  ]) {
     const source = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
-    assert.match(source, /api\.twilio\.com|resend\.com\/emails|twilioFetch|resendFetch/);
+    assert.match(source, /getLeadOutboundHold/);
+    assert.match(source, /outbound_hold/);
+    assert.match(source, /lead_outbound_hold/);
   }
 });
