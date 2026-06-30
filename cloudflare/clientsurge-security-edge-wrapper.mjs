@@ -2,10 +2,11 @@ import edgeWorker from "./clientsurge-security-edge-worker.mjs";
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
-export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T07-20Z";
+export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T20-05Z";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
+  "Admin / AI Status Dashboard",
   "Business Setup",
   "Client Portal",
   "Client Dashboard",
@@ -22,6 +23,7 @@ const INTERNAL_ROUTE_WORDS = [
 
 const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>)/i;
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
+const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard)|Business Setup|Client Portal|Client Dashboard|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline/i;
 
 export function looksLikeRouteExposureHtml(html = "") {
   return GENERATED_DIRECTORY_PATTERN.test(html) && INTERNAL_TEXT_PATTERN.test(html);
@@ -30,10 +32,11 @@ export function looksLikeRouteExposureHtml(html = "") {
 export function sanitizeGeneratedPagesDirectoryHtml(html = "") {
   let nextHtml = String(html || "");
 
+  const internalTermsSource = INTERNAL_ROUTE_TERMS.source;
   const patterns = [
-    /<section\b[^>]*>[\s\S]{0,6000}<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>[\s\S]{0,9000}?(?:Admin Dashboard|Business Setup|Client Portal|Function Audit|System Observability)[\s\S]{0,6000}?<\/section>/gi,
-    /<main\b[^>]*>[\s\S]{0,6000}<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>[\s\S]{0,9000}?(?:Admin Dashboard|Business Setup|Client Portal|Function Audit|System Observability)[\s\S]{0,6000}?<\/main>/gi,
-    /<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(?:ul|ol|nav|div|section)\b[^>]*>[\s\S]{0,12000}?(?:Admin Dashboard|Business Setup|Client Portal|Function Audit|System Observability)[\s\S]{0,12000}?<\/(?:ul|ol|nav|div|section)>/gi,
+    new RegExp(`<section\\b[^>]*>[\\s\\S]{0,6000}<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>[\\s\\S]{0,9000}?(?:${internalTermsSource})[\\s\\S]{0,6000}?<\\/section>`, "gi"),
+    new RegExp(`<main\\b[^>]*>[\\s\\S]{0,6000}<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>[\\s\\S]{0,9000}?(?:${internalTermsSource})[\\s\\S]{0,6000}?<\\/main>`, "gi"),
+    new RegExp(`<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>\\s*<(?:ul|ol|nav|div|section)\\b[^>]*>[\\s\\S]{0,12000}?(?:${internalTermsSource})[\\s\\S]{0,12000}?<\\/(?:ul|ol|nav|div|section)>`, "gi"),
   ];
 
   for (const pattern of patterns) {
@@ -49,7 +52,7 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
   if (window.__clientsurgeEdgeRouteExposureGuard) return;
   window.__clientsurgeEdgeRouteExposureGuard = true;
   const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|$)/i;
-  const INTERNAL_TEXT = /\b(Admin Dashboard|Business Setup|Client Portal|Client Dashboard|Function Audit|System Observability|Reconciliation|Onboarding Pipeline|Install Guide|Mission Control|SaaS Admin|AI Status Dashboard|Performance Wars|Admin Settings|Lead Intelligence|Credentials Setup|Website Preview|Automation Health|Opportunity Review Queue)\b/i;
+  const INTERNAL_TEXT = /\b(Admin Dashboard|Admin\s*\/\s*AI Status Dashboard|Business Setup|Client Portal|Client Dashboard|Function Audit|System Observability|Reconciliation|Onboarding Pipeline|Install Guide|Mission Control|SaaS Admin|AI Status Dashboard|Performance Wars|Admin Settings|Lead Intelligence|Credentials Setup|Website Preview|Automation Health|Opportunity Review Queue)\b/i;
   const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates/i;
   const text = (node) => (node && node.textContent || '').replace(/\s+/g, ' ').trim();
   const hasInternalLink = (root) => Array.from(root.querySelectorAll?.('a[href]') || []).some((a) => {
