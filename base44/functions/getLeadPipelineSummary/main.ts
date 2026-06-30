@@ -40,10 +40,14 @@ Deno.serve(async (req) => {
       base44.asServiceRole.entities.CommunicationEvent.list("-created_date", EVENT_LIMIT).catch(() => []),
     ]);
 
-    const scopedLeads = user.role === "super_admin"
-      ? leads || []
-      : (leads || []).filter((lead) => !lead.assigned_to || lead.assigned_to === user.email);
-    const visibleLeads = scopedLeads.filter(isLeadProductionTrusted);
+    // This endpoint is an admin dashboard endpoint. Both admin and super_admin
+    // should see the same admin-wide CRM truth totals. Scoping ordinary admins
+    // by assigned_to caused KPI cards to show 0 while the Leads table still
+    // rendered unassigned rows.
+    const rawLeads = leads || [];
+    const visibleLeads = filters.includeFlagged === true
+      ? rawLeads
+      : rawLeads.filter(isLeadProductionTrusted);
 
     const snapshot = buildLeadPipelineSnapshot({
       leads: visibleLeads,
@@ -55,18 +59,30 @@ Deno.serve(async (req) => {
 
     return secureJson({
       ...snapshot,
+      summary: {
+        ...(snapshot.summary || {}),
+        raw_total_leads: rawLeads.length,
+        trusted_leads: visibleLeads.length,
+        hidden_junk_leads: Math.max(0, rawLeads.length - visibleLeads.length),
+        truth_source: "getLeadPipelineSummary_admin_wide",
+      },
       data_window: {
         limits: {
           leads: LEAD_PIPELINE_MAX_FETCH,
           events: EVENT_LIMIT,
         },
+        rows_loaded: {
+          leads: rawLeads.length,
+          trusted_leads: visibleLeads.length,
+          events: (events || []).length,
+        },
         truncated: {
-          leads_capped: (leads || []).length >= LEAD_PIPELINE_MAX_FETCH,
+          leads_capped: rawLeads.length >= LEAD_PIPELINE_MAX_FETCH,
           events_capped: (events || []).length >= EVENT_LIMIT,
         },
         crm_filter: {
-          hidden_leads: scopedLeads.length - visibleLeads.length,
-          rule_set: "track_c",
+          hidden_leads: rawLeads.length - visibleLeads.length,
+          rule_set: "track_c_admin_wide",
         },
       },
     });
