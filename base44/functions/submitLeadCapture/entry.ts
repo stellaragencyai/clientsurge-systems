@@ -1,133 +1,209 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import {
+  buildDedupKey,
+  cleanString,
+  createLeadCaptureRateLimiter,
+  findDuplicateWebsiteLead,
+  isDisposableEmail,
+  normalizeEmail,
+  normalizePhone,
+} from './leadCapture.shared.js';
+import { validatePublicFormOrigin } from '../_shared/publicFormOriginGuard.js';
 
-// Phone normalization utility
-function normalizePhone(phone) {
-  if (!phone || typeof phone !== 'string') return null;
-  const digits = phone.replace(/\D/g, '');
-  if (digits.length === 10) return `+1${digits}`;
-  if (digits.length === 11 && digits[0] === '1') return `+${digits}`;
-  if (digits.length > 11) return `+1${digits.slice(-10)}`;
-  return null;
+const MAX_MESSAGE_LENGTH = 1000;
+const rateLimiter = createLeadCaptureRateLimiter();
+const ALLOWED_SOURCE_VALUES = new Set([
+  'website_form',
+  'contact_page',
+  'pricing_page',
+  'landing_page',
+  'elevenlabs_sarah_ai_receptionist',
+]);
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      ...(init.headers || {}),
+    },
+  });
+}
+
+function getRequestIp(req) {
+  const forwardedFor = cleanString(req.headers.get('x-forwarded-for')).split(',')[0]?.trim();
+  return (
+    cleanString(req.headers.get('cf-connecting-ip')) ||
+    forwardedFor ||
+    cleanString(req.headers.get('x-real-ip')) ||
+    'unknown'
+  );
+}
+
+function parseRequestedChannels(value) {
+  if (!Array.isArray(value)) {
+    return [];
+  }
+
+  return value.map((channel) => cleanString(channel).toLowerCase()).filter(Boolean);
+}
+
+function normalizeLeadSource(value) {
+  const source = cleanString(value);
+
+  if (!source) {
+    return 'website_form';
+  }
+
+  if (ALLOWED_SOURCE_VALUES.has(source)) {
+    return source;
+  }
+
+  if (source.includes('landing')) {
+    return 'landing_page';
+  }
+
+  if (source.includes('contact')) {
+    return 'contact_page';
+  }
+
+  if (source.includes('pricing')) {
+    return 'pricing_page';
+  }
+
+  return 'website_form';
+}
+
+function uniqueById(leads) {
+  const seen = new Set();
+  return (leads || []).filter((lead) => {
+    const id = lead?.id || `${lead?.email || ''}:${lead?.phone_number || ''}:${lead?.created_date || ''}`;
+    if (seen.has(id)) {
+      return false;
+    }
+    seen.add(id);
+    return true;
+  });
 }
 
 Deno.serve(async (req) => {
   try {
     if (req.method !== 'POST') {
-      return Response.json({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson({ error: 'Method not allowed' }, { status: 405 });
+    }
+
+    const originGuard = validatePublicFormOrigin(req);
+    if (!originGuard.ok) {
+      return secureJson({ error: originGuard.error }, { status: originGuard.status });
+    }
+
+    const body = await req.json().catch(() => null);
+    if (!body || typeof body !== 'object') {
+      return secureJson({ error: 'Invalid JSON body' }, { status: 400 });
+    }
+
+    const honeypot = cleanString(body.website_url);
+    if (honeypot) {
+      return secureJson({ success: true, ignored: true, reason: "bot_detected" });
+    }
+
+    const ipAddress = getRequestIp(req);
+    if (rateLimiter.isRateLimited(ipAddress)) {
+      return secureJson({ error: 'Too many submissions. Please try again later.' }, { status: 429 });
+    }
+
+    const fullName = cleanString(body.full_name);
+    const businessName = cleanString(body.business_name);
+    const email = normalizeEmail(body.email);
+    const submittedPhone = cleanString(body.phone_number || body.phone);
+    const normalizedPhone = normalizePhone(submittedPhone);
+    const requestedChannels = parseRequestedChannels(body.requested_channels);
+    const consentGiven = body.consent_given === true || body.consent_given === 'true';
+    const message = cleanString(body.message || body.problem || body.biggest_problem).slice(0, MAX_MESSAGE_LENGTH);
+    const businessType = cleanString(body.business_type || body.niche) || 'Other';
+    const source = normalizeLeadSource(body.source);
+    const sourcePage = cleanString(body.source_page);
+    const consentSource = cleanString(body.consent_source) || 'lead_capture_form';
+    const consentTextVersion = cleanString(body.consent_text_version) || 'lead_capture_explicit_checkbox_v1';
+
+    const errors = [];
+    if (!fullName) errors.push('Full name is required');
+    if (!businessName) errors.push('Business name is required');
+    if (!email) errors.push('Email is required');
+    if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) errors.push('Email must be valid');
+    if (email && isDisposableEmail(email)) errors.push('Disposable email addresses are not allowed');
+    if (!submittedPhone) errors.push('Phone number is required');
+    if (submittedPhone && !normalizedPhone) errors.push('Phone number must be valid');
+    if (!consentGiven) errors.push('SMS and email consent is required');
+
+    if (errors.length > 0) {
+      return secureJson({ error: errors[0], errors }, { status: 400 });
     }
 
     const base44 = createClientFromRequest(req);
-    const body = await req.json();
 
-    // Extract lead data
-    const {
-      full_name,
+    const emailMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ email }, '-created_date', 10);
+    const phoneMatches = normalizedPhone
+      ? await base44.asServiceRole.entities.WebsiteLead.filter({ phone_number: normalizedPhone }, '-created_date', 10)
+      : [];
+    const duplicate = findDuplicateWebsiteLead({
+      leads: uniqueById([...emailMatches, ...phoneMatches]),
       email,
-      phone_number,
-      business_name,
-      message,
-      source,
-      routing_key,
-    } = body;
+      phone: normalizedPhone,
+    });
 
-    // Validate required fields
-    if (!email || !full_name || !business_name) {
-      return Response.json(
-        { error: 'Missing required fields: email, full_name, business_name' },
-        { status: 400 }
-      );
+    if (duplicate) {
+      return secureJson({
+        success: true,
+        lead_id: duplicate.id,
+        action: 'duplicate_recent',
+        duplicate: true,
+      });
     }
 
-    // Normalize phone number
-    const normalizedPhone = normalizePhone(phone_number);
-    if (phone_number && !normalizedPhone) {
-      return Response.json(
-        { error: 'Invalid phone number format' },
-        { status: 400 }
-      );
-    }
-
-    // Check for duplicate: normalized email + phone (multi-layer dedup)
-    const normalizedEmail = email.toLowerCase().trim();
-    const existingByEmailPhone = normalizedPhone ? await base44.asServiceRole.entities.WebsiteLead.filter({
-      email: normalizedEmail,
+    const nowIso = new Date().toISOString();
+    const newLead = await base44.asServiceRole.entities.WebsiteLead.create({
+      full_name: fullName,
+      email,
       phone_number: normalizedPhone,
-    }, '-created_date', 1) : [];
+      business_name: businessName,
+      business_type: businessType,
+      message,
+      problem: message,
+      source,
+      source_page: sourcePage || null,
+      routing_key: cleanString(body.routing_key) || null,
+      requested_channels: requestedChannels,
+      lead_status: 'new',
+      reply_status: 'none',
+      booking_status: 'none',
+      follow_up_step: 0,
+      automation_enabled: true,
+      engagement_score: 0,
+      consent_given: consentGiven,
+      consent_given_at: nowIso,
+      consent_ip: ipAddress,
+      consent_source: consentSource,
+      consent_text_version: consentTextVersion,
+      user_agent: cleanString(req.headers.get('user-agent')),
+      ip_address: ipAddress,
+      dedup_key: buildDedupKey({ email, phone: normalizedPhone }),
+      sms_permission: consentGiven && requestedChannels.includes('sms'),
+    });
 
-    const existingByEmail = await base44.asServiceRole.entities.WebsiteLead.filter({
-      email: normalizedEmail,
-    }, '-created_date', 1);
+    base44.asServiceRole.functions.invoke('processWebsiteLeadInitialResponse', { lead_id: newLead.id }).catch((err) =>
+      console.warn('[submitLeadCapture] Initial response trigger failed (non-blocking):', err.message)
+    );
 
-    if (existingByEmailPhone && existingByEmailPhone.length > 0) {
-      // Email + phone match = high confidence duplicate
-      console.log(`Exact duplicate detected for ${email} / ${normalizedPhone}. Returning existing record.`);
-      return Response.json({
-        success: true,
-        lead_id: existingByEmailPhone[0].id,
-        action: 'duplicate_exact',
-      });
-    }
-
-    if (existingByEmail && existingByEmail.length > 0) {
-      // Email match = potential duplicate, log for review
-      console.log(`Email duplicate detected for ${email}. Continuing with new record.`);
-    }
-
-    // Create new lead with normalized data
-    try {
-      const newLead = await base44.asServiceRole.entities.WebsiteLead.create({
-        full_name: full_name.trim(),
-        email: email.toLowerCase().trim(),
-        phone_number: normalizedPhone || phone_number, // Use normalized or original
-        business_name: business_name.trim(),
-        message: message || '',
-        source: source || 'website_form',
-        routing_key: routing_key || null,
-        lead_status: 'new',
-        reply_status: 'none',
-        booking_status: 'none',
-        automation_enabled: true,
-        engagement_score: 0,
-        consent_given: true,
-        consent_given_at: new Date().toISOString(),
-      });
-
-      console.log(`Lead created successfully: ${newLead.id}`);
-
-      // Fire initial response automation — non-blocking
-      base44.asServiceRole.functions.invoke('processWebsiteLeadInitialResponse', { lead_id: newLead.id }).catch((err) =>
-        console.warn('[submitLeadCapture] Initial response trigger failed (non-blocking):', err.message)
-      );
-
-      return Response.json({
-        success: true,
-        lead_id: newLead.id,
-        action: 'created',
-      });
-    } catch (createError) {
-      // Handle race condition: another request created this lead between our check and create
-      if (createError.message?.includes('UNIQUE_CONSTRAINT') || createError.code === 'UNIQUE_CONSTRAINT') {
-        console.log(`Race condition detected for ${email}. Fetching newly created lead.`);
-        
-        const recentLeads = await base44.asServiceRole.entities.WebsiteLead.filter({
-          email: email.toLowerCase().trim(),
-          business_name: business_name.toLowerCase().trim(),
-        }, '-created_date', 1);
-
-        if (recentLeads && recentLeads.length > 0) {
-          return Response.json({
-            success: true,
-            lead_id: recentLeads[0].id,
-            action: 'race_condition_resolved',
-          });
-        }
-      }
-
-      throw createError;
-    }
+    return secureJson({
+      success: true,
+      lead_id: newLead.id,
+      action: 'created',
+    });
   } catch (error) {
     console.error('submitLeadCapture error:', error);
-    return Response.json(
+    return secureJson(
       { error: error.message || 'Failed to submit lead' },
       { status: 500 }
     );
