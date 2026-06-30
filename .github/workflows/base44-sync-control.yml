@@ -70,6 +70,9 @@ jobs:
       - name: CRM release guard
         run: npm run ci:crm-release-guards
 
+      - name: Function invocation audit
+        run: npm run ci:function-invocations
+
       - name: Build app
         run: npm run build
 
