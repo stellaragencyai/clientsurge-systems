@@ -15,6 +15,7 @@ import {
   shouldStopWebsiteLeadFollowUp,
   WEBSITE_LEAD_FOLLOW_UP_STEPS,
 } from "../_shared/websiteLeadFollowUps.js";
+import { getWebsiteLeadOutboundSuppression, logSuppressedWebsiteLeadOutbound } from "../_shared/outboundLeadGuards.js";
 
 // #128: TCPA opt-out footer for all SMS
 function appendOptOut(msg) {
@@ -196,16 +197,31 @@ Or reply to this email with any questions.
       sent: 0,
       skipped: 0,
       stopped: 0,
+      suppressed: 0,
       failed: 0,
     };
 
     // Process each lead
     for (const lead of leads) {
       try {
+        const freshLead = await base44.asServiceRole.entities.WebsiteLead.get(lead.id);
+        const suppression = getWebsiteLeadOutboundSuppression(freshLead);
+        if (suppression.suppressed) {
+          console.log(
+            `[processWebsiteLeadFollowUps] Outbound suppressed for lead ${lead.id}: ${suppression.reasons.join(', ')}`
+          );
+          await logSuppressedWebsiteLeadOutbound(base44, {
+            lead: freshLead,
+            source: "processWebsiteLeadFollowUps",
+            channel: "internal",
+            reason: suppression.reasons,
+          });
+          results.suppressed++;
+          results.processed++;
+          continue;
+        }
+
         // Re-check stop conditions
-        const freshLead = await base44.asServiceRole.entities.WebsiteLead.get(
-          lead.id
-        );
         if (shouldStopWebsiteLeadFollowUp(freshLead)) {
           console.log(
             `[processWebsiteLeadFollowUps] Lead ${lead.id} stop condition met`
@@ -226,6 +242,7 @@ Or reply to this email with any questions.
             }),
           });
           results.stopped++;
+          results.processed++;
           continue;
         }
 
@@ -253,9 +270,23 @@ Or reply to this email with any questions.
               continue;
             }
 
-            // Re-check stop conditions before send
-            const freshLeadBefore =
-              await base44.asServiceRole.entities.WebsiteLead.get(lead.id);
+            // Re-check stop and suppression conditions before send
+            const freshLeadBefore = await base44.asServiceRole.entities.WebsiteLead.get(lead.id);
+            const stepSuppression = getWebsiteLeadOutboundSuppression(freshLeadBefore);
+            if (stepSuppression.suppressed) {
+              console.log(
+                `[processWebsiteLeadFollowUps] Step ${stepConfig.step} suppressed for lead ${lead.id}: ${stepSuppression.reasons.join(', ')}`
+              );
+              await logSuppressedWebsiteLeadOutbound(base44, {
+                lead: freshLeadBefore,
+                source: "processWebsiteLeadFollowUps",
+                channel: stepConfig.channel,
+                step: stepConfig.step,
+                reason: stepSuppression.reasons,
+              });
+              results.suppressed++;
+              continue;
+            }
             if (shouldStopWebsiteLeadFollowUp(freshLeadBefore)) {
               console.log(
                 `[processWebsiteLeadFollowUps] Lead ${lead.id} stop condition before step ${stepConfig.step}`
