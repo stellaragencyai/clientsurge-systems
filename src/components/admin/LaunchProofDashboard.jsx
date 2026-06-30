@@ -82,10 +82,37 @@ export default function LaunchProofDashboard() {
         return { status: "unknown", nextAction: "Stripe payment proof has not been verified yet." };
       }
       case "analytics": {
-        const ga4 = data.evidence?.ga4;
-        if (ga4?.ga4_active && ga4?.has_real_conversion_events) return { status: "trusted", nextAction: "" };
-        if (ga4?.ga4_active && !ga4?.has_real_conversion_events) return { status: "warning", nextAction: "GA4 is configured but no real conversion events found. Generate traffic and verify in GA4 Realtime." };
-        return { status: "blocked", nextAction: "Configure GA4 with a valid measurement ID and enable tracking." };
+        const ga4 = data.evidence?.ga4 || data.sections?.ga4 || {};
+        const pageViewCount = Number(ga4.page_view_count || 0);
+        const ctaClickCount = Number(ga4.cta_click_count || 0);
+        const hasRealConversionEvents = Boolean(
+          ga4.has_real_conversion_events ||
+          ga4.has_tracking_proof ||
+          (pageViewCount > 0 && ctaClickCount > 0)
+        );
+        const ga4Active = Boolean(
+          ga4.ga4_active ||
+          ga4.status === "ready_for_proof" ||
+          ga4.status === "trusted" ||
+          (
+            ga4.record_exists &&
+            ga4.measurement_id_valid &&
+            ga4.tracking_enabled &&
+            ga4.setup_status === "active"
+          )
+        );
+
+        if (ga4Active && hasRealConversionEvents) return { status: "trusted", nextAction: "" };
+        if (ga4Active && !hasRealConversionEvents) {
+          return {
+            status: "warning",
+            nextAction: ga4.next_action || "GA4 is configured, but no real page_view + cta_click proof has been recorded yet. Generate traffic and verify in GA4 Realtime.",
+          };
+        }
+        return {
+          status: "blocked",
+          nextAction: ga4.next_action || "Configure GA4 with a valid measurement ID and enable tracking.",
+        };
       }
       case "dashboard_truth": {
         const leadCapture = data.evidence?.lead_capture;
