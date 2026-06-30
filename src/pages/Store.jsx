@@ -1,991 +1,155 @@
-import { lazy, Suspense, useEffect, useMemo, useState, useRef, useCallback } from "react";
-import { motion } from "framer-motion";
-import { ShoppingCart, Search, LayoutGrid, Clock, BadgeCheck, MessageCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Search, LayoutGrid, Clock, BadgeCheck, ShoppingCart, ArrowRight } from "lucide-react";
 import { CartProvider, useCart } from "@/lib/cartContext";
-import { AI_PRODUCTS, CATEGORIES } from "@/lib/aiProducts";
+import { AI_PRODUCTS, CATEGORIES, getPackageOffer, getPackageServices } from "@/lib/aiProducts";
 import ProductCard from "@/components/store/ProductCard";
 import CartSidebar from "@/components/store/CartSidebar";
 import Navbar from "@/components/landing/Navbar";
+import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
-import { getSelectedIndustryRecommendation } from "@/lib/industryRecommendations";
-import { getPackageOffer } from "@/lib/salesCatalog";
-import GuidedPathToggle from "@/components/store/GuidedPathToggle";
-import { LazyProductGrid } from "@/components/store/StorePageEnhancements";
 import { setPageMetadata } from "@/lib/seo";
 import { trackCTA } from "@/lib/analytics";
-import Footer from "@/components/landing/Footer";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
-// Lazy load heavy store components
-const InteractiveStackBuilder = lazy(() =>
-import("@/components/store/InteractiveStackBuilder")
-);
-const SocialProofTicker = lazy(() => import("@/components/store/SocialProofTicker"));
-const ServiceComparisonModal = lazy(() => import("@/components/store/ServiceComparisonModal"));
-const BuildYourStackFlow = lazy(() => import("@/components/store/BuildYourStackFlow"));
-const BundleSavingsToast = lazy(() => import("@/components/store/BundleSavingsToast"));
-
-function StoreSuspenseFallback({ minHeight = 240 }) {
-  return (
-    <div
-      aria-hidden="true"
-      className="animate-pulse"
-      style={{
-        minHeight,
-        width: "100%",
-        borderRadius: "18px",
-        background:
-          "linear-gradient(90deg, rgba(0,174,239,0.08), rgba(255,255,255,0.9), rgba(0,95,153,0.08))",
-        border: "1px solid rgba(0,136,204,0.12)"
-      }}
-    />
-  );
-}
-
-function StoreHumanFallbackCTA() {
-  return (
-    <section
-      aria-label="Talk to a human"
-      className="store-human-fallback"
-      style={{
-        margin: "24px 0 24px",
-        borderRadius: "24px",
-        border: "1px solid rgba(0,174,239,0.16)",
-        background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(255,255,255,0.92))",
-        padding: "22px",
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        gap: "18px",
-        flexWrap: "wrap",
-        boxShadow: "0 12px 32px rgba(0, 59, 143, 0.08)"
-      }}
-    >
-      <div style={{ maxWidth: "620px" }}>
-        <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.55)", fontWeight: 800, letterSpacing: "0.08em", textTransform: "uppercase", margin: "0 0 6px" }}>
-          Not sure which package fits?
-        </p>
-        <p style={{ fontSize: "17px", color: "#0A1628", fontWeight: 800, margin: "0 0 4px" }}>
-          Get help choosing the right system for your business.
-        </p>
-        <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.62)", margin: 0, lineHeight: 1.6 }}>
-          We'll talk through your lead flow and recommend whether Starter, Growth, or Pro is the best fit.
-        </p>
-      </div>
-      <a
-        href="/book"
-        className="cs-btn-primary"
-      >
-        <MessageCircle style={{ width: "18px", height: "18px" }} aria-hidden="true" />
-        Get Help Choosing
-      </a>
-    </section>
-  );
-}
-
-function PackageReviewBanner({ packageOffer, onContinue, onBrowseAll }) {
-  return (
-    <section
-      aria-label={`${packageOffer.customer_facing_name || packageOffer.name} package review`}
-      style={{
-        marginBottom: "22px",
-        borderRadius: "28px",
-        border: "1px solid rgba(0,174,239,0.16)",
-        background: "linear-gradient(135deg, rgba(0,174,239,0.10), rgba(255,255,255,0.96), rgba(0,59,143,0.06))",
-        boxShadow: "0 18px 48px rgba(0,59,143,0.08)",
-        padding: "24px",
-      }}
-    >
-      <div style={{ display: "flex", justifyContent: "space-between", gap: "18px", flexWrap: "wrap", alignItems: "flex-start" }}>
-        <div style={{ maxWidth: "720px" }}>
-          <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#00AEEF", margin: "0 0 8px" }}>
-            Package Review
-          </p>
-          <h2 style={{ fontSize: "clamp(1.4rem, 3vw, 2rem)", lineHeight: 1.1, color: "#0A1628", fontWeight: 800, margin: "0 0 8px" }}>
-            {packageOffer.customer_facing_name || packageOffer.name} is loaded and ready to buy
-          </h2>
-          <p style={{ fontSize: "14px", lineHeight: 1.7, color: "rgba(10,22,40,0.68)", margin: "0 0 14px" }}>
-            {packageOffer.description} Review what is included, then continue straight into the package checkout flow.
-          </p>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: "8px", marginBottom: "14px" }}>
-            {packageOffer.included_services.map((service) => (
-              <span
-                key={service.product_id}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "6px",
-                  borderRadius: "999px",
-                  padding: "8px 12px",
-                  background: "rgba(255,255,255,0.88)",
-                  border: "1px solid rgba(0,174,239,0.14)",
-                  fontSize: "12px",
-                  fontWeight: 700,
-                  color: "#0A1628",
-                }}
-              >
-                <span aria-hidden="true">{service.icon}</span>
-                {service.name}
-              </span>
-            ))}
-          </div>
-          <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)", margin: 0 }}>
-            One-time setup fee plus monthly service. No long-term contracts. Cancel anytime.
-          </p>
-        </div>
-
-        <div
-          style={{
-            minWidth: "260px",
-            flex: "0 0 280px",
-            borderRadius: "22px",
-            padding: "18px",
-            background: "#ffffff",
-            border: "1px solid rgba(0,174,239,0.14)",
-            boxShadow: "0 12px 30px rgba(0,59,143,0.07)",
-          }}
-        >
-          <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "rgba(10,22,40,0.45)", margin: "0 0 10px" }}>
-            Checkout Summary
-          </p>
-          <div style={{ marginBottom: "14px" }}>
-            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.56)", margin: "0 0 2px" }}>One-time setup</p>
-            <p style={{ fontSize: "26px", fontWeight: 900, color: "#0A1628", margin: 0 }}>${packageOffer.setup_total.toLocaleString()}</p>
-          </div>
-          <div style={{ marginBottom: "18px" }}>
-            <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.56)", margin: "0 0 2px" }}>Monthly service</p>
-            <p style={{ fontSize: "26px", fontWeight: 900, color: "#00AEEF", margin: 0 }}>${packageOffer.monthly_total.toLocaleString()}<span style={{ fontSize: "13px", fontWeight: 700, color: "rgba(10,22,40,0.48)" }}>/mo</span></p>
-          </div>
-          <button
-               type="button"
-               onClick={onContinue}
-               className="cs-btn-primary"
-               style={{
-                 width: "100%",
-                 minHeight: "48px",
-                 borderRadius: "999px",
-                 fontSize: "14px",
-                 marginBottom: "10px",
-               }}
-             >
-               Continue to Checkout
-             </button>
-             <button
-               type="button"
-               onClick={onBrowseAll}
-               style={{
-                 width: "100%",
-                 minHeight: "42px",
-                 borderRadius: "999px",
-                 border: "1px solid rgba(0,174,239,0.16)",
-                 background: "rgba(255,255,255,0.9)",
-                 color: "#00AEEF",
-                 fontSize: "13px",
-                 fontWeight: 700,
-                 cursor: "pointer",
-               }}
-             >
-               Browse All Services Instead
-             </button>
-        </div>
-      </div>
-    </section>
-  );
-}
-
 function StoreInner() {
-  const [searchParams, setSearchParams] = useSearchParams();
   const navigate = useNavigate();
+  const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
-  const [searchInput, setSearchInput] = useState("");
-  const searchDebounce = useRef(null);
-  const appliedPackageKeyRef = useRef(null);
-
-  const handleSearchChange = useCallback((val) => {
-    setSearchInput(val);
-    clearTimeout(searchDebounce.current);
-    searchDebounce.current = setTimeout(() => setSearch(val), 280);
-  }, []);
-  const [selectedIndustry, setSelectedIndustry] = useState(null);
-  const [showComparison, setShowComparison] = useState(false);
-  const [pathMode, setPathMode] = useState("explore");
   const { items, setCartOpen, totalSetup, totalMonthly, replaceItems } = useCart();
   const requestedPackageKey = searchParams.get("package");
-  const selectedPackageOffer = useMemo(
-    () => getPackageOffer(requestedPackageKey),
-    [requestedPackageKey]
-  );
+  const selectedPackageOffer = useMemo(() => getPackageOffer(requestedPackageKey), [requestedPackageKey]);
 
   useEffect(() => {
-    const cleanupMeta = setPageMetadata({
-      title: "Business AI Automation Store — Browse Installable Systems | ClientSurge Systems",
-      description: "Browse installable AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Remote setup by ClientSurge.",
+    return setPageMetadata({
+      title: "AI Automation Storefront — Browse Installable Systems | ClientSurge Systems",
+      description: "Browse installable AI automation systems for lead response, missed-call recovery, follow-up, booking, reviews, and reactivation. Done-for-you setup by ClientSurge.",
       canonicalPath: "/store",
-      ogTitle: "Business AI Automation Store | ClientSurge Systems",
-      ogDescription: "Browse and choose from six AI automation systems. ClientSurge handles remote setup, testing, and launch through a guided AI intake process.",
-      robots: "noindex,nofollow"
+      ogTitle: "AI Automation Storefront | ClientSurge Systems",
+      ogDescription: "Choose a packaged AI system, complete guided intake, and let ClientSurge handle setup, testing, and launch readiness.",
+      robots: "noindex,nofollow",
     });
-    return cleanupMeta;
   }, []);
 
   useEffect(() => {
-    if (typeof window === "undefined") {
-      return undefined;
-    }
-
-    const syncIndustry = () => {
-      // Check if quiz routed here with a package key
-      const quizPackage = window.sessionStorage.getItem("clientsurge:quiz-package");
-      if (quizPackage) {
-        const pkg = getPackageOffer(quizPackage);
-        if (pkg) {
-          setSelectedIndustry({
-            shortName: pkg.customer_facing_name || pkg.name,
-            recommendedPackage: pkg,
-            recommendedServiceKeys: pkg.included_service_keys,
-            recommendedServices: pkg.included_services.map((s) => ({ ...s, whyThisMatters: s.description })),
-            whyItWorks: pkg.fit
-          });
-          return;
-        }
-      }
-      setSelectedIndustry(getSelectedIndustryRecommendation());
-    };
-
-    syncIndustry();
-    window.addEventListener("storage", syncIndustry);
-    window.addEventListener("clientsurge:industry-selected", syncIndustry);
-
-    return () => {
-      window.removeEventListener("storage", syncIndustry);
-      window.removeEventListener("clientsurge:industry-selected", syncIndustry);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (!selectedPackageOffer) {
-      appliedPackageKeyRef.current = null;
-      return;
-    }
-
-    if (appliedPackageKeyRef.current === selectedPackageOffer.package_key) {
-      return;
-    }
-
-    replaceItems(selectedPackageOffer.included_services);
-    setPathMode("guided");
-    appliedPackageKeyRef.current = selectedPackageOffer.package_key;
+    if (!selectedPackageOffer) return;
+    replaceItems(getPackageServices(selectedPackageOffer.package_key));
   }, [replaceItems, selectedPackageOffer]);
 
-  const filtered = useMemo(() => {
-    const recommendedKeys = new Set(
-      selectedIndustry?.recommendedServiceKeys || []
-    );
-
-    let results = AI_PRODUCTS.filter((product) => {
-      const matchCategory =
-      activeCategory === "All" || product.category === activeCategory;
-      const matchSearch =
-      !search ||
-      product.name.toLowerCase().includes(search.toLowerCase()) ||
-      product.description.toLowerCase().includes(search.toLowerCase());
-      return matchCategory && matchSearch;
-    }).sort((left, right) => {
-      const leftRecommended = recommendedKeys.has(left.service_key);
-      const rightRecommended = recommendedKeys.has(right.service_key);
-
-      if (leftRecommended === rightRecommended) {
-        return 0;
-      }
-
-      return leftRecommended ? -1 : 1;
+  const filteredProducts = useMemo(() => {
+    return AI_PRODUCTS.filter((product) => {
+      const matchesCategory = activeCategory === "All" || product.category === activeCategory;
+      const term = search.trim().toLowerCase();
+      const matchesSearch = !term || product.name.toLowerCase().includes(term) || product.description.toLowerCase().includes(term) || product.category.toLowerCase().includes(term);
+      return matchesCategory && matchesSearch;
     });
+  }, [activeCategory, search]);
 
-    // In guided mode, only narrow the catalog when a real recommendation exists.
-    if (pathMode === "guided") {
-      if (selectedIndustry) {
-        const recommendedNames = new Set(
-          selectedIndustry?.recommendedServices?.map((s) => s.name) || []
-        );
-        results = results.filter((p) => recommendedNames.has(p.name)).slice(0, 6);
-      }
-    }
-
-    return results;
-  }, [activeCategory, search, selectedIndustry, pathMode]);
-
-  const recommendedPreview = useMemo(
-    () => selectedIndustry?.recommendedServices?.slice(0, 4) || [],
-    [selectedIndustry]
-  );
-
-  const recommendedOverflow = Math.max(
-    (selectedIndustry?.recommendedServices?.length || 0) -
-    recommendedPreview.length,
-    0
-  );
-
-  const resultLabel = `${filtered.length} service${
-  filtered.length === 1 ? "" : "s"}`;
-
+  const choosePackage = (packageKey) => {
+    trackCTA(`store_package_${packageKey}`, "store");
+    navigate(`/product-signup?package=${packageKey}`);
+  };
 
   return (
-    <div
-      style={{
-        minHeight: "100vh",
-        fontFamily: "'Inter', sans-serif",
-        position: "relative",
-        background: "hsl(var(--background))"
-      }}>
-
-
-
-      <div style={{ position: "relative", zIndex: 2 }}>
-        <style>{`
-          .store-page .store-hero {
-            text-align: center;
-            padding: calc(var(--cs-nav-height) + 40px) 24px 14px;
-            position: relative;
-          }
-          .store-page .store-hero-copy {
-            max-width: 880px;
-            margin: 0 auto;
-          }
-          .store-page .store-hero-copy .cs-section-title {
-            white-space: nowrap;
-          }
-          @media (max-width: 720px) {
-            .store-page .store-hero-copy .cs-section-title {
-              white-space: normal;
-            }
-          }
-          .store-page .store-stat-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 14px;
-            max-width: 760px;
-            margin: 0 auto;
-          }
-          @media (min-width: 721px) and (max-width: 1024px) {
-            .store-page .store-stat-grid {
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              max-width: 540px;
-            }
-          }
-          .store-page .store-toolbar {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 14px;
-            align-items: center;
-            justify-content: space-between;
-            margin-bottom: 24px;
-          }
-          .store-page .store-searchWrap {
-            position: relative;
-            flex: 1 1 320px;
-            max-width: 390px;
-          }
-          .store-page .store-filterMeta {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-            flex: 1 1 520px;
-          }
-          .store-page .store-categories {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-          }
-          /* AI Module tab active glow */
-          .ai-module-btn {
-            position: relative;
-            overflow: hidden;
-          }
-          .ai-module-btn::after {
-            content: '';
-            position: absolute;
-            inset: 0;
-            border-radius: 8px;
-            opacity: 0;
-            background: radial-gradient(ellipse at center, rgba(0,174,239,0.18) 0%, transparent 70%);
-            transition: opacity 0.3s ease;
-          }
-          .ai-module-btn:hover::after { opacity: 1; }
-          .ai-module-btn.active-module::after { opacity: 1; }
-          .store-page .store-grid {
-            display: grid;
-            grid-template-columns: repeat(3, minmax(0, 1fr));
-            gap: 28px;
-          }
-          .store-page .store-sticky-cart {
-            position: sticky;
-            top: calc(var(--cs-nav-height) + 12px);
-            z-index: 40;
-            margin: 0 24px 20px;
-            border-radius: 18px;
-            background: linear-gradient(135deg, rgba(0,107,176,0.95) 0%, rgba(0,174,239,0.95) 52%, rgba(0,59,143,0.97) 100%);
-            padding: 12px 16px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 14px;
-            cursor: pointer;
-            box-shadow: 0 10px 28px rgba(0,59,143,0.28);
-            border: 1px solid rgba(0,174,239,0.25);
-            backdrop-filter: blur(14px);
-            -webkit-backdrop-filter: blur(14px);
-            width: calc(100% - 48px);
-            padding: 14px 20px !important;
-            font: inherit;
-            text-align: left;
-          }
-          .store-page .store-sticky-cart__meta {
-            display: flex;
-            align-items: center;
-            gap: 14px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-          }
-          .store-page .store-recommendation-pills {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-            margin-top: 12px;
-          }
-          .store-page .store-summary-chip {
-            display: inline-flex;
-            align-items: center;
-            border-radius: 999px;
-            padding: 7px 12px;
-            font-size: 11px;
-            font-weight: 700;
-            color: #e0f4ff;
-            background: rgba(255,255,255,0.08);
-            border: 1px solid rgba(0,174,239,0.3);
-          }
-          @media (max-width: 1080px) {
-            .store-page .store-grid {
-              grid-template-columns: repeat(2, minmax(0, 1fr));
-              gap: 24px;
-            }
-          }
-          @media (max-width: 720px) {
-            .store-page .store-hero {
-              padding: 88px 16px 10px;
-            }
-            .store-page .store-stat-grid {
-              grid-template-columns: 1fr;
-              gap: 10px;
-              max-width: 100%;
-              padding: 0 4px;
-            }
-            .store-page .store-toolbar {
-              flex-direction: column;
-              align-items: stretch;
-              margin-bottom: 18px;
-            }
-            .store-page .store-searchWrap {
-              max-width: none;
-            }
-            .store-page .store-filterMeta {
-              justify-content: flex-start;
-              flex-direction: column;
-              align-items: stretch;
-            }
-            .store-page .store-categories {
-              flex-wrap: nowrap;
-              overflow-x: auto;
-              padding-bottom: 6px;
-              scrollbar-width: thin;
-              scrollbar-color: rgba(0,174,239,0.35) transparent;
-            }
-            .store-page .store-categories::-webkit-scrollbar {
-              height: 3px;
-            }
-            .store-page .store-categories::-webkit-scrollbar-thumb {
-              background: rgba(0,174,239,0.35);
-              border-radius: 999px;
-            }
-            .store-page .store-grid {
-              grid-template-columns: 1fr;
-              gap: 20px;
-            }
-            .store-page .store-sticky-cart {
-              margin: 0 16px 18px;
-              align-items: stretch;
-              flex-direction: column;
-              width: calc(100% - 32px);
-            }
-            .store-page .store-sticky-cart__meta {
-              width: 100%;
-              justify-content: space-between;
-            }
-          }
-        `}</style>
-        <div className="store-page">
-          <Navbar />
-
-          <div id="top" className="store-hero">
-            <div className="store-hero-copy">
-              <SectionHeader
-                eyebrow={selectedPackageOffer ? "Review Your Package" : "Business AI Automation Store"}
-                title={
-                  selectedPackageOffer
-                    ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} Package`
-                    : "Business AI Automation Store"
-                }
-                subtitle={
-                  selectedPackageOffer
-                    ? "Your package is preloaded for a faster self-serve checkout. Review what is included, then continue straight into the purchase flow."
-                    : "Browse installable AI automation systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Choose a system, complete guided intake, and ClientSurge handles remote setup and testing."
-                }
-              />
-            </div>
-
-            {selectedIndustry ?
-            <div
-              style={{
-                maxWidth: "760px",
-                margin: "0 auto 10px",
-                padding: "12px 16px",
-                borderRadius: "12px",
-                background: "rgba(0,174,239,0.06)",
-                border: "1px solid rgba(0,174,239,0.2)",
-                boxShadow: "0 2px 8px rgba(0,59,143,0.05)",
-                fontSize: "12px"
-              }}>
-              
-                <p
-                style={{
-                  fontSize: "10px",
-                  fontWeight: "700",
-                  letterSpacing: "0.16em",
-                  textTransform: "uppercase",
-                  color: "#00AEEF",
-                  margin: "0 0 4px"
-                }}>
-                
-                  Personalized For {selectedIndustry.shortName}
-                </p>
-                <p
-                style={{
-                  fontSize: "13px",
-                  color: "#0A1628",
-                  fontWeight: "600",
-                  margin: "0 0 2px",
-                  lineHeight: 1.4
-                }}>
-                
-                  Recommended: {selectedIndustry.recommendedPackage?.name}
-                </p>
-              </div> :
-            null}
-
-            <div className="store-stat-grid" style={{ marginBottom: "8px" }}>
-              {[
-              { label: "Packages Available", val: "3 Systems", Icon: LayoutGrid },
-              { label: "Avg. Setup Time", val: "5–7 Days", Icon: Clock },
-              { label: "Cancel Anytime", val: "No Contracts", Icon: BadgeCheck }].
-              map(({ label, val, Icon }, idx) =>
-              <motion.div
-                key={label}
-                initial={{ opacity: 0, y: 28 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ type: "spring", stiffness: 300, damping: 28, delay: idx * 0.1 }}
-                whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,174,239,0.13)" }}
-                style={{
-                  display: "flex",
-                  alignItems: "center",
-                  gap: "14px",
-                  borderRadius: "14px",
-                  padding: "14px 18px",
-                  background: "#ffffff",
-                  border: "1.5px solid rgba(0,174,239,0.14)",
-                  boxShadow: "0 8px 22px rgba(0,59,143,0.08)",
-                  cursor: "default"
-                }}>
-                
-                  <div style={{
-                  width: "42px",
-                  height: "42px",
-                  borderRadius: "12px",
-                  background: "linear-gradient(135deg, rgba(0,174,239,0.12) 0%, rgba(0,157,255,0.08) 100%)",
-                  border: "1px solid rgba(0,174,239,0.2)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  flexShrink: 0
-                }}>
-                    <Icon style={{ width: "18px", height: "18px", color: "#00AEEF" }} />
-                  </div>
-                  <div style={{ textAlign: "left" }}>
-                    <p style={{ fontSize: "15px", fontWeight: "800", color: "#0A1628", margin: "0 0 2px" }}>
-                      {val}
-                    </p>
-                    <p style={{ fontSize: "10px", color: "rgba(10,22,40,0.6)", margin: 0, fontWeight: "600" }}>
-                      {label}
-                    </p>
-                  </div>
-                </motion.div>
-              )}
-            </div>
-          </div>
-
-          {items.length > 0 ?
-          <button
-            type="button"
-            onClick={() => setCartOpen(true)}
-            className="store-sticky-cart"
-            aria-label={`Open cart with ${items.length} service${items.length === 1 ? "" : "s"} selected`}
-          >
-              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-                <span
-                  style={{
-                    position: "relative",
-                    display: "inline-flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    width: "30px",
-                    height: "30px"
-                  }}
-                >
-                  <ShoppingCart
-                    style={{ width: "18px", height: "18px", color: "#e0f4ff" }}
-                  />
-                  <span
-                    style={{
-                      position: "absolute",
-                      top: "-6px",
-                      right: "-6px",
-                      minWidth: "18px",
-                      height: "18px",
-                      borderRadius: "999px",
-                      padding: "0 5px",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      background: "#ffffff",
-                      color: "#003B8F",
-                      fontSize: "10px",
-                      fontWeight: "800",
-                      boxShadow: "0 6px 14px rgba(0,0,0,0.18)"
-                    }}
-                    aria-label={`${items.length} item${items.length === 1 ? "" : "s"} in cart`}
-                  >
-                    {items.length}
-                  </span>
-                </span>
-              
-                <span
-                style={{
-                  color: "#e0f4ff",
-                  fontWeight: "700",
-                  fontSize: "14px"
-                }}>
-                
-                  {items.length} service{items.length > 1 ? "s" : ""} in cart
-                </span>
-              </div>
-              <div className="store-sticky-cart__meta">
-                <span
-                style={{
-                  fontSize: "12px",
-                  color: "rgba(200,235,255,0.85)"
-                }}>
-                
-                  ${totalSetup} setup - ${totalMonthly}/mo
-                </span>
-                <span
-                style={{
-                  background: "rgba(255,255,255,0.15)",
-                  color: "#e0f4ff",
-                  fontSize: "12px",
-                  fontWeight: "700",
-                  padding: "6px 16px",
-                  borderRadius: "9999px"
-                }}>
-                
-                  View Cart
-                </span>
-              </div>
-            </button> :
-          null}
-
-          <div
-            style={{
-              maxWidth: "1300px",
-              margin: "0 auto",
-              padding: "0 24px 24px"
-            }}>
-            {selectedPackageOffer ? (
-              <PackageReviewBanner
-                packageOffer={selectedPackageOffer}
-                onContinue={() => {
-                  trackCTA("store_package_checkout", "store");
-                  navigate(`/product-signup?package=${selectedPackageOffer.package_key}`);
-                }}
-                onBrowseAll={() => {
-                  const nextParams = new URLSearchParams(searchParams);
-                  nextParams.delete("package");
-                  setSearchParams(nextParams, { replace: true });
-                  setPathMode("explore");
-                }}
-              />
-            ) : null}
-
-
-            <div style={{ display: "flex", gap: "10px", marginBottom: "18px", justifyContent: "space-between", alignItems: "center", flexWrap: "wrap" }}>
-              
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-              
-              <GuidedPathToggle mode={pathMode} onModeChange={setPathMode} />
-            </div>
-
-            <div className="store-toolbar">
-              <div className="store-searchWrap">
-                <Search
-                  style={{
-                    position: "absolute",
-                    left: "14px",
-                    top: "50%",
-                    transform: "translateY(-50%)",
-                    width: "14px",
-                    height: "14px",
-                    color: "rgba(0,174,239,0.6)"
-                  }} />
-                
-                <input
-                  type="text"
-                  placeholder="Search services..."
-                  value={searchInput}
-                  onChange={(e) => handleSearchChange(e.target.value)}
-                  style={{
-                    width: "100%",
-                    borderRadius: "9999px",
-                    border: "1.5px solid rgba(0,174,239,0.42)",
-                    padding: "11px 16px 11px 38px",
-                    fontSize: "13px",
-                    background: "#ffffff",
-                    outline: "none",
-                    boxSizing: "border-box",
-                    color: "#0A1628",
-                    boxShadow: "0 2px 8px rgba(0,174,239,0.07)"
-                  }} />
-                
-              </div>
-
-              <div className="store-filterMeta">
-                <span
-                  style={{
-                    fontSize: "12px",
-                    fontWeight: "700",
-                    color: "rgba(10,22,40,0.55)",
-                    letterSpacing: "0.08em",
-                    textTransform: "uppercase"
-                  }}>
-                  
-                  {resultLabel}
-                </span>
-                <div className="store-categories">
-                  {CATEGORIES.map((category) =>
-                  <motion.button
-                    key={category}
-                    onClick={() => setActiveCategory(category)}
-                    whileHover={{ y: -1, scale: 1.03 }}
-                    whileTap={{ scale: 0.94 }}
-                    transition={{ type: "spring", stiffness: 400, damping: 25 }}
-                    style={{
-                      borderRadius: "9999px",
-                      padding: "7px 16px",
-                      fontSize: "12px",
-                      fontWeight: "600",
-                      border:
-                      activeCategory === category ?
-                      "1.5px solid rgba(0,174,239,0.6)" :
-                      "1.5px solid rgba(0,174,239,0.18)",
-                      cursor: "pointer",
-                      background:
-                      activeCategory === category ?
-                      "linear-gradient(135deg,#00AEEF,#0079c1)" :
-                      "#ffffff",
-                      color:
-                      activeCategory === category ?
-                      "#ffffff" :
-                      "rgba(10,22,40,0.72)",
-                      boxShadow:
-                      activeCategory === category ?
-                      "0 4px 14px rgba(0,174,239,0.35)" :
-                      "0 1px 4px rgba(0,174,239,0.08)"
-                    }}>
-                    
-                      {category}
-                    </motion.button>
-                  )}
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main className="pt-[calc(var(--cs-nav-height)+40px)]">
+        <section className="px-6 pb-10 text-center">
+          <SectionHeader
+            eyebrow="AI Automation Storefront"
+            title={selectedPackageOffer ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} System` : "The AI Automation Storefront for Service Businesses"}
+            subtitle={selectedPackageOffer ? "Your selected ClientSurge system is preloaded. Review what is included, then continue into checkout and guided setup." : "Browse installable AI systems for missed calls, lead response, follow-up, booking, reviews, and reactivation. Choose what you need. ClientSurge installs it."}
+          />
+          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
+            {[
+              { label: "Packaged Systems", value: "Starter / Growth / Pro", Icon: LayoutGrid },
+              { label: "Launch Quality", value: "Proof Checked", Icon: Clock },
+              { label: "Billing", value: "Month-to-Month", Icon: BadgeCheck },
+            ].map(({ label, value, Icon }) => (
+              <div key={label} className="rounded-xl border border-primary/15 bg-white p-4 text-left shadow-sm">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-lg bg-primary/10 border border-primary/20 flex items-center justify-center"><Icon className="h-4 w-4 text-primary" /></div>
+                  <div><p className="text-sm font-bold text-foreground">{value}</p><p className="text-xs font-semibold text-muted-foreground">{label}</p></div>
                 </div>
               </div>
-            </div>
-
-            {filtered.length >= 8 ? (
-              <LazyProductGrid
-                key={activeCategory + search + pathMode}
-                className="store-grid"
-                products={filtered}
-                renderCard={(product) => (
-                  <ProductCard key={product.product_id} product={product} />
-                )}
-              />
-            ) : (
-              <motion.div
-                className="store-grid"
-                variants={{ visible: { transition: { staggerChildren: 0.08 } } }}
-                initial="hidden"
-                animate="visible"
-                key={activeCategory + search + pathMode}
-              >
-                {filtered.map((product) =>
-                <ProductCard key={product.product_id} product={product} />
-                )}
-              </motion.div>
-            )}
-
-            {filtered.length === 0 ?
-            <div
-              style={{
-                textAlign: "center",
-                padding: "48px",
-                color: "rgba(10,22,40,0.45)"
-              }}>
-              
-                <p style={{ fontSize: "16px", fontWeight: "600" }}>
-                  {pathMode === "guided" && !selectedIndustry ?
-                "No services available — try 'Explore All'" :
-                pathMode === "guided" && selectedIndustry ?
-                "Try switching to 'Explore All' to see more services" :
-                "No services match your search"}
-                </p>
-              </div> :
-            null}
-
-            <StoreHumanFallbackCTA />
-
-            {/* Need a Complete System? */}
-            <section
-              aria-label="Package bundles"
-              style={{
-                margin: "8px 0 28px",
-                borderRadius: "20px",
-                border: "1px solid rgba(0,174,239,0.16)",
-                background: "linear-gradient(135deg, rgba(0,174,239,0.07), rgba(255,255,255,0.95))",
-                padding: "28px",
-                boxShadow: "0 8px 28px rgba(0,59,143,0.07)",
-              }}
-            >
-              <p style={{ fontSize: "11px", fontWeight: 800, letterSpacing: "0.16em", textTransform: "uppercase", color: "#00AEEF", margin: "0 0 6px" }}>
-                Complete Systems
-              </p>
-              <h3 style={{ fontSize: "1.2rem", fontWeight: 800, color: "#0A1628", margin: "0 0 8px" }}>
-                Need a Complete System Instead?
-              </h3>
-              <p style={{ fontSize: "14px", color: "rgba(10,22,40,0.65)", lineHeight: 1.6, margin: "0 0 20px" }}>
-                Most businesses start with a package that bundles multiple automations together for a faster, more complete remote setup.
-              </p>
-              <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(200px, 1fr))", gap: "14px" }}>
-                {[
-                  { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo", highlight: false },
-                  { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", highlight: true, badge: "Recommended" },
-                  { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo", highlight: false },
-                ].map((pkg) => (
-                  <button
-                    type="button"
-                    key={pkg.key}
-                    onClick={() => { trackCTA(`store_package_${pkg.key}`, "store"); navigate(`/product-signup?package=${pkg.key}`); }}
-                    style={{
-                      display: "flex",
-                      flexDirection: "column",
-                      gap: "6px",
-                      borderRadius: "14px",
-                      border: pkg.highlight ? "1.5px solid rgba(0,174,239,0.6)" : "1.5px solid rgba(0,174,239,0.18)",
-                      background: pkg.highlight ? "rgba(0,174,239,0.08)" : "#ffffff",
-                      padding: "16px",
-                      boxShadow: pkg.highlight ? "0 4px 16px rgba(0,174,239,0.2)" : "none",
-                      position: "relative",
-                      cursor: "pointer",
-                      textAlign: "left",
-                      font: "inherit",
-                      minHeight: "unset",
-                      minWidth: "unset",
-                    }}
-                  >
-                    {pkg.badge && (
-                      <span style={{ position: "absolute", top: "-10px", left: "14px", background: "linear-gradient(90deg, #0079c1, #005691)", color: "#fff", fontSize: "10px", fontWeight: 800, borderRadius: "999px", padding: "3px 10px" }}>
-                        {pkg.badge}
-                      </span>
-                    )}
-                    <span style={{ fontSize: "14px", fontWeight: 800, color: "#0A1628", marginTop: pkg.badge ? "6px" : 0 }}>{pkg.name}</span>
-                    <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.55)" }}>{pkg.price}</span>
-                  </button>
-                ))}
-              </div>
-            </section>
-
-            {items.length > 0 ?
-            <Suspense fallback={<StoreSuspenseFallback minHeight={320} />}>
-                <InteractiveStackBuilder />
-              </Suspense> :
-            null}
+            ))}
           </div>
+        </section>
 
-          <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
-            <BuildYourStackFlow />
-            <BundleSavingsToast />
-          </Suspense>
-           <CartSidebar />
-           <Footer />
-           <Suspense fallback={<StoreSuspenseFallback minHeight={96} />}>
-             <SocialProofTicker />
-           </Suspense>
-           {showComparison &&
-          <Suspense fallback={<StoreSuspenseFallback minHeight={360} />}>
-               <ServiceComparisonModal onClose={() => setShowComparison(false)} />
-             </Suspense>
-          }
-        </div>
-      </div>
-    </div>);
+        {items.length > 0 && (
+          <button type="button" onClick={() => setCartOpen(true)} className="mx-auto mb-8 flex max-w-5xl w-[calc(100%-48px)] items-center justify-between gap-3 rounded-2xl px-5 py-4 text-left shadow-lg" style={{ background: "linear-gradient(135deg, rgba(0,107,176,0.95), rgba(0,174,239,0.95))", color: "#ffffff" }}>
+            <span className="inline-flex items-center gap-2 text-sm font-bold"><ShoppingCart className="h-4 w-4" /> {items.length} service{items.length === 1 ? "" : "s"} selected</span>
+            <span className="text-xs font-semibold">${totalSetup} setup · ${totalMonthly}/mo · View Cart</span>
+          </button>
+        )}
 
+        {selectedPackageOffer && (
+          <section className="max-w-5xl mx-auto px-6 mb-10">
+            <div className="rounded-2xl border border-primary/15 bg-white p-6 shadow-sm">
+              <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Selected System</p>
+              <h2 className="text-2xl font-titles font-bold text-foreground mb-2">{selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} is ready for guided setup</h2>
+              <p className="text-sm text-muted-foreground leading-relaxed mb-5">{selectedPackageOffer.description} Review the included systems below, then continue into checkout and guided setup.</p>
+              <div className="flex flex-wrap gap-2 mb-5">
+                {selectedPackageOffer.included_services.map((service) => <span key={service.product_id} className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-2 text-xs font-bold text-foreground"><span>{service.icon}</span>{service.name}</span>)}
+              </div>
+              <div className="flex flex-col sm:flex-row gap-3">
+                <button onClick={() => { trackCTA("store_package_checkout", "store"); navigate(`/product-signup?package=${selectedPackageOffer.package_key}`); }} className="cs-btn-primary inline-flex"><ArrowRight className="w-4 h-4" /> Continue to Checkout</button>
+                <button onClick={() => { const next = new URLSearchParams(searchParams); next.delete("package"); setSearchParams(next, { replace: true }); }} className="inline-flex items-center justify-center rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">Browse All Services Instead</button>
+              </div>
+            </div>
+          </section>
+        )}
+
+        <section className="max-w-7xl mx-auto px-6 pb-12">
+          <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between mb-6">
+            <div className="relative md:w-[360px]">
+              <Search className="absolute left-4 top-1/2 -translate-y-1/2 h-4 w-4 text-primary/60" />
+              <input value={search} onChange={(e) => setSearch(e.target.value)} placeholder="Search by problem: missed calls, follow-up, booking, reviews..." className="w-full rounded-full border border-primary/30 bg-white px-10 py-3 text-sm outline-none focus:ring-2 focus:ring-primary/20" />
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {CATEGORIES.map((category) => (
+                <button key={category} onClick={() => setActiveCategory(category)} className={`rounded-full border px-4 py-2 text-xs font-semibold transition ${activeCategory === category ? "border-primary bg-primary text-white" : "border-border bg-white text-foreground hover:border-primary/50"}`}>{category}</button>
+              ))}
+            </div>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {filteredProducts.map((product) => <ProductCard key={product.product_id} product={product} />)}
+          </div>
+          {filteredProducts.length === 0 && <div className="py-20 text-center text-muted-foreground">No services match that search.</div>}
+        </section>
+
+        <section className="max-w-7xl mx-auto px-6 pb-16">
+          <div className="rounded-2xl border border-primary/15 bg-white p-6 shadow-sm">
+            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Complete Systems</p>
+            <h2 className="text-xl font-titles font-bold text-foreground mb-2">Want the fastest path? Start with a complete system.</h2>
+            <p className="text-sm text-muted-foreground mb-5">Buying automations one by one is useful, but most businesses move faster by starting with Starter, Growth, or Pro.</p>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+              {[
+                { name: "Starter System", key: "starter_system", price: "$797 setup + $497/mo" },
+                { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", badge: "Recommended" },
+                { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo" },
+              ].map((pkg) => (
+                <button key={pkg.key} onClick={() => choosePackage(pkg.key)} className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-left hover:border-primary/50 transition">
+                  {pkg.badge && <span className="mb-2 inline-flex rounded-full bg-primary px-2 py-1 text-[10px] font-bold uppercase text-white">{pkg.badge}</span>}
+                  <p className="font-bold text-foreground">{pkg.name}</p>
+                  <p className="text-xs text-muted-foreground mt-1">{pkg.price}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
+      </main>
+      <Footer />
+      <CartSidebar />
+    </div>
+  );
 }
 
 export default function Store() {
   return (
     <DemoBookingProvider>
-      <CartProvider>
-        <StoreInner />
-      </CartProvider>
-    </DemoBookingProvider>);
-
+      <CartProvider><StoreInner /></CartProvider>
+    </DemoBookingProvider>
+  );
 }

@@ -11,13 +11,13 @@ import { setPageMetadata } from "@/lib/seo";
 export default function PricingPage() {
   useEffect(() => {
     return setPageMetadata({
-      title: "Business AI Automation Packages — Starter, Growth, Pro | ClientSurge Systems",
+      title: "Choose Your ClientSurge AI System — Starter, Growth, Pro",
       description:
-        "Choose your ClientSurge automation package. Starter, Growth, and Pro systems for lead capture, missed-call recovery, AI follow-up, booking, reviews, and reactivation. Remote setup included.",
+        "Compare ClientSurge Starter, Growth, and Pro systems for lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation. Done-for-you setup included.",
       canonicalPath: "/pricing",
-      ogTitle: "Choose Your Business AI Automation Package | ClientSurge Systems",
+      ogTitle: "Choose Your ClientSurge AI System",
       ogDescription:
-        "Compare Starter ($797 setup), Growth ($1,297 setup), and Pro ($2,497 setup) packages. Remotely installed AI automation systems for service businesses.",
+        "Pick the system that matches your lead flow. Starter fixes response gaps. Growth adds follow-up and booking. Pro adds the full recovery layer.",
     });
   }, []);
 

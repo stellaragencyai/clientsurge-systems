@@ -1,67 +1,62 @@
 export const FAQ_ITEMS = [
   {
     q: "Who is this built for?",
-    a: "Service businesses that already generate leads but are not converting them efficiently - med spas, aesthetic clinics, real estate agencies, home service companies, and similar appointment-based businesses.",
+    a: "Service businesses that already generate leads and want a cleaner system for response, follow-up, booking, reviews, and reactivation.",
+    category: "setup",
+  },
+  {
+    q: "What makes ClientSurge different from buying separate AI tools?",
+    a: "ClientSurge packages the system, collects setup details, configures workflows, checks the launch path, and keeps the buyer focused on one operating layer instead of scattered tools.",
     category: "setup",
   },
   {
     q: "Do I need existing software or systems?",
-    a: "No. We work with what you have or build from the ground up. Either way, we handle the entire setup.",
+    a: "No. We can work with your current tools or create a clean setup path from the ground up.",
     category: "setup",
   },
   {
     q: "Will this replace my staff?",
-    a: "No. It handles the repetitive work - instant responses, follow-up sequences, reminders - so your team can focus on the clients in front of them.",
+    a: "No. It handles repeatable response, follow-up, reminder, and routing work so your team can focus on conversations that need people.",
     category: "setup",
   },
   {
     q: "How fast can I get set up?",
-    a: "The target setup window is 24-48 hours after onboarding for straightforward installs. More complex calendars, CRMs, phone routing, or approval steps can extend that timeline, and we confirm it during onboarding.",
+    a: "Straightforward installs can move quickly after onboarding. More complex calendars, CRMs, phone routing, or approval steps can extend the setup window.",
     category: "setup",
   },
   {
     q: "What results should I expect?",
-    a: "The first measurable goals are faster lead response, cleaner follow-up, fewer dropped calls, and more visible booking handoffs. We review performance after launch instead of promising a fixed revenue outcome.",
+    a: "The first measurable goals are faster lead response, cleaner follow-up, fewer dropped calls, and more visible booking handoffs. Revenue still depends on traffic, offer, market, and sales execution.",
     category: "pricing",
   },
   {
     q: "Is there a long-term contract?",
-    a: "No. Month-to-month only. We keep your business because the system works - not because you are locked in.",
+    a: "Plans are month-to-month, with package pricing shown before checkout.",
     category: "pricing",
   },
   {
     q: "How much does it cost?",
-    a: "Plans start at $497/month with a one-time setup fee. We have three tiers - Starter, Growth, and Pro - depending on your lead volume and goals. See our Pricing section for full details.",
+    a: "Plans start at $497/month with a one-time setup fee. Starter, Growth, and Pro are based on how much of your lead flow you want ClientSurge to handle.",
     category: "pricing",
   },
   {
-    q: "What happens during the Free Automation Audit?",
-    a: "We spend 30 minutes understanding your business, your lead volume, and where bookings may be leaking. Then we show the system we would build, the assumptions behind it, and the proof steps needed before go-live.",
+    q: "What happens during the Guided System Match?",
+    a: "We review your lead sources, follow-up gaps, booking path, and current tools, then recommend whether Starter, Growth, or Pro is the right starting point.",
     category: "integration",
   },
   {
-    q: "Will this actually work for my specific business?",
-    a: "If you generate leads but lose conversions due to slow follow-up, the system is likely relevant. We specialize in appointment-based industries and tailor every setup to your actual lead flow. During your audit, we identify the gaps and tell you upfront if the fit is weak.",
+    q: "Can you integrate this with my current booking system?",
+    a: "Usually, yes. We review your current booking and follow-up tools during intake, confirm what can connect cleanly, and recommend the simplest setup path.",
     category: "integration",
   },
   {
     q: "How much time will I need to spend managing this?",
-    a: "Very little after launch. We handle setup and optimization, while your team reviews the pipeline and responds when a lead needs a human handoff. We keep the workflow simple instead of adding another tool to manage.",
+    a: "Very little after launch. We handle setup and optimization while your team reviews the pipeline and responds when a lead needs a human handoff.",
     category: "support",
   },
   {
-    q: "What if the system does not increase my bookings?",
-    a: "We set clear success goals during onboarding and review performance with you after launch. If we do not think we can create a meaningful improvement for your business, we will tell you before you move forward.",
-    category: "support",
-  },
-  {
-    q: "Can you integrate this with my current booking system?",
-    a: "Usually, yes. We review your current booking and follow-up tools during the audit, confirm what can be connected cleanly, and recommend the simplest setup path for your business.",
-    category: "integration",
-  },
-  {
-    q: "How do I know if this is the right investment for my business?",
-    a: "We will walk you through the specific system we would build, what it costs, the assumptions behind the recommendation, and which metrics we would track after launch. You will have concrete operating numbers before deciding.",
+    q: "How do I know if this is the right investment?",
+    a: "We walk through the system, cost, assumptions, launch proof steps, and metrics to track before you decide.",
     category: "support",
   },
 ];
