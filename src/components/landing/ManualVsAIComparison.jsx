@@ -139,23 +139,24 @@ export default function ManualVsAIComparison() {
 
         {/* Summary stat bar */}
         <div
-          className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 p-6 rounded-xl"
+          className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4 p-6 rounded-xl text-white"
           style={{
             background: "linear-gradient(135deg, #003B8F 0%, #006BB0 52%, #00AEEF 100%)",
             boxShadow: "0 8px 32px rgba(0,174,239,0.2)",
+            color: "#ffffff",
           }}
         >
           <div className="text-center text-white">
-            <p className="text-3xl md:text-4xl font-black font-titles">63%</p>
-            <p className="text-xs font-semibold uppercase tracking-wide mt-1 opacity-80">More Leads Captured</p>
+            <p className="text-3xl md:text-4xl font-black font-titles text-white" style={{ color: "#ffffff" }}>63%</p>
+            <p className="text-xs font-semibold uppercase tracking-wide mt-1 text-white" style={{ color: "#ffffff" }}>More Leads Captured</p>
           </div>
           <div className="text-center text-white md:border-l md:border-r border-white/20">
-            <p className="text-3xl md:text-4xl font-black font-titles">8x</p>
-            <p className="text-xs font-semibold uppercase tracking-wide mt-1 opacity-80">Faster Response Time</p>
+            <p className="text-3xl md:text-4xl font-black font-titles text-white" style={{ color: "#ffffff" }}>8x</p>
+            <p className="text-xs font-semibold uppercase tracking-wide mt-1 text-white" style={{ color: "#ffffff" }}>Faster Response Time</p>
           </div>
           <div className="text-center text-white">
-            <p className="text-3xl md:text-4xl font-black font-titles">24/7</p>
-            <p className="text-xs font-semibold uppercase tracking-wide mt-1 opacity-80">Always On Coverage</p>
+            <p className="text-3xl md:text-4xl font-black font-titles text-white" style={{ color: "#ffffff" }}>24/7</p>
+            <p className="text-xs font-semibold uppercase tracking-wide mt-1 text-white" style={{ color: "#ffffff" }}>Always On Coverage</p>
           </div>
         </div>
       </div>
