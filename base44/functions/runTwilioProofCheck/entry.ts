@@ -4,7 +4,15 @@
  * Checks ONLY real runtime conditions — never marks proof_passed without evidence.
  * Updates LaunchGate records for twilio_sms_gate and twilio_voice_gate.
  *
- * Voice gate now validates:
+ * Track D SMS hardening:
+ *   SMS proof now requires a real outbound Twilio CommunicationLog with:
+ *     - provider_message_id starting with SM
+ *     - delivery_status=delivered
+ *     - delivered_at present
+ *     - failed_at absent
+ *   Queued/sent SMS records are NOT delivery proof.
+ *
+ * Voice gate validates:
  *   a) Twilio credentials present
  *   b) Voice webhook URL configured in AdminSettings
  *   c) TwiML health: GET the webhook URL → 200 + text/xml + <Response> root
@@ -26,12 +34,64 @@ function normalizePhoneE164(phone) {
   return null;
 }
 
-const SELF_NUMBER = "+16025843227";
+function isRealTwilioMessageSid(value) {
+  return typeof value === "string" && /^SM[a-zA-Z0-9]+$/.test(value);
+}
 
-function isSelfNumber(phone) {
-  const norm = normalizePhoneE164(phone);
-  if (!norm) return false;
-  return norm === normalizePhoneE164(SELF_NUMBER);
+function isValidDeliveredSmsProof(log, twilioFromNumber) {
+  if (!log) return false;
+  if (log.channel !== "sms") return false;
+  if (log.provider !== "twilio") return false;
+  if (log.direction !== "outbound") return false;
+  if (log.environment !== "production") return false;
+  if (log.dashboard_excluded === true) return false;
+  if (!isRealTwilioMessageSid(log.provider_message_id)) return false;
+  if (log.delivery_status !== "delivered") return false;
+  if (!log.delivered_at) return false;
+  if (log.failed_at) return false;
+  if (log.provider_status && log.provider_status !== "delivered") return false;
+
+  const expectedFrom = normalizePhoneE164(twilioFromNumber);
+  const actualFrom = normalizePhoneE164(log.from_address);
+  if (expectedFrom && actualFrom && actualFrom !== expectedFrom) return false;
+
+  return true;
+}
+
+function buildSmsEvidenceSummary({ deliveredProof, latestSmsLog, twilioCredsOk, smsWebhookReg }) {
+  if (deliveredProof) {
+    const to = deliveredProof.to_address || deliveredProof.canonical_to_address || "MISSING_TO";
+    return [
+      "Delivered Twilio SMS proof found",
+      `CommunicationLog ID: ${deliveredProof.id}`,
+      `Provider ID: ${deliveredProof.provider_message_id}`,
+      "delivery_status=delivered",
+      `provider_status=${deliveredProof.provider_status || "delivered"}`,
+      `delivered_at=${deliveredProof.delivered_at}`,
+      `from=${deliveredProof.from_address || "MISSING_FROM"}`,
+      `to=${to}`,
+      "AutomationProofLog pass still required before final proof",
+    ].join(" | ");
+  }
+
+  if (latestSmsLog) {
+    return [
+      `Twilio credentials: ${twilioCredsOk ? "PRESENT" : "MISSING"}`,
+      `SMS WebhookRegistration: ${smsWebhookReg ? smsWebhookReg.status : "NOT FOUND"}`,
+      `Latest outbound SMS CommunicationLog ID: ${latestSmsLog.id}`,
+      `Provider ID: ${latestSmsLog.provider_message_id || "MISSING"}`,
+      `delivery_status=${latestSmsLog.delivery_status || "unknown"}`,
+      `provider_status=${latestSmsLog.provider_status || "unknown"}`,
+      "Queued or sent SMS is not delivery proof",
+    ].join(" | ");
+  }
+
+  return [
+    `Twilio credentials: ${twilioCredsOk ? "PRESENT" : "MISSING"}`,
+    `SMS WebhookRegistration: ${smsWebhookReg ? smsWebhookReg.status : "NOT FOUND"}`,
+    "No outbound Twilio SMS CommunicationLog found",
+    "No delivered callback proof is attached to this gate",
+  ].join(" | ");
 }
 
 Deno.serve(async (req) => {
@@ -43,7 +103,6 @@ Deno.serve(async (req) => {
     }
 
     const now = new Date().toISOString();
-    const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
 
     // ── Credential checks ──
     const hasAccountSid = !!Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -59,23 +118,33 @@ Deno.serve(async (req) => {
       settings = s || null;
     } catch (_) {}
 
+    const twilioFromNumber = settings?.twilio_from_number || Deno.env.get("TWILIO_PHONE_NUMBER") || null;
     const voiceWebhookUrl = settings?.voice_webhook_url || settings?.webhook_url || "";
-    const inboundVoiceEnabled = settings?.inbound_voice_enabled === true;
     const agentIdFromSettings =
       settings?.elevenlabs_agent_ids?.receptionist ||
       settings?.elevenlabs_agent_ids?.general || null;
     const voiceAgentConfigured = hasElevenLabsAgent || !!agentIdFromSettings;
 
-    // ── SMS CommunicationEvent check ──
-    let latestSmsEvent = null;
+    // ── SMS CommunicationLog check: provider delivery proof only ──
+    let latestSmsLog = null;
+    let deliveredSmsProof = null;
+    let smsLogs = [];
     try {
-      const smsEvents = await base44.asServiceRole.entities.CommunicationEvent.filter(
-        { channel: "sms", provider: "twilio" }, "-created_date", 1
+      smsLogs = await base44.asServiceRole.entities.CommunicationLog.filter(
+        {
+          channel: "sms",
+          provider: "twilio",
+          direction: "outbound",
+          environment: "production",
+        },
+        "-created_date",
+        250,
       );
-      latestSmsEvent = smsEvents?.[0] || null;
+      latestSmsLog = smsLogs?.[0] || null;
+      deliveredSmsProof = smsLogs?.find((log) => isValidDeliveredSmsProof(log, twilioFromNumber)) || null;
     } catch (_) {}
 
-    const smsEventWithin30Days = latestSmsEvent && latestSmsEvent.created_date > thirtyDaysAgo;
+    const deliveredSmsProofExists = !!deliveredSmsProof;
 
     // ── Voice CommunicationEvent check ──
     let latestVoiceEvent = null;
@@ -145,17 +214,25 @@ Deno.serve(async (req) => {
     // ── Score SMS gate ──
     const smsChecks = [
       { label: "Twilio credentials present", passed: twilioCredsOk },
-      { label: "SMS CommunicationEvent within 30 days", passed: !!smsEventWithin30Days },
+      { label: "Delivered Twilio SMS callback proof", passed: deliveredSmsProofExists },
       { label: "SMS WebhookRegistration active", passed: smsWebhookActive },
     ];
     const smsPassedCount = smsChecks.filter(c => c.passed).length;
     const smsCompletionPct = Math.round((smsPassedCount / smsChecks.length) * 100);
-    const smsProofPct = smsEventWithin30Days ? smsCompletionPct : 0;
-    const smsGateStatus = smsPassedCount === smsChecks.length ? "ready_for_proof" : "blocked";
+    const smsProofPct = deliveredSmsProofExists ? 50 : 0;
+    const smsGateStatus = twilioCredsOk ? "ready_for_proof" : "blocked";
     const smsMissingItems = smsChecks.filter(c => !c.passed).map(c => c.label);
-    const smsBlocker = smsMissingItems.length > 0
-      ? `Missing: ${smsMissingItems.join("; ")}`
-      : "All SMS checks passed — awaiting manual approval";
+    const smsBlocker = !twilioCredsOk
+      ? "Missing: Twilio credentials present"
+      : deliveredSmsProofExists
+        ? "AutomationProofLog pass still required before final proof."
+        : "No Twilio delivered callback proof is attached to this gate.";
+    const smsNextAction = deliveredSmsProofExists
+      ? "Review delivered Twilio callback evidence, then create AutomationProofLog pass only if this is a real production proof test."
+      : "Send one real outbound SMS and wait for a Twilio delivered status callback.";
+    const smsLastVerdict = deliveredSmsProofExists
+      ? "Provider delivery proof found — admin approval still required"
+      : "Not proven — queued SMS is not delivery proof";
 
     // ── Score Voice gate (6 checks) ──
     const voiceChecks = [
@@ -172,7 +249,6 @@ Deno.serve(async (req) => {
       ? voiceCompletionPct
       : (twimlHealthy ? Math.round(voiceCompletionPct * 0.5) : 0);
 
-    // Gate status: blocked if TwiML not healthy or creds missing; proof_passed only with real call proof
     let voiceGateStatus;
     if (!twilioCredsOk || !voiceWebhookUrl || !twimlHealthy) {
       voiceGateStatus = "blocked";
@@ -188,11 +264,12 @@ Deno.serve(async (req) => {
       : "All voice checks passed";
 
     // ── Build evidence summaries ──
-    const smsEvidenceSummary = [
-      `Twilio credentials: ${twilioCredsOk ? "PRESENT" : "MISSING"}`,
-      `Latest SMS CommunicationEvent: ${latestSmsEvent ? latestSmsEvent.created_date : "NONE"}`,
-      `SMS WebhookRegistration: ${smsWebhookReg ? smsWebhookReg.status : "NOT FOUND"}`,
-    ].join(" | ");
+    const smsEvidenceSummary = buildSmsEvidenceSummary({
+      deliveredProof: deliveredSmsProof,
+      latestSmsLog,
+      twilioCredsOk,
+      smsWebhookReg,
+    });
 
     const voiceEventLabel = latestVoiceEvent
       ? `${latestVoiceEvent.created_date} (sid=${latestVoiceEvent.provider_message_id}, ${isLatestSmoke ? "SMOKE — not real" : "REAL CALL"})`
@@ -219,12 +296,10 @@ Deno.serve(async (req) => {
         completion_percent: smsCompletionPct,
         proof_percent: smsProofPct,
         current_blocker: smsBlocker,
-        next_action: smsPassedCount === smsChecks.length
-          ? "All SMS checks pass — run a live test SMS and request manual approval"
-          : smsMissingItems[0],
+        next_action: smsNextAction,
         evidence_summary: smsEvidenceSummary,
         last_checked_at: now,
-        last_verdict: `Proof runner executed ${now} — ${smsPassedCount}/${smsChecks.length} checks passed`,
+        last_verdict: smsLastVerdict,
       });
     }
 
@@ -302,7 +377,19 @@ Deno.serve(async (req) => {
         proof_percent: smsProofPct,
         checks: smsChecks,
         blocker: smsBlocker,
-        latest_sms_event: latestSmsEvent?.created_date || null,
+        latest_sms_log: latestSmsLog ? {
+          id: latestSmsLog.id,
+          provider_message_id: latestSmsLog.provider_message_id || null,
+          delivery_status: latestSmsLog.delivery_status || null,
+          provider_status: latestSmsLog.provider_status || null,
+          delivered_at: latestSmsLog.delivered_at || null,
+          failed_at: latestSmsLog.failed_at || null,
+        } : null,
+        delivered_sms_proof: deliveredSmsProof ? {
+          id: deliveredSmsProof.id,
+          provider_message_id: deliveredSmsProof.provider_message_id,
+          delivered_at: deliveredSmsProof.delivered_at,
+        } : null,
       },
       voice_gate: {
         status: voiceGateStatus,
