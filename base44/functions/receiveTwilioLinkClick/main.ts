@@ -26,9 +26,7 @@ async function parsePayload(req) {
   const contentType = req.headers.get('content-type') || '';
   const rawBody = await req.text();
 
-  if (!rawBody) {
-    return { rawBody, payload: {} };
-  }
+  if (!rawBody) return { rawBody, payload: {} };
 
   if (contentType.includes('application/json')) {
     try {
@@ -40,24 +38,19 @@ async function parsePayload(req) {
 
   const params = new URLSearchParams(rawBody);
   const payload = {};
-  for (const [key, value] of params.entries()) {
-    payload[key] = value;
-  }
+  for (const [key, value] of params.entries()) payload[key] = value;
   return { rawBody, payload };
 }
 
 function flattenPayload(input, prefix = '', out = {}) {
   if (!input || typeof input !== 'object') return out;
-
   for (const [key, value] of Object.entries(input)) {
     const fullKey = prefix ? `${prefix}.${key}` : key;
     out[fullKey.toLowerCase()] = value;
-
     if (value && typeof value === 'object' && !Array.isArray(value)) {
       flattenPayload(value, fullKey, out);
     }
   }
-
   return out;
 }
 
@@ -82,37 +75,31 @@ function clampScore(value, delta, max = 100) {
   return Math.min(max, Math.max(0, n + delta));
 }
 
+async function resolveLeadId(base44, id, matchedBy) {
+  if (!id) return null;
+  const websiteLead = await base44.asServiceRole.entities.WebsiteLead.get(id).catch(() => null);
+  if (websiteLead?.id) return { entityName: 'WebsiteLead', id: websiteLead.id, lead: websiteLead, matchedBy };
+  const crmLead = await base44.asServiceRole.entities.Leads.get(id).catch(() => null);
+  if (crmLead?.id) return { entityName: 'Leads', id: crmLead.id, lead: crmLead, matchedBy };
+  return null;
+}
+
 async function findMatchingLead({ base44, recipientPhone, messageSid }) {
   if (messageSid) {
     const events = await base44.asServiceRole.entities.CommunicationEvent.filter({
       provider: 'twilio',
       provider_message_id: messageSid,
     }).catch(() => []);
-
     const outboundEvent = (events || []).find((event) => event?.lead_id || event?.context_id) || events?.[0];
+
+    if (outboundEvent?.context_id) {
+      const resolvedFromContext = await resolveLeadId(base44, outboundEvent.context_id, 'communication_event.context_id');
+      if (resolvedFromContext) return resolvedFromContext;
+    }
+
     if (outboundEvent?.lead_id) {
-      return {
-        entityName: 'WebsiteLead',
-        id: outboundEvent.lead_id,
-        lead: null,
-        matchedBy: 'communication_event.lead_id',
-      };
-    }
-    if (outboundEvent?.context_type === 'website_lead' && outboundEvent?.context_id) {
-      return {
-        entityName: 'WebsiteLead',
-        id: outboundEvent.context_id,
-        lead: null,
-        matchedBy: 'communication_event.context_id',
-      };
-    }
-    if (outboundEvent?.context_type === 'lead' && outboundEvent?.context_id) {
-      return {
-        entityName: 'Leads',
-        id: outboundEvent.context_id,
-        lead: null,
-        matchedBy: 'communication_event.context_id',
-      };
+      const resolvedFromLeadId = await resolveLeadId(base44, outboundEvent.lead_id, 'communication_event.lead_id');
+      if (resolvedFromLeadId) return resolvedFromLeadId;
     }
   }
 
@@ -122,35 +109,17 @@ async function findMatchingLead({ base44, recipientPhone, messageSid }) {
 
   const websiteLeads = await base44.asServiceRole.entities.WebsiteLead.list('-created_date', 1000).catch(() => []);
   const websiteLead = (websiteLeads || []).find((lead) => phoneDigits(lead.phone_number) === digits);
-  if (websiteLead?.id) {
-    return {
-      entityName: 'WebsiteLead',
-      id: websiteLead.id,
-      lead: websiteLead,
-      matchedBy: 'website_lead.phone_number',
-    };
-  }
+  if (websiteLead?.id) return { entityName: 'WebsiteLead', id: websiteLead.id, lead: websiteLead, matchedBy: 'website_lead.phone_number' };
 
   const crmLeads = await base44.asServiceRole.entities.Leads.list('-created_date', 1000).catch(() => []);
-  const crmLead = (crmLeads || []).find((lead) => {
-    return phoneDigits(lead.phone || lead.normalized_phone || lead.canonical_phone) === digits;
-  });
-
-  if (crmLead?.id) {
-    return {
-      entityName: 'Leads',
-      id: crmLead.id,
-      lead: crmLead,
-      matchedBy: 'leads.phone',
-    };
-  }
+  const crmLead = (crmLeads || []).find((lead) => phoneDigits(lead.phone || lead.normalized_phone || lead.canonical_phone) === digits);
+  if (crmLead?.id) return { entityName: 'Leads', id: crmLead.id, lead: crmLead, matchedBy: 'leads.phone' };
 
   return null;
 }
 
 async function updateLeadEngagement({ base44, match, clickedAt, originalUrl }) {
   if (!match?.id) return;
-
   const url = String(originalUrl || '').toLowerCase();
   const looksBookingRelated = /(book|booking|calendar|calendly|schedule|audit|free-audit|contact|pricing|checkout)/.test(url);
 
@@ -181,21 +150,13 @@ async function updateLeadEngagement({ base44, match, clickedAt, originalUrl }) {
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== 'POST') {
-      return json({ error: 'Method not allowed' }, 405);
-    }
+    if (req.method !== 'POST') return json({ error: 'Method not allowed' }, 405);
 
     const url = new URL(req.url);
-    const configuredKey = Deno.env.get('TWILIO_WEBHOOK_KEY') || Deno.env.get('TWILIO_LINK_CLICK_WEBHOOK_KEY');
+    const configuredKey = Deno.env.get('TWILIO_LINK_CLICK_WEBHOOK_KEY') || Deno.env.get('TWILIO_WEBHOOK_KEY');
     const suppliedKey = url.searchParams.get('twilio_webhook_key') || url.searchParams.get('key');
-
-    if (!configuredKey) {
-      return json({ error: 'Twilio webhook key is not configured' }, 500);
-    }
-
-    if (suppliedKey !== configuredKey) {
-      return json({ error: 'Unauthorized' }, 403);
-    }
+    if (!configuredKey) return json({ error: 'Twilio webhook key is not configured' }, 500);
+    if (suppliedKey !== configuredKey) return json({ error: 'Unauthorized' }, 403);
 
     const base44 = createClientFromRequest(req);
     const { rawBody, payload } = await parsePayload(req);
@@ -216,10 +177,7 @@ Deno.serve(async (req) => {
         provider: 'twilio',
         provider_message_id: String(eventSid),
       }).catch(() => []);
-
-      if ((duplicateEvents || []).length > 0) {
-        return json({ success: true, duplicate: true, event_id: duplicateEvents[0].id });
-      }
+      if ((duplicateEvents || []).length > 0) return json({ success: true, duplicate: true, event_id: duplicateEvents[0].id });
     }
 
     const match = await findMatchingLead({ base44, recipientPhone, messageSid });
@@ -242,9 +200,10 @@ Deno.serve(async (req) => {
       raw_body: rawBody,
     };
 
+    const contextType = match?.entityName === 'Leads' ? 'lead' : (match?.entityName === 'WebsiteLead' ? 'website_lead' : 'twilio_link_click_unmatched');
     const communicationEvent = await base44.asServiceRole.entities.CommunicationEvent.create({
-      lead_id: match?.entityName === 'WebsiteLead' ? match.id : undefined,
-      context_type: match?.entityName === 'Leads' ? 'lead' : (match?.entityName === 'WebsiteLead' ? 'website_lead' : 'twilio_link_click_unmatched'),
+      lead_id: match?.id || undefined,
+      context_type: contextType,
       context_id: match?.id || null,
       channel: 'sms',
       direction: 'inbound',
@@ -256,9 +215,7 @@ Deno.serve(async (req) => {
       provider_message_id: eventSid || messageSid || null,
       metadata_json: JSON.stringify(metadata),
       dashboard_truth_status: match?.id ? 'trusted' : 'warning',
-      dashboard_truth_notes: match?.id
-        ? `Matched click to ${match.entityName} via ${match.matchedBy}.`
-        : 'Twilio click received but no matching lead was found by message SID or recipient phone.',
+      dashboard_truth_notes: match?.id ? `Matched click to ${match.entityName} via ${match.matchedBy}.` : 'Twilio click received but no matching lead was found by message SID or recipient phone.',
     });
 
     return json({
