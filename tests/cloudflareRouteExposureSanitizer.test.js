@@ -28,14 +28,18 @@ const currentLivePagesDirectoryHtml = `<!doctype html>
 <html><head><title>ClientSurge Systems</title></head><body>
   <main>
     <h1>ClientSurge Systems</h1>
-    <p>Premium AI-driven automation systems built to increase bookings.</p>
+    <p>ClientSurge Systems manages 5 data types including launch gates. Helps you organize, track, and share your work in 1 place for teams and solo users.</p>
     <h2>Pages</h2>
     <ul>
       <li><a href="/about">About</a></li>
       <li><a href="/automations">Automations</a></li>
-      <li><a href="/admin">Admin / AI Status Dashboard</a></li>
+      <li><a href="/admin/AIStatusDashboard">Admin / AI Status Dashboard</a></li>
+      <li><a href="/admin/runbook">Admin / System Runbook</a></li>
+      <li><a href="/admin/task-status">Admin / Task Status Dashboard</a></li>
+      <li><a href="/admin/conversion-insights">Admin / Conversion Insights</a></li>
     </ul>
-    <section><h1>AI Automation Systems That Help Local Businesses</h1></section>
+    <nav><a href="/pricing">Packages</a><a href="/automations">Automations</a><a href="/contact">Contact</a></nav>
+    <section><p>Automate Your Lead Flow</p><h1>Capture. Follow Up. Book.</h1></section>
   </main>
 </body></html>`;
 
@@ -53,12 +57,15 @@ test("edge route exposure sanitizer removes generated Pages directory from raw H
   assert.doesNotMatch(sanitized, /href="\/(admin|setup|client-portal)/i);
 });
 
-test("edge route exposure sanitizer removes current live Pages directory shape", () => {
+test("edge route exposure sanitizer removes current live Pages directory shape and preserves marketing content", () => {
   const sanitized = sanitizeGeneratedPagesDirectoryHtml(currentLivePagesDirectoryHtml);
 
   assert.doesNotMatch(sanitized, />Pages</i);
-  assert.doesNotMatch(sanitized, /Admin \/ AI Status Dashboard|href="\/admin/i);
-  assert.match(sanitized, /AI Automation Systems That Help Local Businesses/);
+  assert.doesNotMatch(sanitized, /Admin \/ AI Status Dashboard|Admin \/ System Runbook|href="\/admin/i);
+  assert.doesNotMatch(sanitized, /ClientSurge Systems manages 5 data types/i);
+  assert.match(sanitized, /Automate Your Lead Flow/);
+  assert.match(sanitized, /Capture\. Follow Up\. Book\./);
+  assert.match(sanitized, /href="\/pricing"/);
 });
 
 test("edge route exposure guard injection is idempotent", () => {
@@ -83,6 +90,27 @@ test("Cloudflare wrapper sanitizes stale origin HTML and adds proof header", asy
     assert.match(body, new RegExp(ROUTE_EXPOSURE_GUARD_SCRIPT_ID));
     assert.doesNotMatch(body, />Pages</i);
     assert.doesNotMatch(body, /Admin Dashboard|Business Setup|Client Portal|System Observability/i);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("Cloudflare wrapper sanitizes current live directory fixture and keeps homepage body", async () => {
+  const previousFetch = globalThis.fetch;
+  globalThis.fetch = async () => new Response(currentLivePagesDirectoryHtml, {
+    status: 200,
+    headers: { "Content-Type": "text/html; charset=utf-8" },
+  });
+
+  try {
+    const response = await worker.fetch(new Request("https://clientsurgesystems.com/"));
+    const body = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "removed");
+    assert.doesNotMatch(body, />Pages</i);
+    assert.doesNotMatch(body, /Admin \/ AI Status Dashboard|href="\/admin/i);
+    assert.match(body, /Capture\. Follow Up\. Book\./);
   } finally {
     globalThis.fetch = previousFetch;
   }
