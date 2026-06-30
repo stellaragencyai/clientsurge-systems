@@ -1,13 +1,6 @@
-/**
- * IndustryPageTemplate — Dynamic template for all 9 industry-specific landing pages.
- * Pulls all hero config, pain points, use cases, ROI, testimonials, and features
- * from data/industryMarketingConfig.js — no hardcoded industry logic.
- * Uses SectionHeader for consistent typography across every industry page.
- */
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getIndustryBySlug } from '@/data/industryMarketingConfig';
-import { getPlanFeatures } from '@/lib/saasProductizationConfig';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
@@ -16,30 +9,7 @@ import SectionHeader from '@/components/design-system/SectionHeader';
 import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
 import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery';
 
-// Icon mapping — maps string icon names from config to lucide components
-const ICON_MAP = {
-  MessageSquare,
-  Calendar,
-  Phone,
-  AlertCircle,
-  Zap,
-  TrendingUp,
-  Users,
-  Shield,
-  RotateCw,
-  Smile,
-  Cloud,
-  FileText,
-  FileCheck,
-  MapPin,
-  ClipboardList,
-  Send,
-  Search,
-  Home,
-  CheckSquare,
-  Thermometer,
-  CheckCircle,
-};
+const ICON_MAP = { MessageSquare, Calendar, Phone, AlertCircle, Zap, TrendingUp, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer, CheckCircle };
 
 export default function IndustryPageTemplate() {
   const { slug } = useParams();
@@ -58,30 +28,20 @@ export default function IndustryPageTemplate() {
 
   if (!industry) return null;
 
-  const recommendedFeatures = getPlanFeatures(industry.recommended_plan);
-
-  // Dynamic hero config — works for ALL industries, not just roofing
   const heroConfig = {
-    eyebrow: `${industry.industry_name} AI Automation`,
+    eyebrow: `${industry.industry_name} AI System`,
     headline: industry.hero_headline,
     subheadline: industry.hero_subheadline,
     description: industry.hero_description,
-    backgroundImage: null, // No hardcoded image — each industry uses gradient hero
-    primaryCTA: {
-      label: industry.primary_cta,
-      path: '/book',
-    },
-    secondaryCTA: {
-      label: industry.secondary_cta,
-      path: '/pricing',
-    },
+    backgroundImage: null,
+    primaryCTA: { label: industry.primary_cta, path: '/pricing' },
+    secondaryCTA: { label: industry.secondary_cta, path: '/automations' },
   };
 
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
 
-      {/* HERO */}
       <IndustryHero
         industryKey={slug}
         eyebrow={heroConfig.eyebrow}
@@ -93,14 +53,9 @@ export default function IndustryPageTemplate() {
         secondaryCTA={heroConfig.secondaryCTA}
       />
 
-      {/* PAIN POINTS */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <SectionHeader
-            eyebrow="The Problem"
-            title={`The ${industry.industry_name} Problem`}
-            align="center"
-          />
+          <SectionHeader eyebrow="The Problem" title={`Where ${industry.industry_name} Leads Slip`} align="center" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6 md:mt-8">
             {industry.pain_points.map((point, i) => (
               <div key={i} className="p-5 md:p-6 border border-border rounded-xl bg-muted/30">
@@ -112,14 +67,9 @@ export default function IndustryPageTemplate() {
         </div>
       </section>
 
-      {/* USE CASES */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader
-            eyebrow="How It Works"
-            title={`How ${industry.industry_name} Automation Works`}
-            align="center"
-          />
+          <SectionHeader eyebrow="How It Works" title={`How ClientSurge Supports ${industry.industry_name}`} align="center" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8">
             {industry.use_cases.map((useCase, i) => {
               const IconComponent = ICON_MAP[useCase.icon] || CheckCircle;
@@ -144,52 +94,33 @@ export default function IndustryPageTemplate() {
         </div>
       </section>
 
-      {/* ROI METRICS */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <SectionHeader
-            eyebrow="Expected Returns"
-            title={`Typical ROI For ${industry.industry_name}`}
-            align="center"
-          />
+          <SectionHeader eyebrow="Launch Focus" title={`What the ${industry.industry_name} System Is Built to Improve`} align="center" />
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6 md:mt-8">
             {Object.entries(industry.roi_metrics).map(([key, value]) => (
               <div key={key} className="p-4 md:p-6 border border-border rounded-xl text-center">
-                <p className="text-2xl md:text-3xl font-titles font-bold text-primary mb-2">{value}</p>
-                <p className="text-xs md:text-sm text-muted-foreground capitalize">
-                  {key.replace(/_/g, ' ')}
-                </p>
+                <p className="text-xl md:text-2xl font-titles font-bold text-primary mb-2">{value}</p>
+                <p className="text-xs md:text-sm text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* IMMERSIVE SUCCESS GALLERY */}
       <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 
-      {/* TESTIMONIALS */}
       {industry.testimonials?.length > 0 && (
         <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
           <div className="max-w-5xl mx-auto">
-            <SectionHeader
-              eyebrow="Real Results"
-              title={`Real Results From ${industry.industry_name} Leaders`}
-              align="center"
-            />
+            <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8">
               {industry.testimonials.map((testimonial, i) => (
                 <div key={i} className="bg-white p-6 md:p-8 rounded-xl border border-border shadow-sm">
-                  <div className="mb-4">
-                    <p className="font-titles text-xl md:text-2xl font-bold text-primary">{testimonial.metric}</p>
-                  </div>
-                  <blockquote className="text-sm md:text-base text-foreground/80 mb-4 md:mb-6 italic leading-relaxed">
-                    "{testimonial.quote}"
-                  </blockquote>
-                  <div>
-                    <p className="font-bold text-foreground text-sm md:text-base">{testimonial.name}</p>
-                    <p className="text-xs md:text-sm text-muted-foreground">{testimonial.business}</p>
-                  </div>
+                  <p className="font-titles text-xl md:text-2xl font-bold text-primary mb-4">{testimonial.metric}</p>
+                  <blockquote className="text-sm md:text-base text-foreground/80 mb-4 md:mb-6 italic leading-relaxed">"{testimonial.quote}"</blockquote>
+                  <p className="font-bold text-foreground text-sm md:text-base">{testimonial.name}</p>
+                  <p className="text-xs md:text-sm text-muted-foreground">{testimonial.business}</p>
                 </div>
               ))}
             </div>
@@ -197,71 +128,33 @@ export default function IndustryPageTemplate() {
         </section>
       )}
 
-      {/* FEATURES */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <SectionHeader
-            eyebrow="What's Included"
-            title={`Your ${industry.industry_name} System Includes`}
-            align="center"
-          />
+          <SectionHeader eyebrow="What's Included" title={`Your ${industry.industry_name} System Includes`} align="center" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-2xl mx-auto mt-6 md:mt-8">
             {industry.key_features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 md:p-4">
-                <CheckCircle className="w-5 h-5 text-primary flex-shrink-0" />
-                <span className="text-sm md:text-base text-foreground/80 font-medium">{feature}</span>
-              </div>
+              <div key={i} className="flex items-center gap-3 p-3 md:p-4"><CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /><span className="text-sm md:text-base text-foreground/80 font-medium">{feature}</span></div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* INDUSTRY QUALIFICATION FORM */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-2xl mx-auto">
           <div className="mb-6 md:mb-8">
-            <SectionHeader
-              eyebrow="Free Automation Audit"
-              title={`Is Your ${industry.industry_name} Business Ready?`}
-              subtitle="Answer 4 quick questions and we'll tell you exactly which automation system fits your volume, budget, and goals — free, no obligation."
-              align="center"
-            />
+            <SectionHeader eyebrow="Guided System Match" title={`Which ${industry.industry_name} System Fits?`} subtitle="Answer 4 quick questions and we will help match your lead flow to Starter, Growth, or Pro." align="center" />
           </div>
-          <div className="rounded-2xl border border-border bg-white shadow-sm p-5 md:p-8">
-            <IndustryQualificationForm
-              industrySlug={slug}
-              industryName={industry.industry_name}
-            />
-          </div>
+          <div className="rounded-2xl border border-border bg-white shadow-sm p-5 md:p-8"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
         </div>
       </section>
 
-      {/* FINAL CTA */}
       <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <SectionHeader
-            eyebrow="Get Started"
-            title={`Ready to Transform Your ${industry.industry_name} Business?`}
-            subtitle="Start your automation system today. First consultation is free."
-            align="center"
-          />
+          <SectionHeader eyebrow="Get Started" title={`Install a ${industry.industry_name} Lead Flow System`} subtitle="Compare packages, choose the system, and move into guided setup." align="center" />
           <div className="mb-6 md:mb-8" />
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button
-              onClick={() => navigate('/book')}
-              className="cs-btn-primary bg-white text-primary hover:bg-white/90"
-              style={{ minHeight: '44px' }}
-            >
-              {industry.primary_cta}
-              <ArrowRight className="w-4 h-4" />
-            </button>
-            <button
-              onClick={() => navigate('/pricing')}
-              className="inline-flex items-center justify-center px-6 py-3 border-2 border-white rounded-lg text-white font-semibold hover:bg-white/10 transition-colors"
-              style={{ minHeight: '44px' }}
-            >
-              See Pricing
-            </button>
+            <button onClick={() => navigate('/pricing')} className="cs-btn-primary" style={{ minHeight: '44px' }}>{industry.primary_cta}<ArrowRight className="w-4 h-4" /></button>
+            <button onClick={() => navigate('/automations')} className="inline-flex items-center justify-center px-6 py-3 border-2 border-primary rounded-lg text-primary font-semibold hover:bg-primary/10 transition-colors" style={{ minHeight: '44px' }}>View Automation Stack</button>
           </div>
         </div>
       </section>
