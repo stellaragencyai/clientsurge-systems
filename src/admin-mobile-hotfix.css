@@ -1,0 +1,60 @@
+/*
+ * Admin mobile hotfix
+ * Scope: admin dashboard shell only. This keeps /admin usable on iPhone while the
+ * duplicated AdminDashboard sidebar is consolidated with AdminShell.
+ */
+
+@media (max-width: 1023px) {
+  /* Main /admin duplicated sidebar: cap width and respect iPhone safe areas. */
+  div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"][class*="bg-white"][class*="border-r"] {
+    width: min(20rem, 86vw) !important;
+    padding-top: env(safe-area-inset-top, 0px) !important;
+    box-shadow: 0 20px 70px rgba(15, 23, 42, 0.24) !important;
+    max-width: 86vw !important;
+  }
+
+  /* Sidebar nav should scroll inside the drawer instead of dragging the page. */
+  div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"] nav[class*="overflow-y-auto"] {
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Main /admin sticky topbar: denser and safe-area aware on iPhone. */
+  div[class*="bg-white"][class*="border-b"][class*="sticky"][class*="top-0"][class*="z-10"] {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+    padding-top: max(0.625rem, env(safe-area-inset-top, 0px)) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+  }
+
+  div[class*="bg-white"][class*="border-b"][class*="sticky"][class*="top-0"][class*="z-10"] span[class*="font-semibold"] {
+    max-width: 58vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  /* Admin page content: reclaim width on small screens. */
+  div[class*="flex-1"][class*="overflow-auto"][class*="p-6"] {
+    padding: 0.75rem !important;
+    padding-bottom: max(1rem, env(safe-area-inset-bottom, 0px)) !important;
+  }
+
+  /* Make admin cards/forms breathe without blowing up horizontal width. */
+  .admin-mobile-card,
+  div[class*="rounded-xl"][class*="border"],
+  div[class*="rounded-lg"][class*="border"] {
+    max-width: 100%;
+  }
+
+  /* Tables/logs should scroll inside their own container instead of widening the whole admin shell. */
+  table {
+    max-width: 100%;
+  }
+
+  div[class*="overflow-x-auto"] {
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior-x: contain;
+  }
+}

@@ -4,11 +4,41 @@ import App from '@/App.jsx'
 import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
+import '@/admin-mobile-hotfix.css'
 
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
 if (staticFallback) {
   staticFallback.style.display = 'none';
+}
+
+function closeInitialAdminMobileDrawer() {
+  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  if (!/^\/(admin|dashboard|admin-settings)(\/|$)/i.test(window.location.pathname)) return;
+  if (!window.matchMedia || !window.matchMedia('(max-width: 1023px)').matches) return;
+
+  let closed = false;
+  let attempts = 0;
+
+  const closeIfOpen = () => {
+    if (closed || attempts > 20) return;
+    attempts += 1;
+
+    const overlay = Array.from(document.querySelectorAll('div[class*="z-30"]')).find((el) => {
+      const className = String(el.className || '');
+      return className.includes('fixed') && className.includes('inset-0') && className.includes('lg:hidden') && className.includes('bg-black');
+    });
+
+    if (overlay) {
+      closed = true;
+      overlay.click();
+      return;
+    }
+
+    window.setTimeout(closeIfOpen, 75);
+  };
+
+  window.setTimeout(closeIfOpen, 0);
 }
 
 // Initialize with error boundary for debugging
@@ -18,6 +48,7 @@ function initApp() {
     ReactDOM.createRoot(document.getElementById('root')).render(
       import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
     )
+    closeInitialAdminMobileDrawer();
   } catch (err) {
     console.error('Critical error rendering App:', err);
     const root = document.getElementById('root');
