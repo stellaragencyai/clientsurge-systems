@@ -42,6 +42,7 @@
     "cloudflare:security:diagnose-route": "node scripts/cloudflare/diagnose-route-bypass.mjs",
     "cloudflare:security:upsert-headers": "node scripts/cloudflare/upsert-security-header-transform.mjs",
     "smoke:public-routes": "node scripts/public-route-smoke.mjs",
+    "smoke:public-exposure-live": "node scripts/public-exposure-live-smoke.mjs",
     "audit:raw-route-html": "node scripts/audit-raw-route-html.mjs",
     "verify:production-security": "node scripts/verify-production-security.mjs",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
