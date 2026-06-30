@@ -4,6 +4,7 @@ import {
   buildLeadPipelineSnapshot,
   LEAD_PIPELINE_MAX_FETCH,
 } from "../_shared/leadPipeline.js";
+import { isLeadProductionTrusted } from "../_shared/trackCLeadTruth.js";
 
 const DEFAULT_LIMIT = 100;
 const MAX_LIMIT = 250;
@@ -42,9 +43,10 @@ Deno.serve(async (req) => {
     const scopedLeads = user.role === "super_admin"
       ? leads || []
       : (leads || []).filter((lead) => !lead.assigned_to || lead.assigned_to === user.email);
+    const visibleLeads = scopedLeads.filter(isLeadProductionTrusted);
 
     const snapshot = buildLeadPipelineSnapshot({
-      leads: scopedLeads,
+      leads: visibleLeads,
       events: events || [],
       filters,
       limit,
@@ -61,6 +63,10 @@ Deno.serve(async (req) => {
         truncated: {
           leads_capped: (leads || []).length >= LEAD_PIPELINE_MAX_FETCH,
           events_capped: (events || []).length >= EVENT_LIMIT,
+        },
+        crm_filter: {
+          hidden_leads: scopedLeads.length - visibleLeads.length,
+          rule_set: "track_c",
         },
       },
     });
