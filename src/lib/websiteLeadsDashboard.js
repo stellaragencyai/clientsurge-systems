@@ -1,4 +1,5 @@
 export const WEBSITE_LEADS_PAGE_SIZE = 25;
+export const WEBSITE_LEADS_MAX_FETCH = 500;
 
 export const WEBSITE_LEAD_SORT_OPTIONS = [
   { value: "-created_date", label: "Newest" },
@@ -17,8 +18,11 @@ export function normalizeWebsiteLeadPage(page) {
   return Math.floor(parsed);
 }
 
-export function getWebsiteLeadFetchLimit(page, pageSize = WEBSITE_LEADS_PAGE_SIZE) {
-  return normalizeWebsiteLeadPage(page) * pageSize + 1;
+export function getWebsiteLeadFetchLimit(page, pageSize = WEBSITE_LEADS_PAGE_SIZE, includeBuffer = true) {
+  const safePage = normalizeWebsiteLeadPage(page);
+  const minimumForPage = safePage * pageSize + 1;
+  if (!includeBuffer) return minimumForPage;
+  return Math.min(Math.max(minimumForPage * 4, 100), WEBSITE_LEADS_MAX_FETCH);
 }
 
 export function getWebsiteLeadPage(leads, page, pageSize = WEBSITE_LEADS_PAGE_SIZE) {
