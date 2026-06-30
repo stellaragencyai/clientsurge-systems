@@ -223,9 +223,68 @@ export function subscribeToLeadPipelineChanges({ onChange, onError } = {}) {
         onChange?.(event);
       }
     });
-    return subscription;
+
+    return () => subscription?.unsubscribe?.();
   } catch (error) {
     onError?.(error);
     return null;
   }
+}
+
+export async function previewLeadImport({ rows, import_source = "manual_import" }) {
+  const response = await base44.functions.invoke("importLeads", {
+    rows,
+    import_source,
+    dry_run: true,
+  });
+
+  return response?.data?.preview || null;
+}
+
+export async function executeLeadImport({ rows, import_source = "manual_import" }) {
+  const response = await base44.functions.invoke("importLeads", {
+    rows,
+    import_source,
+    dry_run: false,
+  });
+
+  return response?.data?.result || null;
+}
+
+export async function triggerLeadScoring(lead_id = null) {
+  const response = await base44.functions.invoke("scoreLeads", lead_id ? { lead_id } : {});
+  return response?.data || {};
+}
+
+export async function runLeadDeduplication({ dry_run = true } = {}) {
+  const response = await base44.functions.invoke("deduplicateLeads", { dry_run });
+  return response?.data || {};
+}
+
+export async function prepareLeadOutreachQueue() {
+  const dedupe = await runLeadDeduplication({ dry_run: false });
+  const scoring = await triggerLeadScoring();
+  return { dedupe, scoring };
+}
+
+export async function saveLeadStatus({ lead_id, status, note = "" }) {
+  const response = await base44.functions.invoke("updateLeadStatus", {
+    lead_id,
+    status,
+    note,
+  });
+
+  return response?.data || {};
+}
+
+export async function bridgeCrmWon({ lead_id, package_key, payment_source, follow_up_date = "", note = "" }) {
+  const response = await base44.functions.invoke("crmWonBridge", {
+    lead_id,
+    package_key,
+    payment_source,
+    follow_up_date,
+    note,
+  });
+
+  return response?.data || {};
 }
