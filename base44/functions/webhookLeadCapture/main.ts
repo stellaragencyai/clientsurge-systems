@@ -7,24 +7,16 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
  *
  * Architecture: Worker → CommunicationEvent → Leads
  * PRIMARY ENTITIES: Leads (CRM), CommunicationEvent (audit log), WebhookRegistration
- * 
- * Flow:
- * 1. Verify signed webhook registration (security)
- * 2. Parse & normalize payload (email, phone, name)
- * 3. Create/retrieve Leads record (idempotent, deduped by email+phone)
- * 4. Log to CommunicationEvent (audit trail)
- * 5. Invoke automationOrchestrator (async)
- * 
- * Backward Compatibility: Maintains WebsiteLead bridge for legacy reference
- * System of Truth: All CRM ops must reference Leads entity, not Lead (legacy)
- * 
- * See: ARCHITECTURE_SYSTEM_OF_TRUTH.md, SYSTEM_ENTITY_REFERENCE.md
  */
 
 const SIGNATURE_WINDOW_SECONDS = 300;
 
 function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
+}
+
+function lower(value) {
+  return cleanString(value).toLowerCase();
 }
 
 function normalizeEmail(value) {
@@ -62,6 +54,37 @@ function parseCapturePayload(payload) {
       cleanString(payload.utm_source) ||
       "client_webhook",
     requested_channels: normalizeRequestedChannels(payload.requested_channels),
+  };
+}
+
+function classifyIntake({ payload, lead, registration, req }) {
+  const joined = [
+    lead.full_name,
+    lead.email,
+    lead.phone,
+    lead.business_name,
+    lead.business_type,
+    lead.problem,
+    lead.source,
+    payload.consent_source,
+    payload.source_page,
+    payload.page_url,
+    registration?.source_name,
+    registration?.service_key,
+    req.headers.get("user-agent") || "",
+  ].map(lower).join(" ");
+  const phoneDigits = String(lead.phone || "").replace(/\D/g, "");
+  const markers = [];
+
+  if (joined.includes("clientsurge.test") || joined.includes("clientsurge-install.internal") || joined.includes("@clientsurge.test") || joined.includes(".internal")) markers.push("internal_email_domain");
+  if (joined.includes("backfill-test") || joined.includes("post_patch_verification") || joined.includes("runaibraininstallerbackfill")) markers.push("internal_backfill_run");
+  if (joined.includes("crm_live_smoke_test") || joined.includes("smoke") || joined.includes("install_test") || joined.includes("admin_test_lead")) markers.push("internal_validation_run");
+  if (joined.includes("sarah smoke") || joined.includes("client surge smoke") || joined.includes("clientsurge smoke") || joined.includes("test owner")) markers.push("internal_validation_name");
+  if (phoneDigits.length >= 7 && phoneDigits.includes("555")) markers.push("reserved_phone_pattern");
+
+  return {
+    nonProduction: markers.length > 0,
+    markers: [...new Set(markers)],
   };
 }
 
@@ -117,9 +140,7 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
       code: "lead_webhook_signature_missing",
       status: 401,
       reason: "Missing signed webhook headers.",
-      metadata: {
-        registration_id: registrationId || null,
-      },
+      metadata: { registration_id: registrationId || null },
     };
   }
 
@@ -133,9 +154,7 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
       code: "lead_webhook_registration_not_found",
       status: 401,
       reason: "Webhook registration not found.",
-      metadata: {
-        registration_id: registrationId,
-      },
+      metadata: { registration_id: registrationId },
     };
   }
 
@@ -160,9 +179,7 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
       status: 409,
       reason: "Webhook registration is missing client_project_id.",
       registration,
-      metadata: {
-        registration_id: registration.id,
-      },
+      metadata: { registration_id: registration.id },
     };
   }
 
@@ -173,10 +190,7 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
       status: 401,
       reason: "Webhook timestamp is outside the allowed verification window.",
       registration,
-      metadata: {
-        registration_id: registration.id,
-        timestamp,
-      },
+      metadata: { registration_id: registration.id, timestamp },
     };
   }
 
@@ -206,22 +220,18 @@ async function verifySignedRegistration({ base44, headers, rawBody }) {
     };
   }
 
-  return {
-    ok: true,
-    registration,
-  };
+  return { ok: true, registration };
 }
 
-async function createCrmLead(base44, lead, project) {
+async function createCrmLead(base44, lead, project, intakeQuality) {
   // Check for duplicate using normalized email+phone before creating
-  const dedupKey = `${lead.email}:${lead.phone}`;
   const existing = await base44.asServiceRole.entities.Leads.filter({
     normalized_email: lead.email?.toLowerCase() || "",
     normalized_phone: lead.phone || "",
   }).catch(() => []);
   
   if (existing && existing.length > 0) {
-    return existing[0]; // Return existing lead instead of creating duplicate
+    return existing[0];
   }
 
   return base44.asServiceRole.entities.Leads.create({
@@ -233,13 +243,17 @@ async function createCrmLead(base44, lead, project) {
     problem: lead.problem || "Webhook submission",
     source: lead.source || "client_webhook",
     status: "New",
-    lead_score: 50,
-    activation_priority: "Medium",
+    lead_score: intakeQuality.nonProduction ? 0 : 50,
+    activation_priority: intakeQuality.nonProduction ? "Low" : "Medium",
     intake_type: "webhook",
     assigned_to: project.contact_email || project.client_email || "",
     assigned_at: new Date().toISOString(),
     normalized_email: lead.email?.toLowerCase() || "",
     normalized_phone: lead.phone || "",
+    quality_review_status: intakeQuality.nonProduction ? "quarantine_candidate" : undefined,
+    quality_reason: intakeQuality.nonProduction ? `Non-production intake marker(s): ${intakeQuality.markers.join(", ")}` : undefined,
+    quality_reason_codes: intakeQuality.nonProduction ? intakeQuality.markers : undefined,
+    audited_at: intakeQuality.nonProduction ? new Date().toISOString() : undefined,
   });
 }
 
@@ -309,11 +323,7 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     return secureJson({ error: "Invalid JSON payload" }, { status: 400 });
   }
 
-  const verification = await verifySignedRegistration({
-    base44,
-    headers: req.headers,
-    rawBody,
-  });
+  const verification = await verifySignedRegistration({ base44, headers: req.headers, rawBody });
 
   if (!verification.ok) {
     await logRejectedAttempt(base44, {
@@ -330,23 +340,17 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     });
 
     return secureJson(
-      {
-        success: false,
-        code: verification.code,
-        error: verification.reason,
-      },
+      { success: false, code: verification.code, error: verification.reason },
       { status: verification.status }
     );
   }
 
   const registration = verification.registration;
   const lead = parseCapturePayload(payload);
+  const intakeQuality = classifyIntake({ payload, lead, registration, req });
 
   if (!lead.email && !lead.phone) {
-    return secureJson(
-      { error: "Email or phone required" },
-      { status: 400 }
-    );
+    return secureJson({ error: "Email or phone required" }, { status: 400 });
   }
 
   const project = await base44.asServiceRole.entities.ClientProject.get(
@@ -399,9 +403,16 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
         req.headers.get("x-real-ip") ||
         ""
     ),
+    lead_status: intakeQuality.nonProduction ? "ignored" : "new",
+    automation_enabled: !intakeQuality.nonProduction,
+    cadence_paused: intakeQuality.nonProduction,
+    cadence_paused_at: intakeQuality.nonProduction ? now : null,
+    archived: intakeQuality.nonProduction,
+    archived_at: intakeQuality.nonProduction ? now : null,
+    quality_notes: intakeQuality.nonProduction ? `non_production:${intakeQuality.markers.join(",")}` : "",
   });
 
-  const crmLead = await createCrmLead(base44, lead, project);
+  const crmLead = await createCrmLead(base44, lead, project, intakeQuality);
   await base44.asServiceRole.entities.WebsiteLead.update(websiteLead.id, {
     crm_lead_id: crmLead.id,
   }).catch(() => {});
@@ -419,8 +430,8 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     direction: "inbound",
     event_type: "lead_created",
     provider: "internal",
-    status: "received",
-    subject: "Signed lead webhook accepted",
+    status: intakeQuality.nonProduction ? "skipped" : "received",
+    subject: intakeQuality.nonProduction ? "Signed lead webhook stored as non-production" : "Signed lead webhook accepted",
     message_body: lead.problem || "Lead webhook received",
     context_type: "lead_webhook",
     context_id: registration.id,
@@ -428,6 +439,8 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
       registration_id: registration.id,
       source_name: registration.source_name || "",
       website_lead_id: websiteLead.id,
+      non_production: intakeQuality.nonProduction,
+      markers: intakeQuality.markers,
       payload_summary: {
         email_present: Boolean(lead.email),
         phone_present: Boolean(lead.phone),
@@ -435,18 +448,37 @@ export async function handleLeadCaptureWebhook(req, base44Override = null) {
     }),
   });
 
-  await invokeAutomationOrchestrator(base44, {
-    leadId: crmLead.id,
-    projectId: project.id,
-    triggerEvent: "new_client_webhook_lead",
-  });
+  if (!intakeQuality.nonProduction) {
+    await invokeAutomationOrchestrator(base44, {
+      leadId: crmLead.id,
+      projectId: project.id,
+      triggerEvent: "new_client_webhook_lead",
+    });
+  } else {
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: crmLead.id,
+      client_project_id: project.id,
+      channel: "internal",
+      direction: "internal",
+      event_type: "workflow_triggered",
+      provider: "automationOrchestrator",
+      status: "skipped",
+      subject: "Automation skipped for non-production lead intake",
+      message_body: intakeQuality.markers.join(", "),
+      metadata_json: JSON.stringify({ markers: intakeQuality.markers }),
+    }).catch(() => null);
+  }
 
   return secureJson({
     success: true,
     website_lead_id: websiteLead.id,
     lead_id: crmLead.id,
     client_project_id: project.id,
-    message: "Lead captured and linked to canonical project routing.",
+    non_production: intakeQuality.nonProduction,
+    markers: intakeQuality.markers,
+    message: intakeQuality.nonProduction
+      ? "Lead captured as non-production and excluded from automation."
+      : "Lead captured and linked to canonical project routing.",
   });
 }
 
