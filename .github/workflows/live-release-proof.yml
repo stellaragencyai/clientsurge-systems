@@ -3,8 +3,8 @@ name: Live Release Proof
 on:
   workflow_dispatch:
     inputs:
-      verify_url:
-        description: "Live site URL"
+      verify_host:
+        description: "Live site host"
         required: true
         default: "clientsurgesystems.com"
       expected_release_id:
@@ -19,10 +19,27 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Check release marker
+        env:
+          VERIFY_HOST: ${{ inputs.verify_host }}
+          EXPECTED_RELEASE_ID: ${{ inputs.expected_release_id }}
         run: |
-          set -euo pipefail
-          SITE="${{ inputs.verify_url }}"
-          EXPECTED="${{ inputs.expected_release_id }}"
           python3 - <<'PY'
-          print('Live release proof workflow placeholder. Use browser or web fetch for the marker URL after publish.')
+          import json, os, sys, time, urllib.request
+          host = os.environ['VERIFY_HOST'].strip().rstrip('/')
+          expected = os.environ['EXPECTED_RELEASE_ID'].strip()
+          url = 'https://' + host + '/release-proof.json?v=' + str(int(time.time()))
+          print('checking', url)
+          with urllib.request.urlopen(url, timeout=20) as response:
+              if response.status != 200:
+                  print('bad status', response.status)
+                  sys.exit(1)
+              data = json.loads(response.read().decode('utf-8'))
+          print(json.dumps(data, indent=2))
+          if data.get('release_id') != expected:
+              print('release_id mismatch:', data.get('release_id'), '!=', expected)
+              sys.exit(1)
+          if data.get('source_repo') != 'stellaragencyai/clientsurge-systems':
+              print('source_repo mismatch:', data.get('source_repo'))
+              sys.exit(1)
+          print('live release proof passed')
           PY
