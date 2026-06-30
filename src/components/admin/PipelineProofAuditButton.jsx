@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
-import { RefreshCw, CheckCircle2, AlertCircle } from 'lucide-react';
+import { RefreshCw } from 'lucide-react';
+import AdminActionResult from './AdminActionResult';
+import { errorToAdminActionResult, normalizeAdminActionResult } from '@/lib/adminActionResult';
 
 export default function PipelineProofAuditButton({ onComplete }) {
   const [running, setRunning] = useState(false);
@@ -11,15 +13,30 @@ export default function PipelineProofAuditButton({ onComplete }) {
     setResult(null);
     try {
       const res = await base44.functions.invoke('runPipelineProofAudit', {});
-      setResult({
-        success: res.data?.success,
-        message: res.data?.success
-          ? `Audit complete. Created ${res.data.results.eventQueueCreated} queues, ${res.data.results.communicationEventCreated} events, ${res.data.results.deadLetterLogsCreated} dead letters.`
-          : res.data?.error || 'Audit failed',
-      });
+      const data = res.data || res;
+      const createdQueues = Number(data?.results?.eventQueueCreated || 0);
+      const createdEvents = Number(data?.results?.communicationEventCreated || 0);
+      const createdDeadLetters = Number(data?.results?.deadLetterLogsCreated || 0);
+      setResult(normalizeAdminActionResult({
+        action: 'Pipeline Check',
+        success: Boolean(data?.success),
+        status: data?.success ? 'success' : 'error',
+        message: data?.success
+          ? 'Pipeline check completed and wrote verification records.'
+          : data?.error || 'Pipeline check failed.',
+        affected: createdQueues + createdEvents + createdDeadLetters,
+        failed: data?.success ? 0 : 1,
+        details: [
+          `${createdQueues} queue record(s) created`,
+          `${createdEvents} event record(s) created`,
+          `${createdDeadLetters} dead-letter record(s) created`,
+        ],
+        retry: data?.success ? 'Open Launch Proof or Communication Logs to verify the newly written evidence.' : undefined,
+        raw: data,
+      }));
       if (onComplete) onComplete();
     } catch (err) {
-      setResult({ success: false, message: `Error: ${err.message}` });
+      setResult(errorToAdminActionResult('Pipeline Check', err, 'Pipeline check failed.'));
     } finally {
       setRunning(false);
     }
@@ -33,35 +50,11 @@ export default function PipelineProofAuditButton({ onComplete }) {
         className="flex items-center gap-2 px-4 py-2.5 rounded-lg bg-primary text-primary-foreground font-semibold text-sm hover:opacity-90 transition-opacity disabled:opacity-60"
         style={{ minHeight: 'unset', minWidth: 'unset' }}
       >
-        {running ? (
-          <>
-            <RefreshCw className="w-4 h-4 animate-spin" />
-            Running Audit...
-          </>
-        ) : (
-          <>
-            <RefreshCw className="w-4 h-4" />
-            Run Pipeline Proof Audit
-          </>
-        )}
+        <RefreshCw className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
+        {running ? 'Running Check...' : 'Run Pipeline Check'}
       </button>
 
-      {result && (
-        <div
-          className={`flex items-start gap-2.5 rounded-lg border p-3 text-sm ${
-            result.success
-              ? 'border-green-200 bg-green-50 text-green-800'
-              : 'border-red-200 bg-red-50 text-red-800'
-          }`}
-        >
-          {result.success ? (
-            <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          ) : (
-            <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-          )}
-          <p>{result.message}</p>
-        </div>
-      )}
+      <AdminActionResult result={result} onRetry={!running ? handleRunAudit : null} onDismiss={() => setResult(null)} />
     </div>
   );
 }
