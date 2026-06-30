@@ -1,0 +1,70 @@
+name: Deploy Cloudflare Security Edge
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "cloudflare/**"
+      - "wrangler.clientsurge-security.toml"
+      - "scripts/public-exposure-live-smoke.mjs"
+      - "package.json"
+      - "package-lock.json"
+      - "tests/cloudflareRouteExposureSanitizer.test.js"
+      - "tests/cloudflareSecurityEdge.test.js"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clientsurge-cloudflare-security-edge-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Deploy edge sanitizer and verify live exposure
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VERIFY_URL: https://clientsurgesystems.com
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Test Cloudflare route exposure sanitizer
+        run: node --test tests/cloudflareRouteExposureSanitizer.test.js tests/cloudflareSecurityEdge.test.js
+
+      - name: Require Cloudflare credentials
+        run: |
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "CLOUDFLARE_API_TOKEN secret is missing. Cannot deploy edge sanitizer."
+            exit 1
+          fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "CLOUDFLARE_ACCOUNT_ID secret is missing. Cannot deploy edge sanitizer."
+            exit 1
+          fi
+
+      - name: Dry-run Cloudflare deploy
+        run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
+
+      - name: Deploy Cloudflare edge sanitizer
+        run: npx wrangler deploy --config wrangler.clientsurge-security.toml
+
+      - name: Verify production security edge
+        run: npm run verify:production-security
+
+      - name: Verify live public exposure is gone
+        run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
