@@ -12,6 +12,10 @@ import {
 const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
 const sitemapXml = readFileSync(new URL("../public/sitemap.xml", import.meta.url), "utf8");
 const robotsTxt = readFileSync(new URL("../public/robots.txt", import.meta.url), "utf8");
+const routeExposureGuard = readFileSync(
+  new URL("../public/clientsurge-public-route-exposure-guard.js", import.meta.url),
+  "utf8",
+);
 
 const INTENDED_PUBLIC_ROUTES = [
   "/",
@@ -95,6 +99,15 @@ test("static fallback is crawlable and does not expose app-builder route directo
   for (const route of ["/privacy", "/terms", "/sms-terms", "/refund-policy"]) {
     assert.match(indexHtml, new RegExp(`href="${route}"`));
   }
+});
+
+test("public route exposure guard is loaded and targets the generated Pages directory risk", () => {
+  assert.match(indexHtml, /src="\/clientsurge-public-route-exposure-guard\.js" defer/);
+  assert.match(routeExposureGuard, /looksLikeGeneratedPagesDirectory/);
+  assert.match(routeExposureGuard, /INTERNAL_PATH_PATTERN/);
+  assert.match(routeExposureGuard, /Admin Dashboard/);
+  assert.match(routeExposureGuard, /Business Setup/);
+  assert.match(routeExposureGuard, /Client Portal/);
 });
 
 test("private/internal routes are noindex candidates", () => {
