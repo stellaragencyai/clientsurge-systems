@@ -14,15 +14,7 @@ on:
         required: true
         default: "https://clientsurgesystems.com"
       run_base44_safety_tests:
-        description: "Run Base44 publish safety tests"
-        required: true
-        type: choice
-        default: "false"
-        options:
-          - "false"
-          - "true"
-      run_full_node_tests:
-        description: "Run the full Node test suite"
+        description: "Run focused Base44 publish safety tests"
         required: true
         type: choice
         default: "false"
@@ -51,9 +43,9 @@ concurrency:
 
 jobs:
   validate:
-    name: Validate build
+    name: Validate required release checks
     runs-on: ubuntu-latest
-    timeout-minutes: 25
+    timeout-minutes: 35
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -67,16 +59,21 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Lint source
+        run: npm run lint
+
+      - name: Typecheck source
+        run: npm run typecheck
+
       - name: Build app
         run: npm run build
 
-      - name: Run Base44 publish safety tests
+      - name: Run full Node tests
+        run: npm run test:node
+
+      - name: Run focused Base44 publish safety tests
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_base44_safety_tests == 'true' }}
         run: node --test tests/base44PublishAutomation.test.js tests/adminLoginFlow.test.js
-
-      - name: Run full Node tests
-        if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_full_node_tests == 'true' }}
-        run: npm run test:node
 
       - name: Set up Deno
         if: ${{ github.event_name == 'workflow_dispatch' && inputs.run_deno_tests == 'true' }}
