@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
-import { Mail, Phone, MessageSquare, CheckCircle2, Clock, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Phone, MessageSquare, CheckCircle2, Clock, AlertCircle, Loader2, Archive, Trash2, Shield } from 'lucide-react';
 import {
   WEBSITE_LEAD_SORT_OPTIONS,
   buildWebsiteLeadQuery,
@@ -9,6 +9,10 @@ import {
   hasNextWebsiteLeadPage,
   normalizeWebsiteLeadPage,
 } from '@/lib/websiteLeadsDashboard';
+import {
+  getWebsiteLeadCleanupEligibility,
+  isWebsiteLeadVisibleInSalesViews,
+} from '@/lib/leadCleanupGuards';
 
 export default function WebsiteLeadsDashboard() {
   const [leads, setLeads] = useState([]);
@@ -19,21 +23,38 @@ export default function WebsiteLeadsDashboard() {
   const [hasNextPage, setHasNextPage] = useState(false);
   const [selectedLead, setSelectedLead] = useState(null);
   const [logs, setLogs] = useState([]);
+  const [includeHidden, setIncludeHidden] = useState(false);
+  const [cleanupMessage, setCleanupMessage] = useState('');
+  const [cleanupLoading, setCleanupLoading] = useState(false);
 
   useEffect(() => {
     loadLeads(1);
-  }, [filter, sort]);
+  }, [filter, sort, includeHidden]);
 
   const loadLeads = async (nextPage = page) => {
     try {
       setLoading(true);
       const safePage = normalizeWebsiteLeadPage(nextPage);
-      const data = await base44.asServiceRole.entities.WebsiteLead.filter(
-        buildWebsiteLeadQuery(filter),
-        sort,
-        getWebsiteLeadFetchLimit(safePage)
-      );
-      const nextLeads = data || [];
+      let data;
+      try {
+        data = await base44.asServiceRole.entities.WebsiteLead.filter(
+          buildWebsiteLeadQuery(filter, { includeHidden }),
+          sort,
+          getWebsiteLeadFetchLimit(safePage, undefined, includeHidden ? 1 : 4)
+        );
+      } catch (error) {
+        // Some Base44 SDK contexts may not support $ne; retry raw and filter client-side.
+        data = await base44.asServiceRole.entities.WebsiteLead.filter(
+          buildWebsiteLeadQuery(filter, { includeHidden: true }),
+          sort,
+          getWebsiteLeadFetchLimit(safePage, undefined, includeHidden ? 1 : 4)
+        );
+      }
+
+      let nextLeads = data || [];
+      if (!includeHidden) {
+        nextLeads = nextLeads.filter(isWebsiteLeadVisibleInSalesViews);
+      }
       setLeads(getWebsiteLeadPage(nextLeads, safePage));
       setHasNextPage(hasNextWebsiteLeadPage(nextLeads, safePage));
       setPage(safePage);
@@ -59,6 +80,7 @@ export default function WebsiteLeadsDashboard() {
 
   const handleSelectLead = (lead) => {
     setSelectedLead(lead);
+    setCleanupMessage('');
     loadLogs(lead.id);
   };
 
@@ -77,6 +99,11 @@ export default function WebsiteLeadsDashboard() {
   };
 
   const runImmediateResponse = async (leadId) => {
+    const lead = selectedLead?.id === leadId ? selectedLead : leads.find((item) => item.id === leadId);
+    if (lead && !isWebsiteLeadVisibleInSalesViews(lead)) {
+      alert('Blocked: this looks like an internal/test/hidden website lead. Unhide and verify it before sending automation.');
+      return;
+    }
     try {
       await base44.functions.invoke('sendWebsiteLeadResponse', { lead_id: leadId });
       loadLogs(leadId);
@@ -84,6 +111,54 @@ export default function WebsiteLeadsDashboard() {
     } catch (error) {
       console.error('Failed to send response:', error);
       alert('Failed to send response');
+    }
+  };
+
+  const archiveWebsiteLead = async (lead) => {
+    if (!lead?.id) return;
+    setCleanupLoading(true);
+    try {
+      await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
+        archived: true,
+        archived_at: new Date().toISOString(),
+        lead_status: 'ignored',
+        cadence_paused: true,
+        cadence_paused_at: new Date().toISOString(),
+        automation_enabled: false,
+      });
+      setCleanupMessage('Archived and removed from normal Website Leads view.');
+      setSelectedLead({ ...lead, archived: true, lead_status: 'ignored', cadence_paused: true, automation_enabled: false });
+      await loadLeads(page);
+    } catch (error) {
+      setCleanupMessage(error?.message || 'Failed to archive website lead.');
+    } finally {
+      setCleanupLoading(false);
+    }
+  };
+
+  const deleteVerifiedWebsiteJunk = async (lead) => {
+    if (!lead?.id) return;
+    const eligibility = getWebsiteLeadCleanupEligibility(lead);
+    if (!eligibility.eligible) {
+      setCleanupMessage(`Delete blocked: ${eligibility.blockers.join('; ') || 'not verified junk'}`);
+      return;
+    }
+    const phrase = window.prompt(
+      `This WebsiteLead passed verified-junk guardrails.\n\nLead: ${lead.business_name || lead.full_name || lead.email || lead.id}\nReason: ${(eligibility.signals || []).slice(0, 3).join('; ')}\n\nType DELETE JUNK to permanently delete it.`
+    );
+    if (phrase !== 'DELETE JUNK') return;
+
+    setCleanupLoading(true);
+    try {
+      await base44.asServiceRole.entities.WebsiteLead.delete(lead.id);
+      setCleanupMessage('Deleted verified junk WebsiteLead.');
+      setSelectedLead(null);
+      setLogs([]);
+      await loadLeads(page);
+    } catch (error) {
+      setCleanupMessage(error?.message || 'Failed to delete verified junk WebsiteLead.');
+    } finally {
+      setCleanupLoading(false);
     }
   };
 
@@ -113,10 +188,16 @@ export default function WebsiteLeadsDashboard() {
     return icons[status];
   };
 
+  const selectedEligibility = selectedLead ? getWebsiteLeadCleanupEligibility(selectedLead) : null;
+  const selectedHidden = selectedLead ? !isWebsiteLeadVisibleInSalesViews(selectedLead) : false;
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 xl:flex-row xl:items-center xl:justify-between">
-        <h2 className="text-2xl font-bold text-foreground">Website Leads</h2>
+        <div>
+          <h2 className="text-2xl font-bold text-foreground">Website Leads</h2>
+          <p className="mt-1 text-xs text-muted-foreground">Trusted view hides archived, smoke, install, QA, 555, and .internal test leads by default.</p>
+        </div>
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
           <div className="flex flex-wrap gap-2">
             {['all', 'new', 'contacted', 'responded', 'booked', 'closed'].map((f) => (
@@ -147,6 +228,23 @@ export default function WebsiteLeadsDashboard() {
               ))}
             </select>
           </label>
+          <label className="flex items-center gap-2 rounded border border-border bg-background px-3 py-1 text-xs font-semibold text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={includeHidden}
+              onChange={(event) => setIncludeHidden(event.target.checked)}
+              className="rounded"
+            />
+            Show hidden/test
+          </label>
+        </div>
+      </div>
+
+      <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm text-blue-900 flex items-start gap-3">
+        <Shield className="w-4 h-4 mt-0.5 flex-shrink-0" />
+        <div>
+          <p className="font-semibold">Website lead cleanup is guarded.</p>
+          <p className="text-xs mt-1">Normal view hides known fake/test WebsiteLead records. Archive pauses automation. Delete requires strict eligibility plus DELETE JUNK confirmation.</p>
         </div>
       </div>
 
@@ -160,51 +258,64 @@ export default function WebsiteLeadsDashboard() {
                 Loading...
               </div>
             ) : leads.length === 0 ? (
-              <div className="p-6 text-center text-muted-foreground">No leads found</div>
+              <div className="p-6 text-center text-muted-foreground">No trusted website leads found</div>
             ) : (
               <div className="max-h-96 overflow-y-auto">
-                {leads.map((lead) => (
-                  <button
-                    key={lead.id}
-                    onClick={() => handleSelectLead(lead)}
-                    className={`w-full p-4 border-b border-border text-left transition hover:bg-muted ${
-                      selectedLead?.id === lead.id ? 'bg-primary/10 border-l-4 border-l-primary' : ''
-                    }`}
-                  >
-                    <div className="flex items-start justify-between gap-2">
-                      <div>
-                        <p className="font-semibold text-foreground text-sm">{lead.full_name}</p>
-                        <p className="text-xs text-muted-foreground">{lead.email}</p>
-                        {lead.phone_number && (
-                          <p className="text-xs text-muted-foreground">{lead.phone_number}</p>
+                {leads.map((lead) => {
+                  const hidden = !isWebsiteLeadVisibleInSalesViews(lead);
+                  return (
+                    <button
+                      key={lead.id}
+                      onClick={() => handleSelectLead(lead)}
+                      className={`w-full p-4 border-b border-border text-left transition hover:bg-muted ${
+                        selectedLead?.id === lead.id ? 'bg-primary/10 border-l-4 border-l-primary' : ''
+                      } ${hidden ? 'opacity-80' : ''}`}
+                    >
+                      <div className="flex items-start justify-between gap-2">
+                        <div>
+                          <p className="font-semibold text-foreground text-sm">{lead.full_name}</p>
+                          <p className="text-xs text-muted-foreground">{lead.email}</p>
+                          {lead.phone_number && (
+                            <p className="text-xs text-muted-foreground">{lead.phone_number}</p>
+                          )}
+                        </div>
+                        <div className="flex gap-1">
+                          {getStatusIcon(lead.lead_status)}
+                        </div>
+                      </div>
+                      <div className="mt-2 flex gap-1 flex-wrap">
+                        <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(lead.lead_status)}`}>
+                          {lead.lead_status}
+                        </span>
+                        {hidden && (
+                          <span className="text-xs px-2 py-1 rounded-full border border-red-200 bg-red-50 text-red-700">
+                            Hidden/Test
+                          </span>
+                        )}
+                        {lead.archived && (
+                          <span className="text-xs px-2 py-1 rounded-full border border-gray-200 bg-gray-50 text-gray-700">
+                            Archived
+                          </span>
+                        )}
+                        {lead.reply_status === 'responded' && (
+                          <span className="text-xs px-2 py-1 rounded-full border border-green-200 bg-green-50">
+                            Replied
+                          </span>
+                        )}
+                        {lead.initial_response_sent_at && (
+                          <span className="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-700">
+                            AI Reply Sent
+                          </span>
+                        )}
+                        {lead.booking_status === 'booked' && (
+                          <span className="text-xs px-2 py-1 rounded-full border border-purple-200 bg-purple-50">
+                            Booked
+                          </span>
                         )}
                       </div>
-                      <div className="flex gap-1">
-                        {getStatusIcon(lead.lead_status)}
-                      </div>
-                    </div>
-                    <div className="mt-2 flex gap-1 flex-wrap">
-                      <span className={`text-xs px-2 py-1 rounded-full border ${getStatusColor(lead.lead_status)}`}>
-                        {lead.lead_status}
-                      </span>
-                      {lead.reply_status === 'responded' && (
-                        <span className="text-xs px-2 py-1 rounded-full border border-green-200 bg-green-50">
-                          Replied
-                        </span>
-                      )}
-                      {lead.initial_response_sent_at && (
-                        <span className="text-xs px-2 py-1 rounded-full border border-blue-200 bg-blue-50 text-blue-700">
-                          AI Reply Sent
-                        </span>
-                      )}
-                      {lead.booking_status === 'booked' && (
-                        <span className="text-xs px-2 py-1 rounded-full border border-purple-200 bg-purple-50">
-                          Booked
-                        </span>
-                      )}
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
             )}
             {!loading && leads.length > 0 && (
@@ -233,7 +344,13 @@ export default function WebsiteLeadsDashboard() {
         {selectedLead && (
           <div className="lg:col-span-2 space-y-4">
             <div className="bg-white rounded-lg border border-border shadow-sm p-6">
-              <h3 className="text-lg font-semibold mb-4 text-foreground">{selectedLead.full_name}</h3>
+              <div className="mb-4 flex items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-lg font-semibold text-foreground">{selectedLead.full_name}</h3>
+                  {selectedHidden && <p className="text-xs font-semibold text-red-700">Hidden/test WebsiteLead — automation is blocked unless manually verified.</p>}
+                </div>
+                {selectedHidden && <span className="rounded-full bg-red-50 border border-red-200 px-2 py-1 text-xs font-semibold text-red-700">Hidden/Test</span>}
+              </div>
 
               <div className="grid grid-cols-2 gap-4 mb-6">
                 {selectedLead.email && (
@@ -257,11 +374,11 @@ export default function WebsiteLeadsDashboard() {
               <div className="space-y-3 border-t border-border pt-4">
                 <div>
                   <p className="text-xs uppercase text-muted-foreground font-semibold">Service Interest</p>
-                  <p className="text-sm text-foreground">{selectedLead.service_interest || '—'}</p>
+                  <p className="text-sm text-foreground">{selectedLead.service_interest || selectedLead.interested_service || '—'}</p>
                 </div>
                 <div>
                   <p className="text-xs uppercase text-muted-foreground font-semibold">Message</p>
-                  <p className="text-sm text-foreground">{selectedLead.message || '—'}</p>
+                  <p className="text-sm text-foreground whitespace-pre-wrap">{selectedLead.message || selectedLead.call_summary || '—'}</p>
                 </div>
                 <div>
                   <p className="text-xs uppercase text-muted-foreground font-semibold">Follow-Up Step</p>
@@ -269,12 +386,45 @@ export default function WebsiteLeadsDashboard() {
                 </div>
               </div>
 
+              <div className="mt-5 rounded-lg border border-border bg-muted/20 p-4">
+                <p className="text-xs uppercase text-muted-foreground font-semibold">Cleanup Guard</p>
+                <p className={`mt-1 text-sm font-semibold ${selectedEligibility?.eligible ? 'text-red-700' : 'text-foreground'}`}>
+                  {selectedEligibility?.eligible ? 'Eligible for verified-junk deletion' : 'Hard delete blocked unless verified junk'}
+                </p>
+                {selectedEligibility?.signals?.length > 0 && (
+                  <ul className="mt-2 list-disc pl-5 text-xs text-red-700 space-y-0.5">
+                    {selectedEligibility.signals.slice(0, 5).map((signal) => <li key={signal}>{signal}</li>)}
+                  </ul>
+                )}
+                {selectedEligibility?.blockers?.length > 0 && (
+                  <ul className="mt-2 list-disc pl-5 text-xs text-amber-700 space-y-0.5">
+                    {selectedEligibility.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}
+                  </ul>
+                )}
+                {cleanupMessage && <p className="mt-2 text-xs font-semibold text-foreground">{cleanupMessage}</p>}
+              </div>
+
               <div className="flex gap-2 mt-6 flex-wrap">
                 <button
                   onClick={() => runImmediateResponse(selectedLead.id)}
-                  className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded hover:bg-primary/90 transition"
+                  disabled={selectedHidden}
+                  className="px-4 py-2 bg-primary text-primary-foreground text-sm font-medium rounded hover:bg-primary/90 transition disabled:opacity-40"
                 >
                   Run Immediate Response
+                </button>
+                <button
+                  onClick={() => archiveWebsiteLead(selectedLead)}
+                  disabled={cleanupLoading || selectedLead.archived}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded border border-gray-300 text-gray-700 text-sm font-medium hover:bg-gray-50 transition disabled:opacity-40"
+                >
+                  {cleanupLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Archive className="w-4 h-4" />} Archive Test Lead
+                </button>
+                <button
+                  onClick={() => deleteVerifiedWebsiteJunk(selectedLead)}
+                  disabled={cleanupLoading || !selectedEligibility?.eligible}
+                  className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition disabled:opacity-40"
+                >
+                  {cleanupLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Trash2 className="w-4 h-4" />} Delete Verified Junk
                 </button>
                 <select
                   value={selectedLead.lead_status}

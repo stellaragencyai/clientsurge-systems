@@ -7,8 +7,12 @@ export const WEBSITE_LEAD_SORT_OPTIONS = [
   { value: "-last_message_sent", label: "Recently Messaged" },
 ];
 
-export function buildWebsiteLeadQuery(filter) {
-  return filter === "all" ? {} : { lead_status: filter };
+export function buildWebsiteLeadQuery(filter, { includeHidden = false } = {}) {
+  const query = filter === "all" ? {} : { lead_status: filter };
+  if (!includeHidden) {
+    query.archived = { $ne: true };
+  }
+  return query;
 }
 
 export function normalizeWebsiteLeadPage(page) {
@@ -17,8 +21,8 @@ export function normalizeWebsiteLeadPage(page) {
   return Math.floor(parsed);
 }
 
-export function getWebsiteLeadFetchLimit(page, pageSize = WEBSITE_LEADS_PAGE_SIZE) {
-  return normalizeWebsiteLeadPage(page) * pageSize + 1;
+export function getWebsiteLeadFetchLimit(page, pageSize = WEBSITE_LEADS_PAGE_SIZE, multiplier = 1) {
+  return normalizeWebsiteLeadPage(page) * pageSize * multiplier + 1;
 }
 
 export function getWebsiteLeadPage(leads, page, pageSize = WEBSITE_LEADS_PAGE_SIZE) {

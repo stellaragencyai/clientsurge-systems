@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
-import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X, RefreshCw } from "lucide-react";
+import { Search, ChevronUp, ChevronDown, Loader2, AlertCircle, AlertTriangle, Trash2, X, RefreshCw, Shield } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { fetchLeadPipelineSummary } from "@/lib/leadPipelineApi";
+import { getLeadCleanupEligibility, getTrustedLeadQueryFilter, isLeadVisibleInSalesViews } from "@/lib/leadCleanupGuards";
 
 const PAGE_SIZE = 25;
 
@@ -52,6 +53,17 @@ function getRowHighlight(leadState) {
   return highlights[leadState] || "hover:bg-primary/5 transition-colors";
 }
 
+function baseFilterState() {
+  return {
+    status: "",
+    lead_state: "",
+    intelligence_segment: "",
+    scoreMin: "",
+    scoreMax: "",
+    includeFlagged: false,
+  };
+}
+
 export default function LeadsTable() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -60,20 +72,17 @@ export default function LeadsTable() {
   const [search, setSearch] = useState("");
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleting, setDeleting] = useState(false);
-  const [filters, setFilters] = useState({
-    status: "",
-    lead_state: "",
-    intelligence_segment: "",
-    scoreMin: "",
-    scoreMax: "",
-  });
+  const [filters, setFilters] = useState(baseFilterState());
   const [sort, setSort] = useState({ field: "created_date", order: -1 });
-  const [kpis, setKpis] = useState({ total: 0, hot: 0, new: 0, booked: 0 });
+  const [kpis, setKpis] = useState({ total: 0, rawTotal: 0, hidden: 0, hot: 0, new: 0, booked: 0 });
   const [duplicateWarnings, setDuplicateWarnings] = useState(0);
 
   // Build query filter for the canonical Leads entity
-  const buildFilter = useCallback(() => {
+  const buildFilter = useCallback((includeTrustedScope = true) => {
     const f = {};
+    if (includeTrustedScope && !filters.includeFlagged) {
+      Object.assign(f, getTrustedLeadQueryFilter());
+    }
     if (filters.status) f.status = filters.status;
     if (filters.lead_state) f.lead_state = filters.lead_state;
     if (filters.intelligence_segment) f.intelligence_segment = filters.intelligence_segment;
@@ -85,17 +94,20 @@ export default function LeadsTable() {
     return f;
   }, [filters]);
 
-  // Load KPIs — uses fetchLeadPipelineSummary which paginates through all leads
+  // Load KPIs — uses fetchLeadPipelineSummary which now defaults to trusted lead scope
   useEffect(() => {
     const loadKpis = async () => {
       try {
-        const data = await fetchLeadPipelineSummary({ limit: 1, offset: 0 });
+        const data = await fetchLeadPipelineSummary({ limit: 1, offset: 0, includeFlagged: filters.includeFlagged });
         const summary = data?.summary || {};
         const statusCounts = summary.status_counts || {};
-        const total = summary.total_leads || 0;
+        const total = summary.trusted_leads ?? summary.total_leads ?? 0;
+        const rawTotal = summary.raw_total_leads ?? summary.total_leads ?? total;
 
         setKpis({
           total,
+          rawTotal,
+          hidden: summary.hidden_junk_leads ?? Math.max(0, Number(rawTotal || 0) - Number(total || 0)),
           hot: summary.segment_counts?.hot || 0,
           new: statusCounts["New"] || 0,
           booked: statusCounts["Booked"] || 0,
@@ -106,7 +118,7 @@ export default function LeadsTable() {
       }
     };
     loadKpis();
-  }, []);
+  }, [filters.includeFlagged]);
 
   // Load paginated leads with real-time updates
   useEffect(() => {
@@ -116,20 +128,28 @@ export default function LeadsTable() {
       setLoading(true);
       setError("");
       try {
-        const filter = buildFilter();
+        const filter = buildFilter(true);
+        const rawFallbackFilter = buildFilter(false);
         const offset = page * PAGE_SIZE;
         const sortKey = sort.field === "intelligence_score" ? "intelligence_score" : "created_date";
         const sortValue = sort.order === 1 ? sortKey : `-${sortKey}`;
+        const fetchLimit = filters.includeFlagged ? PAGE_SIZE + 1 : PAGE_SIZE * 4;
 
-        // Admin reads via user-scoped SDK (RLS allows admin to read all Leads)
-        const results = await base44.entities.Leads.filter(
-          filter,
-          sortValue,
-          PAGE_SIZE + 1,
-          offset
-        );
+        // Admin reads via user-scoped SDK (RLS allows admin to read all Leads). If advanced
+        // operators fail in Base44 SDK, retry raw and apply client-side trusted filtering.
+        let results;
+        try {
+          results = await base44.entities.Leads.filter(filter, sortValue, fetchLimit, offset);
+        } catch (primaryError) {
+          if (filters.includeFlagged) throw primaryError;
+          results = await base44.entities.Leads.filter(rawFallbackFilter, sortValue, fetchLimit, offset);
+        }
 
-        let items = Array.isArray(results) ? results.slice(0, PAGE_SIZE) : [];
+        let items = Array.isArray(results) ? results : [];
+        if (!filters.includeFlagged) {
+          items = items.filter(isLeadVisibleInSalesViews);
+        }
+        items = items.slice(0, PAGE_SIZE);
 
         // Client-side search filter (SDK doesn't support full-text search)
         if (search && items.length > 0) {
@@ -164,6 +184,7 @@ export default function LeadsTable() {
         if (!event || event.type !== "update" || !event.data) return;
         setLeads((prev) =>
           prev.map((l) => (l?.id === event.entity_id ? { ...l, ...event.data } : l))
+            .filter((l) => filters.includeFlagged || isLeadVisibleInSalesViews(l))
         );
       });
     } catch {
@@ -206,17 +227,56 @@ export default function LeadsTable() {
 
   const handleDeleteLead = async () => {
     if (!deleteTarget?.id) return;
+    const eligibility = getLeadCleanupEligibility(deleteTarget);
+    if (!eligibility.eligible) {
+      setError(`Delete blocked: ${eligibility.blockers.join('; ') || 'record is not verified junk'}`);
+      return;
+    }
+
+    const phrase = window.prompt(
+      `This record passed verified-junk guardrails.\n\nLead: ${deleteTarget.business_name || deleteTarget.full_name || deleteTarget.id}\nReason: ${(eligibility.signals || []).slice(0, 3).join('; ')}\n\nType DELETE JUNK to permanently delete it.`
+    );
+    if (phrase !== "DELETE JUNK") return;
+
     setDeleting(true);
     try {
       await base44.entities.Leads.delete(deleteTarget.id);
       setLeads((prev) => prev.filter((l) => l.id !== deleteTarget.id));
-      setKpis((prev) => ({ ...prev, total: Math.max(0, prev.total - 1) }));
+      setKpis((prev) => ({
+        ...prev,
+        total: Math.max(0, prev.total - 1),
+        rawTotal: Math.max(0, prev.rawTotal - 1),
+      }));
       setDeleteTarget(null);
     } catch (err) {
-      setError(err?.message || "Failed to delete lead");
+      setError(err?.message || "Failed to delete verified junk lead");
     } finally {
       setDeleting(false);
     }
+  };
+
+  const handleQuarantineLead = async () => {
+    if (!deleteTarget?.id) return;
+    setDeleting(true);
+    try {
+      await base44.entities.Leads.update(deleteTarget.id, {
+        quality_review_status: 'quarantined',
+        quality_reason: deleteTarget.quality_reason || 'Manually quarantined from Leads table',
+        audited_at: new Date().toISOString(),
+      });
+      setLeads((prev) => prev.filter((l) => l.id !== deleteTarget.id));
+      setDeleteTarget(null);
+    } catch (err) {
+      setError(err?.message || "Failed to quarantine lead");
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  const resetFilters = () => {
+    setError("");
+    setPage(0);
+    setFilters(baseFilterState());
   };
 
   return (
@@ -224,8 +284,11 @@ export default function LeadsTable() {
       {/* KPI Cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <div className="rounded-lg bg-white p-4 border border-border text-center">
-          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest">Total</p>
+          <p className="text-[11px] text-muted-foreground font-bold uppercase tracking-widest">{filters.includeFlagged ? 'Raw Total' : 'Trusted'}</p>
           <p className="text-3xl font-bold text-foreground mt-2">{kpis.total}</p>
+          {!filters.includeFlagged && kpis.rawTotal > kpis.total && (
+            <p className="mt-1 text-[10px] text-muted-foreground">{kpis.rawTotal} raw · {kpis.hidden} hidden</p>
+          )}
         </div>
         <div className="rounded-lg bg-white p-4 border border-border text-center">
           <p className="text-[11px] text-red-600 font-bold uppercase tracking-widest">Hot</p>
@@ -240,6 +303,16 @@ export default function LeadsTable() {
           <p className="text-3xl font-bold text-green-600 mt-2">{kpis.booked}</p>
         </div>
       </div>
+
+      {/* Trusted view warning */}
+      {!filters.includeFlagged && kpis.hidden > 0 && (
+        <div className="flex items-start gap-3 p-4 rounded-lg bg-blue-50 border border-blue-200 text-sm text-blue-900">
+          <Shield className="w-4 h-4 flex-shrink-0 mt-0.5" />
+          <div>
+            <strong>Trusted view is active.</strong> {kpis.hidden} quarantine/test/duplicate lead(s) are hidden from this sales table. Use Lead Quality Control to review or delete verified junk.
+          </div>
+        </div>
+      )}
 
       {/* Duplicate Warning */}
       {duplicateWarnings > 0 && (
@@ -264,7 +337,7 @@ export default function LeadsTable() {
           />
         </div>
 
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-2">
           <select
             value={filters.lead_state}
             onChange={(e) => handleFilterChange("lead_state", e.target.value)}
@@ -310,6 +383,16 @@ export default function LeadsTable() {
             onChange={(e) => handleFilterChange("scoreMax", e.target.value)}
             className="rounded-lg border border-border bg-background px-3 py-2 text-sm outline-none hover:border-primary transition-colors"
           />
+
+          <label className="flex items-center gap-2 rounded-lg border border-border bg-background px-3 py-2 text-xs font-semibold text-muted-foreground">
+            <input
+              type="checkbox"
+              checked={filters.includeFlagged}
+              onChange={(e) => handleFilterChange("includeFlagged", e.target.checked)}
+              className="rounded"
+            />
+            Show hidden/test/duplicates
+          </label>
         </div>
       </div>
 
@@ -321,7 +404,7 @@ export default function LeadsTable() {
             <div>{error}</div>
           </div>
           <button
-            onClick={() => { setError(""); setPage(0); setFilters({ status: "", lead_state: "", intelligence_segment: "", scoreMin: "", scoreMax: "" }); }}
+            onClick={resetFilters}
             className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold border border-red-300 text-red-700 hover:bg-red-100 transition-colors flex-shrink-0"
           >
             <RefreshCw className="w-3.5 h-3.5" /> Reset
@@ -366,15 +449,17 @@ export default function LeadsTable() {
               ) : leads.length === 0 ? (
                 <tr>
                   <td colSpan="8" className="px-3 py-12 text-center text-muted-foreground">
-                    <p className="text-sm font-medium">No leads found</p>
-                    <p className="text-xs mt-1">Try adjusting your filters or check back later.</p>
+                    <p className="text-sm font-medium">No trusted leads found</p>
+                    <p className="text-xs mt-1">Try adjusting filters or enable “Show hidden/test/duplicates” for raw records.</p>
                   </td>
                 </tr>
               ) : (
                 leads.map((lead) => {
                   const seg = getIntelligenceSegmentBadge(lead?.intelligence_segment);
+                  const hidden = !isLeadVisibleInSalesViews(lead);
+                  const eligibility = getLeadCleanupEligibility(lead);
                   return (
-                    <tr key={lead?.id || Math.random()} className={`${getRowHighlight(lead?.lead_state)} border-none`}>
+                    <tr key={lead?.id || Math.random()} className={`${getRowHighlight(lead?.lead_state)} border-none ${hidden ? 'opacity-80' : ''}`}>
                       <td className="px-3 py-3 font-medium text-foreground whitespace-nowrap">{safeStr(lead?.full_name)}</td>
                       <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">{safeStr(lead?.business_name)}</td>
                       <td className="px-3 py-3 text-muted-foreground whitespace-nowrap">
@@ -401,16 +486,13 @@ export default function LeadsTable() {
                         </span>
                       </td>
                       <td className="px-3 py-3 whitespace-nowrap">
-                        {(() => {
-                          const qs = lead?.quality_review_status;
-                          if (qs === "quarantine_candidate" || qs === "quarantined") {
-                            return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-amber-100 text-amber-800" title={lead?.quality_reason || "Flagged for review"}>⚠ Test</span>;
-                          }
-                          if (qs === "verified_outbound_ready") {
-                            return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">✓ Verified</span>;
-                          }
-                          return <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-600">{safeStr(qs, "active")}</span>;
-                        })()}
+                        {hidden ? (
+                          <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-red-100 text-red-800" title={lead?.quality_reason || eligibility.signals.join('; ')}>Hidden</span>
+                        ) : lead?.quality_review_status === "verified_outbound_ready" ? (
+                          <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-green-100 text-green-800">✓ Verified</span>
+                        ) : (
+                          <span className="inline-flex px-2 py-1 rounded text-xs font-semibold bg-gray-100 text-gray-600">{safeStr(lead?.quality_review_status, "active")}</span>
+                        )}
                       </td>
                       <td className="px-3 py-3 text-muted-foreground text-sm whitespace-nowrap">
                         {safeDate(lead?.created_date)}
@@ -418,8 +500,8 @@ export default function LeadsTable() {
                       <td className="px-3 py-3 text-center whitespace-nowrap">
                         <button
                           onClick={() => setDeleteTarget(lead)}
-                          className="inline-flex items-center justify-center w-8 h-8 rounded-lg text-red-500 hover:bg-red-50 hover:text-red-700 transition-colors"
-                          title="Delete lead"
+                          className={`inline-flex items-center justify-center w-8 h-8 rounded-lg transition-colors ${eligibility.eligible ? 'text-red-500 hover:bg-red-50 hover:text-red-700' : 'text-amber-500 hover:bg-amber-50 hover:text-amber-700'}`}
+                          title={eligibility.eligible ? "Delete verified junk" : "Delete blocked — open to see guardrail reason"}
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -435,7 +517,7 @@ export default function LeadsTable() {
         {/* Pagination */}
         <div className="flex items-center justify-between border-t border-border px-4 py-3 bg-gray-50">
           <p className="text-sm text-muted-foreground">
-            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, page * PAGE_SIZE + leads.length)} of ~{kpis.total}
+            {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, page * PAGE_SIZE + leads.length)} of ~{kpis.total}{!filters.includeFlagged && kpis.rawTotal > kpis.total ? ` trusted (${kpis.rawTotal} raw)` : ''}
           </p>
           <div className="flex items-center gap-2">
             <button
@@ -458,55 +540,85 @@ export default function LeadsTable() {
       </div>
 
       {/* Delete Confirmation Modal */}
-      {deleteTarget && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
-          <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
-            <div className="flex items-center justify-between p-5 border-b border-border">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-red-100 flex items-center justify-center">
-                  <Trash2 className="w-5 h-5 text-red-600" />
+      {deleteTarget && (() => {
+        const eligibility = getLeadCleanupEligibility(deleteTarget);
+        return (
+          <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+            <div className="w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden">
+              <div className="flex items-center justify-between p-5 border-b border-border">
+                <div className="flex items-center gap-3">
+                  <div className={`w-10 h-10 rounded-full flex items-center justify-center ${eligibility.eligible ? 'bg-red-100' : 'bg-amber-100'}`}>
+                    <Trash2 className={`w-5 h-5 ${eligibility.eligible ? 'text-red-600' : 'text-amber-600'}`} />
+                  </div>
+                  <h3 className="text-lg font-bold text-foreground">{eligibility.eligible ? 'Delete Verified Junk?' : 'Delete Blocked'}</h3>
                 </div>
-                <h3 className="text-lg font-bold text-foreground">Delete Lead?</h3>
+                <button onClick={() => setDeleteTarget(null)} className="text-muted-foreground hover:text-foreground p-1">
+                  <X className="w-5 h-5" />
+                </button>
               </div>
-              <button onClick={() => setDeleteTarget(null)} className="text-muted-foreground hover:text-foreground p-1">
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-            <div className="p-5">
-              <p className="text-sm text-muted-foreground mb-3">
-                This will permanently delete this lead record. This action cannot be undone.
-              </p>
-              <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
-                <p className="text-sm font-semibold text-foreground">{safeStr(deleteTarget?.full_name)}</p>
-                <p className="text-xs text-muted-foreground">{safeStr(deleteTarget?.business_name)}</p>
-                <p className="text-xs text-muted-foreground">{safeStr(deleteTarget?.email)}</p>
-              </div>
-            </div>
-            <div className="flex gap-3 p-5 border-t border-border">
-              <button
-                onClick={() => setDeleteTarget(null)}
-                className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleDeleteLead}
-                disabled={deleting}
-                className="flex-1 px-4 py-2.5 rounded-lg text-white text-sm font-semibold transition-colors disabled:opacity-60"
-                style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)" }}
-              >
-                {deleting ? (
-                  <span className="flex items-center justify-center gap-2">
-                    <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
-                  </span>
-                ) : (
-                  "Delete Permanently"
+              <div className="p-5 space-y-3">
+                <p className="text-sm text-muted-foreground">
+                  {eligibility.eligible
+                    ? 'This record has strict junk/test/duplicate signals and no conversion evidence. Deletion still requires the DELETE JUNK confirmation phrase.'
+                    : 'This record is not safe to delete. You can quarantine it instead, but hard deletion is blocked to protect real leads.'}
+                </p>
+                <div className="rounded-lg border border-border bg-muted/30 p-3 space-y-1">
+                  <p className="text-sm font-semibold text-foreground">{safeStr(deleteTarget?.full_name)}</p>
+                  <p className="text-xs text-muted-foreground">{safeStr(deleteTarget?.business_name)}</p>
+                  <p className="text-xs text-muted-foreground">{safeStr(deleteTarget?.email)}</p>
+                </div>
+                {eligibility.signals.length > 0 && (
+                  <div className="rounded-lg bg-red-50 border border-red-100 p-3">
+                    <p className="text-xs font-semibold text-red-700 mb-1">Junk signals</p>
+                    <ul className="text-xs text-red-700 list-disc pl-4 space-y-0.5">
+                      {eligibility.signals.slice(0, 5).map((signal) => <li key={signal}>{signal}</li>)}
+                    </ul>
+                  </div>
                 )}
-              </button>
+                {eligibility.blockers.length > 0 && (
+                  <div className="rounded-lg bg-amber-50 border border-amber-100 p-3">
+                    <p className="text-xs font-semibold text-amber-700 mb-1">Delete blockers</p>
+                    <ul className="text-xs text-amber-700 list-disc pl-4 space-y-0.5">
+                      {eligibility.blockers.map((blocker) => <li key={blocker}>{blocker}</li>)}
+                    </ul>
+                  </div>
+                )}
+              </div>
+              <div className="flex gap-3 p-5 border-t border-border">
+                <button
+                  onClick={() => setDeleteTarget(null)}
+                  className="flex-1 px-4 py-2.5 rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
+                >
+                  Cancel
+                </button>
+                {!eligibility.eligible && (
+                  <button
+                    onClick={handleQuarantineLead}
+                    disabled={deleting}
+                    className="flex-1 px-4 py-2.5 rounded-lg border border-amber-300 text-amber-700 text-sm font-semibold hover:bg-amber-50 transition-colors disabled:opacity-60"
+                  >
+                    {deleting ? 'Saving...' : 'Quarantine Instead'}
+                  </button>
+                )}
+                <button
+                  onClick={handleDeleteLead}
+                  disabled={deleting || !eligibility.eligible}
+                  className="flex-1 px-4 py-2.5 rounded-lg text-white text-sm font-semibold transition-colors disabled:opacity-40"
+                  style={{ background: "linear-gradient(135deg, #ef4444, #dc2626)" }}
+                >
+                  {deleting ? (
+                    <span className="flex items-center justify-center gap-2">
+                      <Loader2 className="w-4 h-4 animate-spin" /> Deleting...
+                    </span>
+                  ) : (
+                    "Delete Verified Junk"
+                  )}
+                </button>
+              </div>
             </div>
           </div>
-        </div>
-      )}
+        );
+      })()}
     </div>
   );
 }
