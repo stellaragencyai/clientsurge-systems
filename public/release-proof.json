@@ -1,0 +1,8 @@
+{
+  "app": "ClientSurge Systems",
+  "release_id": "clientsurge-live-sync-proof-2026-06-30-001",
+  "source_repo": "stellaragencyai/clientsurge-systems",
+  "source_branch": "main",
+  "base_commit": "fee32c9902d1e529d0a68b3018fbbb33f53404cb",
+  "cache_bust_required": true
+}
