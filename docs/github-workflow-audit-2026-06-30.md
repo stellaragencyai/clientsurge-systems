@@ -18,6 +18,9 @@ Advisory checks:
 - full Node test audit
 - public route smoke audit
 
+Hardening applied:
+- Node runtime moved to 22 to avoid Node 20 runner deprecation noise.
+
 Status: healthy. This is the primary workflow to trust for routine release status.
 
 ### ClientSurge Base44 Sync Control
@@ -47,6 +50,9 @@ Purpose: lightweight build verification for copy and storefront changes.
 Blocking checks:
 - dependency install
 - app build
+
+Hardening applied:
+- Node runtime moved to 22 to avoid Node 20 runner deprecation noise.
 
 Status: safe but partly redundant because Release Gate and Base44 Sync Control also build pull requests.
 
