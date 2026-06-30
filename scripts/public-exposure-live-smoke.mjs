@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 
 // Trigger Cloudflare security-edge workflow with the current sanitizer build.
-// Trigger: 2026-06-30T21-42Z
+// Trigger: 2026-06-30T22-59Z
 const args = process.argv.slice(2);
 function getArg(name, fallback) {
   const index = args.indexOf(name);
