@@ -137,7 +137,7 @@ export default function Contact() {
                 <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-5" />
                 <h2 className="text-3xl font-titles font-black text-foreground mb-3">Message Received</h2>
                 <p className="text-muted-foreground text-base leading-relaxed mb-8 max-w-sm mx-auto">
-                  Thanks for reaching out. We'll respond within one business day.
+                  {`Thanks for reaching out. We'll respond within one business day.`}
                 </p>
                 <Link to="/" className="cs-btn-primary">
                   Back to Home <ArrowRight className="w-4 h-4" />
