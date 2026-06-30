@@ -76,6 +76,8 @@
         "sms_skipped",
         "sms_received",
         "sms_delivered",
+        "sms_link_clicked",
+        "sms_link_previewed",
         "email_sent",
         "email_failed",
         "email_skipped",
@@ -127,6 +129,7 @@
         "delivered",
         "failed",
         "opened",
+        "clicked",
         "received",
         "processed"
       ]

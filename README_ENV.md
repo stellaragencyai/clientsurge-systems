@@ -33,9 +33,25 @@ This document lists the production environment variables the app and Base44 func
 - `TWILIO_ACCOUNT_SID`
 - `TWILIO_AUTH_TOKEN`
 - `TWILIO_PHONE_NUMBER`
+  - Fallback sender only. Prefer `TWILIO_MESSAGING_SERVICE_SID` for production SMS so Messaging Service add-ons apply.
+- `TWILIO_MESSAGING_SERVICE_SID`
+  - Production value should be the ClientSurge Production SMS - A2P Messaging Service SID.
+  - Current Twilio service: `MG01671b8a8ce56066b9f36e9f50463cee`.
+- `TWILIO_WEBHOOK_KEY`
+  - Shared secret used on Twilio inbound/status/link-click callback URLs as `?twilio_webhook_key=...`.
+- `TWILIO_LINK_CLICK_WEBHOOK_KEY`
+  - Optional override for `receiveTwilioLinkClick`. If omitted, the function uses `TWILIO_WEBHOOK_KEY`.
 - `TWILIO_SMS_STATUS_CALLBACK_URL`
 - `RESEND_API_KEY`
 - `RESEND_FROM_EMAIL`
+
+### Twilio Link Click Callback
+
+After the `receiveTwilioLinkClick` Base44 function is deployed, paste this URL into Twilio Link Shortening → Domain configuration → Click tracking callback URL:
+
+`https://clientsurgesystems.com/api/functions/receiveTwilioLinkClick?twilio_webhook_key=YOUR_TWILIO_WEBHOOK_KEY`
+
+The callback logs SMS link clicks into `CommunicationEvent` with `event_type=sms_link_clicked`, links the click to a WebsiteLead/Lead when possible, and updates lead engagement status.
 
 ## AI / LLM
 

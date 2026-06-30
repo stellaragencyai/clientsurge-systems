@@ -25,8 +25,10 @@ Deno.serve(async (req) => {
     const accountSid = Deno.env.get('TWILIO_ACCOUNT_SID');
     const authToken = Deno.env.get('TWILIO_AUTH_TOKEN');
     const fromNumber = Deno.env.get('TWILIO_PHONE_NUMBER');
+    const messagingServiceSid = Deno.env.get('TWILIO_MESSAGING_SERVICE_SID');
+    const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');
 
-    if (!accountSid || !authToken || !fromNumber) {
+    if (!accountSid || !authToken || (!fromNumber && !messagingServiceSid)) {
       return json({ error: 'Twilio credentials not configured' }, 500);
     }
 
@@ -59,17 +61,28 @@ Deno.serve(async (req) => {
     }
 
     const auth = btoa(`${accountSid}:${authToken}`);
+    const body = new URLSearchParams({
+      To: phone,
+      Body: appendSmsOptOut(message),
+    });
+
+    if (messagingServiceSid) {
+      body.set('MessagingServiceSid', messagingServiceSid);
+    } else {
+      body.set('From', fromNumber);
+    }
+
+    if (statusCallbackUrl) {
+      body.set('StatusCallback', statusCallbackUrl);
+    }
+
     const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
       method: 'POST',
       headers: {
         'Authorization': `Basic ${auth}`,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-      body: new URLSearchParams({
-        From: fromNumber,
-        To: phone,
-        Body: appendSmsOptOut(message),
-      }).toString(),
+      body: body.toString(),
     });
 
     const data = await response.json();
@@ -88,6 +101,11 @@ Deno.serve(async (req) => {
             status: 'failed',
             message_body: message,
             error_message: data.message || `Twilio error ${response.status}`,
+            metadata_json: JSON.stringify({
+              twilio_code: data.code || null,
+              messaging_service_sid: messagingServiceSid || null,
+              from_number: messagingServiceSid ? null : fromNumber,
+            }),
           });
         } catch (_) {}
       }
@@ -107,6 +125,11 @@ Deno.serve(async (req) => {
           status: 'sent',
           message_body: message,
           provider_message_id: data.sid || null,
+          metadata_json: JSON.stringify({
+            messaging_service_sid: messagingServiceSid || null,
+            from_number: messagingServiceSid ? null : fromNumber,
+            link_shortening_domain: messagingServiceSid ? 'sms.clientsurgesystems.com' : null,
+          }),
         });
 
         await base44.entities.Messages.create({
@@ -119,7 +142,7 @@ Deno.serve(async (req) => {
       } catch (_) {}
     }
 
-    return json({ success: true, messageSid: data.sid });
+    return json({ success: true, messageSid: data.sid, messagingServiceSid: messagingServiceSid || null });
   } catch (error) {
     return json({ error: error.message }, 500);
   }
