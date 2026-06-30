@@ -20,6 +20,7 @@ test('WebsiteLead provider senders use outboundLeadGuards', () => {
   for (const file of [
     'base44/functions/sendWebsiteLeadResponse/main.ts',
     'base44/functions/processWebsiteLeadFollowUps/main.ts',
+    'base44/functions/sendInstantLeadResponseSms/main.ts',
   ]) {
     const source = readFileSync(new URL(`../${file}`, import.meta.url), 'utf8');
     assert.match(source, /getWebsiteLeadOutboundSuppression/);
@@ -27,9 +28,8 @@ test('WebsiteLead provider senders use outboundLeadGuards', () => {
   }
 });
 
-test('legacy Lead provider senders are inventoried for guardrail migration', () => {
+test('remaining Lead provider senders are inventoried for guardrail migration', () => {
   const expectedLegacyFiles = [
-    'base44/functions/sendInstantLeadResponseSms/main.ts',
     'base44/functions/processMissedCallFollowUps/main.ts',
     'base44/functions/processQualifiedFollowUps/main.ts',
   ];
