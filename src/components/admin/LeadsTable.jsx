@@ -5,6 +5,8 @@ import { fetchLeadPipelineSummary } from "@/lib/leadPipelineApi";
 import { getLeadCleanupEligibility, getTrustedLeadQueryFilter, isLeadVisibleInSalesViews } from "@/lib/leadCleanupGuards";
 
 const PAGE_SIZE = 25;
+const KPI_PAGE_SIZE = 500;
+const KPI_MAX_ROWS = 25000;
 
 // ── Safe field helpers — never throw on missing/undefined ──
 const safeStr = (val, fallback = "—") => (val != null && String(val).trim() !== "") ? String(val) : fallback;
@@ -64,6 +66,49 @@ function baseFilterState() {
   };
 }
 
+function matchesLeadFilters(lead, filters) {
+  if (filters.status && lead.status !== filters.status) return false;
+  if (filters.lead_state && lead.lead_state !== filters.lead_state) return false;
+  if (filters.intelligence_segment && lead.intelligence_segment !== filters.intelligence_segment) return false;
+  if (filters.scoreMin || filters.scoreMax) {
+    const score = Number(lead.intelligence_score || 0);
+    if (filters.scoreMin && score < parseInt(filters.scoreMin, 10)) return false;
+    if (filters.scoreMax && score > parseInt(filters.scoreMax, 10)) return false;
+  }
+  return true;
+}
+
+function computeKpisFromLeads(allLeads, filters) {
+  const rawRows = Array.isArray(allLeads) ? allLeads : [];
+  const visibleRows = filters.includeFlagged ? rawRows : rawRows.filter(isLeadVisibleInSalesViews);
+  const filteredRows = visibleRows.filter((lead) => matchesLeadFilters(lead, filters));
+  const statusCounts = filteredRows.reduce((counts, lead) => {
+    const status = lead.status || "unknown";
+    counts[status] = (counts[status] || 0) + 1;
+    return counts;
+  }, {});
+
+  return {
+    total: filteredRows.length,
+    rawTotal: rawRows.length,
+    hidden: Math.max(0, rawRows.length - visibleRows.length),
+    hot: filteredRows.filter((lead) => lead.lead_state === "HOT" || lead.intelligence_segment === "HOT_LEADS").length,
+    new: statusCounts.New || filteredRows.filter((lead) => lead.lead_state === "NEW").length,
+    booked: statusCounts.Booked || filteredRows.filter((lead) => lead.lead_state === "BOOKED").length,
+  };
+}
+
+async function fetchAllLeadsForKpis() {
+  const allRows = [];
+  for (let skip = 0; skip < KPI_MAX_ROWS; skip += KPI_PAGE_SIZE) {
+    const page = await base44.entities.Leads.list("-created_date", KPI_PAGE_SIZE, skip);
+    const rows = Array.isArray(page) ? page : [];
+    allRows.push(...rows);
+    if (rows.length < KPI_PAGE_SIZE) break;
+  }
+  return allRows;
+}
+
 export default function LeadsTable() {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -94,31 +139,51 @@ export default function LeadsTable() {
     return f;
   }, [filters]);
 
-  // Load KPIs — uses fetchLeadPipelineSummary which now defaults to trusted lead scope
+  const refreshKpisFromReadableRows = useCallback(async () => {
+    const allRows = await fetchAllLeadsForKpis();
+    const directKpis = computeKpisFromLeads(allRows, filters);
+    setKpis(directKpis);
+    setDuplicateWarnings(0);
+    return directKpis;
+  }, [filters]);
+
+  // Load KPIs. The backend summary is the fast path, but the direct Leads-read
+  // fallback is authoritative for this screen because it uses the same entity the
+  // table can already read. This prevents 0 KPI cards while rows are visible.
   useEffect(() => {
+    let cancelled = false;
+
     const loadKpis = async () => {
       try {
         const data = await fetchLeadPipelineSummary({ limit: 1, offset: 0, includeFlagged: filters.includeFlagged });
         const summary = data?.summary || {};
         const statusCounts = summary.status_counts || {};
-        const total = summary.trusted_leads ?? summary.total_leads ?? 0;
-        const rawTotal = summary.raw_total_leads ?? summary.total_leads ?? total;
-
-        setKpis({
+        const total = Number(summary.trusted_leads ?? summary.total_leads ?? 0);
+        const rawTotal = Number(summary.raw_total_leads ?? summary.total_leads ?? total);
+        const backendKpis = {
           total,
           rawTotal,
           hidden: summary.hidden_junk_leads ?? Math.max(0, Number(rawTotal || 0) - Number(total || 0)),
-          hot: summary.segment_counts?.hot || 0,
-          new: statusCounts["New"] || 0,
-          booked: statusCounts["Booked"] || 0,
-        });
-        setDuplicateWarnings(0);
+          hot: summary.segment_counts?.hot || summary.segment_counts?.HOT || summary.segment_counts?.HOT_LEADS || 0,
+          new: statusCounts.New || 0,
+          booked: statusCounts.Booked || 0,
+        };
+
+        if (!cancelled && (backendKpis.total > 0 || backendKpis.rawTotal > 0)) {
+          setKpis(backendKpis);
+          setDuplicateWarnings(0);
+          return;
+        }
+
+        if (!cancelled) await refreshKpisFromReadableRows();
       } catch {
-        // KPIs are secondary — silent fail keeps the table usable
+        if (!cancelled) await refreshKpisFromReadableRows().catch(() => null);
       }
     };
+
     loadKpis();
-  }, [filters.includeFlagged]);
+    return () => { cancelled = true; };
+  }, [filters, refreshKpisFromReadableRows]);
 
   // Load paginated leads with real-time updates
   useEffect(() => {
@@ -163,6 +228,9 @@ export default function LeadsTable() {
 
         if (!cancelled) {
           setLeads(items);
+          if (items.length > 0 && kpis.total === 0) {
+            refreshKpisFromReadableRows().catch(() => null);
+          }
         }
       } catch (err) {
         if (!cancelled) {
@@ -186,6 +254,7 @@ export default function LeadsTable() {
           prev.map((l) => (l?.id === event.entity_id ? { ...l, ...event.data } : l))
             .filter((l) => filters.includeFlagged || isLeadVisibleInSalesViews(l))
         );
+        refreshKpisFromReadableRows().catch(() => null);
       });
     } catch {
       // Realtime subscription failed — table still works, just not real-time
@@ -197,7 +266,7 @@ export default function LeadsTable() {
         try { unsubscribe(); } catch { /* noop */ }
       }
     };
-  }, [page, filters, sort, buildFilter, search]);
+  }, [page, filters, sort, buildFilter, search, kpis.total, refreshKpisFromReadableRows]);
 
   const handleSearchChange = (e) => {
     setSearch(e.target.value);
@@ -248,6 +317,7 @@ export default function LeadsTable() {
         rawTotal: Math.max(0, prev.rawTotal - 1),
       }));
       setDeleteTarget(null);
+      refreshKpisFromReadableRows().catch(() => null);
     } catch (err) {
       setError(err?.message || "Failed to delete verified junk lead");
     } finally {
@@ -266,6 +336,7 @@ export default function LeadsTable() {
       });
       setLeads((prev) => prev.filter((l) => l.id !== deleteTarget.id));
       setDeleteTarget(null);
+      refreshKpisFromReadableRows().catch(() => null);
     } catch (err) {
       setError(err?.message || "Failed to quarantine lead");
     } finally {
