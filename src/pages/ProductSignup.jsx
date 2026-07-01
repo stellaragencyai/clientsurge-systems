@@ -42,6 +42,7 @@ const PLANS = [
 const DEFAULT_PLAN_ID = "growth_system";
 const FORM_STORAGE_KEY = "clientsurge_signup_form";
 const REQUIRED_FIELDS = ["fullName", "businessName", "email", "phone"];
+const CHECKOUT_TIMEOUT_MS = 20000;
 
 function normalizePlanParam(value) {
   const raw = String(value || "").trim().toLowerCase().replace(/[\s_]+/g, "-");
@@ -62,6 +63,24 @@ function getCheckoutErrorMessage(err) {
   const message = err?.data?.error || err?.message || "Checkout could not be started.";
   const requestId = err?.data?.request_id || "";
   return [message, code ? `Code: ${code}` : "", requestId ? `Request ID: ${requestId}` : ""].filter(Boolean).join(" ");
+}
+
+function withCheckoutTimeout(promise) {
+  return Promise.race([
+    promise,
+    new Promise((_, reject) => {
+      window.setTimeout(() => reject(new Error("Checkout timed out before Stripe returned a secure checkout link.")), CHECKOUT_TIMEOUT_MS);
+    }),
+  ]);
+}
+
+function isEmbeddedPreview() {
+  if (typeof window === "undefined") return false;
+  try {
+    return window.self !== window.top;
+  } catch {
+    return true;
+  }
 }
 
 export default function ProductSignup() {
@@ -121,10 +140,15 @@ export default function ProductSignup() {
 
   const handleCheckout = async () => {
     setCheckoutError(null);
+    if (isEmbeddedPreview()) {
+      try { window.open(window.location.href, "_blank", "noopener,noreferrer"); } catch {}
+      setCheckoutError("Checkout must run in a full browser tab, not inside an embedded preview. I opened a new tab; continue checkout there.");
+      return;
+    }
     if (!validateAll()) { setCheckoutError("Please complete the highlighted fields before checkout."); return; }
     setCheckoutLoading(true);
     try {
-      const response = await base44.functions.invoke("createCheckoutSession", {
+      const payload = {
         package_key: selectedPlanId,
         customer_name: formData.fullName.trim(),
         customer_email: formData.email.trim(),
@@ -133,14 +157,23 @@ export default function ProductSignup() {
         industry: formData.industry.trim(),
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/product-signup?package=${selectedPlanId}`,
-      });
+      };
+      const response = await withCheckoutTimeout(base44.functions.invoke("createCheckoutSession", payload));
       const url = response?.data?.url || response?.url;
       if (!url) throw new Error(response?.data?.error || response?.error || "No checkout URL returned.");
       trackCTA("checkout_redirect", "product_signup", { package_id: selectedPlanId });
-      try { localStorage.removeItem(FORM_STORAGE_KEY); } catch {}
-      window.location.href = url;
+      try {
+        sessionStorage.setItem("clientsurge:last-checkout-session", JSON.stringify({
+          package_id: selectedPlanId,
+          request_id: response?.data?.request_id || response?.request_id || "",
+          session_id: response?.data?.session_id || response?.session_id || "",
+          created_at: new Date().toISOString(),
+        }));
+        localStorage.removeItem(FORM_STORAGE_KEY);
+      } catch {}
+      window.location.assign(url);
     } catch (err) {
-      setCheckoutError(getCheckoutErrorMessage(err));
+      setCheckoutError(`${getCheckoutErrorMessage(err)} Use Book help or Contact support below if checkout does not recover.`);
       setCheckoutLoading(false);
     }
   };
@@ -182,12 +215,15 @@ export default function ProductSignup() {
             {selectedPlan && (
               <div className="space-y-6 rounded-2xl border border-primary/15 bg-white p-5 md:p-6 shadow-sm">
                 <div className="p-5 bg-[#f8fcff] rounded-xl border border-primary/10"><h4 className="font-bold text-[#001B44] mb-4">What's included in {selectedPlan.title}:</h4><ul className="space-y-2">{selectedPlan.features.map((feature) => <li key={feature} className="text-sm text-slate-700 flex items-start gap-2"><span className="text-[#00AEEF] font-bold mt-0.5">✓</span>{feature}</li>)}</ul></div>
-                <div className="space-y-4"><p className="text-sm font-bold text-slate-700 uppercase tracking-wide">Your information</p>{[["fullName", "Full Name", "John Doe"], ["businessName", "Business Name", "Your Business"], ["email", "Email", "owner@yourbusiness.com"], ["phone", "Phone", "(602) 555-0100"], ["industry", "Industry", "e.g., HVAC, Dental, Roofing"]].map(([field, label, placeholder]) => <div key={field}><label className="block text-sm font-semibold text-slate-700 mb-1">{label}{REQUIRED_FIELDS.includes(field) && <span className="text-red-500"> *</span>}</label><input type={field === "email" ? "email" : field === "phone" ? "tel" : "text"} placeholder={placeholder} value={formData[field]} onChange={(e) => handleFieldChange(field, e.target.value)} className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/30 text-slate-900 ${fieldErrors[field] ? "border-red-400 bg-red-50" : "border-slate-200 bg-white"}`} />{fieldErrors[field] && <p className="text-xs text-red-600 mt-1">{fieldErrors[field]}</p>}</div>)}</div>
-                {checkoutError && <div className="p-4 bg-red-50 border border-red-200 rounded-xl flex gap-3"><AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" /><p className="text-sm text-red-700 leading-relaxed">{checkoutError}</p></div>}
+                <div className="space-y-4"><p className="text-sm font-bold text-slate-700 uppercase tracking-wide">Your information</p>{[["fullName", "Full Name", "John Doe"], ["businessName", "Business Name", "Your Business"], ["email", "Email", "owner@example.com"], ["phone", "Phone", "(602) 555-0100"], ["industry", "Industry", "e.g., HVAC, Dental, Roofing"]].map(([field, label, placeholder]) => <div key={field}><label className="block text-sm font-semibold text-slate-700 mb-1">{label}{REQUIRED_FIELDS.includes(field) && <span className="text-red-500"> *</span>}</label><input type={field === "email" ? "email" : field === "phone" ? "tel" : "text"} placeholder={placeholder} value={formData[field]} onChange={(e) => handleFieldChange(field, e.target.value)} className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/30 text-slate-900 ${fieldErrors[field] ? "border-red-400 bg-red-50" : "border-slate-200 bg-white"}`} />{fieldErrors[field] && <p className="text-xs text-red-600 mt-1">{fieldErrors[field]}</p>}</div>)}</div>
+                {checkoutError && (
+                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
+                    <div className="flex gap-3"><AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" /><p className="text-sm text-red-700 leading-relaxed">{checkoutError}</p></div>
+                    <div className="mt-3 flex flex-wrap gap-2 pl-8"><Link to="/book" className="rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100">Book help</Link><Link to="/contact" className="rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100">Contact support</Link></div>
+                  </div>
+                )}
                 <button onClick={handleCheckout} disabled={checkoutLoading} className="cs-btn-primary w-full px-6 py-3.5 rounded-full font-bold text-white transition-all flex items-center justify-center gap-2" style={{ opacity: checkoutLoading ? 0.7 : 1, cursor: checkoutLoading ? "not-allowed" : "pointer" }}>{checkoutLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating checkout...</> : <>Continue to Secure Checkout <ArrowRight className="w-4 h-4" /></>}</button>
-                <div className="flex flex-col gap-2 text-center text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-center">
-                  <span>Secure Stripe checkout</span><span className="hidden sm:inline">•</span><span>Month-to-month billing</span>
-                </div>
+                <div className="flex flex-col gap-2 text-center text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-center"><span>Secure Stripe checkout</span><span className="hidden sm:inline">•</span><span>Month-to-month billing</span></div>
                 <Link to="/book" className="flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80"><HelpCircle className="w-4 h-4" /> Need help choosing?</Link>
               </div>
             )}
