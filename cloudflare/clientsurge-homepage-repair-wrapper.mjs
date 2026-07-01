@@ -1,7 +1,7 @@
 import edgeWorker from "./clientsurge-security-edge-worker.mjs";
 
 const REPAIR_HEADER = "x-clientsurge-homepage-repair";
-const REPAIR_VERSION = "2026-07-01T03-00Z-force-clean-homepage";
+const REPAIR_VERSION = "2026-07-01T03-30Z-force-clean-homepage-and-trigger-deploy";
 
 const CLEAN_HOMEPAGE = `<!doctype html>
 <html lang="en">
@@ -20,7 +20,7 @@ const CLEAN_HOMEPAGE = `<!doctype html>
   <main class="shell" aria-label="ClientSurge Systems homepage">
     <header>
       <a class="brand" href="/">ClientSurge Systems</a>
-      <nav aria-label="Public navigation"><a href="/pricing">Pricing</a><a href="/automations">Automations</a><a href="/contact">Contact</a></nav>
+      <nav aria-label="Public navigation"><a href="/pricing">Pricing</a><a href="/automations">Automations</a><a href="/contact">Contact</a><a href="/privacy">Privacy</a><a href="/terms">Terms</a></nav>
     </header>
     <section class="hero" aria-labelledby="home-heading">
       <div>
@@ -49,6 +49,8 @@ function isHomepageRequest(request) {
 function cleanHomepageResponse() {
   const headers = new Headers();
   headers.set(REPAIR_HEADER, REPAIR_VERSION);
+  headers.set("x-clientsurge-route-exposure-sanitized", "homepage-replaced");
+  headers.set("x-clientsurge-route-exposure-version", REPAIR_VERSION);
   headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
   headers.set("Content-Type", "text/html; charset=utf-8");
   headers.set("X-Robots-Tag", "index, follow");
