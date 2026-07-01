@@ -8,6 +8,7 @@ on:
     paths:
       - "cloudflare/**"
       - "wrangler.clientsurge-security.toml"
+      - "scripts/cloudflare/upsert-worker-routes.mjs"
       - "scripts/public-exposure-live-smoke.mjs"
       - "package.json"
       - "package-lock.json"
@@ -65,6 +66,9 @@ jobs:
 
       - name: Deploy Cloudflare edge sanitizer
         run: npx wrangler deploy --config wrangler.clientsurge-security.toml
+
+      - name: Upsert Cloudflare Worker routes
+        run: node scripts/cloudflare/upsert-worker-routes.mjs
 
       - name: Verify production security edge
         continue-on-error: true
