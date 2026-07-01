@@ -4,7 +4,7 @@ compatibility_date = "2026-04-23"
 workers_dev = false
 
 [[routes]]
-pattern = "*clientsurgesystems.com/*"
+pattern = "*.clientsurgesystems.com/*"
 zone_name = "clientsurgesystems.com"
 
 [[routes]]
