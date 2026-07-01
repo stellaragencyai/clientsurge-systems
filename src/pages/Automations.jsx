@@ -31,7 +31,7 @@ export default function Automations() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen text-slate-950" style={{ background: "#FFFFFF" }}>
+      <div className="min-h-screen bg-background text-foreground">
         <Navbar />
         <main className="pt-[var(--cs-nav-height)]">
           <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
@@ -49,23 +49,15 @@ export default function Automations() {
               {SERVICES.map((service) => {
                 const Icon = service.icon;
                 return (
-                  <article
-                    key={service.id}
-                    className="rounded-xl overflow-hidden border p-6 flex flex-col shadow-sm"
-                    style={{
-                      background: "#FFFFFF",
-                      borderColor: "rgba(0,79,156,0.16)",
-                      boxShadow: "0 18px 45px rgba(6,16,37,0.08)",
-                    }}
-                  >
-                    <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)" }}>
-                      <Icon className="w-5 h-5" style={{ color: "#0077B6" }} />
+                  <article key={service.id} className="cs-card overflow-hidden p-6 flex flex-col">
+                    <div className="w-11 h-11 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">
+                      <Icon className="w-5 h-5 text-primary" />
                     </div>
-                    <p className="text-[10px] font-bold uppercase tracking-widest mb-2" style={{ color: "#53647A" }}>What this protects</p>
-                    <h2 className="font-titles text-lg font-bold mb-2" style={{ color: "#061025" }}>{service.title}</h2>
-                    <p className="text-sm leading-relaxed mb-4 flex-1" style={{ color: "#334155" }}>{service.tagline}</p>
-                    <div className="rounded-lg p-3 mb-5" style={{ border: "1px solid rgba(0,119,182,0.18)", background: "#EFF8FF" }}>
-                      <p className="text-xs font-semibold" style={{ color: "#061025" }}><CheckCircle className="w-3.5 h-3.5 inline mr-1" style={{ color: "#0077B6" }} /> {service.included}</p>
+                    <p className="text-[10px] font-bold uppercase tracking-widest mb-2 text-muted-foreground">What this protects</p>
+                    <h2 className="font-titles text-lg font-bold mb-2 text-foreground">{service.title}</h2>
+                    <p className="text-sm leading-relaxed mb-4 flex-1 text-muted-foreground">{service.tagline}</p>
+                    <div className="rounded-lg p-3 mb-5 border border-primary/20 bg-primary/5">
+                      <p className="text-xs font-semibold text-foreground"><CheckCircle className="w-3.5 h-3.5 inline mr-1 text-primary" /> {service.included}</p>
                     </div>
                     <Link to={`/book?service=${service.id}`} className="cs-btn-primary w-full">See Packages With This System <ArrowRight className="w-4 h-4" /></Link>
                   </article>
@@ -73,20 +65,13 @@ export default function Automations() {
               })}
             </div>
 
-            <div
-              className="mt-16 rounded-2xl p-10 md:p-14 text-center"
-              style={{
-                background: "linear-gradient(135deg, rgba(239,248,255,0.96), rgba(255,255,255,0.98))",
-                border: "1px solid rgba(0,79,156,0.16)",
-                boxShadow: "0 22px 60px rgba(6,16,37,0.08)",
-              }}
-            >
-              <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: "#0077B6" }}>Compare Packages</p>
-              <h2 className="font-titles text-3xl md:text-4xl font-bold mb-4" style={{ color: "#061025" }}>Not Every Business Needs the Full Stack on Day One</h2>
-              <p className="text-base max-w-xl mx-auto mb-8 leading-relaxed" style={{ color: "#334155" }}>Compare Starter, Growth, and Pro to choose the amount of lead flow you want ClientSurge to handle.</p>
+            <div className="cs-card mt-16 rounded-2xl p-10 md:p-14 text-center">
+              <p className="text-xs font-bold uppercase tracking-widest mb-3 text-primary">Compare Packages</p>
+              <h2 className="font-titles text-3xl md:text-4xl font-bold mb-4 text-foreground">Not Every Business Needs the Full Stack on Day One</h2>
+              <p className="text-base max-w-xl mx-auto mb-8 leading-relaxed text-muted-foreground">Compare Starter, Growth, and Pro to choose the amount of lead flow you want ClientSurge to handle.</p>
               <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
                 <Link to="/pricing" className="cs-btn-primary" style={{ padding: "0 40px", height: "56px", fontSize: "1rem" }}>Compare Packages <ArrowRight className="w-5 h-5" /></Link>
-                <Link to="/book" className="inline-flex items-center gap-2 px-8 py-4 rounded-full text-base font-semibold transition-all" style={{ color: "#004F9C", border: "1.5px solid rgba(0, 119, 182, 0.28)", background: "#FFFFFF" }}>Get Help Choosing</Link>
+                <Link to="/book" className="cs-btn-secondary text-base px-8 py-4">Get Help Choosing</Link>
               </div>
             </div>
           </section>

@@ -40,7 +40,7 @@ export default function Industries() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
-      <section className="text-center pr-4 pl-4 pt-24 pb-8" style={{ background: "linear-gradient(to bottom, #f7fbff, #ffffff)" }}>
+      <section className="text-center pr-4 pl-4 pt-24 pb-8 bg-background">
         <SectionHeader
           eyebrow="Industries"
           title="Automation for Lead-Driven Service Businesses"
@@ -53,16 +53,16 @@ export default function Industries() {
           {industries.map((industry) => {
             const IndustryIcon = industry.icon;
             return (
-              <article key={industry.id} id={industry.id} className="rounded-3xl border border-border bg-card p-6 shadow-sm scroll-mt-24">
+              <article key={industry.id} id={industry.id} className="cs-card p-6 scroll-mt-24">
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border bg-primary/10 border-primary/20"><IndustryIcon className="h-5 w-5 text-primary" /></div>
                     <h2 className="font-display text-2xl font-semibold text-foreground">{industry.title}</h2>
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap bg-[#005f99]/10 text-[#005f99] border border-[#005f99]/25"><CheckCircle2 className="w-3.5 h-3.5" /> Live</span>
+                  <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap bg-primary/10 text-primary border border-primary/25"><CheckCircle2 className="w-3.5 h-3.5" /> Live</span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-6">{industry.description}</p>
-                <a href={industry.href} onClick={(event) => handleIndustryNavigation(event, industry.href)} className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-semibold transition-colors border-primary/25 bg-primary/5 text-primary hover:bg-primary/10">
+                <a href={industry.href} onClick={(event) => handleIndustryNavigation(event, industry.href)} className="cs-btn-secondary">
                   View system fit <ArrowRight className="w-4 h-4" />
                 </a>
               </article>
