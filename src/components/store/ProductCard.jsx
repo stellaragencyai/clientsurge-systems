@@ -1,26 +1,38 @@
-import { CheckCircle2, Plus, Check } from "lucide-react";
+import { CheckCircle2, Plus, Check, ArrowRight, BadgeCheck } from "lucide-react";
 import { useState } from "react";
 import { useCart } from "@/lib/cartContext";
 import ServiceDetailModal from "@/components/store/ServiceDetailModal";
 import { motion } from "framer-motion";
 
+const CHECK_GREEN = "#16A34A";
+const CHECK_GREEN_BG = "rgba(22, 163, 74, 0.1)";
+const PRIMARY_BLUE = "#0079c1";
+const DEEP_BLUE = "#005691";
+
+const formatMoney = (value) => {
+  if (value === null || value === undefined || value === "—") return "—";
+  const numeric = Number(value);
+  if (Number.isFinite(numeric)) return `$${numeric.toLocaleString()}`;
+  const stringValue = String(value);
+  return stringValue.startsWith("$") ? stringValue : `$${stringValue}`;
+};
+
 export default function ProductCard({ product }) {
   const { items, addItem, removeItem } = useCart();
   const inCart = items.some((item) => item.product_id === product.product_id);
   const [modalOpen, setModalOpen] = useState(false);
-  const [expanded, setExpanded] = useState(false);
+
+  const unavailable = product.coming_soon || !product.checkout_enabled;
+  const monthlyLabel = formatMoney(product.monthly_fee);
+  const setupLabel = product.setup_fee === 0 ? "No setup fee" : formatMoney(product.setup_fee);
+  const visibleHighlights = Array.isArray(product.highlights) ? product.highlights.slice(0, 4) : [];
+  const remainingHighlightCount = Array.isArray(product.highlights) ? Math.max(product.highlights.length - 4, 0) : 0;
 
   const toggle = (e) => {
     e.stopPropagation();
-    // Coming soon products cannot be added to cart
-    if (product.coming_soon || !product.checkout_enabled) return;
+    if (unavailable) return;
     if (inCart) removeItem(product.product_id);
     else addItem(product);
-  };
-
-  const handleExpandToggle = (e) => {
-    e.stopPropagation();
-    setExpanded(!expanded);
   };
 
   return (
@@ -28,274 +40,319 @@ export default function ProductCard({ product }) {
       <style>{`
         .pcard {
           position: relative;
-          border-radius: 20px;
-          padding: 20px;
+          border-radius: 24px;
+          padding: 22px;
           display: flex;
           flex-direction: column;
-          gap: 12px;
-          background: rgba(255,255,255,0.96);
-          border: 1.5px solid rgba(0,136,204,0.2);
-          box-shadow: 0 12px 34px rgba(0,59,143,0.08), inset 0 1px 0 rgba(255,255,255,0.65);
+          gap: 14px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(248,252,255,0.96) 100%);
+          border: 1.5px solid rgba(0,136,204,0.18);
+          box-shadow: 0 14px 36px rgba(15,23,42,0.08), inset 0 1px 0 rgba(255,255,255,0.8);
           cursor: pointer;
-          transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease, height 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-          min-height: 340px;
+          transition: border-color 0.3s ease, box-shadow 0.3s ease, transform 0.3s ease;
+          min-height: 380px;
           overflow: visible;
+          isolation: isolate;
+        }
+        .pcard::before {
+          content: "";
+          position: absolute;
+          inset: 0;
+          border-radius: inherit;
+          background: radial-gradient(circle at 18% 0%, rgba(0,174,239,0.1), transparent 36%), radial-gradient(circle at 100% 16%, rgba(0,86,145,0.07), transparent 34%);
+          opacity: 0;
+          transition: opacity 0.3s ease;
+          pointer-events: none;
+          z-index: -1;
         }
         .pcard:hover {
           border-color: rgba(0,136,204,0.42);
-          box-shadow: 0 18px 42px rgba(0,59,143,0.13), inset 0 1px 0 rgba(255,255,255,0.75);
+          box-shadow: 0 22px 48px rgba(0,59,143,0.13), inset 0 1px 0 rgba(255,255,255,0.86);
           transform: translateY(-3px);
         }
+        .pcard:hover::before { opacity: 1; }
         .pcard.in-cart {
-          border-color: #22c55e;
-          box-shadow: 0 8px 28px rgba(34,197,94,0.2), inset 0 1px 0 rgba(255,255,255,0.3);
+          border-color: rgba(22,163,74,0.52);
+          box-shadow: 0 16px 42px rgba(22,163,74,0.18), inset 0 1px 0 rgba(255,255,255,0.86);
         }
         .pcard.coming-soon-card {
           cursor: default;
-          opacity: 0.62;
+          opacity: 0.78;
         }
         .pcard-click-hint {
           position: absolute;
-          bottom: 12px;
-          right: 14px;
+          bottom: 14px;
+          right: 16px;
           font-size: 9px;
-          font-weight: 700;
-          color: rgba(0,95,153,0.45);
-          letter-spacing: 0.1em;
+          font-weight: 800;
+          color: rgba(0,95,153,0.5);
+          letter-spacing: 0.12em;
           text-transform: uppercase;
           opacity: 0;
           transition: opacity 0.3s ease;
         }
         .pcard:hover .pcard-click-hint { opacity: 1; }
-        .price-chip-light {
-          background: linear-gradient(135deg, rgba(0,174,239,0.07), rgba(0,157,255,0.04));
-          border: 1.5px solid rgba(0,174,239,0.18);
-          border-radius: 14px;
-          padding: 8px 14px;
-        }
-        .highlight-pills {
-          display: grid;
-          grid-template-columns: repeat(2, 1fr);
-          gap: 8px;
-        }
-        .highlight-pill {
-          display: flex;
-          align-items: center;
-          gap: 5px;
-          padding: 6px 10px;
-          border-radius: 12px;
-          background: linear-gradient(135deg, rgba(0,174,239,0.08), rgba(0,157,255,0.04));
-          border: 1px solid rgba(0,174,239,0.15);
-          font-size: 10px;
-          font-weight: 600;
-          color: rgba(10,22,40,0.72);
-          white-space: nowrap;
-          overflow: hidden;
-          text-overflow: ellipsis;
-        }
-        .highlight-pill svg {
-          width: 10px;
-          height: 10px;
-          color: #22c55e;
-        }
-        .features-count-badge {
+        .automation-card-kicker {
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          padding: 4px 8px;
-          border-radius: 6px;
-          background: rgba(34,197,94,0.1);
-          border: 1px solid rgba(34,197,94,0.25);
-          font-size: 9px;
-          font-weight: 700;
-          color: #16a34a;
+          gap: 6px;
+          width: fit-content;
+          max-width: 100%;
+          font-size: 8px;
+          font-weight: 850;
           text-transform: uppercase;
-          letter-spacing: 0.08em;
+          letter-spacing: 0.16em;
+          color: ${DEEP_BLUE};
+          background: rgba(0,174,239,0.07);
+          border: 1px solid rgba(0,174,239,0.16);
+          border-radius: 999px;
+          padding: 5px 10px;
         }
-        .see-more-btn {
-          background: none;
-          border: none;
-          color: #005f99;
+        .automation-highlight-pills {
+          display: grid;
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+          gap: 8px;
+        }
+        .automation-highlight-pill {
+          display: flex;
+          align-items: center;
+          gap: 7px;
+          padding: 8px 9px;
+          border-radius: 13px;
+          background: rgba(255,255,255,0.82);
+          border: 1px solid rgba(0,174,239,0.14);
           font-size: 10px;
           font-weight: 700;
+          color: rgba(10,22,40,0.74);
+          line-height: 1.25;
+          min-width: 0;
+        }
+        .automation-highlight-pill span {
+          min-width: 0;
+          overflow: hidden;
+          text-overflow: ellipsis;
+          display: -webkit-box;
+          -webkit-line-clamp: 2;
+          -webkit-box-orient: vertical;
+        }
+        .automation-highlight-pill svg {
+          width: 13px;
+          height: 13px;
+          color: ${CHECK_GREEN};
+          flex-shrink: 0;
+        }
+        .automation-card-more-btn {
+          background: none;
+          border: none;
+          color: ${PRIMARY_BLUE};
+          font-size: 10px;
+          font-weight: 850;
           cursor: pointer;
           padding: 0;
-          margin-top: 8px;
+          margin-top: -2px;
+          text-align: left;
           text-transform: uppercase;
           letter-spacing: 0.1em;
-          transition: color 0.2s ease;
+          transition: color 0.2s ease, transform 0.2s ease;
         }
-        .see-more-btn:hover {
-          color: #0088CC;
+        .automation-card-more-btn:hover {
+          color: ${DEEP_BLUE};
+          transform: translateX(2px);
         }
-        .price-highlight-box {
-          background: #ffffff;
-          border: 1px solid rgba(0,136,204,0.14);
-          border-radius: 14px;
-          padding: 12px 14px;
-          text-align: center;
-          margin-bottom: 2px;
+        .automation-price-panel {
+          background: linear-gradient(180deg, #ffffff, rgba(248,250,252,0.92));
+          border: 1px solid rgba(0,136,204,0.16);
+          border-radius: 18px;
+          padding: 14px;
+          box-shadow: inset 0 1px 0 rgba(255,255,255,0.82), 0 10px 24px rgba(15,23,42,0.05);
         }
-        .price-highlight-box .price-value {
+        .automation-price-row {
+          display: flex;
+          align-items: flex-start;
+          justify-content: space-between;
+          gap: 12px;
+        }
+        .automation-price-label {
+          font-size: 9px;
+          font-weight: 850;
+          color: rgba(10,22,40,0.48);
+          text-transform: uppercase;
+          letter-spacing: 0.16em;
+          margin: 0 0 5px;
+        }
+        .automation-price-value {
           display: flex;
           align-items: baseline;
-          justify-content: center;
           gap: 4px;
-          font-size: 24px;
+          font-size: 25px;
           font-weight: 900;
           color: #0A1628;
           line-height: 1;
-          margin-bottom: 4px;
+          margin: 0;
         }
-        .price-highlight-box .price-value span {
+        .automation-price-value span {
           font-size: 10px;
-          font-weight: 600;
-          color: #005f99;
+          font-weight: 800;
+          color: rgba(0,95,153,0.72);
+          text-transform: uppercase;
+          letter-spacing: 0.1em;
         }
-        .price-highlight-box .setup-fee {
-          font-size: 8px;
-          color: #003B8F;
-          font-weight: 600;
+        .automation-setup-row {
+          margin-top: 11px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 10px;
+          padding: 10px 11px;
+          border-radius: 14px;
+          background: rgba(0,174,239,0.055);
+          border: 1px solid rgba(0,174,239,0.13);
         }
-        .pcard.coming-soon-card {
-          opacity: 1;
-        }
-        .product-card-cta-label {
+        .automation-card-cta-label {
           font-size: 11px;
         }
         @media (max-width: 480px) {
-          .product-card-cta-label {
-            font-size: 10px;
-          }
+          .automation-card-cta-label { font-size: 10px; }
+          .automation-highlight-pills { grid-template-columns: 1fr; }
         }
       `}</style>
 
       <motion.div
         className={`pcard${inCart ? " in-cart" : ""}${product.coming_soon ? " coming-soon-card" : ""}`}
-        onClick={() => !product.coming_soon && setModalOpen(true)}
+        onClick={() => !unavailable && setModalOpen(true)}
         variants={{
           hidden: { opacity: 0, y: 32 },
           visible: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } },
         }}
-        whileHover={{ y: -5, boxShadow: inCart ? "0 14px 36px rgba(34,197,94,0.25)" : "0 14px 36px rgba(0,0,0,0.16)" }}
+        whileHover={{ y: unavailable ? 0 : -5, boxShadow: inCart ? "0 18px 44px rgba(22,163,74,0.22)" : "0 20px 48px rgba(0,59,143,0.14)" }}
         transition={{ type: "spring", stiffness: 340, damping: 28 }}
       >
-        {/* Header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
-          <div style={{
-            width: "48px", height: "48px", borderRadius: "14px",
-            display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px",
-            background: "transparent",
-            border: "none",
-          }}>
-            {product.icon}
+        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: "12px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: "12px", minWidth: 0 }}>
+            <div style={{
+              width: "50px", height: "50px", borderRadius: "16px",
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: "26px",
+              background: "linear-gradient(145deg, rgba(255,255,255,0.98), rgba(232,247,255,0.9))",
+              border: "1px solid rgba(0,174,239,0.18)",
+              boxShadow: "0 10px 22px rgba(0,136,204,0.09)",
+              flexShrink: 0,
+            }}>
+              {product.icon}
+            </div>
+            <div style={{ minWidth: 0 }}>
+              <span className="automation-card-kicker">
+                <BadgeCheck style={{ width: "10px", height: "10px" }} />
+                {product.category}
+              </span>
+            </div>
           </div>
-          <span style={{
-            fontSize: "8px", fontWeight: "800", textTransform: "uppercase", letterSpacing: "0.16em",
-            color: "rgba(0,174,239,0.9)", background: "rgba(0,174,239,0.07)",
-            padding: "4px 10px", borderRadius: "999px", border: "1px solid rgba(0,174,239,0.14)",
-          }}>
-            {product.category}
-          </span>
+          {product.popular && !product.coming_soon && (
+            <span style={{
+              background: "linear-gradient(135deg,#0088CC,#00AEEF)", color: "#fff",
+              fontSize: "8px", fontWeight: "850", padding: "5px 10px", borderRadius: "999px",
+              letterSpacing: "0.1em", textTransform: "uppercase", boxShadow: "0 7px 18px rgba(0,174,239,0.28)", flexShrink: 0,
+            }}>
+              Popular
+            </span>
+          )}
         </div>
 
-        {/* Title */}
         <div>
-          <h2 style={{ fontSize: "16px", fontWeight: "700", color: "#0A1628", margin: "0 0 3px", lineHeight: 1.2 }}>
+          <h2 style={{ fontSize: "17px", fontWeight: "850", color: "#0A1628", margin: "0 0 5px", lineHeight: 1.18 }}>
             {product.name}
           </h2>
-          <p style={{ fontSize: "9px", color: "rgba(0,174,239,0.8)", fontWeight: "700", margin: 0, textTransform: "uppercase", letterSpacing: "0.1em" }}>
+          <p style={{ fontSize: "9px", color: "rgba(0,136,204,0.82)", fontWeight: "850", margin: 0, textTransform: "uppercase", letterSpacing: "0.11em" }}>
             {product.subtitle}
           </p>
         </div>
 
-        {/* Description */}
-        <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.64)", lineHeight: 1.65, margin: 0, flex: 1 }}>
+        <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.66)", lineHeight: 1.65, margin: 0, flex: 1 }}>
           {product.description}
         </p>
 
-        {/* All Features - Grid (max 4, with see more) */}
-        <div className="highlight-pills">
-          {product.highlights.slice(0, 4).map((h) => (
-            <div key={h} className="highlight-pill">
+        <div className="automation-highlight-pills">
+          {visibleHighlights.map((h) => (
+            <div key={h} className="automation-highlight-pill">
               <CheckCircle2 />
               <span>{h}</span>
             </div>
           ))}
         </div>
-        
-        {product.highlights.length > 4 && (
-          <button 
-            onClick={(e) => { e.stopPropagation(); setModalOpen(true); }} 
-            className="see-more-btn"
+
+        {remainingHighlightCount > 0 && (
+          <button
+            onClick={(e) => { e.stopPropagation(); setModalOpen(true); }}
+            className="automation-card-more-btn"
           >
-            + See {product.highlights.length - 4} more feature{product.highlights.length - 4 > 1 ? 's' : ''}
+            + See {remainingHighlightCount} more feature{remainingHighlightCount > 1 ? "s" : ""} <ArrowRight style={{ width: "10px", height: "10px", display: "inline", verticalAlign: "-1px" }} />
           </button>
         )}
 
-        {/* Price Highlight Box */}
-        <div className="price-highlight-box">
-          <div className="price-value">
-            <span>💰</span>
-            ${product.monthly_fee}<span>/month</span>
+        <div className="automation-price-panel">
+          <div className="automation-price-row">
+            <div>
+              <p className="automation-price-label">Monthly plan</p>
+              <p className="automation-price-value">{monthlyLabel}<span>/mo</span></p>
+            </div>
+            <span style={{
+              flexShrink: 0,
+              borderRadius: "999px",
+              padding: "5px 9px",
+              fontSize: "8px",
+              fontWeight: "850",
+              textTransform: "uppercase",
+              letterSpacing: "0.12em",
+              color: unavailable ? "#64748B" : PRIMARY_BLUE,
+              background: unavailable ? "rgba(100,116,139,0.08)" : "rgba(0,174,239,0.07)",
+              border: unavailable ? "1px solid rgba(100,116,139,0.14)" : "1px solid rgba(0,174,239,0.16)",
+            }}>
+              {product.availability_label || (unavailable ? "Coming Soon" : "Self-Serve")}
+            </span>
           </div>
-          <div className="setup-fee">{product.setup_fee === 0 ? "No setup fee" : `$${product.setup_fee} one-time setup`}</div>
+          <div className="automation-setup-row">
+            <div>
+              <p style={{ margin: 0, fontSize: "9px", color: "rgba(10,22,40,0.48)", fontWeight: 850, textTransform: "uppercase", letterSpacing: "0.14em" }}>One-time setup</p>
+              <p style={{ margin: "2px 0 0", fontSize: "10px", color: "rgba(10,22,40,0.5)", fontWeight: 700 }}>{product.fulfillment_label || "Done-for-you setup included"}</p>
+            </div>
+            <span style={{ fontSize: "13px", fontWeight: 900, color: DEEP_BLUE, whiteSpace: "nowrap" }}>{setupLabel}</span>
+          </div>
         </div>
 
-        {/* Full-Width CTA Footer */}
         <div style={{ marginTop: "auto", paddingTop: "2px", display: "flex", flexDirection: "column", gap: "8px" }}>
-          {!product.coming_soon && (
+          {!unavailable && (
             <motion.button
               onClick={toggle}
-              whileTap={{ scale: 0.94, rotateY: 6, rotateX: -2 }}
-              whileHover={{ y: -2, boxShadow: inCart ? "0 8px 20px rgba(34,197,94,0.4)" : "0 4px 24px rgba(0,121,193,0.5)" }}
+              whileTap={{ scale: 0.96 }}
+              whileHover={{ y: -2, boxShadow: inCart ? "0 9px 22px rgba(22,163,74,0.36)" : "0 9px 24px rgba(0,121,193,0.34)" }}
               transition={{ type: "spring", stiffness: 400, damping: 25 }}
               style={{
                 width: "100%",
-                borderRadius: "9999px", padding: "1px",
+                borderRadius: "9999px",
                 background: inCart ? "linear-gradient(135deg,#22c55e,#16a34a)" : "linear-gradient(90deg, #0079c1 0%, #005691 100%)",
-                border: "none", cursor: "pointer",
-                boxShadow: inCart ? "0 4px 12px rgba(34,197,94,0.3)" : "0 2px 12px rgba(0,121,193,0.35)",
+                border: "none",
+                cursor: "pointer",
+                boxShadow: inCart ? "0 6px 15px rgba(34,197,94,0.28)" : "0 6px 18px rgba(0,121,193,0.28)",
+                padding: 0,
               }}
             >
-              <span className="product-card-cta-label" style={{
-                display: "flex", alignItems: "center", justifyContent: "center", gap: "6px",
-                width: "100%",
-                height: "36px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
-                background: inCart ? "linear-gradient(135deg,#16a34a,#15803d)" : "linear-gradient(90deg, #0079c1 0%, #005691 100%)",
-                color: "#fff", fontWeight: "700", whiteSpace: "nowrap",
-                pointerEvents: "none",
+              <span className="automation-card-cta-label" style={{
+                display: "flex", alignItems: "center", justifyContent: "center", gap: "7px",
+                width: "100%", height: "40px", paddingLeft: "16px", paddingRight: "16px", borderRadius: "9999px",
+                color: "#fff", fontWeight: "850", whiteSpace: "nowrap", pointerEvents: "none",
               }}>
-                {inCart ? <><Check style={{ width: "12px", height: "12px" }} /> Added to Cart</> : <><Plus style={{ width: "12px", height: "12px" }} /> Add to Cart</>}
+                {inCart ? <><Check style={{ width: "13px", height: "13px" }} /> Added to Cart</> : <><Plus style={{ width: "13px", height: "13px" }} /> Add Automation</>}
               </span>
             </motion.button>
           )}
 
-          {product.coming_soon && (
-            <>
-              <span style={{ fontSize: "11px", fontWeight: "700", color: "#003B8F", background: "rgba(0,174,239,0.06)", padding: "8px 12px", borderRadius: "9999px", border: "1px solid rgba(0,174,239,0.15)", whiteSpace: "nowrap", textAlign: "center" }}>
-                <span style={{display:"inline-block",width:"7px",height:"7px",borderRadius:"50%",background:"#00AEEF",marginRight:"5px",animation:"cs-pulse 1.4s ease-in-out infinite"}} />
-                Coming Soon
-              </span>
-              <style>{`@keyframes cs-pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(1.3)}}`}</style>
-            </>
+          {unavailable && (
+            <span style={{ fontSize: "11px", fontWeight: "800", color: "#475569", background: "rgba(100,116,139,0.08)", padding: "10px 12px", borderRadius: "9999px", border: "1px solid rgba(100,116,139,0.16)", whiteSpace: "nowrap", textAlign: "center" }}>
+              Early Access — Not Checkout Enabled
+            </span>
           )}
         </div>
 
-        {product.popular && !product.coming_soon && (
-          <div style={{
-            position: "absolute", top: "-10px", right: "10px", zIndex: 10,
-            background: "linear-gradient(135deg,#0088CC,#00AEEF)",
-            color: "#fff", fontSize: "8px", fontWeight: "700",
-            padding: "4px 10px", borderRadius: "18px",
-            letterSpacing: "0.08em", textTransform: "uppercase",
-            boxShadow: "0 2px 8px rgba(0,174,239,0.35)",
-          }}>
-            Popular
-          </div>
-        )}
-
-        {!product.coming_soon && <span className="pcard-click-hint">tap for details →</span>}
+        {!unavailable && <span className="pcard-click-hint">details →</span>}
       </motion.div>
 
       {modalOpen && (
