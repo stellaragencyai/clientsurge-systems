@@ -1,5 +1,5 @@
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
+import { execFileSync, spawnSync } from "node:child_process";
 import { readFileSync } from "node:fs";
 import test from "node:test";
 
@@ -32,4 +32,17 @@ test("production proof self-test exits cleanly", () => {
   assert.equal(report.status, "pass");
   assert.equal(report.expected_main_sha, "test-sha");
   assert.equal(report.fail_count, 0);
+});
+
+test("production proof fails when generated Base44 Pages directory is exposed", () => {
+  const result = spawnSync(process.execPath, ["scripts/release/prove-production-release.mjs", "--self-test-route-exposure", "--expected-sha=test-sha"], {
+    cwd: new URL("..", import.meta.url),
+    encoding: "utf8",
+  });
+
+  assert.notEqual(result.status, 0);
+  const report = JSON.parse(result.stdout);
+  assert.equal(report.status, "fail");
+  assert.equal(report.routes.find((route) => route.route === "/")?.generated_pages_exposure, true);
+  assert.match(JSON.stringify(report), /generated Base44 Pages directory exposed/i);
 });
