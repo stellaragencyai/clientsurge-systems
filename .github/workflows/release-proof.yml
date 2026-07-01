@@ -1,0 +1,67 @@
+name: ClientSurge Release Proof
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  release-proof:
+    name: Build and release proof
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint --if-present
+
+      - name: Typecheck
+        run: npm run typecheck --if-present
+
+      - name: Node tests
+        run: npm run test:node --if-present
+
+      - name: Release gate tests
+        run: npm run test:release-gate:node --if-present
+
+      - name: Build
+        run: npm run build
+
+      - name: Public route smoke script availability
+        run: |
+          test -f scripts/public-route-smoke.mjs
+          test -f scripts/release/prove-production-release.mjs
+
+      - name: Source of truth assertion
+        run: |
+          grep -R "69dc4a79656fdba136d413d3" base44 src scripts docs package.json
+          grep -R "clientsurgesystems.com" src scripts docs package.json
+          grep -R "stellaragencyai/clientsurge-systems" docs src || true
+
+      - name: Release proof summary
+        run: |
+          echo "## ClientSurge release proof" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Repo: stellaragencyai/clientsurge-systems" >> "$GITHUB_STEP_SUMMARY"
+          echo "- App ID: 69dc4a79656fdba136d413d3" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Domain: https://clientsurgesystems.com" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Build: attempted in this workflow" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Base44 deploy: still requires separate Base44 proof because Base44 reports git_remote_source=s3" >> "$GITHUB_STEP_SUMMARY"
