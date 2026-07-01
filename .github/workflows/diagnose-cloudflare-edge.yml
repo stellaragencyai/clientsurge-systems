@@ -84,6 +84,7 @@ jobs:
           tail -120 /tmp/wrangler-dry-run.log
           exit $code
 
-      - name: Require live homepage exposure smoke
+      - name: Require live homepage exposure smoke after merge
+        if: github.event_name != 'pull_request'
         shell: bash
         run: node scripts/public-exposure-live-smoke.mjs --url "$VERIFY_URL"
