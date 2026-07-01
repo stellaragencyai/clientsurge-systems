@@ -34,15 +34,8 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@v4
-
-      - name: Set up Node
-        uses: actions/setup-node@v4
         with:
-          node-version: 22
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
+          show-progress: false
 
       - name: Require Cloudflare secret presence
         shell: bash
@@ -59,12 +52,12 @@ jobs:
 
       - name: Require Wrangler auth
         shell: bash
-        run: npx wrangler whoami >/tmp/wrangler-whoami.log 2>&1
+        run: npx --yes wrangler whoami
 
       - name: Require Wrangler deploy dry-run
         shell: bash
-        run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run >/tmp/wrangler-dry-run.log 2>&1
+        run: npx --yes wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
 
       - name: Require live homepage exposure smoke
         shell: bash
-        run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
+        run: node scripts/public-exposure-live-smoke.mjs --url "$VERIFY_URL"
