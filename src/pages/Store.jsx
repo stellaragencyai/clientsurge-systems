@@ -9,11 +9,12 @@ import Footer from "@/components/landing/Footer";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { setPageMetadata } from "@/lib/seo";
 import { trackCTA } from "@/lib/analytics";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
+const checkoutHrefForPackage = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
+
 function StoreInner() {
-  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [activeCategory, setActiveCategory] = useState("All");
   const [search, setSearch] = useState("");
@@ -46,9 +47,8 @@ function StoreInner() {
     });
   }, [activeCategory, search]);
 
-  const choosePackage = (packageKey) => {
+  const trackPackageSelection = (packageKey) => {
     trackCTA(`store_package_${packageKey}`, "store");
-    navigate(`/product-signup?package=${packageKey}`);
   };
 
   return (
@@ -94,7 +94,13 @@ function StoreInner() {
                 {selectedPackageOffer.included_services.map((service) => <span key={service.product_id} className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/5 px-3 py-2 text-xs font-bold text-foreground"><span>{service.icon}</span>{service.name}</span>)}
               </div>
               <div className="flex flex-col sm:flex-row gap-3">
-                <button onClick={() => { trackCTA("store_package_checkout", "store"); navigate(`/product-signup?package=${selectedPackageOffer.package_key}`); }} className="cs-btn-primary inline-flex"><ArrowRight className="w-4 h-4" /> Continue to Checkout</button>
+                <a
+                  href={checkoutHrefForPackage(selectedPackageOffer.package_key)}
+                  onClick={() => trackCTA("store_package_checkout", "store")}
+                  className="cs-btn-primary inline-flex items-center gap-2 no-underline"
+                >
+                  <ArrowRight className="w-4 h-4" /> Continue to Checkout
+                </a>
                 <button onClick={() => { const next = new URLSearchParams(searchParams); next.delete("package"); setSearchParams(next, { replace: true }); }} className="inline-flex items-center justify-center rounded-full border border-border px-5 py-3 text-sm font-semibold text-foreground hover:bg-muted">Browse All Services Instead</button>
               </div>
             </div>
@@ -130,11 +136,16 @@ function StoreInner() {
                 { name: "Growth System", key: "growth_system", price: "$1,297 setup + $997/mo", badge: "Recommended" },
                 { name: "Pro System", key: "pro_system", price: "$2,497 setup + $1,997/mo" },
               ].map((pkg) => (
-                <button key={pkg.key} onClick={() => choosePackage(pkg.key)} className="rounded-xl border border-primary/20 bg-primary/5 p-4 text-left hover:border-primary/50 transition">
+                <a
+                  key={pkg.key}
+                  href={checkoutHrefForPackage(pkg.key)}
+                  onClick={() => trackPackageSelection(pkg.key)}
+                  className="block rounded-xl border border-primary/20 bg-primary/5 p-4 text-left no-underline hover:border-primary/50 transition"
+                >
                   {pkg.badge && <span className="mb-2 inline-flex rounded-full bg-primary px-2 py-1 text-[10px] font-bold uppercase text-white">{pkg.badge}</span>}
                   <p className="font-bold text-foreground">{pkg.name}</p>
                   <p className="text-xs text-muted-foreground mt-1">{pkg.price}</p>
-                </button>
+                </a>
               ))}
             </div>
           </div>
