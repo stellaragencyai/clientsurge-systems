@@ -16,16 +16,36 @@ function getReactContainerMarkerCount(node) {
   return Object.keys(node).filter((key) => key.startsWith('__reactContainer$')).length;
 }
 
-function getOrCreateClientSurgeMount(rootElement) {
+function getOrCreateDocumentRoot() {
+  let rootElement = document.getElementById('root');
+
   if (!rootElement) {
-    throw new Error('ClientSurge root element #root was not found.');
+    rootElement = document.createElement('div');
+    rootElement.id = 'root';
+    rootElement.setAttribute('data-clientsurge-root-repaired', 'true');
+
+    const firstBodyChild = document.body?.firstChild || null;
+    if (document.body) {
+      document.body.insertBefore(rootElement, firstBodyChild);
+      console.warn('ClientSurge repaired missing #root element before app mount.');
+    }
+  }
+
+  return rootElement;
+}
+
+function getOrCreateClientSurgeMount(rootElement) {
+  const safeRootElement = rootElement || getOrCreateDocumentRoot();
+
+  if (!safeRootElement) {
+    throw new Error('ClientSurge root element #root could not be created.');
   }
 
   let mountElement = document.getElementById(CLIENTSURGE_APP_ROOT_ID);
   if (!mountElement) {
     mountElement = document.createElement('div');
     mountElement.id = CLIENTSURGE_APP_ROOT_ID;
-    rootElement.appendChild(mountElement);
+    safeRootElement.appendChild(mountElement);
   }
 
   // If Base44/editor/runtime code already claimed this mount with a React root but
@@ -96,19 +116,20 @@ function markClientSurgeMounted() {
 }
 
 function showStaticFallback(rootElement) {
+  const safeRootElement = rootElement || getOrCreateDocumentRoot();
   document.documentElement.classList.remove('clientsurge-app-mounted');
   document.documentElement.classList.add('app-fallback-visible');
   const staticFallback = document.querySelector('.static-fallback');
   if (staticFallback) {
     staticFallback.style.display = 'block';
-  } else if (rootElement) {
-    rootElement.innerHTML = `<div style="padding:20px;color:#0f172a;font-family:Inter,system-ui,sans-serif"><h1>ClientSurge Systems</h1><p>The site shell loaded but the application runtime failed. Please refresh.</p></div>`;
+  } else if (safeRootElement) {
+    safeRootElement.innerHTML = `<div style="padding:20px;color:#0f172a;font-family:Inter,system-ui,sans-serif"><h1>ClientSurge Systems</h1><p>The site shell loaded but the application runtime failed. Please refresh.</p></div>`;
   }
 }
 
 // Initialize with error boundary for debugging
 function initApp() {
-  const rootElement = document.getElementById('root');
+  const rootElement = getOrCreateDocumentRoot();
 
   try {
     const app = <App />
