@@ -1,11 +1,7 @@
 name = "clientsurge-security-edge"
-main = "cloudflare/clientsurge-homepage-repair-wrapper.mjs"
+main = "cloudflare/clientsurge-security-edge-wrapper.mjs"
 compatibility_date = "2026-04-23"
 workers_dev = false
-
-[[routes]]
-pattern = "*clientsurgesystems.com/*"
-zone_name = "clientsurgesystems.com"
 
 [[routes]]
 pattern = "clientsurgesystems.com/*"
