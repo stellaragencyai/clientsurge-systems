@@ -125,7 +125,7 @@ export default function CinematicHero() {
               maxWidth: "980px",
             }}
           >
-            <span style={{ display: "block", color: "#FFFFFF" }}>Capture. Follow Up. Book.</span>
+            <span style={{ display: "block", color: "#FFFFFF" }}>Turn Your Website Into a 24/7 AI Sales Machine</span>
           </motion.h1>
 
           <motion.p
