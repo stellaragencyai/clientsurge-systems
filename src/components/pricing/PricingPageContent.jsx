@@ -81,7 +81,7 @@ export default function PricingPageContent() {
                 {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground">✦ {pkg.badge}</span></div>}
                 <div className="p-7 flex flex-col flex-1" style={{ paddingTop: "32px" }}>
                   <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{pkg.problem}</p>
-                  <h2 className="text-xl font-bold text-foreground mb-2">{pkg.name}</h2>
+                  <h2 className="font-titles text-xl font-bold text-foreground mb-2">{pkg.name}</h2>
                   <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{pkg.promise}</p>
                   <div className="mb-6">
                     <span className="text-3xl font-extrabold text-foreground">{pkg.monthly}</span><span className="text-sm text-muted-foreground font-semibold">/mo</span>
