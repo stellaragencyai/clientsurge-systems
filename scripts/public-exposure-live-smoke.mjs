@@ -1,7 +1,5 @@
 #!/usr/bin/env node
 
-// Trigger Cloudflare security-edge workflow with the current sanitizer build.
-// Trigger: 2026-06-30T23-05Z
 const args = process.argv.slice(2);
 function getArg(name, fallback) {
   const index = args.indexOf(name);
@@ -15,7 +13,9 @@ url.searchParams.set("v", String(Date.now()));
 const EDGE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
 const INTERNAL_TEXT = /Admin Dashboard|Business Setup|Client Portal|Client Dashboard|Setup Status|Website Preview|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline/i;
 const GENERATED_PAGES = /(?:<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*<)/i;
-const INTERNAL_HREF = /href=["']\/(admin|dashboard|client-portal|client-dashboard|setup|internal|functions|mission-control|observability|reconciliation)(\/|["'?])/i;
+const GENERATED_DIRECTORY_COPY = /ClientSurge Systems manages \d+ data types|data types and \d+ pages|organize, track, and share your work in 1 place|including launch gates/i;
+const INTERNAL_HREF = /href=["']\/(admin|dashboard|client|client-portal|client-dashboard|setup|internal|functions|function|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|["'?])/i;
+const REQUIRED_PUBLIC_HREFS = ["/pricing", "/automations", "/contact", "/privacy", "/terms"];
 
 function stripInjectedEdgeGuard(html = "") {
   return String(html).replace(
@@ -51,8 +51,13 @@ if (GENERATED_PAGES.test(publicHtml) && INTERNAL_TEXT.test(publicHtml)) {
 if (INTERNAL_HREF.test(publicHtml)) {
   findings.push("Internal/admin route href is present in live raw HTML.");
 }
-if (INTERNAL_TEXT.test(publicHtml) && /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates/i.test(publicHtml)) {
+if (INTERNAL_TEXT.test(publicHtml) && GENERATED_DIRECTORY_COPY.test(publicHtml)) {
   findings.push("Base44 app-builder directory copy is present in live raw HTML.");
+}
+for (const href of REQUIRED_PUBLIC_HREFS) {
+  if (!publicHtml.includes(`href="${href}"`) && !publicHtml.includes(`href='${href}'`)) {
+    findings.push(`Expected public navigation href missing: ${href}`);
+  }
 }
 
 console.log(JSON.stringify({
