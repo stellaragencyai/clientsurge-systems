@@ -114,15 +114,17 @@ export default function CinematicHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
             style={{
-              fontFamily: "'Montserrat', sans-serif",
-              fontSize: "clamp(2rem, 5vw, 3.7rem)",
+              fontFamily: "'Montserrat', 'Arial Black', 'Helvetica Neue', sans-serif",
+              fontSize: "clamp(2.25rem, 5.4vw, 4.45rem)",
               fontWeight: 900,
-              lineHeight: 1.07,
-              letterSpacing: "-0.04em",
+              lineHeight: 0.96,
+              letterSpacing: "-0.025em",
               margin: "0 0 20px 0",
+              textTransform: "uppercase",
               textWrap: "balance",
               textShadow: "0 2px 24px rgba(0, 0, 0, 0.6)",
-              maxWidth: "980px",
+              maxWidth: "1100px",
+              fontFeatureSettings: "'kern' 1",
             }}
           >
             <span style={{ display: "block", color: "#FFFFFF" }}>Turn Your Website Into a 24/7 AI Sales Machine</span>
