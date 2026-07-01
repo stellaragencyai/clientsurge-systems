@@ -93,6 +93,7 @@ test("static fallback is crawlable and does not expose app-builder route directo
   assert.match(indexHtml, /Pro System:<\/strong> \$2,497 setup \+ \$1,997\/month/);
 
   assert.doesNotMatch(indexHtml, />Pages</i);
+  assert.doesNotMatch(indexHtml, /ClientSurge Systems manages \d+ data types/i);
   assert.doesNotMatch(indexHtml, /Admin Dashboard|Business Setup|Client Portal|Function Audit|System Observability/i);
   assert.doesNotMatch(indexHtml, /href="\/(admin|dashboard|client|client-portal|setup|functions|internal|private|onboarding|audit|reconciliation|observability)/i);
 
@@ -106,8 +107,11 @@ test("public route exposure guard is loaded early and targets generated Pages di
   assert.doesNotMatch(indexHtml, /src="\/clientsurge-public-route-exposure-guard\.js" defer/);
   assert.match(routeExposureGuard, /looksLikeGeneratedPagesDirectory/);
   assert.match(routeExposureGuard, /removeLooseGeneratedPagesDirectory/);
+  assert.match(routeExposureGuard, /removeGeneratedSiblingCluster/);
+  assert.match(routeExposureGuard, /markUnexpectedPublicAnchors/);
   assert.match(routeExposureGuard, /GENERATED_COPY_PATTERN/);
   assert.match(routeExposureGuard, /INTERNAL_PATH_PATTERN/);
+  assert.match(routeExposureGuard, /ClientSurge Systems manages \\d\+ data types and \\d\+ pages/);
   assert.match(routeExposureGuard, /Admin Dashboard/);
   assert.match(routeExposureGuard, /Business Setup/);
   assert.match(routeExposureGuard, /Client Portal/);
