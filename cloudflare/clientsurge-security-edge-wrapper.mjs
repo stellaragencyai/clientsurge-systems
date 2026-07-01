@@ -35,13 +35,13 @@ const INTERNAL_ROUTE_WORDS = [
   "Automation Health",
 ];
 
-const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates/i;
-const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*<)/i;
+const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including [...]
+const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|i[...]
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
-const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Client Setup Lookup|Setup Status|Website Preview|Function Audit|System Observability|Reconciliation|Mission Control|SaaS Admin|AI Status Dashboard|Onboarding Pipeline|Opportunity Review Queue|Automation Health/i;
-const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|reconciliation|saas|lead-intelligence|sam|medspa-dashboard)[^"']*["'][\s\S]*?<\/a>/gi;
+const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas[...]
+const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|rec[...]
 
-const APP_SHELL_BLOCKED_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard|motion-lab)(?:\/|$)/i;
+const APP_SHELL_BLOCKED_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|[...]
 const APP_SHELL_ASSET_PATH_PATTERN = /\.(?:js|mjs|css|map|json|png|jpe?g|gif|svg|webp|ico|txt|xml|woff2?|ttf|otf|wasm|pdf|zip)(?:$|\?)/i;
 
 const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
@@ -51,7 +51,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="robots" content="index,follow" />
-    <meta name="description" content="ClientSurge Systems installs AI automation for local service businesses: lead capture, missed-call recovery, AI follow-up, booking automation, reviews, and lead reactivation." />
+    <meta name="description" content="ClientSurge Systems installs AI automation for local service businesses: lead capture, missed-call recovery, AI follow-up, booking automation, reviews, and le[...]
     <link rel="canonical" href="https://clientsurgesystems.com/" />
     <meta property="og:title" content="ClientSurge Systems | AI Automation for Local Businesses" />
     <meta property="og:description" content="Capture leads, follow up instantly, book appointments, and recover revenue that normally slips through the cracks." />
@@ -61,7 +61,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
     <style>
       :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       * { box-sizing: border-box; }
-      body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 20% 10%, rgba(0,174,239,.13), transparent 35%), linear-gradient(135deg,#f7fbff 0%,#ffffff 48%,#eef8ff 100%); color: #07111f; }
+      body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 20% 10%, rgba(0,174,239,.13), transparent 35%), linear-gradient(135deg,#f7fbff 0%,#ffffff 48%,#eef8ff 100%); color:[...]
       .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
       header, footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 0; }
       .brand { color: #07111f; font-weight: 950; letter-spacing: -.04em; text-decoration: none; font-size: 21px; }
@@ -72,7 +72,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
       h1 { margin: 0; max-width: 820px; font-size: clamp(42px, 7vw, 82px); line-height: .94; letter-spacing: -.07em; }
       .lede { max-width: 760px; margin: 22px 0 0; color: #475569; font-size: clamp(18px, 2vw, 22px); line-height: 1.65; }
       .actions, .bullets { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; padding: 0 22px; background: linear-gradient(135deg,#003b8f,#00aeef); color: #fff !important; font-weight: 950; box-shadow: 0 14px 32px rgba(0, 109, 255, .22); }
+      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; padding: 0 22px; background: linear-gradient(135deg,#003b8f,#00aeef); co[...]
       .button.secondary { background: #fff; color: #0f172a !important; border: 1px solid #cbd5e1; box-shadow: none; }
       .bullets span, .panel { border: 1px solid #dbe7e4; background: rgba(255,255,255,.9); }
       .bullets span { border-radius: 999px; padding: 8px 12px; color: #334155; font-size: 14px; font-weight: 700; }
@@ -99,7 +99,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
         <div>
           <p class="eyebrow">Automate Your Lead Flow</p>
           <h1 id="home-heading">Capture. Follow Up. Book.</h1>
-          <p class="lede">ClientSurge installs AI automation systems for local service businesses that need faster lead response, missed-call recovery, follow-up, booking, reviews, and reactivation.</p>
+          <p class="lede">ClientSurge installs AI automation systems for local service businesses that need faster lead response, missed-call recovery, follow-up, booking, reviews, and reactivati[...]
           <div class="actions">
             <a class="button" href="/pricing">Compare Packages</a>
             <a class="button secondary" href="/contact">Start With Contact</a>
@@ -226,17 +226,20 @@ function removePatterns(html, patterns) {
 
 export function sanitizeGeneratedPagesDirectoryHtml(html = "") {
   let nextHtml = String(html || "");
-  const internalTermsSource = INTERNAL_ROUTE_TERMS.source;
+  
+  // First, remove only the "Pages" heading and its associated list
+  // This targets the exact structure: <h2>Pages</h2> followed by <ul> or <ol>
+  nextHtml = nextHtml.replace(/<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(ul|ol)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  
+  // Remove individual admin/internal links that try to expose private routes
+  nextHtml = nextHtml.replace(INTERNAL_HREF_PATTERN, "");
+  
+  // Remove nav elements specifically containing admin links and internal route text
+  nextHtml = nextHtml.replace(/<nav\b[^>]*>[\s\S]{0,8000}?(?:Admin\s*\/|href=["']\/(?:admin|dashboard|client-portal|setup))[^\n]*?<\/nav>/gi, "");
+  
+  // Remove generated base44 copy patterns that indicate auto-generated content
   const generatedCopySource = GENERATED_BASE44_COPY.source;
-
-  nextHtml = removePatterns(nextHtml, [
-    new RegExp(`<section\\b[^>]*>[\\s\\S]{0,12000}<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>[\\s\\S]{0,24000}?(?:${internalTermsSource})[\\s\\S]{0,12000}?<\\/section>`, "gi"),
-    new RegExp(`<main\\b[^>]*>[\\s\\S]{0,12000}<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>[\\s\\S]{0,24000}?(?:${internalTermsSource})[\\s\\S]{0,12000}?<\\/main>`, "gi"),
-    new RegExp(`<h[1-4][^>]*>\\s*ClientSurge Systems\\s*<\\/h[1-4]>\\s*<(?:p|div)[^>]*>[\\s\\S]{0,3000}?(?:${generatedCopySource})[\\s\\S]{0,3000}?<\\/(?:p|div)>`, "gi"),
-    /<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(ul|ol)\b[^>]*>[\s\S]*?<\/\1>/gi,
-    new RegExp(`<h[1-4][^>]*>\\s*Pages\\s*<\\/h[1-4]>\\s*<(nav|section|div)\\b[^>]*>[\\s\\S]{0,36000}?(?:${internalTermsSource}|${generatedCopySource})[\\s\\S]{0,36000}?<\\/\\1>`, "gi"),
-    INTERNAL_HREF_PATTERN,
-  ]);
+  nextHtml = nextHtml.replace(new RegExp(`<(?:p|div)[^>]*>[\\s\\S]{0,3000}?(?:${generatedCopySource})[\\s\\S]{0,3000}?<\\/(?:p|div)>`, "gi"), "");
 
   return nextHtml;
 }
@@ -255,9 +258,9 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
 (() => {
   if (window.__clientsurgeEdgeRouteExposureGuard) return;
   window.__clientsurgeEdgeRouteExposureGuard = true;
-  const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|$)/i;
-  const INTERNAL_TEXT = /\b(Admin Dashboard|Admin\s*\/\s*AI Status Dashboard|Admin\s*\/\s*System Runbook|Admin\s*\/\s*Task Status Dashboard|Admin\s*\/\s*Conversion Insights|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Client Setup Lookup|Function Audit|System Observability|Reconciliation|Onboarding Pipeline|Install Guide|Mission Control|SaaS Admin|AI Status Dashboard|Performance Wars|Admin Settings|Lead Intelligence|Credentials Setup|Website Preview|Automation Health|Opportunity Review Queue)\b/i;
-  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates/i;
+  const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|rec[...]
+  const INTERNAL_TEXT = /\b(Admin Dashboard|Admin\s*\/\s*AI Status Dashboard|Admin\s*\/\s*System Runbook|Admin\s*\/\s*Task Status Dashboard|Admin\s*\/\s*Conversion Insights|Business Setup|Client [...]
+  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including laun[...]
   const MARKETING_START = /Automate Your Lead Flow|AI automation for local service businesses|Capture\. Follow Up\. Book\.|Compare Packages|Included Automations/i;
   const text = (node) => (node && node.textContent || '').replace(/\s+/g, ' ').trim();
   const hasInternalLink = (root) => Array.from(root.querySelectorAll?.('a[href]') || []).some((a) => {
