@@ -30,13 +30,20 @@ const emailMarkers = [
   ".internal",
   "backfill-test",
   "test@example.com",
+  "testbusiness.com",
+  "testlead.com",
 ];
 
 const sourceMarkers = [
   "crm_live_smoke_test",
   "smoke",
+  "qa",
   "install_test",
   "post_patch_verification",
+  "post-patch verification",
+  "runtime verification",
+  "verification=",
+  "email-template-runtime",
   "runaibraininstallerbackfill",
   "admin_test_lead",
   "testwebsiteleadautomation",
@@ -48,6 +55,8 @@ const nameMarkers = [
   "clientsurge smoke qa",
   "clientsurge crm smoke",
   "client surge smoke",
+  "clientsurge internal test verification",
+  "nolan runtime verify",
   "sarah smoke test",
   "admin test lead",
   "install test",
@@ -73,11 +82,13 @@ const internalCodes = new Set([
   "test_phone_555",
   "test_website",
   "generic_inquiry_name",
+  "email_marker",
+  "source_marker",
+  "name_marker",
+  "reserved_phone_pattern",
 ]);
 
-const conversionStates = new Set(["BOOKED", "WON"]);
-const conversionStatuses = new Set(["Booked", "Closed"]);
-const conversionStages = new Set(["Audit Booked", "Won Pending Payment", "Won"]);
+const commercialPaymentSources = new Set(["stripe", "manual_payment"]);
 
 function hasReasonCode(record: any, set: Set<string>) {
   return (record?.quality_reason_codes || []).some((code: string) => set.has(s(code)));
@@ -99,19 +110,13 @@ function hasUsefulContact(record: any) {
   );
 }
 
-function hasLeadConversionEvidence(lead: any) {
+function hasCommercialEvidence(lead: any) {
   return Boolean(
     Number(lead.total_revenue || 0) > 0 ||
     Number(lead.number_of_conversions || 0) > 0 ||
     s(lead.last_conversion_date) ||
     s(lead.order_id) ||
-    ["stripe", "manual_payment"].includes(lower(lead.payment_source)) ||
-    s(lead.booked_at) ||
-    conversionStates.has(s(lead.lead_state)) ||
-    conversionStatuses.has(s(lead.status)) ||
-    conversionStages.has(s(lead.crm_stage)) ||
-    ["replied", "booked"].includes(lower(lead.outreach_status)) ||
-    lower(lead.reply_sentiment) === "positive"
+    commercialPaymentSources.has(lower(lead.payment_source))
   );
 }
 
@@ -127,14 +132,14 @@ function hasWebsiteLeadEngagement(lead: any) {
 function leadSignals(lead: any) {
   const signals: string[] = [];
   const email = lower(lead.email || lead.canonical_email || lead.normalized_email);
-  const sourceText = lower([lead.source, lead.import_source, lead.consent_source, lead.source_page, lead.page_submitted_from].join(" "));
+  const sourceText = lower([lead.source, lead.import_source, lead.consent_source, lead.source_page, lead.page_submitted_from, lead.problem, lead.notes].join(" "));
   const nameText = lower([lead.business_name, lead.full_name, lead.owner_contact_name].join(" "));
   const phone = digits(lead.phone || lead.canonical_phone || lead.normalized_phone);
   const reason = lower(lead.quality_reason);
 
   if (["quarantine_candidate", "quarantined", "duplicate_candidate"].includes(s(lead.quality_review_status))) signals.push(`quality_status:${lead.quality_review_status}`);
   if (["duplicate_candidate", "merged_duplicate"].includes(s(lead.dedupe_status))) signals.push(`dedupe_status:${lead.dedupe_status}`);
-  if (s(lead.dedupe_duplicate_of) && !hasLeadConversionEvidence(lead)) signals.push("duplicate_keeper_linked");
+  if (s(lead.dedupe_duplicate_of) && !hasCommercialEvidence(lead)) signals.push("duplicate_keeper_linked");
   if (includesAny(email, emailMarkers)) signals.push("email_marker");
   if (includesAny(sourceText, sourceMarkers)) signals.push("source_marker");
   if (includesAny(nameText, nameMarkers)) signals.push("name_marker");
@@ -166,7 +171,7 @@ function websiteLeadSignals(lead: any) {
 }
 
 function buildLeadUpdate(lead: any, signals: string[], now: string) {
-  if (!signals.length || hasLeadConversionEvidence(lead) || s(lead.quality_review_status) === "verified_outbound_ready") return null;
+  if (!signals.length || hasCommercialEvidence(lead) || s(lead.quality_review_status) === "verified_outbound_ready") return null;
   const nextCodes = unique([...(lead.quality_reason_codes || []), ...signals]);
   return {
     quality_review_status: s(lead.dedupe_duplicate_of) || signals.some((x) => x.includes("duplicate")) ? "duplicate_candidate" : "quarantine_candidate",
@@ -174,6 +179,8 @@ function buildLeadUpdate(lead: any, signals: string[], now: string) {
     quality_reason_codes: nextCodes,
     quality_confidence: Math.max(Number(lead.quality_confidence || 0), signals.length >= 2 ? 95 : 80),
     audited_at: now,
+    data_quality_checked_at: now,
+    data_quality_flags: unique([...(lead.data_quality_flags || []), ...signals]),
   };
 }
 
@@ -218,7 +225,7 @@ async function applyUpdates(entity: any, updates: Array<{ id: string; update: Re
 
 async function recordQualityBackfillRun(base44: any, summary: any) {
   const action = summary.dry_run ? "dry_run" : "applied";
-  const message = `Scanned ${summary.scanned.leads} Leads / ${summary.scanned.website_leads} WebsiteLeads; eligible ${summary.eligible.leads} Leads / ${summary.eligible.website_leads} WebsiteLeads; applied ${summary.applied.leads} Leads / ${summary.applied.website_leads} WebsiteLeads.`;
+  const message = `Scanned ${summary.scanned.leads} Leads / ${summary.scanned.website_leads} WebsiteLeads; eligible ${summary.eligible.leads} Leads / ${summary.eligible.website_leads} WebsiteLeads; applied ${summary.applied.leads} Leads / ${summary.applied.website_leads}.`;
   await base44.asServiceRole.entities.CommunicationEvent.create({
     channel: "internal",
     direction: "system",
