@@ -120,28 +120,28 @@ export default function Home() {
           <CinematicHero />
         </SectionErrorBoundary>
 
-        {/* 2. Six Core Automations — what the system does */}
+        {/* 2. Industries — first post-hero section so visitors immediately find their vertical */}
+        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
+          <Industries />
+        </LazyHomepageSection>
+
+        {/* 3. Six Core Automations — what the system does */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
           <SixAutomationsSection />
         </SectionErrorBoundary>
 
-        {/* 3. Revenue Leak — problem framing */}
+        {/* 4. Revenue Leak — problem framing */}
         <SectionErrorBoundary sectionName="revenue-leak">
           <RevenueLeakSection />
         </SectionErrorBoundary>
 
-        {/* 4. Pricing / Core Offer */}
+        {/* 5. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="pricing">
           <ThreeSystemsSection />
         </SectionErrorBoundary>
-
-        {/* 5. Industries — user finds their vertical */}
-        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
-          <Industries />
-        </LazyHomepageSection>
 
         {/* 6. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
