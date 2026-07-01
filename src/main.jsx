@@ -7,6 +7,9 @@ import '@/design-system.css'
 import '@/admin-mobile-hotfix.css'
 import { installAdminMobileRuntime } from '@/lib/adminMobileRuntime'
 
+const CLIENTSURGE_ROOT_KEY = '__clientsurgeReactRoot__';
+const CLIENTSURGE_RUNTIME_KEY = '__clientsurgeRuntimeInstalled__';
+
 // Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
 const staticFallback = document.querySelector('.static-fallback');
 if (staticFallback) {
@@ -42,20 +45,42 @@ function closeInitialAdminMobileDrawer() {
   window.setTimeout(closeIfOpen, 0);
 }
 
+function getClientSurgeRoot(rootElement) {
+  if (!rootElement) {
+    throw new Error('ClientSurge root element #root was not found.');
+  }
+
+  // Production hardening: Base44/admin/editor/runtime scripts can cause the app
+  // bundle to initialize more than once on the same DOM container. React 18
+  // throws minified error #299 when createRoot is called twice. Reuse the root.
+  if (!window[CLIENTSURGE_ROOT_KEY]) {
+    window[CLIENTSURGE_ROOT_KEY] = ReactDOM.createRoot(rootElement);
+  }
+
+  return window[CLIENTSURGE_ROOT_KEY];
+}
+
+function installClientSurgeRuntimeOnce() {
+  if (window[CLIENTSURGE_RUNTIME_KEY]) return;
+  window[CLIENTSURGE_RUNTIME_KEY] = true;
+  closeInitialAdminMobileDrawer();
+  installAdminMobileRuntime();
+}
+
 // Initialize with error boundary for debugging
 function initApp() {
+  const rootElement = document.getElementById('root');
+
   try {
     const app = <App />
-    ReactDOM.createRoot(document.getElementById('root')).render(
+    getClientSurgeRoot(rootElement).render(
       import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
     )
-    closeInitialAdminMobileDrawer();
-    installAdminMobileRuntime();
+    installClientSurgeRuntimeOnce();
   } catch (err) {
     console.error('Critical error rendering App:', err);
-    const root = document.getElementById('root');
-    if (root) {
-      root.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
+    if (rootElement) {
+      rootElement.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
     }
   }
 }
