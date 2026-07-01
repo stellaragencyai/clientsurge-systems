@@ -1,10 +1,10 @@
 /*
-  Security & SEO Headers — fixes FLAW #39, #90
+  Security & SEO Headers — production-aligned CSP for ClientSurge public shell
   Applied to all routes via Netlify/Cloudflare _headers file
 */
 
 /*
-  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://cdn.worldvectorlogo.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://api.stripe.com https://www.google-analytics.com https://region1.google-analytics.com wss: ws:; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; object-src 'none'; base-uri 'self'; form-action 'self' https://api.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests
+  Content-Security-Policy: default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://js.stripe.com https://checkout.stripe.com https://assets.calendly.com https://calendly.com https://unpkg.com; script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://js.stripe.com https://checkout.stripe.com https://assets.calendly.com https://calendly.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https:; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https: wss: ws:; frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://calendly.com https://assets.calendly.com; object-src 'none'; base-uri 'self'; form-action 'self' https://api.stripe.com https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
   Referrer-Policy: strict-origin-when-cross-origin
