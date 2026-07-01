@@ -102,12 +102,12 @@ export default function ThreeSystemsSection() {
                       </li>
                     ))}
                   </ul>
-                  <div className="mb-7 w-full pt-4" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
-                    <div className="flex items-baseline justify-center gap-1.5">
-                      <span className="font-extrabold tracking-tight text-black" style={{ fontSize: "clamp(2rem, 4vw, 2.75rem)" }}>{pkg.price}</span>
-                      <span className="text-sm text-foreground/60 font-semibold">/mo</span>
+                  <div className="mb-7 w-full pt-5" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
+                    <div className="flex items-end justify-center gap-2" style={{ lineHeight: 1 }}>
+                      <span className="font-extrabold tracking-tight text-black" style={{ fontSize: "clamp(1.65rem, 3vw, 2.15rem)", letterSpacing: "-0.045em" }}>{pkg.price}</span>
+                      <span className="text-xs text-foreground/60 font-bold" style={{ paddingBottom: "0.28rem" }}>/mo</span>
                     </div>
-                    <p className="text-xs text-foreground/70 mt-2">{pkg.setup}</p>
+                    <p className="text-[11px] text-foreground/60 mt-3 font-semibold tracking-[0.08em]">{pkg.setup}</p>
                   </div>
                   <button
                     type="button"
