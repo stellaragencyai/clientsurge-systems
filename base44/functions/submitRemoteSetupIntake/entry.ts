@@ -1,10 +1,28 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import {
+  RESEND_TEMPLATE_ALIASES,
+  clean,
+  commonTemplateVariables,
+  firstNameFrom,
+  getFromEmail,
+  getRemoteSetupIntakeSuppressionReasons,
+  labelPackage,
+  labelService,
+  logEmailEvent,
+  renderMasterFallbackHtml,
+  renderMasterFallbackText,
+  sendClientSurgeResendTemplateEmail,
+} from '../_shared/clientSurgeResendTemplates.ts';
 
 const PACKAGE_SERVICE_MAP = {
   starter_system: ['instant_lead_response', 'missed_call_text_back'],
   growth_system: ['instant_lead_response', 'missed_call_text_back', 'nurture_sequence_14d', 'ai_booking_agent'],
   pro_system: ['instant_lead_response', 'missed_call_text_back', 'nurture_sequence_14d', 'ai_booking_agent', 'review_request', 'lead_reactivation'],
 };
+
+const APP_URL = Deno.env.get('APP_URL') || 'https://clientsurgesystems.com';
+const SUPPORT_EMAIL = Deno.env.get('SUPPORT_EMAIL') || 'support@clientsurgesystems.com';
+const SUPPORT_PHONE = Deno.env.get('SUPPORT_PHONE') || '(602) 584-3227';
 
 Deno.serve(async (req) => {
   try {
@@ -38,7 +56,7 @@ Deno.serve(async (req) => {
     }
 
     const now = new Date().toISOString();
-    const firstName = contact_name?.trim().split(' ')[0] || '';
+    const firstName = firstNameFrom(contact_name);
     const requested_channels = consent ? ['sms', 'email'] : [];
     const packageServiceKeys = PACKAGE_SERVICE_MAP[selected_package_key] || [];
     const serviceInterest = selected_service_key || packageServiceKeys[0] || null;
@@ -212,16 +230,114 @@ Deno.serve(async (req) => {
       console.error('CommunicationEvent error:', e.message);
     }
 
-    // ── 6. Confirmation email (best-effort) ─────────────────
-    try {
-      await svc.integrations.Core.SendEmail({
-        to: email,
-        from_name: 'ClientSurge Systems',
-        subject: 'Remote Setup Intake Received — ClientSurge Systems',
-        body: `Hi ${firstName},\n\nYour remote setup intake has been received for ${business_name}.\n\nSelected: ${PACKAGE_SERVICE_MAP[selected_package_key] ? selected_package_key : selected_service_key || 'Custom'}\n\nClientSurge will review your business details, lead sources, and setup access requirements. You'll hear from us shortly.\n\nNext step: Watch for an email from our team with your setup checklist and access requirements.\n\nQuestions? Reply to this email or call (602) 584-3227.\n\nClientSurge Systems\nsupport@clientsurgesystems.com`,
+    // ── 6. Branded Resend template confirmation email ────────
+    const emailSubject = 'Your ClientSurge setup intake is received — next step inside';
+    const selectedSystem = labelPackage(selected_package_key || selected_service_key || 'custom');
+    const requestedAutomation = selected_service_key ? labelService(selected_service_key) : packageServiceKeys.map(labelService).join(', ') || 'Not provided yet';
+    const secureChecklistUrl = `${APP_URL}/start?intake_id=${encodeURIComponent(submissionId || '')}`;
+    const suppressionReasons = getRemoteSetupIntakeSuppressionReasons({
+      business_name,
+      contact_name,
+      email,
+      website,
+    });
+
+    if (suppressionReasons.length > 0) {
+      await logEmailEvent(svc, {
+        leadId,
+        onboardingClientId,
+        contextType: 'OnboardingSubmission',
+        contextId: submissionId,
+        relatedEntityType: 'OnboardingSubmission',
+        relatedEntityId: submissionId,
+        eventType: 'email_skipped',
+        status: 'processed',
+        subject: emailSubject,
+        bodyPreview: `Remote setup confirmation suppressed for ${email}: ${suppressionReasons.join(', ')}`,
+        templateAlias: RESEND_TEMPLATE_ALIASES.remoteSetupIntake,
+        recipient: email,
+        suppressionReasons,
       });
-    } catch (e) {
-      console.error('Confirmation email error (non-fatal):', e.message);
+    } else {
+      const rows = [
+        ['Business', business_name],
+        ['Selected system', selectedSystem],
+        ['Requested automation', requestedAutomation],
+        ['Industry', business_type || 'Not provided yet'],
+        ['Website', website || 'Not provided yet'],
+        ['Reference', submissionId || 'not assigned'],
+      ];
+      const fallbackHtml = renderMasterFallbackHtml({
+        badge: 'Intake Received',
+        headline: `${firstName}, we received your setup intake.`,
+        intro: `Our setup team is reviewing ${business_name}, your lead sources, selected automations, and access requirements so the installation can be prepared correctly.`,
+        ctaLabel: 'Open Secure Setup Checklist',
+        ctaUrl: secureChecklistUrl,
+        rows,
+        bullets: ['Access checklist', 'Build and connect', 'Test lead flow', 'Launch confirmation'],
+        proofLine: 'Every ClientSurge install is tracked by setup stage, required access, test status, and launch confirmation.',
+        referenceId: submissionId,
+      });
+      const fallbackText = renderMasterFallbackText({
+        headline: `${firstName}, we received your setup intake.`,
+        intro: `Our setup team is reviewing ${business_name} and preparing the next setup step.`,
+        ctaLabel: 'Open Secure Setup Checklist',
+        ctaUrl: secureChecklistUrl,
+        rows,
+        referenceId: submissionId,
+      });
+
+      const sendResult = await sendClientSurgeResendTemplateEmail({
+        to: email,
+        fromEmail: getFromEmail('system@clientsurgesystems.com'),
+        fromName: 'ClientSurge Setup Team',
+        replyTo: SUPPORT_EMAIL,
+        subject: emailSubject,
+        templateAlias: RESEND_TEMPLATE_ALIASES.remoteSetupIntake,
+        variables: commonTemplateVariables({
+          RECIPIENT_NAME: firstName,
+          BUSINESS_NAME: clean(business_name) || 'your business',
+          REFERENCE_ID: submissionId || 'not assigned',
+          SUPPORT_EMAIL,
+          SUPPORT_PHONE,
+          SELECTED_SYSTEM: selectedSystem,
+          REQUESTED_AUTOMATION: requestedAutomation,
+          INDUSTRY: business_type || 'Not provided yet',
+          WEBSITE_URL: website || 'Not provided yet',
+          SECURE_CHECKLIST_URL: secureChecklistUrl,
+        }),
+        fallbackHtml,
+        fallbackText,
+        tags: [
+          { name: 'category', value: 'remote_setup_intake' },
+          { name: 'template', value: RESEND_TEMPLATE_ALIASES.remoteSetupIntake },
+        ],
+        idempotencyKey: submissionId ? `remote-setup-intake-confirmation-${submissionId}` : null,
+      });
+
+      await logEmailEvent(svc, {
+        leadId,
+        onboardingClientId,
+        contextType: 'OnboardingSubmission',
+        contextId: submissionId,
+        relatedEntityType: 'OnboardingSubmission',
+        relatedEntityId: submissionId,
+        eventType: sendResult.ok ? 'email_sent' : 'email_failed',
+        status: sendResult.ok ? 'sent' : 'failed',
+        subject: emailSubject,
+        bodyPreview: sendResult.ok
+          ? `Remote setup confirmation sent to ${email}. Template used: ${sendResult.templateUsed}. Fallback used: ${sendResult.fallbackUsed}.`
+          : `Remote setup confirmation failed for ${email}: ${sendResult.error}`,
+        templateAlias: RESEND_TEMPLATE_ALIASES.remoteSetupIntake,
+        providerMessageId: sendResult.ok ? sendResult.providerMessageId : null,
+        recipient: email,
+        templateUsed: sendResult.ok ? sendResult.templateUsed : false,
+        fallbackUsed: sendResult.ok ? sendResult.fallbackUsed : true,
+      });
+
+      if (!sendResult.ok) {
+        console.error('Remote setup template email failed:', sendResult.error);
+      }
     }
 
     return Response.json({
