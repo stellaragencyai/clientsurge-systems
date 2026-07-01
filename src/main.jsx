@@ -9,11 +9,36 @@ import { installAdminMobileRuntime } from '@/lib/adminMobileRuntime'
 
 const CLIENTSURGE_ROOT_KEY = '__clientsurgeReactRoot__';
 const CLIENTSURGE_RUNTIME_KEY = '__clientsurgeRuntimeInstalled__';
+const CLIENTSURGE_APP_ROOT_ID = 'clientsurge-app-root';
 
-// Fix 3: Hide static fallback WITHOUT removing it — preserves visual editor DOM references
-const staticFallback = document.querySelector('.static-fallback');
-if (staticFallback) {
-  staticFallback.style.display = 'none';
+function getReactContainerMarkerCount(node) {
+  if (!node) return 0;
+  return Object.keys(node).filter((key) => key.startsWith('__reactContainer$')).length;
+}
+
+function getOrCreateClientSurgeMount(rootElement) {
+  if (!rootElement) {
+    throw new Error('ClientSurge root element #root was not found.');
+  }
+
+  let mountElement = document.getElementById(CLIENTSURGE_APP_ROOT_ID);
+  if (!mountElement) {
+    mountElement = document.createElement('div');
+    mountElement.id = CLIENTSURGE_APP_ROOT_ID;
+    rootElement.appendChild(mountElement);
+  }
+
+  // If Base44/editor/runtime code already claimed this mount with a React root but
+  // our window handle was lost, React 18 throws minified error #299 on createRoot.
+  // Replace the empty mount node and claim the fresh node instead of crashing the site.
+  if (!window[CLIENTSURGE_ROOT_KEY] && getReactContainerMarkerCount(mountElement) > 0) {
+    const freshMount = document.createElement('div');
+    freshMount.id = CLIENTSURGE_APP_ROOT_ID;
+    mountElement.replaceWith(freshMount);
+    mountElement = freshMount;
+  }
+
+  return mountElement;
 }
 
 function closeInitialAdminMobileDrawer() {
@@ -46,15 +71,10 @@ function closeInitialAdminMobileDrawer() {
 }
 
 function getClientSurgeRoot(rootElement) {
-  if (!rootElement) {
-    throw new Error('ClientSurge root element #root was not found.');
-  }
+  const mountElement = getOrCreateClientSurgeMount(rootElement);
 
-  // Production hardening: Base44/admin/editor/runtime scripts can cause the app
-  // bundle to initialize more than once on the same DOM container. React 18
-  // throws minified error #299 when createRoot is called twice. Reuse the root.
   if (!window[CLIENTSURGE_ROOT_KEY]) {
-    window[CLIENTSURGE_ROOT_KEY] = ReactDOM.createRoot(rootElement);
+    window[CLIENTSURGE_ROOT_KEY] = ReactDOM.createRoot(mountElement);
   }
 
   return window[CLIENTSURGE_ROOT_KEY];
@@ -67,6 +87,25 @@ function installClientSurgeRuntimeOnce() {
   installAdminMobileRuntime();
 }
 
+function markClientSurgeMounted() {
+  document.documentElement.classList.add('clientsurge-app-mounted');
+  const staticFallback = document.querySelector('.static-fallback');
+  if (staticFallback) {
+    staticFallback.style.display = 'none';
+  }
+}
+
+function showStaticFallback(rootElement) {
+  document.documentElement.classList.remove('clientsurge-app-mounted');
+  document.documentElement.classList.add('app-fallback-visible');
+  const staticFallback = document.querySelector('.static-fallback');
+  if (staticFallback) {
+    staticFallback.style.display = 'block';
+  } else if (rootElement) {
+    rootElement.innerHTML = `<div style="padding:20px;color:#0f172a;font-family:Inter,system-ui,sans-serif"><h1>ClientSurge Systems</h1><p>The site shell loaded but the application runtime failed. Please refresh.</p></div>`;
+  }
+}
+
 // Initialize with error boundary for debugging
 function initApp() {
   const rootElement = document.getElementById('root');
@@ -76,12 +115,11 @@ function initApp() {
     getClientSurgeRoot(rootElement).render(
       import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
     )
+    markClientSurgeMounted();
     installClientSurgeRuntimeOnce();
   } catch (err) {
     console.error('Critical error rendering App:', err);
-    if (rootElement) {
-      rootElement.innerHTML = `<div style="padding:20px;color:red;font-family:monospace"><h1>App Failed to Load</h1><pre>${err.stack || err.message}</pre></div>`;
-    }
+    showStaticFallback(rootElement);
   }
 }
 
