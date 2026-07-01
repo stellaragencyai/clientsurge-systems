@@ -24,7 +24,7 @@ permissions:
 
 jobs:
   diagnose:
-    name: Safe Cloudflare edge diagnostics
+    name: Strict Cloudflare edge diagnostics
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -44,72 +44,27 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Secret presence check
+      - name: Require Cloudflare secret presence
         shell: bash
         run: |
-          echo "## Cloudflare Edge Diagnostic Summary" >> "$GITHUB_STEP_SUMMARY"
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "DIAG:CLOUDFLARE_API_TOKEN=present"
-            echo "- CLOUDFLARE_API_TOKEN: present" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "DIAG:CLOUDFLARE_API_TOKEN=missing"
-            echo "- CLOUDFLARE_API_TOKEN: missing" >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
+            echo "CLOUDFLARE_API_TOKEN is missing."
+            exit 1
           fi
-          if [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "DIAG:CLOUDFLARE_ACCOUNT_ID=present"
-            echo "- CLOUDFLARE_ACCOUNT_ID: present" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "DIAG:CLOUDFLARE_ACCOUNT_ID=missing"
-            echo "- CLOUDFLARE_ACCOUNT_ID: missing" >> "$GITHUB_STEP_SUMMARY"
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "CLOUDFLARE_ACCOUNT_ID is missing."
+            exit 1
           fi
+          echo "Cloudflare secrets are present. Values were not printed."
 
-      - name: Wrangler auth check
+      - name: Require Wrangler auth
         shell: bash
-        continue-on-error: true
-        run: |
-          set +e
-          npx wrangler whoami >/tmp/wrangler-whoami.log 2>&1
-          code=$?
-          if [ "$code" -eq 0 ]; then
-            echo "DIAG:WRANGLER_AUTH=passed"
-            echo "- Wrangler auth: passed" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "DIAG:WRANGLER_AUTH=failed"
-            echo "- Wrangler auth: failed" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          exit 0
+        run: npx wrangler whoami >/tmp/wrangler-whoami.log 2>&1
 
-      - name: Wrangler deploy dry-run check
+      - name: Require Wrangler deploy dry-run
         shell: bash
-        continue-on-error: true
-        run: |
-          set +e
-          npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run >/tmp/wrangler-dry-run.log 2>&1
-          code=$?
-          if [ "$code" -eq 0 ]; then
-            echo "DIAG:WRANGLER_DRY_RUN=passed"
-            echo "- Wrangler dry-run: passed" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "DIAG:WRANGLER_DRY_RUN=failed"
-            echo "- Wrangler dry-run: failed" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          exit 0
+        run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run >/tmp/wrangler-dry-run.log 2>&1
 
-      - name: Live homepage exposure check
+      - name: Require live homepage exposure smoke
         shell: bash
-        continue-on-error: true
-        run: |
-          set +e
-          npm run smoke:public-exposure-live -- --url "$VERIFY_URL" >/tmp/live-exposure.log 2>&1
-          code=$?
-          if [ "$code" -eq 0 ]; then
-            echo "DIAG:LIVE_HOMEPAGE_EXPOSURE=passed"
-            echo "- Live homepage exposure: passed" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "DIAG:LIVE_HOMEPAGE_EXPOSURE=failed"
-            echo "- Live homepage exposure: failed" >> "$GITHUB_STEP_SUMMARY"
-          fi
-          echo "" >> "$GITHUB_STEP_SUMMARY"
-          echo "Diagnostic only: this workflow does not print secret values and does not deploy production changes." >> "$GITHUB_STEP_SUMMARY"
-          exit 0
+        run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
