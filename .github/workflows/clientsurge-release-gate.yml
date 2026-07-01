@@ -77,3 +77,6 @@ jobs:
       - name: Smoke public routes audit
         continue-on-error: true
         run: npm run smoke:public-routes
+
+      - name: Smoke product signup route
+        run: node scripts/product-signup-route-smoke.mjs
