@@ -1,9 +1,7 @@
 import edgeWorker from "./clientsurge-security-edge-worker.mjs";
 
 const REPAIR_HEADER = "x-clientsurge-homepage-repair";
-const REPAIR_VERSION = "2026-07-01T02-00Z";
-const GENERATED_DIRECTORY_COPY = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|>\s*Pages\s*</i;
-const INTERNAL_LINK_COPY = /Admin Dashboard|Business Setup|Client Portal|Client Dashboard|System Observability|Mission Control|SaaS Admin|AI Status Dashboard/i;
+const REPAIR_VERSION = "2026-07-01T03-00Z-force-clean-homepage";
 
 const CLEAN_HOMEPAGE = `<!doctype html>
 <html lang="en">
@@ -48,28 +46,18 @@ function isHomepageRequest(request) {
   return request.method === "GET" && (url.pathname === "/" || url.pathname === "");
 }
 
-function isHtmlResponse(response) {
-  return (response.headers.get("content-type") || "").includes("text/html");
-}
-
-function needsHomepageRepair(html = "") {
-  return GENERATED_DIRECTORY_COPY.test(html) || (INTERNAL_LINK_COPY.test(html) && />\s*Pages\s*</i.test(html));
-}
-
-function cleanHomepageResponse(originalResponse) {
-  const headers = new Headers(originalResponse.headers);
+function cleanHomepageResponse() {
+  const headers = new Headers();
   headers.set(REPAIR_HEADER, REPAIR_VERSION);
-  headers.set("Cache-Control", "no-store, max-age=0");
+  headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
   headers.set("Content-Type", "text/html; charset=utf-8");
+  headers.set("X-Robots-Tag", "index, follow");
   return new Response(CLEAN_HOMEPAGE, { status: 200, statusText: "OK", headers });
 }
 
 export default {
   async fetch(request, env, ctx) {
-    const response = await edgeWorker.fetch(request, env, ctx);
-    if (!isHomepageRequest(request) || !isHtmlResponse(response)) return response;
-    const html = await response.text();
-    if (needsHomepageRepair(html)) return cleanHomepageResponse(response);
-    return new Response(html, response);
+    if (isHomepageRequest(request)) return cleanHomepageResponse();
+    return edgeWorker.fetch(request, env, ctx);
   },
 };
