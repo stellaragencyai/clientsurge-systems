@@ -6,14 +6,17 @@ const REQUIRED_RELEASE_MARKERS = [
   { key: 'admin_release_panel', label: 'Admin Release Proof Panel', expected: 'present' },
   { key: 'release_gate', label: 'ClientSurge Release Gate', expected: 'required before publish' },
   { key: 'base44_sync_control', label: 'Base44 Sync Control', expected: 'required before publish' },
+  { key: 'production_release_proof', label: 'Production Release Proof Command', expected: 'npm run proof:production-release -- --expected-sha=<main-sha>' },
 ];
 
 const REQUIRED_MANUAL_PROOF = [
   'Confirm GitHub main has green ClientSurge Release Gate.',
   'Confirm Base44 publish/sync ran after the target merge commit.',
+  'Run npm run proof:production-release with the target main SHA and save the generated report.',
   'Confirm live admin contains this Release Proof panel.',
   'Confirm Data Quality dashboard contains CRM Data Quality and Automation Evidence Cards.',
   'Run a real public route smoke check against https://clientsurgesystems.com.',
+  'Capture desktop and mobile screenshots after hard refresh.',
 ];
 
 export const RELEASE_PROOF_CONFIG = {
@@ -23,6 +26,8 @@ export const RELEASE_PROOF_CONFIG = {
   defaultBranch: 'main',
   productionDomain: 'clientsurgesystems.com',
   productionUrl: 'https://clientsurgesystems.com',
+  proofCommand: 'npm run proof:production-release -- --expected-sha=<main-sha>',
+  proofRunbook: 'docs/PRODUCTION_RELEASE_PROOF_RUNBOOK.md',
   requiredMarkers: REQUIRED_RELEASE_MARKERS,
   requiredManualProof: REQUIRED_MANUAL_PROOF,
 };
