@@ -11,6 +11,18 @@ export const PUBLIC_ROUTE_METADATA = {
     description:
       "Compare ClientSurge Systems packages: Starter System, Growth System, and Pro System with crawlable setup and monthly pricing for AI automation services.",
   },
+  "/product-signup": {
+    key: "product-signup",
+    title: "Complete Your ClientSurge Signup | ClientSurge Systems",
+    description:
+      "Choose Starter, Growth, or Pro and continue to secure checkout for your ClientSurge AI automation system.",
+  },
+  "/signup": {
+    key: "signup",
+    title: "Complete Your ClientSurge Signup | ClientSurge Systems",
+    description:
+      "Start your ClientSurge signup and continue to secure checkout for a Starter, Growth, or Pro AI automation system.",
+  },
   "/automations": {
     key: "automations",
     title: "AI Automation Services | ClientSurge Systems",
@@ -61,8 +73,6 @@ export const STATIC_ROUTE_ALIASES = {
   "/store": "/pricing",
   "/product": "/pricing",
   "/product-landing": "/pricing",
-  "/product-signup": "/pricing",
-  "/signup": "/pricing",
   "/about": "/",
   "/industries": "/automations",
   "/blog": "/",
@@ -78,6 +88,8 @@ export const LEGACY_REDIRECTS = Object.entries(STATIC_ROUTE_ALIASES);
 export const PUBLIC_DIRECTORY_PAGES = [
   "/",
   "/pricing",
+  "/product-signup",
+  "/signup",
   "/automations",
   "/contact",
   "/privacy",
