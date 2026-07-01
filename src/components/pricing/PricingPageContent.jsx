@@ -5,20 +5,29 @@ import { useCart } from "@/lib/cartContext";
 import { getPackageServices } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 
+const CHECK_GREEN = "#16A34A";
+const CHECK_GREEN_BG = "rgba(22, 163, 74, 0.1)";
+
 const PACKAGES = [
   {
     key: "starter_system",
     name: "Starter System",
+    layer: "Response Foundation",
     setup: "$797",
     monthly: "$497",
     problem: "We miss calls or reply too late.",
     promise: "Lead capture, instant response, and missed-call recovery installed first.",
     features: ["Instant lead response", "Missed-call text-back", "Lead capture foundation", "Owner notification", "Remote setup workflow"],
     cta: "Add Starter System",
+    accent: "#0EA5E9",
+    accentDark: "#0369A1",
+    accentSoft: "rgba(14, 165, 233, 0.08)",
+    accentBorder: "rgba(14,165,233,0.2)",
   },
   {
     key: "growth_system",
     name: "Growth System",
+    layer: "Growth Engine",
     badge: "Recommended",
     setup: "$1,297",
     monthly: "$997",
@@ -26,16 +35,25 @@ const PACKAGES = [
     promise: "Response, nurture, booking, and lead status tracking working together.",
     features: ["Everything in Starter", "14-day SMS/email nurture", "AI booking handoff", "Lead status tracking", "Testing workflow"],
     cta: "Add Growth System",
+    accent: "#00AEEF",
+    accentDark: "#005691",
+    accentSoft: "rgba(0,174,239,0.1)",
+    accentBorder: "rgba(0,174,239,0.45)",
   },
   {
     key: "pro_system",
     name: "Pro System",
+    layer: "Revenue Operating Layer",
     setup: "$2,497",
     monthly: "$1,997",
     problem: "We want the full lead recovery layer.",
     promise: "The complete system for response, booking, reviews, reactivation, reporting, and priority setup.",
     features: ["Everything in Growth", "Lead reactivation", "Review automation", "Advanced reporting", "Priority launch support"],
     cta: "Add Pro System",
+    accent: "#1D4ED8",
+    accentDark: "#0F172A",
+    accentSoft: "rgba(15, 23, 42, 0.06)",
+    accentBorder: "rgba(15,23,42,0.16)",
   },
 ];
 
@@ -77,19 +95,55 @@ export default function PricingPageContent() {
           {PACKAGES.map((pkg) => {
             const highlight = Boolean(pkg.badge);
             return (
-              <article key={pkg.key} className={`cs-card relative flex flex-col ${highlight ? "border-primary bg-primary/5 shadow-lg" : ""}`}>
+              <article key={pkg.key} className="cs-card relative flex flex-col overflow-hidden transition-all duration-300 hover:-translate-y-1" style={{ borderColor: highlight ? "rgba(0,174,239,0.55)" : pkg.accentBorder, background: highlight ? "linear-gradient(160deg, #f0f9ff 0%, #ffffff 48%, #f8fbff 100%)" : "linear-gradient(180deg, #ffffff 0%, #fbfdff 100%)", boxShadow: highlight ? "0 22px 64px rgba(0,174,239,0.2), 0 4px 12px rgba(15,23,42,0.06)" : "0 10px 32px rgba(15,23,42,0.08), 0 1px 4px rgba(15,23,42,0.04)" }}>
+                <div style={{ height: "4px", background: highlight ? "linear-gradient(90deg, #0079c1, #00AEEF)" : `linear-gradient(90deg, ${pkg.accent}, transparent)`, flexShrink: 0 }} />
                 {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground">✦ {pkg.badge}</span></div>}
                 <div className="p-7 flex flex-col flex-1" style={{ paddingTop: "32px" }}>
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{pkg.problem}</p>
-                  <h2 className="text-xl font-bold text-foreground mb-2">{pkg.name}</h2>
+                  <span className="inline-flex w-fit items-center rounded-full px-3 py-1 text-[10px] font-bold uppercase tracking-[0.18em] mb-4" style={{ background: pkg.accentSoft, border: `1px solid ${pkg.accentBorder}`, color: pkg.accentDark }}>
+                    {pkg.layer}
+                  </span>
+                  <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: pkg.accentDark }}>{pkg.problem}</p>
+                  <h2 className="text-xl font-bold mb-2" style={{ color: "#0F172A" }}>{pkg.name}</h2>
                   <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{pkg.promise}</p>
-                  <div className="mb-6">
-                    <span className="text-3xl font-extrabold text-foreground">{pkg.monthly}</span><span className="text-sm text-muted-foreground font-semibold">/mo</span>
-                    <p className="text-xs text-muted-foreground mt-1">{pkg.setup} one-time setup</p>
+
+                  <div className="mb-6 rounded-3xl p-5 text-left" style={{ background: highlight ? "linear-gradient(180deg, rgba(255,255,255,0.9), rgba(240,249,255,0.92))" : "linear-gradient(180deg, #ffffff, rgba(248,250,252,0.92))", border: `1px solid ${pkg.accentBorder}`, boxShadow: "inset 0 1px 0 rgba(255,255,255,0.7), 0 10px 24px rgba(15,23,42,0.05)" }}>
+                    <div className="flex items-start justify-between gap-3">
+                      <div>
+                        <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/50">Monthly plan</p>
+                        <div className="flex items-end gap-1.5 mt-1.5">
+                          <span className="font-extrabold tracking-tight" style={{ color: pkg.accentDark, fontSize: "clamp(1.85rem, 3.2vw, 2.25rem)", lineHeight: 1 }}>{pkg.monthly}</span>
+                          <span className="text-xs text-foreground/55 font-bold mb-1 uppercase tracking-[0.12em]">/mo</span>
+                        </div>
+                      </div>
+                      <span className="shrink-0 rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ color: pkg.accentDark, background: pkg.accentSoft, border: `1px solid ${pkg.accentBorder}` }}>
+                        No contract
+                      </span>
+                    </div>
+
+                    <div className="mt-4 rounded-2xl px-4 py-3 flex items-center justify-between gap-3" style={{ background: "rgba(255,255,255,0.78)", border: "1px solid rgba(15,23,42,0.08)" }}>
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-[0.16em] text-foreground/45">One-time setup</p>
+                        <p className="text-xs text-foreground/55 mt-0.5">Setup & configuration</p>
+                      </div>
+                      <span className="text-sm font-extrabold" style={{ color: pkg.accentDark }}>{pkg.setup}</span>
+                    </div>
                   </div>
-                  <ul className="space-y-2.5 mb-8 flex-1">
+
+                  <div className="w-full mb-4 flex items-center justify-between">
+                    <span className="text-[11px] font-bold uppercase tracking-[0.18em] text-foreground/45">Included</span>
+                    <span className="rounded-full px-2.5 py-1 text-[10px] font-bold uppercase tracking-[0.14em]" style={{ background: CHECK_GREEN_BG, color: CHECK_GREEN }}>
+                      Installed
+                    </span>
+                  </div>
+
+                  <ul className="space-y-3.5 mb-8 flex-1">
                     {pkg.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2.5"><CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /><span className="text-sm text-foreground/85">{feature}</span></li>
+                      <li key={feature} className="flex items-start gap-3">
+                        <span className="mt-0.5 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full" style={{ background: CHECK_GREEN_BG }}>
+                          <CheckCircle2 className="w-[18px] h-[18px]" style={{ color: CHECK_GREEN, strokeWidth: 2.8 }} />
+                        </span>
+                        <span className="text-sm text-foreground/85 leading-snug">{feature}</span>
+                      </li>
                     ))}
                   </ul>
                   <button onClick={() => handlePackageCTA(pkg)} className={`${highlight ? "cs-btn-primary" : "cs-btn-secondary"} w-full text-center justify-center`} style={{ minHeight: "unset", minWidth: "unset" }}>
