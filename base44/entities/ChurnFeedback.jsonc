@@ -42,9 +42,16 @@
   },
   "rls": {
     "create": {
-      "user_condition": {
-        "role": "user"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
+      ]
     },
     "read": {
       "user_condition": {
@@ -61,5 +68,6 @@
         "role": "admin"
       }
     }
-  }
+  },
+  "required": []
 }
