@@ -44,14 +44,11 @@ jobs:
       - name: Require Cloudflare credentials
         shell: bash
         run: |
-          if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
-            echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret. Worker cannot be deployed from GitHub Actions."
-            exit 1
-          fi
-          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
-            echo "::error::Missing CLOUDFLARE_ACCOUNT_ID repository secret. Worker cannot be deployed from GitHub Actions."
-            exit 1
-          fi
+          test -n "$CLOUDFLARE_API_TOKEN"
+          test -n "$CLOUDFLARE_ACCOUNT_ID"
+
+      - name: Ensure DNS is proxied for Worker routing
+        run: node scripts/cloudflare/ensure-proxied-dns.mjs
 
       - name: Dry-run active Cloudflare Worker
         run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
