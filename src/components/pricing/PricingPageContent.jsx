@@ -65,7 +65,7 @@ export default function PricingPageContent() {
             { Icon: CheckCircle2, text: "Proof Checked Before Launch" },
             { Icon: Wallet, text: "Month-to-Month Billing" },
           ].map(({ Icon, text }) => (
-            <span key={text} className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border" style={{ background: "rgba(0,174,239,0.08)", borderColor: "rgba(0,174,239,0.28)", color: "#00AEEF" }}>
+            <span key={text} className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border border-primary/30 bg-primary/10 text-primary">
               <Icon className="h-3.5 w-3.5" /> {text}
             </span>
           ))}
@@ -77,8 +77,8 @@ export default function PricingPageContent() {
           {PACKAGES.map((pkg) => {
             const highlight = Boolean(pkg.badge);
             return (
-              <article key={pkg.key} className={`relative rounded-xl border flex flex-col transition-all ${highlight ? "border-primary shadow-lg" : "border-border"}`} style={highlight ? { boxShadow: "0 8px 32px rgba(0,174,239,0.18)", background: "linear-gradient(160deg, rgba(0,174,239,0.04) 0%, #ffffff 60%)" } : { background: "#ffffff" }}>
-                {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold text-white" style={{ background: "linear-gradient(90deg, #0079c1, #005691)" }}>✦ {pkg.badge}</span></div>}
+              <article key={pkg.key} className={`cs-card relative flex flex-col ${highlight ? "border-primary bg-primary/5 shadow-lg" : ""}`}>
+                {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground">✦ {pkg.badge}</span></div>}
                 <div className="p-7 flex flex-col flex-1" style={{ paddingTop: "32px" }}>
                   <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{pkg.problem}</p>
                   <h2 className="text-xl font-bold text-foreground mb-2">{pkg.name}</h2>
@@ -92,7 +92,7 @@ export default function PricingPageContent() {
                       <li key={feature} className="flex items-start gap-2.5"><CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /><span className="text-sm text-foreground/85">{feature}</span></li>
                     ))}
                   </ul>
-                  <button onClick={() => handlePackageCTA(pkg)} className={highlight ? "cs-btn-primary w-full text-center justify-center" : "w-full text-center justify-center inline-flex items-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors py-3 px-4"} style={{ minHeight: "unset", minWidth: "unset" }}>
+                  <button onClick={() => handlePackageCTA(pkg)} className={`${highlight ? "cs-btn-primary" : "cs-btn-secondary"} w-full text-center justify-center`} style={{ minHeight: "unset", minWidth: "unset" }}>
                     <ShoppingCart className="w-4 h-4 mr-1.5" /> {pkg.cta}
                   </button>
                 </div>
@@ -107,7 +107,7 @@ export default function PricingPageContent() {
       </section>
 
       <section className="px-6 pb-16 max-w-5xl mx-auto">
-        <div className="rounded-2xl border border-border bg-card p-8 md:p-10 text-center">
+        <div className="cs-card p-8 md:p-10 text-center">
           <h2 className="font-titles text-foreground text-xl md:text-2xl font-bold mb-3">What Happens After You Choose</h2>
           <p className="text-muted-foreground text-sm max-w-2xl mx-auto mb-8 leading-relaxed">
             After checkout, ClientSurge collects your business details, lead sources, phone and email requirements, booking links, CRM access, and launch goals through guided intake. Then we configure, test, and launch your selected system with proof before go-live.
