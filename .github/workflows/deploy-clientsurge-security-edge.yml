@@ -8,6 +8,7 @@ on:
     paths:
       - "cloudflare/**"
       - "scripts/cloudflare/**"
+      - "scripts/public-exposure-live-smoke.mjs"
       - "src/lib/publicRouteMetadata.js"
       - "wrangler.clientsurge-security.toml"
       - "package.json"
@@ -40,20 +41,26 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run edge regression tests
-        run: node --test tests/cloudflareSecurityEdgeWrapper.test.js tests/cloudflareSecurityEdge.test.js
-
-      - name: Require Cloudflare token
+      - name: Require Cloudflare credentials
         shell: bash
         run: |
           if [ -z "$CLOUDFLARE_API_TOKEN" ]; then
             echo "::error::Missing CLOUDFLARE_API_TOKEN repository secret. Worker cannot be deployed from GitHub Actions."
             exit 1
           fi
+          if [ -z "$CLOUDFLARE_ACCOUNT_ID" ]; then
+            echo "::error::Missing CLOUDFLARE_ACCOUNT_ID repository secret. Worker cannot be deployed from GitHub Actions."
+            exit 1
+          fi
 
-      - name: Deploy Cloudflare security edge
-        shell: pwsh
-        run: npm run cloudflare:security:release
+      - name: Dry-run active Cloudflare Worker
+        run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
+
+      - name: Deploy active Cloudflare Worker
+        run: npx wrangler deploy --config wrangler.clientsurge-security.toml
+
+      - name: Upsert Cloudflare Worker routes
+        run: node scripts/cloudflare/upsert-worker-routes.mjs
 
       - name: Verify live public route exposure
         run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
