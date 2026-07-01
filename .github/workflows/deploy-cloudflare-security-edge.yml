@@ -1,20 +1,11 @@
 name: Deploy Cloudflare Security Edge
 
+# Legacy diagnostic/deploy workflow kept for manual emergency runs only.
+# Main-branch production deployment is owned by deploy-clientsurge-security-edge.yml.
+# Having both workflows subscribe to the same cloudflare/** pushes caused duplicate
+# production deploy attempts and notification storms.
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
-    paths:
-      - "cloudflare/**"
-      - "wrangler.clientsurge-security.toml"
-      - "scripts/cloudflare/ensure-proxied-dns.mjs"
-      - "scripts/cloudflare/upsert-worker-routes.mjs"
-      - "scripts/public-exposure-live-smoke.mjs"
-      - "package.json"
-      - "package-lock.json"
-      - "tests/cloudflareRouteExposureSanitizer.test.js"
-      - "tests/cloudflareSecurityEdge.test.js"
 
 permissions:
   contents: read
