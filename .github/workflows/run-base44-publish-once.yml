@@ -1,0 +1,62 @@
+name: Run One-Time Base44 Publish Attempt
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/run-base44-publish-once.yml"
+
+concurrency:
+  group: base44-publish-once
+  cancel-in-progress: false
+
+jobs:
+  publish-base44:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore Base44 CLI auth if secret exists
+        env:
+          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON }}
+        run: |
+          if [ -n "$BASE44_AUTH_JSON" ]; then
+            mkdir -p "$HOME/.base44/auth"
+            printf '%s' "$BASE44_AUTH_JSON" > "$HOME/.base44/auth/auth.json"
+            echo "Base44 auth secret restored."
+          else
+            echo "BASE44_AUTH_JSON secret not set; publish script will try available auth/browser fallback."
+          fi
+
+      - name: Publish Base44 app
+        run: |
+          set +e
+          node scripts/base44/publish-deploy-endpoint.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com --verify-wait-ms 120000 --verify-poll-ms 10000 --summary > BASE44_PUBLISH_ATTEMPT_RESULT.md 2>&1
+          STATUS=$?
+          set -e
+          sed -i -E 's/(accessToken|refreshToken|Authorization|Bearer)[^,}\n]*/[REDACTED]/g' BASE44_PUBLISH_ATTEMPT_RESULT.md || true
+          echo "" >> BASE44_PUBLISH_ATTEMPT_RESULT.md
+          echo "Exit status: $STATUS" >> BASE44_PUBLISH_ATTEMPT_RESULT.md
+          exit 0
+
+      - name: Commit publish attempt result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B base44-publish-attempt-result
+          git add BASE44_PUBLISH_ATTEMPT_RESULT.md
+          git commit -m "Record Base44 publish attempt result"
+          git push --force origin base44-publish-attempt-result
