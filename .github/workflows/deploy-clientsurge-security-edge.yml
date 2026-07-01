@@ -1,4 +1,4 @@
-name: Deploy ClientSurge Security Edge
+name: ACTIVE - Deploy ClientSurge Security Edge
 
 on:
   workflow_dispatch:
@@ -40,6 +40,12 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+
+      - name: Confirm active deploy workflow
+        run: |
+          echo "ACTIVE ClientSurge Cloudflare Security Edge deploy workflow"
+          echo "Commit: $GITHUB_SHA"
+          echo "This is the only active Cloudflare security-edge deployment workflow."
 
       - name: Require Cloudflare credentials
         shell: bash
