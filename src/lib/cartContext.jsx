@@ -6,6 +6,27 @@ const CART_LS_KEY = "clientsurge:cart:persistent";
 const CART_EXPIRY_HOURS = 48;
 const CartContext = createContext(null);
 
+function packageSignupUrl(packageKey) {
+  return `/product-signup?package=${encodeURIComponent(packageKey)}`;
+}
+
+function hardenPricingSummaryCheckoutUrl(summary) {
+  const packageKey = summary?.package_offer?.package_key;
+  if (!packageKey) return summary;
+
+  return {
+    ...summary,
+    package_offer: {
+      ...summary.package_offer,
+      // Never send buyers to static Stripe Payment Links from the cart. Those
+      // links have gone stale before and can bypass the Base44 order pipeline.
+      // Route through ProductSignup so createCheckoutSession creates a fresh
+      // Stripe Checkout Session and stores the matching Order first.
+      checkout_url: packageSignupUrl(packageKey),
+    },
+  };
+}
+
 function loadPersistedCart() {
   // First try sessionStorage (current session)
   try {
@@ -70,7 +91,10 @@ export function CartProvider({ children }) {
     setItems(normalizeSelectedProducts(nextItems));
   }, []);
 
-  const pricingSummary = useMemo(() => buildPricingSummaryForProducts(items), [items]);
+  const pricingSummary = useMemo(
+    () => hardenPricingSummaryCheckoutUrl(buildPricingSummaryForProducts(items)),
+    [items]
+  );
   const totalSetup = pricingSummary.total_setup;
   const totalMonthly = pricingSummary.total_monthly;
 
