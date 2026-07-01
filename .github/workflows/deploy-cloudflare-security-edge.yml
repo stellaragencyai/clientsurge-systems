@@ -8,6 +8,7 @@ on:
     paths:
       - "cloudflare/**"
       - "wrangler.clientsurge-security.toml"
+      - "scripts/cloudflare/ensure-proxied-dns.mjs"
       - "scripts/cloudflare/upsert-worker-routes.mjs"
       - "scripts/public-exposure-live-smoke.mjs"
       - "package.json"
@@ -60,6 +61,9 @@ jobs:
             echo "CLOUDFLARE_ACCOUNT_ID secret is missing. Cannot deploy edge sanitizer."
             exit 1
           fi
+
+      - name: Ensure DNS is proxied for Worker routing
+        run: node scripts/cloudflare/ensure-proxied-dns.mjs
 
       - name: Dry-run Cloudflare deploy
         run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
