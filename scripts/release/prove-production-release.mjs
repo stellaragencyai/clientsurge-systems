@@ -10,6 +10,10 @@ const STAGING_APP_IDS = ["69f959e2bc665e019e19840c", "6a15f1424f4856ba4e9ed90b"]
 
 const ROUTES = ["/", "/admin", "/login", "/pricing", "/automations", "/store", "/contact", "/proof", "/roofing", "/hvac", "/plumbing"];
 
+const GENERATED_PAGES_HEADING_PATTERN = /<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|>\s*Pages\s*</i;
+const GENERATED_BASE44_DIRECTORY_COPY_PATTERN = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|Premium AI-driven automation systems built to increase bookings/i;
+const INTERNAL_ROUTE_EXPOSURE_PATTERN = /href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions?|mission-control|observability|reconciliation|saas\/admin)[^"']*["']|Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|System Observability|Function Audit|Mission Control/i;
+
 function getArg(name, fallback = "") {
   const prefix = `--${name}=`;
   const found = process.argv.find((arg) => arg.startsWith(prefix));
@@ -20,9 +24,16 @@ const baseUrl = getArg("base-url", process.env.CLIENTSURGE_PROOF_BASE_URL || DEF
 const expectedSha = getArg("expected-sha", process.env.GITHUB_SHA || "manual-main-sha-required");
 const writeReport = process.argv.includes("--write-report");
 const selfTest = process.argv.includes("--self-test");
+const selfTestRouteExposure = process.argv.includes("--self-test-route-exposure");
 
 function hasStagingLeak(html = "") {
   return STAGING_APP_IDS.some((id) => html.includes(id));
+}
+
+function hasGeneratedPagesExposure(html = "") {
+  const text = String(html || "");
+  if (!GENERATED_PAGES_HEADING_PATTERN.test(text)) return false;
+  return GENERATED_BASE44_DIRECTORY_COPY_PATTERN.test(text) || INTERNAL_ROUTE_EXPOSURE_PATTERN.test(text);
 }
 
 function extractAssetHints(html = "") {
@@ -32,6 +43,18 @@ function extractAssetHints(html = "") {
 }
 
 async function fetchRoute(route) {
+  if (selfTestRouteExposure) {
+    const exposedHtml = `<!doctype html><html><body><div id="root"><main><h1>ClientSurge Systems</h1><p>ClientSurge Systems manages 5 data types including launch gates.</p><h2>Pages</h2><ul><li><a href="/admin">Admin Dashboard</a></li><li><a href="/client-portal">Client Portal</a></li></ul><section><p>Automate Your Lead Flow</p></section></main></div></body></html>`;
+    return {
+      route,
+      url: `${baseUrl}${route}`,
+      statusCode: 200,
+      contentType: "text/html; charset=utf-8",
+      cacheControl: "no-cache",
+      html: route === "/" ? exposedHtml : '<!doctype html><html><body><div id="root"></div></body></html>',
+    };
+  }
+
   if (selfTest) {
     return {
       route,
@@ -64,12 +87,14 @@ function evaluateRoute(result) {
   const looksLikeHtml = result.contentType.includes("text/html") || result.html.includes("<html");
   const appShellPresent = result.html.includes('id="root"') || result.html.includes("id='root'");
   const stagingLeak = hasStagingLeak(result.html);
+  const generatedPagesExposure = hasGeneratedPagesExposure(result.html);
   const assetHints = extractAssetHints(result.html);
 
   if (result.statusCode < 200 || result.statusCode >= 400) failures.push(`HTTP ${result.statusCode}`);
   if (!looksLikeHtml) failures.push(`not HTML: ${result.contentType || "missing content-type"}`);
   if (!appShellPresent) failures.push("missing React app shell root");
   if (stagingLeak) failures.push("staging or donor Base44 app ID leaked into production HTML");
+  if (generatedPagesExposure) failures.push("generated Base44 Pages directory exposed in production HTML");
 
   return {
     route: result.route,
@@ -78,6 +103,7 @@ function evaluateRoute(result) {
     http_status: result.statusCode,
     content_type: result.contentType,
     cache_control: result.cacheControl,
+    generated_pages_exposure: generatedPagesExposure,
     script_assets: assetHints.scripts.slice(0, 5),
     stylesheet_assets: assetHints.styles.slice(0, 5),
     failures,
@@ -121,6 +147,7 @@ async function main() {
         http_status: 0,
         content_type: "",
         cache_control: "",
+        generated_pages_exposure: false,
         script_assets: [],
         stylesheet_assets: [],
         failures: [`request error: ${error.message}`],
@@ -145,6 +172,7 @@ async function main() {
       "ClientSurge Release Gate passed for the expected SHA.",
       "ClientSurge Base44 Sync Control passed for the expected SHA.",
       "Base44 publisher ran after the expected SHA was on main.",
+      "Live public routes do not expose the generated Base44 Pages directory.",
       "Live admin mobile route opens without stale UI after a hard refresh.",
       "Screenshot proof captured for live desktop and mobile admin.",
     ],
