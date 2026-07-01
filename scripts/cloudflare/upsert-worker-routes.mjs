@@ -4,7 +4,7 @@ const API_BASE = "https://api.cloudflare.com/client/v4";
 const token = process.env.CLOUDFLARE_API_TOKEN;
 const zoneName = process.env.CLOUDFLARE_ZONE_NAME || "clientsurgesystems.com";
 const scriptName = process.env.CLOUDFLARE_WORKER_SCRIPT || "clientsurge-security-edge";
-const routePatterns = (process.env.CLOUDFLARE_WORKER_ROUTES || "clientsurgesystems.com/*,www.clientsurgesystems.com/*,*clientsurgesystems.com/*")
+const routePatterns = (process.env.CLOUDFLARE_WORKER_ROUTES || "clientsurgesystems.com/*,www.clientsurgesystems.com/*")
   .split(",")
   .map((value) => value.trim())
   .filter(Boolean);
