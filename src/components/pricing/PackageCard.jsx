@@ -11,7 +11,7 @@ export default function PackageCard({
   ctaAction,
   isRecommended = false,
   isBestFor = false,
-  highlighted = false,
+  highlighted = false
 }) {
   return (
     <div
@@ -40,7 +40,7 @@ export default function PackageCard({
       {/* Content */}
       <div className="p-8">
         {/* Package Name */}
-        <h3 className="text-2xl font-bold text-black mb-2">{name}</h3>
+        <h3 className="font-titles text-2xl font-bold text-black mb-2">{name}</h3>
 
         {/* Best For */}
         <p className="text-sm text-foreground mb-6 leading-relaxed">{description}</p>
