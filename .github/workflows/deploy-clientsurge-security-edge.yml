@@ -26,6 +26,7 @@ jobs:
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VERIFY_URL: https://clientsurgesystems.com
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -53,3 +54,6 @@ jobs:
       - name: Deploy Cloudflare security edge
         shell: pwsh
         run: npm run cloudflare:security:release
+
+      - name: Verify live public route exposure
+        run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
