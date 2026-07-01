@@ -4,11 +4,11 @@ import edgeWorker, {
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
-export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-07-01T04-05Z";
+export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-06-30T23-12Z";
 export const APP_SHELL_FALLBACK_HEADER = "x-clientsurge-app-shell-fallback";
 export const APP_SHELL_FALLBACK_VERSION = "2026-06-30T23-47Z";
 export const HOMEPAGE_REPAIR_HEADER = "x-clientsurge-homepage-repair";
-export const HOMEPAGE_REPAIR_VERSION = "2026-07-01T04-05Z-force-root";
+export const HOMEPAGE_REPAIR_VERSION = "2026-06-30T23-58Z";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
@@ -35,13 +35,13 @@ const INTERNAL_ROUTE_WORDS = [
   "Automation Health",
 ];
 
-const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates/i;
-const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates|>\s*Pages\s*<)/i;
+const GENERATED_BASE44_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including [...]
+const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|i[...]
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
-const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas|Setup Status|Website Preview|Function Audit|System Observability|Mission Control|SaaS Admin|Automation Health/i;
-const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|reconciliation|automation-health)[^"']*["'][^>]*>[\s\S]*?<\/a>/gi;
+const INTERNAL_ROUTE_TERMS = /Admin\s*(?:\/\s*)?(?:Dashboard|AI Status Dashboard|System Runbook|Task Status Dashboard|Conversion Insights)|Business Setup|Client Portal|Client Dashboard|Client Saas[...]
+const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|rec[...]
 
-const APP_SHELL_BLOCKED_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|mission-control|automation-health)(?:\/|$)/i;
+const APP_SHELL_BLOCKED_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|[...]
 const APP_SHELL_ASSET_PATH_PATTERN = /\.(?:js|mjs|css|map|json|png|jpe?g|gif|svg|webp|ico|txt|xml|woff2?|ttf|otf|wasm|pdf|zip)(?:$|\?)/i;
 
 const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
@@ -51,7 +51,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="theme-color" content="#ffffff" />
     <meta name="robots" content="index,follow" />
-    <meta name="description" content="ClientSurge Systems installs AI automation for local service businesses: lead capture, missed-call recovery, AI follow-up, booking automation, reviews, and lead reactivation." />
+    <meta name="description" content="ClientSurge Systems installs AI automation for local service businesses: lead capture, missed-call recovery, AI follow-up, booking automation, reviews, and le[...]
     <link rel="canonical" href="https://clientsurgesystems.com/" />
     <meta property="og:title" content="ClientSurge Systems | AI Automation for Local Businesses" />
     <meta property="og:description" content="Capture leads, follow up instantly, book appointments, and recover revenue that normally slips through the cracks." />
@@ -61,7 +61,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
     <style>
       :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       * { box-sizing: border-box; }
-      body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 20% 10%, rgba(0,174,239,.13), transparent 35%), linear-gradient(135deg,#f7fbff 0%,#ffffff 48%,#eef8ff 100%); color: #07111f; }
+      body { margin: 0; min-height: 100vh; background: radial-gradient(circle at 20% 10%, rgba(0,174,239,.13), transparent 35%), linear-gradient(135deg,#f7fbff 0%,#ffffff 48%,#eef8ff 100%); color:[...]
       .shell { width: min(1120px, calc(100% - 32px)); margin: 0 auto; }
       header, footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 24px 0; }
       .brand { color: #07111f; font-weight: 950; letter-spacing: -.04em; text-decoration: none; font-size: 21px; }
@@ -72,7 +72,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
       h1 { margin: 0; max-width: 820px; font-size: clamp(42px, 7vw, 82px); line-height: .94; letter-spacing: -.07em; }
       .lede { max-width: 760px; margin: 22px 0 0; color: #475569; font-size: clamp(18px, 2vw, 22px); line-height: 1.65; }
       .actions, .bullets { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; padding: 0 22px; background: linear-gradient(135deg,#003b8f,#00aeef); color: #fff !important; font-weight: 900; text-decoration: none !important; }
+      .button { display: inline-flex; align-items: center; justify-content: center; min-height: 48px; border-radius: 999px; padding: 0 22px; background: linear-gradient(135deg,#003b8f,#00aeef); co[...]
       .button.secondary { background: #fff; color: #0f172a !important; border: 1px solid #cbd5e1; box-shadow: none; }
       .bullets span, .panel { border: 1px solid #dbe7e4; background: rgba(255,255,255,.9); }
       .bullets span { border-radius: 999px; padding: 8px 12px; color: #334155; font-size: 14px; font-weight: 700; }
@@ -81,6 +81,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
       .panel p, footer p { color: #475569; line-height: 1.65; }
       ul { margin: 18px 0 0; padding: 0; list-style: none; display: grid; gap: 12px; color: #334155; }
       li strong { color: #0f172a; }
+      .warning { margin-top: 18px; padding: 14px 16px; border-radius: 18px; background: #eff6ff; color: #1e3a8a; font-size: 14px; font-weight: 750; }
       @media (max-width: 820px) { header, footer, .hero { display: block; } nav { margin-top: 16px; } .hero { padding-top: 42px; } .panel { margin-top: 28px; } }
     </style>
   </head>
@@ -98,7 +99,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
         <div>
           <p class="eyebrow">Automate Your Lead Flow</p>
           <h1 id="home-heading">Capture. Follow Up. Book.</h1>
-          <p class="lede">ClientSurge installs AI automation systems for local service businesses that need faster lead response, missed-call recovery, follow-up, booking, reviews, and reactivation.</p>
+          <p class="lede">ClientSurge installs AI automation systems for local service businesses that need faster lead response, missed-call recovery, follow-up, booking, reviews, and reactivati[...]
           <div class="actions">
             <a class="button" href="/pricing">Compare Packages</a>
             <a class="button secondary" href="/contact">Start With Contact</a>
@@ -120,6 +121,7 @@ const EMERGENCY_HOMEPAGE_HTML = `<!doctype html>
             <li><strong>Growth System:</strong> $1,297 setup + $997/month.</li>
             <li><strong>Pro System:</strong> $2,497 setup + $1,997/month.</li>
           </ul>
+          <p class="warning">Emergency edge fallback is active while the Base44 route shell is being repaired.</p>
         </aside>
       </section>
       <footer>
@@ -145,22 +147,6 @@ function acceptsHtmlNavigation(request) {
   const accept = request.headers.get("accept") || "";
   const mode = request.headers.get("sec-fetch-mode") || "";
   return accept.includes("text/html") || mode === "navigate" || accept === "";
-}
-
-function isRootHtmlRequest(request) {
-  if (request.method !== "GET" && request.method !== "HEAD") return false;
-  if (!acceptsHtmlNavigation(request)) return false;
-  return normalizePathname(new URL(request.url).pathname) === "/";
-}
-
-function buildForcedHomepageResponse() {
-  const headers = new Headers();
-  headers.set("Content-Type", "text/html; charset=utf-8");
-  headers.set("Cache-Control", "no-store, max-age=0, must-revalidate");
-  headers.set(ROUTE_EXPOSURE_SANITIZED_HEADER, "homepage-forced");
-  headers.set("x-clientsurge-route-exposure-version", ROUTE_EXPOSURE_SANITIZER_VERSION);
-  headers.set(HOMEPAGE_REPAIR_HEADER, HOMEPAGE_REPAIR_VERSION);
-  return new Response(EMERGENCY_HOMEPAGE_HTML, { status: 200, statusText: "OK", headers });
 }
 
 function isAppShellFallbackEligibleRequest(request) {
@@ -240,9 +226,15 @@ function removePatterns(html, patterns) {
 
 export function sanitizeGeneratedPagesDirectoryHtml(html = "") {
   let nextHtml = String(html || "");
+  
+  // Remove the exact "Pages" heading and its associated list (ul or ol)
+  // This is highly specific to avoid touching marketing sections
   nextHtml = nextHtml.replace(/<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(ul|ol)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  
+  // Remove individual admin/internal links
   nextHtml = nextHtml.replace(INTERNAL_HREF_PATTERN, "");
-  return removePatterns(nextHtml, [INTERNAL_ROUTE_TERMS]);
+
+  return nextHtml;
 }
 
 export function shouldRepairHomepage(request, html = "") {
@@ -259,9 +251,9 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
 (() => {
   if (window.__clientsurgeEdgeRouteExposureGuard) return;
   window.__clientsurgeEdgeRouteExposureGuard = true;
-  const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|mission-control|automation-health)(\/|$)/i;
-  const INTERNAL_TEXT = /\b(Admin Dashboard|Admin\s*\/\s*AI Status Dashboard|Admin\s*\/\s*System Runbook|Admin\s*\/\s*Task Status Dashboard|Admin\s*\/\s*Conversion Insights|Business Setup|Client Portal|Client Dashboard|Client Saas Dashboard|Setup Status|Website Preview|Function Audit|System Observability|Mission Control|SaaS Admin|Automation Health)\b/i;
-  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates/i;
+  const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|rec[...]
+  const INTERNAL_TEXT = /\b(Admin Dashboard|Admin\s*\/\s*AI Status Dashboard|Admin\s*\/\s*System Runbook|Admin\s*\/\s*Task Status Dashboard|Admin\s*\/\s*Conversion Insights|Business Setup|Client [...]
+  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including laun[...]
   const MARKETING_START = /Automate Your Lead Flow|AI automation for local service businesses|Capture\. Follow Up\. Book\.|Compare Packages|Included Automations/i;
   const text = (node) => (node && node.textContent || '').replace(/\s+/g, ' ').trim();
   const hasInternalLink = (root) => Array.from(root.querySelectorAll?.('a[href]') || []).some((a) => {
@@ -323,8 +315,6 @@ function shouldSanitizeHtml(request, response) {
 
 export default {
   async fetch(request, env, ctx) {
-    if (isRootHtmlRequest(request)) return buildForcedHomepageResponse();
-
     let response;
     try {
       response = await edgeWorker.fetch(request, env, ctx);
