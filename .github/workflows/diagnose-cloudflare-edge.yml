@@ -1,0 +1,107 @@
+name: Diagnose Cloudflare Edge
+
+on:
+  workflow_dispatch:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/diagnose-cloudflare-edge.yml"
+      - "cloudflare/**"
+      - "wrangler.clientsurge-security.toml"
+      - "scripts/public-exposure-live-smoke.mjs"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/diagnose-cloudflare-edge.yml"
+      - "cloudflare/**"
+      - "wrangler.clientsurge-security.toml"
+      - "scripts/public-exposure-live-smoke.mjs"
+
+permissions:
+  contents: read
+
+jobs:
+  diagnose:
+    name: Safe Cloudflare edge diagnostics
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      VERIFY_URL: https://clientsurgesystems.com
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Secret presence check
+        shell: bash
+        run: |
+          {
+            echo "## Cloudflare Edge Diagnostic Summary"
+            echo ""
+            if [ -n "$CLOUDFLARE_API_TOKEN" ]; then
+              echo "- CLOUDFLARE_API_TOKEN: present"
+            else
+              echo "- CLOUDFLARE_API_TOKEN: missing"
+            fi
+            if [ -n "$CLOUDFLARE_ACCOUNT_ID" ]; then
+              echo "- CLOUDFLARE_ACCOUNT_ID: present"
+            else
+              echo "- CLOUDFLARE_ACCOUNT_ID: missing"
+            fi
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Wrangler auth check
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+          npx wrangler whoami >/tmp/wrangler-whoami.log 2>&1
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "- Wrangler auth: passed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Wrangler auth: failed" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit 0
+
+      - name: Wrangler deploy dry-run check
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+          npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run >/tmp/wrangler-dry-run.log 2>&1
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "- Wrangler dry-run: passed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Wrangler dry-run: failed" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          exit 0
+
+      - name: Live homepage exposure check
+        shell: bash
+        continue-on-error: true
+        run: |
+          set +e
+          npm run smoke:public-exposure-live -- --url "$VERIFY_URL" >/tmp/live-exposure.log 2>&1
+          code=$?
+          if [ "$code" -eq 0 ]; then
+            echo "- Live homepage exposure: passed" >> "$GITHUB_STEP_SUMMARY"
+          else
+            echo "- Live homepage exposure: failed" >> "$GITHUB_STEP_SUMMARY"
+          fi
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "Diagnostic only: this workflow does not print secret values and does not deploy production changes." >> "$GITHUB_STEP_SUMMARY"
+          exit 0
