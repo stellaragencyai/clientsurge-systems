@@ -71,11 +71,17 @@ jobs:
 
       - name: Require Wrangler auth
         shell: bash
-        run: npx --yes wrangler whoami
+        run: npx --yes wrangler whoami >/tmp/wrangler-whoami.log 2>&1
 
       - name: Require Wrangler deploy dry-run
         shell: bash
-        run: npx --yes wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
+        run: |
+          set +e
+          npx --yes wrangler deploy --config wrangler.clientsurge-security.toml --dry-run >/tmp/wrangler-dry-run.log 2>&1
+          code=$?
+          echo "WRANGLER_DRY_RUN_EXIT=$code"
+          tail -120 /tmp/wrangler-dry-run.log
+          exit $code
 
       - name: Require live homepage exposure smoke
         shell: bash
