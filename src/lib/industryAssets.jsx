@@ -110,19 +110,13 @@ export const FILTER_TAGS = [
   { id: "all", label: "All Industries" },
   { id: "health", label: "Health & Medical" },
   { id: "home", label: "Home Services" },
-  { id: "professional", label: "Professional" },
 ];
 
 export const INDUSTRY_TAGS = {
   "med-spa": "health",
-  "dental": "health",
+  dental: "health",
   "chiro-pt": "health",
-  "hvac": "home",
-  "plumbing": "home",
-  "roofing": "home",
-  "contractors": "home",
-  "real-estate": "professional",
-  "personal-injury": "professional",
-  "property-services": "home",
-  "veterinary": "health",
+  hvac: "home",
+  roofing: "home",
+  contractors: "home",
 };
