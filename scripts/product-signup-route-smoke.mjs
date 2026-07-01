@@ -1,42 +1,33 @@
 #!/usr/bin/env node
 
+import fs from "node:fs";
 import http from "node:http";
 import https from "node:https";
 
 const defaultBaseUrl = process.env.CLIENTSURGE_PRODUCT_SIGNUP_SMOKE_BASE_URL || "http://127.0.0.1:4173";
 const baseUrlArg = process.argv.find((arg) => arg.startsWith("--base-url="));
 const baseUrl = new URL(baseUrlArg ? baseUrlArg.split("=").slice(1).join("=") : defaultBaseUrl);
+const builtFallbackPath = "dist/product-signup";
 
-const checks = [
-  {
-    route: "/product-signup",
-    required: [
-      "Complete your ClientSurge signup",
-      "Starter System",
-      "Growth System",
-      "Pro System",
-      "Your information",
-      "Continue to Secure Checkout",
-      "createCheckoutSession",
-    ],
-  },
-  {
-    route: "/product-signup?package=growth_system",
-    required: ["Complete your ClientSurge signup", "Growth System", "Continue to Secure Checkout"],
-  },
-  {
-    route: "/product-signup?package=starter_system",
-    required: ["Complete your ClientSurge signup", "Starter System", "Continue to Secure Checkout"],
-  },
-  {
-    route: "/product-signup?package=pro_system",
-    required: ["Complete your ClientSurge signup", "Pro System", "Continue to Secure Checkout"],
-  },
+const requiredMarkers = [
+  "Complete your ClientSurge signup",
+  "Starter System",
+  "Growth System",
+  "Pro System",
+  "Your information",
+  "Continue to Secure Checkout",
+  "createCheckoutSession",
+  "69dc4a79656fdba136d413d3",
+  "/api/apps/",
+  "/functions/createCheckoutSession",
 ];
 
-function stripQuery(route) {
-  return String(route || "/").split("?")[0];
-}
+const routes = [
+  "/product-signup",
+  "/product-signup?package=growth_system",
+  "/product-signup?package=starter_system",
+  "/product-signup?package=pro_system",
+];
 
 function looksBlank(html) {
   const bodyMatch = html.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
@@ -51,7 +42,49 @@ function looksBlank(html) {
   return text.length < 120;
 }
 
-async function checkRoute({ route, required }) {
+function validateHtml(html) {
+  const failures = [];
+
+  if (!html || looksBlank(html)) {
+    failures.push("page appears blank or nearly blank");
+  }
+
+  if (/404\s*\|\s*ClientSurge Systems/i.test(html) || /page not found/i.test(html)) {
+    failures.push("page appears to be a not-found page");
+  }
+
+  if (/Access Restricted/i.test(html)) {
+    failures.push("page appears to be behind an auth/access restriction screen");
+  }
+
+  for (const marker of requiredMarkers) {
+    if (!html.includes(marker)) {
+      failures.push(`missing required marker: ${marker}`);
+    }
+  }
+
+  return failures;
+}
+
+function checkBuiltFallback() {
+  if (!fs.existsSync(builtFallbackPath)) {
+    return {
+      status: "fail",
+      bytes: 0,
+      failures: [`built fallback file not found: ${builtFallbackPath}`],
+    };
+  }
+
+  const html = fs.readFileSync(builtFallbackPath, "utf8");
+  const failures = validateHtml(html);
+  return {
+    status: failures.length ? "fail" : "pass",
+    bytes: Buffer.byteLength(html, "utf8"),
+    failures,
+  };
+}
+
+async function checkRoute(route) {
   const url = new URL(route, baseUrl);
   const failures = [];
 
@@ -78,35 +111,10 @@ async function checkRoute({ route, required }) {
     failures.push(`expected text/html, received ${contentType || "no content-type"}`);
   }
 
-  if (!html || looksBlank(html)) {
-    failures.push("route appears blank or nearly blank");
-  }
-
-  if (/404\s*\|\s*ClientSurge Systems/i.test(html) || /page not found/i.test(html)) {
-    failures.push("route appears to be serving a not-found page");
-  }
-
-  if (/Access Restricted/i.test(html)) {
-    failures.push("route appears to be behind an auth/access restriction screen");
-  }
-
-  for (const needle of required) {
-    if (!html.includes(needle)) {
-      failures.push(`missing required visible/source marker: ${needle}`);
-    }
-  }
-
-  if (!html.includes("69dc4a79656fdba136d413d3")) {
-    failures.push("Base44 app id marker missing from checkout fallback");
-  }
-
-  if (!html.includes("/api/apps/") || !html.includes("/functions/createCheckoutSession")) {
-    failures.push("checkout function endpoint marker missing");
-  }
+  failures.push(...validateHtml(html));
 
   return {
     route,
-    normalized_path: stripQuery(route),
     url: url.href,
     status: failures.length ? "fail" : "pass",
     http_status: statusCode,
@@ -155,18 +163,25 @@ function requestHtml(url) {
   });
 }
 
-const results = await Promise.all(checks.map(checkRoute));
-const failed = results.filter((result) => result.status !== "pass");
+const builtFallback = checkBuiltFallback();
+const routeResults = await Promise.all(routes.map(checkRoute));
+const hardFailures = [
+  ...(builtFallback.status === "pass" ? [] : [{ check: "built-fallback", failures: builtFallback.failures }]),
+  ...routeResults
+    .filter((result) => result.status !== "pass")
+    .map((result) => ({ check: result.route, failures: result.failures })),
+];
 
 const summary = {
   generated_at: new Date().toISOString(),
   base_url: baseUrl.href.replace(/\/$/, ""),
-  checked_count: results.length,
-  pass_count: results.length - failed.length,
-  fail_count: failed.length,
-  note: "This verifies product-signup does not return blank HTML and includes checkout UI/function markers.",
-  results,
+  built_fallback: builtFallback,
+  route_results: routeResults,
+  checked_count: 1 + routeResults.length,
+  pass_count: 1 + routeResults.filter((result) => result.status === "pass").length,
+  fail_count: hardFailures.length,
+  note: "This verifies the built product-signup fallback and the preview route both expose non-blank checkout HTML.",
 };
 
 console.log(JSON.stringify(summary, null, 2));
-process.exit(failed.length ? 1 : 0);
+process.exit(hardFailures.length ? 1 : 0);
