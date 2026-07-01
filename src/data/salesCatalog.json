@@ -1,11 +1,11 @@
 {
-  "_comment": "Canonical price list. Only these are valid. Legacy $97/$297 wrong values are purged.",
+  "_comment": "Canonical price list. Checkout URLs intentionally route through /product-signup so Base44 creates a fresh Stripe Checkout Session and matching Order before redirecting to Stripe.",
   "tiers": {
     "starter": {
       "monthly_fee": 497,
       "setup_fee": 797,
       "label": "Starter System",
-      "checkout_url": "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
+      "checkout_url": "/product-signup?package=starter_system",
       "services": ["Instant Lead Response", "Missed Call Text-Back"],
       "service_count": 2
     },
@@ -13,7 +13,7 @@
       "monthly_fee": 997,
       "setup_fee": 1297,
       "label": "Growth System",
-      "checkout_url": "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
+      "checkout_url": "/product-signup?package=growth_system",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"],
       "service_count": 4
     },
@@ -21,7 +21,7 @@
       "monthly_fee": 1997,
       "setup_fee": 2497,
       "label": "Pro System",
-      "checkout_url": "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
+      "checkout_url": "/product-signup?package=pro_system",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking", "Review Request AI", "Reactivation Campaign"],
       "service_count": 6
     }
