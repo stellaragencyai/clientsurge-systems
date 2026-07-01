@@ -227,17 +227,13 @@ function removePatterns(html, patterns) {
 export function sanitizeGeneratedPagesDirectoryHtml(html = "") {
   let nextHtml = String(html || "");
   
-  // First, remove only the "Pages" heading and its associated list
-  // This targets the exact structure: <h2>Pages</h2> followed by <ul> or <ol>
+  // Remove the "Pages" heading and its associated list
   nextHtml = nextHtml.replace(/<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(ul|ol)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
   
-  // Remove individual admin/internal links that try to expose private routes
+  // Remove individual admin/internal links
   nextHtml = nextHtml.replace(INTERNAL_HREF_PATTERN, "");
   
-  // Remove nav elements specifically containing admin links and internal route text
-  nextHtml = nextHtml.replace(/<nav\b[^>]*>[\s\S]{0,8000}?(?:Admin\s*\/|href=["']\/(?:admin|dashboard|client-portal|setup))[^\n]*?<\/nav>/gi, "");
-  
-  // Remove generated base44 copy patterns that indicate auto-generated content
+  // Remove generated base44 copy patterns
   const generatedCopySource = GENERATED_BASE44_COPY.source;
   nextHtml = nextHtml.replace(new RegExp(`<(?:p|div)[^>]*>[\\s\\S]{0,3000}?(?:${generatedCopySource})[\\s\\S]{0,3000}?<\\/(?:p|div)>`, "gi"), "");
 
