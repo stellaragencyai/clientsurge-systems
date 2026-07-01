@@ -114,11 +114,11 @@ export default function CinematicHero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
             style={{
-              fontFamily: "'Montserrat', 'Arial Black', 'Helvetica Neue', sans-serif",
-              fontSize: "clamp(2.25rem, 5.4vw, 4.45rem)",
-              fontWeight: 900,
-              lineHeight: 0.96,
-              letterSpacing: "-0.025em",
+              fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif",
+              fontSize: "clamp(1.5rem, 3.6vw, 3rem)",
+              fontWeight: 400,
+              lineHeight: 1.05,
+              letterSpacing: "-0.015em",
               margin: "0 0 20px 0",
               textTransform: "uppercase",
               textWrap: "balance",
