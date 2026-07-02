@@ -22,6 +22,7 @@ import AutomationChecklist from "../components/portal/AutomationChecklist";
 import PortalWhatsNew from "../components/portal/PortalWhatsNew";
 import ClientOrderStatusTab from "../components/portal/ClientOrderStatusTab";
 import PortalNavigationTabs from "../components/portal/PortalNavigationTabs";
+import PortalConfidenceSummary from "../components/portal/PortalConfidenceSummary";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
@@ -320,6 +321,8 @@ export default function ClientPortal() {
           <SystemStatusBadge project={project} />
         </div>
       </div>
+
+      <PortalConfidenceSummary project={project} order={portalOrder} healthData={healthData} onNavigate={setActiveTab} />
 
       {/* Payment Failed Banner */}
       <PaymentFailedBanner subscription={subscription} order={portalOrder} />
