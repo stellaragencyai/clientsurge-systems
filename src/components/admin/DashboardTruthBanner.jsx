@@ -4,7 +4,7 @@ import { base44 } from "@/api/base44Client";
 const LABELS = {
   trusted: "Trusted",
   warning: "Warning",
-  blocked: "Blocked / Not Trusted",
+  blocked: "Blocked",
   unknown: "Unknown",
 };
 
