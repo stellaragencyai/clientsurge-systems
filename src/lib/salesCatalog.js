@@ -1,6 +1,8 @@
-// Canonical sales catalog for packaged offers, self-serve services, cart pricing,
-// checkout canonicalization, and admin visibility.
-// This file intentionally stays plain ESM so both the frontend and backend can import it.
+// Canonical frontend sales catalog for package display, cart pricing, and checkout routing.
+// Do not send public buyers directly to static Stripe Payment Links from this file.
+// Checkout must route through /product-signup so Base44 creates a fresh Order and Checkout Session first.
+
+const packageSignupUrl = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
 
 export const PUBLIC_STORE_PRODUCTS = [
   {
@@ -15,10 +17,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_price_id: "price_1TOwfiB9GU5ysJqE20FYUfVc",
     icon: "⚡",
     category: "Response",
-    highlights: [
-      "Responds in under 4 seconds",
-      "Works 24/7 with zero manual effort",
-    ],
+    highlights: ["Responds in under 4 seconds", "Works 24/7 with zero manual effort"],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
@@ -36,11 +35,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_price_id: "price_1TOwfiB9GU5ysJqE8knUfswZ",
     icon: "📞",
     category: "Response",
-    highlights: [
-      "60-second auto text-back",
-      "Stops missed-call lead loss",
-      "Works 24/7 with zero manual effort",
-    ],
+    highlights: ["60-second auto text-back", "Stops missed-call lead loss", "Works 24/7 with zero manual effort"],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
     fulfillment_label: "Done-for-you setup included",
@@ -57,11 +52,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_price_id: "price_1TOwfiB9GU5ysJqEsoZmFl6D",
     icon: "🔄",
     category: "Follow-Up",
-    highlights: [
-      "14-day automated sequence",
-      "SMS and email combined",
-      "Plug-and-play with your existing setup",
-    ],
+    highlights: ["14-day automated sequence", "SMS and email combined", "Plug-and-play with your existing setup"],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
@@ -79,11 +70,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_price_id: "price_1TOwfiB9GU5ysJqEKhYvS71r",
     icon: "📅",
     category: "Booking",
-    highlights: [
-      "Booking link and intake flow",
-      "Confirmation and reminder messaging",
-      "Tested end-to-end before go-live",
-    ],
+    highlights: ["Booking link and intake flow", "Confirmation and reminder messaging", "Tested end-to-end before go-live"],
     popular: true,
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
@@ -101,11 +88,7 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_price_id: "price_1TOwfiB9GU5ysJqEfsJEvPcI",
     icon: "💰",
     category: "Revenue",
-    highlights: [
-      "Works with your existing lead database",
-      "Safe batch sending with rate controls",
-      "Full activity log per lead",
-    ],
+    highlights: ["Works with your existing lead database", "Safe batch sending with rate controls", "Full activity log per lead"],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
     fulfillment_label: "Done-for-you setup included",
@@ -122,152 +105,14 @@ export const PUBLIC_STORE_PRODUCTS = [
     monthly_price_id: "price_1TOwfiB9GU5ysJqEryd66HuE",
     icon: "⭐",
     category: "Reputation",
-    highlights: [
-      "Manual or post-completion trigger",
-      "SMS or email channel support",
-      "Sent automatically after each appointment",
-    ],
+    highlights: ["Manual or post-completion trigger", "SMS or email channel support", "Sent automatically after each appointment"],
     checkout_enabled: true,
     availability_label: "Self-Serve Checkout",
     fulfillment_label: "Done-for-you setup included",
   },
-  {
-    product_id: "prod_UNi5aQjPk58U4o",
-    service_key: null,
-    name: "AI Email Follow-Up",
-    subtitle: "Sequence",
-    description: "Smart email sequences that nurture leads and clients with personalized, timely messages.",
-    setup_fee: 297,
-    monthly_fee: 97,
-    setup_price_id: "price_1TOwfiB9GU5ysJqEJcZwnVFL",
-    monthly_price_id: "price_1TOwfiB9GU5ysJqExHsLIEtN",
-    icon: "📧",
-    category: "Follow-Up",
-    highlights: [
-      "Personalized per lead",
-      "Smart send timing",
-      "Fully managed deployment",
-    ],
-    checkout_enabled: false,
-    availability_label: "Coming Soon",
-    fulfillment_label: "Exclusive early access",
-    coming_soon: true,
-  },
-  {
-    product_id: "prod_UNi5ybXQSG6QkX",
-    service_key: null,
-    name: "Missed Appointment Recovery",
-    subtitle: "Rebook no-shows",
-    description: "Re-engage no-shows with recovery messaging to recover lost appointments.",
-    setup_fee: 247,
-    monthly_fee: 77,
-    setup_price_id: "price_1TOwfiB9GU5ysJqEO8w24UTX",
-    monthly_price_id: "price_1TOwfiB9GU5ysJqE1M9PoI15",
-    icon: "🗓️",
-    category: "Booking",
-    highlights: [
-      "Targets no-shows quickly",
-      "Recovery sequence playbook",
-      "Fully managed deployment",
-    ],
-    checkout_enabled: false,
-    availability_label: "Coming Soon",
-    fulfillment_label: "Exclusive early access",
-    coming_soon: true,
-  },
-  {
-    product_id: "prod_UNi5Df5KWsS4lW",
-    service_key: null,
-    name: "New Client Onboarding",
-    subtitle: "Welcome flow",
-    description: "Automated welcome sequences and onboarding messages for new clients after signup or purchase.",
-    setup_fee: 347,
-    monthly_fee: 107,
-    setup_price_id: "price_1TOwfiB9GU5ysJqEJ7XM5LB6",
-    monthly_price_id: "price_1TOwfiB9GU5ysJqEpL7Tbjzm",
-    icon: "🎉",
-    category: "Retention",
-    highlights: [
-      "Welcome flow messaging",
-      "Expectation setting",
-      "Fully managed deployment",
-    ],
-    checkout_enabled: false,
-    availability_label: "Coming Soon",
-    fulfillment_label: "Exclusive early access",
-    coming_soon: true,
-  },
-  {
-    product_id: "prod_UNi53DY2nkRTuM",
-    service_key: null,
-    name: "Social DM Auto-Responder",
-    subtitle: "Instagram & Facebook",
-    description: "Instant DM response flow for social inquiries that need a consultative integration review first.",
-    setup_fee: 497,
-    monthly_fee: 127,
-    setup_price_id: "price_1TOwfiB9GU5ysJqE3mAZpu43",
-    monthly_price_id: "price_1TOwfiB9GU5ysJqEfV7uVJLb",
-    icon: "💬",
-    category: "Social",
-    highlights: [
-      "Instagram and Facebook DM flow",
-      "Lead capture from social",
-      "Fully managed deployment",
-    ],
-    checkout_enabled: false,
-    availability_label: "Coming Soon",
-    fulfillment_label: "Exclusive early access",
-    coming_soon: true,
-  },
-  {
-    product_id: "prod_UNi5Li4ZFZGRIc",
-    service_key: null,
-    name: "AI Reputation Manager",
-    subtitle: "Reviews & ratings",
-    description: "Reputation workflow offering that still requires a consultative delivery review before sale.",
-    setup_fee: 447,
-    monthly_fee: 137,
-    setup_price_id: "price_1TOwfiB9GU5ysJqEEvf0RdVG",
-    monthly_price_id: "price_1TOwfiB9GU5ysJqEkzPf9zrt",
-    icon: "🛡️",
-    category: "Reputation",
-    highlights: [
-      "Multi-platform reputation support",
-      "Consultative setup with your team",
-      "Tracks reviews across Google & Yelp",
-    ],
-    checkout_enabled: false,
-    availability_label: "Coming Soon",
-    fulfillment_label: "Exclusive early access",
-    coming_soon: true,
-  },
-  {
-    product_id: "prod_UNi5nfHZ3XKzzZ",
-    service_key: null,
-    name: "Lead Scoring & Qualification",
-    subtitle: "AI-powered",
-    description: "Lead prioritization offering that remains consultative until its delivery path is standardized.",
-    setup_fee: 547,
-    monthly_fee: 167,
-    setup_price_id: "price_1TOwfiB9GU5ysJqELMl0Jlbf",
-    monthly_price_id: "price_1TOwfiB9GU5ysJqEesWHeFVY",
-    icon: "🧠",
-    category: "Intelligence",
-    highlights: [
-      "Lead prioritization support",
-      "AI scores and ranks every lead automatically",
-      "Fully managed deployment",
-    ],
-    checkout_enabled: false,
-    availability_label: "Coming Soon",
-    fulfillment_label: "Exclusive early access",
-    coming_soon: true,
-  },
 ];
 
-export const CANONICAL_SERVICE_PRODUCTS = PUBLIC_STORE_PRODUCTS.filter(
-  (product) => product.checkout_enabled
-);
+export const CANONICAL_SERVICE_PRODUCTS = PUBLIC_STORE_PRODUCTS.filter((product) => product.checkout_enabled);
 
 export const PACKAGE_DEFINITIONS = [
   {
@@ -279,20 +124,10 @@ export const PACKAGE_DEFINITIONS = [
     description: "Start with immediate website lead response plus automatic missed-call text-back.",
     checkout_eligibility: "checkout_enabled",
     checkout_enabled: true,
-    ai_voice_agent_status: "optional_add_on_owner_confirmation_required",
-    owner_confirmation_flags: [
-      "OWNER_CONFIRMATION_REQUIRED: final owner approval of live pricing",
-      "OWNER_CONFIRMATION_REQUIRED: AI voice agent packaging",
-    ],
-    metadata: {
-      current_public_package: true,
-      package_family: "controlled_launch",
-      sales_position: "entry response and missed-call recovery package",
-    },
+    checkout_url: packageSignupUrl("starter_system"),
     stripe_product_id: "prod_UReWMpnZsCnfcL",
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
-    checkout_url: "https://checkout.clientsurgesystems.com/b/4gMaEW1T9byiayH97pbII06",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
     setup_total: 797,
     monthly_total: 497,
@@ -306,26 +141,11 @@ export const PACKAGE_DEFINITIONS = [
     description: "The core response and nurture stack for businesses actively converting inbound demand.",
     checkout_eligibility: "checkout_enabled",
     checkout_enabled: true,
-    ai_voice_agent_status: "optional_add_on_owner_confirmation_required",
-    owner_confirmation_flags: [
-      "OWNER_CONFIRMATION_REQUIRED: final owner approval of live pricing",
-      "OWNER_CONFIRMATION_REQUIRED: AI voice agent packaging",
-    ],
-    metadata: {
-      current_public_package: true,
-      package_family: "controlled_launch",
-      sales_position: "core response, nurture, and booking package",
-    },
+    checkout_url: packageSignupUrl("growth_system"),
     stripe_product_id: "prod_UReWhZsWks1HuA",
     setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
     monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
-    checkout_url: "https://checkout.clientsurgesystems.com/b/3cIcN47dt6dYayH97pbII07",
-    included_service_keys: [
-      "instant_lead_response",
-      "missed_call_text_back",
-      "nurture_sequence_14d",
-      "ai_booking_agent",
-    ],
+    included_service_keys: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
     setup_total: 1297,
     monthly_total: 997,
     badge: "Most Popular",
@@ -341,28 +161,11 @@ export const PACKAGE_DEFINITIONS = [
     description: "The complete AI automation bundle — every service, fully managed.",
     checkout_eligibility: "checkout_enabled",
     checkout_enabled: true,
-    ai_voice_agent_status: "optional_add_on_owner_confirmation_required",
-    owner_confirmation_flags: [
-      "OWNER_CONFIRMATION_REQUIRED: final owner approval of live pricing",
-      "OWNER_CONFIRMATION_REQUIRED: AI voice agent packaging",
-    ],
-    metadata: {
-      current_public_package: true,
-      package_family: "controlled_launch",
-      sales_position: "full response, reactivation, and review package",
-    },
+    checkout_url: packageSignupUrl("pro_system"),
     stripe_product_id: "prod_UReW1LmsVbn4BZ",
     setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
     monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
-    checkout_url: "https://checkout.clientsurgesystems.com/b/28EfZgdBR1XIcGP0ATbII08",
-    included_service_keys: [
-      "instant_lead_response",
-      "missed_call_text_back",
-      "nurture_sequence_14d",
-      "ai_booking_agent",
-      "lead_reactivation",
-      "review_request",
-    ],
+    included_service_keys: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent", "lead_reactivation", "review_request"],
     setup_total: 2497,
     monthly_total: 1997,
   },
@@ -381,95 +184,9 @@ export const PACKAGE_KEY_ALIASES = {
   pro: "pro_system",
   "pro system": "pro_system",
   pro_system: "pro_system",
-  "pro_website_plus_six_automations": "pro_system",
   pro_website_plus_six_automations: "pro_system",
+  "pro_website_plus_six_automations": "pro_system",
 };
-
-const PACKAGE_STRIPE_OVERRIDE_ENV = "STRIPE_PACKAGE_PRICE_OVERRIDES_JSON";
-
-function readPackageStripeOverrideConfig() {
-  // This function intentionally returns empty string in the browser.
-  // Server-side runtimes (Deno/Node) that need this config call it via
-  // backend functions where environment variables are available.
-  return "";
-}
-
-function getPackageStripeOverrides() {
-  const raw = readPackageStripeOverrideConfig().trim();
-  if (!raw) {
-    return {};
-  }
-
-  try {
-    const parsed = JSON.parse(raw);
-    if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
-      throw new Error(`${PACKAGE_STRIPE_OVERRIDE_ENV} must be a JSON object.`);
-    }
-    return parsed;
-  } catch (error) {
-    throw new Error(`Invalid ${PACKAGE_STRIPE_OVERRIDE_ENV}: ${error.message}`);
-  }
-}
-
-export function resolvePackageStripeIds(packageOffer) {
-  if (!packageOffer?.package_key) {
-    return {
-      stripe_product_id: null,
-      setup_price_id: null,
-      monthly_price_id: null,
-    };
-  }
-
-  const overrides = getPackageStripeOverrides();
-  const legacyOverrideKey = (packageOffer.legacy_package_keys || []).find(
-    (legacyKey) => overrides[legacyKey]
-  );
-  const override = overrides[packageOffer.package_key] || overrides[legacyOverrideKey] || null;
-
-  if (override) {
-    const hasCompleteOverride =
-      typeof override.stripe_product_id === "string" &&
-      override.stripe_product_id.trim() &&
-      typeof override.setup_price_id === "string" &&
-      override.setup_price_id.trim() &&
-      typeof override.monthly_price_id === "string" &&
-      override.monthly_price_id.trim();
-
-    if (!hasCompleteOverride) {
-      throw new Error(
-        `${PACKAGE_STRIPE_OVERRIDE_ENV} must include stripe_product_id, setup_price_id, and monthly_price_id for ${packageOffer.package_key}.`
-      );
-    }
-
-    return {
-      stripe_product_id: override.stripe_product_id,
-      setup_price_id: override.setup_price_id,
-      monthly_price_id: override.monthly_price_id,
-    };
-  }
-
-  return {
-    stripe_product_id: packageOffer.stripe_product_id || null,
-    setup_price_id: packageOffer.setup_price_id || null,
-    monthly_price_id: packageOffer.monthly_price_id || null,
-  };
-}
-
-const SERVICE_BY_PRODUCT_ID = Object.fromEntries(
-  CANONICAL_SERVICE_PRODUCTS.map((product) => [product.product_id, product])
-);
-
-const SERVICE_BY_KEY = Object.fromEntries(
-  CANONICAL_SERVICE_PRODUCTS.map((product) => [product.service_key, product])
-);
-
-const SERVICE_BY_MONTHLY_PRICE_ID = Object.fromEntries(
-  CANONICAL_SERVICE_PRODUCTS.map((product) => [product.monthly_price_id, product])
-);
-
-const SERVICE_BY_SETUP_PRICE_ID = Object.fromEntries(
-  CANONICAL_SERVICE_PRODUCTS.map((product) => [product.setup_price_id, product])
-);
 
 function sum(values) {
   return values.reduce((total, value) => total + value, 0);
@@ -478,17 +195,12 @@ function sum(values) {
 function uniqueBy(array, keyFn) {
   const seen = new Set();
   const result = [];
-
   for (const item of array) {
     const key = keyFn(item);
-    if (seen.has(key)) {
-      continue;
-    }
-
+    if (seen.has(key)) continue;
     seen.add(key);
     result.push(item);
   }
-
   return result;
 }
 
@@ -500,70 +212,15 @@ function fromCents(amount) {
   return Math.round(amount) / 100;
 }
 
-function allocateWeightedTotalCents(entries, totalCents, weightField) {
-  if (!entries.length) {
-    return [];
-  }
-
-  const totalWeight = entries.reduce(
-    (sumWeight, entry) => sumWeight + Math.max(0, entry[weightField]),
-    0
-  );
-
-  if (totalWeight <= 0) {
-    const equalShare = Math.floor(totalCents / entries.length);
-    let remainder = totalCents - equalShare * entries.length;
-
-    return entries.map((entry) => {
-      const cents = equalShare + (remainder > 0 ? 1 : 0);
-      remainder = Math.max(0, remainder - 1);
-      return { ...entry, allocated_cents: cents };
-    });
-  }
-
-  const provisional = entries.map((entry) => {
-    const exact = (entry[weightField] / totalWeight) * totalCents;
-    const allocated = Math.floor(exact);
-
-    return {
-      ...entry,
-      allocated_cents: allocated,
-      remainder: exact - allocated,
-    };
-  });
-
-  let remaining = totalCents - provisional.reduce((sumAllocated, entry) => sumAllocated + entry.allocated_cents, 0);
-
-  provisional
-    .sort((left, right) => right.remainder - left.remainder)
-    .forEach((entry) => {
-      if (remaining > 0) {
-        entry.allocated_cents += 1;
-        remaining -= 1;
-      }
-    });
-
-  return provisional.map(({ remainder, ...entry }) => entry);
-}
-
 function enrichPackage(definition) {
-  const included_services = definition.included_service_keys
-    .map((serviceKey) => SERVICE_BY_KEY[serviceKey])
-    .filter(Boolean);
-  const compareAtSetupFromServices = sum(included_services.map((service) => service.setup_fee));
-  const compareAtMonthlyFromServices = sum(included_services.map((service) => service.monthly_fee));
-  const compare_at_setup = Math.max(compareAtSetupFromServices, definition.setup_total);
-  const compare_at_monthly = Math.max(compareAtMonthlyFromServices, definition.monthly_total);
-
+  const included_services = definition.included_service_keys.map((serviceKey) => SERVICE_BY_KEY[serviceKey]).filter(Boolean);
+  const compare_at_setup = Math.max(sum(included_services.map((service) => service.setup_fee)), definition.setup_total);
+  const compare_at_monthly = Math.max(sum(included_services.map((service) => service.monthly_fee)), definition.monthly_total);
   return {
     ...definition,
     included_services,
-    optional_service_keys: CANONICAL_SERVICE_PRODUCTS.filter(
-      (service) => !definition.included_service_keys.includes(service.service_key)
-    ).map((service) => service.service_key),
-    optional_services: CANONICAL_SERVICE_PRODUCTS.filter(
-      (service) => !definition.included_service_keys.includes(service.service_key)
-    ),
+    optional_service_keys: CANONICAL_SERVICE_PRODUCTS.filter((service) => !definition.included_service_keys.includes(service.service_key)).map((service) => service.service_key),
+    optional_services: CANONICAL_SERVICE_PRODUCTS.filter((service) => !definition.included_service_keys.includes(service.service_key)),
     compare_at_setup,
     compare_at_monthly,
     setup_savings: Math.max(0, compare_at_setup - definition.setup_total),
@@ -572,12 +229,13 @@ function enrichPackage(definition) {
   };
 }
 
-export const PACKAGE_OFFERS = PACKAGE_DEFINITIONS.map(enrichPackage);
+const SERVICE_BY_PRODUCT_ID = Object.fromEntries(CANONICAL_SERVICE_PRODUCTS.map((product) => [product.product_id, product]));
+const SERVICE_BY_KEY = Object.fromEntries(CANONICAL_SERVICE_PRODUCTS.map((product) => [product.service_key, product]));
+const SERVICE_BY_MONTHLY_PRICE_ID = Object.fromEntries(CANONICAL_SERVICE_PRODUCTS.map((product) => [product.monthly_price_id, product]));
+const SERVICE_BY_SETUP_PRICE_ID = Object.fromEntries(CANONICAL_SERVICE_PRODUCTS.map((product) => [product.setup_price_id, product]));
 
-export const CATEGORIES = [
-  "All",
-  ...new Set(PUBLIC_STORE_PRODUCTS.map((product) => product.category)),
-];
+export const PACKAGE_OFFERS = PACKAGE_DEFINITIONS.map(enrichPackage);
+export const CATEGORIES = ["All", ...new Set(PUBLIC_STORE_PRODUCTS.map((product) => product.category))];
 
 export function formatCurrency(amount) {
   return Number(amount || 0).toLocaleString();
@@ -590,15 +248,8 @@ export function normalizePackageKey(packageKey) {
 
 export function getPackageOfferByName(packageName) {
   const normalizedName = String(packageName || "").trim().toLowerCase();
-  if (!normalizedName) {
-    return null;
-  }
-
-  return (
-    PACKAGE_OFFERS.find((offer) => offer.name.toLowerCase() === normalizedName) ||
-    getPackageOffer(normalizedName) ||
-    null
-  );
+  if (!normalizedName) return null;
+  return PACKAGE_OFFERS.find((offer) => offer.name.toLowerCase() === normalizedName) || getPackageOffer(normalizedName) || null;
 }
 
 export function getServiceProductById(productId) {
@@ -628,10 +279,7 @@ export function getPackageStorePath(packageKey) {
 }
 
 export function getBestPackageOfferForServiceKeys(serviceKeys = []) {
-  const selectedProducts = serviceKeys
-    .map((serviceKey) => getServiceProductByKey(serviceKey))
-    .filter(Boolean);
-
+  const selectedProducts = serviceKeys.map((serviceKey) => getServiceProductByKey(serviceKey)).filter(Boolean);
   return selectBestPackageOffer(selectedProducts);
 }
 
@@ -640,56 +288,56 @@ export function getPackageServices(packageKey) {
 }
 
 export function normalizeSelectedProducts(items = []) {
-  const products = items
-    .map((item) => {
-      if (typeof item === "string") {
-        return getServiceProductById(item);
-      }
-
-      if (item?.product_id) {
-        return getServiceProductById(item.product_id);
-      }
-
-      return null;
-    })
-    .filter(Boolean);
-
+  const products = items.map((item) => {
+    if (typeof item === "string") return getServiceProductById(item);
+    if (item?.product_id) return getServiceProductById(item.product_id);
+    return null;
+  }).filter(Boolean);
   return uniqueBy(products, (product) => product.product_id);
 }
 
 function getEligiblePackageOffers(products) {
   const selectedServiceKeys = new Set(products.map((product) => product.service_key));
-
-  return PACKAGE_OFFERS.filter((offer) =>
-    offer.included_service_keys.every((serviceKey) => selectedServiceKeys.has(serviceKey))
-  );
+  return PACKAGE_OFFERS.filter((offer) => offer.included_service_keys.every((serviceKey) => selectedServiceKeys.has(serviceKey)));
 }
 
 function selectBestPackageOffer(products) {
   const eligible = getEligiblePackageOffers(products);
-
-  if (!eligible.length) {
-    return null;
-  }
-
+  if (!eligible.length) return null;
   return [...eligible].sort((left, right) => {
-    const packageSizeDifference =
-      right.included_service_keys.length - left.included_service_keys.length;
-
-    if (packageSizeDifference !== 0) {
-      return packageSizeDifference;
-    }
-
-    const savingsDifference =
-      (right.setup_savings + right.monthly_savings) -
-      (left.setup_savings + left.monthly_savings);
-
-    if (savingsDifference !== 0) {
-      return savingsDifference;
-    }
-
+    const packageSizeDifference = right.included_service_keys.length - left.included_service_keys.length;
+    if (packageSizeDifference !== 0) return packageSizeDifference;
+    const savingsDifference = (right.setup_savings + right.monthly_savings) - (left.setup_savings + left.monthly_savings);
+    if (savingsDifference !== 0) return savingsDifference;
     return right.setup_total - left.setup_total;
   })[0];
+}
+
+function allocateWeightedTotalCents(entries, totalCents, weightField) {
+  if (!entries.length) return [];
+  const totalWeight = entries.reduce((sumWeight, entry) => sumWeight + Math.max(0, entry[weightField]), 0);
+  if (totalWeight <= 0) {
+    const equalShare = Math.floor(totalCents / entries.length);
+    let remainder = totalCents - equalShare * entries.length;
+    return entries.map((entry) => {
+      const cents = equalShare + (remainder > 0 ? 1 : 0);
+      remainder = Math.max(0, remainder - 1);
+      return { ...entry, allocated_cents: cents };
+    });
+  }
+  const provisional = entries.map((entry) => {
+    const exact = (entry[weightField] / totalWeight) * totalCents;
+    const allocated = Math.floor(exact);
+    return { ...entry, allocated_cents: allocated, remainder: exact - allocated };
+  });
+  let remaining = totalCents - provisional.reduce((sumAllocated, entry) => sumAllocated + entry.allocated_cents, 0);
+  provisional.sort((left, right) => right.remainder - left.remainder).forEach((entry) => {
+    if (remaining > 0) {
+      entry.allocated_cents += 1;
+      remaining -= 1;
+    }
+  });
+  return provisional.map(({ remainder, ...entry }) => entry);
 }
 
 function allocatePackagePricing(packageOffer) {
@@ -698,34 +346,18 @@ function allocatePackagePricing(packageOffer) {
     setup_fee_cents: toCents(service.setup_fee),
     monthly_fee_cents: toCents(service.monthly_fee),
   }));
-
-  const allocatedSetup = allocateWeightedTotalCents(
-    includedServices,
-    toCents(packageOffer.setup_total),
-    "setup_fee_cents"
-  );
-  const allocatedMonthly = allocateWeightedTotalCents(
-    includedServices,
-    toCents(packageOffer.monthly_total),
-    "monthly_fee_cents"
-  );
-
-  return Object.fromEntries(
-    includedServices.map((service) => {
-      const setupShare = allocatedSetup.find((entry) => entry.product_id === service.product_id)?.allocated_cents || 0;
-      const monthlyShare = allocatedMonthly.find((entry) => entry.product_id === service.product_id)?.allocated_cents || 0;
-
-      return [
-        service.product_id,
-        {
-          setup_fee: fromCents(setupShare),
-          monthly_fee: fromCents(monthlyShare),
-          setup_discount_fee: service.setup_fee - fromCents(setupShare),
-          monthly_discount_fee: service.monthly_fee - fromCents(monthlyShare),
-        },
-      ];
-    })
-  );
+  const allocatedSetup = allocateWeightedTotalCents(includedServices, toCents(packageOffer.setup_total), "setup_fee_cents");
+  const allocatedMonthly = allocateWeightedTotalCents(includedServices, toCents(packageOffer.monthly_total), "monthly_fee_cents");
+  return Object.fromEntries(includedServices.map((service) => {
+    const setupShare = allocatedSetup.find((entry) => entry.product_id === service.product_id)?.allocated_cents || 0;
+    const monthlyShare = allocatedMonthly.find((entry) => entry.product_id === service.product_id)?.allocated_cents || 0;
+    return [service.product_id, {
+      setup_fee: fromCents(setupShare),
+      monthly_fee: fromCents(monthlyShare),
+      setup_discount_fee: service.setup_fee - fromCents(setupShare),
+      monthly_discount_fee: service.monthly_fee - fromCents(monthlyShare),
+    }];
+  }));
 }
 
 export function buildPricingSummaryForProducts(items = []) {
@@ -733,14 +365,12 @@ export function buildPricingSummaryForProducts(items = []) {
   const packageOffer = selectBestPackageOffer(products);
   const packagePricing = packageOffer ? allocatePackagePricing(packageOffer) : {};
   const packageServiceKeys = new Set(packageOffer?.included_service_keys || []);
-
   const priced_items = products.map((product) => {
     const packageShare = packagePricing[product.product_id];
     const actualSetup = packageShare ? packageShare.setup_fee : product.setup_fee;
     const actualMonthly = packageShare ? packageShare.monthly_fee : product.monthly_fee;
     const compareAtSetupFee = Math.max(product.setup_fee, actualSetup);
     const compareAtMonthlyFee = Math.max(product.monthly_fee, actualMonthly);
-
     return {
       ...product,
       compare_at_setup_fee: compareAtSetupFee,
@@ -753,19 +383,11 @@ export function buildPricingSummaryForProducts(items = []) {
       source_package_name: packageServiceKeys.has(product.service_key) ? packageOffer.name : null,
     };
   });
-
-  const total_setup_before_discount = Math.max(
-    fromCents(sum(products.map((product) => toCents(product.setup_fee)))),
-    packageOffer?.compare_at_setup || 0
-  );
-  const total_monthly_before_discount = Math.max(
-    fromCents(sum(products.map((product) => toCents(product.monthly_fee)))),
-    packageOffer?.compare_at_monthly || 0
-  );
+  const total_setup_before_discount = Math.max(fromCents(sum(products.map((product) => toCents(product.setup_fee)))), packageOffer?.compare_at_setup || 0);
+  const total_monthly_before_discount = Math.max(fromCents(sum(products.map((product) => toCents(product.monthly_fee)))), packageOffer?.compare_at_monthly || 0);
   const total_setup = fromCents(sum(priced_items.map((product) => toCents(product.setup_fee))));
   const total_monthly = fromCents(sum(priced_items.map((product) => toCents(product.monthly_fee))));
   const add_on_services = priced_items.filter((product) => !packageServiceKeys.has(product.service_key));
-
   return {
     products,
     priced_items,
@@ -783,11 +405,18 @@ export function buildPricingSummaryForProducts(items = []) {
   };
 }
 
+export function resolvePackageStripeIds(packageOffer) {
+  return {
+    stripe_product_id: packageOffer?.stripe_product_id || null,
+    setup_price_id: packageOffer?.setup_price_id || null,
+    monthly_price_id: packageOffer?.monthly_price_id || null,
+  };
+}
+
 export function buildStoredPricingSummary(items = []) {
   const summary = buildPricingSummaryForProducts(items);
   const packageOffer = summary.package_offer;
   const packageStripeIds = resolvePackageStripeIds(packageOffer);
-
   return {
     pricing_version: "canonical_sales_catalog_v1",
     package_key: packageOffer?.package_key || null,
@@ -814,36 +443,21 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
   const packageOffer = pricingSummary?.package_offer || null;
   const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
   const packageStripeIds = resolvePackageStripeIds(packageOffer);
-
   if (!packageStripeIds.setup_price_id || !packageStripeIds.monthly_price_id) {
     throw new Error("Live checkout currently requires a Starter, Growth, or Pro package bundle.");
   }
-
   if (addOnServiceKeys.length > 0) {
     throw new Error("Live checkout currently supports package bundles only; add-on checkout is not enabled.");
   }
-
   return [
-    {
-      price: packageStripeIds.setup_price_id,
-      quantity: 1,
-    },
-    {
-      price: packageStripeIds.monthly_price_id,
-      quantity: 1,
-    },
+    { price: packageStripeIds.setup_price_id, quantity: 1 },
+    { price: packageStripeIds.monthly_price_id, quantity: 1 },
   ];
 }
 
 export function getPackageDisplayLabel(pricingSummary) {
-  if (!pricingSummary?.package_name) {
-    return "Custom Service Bundle";
-  }
-
-  if ((pricingSummary.add_on_service_keys || []).length > 0) {
-    return `${pricingSummary.package_name} + Add-Ons`;
-  }
-
+  if (!pricingSummary?.package_name) return "Custom Service Bundle";
+  if ((pricingSummary.add_on_service_keys || []).length > 0) return `${pricingSummary.package_name} + Add-Ons`;
   return pricingSummary.package_name;
 }
 
