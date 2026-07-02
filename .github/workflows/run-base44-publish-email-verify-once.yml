@@ -1,0 +1,133 @@
+name: Run Base44 Publish And Email Verify Once
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/run-base44-publish-email-verify-once.yml"
+
+concurrency:
+  group: base44-publish-email-verify-once
+  cancel-in-progress: false
+
+jobs:
+  publish-and-verify:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore Base44 auth
+        env:
+          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON }}
+        run: |
+          if [ -z "$BASE44_AUTH_JSON" ]; then
+            echo "BASE44_AUTH_JSON secret is missing." > BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            exit 1
+          fi
+          mkdir -p "$HOME/.base44/auth"
+          printf '%s' "$BASE44_AUTH_JSON" > "$HOME/.base44/auth/auth.json"
+          echo "Base44 auth secret restored." > BASE44_PUBLISH_AND_VERIFY_RESULT.md
+
+      - name: Publish Base44 app and submit verification intakes
+        run: |
+          set +e
+          echo "# Base44 Publish And Email Verification Result" > BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          echo "" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          echo "Run at: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          echo "" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+
+          echo "## Publish attempt" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          echo '```text' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          node scripts/base44/publish-deploy-endpoint.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com --verify-wait-ms 120000 --verify-poll-ms 10000 --summary >> BASE44_PUBLISH_AND_VERIFY_RESULT.md 2>&1
+          PUBLISH_STATUS=$?
+          echo '```' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          echo "Publish exit status: $PUBLISH_STATUS" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          echo "" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+
+          if [ "$PUBLISH_STATUS" -eq 0 ]; then
+            TS=$(date -u +%Y%m%dT%H%M%SZ)
+            CLEAN_PAYLOAD=$(cat <<JSON
+          {
+            "contact_name":"Nolan Runtime Verify",
+            "business_name":"ClientSurge Runtime Verification $TS",
+            "email":"nolan@clientsurgesystems.com",
+            "phone":"6025550199",
+            "website":"https://clientsurgesystems.com",
+            "business_type":"HVAC / Plumbing / Home Services",
+            "selected_package_key":"growth_system",
+            "crm_stack":"Verification run",
+            "booking_link":"https://calendly.com/nolan-clientsurge",
+            "lead_sources":["Website / Contact Form"],
+            "problem":"Runtime verification for Resend template wiring after Base44 publish",
+            "timeline":"Verification only",
+            "notes":"GitHub Actions runtime verification. Clean payload should send branded email template.",
+            "consent":false,
+            "source_page":"/start?verification=email-template-runtime-clean-$TS"
+          }
+          JSON
+          )
+            SUPPRESSED_PAYLOAD=$(cat <<JSON
+          {
+            "contact_name":"Test Owner",
+            "business_name":"fdsfdsf",
+            "email":"test-intake-validate@clientsurge.test",
+            "phone":"6025550100",
+            "website":"abc.com",
+            "business_type":"HVAC / Plumbing / Home Services",
+            "selected_package_key":"growth_system",
+            "crm_stack":"Verification run",
+            "booking_link":"https://calendly.com/nolan-clientsurge",
+            "lead_sources":["Website / Contact Form"],
+            "problem":"Suppression verification for placeholder intake",
+            "timeline":"Verification only",
+            "notes":"GitHub Actions runtime verification. Suppressed payload should log email_skipped and not send customer-facing email.",
+            "consent":false,
+            "source_page":"/start?verification=email-template-runtime-suppressed-$TS"
+          }
+          JSON
+          )
+
+            CLEAN_RESPONSE=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" -X POST "https://clientsurgesystems.com/functions/submitRemoteSetupIntake" -H "Content-Type: application/json" --data "$CLEAN_PAYLOAD")
+            CLEAN_STATUS=$?
+            SUPPRESSED_RESPONSE=$(curl -sS -w "\nHTTP_STATUS:%{http_code}" -X POST "https://clientsurgesystems.com/functions/submitRemoteSetupIntake" -H "Content-Type: application/json" --data "$SUPPRESSED_PAYLOAD")
+            SUPPRESSED_STATUS=$?
+
+            echo "## Clean intake request" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "curl exit status: $CLEAN_STATUS" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo '```text' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "$CLEAN_RESPONSE" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo '```' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "## Suppressed intake request" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "curl exit status: $SUPPRESSED_STATUS" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo '```text' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "$SUPPRESSED_RESPONSE" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo '```' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          else
+            echo "Runtime verification skipped because publish failed." >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          fi
+
+          sed -i -E 's/(accessToken|refreshToken|Authorization|Bearer)[^,}\n]*/[REDACTED]/g' BASE44_PUBLISH_AND_VERIFY_RESULT.md || true
+          exit 0
+
+      - name: Commit result to branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B base44-publish-email-verify-result
+          git add BASE44_PUBLISH_AND_VERIFY_RESULT.md
+          git commit -m "Record Base44 publish and email verification result"
+          git push --force origin base44-publish-email-verify-result
