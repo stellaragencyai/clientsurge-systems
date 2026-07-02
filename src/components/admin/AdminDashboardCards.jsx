@@ -169,17 +169,40 @@ export function InstallStatusTable({ onboardings = [] }) {
   );
 }
 
+function summarizeActionResult(result) {
+  const data = result?.data || result || {};
+  const proofId = data.communication_event_id || data.communicationEventId || data.event_id || data.eventId || data.job_id || data.jobId || data.audit_log_id || data.auditLogId;
+  const providerId = data.provider_message_id || data.providerMessageId || data.message_id || data.messageId;
+  const status = data.status || data.result || "completed";
+  const details = [
+    proofId ? `proof ${proofId}` : null,
+    providerId ? `provider ${providerId}` : null,
+  ].filter(Boolean).join(" · ");
+
+  return details ? `${status} · ${details}` : status;
+}
+
 // Quick Actions
 export function AdminQuickActions({ order, onRefresh }) {
   const [loading, setLoading] = useState({});
+  const [results, setResults] = useState({});
 
   const act = async (key, fnName, body) => {
     setLoading(l => ({ ...l, [key]: true }));
+    setResults(r => ({ ...r, [key]: { type: "pending", text: "Running action..." } }));
     try {
-      await base44.functions.invoke(fnName, body);
+      const result = await base44.functions.invoke(fnName, body);
+      setResults(r => ({ ...r, [key]: { type: "success", text: summarizeActionResult(result) } }));
       onRefresh?.();
     } catch (err) {
       console.error(`AdminQuickActions: ${fnName} failed`, err);
+      setResults(r => ({
+        ...r,
+        [key]: {
+          type: "error",
+          text: err?.message || "Action failed. Check function logs before retrying.",
+        },
+      }));
     } finally {
       setLoading(l => ({ ...l, [key]: false }));
     }
@@ -192,16 +215,31 @@ export function AdminQuickActions({ order, onRefresh }) {
   ];
 
   return (
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-      {actions.map(a => (
-        <button key={a.key} onClick={a.fn} disabled={loading[a.key]} style={{
-          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-          color: "#D1D5DB", borderRadius: 9999, padding: "7px 16px", fontSize: 12,
-          fontWeight: 600, cursor: loading[a.key] ? "not-allowed" : "pointer",
-        }}>
-          {loading[a.key] ? "..." : a.label}
-        </button>
-      ))}
+    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+        {actions.map(a => (
+          <button key={a.key} onClick={a.fn} disabled={loading[a.key]} style={{
+            background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
+            color: "#D1D5DB", borderRadius: 9999, padding: "7px 16px", fontSize: 12,
+            fontWeight: 600, cursor: loading[a.key] ? "not-allowed" : "pointer",
+          }}>
+            {loading[a.key] ? "..." : a.label}
+          </button>
+        ))}
+      </div>
+      {Object.entries(results).length > 0 && (
+        <div style={{ display: "grid", gap: 6 }}>
+          {actions.filter(a => results[a.key]).map(a => {
+            const result = results[a.key];
+            const color = result.type === "success" ? "#10B981" : result.type === "error" ? "#EF4444" : "#9CA3AF";
+            return (
+              <div key={a.key} style={{ color, fontSize: 11, lineHeight: 1.4 }}>
+                <strong>{a.label}:</strong> {result.text}
+              </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
