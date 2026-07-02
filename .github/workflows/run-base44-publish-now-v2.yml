@@ -46,7 +46,7 @@ jobs:
 
       - name: Publish GitHub source to Base44 live app
         env:
-          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
+          BASE44_AUTH_JSON: ${{ secrets.BASE44 || secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
         run: |
           set +e
           echo "# Base44 Live Publish Result" > BASE44_PUBLISH_NOW_V2_RESULT.md
@@ -54,7 +54,7 @@ jobs:
           echo "Commit: $GITHUB_SHA" >> BASE44_PUBLISH_NOW_V2_RESULT.md
           echo "Workflow: ACTIVE - Publish Base44 Live App" >> BASE44_PUBLISH_NOW_V2_RESULT.md
           if [ -z "$BASE44_AUTH_JSON" ]; then
-            echo "Base44 auth secret missing. Cannot publish live Base44 app." >> BASE44_PUBLISH_NOW_V2_RESULT.md
+            echo "Base44 auth secret missing. Expected GitHub secret: BASE44. Fallbacks checked: BASE44_AUTH_JSON, BASE_44_AUTH_JSON." >> BASE44_PUBLISH_NOW_V2_RESULT.md
             STATUS=99
           else
             mkdir -p "$HOME/.base44/auth"
