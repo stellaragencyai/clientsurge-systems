@@ -31,7 +31,7 @@ jobs:
 
       - name: Publish Base44 app and submit verification intakes
         env:
-          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON }}
+          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
         run: |
           set +e
           echo "# Base44 Publish And Email Verification Result" > BASE44_PUBLISH_AND_VERIFY_RESULT.md
@@ -40,12 +40,12 @@ jobs:
           echo "" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
 
           if [ -z "$BASE44_AUTH_JSON" ]; then
-            echo "BASE44_AUTH_JSON secret is missing or unavailable to this workflow." >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "BASE44 auth secret is missing or unavailable to this workflow. Checked both BASE44_AUTH_JSON and BASE_44_AUTH_JSON." >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
             PUBLISH_STATUS=99
           else
             mkdir -p "$HOME/.base44/auth"
             printf '%s' "$BASE44_AUTH_JSON" > "$HOME/.base44/auth/auth.json"
-            echo "BASE44 auth secret restored." >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
+            echo "Base44 auth secret restored." >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
             echo "" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
             echo "## Publish attempt" >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
             echo '```text' >> BASE44_PUBLISH_AND_VERIFY_RESULT.md
