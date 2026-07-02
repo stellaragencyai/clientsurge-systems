@@ -16,9 +16,10 @@ export function LTVCard({ orders = [] }) {
 
   return (
     <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Total LTV</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Estimated LTV</p>
       <p className="text-3xl font-extrabold text-emerald-500 mb-1">${totalLTV.toLocaleString()}</p>
-      <p className="text-xs text-muted-foreground">Avg ${avgLTV.toLocaleString()} / client · {orders.length} clients</p>
+      <p className="text-xs text-muted-foreground">Order-derived estimate · Avg ${avgLTV.toLocaleString()} / client · {orders.length} paid orders</p>
+      <p className="mt-2 text-[11px] text-amber-600">Needs Stripe/subscription reconciliation before treating as collected revenue proof.</p>
     </div>
   );
 }
@@ -26,17 +27,28 @@ export function LTVCard({ orders = [] }) {
 // #270: Churn Risk Panel
 export function ChurnRiskPanel({ orders = [] }) {
   const [risks, setRisks] = useState([]);
+  const [hasInstrumentedRisk, setHasInstrumentedRisk] = useState(false);
 
   useEffect(() => {
+    const instrumented = orders.some((o) => Number.isFinite(Number(o.churn_risk_score)));
     const flagged = orders
-      .filter((o) => Number(o.churn_risk_score || 0) > 70)
+      .filter((o) => Number.isFinite(Number(o.churn_risk_score)) && Number(o.churn_risk_score) > 70)
       .sort((a, b) => Number(b.churn_risk_score || 0) - Number(a.churn_risk_score || 0));
+    setHasInstrumentedRisk(instrumented);
     setRisks(flagged);
   }, [orders]);
 
+  if (!hasInstrumentedRisk) return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-5">
+      <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Churn risk needs instrumentation</p>
+      <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">No proven churn_risk_score source is present on the loaded paid orders. Do not read this as “no churn risk detected.”</p>
+    </div>
+  );
+
   if (!risks.length) return (
     <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-sm font-semibold text-emerald-600">✅ No churn risk detected</p>
+      <p className="text-sm font-semibold text-foreground">No high churn risk in instrumented orders</p>
+      <p className="mt-1 text-xs text-muted-foreground">Only orders with a numeric churn_risk_score were evaluated.</p>
     </div>
   );
 
@@ -55,18 +67,33 @@ export function ChurnRiskPanel({ orders = [] }) {
   );
 }
 
-// Install Status Table — uses actual OnboardingClient entity fields
+// Install Status Table — must be fed ClientInstallationOS records for truthful install fields
 export function InstallStatusTable({ onboardings = [] }) {
-  // Use real entity fields from OnboardingClient schema
   const cols = [
     { key: "website_status", label: "Website" },
     { key: "activation_status", label: "Activation" },
     { key: "workflow_stage", label: "Stage" },
   ];
+  const hasInstallFields = onboardings.some((o) =>
+    cols.some((c) => Object.prototype.hasOwnProperty.call(o || {}, c.key))
+  );
+
+  if (onboardings.length > 0 && !hasInstallFields) {
+    return (
+      <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-5">
+        <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Install status source mismatch</p>
+        <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">
+          This widget needs ClientInstallationOS records. The current records do not include website_status, activation_status, or workflow_stage.
+        </p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
       <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>Install Status</p>
+        <p style={{ color: "#9CA3AF", fontSize: 11, margin: "4px 0 0" }}>Source: ClientInstallationOS install fields required</p>
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -80,7 +107,7 @@ export function InstallStatusTable({ onboardings = [] }) {
           </thead>
           <tbody>
             {onboardings.length === 0 && (
-              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No onboarding records yet</td></tr>
+              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No install records available yet</td></tr>
             )}
             {onboardings.map(o => (
               <tr key={o.id} style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
