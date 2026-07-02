@@ -4,7 +4,8 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 const DEFAULT_PAGE_SIZE = 500;
 const MAX_PAGE_SIZE = 1000;
 const MAX_PAGES = 25;
-const APPLY_LIMIT = 500;
+const DEFAULT_APPLY_LIMIT = 5000;
+const MAX_APPLY_LIMIT = 5000;
 const CONFIRM_PHRASE = "BACKFILL JUNK";
 
 function s(value: unknown) {
@@ -78,6 +79,8 @@ const internalCodes = new Set([
 const conversionStates = new Set(["BOOKED", "WON"]);
 const conversionStatuses = new Set(["Booked", "Closed"]);
 const conversionStages = new Set(["Audit Booked", "Won Pending Payment", "Won"]);
+
+type Candidate = { id: string; update: any; signals: string[]; name: string };
 
 function hasReasonCode(record: any, set: Set<string>) {
   return (record?.quality_reason_codes || []).some((code: string) => set.has(s(code)));
@@ -216,6 +219,20 @@ async function applyUpdates(entity: any, updates: Array<{ id: string; update: Re
   return { applied, failed };
 }
 
+function buildCandidates<T>(records: T[], getSignals: (record: T) => string[], getUpdate: (record: T, signals: string[], now: string) => any, now: string): Candidate[] {
+  return records
+    .map((record: any) => {
+      const signals = getSignals(record);
+      const update = getUpdate(record, signals, now);
+      return update ? { id: record.id, update, signals, name: record.business_name || record.full_name || record.email || record.id } : null;
+    })
+    .filter(Boolean) as Candidate[];
+}
+
+function sampleCandidates(candidates: Candidate[]) {
+  return candidates.slice(0, 20).map((item) => ({ id: item.id, name: item.name, signals: item.signals }));
+}
+
 async function recordQualityBackfillRun(base44: any, summary: any) {
   const action = summary.dry_run ? "dry_run" : "applied";
   const message = `Scanned ${summary.scanned.leads} Leads / ${summary.scanned.website_leads} WebsiteLeads; eligible ${summary.eligible.leads} Leads / ${summary.eligible.website_leads} WebsiteLeads; applied ${summary.applied.leads} Leads / ${summary.applied.website_leads} WebsiteLeads.`;
@@ -235,6 +252,8 @@ async function recordQualityBackfillRun(base44: any, summary: any) {
       scope: summary.scope,
       page_size: summary.page_size,
       max_pages: summary.max_pages,
+      apply_limit: summary.apply_limit,
+      apply_limited: summary.apply_limited,
       scanned: summary.scanned,
       eligible: summary.eligible,
       applied: summary.applied,
@@ -263,6 +282,7 @@ Deno.serve(async (req) => {
     const scope = ["leads", "website_leads", "both"].includes(body.scope) ? body.scope : "both";
     const pageSize = Math.min(Math.max(Number(body.page_size || DEFAULT_PAGE_SIZE), 1), MAX_PAGE_SIZE);
     const maxPages = Math.min(Math.max(Number(body.max_pages || 5), 1), MAX_PAGES);
+    const applyLimit = Math.min(Math.max(Number(body.apply_limit || DEFAULT_APPLY_LIMIT), 1), MAX_APPLY_LIMIT);
 
     if (!dryRun && !confirmed) {
       return secureJson({
@@ -281,6 +301,8 @@ Deno.serve(async (req) => {
       scope,
       page_size: pageSize,
       max_pages: maxPages,
+      apply_limit: applyLimit,
+      apply_limited: { leads: false, website_leads: false },
       scanned: { leads: 0, website_leads: 0 },
       eligible: { leads: 0, website_leads: 0 },
       applied: { leads: 0, website_leads: 0 },
@@ -292,14 +314,12 @@ Deno.serve(async (req) => {
     if (scope === "leads" || scope === "both") {
       const leads = await fetchPages(base44.asServiceRole.entities.Leads, pageSize, maxPages);
       summary.scanned.leads = leads.length;
-      const updates = leads.map((lead) => {
-        const signals = leadSignals(lead);
-        const update = buildLeadUpdate(lead, signals, now);
-        return update ? { id: lead.id, update, signals, name: lead.business_name || lead.full_name || lead.email || lead.id } : null;
-      }).filter(Boolean).slice(0, APPLY_LIMIT) as Array<{ id: string; update: any; signals: string[]; name: string }>;
+      const candidates = buildCandidates(leads, leadSignals, buildLeadUpdate, now);
+      const updates = candidates.slice(0, applyLimit);
 
-      summary.eligible.leads = updates.length;
-      summary.samples.leads = updates.slice(0, 20).map((item) => ({ id: item.id, name: item.name, signals: item.signals }));
+      summary.eligible.leads = candidates.length;
+      summary.apply_limited.leads = candidates.length > updates.length;
+      summary.samples.leads = sampleCandidates(candidates);
       if (!dryRun) {
         const result = await applyUpdates(base44.asServiceRole.entities.Leads, updates.map((item) => ({ id: item.id, update: item.update })));
         summary.applied.leads = result.applied;
@@ -310,14 +330,12 @@ Deno.serve(async (req) => {
     if (scope === "website_leads" || scope === "both") {
       const websiteLeads = await fetchPages(base44.asServiceRole.entities.WebsiteLead, pageSize, maxPages);
       summary.scanned.website_leads = websiteLeads.length;
-      const updates = websiteLeads.map((lead) => {
-        const signals = websiteLeadSignals(lead);
-        const update = buildWebsiteLeadUpdate(lead, signals, now);
-        return update ? { id: lead.id, update, signals, name: lead.business_name || lead.full_name || lead.email || lead.id } : null;
-      }).filter(Boolean).slice(0, APPLY_LIMIT) as Array<{ id: string; update: any; signals: string[]; name: string }>;
+      const candidates = buildCandidates(websiteLeads, websiteLeadSignals, buildWebsiteLeadUpdate, now);
+      const updates = candidates.slice(0, applyLimit);
 
-      summary.eligible.website_leads = updates.length;
-      summary.samples.website_leads = updates.slice(0, 20).map((item) => ({ id: item.id, name: item.name, signals: item.signals }));
+      summary.eligible.website_leads = candidates.length;
+      summary.apply_limited.website_leads = candidates.length > updates.length;
+      summary.samples.website_leads = sampleCandidates(candidates);
       if (!dryRun) {
         const result = await applyUpdates(base44.asServiceRole.entities.WebsiteLead, updates.map((item) => ({ id: item.id, update: item.update })));
         summary.applied.website_leads = result.applied;
