@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { DashboardTruthBanner } from "./AdminDashboardCards";
+import DashboardTruthBanner from "./DashboardTruthBanner";
 
 export default function LeadIntelligenceMiniPanel({ onNavigate }) {
   const [kpis, setKpis] = useState(null);
