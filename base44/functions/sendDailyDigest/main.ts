@@ -1,177 +1,91 @@
 import { secureJson } from "../_shared/response.ts";
-// redeployed 2026-05-02
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
+import { csEmailShell, csEmailFrom, csEmailLogoUrl, csEmailEscape, CS_EMAIL_THEME } from "../_shared/clientSurgeEmailDesignSystem.ts";
 
-// Inline: allow scheduler/automation calls that have no authenticated user
 function allowAnonymousAutomation(req) {
-  const ua = req.headers.get('user-agent') || '';
-  const auth = req.headers.get('authorization') || '';
-  return ua.includes('base44') || auth.startsWith('Bearer ');
+  const ua = req.headers.get("user-agent") || "";
+  const auth = req.headers.get("authorization") || "";
+  return ua.includes("base44") || auth.startsWith("Bearer ");
 }
 
 const LEAD_LIMIT = 5000;
-const BUSINESS_TZ = 'America/Phoenix';
-const PHOENIX_OFFSET = '-07:00';
+const BUSINESS_TZ = "America/Phoenix";
+const PHOENIX_OFFSET = "-07:00";
 
 function getPhoenixDayStart(reference = new Date()) {
-  const parts = new Intl.DateTimeFormat('en-CA', {
-    timeZone: BUSINESS_TZ,
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  }).formatToParts(reference);
-  const year = parts.find((part) => part.type === 'year')?.value;
-  const month = parts.find((part) => part.type === 'month')?.value;
-  const day = parts.find((part) => part.type === 'day')?.value;
+  const parts = new Intl.DateTimeFormat("en-CA", { timeZone: BUSINESS_TZ, year: "numeric", month: "2-digit", day: "2-digit" }).formatToParts(reference);
+  const year = parts.find((part) => part.type === "year")?.value;
+  const month = parts.find((part) => part.type === "month")?.value;
+  const day = parts.find((part) => part.type === "day")?.value;
   return new Date(`${year}-${month}-${day}T00:00:00${PHOENIX_OFFSET}`);
 }
 
 function formatPhoenixDate(reference = new Date()) {
-  return reference.toLocaleDateString('en-US', { timeZone: BUSINESS_TZ });
+  return reference.toLocaleDateString("en-US", { timeZone: BUSINESS_TZ });
+}
+
+function metricCard(label: string, value: number, detail: string) {
+  return `<td style="width:50%;padding:6px;vertical-align:top;"><div style="background:${CS_EMAIL_THEME.soft};border:1px solid ${CS_EMAIL_THEME.border};border-radius:16px;padding:18px 16px;text-align:center;"><div style="font-size:32px;line-height:38px;font-weight:900;color:#000;">${value}</div><div style="margin-top:4px;color:${CS_EMAIL_THEME.deep};font-size:11px;line-height:15px;font-weight:900;text-transform:uppercase;letter-spacing:0.08em;">${csEmailEscape(label)}</div><div style="margin-top:5px;color:${CS_EMAIL_THEME.muted};font-size:12px;line-height:17px;font-weight:700;">${csEmailEscape(detail)}</div></div></td>`;
+}
+
+function hotLeadTable(rows: string) {
+  if (!rows) return "";
+  return `<div style="margin-top:24px;background:#ffffff;border:1px solid ${CS_EMAIL_THEME.border};border-radius:16px;padding:20px 22px;"><div style="color:${CS_EMAIL_THEME.deep};font-size:11px;font-weight:900;text-transform:uppercase;letter-spacing:0.09em;margin-bottom:12px;">Top Hot Leads</div><table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;font-size:13px;"><thead><tr><th style="padding:8px 10px;text-align:left;border-bottom:1px solid ${CS_EMAIL_THEME.border};color:${CS_EMAIL_THEME.muted};">Name</th><th style="padding:8px 10px;text-align:left;border-bottom:1px solid ${CS_EMAIL_THEME.border};color:${CS_EMAIL_THEME.muted};">Business</th><th style="padding:8px 10px;text-align:left;border-bottom:1px solid ${CS_EMAIL_THEME.border};color:${CS_EMAIL_THEME.muted};">Status</th><th style="padding:8px 10px;text-align:left;border-bottom:1px solid ${CS_EMAIL_THEME.border};color:${CS_EMAIL_THEME.muted};">Score</th></tr></thead><tbody>${rows}</tbody></table></div>`;
 }
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== 'POST') {
-      return secureJson({ error: 'Method not allowed' }, { status: 405 });
-    }
-
+    if (req.method !== "POST") return secureJson({ error: "Method not allowed" }, { status: 405 });
     const base44 = createClientFromRequest(req);
 
-    // Allow scheduled runs (no user) or admin users
     let user = null;
     try { user = await base44.auth.me(); } catch (_) {}
-    if (user && user.role !== 'admin') {
-      return secureJson({ error: 'Forbidden' }, { status: 403 });
-    }
-    if (!user && !allowAnonymousAutomation(req)) {
-      return secureJson({ error: 'Forbidden' }, { status: 403 });
-    }
+    if (user && user.role !== "admin") return secureJson({ error: "Forbidden" }, { status: 403 });
+    if (!user && !allowAnonymousAutomation(req)) return secureJson({ error: "Forbidden" }, { status: 403 });
 
-    const [settings] = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
-    const notificationEmail =
-      settings?.lead_notification_email ||
-      Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ||
-      Deno.env.get('ADMIN_EMAIL');
+    const [settings] = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+    const notificationEmail = settings?.lead_notification_email || Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || Deno.env.get("ADMIN_EMAIL");
+    if (!notificationEmail) return secureJson({ error: "No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret." }, { status: 400 });
 
-    if (!notificationEmail) {
-      console.error(
-        '[sendDailyDigest] No admin email resolved. ' +
-        `AdminSettings.lead_notification_email=${settings?.lead_notification_email ?? 'not set'}, ` +
-        `ADMIN_NOTIFICATION_EMAIL env=${Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ?? 'not set'}, ` +
-        `ADMIN_EMAIL env=${Deno.env.get('ADMIN_EMAIL') ?? 'not set'}`
-      );
-      return secureJson(
-        { error: 'No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret.' },
-        { status: 400 }
-      );
-    }
-
-    const emailSource =
-      settings?.lead_notification_email ? 'AdminSettings' :
-      Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ? 'ADMIN_NOTIFICATION_EMAIL env' :
-      'ADMIN_EMAIL env';
-    console.log(`[sendDailyDigest] Resolved notification email from: ${emailSource}`);
-
-    const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
+    const allLeads = await base44.asServiceRole.entities.Leads.list("-updated_date", LEAD_LIMIT);
     const now = Date.now();
     const dayMs = 86400000;
     const startOfToday = getPhoenixDayStart();
-
-    const newToday = allLeads.filter(l => new Date(l.created_date).getTime() >= startOfToday.getTime()).length;
-    const hotLeads = allLeads.filter(l => l.activation_priority === 'Hot' && l.status !== 'Booked' && l.status !== 'Closed');
-    const overdueFollowUp = allLeads.filter(l => {
-      const isActive = !['Booked', 'Closed'].includes(l.status);
+    const newToday = allLeads.filter((l) => new Date(l.created_date).getTime() >= startOfToday.getTime()).length;
+    const hotLeads = allLeads.filter((l) => l.activation_priority === "Hot" && l.status !== "Booked" && l.status !== "Closed");
+    const overdueFollowUp = allLeads.filter((l) => {
+      const isActive = !["Booked", "Closed"].includes(l.status);
       const nextFollowUpAt = l.next_follow_up_at ? new Date(l.next_follow_up_at).getTime() : null;
-      if (nextFollowUpAt) {
-        return isActive && nextFollowUpAt <= now;
-      }
+      if (nextFollowUpAt) return isActive && nextFollowUpAt <= now;
       const noContact = !l.last_contacted_at || (now - new Date(l.last_contacted_at).getTime()) > dayMs;
       return isActive && noContact;
     });
-    const replied = allLeads.filter(l => l.status === 'Replied');
+    const replied = allLeads.filter((l) => l.status === "Replied");
 
-    const hotRows = hotLeads.slice(0, 5).map(l =>
-      `<tr><td style="padding:6px 12px;">${l.full_name}</td><td style="padding:6px 12px;">${l.business_name}</td><td style="padding:6px 12px;">${l.status}</td><td style="padding:6px 12px;">${l.lead_score ?? 0}</td></tr>`
-    ).join('');
+    const hotRows = hotLeads.slice(0, 5).map((l) => `<tr><td style="padding:8px 10px;border-bottom:1px solid ${CS_EMAIL_THEME.border};">${csEmailEscape(l.full_name)}</td><td style="padding:8px 10px;border-bottom:1px solid ${CS_EMAIL_THEME.border};">${csEmailEscape(l.business_name)}</td><td style="padding:8px 10px;border-bottom:1px solid ${CS_EMAIL_THEME.border};">${csEmailEscape(l.status)}</td><td style="padding:8px 10px;border-bottom:1px solid ${CS_EMAIL_THEME.border};">${csEmailEscape(l.lead_score ?? 0)}</td></tr>`).join("");
 
-    const body = `
-<div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
-  <h2 style="color:#9a5c2e;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
-  
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
-    <div style="background:#eff6ff;border-radius:8px;padding:16px;text-align:center;">
-      <div style="font-size:32px;font-weight:bold;color:#1d4ed8;">${newToday}</div>
-      <div style="font-size:12px;color:#3b82f6;">New leads today</div>
-    </div>
-    <div style="background:#fef2f2;border-radius:8px;padding:16px;text-align:center;">
-      <div style="font-size:32px;font-weight:bold;color:#dc2626;">${hotLeads.length}</div>
-      <div style="font-size:12px;color:#ef4444;">Hot leads needing outreach</div>
-    </div>
-    <div style="background:#fffbeb;border-radius:8px;padding:16px;text-align:center;">
-      <div style="font-size:32px;font-weight:bold;color:#d97706;">${overdueFollowUp.length}</div>
-      <div style="font-size:12px;color:#f59e0b;">Overdue follow-ups</div>
-    </div>
-    <div style="background:#f0fdf4;border-radius:8px;padding:16px;text-align:center;">
-      <div style="font-size:32px;font-weight:bold;color:#16a34a;">${replied.length}</div>
-      <div style="font-size:12px;color:#22c55e;">Replied (need qualification)</div>
-    </div>
-  </div>
+    const metrics = `<table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="margin-top:24px;border-collapse:collapse;"><tr>${metricCard("New Leads", newToday, "Created today")}${metricCard("Hot Leads", hotLeads.length, "Need outreach")}</tr><tr>${metricCard("Overdue", overdueFollowUp.length, "Follow-ups due")}${metricCard("Replied", replied.length, "Need qualification")}</tr></table>`;
+    const body = `${metrics}${hotLeadTable(hotRows)}`;
+    const html = csEmailShell({ badge: "Daily Digest", title: `Daily Lead Digest — ${formatPhoenixDate()}`, subtitle: "Your daily ClientSurge lead snapshot is ready.", body, logoUrl: csEmailLogoUrl(), footerTitle: "Daily lead digest", footerText: "Sent daily at 8am Arizona time. Manage leads in your admin dashboard." });
 
-  ${hotLeads.length > 0 ? `
-  <h3 style="color:#7a4825;">🔥 Top Hot Leads — Act Now</h3>
-  <table style="width:100%;border-collapse:collapse;font-size:13px;">
-    <thead><tr style="background:#fef3e2;">
-      <th style="padding:8px 12px;text-align:left;">Name</th>
-      <th style="padding:8px 12px;text-align:left;">Business</th>
-      <th style="padding:8px 12px;text-align:left;">Status</th>
-      <th style="padding:8px 12px;text-align:left;">Score</th>
-    </tr></thead>
-    <tbody>${hotRows}</tbody>
-  </table>
-  ` : ''}
+    const resendKey = Deno.env.get("RESEND_API_KEY");
+    if (!resendKey) return secureJson({ error: "RESEND_API_KEY not set" }, { status: 500 });
+    const fromEmail = settings?.resend_from_email || csEmailFrom("noreply@clientsurgesystems.com");
 
-  <p style="color:#6b7280;font-size:12px;margin-top:24px;">
-    This digest is sent daily at 8am. Manage leads at your admin dashboard.
-  </p>
-</div>`;
-
-    console.log(`[sendDailyDigest] Preparing digest — total leads: ${allLeads.length}, new today: ${newToday}, hot: ${hotLeads.length}, overdue: ${overdueFollowUp.length}, replied: ${replied.length}`);
-
-    const resendKey = Deno.env.get('RESEND_API_KEY');
-    if (!resendKey) {
-      return secureJson({ error: 'RESEND_API_KEY not set' }, { status: 500 });
-    }
-    const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
-
-    try {
-      const res = await resendFetch('https://api.resend.com/emails', {
-        method: 'POST',
-        headers: {
-          Authorization: `Bearer ${resendKey}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          from: fromEmail,
-          to: notificationEmail,
-          subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
-          html: body,
-        }),
-      });
-      if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error(err?.message || `Resend error ${res.status}`);
-      }
-      console.log(`[sendDailyDigest] ✓ Digest sent successfully to ${notificationEmail}`);
-    } catch (emailError) {
-      console.error(`[sendDailyDigest] ✗ SendEmail failed: ${emailError.message}`);
-      throw emailError;
+    const res = await resendFetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: fromEmail, to: notificationEmail, subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`, html }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err?.message || `Resend error ${res.status}`);
     }
 
     return secureJson({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
-    console.error('[sendDailyDigest] sendDailyDigest error:', error);
+    console.error("[sendDailyDigest] sendDailyDigest error:", error);
     return secureJson({ error: error.message }, { status: 500 });
   }
 });
