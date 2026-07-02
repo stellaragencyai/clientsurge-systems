@@ -5,6 +5,7 @@ import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const repoRoot = resolve(__dirname, "../..");
+const BASE44_ORIGIN = "https://app.base44.com";
 const ACCESS_KEY = ["access", "Token"].join("");
 const REFRESH_KEY = ["refresh", "Token"].join("");
 const AUTH_HEADER = ["Author", "ization"].join("");
@@ -88,7 +89,7 @@ async function refreshCliAuthIfNeeded() {
   body.set("grant_type", "refresh_token");
   body.set("refresh_token", refreshValue);
   body.set("client_id", "base44_cli");
-  const response = await fetch("https://app.base44.com/oauth/token", {
+  const response = await fetch(`${BASE44_ORIGIN}/oauth/token`, {
     method: "POST",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body: body.toString(),
@@ -110,7 +111,7 @@ async function refreshCliAuthIfNeeded() {
 
 async function postDeployWithToken(appId, token) {
   if (!token) return null;
-  const response = await fetch(`https://app.base44.com/api/apps/${appId}/deploy`, {
+  const response = await fetch(`${BASE44_ORIGIN}/api/apps/${appId}/deploy`, {
     method: "POST",
     headers: {
       [AUTH_HEADER]: `${AUTH_SCHEME} ${token}`,
@@ -167,32 +168,101 @@ async function loadChromium() {
   return requireFromBrowserAudit("playwright").chromium;
 }
 
+function isProbablyAuthUrl(url) {
+  return /\/login|\/signin|\/sign-in|\/auth|accounts\.google\.com|oauth/i.test(url || "");
+}
+
+async function checkBrowserAppAccess(page, appId) {
+  if (!page.url().startsWith(BASE44_ORIGIN)) {
+    return { ok: false, status: 0, body: `browser_not_on_base44_origin:${page.url()}` };
+  }
+
+  return page.evaluate(async (path) => {
+    const response = await fetch(path, { credentials: "include" });
+    const text = await response.text();
+    let body = text;
+    try { body = JSON.parse(text); } catch {}
+    return { ok: response.ok, status: response.status, body };
+  }, `/api/apps/${appId}`);
+}
+
+async function openBrowserContext(args) {
+  const chromium = await loadChromium();
+  return chromium.launchPersistentContext(args.profileDir, {
+    headless: !args.showBrowser,
+    viewport: { width: 1440, height: 960 },
+  });
+}
+
+async function waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs, showBrowser }) {
+  await page.goto(dashboardUrl, { waitUntil: "domcontentloaded", timeout: timeoutMs });
+  let access = await checkBrowserAppAccess(page, appId).catch((error) => ({ ok: false, status: 0, body: error.message }));
+  if (access.ok) return access;
+
+  if (!showBrowser) {
+    throw new Error(`Base44 browser session is not authenticated for app ${appId}. Run once with --show-browser to sign in. Last access status: ${access.status} ${JSON.stringify(access.body)}`);
+  }
+
+  console.error("Base44 browser authentication is required.");
+  console.error("Complete the Base44 sign-in in the opened browser window. The script will keep polling until the app API becomes authorized.");
+
+  const deadline = Date.now() + timeoutMs;
+  while (Date.now() < deadline) {
+    await page.waitForTimeout(1500);
+    if (isProbablyAuthUrl(page.url()) || !page.url().startsWith(BASE44_ORIGIN)) continue;
+    access = await checkBrowserAppAccess(page, appId).catch((error) => ({ ok: false, status: 0, body: error.message }));
+    if (access.ok) {
+      await page.goto(dashboardUrl, { waitUntil: "domcontentloaded", timeout: timeoutMs }).catch(() => {});
+      return access;
+    }
+  }
+
+  throw new Error(`Timed out waiting for Base44 browser login for app ${appId}. Last URL: ${page.url()}. Last access status: ${access.status} ${JSON.stringify(access.body)}`);
+}
+
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   const appId = args.appId || readBase44AppId();
-  const dashboardUrl = `https://app.base44.com/apps/${appId}/editor/workspace/overview`;
+  const dashboardUrl = `${BASE44_ORIGIN}/apps/${appId}/editor/workspace/overview`;
   if (!existsSync(args.profileDir)) mkdirSync(args.profileDir, { recursive: true });
 
   const beforeSignal = await fetchLiveSignal(args.verifyUrl);
   const endpoint = `/api/apps/${appId}/deploy`;
   const cliToken = await refreshCliAuthIfNeeded();
+
   if (args.dryRun) {
-    console.log(JSON.stringify({ ok: true, dryRun: true, dashboardUrl, endpoint, hasCliAuth: Boolean(cliToken) }, null, 2));
+    let browserAuth = null;
+    if (args.showBrowser) {
+      const context = await openBrowserContext(args);
+      try {
+        const page = context.pages()[0] || await context.newPage();
+        browserAuth = await waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: true });
+      } finally {
+        await context.close();
+      }
+    }
+    console.log(JSON.stringify({
+      ok: true,
+      dryRun: true,
+      dashboardUrl,
+      endpoint,
+      profileDir: args.profileDir,
+      hasCliAuth: Boolean(cliToken),
+      browserAuth: browserAuth ? { ok: browserAuth.ok, status: browserAuth.status } : null,
+    }, null, 2));
     return;
   }
 
   let deployResult = await postDeployWithToken(appId, cliToken);
 
   if (!deployResult?.ok) {
-    const chromium = await loadChromium();
-    const context = await chromium.launchPersistentContext(args.profileDir, {
-      headless: !args.showBrowser,
-      viewport: { width: 1440, height: 960 },
-    });
+    if (deployResult) {
+      console.error(`Base44 token deploy failed with HTTP ${deployResult.status}; trying persistent browser session next.`);
+    }
+    const context = await openBrowserContext(args);
     try {
       const page = context.pages()[0] || await context.newPage();
-      await page.goto(dashboardUrl, { waitUntil: "domcontentloaded", timeout: args.timeoutMs });
-      if (page.url().includes("/login")) throw new Error("Base44 login is required for browser fallback.");
+      await waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: args.showBrowser });
       deployResult = await page.evaluate(async ({ deployEndpoint, token, headerName, scheme }) => {
         const headers = {};
         if (token) headers[headerName] = `${scheme} ${token}`;
