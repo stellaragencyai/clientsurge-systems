@@ -63,6 +63,7 @@
     "email:env-audit": "node scripts/email/base44-email-env-audit.mjs",
     "email:flow-inventory": "node scripts/email/email-flow-inventory.mjs",
     "email:branding-check": "node scripts/email/check-email-branding.mjs",
+    "email:build-previews": "node scripts/email/build-email-previews.mjs",
     "stripe:verify-test-checkout": "node scripts/stripe/verify-test-checkout.mjs",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
