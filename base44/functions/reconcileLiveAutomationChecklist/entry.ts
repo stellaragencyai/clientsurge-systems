@@ -88,16 +88,16 @@ const EVENT_TYPES_BY_STEP: Record<string, string[]> = {
   step1_sent: ["sms_sent", "email_sent", "provider_send_succeeded"],
   step2_sent: ["email_sent", "sms_sent"],
   comm_event_logged: ["*"],
-  lead_status_updated: ["status_update", "workflow_triggered"],
+  lead_status_updated: ["status_update", "workflow_triggered", "service_status_changed"],
   twilio_sid: ["sms_sent", "sms_delivered", "provider_send_succeeded", "voice_call_completed", "voice_call_no_answer"],
   resend_key: ["email_sent", "provider_send_succeeded"],
   twilio_webhook: ["voice_call_no_answer", "voice_call_completed", "sms_received"],
   status_callback: ["sms_delivered", "provider_send_succeeded", "provider_send_failed"],
   test_call: ["voice_call_no_answer", "voice_call_completed"],
-  automation_schedule: ["workflow_triggered", "sms_sent", "email_sent"],
+  automation_schedule: ["workflow_triggered", "sms_sent", "email_sent", "service_status_changed"],
   stop_on_reply: ["sms_received"],
   stop_on_reply_verified: ["sms_received"],
-  qualified_trigger: ["workflow_triggered", "booking_simulation_created", "sms_sent", "email_sent"],
+  qualified_trigger: ["workflow_triggered", "booking_simulation_created", "sms_sent", "email_sent", "service_status_changed"],
   test_booking: ["booking_simulation_created", "booking_created"],
   booking_link_in_sms: ["sms_sent", "sms_delivered"],
   test_batch: ["lead_reactivation_batch_completed"],
@@ -116,6 +116,14 @@ function json(data: unknown, status = 200) {
 function normalizeServiceKey(raw: string | undefined | null) {
   const key = String(raw || "").trim().toLowerCase();
   return LEGACY_SERVICE_KEY_MAP[key] || key;
+}
+
+function eventRelevantToService(event: any, serviceKey: string) {
+  const eventServiceKey = normalizeServiceKey(event?.service_key || "");
+  if (!eventServiceKey) return true;
+  if (eventServiceKey === serviceKey) return true;
+  const haystack = `${event?.subject || ""} ${event?.message_body || ""} ${event?.metadata_json || ""}`.toLowerCase();
+  return haystack.includes(serviceKey.toLowerCase());
 }
 
 function eventMatchesStep(event: any, stepId: string) {
@@ -138,7 +146,7 @@ function deriveStepStatus(stepId: string, currentStep: any, events: any[]) {
     return {
       status: eventIsFailure(event) ? "failed" : "complete",
       source: "communication_event",
-      evidence: `${event.event_type || "event"}:${event.status || "unknown"}:${event.provider || "internal"}`,
+      evidence: `${event.event_type || "event"}:${event.status || "unknown"}:${event.provider || "internal"}${event.service_key ? `:${event.service_key}` : ":order-scoped"}`,
       completed_at: event.created_date || event.created_at || event.updated_date || new Date().toISOString(),
     };
   }
@@ -195,6 +203,8 @@ Deno.serve(async (req) => {
         actions: [],
         blocked_reasons: [],
         step_results: [],
+        order_event_count: 0,
+        relevant_event_count: 0,
       };
 
       if (!templates) {
@@ -216,12 +226,16 @@ Deno.serve(async (req) => {
         }
       }
 
-      const [existingSteps, events] = await Promise.all([
+      const [existingSteps, orderEvents] = await Promise.all([
         base44.asServiceRole.entities.AutomationChecklistStep.filter({ automation_checklist_id: checklist.id }, "step_order", 100).catch(() => []),
         checklist.order_id
-          ? base44.asServiceRole.entities.CommunicationEvent.filter({ order_id: checklist.order_id, service_key: serviceKey }, "-created_date", 100).catch(() => [])
+          ? base44.asServiceRole.entities.CommunicationEvent.filter({ order_id: checklist.order_id }, "-created_date", 100).catch(() => [])
           : Promise.resolve([]),
       ]);
+
+      const events = (orderEvents || []).filter((event: any) => eventRelevantToService(event, serviceKey));
+      result.order_event_count = orderEvents?.length || 0;
+      result.relevant_event_count = events.length;
 
       if (!checklist.order_id) result.blocked_reasons.push("Missing order_id; cannot safely bind events to checklist.");
       const stepById = new Map((existingSteps || []).map((step: any) => [step.step_id, step]));
@@ -267,7 +281,7 @@ Deno.serve(async (req) => {
       const derivedChecklist = deriveChecklistStatus(result.step_results);
       const truthNotes = result.blocked_reasons.length
         ? `Blocked: ${result.blocked_reasons.join("; ")}`
-        : `Reconciled from ${existingSteps?.length || 0} DB steps and ${events?.length || 0} CommunicationEvent records.`;
+        : `Reconciled from ${existingSteps?.length || 0} DB steps, ${result.relevant_event_count} relevant events, and ${result.order_event_count} order events.`;
 
       result.derived_status = derivedChecklist.status;
       result.dashboard_truth_status = result.blocked_reasons.length ? "blocked" : derivedChecklist.truth;
