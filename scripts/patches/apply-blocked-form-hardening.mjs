@@ -9,7 +9,7 @@ function filePath(relativePath) {
 }
 
 function read(relativePath) {
-  return fs.readFileSync(filePath(relativePath), 'utf8');
+  return fs.readFileSync(filePath(relativePath), 'utf8').replace(/\r\n/g, '\n');
 }
 
 function write(relativePath, content) {
@@ -119,7 +119,47 @@ function patchLandingLeadCaptureForm() {
     'LeadCaptureForm updateField'
   );
 
-  const validateHelpers = `\n  const validateStep = (targetStep) => {\n    const nextErrors = {};\n    if (targetStep === 1) {\n      if (formData.full_name.trim().length < 2) nextErrors.full_name = "Enter your full name.";\n      if (!formData.email.trim()) nextErrors.email = "Email is required.";\n      else if (!EMAIL_REGEX.test(formData.email.trim())) nextErrors.email = "Enter a valid email.";\n      if (!formData.phone.trim()) nextErrors.phone = "Phone is required.";\n      else if (phoneDigits(formData.phone).length < 10) nextErrors.phone = "Enter a valid phone number.";\n    }\n    if (targetStep === 2) {\n      if (formData.business_name.trim().length < 2) nextErrors.business_name = "Enter your business name.";\n      if (!formData.niche) nextErrors.niche = "Select your industry.";\n    }\n    if (targetStep === 3) {\n      if (!formData.monthly_leads.trim()) nextErrors.monthly_leads = "Enter your monthly lead volume.";\n      if (!formData.contact_method) nextErrors.contact_method = "Select your preferred contact method.";\n    }\n    if (targetStep === 4) {\n      if (formData.biggest_problem.trim().length < 8) nextErrors.biggest_problem = "Briefly describe the follow-up challenge.";\n      if (formData.consent_given !== true) nextErrors.consent_given = "Consent is required before submitting.";\n    }\n    return nextErrors;\n  };\n\n  const validateAll = () => ({\n    ...validateStep(1),\n    ...validateStep(2),\n    ...validateStep(3),\n    ...validateStep(4),\n  });\n\n  const goNext = () => {\n    const nextErrors = validateStep(step);\n    if (Object.keys(nextErrors).length > 0) {\n      setFieldErrors((prev) => ({ ...prev, ...nextErrors }));\n      return;\n    }\n    setStep(Math.min(sections.length, step + 1));\n  };\n`;
+  const validateHelpers = `
+  const validateStep = (targetStep) => {
+    const nextErrors = {};
+    if (targetStep === 1) {
+      if (formData.full_name.trim().length < 2) nextErrors.full_name = "Enter your full name.";
+      if (!formData.email.trim()) nextErrors.email = "Email is required.";
+      else if (!EMAIL_REGEX.test(formData.email.trim())) nextErrors.email = "Enter a valid email.";
+      if (!formData.phone.trim()) nextErrors.phone = "Phone is required.";
+      else if (phoneDigits(formData.phone).length < 10) nextErrors.phone = "Enter a valid phone number.";
+    }
+    if (targetStep === 2) {
+      if (formData.business_name.trim().length < 2) nextErrors.business_name = "Enter your business name.";
+      if (!formData.niche) nextErrors.niche = "Select your industry.";
+    }
+    if (targetStep === 3) {
+      if (!formData.monthly_leads.trim()) nextErrors.monthly_leads = "Enter your monthly lead volume.";
+      if (!formData.contact_method) nextErrors.contact_method = "Select your preferred contact method.";
+    }
+    if (targetStep === 4) {
+      if (formData.biggest_problem.trim().length < 8) nextErrors.biggest_problem = "Briefly describe the follow-up challenge.";
+      if (formData.consent_given !== true) nextErrors.consent_given = "Consent is required before submitting.";
+    }
+    return nextErrors;
+  };
+
+  const validateAll = () => ({
+    ...validateStep(1),
+    ...validateStep(2),
+    ...validateStep(3),
+    ...validateStep(4),
+  });
+
+  const goNext = () => {
+    const nextErrors = validateStep(step);
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors((prev) => ({ ...prev, ...nextErrors }));
+      return;
+    }
+    setStep(Math.min(sections.length, step + 1));
+  };
+`;
 
   content = replaceOnce(
     content,
