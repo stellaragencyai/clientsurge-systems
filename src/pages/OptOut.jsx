@@ -16,6 +16,9 @@ const PREFERENCES = [
   { value: "stop_all", label: "Stop All Communications", description: "Opt out of all automated messages", icon: "🚫" },
 ];
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneDigits = (value) => String(value || "").replace(/\D/g, "");
+
 export default function OptOut() {
   const [form, setForm] = useState({ email: "", phone: "" });
   const [preference, setPreference] = useState("");
@@ -37,25 +40,44 @@ export default function OptOut() {
     if (params.get("action") === "stop") setPreference("stop_all");
   }, []);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    if (!form.email && !form.phone) {
-      setError("Please enter your email or phone number.");
-      return;
+  const validate = () => {
+    const trimmedEmail = form.email.trim();
+    const trimmedPhone = form.phone.trim();
+
+    if (!trimmedEmail && !trimmedPhone) {
+      return "Please enter your email or phone number.";
+    }
+    if (trimmedEmail && !EMAIL_REGEX.test(trimmedEmail)) {
+      return "Please enter a valid email address.";
+    }
+    if (trimmedPhone && phoneDigits(trimmedPhone).length < 10) {
+      return "Please enter a valid phone number.";
     }
     if (!preference) {
-      setError("Please select a preference.");
+      return "Please select a preference.";
+    }
+    return "";
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
       return;
     }
 
     setLoading(true);
     setError("");
     try {
-      await base44.functions.invoke("updateContactPreferences", {
-        email: form.email,
-        phone: form.phone,
+      const result = await base44.functions.invoke("updateContactPreferences", {
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
         preference,
       });
+      if (result?.data?.success === false) {
+        throw new Error(result.data.error || "Preference update failed");
+      }
       setSubmitted(true);
     } catch (err) {
       setError(err.message || "Something went wrong. Please try again.");
@@ -121,8 +143,9 @@ export default function OptOut() {
                   <input
                     type="email"
                     value={form.email}
-                    onChange={e => setForm(f => ({ ...f, email: e.target.value }))}
+                    onChange={e => { setForm(f => ({ ...f, email: e.target.value })); setError(""); }}
                     placeholder="your@email.com"
+                    aria-invalid={Boolean(error && form.email && !EMAIL_REGEX.test(form.email.trim()))}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid #ddd", fontSize: "14px", boxSizing: "border-box" }}
                   />
                 </div>
@@ -133,8 +156,9 @@ export default function OptOut() {
                   <input
                     type="tel"
                     value={form.phone}
-                    onChange={e => setForm(f => ({ ...f, phone: e.target.value }))}
+                    onChange={e => { setForm(f => ({ ...f, phone: e.target.value })); setError(""); }}
                     placeholder="+1 (602) 555-0123"
+                    aria-invalid={Boolean(error && form.phone && phoneDigits(form.phone).length < 10)}
                     style={{ width: "100%", padding: "10px 14px", borderRadius: "8px", border: "1px solid #ddd", fontSize: "14px", boxSizing: "border-box" }}
                   />
                 </div>
@@ -165,7 +189,7 @@ export default function OptOut() {
                       name="preference"
                       value={pref.value}
                       checked={preference === pref.value}
-                      onChange={() => setPreference(pref.value)}
+                      onChange={() => { setPreference(pref.value); setError(""); }}
                       style={{ marginTop: "3px", accentColor: "#00AEEF" }}
                     />
                     <div>
