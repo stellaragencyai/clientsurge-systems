@@ -93,7 +93,7 @@ function auditFile(file) {
     }
   }
 
-  if (/type=["']email["']/.test(content) && !/^[\s\S]*@[^\s@]+\.[^\s@]+/.test(content) && !/EMAIL_REGEX|EMAIL_RE|validateEmail/.test(content)) {
+  if (/type=["']email["']/.test(content) && !/EMAIL_REGEX|EMAIL_RE|validateEmail/.test(content)) {
     reportFinding(findings, file, 'warn', 'Email input found without obvious email validation helper.');
   }
 
@@ -103,6 +103,10 @@ function auditFile(file) {
 
   if (/type=["']checkbox["']/.test(content) && /value=/.test(content) && !/checked=/.test(content)) {
     reportFinding(findings, file, 'warn', 'Checkbox input appears to use value without checked.');
+  }
+
+  if (/setSubmitted\(true\)|setSuccess\(true\)/.test(content) && /\.functions\.invoke\(/.test(content) && !/\.data\?\.success|\.data\.success|result\?\.data\?\.success|res\.data\?\.success|response\?\.data\?\.url/.test(content)) {
+    reportFinding(findings, file, 'warn', 'Form may show success after a backend invocation without checking response success.');
   }
 
   return findings;
@@ -117,17 +121,27 @@ const findings = files.flatMap(auditFile);
 const errors = findings.filter((finding) => finding.severity === 'error');
 const warnings = findings.filter((finding) => finding.severity === 'warn');
 
+console.log('Public form release checklist:');
+for (const file of PUBLIC_FORM_FILES) {
+  const exists = fs.existsSync(path.join(REPO_ROOT, file));
+  const fileFindings = findings.filter((finding) => finding.file === file);
+  const errorCount = fileFindings.filter((finding) => finding.severity === 'error').length;
+  const warningCount = fileFindings.filter((finding) => finding.severity === 'warn').length;
+  const status = !exists ? 'MISSING' : errorCount > 0 ? 'BLOCKED' : warningCount > 0 ? 'REVIEW' : 'PASS';
+  console.log(`- ${status.padEnd(7)} ${file} (${errorCount} error, ${warningCount} warning)`);
+}
+
 if (findings.length === 0) {
-  console.log('Public form safety scan passed with no findings.');
+  console.log('\nPublic form safety scan passed with no findings.');
 } else {
-  console.log('Public form safety scan findings:');
+  console.log('\nPublic form safety scan findings:');
   for (const finding of findings) {
     const location = finding.line ? `${finding.file}:${finding.line}` : finding.file;
     console.log(`- [${finding.severity.toUpperCase()}] ${location} — ${finding.message}`);
   }
 }
 
-console.log(`Summary: ${errors.length} error(s), ${warnings.length} warning(s). Strict mode: ${STRICT ? 'on' : 'off'}.`);
+console.log(`\nSummary: ${errors.length} error(s), ${warnings.length} warning(s). Strict mode: ${STRICT ? 'on' : 'off'}.`);
 
 if (STRICT && errors.length > 0) {
   process.exit(1);
