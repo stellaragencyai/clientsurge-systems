@@ -1,6 +1,8 @@
 import { useEffect, useState } from "react";
-import { ShieldCheck, Database, Globe, Server, Clock, RefreshCw, GitBranch, AlertTriangle } from "lucide-react";
+import { ShieldCheck, Database, Globe, Server, Clock, RefreshCw, GitBranch, AlertTriangle, BadgeCheck } from "lucide-react";
 import ReleaseProofPanel from './ReleaseProofPanel';
+
+const RELEASE_PROOF_MARKER = "release-proof-2026-07-01.1";
 
 export default function SystemIdentityPanel() {
   const [now, setNow] = useState(new Date());
@@ -14,6 +16,7 @@ export default function SystemIdentityPanel() {
     { label: "App Name", value: "ClientSurge Systems", icon: ShieldCheck },
     { label: "Production App ID", value: "69dc4a79656fdba136d413d3", icon: Database },
     { label: "Production Repo", value: "stellaragencyai/clientsurge-systems", icon: GitBranch },
+    { label: "Release Proof Marker", value: RELEASE_PROOF_MARKER, icon: BadgeCheck },
     { label: "Retired Export Repo", value: "stellaragencyai/clientsurgesystems-refined-export", icon: AlertTriangle },
     { label: "Base44 Reported Source", value: "s3 — deploy linkage still requires proof", icon: AlertTriangle },
     { label: "Domain", value: "clientsurgesystems.com", icon: Globe },
