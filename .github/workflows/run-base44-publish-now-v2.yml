@@ -1,41 +1,60 @@
-name: Run Base44 Publish Now V2
+name: ACTIVE - Publish Base44 Live App
 
 on:
+  workflow_dispatch:
   push:
     branches:
       - main
     paths:
+      - "src/**"
+      - "public/**"
+      - "base44/**"
+      - "scripts/base44/**"
+      - "scripts/public-route-smoke.mjs"
+      - "scripts/public-exposure-live-smoke.mjs"
+      - "package.json"
+      - "package-lock.json"
       - ".github/workflows/run-base44-publish-now-v2.yml"
 
 concurrency:
-  group: base44-publish-now-v2
+  group: base44-publish-live-app
   cancel-in-progress: false
 
 jobs:
   publish-base44:
+    name: Publish GitHub source to Base44 live app
     runs-on: ubuntu-latest
+    timeout-minutes: 25
     permissions:
       contents: write
     steps:
       - uses: actions/checkout@v4
+
       - uses: actions/setup-node@v4
         with:
           node-version: 20
           cache: npm
+
       - name: Install dependencies
         run: |
           npm ci
           npm ci --prefix tools/browser-audit
           npm run --prefix tools/browser-audit install:browsers
-      - name: Publish
+
+      - name: Build source before publish
+        run: npm run build
+
+      - name: Publish GitHub source to Base44 live app
         env:
-          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
+          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE44 || secrets.BASE_44_AUTH_JSON }}
         run: |
           set +e
-          echo "# Base44 Publish Now V2 Result" > BASE44_PUBLISH_NOW_V2_RESULT.md
+          echo "# Base44 Live Publish Result" > BASE44_PUBLISH_NOW_V2_RESULT.md
           echo "Run at: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> BASE44_PUBLISH_NOW_V2_RESULT.md
+          echo "Commit: $GITHUB_SHA" >> BASE44_PUBLISH_NOW_V2_RESULT.md
+          echo "Workflow: ACTIVE - Publish Base44 Live App" >> BASE44_PUBLISH_NOW_V2_RESULT.md
           if [ -z "$BASE44_AUTH_JSON" ]; then
-            echo "Base44 auth secret missing." >> BASE44_PUBLISH_NOW_V2_RESULT.md
+            echo "Base44 auth secret missing. Expected GitHub secret: BASE44_AUTH_JSON. Fallbacks checked: BASE44, BASE_44_AUTH_JSON." >> BASE44_PUBLISH_NOW_V2_RESULT.md
             STATUS=99
           else
             mkdir -p "$HOME/.base44/auth"
@@ -48,11 +67,12 @@ jobs:
           fi
           sed -i -E 's/(accessToken|refreshToken|Authorization|Bearer)[^,}\n]*/[REDACTED]/g' BASE44_PUBLISH_NOW_V2_RESULT.md || true
           exit 0
-      - name: Commit result
+
+      - name: Commit publish result
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git checkout -B base44-publish-now-v2-result
           git add BASE44_PUBLISH_NOW_V2_RESULT.md
-          git commit -m "Record Base44 publish now v2 result"
+          git commit -m "Record Base44 live publish result" || echo "No publish result changes to commit"
           git push --force origin base44-publish-now-v2-result

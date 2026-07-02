@@ -3,6 +3,30 @@ import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+const PAID_ORDER_REQUIRED_MESSAGE =
+  "We could not find a paid ClientSurge order for that email yet. Finish checkout first, then create your portal account with the same email.";
+const GENERIC_SUBMIT_MESSAGE = "We could not create your account right now. Please try again or contact support.";
+
+function getSubmitErrorMessage(err) {
+  const status = err?.response?.status || err?.status;
+  const code = err?.response?.data?.code || err?.data?.code;
+  const apiMessage =
+    err?.response?.data?.error ||
+    err?.response?.data?.message ||
+    err?.data?.error ||
+    err?.data?.message;
+
+  if (code === "canonical_paid_order_not_found") {
+    return PAID_ORDER_REQUIRED_MESSAGE;
+  }
+
+  if (status === 404 && /request failed with status code 404/i.test(err?.message || "")) {
+    return PAID_ORDER_REQUIRED_MESSAGE;
+  }
+
+  return apiMessage || err?.message || GENERIC_SUBMIT_MESSAGE;
+}
+
 export default function SignupModal({ onClose, onSwitchToLogin }) {
   const [form, setForm] = useState({
     full_name: "",
@@ -29,7 +53,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
   const handleChange = (e) => {
     setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
-    setErrors((err) => ({ ...err, [e.target.name]: undefined }));
+    setErrors((err) => ({ ...err, [e.target.name]: undefined, submit: undefined }));
   };
 
   const handleSubmit = async (e) => {
@@ -46,7 +70,7 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
       setSuccess(true);
     } catch (err) {
-      setErrors({ submit: err?.data?.error || err.message || "Something went wrong. Please try again." });
+      setErrors({ submit: getSubmitErrorMessage(err) });
     } finally {
       setLoading(false);
     }
