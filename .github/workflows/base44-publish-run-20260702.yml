@@ -1,0 +1,45 @@
+name: Base44 Publish Run 20260702
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/base44-publish-run-20260702.yml"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+      - name: Install packages
+        run: |
+          npm ci
+          npm ci --prefix tools/browser-audit
+          npm run --prefix tools/browser-audit install:browsers
+      - name: Publish app
+        env:
+          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
+        run: |
+          set +e
+          echo "# Base44 Publish Run 20260702" > BASE44_PUBLISH_RUN_20260702_RESULT.md
+          echo "Run at: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> BASE44_PUBLISH_RUN_20260702_RESULT.md
+          echo '```text' >> BASE44_PUBLISH_RUN_20260702_RESULT.md
+          node scripts/base44/publish-deploy-endpoint.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com --verify-wait-ms 120000 --verify-poll-ms 10000 --summary >> BASE44_PUBLISH_RUN_20260702_RESULT.md 2>&1
+          STATUS=$?
+          echo '```' >> BASE44_PUBLISH_RUN_20260702_RESULT.md
+          echo "Exit status: $STATUS" >> BASE44_PUBLISH_RUN_20260702_RESULT.md
+          sed -i -E 's/(accessToken|refreshToken|Authorization|Bearer)[^,}\n]*/[REDACTED]/g' BASE44_PUBLISH_RUN_20260702_RESULT.md || true
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -B base44-publish-run-20260702-result
+          git add BASE44_PUBLISH_RUN_20260702_RESULT.md
+          git commit -m "Record Base44 publish run 20260702 result"
+          git push --force origin base44-publish-run-20260702-result
+          exit 0
