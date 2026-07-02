@@ -34,5 +34,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Public form safety scan
+        run: node scripts/audit/public-form-safety-scan.mjs
+
       - name: Build app
         run: npm run build
