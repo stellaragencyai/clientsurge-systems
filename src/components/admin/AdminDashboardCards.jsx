@@ -67,8 +67,11 @@ export function ChurnRiskPanel({ orders = [] }) {
   );
 }
 
-// Install Status Table — must be fed ClientInstallationOS records for truthful install fields
+// Install Status Table — uses ClientInstallationOS as the dashboard source of truth.
 export function InstallStatusTable({ onboardings = [] }) {
+  const [installRecords, setInstallRecords] = useState([]);
+  const [installLoading, setInstallLoading] = useState(false);
+  const [installError, setInstallError] = useState("");
   const cols = [
     { key: "website_status", label: "Website" },
     { key: "activation_status", label: "Activation" },
@@ -77,14 +80,52 @@ export function InstallStatusTable({ onboardings = [] }) {
   const hasInstallFields = onboardings.some((o) =>
     cols.some((c) => Object.prototype.hasOwnProperty.call(o || {}, c.key))
   );
+  const shouldFetchInstallRecords = onboardings.length === 0 || !hasInstallFields;
 
-  if (onboardings.length > 0 && !hasInstallFields) {
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadInstallRecords() {
+      if (!shouldFetchInstallRecords) return;
+
+      setInstallLoading(true);
+      setInstallError("");
+      try {
+        const records = await base44.entities.ClientInstallationOS.list("-created_date", 100);
+        if (!cancelled) setInstallRecords(records || []);
+      } catch (err) {
+        if (!cancelled) {
+          console.error("InstallStatusTable: failed to load ClientInstallationOS records", err);
+          setInstallError("Unable to load ClientInstallationOS install records.");
+        }
+      } finally {
+        if (!cancelled) setInstallLoading(false);
+      }
+    }
+
+    loadInstallRecords();
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldFetchInstallRecords]);
+
+  const sourceRecords = hasInstallFields ? onboardings : installRecords;
+  const sourceLabel = hasInstallFields ? "ClientInstallationOS-compatible records" : "ClientInstallationOS fallback query";
+
+  if (installError) {
     return (
-      <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-5">
-        <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Install status source mismatch</p>
-        <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">
-          This widget needs ClientInstallationOS records. The current records do not include website_status, activation_status, or workflow_stage.
-        </p>
+      <div className="rounded-2xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900 p-5">
+        <p className="text-sm font-semibold text-red-700 dark:text-red-400">Install status unavailable</p>
+        <p className="mt-1 text-xs text-red-700/80 dark:text-red-300/80">{installError}</p>
+      </div>
+    );
+  }
+
+  if (installLoading && sourceRecords.length === 0) {
+    return (
+      <div className="rounded-2xl border border-border bg-background p-5">
+        <p className="text-sm font-semibold text-foreground">Loading install status...</p>
+        <p className="mt-1 text-xs text-muted-foreground">Source: ClientInstallationOS</p>
       </div>
     );
   }
@@ -93,7 +134,7 @@ export function InstallStatusTable({ onboardings = [] }) {
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
       <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>Install Status</p>
-        <p style={{ color: "#9CA3AF", fontSize: 11, margin: "4px 0 0" }}>Source: ClientInstallationOS install fields required</p>
+        <p style={{ color: "#9CA3AF", fontSize: 11, margin: "4px 0 0" }}>Source: {sourceLabel}</p>
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -106,10 +147,10 @@ export function InstallStatusTable({ onboardings = [] }) {
             </tr>
           </thead>
           <tbody>
-            {onboardings.length === 0 && (
-              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No install records available yet</td></tr>
+            {sourceRecords.length === 0 && (
+              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No ClientInstallationOS install records available yet</td></tr>
             )}
-            {onboardings.map(o => (
+            {sourceRecords.slice(0, 20).map(o => (
               <tr key={o.id} style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
                 <td style={{ padding: "10px 16px", color: "#D1D5DB" }}>{o.business_name || o.client_name || "Unknown"}</td>
                 {cols.map(c => (
