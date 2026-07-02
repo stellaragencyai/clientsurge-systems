@@ -16,9 +16,10 @@ export function LTVCard({ orders = [] }) {
 
   return (
     <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Total LTV</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Estimated LTV</p>
       <p className="text-3xl font-extrabold text-emerald-500 mb-1">${totalLTV.toLocaleString()}</p>
-      <p className="text-xs text-muted-foreground">Avg ${avgLTV.toLocaleString()} / client · {orders.length} clients</p>
+      <p className="text-xs text-muted-foreground">Order-derived estimate · Avg ${avgLTV.toLocaleString()} / client · {orders.length} paid orders</p>
+      <p className="mt-2 text-[11px] text-amber-600">Needs Stripe/subscription reconciliation before treating as collected revenue proof.</p>
     </div>
   );
 }
@@ -26,17 +27,28 @@ export function LTVCard({ orders = [] }) {
 // #270: Churn Risk Panel
 export function ChurnRiskPanel({ orders = [] }) {
   const [risks, setRisks] = useState([]);
+  const [hasInstrumentedRisk, setHasInstrumentedRisk] = useState(false);
 
   useEffect(() => {
+    const instrumented = orders.some((o) => Number.isFinite(Number(o.churn_risk_score)));
     const flagged = orders
-      .filter((o) => Number(o.churn_risk_score || 0) > 70)
+      .filter((o) => Number.isFinite(Number(o.churn_risk_score)) && Number(o.churn_risk_score) > 70)
       .sort((a, b) => Number(b.churn_risk_score || 0) - Number(a.churn_risk_score || 0));
+    setHasInstrumentedRisk(instrumented);
     setRisks(flagged);
   }, [orders]);
 
+  if (!hasInstrumentedRisk) return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-5">
+      <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Churn risk needs instrumentation</p>
+      <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">No proven churn_risk_score source is present on the loaded paid orders. Do not read this as “no churn risk detected.”</p>
+    </div>
+  );
+
   if (!risks.length) return (
     <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-sm font-semibold text-emerald-600">✅ No churn risk detected</p>
+      <p className="text-sm font-semibold text-foreground">No high churn risk in instrumented orders</p>
+      <p className="mt-1 text-xs text-muted-foreground">Only orders with a numeric churn_risk_score were evaluated.</p>
     </div>
   );
 
@@ -55,18 +67,74 @@ export function ChurnRiskPanel({ orders = [] }) {
   );
 }
 
-// Install Status Table — uses actual OnboardingClient entity fields
+// Install Status Table — uses ClientInstallationOS as the dashboard source of truth.
 export function InstallStatusTable({ onboardings = [] }) {
-  // Use real entity fields from OnboardingClient schema
+  const [installRecords, setInstallRecords] = useState([]);
+  const [installLoading, setInstallLoading] = useState(false);
+  const [installError, setInstallError] = useState("");
   const cols = [
     { key: "website_status", label: "Website" },
     { key: "activation_status", label: "Activation" },
     { key: "workflow_stage", label: "Stage" },
   ];
+  const hasInstallFields = onboardings.some((o) =>
+    cols.some((c) => Object.prototype.hasOwnProperty.call(o || {}, c.key))
+  );
+  const shouldFetchInstallRecords = onboardings.length === 0 || !hasInstallFields;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadInstallRecords() {
+      if (!shouldFetchInstallRecords) return;
+
+      setInstallLoading(true);
+      setInstallError("");
+      try {
+        const records = await base44.entities.ClientInstallationOS.list("-created_date", 100);
+        if (!cancelled) setInstallRecords(records || []);
+      } catch (err) {
+        if (!cancelled) {
+          console.error("InstallStatusTable: failed to load ClientInstallationOS records", err);
+          setInstallError("Unable to load ClientInstallationOS install records.");
+        }
+      } finally {
+        if (!cancelled) setInstallLoading(false);
+      }
+    }
+
+    loadInstallRecords();
+    return () => {
+      cancelled = true;
+    };
+  }, [shouldFetchInstallRecords]);
+
+  const sourceRecords = hasInstallFields ? onboardings : installRecords;
+  const sourceLabel = hasInstallFields ? "ClientInstallationOS-compatible records" : "ClientInstallationOS fallback query";
+
+  if (installError) {
+    return (
+      <div className="rounded-2xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900 p-5">
+        <p className="text-sm font-semibold text-red-700 dark:text-red-400">Install status unavailable</p>
+        <p className="mt-1 text-xs text-red-700/80 dark:text-red-300/80">{installError}</p>
+      </div>
+    );
+  }
+
+  if (installLoading && sourceRecords.length === 0) {
+    return (
+      <div className="rounded-2xl border border-border bg-background p-5">
+        <p className="text-sm font-semibold text-foreground">Loading install status...</p>
+        <p className="mt-1 text-xs text-muted-foreground">Source: ClientInstallationOS</p>
+      </div>
+    );
+  }
+
   return (
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
       <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>Install Status</p>
+        <p style={{ color: "#9CA3AF", fontSize: 11, margin: "4px 0 0" }}>Source: {sourceLabel}</p>
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -79,10 +147,10 @@ export function InstallStatusTable({ onboardings = [] }) {
             </tr>
           </thead>
           <tbody>
-            {onboardings.length === 0 && (
-              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No onboarding records yet</td></tr>
+            {sourceRecords.length === 0 && (
+              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No ClientInstallationOS install records available yet</td></tr>
             )}
-            {onboardings.map(o => (
+            {sourceRecords.slice(0, 20).map(o => (
               <tr key={o.id} style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
                 <td style={{ padding: "10px 16px", color: "#D1D5DB" }}>{o.business_name || o.client_name || "Unknown"}</td>
                 {cols.map(c => (
