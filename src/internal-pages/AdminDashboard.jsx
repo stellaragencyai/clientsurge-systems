@@ -18,6 +18,8 @@ import LeadIntelligenceDashboard from '../components/admin/LeadIntelligenceDashb
 import LeadIntelligenceMiniPanel from '../components/admin/LeadIntelligenceMiniPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import CrmHealthDashboard from '../components/admin/CrmHealthDashboard';
+import LeadCleanupPanel from '../components/admin/LeadCleanupPanel';
+// LeadCleanupPanel added for CRM data quality management
 import LaunchGatesPanel from '../components/admin/LaunchGatesPanel';
 import CommunicationTemplates from '../components/admin/CommunicationTemplates';
 import IntegrationHealth from '../components/admin/IntegrationHealth';
@@ -321,7 +323,12 @@ export default function AdminDashboard() {
       case 'revenue': return <LazyAdminPanel><RevenueDashboard /></LazyAdminPanel>;
       case 'revenue-tracking': return <LazyAdminPanel><RevenueTrackingDashboard /></LazyAdminPanel>;
       case 'onboarding-orchestration': return <LazyAdminPanel><UnifiedOnboardingProgress /></LazyAdminPanel>;
-      case 'data-quality': return <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>;
+      case 'data-quality': return (
+        <div className="space-y-6">
+          <LeadCleanupPanel />
+          <LazyAdminPanel><LeadDataQualityDashboard /></LazyAdminPanel>
+        </div>
+      );
       case 'platform-clients': return <LazyAdminPanel><PlatformClientsPanel /></LazyAdminPanel>;
       case 'inbox': return <AdminInbox />;
       case 'install-queue': return <InstallQueuePanel />;
