@@ -28,6 +28,11 @@ jobs:
           node-version: '22'
           cache: 'npm'
 
+      - name: Setup Deno
+        uses: denoland/setup-deno@v2
+        with:
+          deno-version: v2.x
+
       - name: Install dependencies
         run: npm ci
 
@@ -80,6 +85,6 @@ jobs:
           echo "- Domain: https://clientsurgesystems.com" >> "$GITHUB_STEP_SUMMARY"
           echo "- Build: required in this workflow" >> "$GITHUB_STEP_SUMMARY"
           echo "- Product signup fallback proof: required in this workflow" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Runtime: Node 22, ripgrep, and .env.local prepared to match ClientSurge Release Gate" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Runtime: Node 22, Deno, ripgrep, and .env.local prepared to match ClientSurge Release Gate" >> "$GITHUB_STEP_SUMMARY"
           echo "- Lint audit: non-blocking so proof steps still run; release gate remains the blocking source of truth" >> "$GITHUB_STEP_SUMMARY"
           echo "- Base44 deploy: still requires separate Base44 proof because Base44 reports git_remote_source=s3" >> "$GITHUB_STEP_SUMMARY"
