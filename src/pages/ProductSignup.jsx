@@ -41,8 +41,10 @@ const PLANS = [
 
 const DEFAULT_PLAN_ID = "growth_system";
 const FORM_STORAGE_KEY = "clientsurge_signup_form";
-const REQUIRED_FIELDS = ["fullName", "businessName", "email", "phone"];
+const REQUIRED_FIELDS = ["fullName", "businessName", "email", "phone", "industry"];
 const CHECKOUT_TIMEOUT_MS = 20000;
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneDigits = (value) => String(value || "").replace(/\D/g, "");
 
 function normalizePlanParam(value) {
   const raw = String(value || "").trim().toLowerCase().replace(/[\s_]+/g, "-");
@@ -52,9 +54,11 @@ function normalizePlanParam(value) {
 
 function validateField(field, value) {
   if (!REQUIRED_FIELDS.includes(field)) return "";
-  if (!value || !value.trim()) return "This field is required.";
-  if (field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return "Please enter a valid email address.";
-  if (field === "phone" && value.replace(/\D/g, "").length < 10) return "Please enter a valid phone number.";
+  const trimmed = String(value || "").trim();
+  if (!trimmed) return "This field is required.";
+  if ((field === "fullName" || field === "businessName" || field === "industry") && trimmed.length < 2) return "Please enter at least 2 characters.";
+  if (field === "email" && !EMAIL_REGEX.test(trimmed)) return "Please enter a valid email address.";
+  if (field === "phone" && phoneDigits(trimmed).length < 10) return "Please enter a valid phone number.";
   return "";
 }
 
@@ -151,7 +155,7 @@ export default function ProductSignup() {
       const payload = {
         package_key: selectedPlanId,
         customer_name: formData.fullName.trim(),
-        customer_email: formData.email.trim(),
+        customer_email: formData.email.trim().toLowerCase(),
         customer_phone: formData.phone.trim(),
         business_name: formData.businessName.trim(),
         industry: formData.industry.trim(),

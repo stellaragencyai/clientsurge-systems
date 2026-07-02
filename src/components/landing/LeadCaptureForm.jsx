@@ -18,6 +18,8 @@ const CONTACT_METHOD_CHANNELS = {
   "Phone Call": ["call"],
   "Text Message": ["sms"],
 };
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneDigits = (value) => String(value || "").replace(/\D/g, "");
 
 const sections = [
   { step: 1, title: "Your Info" },
@@ -31,6 +33,7 @@ export default function LeadCaptureForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -47,6 +50,8 @@ export default function LeadCaptureForm() {
 
   const updateField = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
+    setFieldErrors((prev) => ({ ...prev, [field]: undefined }));
+    setError(null);
   };
 
   const buildProblemSummary = () => {
@@ -67,17 +72,65 @@ export default function LeadCaptureForm() {
     return details.join(" | ") || "Requested a demo from the website";
   };
 
+
+  const validateStep = (targetStep) => {
+    const nextErrors = {};
+    if (targetStep === 1) {
+      if (formData.full_name.trim().length < 2) nextErrors.full_name = "Enter your full name.";
+      if (!formData.email.trim()) nextErrors.email = "Email is required.";
+      else if (!EMAIL_REGEX.test(formData.email.trim())) nextErrors.email = "Enter a valid email.";
+      if (!formData.phone.trim()) nextErrors.phone = "Phone is required.";
+      else if (phoneDigits(formData.phone).length < 10) nextErrors.phone = "Enter a valid phone number.";
+    }
+    if (targetStep === 2) {
+      if (formData.business_name.trim().length < 2) nextErrors.business_name = "Enter your business name.";
+      if (!formData.niche) nextErrors.niche = "Select your industry.";
+    }
+    if (targetStep === 3) {
+      if (!formData.monthly_leads.trim()) nextErrors.monthly_leads = "Enter your monthly lead volume.";
+      if (!formData.contact_method) nextErrors.contact_method = "Select your preferred contact method.";
+    }
+    if (targetStep === 4) {
+      if (formData.biggest_problem.trim().length < 8) nextErrors.biggest_problem = "Briefly describe the follow-up challenge.";
+      if (formData.consent_given !== true) nextErrors.consent_given = "Consent is required before submitting.";
+    }
+    return nextErrors;
+  };
+
+  const validateAll = () => ({
+    ...validateStep(1),
+    ...validateStep(2),
+    ...validateStep(3),
+    ...validateStep(4),
+  });
+
+  const goNext = () => {
+    const nextErrors = validateStep(step);
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors((prev) => ({ ...prev, ...nextErrors }));
+      return;
+    }
+    setStep(Math.min(sections.length, step + 1));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const nextErrors = validateAll();
+    if (Object.keys(nextErrors).length > 0) {
+      setFieldErrors(nextErrors);
+      setError("Please fix the highlighted fields before submitting.");
+      return;
+    }
     setLoading(true);
     setError(null);
+    setFieldErrors({});
 
     try {
       const result = await base44.functions.invoke('submitLeadCapture', {
-        full_name: formData.full_name,
-        business_name: formData.business_name,
-        email: formData.email,
-        phone: formData.phone,
+        full_name: formData.full_name.trim(),
+        business_name: formData.business_name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
         business_type: formData.niche || "Other",
         problem: buildProblemSummary(),
         source: "website_form",
@@ -296,7 +349,7 @@ export default function LeadCaptureForm() {
             ) : (
               <button
                 type="button"
-                onClick={() => setStep(Math.min(sections.length, step + 1))}
+                onClick={goNext}
                 className="px-8 py-2.5 rounded-lg bg-primary text-primary-foreground font-medium hover:bg-primary/90 transition-colors gap-2 flex items-center"
               >
                 Next
