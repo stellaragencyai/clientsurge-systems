@@ -1,5 +1,15 @@
 import { spawnSync } from "node:child_process";
 
+const gate = spawnSync(process.execPath, ["scripts/ci/check-no-static-stripe-payment-links.mjs"], {
+  cwd: process.cwd(),
+  env: process.env,
+  stdio: "inherit",
+});
+
+if (gate.status !== 0) {
+  throw new Error("Checkout source gate failed.");
+}
+
 const RELEASE_GATE_NODE_TESTS = [
   "tests/websiteLeadsDashboard.test.js",
 ];
