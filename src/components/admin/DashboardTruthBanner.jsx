@@ -91,8 +91,8 @@ export default function DashboardTruthBanner() {
           <p className="mt-1 text-xs opacity-80">Last checked: {lastChecked}</p>
         </div>
         <div className="min-w-[190px] rounded-lg bg-white/50 p-3 text-xs dark:bg-black/10">
-          <p className="font-semibold">Admin visible: {record.safe_to_show_admin ? "yes" : "no"}</p>
-          <p className="mt-1 font-semibold">Launch ready: {record.safe_to_launch ? "yes" : "no"}</p>
+          <p className="font-semibold">Admin visibility: {record.safe_to_show_admin ? "cleared" : "not cleared"}</p>
+          <p className="mt-1 font-semibold">Launch status: {record.safe_to_launch ? "cleared" : "not cleared"}</p>
           <p className="mt-2 opacity-80">Source: DashboardTruthCheck</p>
         </div>
       </div>
