@@ -2,6 +2,9 @@ import { useEffect, useState } from "react";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneDigits = (value) => String(value || "").replace(/\D/g, "");
+
 export default function MedSpaDemoModal({ onClose }) {
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({
@@ -21,6 +24,7 @@ export default function MedSpaDemoModal({ onClose }) {
   const [success, setSuccess] = useState(false);
   const [submitError, setSubmitError] = useState("");
   const [submitWarnings, setSubmitWarnings] = useState([]);
+  const [errors, setErrors] = useState({});
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;
@@ -32,32 +36,66 @@ export default function MedSpaDemoModal({ onClose }) {
   }, []);
 
   const handleChange = (e) => {
-    setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
   };
 
   const handleSchedulingChange = (e) => {
-    setScheduling((s) => ({ ...s, [e.target.name]: e.target.value }));
+    const { name, value } = e.target;
+    setScheduling((s) => ({ ...s, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
+  };
+
+  const validateStep1 = () => {
+    const nextErrors = {};
+    if (form.full_name.trim().length < 2) nextErrors.full_name = "Enter your full name.";
+    if (form.business_name.trim().length < 2) nextErrors.business_name = "Enter your business name.";
+    if (!form.email.trim()) nextErrors.email = "Email is required.";
+    else if (!EMAIL_REGEX.test(form.email.trim())) nextErrors.email = "Enter a valid email.";
+    if (!form.phone.trim()) nextErrors.phone = "Phone is required.";
+    else if (phoneDigits(form.phone).length < 10) nextErrors.phone = "Enter a valid phone number.";
+    return nextErrors;
+  };
+
+  const validateScheduling = () => {
+    const nextErrors = {};
+    if (!scheduling.date) nextErrors.date = "Select a date.";
+    if (!scheduling.time) nextErrors.time = "Select a time.";
+    return nextErrors;
   };
 
   const handleStep1Submit = (e) => {
     e.preventDefault();
-    if (form.full_name && form.business_name && form.email && form.phone) {
-      setStep(2);
+    const nextErrors = validateStep1();
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      return;
     }
+    setErrors({});
+    setStep(2);
   };
 
   const handleStep2Submit = async (e) => {
     e.preventDefault();
-    if (!scheduling.date || !scheduling.time) return;
+    const step1Errors = validateStep1();
+    const schedulingErrors = validateScheduling();
+    const nextErrors = { ...step1Errors, ...schedulingErrors };
+    if (Object.keys(nextErrors).length > 0) {
+      setErrors(nextErrors);
+      if (Object.keys(step1Errors).length > 0) setStep(1);
+      return;
+    }
 
     setSaving(true);
+    setSubmitError("");
     setSubmitWarnings([]);
     try {
       const result = await base44.functions.invoke('scheduleDemoBooking', {
-        full_name: form.full_name,
-        business_name: form.business_name,
-        email: form.email,
-        phone: form.phone,
+        full_name: form.full_name.trim(),
+        business_name: form.business_name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
         monthly_leads: form.monthly_leads,
         biggest_issue: form.biggest_issue,
         website_url: form.website_url,
@@ -66,13 +104,15 @@ export default function MedSpaDemoModal({ onClose }) {
         industry: "Med Spa",
       });
 
-      if (result.data.success) {
-        setSubmitWarnings(result.data.warnings || []);
-        setSuccess(true);
-        setTimeout(() => {
-          onClose();
-        }, 3000);
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || 'Demo scheduling failed');
       }
+
+      setSubmitWarnings(result.data.warnings || []);
+      setSuccess(true);
+      setTimeout(() => {
+        onClose();
+      }, 3000);
     } catch (error) {
       setSubmitError('Something went wrong. Please try again or contact us directly.');
     } finally {
@@ -166,8 +206,10 @@ export default function MedSpaDemoModal({ onClose }) {
                   required
                   autoComplete="name"
                   placeholder="Jane Smith"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  aria-invalid={Boolean(errors.full_name)}
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${errors.full_name ? 'border-red-400' : 'border-input'}`}
                 />
+                {errors.full_name && <p className="mt-1 text-xs text-red-500">{errors.full_name}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Business Name *</label>
@@ -178,8 +220,10 @@ export default function MedSpaDemoModal({ onClose }) {
                   required
                   autoComplete="organization"
                   placeholder="Glow Med Spa"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  aria-invalid={Boolean(errors.business_name)}
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${errors.business_name ? 'border-red-400' : 'border-input'}`}
                 />
+                {errors.business_name && <p className="mt-1 text-xs text-red-500">{errors.business_name}</p>}
               </div>
             </div>
 
@@ -194,8 +238,10 @@ export default function MedSpaDemoModal({ onClose }) {
                   required
                   autoComplete="email"
                   placeholder="jane@glowspa.com"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  aria-invalid={Boolean(errors.email)}
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${errors.email ? 'border-red-400' : 'border-input'}`}
                 />
+                {errors.email && <p className="mt-1 text-xs text-red-500">{errors.email}</p>}
               </div>
               <div className="col-span-2 sm:col-span-1">
                 <label className="block text-xs font-semibold text-foreground mb-1.5">Phone *</label>
@@ -208,8 +254,10 @@ export default function MedSpaDemoModal({ onClose }) {
                   autoComplete="tel"
                   inputMode="tel"
                   placeholder="(555) 000-0000"
-                  className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                  aria-invalid={Boolean(errors.phone)}
+                  className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${errors.phone ? 'border-red-400' : 'border-input'}`}
                 />
+                {errors.phone && <p className="mt-1 text-xs text-red-500">{errors.phone}</p>}
               </div>
             </div>
 
@@ -265,8 +313,10 @@ export default function MedSpaDemoModal({ onClose }) {
                 min={new Date().toISOString().split('T')[0]}
                 onChange={handleSchedulingChange}
                 required
-                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                aria-invalid={Boolean(errors.date)}
+                className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${errors.date ? 'border-red-400' : 'border-input'}`}
               />
+              {errors.date && <p className="mt-1 text-xs text-red-500">{errors.date}</p>}
             </div>
 
             <div>
@@ -276,7 +326,8 @@ export default function MedSpaDemoModal({ onClose }) {
                 value={scheduling.time}
                 onChange={handleSchedulingChange}
                 required
-                className="w-full h-11 rounded-xl border border-input bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition"
+                aria-invalid={Boolean(errors.time)}
+                className={`w-full h-11 rounded-xl border bg-background px-4 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition ${errors.time ? 'border-red-400' : 'border-input'}`}
               >
                 <option value="">Choose a time...</option>
                 <option value="09:00">9:00 AM</option>
@@ -292,6 +343,7 @@ export default function MedSpaDemoModal({ onClose }) {
                 <option value="16:00">4:00 PM</option>
                 <option value="16:30">4:30 PM</option>
               </select>
+              {errors.time && <p className="mt-1 text-xs text-red-500">{errors.time}</p>}
             </div>
 
             <div className="bg-primary/10 border border-primary/20 rounded-xl p-4">
