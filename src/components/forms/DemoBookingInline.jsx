@@ -103,13 +103,16 @@ export default function DemoBookingInline({
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const set = (e) => setForm((f) => ({ ...f, [e.target.name]: e.target.value }));
+  const set = (e) => {
+    const { name, value } = e.target;
+    setForm((f) => ({ ...f, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
+  };
 
-  const validateEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v);
+  const validateEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
   const validatePhone = (v) => /^[\d\s\-()]+$/.test(v) && v.replace(/\D/g, "").length >= 10;
 
-  const handleStep1 = (e) => {
-    e.preventDefault();
+  const getStep1Errors = () => {
     const errs = {};
     if (!form.first_name.trim()) errs.first_name = "Required";
     if (!form.last_name.trim()) errs.last_name = "Required";
@@ -122,6 +125,12 @@ export default function DemoBookingInline({
     if (!form.website.trim()) errs.website = "Required";
     if (!form.biggest_issue.trim()) errs.biggest_issue = "Required";
     if (form.consent_given !== true) errs.consent_given = "Required";
+    return errs;
+  };
+
+  const handleStep1 = (e) => {
+    e.preventDefault();
+    const errs = getStep1Errors();
     setErrors(errs);
     if (Object.keys(errs).length === 0) setStep(2);
   };
@@ -129,6 +138,7 @@ export default function DemoBookingInline({
   const handleDateChange = async (e) => {
     const value = e.target.value;
     setScheduling({ date: value, time: "" });
+    setErrors((current) => ({ ...current, scheduling: undefined, submit: undefined }));
     if (!value) return;
     setLoadingSlots(true);
     try {
@@ -140,24 +150,35 @@ export default function DemoBookingInline({
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const step1Errors = getStep1Errors();
+    if (Object.keys(step1Errors).length > 0) {
+      setErrors(step1Errors);
+      setStep(1);
+      return;
+    }
     if (!scheduling.date || !scheduling.time) {
       setErrors({ scheduling: "Please select both date and time" });
       return;
     }
+    if (bookedSlots.includes(scheduling.time)) {
+      setErrors({ scheduling: "That time is already reserved. Please choose another time." });
+      return;
+    }
     setSaving(true);
     setSubmitWarnings([]);
+    setErrors({});
     try {
       const industrySlug = canonicalIndustrySlug(form.industry);
       const res = await base44.functions.invoke("scheduleDemoBooking", {
         ...getPageAttribution(),
-        full_name: `${form.first_name} ${form.last_name}`,
-        first_name: form.first_name,
-        last_name: form.last_name,
-        business_name: form.business_name,
-        email: form.email,
-        phone: form.phone,
-        website: form.website,
-        business_website_url: form.website,
+        full_name: `${form.first_name.trim()} ${form.last_name.trim()}`,
+        first_name: form.first_name.trim(),
+        last_name: form.last_name.trim(),
+        business_name: form.business_name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
+        website: form.website.trim(),
+        business_website_url: form.website.trim(),
         industry: form.industry,
         business_type: form.industry,
         industry_slug: industrySlug,
@@ -172,9 +193,11 @@ export default function DemoBookingInline({
         scheduled_date: scheduling.date,
         scheduled_time: scheduling.time,
       });
-      if (res.data.success) {
+      if (res.data?.success) {
         setSubmitWarnings(res.data.warnings || []);
         setSuccess(true);
+      } else {
+        throw new Error(res.data?.error || "Booking failed");
       }
     } catch {
       setErrors({ submit: "Something went wrong. Please try again." });
@@ -282,7 +305,7 @@ export default function DemoBookingInline({
             checked={form.consent_given}
             onChange={(e) => {
               setForm((f) => ({ ...f, consent_given: e.target.checked }));
-              setErrors((current) => ({ ...current, consent_given: undefined }));
+              setErrors((current) => ({ ...current, consent_given: undefined, submit: undefined }));
             }}
             className={isLight ? "mt-0.5 h-4 w-4 rounded accent-primary" : "mt-0.5 h-4 w-4 rounded accent-amber-500"}
           />
@@ -319,7 +342,10 @@ export default function DemoBookingInline({
         </label>
         <select
           value={scheduling.time}
-          onChange={(e) => setScheduling((s) => ({ ...s, time: e.target.value }))}
+          onChange={(e) => {
+            setScheduling((s) => ({ ...s, time: e.target.value }));
+            setErrors((current) => ({ ...current, scheduling: undefined, submit: undefined }));
+          }}
           disabled={!scheduling.date || loadingSlots}
           className={`${inputCls("scheduling")} disabled:opacity-40 cursor-pointer`}
         >
