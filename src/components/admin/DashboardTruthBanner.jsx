@@ -15,6 +15,11 @@ const CLASSES = {
   unknown: "border-border bg-muted/30 text-muted-foreground",
 };
 
+function normalizeStatus(value) {
+  const status = String(value || "unknown").toLowerCase();
+  return Object.prototype.hasOwnProperty.call(CLASSES, status) ? status : "unknown";
+}
+
 export default function DashboardTruthBanner() {
   const [record, setRecord] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -66,19 +71,19 @@ export default function DashboardTruthBanner() {
     );
   }
 
-  const status = record.truth_status || "unknown";
+  const status = normalizeStatus(record.truth_status);
   const lastChecked = record.last_checked_at ? new Date(record.last_checked_at).toLocaleString() : "Not checked";
   const blockers = Number(record.blocker_count || 0);
   const warnings = Number(record.warning_count || 0);
 
   return (
-    <div className={`rounded-xl border p-4 ${CLASSES[status] || CLASSES.unknown}`}>
+    <div className={`rounded-xl border p-4 ${CLASSES[status]}`}>
       <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
         <div>
           <p className="text-xs font-semibold uppercase tracking-wide opacity-80">Dashboard Truth Status</p>
           <div className="mt-2 flex flex-wrap items-center gap-2">
             <span className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-bold text-foreground dark:bg-black/20 dark:text-white">
-              {LABELS[status] || "Unknown"}
+              {LABELS[status]}
             </span>
             <span className="text-xs font-medium">{blockers} blockers · {warnings} warnings</span>
           </div>
