@@ -1,6 +1,7 @@
 import { CheckCircle2, ShieldCheck, Wallet, ShoppingCart, ArrowRight } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
+import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 
 const PACKAGES = [
   {
@@ -59,6 +60,7 @@ export default function PricingPageContent() {
             </span>
           ))}
         </div>
+        <CheckoutProgress currentStep="compare" className="mt-6" />
       </section>
 
       <section className="px-6 pb-16 max-w-6xl mx-auto">
