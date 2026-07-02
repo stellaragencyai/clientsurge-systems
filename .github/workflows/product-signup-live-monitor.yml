@@ -1,0 +1,44 @@
+name: Product Signup Live Monitor
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */6 * * *'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: product-signup-live-monitor
+  cancel-in-progress: false
+
+jobs:
+  live-product-signup-smoke:
+    name: Verify live product signup route
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Strict live smoke test
+        env:
+          CLIENTSURGE_PRODUCT_SIGNUP_SMOKE_BASE_URL: https://clientsurgesystems.com
+          PRODUCT_SIGNUP_SMOKE_STRICT_HTTP: '1'
+        run: node scripts/product-signup-route-smoke.mjs
+
+      - name: Live monitor summary
+        if: always()
+        run: |
+          echo "## Product signup live monitor" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Domain: https://clientsurgesystems.com" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Required route: /product-signup" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Package variants: growth, starter, pro" >> "$GITHUB_STEP_SUMMARY"
+          echo "- This monitor checks the live production URL, not only the built GitHub source." >> "$GITHUB_STEP_SUMMARY"
+          echo "- If this fails while Release Gate passes, Base44 publish/sync is the likely gap." >> "$GITHUB_STEP_SUMMARY"
