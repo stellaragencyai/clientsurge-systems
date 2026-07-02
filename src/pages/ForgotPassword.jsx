@@ -7,16 +7,26 @@ import { Label } from "@/components/ui/label";
 import { Mail, ArrowLeft, Loader2 } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
 export default function ForgotPassword() {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [sent, setSent] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
+      setError("Enter a valid email address.");
+      return;
+    }
+
     setLoading(true);
+    setError("");
     try {
-      await base44.auth.resetPasswordRequest(email);
+      await base44.auth.resetPasswordRequest(normalizedEmail);
     } catch {
       // Always show success regardless
     } finally {
@@ -41,7 +51,7 @@ export default function ForgotPassword() {
           If an account exists with that email, you'll receive a password reset link shortly.
         </p>
       ) : (
-        <form onSubmit={handleSubmit} className="space-y-4">
+        <form onSubmit={handleSubmit} className="space-y-4" noValidate>
           <div className="space-y-2">
             <Label htmlFor="email">Email address</Label>
             <div className="relative">
@@ -53,11 +63,13 @@ export default function ForgotPassword() {
                 autoFocus
                 placeholder="you@example.com"
                 value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                onChange={(e) => { setEmail(e.target.value); setError(""); }}
                 className="pl-10 h-12"
                 required
+                aria-invalid={Boolean(error)}
               />
             </div>
+            {error && <p className="text-xs text-red-600">{error}</p>}
           </div>
           <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
             {loading ? (
