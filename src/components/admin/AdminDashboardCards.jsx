@@ -1,6 +1,21 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 
+function TruthNote({ children, tone = "muted" }) {
+  const color = tone === "warning" ? "text-amber-600" : "text-muted-foreground";
+  return <p className={`mt-2 text-[11px] leading-snug ${color}`}>{children}</p>;
+}
+
+function hasProvisioningProof(order) {
+  return Boolean(
+    order?.client_project_id ||
+    order?.client_id ||
+    order?.install_initialized_at ||
+    order?.workflow_stage ||
+    order?.activation_started_at
+  );
+}
+
 // #269: LTV Card
 export function LTVCard({ orders = [] }) {
   const totalLTV = orders.reduce((sum, o) => {
@@ -16,9 +31,10 @@ export function LTVCard({ orders = [] }) {
 
   return (
     <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Total LTV</p>
+      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Estimated LTV</p>
       <p className="text-3xl font-extrabold text-emerald-500 mb-1">${totalLTV.toLocaleString()}</p>
-      <p className="text-xs text-muted-foreground">Avg ${avgLTV.toLocaleString()} / client · {orders.length} clients</p>
+      <p className="text-xs text-muted-foreground">Avg ${avgLTV.toLocaleString()} / client · {orders.length} paid orders</p>
+      <TruthNote>Estimated from setup/monthly fields and elapsed months. Use Stripe invoices for verified collected revenue.</TruthNote>
     </div>
   );
 }
@@ -26,24 +42,41 @@ export function LTVCard({ orders = [] }) {
 // #270: Churn Risk Panel
 export function ChurnRiskPanel({ orders = [] }) {
   const [risks, setRisks] = useState([]);
+  const [scoredCount, setScoredCount] = useState(0);
 
   useEffect(() => {
-    const flagged = orders
+    const scored = orders.filter((o) => o.churn_risk_score !== undefined && o.churn_risk_score !== null && o.churn_risk_score !== "");
+    const flagged = scored
       .filter((o) => Number(o.churn_risk_score || 0) > 70)
       .sort((a, b) => Number(b.churn_risk_score || 0) - Number(a.churn_risk_score || 0));
+    setScoredCount(scored.length);
     setRisks(flagged);
   }, [orders]);
 
+  if (!orders.length) return (
+    <div className="rounded-2xl border border-border bg-background p-5">
+      <p className="text-sm font-semibold text-muted-foreground">No paid orders to score yet</p>
+    </div>
+  );
+
+  if (!scoredCount) return (
+    <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-5">
+      <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Churn risk not verified</p>
+      <TruthNote tone="warning">No paid orders have churn_risk_score yet. Do not treat this as low churn risk.</TruthNote>
+    </div>
+  );
+
   if (!risks.length) return (
     <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-sm font-semibold text-emerald-600">✅ No churn risk detected</p>
+      <p className="text-sm font-semibold text-emerald-600">No high churn-risk scores</p>
+      <TruthNote>Based on {scoredCount}/{orders.length} scored paid orders. Advisory score only.</TruthNote>
     </div>
   );
 
   return (
     <div className="rounded-2xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900 p-5">
       <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-3">
-        ⚠️ Churn Risk ({risks.length})
+        Churn Risk ({risks.length})
       </p>
       {risks.map(o => (
         <div key={o.id} className="flex items-center justify-between py-2 border-b border-red-100 dark:border-red-900 last:border-0">
@@ -51,6 +84,7 @@ export function ChurnRiskPanel({ orders = [] }) {
           <span className="text-xs font-semibold text-red-600">Score {o.churn_risk_score}</span>
         </div>
       ))}
+      <TruthNote tone="warning">Based on {scoredCount}/{orders.length} scored paid orders. Advisory score only.</TruthNote>
     </div>
   );
 }
@@ -67,6 +101,7 @@ export function InstallStatusTable({ onboardings = [] }) {
     <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
       <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
         <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>Install Status</p>
+        <p style={{ color: "#9CA3AF", fontSize: 11, margin: "4px 0 0" }}>Source: OnboardingClient records. Empty rows mean missing setup records, not completed installs.</p>
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
@@ -80,15 +115,15 @@ export function InstallStatusTable({ onboardings = [] }) {
           </thead>
           <tbody>
             {onboardings.length === 0 && (
-              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No onboarding records yet</td></tr>
+              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#F59E0B", textAlign: "center" }}>No onboarding records found — install status is unverified</td></tr>
             )}
             {onboardings.map(o => (
               <tr key={o.id} style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
                 <td style={{ padding: "10px 16px", color: "#D1D5DB" }}>{o.business_name || o.client_name || "Unknown"}</td>
                 {cols.map(c => (
                   <td key={c.key} style={{ padding: "10px", textAlign: "center" }}>
-                    <span style={{ color: o[c.key] && o[c.key] !== "not_started" ? "#00FFB3" : "#374151", fontSize: 11 }}>
-                      {o[c.key] || "—"}
+                    <span style={{ color: o[c.key] && o[c.key] !== "not_started" ? "#00FFB3" : "#F59E0B", fontSize: 11 }}>
+                      {o[c.key] || "missing"}
                     </span>
                   </td>
                 ))}
@@ -98,6 +133,15 @@ export function InstallStatusTable({ onboardings = [] }) {
         </table>
       </div>
     </div>
+  );
+}
+
+export function PaidOrderProvisioningBadge({ order }) {
+  const proven = hasProvisioningProof(order);
+  return (
+    <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${proven ? "bg-emerald-50 text-emerald-700" : "bg-amber-50 text-amber-700"}`}>
+      {proven ? "Provisioning proof found" : "Provisioning unverified"}
+    </span>
   );
 }
 
