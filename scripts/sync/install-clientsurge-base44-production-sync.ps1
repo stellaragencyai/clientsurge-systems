@@ -41,10 +41,10 @@ if ($publisherText -notmatch [regex]::Escape($productionAppId) -or $publisherTex
 $argsList = @(
     '-NoProfile',
     '-ExecutionPolicy', 'Bypass',
-    '-File', "`"$installer`"",
-    '-RepoPath', "`"$RepoPath`"",
-    '-MirrorPath', "`"$MirrorPath`"",
-    '-TaskName', "`"$TaskName`"",
+    '-File', $installer,
+    '-RepoPath', $RepoPath,
+    '-MirrorPath', $MirrorPath,
+    '-TaskName', $TaskName,
     '-IntervalMinutes', $IntervalMinutes,
     '-PublishAfterUpdate',
     '-PublisherRole', $PublisherRole,
@@ -52,7 +52,7 @@ $argsList = @(
 )
 
 if ($ActiveRef) {
-    $argsList += @('-ActiveRef', "`"$ActiveRef`"")
+    $argsList += @('-ActiveRef', $ActiveRef)
 }
 if ($SkipPublishTests) {
     $argsList += '-SkipPublishTests'
@@ -61,7 +61,17 @@ if ($SkipGitHubChecks) {
     $argsList += '-SkipGitHubChecks'
 }
 
-$commandPreview = "pwsh $($argsList -join ' ')"
+function Format-CommandPreviewArg {
+    param([Parameter(Mandatory = $true)][object]$Value)
+
+    $text = [string]$Value
+    if ($text -match '\s') {
+        return '"' + ($text -replace '"', '\"') + '"'
+    }
+    return $text
+}
+
+$commandPreview = "pwsh $($argsList | ForEach-Object { Format-CommandPreviewArg $_ } | Join-String -Separator ' ')"
 Write-Host "Production app: $productionAppId" -ForegroundColor Cyan
 Write-Host "Verify URL:     $productionUrl" -ForegroundColor Cyan
 Write-Host "Task name:      $TaskName" -ForegroundColor Cyan
