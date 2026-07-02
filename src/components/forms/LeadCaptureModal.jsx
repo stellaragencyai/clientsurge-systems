@@ -3,6 +3,9 @@ import { base44 } from '@/api/base44Client';
 import { ArrowRight, ChevronLeft, X, CheckCircle2, User, Building2, Mail, Phone, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
 
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneDigits = (value) => String(value || '').replace(/\D/g, '');
+
 export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
@@ -50,18 +53,49 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
 
   const validateField = (name, value) => {
     let error = '';
-    if (step === 1) {
-      if (name === 'email' && value && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        error = 'Please enter a valid email';
-      } else if (name === 'phone' && value && !/^[\d\s\-\(\)]{10,}$/.test(value)) {
-        error = 'Please enter a valid phone number';
-      } else if ((name === 'full_name' || name === 'business_name') && value.trim().length < 2) {
-        error = 'This field must be at least 2 characters';
-      }
+    if ((name === 'full_name' || name === 'business_name') && value.trim().length < 2) {
+      error = 'This field must be at least 2 characters';
+    } else if (name === 'email') {
+      if (!value.trim()) error = 'Email is required';
+      else if (!EMAIL_REGEX.test(value.trim())) error = 'Please enter a valid email';
+    } else if (name === 'phone') {
+      if (!value.trim()) error = 'Phone is required';
+      else if (phoneDigits(value).length < 10) error = 'Please enter a valid phone number';
     }
-    if (error) {
-      setErrors(prev => ({ ...prev, [name]: error }));
+    setErrors(prev => ({ ...prev, [name]: error }));
+    return error;
+  };
+
+  const validateStep = (targetStep) => {
+    const nextErrors = {};
+    const nextTouched = {};
+
+    if (targetStep === 1) {
+      if (formData.full_name.trim().length < 2) nextErrors.full_name = 'This field must be at least 2 characters';
+      if (formData.business_name.trim().length < 2) nextErrors.business_name = 'This field must be at least 2 characters';
+      if (!formData.email.trim()) nextErrors.email = 'Email is required';
+      else if (!EMAIL_REGEX.test(formData.email.trim())) nextErrors.email = 'Please enter a valid email';
+      if (!formData.phone.trim()) nextErrors.phone = 'Phone is required';
+      else if (phoneDigits(formData.phone).length < 10) nextErrors.phone = 'Please enter a valid phone number';
+      ['full_name', 'business_name', 'email', 'phone'].forEach((key) => { nextTouched[key] = true; });
     }
+
+    if (targetStep === 2) {
+      if (!formData.business_type) nextErrors.business_type = 'Select a business type';
+      if (!formData.monthly_leads) nextErrors.monthly_leads = 'Select a monthly lead range';
+      ['business_type', 'monthly_leads'].forEach((key) => { nextTouched[key] = true; });
+    }
+
+    if (targetStep === 3) {
+      if (!formData.biggest_issue) nextErrors.biggest_issue = 'Select the biggest issue';
+      if (formData.lead_source.length === 0) nextErrors.lead_source = 'Select at least one lead source';
+      if (formData.consent_given !== true) nextErrors.consent_given = 'Consent is required before submitting';
+      ['biggest_issue', 'lead_source', 'consent_given'].forEach((key) => { nextTouched[key] = true; });
+    }
+
+    setTouched(prev => ({ ...prev, ...nextTouched }));
+    setErrors(prev => ({ ...prev, ...nextErrors, submit: '' }));
+    return Object.keys(nextErrors).length === 0;
   };
 
   const handleCheckboxChange = (e) => {
@@ -72,6 +106,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         ? [...prev.lead_source, value]
         : prev.lead_source.filter(item => item !== value)
     }));
+    setErrors(prev => ({ ...prev, lead_source: '' }));
   };
 
   const buildProblemSummary = () => {
@@ -94,13 +129,15 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!validateStep(3)) return;
+
     setLoading(true);
     try {
       const result = await base44.functions.invoke('submitLeadCapture', {
-        full_name: formData.full_name,
-        business_name: formData.business_name,
-        email: formData.email,
-        phone: formData.phone,
+        full_name: formData.full_name.trim(),
+        business_name: formData.business_name.trim(),
+        email: formData.email.trim().toLowerCase(),
+        phone: formData.phone.trim(),
         business_type: formData.business_type,
         problem: buildProblemSummary(),
         source: "lead_capture_modal",
@@ -151,8 +188,8 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
     onClose();
   };
 
-  const canProceedStep1 = formData.full_name && formData.business_name && formData.email && formData.phone;
-  const canProceedStep2 = formData.business_type && formData.monthly_leads;
+  const canProceedStep1 = formData.full_name.trim().length >= 2 && formData.business_name.trim().length >= 2 && EMAIL_REGEX.test(formData.email.trim()) && phoneDigits(formData.phone).length >= 10;
+  const canProceedStep2 = Boolean(formData.business_type && formData.monthly_leads);
   const canSubmit = canProceedStep2 && formData.biggest_issue && formData.lead_source.length > 0 && formData.consent_given;
 
   if (!isOpen) return null;
@@ -321,7 +358,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      value={formData.business_type}
                      onChange={handleInputChange}
                      disabled={loading}
-                     className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                     className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all ${errors.business_type && touched.business_type ? 'border-red-500' : 'border-border'}`}
                    >
                      <option value="">Select type</option>
                      <option value="med_spa">Med Spas & Aesthetic Clinics</option>
@@ -332,6 +369,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      <option value="contractor">Contractors & Trades</option>
                      <option value="other">Other</option>
                    </select>
+                   {errors.business_type && touched.business_type && <p className="text-xs text-red-500 mt-0.5">{errors.business_type}</p>}
                  </div>
                  <div>
                    <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Monthly Leads</label>
@@ -340,7 +378,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      value={formData.monthly_leads}
                      onChange={handleInputChange}
                      disabled={loading}
-                     className="w-full px-3 py-2 text-sm border border-border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                     className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all ${errors.monthly_leads && touched.monthly_leads ? 'border-red-500' : 'border-border'}`}
                    >
                      <option value="">Select range</option>
                      <option value="1-10">1-10/month</option>
@@ -348,6 +386,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      <option value="26-50">26-50/month</option>
                      <option value="50+">50+/month</option>
                    </select>
+                   {errors.monthly_leads && touched.monthly_leads && <p className="text-xs text-red-500 mt-0.5">{errors.monthly_leads}</p>}
                  </div>
                </div>
              )}
@@ -375,6 +414,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                        </label>
                      ))}
                    </div>
+                   {errors.biggest_issue && touched.biggest_issue && <p className="text-xs text-red-500 mt-1">{errors.biggest_issue}</p>}
                  </div>
 
                  <div>
@@ -394,14 +434,18 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                        </label>
                      ))}
                    </div>
+                   {errors.lead_source && touched.lead_source && <p className="text-xs text-red-500 mt-1">{errors.lead_source}</p>}
                  </div>
 
-                 <label className="flex items-start gap-2.5 rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
+                 <label className={`flex items-start gap-2.5 rounded-lg border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground ${errors.consent_given && touched.consent_given ? 'border-red-500' : 'border-border'}`}>
                    <input
                      type="checkbox"
                      name="consent_given"
                      checked={formData.consent_given}
-                     onChange={(e) => setFormData(prev => ({ ...prev, consent_given: e.target.checked }))}
+                     onChange={(e) => {
+                       setFormData(prev => ({ ...prev, consent_given: e.target.checked }));
+                       setErrors(prev => ({ ...prev, consent_given: '' }));
+                     }}
                      disabled={loading}
                      required
                      className="mt-0.5 h-4 w-4 rounded accent-amber-600"
@@ -414,6 +458,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      <a href="/terms" className="underline hover:text-foreground">Terms</a>.
                    </span>
                  </label>
+                 {errors.consent_given && touched.consent_given && <p className="text-xs text-red-500 mt-1">{errors.consent_given}</p>}
                </div>
              )}
 
@@ -435,7 +480,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
               {step < 3 ? (
                 <button
                   type="button"
-                  onClick={() => setStep(step + 1)}
+                  onClick={() => { if (validateStep(step)) setStep(step + 1); }}
                   disabled={step === 1 ? !canProceedStep1 : !canProceedStep2 || loading}
                   className="ml-auto flex items-center gap-1.5 px-6 py-2 rounded-full font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
                   style={{background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)'}}
@@ -479,4 +524,3 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
             </div>
             );
             }
-
