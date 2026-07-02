@@ -79,6 +79,7 @@ Set-Location $repoRoot
 $stateDir = Join-Path $repoRoot 'logs/base44-publish'
 New-Item -ItemType Directory -Force -Path $stateDir | Out-Null
 $statePath = Join-Path $stateDir 'last-published-main.txt'
+$base44BrowserProfileDir = Join-Path $env:USERPROFILE '.base44\publish-browser-profile'
 
 function Get-RemoteSha {
     Invoke-Step 'git fetch origin --prune'
@@ -170,7 +171,7 @@ function Invoke-ProductionPublish {
     }
 
     try {
-        Invoke-Step "node scripts/base44/publish-deploy-endpoint.mjs --app-id $AppId --verify-url $VerifyUrl --summary"
+        Invoke-Step "node scripts/base44/publish-deploy-endpoint.mjs --app-id $AppId --verify-url $VerifyUrl --profile-dir `"$base44BrowserProfileDir`" --summary"
     }
     catch {
         if (-not $FallbackToUiClick) {
@@ -207,6 +208,7 @@ Write-Host "Watching origin/$TargetBranch for production Base44 publish." -Foreg
 Write-Host "App:    $AppId"
 Write-Host "Verify: $VerifyUrl"
 Write-Host "Role:   $PublisherRole"
+Write-Host "Profile: $base44BrowserProfileDir"
 
 do {
     try {
