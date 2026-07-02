@@ -12,6 +12,7 @@ const formatPhone = (value) => {
 };
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const phoneDigits = (value) => String(value || '').replace(/\D/g, '');
 
 // Industry-specific qualifying questions
 const INDUSTRY_QUESTIONS = {
@@ -91,13 +92,15 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
 
   const validate = () => {
     const e = {};
-    if (!form.full_name.trim()) e.full_name = 'Required';
-    if (!form.email.trim() || !EMAIL_RE.test(form.email)) e.email = 'Valid email required';
-    if (!form.phone.trim() || form.phone.replace(/\D/g, '').length < 10) e.phone = 'Valid phone required';
-    if (!form.business_name.trim()) e.business_name = 'Required';
+    if (form.full_name.trim().length < 2) e.full_name = 'Enter your full name';
+    if (!form.email.trim()) e.email = 'Email is required';
+    else if (!EMAIL_RE.test(form.email.trim())) e.email = 'Valid email required';
+    if (!form.phone.trim()) e.phone = 'Phone is required';
+    else if (phoneDigits(form.phone).length < 10) e.phone = 'Valid phone required';
+    if (form.business_name.trim().length < 2) e.business_name = 'Enter your business name';
     if (!form.lead_volume) e.lead_volume = 'Please select an option';
-    if (!form.problem.trim()) e.problem = 'Required';
-    if (!form.consent) e.consent = 'Consent required to continue';
+    if (form.problem.trim().length < 8) e.problem = 'Briefly describe the lead follow-up problem';
+    if (form.consent !== true) e.consent = 'Consent required to continue';
     return e;
   };
 
@@ -108,19 +111,23 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
     setLoading(true);
     try {
       trackCTA(`industry_qualification_submit_${industrySlug}`, `/${industrySlug}`);
-      await base44.functions.invoke('submitLeadCapture', {
-        full_name: form.full_name,
-        email: form.email,
-        phone: form.phone,
-        business_name: form.business_name,
+      const result = await base44.functions.invoke('submitLeadCapture', {
+        full_name: form.full_name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
+        business_name: form.business_name.trim(),
         business_type: industryName,
-        problem: `[Volume: ${form.lead_volume}] ${form.problem}`,
+        problem: `[Volume: ${form.lead_volume}] ${form.problem.trim()}`,
         source: 'industry_qualification_form',
         source_page: `/${industrySlug}`,
         intake_type: 'industry_qualification',
         consent_given: form.consent,
-        consent_source: `industry_page_${industrySlug}`,
+        consent_source: `industry_page_${industrySlug || 'general'}`,
+        consent_text_version: 'industry_qualification_explicit_checkbox_v1',
       });
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || 'Lead submission failed');
+      }
       setSubmitted(true);
     } catch {
       setErrors({ submit: 'Something went wrong. Please try again.' });
@@ -277,8 +284,8 @@ function Field({ label, required, error, children }) {
 function QInput({ type = 'text', value, onChange, placeholder, autoComplete = '' }) {
   const isEmail = type === 'email';
   const isTel = type === 'tel';
-  const isValidEmail = isEmail && value && EMAIL_RE.test(value);
-  const isValidPhone = isTel && value && value.replace(/\D/g, '').length >= 10;
+  const isValidEmail = isEmail && value && EMAIL_RE.test(value.trim());
+  const isValidPhone = isTel && value && phoneDigits(value).length >= 10;
   const showCheck = isValidEmail || isValidPhone;
 
   return (
