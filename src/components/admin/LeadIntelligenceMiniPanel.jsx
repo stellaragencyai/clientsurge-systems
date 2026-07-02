@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
-import { Flame, TrendingUp, DollarSign, Zap } from "lucide-react";
+import { Zap } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import DashboardTruthBanner from "./DashboardTruthBanner";
 
 export default function LeadIntelligenceMiniPanel({ onNavigate }) {
   const [kpis, setKpis] = useState(null);
@@ -15,7 +16,9 @@ export default function LeadIntelligenceMiniPanel({ onNavigate }) {
     load();
   }, []);
 
-  if (!kpis) return null;
+  if (!kpis) {
+    return <DashboardTruthBanner />;
+  }
 
   const cards = [
     {
@@ -54,34 +57,37 @@ export default function LeadIntelligenceMiniPanel({ onNavigate }) {
   ];
 
   return (
-    <div className="rounded-xl border border-border bg-card p-4">
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-2">
-          <Zap className="w-4 h-4 text-primary" />
-          <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">Lead Intelligence Layer</h3>
-        </div>
-        <button
-          onClick={() => onNavigate("lead-intelligence")}
-          className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
-        >
-          Open full view →
-        </button>
-      </div>
-      <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {cards.map((card, i) => (
+    <div className="space-y-4">
+      <DashboardTruthBanner />
+      <div className="rounded-xl border border-border bg-card p-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <Zap className="w-4 h-4 text-primary" />
+            <h3 className="text-sm font-bold text-foreground uppercase tracking-wide">Lead Intelligence Layer</h3>
+          </div>
           <button
-            key={i}
-            onClick={() => onNavigate(card.segment)}
-            className={`rounded-lg border p-3 text-left transition hover:shadow-sm relative ${card.color} ${card.urgent ? "ring-2 ring-red-300" : ""}`}
+            onClick={() => onNavigate("lead-intelligence")}
+            className="text-xs font-semibold text-primary hover:text-primary/80 transition-colors"
           >
-            {card.urgent && (
-              <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
-            )}
-            <p className="text-xs font-semibold text-muted-foreground mb-1">{card.label}</p>
-            <p className={`text-2xl font-black ${card.textColor}`}>{card.value}</p>
-            <p className="text-[11px] text-muted-foreground mt-1">{card.sub}</p>
+            Open full view →
           </button>
-        ))}
+        </div>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          {cards.map((card, i) => (
+            <button
+              key={i}
+              onClick={() => onNavigate(card.segment)}
+              className={`rounded-lg border p-3 text-left transition hover:shadow-sm relative ${card.color} ${card.urgent ? "ring-2 ring-red-300" : ""}`}
+            >
+              {card.urgent && (
+                <span className="absolute top-2 right-2 w-2 h-2 rounded-full bg-red-500 animate-pulse" />
+              )}
+              <p className="text-xs font-semibold text-muted-foreground mb-1">{card.label}</p>
+              <p className={`text-2xl font-black ${card.textColor}`}>{card.value}</p>
+              <p className="text-[11px] text-muted-foreground mt-1">{card.sub}</p>
+            </button>
+          ))}
+        </div>
       </div>
     </div>
   );
