@@ -1,13 +1,27 @@
-const sharedMetrics = {
-  response_speed: 'Faster replies',
-  follow_up_quality: 'Cleaner follow-up',
-  booking_path: 'Clearer booking handoff',
-  launch_proof: 'Tested before launch',
+const sharedProof = {
+  status: 'coming_soon',
+  label: 'Proof coming soon',
+  note: 'ClientSurge does not publish fake case studies, fake live counters, or unverified client results. Verified industry proof will be added only after real installations produce documented evidence.',
 };
 
-const sharedTestimonials = [];
-
-const buildIndustry = ({ slug, industry_name, display_name, headline, subheadline, description, pains, useCases, features, recommended_plan = 'growth_system' }) => ({
+const buildIndustry = ({
+  slug,
+  industry_name,
+  display_name,
+  headline,
+  subheadline,
+  description,
+  pains,
+  useCases,
+  features,
+  workflow,
+  roiExamples,
+  faqs,
+  recommended_plan = 'growth_system',
+  seoTitle,
+  seoDescription,
+  proof = sharedProof,
+}) => ({
   slug,
   industry_name,
   display_name,
@@ -18,11 +32,39 @@ const buildIndustry = ({ slug, industry_name, display_name, headline, subheadlin
   secondary_cta: 'View Automation Stack',
   pain_points: pains,
   use_cases: useCases,
-  roi_metrics: sharedMetrics,
-  testimonials: sharedTestimonials,
+  roi_metrics: {
+    response_speed: 'Target outcome: faster first response',
+    missed_call_recovery: 'Target outcome: fewer abandoned inquiries',
+    booking_path: 'Target outcome: cleaner handoff',
+    launch_proof: 'Verified before go-live',
+  },
+  testimonials: [],
+  proof,
   recommended_plan,
   key_features: features,
+  workflow,
+  roi_examples: roiExamples,
+  faqs,
+  seo: {
+    title: seoTitle || `${display_name} | ClientSurge Systems`,
+    description: seoDescription || description,
+    canonicalPath: `/${slug}`,
+  },
 });
+
+const defaultWorkflow = (industryName) => [
+  { title: 'Lead captured', description: `A ${industryName} inquiry comes from a form, call, missed call, ad, or website CTA.` },
+  { title: 'Immediate response', description: 'The lead receives a branded response with the next step while the business is notified.' },
+  { title: 'Qualification', description: 'The system captures the core details needed for routing, booking, or follow-up.' },
+  { title: 'Booking or follow-up', description: 'The lead is moved toward a callback, appointment, estimate, consultation, or nurture path.' },
+];
+
+const defaultFaqs = (industryName) => [
+  { question: `Can ClientSurge replace my ${industryName} front desk?`, answer: 'No. It supports your team by responding, routing, and following up faster. Your team still controls final scheduling, service decisions, and customer experience.' },
+  { question: 'Do you use fake testimonials or fake performance numbers?', answer: 'No. Any proof block must be verified, clearly labeled as unverified, or marked as coming soon.' },
+  { question: 'What happens after someone submits the form?', answer: 'The inquiry is captured with source attribution and routed toward pricing, package selection, audit review, or onboarding depending on the CTA path.' },
+  { question: 'Which package usually fits best?', answer: 'Most lead-driven service businesses should start with Growth System or Pro System when they need missed-call recovery, follow-up, and booking handoff working together.' },
+];
 
 export const INDUSTRY_MARKETING_DATA = {
   'med-spa': buildIndustry({
@@ -45,14 +87,17 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Client Reactivation', description: 'Past clients and dormant leads can receive structured reactivation campaigns.', icon: 'RotateCw', metrics: 'Target outcome: more recovered conversations' },
     ],
     features: ['Lead capture', 'Instant response', 'Missed-call recovery', 'Booking handoff', 'Review requests', 'Reactivation campaigns'],
+    workflow: defaultWorkflow('med spa'),
+    roiExamples: ['Consultation requests get routed before the prospect forgets why they reached out.', 'Dormant treatment leads can be moved into controlled reactivation instead of sitting untouched.'],
+    faqs: defaultFaqs('med spa'),
   }),
 
   dental: buildIndustry({
     slug: 'dental',
     industry_name: 'Dental Practice',
-    display_name: 'Dental Practice Automation System',
+    display_name: 'Dental & Orthodontics Automation System',
     headline: 'Help New Patient Inquiries Get Answered Faster',
-    subheadline: 'AI systems for dental teams that need response, routing, booking, reminders, and follow-up support.',
+    subheadline: 'AI systems for dental and orthodontic teams that need response, routing, booking, reminders, and follow-up support.',
     description: 'ClientSurge helps dental practices reduce response delays, organize new-patient requests, route urgent inquiries, and keep appointment conversations moving.',
     pains: [
       { title: 'Front Desk Overload', desc: 'Calls and forms arrive while the team is helping in-office patients.' },
@@ -67,6 +112,9 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Recall Reactivation', description: 'Dormant patients and unfinished plans can receive structured reactivation.', icon: 'RotateCw', metrics: 'Target outcome: more re-engagement' },
     ],
     features: ['New patient response', 'Missed-call text-back', 'Booking handoff', 'Appointment reminders', 'Recall follow-up', 'Review requests'],
+    workflow: defaultWorkflow('dental'),
+    roiExamples: ['New-patient inquiries receive a clear next step instead of sitting in voicemail.', 'Recall and unfinished treatment lists can be handled with controlled follow-up.'],
+    faqs: defaultFaqs('dental'),
   }),
 
   hvac: buildIndustry({
@@ -89,6 +137,15 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Seasonal Tune-Up Campaigns', description: 'Past customers can be reactivated for AC tune-ups, heating checks, filter reminders, maintenance plans, and warranty follow-up.', icon: 'Thermometer', metrics: 'Target outcome: more repeat service conversations' },
     ],
     features: ['Emergency service triage', 'Missed-call recovery', 'After-hours text-back', 'Dispatch handoff', 'Seasonal maintenance reactivation', 'Review request flow'],
+    workflow: [
+      { title: 'No-cool or heating inquiry captured', description: 'The system captures service area, issue type, urgency, and contact details.' },
+      { title: 'Missed-call text-back fires', description: 'The caller receives a branded next-step text instead of calling the next HVAC company.' },
+      { title: 'Dispatch context is organized', description: 'The team gets the core job details before callback or booking.' },
+      { title: 'Maintenance follow-up continues', description: 'Tune-up and seasonal lists can be reactivated without manual spreadsheet chasing.' },
+    ],
+    roiExamples: ['A no-cool call gets acknowledged immediately instead of becoming a competitor’s booked service call.', 'Seasonal tune-up lists can be reactivated before peak demand hits.'],
+    faqs: defaultFaqs('HVAC'),
+    recommended_plan: 'pro_system',
   }),
 
   plumbing: buildIndustry({
@@ -111,15 +168,19 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Estimate Follow-Up', description: 'Open water heater, drain, repipe, and fixture estimates receive structured follow-up until there is a clear outcome.', icon: 'RotateCw', metrics: 'Target outcome: fewer stale repair opportunities' },
     ],
     features: ['Leak and backup intake', 'Missed-call text-back', 'Service-area qualification', 'Dispatch handoff', 'Estimate follow-up', 'Review request flow'],
+    workflow: defaultWorkflow('plumbing'),
+    roiExamples: ['A leak call can be acknowledged while the tech is on-site.', 'Open water-heater estimates can receive controlled follow-up instead of going cold.'],
+    faqs: defaultFaqs('plumbing'),
+    recommended_plan: 'pro_system',
   }),
 
   roofing: buildIndustry({
     slug: 'roofing',
-    industry_name: 'Roofing',
-    display_name: 'Roofing Inspection Automation System',
+    industry_name: 'Roofing & Restoration',
+    display_name: 'Roofing & Restoration Automation System',
     headline: 'Convert Storm, Leak, and Inspection Leads Into Scheduled Roof Appointments',
-    subheadline: 'AI systems for roofing teams that need faster storm-lead response, inspection booking, estimate follow-up, and old-lead reactivation.',
-    description: 'ClientSurge helps roofers respond to storm damage, repair, replacement, and inspection inquiries with a clearer path from first contact to scheduled inspection and estimate follow-up.',
+    subheadline: 'AI systems for roofing and restoration teams that need faster storm-lead response, inspection booking, estimate follow-up, and old-lead reactivation.',
+    description: 'ClientSurge helps roofers and restoration teams respond to storm damage, repair, replacement, and inspection inquiries with a clearer path from first contact to scheduled inspection and estimate follow-up.',
     pains: [
       { title: 'Storm Windows Create Lead Surges', desc: 'After hail, wind, or heavy rain, homeowners often contact several roofers and choose the one that responds fastest.' },
       { title: 'Inspection Scheduling Gets Messy', desc: 'Roofing leads need address, issue type, roof age, photos, and availability before the team can route the appointment cleanly.' },
@@ -133,12 +194,16 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Old Lead Reactivation', description: 'Reactivate prior storm, leak, inspection, and replacement inquiries with controlled messaging and response tracking.', icon: 'Send', metrics: 'Target outcome: more revived homeowner conversations' },
     ],
     features: ['Storm lead capture', 'Inspection booking handoff', 'Missed-call recovery', 'Estimate follow-up', 'Old lead reactivation', 'Review request flow'],
+    workflow: defaultWorkflow('roofing and restoration'),
+    roiExamples: ['Storm inquiries can be captured with enough context for inspection scheduling.', 'Open estimates can be followed up until there is a next step or clear no.'],
+    faqs: defaultFaqs('roofing'),
+    recommended_plan: 'pro_system',
   }),
 
   contractors: buildIndustry({
     slug: 'contractors',
-    industry_name: 'Contractors',
-    display_name: 'Contractor Automation System',
+    industry_name: 'Contractors & Trades',
+    display_name: 'Contractors & Trades Automation System',
     headline: 'Keep Project Inquiries and Quotes From Going Stale',
     subheadline: 'AI systems for contractors that need faster response, estimate follow-up, and appointment handoff.',
     description: 'ClientSurge helps contractors capture project inquiries, qualify basic context, follow up on estimates, and route interested prospects toward walkthroughs or calls.',
@@ -155,12 +220,15 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Review Request Flow', description: 'Completed projects can trigger a timely reputation request.', icon: 'MessageSquare', metrics: 'Target outcome: more consistent review asks' },
     ],
     features: ['Project inquiry capture', 'Quote follow-up', 'Walkthrough scheduling handoff', 'Missed-call recovery', 'Reactivation', 'Review requests'],
+    workflow: defaultWorkflow('contractor'),
+    roiExamples: ['Walkthrough requests get routed with job scope, location, and timing.', 'Estimates can be followed up without relying on memory.'],
+    faqs: defaultFaqs('contractor'),
   }),
 
   chiropractic: buildIndustry({
     slug: 'chiropractic',
-    industry_name: 'Chiropractic',
-    display_name: 'Chiropractic Automation System',
+    industry_name: 'Chiropractic & Physical Therapy',
+    display_name: 'Chiropractic & Physical Therapy Automation System',
     headline: 'Help New Patient Inquiries Move Toward Booking Faster',
     subheadline: 'AI systems for chiropractic and physical therapy teams that need response, intake, booking, and reactivation support.',
     description: 'ClientSurge helps clinics respond to new patient inquiries, guide interested patients toward booking, send reminders, and reactivate dormant patients.',
@@ -177,6 +245,38 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Patient Reactivation', description: 'Dormant patients can receive structured follow-up.', icon: 'RotateCw', metrics: 'Target outcome: more re-engagement' },
     ],
     features: ['New patient response', 'Booking handoff', 'Appointment reminders', 'Missed-call text-back', 'Patient reactivation', 'Review request flow'],
+    workflow: defaultWorkflow('chiropractic and physical therapy'),
+    roiExamples: ['New patient inquiries get a clear next step while the clinic is busy.', 'Dormant patients can be reactivated with structured follow-up.'],
+    faqs: defaultFaqs('clinic'),
+  }),
+
+  'law-firms': buildIndustry({
+    slug: 'law-firms',
+    industry_name: 'Law Firm',
+    display_name: 'Law Firm Intake Automation System',
+    headline: 'Turn Legal Inquiries Into Cleaner Consultation Paths',
+    subheadline: 'AI intake support for firms that need faster response, missed-call recovery, consultation handoff, and structured follow-up.',
+    description: 'ClientSurge helps law firms capture inquiries, route case details, recover missed calls, and move qualified prospects toward consultation review without claiming legal outcomes.',
+    pains: [
+      { title: 'Missed Calls Become Competitor Consultations', desc: 'Prospects often contact several firms and choose the first credible response.' },
+      { title: 'Intake Details Are Incomplete', desc: 'Staff need practice area, timing, urgency, contact details, and basic context before review.' },
+      { title: 'Consultations Need Confirmation', desc: 'Unconfirmed consultations and vague next steps create no-shows and intake drag.' },
+      { title: 'Follow-Up Must Stay Controlled', desc: 'Legal follow-up needs consistency, review, and firm-approved language.' },
+    ],
+    useCases: [
+      { title: 'Practice-Area Intake', description: 'Capture inquiry type, timing, and basic routing context for staff review.', icon: 'ClipboardList', metrics: 'Target outcome: cleaner intake handoff' },
+      { title: 'Missed-Call Recovery', description: 'Missed callers receive a firm-approved next step instead of disappearing.', icon: 'Phone', metrics: 'Target outcome: fewer abandoned inquiries' },
+      { title: 'Consultation Handoff', description: 'Qualified prospects can be routed toward a callback or consultation request.', icon: 'Calendar', metrics: 'Target outcome: clearer scheduling path' },
+      { title: 'Compliance-Controlled Follow-Up', description: 'Messaging stays templated, reviewable, and aligned with firm rules.', icon: 'Shield', metrics: 'Target outcome: safer follow-up' },
+    ],
+    features: ['Inquiry capture', 'Missed-call recovery', 'Consultation handoff', 'Practice-area routing', 'Follow-up prompts', 'Compliance review note'],
+    workflow: defaultWorkflow('law firm'),
+    roiExamples: ['A missed intake call can receive a firm-approved response before the prospect calls another firm.', 'Consultation requests can be routed with enough context for human review.'],
+    faqs: [
+      { question: 'Does ClientSurge give legal advice?', answer: 'No. It only supports intake, routing, follow-up, and consultation handoff. Legal advice and case evaluation stay with the firm.' },
+      ...defaultFaqs('law firm').slice(1),
+    ],
+    recommended_plan: 'pro_system',
   }),
 
   'real-estate': buildIndustry({
@@ -199,6 +299,9 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Seller Lead Capture', description: 'Seller inquiries can be routed into a consultation path.', icon: 'Home', metrics: 'Target outcome: cleaner seller intake' },
     ],
     features: ['Buyer inquiry response', 'Showing handoff', 'Seller lead capture', 'Follow-up sequence', 'Missed-call recovery', 'Lead reactivation'],
+    workflow: defaultWorkflow('real estate'),
+    roiExamples: ['Showing requests get routed before the buyer keeps shopping.', 'Seller leads can be moved into a consultation path with property context.'],
+    faqs: defaultFaqs('real estate'),
   }),
 
   'property-services': buildIndustry({
@@ -221,6 +324,84 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Follow-Up Path', description: 'Open conversations receive structured follow-up.', icon: 'MessageSquare', metrics: 'Target outcome: fewer stalled inquiries' },
     ],
     features: ['Request capture', 'Routing support', 'Missed-call text-back', 'Booking handoff', 'Follow-up sequence', 'Review requests'],
+    workflow: defaultWorkflow('property service'),
+    roiExamples: ['Tenant, owner, and service requests can be organized by need and routed faster.', 'Open repair requests can receive a controlled next step instead of sitting unresolved.'],
+    faqs: defaultFaqs('property service'),
+  }),
+
+  'auto-services': buildIndustry({
+    slug: 'auto-services',
+    industry_name: 'Auto Services',
+    display_name: 'Auto Repair & Auto Services Automation System',
+    headline: 'Turn Repair Calls and Service Requests Into Booked Appointments',
+    subheadline: 'AI systems for auto repair shops and service businesses that need missed-call recovery, estimate follow-up, and appointment handoff.',
+    description: 'ClientSurge helps auto service businesses respond to repair inquiries, collect basic service context, route missed calls, and move customers toward appointment booking.',
+    pains: [
+      { title: 'Service Calls Arrive While Advisors Are Busy', desc: 'Front counters and service advisors cannot answer every call during active shop hours.' },
+      { title: 'Estimate Follow-Up Gets Missed', desc: 'Repair estimates and declined services often need structured follow-up.' },
+      { title: 'Appointment Requests Need Fast Routing', desc: 'Customers want availability, service type, and next step quickly.' },
+      { title: 'Reviews Depend on Timing', desc: 'Happy customers are not always asked at the right point after service.' },
+    ],
+    useCases: [
+      { title: 'Service Request Intake', description: 'Capture vehicle, service need, urgency, and preferred appointment timing.', icon: 'ClipboardList', metrics: 'Target outcome: cleaner service handoff' },
+      { title: 'Missed-Call Recovery', description: 'Missed callers receive a branded text-back and next step.', icon: 'Phone', metrics: 'Target outcome: fewer lost service calls' },
+      { title: 'Appointment Handoff', description: 'Interested customers are moved toward callback or booking.', icon: 'Calendar', metrics: 'Target outcome: clearer scheduling path' },
+      { title: 'Estimate Follow-Up', description: 'Open estimates and declined services receive structured follow-up.', icon: 'RotateCw', metrics: 'Target outcome: fewer stale repair opportunities' },
+    ],
+    features: ['Service request capture', 'Missed-call recovery', 'Appointment handoff', 'Estimate follow-up', 'Review request flow', 'Customer reactivation'],
+    workflow: defaultWorkflow('auto service'),
+    roiExamples: ['A brake or repair inquiry can get a fast next step while advisors are tied up.', 'Open estimates can be followed up without relying on sticky notes.'],
+    faqs: defaultFaqs('auto service'),
+  }),
+
+  'cleaning-services': buildIndustry({
+    slug: 'cleaning-services',
+    industry_name: 'Cleaning Service',
+    display_name: 'Home Cleaning & Local Services Automation System',
+    headline: 'Turn Quote Requests Into Cleaner Booking Paths',
+    subheadline: 'AI systems for cleaning companies that need faster quote response, booking handoff, recurring-service follow-up, and missed-call recovery.',
+    description: 'ClientSurge helps cleaning services capture quote requests, collect property and service details, follow up on estimates, and move prospects toward one-time or recurring bookings.',
+    pains: [
+      { title: 'Quote Requests Need Detail', desc: 'Cleaning leads need property type, size, timing, service type, and access details before booking.' },
+      { title: 'Missed Calls Turn Into Lost Jobs', desc: 'Prospects often call multiple providers and choose the clearest response.' },
+      { title: 'Recurring Service Follow-Up Slips', desc: 'One-time customers can go quiet without a structured recurring-service path.' },
+      { title: 'No-Shows and Unconfirmed Jobs Waste Capacity', desc: 'Manual confirmations can be inconsistent.' },
+    ],
+    useCases: [
+      { title: 'Quote Request Intake', description: 'Capture property type, square footage, service need, timing, and contact details.', icon: 'ClipboardList', metrics: 'Target outcome: cleaner quoting' },
+      { title: 'Missed-Call Text-Back', description: 'Missed callers receive a fast branded response.', icon: 'Phone', metrics: 'Target outcome: fewer lost inquiries' },
+      { title: 'Booking Handoff', description: 'Qualified prospects move toward booking or callback.', icon: 'Calendar', metrics: 'Target outcome: clearer next step' },
+      { title: 'Recurring Service Follow-Up', description: 'Past one-time customers can be offered a controlled recurring service path.', icon: 'RotateCw', metrics: 'Target outcome: more repeat conversations' },
+    ],
+    features: ['Quote request capture', 'Missed-call recovery', 'Booking handoff', 'Recurring-service follow-up', 'Review request flow', 'Past customer reactivation'],
+    workflow: defaultWorkflow('cleaning service'),
+    roiExamples: ['A quote request can be routed with enough details to price or call back.', 'One-time customers can be followed up for recurring service without manual chasing.'],
+    faqs: defaultFaqs('cleaning service'),
+  }),
+
+  'local-services': buildIndustry({
+    slug: 'local-services',
+    industry_name: 'Local Service Business',
+    display_name: 'Local Service Business Automation System',
+    headline: 'Stop Letting Local Service Leads Die in Voicemail and Forms',
+    subheadline: 'AI systems for service businesses that need faster lead response, missed-call recovery, booking handoff, and structured follow-up.',
+    description: 'ClientSurge helps local service businesses capture inquiries, respond faster, recover missed calls, follow up on estimates, and route prospects toward booking or callback.',
+    pains: [
+      { title: 'Leads Arrive Across Too Many Channels', desc: 'Calls, forms, messages, and referrals get scattered when there is no simple intake path.' },
+      { title: 'Missed Calls Lose Trust', desc: 'Local buyers often choose the provider that responds first and makes the next step clear.' },
+      { title: 'Quotes Go Cold', desc: 'Open estimates and pending decisions can stall without structured follow-up.' },
+      { title: 'Reviews Are Inconsistent', desc: 'Completed jobs do not always trigger a timely reputation request.' },
+    ],
+    useCases: [
+      { title: 'Lead Capture', description: 'Capture the contact, service need, location, and source.', icon: 'ClipboardList', metrics: 'Target outcome: cleaner intake' },
+      { title: 'Missed-Call Recovery', description: 'Missed callers receive a branded text-back and next step.', icon: 'Phone', metrics: 'Target outcome: fewer dropped inquiries' },
+      { title: 'Booking Handoff', description: 'Qualified prospects are routed toward booking, callback, or estimate review.', icon: 'Calendar', metrics: 'Target outcome: clearer conversion path' },
+      { title: 'Follow-Up and Reactivation', description: 'Old leads, quotes, and past customers can receive controlled follow-up.', icon: 'RotateCw', metrics: 'Target outcome: more recovered conversations' },
+    ],
+    features: ['Lead capture', 'Missed-call text-back', 'Booking handoff', 'Quote follow-up', 'Customer reactivation', 'Review request flow'],
+    workflow: defaultWorkflow('local service'),
+    roiExamples: ['A missed call can still become a conversation instead of a lost lead.', 'Open estimates can be followed up consistently until there is a clear outcome.'],
+    faqs: defaultFaqs('local service'),
   }),
 
   veterinary: buildIndustry({
@@ -243,6 +424,9 @@ export const INDUSTRY_MARKETING_DATA = {
       { title: 'Wellness Reactivation', description: 'Past clients can receive structured reminder campaigns.', icon: 'RotateCw', metrics: 'Target outcome: more re-engagement' },
     ],
     features: ['Appointment request capture', 'Missed-call recovery', 'Booking handoff', 'Reminder support', 'Client reactivation', 'Review requests'],
+    workflow: defaultWorkflow('veterinary'),
+    roiExamples: ['Pet owner requests can be captured with service need and preferred timing.', 'Wellness reminders can be followed up consistently.'],
+    faqs: defaultFaqs('veterinary'),
   }),
 };
 
