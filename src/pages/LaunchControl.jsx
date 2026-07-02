@@ -1,12 +1,31 @@
-import { useState } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, Navigate } from "react-router-dom";
 import LaunchControlCenter from "@/components/portal/LaunchControlCenter";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
+import { useAuth } from "@/lib/AuthContext";
+
+const AUTHORIZED_ROLES = ["admin", "super_admin", "client"];
 
 export default function LaunchControl() {
   const [searchParams] = useSearchParams();
+  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } = useAuth();
   const orderId = searchParams.get("order_id");
+
+  if (isLoadingAuth || isLoadingPublicSettings) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+      </div>
+    );
+  }
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
+
+  if (!AUTHORIZED_ROLES.includes(user?.role)) {
+    return <Navigate to="/" replace />;
+  }
 
   return (
     <div className="min-h-screen bg-background">
