@@ -115,9 +115,13 @@ const INDUSTRY_ROUTE_SLUGS = [
   "roofing",
   "chiropractic",
   "contractors",
+  "law-firms",
   "real-estate",
   "personal-injury",
   "property-services",
+  "auto-services",
+  "cleaning-services",
+  "local-services",
   "veterinary",
 ];
 

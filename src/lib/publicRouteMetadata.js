@@ -1,63 +1,71 @@
+const INDUSTRY_PUBLIC_PATHS = [
+  "/industries",
+  "/med-spa",
+  "/dental",
+  "/chiropractic",
+  "/hvac",
+  "/plumbing",
+  "/roofing",
+  "/contractors",
+  "/law-firms",
+  "/real-estate",
+  "/property-services",
+  "/auto-services",
+  "/cleaning-services",
+  "/local-services",
+  "/personal-injury",
+];
+
 export const PUBLIC_ROUTE_METADATA = {
   "/": {
     key: "home",
     title: "ClientSurge Systems | AI Automation for Local Businesses",
-    description:
-      "ClientSurge Systems installs AI automation for local service businesses, including lead capture, missed-call recovery, AI follow-up, appointment booking, review requests, and reactivation workflows.",
+    description: "ClientSurge Systems installs AI automation for local service businesses, including lead capture, missed-call recovery, AI follow-up, appointment booking, review requests, and reactivation workflows.",
   },
   "/pricing": {
     key: "pricing",
     title: "Pricing | Starter, Growth, and Pro AI Automation Packages | ClientSurge Systems",
-    description:
-      "Compare ClientSurge Systems packages: Starter System, Growth System, and Pro System with crawlable setup and monthly pricing for AI automation services.",
+    description: "Compare ClientSurge Systems packages: Starter System, Growth System, and Pro System with crawlable setup and monthly pricing for AI automation services.",
   },
   "/product-signup": {
     key: "product-signup",
     title: "Complete Your ClientSurge Signup | ClientSurge Systems",
-    description:
-      "Choose Starter, Growth, or Pro and continue to secure checkout for your ClientSurge AI automation system.",
+    description: "Choose Starter, Growth, or Pro and continue to secure checkout for your ClientSurge AI automation system.",
   },
   "/signup": {
     key: "signup",
     title: "Complete Your ClientSurge Signup | ClientSurge Systems",
-    description:
-      "Start your ClientSurge signup and continue to secure checkout for a Starter, Growth, or Pro AI automation system.",
+    description: "Start your ClientSurge signup and continue to secure checkout for a Starter, Growth, or Pro AI automation system.",
   },
   "/automations": {
     key: "automations",
     title: "AI Automation Services | ClientSurge Systems",
-    description:
-      "Explore ClientSurge automation services for lead response, missed-call text-back, AI follow-up, booking, reviews, and customer reactivation.",
+    description: "Explore ClientSurge automation services for lead response, missed-call text-back, AI follow-up, booking, reviews, and customer reactivation.",
   },
   "/contact": {
     key: "contact",
     title: "Contact ClientSurge Systems | Questions and Demo Requests",
-    description:
-      "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
+    description: "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
   },
   "/privacy": {
     key: "privacy",
     title: "Privacy Policy | ClientSurge Systems",
-    description:
-      "Read the ClientSurge Systems privacy policy covering lead forms, SMS communications, AI voice and call automation, analytics, payment processors, data retention, and privacy rights.",
+    description: "Read the ClientSurge Systems privacy policy covering lead forms, SMS communications, AI voice and call automation, analytics, payment processors, data retention, and privacy rights.",
   },
   "/terms": {
     key: "terms",
     title: "Terms of Service | ClientSurge Systems",
-    description:
-      "Review the ClientSurge Systems terms of service covering AI automation services, subscriptions, payments, acceptable use, limitations, and customer responsibilities.",
+    description: "Review the ClientSurge Systems terms of service covering AI automation services, subscriptions, payments, acceptable use, limitations, and customer responsibilities.",
   },
   "/sms-terms": {
     key: "sms-terms",
     title: "SMS Terms and Consent | ClientSurge Systems",
-    description:
-      "Read the ClientSurge Systems SMS terms covering opt-in consent, message frequency, message and data rates, STOP opt-out instructions, HELP support, and communication preferences.",
+    description: "Read the ClientSurge Systems SMS terms covering opt-in consent, message frequency, message and data rates, STOP opt-out instructions, HELP support, and communication preferences.",
   },
   "/refund-policy": {
     key: "refund-policy",
     title: "Refund and Cancellation Policy | ClientSurge Systems",
-    description:
-      "Read the ClientSurge Systems refund and cancellation policy covering setup work, monthly subscriptions, prospective cancellation, and billing support.",
+    description: "Read the ClientSurge Systems refund and cancellation policy covering setup work, monthly subscriptions, prospective cancellation, and billing support.",
   },
 };
 
@@ -74,7 +82,6 @@ export const STATIC_ROUTE_ALIASES = {
   "/product": "/pricing",
   "/product-landing": "/pricing",
   "/about": "/",
-  "/industries": "/automations",
   "/blog": "/",
   "/faq": "/contact",
   "/our-system": "/automations",
@@ -96,10 +103,10 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/terms",
   "/sms-terms",
   "/refund-policy",
+  ...INDUSTRY_PUBLIC_PATHS,
 ];
 
 export const PUBLIC_ROUTE_PATHS = [...PUBLIC_DIRECTORY_PAGES];
-
 export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
@@ -131,7 +138,6 @@ export const INTERNAL_ROUTE_PREFIXES = [
   "/functions",
   "/function",
   "/internal",
-  "/private",
   "/install",
   "/audit",
   "/observability",
@@ -168,7 +174,6 @@ export const NOINDEX_ROUTE_PREFIXES = [
 ];
 
 export const SITEMAP_STATIC_PATHS = [...PUBLIC_DIRECTORY_PAGES];
-
 export const BLOG_SITEMAP_PATHS = [];
 
 export const ROBOTS_DISALLOW_PATHS = [
@@ -193,8 +198,6 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/function/",
   "/internal",
   "/internal/",
-  "/private",
-  "/private/",
   "/onboarding",
   "/onboarding/",
   "/install",

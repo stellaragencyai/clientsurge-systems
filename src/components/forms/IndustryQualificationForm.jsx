@@ -16,29 +16,29 @@ const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 // Industry-specific qualifying questions
 const INDUSTRY_QUESTIONS = {
   roofing: {
-    label: 'How many roofing leads do you receive per month?',
+    label: 'How many roofing or restoration leads do you receive per month?',
     options: ['1–10 leads/mo', '11–30 leads/mo', '31–60 leads/mo', '60+ leads/mo'],
-    problem_prompt: 'What is your biggest challenge following up on roofing leads? (e.g. missed calls, slow response, no-shows)',
+    problem_prompt: 'What is your biggest challenge following up on roofing leads? (e.g. storm surges, missed calls, stale estimates)',
   },
   hvac: {
-    label: 'What is your peak lead volume per month?',
+    label: 'What is your peak HVAC lead volume per month?',
     options: ['1–15 leads/mo', '16–40 leads/mo', '41–80 leads/mo', '80+ leads/mo'],
-    problem_prompt: 'Describe your biggest HVAC lead follow-up problem (e.g. missed calls after hours, seasonal swings)',
+    problem_prompt: 'Describe your biggest HVAC lead follow-up problem (e.g. after-hours calls, no-cool emergencies, seasonal swings)',
   },
   plumbing: {
-    label: 'How many inbound calls or leads do you receive per month?',
+    label: 'How many plumbing calls or service leads do you receive per month?',
     options: ['1–10 calls/mo', '11–30 calls/mo', '31–60 calls/mo', '60+ calls/mo'],
-    problem_prompt: 'What happens to leads who call and get no answer?',
+    problem_prompt: 'What happens when leak, drain, or water-heater leads call and get no answer?',
   },
   dental: {
     label: 'How many new patient inquiries do you receive per month?',
     options: ['1–20 inquiries/mo', '21–50 inquiries/mo', '51–100 inquiries/mo', '100+ inquiries/mo'],
-    problem_prompt: 'What is your biggest patient follow-up or no-show challenge?',
+    problem_prompt: 'What is your biggest patient follow-up, recall, or no-show challenge?',
   },
   'med-spa': {
-    label: 'How many consultation or booking requests per month?',
+    label: 'How many consultation or treatment booking requests do you receive per month?',
     options: ['1–20/mo', '21–50/mo', '51–100/mo', '100+/mo'],
-    problem_prompt: 'What follow-up challenge costs your Med Spa the most revenue?',
+    problem_prompt: 'What follow-up challenge costs your med spa the most revenue?',
   },
   chiropractic: {
     label: 'How many new patient inquiries do you receive per month?',
@@ -46,19 +46,44 @@ const INDUSTRY_QUESTIONS = {
     problem_prompt: 'What is your biggest missed-opportunity challenge? (e.g. no-shows, cold leads, missed calls)',
   },
   contractors: {
-    label: 'How many quote requests or inquiries do you receive per month?',
+    label: 'How many quote requests or project inquiries do you receive per month?',
     options: ['1–10/mo', '11–30/mo', '31–60/mo', '60+/mo'],
     problem_prompt: 'What happens to quote requests that go unanswered for more than 24 hours?',
   },
+  'law-firms': {
+    label: 'How many consultations or case inquiries do you receive per month?',
+    options: ['1–15/mo', '16–40/mo', '41–80/mo', '80+/mo'],
+    problem_prompt: 'Where does your intake process lose the most opportunities? (e.g. missed calls, slow intake, no consultation follow-up)',
+  },
   'real-estate': {
-    label: 'How many buyer or seller leads do you receive per month?',
+    label: 'How many buyer, seller, or showing leads do you receive per month?',
     options: ['1–20/mo', '21–50/mo', '51–100/mo', '100+/mo'],
-    problem_prompt: 'What is your biggest lead follow-up or engagement challenge?',
+    problem_prompt: 'What is your biggest real estate lead follow-up or showing handoff challenge?',
+  },
+  'property-services': {
+    label: 'How many property service requests do you receive per month?',
+    options: ['1–20/mo', '21–50/mo', '51–100/mo', '100+/mo'],
+    problem_prompt: 'Where do property service requests get stuck? (e.g. routing, missed calls, tenant/owner handoff, follow-up)',
   },
   'personal-injury': {
     label: 'How many case inquiries do you receive per month?',
     options: ['1–15/mo', '16–40/mo', '41–80/mo', '80+/mo'],
     problem_prompt: 'What is your biggest challenge converting inquiries into signed cases?',
+  },
+  'auto-services': {
+    label: 'How many service calls, quote requests, or appointment requests do you receive per month?',
+    options: ['1–20/mo', '21–50/mo', '51–100/mo', '100+/mo'],
+    problem_prompt: 'Where do auto service leads get lost? (e.g. missed calls, estimate follow-up, appointment scheduling, no-shows)',
+  },
+  'cleaning-services': {
+    label: 'How many cleaning quote or booking requests do you receive per month?',
+    options: ['1–20/mo', '21–50/mo', '51–100/mo', '100+/mo'],
+    problem_prompt: 'Where do cleaning leads stall? (e.g. quote follow-up, recurring service booking, missed calls, scheduling)',
+  },
+  'local-services': {
+    label: 'How many local service leads do you receive per month?',
+    options: ['1–20/mo', '21–50/mo', '51–100/mo', '100+/mo'],
+    problem_prompt: 'What is the biggest leak in your lead process right now?',
   },
 };
 
@@ -118,6 +143,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
         source: 'industry_qualification_form',
         source_page: `/${industrySlug}`,
         intake_type: 'industry_qualification',
+        industry_slug: industrySlug,
         consent_given: form.consent,
         consent_source: `industry_page_${industrySlug}`,
       });

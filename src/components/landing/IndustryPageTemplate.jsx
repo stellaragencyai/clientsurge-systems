@@ -4,15 +4,60 @@ import { getIndustryBySlug } from '@/data/industryMarketingConfig';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
-import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer } from 'lucide-react';
+import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer, Building2 } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
 import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
 import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery';
+import { setJsonLd, setPageMetadata } from '@/lib/seo';
 
-const ICON_MAP = { MessageSquare, Calendar, Phone, AlertCircle, Zap, TrendingUp, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer, CheckCircle };
+const ICON_MAP = { MessageSquare, Calendar, Phone, AlertCircle, Zap, TrendingUp, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer, CheckCircle, Building2 };
 
 const SECTION_SHELL = 'relative overflow-hidden';
 const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
+
+function buildIndustryServiceSchema(industry) {
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'Service',
+    name: industry.display_name,
+    description: industry.seo?.description || industry.hero_description,
+    provider: {
+      '@type': 'Organization',
+      name: 'ClientSurge Systems',
+      url: 'https://clientsurgesystems.com',
+    },
+    areaServed: 'United States',
+    serviceType: `${industry.industry_name} AI automation and lead response system`,
+    url: `https://clientsurgesystems.com/${industry.slug}`,
+  };
+}
+
+function buildFaqSchema(industry) {
+  if (!industry.faqs?.length) return null;
+  return {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: industry.faqs.map((faq) => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  };
+}
+
+function proofLabel(status) {
+  switch (status) {
+    case 'verified':
+      return 'Verified proof';
+    case 'unverified':
+      return 'Unverified placeholder';
+    default:
+      return 'Proof coming soon';
+  }
+}
 
 export default function IndustryPageTemplate() {
   const { slug } = useParams();
@@ -21,12 +66,29 @@ export default function IndustryPageTemplate() {
 
   useEffect(() => {
     const data = getIndustryBySlug(slug);
-    if (data) {
-      setIndustry(data);
-      document.title = `${data.display_name} | ClientSurge Systems`;
-    } else {
+    if (!data) {
       navigate('/');
+      return undefined;
     }
+
+    setIndustry(data);
+
+    const cleanupMetadata = setPageMetadata({
+      title: data.seo?.title || `${data.display_name} | ClientSurge Systems`,
+      description: data.seo?.description || data.hero_description,
+      canonicalPath: data.seo?.canonicalPath || `/${data.slug}`,
+      ogTitle: data.display_name,
+      ogDescription: data.hero_description,
+    });
+    const cleanupServiceSchema = setJsonLd(`industry-service-${data.slug}`, buildIndustryServiceSchema(data));
+    const faqSchema = buildFaqSchema(data);
+    const cleanupFaqSchema = faqSchema ? setJsonLd(`industry-faq-${data.slug}`, faqSchema) : null;
+
+    return () => {
+      cleanupMetadata?.();
+      cleanupServiceSchema?.();
+      cleanupFaqSchema?.();
+    };
   }, [slug, navigate]);
 
   if (!industry) return null;
@@ -82,7 +144,7 @@ export default function IndustryPageTemplate() {
                 <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center w-11 h-11 md:w-13 md:h-13 rounded-2xl bg-gradient-to-br from-primary/12 to-sky-100 text-primary border border-primary/20 shadow-sm">
+                      <div className="flex items-center justify-center w-11 h-11 rounded-2xl bg-gradient-to-br from-primary/12 to-sky-100 text-primary border border-primary/20 shadow-sm">
                         <IconComponent className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
                     </div>
@@ -100,45 +162,83 @@ export default function IndustryPageTemplate() {
       </section>
 
       <section className="py-14 md:py-20 px-4 md:px-6">
-        <div className="max-w-5xl mx-auto">
-          <SectionHeader eyebrow="Launch Focus" title={`What the ${industry.industry_name} System Is Built to Improve`} align="center" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8">
-            {Object.entries(industry.roi_metrics).map(([key, value]) => (
-              <div key={key} className={`${PREMIUM_SURFACE} p-5 md:p-6 text-center`}>
-                <p className="text-lg md:text-xl font-titles font-bold text-primary mb-2 tracking-tight">{value}</p>
-                <p className="text-[11px] md:text-xs text-muted-foreground capitalize font-semibold tracking-wide">{key.replace(/_/g, ' ')}</p>
+        <div className="max-w-6xl mx-auto">
+          <SectionHeader eyebrow="Workflow" title={`From First ${industry.industry_name} Inquiry to Next Step`} subtitle="This is the customer journey connection: capture, respond, qualify, and hand off toward booking or package selection." align="center" />
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 md:gap-5 mt-8">
+            {industry.workflow?.map((step, i) => (
+              <div key={step.title} className={`${PREMIUM_SURFACE} p-5 md:p-6`}>
+                <p className="mb-3 inline-flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white text-xs font-black">{i + 1}</p>
+                <h3 className="font-titles text-base md:text-lg font-bold text-foreground mb-2">{step.title}</h3>
+                <p className="text-sm leading-relaxed text-muted-foreground">{step.description}</p>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      <IndustrySuccessGallery industry={industry} industrySlug={slug} />
-
-      {industry.testimonials?.length > 0 && (
-        <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
-          <div className="max-w-5xl mx-auto">
-            <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
-              {industry.testimonials.map((testimonial, i) => (
-                <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
-                  <p className="font-titles text-xl md:text-2xl font-bold text-primary mb-4">{testimonial.metric}</p>
-                  <blockquote className="text-sm md:text-base text-foreground/80 mb-5 italic leading-relaxed">&quot;{testimonial.quote}&quot;</blockquote>
-                  <p className="font-bold text-foreground text-sm md:text-base">{testimonial.name}</p>
-                  <p className="text-xs md:text-sm text-muted-foreground">{testimonial.business}</p>
+      <section className="py-14 md:py-20 px-4 md:px-6 bg-white/70">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeader eyebrow="Target Outcomes" title={`What the ${industry.industry_name} System Is Built to Improve`} subtitle="These are target outcomes and workflow examples, not claimed case-study results." align="center" />
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8">
+            {Object.entries(industry.roi_metrics).map(([key, value]) => (
+              <div key={key} className={`${PREMIUM_SURFACE} p-5 md:p-6 text-center`}>
+                <p className="text-base md:text-lg font-titles font-bold text-primary mb-2 tracking-tight">{value}</p>
+                <p className="text-[11px] md:text-xs text-muted-foreground capitalize font-semibold tracking-wide">{key.replace(/_/g, ' ')}</p>
+              </div>
+            ))}
+          </div>
+          {industry.roi_examples?.length > 0 && (
+            <div className="mt-8 grid gap-4 md:grid-cols-2">
+              {industry.roi_examples.map((example) => (
+                <div key={example} className="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm leading-relaxed text-amber-950">
+                  <span className="font-black">Example, not verified proof: </span>{example}
                 </div>
               ))}
             </div>
-          </div>
-        </section>
-      )}
+          )}
+        </div>
+      </section>
+
+      <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 
       <section className="py-14 md:py-20 px-4 md:px-6">
+        <div className="max-w-5xl mx-auto">
+          <SectionHeader eyebrow="Proof Policy" title={`Truthful ${industry.industry_name} Proof`} subtitle="No fake case studies, no fake live counters, no fabricated customer results." align="center" />
+          <div className={`${PREMIUM_SURFACE} mt-8 p-6 md:p-8`}>
+            <div className="flex flex-col md:flex-row md:items-start gap-4 md:gap-6">
+              <div className="inline-flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-primary/15 bg-primary/8 text-primary">
+                <Shield className="h-6 w-6" />
+              </div>
+              <div>
+                <p className="mb-2 inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1 text-xs font-black uppercase tracking-wide text-primary">{proofLabel(industry.proof?.status)}</p>
+                <h3 className="font-titles text-xl md:text-2xl font-bold text-foreground">{industry.proof?.label || 'Proof coming soon'}</h3>
+                <p className="mt-3 text-sm md:text-base leading-relaxed text-muted-foreground">{industry.proof?.note}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
         <div className="max-w-5xl mx-auto">
           <SectionHeader eyebrow="What's Included" title={`Your ${industry.industry_name} System Includes`} align="center" />
           <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto mt-8">
             {industry.key_features.map((feature, i) => (
               <div key={i} className="flex items-center gap-3 rounded-xl border border-primary/10 bg-white/80 p-4 shadow-sm"><CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /><span className="text-sm md:text-base text-foreground/80 font-semibold">{feature}</span></div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="py-14 md:py-20 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          <SectionHeader eyebrow="FAQs" title={`${industry.industry_name} Automation Questions`} align="center" />
+          <div className="mt-8 space-y-4">
+            {industry.faqs?.map((faq) => (
+              <details key={faq.question} className={`${PREMIUM_SURFACE} p-5 md:p-6 group`}>
+                <summary className="cursor-pointer font-titles text-base md:text-lg font-bold text-foreground">{faq.question}</summary>
+                <p className="mt-3 text-sm md:text-base leading-relaxed text-muted-foreground">{faq.answer}</p>
+              </details>
             ))}
           </div>
         </div>
