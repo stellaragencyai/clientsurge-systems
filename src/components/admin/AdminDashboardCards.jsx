@@ -1,6 +1,114 @@
 import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 
+const TRUTH_STATUS_LABELS = {
+  trusted: "Trusted",
+  warning: "Warning",
+  blocked: "Blocked",
+  unknown: "Unknown",
+};
+
+const TRUTH_STATUS_CLASSES = {
+  trusted: "border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/20 dark:text-emerald-300",
+  warning: "border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950/20 dark:text-amber-300",
+  blocked: "border-red-200 bg-red-50 text-red-800 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300",
+  unknown: "border-border bg-muted/30 text-muted-foreground",
+};
+
+export function DashboardTruthBanner() {
+  const [truthCheck, setTruthCheck] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function loadDashboardTruth() {
+      setLoading(true);
+      setError("");
+      try {
+        const records = await base44.entities.DashboardTruthCheck.filter(
+          { scope: "admin_dashboard" },
+          "-last_checked_at",
+          1
+        );
+        if (!cancelled) setTruthCheck((records || [])[0] || null);
+      } catch (err) {
+        if (!cancelled) {
+          console.error("DashboardTruthBanner: failed to load DashboardTruthCheck", err);
+          setError("Unable to load dashboard truth check.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    }
+
+    loadDashboardTruth();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  if (loading) {
+    return (
+      <div className="rounded-xl border border-border bg-card p-4">
+        <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Dashboard Truth Status</p>
+        <p className="mt-2 text-sm text-muted-foreground">Loading latest DashboardTruthCheck...</p>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-red-800 dark:border-red-900 dark:bg-red-950/20 dark:text-red-300">
+        <p className="text-xs font-semibold uppercase tracking-wide">Dashboard Truth Status</p>
+        <p className="mt-2 text-sm font-medium">{error}</p>
+        <p className="mt-1 text-xs">Treat dashboard claims as unverified until this source loads.</p>
+      </div>
+    );
+  }
+
+  if (!truthCheck) {
+    return (
+      <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-amber-800 dark:border-amber-900 dark:bg-amber-950/20 dark:text-amber-300">
+        <p className="text-xs font-semibold uppercase tracking-wide">Dashboard Truth Status</p>
+        <p className="mt-2 text-sm font-medium">Needs Instrumentation</p>
+        <p className="mt-1 text-xs">No admin_dashboard DashboardTruthCheck record exists yet. Do not treat dashboard metrics as trusted.</p>
+      </div>
+    );
+  }
+
+  const status = truthCheck.truth_status || "unknown";
+  const safeToAdmin = truthCheck.safe_to_show_admin ? "Safe for admin visibility" : "Not cleared for admin visibility";
+  const safeToLaunch = truthCheck.safe_to_launch ? "Safe to launch" : "Not safe to launch";
+  const lastChecked = truthCheck.last_checked_at ? new Date(truthCheck.last_checked_at).toLocaleString() : "Not checked";
+  const blockerCount = Number(truthCheck.blocker_count || 0);
+  const warningCount = Number(truthCheck.warning_count || 0);
+
+  return (
+    <div className={`rounded-xl border p-4 ${TRUTH_STATUS_CLASSES[status] || TRUTH_STATUS_CLASSES.unknown}`}>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-wide opacity-80">Dashboard Truth Status</p>
+          <div className="mt-2 flex flex-wrap items-center gap-2">
+            <span className="rounded-full bg-white/70 px-2.5 py-1 text-xs font-bold text-foreground dark:bg-black/20 dark:text-white">
+              {TRUTH_STATUS_LABELS[status] || "Unknown"}
+            </span>
+            <span className="text-xs font-medium">{blockerCount} blockers · {warningCount} warnings</span>
+          </div>
+          <p className="mt-2 text-sm font-medium">{truthCheck.evidence_summary || "No evidence summary recorded."}</p>
+          <p className="mt-1 text-xs opacity-80">Last checked: {lastChecked}</p>
+        </div>
+        <div className="min-w-[190px] rounded-lg bg-white/50 p-3 text-xs dark:bg-black/10">
+          <p className="font-semibold">{safeToAdmin}</p>
+          <p className="mt-1 font-semibold">{safeToLaunch}</p>
+          <p className="mt-2 opacity-80">Source: DashboardTruthCheck · scope=admin_dashboard</p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 // #269: LTV Card
 export function LTVCard({ orders = [] }) {
   const totalLTV = orders.reduce((sum, o) => {
