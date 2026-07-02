@@ -1,0 +1,73 @@
+name: Stripe Checkout Proof
+
+on:
+  workflow_dispatch:
+    inputs:
+      package_key:
+        description: Package to verify
+        required: true
+        default: starter_system
+        type: choice
+        options:
+          - starter_system
+          - growth_system
+          - pro_system
+      create_test_checkout:
+        description: Explicitly create a Stripe test checkout session
+        required: true
+        default: false
+        type: boolean
+
+permissions:
+  contents: read
+
+concurrency:
+  group: stripe-checkout-proof-${{ github.event.inputs.package_key }}
+  cancel-in-progress: false
+
+jobs:
+  stripe-checkout-proof:
+    name: Verify Stripe test checkout
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Verify Stripe test checkout
+        env:
+          STRIPE_MODE: test
+          STRIPE_TEST_SECRET_KEY: ${{ secrets.STRIPE_TEST_SECRET_KEY }}
+          STRIPE_TEST_WEBHOOK_SECRET: ${{ secrets.STRIPE_TEST_WEBHOOK_SECRET }}
+          CLIENTSURGE_STRIPE_TEST_CHECKOUT_URL: ${{ secrets.CLIENTSURGE_STRIPE_TEST_CHECKOUT_URL }}
+          CLIENTSURGE_STRIPE_TEST_CREATE_CHECKOUT: ${{ github.event.inputs.create_test_checkout }}
+          CLIENTSURGE_STRIPE_TEST_PACKAGE_KEY: ${{ github.event.inputs.package_key }}
+        run: node scripts/stripe/verify-test-checkout.mjs
+
+      - name: Upload checkout proof artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: stripe-test-checkout-proof-${{ github.event.inputs.package_key }}
+          path: artifacts/stripe/stripe-test-checkout-proof.json
+          if-no-files-found: warn
+
+      - name: Checkout proof summary
+        if: always()
+        run: |
+          echo "## Stripe checkout proof" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Mode: test only" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Package: ${{ github.event.inputs.package_key }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Creates checkout only when create_test_checkout is explicitly true" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Requires test Stripe key, test webhook secret, and test checkout URL secrets" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Does not change live Stripe products, prices, or customers" >> "$GITHUB_STEP_SUMMARY"
