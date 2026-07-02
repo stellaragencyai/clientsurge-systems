@@ -89,6 +89,7 @@ const FunnelOptimizationPage = lazy(() => import("./components/admin/FunnelOptim
 const RealEstate = lazy(() => import("./pages/RealEstate"));
 const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
 const LaunchControl = lazy(() => import("./pages/LaunchControl"));
+const AutomationRoadmap = lazy(() => import("./pages/AutomationRoadmap"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -417,6 +418,8 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/how-it-works" element={<LazyRoute Component={HowItWorks} />} />
       <Route path="/setup-lookup" element={<LazyRoute Component={ClientSetupLookup} />} />
       <Route path="/proof" element={<LazyRoute Component={ProofPage} />} />
+      <Route path="/roadmap" element={<LazyRoute Component={AutomationRoadmap} />} />
+      <Route path="/automation-roadmap" element={<Navigate to="/roadmap" replace />} />
       {AUTOMATION_SERVICE_ROUTES.map((path) => (
         <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />
       ))}
