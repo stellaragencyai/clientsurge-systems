@@ -5,6 +5,7 @@ import test from "node:test";
 const industriesPageSource = readFileSync(new URL("../src/pages/Industries.jsx", import.meta.url), "utf8");
 const legacyIndustriesPageSource = readFileSync(new URL("../src/legacy-pages/IndustriesPage.jsx", import.meta.url), "utf8");
 const appSource = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
+const publicRouteMetadataSource = readFileSync(new URL("../src/lib/publicRouteMetadata.js", import.meta.url), "utf8");
 const industryLandingPageSource = readFileSync(new URL("../src/components/industry/IndustryLandingPage.jsx", import.meta.url), "utf8");
 const industryMarketingConfigSource = readFileSync(new URL("../src/data/industryMarketingConfig.js", import.meta.url), "utf8");
 const industryQualificationFormSource = readFileSync(new URL("../src/components/forms/IndustryQualificationForm.jsx", import.meta.url), "utf8");
@@ -32,6 +33,15 @@ test("live industries page forces a top reset before navigating to live industry
 
   for (const href of canonicalIndustryRoutes) {
     assert.match(industriesPageSource, new RegExp(`href:\\s*"${href.replace("/", "\\/")}"`));
+  }
+});
+
+test("industry routes are registered as public app shell paths", () => {
+  assert.match(publicRouteMetadataSource, /const\s+INDUSTRY_PUBLIC_PATHS\s*=\s*\[/);
+  assert.match(publicRouteMetadataSource, /\.\.\.INDUSTRY_PUBLIC_PATHS/);
+
+  for (const route of canonicalIndustryRoutes) {
+    assert.match(publicRouteMetadataSource, new RegExp(`"${route.replace("/", "\\/")}"`));
   }
 });
 
