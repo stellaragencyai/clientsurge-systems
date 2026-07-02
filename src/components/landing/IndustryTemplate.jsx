@@ -12,6 +12,7 @@ import IndustryResults from "../industry/IndustryResults";
 import IndustryFAQ from "../industry/IndustryFAQ";
 import IndustryAutomationUseCases from "./IndustryAutomationUseCases";
 import { getIndustryBySlug } from "@/lib/industryData";
+import { applyCurrentSixIndustryOverride } from "@/lib/currentSixIndustryPageOverrides";
 import { getFAQSchema } from "../SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 import { forceScrollToTop } from "@/lib/scroll";
@@ -152,7 +153,8 @@ function buildSmsMessages(smsDemo) {
 }
 
 function IndustryTemplateInner({ industrySlug }) {
-  const industry = getIndustryBySlug(industrySlug);
+  const baseIndustry = getIndustryBySlug(industrySlug);
+  const industry = applyCurrentSixIndustryOverride(baseIndustry, industrySlug);
   const seo = INDUSTRY_SEO[industrySlug];
   const blogLink = INDUSTRY_BLOG_LINKS[industrySlug];
   const theme = INDUSTRY_THEME[industrySlug] || INDUSTRY_THEME.default;
@@ -170,10 +172,10 @@ function IndustryTemplateInner({ industrySlug }) {
 
     const cleanupMetadata = setPageMetadata({
       title: seo?.title || `${industry.name} AI Automation | ClientSurge Systems`,
-      description: seo?.description || industry.hero?.subheadline || `Done-for-you AI lead response and booking automation for ${industry.name}.`,
+      description: industry.hero?.subheadline || seo?.description || `Done-for-you AI lead response and booking automation for ${industry.name}.`,
       canonicalPath: `/${industrySlug}`,
       ogTitle: seo?.title || `${industry.name} AI Automation | ClientSurge Systems`,
-      ogDescription: seo?.description || industry.hero?.subheadline || `AI automation built specifically for ${industry.name}.`,
+      ogDescription: industry.hero?.subheadline || seo?.description || `AI automation built specifically for ${industry.name}.`,
     });
     const cleanupFaq = setJsonLd(`industry-faq-${industrySlug}`, getFAQSchema(industry.faqs || []));
     const cleanupIndustryJsonLd = setJsonLd(`industry-local-business-${industrySlug}`, buildIndustryJsonLd(industrySlug));
@@ -206,8 +208,8 @@ function IndustryTemplateInner({ industrySlug }) {
          <ErrorBoundary>
            <IndustryHero
              eyebrow={industry.hero.eyebrow}
-             headline={seo?.h1 || industry.hero.headline}
-             subheadline={seo?.description || industry.hero.subheadline}
+             headline={industry.hero.headline || seo?.h1}
+             subheadline={industry.hero.subheadline || seo?.description}
              image={industry.hero.image || INDUSTRY_HERO_FALLBACKS[industrySlug] || INDUSTRY_HERO_FALLBACKS.contractors}
              cta={industry.hero.cta}
              onBookDemo={() => {
