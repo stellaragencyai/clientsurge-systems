@@ -7,17 +7,25 @@ import {
   AlertCircle,
   CheckCircle2,
   Circle,
-  Clock3,
   Database,
-  ExternalLink,
   Eye,
   Loader2,
   PauseCircle,
-  Play,
   RefreshCw,
   ShieldCheck,
   XCircle,
 } from "lucide-react";
+
+const LEGACY_SERVICE_KEY_MAP = {
+  missed_call_textback: "missed_call_text_back",
+  appointment_booking: "ai_booking_agent",
+  followup_sequences: "nurture_sequence_14d",
+};
+
+function normalizeServiceKey(raw) {
+  const key = String(raw || "").trim().toLowerCase();
+  return LEGACY_SERVICE_KEY_MAP[key] || key;
+}
 
 const SERVICE_DEFINITIONS = {
   instant_lead_response: {
@@ -110,6 +118,7 @@ const SERVICE_DEFINITIONS = {
 };
 
 const STATUS_CONFIG = {
+  blocked: { label: "Blocked", color: "bg-red-100 text-red-800", icon: AlertCircle },
   not_started: { label: "Not Started", color: "bg-gray-100 text-gray-700", icon: Circle },
   in_progress: { label: "In Progress", color: "bg-blue-100 text-blue-700", icon: RefreshCw },
   active: { label: "Active", color: "bg-green-100 text-green-700", icon: CheckCircle2 },
@@ -155,6 +164,7 @@ const EVENT_TYPES_BY_STEP = {
 };
 
 const LIVE_REFRESH_MS = 30000;
+const RECONCILE_CONFIRM = "RECONCILE_LIVE_AUTOMATION_CHECKLIST";
 
 function isCompleteStatus(status) {
   return status === "complete" || status === "active" || status === "trusted";
@@ -208,7 +218,9 @@ function deriveStepState(step, dbStep, events) {
   return { status: "pending", source: "Waiting", detail: "No live evidence found yet.", timestamp: null };
 }
 
-function deriveCardStatus(checklist, stepStates, events) {
+function deriveCardStatus(checklist, stepStates, events, hasKnownService) {
+  if (!hasKnownService) return "blocked";
+  if (checklist.dashboard_truth_status === "blocked") return "blocked";
   const failedEvent = events.find(e => e.status === "failed" || String(e.event_type || "").includes("failed"));
   if (checklist.status === "paused") return "paused";
   if (checklist.status === "failed" || failedEvent || stepStates.some(s => s.status === "failed")) return "failed";
@@ -256,10 +268,104 @@ function LiveStepRow({ step, state }) {
   );
 }
 
+function ReconciliationPanel({ onReconciled }) {
+  const [running, setRunning] = useState(false);
+  const [confirmText, setConfirmText] = useState("");
+  const [report, setReport] = useState(null);
+  const [error, setError] = useState("");
+
+  const runReconciliation = async (writeMode = false) => {
+    setRunning(true);
+    setError("");
+    try {
+      const payload = writeMode
+        ? { dry_run: false, confirm: RECONCILE_CONFIRM, limit: 200 }
+        : { dry_run: true, limit: 200 };
+      const response = await base44.functions.invoke("reconcileLiveAutomationChecklist", payload);
+      const data = response?.data || response;
+      setReport(data);
+      await onReconciled?.();
+    } catch (err) {
+      setError(err?.data?.error || err?.message || "Reconciliation function failed. It may not be deployed by Base44 yet.");
+    } finally {
+      setRunning(false);
+    }
+  };
+
+  const results = report?.results || [];
+  const actionCount = results.reduce((sum, item) => sum + (item.actions?.length || 0), 0);
+  const blockedCount = results.filter(item => item.dashboard_truth_status === "blocked" || item.blocked_reasons?.length).length;
+  const trustedCount = results.filter(item => item.dashboard_truth_status === "trusted").length;
+
+  return (
+    <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+      <div className="flex flex-wrap items-start justify-between gap-3">
+        <div>
+          <div className="flex items-center gap-2">
+            <ShieldCheck className="h-4 w-4 text-slate-700" />
+            <h3 className="text-sm font-semibold text-slate-900">Live Proof Reconciliation</h3>
+          </div>
+          <p className="mt-1 text-xs text-slate-500">Dry-run first. Write mode creates missing DB steps, normalizes legacy keys, and marks missing proof as blocked.</p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          <button onClick={() => runReconciliation(false)} disabled={running} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-1.5 text-xs font-semibold text-blue-700 hover:bg-blue-100 disabled:opacity-50">
+            {running ? <Loader2 className="h-3 w-3 animate-spin" /> : <RefreshCw className="h-3 w-3" />} Run Dry Run
+          </button>
+        </div>
+      </div>
+
+      <div className="mt-3 grid gap-2 md:grid-cols-[1fr_auto]">
+        <input
+          value={confirmText}
+          onChange={event => setConfirmText(event.target.value)}
+          placeholder={`Type ${RECONCILE_CONFIRM} to enable write mode`}
+          className="rounded-lg border border-slate-200 px-3 py-2 text-xs focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+        <button
+          onClick={() => runReconciliation(true)}
+          disabled={running || confirmText !== RECONCILE_CONFIRM}
+          className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-700 hover:bg-red-100 disabled:opacity-40"
+        >
+          <AlertCircle className="h-3 w-3" /> Run Write Mode
+        </button>
+      </div>
+
+      {error && <div className="mt-3 rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">{error}</div>}
+
+      {report && (
+        <div className="mt-3 space-y-3">
+          <div className="grid gap-2 md:grid-cols-4">
+            <div className="rounded-lg bg-slate-50 p-3"><p className="text-[10px] font-bold uppercase text-slate-400">Mode</p><p className="text-sm font-semibold text-slate-800">{report.dry_run ? "Dry Run" : "Write Mode"}</p></div>
+            <div className="rounded-lg bg-slate-50 p-3"><p className="text-[10px] font-bold uppercase text-slate-400">Processed</p><p className="text-sm font-semibold text-slate-800">{report.processed || 0}</p></div>
+            <div className="rounded-lg bg-slate-50 p-3"><p className="text-[10px] font-bold uppercase text-slate-400">Proposed Actions</p><p className="text-sm font-semibold text-slate-800">{actionCount}</p></div>
+            <div className="rounded-lg bg-slate-50 p-3"><p className="text-[10px] font-bold uppercase text-slate-400">Blocked / Trusted</p><p className="text-sm font-semibold text-slate-800">{blockedCount} / {trustedCount}</p></div>
+          </div>
+          {results.length > 0 && (
+            <div className="max-h-56 overflow-auto rounded-lg border border-slate-200">
+              {results.slice(0, 12).map(item => (
+                <div key={item.checklist_id} className="border-b border-slate-100 p-3 text-xs last:border-0">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-semibold text-slate-800">{item.business_name || item.checklist_id}</span>
+                    <span className={`rounded-full px-2 py-0.5 font-bold ${item.dashboard_truth_status === "trusted" ? "bg-green-50 text-green-700" : item.dashboard_truth_status === "blocked" ? "bg-red-50 text-red-700" : "bg-amber-50 text-amber-700"}`}>{item.dashboard_truth_status || "unknown"}</span>
+                  </div>
+                  <p className="mt-1 text-slate-500">{item.original_service_key} → {item.normalized_service_key}</p>
+                  {item.actions?.length > 0 && <p className="mt-1 text-blue-700">Actions: {item.actions.slice(0, 3).join("; ")}{item.actions.length > 3 ? "…" : ""}</p>}
+                  {item.blocked_reasons?.length > 0 && <p className="mt-1 text-red-700">Blocked: {item.blocked_reasons.join("; ")}</p>}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 function ChecklistCard({ checklist, evidence, onManualStatus }) {
   const { user } = useAuth();
   const [expanded, setExpanded] = useState(false);
-  const def = SERVICE_DEFINITIONS[checklist.service_key];
+  const normalizedServiceKey = normalizeServiceKey(checklist.service_key);
+  const def = SERVICE_DEFINITIONS[normalizedServiceKey];
   const steps = def?.steps || [];
   const dbSteps = evidence?.steps || [];
   const events = evidence?.events || [];
@@ -275,12 +381,13 @@ function ChecklistCard({ checklist, evidence, onManualStatus }) {
   const completeCount = stepStates.filter(s => s.status === "complete").length;
   const failedCount = stepStates.filter(s => s.status === "failed").length;
   const progress = steps.length ? Math.round((completeCount / steps.length) * 100) : 0;
-  const liveStatus = deriveCardStatus(checklist, stepStates, events);
+  const liveStatus = deriveCardStatus(checklist, stepStates, events, Boolean(def));
   const statusCfg = STATUS_CONFIG[liveStatus] || STATUS_CONFIG.not_started;
   const StatusIcon = statusCfg.icon;
   const latestEvent = events[0];
   const latestDbStep = dbSteps.find(s => s.completed_at);
   const latestEvidenceTime = getEventTime(latestEvent) || latestDbStep?.completed_at || checklist.updated_date;
+  const isLegacyKey = checklist.service_key !== normalizedServiceKey;
 
   if (!def) {
     return (
@@ -301,6 +408,7 @@ function ChecklistCard({ checklist, evidence, onManualStatus }) {
               <StatusIcon className={`h-3 w-3 ${liveStatus === "in_progress" ? "animate-spin" : ""}`} />
               Live: {statusCfg.label}
             </span>
+            {isLegacyKey && <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Legacy key: {checklist.service_key}</span>}
             {checklist.status !== liveStatus && (
               <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[10px] font-bold text-amber-700">Manual status says {checklist.status}</span>
             )}
@@ -322,10 +430,16 @@ function ChecklistCard({ checklist, evidence, onManualStatus }) {
 
       {expanded && (
         <div className="space-y-5 border-t border-slate-100 p-4">
+          {checklist.dashboard_truth_status === "blocked" && (
+            <div className="rounded-lg border border-red-200 bg-red-50 p-3 text-xs text-red-800">
+              <strong>Blocked:</strong> {checklist.dashboard_truth_notes || "Missing proof. Run reconciliation to refresh the exact reason."}
+            </div>
+          )}
+
           <div className="grid gap-3 text-xs md:grid-cols-5">
             <div><p className="font-semibold uppercase tracking-wide text-slate-400">Order ID</p><p className="mt-0.5 truncate text-slate-700">{checklist.order_id || "—"}</p></div>
             <div><p className="font-semibold uppercase tracking-wide text-slate-400">Manual Status</p><p className="mt-0.5 text-slate-700">{checklist.status}</p></div>
-            <div><p className="font-semibold uppercase tracking-wide text-slate-400">Live Evidence</p><p className="mt-0.5 text-slate-700">{events.length} events / {dbSteps.length} steps</p></div>
+            <div><p className="font-semibold uppercase tracking-wide text-slate-400">Truth Status</p><p className="mt-0.5 text-slate-700">{checklist.dashboard_truth_status || "unknown"}</p></div>
             <div><p className="font-semibold uppercase tracking-wide text-slate-400">Failed Signals</p><p className="mt-0.5 text-slate-700">{failedCount}</p></div>
             <div><p className="font-semibold uppercase tracking-wide text-slate-400">Latest Proof</p><p className="mt-0.5 text-slate-700">{compactDate(latestEvidenceTime)}</p></div>
           </div>
@@ -386,8 +500,9 @@ export default function AutomationInstallChecklist() {
   }, []);
 
   const loadEvidenceForChecklist = async (checklist) => {
+    const normalizedServiceKey = normalizeServiceKey(checklist.service_key);
     const stepQuery = { automation_checklist_id: checklist.id };
-    const eventQuery = { service_key: checklist.service_key };
+    const eventQuery = { service_key: normalizedServiceKey };
     if (checklist.order_id) eventQuery.order_id = checklist.order_id;
 
     const [steps, events] = await Promise.all([
@@ -417,12 +532,13 @@ export default function AutomationInstallChecklist() {
   };
 
   const getLiveStatus = (checklist) => {
-    const def = SERVICE_DEFINITIONS[checklist.service_key];
+    const normalizedServiceKey = normalizeServiceKey(checklist.service_key);
+    const def = SERVICE_DEFINITIONS[normalizedServiceKey];
     const evidence = evidenceByChecklist[checklist.id] || { steps: [], events: [] };
     const dbMap = {};
     evidence.steps.forEach(step => { dbMap[step.step_id] = step; });
     const states = (def?.steps || []).map(step => deriveStepState(step, dbMap[step.id], evidence.events || []));
-    return deriveCardStatus(checklist, states, evidence.events || []);
+    return deriveCardStatus(checklist, states, evidence.events || [], Boolean(def));
   };
 
   const handleManualStatus = async (checklist, status, email) => {
@@ -440,7 +556,7 @@ export default function AutomationInstallChecklist() {
   const filtered = checklists.filter(checklist => {
     const liveStatus = getLiveStatus(checklist);
     if (filterStatus !== "all" && liveStatus !== filterStatus) return false;
-    if (filterService !== "all" && checklist.service_key !== filterService) return false;
+    if (filterService !== "all" && normalizeServiceKey(checklist.service_key) !== filterService) return false;
     if (search) {
       const q = search.toLowerCase();
       const haystack = `${checklist.business_name || ""} ${checklist.client_email || ""} ${checklist.order_id || ""}`.toLowerCase();
@@ -471,6 +587,8 @@ export default function AutomationInstallChecklist() {
           {refreshing ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />} Refresh Live Proof
         </button>
       </div>
+
+      <ReconciliationPanel onReconciled={() => loadDashboard(false)} />
 
       <div className="grid gap-3 md:grid-cols-4">
         <div className="rounded-xl border border-slate-200 bg-white p-4"><p className="text-xs font-semibold uppercase tracking-wide text-slate-400">Tracked Checklists</p><p className="mt-1 text-2xl font-bold text-slate-900">{checklists.length}</p></div>
