@@ -21,6 +21,7 @@ import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
 import AutomationChecklist from "../components/portal/AutomationChecklist";
 import PortalWhatsNew from "../components/portal/PortalWhatsNew";
 import ClientOrderStatusTab from "../components/portal/ClientOrderStatusTab";
+import PortalNavigationTabs from "../components/portal/PortalNavigationTabs";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalTimeline from "../components/portal/PortalTimeline";
@@ -56,28 +57,6 @@ function PortalPanelSkeleton() {
 function LazyPortalPanel({ children }) {
   return <Suspense fallback={<PortalPanelSkeleton />}>{children}</Suspense>;
 }
-
-const TABS = [
-  { id: "progress", label: "🚀 Setup Progress" },
-  { id: "timeline", label: "📍 Timeline" },
-  { id: "quickstart", label: "⚡ Quick Start" },
-  { id: "performance", label: "🎯 Performance" },
-  { id: "metrics", label: "Lead Flow" },
-  { id: "tasks", label: "Tasks" },
-  { id: "checklist", label: "Checklist" },
-  { id: "leads", label: "My Leads" },
-  { id: "deadlines", label: "Deadlines" },
-  { id: "files", label: "Files & Docs" },
-  { id: "billing", label: "Billing" },
-  { id: "referrals", label: "Referrals" },
-  { id: "support", label: "Support & Messaging" },
-  { id: "plan", label: "My Plan" },
-  { id: "reports", label: "Weekly Report" },
-  { id: "updates", label: "What's New" },
-  { id: "settings", label: "Settings" },
-];
-
-TABS.splice(1, 0, { id: "order-status", label: "Order Status" });
 
 export default function ClientPortal() {
   // Prevent search engines from indexing private portal
@@ -214,8 +193,8 @@ export default function ClientPortal() {
         <div className="min-h-screen bg-background flex items-center justify-center px-6">
           <div className="max-w-md text-center">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)" }}>
-              <Eye className="w-8 h-8" style={{ color: "#B8941F" }} />
+              style={{ background: "rgba(0,174,239,0.10)", border: "1px solid rgba(0,136,204,0.24)" }}>
+              <Eye className="w-8 h-8" style={{ color: "#0088CC" }} />
             </div>
             <h1 className="font-display text-2xl font-semibold text-foreground mb-2">Admin Preview Mode</h1>
             <p className="text-muted-foreground text-sm leading-relaxed mb-4">
@@ -232,7 +211,7 @@ export default function ClientPortal() {
             <div className="flex flex-col gap-3">
               <a href="/admin"
                 className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-                style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}>
+                style={{ background: "linear-gradient(135deg,#0088CC,#005691)" }}>
                 Go to Admin Dashboard
               </a>
               <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Back to Home</a>
@@ -264,7 +243,7 @@ export default function ClientPortal() {
             <a
               href="mailto:support@clientsurgesystems.com"
               className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-              style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
+              style={{ background: "linear-gradient(135deg,#0088CC,#005691)" }}
             >
               Contact Support
             </a>
@@ -291,7 +270,7 @@ export default function ClientPortal() {
         <div className="flex items-center gap-3">
           <div
             className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-            style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
+            style={{ background: "linear-gradient(135deg,#0088CC,#005691)" }}
           >
             <span className="text-white text-xs font-bold">CS</span>
           </div>
@@ -325,10 +304,10 @@ export default function ClientPortal() {
       {/* Hero greeting */}
       <div
         className="px-6 py-10"
-        style={{ background: "linear-gradient(135deg,#003B8F 0%,#006BB0 60%,#00AEEF 100%)" }}
+        style={{ background: "linear-gradient(135deg,#005691 0%,#0088CC 60%,#00AEEF 100%)" }}
       >
         <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Welcome Back</p>
+          <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Client Command Center</p>
           <h1 className="font-display text-2xl md:text-3xl font-semibold text-white mb-1">
             {project?.business_name}
           </h1>
@@ -357,27 +336,7 @@ export default function ClientPortal() {
         <OnboardingMissingAssetsBanner project={project} onNavigate={setActiveTab} />
       </div>
 
-      {/* Tabs — horizontally scrollable on mobile */}
-      <div className="border-b border-border bg-background px-4 md:px-6 overflow-x-auto relative" role="tablist" aria-label="Portal sections">
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10" aria-hidden="true" />
-        <div className="max-w-4xl mx-auto flex gap-0.5 min-w-max">
-          {TABS.map(tab => (
-            <button
-              key={tab.id}
-              role="tab"
-              aria-selected={activeTab === tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 md:px-4 py-3.5 text-xs md:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap min-h-[44px] ${
-                activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
-        </div>
-      </div>
+      <PortalNavigationTabs activeTab={activeTab} onChange={setActiveTab} />
 
       {/* Content */}
       <main id="main-content" className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 portal-tab-content">
