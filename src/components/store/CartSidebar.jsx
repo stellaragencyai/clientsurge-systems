@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ShoppingCart, Trash2, ArrowRight, Lock } from "lucide-react";
+import { X, ShoppingCart, Trash2, ArrowRight } from "lucide-react";
 import { useCart } from "@/lib/cartContext";
-import { base44 } from "@/api/base44Client";
 import { AI_PRODUCTS } from "@/lib/aiProducts";
 import VoiceAgentUpsell from "./VoiceAgentUpsell";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
@@ -15,31 +14,44 @@ const COMPLEMENTARY_SERVICES = {
   lead_reactivation: ["nurture_sequence_14d", "instant_lead_response", "review_request"],
 };
 
-const CHECKOUT_ATTRIBUTION_KEY = "clientsurge:checkout-lead-attribution";
+const SIGNUP_FORM_STORAGE_KEY = "clientsurge_signup_form";
 
-function readCheckoutLeadAttribution() {
-  if (typeof window === "undefined") {
-    return {};
-  }
+function packageSignupUrl(packageKey) {
+  return `/product-signup?package=${encodeURIComponent(packageKey)}`;
+}
 
-  const params = new URLSearchParams(window.location.search);
-  const fromUrl = {
-    lead_id: params.get("lead_id") || "",
-    crm_lead_id: params.get("crm_lead_id") || params.get("lead_id") || "",
-    website_lead_id: params.get("website_lead_id") || "",
-  };
-
-  const hasUrlAttribution = Object.values(fromUrl).some(Boolean);
-  if (hasUrlAttribution) {
-    sessionStorage.setItem(CHECKOUT_ATTRIBUTION_KEY, JSON.stringify(fromUrl));
-    return fromUrl;
-  }
-
+function saveSignupPrefill(form) {
   try {
-    return JSON.parse(sessionStorage.getItem(CHECKOUT_ATTRIBUTION_KEY) || "{}") || {};
-  } catch {
-    return {};
-  }
+    localStorage.setItem(
+      SIGNUP_FORM_STORAGE_KEY,
+      JSON.stringify({
+        fullName: form.name || "",
+        businessName: form.business || "",
+        email: form.email || "",
+        phone: form.phone || "",
+        industry: "",
+      })
+    );
+  } catch {}
+}
+
+function saveOrderPreview({ items, totalSetup, totalMonthly, packageKey }) {
+  try {
+    sessionStorage.setItem(
+      "clientsurge:last-order",
+      JSON.stringify({
+        packageKey,
+        items: items.map((item) => ({
+          icon: item.icon,
+          name: item.name,
+          setup_fee: item.setup_fee,
+          monthly_fee: item.monthly_fee,
+        })),
+        totalSetup,
+        totalMonthly,
+      })
+    );
+  } catch {}
 }
 
 export default function CartSidebar() {
@@ -54,26 +66,19 @@ export default function CartSidebar() {
     totalMonthly,
   } = useCart();
   const [step, setStep] = useState("cart");
-  const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    business: "",
-  });
-  const [smsConsent, setSmsConsent] = useState(false);
+  const [form, setForm] = useState({ name: "", email: "", phone: "", business: "" });
   const [error, setError] = useState("");
 
-  useEffect(() => {
-    if (!cartOpen) {
-      return undefined;
-    }
+  const packageOffer = pricingSummary?.package_offer || null;
+  const packageKey = packageOffer?.package_key || "";
 
+  useEffect(() => {
+    if (!cartOpen) return undefined;
     return acquireBodyScrollLock("cart-sidebar");
   }, [cartOpen]);
 
   const suggestedAddon = useMemo(() => {
-    if (!items.length) return null;
-    if (pricingSummary?.package_offer) return null;
+    if (!items.length || packageOffer) return null;
 
     const selectedProductIds = new Set(items.map((item) => item.product_id));
     const selectedServiceKeys = new Set(items.map((item) => item.service_key).filter(Boolean));
@@ -82,26 +87,26 @@ export default function CartSidebar() {
     return (
       preferredServiceKeys
         .map((serviceKey) => AI_PRODUCTS.find((product) => product.service_key === serviceKey))
-        .find((product) =>
-          product?.checkout_enabled &&
-          !product.coming_soon &&
-          !selectedProductIds.has(product.product_id) &&
-          !selectedServiceKeys.has(product.service_key)
+        .find(
+          (product) =>
+            product?.checkout_enabled &&
+            !product.coming_soon &&
+            !selectedProductIds.has(product.product_id) &&
+            !selectedServiceKeys.has(product.service_key)
         ) ||
-      AI_PRODUCTS.find((product) =>
-        product.checkout_enabled &&
-        !product.coming_soon &&
-        !selectedProductIds.has(product.product_id)
+      AI_PRODUCTS.find(
+        (product) =>
+          product.checkout_enabled &&
+          !product.coming_soon &&
+          !selectedProductIds.has(product.product_id)
       ) ||
       null
     );
-  }, [items, pricingSummary]);
+  }, [items, packageOffer]);
 
   const checkoutBlocker = useMemo(() => {
     if (!items.length) return "";
-
-    const packageOffer = pricingSummary?.package_offer;
-    if (!packageOffer) {
+    if (!packageOffer?.package_key) {
       return "Live checkout requires a Starter, Growth, or Pro package. Choose a complete package before continuing.";
     }
 
@@ -116,609 +121,155 @@ export default function CartSidebar() {
     }
 
     return "";
-  }, [items.length, pricingSummary]);
+  }, [items.length, packageOffer, pricingSummary]);
 
-  const handleCheckout = async () => {
+  const openPackageSignup = () => {
     if (checkoutBlocker) {
       setError(checkoutBlocker);
       setStep("cart");
       return;
     }
-
     if (!form.name || !form.email || !form.business) {
       setError("Please fill in all required fields.");
       return;
     }
-
-    if (form.phone && !smsConsent) {
-      setError("Please check the SMS consent box to continue, or remove your phone number.");
+    if (!packageKey) {
+      setError("Checkout is not available for this selection. Please choose a complete package.");
+      setStep("cart");
       return;
     }
 
     setError("");
     setStep("loading");
+    saveSignupPrefill(form);
+    saveOrderPreview({ items, totalSetup, totalMonthly, packageKey });
 
-    // Timeout fallback — reset if Stripe redirect takes too long
-    const timeoutId = setTimeout(() => {
-      setStep("info");
-      setError("Checkout timed out. Please try again.");
-    }, 12000);
-
+    const signupUrl = packageSignupUrl(packageKey);
     if (window.self !== window.top) {
-      // Silently redirect to the live site if inside iframe preview
-      window.open(window.location.href, "_blank");
-      setStep("cart");
-      return;
-    }
-
-    try {
-      const packageOffer = pricingSummary?.package_offer;
-      const checkoutUrl = packageOffer?.checkout_url;
-
-      if (!checkoutUrl) {
-        clearTimeout(timeoutId);
-        setError("Checkout is not available for this selection. Please choose a complete package.");
-        setStep("info");
-        return;
-      }
-
-      // Save order summary so OrderSuccess can display what was purchased
-      try {
-        sessionStorage.setItem("clientsurge:last-order", JSON.stringify({
-          items: items.map(i => ({ icon: i.icon, name: i.name, setup_fee: i.setup_fee, monthly_fee: i.monthly_fee })),
-          totalSetup,
-          totalMonthly,
-        }));
-      } catch {}
-
-      clearTimeout(timeoutId);
-      window.location.href = checkoutUrl;
-      return;
-    } catch (e) {
-      clearTimeout(timeoutId);
-      setError(e.message || "Checkout failed.");
+      window.open(`${window.location.origin}${signupUrl}`, "_blank", "noopener,noreferrer");
       setStep("info");
+      setError("Checkout must run in a full browser tab. I opened the package signup page in a new tab.");
+      return;
     }
+    window.location.assign(signupUrl);
   };
 
   return (
     <AnimatePresence>
       {cartOpen && (
-    <>
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.25 }}
-        onClick={() => setCartOpen(false)}
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,0,0,0.42)",
-          backdropFilter: "blur(6px)",
-          zIndex: 100,
-        }}
-      />
-
-      <motion.div
-        initial={{ x: "100%" }}
-        animate={{ x: 0 }}
-        exit={{ x: "100%" }}
-        transition={{ type: "spring", stiffness: 320, damping: 32 }}
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: "min(430px, 100vw)",
-          background: "linear-gradient(180deg, #f7fbff 0%, #ffffff 100%)",
-          borderLeft: "1px solid rgba(0,136,204,0.16)",
-          boxShadow: "-20px 0 60px rgba(0,0,0,0.18)",
-          zIndex: 101,
-          display: "flex",
-          flexDirection: "column",
-          fontFamily: "'Inter', sans-serif",
-        }}
-      >
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "20px 22px",
-            borderBottom: "1px solid rgba(0,136,204,0.12)",
-            background: "rgba(255,255,255,0.56)",
-            backdropFilter: "blur(12px)",
-          }}
-        >
-          <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-            <ShoppingCart
-              style={{ width: "20px", height: "20px", color: "#0088CC" }}
-            />
-            <span
-              style={{ fontWeight: "700", fontSize: "16px", color: "#0A1628" }}
-            >
-              Your AI Stack
-            </span>
-            {items.length > 0 ? (
-              <span
-                style={{
-                  background: "#0088CC",
-                  color: "#fff",
-                  borderRadius: "9999px",
-                  width: "20px",
-                  height: "20px",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "11px",
-                  fontWeight: "700",
-                }}
-              >
-                {items.length}
-              </span>
-            ) : null}
-          </div>
-          <button
+        <>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
             onClick={() => setCartOpen(false)}
+            style={{ position: "fixed", inset: 0, background: "rgba(0,0,0,0.42)", zIndex: 100 }}
+          />
+          <motion.div
+            initial={{ x: "100%" }}
+            animate={{ x: 0 }}
+            exit={{ x: "100%" }}
+            transition={{ type: "spring", stiffness: 320, damping: 32 }}
             style={{
-              background: "none",
-              border: "none",
-              cursor: "pointer",
-              padding: "4px",
+              position: "fixed",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: "min(430px, 100vw)",
+              background: "linear-gradient(180deg, #f7fbff 0%, #ffffff 100%)",
+              borderLeft: "1px solid rgba(0,136,204,0.16)",
+              boxShadow: "-20px 0 60px rgba(0,0,0,0.18)",
+              zIndex: 101,
+              display: "flex",
+              flexDirection: "column",
+              fontFamily: "'Inter', sans-serif",
             }}
           >
-            <X style={{ width: "20px", height: "20px", color: "rgba(10,22,40,0.58)" }} />
-          </button>
-        </div>
-
-        <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px" }}>
-          {items.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "36px 16px 24px" }}>
-              <div style={{
-                width: "56px", height: "56px", borderRadius: "16px",
-                background: "linear-gradient(135deg, rgba(0,174,239,0.1), rgba(0,59,143,0.05))",
-                border: "1px solid rgba(0,136,204,0.14)",
-                display: "flex", alignItems: "center", justifyContent: "center",
-                margin: "0 auto 14px",
-              }}>
-                <ShoppingCart style={{ width: "26px", height: "26px", color: "#0088CC", opacity: 0.72 }} />
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 22px", borderBottom: "1px solid rgba(0,136,204,0.12)" }}>
+              <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                <ShoppingCart style={{ width: "20px", height: "20px", color: "#0088CC" }} />
+                <span style={{ fontWeight: 700, fontSize: "16px", color: "#0A1628" }}>Your AI Stack</span>
+                {items.length > 0 && <span style={{ background: "#0088CC", color: "#fff", borderRadius: "9999px", padding: "2px 7px", fontSize: "11px", fontWeight: 700 }}>{items.length}</span>}
               </div>
-              <p style={{ fontSize: "14px", fontWeight: "700", color: "#0A1628", margin: "0 0 6px" }}>
-                Your stack is empty
-              </p>
-              <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.5)", marginBottom: "20px", lineHeight: 1.5 }}>
-                Add services from the catalog below to get started.
-              </p>
-              {/* Top 3 popular nudges */}
-              {[
-                { icon: "⚡", name: "Instant Lead Response", price: "$97/month" },
-                { icon: "📞", name: "Missed Call Text-Back", price: "$67/month" },
-                { icon: "📅", name: "AI Booking Agent", price: "$147/month" },
-              ].map((s) => (
-                <div key={s.name} style={{
-                  display: "flex", alignItems: "center", justifyContent: "space-between",
-                  padding: "10px 12px", marginBottom: "6px", borderRadius: "12px",
-                  background: "rgba(255,255,255,0.78)", border: "1px solid rgba(0,136,204,0.12)",
-                  cursor: "pointer",
-                }} onClick={() => setCartOpen(false)}>
-                  <span style={{ fontSize: "13px" }}>{s.icon} {s.name}</span>
-                  <span style={{ fontSize: "11px", color: "#005f99", fontWeight: "700" }}>{s.price}</span>
-                </div>
-              ))}
-              <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.36)", marginTop: "10px" }}>
-                Click a service above to browse
-              </p>
-            </div>
-          ) : step === "cart" ? (
-            <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
-              <AnimatePresence initial={false}>
-              {items.map((item, idx) => (
-                <motion.div
-                  key={item.product_id}
-                  initial={{ opacity: 0, x: 40, scale: 0.96 }}
-                  animate={{ opacity: 1, x: 0, scale: 1 }}
-                  exit={{ opacity: 0, x: 40, scale: 0.92 }}
-                  transition={{ type: "spring", stiffness: 320, damping: 30, delay: idx * 0.05 }}
-                  whileHover={{ y: -2, boxShadow: "0 10px 28px rgba(0,59,143,0.12)" }}
-                  style={{
-                    background: "rgba(255,255,255,0.8)",
-                    border: "1px solid rgba(0,136,204,0.12)",
-                    borderRadius: "16px",
-                    padding: "14px 16px",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "12px",
-                    boxShadow: "0 6px 16px rgba(0,0,0,0.04)",
-                  }}
-                >
-                  <span style={{ fontSize: "22px" }}>{item.icon}</span>
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p
-                      style={{
-                        fontSize: "13px",
-                        fontWeight: "700",
-                        color: "#0A1628",
-                        margin: "0 0 3px",
-                        whiteSpace: "nowrap",
-                        overflow: "hidden",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {item.name}
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "11px",
-                        color: "rgba(10,22,40,0.56)",
-                        margin: 0,
-                      }}
-                    >
-                      {item.setup_fee === 0 ? "No setup fee" : `$${item.setup_fee} setup`} — ${item.monthly_fee}/mo
-                    </p>
-                    <p
-                      style={{
-                        fontSize: "10px",
-                        color: "rgba(10,22,40,0.4)",
-                        margin: "3px 0 0",
-                      }}
-                    >
-                      1 service license included
-                    </p>
-                  </div>
-                  <motion.button
-                    whileTap={{ scale: 0.85 }}
-                    onClick={() => removeItem(item.product_id)}
-                    style={{
-                      background: "none",
-                      border: "none",
-                      cursor: "pointer",
-                      padding: "4px",
-                      color: "#d46d6d",
-                    }}
-                  >
-                    <Trash2 style={{ width: "14px", height: "14px" }} />
-                  </motion.button>
-                </motion.div>
-              ))}
-              </AnimatePresence>
-              {/* Voice Agent upsell — shown when user has a package but no voice add-on */}
-              <VoiceAgentUpsell cartItems={items} onAdd={addItem} />
-
-              {suggestedAddon && (
-                <div
-                  style={{
-                    marginTop: "8px",
-                    borderRadius: "16px",
-                    padding: "14px",
-                    background: "linear-gradient(135deg, rgba(0,174,239,0.08), rgba(0,59,143,0.04))",
-                    border: "1px solid rgba(0,174,239,0.18)",
-                  }}
-                >
-                  <p style={{ margin: "0 0 4px", fontSize: "10px", fontWeight: "800", letterSpacing: "0.12em", textTransform: "uppercase", color: "#0088CC" }}>
-                    Recommended Add-On
-                  </p>
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
-                    <div style={{ minWidth: 0 }}>
-                      <p style={{ margin: "0 0 3px", fontSize: "13px", fontWeight: "800", color: "#0A1628" }}>
-                        {suggestedAddon.icon} {suggestedAddon.name}
-                      </p>
-                      <p style={{ margin: 0, fontSize: "11px", color: "rgba(10,22,40,0.58)" }}>
-                        Complements your current stack - ${suggestedAddon.monthly_fee}/mo
-                      </p>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => addItem(suggestedAddon)}
-                      style={{
-                        border: "none",
-                        borderRadius: "999px",
-                        background: "linear-gradient(135deg,#0088CC,#00AEEF)",
-                        color: "#fff",
-                        fontSize: "11px",
-                        fontWeight: "800",
-                        padding: "8px 12px",
-                        cursor: "pointer",
-                        whiteSpace: "nowrap",
-                      }}
-                    >
-                      Add
-                    </button>
-                  </div>
-                </div>
-              )}
-              {error || checkoutBlocker ? (
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#d14343",
-                    fontWeight: "600",
-                    lineHeight: 1.55,
-                    margin: "8px 2px 0",
-                  }}
-                >
-                  {error || checkoutBlocker}
-                </p>
-              ) : null}
-            </div>
-          ) : (
-            <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
-              <div
-                style={{
-                  borderRadius: "14px",
-                  background: "rgba(0,174,239,0.06)",
-                  border: "1px solid rgba(0,136,204,0.12)",
-                  padding: "12px 14px",
-                }}
-              >
-                <p
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: "600",
-                    color: "rgba(10,22,40,0.68)",
-                    margin: 0,
-                  }}
-                >
-                  Enter your details to continue to payment.
-                </p>
-              </div>
-
-              {[
-                { key: "name", label: "Full Name *", placeholder: "Jane Smith" },
-                {
-                  key: "email",
-                  label: "Email Address *",
-                  placeholder: "jane@yourbiz.com",
-                },
-                {
-                  key: "phone",
-                  label: "Phone Number",
-                  placeholder: "+1 (602) 555-0123",
-                },
-                {
-                  key: "business",
-                  label: "Business Name *",
-                  placeholder: "Glow Med Spa",
-                },
-              ].map((field) => (
-                <div key={field.key}>
-                  <label
-                    style={{
-                      fontSize: "11px",
-                      fontWeight: "700",
-                      color: "rgba(10,22,40,0.55)",
-                      textTransform: "uppercase",
-                      letterSpacing: "0.08em",
-                      display: "block",
-                      marginBottom: "5px",
-                    }}
-                  >
-                    {field.label}
-                  </label>
-                  <input
-                    type={field.key === "email" ? "email" : "text"}
-                    placeholder={field.placeholder}
-                    value={form[field.key]}
-                    onChange={(event) =>
-                      setForm({ ...form, [field.key]: event.target.value })
-                    }
-                    disabled={step === "loading"}
-                    style={{
-                      width: "100%",
-                      borderRadius: "12px",
-                      border: "1.5px solid rgba(0,136,204,0.18)",
-                      padding: "11px 14px",
-                      fontSize: "13px",
-                      background: "rgba(255,255,255,0.86)",
-                      outline: "none",
-                      boxSizing: "border-box",
-                    }}
-                  />
-                </div>
-              ))}
-              {/* SMS Consent — only shown when phone is entered */}
-              {form.phone && (
-                <label style={{ display: "flex", alignItems: "flex-start", gap: "10px", cursor: "pointer" }}>
-                  <input
-                    type="checkbox"
-                    checked={smsConsent}
-                    onChange={(e) => setSmsConsent(e.target.checked)}
-                    style={{ marginTop: "2px", flexShrink: 0, accentColor: "#0088CC", width: "14px", height: "14px" }}
-                  />
-                  <span style={{ fontSize: "11px", color: "rgba(10,22,40,0.62)", lineHeight: 1.5 }}>
-                    I agree to receive SMS messages from ClientSurge Systems about my order and service updates. Message & data rates may apply. Reply STOP to unsubscribe at any time.{" "}
-                    <a href="/privacy-policy" target="_blank" rel="noopener noreferrer" style={{ color: "#005f99", fontWeight: "600" }}>Privacy Policy</a>
-                  </span>
-                </label>
-              )}
-
-              {error ? (
-                <p
-                  style={{
-                    fontSize: "12px",
-                    color: "#d14343",
-                    fontWeight: "600",
-                    lineHeight: 1.55,
-                  }}
-                >
-                  {error}
-                </p>
-              ) : null}
-            </div>
-          )}
-        </div>
-
-        {items.length > 0 ? (
-          <div
-            style={{
-              padding: "16px 20px 18px",
-              borderTop: "1px solid rgba(0,136,204,0.12)",
-              background: "rgba(255,255,255,0.7)",
-              backdropFilter: "blur(12px)",
-            }}
-          >
-            <div
-              style={{
-                borderRadius: "16px",
-                background: "rgba(255,255,255,0.74)",
-                border: "1px solid rgba(0,136,204,0.12)",
-                padding: "14px 14px 12px",
-                marginBottom: "14px",
-              }}
-            >
-              <div
-                style={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  marginBottom: "6px",
-                }}
-              >
-                <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)" }}>
-                  One-time setup total
-                </span>
-                <span
-                  style={{
-                    fontSize: "13px",
-                    fontWeight: "700",
-                    color: "#0A1628",
-                  }}
-                >
-                  ${totalSetup}
-                </span>
-              </div>
-              <div style={{ display: "flex", justifyContent: "space-between" }}>
-                <span style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)" }}>
-                  Monthly total
-                </span>
-                <span
-                  style={{
-                    fontSize: "14px",
-                    fontWeight: "800",
-                    color: "#005f99",
-                  }}
-                >
-                  ${totalMonthly}/mo
-                </span>
-              </div>
-            </div>
-
-            {step === "cart" ? (
-              <button
-                onClick={() => {
-                  if (checkoutBlocker) {
-                    setError(checkoutBlocker);
-                    return;
-                  }
-                  setError("");
-                  setStep("info");
-                }}
-                disabled={Boolean(checkoutBlocker)}
-                style={{
-                    width: "100%",
-                    borderRadius: "9999px",
-                    padding: "2px",
-                    background:
-                      "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-                    border: "none",
-                    cursor: checkoutBlocker ? "not-allowed" : "pointer",
-                    opacity: checkoutBlocker ? 0.72 : 1,
-                    boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      height: "48px",
-                      borderRadius: "9999px",
-                      background:
-                        "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-                      color: "#ffffff",
-                      fontWeight: "700",
-                      fontSize: "14px",
-                    }}
-                  >
-                    Continue to Checkout{" "}
-                  <ArrowRight style={{ width: "15px", height: "15px" }} />
-                </span>
+              <button type="button" onClick={() => setCartOpen(false)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px" }}>
+                <X style={{ width: "20px", height: "20px", color: "rgba(10,22,40,0.58)" }} />
               </button>
-            ) : (
-              <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
-                <button
-                  onClick={handleCheckout}
-                  disabled={step === "loading"}
-                  style={{
-                    width: "100%",
-                    borderRadius: "9999px",
-                    padding: "2px",
-                    background:
-                      "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-                    border: "none",
-                    cursor: step === "loading" ? "not-allowed" : "pointer",
-                    opacity: step === "loading" ? 0.7 : 1,
-                    boxShadow: "0 4px 18px rgba(0,174,239,0.4)",
-                  }}
-                >
-                  <span
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      gap: "6px",
-                      height: "48px",
-                      borderRadius: "9999px",
-                      background:
-                        "linear-gradient(135deg,#0088CC 0%,#006BB0 40%,#003B8F 100%)",
-                      color: "#ffffff",
-                      fontWeight: "700",
-                      fontSize: "14px",
-                    }}
-                  >
-                    {step === "loading" ? (
-                      "Redirecting to Stripe..."
-                    ) : (
-                      <>
-                        <Lock style={{ width: "13px", height: "13px" }} /> Pay
-                        Securely with Stripe
-                      </>
-                    )}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setStep("cart")}
-                  style={{
-                    background: "none",
-                    border: "none",
-                    cursor: "pointer",
-                    fontSize: "12px",
-                    color: "rgba(10,22,40,0.48)",
-                    textDecoration: "underline",
-                  }}
-                >
-                  {"<"} Back to cart
-                </button>
+            </div>
+
+            <div style={{ flex: 1, overflowY: "auto", padding: "18px 20px" }}>
+              {items.length === 0 ? (
+                <div style={{ textAlign: "center", padding: "36px 16px 24px" }}>
+                  <p style={{ fontSize: "14px", fontWeight: 700, color: "#0A1628" }}>Your stack is empty</p>
+                  <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.5)", lineHeight: 1.5 }}>Add services from the catalog below to get started.</p>
+                </div>
+              ) : step === "cart" ? (
+                <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+                  {items.map((item) => (
+                    <div key={item.product_id} style={{ background: "rgba(255,255,255,0.8)", border: "1px solid rgba(0,136,204,0.12)", borderRadius: "16px", padding: "14px 16px", display: "flex", alignItems: "center", gap: "12px" }}>
+                      <span style={{ fontSize: "22px" }}>{item.icon}</span>
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <p style={{ fontSize: "13px", fontWeight: 700, color: "#0A1628", margin: "0 0 3px" }}>{item.name}</p>
+                        <p style={{ fontSize: "11px", color: "rgba(10,22,40,0.56)", margin: 0 }}>{item.setup_fee === 0 ? "No setup fee" : `$${item.setup_fee} setup`} — ${item.monthly_fee}/mo</p>
+                      </div>
+                      <button type="button" onClick={() => removeItem(item.product_id)} style={{ background: "none", border: "none", cursor: "pointer", padding: "4px", color: "#d46d6d" }}>
+                        <Trash2 style={{ width: "14px", height: "14px" }} />
+                      </button>
+                    </div>
+                  ))}
+                  <VoiceAgentUpsell cartItems={items} onAdd={addItem} />
+                  {suggestedAddon && (
+                    <div style={{ marginTop: "8px", borderRadius: "16px", padding: "14px", background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.18)" }}>
+                      <p style={{ margin: "0 0 4px", fontSize: "10px", fontWeight: 800, letterSpacing: "0.12em", textTransform: "uppercase", color: "#0088CC" }}>Recommended Add-On</p>
+                      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px" }}>
+                        <div><p style={{ margin: "0 0 3px", fontSize: "13px", fontWeight: 800, color: "#0A1628" }}>{suggestedAddon.icon} {suggestedAddon.name}</p><p style={{ margin: 0, fontSize: "11px", color: "rgba(10,22,40,0.58)" }}>Complements your stack - ${suggestedAddon.monthly_fee}/mo</p></div>
+                        <button type="button" onClick={() => addItem(suggestedAddon)} style={{ border: "none", borderRadius: "999px", background: "#0088CC", color: "#fff", fontSize: "11px", fontWeight: 800, padding: "8px 12px", cursor: "pointer" }}>Add</button>
+                      </div>
+                    </div>
+                  )}
+                  {(error || checkoutBlocker) && <p style={{ fontSize: "12px", color: "#d14343", fontWeight: 600, lineHeight: 1.55 }}>{error || checkoutBlocker}</p>}
+                </div>
+              ) : (
+                <div style={{ display: "flex", flexDirection: "column", gap: "14px" }}>
+                  <p style={{ fontSize: "13px", fontWeight: 600, color: "rgba(10,22,40,0.68)", margin: 0 }}>Enter your details. The next page creates a fresh Stripe Checkout Session.</p>
+                  {[
+                    { key: "name", label: "Full Name *", placeholder: "Jane Smith" },
+                    { key: "email", label: "Email Address *", placeholder: "jane@example.com" },
+                    { key: "phone", label: "Phone Number", placeholder: "+1 (602) 555-0123" },
+                    { key: "business", label: "Business Name *", placeholder: "Glow Med Spa" },
+                  ].map((field) => (
+                    <div key={field.key}>
+                      <label style={{ fontSize: "11px", fontWeight: 700, color: "rgba(10,22,40,0.55)", textTransform: "uppercase", letterSpacing: "0.08em", display: "block", marginBottom: "5px" }}>{field.label}</label>
+                      <input type={field.key === "email" ? "email" : "text"} placeholder={field.placeholder} value={form[field.key]} onChange={(event) => setForm({ ...form, [field.key]: event.target.value })} disabled={step === "loading"} style={{ width: "100%", borderRadius: "12px", border: "1.5px solid rgba(0,136,204,0.18)", padding: "11px 14px", fontSize: "13px", background: "rgba(255,255,255,0.86)", outline: "none", boxSizing: "border-box" }} />
+                    </div>
+                  ))}
+                  {error && <p style={{ fontSize: "12px", color: "#d14343", fontWeight: 600, lineHeight: 1.55 }}>{error}</p>}
+                </div>
+              )}
+            </div>
+
+            {items.length > 0 && (
+              <div style={{ padding: "16px 20px 18px", borderTop: "1px solid rgba(0,136,204,0.12)", background: "rgba(255,255,255,0.7)" }}>
+                <div style={{ borderRadius: "16px", background: "rgba(255,255,255,0.74)", border: "1px solid rgba(0,136,204,0.12)", padding: "14px", marginBottom: "14px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "6px" }}><span style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)" }}>One-time setup total</span><span style={{ fontSize: "13px", fontWeight: 700, color: "#0A1628" }}>${totalSetup}</span></div>
+                  <div style={{ display: "flex", justifyContent: "space-between" }}><span style={{ fontSize: "12px", color: "rgba(10,22,40,0.52)" }}>Monthly total</span><span style={{ fontSize: "14px", fontWeight: 800, color: "#005f99" }}>${totalMonthly}/mo</span></div>
+                </div>
+                {step === "cart" ? (
+                  <button type="button" onClick={() => { if (checkoutBlocker) { setError(checkoutBlocker); return; } setError(""); setStep("info"); }} disabled={Boolean(checkoutBlocker)} className="cs-btn-primary" style={{ width: "100%", justifyContent: "center" }}>
+                    Continue to Package Signup <ArrowRight style={{ width: "15px", height: "15px" }} />
+                  </button>
+                ) : (
+                  <div style={{ display: "flex", flexDirection: "column", gap: "8px" }}>
+                    <button type="button" onClick={openPackageSignup} disabled={step === "loading"} className="cs-btn-primary" style={{ width: "100%", justifyContent: "center", opacity: step === "loading" ? 0.7 : 1 }}>
+                      {step === "loading" ? "Opening package signup..." : "Continue Secure Checkout"}
+                    </button>
+                    <button type="button" onClick={() => setStep("cart")} style={{ background: "none", border: "none", cursor: "pointer", fontSize: "12px", color: "rgba(10,22,40,0.48)", textDecoration: "underline" }}>{"<"} Back to cart</button>
+                  </div>
+                )}
+                <p style={{ textAlign: "center", fontSize: "10px", color: "rgba(10,22,40,0.4)", marginTop: "10px" }}>Fresh Stripe Checkout Session created on next page · Cancel anytime</p>
               </div>
             )}
-
-            <p
-              style={{
-                textAlign: "center",
-                fontSize: "10px",
-                color: "rgba(10,22,40,0.4)",
-                marginTop: "10px",
-              }}
-            >
-              Secured by Stripe · Cancel anytime ·{" "}
-              <a href="/terms" target="_blank" rel="noopener noreferrer" style={{ color: "rgba(10,22,40,0.48)", textDecoration: "underline" }}>
-                Refund Policy
-              </a>
-            </p>
-          </div>
-        ) : null}
-      </motion.div>
-    </>
+          </motion.div>
+        </>
       )}
     </AnimatePresence>
   );
