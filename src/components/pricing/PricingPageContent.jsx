@@ -1,8 +1,5 @@
 import { CheckCircle2, ShieldCheck, Wallet, ShoppingCart, ArrowRight } from "lucide-react";
-import { useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
-import { useCart } from "@/lib/cartContext";
-import { getPackageServices } from "@/lib/salesCatalog";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 
 const PACKAGES = [
@@ -14,7 +11,7 @@ const PACKAGES = [
     problem: "We miss calls or reply too late.",
     promise: "Lead capture, instant response, and missed-call recovery installed first.",
     features: ["Instant lead response", "Missed-call text-back", "Lead capture foundation", "Owner notification", "Remote setup workflow"],
-    cta: "Add Starter System",
+    cta: "Review Starter System",
   },
   {
     key: "growth_system",
@@ -25,7 +22,7 @@ const PACKAGES = [
     problem: "We need follow-up and booking handled.",
     promise: "Response, nurture, booking, and lead status tracking working together.",
     features: ["Everything in Starter", "14-day SMS/email nurture", "AI booking handoff", "Lead status tracking", "Testing workflow"],
-    cta: "Add Growth System",
+    cta: "Review Growth System",
   },
   {
     key: "pro_system",
@@ -35,22 +32,14 @@ const PACKAGES = [
     problem: "We want the full lead recovery layer.",
     promise: "The complete system for response, booking, reviews, reactivation, reporting, and priority setup.",
     features: ["Everything in Growth", "Lead reactivation", "Review automation", "Advanced reporting", "Priority launch support"],
-    cta: "Add Pro System",
+    cta: "Review Pro System",
   },
 ];
 
 const PROCESS_STEPS = ["Choose System", "Guided Intake", "Access Checklist", "Configuration", "Testing", "Launch Review"];
+const packageReviewHref = (packageKey) => `/store?package=${encodeURIComponent(packageKey)}`;
 
 export default function PricingPageContent() {
-  const navigate = useNavigate();
-  const { replaceItems, setCartOpen } = useCart();
-
-  const handlePackageCTA = (pkg) => {
-    trackCTA(`package_${pkg.key}`, "pricing_page");
-    replaceItems(getPackageServices(pkg.key));
-    setCartOpen(true);
-  };
-
   return (
     <div className="min-h-screen bg-background">
       <section className="pt-[calc(var(--cs-nav-height)+40px)] pb-12 px-6 text-center">
@@ -92,16 +81,21 @@ export default function PricingPageContent() {
                       <li key={feature} className="flex items-start gap-2.5"><CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /><span className="text-sm text-foreground/85">{feature}</span></li>
                     ))}
                   </ul>
-                  <button onClick={() => handlePackageCTA(pkg)} className={`${highlight ? "cs-btn-primary" : "cs-btn-secondary"} w-full text-center justify-center`} style={{ minHeight: "unset", minWidth: "unset" }}>
+                  <a
+                    href={packageReviewHref(pkg.key)}
+                    onClick={() => trackCTA(`package_${pkg.key}`, "pricing_page")}
+                    className={`${highlight ? "cs-btn-primary" : "cs-btn-secondary"} w-full text-center justify-center no-underline`}
+                    style={{ minHeight: "unset", minWidth: "unset" }}
+                  >
                     <ShoppingCart className="w-4 h-4 mr-1.5" /> {pkg.cta}
-                  </button>
+                  </a>
                 </div>
               </article>
             );
           })}
         </div>
         <div className="text-center mt-8">
-          <p className="text-sm text-muted-foreground"><strong>Not sure?</strong> <button onClick={() => { trackCTA("guided_chooser_pricing", "pricing_page"); navigate("/book"); }} className="text-primary font-semibold underline underline-offset-4 hover:text-primary/80 bg-transparent border-none cursor-pointer" style={{ minHeight: "unset", minWidth: "unset" }}>Get help choosing</button> and we will recommend the right starting point.</p>
+          <p className="text-sm text-muted-foreground"><strong>Not sure?</strong> <a href="/book" onClick={() => trackCTA("guided_chooser_pricing", "pricing_page")} className="text-primary font-semibold underline underline-offset-4 hover:text-primary/80">Get help choosing</a> and we will recommend the right starting point.</p>
         </div>
         <MoneyBackGuarantee />
       </section>
