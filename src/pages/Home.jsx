@@ -13,6 +13,7 @@ import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
+import ROICalculator from "../components/landing/ROICalculator.jsx";
 import SectionErrorBoundary from "../components/SectionErrorBoundary.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -136,6 +137,26 @@ export default function Home() {
         <SectionErrorBoundary sectionName="revenue-leak">
           <RevenueLeakSection />
         </SectionErrorBoundary>
+
+        {/* 4b. ROI Calculator — interactive lead recovery estimator */}
+        <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+          <section className="py-16 md:py-24 px-4 bg-muted/30">
+            <div className="max-w-4xl mx-auto">
+              <div className="cs-section-header cs-section-header--center mb-8">
+                <p className="cs-section-eyebrow">Calculate Your Recovery</p>
+                <div className="cs-section-title-row cs-section-header--center">
+                  <span className="cs-section-bar" />
+                  <h2 className="cs-section-title">How Much Are You Losing?</h2>
+                </div>
+                <p className="cs-section-subtitle">
+                  Drag the sliders below to see how many leads you're losing to missed calls
+                  and slow follow-up — and what our AI automation recovers for you.
+                </p>
+              </div>
+              <ROICalculator />
+            </div>
+          </section>
+        </div>
 
         {/* 5. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
