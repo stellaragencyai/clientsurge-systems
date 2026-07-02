@@ -1,5 +1,5 @@
 name: Run Base44 Publish And Email Verify Once
-# rerun: 2026-07-02T01-verify
+# rerun: 2026-07-02T-fresh-auth-secret
 
 on:
   push:
