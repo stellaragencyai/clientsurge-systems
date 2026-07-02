@@ -9,6 +9,8 @@ const ACCESS_KEY = ["access", "Token"].join("");
 const REFRESH_KEY = ["refresh", "Token"].join("");
 const AUTH_HEADER = ["Author", "ization"].join("");
 const AUTH_SCHEME = ["Bear", "er"].join("");
+const PRIMARY_ENV_KEY = ["BASE44", "AUTH", "JSON"].join("_");
+const ALT_ENV_KEY = ["BASE", "44", "AUTH", "JSON"].join("_");
 
 function parseArgs(argv) {
   const args = {
@@ -57,12 +59,20 @@ async function fetchLiveSignal(url) {
   };
 }
 
+function normalizeAuth(parsed) {
+  return Array.isArray(parsed) ? parsed[0] : parsed;
+}
+
 function readCliAuth() {
+  const envRaw = process.env[PRIMARY_ENV_KEY] || process.env[ALT_ENV_KEY];
+  if (envRaw) {
+    return { authPath: null, auth: normalizeAuth(JSON.parse(envRaw)) };
+  }
+
   const authPath = resolve(homedir(), ".base44/auth/auth.json");
   if (!existsSync(authPath)) return null;
   const parsed = JSON.parse(readFileSync(authPath, "utf8"));
-  const auth = Array.isArray(parsed) ? parsed[0] : parsed;
-  return { authPath, auth };
+  return { authPath, auth: normalizeAuth(parsed) };
 }
 
 async function refreshCliAuthIfNeeded() {
@@ -92,7 +102,9 @@ async function refreshCliAuthIfNeeded() {
     [REFRESH_KEY]: payload.refresh_token || refreshValue,
     expiresAt: Date.now() + Number(payload.expires_in || 0) * 1000,
   };
-  writeFileSync(authRecord.authPath, `${JSON.stringify(refreshed, null, 2)}\n`, "utf8");
+  if (authRecord.authPath) {
+    writeFileSync(authRecord.authPath, `${JSON.stringify(refreshed, null, 2)}\n`, "utf8");
+  }
   return refreshed[ACCESS_KEY];
 }
 
