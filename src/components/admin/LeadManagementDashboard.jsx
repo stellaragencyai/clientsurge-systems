@@ -17,6 +17,7 @@ import {
   Users,
   SlidersHorizontal,
   Gauge,
+  ShieldAlert,
 } from "lucide-react";
 import {
   executeLeadImport,
@@ -35,7 +36,29 @@ import LeadCRMDrawer from "./LeadCRMDrawer";
 import LeadScoreBadge from "./LeadScoreBadge";
 import BulkActionToolbar from "./BulkActionToolbar";
 import BulkConfirmModal from "./BulkConfirmModal"; // Task 18
+import LeadIntelligenceSummary from "./LeadIntelligenceSummary";
 import ErrorBoundary from "@/components/ErrorBoundary";
+
+/**
+ * Compute a sentiment/heat background for a lead row based on lead_score.
+ * High score → warm red tint (hot), mid → amber, low → neutral.
+ */
+function getRowHeatClass(lead) {
+  const score = lead.lead_score ?? lead.intent_score ?? 0;
+  if (score >= 80) return "bg-gradient-to-r from-red-50/40 to-orange-50/20";
+  if (score >= 65) return "bg-gradient-to-r from-amber-50/30 to-yellow-50/10";
+  if (score >= 50) return "bg-gradient-to-r from-emerald-50/20 to-green-50/10";
+  return "";
+}
+
+/**
+ * Stage age — how long the lead has been in its current CRM stage.
+ */
+function getStageAgeDays(lead) {
+  if (!lead.last_contacted_at) return null;
+  const diff = Date.now() - new Date(lead.last_contacted_at).getTime();
+  return Math.floor(diff / 86400000);
+}
 
 const intakeTypeLabels = {
   lead_capture: "Lead Capture",
@@ -565,6 +588,8 @@ export default function LeadManagementDashboard({
         />
       </div>
 
+      <LeadIntelligenceSummary summary={snapshot.summary} />
+
       <ConversionFunnelChart summary={snapshot.summary} />
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.4fr,1fr]">
@@ -992,8 +1017,11 @@ export default function LeadManagementDashboard({
                       </td>
                     </tr>
                   ) : (
-                    leads.map((lead) => (
-                      <tr key={lead.id} className={`hover:bg-muted/20 transition-colors ${selectedIds.has(lead.id) ? "bg-primary/5" : ""}`}>
+                    leads.map((lead) => {
+                      const stageAge = getStageAgeDays(lead);
+                      const needsDedupReview = Boolean(lead.dedup_review_needed);
+                      return (
+                      <tr key={lead.id} className={`hover:bg-muted/20 transition-colors ${selectedIds.has(lead.id) ? "bg-primary/5" : ""} ${getRowHeatClass(lead)}`}>
                         <td className="px-4 py-4 w-10">
                           <input
                             type="checkbox"
@@ -1034,6 +1062,16 @@ export default function LeadManagementDashboard({
                                   </span>
                                 ) : null;
                               })()}
+                              {needsDedupReview && (
+                                <span className="inline-flex items-center gap-1 rounded-full bg-purple-100 text-purple-700 px-2 py-1 text-[10px] font-bold ring-2 ring-purple-300/50">
+                                  <ShieldAlert className="h-3 w-3" /> Dedup Review
+                                </span>
+                              )}
+                              {stageAge != null && stageAge > 3 && (
+                                <span className="rounded-full bg-blue-50 text-blue-700 px-2 py-1 text-[10px] font-bold">
+                                  {stageAge}d in stage
+                                </span>
+                              )}
                             </div>
                             <p className="mt-1 text-xs text-muted-foreground">{lead.business_name}</p>
                             <p className="mt-1 text-xs text-muted-foreground">
@@ -1101,7 +1139,8 @@ export default function LeadManagementDashboard({
                          </div>
                         </td>
                       </tr>
-                    ))
+                      );
+                    })
                   )}
                 </tbody>
               </table>

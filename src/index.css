@@ -1891,3 +1891,233 @@ button[data-loading="true"] {
 .cs-hero-shield {
   contain: layout paint style;
 }
+
+/* ============================================
+   FINAL CONSISTENCY PASS — 25 VISUAL FLAW FIXES
+   Consolidated polish across every page
+   ============================================ */
+
+/* FIX 1: Pricing card badge z-index safety on mobile */
+.pricing-cards-grid .absolute.-top-3\.5 {
+  z-index: 10;
+}
+
+/* FIX 2: Pricing cards — ensure glow hover applies even without .pricing-card class */
+.pricing-cards-grid > article:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 2px 4px rgba(0,0,0,0.05),
+    0 8px 20px rgba(0,0,0,0.09),
+    0 24px 48px rgba(0,0,0,0.11),
+    0 0 0 1px rgba(0,174,239,0.10),
+    0 0 32px rgba(0,174,239,0.08);
+}
+@media (pointer: coarse) {
+  .pricing-cards-grid > article:hover { transform: none; }
+}
+
+/* FIX 3: Footer links — smooth color transition + underline on hover */
+.cs-footer-nav-column a,
+.cs-footer-nav-column button {
+  transition: color 0.2s ease, text-decoration 0.2s ease;
+  text-decoration: none;
+}
+.cs-footer-nav-column a:hover,
+.cs-footer-nav-column button:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* FIX 4: Navbar dropdown shadow — unified with glow card system */
+.cs-dropdown-portal > div,
+nav [role="menu"] {
+  box-shadow: 0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,174,239,0.06) !important;
+}
+
+/* FIX 5: Section header bar — consistent 44px height everywhere */
+.cs-section-header--center .cs-section-bar { height: 44px; }
+.cs-section-header--left .cs-section-bar { height: 40px; }
+
+/* FIX 6: Button focus ring — increased offset for visibility */
+.cs-btn-primary:focus-visible,
+.cs-cta-glow:focus-visible,
+.btn-primary:focus-visible {
+  outline: 2px solid #ffffff;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.35) !important;
+}
+
+/* FIX 7: Input focus glow — unified 4px blue glow on all form fields */
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible {
+  box-shadow: 0 0 0 4px hsla(199, 100%, 47%, 0.15) !important;
+  border-color: hsl(199, 100%, 47%) !important;
+}
+
+/* FIX 8: Card border radius — strict 0.75rem uniformity (override any 0.5rem) */
+.cs-glow-card,
+.cs-card,
+.pricing-card,
+.feature-card,
+.saas-card,
+.glass-card,
+.overlay-card,
+.metric-card {
+  border-radius: 0.75rem !important;
+}
+
+/* FIX 9: Mobile nav drawer — guaranteed bottom safe area */
+.mobile-nav-drawer {
+  padding-bottom: max(2rem, env(safe-area-inset-bottom, 2rem)) !important;
+}
+
+/* FIX 10: Status badges — add subtle border for color-blind accessibility */
+.badge-success,
+.badge-warning,
+.badge-error,
+.badge-info,
+.badge-neutral {
+  border: 1px solid currentColor !important;
+}
+
+/* FIX 11: Table headers — enforce uppercase tracking + proper weight */
+table thead th,
+[table] th {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  font-weight: 700;
+  font-size: 0.75rem;
+  color: hsl(var(--muted-foreground));
+}
+
+/* FIX 12: Empty state icon — centered alignment fix */
+.empty-state-icon {
+  margin-left: auto;
+  margin-right: auto;
+  display: block;
+}
+
+/* FIX 13: Skeleton shimmer — unified 2.2s timing (already set, enforcing) */
+[class*="skeleton"],
+.cs-skeleton,
+.cs-section-skeleton {
+  animation-duration: 2.2s !important;
+}
+
+/* FIX 14: Scrollbar thumb — slightly thicker for usability */
+::-webkit-scrollbar { width: 7px; height: 7px; }
+::-webkit-scrollbar-thumb {
+  background: rgba(0,174,239,0.4);
+  border-radius: 9999px;
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+/* FIX 15: Link hover — underline transition on all text links */
+a:not(.cs-btn-primary):not(.cs-cta-glow):not([role="button"]):hover {
+  text-decoration-color: rgba(0, 174, 239, 0.5);
+}
+
+/* FIX 16: Icon-only buttons — ensure minimum touch target */
+button.icon-only,
+.icon-btn {
+  min-width: 44px;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* FIX 17: Pricing toggle / filter chip — active state glow */
+.rounded-full.bg-primary.text-primary-foreground {
+  box-shadow: 0 2px 8px rgba(0, 174, 239, 0.25);
+}
+
+/* FIX 18: Hero CTA — glow on hover + focus */
+.hero-primary-cta:hover,
+.cs-cta-glow:hover {
+  box-shadow:
+    0 4px 24px rgba(0,121,193,0.5),
+    0 0 32px rgba(0,174,239,0.3) !important;
+  transform: translateY(-2px);
+}
+@media (pointer: coarse) {
+  .hero-primary-cta:hover,
+  .cs-cta-glow:hover { transform: none; }
+}
+
+/* FIX 19: Form labels — consistent 0.5rem bottom margin */
+label,
+.cs-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+}
+
+/* FIX 20: Section subtitle — widen max-width for longer descriptions */
+.cs-section-subtitle {
+  max-width: 680px;
+}
+
+/* FIX 21: Button text — prevent wrapping on mobile */
+.cs-btn-primary,
+.cs-cta-glow,
+.btn-primary {
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+}
+
+/* FIX 22: Card hover — disable transform on touch devices globally */
+@media (pointer: coarse) {
+  .cs-glow-card:hover,
+  .cs-interactive-card:hover,
+  .cs-card-shadow:hover {
+    transform: none !important;
+  }
+}
+
+/* FIX 23: Heading letter-spacing — slightly looser on mobile for readability */
+@media (max-width: 640px) {
+  h1 { letter-spacing: -0.02em; }
+  h2 { letter-spacing: -0.015em; }
+  h3 { letter-spacing: -0.01em; }
+}
+
+/* FIX 24: Gradient text — ensure visible on dark backgrounds */
+@media (prefers-color-scheme: dark) {
+  [class*="bg-clip-text"],
+  [style*="background-clip: text"] {
+    -webkit-text-fill-color: currentColor !important;
+  }
+}
+
+/* FIX 25: Disabled buttons — consistent opacity + cursor */
+button:disabled,
+button[disabled],
+a[aria-disabled="true"] {
+  opacity: 0.55;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+/* ============================================
+   GLOBAL BUTTON GLOW — unified cs-btn-primary + cta glow
+   Every primary CTA across the site gets the blue glow effect
+   ============================================ */
+.cs-btn-primary,
+.btn-primary,
+.hero-primary-cta {
+  background: linear-gradient(90deg, #0079c1 0%, #005691 100%) !important;
+  box-shadow: 0 2px 12px rgba(0,121,193,0.35) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease !important;
+}
+.cs-btn-primary:hover,
+.btn-primary:hover,
+.hero-primary-cta:hover {
+  box-shadow: 0 4px 24px rgba(0,121,193,0.5), 0 0 32px rgba(0,174,239,0.3) !important;
+}
+.cs-btn-primary:active,
+.btn-primary:active {
+  transform: translateY(0) scale(0.98) !important;
+}

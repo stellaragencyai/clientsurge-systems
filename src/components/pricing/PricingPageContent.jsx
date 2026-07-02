@@ -43,19 +43,25 @@ const packageReviewHref = (packageKey) => `/store?package=${encodeURIComponent(p
 export default function PricingPageContent() {
   return (
     <div className="min-h-screen bg-background">
-      <section className="pt-[calc(var(--cs-nav-height)+40px)] pb-12 px-6 text-center">
-        <p className="cs-eyebrow mb-3">ClientSurge AI Systems</p>
-        <h1 className="font-titles text-foreground mb-4">Choose the System That Fixes Your Biggest Lead Flow Gap</h1>
-        <p className="text-muted-foreground text-base md:text-lg max-w-2xl mx-auto leading-relaxed mb-8">
-          Starter fixes response gaps. Growth adds follow-up and booking. Pro adds the full recovery layer across reviews, reactivation, reporting, and priority setup.
-        </p>
+      <section className="pt-[calc(var(--cs-nav-height)+3rem)] pb-12 px-6 text-center">
+        <div className="cs-section-header cs-section-header--center mb-6">
+          <p className="cs-section-eyebrow">ClientSurge AI Systems</p>
+          <div className="cs-section-title-row cs-section-header--center">
+            <span className="cs-section-bar" />
+            <h1 className="cs-section-title">Choose the System That Fixes Your Biggest Lead Flow Gap</h1>
+          </div>
+          <p className="cs-section-subtitle">
+            Starter fixes response gaps. Growth adds follow-up and booking. Pro adds the full recovery layer across
+            reviews, reactivation, reporting, and priority setup.
+          </p>
+        </div>
         <div className="flex flex-wrap justify-center gap-3 mb-6">
           {[
             { Icon: ShieldCheck, text: "Secure Stripe Checkout" },
             { Icon: CheckCircle2, text: "Proof Checked Before Launch" },
             { Icon: Wallet, text: "Month-to-Month Billing" },
           ].map(({ Icon, text }) => (
-            <span key={text} className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-lg border border-primary/30 bg-primary/10 text-primary">
+            <span key={text} className="inline-flex items-center gap-1.5 text-xs font-semibold px-4 py-2 rounded-full border border-primary/30 bg-primary/10 text-primary cs-glow-card" style={{ border: "1px solid rgba(0,174,239,0.25)" }}>
               <Icon className="h-3.5 w-3.5" /> {text}
             </span>
           ))}
@@ -64,12 +70,12 @@ export default function PricingPageContent() {
       </section>
 
       <section className="px-6 pb-16 max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pricing-cards-grid">
           {PACKAGES.map((pkg) => {
             const highlight = Boolean(pkg.badge);
             return (
-              <article key={pkg.key} className={`cs-card relative flex flex-col ${highlight ? "border-primary bg-primary/5 shadow-lg" : ""}`}>
-                {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground">✦ {pkg.badge}</span></div>}
+              <article key={pkg.key} className={`cs-glow-card relative flex flex-col ${highlight ? "ring-2 ring-primary/40" : ""}`}>
+                {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground shadow-md">✦ {pkg.badge}</span></div>}
                 <div className="p-7 flex flex-col flex-1" style={{ paddingTop: "32px" }}>
                   <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{pkg.problem}</p>
                   <h2 className="font-titles text-xl font-bold text-foreground mb-2">{pkg.name}</h2>
@@ -86,7 +92,7 @@ export default function PricingPageContent() {
                   <a
                     href={packageReviewHref(pkg.key)}
                     onClick={() => trackCTA(`package_${pkg.key}`, "pricing_page")}
-                    className={`${highlight ? "cs-btn-primary" : "cs-btn-secondary"} w-full text-center justify-center no-underline`}
+                    className={`${highlight ? "cs-btn-primary cs-cta-glow" : "cs-btn-primary"} w-full text-center justify-center no-underline`}
                     style={{ minHeight: "unset", minWidth: "unset" }}
                   >
                     <ShoppingCart className="w-4 h-4 mr-1.5" /> {pkg.cta}
@@ -103,11 +109,18 @@ export default function PricingPageContent() {
       </section>
 
       <section className="px-6 pb-16 max-w-5xl mx-auto">
-        <div className="cs-card p-8 md:p-10 text-center">
-          <h2 className="font-titles text-foreground text-xl md:text-2xl font-bold mb-3">What Happens After You Choose</h2>
-          <p className="text-muted-foreground text-sm max-w-2xl mx-auto mb-8 leading-relaxed">
-            After checkout, ClientSurge collects your business details, lead sources, phone and email requirements, booking links, CRM access, and launch goals through guided intake. Then we configure, test, and launch your selected system with proof before go-live.
-          </p>
+        <div className="cs-glow-card p-8 md:p-10 text-center">
+          <div className="cs-section-header cs-section-header--center mb-8">
+            <div className="cs-section-title-row cs-section-header--center">
+              <span className="cs-section-bar" />
+              <h2 className="cs-section-title">What Happens After You Choose</h2>
+            </div>
+            <p className="cs-section-subtitle">
+              After checkout, ClientSurge collects your business details, lead sources, phone and email requirements,
+              booking links, CRM access, and launch goals through guided intake. Then we configure, test, and launch
+              your selected system with proof before go-live.
+            </p>
+          </div>
           <div className="flex flex-wrap items-center justify-center gap-2">
             {PROCESS_STEPS.map((step, i) => (
               <div key={step} className="flex items-center gap-2">

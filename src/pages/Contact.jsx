@@ -201,7 +201,7 @@ export default function Contact() {
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">
                     Not sure what you need yet? Start with the package comparison, then send us your current lead-flow problem.
                   </p>
-                  <Link to="/pricing" className="cs-btn-primary mt-5 inline-flex">
+                  <Link to="/pricing" className="cs-btn-primary cs-cta-glow mt-5 inline-flex">
                     View Packages <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -218,7 +218,7 @@ export default function Contact() {
                   <p className="mx-auto mt-3 max-w-sm text-base leading-relaxed text-slate-600">
                     {`Thanks for reaching out. We'll respond within one business day.`}
                   </p>
-                  <Link to="/" className="cs-btn-primary mt-8 inline-flex">
+                  <Link to="/" className="cs-btn-primary cs-cta-glow mt-8 inline-flex">
                     Back to Home <ArrowRight className="w-4 h-4" />
                   </Link>
                 </div>
@@ -280,7 +280,7 @@ export default function Contact() {
                     <button
                       type="submit"
                       disabled={loading}
-                      className="cs-btn-primary disabled:cursor-not-allowed disabled:opacity-60"
+                      className="cs-btn-primary cs-cta-glow disabled:cursor-not-allowed disabled:opacity-60"
                       style={{ minHeight: "52px", paddingLeft: "2rem", paddingRight: "2rem" }}
                     >
                       {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <><span>Send Message</span><ArrowRight className="w-4 h-4" /></>}
@@ -319,7 +319,7 @@ export default function Contact() {
               </h2>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
-              <Link to="/pricing" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#006bb0] shadow-[0_18px_45px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5">
+              <Link to="/pricing" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#006bb0] shadow-[0_18px_45px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 cs-cta-glow" style={{ color: "#006bb0" }}>
                 Compare Packages <ArrowRight className="h-4 w-4" />
               </Link>
               <Link to="/automations" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-black text-white backdrop-blur transition hover:bg-white/15">
