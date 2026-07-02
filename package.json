@@ -16,6 +16,7 @@
     "ci:function-invocations": "node scripts/ci/check-function-invocations.mjs",
     "ci:no-static-stripe-links": "node scripts/ci/check-no-static-stripe-payment-links.mjs",
     "ci:email-branding": "node scripts/email/check-email-branding.mjs",
+    "ci:portal-navigation": "node scripts/portal/check-portal-navigation.mjs",
     "release:base44": "pwsh -File scripts/release-base44.ps1",
     "base44:publish-backend": "pwsh -File scripts/base44/publish-backend-changes.ps1",
     "base44:publish-api": "node scripts/base44/publish-deploy-endpoint.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com",
@@ -65,6 +66,7 @@
     "email:flow-inventory": "node scripts/email/email-flow-inventory.mjs",
     "email:branding-check": "node scripts/email/check-email-branding.mjs",
     "email:build-previews": "node scripts/email/build-email-previews.mjs",
+    "portal:navigation-check": "node scripts/portal/check-portal-navigation.mjs",
     "stripe:verify-test-checkout": "node scripts/stripe/verify-test-checkout.mjs",
     "typecheck": "tsc -p ./jsconfig.json",
     "preview": "vite preview"
@@ -81,6 +83,7 @@
     "@radix-ui/react-checkbox": "^1.1.4",
     "@radix-ui/react-collapsible": "^1.1.3",
     "@radix-ui/react-context-menu": "^2.2.6",
+    "@radix-ui/react-dialog": "^1.1.6",
     "@radix-ui/react-dropdown-menu": "^2.1.6",
     "@radix-ui/react-hover-card": "^1.1.6",
     "@radix-ui/react-label": "^2.1.2",
