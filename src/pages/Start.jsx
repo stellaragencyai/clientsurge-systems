@@ -126,13 +126,18 @@ export default function Start() {
       <Navbar />
       <main className="flex-1 px-4 pb-20 pt-[calc(var(--cs-nav-height)+32px)] md:px-6">
         <div className="mx-auto w-full max-w-4xl">
-          <div className="mb-8 text-left">
-            <p className="cs-section-eyebrow mb-3">Guided Installation Intake</p>
-            <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground leading-tight mb-3">Start Your ClientSurge Installation</h1>
-            <p className="text-muted-foreground text-base leading-relaxed max-w-2xl">Choose your system, answer the setup questions, and we will map the configuration path before launch.</p>
+          <div className="cs-section-header cs-section-header--left mb-8">
+            <p className="cs-section-eyebrow">Guided Installation Intake</p>
+            <div className="cs-section-title-row">
+              <span className="cs-section-bar" />
+              <h1 className="cs-section-title">Start Your ClientSurge Installation</h1>
+            </div>
+            <p className="cs-section-subtitle">
+              Choose your system, answer the setup questions, and we will map the configuration path before launch.
+            </p>
           </div>
 
-          <div className="rounded-xl border border-border bg-white shadow-sm p-6 md:p-8 space-y-8">
+          <div className="cs-glow-card p-6 md:p-8 space-y-8">
             <section>
               <h2 className="font-titles text-xl font-bold text-foreground mb-3">What do you want ClientSurge to fix first?</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">

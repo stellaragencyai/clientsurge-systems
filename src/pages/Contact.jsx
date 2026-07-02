@@ -134,18 +134,24 @@ export default function Contact() {
         <div className="absolute left-1/2 top-12 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-[#00AEEF]/10 blur-3xl" />
 
         <section className="px-6 pb-10 sm:px-10 md:px-12">
-          <div className="mx-auto mb-10 max-w-4xl text-center">
-            <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-[#00AEEF]">Get in touch</p>
-            <h1 className="font-titles text-4xl font-black leading-tight tracking-[-0.04em] text-[#07111f] md:text-6xl">
-              Let’s map the fastest path to a cleaner lead system.
-            </h1>
-            <p className="mx-auto mt-5 max-w-2xl text-base leading-relaxed text-slate-600 md:text-lg">
-              Ask a question, request a walkthrough, or tell us where leads are slipping through the cracks. We will help you identify the most practical next step.
-            </p>
+          <div className="mx-auto mb-10 max-w-4xl">
+            <div className="cs-section-header cs-section-header--center">
+              <p className="cs-section-eyebrow">Get in touch</p>
+              <div className="cs-section-title-row cs-section-header--center">
+                <span className="cs-section-bar" />
+                <h1 className="cs-section-title">
+                  Let's map the fastest path to a cleaner lead system.
+                </h1>
+              </div>
+              <p className="cs-section-subtitle">
+                Ask a question, request a walkthrough, or tell us where leads are slipping through the cracks.
+                We will help you identify the most practical next step.
+              </p>
+            </div>
           </div>
 
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
-            <aside className="relative overflow-hidden rounded-[2rem] border border-sky-200/70 bg-white/75 p-8 shadow-[0_24px_80px_rgba(15,23,42,0.10)] backdrop-blur-xl md:p-10">
+            <aside className="relative overflow-hidden rounded-[2rem] cs-glow-card p-8 backdrop-blur-xl md:p-10">
               <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#00AEEF]/15 blur-2xl" />
               <div className="absolute -bottom-20 left-8 h-44 w-44 rounded-full bg-[#003B8F]/10 blur-2xl" />
 

@@ -120,27 +120,28 @@ export default function HowItWorks() {
 
         {/* ── 1. Hero ── */}
         <section
-          className="px-6 pb-16 pt-[calc(var(--cs-nav-height)+56px)] md:px-10"
-          style={{
-            background:
-              "linear-gradient(135deg, #f7fbff 0%, #ffffff 50%, #eef8ff 100%)",
-            borderBottom: "1px solid rgba(0,174,239,0.1)",
-          }}
+          className="px-6 pb-16 pt-[calc(var(--cs-nav-height)+56px)] md:px-10 cs-premium-gradient"
+          style={{ borderBottom: "1px solid rgba(0,174,239,0.1)" }}
         >
           <div className="mx-auto max-w-4xl text-left">
-            <p className="text-xs font-bold uppercase tracking-[0.2em] text-primary mb-4">
-              Business AI Automation Store
-            </p>
-            <h1 className="font-titles text-3xl font-extrabold leading-tight text-foreground md:text-5xl mb-5">
-              How the ClientSurge AI Brain Turns a Business Signup Into a Remote Setup Plan
-            </h1>
-            <p className="text-base leading-relaxed text-muted-foreground max-w-2xl mb-8 md:text-lg">
-              ClientSurge combines package selection, guided intake, setup checklists, automation templates, communication tracking, and remote configuration workflows so businesses can move from choosing an AI automation system to getting it prepared, tested, and launched.
-            </p>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">Business AI Automation Store</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h1 className="cs-section-title">
+                  How the ClientSurge AI Brain Turns a Business Signup Into a Remote Setup Plan
+                </h1>
+              </div>
+              <p className="cs-section-subtitle">
+                ClientSurge combines package selection, guided intake, setup checklists, automation templates,
+                communication tracking, and remote configuration workflows so businesses can move from choosing
+                an AI automation system to getting it prepared, tested, and launched.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
               <Link
                 to="/start"
-                className="cs-btn-primary flex items-center gap-2"
+                className="cs-btn-primary cs-cta-glow flex items-center gap-2"
                 style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.9rem" }}
               >
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
@@ -158,15 +159,17 @@ export default function HowItWorks() {
         {/* ── 2. Horizontal Process ── */}
         <section className="px-6 py-16 md:px-10" style={{ background: "#ffffff" }}>
           <div className="mx-auto max-w-5xl">
-            <div className="flex items-center gap-2 mb-3">
-              <div className="w-1 h-6 rounded-full bg-primary" />
-              <h2 className="font-titles text-2xl font-bold text-foreground md:text-3xl">
-                From Selection to Launch
-              </h2>
+            <div className="cs-section-header cs-section-header--left mb-10">
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">From Selection to Launch</h2>
+              </div>
+              <p className="cs-section-subtitle">
+                The goal is simple: make buying business automation feel less like hiring an agency from scratch
+                and more like choosing the system your business needs, answering the right setup questions, and
+                moving into a clear remote installation path.
+              </p>
             </div>
-            <p className="text-sm text-muted-foreground mb-10 max-w-2xl">
-              The goal is simple: make buying business automation feel less like hiring an agency from scratch and more like choosing the system your business needs, answering the right setup questions, and moving into a clear remote installation path.
-            </p>
 
             {/* Process steps */}
             <div className="overflow-x-auto pb-2">

@@ -122,18 +122,23 @@ export default function ProofPage() {
 
         {/* ── Hero ── */}
         <section className="pt-[calc(var(--cs-nav-height)+48px)] pb-16 px-6 bg-white">
-          <div className="max-w-3xl mx-auto text-left">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-4">
-              Honest Platform Proof
-            </p>
-            <h1 className="font-titles text-3xl md:text-4xl font-extrabold text-foreground leading-tight mb-4">
-              Proof That ClientSurge Is More Than an AI Agency Landing Page
-            </h1>
-            <p className="text-muted-foreground text-base leading-relaxed max-w-2xl mb-8">
-              ClientSurge is being built as a business automation operating system: package selection, guided intake, remote setup checklists, service tracking, communication logs, and outcome analytics foundations working together to support remote AI automation setup.
-            </p>
+          <div className="max-w-3xl mx-auto">
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">Honest Platform Proof</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h1 className="cs-section-title">
+                  Proof That ClientSurge Is More Than an AI Agency Landing Page
+                </h1>
+              </div>
+              <p className="cs-section-subtitle">
+                ClientSurge is being built as a business automation operating system: package selection, guided
+                intake, remote setup checklists, service tracking, communication logs, and outcome analytics
+                foundations working together to support remote AI automation setup.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3">
-              <Link to="/start" className="cs-btn-primary" style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.875rem" }}>
+              <Link to="/start" className="cs-btn-primary cs-cta-glow" style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.875rem" }}>
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
               <Link
@@ -149,13 +154,16 @@ export default function ProofPage() {
         {/* ── What Exists Today ── */}
         <section className="py-16 px-6 bg-muted/30">
           <div className="max-w-4xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">Platform Foundation</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-8">
-              What the Platform Foundation Already Supports
-            </h2>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">Platform Foundation</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">What the Platform Foundation Already Supports</h2>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 mb-8">
               {FOUNDATION_ITEMS.map((item) => (
-                <div key={item} className="flex items-start gap-3 rounded-lg border border-border bg-white px-4 py-3">
+                <div key={item} className="flex items-start gap-3 cs-glow-card px-4 py-3">
                   <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
                   <span className="text-sm font-medium text-foreground">{item}</span>
                 </div>
@@ -173,13 +181,18 @@ export default function ProofPage() {
         {/* ── Buyer Confidence Flow ── */}
         <section className="py-16 px-6 bg-white">
           <div className="max-w-4xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">Risk Reduction</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-4">
-              How Risk Is Reduced During Remote Setup
-            </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-2xl mb-8">
-              ClientSurge reduces setup risk by collecting the right business information first, preserving package/service context, organizing missing access requirements, and separating configuration from launch. Automations should be tested before they are treated as live.
-            </p>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">Risk Reduction</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">How Risk Is Reduced During Remote Setup</h2>
+              </div>
+              <p className="cs-section-subtitle">
+                ClientSurge reduces setup risk by collecting the right business information first, preserving
+                package/service context, organizing missing access requirements, and separating configuration
+                from launch. Automations should be tested before they are treated as live.
+              </p>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               {["Choose System", "Guided Intake", "Access Checklist", "Remote Configuration", "Testing", "Launch Review"].map((step, i, arr) => (
                 <div key={step} className="flex items-center gap-2">
@@ -196,13 +209,16 @@ export default function ProofPage() {
         {/* ── What You Can Expect ── */}
         <section className="py-16 px-6 bg-muted/30">
           <div className="max-w-4xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">Buyer Expectations</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-8">
-              What You Can Expect
-            </h2>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">Buyer Expectations</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">What You Can Expect</h2>
+              </div>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {EXPECTATION_CARDS.map((card) => (
-                <div key={card.title} className="rounded-lg border border-border bg-white p-5">
+                <div key={card.title} className="cs-glow-card p-5">
                   <h3 className="text-sm font-bold text-foreground mb-2">{card.title}</h3>
                   <p className="text-sm text-muted-foreground leading-relaxed">{card.body}</p>
                 </div>
@@ -214,15 +230,15 @@ export default function ProofPage() {
         {/* ── What We Do Not Fake ── */}
         <section className="py-16 px-6 bg-white">
           <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-3 mb-6">
-              <ShieldCheck className="w-6 h-6 text-primary flex-shrink-0" />
-              <h2 className="text-2xl md:text-3xl font-extrabold text-foreground">
-                What ClientSurge Does Not Fake
-              </h2>
+            <div className="cs-section-header cs-section-header--left mb-6">
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">What ClientSurge Does Not Fake</h2>
+              </div>
             </div>
             <div className="space-y-3">
               {NO_FAKE_LIST.map((item) => (
-                <div key={item} className="flex items-start gap-3 rounded-lg border border-border px-4 py-3 bg-white">
+                <div key={item} className="flex items-start gap-3 cs-glow-card px-4 py-3">
                   <CheckCircle2 className="w-4 h-4 text-green-600 flex-shrink-0 mt-0.5" />
                   <span className="text-sm font-medium text-foreground">{item}</span>
                 </div>
@@ -234,16 +250,19 @@ export default function ProofPage() {
         {/* ── Proof Preview ── */}
         <section className="py-16 px-6 bg-muted/30">
           <div className="max-w-4xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">See the System</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-2">
-              See the System Before You Buy
-            </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-8 max-w-xl">
-              These are examples of how the platform organizes setup information — not fake screenshots or invented results.
-            </p>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">See the System</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">See the System Before You Buy</h2>
+              </div>
+              <p className="cs-section-subtitle">
+                These are examples of how the platform organizes setup information — not fake screenshots or invented results.
+              </p>
+            </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               {PREVIEW_CARDS.map((card) => (
-                <div key={card.label} className="rounded-lg border border-primary/15 bg-white p-5">
+                <div key={card.label} className="cs-glow-card p-5">
                   <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{card.label}</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">{card.desc}</p>
                 </div>
@@ -255,13 +274,18 @@ export default function ProofPage() {
         {/* ── Safe Remote Setup ── */}
         <section className="py-16 px-6 bg-white">
           <div className="max-w-4xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">Setup Quality</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-4">
-              Remote Setup Is Powerful — But It Needs Clean Inputs
-            </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed max-w-2xl mb-8">
-              The better the business provides its website, lead sources, booking tools, CRM, phone/email requirements, and access instructions, the faster the setup can move. ClientSurge uses guided intake and setup checklists to reduce confusion and avoid guessing.
-            </p>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">Setup Quality</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">Remote Setup Is Powerful — But It Needs Clean Inputs</h2>
+              </div>
+              <p className="cs-section-subtitle">
+                The better the business provides its website, lead sources, booking tools, CRM, phone/email
+                requirements, and access instructions, the faster the setup can move. ClientSurge uses guided
+                intake and setup checklists to reduce confusion and avoid guessing.
+              </p>
+            </div>
             <div className="flex flex-wrap items-center gap-2">
               {SAFE_INPUT_FLOW.map((step, i, arr) => (
                 <div key={step} className="flex items-center gap-2">
@@ -278,13 +302,16 @@ export default function ProofPage() {
         {/* ── FAQ ── */}
         <section className="py-16 px-6 bg-muted/30">
           <div className="max-w-3xl mx-auto">
-            <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">FAQ</p>
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-8">
-              Common Questions
-            </h2>
+            <div className="cs-section-header cs-section-header--left mb-8">
+              <p className="cs-section-eyebrow">FAQ</p>
+              <div className="cs-section-title-row">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">Common Questions</h2>
+              </div>
+            </div>
             <div className="space-y-4">
               {FAQ_ITEMS.map((item) => (
-                <div key={item.q} className="rounded-lg border border-border bg-white p-5">
+                <div key={item.q} className="cs-glow-card p-5">
                   <p className="text-sm font-bold text-foreground mb-2">{item.q}</p>
                   <p className="text-sm text-muted-foreground leading-relaxed">{item.a}</p>
                 </div>
@@ -296,14 +323,17 @@ export default function ProofPage() {
         {/* ── CTA ── */}
         <section className="py-16 px-6 bg-white border-t border-border">
           <div className="max-w-2xl mx-auto text-center">
-            <h2 className="text-2xl md:text-3xl font-extrabold text-foreground mb-3">
-              Ready to Start With a System Instead of a Guess?
-            </h2>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-8">
-              Choose a package, complete guided intake, and move into a remote setup workflow.
-            </p>
+            <div className="cs-section-header cs-section-header--center mb-8">
+              <div className="cs-section-title-row cs-section-header--center">
+                <span className="cs-section-bar" />
+                <h2 className="cs-section-title">Ready to Start With a System Instead of a Guess?</h2>
+              </div>
+              <p className="cs-section-subtitle">
+                Choose a package, complete guided intake, and move into a remote setup workflow.
+              </p>
+            </div>
             <div className="flex flex-wrap gap-3 justify-center">
-              <Link to="/start" className="cs-btn-primary" style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.875rem" }}>
+              <Link to="/start" className="cs-btn-primary cs-cta-glow" style={{ minHeight: "unset", minWidth: "unset", fontSize: "0.875rem" }}>
                 Start Remote Setup <ArrowRight className="w-4 h-4" />
               </Link>
               <Link to="/store" className="inline-flex items-center gap-2 rounded-lg border border-border bg-background px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">
