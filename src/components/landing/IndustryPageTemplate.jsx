@@ -11,6 +11,9 @@ import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery
 
 const ICON_MAP = { MessageSquare, Calendar, Phone, AlertCircle, Zap, TrendingUp, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer, CheckCircle };
 
+const SECTION_SHELL = 'relative overflow-hidden';
+const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
+
 export default function IndustryPageTemplate() {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -39,7 +42,7 @@ export default function IndustryPageTemplate() {
   };
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-[radial-gradient(circle_at_18%_8%,rgba(0,174,239,0.10),transparent_30%),linear-gradient(180deg,#f8fcff_0%,#ffffff_34%,#f7fbff_100%)]">
       <Navbar />
 
       <IndustryHero
@@ -53,13 +56,15 @@ export default function IndustryPageTemplate() {
         secondaryCTA={heroConfig.secondaryCTA}
       />
 
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <SectionHeader eyebrow="The Problem" title={`Where ${industry.industry_name} Leads Slip`} align="center" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-6 md:mt-8">
+      <section className={`${SECTION_SHELL} py-14 md:py-20 px-4 md:px-6`}>
+        <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
+        <div className="max-w-6xl mx-auto">
+          <SectionHeader eyebrow="The Lead Leak" title={`Where ${industry.industry_name} Opportunities Slip`} align="center" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-8">
             {industry.pain_points.map((point, i) => (
-              <div key={i} className="p-5 md:p-6 border border-border rounded-xl bg-muted/30">
-                <h3 className="font-titles text-base md:text-lg font-bold text-foreground mb-2">{point.title}</h3>
+              <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-7 transition-transform duration-200 hover:-translate-y-1`}>
+                <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/8 text-primary font-black">{i + 1}</div>
+                <h3 className="font-titles text-lg md:text-xl font-bold text-foreground mb-2 tracking-tight">{point.title}</h3>
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{point.desc}</p>
               </div>
             ))}
@@ -67,24 +72,24 @@ export default function IndustryPageTemplate() {
         </div>
       </section>
 
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
+      <section className="py-14 md:py-20 px-4 md:px-6 bg-white/70">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader eyebrow="How It Works" title={`How ClientSurge Supports ${industry.industry_name}`} align="center" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8">
+          <SectionHeader eyebrow="Operating Layer" title={`How ClientSurge Supports ${industry.industry_name}`} align="center" />
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
             {industry.use_cases.map((useCase, i) => {
               const IconComponent = ICON_MAP[useCase.icon] || CheckCircle;
               return (
-                <div key={i} className="bg-white p-6 md:p-8 rounded-xl border border-border shadow-sm">
+                <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
                   <div className="flex items-start gap-4">
                     <div className="flex-shrink-0">
-                      <div className="flex items-center justify-center w-10 h-10 md:w-12 md:h-12 rounded-lg bg-primary/10 text-primary border border-primary/20">
+                      <div className="flex items-center justify-center w-11 h-11 md:w-13 md:h-13 rounded-2xl bg-gradient-to-br from-primary/12 to-sky-100 text-primary border border-primary/20 shadow-sm">
                         <IconComponent className="w-5 h-5 md:w-6 md:h-6" />
                       </div>
                     </div>
                     <div className="flex-1 min-w-0">
-                      <h3 className="font-titles text-base md:text-lg font-bold text-foreground mb-2">{useCase.title}</h3>
-                      <p className="text-sm md:text-base text-muted-foreground mb-3 md:mb-4 leading-relaxed">{useCase.description}</p>
-                      <p className="text-sm font-semibold text-primary">{useCase.metrics}</p>
+                      <h3 className="font-titles text-lg md:text-xl font-bold text-foreground mb-2 tracking-tight">{useCase.title}</h3>
+                      <p className="text-sm md:text-base text-muted-foreground mb-4 leading-relaxed">{useCase.description}</p>
+                      <p className="inline-flex rounded-full border border-primary/15 bg-primary/5 px-3 py-1.5 text-xs font-bold text-primary">{useCase.metrics}</p>
                     </div>
                   </div>
                 </div>
@@ -94,14 +99,14 @@ export default function IndustryPageTemplate() {
         </div>
       </section>
 
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
+      <section className="py-14 md:py-20 px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           <SectionHeader eyebrow="Launch Focus" title={`What the ${industry.industry_name} System Is Built to Improve`} align="center" />
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-6 md:mt-8">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8">
             {Object.entries(industry.roi_metrics).map(([key, value]) => (
-              <div key={key} className="p-4 md:p-6 border border-border rounded-xl text-center">
-                <p className="text-xl md:text-2xl font-titles font-bold text-primary mb-2">{value}</p>
-                <p className="text-xs md:text-sm text-muted-foreground capitalize">{key.replace(/_/g, ' ')}</p>
+              <div key={key} className={`${PREMIUM_SURFACE} p-5 md:p-6 text-center`}>
+                <p className="text-lg md:text-xl font-titles font-bold text-primary mb-2 tracking-tight">{value}</p>
+                <p className="text-[11px] md:text-xs text-muted-foreground capitalize font-semibold tracking-wide">{key.replace(/_/g, ' ')}</p>
               </div>
             ))}
           </div>
@@ -111,14 +116,14 @@ export default function IndustryPageTemplate() {
       <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 
       {industry.testimonials?.length > 0 && (
-        <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
+        <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
           <div className="max-w-5xl mx-auto">
             <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-6 md:mt-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
               {industry.testimonials.map((testimonial, i) => (
-                <div key={i} className="bg-white p-6 md:p-8 rounded-xl border border-border shadow-sm">
+                <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
                   <p className="font-titles text-xl md:text-2xl font-bold text-primary mb-4">{testimonial.metric}</p>
-                  <blockquote className="text-sm md:text-base text-foreground/80 mb-4 md:mb-6 italic leading-relaxed">"{testimonial.quote}"</blockquote>
+                  <blockquote className="text-sm md:text-base text-foreground/80 mb-5 italic leading-relaxed">&quot;{testimonial.quote}&quot;</blockquote>
                   <p className="font-bold text-foreground text-sm md:text-base">{testimonial.name}</p>
                   <p className="text-xs md:text-sm text-muted-foreground">{testimonial.business}</p>
                 </div>
@@ -128,33 +133,34 @@ export default function IndustryPageTemplate() {
         </section>
       )}
 
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
+      <section className="py-14 md:py-20 px-4 md:px-6">
         <div className="max-w-5xl mx-auto">
           <SectionHeader eyebrow="What's Included" title={`Your ${industry.industry_name} System Includes`} align="center" />
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-2xl mx-auto mt-6 md:mt-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto mt-8">
             {industry.key_features.map((feature, i) => (
-              <div key={i} className="flex items-center gap-3 p-3 md:p-4"><CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /><span className="text-sm md:text-base text-foreground/80 font-medium">{feature}</span></div>
+              <div key={i} className="flex items-center gap-3 rounded-xl border border-primary/10 bg-white/80 p-4 shadow-sm"><CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /><span className="text-sm md:text-base text-foreground/80 font-semibold">{feature}</span></div>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
+      <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
         <div className="max-w-2xl mx-auto">
-          <div className="mb-6 md:mb-8">
+          <div className="mb-8">
             <SectionHeader eyebrow="Guided System Match" title={`Which ${industry.industry_name} System Fits?`} subtitle="Answer 4 quick questions and we will help match your lead flow to Starter, Growth, or Pro." align="center" />
           </div>
-          <div className="rounded-2xl border border-border bg-white shadow-sm p-5 md:p-8"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
+          <div className="rounded-3xl border border-primary/15 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.10)] p-5 md:p-8"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
         </div>
       </section>
 
-      <section className="py-12 md:py-20 px-4 md:px-6 bg-white">
-        <div className="max-w-3xl mx-auto text-center">
-          <SectionHeader eyebrow="Get Started" title={`Install a ${industry.industry_name} Lead Flow System`} subtitle="Compare packages, choose the system, and move into guided setup." align="center" />
-          <div className="mb-6 md:mb-8" />
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button onClick={() => navigate('/pricing')} className="cs-btn-primary" style={{ minHeight: '44px' }}>{industry.primary_cta}<ArrowRight className="w-4 h-4" /></button>
-            <button onClick={() => navigate('/automations')} className="inline-flex items-center justify-center px-6 py-3 border-2 border-primary rounded-lg text-primary font-semibold hover:bg-primary/10 transition-colors" style={{ minHeight: '44px' }}>View Automation Stack</button>
+      <section className="py-16 md:py-24 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto text-center rounded-3xl border border-primary/15 bg-gradient-to-br from-[#003b8f] to-[#00aeef] p-8 md:p-12 text-white shadow-[0_24px_80px_rgba(0,107,176,0.24)]">
+          <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-white/75">Get Started</p>
+          <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight">Install a {industry.industry_name} Lead Flow System</h2>
+          <p className="mx-auto mt-4 max-w-2xl text-sm md:text-base leading-relaxed text-white/82">Compare packages, choose the system, and move into guided setup with a clearer path from first inquiry to booked appointment.</p>
+          <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+            <button onClick={() => navigate('/pricing')} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition-transform hover:-translate-y-0.5" style={{ minHeight: '44px' }}>{industry.primary_cta}<ArrowRight className="w-4 h-4" /></button>
+            <button onClick={() => navigate('/automations')} className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 bg-white/10 text-sm font-bold text-white backdrop-blur hover:bg-white/16 transition-colors" style={{ minHeight: '44px' }}>View Automation Stack</button>
           </div>
         </div>
       </section>
