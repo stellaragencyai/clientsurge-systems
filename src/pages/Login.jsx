@@ -22,6 +22,14 @@ export default function Login() {
     });
   }, []);
 
+  // Auto-open login modal when redirected from a protected route (from_url present)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("from_url")) {
+      setShowLogin(true);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-white">
       <Navbar />

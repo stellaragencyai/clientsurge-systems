@@ -53,7 +53,16 @@ export default function PortalLoginModal({ onClose }) {
       // Hard redirect required — the auth provider must re-initialize with the new token.
       // navigate() leaves the app in a half-initialized state and breaks portal access.
       const role = (currentUser?.role || "").toLowerCase();
-      const dest = role === "admin" || role === "super_admin" ? "/admin" : "/client-portal";
+      // Respect from_url redirect if present (e.g. user was trying to reach /client-portal)
+      const params = new URLSearchParams(window.location.search);
+      const fromUrl = params.get("from_url");
+      let dest;
+      if (fromUrl && fromUrl.startsWith("/") && !fromUrl.startsWith("//")) {
+        // Same-origin relative URL — use it as the post-login destination
+        dest = fromUrl;
+      } else {
+        dest = role === "admin" || role === "super_admin" ? "/admin" : "/client-portal";
+      }
       window.location.href = dest;
     } catch (err) {
       setError(err?.data?.message || err?.message || "Unable to sign in. Please check your email and password.");

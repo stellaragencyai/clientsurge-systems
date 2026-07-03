@@ -67,20 +67,7 @@ export const STATIC_ROUTE_ALIASES = {
   "/legal/terms": "/terms",
   "/legal/sms": "/sms-terms",
   "/legal/refund": "/refund-policy",
-  "/book": "/contact",
-  "/book-demo": "/contact",
-  "/start": "/contact",
-  "/store": "/pricing",
-  "/product": "/pricing",
   "/product-landing": "/pricing",
-  "/about": "/",
-  "/industries": "/automations",
-  "/blog": "/",
-  "/faq": "/contact",
-  "/our-system": "/automations",
-  "/testimonials": "/",
-  "/proof": "/",
-  "/library": "/",
 };
 
 export const LEGACY_REDIRECTS = Object.entries(STATIC_ROUTE_ALIASES);
