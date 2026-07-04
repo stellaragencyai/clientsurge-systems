@@ -2,6 +2,8 @@ import {
   AlertTriangle, XCircle, AlertOctagon, MinusCircle, ShieldAlert,
   FileX, ClipboardX, ServerCrash, FileWarning, MicOff, Database,
 } from "lucide-react";
+import TwilioGrowthEnginePhaseBadge from "./TwilioGrowthEnginePhaseBadge";
+import { computeRepairItemPhase } from "@/lib/twilioGrowthEnginePhases";
 
 const SEVERITY_STYLES = {
   critical: { color: "#DC2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.2)", icon: XCircle, label: "Critical" },
@@ -335,6 +337,7 @@ export default function TwilioGrowthEngineRepairQueue({ data, onRefresh }) {
             const sevStyle = SEVERITY_STYLES[item.severity] || SEVERITY_STYLES.low;
             const SevIcon = sevStyle.icon;
             const TypeIcon = REPAIR_TYPE_ICONS[item.repair_type] || AlertTriangle;
+            const phaseInfo = computeRepairItemPhase(item);
             return (
               <div
                 key={idx}
@@ -351,6 +354,7 @@ export default function TwilioGrowthEngineRepairQueue({ data, onRefresh }) {
                   <div className="flex-1 min-w-0 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-bold text-gray-900">{REPAIR_TYPE_LABELS[item.repair_type] || item.repair_type}</p>
+                      <TwilioGrowthEnginePhaseBadge phase={phaseInfo.phase} />
                       <span
                         className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide flex-shrink-0"
                         style={{ color: sevStyle.color, background: sevStyle.bg, border: `1px solid ${sevStyle.border}` }}

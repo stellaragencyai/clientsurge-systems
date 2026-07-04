@@ -1,25 +1,24 @@
-import { getOwnership, OWNER_CATEGORIES } from "./capabilityOwnership";
+import { OWNERSHIP_CATEGORIES, getOwnership } from "./ownershipMap";
 
 /**
- * Compact ownership badge for capability rows.
- * Shows the owner category label. Admin-only — informational, does not override computed status.
+ * Admin-only ownership badge + next owner action for a capability row.
  */
-export default function OwnershipBadge({ capKey, size = "sm" }) {
-  const { owner } = getOwnership(capKey);
-  const cat = OWNER_CATEGORIES[owner] || OWNER_CATEGORIES.trust_review;
-  const sizeClass = size === "xs" ? "text-[9px] px-1.5 py-0.5" : "text-[10px] px-2 py-0.5";
+export default function OwnershipBadge({ capabilityKey, showAction = false }) {
+  const ownership = getOwnership(capabilityKey);
+  const cat = OWNERSHIP_CATEGORIES[ownership.owner] || OWNERSHIP_CATEGORIES.quality_review;
 
   return (
-    <span
-      className={`inline-flex items-center gap-1 rounded-full font-bold ${sizeClass} flex-shrink-0`}
-      style={{
-        color: cat.color,
-        background: `${cat.color}11`,
-        border: `1px solid ${cat.color}30`,
-      }}
-      title={`Owner: ${cat.label} — ${cat.description}`}
-    >
-      {cat.label}
-    </span>
+    <div className="flex flex-col gap-1">
+      <span
+        className="inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide whitespace-nowrap w-fit"
+        style={{ color: cat.color, background: `${cat.color}11`, border: `1px solid ${cat.color}30` }}
+        title={`Owner: ${cat.label}`}
+      >
+        {cat.label}
+      </span>
+      {showAction && ownership.next_owner_action && (
+        <p className="text-[11px] text-gray-500 leading-snug">{ownership.next_owner_action}</p>
+      )}
+    </div>
   );
 }

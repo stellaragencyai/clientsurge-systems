@@ -1,143 +1,150 @@
-import { CheckCircle2, AlertTriangle, XCircle, Rocket } from "lucide-react";
-
-const READY_STYLES = {
-  ready: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Ready" },
-  needs_review: { color: "#D97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.2)", icon: AlertTriangle, label: "Needs Review" },
-  not_ready: { color: "#DC2626", bg: "rgba(220,38,38,0.05)", border: "rgba(220,38,38,0.18)", icon: XCircle, label: "Not Ready" },
-};
-
-const FIRST_LAUNCH_CAPS = ["instant_lead_response", "missed_call_text_back"];
+import { CheckCircle2, AlertTriangle, XCircle } from "lucide-react";
 
 /**
- * Launch-readiness summary card for the first launch scope.
- * Label is based ONLY on current app evidence — no manual overrides.
- *
- * Logic:
- *   - "ready"       = all first-launch capabilities are green
- *   - "not_ready"   = any first-launch capability is red, OR proof_logs_empty
- *   - "needs_review" = first-launch caps are yellow/partial but none red
- *
- * Also shows reason, blockers, and required action.
+ * Admin-only launch-readiness summary card for the first launch scope.
+ * Shows one of three labels: ready, needs review, or not ready.
+ * Label is based only on current app evidence (computed capabilities + proof logs + quarantine).
  */
 export default function LaunchReadinessSummary({ data }) {
-  const capabilities = data?.capabilities || [];
-  const proofLogsEmpty = data?.proof_logs_empty;
-  const deliveryStats = data?.delivery_stats;
-  const missedCallStats = data?.missed_call_stats;
+  if (!data) return null;
 
-  const firstLaunchCaps = capabilities.filter((c) => FIRST_LAUNCH_CAPS.includes(c.key));
+  const capabilities = data.capabilities || [];
+  const proofLogsEmpty = data.proof_logs_empty;
+  const quarantine = data.quarantine || {};
+  const deliveryStats = data.delivery_stats || {};
 
-  const hasRed = firstLaunchCaps.some((c) => c.status === "red");
-  const allGreen = firstLaunchCaps.length > 0 && firstLaunchCaps.every((c) => c.status === "green");
+  // Core launch capabilities
+  const coreCaps = capabilities.filter(c =>
+    ["instant_lead_response", "missed_call_text_back", "automation_proof_logs"].includes(c.key)
+  );
 
-  let readiness = "needs_review";
-  if (proofLogsEmpty || hasRed) {
-    readiness = "not_ready";
-  } else if (allGreen) {
-    readiness = "ready";
-  }
+  const allCoreGreen = coreCaps.length > 0 && coreCaps.every(c => c.status === "green");
+  const anyCoreRed = coreCaps.some(c => c.status === "red");
+  const anyCoreYellow = coreCaps.some(c => c.status === "yellow");
 
-  const style = READY_STYLES[readiness];
-  const Icon = style.icon;
+  // Internal record exclusion check
+  const exclusionReady = quarantine.rules?.length > 0 && (quarantine.excluded_leads_count === 0 || quarantine.production_leads_count > 0);
 
-  const blockers = [];
-  const reasons = [];
+  // Delivery evidence
+  const hasDeliveredProof = (deliveryStats.delivered || 0) > 0;
 
-  if (proofLogsEmpty) {
-    blockers.push("AutomationProofLog is empty — no go-live proof evidence exists");
-    reasons.push("No proof logs have been created for any service");
-  }
+  // Determine label
+  let label, color, reason, blockers = [], requiredAction = "";
 
-  for (const cap of firstLaunchCaps) {
-    if (cap.status === "red") {
-      blockers.push(`${cap.label}: ${cap.blockers?.[0] || "no evidence or implementation"}`);
-      reasons.push(`${cap.label} has no proven evidence`);
-    } else if (cap.status === "yellow") {
-      reasons.push(`${cap.label} is partially configured — proof incomplete`);
-    }
-  }
-
-  if (missedCallStats?.has_404) {
-    blockers.push("Missed-call webhook returning 404");
-  }
-  if (missedCallStats?.has_405) {
-    blockers.push("Missed-call webhook returning 405");
-  }
-  if (deliveryStats && deliveryStats.delivered === 0) {
-    blockers.push("No delivered SMS in CommunicationLog — delivery proof missing");
-  }
-
-  let requiredAction = "";
-  if (readiness === "not_ready") {
+  if (proofLogsEmpty || anyCoreRed || !exclusionReady) {
+    label = "Not Ready";
+    color = "#DC2626";
     if (proofLogsEmpty) {
-      requiredAction = "Create and pass AutomationProofLog records for instant_lead_response and missed_call_text_back before go-live.";
-    } else if (missedCallStats?.has_404 || missedCallStats?.has_405) {
-      requiredAction = "Repair the missed-call webhook URL so Twilio gets 200, then retest with a real inbound call.";
-    } else if (deliveryStats?.delivered === 0) {
-      requiredAction = "Generate a real delivered Twilio SMS on a new non-test lead to prove speed-to-lead delivery.";
-    } else {
-      requiredAction = "Resolve all red blockers for instant_lead_response and missed_call_text_back.";
+      blockers.push("AutomationProofLog is empty — no go-live proof evidence exists.");
+      requiredAction = "Create AutomationProofLog records for every service key before claiming go-live.";
     }
-  } else if (readiness === "needs_review") {
-    requiredAction = "Complete remaining proof for all first-launch capabilities — create passed AutomationProofLog records and verify delivery evidence.";
+    coreCaps.filter(c => c.status === "red").forEach(c => {
+      blockers.push(`${c.label}: ${c.blockers?.[0] || "not configured"}`);
+    });
+    if (!exclusionReady) {
+      blockers.push("Internal record exclusion is not ready — quarantine rules missing or all data is test data.");
+    }
+    reason = blockers[0] || "Core launch items are missing.";
+  } else if (anyCoreYellow || !hasDeliveredProof) {
+    label = "Needs Review";
+    color = "#D97706";
+    if (anyCoreYellow) {
+      blockers.push("Some core capabilities are partially configured — proof is incomplete.");
+    }
+    if (!hasDeliveredProof) {
+      blockers.push("No delivered Twilio SMS proof in CommunicationLog.");
+    }
+    reason = "Core infrastructure exists but proof is incomplete. Review and close remaining gaps.";
+    requiredAction = "Generate real delivered SMS events with provider_message_id and pass proof logs for all core services.";
   } else {
-    requiredAction = "All first-launch capabilities are proven. Proceed with go-live and maintain proof monitoring.";
+    label = "Ready";
+    color = "#059669";
+    reason = "All core launch capabilities are proven by real records and proof logs.";
+    requiredAction = "No action — maintain proof records and monitor.";
   }
+
+  const Icon = label === "Ready" ? CheckCircle2 : label === "Needs Review" ? AlertTriangle : XCircle;
 
   return (
     <div
       className="rounded-xl p-5"
-      style={{ background: style.bg, border: `1px solid ${style.border}` }}
+      style={{
+        background: `linear-gradient(135deg, ${color}0D, ${color}05)`,
+        border: `1px solid ${color}33`,
+      }}
     >
-      <div className="flex items-start gap-3">
+      <div className="flex items-center gap-3 mb-3">
         <div
           className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
-          style={{ background: `${style.color}15`, border: `1px solid ${style.color}30` }}
+          style={{ background: `${color}14`, border: `1px solid ${color}33` }}
         >
-          <Icon className="w-5 h-5" style={{ color: style.color }} />
+          <Icon className="w-5 h-5" style={{ color }} />
         </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2 flex-wrap mb-1">
-            <Rocket className="w-3.5 h-3.5 text-gray-400" />
-            <h3 className="text-sm font-bold text-gray-900">First Launch Readiness — Admin Only</h3>
-            <span
-              className="rounded-full px-2.5 py-0.5 text-xs font-bold flex-shrink-0"
-              style={{ color: style.color, background: `${style.color}11`, border: `1px solid ${style.color}30` }}
-            >
-              {style.label}
-            </span>
-          </div>
-          <p className="text-xs text-gray-500 leading-relaxed mb-3">
-            Scope: Instant Lead Response + Missed Call Text-Back. Label is computed only from current app evidence —
-            no manual overrides, no operator notes, no inferred trust.
-          </p>
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">First Launch Readiness</p>
+          <p className="text-lg font-bold" style={{ color }}>{label}</p>
+        </div>
+      </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-            <div className="rounded-lg bg-white/60 border border-gray-100 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Reason</p>
-              <p className="text-xs text-gray-600 leading-relaxed">
-                {reasons.length > 0 ? reasons.join("; ") : "All first-launch capabilities are proven by real records and passed proof logs."}
-              </p>
+      <div className="space-y-2">
+        <div>
+          <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Reason</p>
+          <p className="text-xs text-gray-600 leading-relaxed">{reason}</p>
+        </div>
+
+        {blockers.length > 0 && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Blockers</p>
+            <ul className="space-y-1">
+              {blockers.map((b, i) => (
+                <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
+                  <span className="text-gray-300 mt-0.5">•</span>
+                  <span>{b}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {requiredAction && (
+          <div>
+            <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Required Action</p>
+            <p className="text-xs text-gray-600 leading-relaxed">{requiredAction}</p>
+          </div>
+        )}
+      </div>
+
+      {/* Core capability indicators */}
+      <div className="mt-4 pt-3 border-t border-gray-100">
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-2">Core Launch Items</p>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+          {coreCaps.map(cap => (
+            <div key={cap.key} className="flex items-center justify-between gap-2 rounded-md border border-gray-100 bg-white/50 px-3 py-1.5">
+              <span className="text-[11px] text-gray-600 truncate">{cap.label}</span>
+              <span
+                className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide flex-shrink-0"
+                style={{
+                  color: cap.status === "green" ? "#059669" : cap.status === "yellow" ? "#D97706" : "#DC2626",
+                  background: cap.status === "green" ? "rgba(5,150,105,0.06)" : cap.status === "yellow" ? "rgba(217,119,6,0.06)" : "rgba(220,38,38,0.06)",
+                  border: `1px solid ${cap.status === "green" ? "rgba(5,150,105,0.2)" : cap.status === "yellow" ? "rgba(217,119,6,0.2)" : "rgba(220,38,38,0.2)"}`,
+                }}
+              >
+                {cap.status}
+              </span>
             </div>
-            <div className="rounded-lg bg-white/60 border border-gray-100 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Blockers</p>
-              {blockers.length > 0 ? (
-                <ul className="space-y-1">
-                  {blockers.map((b, i) => (
-                    <li key={i} className="text-xs text-red-600 flex items-start gap-1.5">
-                      <XCircle className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
-                      <span>{b}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-green-600 font-medium">No blockers detected</p>
-              )}
-            </div>
-            <div className="rounded-lg bg-white/60 border border-gray-100 p-3">
-              <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Required Action</p>
-              <p className="text-xs text-gray-600 leading-relaxed">{requiredAction}</p>
-            </div>
+          ))}
+          <div className="flex items-center justify-between gap-2 rounded-md border border-gray-100 bg-white/50 px-3 py-1.5">
+            <span className="text-[11px] text-gray-600 truncate">Internal Record Exclusion</span>
+            <span
+              className="rounded-full px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wide flex-shrink-0"
+              style={{
+                color: exclusionReady ? "#059669" : "#DC2626",
+                background: exclusionReady ? "rgba(5,150,105,0.06)" : "rgba(220,38,38,0.06)",
+                border: `1px solid ${exclusionReady ? "rgba(5,150,105,0.2)" : "rgba(220,38,38,0.2)"}`,
+              }}
+            >
+              {exclusionReady ? "ready" : "not ready"}
+            </span>
           </div>
         </div>
       </div>
