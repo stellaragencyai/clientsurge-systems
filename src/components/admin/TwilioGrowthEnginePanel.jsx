@@ -119,6 +119,23 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
+      {/* Admin-only summary cards — computed from current audit data */}
+      {data && (
+        <>
+          <CoreSystemHealth data={data} />
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <FirstLaunchScopeSummary data={data} />
+            <CurrentSprintFocus />
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+            <ProjectUpdateSummary />
+            <OwnerAttentionNeeded data={data} />
+          </div>
+          <CoreLaunchFirstWarning data={data} activeView={activeView} />
+          <ProgressSinceLastAudit />
+        </>
+      )}
+
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
