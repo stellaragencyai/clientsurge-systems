@@ -1,181 +1,91 @@
-import {
-  X, CheckCircle2, XCircle, AlertTriangle, FileText, ClipboardList,
-  Database, Settings, ArrowRight, ListChecks,
-} from "lucide-react";
+import { X, CheckCircle2, XCircle, AlertTriangle, FileText, Database } from "lucide-react";
+import EvidenceQualityBadge from "./EvidenceQualityBadge";
+import { classifyCapabilityEvidence, overallEvidenceQuality, EVIDENCE_QUALITY } from "./evidenceQuality";
 
 const STATUS_STYLES = {
-  green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
-  yellow: { color: "#D97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.2)", icon: AlertTriangle, label: "Partial" },
-  red: { color: "#DC2626", bg: "rgba(220,38,38,0.05)", border: "rgba(220,38,38,0.18)", icon: XCircle, label: "Not Done" },
+  green: { color: "#059669", label: "Proven" },
+  yellow: { color: "#D97706", label: "Partial" },
+  red: { color: "#DC2626", label: "Not Done" },
 };
 
-const CAPABILITY_META = {
-  ai_voice_receptionist: {
-    entities: ["AdminSettings.elevenlabs_agent_ids", "AdminSettings.elevenlabs_phone_number_ids", "AdminSettings.inbound_voice_enabled", "CommunicationEvent (channel=voice)", "AutomationProofLog (service_key=ai_voice_receptionist)", "WebsiteLead.transcript"],
-    setupFields: [
-      { key: "inbound_voice_enabled", label: "Inbound Voice Enabled", source: "voice_readiness" },
-      { key: "voice_calls_enabled", label: "Voice Calls Enabled", source: "voice_readiness" },
-      { key: "has_elevenlabs_agent_ids", label: "ElevenLabs Agent IDs", source: "voice_readiness" },
-      { key: "has_elevenlabs_phone_number_ids", label: "ElevenLabs Phone Number IDs", source: "voice_readiness" },
-      { key: "has_transcript_proof", label: "Transcript Proof", source: "voice_readiness" },
-      { key: "voice_webhook_url", label: "Voice Webhook URL", source: "voice_readiness" },
-    ],
-  },
-  missed_call_text_back: {
-    entities: ["AdminSettings.missed_call_webhook_url", "CommunicationLog (trigger_name contains missed_call)", "CommunicationEvent (event_type contains missed_call)", "AutomationProofLog (service_key=missed_call_text_back)"],
-    setupFields: [
-      { key: "webhook_status", label: "Webhook Status", source: "missed_call" },
-      { key: "has_404", label: "Webhook 404 Error", source: "missed_call", invert: true },
-      { key: "has_405", label: "Webhook 405 Error", source: "missed_call", invert: true },
-    ],
-  },
-  instant_lead_response: {
-    entities: ["CommunicationLog (channel=sms)", "CommunicationEvent (channel=sms)", "AutomationProofLog (service_key=instant_lead_response)"],
-    setupFields: [
-      { key: "delivered", label: "Delivered SMS Records", source: "delivery" },
-      { key: "with_provider_message_id", label: "Records with Provider Message ID", source: "delivery" },
-    ],
-  },
-  nurture_sequence_14d: {
-    entities: ["CommunicationLog (trigger_name contains nurture)", "AutomationProofLog (service_key=nurture_sequence_14d)", "AdminSettings (cadence settings)"],
-    setupFields: [
-      { key: "with_provider_message_id", label: "Records with Provider Message ID", source: "delivery" },
-    ],
-  },
-  review_request: {
-    entities: ["AutomationChecklist (service_key=review_request)", "AutomationProofLog (service_key=review_request)", "AdminSettings.review_link_set"],
-    setupFields: [],
-  },
-  lead_reactivation: {
-    entities: ["AutomationProofLog (service_key=lead_reactivation)", "Leads (segment=DORMANT)"],
-    setupFields: [],
-  },
-  inbound_sms_assistant: {
-    entities: ["CommunicationEvent (channel=sms, direction=inbound)", "AutomationProofLog (service_key=inbound_sms_assistant)"],
-    setupFields: [],
-  },
-  ai_booking_agent: {
-    entities: ["WebsiteLead.transcript", "AutomationProofLog (service_key=ai_booking_agent)"],
-    setupFields: [
-      { key: "has_transcript_proof", label: "Transcript Proof", source: "voice_readiness" },
-    ],
-  },
-  automation_proof_logs: {
-    entities: ["AutomationProofLog (all records)"],
-    setupFields: [],
-  },
-};
-
-function getLatestChecklist(data, serviceKey) {
-  if (!serviceKey) return null;
-  const cls = (data.qa_checklists || []).filter(c => c.service_key === serviceKey);
-  if (cls.length === 0) return null;
-  return cls[0];
-}
-
-function getProofStats(data, serviceKey) {
-  if (!serviceKey) {
-    const proof = data.proof_by_service || {};
-    const allProofs = Object.values(proof);
-    return {
-      total: allProofs.reduce((s, p) => s + (p.total || 0), 0),
-      passed: allProofs.reduce((s, p) => s + (p.passed || 0), 0),
-      failed: allProofs.reduce((s, p) => s + (p.failed || 0), 0),
-      pending: allProofs.reduce((s, p) => s + (p.pending || 0), 0),
-    };
-  }
-  return data.proof_by_service?.[serviceKey] || { total: 0, passed: 0, failed: 0, pending: 0 };
-}
-
-function getEvidenceSummary(cap, data) {
-  const parts = [];
-  if (cap.evidence_sources?.length > 0) {
-    parts.push(...cap.evidence_sources);
-  }
-  if (cap.proof) {
-    parts.push(`Proof logs: ${cap.proof.total} total (${cap.proof.passed} passed, ${cap.proof.pending} pending, ${cap.proof.failed} failed)`);
-  }
-  return parts;
-}
-
-function getSetupFieldValue(field, data) {
-  if (field.source === "voice_readiness") return data.voice_readiness?.[field.key];
-  if (field.source === "missed_call") return data.missed_call_stats?.[field.key];
-  if (field.source === "delivery") return data.delivery_stats?.[field.key];
-  return null;
-}
-
-function isFieldComplete(field, value) {
-  if (field.invert) return !value;
-  if (typeof value === "boolean") return value;
-  if (typeof value === "number") return value > 0;
-  if (typeof value === "string") return value === "configured" || value.length > 0;
-  return !!value;
-}
-
-export default function CapabilityDetailDrawer({ capability, data, onClose }) {
+export default function CapabilityDetailDrawer({ capability, latestRecords, settingsSummary, onClose }) {
   if (!capability) return null;
-  const meta = CAPABILITY_META[capability.key] || { entities: [], setupFields: [] };
-  const style = STATUS_STYLES[capability.status] || STATUS_STYLES.red;
-  const StatusIcon = style.icon;
-  const latestChecklist = getLatestChecklist(data, capability.service_key);
-  const proofStats = getProofStats(data, capability.service_key);
-  const evidenceSummary = getEvidenceSummary(capability, data);
+
+  const statusStyle = STATUS_STYLES[capability.status] || STATUS_STYLES.red;
+  const classifiedEvidence = classifyCapabilityEvidence(capability);
+  const overallQuality = overallEvidenceQuality(capability);
+  const qualityConfig = EVIDENCE_QUALITY[overallQuality];
+
+  const entitiesUsed = getEntitiesUsed(capability);
+  const incompleteFields = getIncompleteFields(capability, settingsSummary);
+  const latestProof = latestRecords?.latest_proof || null;
+  const latestChecklist = latestRecords?.latest_checklist || null;
+  const latestSmsLog = latestRecords?.latest_sms_log || null;
+  const latestEvent = latestRecords?.latest_event || null;
 
   return (
-    <div className="fixed inset-0 z-50 flex justify-end">
-      <div className="absolute inset-0 bg-black/30" onClick={onClose} />
-      <div className="relative w-full max-w-xl bg-white shadow-2xl overflow-y-auto h-full">
+    <>
+      {/* Overlay */}
+      <div className="fixed inset-0 z-40 bg-black/30" onClick={onClose} />
+
+      {/* Drawer */}
+      <div className="fixed inset-y-0 right-0 z-50 w-full max-w-lg bg-white shadow-2xl flex flex-col overflow-hidden">
         {/* Header */}
-        <div className="sticky top-0 bg-white border-b border-gray-100 px-6 py-4 flex items-start justify-between gap-3 z-10">
-          <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0" style={{ background: style.bg, border: `1px solid ${style.border}` }}>
-              <StatusIcon className="w-4 h-4" style={{ color: style.color }} />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-gray-900">{capability.label}</h3>
-              <span className="rounded-full px-2 py-0.5 text-xs font-semibold inline-block mt-1" style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}>
-                {style.label}
-              </span>
-            </div>
+        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100 flex-shrink-0">
+          <div>
+            <h3 className="text-sm font-bold text-gray-900">{capability.label}</h3>
+            <p className="text-[11px] text-gray-400 mt-0.5">Admin-only detail view</p>
           </div>
-          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors flex-shrink-0">
-            <X className="w-4 h-4 text-gray-400" />
+          <button onClick={onClose} className="p-1.5 hover:bg-gray-100 rounded-lg transition-colors">
+            <X className="w-4 h-4 text-gray-500" />
           </button>
         </div>
 
-        <div className="px-6 py-5 space-y-6">
+        {/* Content */}
+        <div className="flex-1 overflow-y-auto px-5 py-4 space-y-5">
+          {/* Status + Evidence Quality */}
+          <div className="flex items-center gap-3 flex-wrap">
+            <span
+              className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
+              style={{ color: statusStyle.color, background: `${statusStyle.color}11`, border: `1px solid ${statusStyle.color}30` }}
+            >
+              {statusStyle.label}
+            </span>
+            <EvidenceQualityBadge quality={overallQuality} />
+          </div>
+
           {/* Entities used */}
-          <Section icon={Database} title="Entities Used to Evaluate">
+          <Section title="Exact Entities Used for Evaluation" icon={Database}>
             <ul className="space-y-1">
-              {meta.entities.map((e, i) => (
+              {entitiesUsed.map((e, i) => (
                 <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
-                  <span className="text-gray-300 mt-0.5">▸</span>
-                  <code className="text-[11px] font-mono text-gray-700 break-all">{e}</code>
+                  <span className="text-gray-300 mt-0.5">•</span>
+                  <span className="font-mono">{e}</span>
                 </li>
               ))}
             </ul>
           </Section>
 
           {/* Evidence summary */}
-          <Section icon={FileText} title="Evidence Summary">
-            {evidenceSummary.length > 0 ? (
-              <ul className="space-y-1">
-                {evidenceSummary.map((e, i) => (
-                  <li key={i} className="text-xs text-gray-600 flex items-start gap-1.5">
-                    <CheckCircle2 className="w-3 h-3 text-gray-300 mt-0.5 flex-shrink-0" />
-                    <span>{e}</span>
+          <Section title="Evidence Summary" icon={FileText}>
+            {classifiedEvidence.length === 0 ? (
+              <p className="text-xs text-gray-400">No evidence checked.</p>
+            ) : (
+              <ul className="space-y-2">
+                {classifiedEvidence.map((e, i) => (
+                  <li key={i} className="flex items-start justify-between gap-3">
+                    <span className="text-xs text-gray-600 flex-1">{e.source}</span>
+                    <EvidenceQualityBadge quality={e.quality} />
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="text-xs text-gray-400">No evidence records found.</p>
             )}
+            <p className="text-[11px] text-gray-400 mt-2 italic">{qualityConfig?.description}</p>
           </Section>
 
           {/* Blockers */}
-          <Section icon={AlertTriangle} title="Blockers">
-            {capability.blockers?.length > 0 ? (
+          {capability.blockers?.length > 0 && (
+            <Section title="Blockers" icon={XCircle}>
               <ul className="space-y-1">
                 {capability.blockers.map((b, i) => (
                   <li key={i} className="text-xs text-red-600 flex items-start gap-1.5">
@@ -184,140 +94,190 @@ export default function CapabilityDetailDrawer({ capability, data, onClose }) {
                   </li>
                 ))}
               </ul>
-            ) : (
-              <p className="text-xs text-green-600 font-medium">No blockers detected.</p>
-            )}
-          </Section>
+            </Section>
+          )}
 
           {/* Incomplete setup fields */}
-          <Section icon={Settings} title="Incomplete Setup Fields">
-            {meta.setupFields.length > 0 ? (
-              <div className="space-y-1.5">
-                {meta.setupFields.map((field) => {
-                  const value = getSetupFieldValue(field, data);
-                  const complete = isFieldComplete(field, value);
-                  return (
-                    <div key={field.key} className="flex items-center justify-between gap-2 text-xs">
-                      <span className="text-gray-600">{field.label}</span>
-                      <span className={`font-semibold ${complete ? "text-green-600" : "text-red-600"}`}>
-                        {complete ? "✓ Set" : "✗ Missing"}
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+          {incompleteFields.length > 0 && (
+            <Section title="Incomplete Setup Fields" icon={AlertTriangle}>
+              <ul className="space-y-1">
+                {incompleteFields.map((f, i) => (
+                  <li key={i} className="text-xs text-amber-600 flex items-start gap-1.5">
+                    <AlertTriangle className="w-3 h-3 text-amber-400 mt-0.5 flex-shrink-0" />
+                    <span className="font-mono">{f}</span>
+                  </li>
+                ))}
+              </ul>
+            </Section>
+          )}
+
+          {/* Latest proof record */}
+          <Section title="Latest Related Proof Record" icon={CheckCircle2}>
+            {latestProof ? (
+              <RecordPreview
+                fields={[
+                  { label: "service_key", value: latestProof.service_key },
+                  { label: "status", value: latestProof.status },
+                  { label: "tested_at", value: latestProof.tested_at },
+                  { label: "evidence_summary", value: latestProof.evidence_summary },
+                ]}
+              />
             ) : (
-              <p className="text-xs text-gray-400">No specific setup fields tracked for this capability.</p>
+              <p className="text-xs text-gray-400">No AutomationProofLog record found.</p>
             )}
           </Section>
 
           {/* Latest checklist record */}
-          <Section icon={ClipboardList} title="Latest Related Checklist Record">
+          <Section title="Latest Related Checklist Record" icon={CheckCircle2}>
             {latestChecklist ? (
-              <div className="space-y-1 text-xs text-gray-600">
-                <p><span className="font-semibold text-gray-900">{latestChecklist.business_name || "Unknown"}</span></p>
-                <p>Service: <code className="font-mono">{latestChecklist.service_key}</code></p>
-                <p>Status: <span className="font-semibold">{latestChecklist.status || "unknown"}</span></p>
-                <p>Last tested: {latestChecklist.last_tested_at ? new Date(latestChecklist.last_tested_at).toLocaleString() : "never"}</p>
-                <p>Went live: {latestChecklist.went_live_at ? new Date(latestChecklist.went_live_at).toLocaleString() : "not yet"}</p>
-                {latestChecklist.all_false && <p className="text-red-600 font-semibold mt-1">⚠ All checklist flags are false.</p>}
-              </div>
+              <RecordPreview
+                fields={[
+                  { label: "business_name", value: latestChecklist.business_name },
+                  { label: "service_key", value: latestChecklist.service_key },
+                  { label: "status", value: latestChecklist.status },
+                  { label: "went_live_at", value: latestChecklist.went_live_at },
+                  { label: "twilio_configured", value: String(latestChecklist.twilio_configured) },
+                  { label: "test_response_received", value: String(latestChecklist.test_response_received) },
+                  { label: "client_approved", value: String(latestChecklist.client_approved) },
+                ]}
+              />
             ) : (
-              <p className="text-xs text-gray-400">No AutomationChecklist record found for this service.</p>
-            )}
-          </Section>
-
-          {/* Latest proof record */}
-          <Section icon={CheckCircle2} title="Latest Related Proof Record">
-            {proofStats && proofStats.total > 0 ? (
-              <div className="space-y-1 text-xs text-gray-600">
-                <p>Total proof logs: <span className="font-semibold text-gray-900">{proofStats.total}</span></p>
-                <p>Passed: <span className="font-semibold text-green-600">{proofStats.passed}</span> · Pending: <span className="font-semibold text-amber-600">{proofStats.pending}</span> · Failed: <span className="font-semibold text-red-600">{proofStats.failed}</span></p>
-              </div>
-            ) : (
-              <p className="text-xs text-gray-400">No AutomationProofLog records exist for this service.</p>
+              <p className="text-xs text-gray-400">No AutomationChecklist record found.</p>
             )}
           </Section>
 
           {/* Latest communication/evidence record */}
-          <Section icon={Database} title="Latest Communication / Evidence Record">
-            <CommunicationEvidence capability={capability} data={data} />
+          <Section title="Latest Communication / Evidence Record" icon={FileText}>
+            {latestSmsLog ? (
+              <RecordPreview
+                fields={[
+                  { label: "channel", value: latestSmsLog.channel },
+                  { label: "delivery_status", value: latestSmsLog.delivery_status },
+                  { label: "provider_message_id", value: latestSmsLog.provider_message_id },
+                  { label: "trigger_name", value: latestSmsLog.trigger_name },
+                  { label: "created_date", value: latestSmsLog.created_date },
+                ]}
+              />
+            ) : latestEvent ? (
+              <RecordPreview
+                fields={[
+                  { label: "channel", value: latestEvent.channel },
+                  { label: "status", value: latestEvent.status },
+                  { label: "event_type", value: latestEvent.event_type },
+                  { label: "provider_message_id", value: latestEvent.provider_message_id },
+                ]}
+              />
+            ) : (
+              <p className="text-xs text-gray-400">No CommunicationLog or CommunicationEvent record found.</p>
+            )}
           </Section>
 
           {/* Next admin action */}
-          <Section icon={ArrowRight} title="Next Admin Action">
-            <p className="text-xs text-gray-700 font-medium leading-relaxed">{capability.next_action || "No action specified."}</p>
-          </Section>
+          {capability.next_action && (
+            <Section title="Next Admin Action" icon={AlertTriangle}>
+              <p className="text-xs text-gray-600">{capability.next_action}</p>
+            </Section>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
-function Section({ icon: SectionIcon, title, children }) {
+function Section({ title, icon: Icon, children }) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-2">
-        <SectionIcon className="w-3.5 h-3.5 text-gray-400" />
-        <h4 className="text-[11px] font-bold uppercase tracking-wide text-gray-400">{title}</h4>
+        <Icon className="w-3.5 h-3.5 text-gray-400 flex-shrink-0" />
+        <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400">{title}</p>
       </div>
-      <div className="ml-5">{children}</div>
+      {children}
     </div>
   );
 }
 
-function CommunicationEvidence({ capability, data }) {
-  const key = capability.key;
-  if (key === "missed_call_text_back" && data.missed_call_stats) {
-    const mc = data.missed_call_stats;
-    return (
-      <div className="space-y-1 text-xs text-gray-600">
-        <p>Webhook status: <span className="font-semibold">{mc.webhook_status}</span></p>
-        <p>SMS attempts: <span className="font-semibold">{mc.sms_attempts}</span></p>
-        <p>Successful sends: <span className="font-semibold text-green-600">{mc.successful_sends}</span></p>
-        <p>Failures: <span className="font-semibold text-red-600">{mc.failures}</span></p>
-        {mc.last_error && <p className="text-red-500">Last error: {mc.last_error}</p>}
-      </div>
-    );
+function RecordPreview({ fields }) {
+  return (
+    <div className="rounded-lg border border-gray-100 bg-gray-50 p-3 space-y-1.5">
+      {fields.map((f, i) => (
+        <div key={i} className="flex items-start gap-2 text-xs">
+          <span className="font-mono text-gray-400 flex-shrink-0 w-40">{f.label}:</span>
+          <span className="text-gray-700 break-all">{f.value || "—"}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function getEntitiesUsed(cap) {
+  const entities = [];
+  const sk = cap.service_key;
+
+  if (cap.key === "automation_proof_logs") {
+    entities.push("AutomationProofLog");
+    return entities;
   }
-  if (key === "instant_lead_response" && data.delivery_stats) {
-    const ds = data.delivery_stats;
-    return (
-      <div className="space-y-1 text-xs text-gray-600">
-        <p>Total SMS logs: <span className="font-semibold">{ds.total}</span></p>
-        <p>Delivered: <span className="font-semibold text-green-600">{ds.delivered}</span></p>
-        <p>Sent only: <span className="font-semibold text-amber-600">{ds.sent_only}</span></p>
-        <p>Weak proof: <span className="font-semibold text-amber-600">{ds.weak_proof_count}</span></p>
-      </div>
-    );
+
+  entities.push("AutomationProofLog");
+  entities.push("AutomationChecklist");
+
+  if (sk && ["instant_lead_response", "missed_call_text_back", "inbound_sms_assistant", "review_request", "lead_reactivation"].includes(sk)) {
+    entities.push("CommunicationLog (sms)");
   }
-  if (key === "ai_voice_receptionist" && data.voice_readiness) {
-    const vr = data.voice_readiness;
-    return (
-      <div className="space-y-1 text-xs text-gray-600">
-        <p>Inbound voice enabled: <span className={vr.inbound_voice_enabled ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>{String(vr.inbound_voice_enabled)}</span></p>
-        <p>Has transcript proof: <span className={vr.has_transcript_proof ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>{String(vr.has_transcript_proof)}</span></p>
-        {vr.blockers?.length > 0 && <p className="text-red-500">Blockers: {vr.blockers.join(", ")}</p>}
-      </div>
-    );
+  if (sk === "ai_voice_receptionist" || sk === "ai_booking_agent" || cap.key === "voice_broadcasts") {
+    entities.push("CommunicationEvent (voice)");
+    entities.push("AdminSettings (elevenlabs_*)");
   }
-  if (key === "ai_booking_agent" && data.voice_readiness) {
-    return (
-      <div className="space-y-1 text-xs text-gray-600">
-        <p>Transcript proof: <span className={data.voice_readiness.has_transcript_proof ? "text-green-600 font-semibold" : "text-red-600 font-semibold"}>{String(data.voice_readiness.has_transcript_proof)}</span></p>
-      </div>
-    );
+  if (sk === "nurture_sequence_14d") {
+    entities.push("CommunicationLog (sms)");
+    entities.push("CommunicationEvent");
   }
-  if (data.event_stats) {
-    const es = data.event_stats;
-    return (
-      <div className="space-y-1 text-xs text-gray-600">
-        <p>Total CommunicationEvents: <span className="font-semibold">{es.total}</span></p>
-        <p>With provider message ID: <span className="font-semibold text-green-600">{es.with_provider_message_id}</span></p>
-        <p>Twilio 400 errors: <span className="font-semibold text-red-600">{es.twilio_400_errors}</span></p>
-        <p>Failed events: <span className="font-semibold text-red-600">{es.failed_events}</span></p>
-      </div>
-    );
+  if (sk === "missed_call_text_back") {
+    entities.push("AdminSettings (missed_call_webhook_url)");
   }
-  return <p className="text-xs text-gray-400">No communication evidence available.</p>;
+
+  return entities;
+}
+
+function getIncompleteFields(cap, settingsSummary) {
+  const fields = [];
+  const s = settingsSummary || {};
+
+  switch (cap.key) {
+    case "ai_voice_receptionist":
+    case "voice_broadcasts":
+      if (!s.inbound_voice_enabled) fields.push("inbound_voice_enabled");
+      if (!s.voice_calls_enabled) fields.push("voice_calls_enabled");
+      if (!s.has_elevenlabs_agent_ids) fields.push("elevenlabs_agent_ids");
+      if (!s.has_elevenlabs_phone_number_ids) fields.push("elevenlabs_phone_number_ids");
+      if (!s.voice_webhook_url) fields.push("voice_webhook_url");
+      break;
+    case "missed_call_text_back":
+      if (!s.missed_call_webhook_url) fields.push("missed_call_webhook_url");
+      if (!s.twilio_enabled) fields.push("twilio_enabled");
+      break;
+    case "instant_lead_response":
+      if (!s.twilio_enabled) fields.push("twilio_enabled");
+      if (!s.twilio_from_number) fields.push("twilio_from_number");
+      if (!s.sms_webhook_url) fields.push("sms_webhook_url");
+      break;
+    case "nurture_sequence_14d":
+      if (!s.twilio_enabled) fields.push("twilio_enabled");
+      break;
+    case "review_request":
+      // review_link_set is per-checklist, not in settings summary
+      break;
+    case "lead_reactivation":
+      break;
+    case "inbound_sms_assistant":
+      if (!s.sms_webhook_url) fields.push("sms_webhook_url");
+      break;
+    case "ai_booking_agent":
+      if (!s.has_elevenlabs_agent_ids) fields.push("elevenlabs_agent_ids");
+      break;
+    default:
+      break;
+  }
+
+  return fields;
 }

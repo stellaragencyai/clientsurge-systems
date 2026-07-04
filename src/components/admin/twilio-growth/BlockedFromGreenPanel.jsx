@@ -1,137 +1,111 @@
-import { CheckCircle2, XCircle, AlertTriangle, Ban } from "lucide-react";
+import { XCircle, Ban } from "lucide-react";
+import EvidenceQualityBadge from "./EvidenceQualityBadge";
+import { overallEvidenceQuality } from "./evidenceQuality";
 
 const STATUS_STYLES = {
-  green: { color: "#059669", icon: CheckCircle2, label: "Proven" },
-  yellow: { color: "#D97706", icon: AlertTriangle, label: "Partial" },
-  red: { color: "#DC2626", icon: XCircle, label: "Not Done" },
+  yellow: { color: "#D97706", label: "Partial" },
+  red: { color: "#DC2626", label: "Missing" },
 };
 
-function getBlockedReasons(cap, data) {
-  const reasons = [];
-  const proofByService = data.proof_by_service || {};
-  const deliveryStats = data.delivery_stats || {};
-  const missedCall = data.missed_call_stats || {};
-  const voiceReadiness = data.voice_readiness || {};
-  const eventStats = data.event_stats || {};
+export default function BlockedFromGreenPanel({ capabilities }) {
+  const blocked = (capabilities || []).filter((c) => c.status !== "green");
 
-  // Universal: no proof record exists
-  if (cap.proof?.total === 0) {
-    reasons.push("No proof record exists — no AutomationProofLog has been created for this capability.");
-  } else if (cap.proof?.passed === 0 && cap.proof?.total > 0) {
-    reasons.push("Proof records exist but none have passed — all are pending or failed.");
+  if (blocked.length === 0) {
+    return (
+      <div className="bg-green-50 rounded-xl border border-green-200 p-5 flex items-center gap-2">
+        <Ban className="w-4 h-4 text-green-600 flex-shrink-0" />
+        <p className="text-xs text-green-700 font-semibold">All capabilities are proven — no blockers remain.</p>
+      </div>
+    );
   }
-
-  // Per-capability reasons
-  switch (cap.key) {
-    case "ai_voice_receptionist":
-      if (!voiceReadiness.has_elevenlabs_agent_ids) reasons.push("Required configuration missing — ElevenLabs agent IDs are not set in AdminSettings.");
-      if (!voiceReadiness.has_elevenlabs_phone_number_ids) reasons.push("Required configuration missing — ElevenLabs phone number IDs are not set in AdminSettings.");
-      if (!voiceReadiness.inbound_voice_enabled) reasons.push("Required configuration missing — inbound_voice_enabled is false.");
-      if (!voiceReadiness.has_transcript_proof) reasons.push("Voice assistant lacks transcript or meaningful summary evidence — no real call transcript exists on any WebsiteLead.");
-      break;
-    case "missed_call_text_back":
-      if (missedCall.has_404) reasons.push("Required configuration missing — missed-call webhook is returning 404.");
-      if (missedCall.has_405) reasons.push("Required configuration missing — missed-call webhook is returning 405.");
-      if (!missedCall.webhook_url) reasons.push("Required configuration missing — missed_call_webhook_url is not set in AdminSettings.");
-      if (missedCall.sms_attempts === 0) reasons.push("Latest evidence is only an attempt, not final outcome proof — no missed-call SMS attempts have been logged.");
-      if (missedCall.failures > 0 && missedCall.successful_sends === 0) reasons.push("Latest record is only an attempt, not final outcome proof — all missed-call SMS attempts failed.");
-      break;
-    case "instant_lead_response":
-      if (deliveryStats.delivered === 0) reasons.push("Latest record is only an attempt, not final outcome proof — no SMS log has delivery_status=delivered.");
-      if (deliveryStats.without_provider_message_id > 0 && deliveryStats.with_provider_message_id === 0) reasons.push("Related evidence record is missing important fields — no CommunicationLog has a provider_message_id.");
-      if (deliveryStats.weak_proof_count > 0 && deliveryStats.delivered === 0) reasons.push("Latest evidence is only an attempt, not final outcome proof — weak-proof records exist (sent status without provider_message_id).");
-      break;
-    case "nurture_sequence_14d":
-      if (deliveryStats.with_provider_message_id === 0) reasons.push("Related evidence record is missing important fields — no CommunicationLog has a provider_message_id for nurture steps.");
-      if (cap.proof?.total === 0) reasons.push("No proof record exists — no AutomationProofLog for nurture sequence enrollment or step delivery.");
-      break;
-    case "review_request":
-      if (cap.proof?.total === 0) reasons.push("Review/referral workflow has no evidence record — no AutomationProofLog exists for review_request.");
-      break;
-    case "lead_reactivation":
-      if (cap.proof?.total === 0) reasons.push("Review/referral workflow has no evidence record — no AutomationProofLog exists for lead_reactivation (referral engine).");
-      break;
-    case "inbound_sms_assistant":
-      if (cap.proof?.total === 0) reasons.push("No proof record exists — no AutomationProofLog for inbound SMS assistant classification/response.");
-      if (eventStats.total === 0) reasons.push("Related evidence record is missing important fields — no CommunicationEvent records exist for inbound SMS.");
-      break;
-    case "ai_booking_agent":
-      if (!voiceReadiness.has_transcript_proof) reasons.push("Voice assistant lacks transcript or meaningful summary evidence — no call transcript exists on any WebsiteLead.");
-      break;
-    case "voice_broadcasts":
-      if (!voiceReadiness.voice_calls_enabled) reasons.push("Required configuration missing — voice_calls_enabled is false in AdminSettings.");
-      break;
-    case "automation_proof_logs":
-      if (cap.proof?.total === 0) reasons.push("No proof record exists — AutomationProofLog entity is completely empty.");
-      else if (cap.proof?.passed === 0) reasons.push("Proof records exist but none have passed — all AutomationProofLog records are pending or failed.");
-      break;
-    default:
-      if (cap.blockers?.length > 0) {
-        reasons.push(...cap.blockers.map(b => `Blocked: ${b}`));
-      }
-  }
-
-  // Deduplicate
-  return [...new Set(reasons)];
-}
-
-export default function BlockedFromGreenPanel({ data }) {
-  if (!data) return null;
-
-  const capabilities = (data.capabilities || []).filter(c => c.status !== "green");
-  const allCaps = data.capabilities || [];
-  const greenCount = allCaps.filter(c => c.status === "green").length;
 
   return (
-    <div className="space-y-4">
-      <div className="bg-white rounded-xl border border-gray-200 p-4 flex items-center gap-2" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
-        <Ban className="w-4 h-4 text-gray-400" />
-        <p className="text-xs text-gray-500">
-          <span className="font-semibold text-gray-900">{capabilities.length} capabilities</span> are blocked from green. {greenCount} are proven. Each item below lists the exact reason it cannot be marked complete.
+    <div className="space-y-3">
+      <div className="bg-white rounded-xl border border-gray-200 p-4" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
+        <div className="flex items-center gap-2 mb-1">
+          <Ban className="w-4 h-4 text-red-500" />
+          <h3 className="text-sm font-bold text-gray-900">Blocked From Green</h3>
+        </div>
+        <p className="text-xs text-gray-400">
+          {blocked.length} {blocked.length === 1 ? "capability" : "capabilities"} cannot be marked complete. Each reason is derived from real app data — no status is inferred without evidence.
         </p>
       </div>
 
-      {capabilities.length === 0 ? (
-        <div className="bg-green-50 rounded-xl border border-green-200 p-4 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-green-600" />
-          <p className="text-xs text-green-700 font-semibold">All capabilities are proven green. No blockers detected.</p>
-        </div>
-      ) : (
-        capabilities.map(cap => {
-          const style = STATUS_STYLES[cap.status] || STATUS_STYLES.red;
-          const Icon = style.icon;
-          const reasons = getBlockedReasons(cap, data);
-          return (
-            <div key={cap.key} className="bg-white rounded-xl border border-gray-200 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
-              <div className="flex items-start justify-between gap-3 mb-3">
-                <div className="flex items-center gap-2.5">
-                  <Icon className="w-4 h-4 flex-shrink-0" style={{ color: style.color }} />
-                  <div>
-                    <h4 className="text-sm font-bold text-gray-900">{cap.label}</h4>
-                    {cap.service_key && <p className="text-[11px] text-gray-400 font-mono">{cap.service_key}</p>}
-                  </div>
-                </div>
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0" style={{ color: style.color, background: `${style.color}11`, border: `1px solid ${style.color}30` }}>
+      {blocked.map((cap) => {
+        const style = STATUS_STYLES[cap.status] || STATUS_STYLES.red;
+        const quality = overallEvidenceQuality(cap);
+        const reasons = buildBlockedReasons(cap, quality);
+        return (
+          <div key={cap.key} className="bg-white rounded-xl border border-gray-200 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div>
+                <p className="text-sm font-bold text-gray-900">{cap.label}</p>
+                <p className="text-[11px] text-gray-400 font-mono mt-0.5">{cap.key}</p>
+              </div>
+              <div className="flex items-center gap-2 flex-shrink-0">
+                <EvidenceQualityBadge quality={quality} />
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ color: style.color, background: `${style.color}11`, border: `1px solid ${style.color}30` }}>
                   {style.label}
                 </span>
               </div>
-
-              {reasons.length > 0 ? (
-                <ul className="space-y-1.5">
-                  {reasons.map((reason, i) => (
-                    <li key={i} className="text-xs text-gray-700 flex items-start gap-2 rounded-lg bg-gray-50 border border-gray-100 px-3 py-2">
-                      <XCircle className="w-3.5 h-3.5 text-red-400 mt-0.5 flex-shrink-0" />
-                      <span className="leading-relaxed">{reason}</span>
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-xs text-gray-400">No specific blockers identified — status is {cap.status}. Review manually.</p>
-              )}
             </div>
-          );
-        })
-      )}
+
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-wide text-red-400 mb-2">Exact Reason It Cannot Be Marked Complete</p>
+              <ul className="space-y-1.5">
+                {reasons.map((r, i) => (
+                  <li key={i} className="text-xs text-red-700 flex items-start gap-2">
+                    <XCircle className="w-3.5 h-3.5 text-red-400 mt-0.5 flex-shrink-0" />
+                    <span>{r}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {cap.next_action && (
+              <div className="mt-3 pt-3 border-t border-gray-100">
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Required to Unblock</p>
+                <p className="text-xs text-gray-600">{cap.next_action}</p>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
+}
+
+function buildBlockedReasons(cap, quality) {
+  const reasons = [...(cap.blockers || [])];
+
+  // Deduplicate and add specific blocked-from-complete reasons
+  if (cap.proof?.passed === 0 && !reasons.some((r) => r.toLowerCase().includes("no automationprooflog pass"))) {
+    if (cap.proof?.total === 0) {
+      reasons.push("No proof record exists");
+    } else {
+      reasons.push("Latest record is only an attempt, not final outcome proof");
+    }
+  }
+
+  if (quality === "weak" && !reasons.some((r) => r.toLowerCase().includes("incomplete") || r.toLowerCase().includes("internal"))) {
+    reasons.push("Latest evidence is incomplete, internal-only, or missing important fields");
+  }
+
+  if (quality === "none" && !reasons.some((r) => r.toLowerCase().includes("no ") && r.toLowerCase().includes("evidence"))) {
+    reasons.push("No evidence found — nothing usable to confirm completion");
+  }
+
+  // Voice-specific
+  if (cap.key === "ai_voice_receptionist" && !reasons.some((r) => r.toLowerCase().includes("transcript"))) {
+    reasons.push("Voice assistant lacks transcript or meaningful summary evidence");
+  }
+
+  // Review/referral-specific
+  if ((cap.key === "review_request" || cap.key === "lead_reactivation") && !reasons.some((r) => r.toLowerCase().includes("evidence record"))) {
+    if (cap.proof?.total === 0) {
+      reasons.push("Review/referral workflow has no evidence record");
+    }
+  }
+
+  return reasons.length > 0 ? reasons : ["Required configuration or proof is missing"];
 }

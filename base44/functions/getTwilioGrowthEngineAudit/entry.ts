@@ -348,6 +348,32 @@ Deno.serve(async (req) => {
       };
     });
 
+    // ── Per-capability latest records for detail drawer ──
+    const latestRecords = {};
+    for (const cap of CAPABILITIES) {
+      const sk = cap.service_key;
+      latestRecords[cap.key] = {
+        latest_proof: sk
+          ? (proofLogList.find(p => p.service_key === sk) || null)
+          : (proofLogList[0] || null),
+        latest_checklist: sk
+          ? (checklistList.find(c => c.service_key === sk) || null)
+          : (checklistList[0] || null),
+        latest_sms_log: sk
+          ? (smsLogList.find(l =>
+              (l.trigger_name || '').includes(sk) ||
+              (l.trigger_name || '').includes(sk.replace(/_/g, ' '))
+            ) || null)
+          : (smsLogList[0] || null),
+        latest_event: sk
+          ? (eventList.find(e =>
+              (e.event_type || '').includes(sk) ||
+              (e.metadata_json || '').includes(sk)
+            ) || null)
+          : (eventList[0] || null),
+      };
+    }
+
     // ── QA Checklist view (per AutomationChecklist) ──
     const qaChecklists = checklistList.map(cl => ({
       id: cl.id,
@@ -368,21 +394,6 @@ Deno.serve(async (req) => {
       all_false: !cl.twilio_configured && !cl.resend_configured && !cl.booking_link_set && !cl.review_link_set && !cl.lead_form_connected && !cl.communication_event_logging_verified && !cl.test_lead_sent && !cl.test_response_received && !cl.client_approved,
     }));
 
-    // ── Latest records per service (for capability detail drawer) ──
-    const latestProofByService = {};
-    const latestChecklistByService = {};
-    const latestCommLogByService = {};
-    for (const sk of SERVICE_KEYS) {
-      const proofs = proofLogList.filter(p => p.service_key === sk);
-      latestProofByService[sk] = proofs.length > 0 ? proofs[0] : null;
-      const checklists = checklistList.filter(c => c.service_key === sk);
-      latestChecklistByService[sk] = checklists.length > 0 ? checklists[0] : null;
-      const logs = smsLogList.filter(l =>
-        (l.trigger_name || '').includes(sk) || (l.trigger_name || '').includes(sk.replace(/_/g, ' '))
-      );
-      latestCommLogByService[sk] = logs.length > 0 ? logs[0] : null;
-    }
-
     return Response.json({
       capabilities,
       delivery_stats: deliveryStats,
@@ -390,11 +401,6 @@ Deno.serve(async (req) => {
       missed_call_stats: missedCallStats,
       voice_readiness: voiceReadiness,
       proof_by_service: proofByService,
-      latest_records_by_service: {
-        proof: latestProofByService,
-        checklist: latestChecklistByService,
-        comm_log: latestCommLogByService,
-      },
       qa_checklists: qaChecklists,
       quarantine: {
         excluded_leads_count: excludedLeadsCount,
@@ -419,6 +425,7 @@ Deno.serve(async (req) => {
         has_elevenlabs_agent_ids: hasAgentIds,
         has_elevenlabs_phone_number_ids: hasPhoneIds,
       },
+      latest_records: latestRecords,
       proof_logs_empty: proofLogList.length === 0,
       timestamp: new Date().toISOString(),
     });
