@@ -10,7 +10,10 @@ import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
 import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
 import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import FirstLaunchChecklist from "./twilio-growth/FirstLaunchChecklist";
+import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
+import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
+import OwnershipBadge from "./twilio-growth/OwnershipBadge";
+import OperatorNotes from "./twilio-growth/OperatorNotes";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -109,9 +112,6 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
-      {/* Admin-only verification-required-before-closeout reminder */}
-      <VerificationBeforeCloseoutReminder />
-
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
@@ -121,7 +121,7 @@ export default function TwilioGrowthEnginePanel() {
           { id: "blocked", label: "Blocked From Green" },
           { id: "asana", label: "Asana Sync" },
           { id: "qa", label: "QA Checklists" },
-          { id: "first-launch", label: "First Launch Checklist" },
+          { id: "evidence_map", label: "Evidence Map" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -313,38 +313,6 @@ function WorkItemNotes() {
             </div>
           </div>
         ))}
-      </div>
-    </div>
-  );
-}
-
-// ── Verification Required Before Closeout Reminder ──
-function VerificationBeforeCloseoutReminder() {
-  return (
-    <div
-      className="rounded-xl p-5 flex items-start gap-3"
-      style={{
-        background: "linear-gradient(135deg, rgba(220,38,38,0.06), rgba(220,38,38,0.02))",
-        border: "1px solid rgba(220,38,38,0.2)",
-      }}
-    >
-      <div
-        className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
-        style={{
-          background: "rgba(220,38,38,0.1)",
-          border: "1px solid rgba(220,38,38,0.25)",
-        }}
-      >
-        <ShieldAlert className="w-4 h-4 text-red-600" />
-      </div>
-      <div>
-        <p className="text-sm font-bold mb-1 text-red-600">Verification Required Before Closeout — Admin Only</p>
-        <p className="text-xs text-gray-500 leading-relaxed">
-          Do not close the implementation tasks until the admin panels render correctly and computed statuses match actual records.
-        </p>
-        <p className="text-xs font-semibold text-red-600 mt-2">
-          ⚠ Closeout requires evidence-backed verification, not just UI rendering.
-        </p>
       </div>
     </div>
   );
