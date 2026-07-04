@@ -18,6 +18,9 @@ import {
   Lightbulb,
 } from "lucide-react";
 import { AUDIT_SECTIONS, TARGET_SCORE } from "@/lib/auditScoring";
+import LeadCaptureDetailPanel from "./audit/LeadCaptureDetailPanel";
+import AutomationDeliveryDetailPanel from "./audit/AutomationDeliveryDetailPanel";
+import ClientPortalDetailPanel from "./audit/ClientPortalDetailPanel";
 
 const STATUS_STYLES = {
   Trusted: {
@@ -367,6 +370,21 @@ export default function AuditCommandCenter() {
       {/* Admin Truth Detail Panel */}
       {data?.admin_detail && (
         <AdminTruthDetailPanel detail={data.admin_detail} />
+      )}
+
+      {/* Lead Capture Detail Panel */}
+      {data?.lead_capture_detail && (
+        <LeadCaptureDetailPanel detail={data.lead_capture_detail} />
+      )}
+
+      {/* Automation Delivery Detail Panel */}
+      {data?.automation_detail && (
+        <AutomationDeliveryDetailPanel detail={data.automation_detail} />
+      )}
+
+      {/* Client Portal Detail Panel */}
+      {data?.portal_detail && (
+        <ClientPortalDetailPanel detail={data.portal_detail} />
       )}
 
       {/* Environment filter notice */}

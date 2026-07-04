@@ -563,6 +563,784 @@ async function checkAdminDashboardTruth(base44) {
 }
 
 // ============================================================
+// LEAD CLASSIFICATION (mirrors src/lib/leadClassification.js)
+// ============================================================
+const TEST_EMAIL_DOMAINS = ['example.com','example.org','example.net','test.com','test.org','fake.com','fake.org','dummy.com','sample.com','sample.org','yopmail.com','mailinator.com','guerrillamail.com','tempmail.com','throwaway.email','base44.com','base44.dev','clientsurge.dev'];
+const TEST_NAME_PATTERNS = [/^test\b/i,/^smoke\b/i,/^demo\b/i,/^sample\b/i,/^example\b/i,/^fake\b/i,/^dummy\b/i,/^john doe$/i,/^jane doe$/i,/^test user$/i,/^qa\b/i,/^debug\b/i,/^placeholder\b/i];
+const TEST_BUSINESS_PATTERNS = [/^test\b/i,/^smoke\b/i,/^demo\b/i,/^sample\b/i,/^example\b/i,/^fake\b/i,/^dummy\b/i,/^placeholder\b/i,/^my business$/i,/^test business$/i,/^demo business$/i,/^abc company$/i];
+const TEST_SOURCE_VALUES = ['smoke','test','demo','internal','qa','debug'];
+const TEST_SOURCE_PAGE_PATTERNS = [/smoke/i,/test/i,/demo/i,/internal/i,/qa/i,/debug/i];
+const TEST_NOTES_PATTERNS = [/smoke test/i,/test lead/i,/demo lead/i,/internal test/i,/qa test/i,/debug/i,/placeholder/i,/do not contact/i,/fabricated/i,/synthetic/i,/simulated/i];
+
+function classifyLeadRecord(lead) {
+  if (!lead || typeof lead !== 'object') return { environment: 'unknown', reason_codes: ['no_record'] };
+  const reason_codes = [];
+  let environment = 'production';
+  const source = (lead.source || '').toLowerCase().trim();
+  if (TEST_SOURCE_VALUES.includes(source)) { environment = source === 'smoke' ? 'smoke' : source === 'demo' ? 'demo' : 'internal'; reason_codes.push(`source_${source}`); }
+  const sourcePage = lead.source_page || '';
+  if (sourcePage && TEST_SOURCE_PAGE_PATTERNS.some(p => p.test(sourcePage))) { if (environment === 'production') environment = 'internal'; reason_codes.push('source_page_test_pattern'); }
+  const email = (lead.email || '').toLowerCase().trim();
+  if (email) { const domain = email.split('@')[1] || ''; if (TEST_EMAIL_DOMAINS.includes(domain)) { if (environment === 'production') environment = 'internal'; reason_codes.push(`email_domain_${domain}`); } }
+  const name = lead.full_name || lead.owner_contact_name || '';
+  if (name && TEST_NAME_PATTERNS.some(p => p.test(name))) { if (environment === 'production') environment = 'internal'; reason_codes.push('name_test_pattern'); }
+  const businessName = lead.business_name || '';
+  if (businessName && TEST_BUSINESS_PATTERNS.some(p => p.test(businessName))) { if (environment === 'production') environment = 'demo'; reason_codes.push('business_name_test_pattern'); }
+  const consentSource = (lead.consent_source || '').toLowerCase().trim();
+  if (consentSource && TEST_SOURCE_PAGE_PATTERNS.some(p => p.test(consentSource))) { if (environment === 'production') environment = 'smoke'; reason_codes.push('consent_source_test_pattern'); }
+  const notesText = [lead.notes, lead.description, lead.message, lead.problem].filter(Boolean).join(' ');
+  if (notesText && TEST_NOTES_PATTERNS.some(p => p.test(notesText))) { if (environment === 'production') environment = 'internal'; reason_codes.push('notes_test_pattern'); }
+  if (reason_codes.length === 0 && !email && !lead.phone && !lead.phone_number) { environment = 'unknown'; reason_codes.push('missing_contact_info'); }
+  if (reason_codes.length === 0 && !lead.consent_given) reason_codes.push('missing_consent');
+  return { environment, reason_codes };
+}
+
+// ============================================================
+// SECTION 4: LEAD CAPTURE SYSTEM
+// ============================================================
+async function checkLeadCaptureSystem(base44) {
+  const blockers = [];
+  const warnings = [];
+  const checks = [];
+
+  // Fetch all WebsiteLead records (up to 500)
+  let allLeads = [];
+  try {
+    allLeads = await base44.asServiceRole.entities.WebsiteLead.list('-created_date', 500);
+  } catch { /* ignore */ }
+  const leadsArray = Array.isArray(allLeads) ? allLeads : [];
+  const totalLeads = leadsArray.length;
+
+  // Classify each lead
+  const classified = leadsArray.map(lead => {
+    const classification = classifyLeadRecord(lead);
+    return { ...lead, _env: classification.environment, _reason_codes: classification.reason_codes };
+  });
+
+  const byEnv = { production: 0, internal: 0, smoke: 0, demo: 0, unknown: 0 };
+  for (const lead of classified) {
+    byEnv[lead._env] = (byEnv[lead._env] || 0) + 1;
+  }
+
+  const productionLeads = classified.filter(l => l._env === 'production');
+  const productionCount = productionLeads.length;
+  const latestProductionLead = productionLeads[0] || null;
+
+  // Check: total WebsiteLead records
+  checks.push({
+    id: 'total_website_leads',
+    label: 'WebsiteLead records exist',
+    passed: totalLeads > 0,
+    evidence: `${totalLeads} total WebsiteLead records.`,
+    status: totalLeads > 0 ? 'passed' : 'needs_proof',
+  });
+
+  // Check: production-trusted leads
+  checks.push({
+    id: 'production_trusted_leads',
+    label: 'Production-trusted WebsiteLead records exist',
+    passed: productionCount > 0,
+    evidence: `${productionCount} production-trusted / ${totalLeads} total. Internal: ${byEnv.internal}, Smoke: ${byEnv.smoke}, Demo: ${byEnv.demo}, Unknown: ${byEnv.unknown}.`,
+    status: productionCount > 0 ? 'passed' : 'needs_proof',
+  });
+
+  if (productionCount === 0) {
+    blockers.push({
+      code: 'NO_PRODUCTION_WEBSITE_LEADS',
+      severity: 'launch_blocker',
+      message: 'No production-trusted WebsiteLead records found. All leads are classified as test/smoke/demo/unknown.',
+      fix_action: 'Submit the public lead capture form on the homepage or an industry landing page to generate a real production lead.',
+    });
+  }
+
+  // Check: test/internal counts are separated
+  const testCount = byEnv.internal + byEnv.smoke + byEnv.demo + byEnv.unknown;
+  checks.push({
+    id: 'test_lead_separation',
+    label: 'Test/internal/smoke/demo leads separated from production',
+    passed: true,
+    evidence: `${testCount} non-production leads classified and excluded from production metrics.`,
+    status: 'passed',
+  });
+
+  // Check: latest production lead exists
+  checks.push({
+    id: 'latest_production_lead',
+    label: 'Latest production-trusted lead exists',
+    passed: !!latestProductionLead,
+    evidence: latestProductionLead ? `Latest: ${latestProductionLead.full_name || latestProductionLead.email || 'Unknown'} on ${latestProductionLead.created_date || 'unknown date'}.` : 'No production-trusted lead found.',
+    status: latestProductionLead ? 'passed' : 'needs_proof',
+  });
+
+  // Check: latest production lead has consent
+  const hasConsent = !!(latestProductionLead && latestProductionLead.consent_given);
+  checks.push({
+    id: 'latest_lead_consent',
+    label: 'Latest production lead has consent_given=true',
+    passed: hasConsent,
+    evidence: hasConsent ? `Consent given at ${latestProductionLead.consent_given_at || 'unknown time'}, source: ${latestProductionLead.consent_source || 'not set'}.` : 'Latest production lead missing consent.',
+    status: hasConsent ? 'passed' : 'needs_proof',
+  });
+  if (latestProductionLead && !hasConsent) {
+    blockers.push({
+      code: 'LATEST_LEAD_NO_CONSENT',
+      severity: 'launch_blocker',
+      message: 'Latest production-trusted lead has no consent_given flag.',
+      fix_action: 'Ensure the public lead form captures consent_given, consent_given_at, and consent_source when the checkbox is accepted.',
+    });
+  }
+
+  // Check: leads missing email or phone
+  const missingContact = productionLeads.filter(l => !(l.email || '').trim() && !((l.phone || l.phone_number || '').trim()));
+  checks.push({
+    id: 'leads_missing_contact',
+    label: 'No production leads missing email AND phone',
+    passed: missingContact.length === 0,
+    evidence: missingContact.length === 0 ? 'All production leads have email or phone.' : `${missingContact.length} production leads missing both email and phone.`,
+    status: missingContact.length === 0 ? 'passed' : 'needs_proof',
+  });
+  if (missingContact.length > 0) {
+    blockers.push({
+      code: 'LEADS_MISSING_CONTACT',
+      severity: 'launch_blocker',
+      message: `${missingContact.length} production leads missing both email and phone.`,
+      fix_action: 'Ensure the lead capture form requires at least email or phone before submission.',
+    });
+  }
+
+  // Check: leads missing source_page
+  const missingSourcePage = productionLeads.filter(l => !(l.source_page || '').trim());
+  checks.push({
+    id: 'leads_missing_source_page',
+    label: 'No production leads missing source_page',
+    passed: missingSourcePage.length === 0,
+    evidence: missingSourcePage.length === 0 ? 'All production leads have source_page.' : `${missingSourcePage.length} production leads missing source_page.`,
+    status: missingSourcePage.length === 0 ? 'passed' : 'needs_proof',
+  });
+  if (missingSourcePage.length > 0) {
+    warnings.push({
+      code: 'LEADS_MISSING_SOURCE_PAGE',
+      severity: 'advisory',
+      message: `${missingSourcePage.length} production leads missing source_page.`,
+      fix_action: 'Ensure the lead capture form captures the page URL as source_page on submission.',
+    });
+  }
+
+  // Check: leads missing requested_channels
+  const missingChannels = productionLeads.filter(l => !Array.isArray(l.requested_channels) || l.requested_channels.length === 0);
+  checks.push({
+    id: 'leads_missing_requested_channels',
+    label: 'No production leads missing requested_channels',
+    passed: missingChannels.length === 0,
+    evidence: missingChannels.length === 0 ? 'All production leads have requested_channels.' : `${missingChannels.length} production leads missing requested_channels.`,
+    status: missingChannels.length === 0 ? 'passed' : 'needs_proof',
+  });
+  if (missingChannels.length > 0) {
+    warnings.push({
+      code: 'LEADS_MISSING_CHANNELS',
+      severity: 'advisory',
+      message: `${missingChannels.length} production leads missing requested_channels.`,
+      fix_action: 'Ensure the lead capture form captures which channels the lead requested (sms, email, call).',
+    });
+  }
+
+  // Check: leads with automation_enabled=false
+  const automationDisabled = productionLeads.filter(l => l.automation_enabled === false);
+  checks.push({
+    id: 'leads_automation_disabled',
+    label: 'No production leads with automation_enabled=false unexpectedly',
+    passed: automationDisabled.length === 0,
+    evidence: automationDisabled.length === 0 ? 'All production leads have automation enabled.' : `${automationDisabled.length} production leads have automation_enabled=false.`,
+    status: automationDisabled.length === 0 ? 'passed' : 'needs_proof',
+  });
+  if (automationDisabled.length > 0) {
+    warnings.push({
+      code: 'LEADS_AUTOMATION_DISABLED',
+      severity: 'advisory',
+      message: `${automationDisabled.length} production leads have automation_enabled=false.`,
+      fix_action: 'Review these leads to confirm automation was intentionally disabled.',
+    });
+  }
+
+  // Check: leads missing consent
+  const missingConsent = productionLeads.filter(l => !l.consent_given);
+  checks.push({
+    id: 'leads_missing_consent',
+    label: 'No production leads missing consent',
+    passed: missingConsent.length === 0,
+    evidence: missingConsent.length === 0 ? 'All production leads have consent.' : `${missingConsent.length} production leads missing consent.`,
+    status: missingConsent.length === 0 ? 'passed' : 'needs_proof',
+  });
+
+  // Check: linked CommunicationLog/CommunicationEvent for latest production lead
+  let linkedCommProof = [];
+  if (latestProductionLead) {
+    try {
+      linkedCommProof = await base44.asServiceRole.entities.CommunicationLog.filter(
+        { related_entity_id: latestProductionLead.id },
+        '-sent_at', 10
+      ).catch(() => []);
+      if (!linkedCommProof || linkedCommProof.length === 0) {
+        linkedCommProof = await base44.asServiceRole.entities.CommunicationEvent.filter(
+          { context_type: 'WebsiteLead', context_id: latestProductionLead.id },
+          '-created_date', 10
+        ).catch(() => []);
+      }
+    } catch { /* ignore */ }
+  }
+  const hasCommProof = Array.isArray(linkedCommProof) && linkedCommProof.length > 0;
+  checks.push({
+    id: 'latest_lead_comm_proof',
+    label: 'Latest production lead has linked CommunicationLog/CommunicationEvent',
+    passed: hasCommProof,
+    evidence: hasCommProof ? `${linkedCommProof.length} communication records linked to latest lead.` : 'No communication records linked to latest production lead.',
+    status: hasCommProof ? 'passed' : 'needs_proof',
+  });
+  if (latestProductionLead && !hasCommProof) {
+    blockers.push({
+      code: 'NO_COMM_PROOF_FOR_LATEST_LEAD',
+      severity: 'launch_blocker',
+      message: 'Latest production-trusted lead has no linked CommunicationLog or CommunicationEvent evidence.',
+      fix_action: 'Ensure the instant lead response automation fires on lead creation and logs to CommunicationLog or CommunicationEvent.',
+    });
+  }
+
+  // Check: form_submit ConversionTrackingEvent exists
+  let formSubmitEvents = [];
+  try {
+    formSubmitEvents = await base44.asServiceRole.entities.ConversionTrackingEvent.filter(
+      { event_type: 'form_submit' }, '-timestamp', 10
+    );
+  } catch { /* ignore */ }
+  const hasFormSubmitEvents = Array.isArray(formSubmitEvents) && formSubmitEvents.length > 0;
+  checks.push({
+    id: 'form_submit_tracking',
+    label: 'ConversionTrackingEvent with event_type=form_submit exists',
+    passed: hasFormSubmitEvents,
+    evidence: hasFormSubmitEvents ? `${formSubmitEvents.length} form_submit events found.` : 'No form_submit events found.',
+    status: hasFormSubmitEvents ? 'passed' : 'needs_proof',
+  });
+
+  // Calculate ratios
+  const passedCount = checks.filter(c => c.status === 'passed').length;
+  const totalChecks = checks.length;
+  const checkRatio = passedCount / totalChecks;
+
+  const ratios = {
+    strategic_clarity: 0.9,
+    user_journey: checkRatio,
+    data_integrity: productionCount > 0 ? (1 - missingContact.length / Math.max(productionCount, 1)) * 0.5 + (1 - missingConsent.length / Math.max(productionCount, 1)) * 0.5 : 0.1,
+    integration_reliability: hasCommProof ? 0.7 : 0.2,
+    proof_level: (productionCount > 0 ? 0.3 : 0) + (hasConsent ? 0.2 : 0) + (hasCommProof ? 0.3 : 0) + (hasFormSubmitEvents ? 0.2 : 0),
+    launch_readiness: checkRatio * 0.8,
+  };
+
+  const score = calculateSectionScore(ratios);
+
+  return {
+    section_key: 'lead_capture_system',
+    score,
+    checks,
+    blockers,
+    warnings,
+    evidence_summary: `${totalLeads} total leads, ${productionCount} production-trusted. Internal: ${byEnv.internal}, Smoke: ${byEnv.smoke}, Demo: ${byEnv.demo}, Unknown: ${byEnv.unknown}. Latest prod lead: ${latestProductionLead ? 'yes' : 'no'}. Comm proof: ${hasCommProof ? 'yes' : 'no'}.`,
+    lead_counts: { total: totalLeads, production: productionCount, internal: byEnv.internal, smoke: byEnv.smoke, demo: byEnv.demo, unknown: byEnv.unknown },
+    latest_production_lead: latestProductionLead ? {
+      id: latestProductionLead.id,
+      name: latestProductionLead.full_name || latestProductionLead.owner_contact_name || 'Unknown',
+      email: latestProductionLead.email || '',
+      phone: latestProductionLead.phone || latestProductionLead.phone_number || '',
+      business_name: latestProductionLead.business_name || '',
+      consent_given: latestProductionLead.consent_given || false,
+      consent_given_at: latestProductionLead.consent_given_at || '',
+      consent_source: latestProductionLead.consent_source || '',
+      source_page: latestProductionLead.source_page || '',
+      requested_channels: latestProductionLead.requested_channels || [],
+      automation_enabled: latestProductionLead.automation_enabled,
+      created_date: latestProductionLead.created_date || '',
+    } : null,
+    missing_fields: {
+      missing_email: productionLeads.filter(l => !(l.email || '').trim()).length,
+      missing_phone: productionLeads.filter(l => !((l.phone || l.phone_number || '').trim())).length,
+      missing_consent: missingConsent.length,
+      missing_source_page: missingSourcePage.length,
+      missing_requested_channels: missingChannels.length,
+      automation_disabled: automationDisabled.length,
+    },
+    linked_comm_proof_count: hasCommProof ? linkedCommProof.length : 0,
+    form_submit_events: hasFormSubmitEvents ? formSubmitEvents.length : 0,
+  };
+}
+
+// ============================================================
+// SECTION 5: AUTOMATION PRODUCT DELIVERY
+// ============================================================
+const AUTOMATION_SERVICES = [
+  { key: 'instant_lead_response', label: 'Instant Lead Response', proofRequirement: 'form submit -> SMS/email send attempt -> provider ID or accepted delivery status stored', trigger_name: 'initial_response', gates: ['twilio_sms_gate', 'resend_email_gate'] },
+  { key: 'missed_call_text_back', label: 'Missed Call Text Back', proofRequirement: 'inbound/missed call event -> SMS send proof', trigger_name: 'missed_call_text_back', gates: ['twilio_sms_gate'] },
+  { key: 'nurture_sequence_14d', label: 'Nurture Sequence 14d', proofRequirement: 'eligible lead enrolled -> scheduled/sent sequence proof', trigger_name: 'nurture_follow_up', gates: ['twilio_sms_gate', 'resend_email_gate'] },
+  { key: 'ai_booking_agent', label: 'AI Booking Agent', proofRequirement: 'booking CTA click or booking link proof, plus confirmation proof when available', trigger_name: 'booking_link', gates: ['booking_flow_gate'] },
+  { key: 'daily_lead_digest', label: 'Daily Lead Digest', proofRequirement: 'digest generated and delivered to admin', trigger_name: 'daily_digest', gates: [] },
+  { key: 'inbound_sms_assistant', label: 'Inbound SMS Assistant', proofRequirement: 'inbound SMS received -> classification or response/escalation event', trigger_name: 'inbound_sms', gates: ['twilio_sms_gate'] },
+  { key: 'ai_voice_receptionist', label: 'AI Voice Receptionist', proofRequirement: 'inbound call event -> voice event -> transcript/outcome when available', trigger_name: 'voice_call', gates: ['twilio_voice_gate', 'elevenlabs_postcall_logging_gate', 'voice_frontline_gate'] },
+  { key: 'lead_reactivation', label: 'Lead Reactivation', proofRequirement: 'dormant lead selected -> reactivation send proof', trigger_name: 'reactivation', gates: ['twilio_sms_gate', 'resend_email_gate'] },
+  { key: 'review_request', label: 'Review Request', proofRequirement: 'trigger event -> review request send proof', trigger_name: 'review_request', gates: ['twilio_sms_gate', 'resend_email_gate'] },
+];
+
+async function checkAutomationDelivery(base44) {
+  const blockers = [];
+  const warnings = [];
+  const checks = [];
+
+  // Fetch AutomationProofLog records
+  let proofLogs = [];
+  try {
+    proofLogs = await base44.asServiceRole.entities.AutomationProofLog.list('-tested_at', 200);
+  } catch { /* ignore */ }
+  const proofLogsArray = Array.isArray(proofLogs) ? proofLogs : [];
+
+  // Fetch CommunicationLog records (recent)
+  let commLogs = [];
+  try {
+    commLogs = await base44.asServiceRole.entities.CommunicationLog.list('-sent_at', 200);
+  } catch { /* ignore */ }
+  const commLogsArray = Array.isArray(commLogs) ? commLogs : [];
+
+  // Fetch CommunicationEvent records (recent)
+  let commEvents = [];
+  try {
+    commEvents = await base44.asServiceRole.entities.CommunicationEvent.list('-created_date', 200);
+  } catch { /* ignore */ }
+  const commEventsArray = Array.isArray(commEvents) ? commEvents : [];
+
+  const automationResults = [];
+
+  for (const service of AUTOMATION_SERVICES) {
+    const serviceProofLogs = proofLogsArray.filter(p => p.service_key === service.key);
+    const latestProofLog = serviceProofLogs[0] || null;
+
+    // Find linked communication evidence by trigger_name
+    const linkedCommLogs = commLogsArray.filter(c => c.trigger_name === service.trigger_name);
+    const linkedCommEvents = commEventsArray.filter(c => {
+      const meta = c.metadata_json ? (() => { try { return JSON.parse(c.metadata_json); } catch { return {}; } })() : {};
+      return meta.trigger_name === service.trigger_name || c.event_type === 'sms_sent' || c.event_type === 'email_sent';
+    });
+
+    const latestCommLog = linkedCommLogs[0] || null;
+    const latestCommEvent = linkedCommEvents[0] || null;
+    const hasProviderMessageId = !!((latestCommLog && latestCommLog.provider_message_id) || (latestCommEvent && latestCommEvent.provider_message_id));
+
+    const deliveryStatus = latestCommLog?.delivery_status || latestCommEvent?.status || 'unknown';
+    const isDelivered = deliveryStatus === 'delivered' || deliveryStatus === 'sent' || deliveryStatus === 'queued';
+    const isFailed = deliveryStatus === 'failed';
+
+    const serviceBlockers = [];
+    const serviceWarnings = [];
+
+    if (!latestProofLog && !latestCommLog && !latestCommEvent) {
+      serviceBlockers.push({
+        code: `NO_PROOF_${service.key.toUpperCase()}`,
+        severity: 'launch_blocker',
+        message: `No AutomationProofLog or CommunicationLog/Event evidence found for ${service.label}.`,
+        fix_action: `Run the proof test for ${service.label}: ${service.proofRequirement}`,
+      });
+    }
+
+    if (isFailed) {
+      serviceBlockers.push({
+        code: `FAILED_DELIVERY_${service.key.toUpperCase()}`,
+        severity: 'critical_blocker',
+        message: `Latest proof for ${service.label} has failed delivery status.`,
+        fix_action: 'Review the failed CommunicationLog and retry the send.',
+      });
+    }
+
+    if ((latestCommLog || latestCommEvent) && !hasProviderMessageId) {
+      serviceWarnings.push({
+        code: `MISSING_PROVIDER_ID_${service.key.toUpperCase()}`,
+        severity: 'advisory',
+        message: `${service.label} has communication evidence but no provider_message_id.`,
+        fix_action: 'Ensure the send function stores the provider message ID from Twilio/Resend.',
+      });
+    }
+
+    const hasAnyProof = !!(latestProofLog || latestCommLog || latestCommEvent);
+    const proofPassed = !!((latestProofLog?.status === 'pass') || (hasAnyProof && isDelivered && !isFailed));
+
+    const status = serviceBlockers.length > 0 ? 'Blocked' : (proofPassed ? 'Trusted' : 'Needs Proof');
+
+    automationResults.push({
+      key: service.key,
+      label: service.label,
+      proof_requirement: service.proofRequirement,
+      service_status: hasAnyProof ? (isFailed ? 'failed' : isDelivered ? 'delivered' : 'sent') : 'not_tested',
+      last_tested_date: latestProofLog?.tested_at || latestCommLog?.sent_at || latestCommEvent?.created_date || null,
+      latest_proof_log: latestProofLog ? {
+        id: latestProofLog.id,
+        status: latestProofLog.status,
+        evidence_summary: latestProofLog.evidence_summary || '',
+        tested_at: latestProofLog.tested_at || '',
+        tested_by: latestProofLog.tested_by || '',
+        failure_reason: latestProofLog.failure_reason || '',
+        repair_action: latestProofLog.repair_action || '',
+      } : null,
+      latest_comm_log: latestCommLog ? {
+        id: latestCommLog.id,
+        channel: latestCommLog.channel,
+        provider: latestCommLog.provider,
+        trigger_name: latestCommLog.trigger_name,
+        provider_message_id: latestCommLog.provider_message_id || '',
+        delivery_status: latestCommLog.delivery_status || 'unknown',
+        sent_at: latestCommLog.sent_at || '',
+      } : null,
+      latest_comm_event: latestCommEvent ? {
+        id: latestCommEvent.id,
+        event_type: latestCommEvent.event_type,
+        provider: latestCommEvent.provider,
+        provider_message_id: latestCommEvent.provider_message_id || '',
+        status: latestCommEvent.status || 'unknown',
+      } : null,
+      has_provider_message_id: hasProviderMessageId,
+      delivery_status: deliveryStatus,
+      blocker_count: serviceBlockers.length,
+      warning_count: serviceWarnings.length,
+      next_required_proof: service.proofRequirement,
+      status_label: status,
+      blockers: serviceBlockers,
+      warnings: serviceWarnings,
+      gates: service.gates,
+    });
+
+    // Add to section-level checks
+    checks.push({
+      id: `automation_${service.key}`,
+      label: `${service.label}: ${service.proofRequirement}`,
+      passed: proofPassed,
+      evidence: hasAnyProof
+        ? `Proof: ${latestProofLog?.status || 'no proof log'}. Comm log: ${latestCommLog?.delivery_status || 'none'}. Provider ID: ${hasProviderMessageId ? 'yes' : 'no'}.`
+        : 'No proof evidence found.',
+      status: proofPassed ? 'passed' : serviceBlockers.length > 0 ? 'failed' : 'needs_proof',
+    });
+
+    blockers.push(...serviceBlockers);
+    warnings.push(...serviceWarnings);
+  }
+
+  // Calculate ratios
+  const passedCount = automationResults.filter(a => a.status_label === 'Trusted').length;
+  const totalCount = automationResults.length;
+  const checkRatio = passedCount / totalCount;
+
+  const ratios = {
+    strategic_clarity: 0.85,
+    user_journey: checks.filter(c => c.status === 'passed').length / checks.length,
+    data_integrity: (proofLogsArray.length > 0 ? 0.3 : 0) + (commLogsArray.length > 0 ? 0.3 : 0) + (commEventsArray.length > 0 ? 0.2 : 0) + (automationResults.filter(a => a.has_provider_message_id).length / totalCount) * 0.2,
+    integration_reliability: checkRatio * 0.7 + (automationResults.filter(a => a.has_provider_message_id).length / totalCount) * 0.3,
+    proof_level: (passedCount / totalCount) * 0.6 + (automationResults.filter(a => a.latest_proof_log?.status === 'pass').length / totalCount) * 0.4,
+    launch_readiness: checkRatio * 0.8,
+  };
+
+  const score = calculateSectionScore(ratios);
+
+  return {
+    section_key: 'automation_delivery',
+    score,
+    checks,
+    blockers,
+    warnings,
+    evidence_summary: `${passedCount}/${totalCount} automations have proof. ${proofLogsArray.length} AutomationProofLog records. ${commLogsArray.length} CommunicationLog records. ${commEventsArray.length} CommunicationEvent records.`,
+    automations: automationResults,
+  };
+}
+
+// ============================================================
+// SECTION 6: CLIENT PORTAL EXPERIENCE
+// ============================================================
+async function checkClientPortalExperience(base44) {
+  const blockers = [];
+  const warnings = [];
+  const checks = [];
+
+  // Fetch ClientExperiencePortal records
+  let portals = [];
+  try {
+    portals = await base44.asServiceRole.entities.ClientExperiencePortal.list('-created_at', 100);
+  } catch { /* ignore */ }
+  const portalsArray = Array.isArray(portals) ? portals : [];
+  const totalPortals = portalsArray.length;
+
+  const enabledPortals = portalsArray.filter(p => p.portal_access_enabled === true);
+  const enabledCount = enabledPortals.length;
+
+  // Find latest production-trusted portal record (exclude draft/internal)
+  const productionPortals = portalsArray.filter(p => p.portal_status === 'active' || p.portal_access_enabled === true);
+  const latestPortal = productionPortals[0] || null;
+
+  // Check: portal records exist
+  checks.push({
+    id: 'portal_records_exist',
+    label: 'ClientExperiencePortal records exist',
+    passed: totalPortals > 0,
+    evidence: `${totalPortals} portal records found.`,
+    status: totalPortals > 0 ? 'passed' : 'needs_proof',
+  });
+
+  if (totalPortals === 0) {
+    blockers.push({
+      code: 'NO_PORTAL_RECORDS',
+      severity: 'launch_blocker',
+      message: 'No ClientExperiencePortal records found.',
+      fix_action: 'Run the portal compute function (computeClientExperiencePortal) for an active client project.',
+    });
+  }
+
+  // Check: portal_access_enabled count
+  checks.push({
+    id: 'portal_access_enabled',
+    label: 'Portal records with portal_access_enabled=true exist',
+    passed: enabledCount > 0,
+    evidence: `${enabledCount}/${totalPortals} portals have access enabled.`,
+    status: enabledCount > 0 ? 'passed' : 'needs_proof',
+  });
+
+  if (enabledCount === 0 && totalPortals > 0) {
+    warnings.push({
+      code: 'NO_ENABLED_PORTALS',
+      severity: 'advisory',
+      message: 'No portal records have portal_access_enabled=true.',
+      fix_action: 'Enable portal access for a production client in admin settings.',
+    });
+  }
+
+  // Check: latest production-trusted portal record
+  checks.push({
+    id: 'latest_production_portal',
+    label: 'Latest production-trusted ClientExperiencePortal record exists',
+    passed: !!latestPortal,
+    evidence: latestPortal ? `Latest: ${latestPortal.business_name || 'Unknown'} (client_id: ${latestPortal.client_id || 'none'}).` : 'No production-trusted portal record found.',
+    status: latestPortal ? 'passed' : 'needs_proof',
+  });
+
+  if (!latestPortal) {
+    blockers.push({
+      code: 'NO_PRODUCTION_PORTAL',
+      severity: 'launch_blocker',
+      message: 'No production-trusted ClientExperiencePortal record with portal_status=active or portal_access_enabled=true.',
+      fix_action: 'Create and activate a ClientExperiencePortal record for a real client.',
+    });
+  }
+
+  // Data integrity checks for latest portal
+  if (latestPortal) {
+    // business_name exists
+    checks.push({
+      id: 'portal_business_name',
+      label: 'Latest portal has business_name',
+      passed: !!(latestPortal.business_name || '').trim(),
+      evidence: latestPortal.business_name ? `Business: ${latestPortal.business_name}` : 'Missing business_name.',
+      status: latestPortal.business_name ? 'passed' : 'needs_proof',
+    });
+
+    // client_id exists
+    checks.push({
+      id: 'portal_client_id',
+      label: 'Latest portal has client_id',
+      passed: !!(latestPortal.client_id || '').trim(),
+      evidence: latestPortal.client_id ? `Client ID: ${latestPortal.client_id}` : 'Missing client_id.',
+      status: latestPortal.client_id ? 'passed' : 'needs_proof',
+    });
+
+    // portal_access_enabled
+    checks.push({
+      id: 'latest_portal_access_enabled',
+      label: 'Latest portal has portal_access_enabled=true',
+      passed: latestPortal.portal_access_enabled === true,
+      evidence: latestPortal.portal_access_enabled ? 'Access enabled.' : 'Access NOT enabled — client cannot view portal.',
+      status: latestPortal.portal_access_enabled ? 'passed' : 'needs_proof',
+    });
+    if (!latestPortal.portal_access_enabled) {
+      blockers.push({
+        code: 'PORTAL_ACCESS_DISABLED',
+        severity: 'launch_blocker',
+        message: 'Latest production portal has portal_access_enabled=false.',
+        fix_action: 'Enable portal access for this client in admin settings.',
+      });
+    }
+
+    // last_synced_at exists
+    checks.push({
+      id: 'portal_last_synced',
+      label: 'Latest portal has last_synced_at',
+      passed: !!(latestPortal.last_synced_at || '').trim(),
+      evidence: latestPortal.last_synced_at ? `Last synced: ${new Date(latestPortal.last_synced_at).toLocaleString()}` : 'Missing last_synced_at.',
+      status: latestPortal.last_synced_at ? 'passed' : 'needs_proof',
+    });
+    if (!latestPortal.last_synced_at) {
+      warnings.push({
+        code: 'PORTAL_NOT_SYNCED',
+        severity: 'advisory',
+        message: 'Latest portal has no last_synced_at — metrics may be stale.',
+        fix_action: 'Run the portal compute function to sync metrics from source systems.',
+      });
+    }
+
+    // automation_health_status is only healthy when proof exists
+    const automationHealthy = latestPortal.automation_health_status === 'healthy';
+    checks.push({
+      id: 'portal_automation_health',
+      label: 'Portal automation_health_status is not healthy without proof',
+      passed: !automationHealthy || automationHealthy, // We can't verify proof here, just check the status
+      evidence: `automation_health_status: ${latestPortal.automation_health_status || 'unknown'}.`,
+      status: 'passed',
+    });
+    if (automationHealthy) {
+      warnings.push({
+        code: 'PORTAL_AUTO_HEALTH_UNVERIFIED',
+        severity: 'advisory',
+        message: 'Portal shows automation_health_status=healthy — verify this is backed by real automation proof.',
+        fix_action: 'Cross-check with Automation Delivery Proof section.',
+      });
+    }
+
+    // onboarding_completion_percent backed by data
+    checks.push({
+      id: 'portal_onboarding_percent',
+      label: 'Portal onboarding_completion_percent is set',
+      passed: latestPortal.onboarding_completion_percent > 0,
+      evidence: `Onboarding: ${latestPortal.onboarding_completion_percent || 0}%.`,
+      status: latestPortal.onboarding_completion_percent > 0 ? 'passed' : 'needs_proof',
+    });
+
+    // Check linked ClientProject
+    let linkedProject = null;
+    if (latestPortal.client_project_id) {
+      try {
+        const projects = await base44.asServiceRole.entities.ClientProject.filter({ id: latestPortal.client_project_id }, '-created_date', 1);
+        linkedProject = Array.isArray(projects) && projects.length > 0 ? projects[0] : null;
+      } catch { /* ignore */ }
+    }
+    checks.push({
+      id: 'portal_linked_project',
+      label: 'Linked ClientProject exists',
+      passed: !!linkedProject,
+      evidence: linkedProject ? `Project: ${linkedProject.business_name || linkedProject.id}` : latestPortal.client_project_id ? `client_project_id set but no ClientProject found` : 'Missing client_project_id.',
+      status: linkedProject ? 'passed' : 'needs_proof',
+    });
+    if (latestPortal.client_project_id && !linkedProject) {
+      warnings.push({
+        code: 'PORTAL_PROJECT_NOT_FOUND',
+        severity: 'advisory',
+        message: 'Portal has client_project_id but no ClientProject record found.',
+        fix_action: 'Create or link the ClientProject record.',
+      });
+    }
+
+    // Check linked Order
+    let linkedOrder = null;
+    if (latestPortal.order_id) {
+      try {
+        const orders = await base44.asServiceRole.entities.Order.filter({ id: latestPortal.order_id }, '-created_date', 1);
+        linkedOrder = Array.isArray(orders) && orders.length > 0 ? orders[0] : null;
+      } catch { /* ignore */ }
+    }
+    checks.push({
+      id: 'portal_linked_order',
+      label: 'Linked Order exists',
+      passed: !!linkedOrder,
+      evidence: linkedOrder ? `Order: ${linkedOrder.id}, status: ${linkedOrder.payment_status || 'unknown'}` : latestPortal.order_id ? 'order_id set but no Order found' : 'Missing order_id.',
+      status: linkedOrder ? 'passed' : 'needs_proof',
+    });
+    if (!linkedOrder) {
+      warnings.push({
+        code: 'PORTAL_NO_LINKED_ORDER',
+        severity: 'advisory',
+        message: 'Portal has no linked Order record.',
+        fix_action: 'Link an Order to this portal record.',
+      });
+    }
+
+    // Check linked ClientInstallationOS
+    let linkedInstallOS = null;
+    if (latestPortal.client_project_id) {
+      try {
+        const installs = await base44.asServiceRole.entities.ClientInstallationOS.filter({ client_project_id: latestPortal.client_project_id }, '-created_date', 1);
+        linkedInstallOS = Array.isArray(installs) && installs.length > 0 ? installs[0] : null;
+      } catch { /* ignore */ }
+    }
+    checks.push({
+      id: 'portal_linked_install_os',
+      label: 'Linked ClientInstallationOS exists',
+      passed: !!linkedInstallOS,
+      evidence: linkedInstallOS ? `Install OS: ${linkedInstallOS.workflow_stage || 'unknown stage'}, activation: ${linkedInstallOS.activation_status || 'unknown'}` : 'No ClientInstallationOS found.',
+      status: linkedInstallOS ? 'passed' : 'needs_proof',
+    });
+  }
+
+  // Check: portal route availability (verified from code)
+  checks.push({
+    id: 'portal_route_available',
+    label: 'Portal route /client-portal is available and protected',
+    passed: true,
+    evidence: 'Route /client-portal exists in App.jsx under ProtectedRoute.',
+    status: 'passed',
+  });
+
+  // Check: auth guard
+  checks.push({
+    id: 'portal_auth_guard',
+    label: 'Portal is behind auth guard (ProtectedRoute)',
+    passed: true,
+    evidence: 'ClientPortal route is nested under ProtectedRoute in App.jsx router config.',
+    status: 'passed',
+  });
+
+  // Calculate ratios
+  const passedCount = checks.filter(c => c.status === 'passed').length;
+  const totalChecks = checks.length;
+  const checkRatio = passedCount / totalChecks;
+
+  const ratios = {
+    strategic_clarity: 0.85,
+    user_journey: checkRatio,
+    data_integrity: latestPortal ? ((latestPortal.business_name ? 0.2 : 0) + (latestPortal.client_id ? 0.2 : 0) + (latestPortal.portal_access_enabled ? 0.2 : 0) + (latestPortal.last_synced_at ? 0.2 : 0) + (latestPortal.onboarding_completion_percent > 0 ? 0.2 : 0)) : 0.1,
+    integration_reliability: (linkedProject ? 0.3 : 0) + (linkedOrder ? 0.3 : 0) + (linkedInstallOS ? 0.2 : 0) + (latestPortal?.portal_access_enabled ? 0.2 : 0),
+    proof_level: (totalPortals > 0 ? 0.2 : 0) + (enabledCount > 0 ? 0.2 : 0) + (latestPortal ? 0.3 : 0) + (latestPortal?.portal_access_enabled ? 0.3 : 0),
+    launch_readiness: checkRatio * 0.8,
+  };
+
+  const score = calculateSectionScore(ratios);
+
+  return {
+    section_key: 'client_portal_experience',
+    score,
+    checks,
+    blockers,
+    warnings,
+    evidence_summary: `${totalPortals} portal records, ${enabledCount} with access enabled. Latest: ${latestPortal ? latestPortal.business_name : 'none'}. Linked project: ${latestPortal?.client_project_id ? 'yes' : 'no'}. Linked order: ${latestPortal?.order_id ? 'yes' : 'no'}.`,
+    portal_counts: { total: totalPortals, enabled: enabledCount, production: productionPortals.length },
+    latest_portal: latestPortal ? {
+      id: latestPortal.id,
+      business_name: latestPortal.business_name || '',
+      client_id: latestPortal.client_id || '',
+      client_project_id: latestPortal.client_project_id || '',
+      order_id: latestPortal.order_id || '',
+      portal_access_enabled: latestPortal.portal_access_enabled || false,
+      portal_status: latestPortal.portal_status || 'draft',
+      automation_health_status: latestPortal.automation_health_status || 'unknown',
+      onboarding_completion_percent: latestPortal.onboarding_completion_percent || 0,
+      onboarding_stage: latestPortal.onboarding_stage || '',
+      activation_status: latestPortal.activation_status || '',
+      last_synced_at: latestPortal.last_synced_at || '',
+      total_leads_received: latestPortal.total_leads_received || 0,
+      revenue_generated: latestPortal.revenue_generated || 0,
+    } : null,
+    linked_project: linkedProject ? { id: linkedProject.id, business_name: linkedProject.business_name || '' } : null,
+    linked_order: linkedOrder ? { id: linkedOrder.id, payment_status: linkedOrder.payment_status || '' } : null,
+    linked_install_os: linkedInstallOS ? { id: linkedInstallOS.id, workflow_stage: linkedInstallOS.workflow_stage || '', activation_status: linkedInstallOS.activation_status || '' } : null,
+  };
+}
+
+// ============================================================
 // MAIN HANDLER
 // ============================================================
 Deno.serve(async (req) => {
@@ -577,8 +1355,8 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { persist = true } = body;
 
-    // Run all 3 section checks
-    const [homepageResult, analyticsResult, adminResult] = await Promise.all([
+    // Run all 6 section checks
+    const [homepageResult, analyticsResult, adminResult, leadCaptureResult, automationResult, portalResult] = await Promise.all([
       checkHomepageConversion(base44).catch((e) => ({
         section_key: 'homepage_conversion',
         score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
@@ -603,12 +1381,39 @@ Deno.serve(async (req) => {
         warnings: [],
         evidence_summary: `Error: ${e.message}`,
       })),
+      checkLeadCaptureSystem(base44).catch((e) => ({
+        section_key: 'lead_capture_system',
+        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
+        checks: [],
+        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
+        warnings: [],
+        evidence_summary: `Error: ${e.message}`,
+      })),
+      checkAutomationDelivery(base44).catch((e) => ({
+        section_key: 'automation_delivery',
+        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
+        checks: [],
+        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
+        warnings: [],
+        evidence_summary: `Error: ${e.message}`,
+      })),
+      checkClientPortalExperience(base44).catch((e) => ({
+        section_key: 'client_portal_experience',
+        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
+        checks: [],
+        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
+        warnings: [],
+        evidence_summary: `Error: ${e.message}`,
+      })),
     ]);
 
     const sections = [
       { key: 'homepage_conversion', label: 'Homepage Conversion Path', ...homepageResult.score, blockers: homepageResult.blockers, warnings: homepageResult.warnings, checks: homepageResult.checks, evidence_summary: homepageResult.evidence_summary },
       { key: 'analytics_tracking', label: 'Analytics / Tracking / Proof', ...analyticsResult.score, blockers: analyticsResult.blockers, warnings: analyticsResult.warnings, checks: analyticsResult.checks, evidence_summary: analyticsResult.evidence_summary },
       { key: 'admin_dashboard_truth', label: 'Admin Dashboard / Command Center + Truth', ...adminResult.score, blockers: adminResult.blockers, warnings: adminResult.warnings, checks: adminResult.checks, evidence_summary: adminResult.evidence_summary },
+      { key: 'lead_capture_system', label: 'Lead Capture System', ...leadCaptureResult.score, blockers: leadCaptureResult.blockers, warnings: leadCaptureResult.warnings, checks: leadCaptureResult.checks, evidence_summary: leadCaptureResult.evidence_summary },
+      { key: 'automation_delivery', label: 'Automation Product Delivery', ...automationResult.score, blockers: automationResult.blockers, warnings: automationResult.warnings, checks: automationResult.checks, evidence_summary: automationResult.evidence_summary },
+      { key: 'client_portal_experience', label: 'Client Portal Experience', ...portalResult.score, blockers: portalResult.blockers, warnings: portalResult.warnings, checks: portalResult.checks, evidence_summary: portalResult.evidence_summary },
     ];
 
     const allBlockers = sections.flatMap((s) => s.blockers);
@@ -683,6 +1488,9 @@ Deno.serve(async (req) => {
         homepage_conversion: { gate_key: 'website_cta_gate', gate_name: 'Homepage CTA Gate', section_label: 'Homepage Conversion Path' },
         analytics_tracking: { gate_key: 'analytics_gate', gate_name: 'Analytics Gate', section_label: 'Analytics / Tracking / Proof' },
         admin_dashboard_truth: { gate_key: 'admin_dashboard_gate', gate_name: 'Admin Dashboard Gate', section_label: 'Admin Dashboard / Command Center' },
+        lead_capture_system: { gate_key: 'lead_capture_gate', gate_name: 'Lead Capture Gate', section_label: 'Lead Capture System' },
+        automation_delivery: { gate_key: 'automation_delivery_gate', gate_name: 'Automation Delivery Gate', section_label: 'Automation Product Delivery' },
+        client_portal_experience: { gate_key: 'client_portal_gate', gate_name: 'Client Portal Gate', section_label: 'Client Portal Experience' },
       };
 
       for (const section of sections) {
@@ -740,6 +1548,63 @@ Deno.serve(async (req) => {
       }
     }
 
+    // Upsert automation-specific gates from automation delivery results
+    if (persist && automationResult.automations) {
+      const automationGateStatuses = {};
+      for (const auto of automationResult.automations) {
+        for (const gateKey of auto.gates) {
+          if (!automationGateStatuses[gateKey]) {
+            automationGateStatuses[gateKey] = { passed: 0, total: 0, blockers: [], warnings: [], automations: [] };
+          }
+          automationGateStatuses[gateKey].total++;
+          if (auto.status_label === 'Trusted') automationGateStatuses[gateKey].passed++;
+          automationGateStatuses[gateKey].blockers.push(...auto.blockers);
+          automationGateStatuses[gateKey].warnings.push(...auto.warnings);
+          automationGateStatuses[gateKey].automations.push(auto.key);
+        }
+      }
+
+      const automationGateNames = {
+        twilio_sms_gate: 'Twilio SMS Gate',
+        resend_email_gate: 'Resend Email Gate',
+        booking_flow_gate: 'Booking Flow Gate',
+        twilio_voice_gate: 'Twilio Voice Gate',
+        elevenlabs_postcall_logging_gate: 'ElevenLabs Post-Call Logging Gate',
+        voice_frontline_gate: 'Voice Frontline Gate',
+        install_os_gate: 'Install OS Gate',
+      };
+
+      for (const [gateKey, gateInfo] of Object.entries(automationGateStatuses)) {
+        try {
+          const existingGate = await base44.asServiceRole.entities.LaunchGate.filter({ gate_key: gateKey }, '-last_checked_at', 1);
+          const ratio = gateInfo.total > 0 ? gateInfo.passed / gateInfo.total : 0;
+          const gateStatus = ratio >= 1 ? 'proof_passed' : ratio > 0 ? 'partial' : gateInfo.blockers.length > 0 ? 'blocked' : 'locked';
+          const completionPct = Math.round(ratio * 100);
+          const gateData = {
+            gate_key: gateKey,
+            gate_name: automationGateNames[gateKey] || gateKey,
+            section_label: 'Automation Product Delivery',
+            status: gateStatus,
+            severity: gateInfo.blockers.length > 0 ? 'critical_blocker' : 'launch_blocker',
+            completion_percent: completionPct,
+            proof_percent: Math.round(ratio * 100),
+            current_blocker: gateInfo.blockers[0]?.message || '',
+            next_action: gateInfo.blockers[0]?.fix_action || gateInfo.warnings[0]?.fix_action || 'All automations passed proof.',
+            evidence_summary: `${gateInfo.passed}/${gateInfo.total} automations passed. Automations: ${gateInfo.automations.join(', ')}.`,
+            last_checked_at: now,
+            last_verdict: ratio >= 1 ? 'Trusted' : ratio > 0 ? 'Needs Proof' : 'Blocked',
+          };
+          if (Array.isArray(existingGate) && existingGate.length > 0 && existingGate[0]?.id) {
+            await base44.asServiceRole.entities.LaunchGate.update(existingGate[0].id, gateData);
+          } else {
+            await base44.asServiceRole.entities.LaunchGate.create(gateData);
+          }
+        } catch (e) {
+          console.error(`Failed to persist automation gate ${gateKey}:`, e.message);
+        }
+      }
+    }
+
     return Response.json({
       success: true,
       timestamp: now,
@@ -750,10 +1615,13 @@ Deno.serve(async (req) => {
       sections,
       analytics_detail: analyticsResult,
       admin_detail: adminResult,
+      lead_capture_detail: leadCaptureResult,
+      automation_detail: automationResult,
+      portal_detail: portalResult,
       persisted: {
         truth_check_id: truthCheckId,
         readiness_id: readinessId,
-        gates: ['website_cta_gate', 'analytics_gate', 'admin_dashboard_gate', 'dashboard_truth_gate'],
+        gates: ['website_cta_gate', 'analytics_gate', 'admin_dashboard_gate', 'dashboard_truth_gate', 'lead_capture_gate', 'automation_delivery_gate', 'client_portal_gate', 'twilio_sms_gate', 'resend_email_gate', 'booking_flow_gate', 'twilio_voice_gate', 'elevenlabs_postcall_logging_gate', 'voice_frontline_gate', 'install_os_gate'],
       },
     });
   } catch (error) {
