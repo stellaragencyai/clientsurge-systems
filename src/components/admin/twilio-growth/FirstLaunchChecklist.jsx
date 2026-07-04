@@ -1,208 +1,236 @@
-import { CheckCircle2, XCircle, AlertTriangle, Rocket } from "lucide-react";
+import {
+  CheckCircle2, AlertTriangle, XCircle, Rocket, FileText,
+} from "lucide-react";
+import { computePhase } from "@/lib/twilioGrowthEnginePhases";
 
 const STATUS_STYLES = {
-  ready: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Ready" },
-  partial: { color: "#D97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.2)", icon: AlertTriangle, label: "Partial" },
-  blocked: { color: "#DC2626", bg: "rgba(220,38,38,0.05)", border: "rgba(220,38,38,0.18)", icon: XCircle, label: "Blocked" },
+  green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Ready" },
+  yellow: { color: "#D97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.2)", icon: AlertTriangle, label: "Partial" },
+  red: { color: "#DC2626", bg: "rgba(220,38,38,0.05)", border: "rgba(220,38,38,0.18)", icon: XCircle, label: "Blocked" },
 };
 
-function evaluateItem(key, data) {
+function evaluateItem(itemId, data) {
   const caps = data.capabilities || [];
   const delivery = data.delivery_stats || {};
   const missed = data.missed_call_stats || {};
   const quarantine = data.quarantine || {};
-  const proofEmpty = data.proof_logs_empty;
+  const proofLogsEmpty = data.proof_logs_empty;
 
-  const findCap = (k) => caps.find(c => c.key === k);
-
-  switch (key) {
+  switch (itemId) {
     case "speed_to_lead": {
-      const cap = findCap("instant_lead_response");
-      const hasDelivered = delivery.delivered > 0;
-      const hasProviderId = delivery.with_provider_message_id > 0;
-      const hasProof = cap?.proof?.passed > 0;
-      if (hasProof && hasDelivered && hasProviderId) {
-        return { status: "ready", blocker: null, nextAction: "Maintain speed-to-lead monitoring." };
-      }
+      const cap = caps.find(c => c.key === "instant_lead_response");
+      const hasDelivered = (delivery.delivered || 0) > 0;
+      const hasProviderId = (delivery.with_provider_message_id || 0) > 0;
+      const proofPassed = cap?.proof?.passed > 0;
       const blockers = [];
-      if (!hasProof) blockers.push("No AutomationProofLog pass for instant_lead_response");
-      if (!hasDelivered) blockers.push("No delivered Twilio SMS proof");
-      if (!hasProviderId) blockers.push("Missing provider_message_id on SMS logs");
+      if (!hasDelivered) blockers.push("No delivered SMS proof in CommunicationLog");
+      if (!hasProviderId) blockers.push("No provider_message_id on outbound SMS records");
+      if (!proofPassed) blockers.push("No AutomationProofLog pass for instant_lead_response");
+      const ready = hasDelivered && hasProviderId && proofPassed;
+      const status = ready ? "green" : hasDelivered || hasProviderId ? "yellow" : "red";
       return {
-        status: hasDelivered || cap?.status === "yellow" ? "partial" : "blocked",
-        blocker: blockers.join("; "),
-        nextAction: "Trigger a real lead and confirm delivered Twilio SMS with provider_message_id, then create a passing AutomationProofLog.",
+        status,
+        requiredEvidence: "Delivered SMS (delivery_status=delivered) tied to a real production lead, with valid provider_message_id and AutomationProofLog pass.",
+        blockers,
+        nextAction: ready
+          ? "Maintain monitoring. Speed-to-lead is launch-ready."
+          : "Trigger a real production lead and confirm delivered SMS with provider_message_id, then pass AutomationProofLog.",
+        canLaunch: ready,
       };
     }
     case "missed_call": {
-      const cap = findCap("missed_call_text_back");
-      const hasProof = cap?.proof?.passed > 0;
-      const hasAttempts = missed.sms_attempts > 0;
-      const hasSuccess = missed.successful_sends > 0;
-      const webhookBlocked = missed.has_404 || missed.has_405;
-      if (hasProof && hasAttempts && hasSuccess && !webhookBlocked) {
-        return { status: "ready", blocker: null, nextAction: "Maintain missed-call webhook monitoring." };
-      }
+      const cap = caps.find(c => c.key === "missed_call_text_back");
+      const has404 = missed.has_404;
+      const has405 = missed.has_405;
+      const smsAttempts = (missed.sms_attempts || 0) > 0;
+      const successfulSends = (missed.successful_sends || 0) > 0;
+      const proofPassed = cap?.proof?.passed > 0;
       const blockers = [];
-      if (webhookBlocked) blockers.push(`Webhook returning ${missed.has_404 ? "404" : "405"}`);
-      if (!hasProof) blockers.push("No AutomationProofLog pass for missed_call_text_back");
-      if (!hasAttempts) blockers.push("No missed-call SMS attempts logged");
+      if (has404) blockers.push("Webhook returning 404");
+      if (has405) blockers.push("Webhook returning 405");
+      if (!smsAttempts) blockers.push("No missed-call SMS attempts logged");
+      if (!successfulSends) blockers.push("No successful missed-call SMS sends");
+      if (!proofPassed) blockers.push("No AutomationProofLog pass for missed_call_text_back");
+      const ready = !has404 && !has405 && smsAttempts && successfulSends && proofPassed;
+      const status = ready ? "green" : smsAttempts || successfulSends ? "yellow" : "red";
       return {
-        status: hasAttempts || cap?.status === "yellow" ? "partial" : "blocked",
-        blocker: blockers.join("; "),
-        nextAction: "Repair webhook (if blocked), trigger a test missed call, and create a passing AutomationProofLog.",
+        status,
+        requiredEvidence: "Missed-call webhook returning 200, SMS attempt with successful delivery, and AutomationProofLog pass.",
+        blockers,
+        nextAction: ready
+          ? "Maintain webhook monitoring. Missed-call recovery is launch-ready."
+          : "Repair webhook 404/405 if present, trigger a test missed call, confirm SMS delivery, then pass AutomationProofLog.",
+        canLaunch: ready,
       };
     }
     case "proof_logging": {
-      const cap = findCap("automation_proof_logs");
-      const hasPassed = cap?.proof?.passed > 0;
-      const hasRecords = cap?.proof?.total > 0;
-      if (hasPassed) {
-        return { status: "ready", blocker: null, nextAction: "Continue maintaining proof logs for all automations." };
-      }
-      if (hasRecords) {
-        return { status: "partial", blocker: "Proof logs exist but none passed", nextAction: "Review pending/failed proof logs and resolve blockers." };
-      }
-      return { status: "blocked", blocker: "AutomationProofLog is empty", nextAction: "Create AutomationProofLog records for instant_lead_response and missed_call_text_back." };
+      const cap = caps.find(c => c.key === "automation_proof_logs");
+      const totalProofs = cap?.proof?.total || 0;
+      const passedProofs = cap?.proof?.passed || 0;
+      const blockers = [];
+      if (totalProofs === 0) blockers.push("AutomationProofLog is empty — no proof records exist");
+      if (totalProofs > 0 && passedProofs === 0) blockers.push("Proof records exist but none passed");
+      const ready = passedProofs > 0;
+      const status = ready ? "green" : totalProofs > 0 ? "yellow" : "red";
+      return {
+        status,
+        requiredEvidence: "At least one passed AutomationProofLog record for a first-launch service (instant_lead_response or missed_call_text_back).",
+        blockers,
+        nextAction: ready
+          ? "Continue maintaining proof records for all first-launch services."
+          : proofLogsEmpty
+            ? "Create and pass AutomationProofLog records for instant_lead_response and missed_call_text_back."
+            : "Review pending/failed proof records and resolve blockers.",
+        canLaunch: ready,
+      };
     }
     case "test_exclusion": {
-      const hasRules = quarantine.rules && quarantine.rules.length > 0;
-      const hasExcluded = quarantine.excluded_leads_count !== undefined;
-      const hasWeakProof = delivery.weak_proof_count > 0;
-      if (hasRules && hasExcluded && !hasWeakProof) {
-        return { status: "ready", blocker: null, nextAction: "Maintain test data exclusion rules." };
-      }
+      const excludedCount = quarantine.excluded_leads_count;
+      const productionCount = quarantine.production_leads_count;
+      const hasRules = (quarantine.rules || []).length > 0;
+      const weakProofCount = delivery.weak_proof_count || 0;
       const blockers = [];
-      if (!hasRules) blockers.push("No exclusion rules configured");
-      if (hasWeakProof) blockers.push(`${delivery.weak_proof_count} weak-proof records detected (provider_message_id=null + status=sent)`);
+      if (!hasRules) blockers.push("No test-data exclusion rules defined");
+      if (weakProofCount > 0) blockers.push(`${weakProofCount} weak-proof records detected (provider_message_id=null + status=sent)`);
+      if (excludedCount === undefined) blockers.push("Quarantine counts not computed — exclusion status unknown");
+      const ready = hasRules && weakProofCount === 0 && excludedCount !== undefined;
+      const status = ready ? "green" : hasRules ? "yellow" : "red";
       return {
-        status: hasRules ? "partial" : "blocked",
-        blocker: blockers.join("; "),
-        nextAction: "Configure exclusion rules and resolve weak-proof records so test data does not pollute production metrics.",
+        status,
+        requiredEvidence: "Test/internal/smoke exclusion rules active, zero weak-proof records polluting production metrics, quarantine counts computed.",
+        blockers,
+        nextAction: ready
+          ? "Exclusion system is launch-ready. Continue excluding test data from production KPIs."
+          : weakProofCount > 0
+            ? "Investigate and exclude weak-proof records (null provider_message_id + sent status) from production metrics."
+            : "Define and verify test-data exclusion rules in the audit function.",
+        canLaunch: ready,
       };
     }
     case "repair_queue": {
-      const repairItems = data.repair_items || [];
-      const criticalCount = repairItems.filter(r => r.severity === "critical").length;
-      if (criticalCount === 0 && repairItems.length === 0) {
-        return { status: "ready", blocker: null, nextAction: "Keep repair queue clear of critical items." };
-      }
-      if (criticalCount === 0) {
-        return { status: "partial", blocker: `${repairItems.length} non-critical repair items in queue`, nextAction: "Review and resolve remaining repair items." };
-      }
-      return { status: "blocked", blocker: `${criticalCount} critical repair items blocking launch`, nextAction: "Resolve all critical-severity repair items before launch." };
+      const repairCap = caps.filter(c => c.status !== "green");
+      const criticalRepairs = repairCap.filter(c => c.key === "instant_lead_response" || c.key === "missed_call_text_back");
+      const blockers = [];
+      if (criticalRepairs.length > 0) blockers.push(`${criticalRepairs.length} critical first-launch repair(s) open`);
+      if (missed.has_404) blockers.push("Missed-call webhook 404 — appears in repair queue");
+      if (delivery.without_provider_message_id > 0) blockers.push(`${delivery.without_provider_message_id} SMS log(s) without provider_message_id`);
+      const ready = criticalRepairs.length === 0 && !missed.has_404 && (delivery.without_provider_message_id || 0) === 0;
+      const status = ready ? "green" : repairCap.length > 0 ? "yellow" : "red";
+      return {
+        status,
+        requiredEvidence: "Repair Queue visible and empty of critical first-launch items (speed-to-lead, missed-call recovery, webhook 404, provider errors).",
+        blockers,
+        nextAction: ready
+          ? "Repair Queue is clear for first launch. Monitor for new items."
+          : "Resolve all critical first-launch repairs before launching. Check the Repair Queue tab.",
+        canLaunch: ready,
+      };
     }
     default:
-      return { status: "blocked", blocker: "Unknown checklist item", nextAction: "Define evaluation criteria." };
+      return { status: "red", requiredEvidence: "Unknown checklist item.", blockers: ["Unknown item"], nextAction: "N/A", canLaunch: false };
   }
 }
 
-const CHECKLIST_ITEMS = [
-  { key: "speed_to_lead", label: "Website Speed-to-Lead Readiness", evidence: "Delivered Twilio SMS with provider_message_id on a real (non-test) lead + AutomationProofLog pass for instant_lead_response." },
-  { key: "missed_call", label: "Missed Call Recovery Readiness", evidence: "Webhook returning 200 (no 404/405) + missed-call SMS attempt logged + AutomationProofLog pass for missed_call_text_back." },
-  { key: "proof_logging", label: "Evidence / Proof Logging Readiness", evidence: "At least one AutomationProofLog record with status=pass exists in the system." },
-  { key: "test_exclusion", label: "Internal / Test Record Exclusion Readiness", evidence: "Exclusion rules configured + no weak-proof records (provider_message_id=null + status=sent) in production metrics." },
-  { key: "repair_queue", label: "Repair Queue Visibility", evidence: "Zero critical-severity repair items in the Repair Queue." },
+const ITEMS = [
+  { id: "speed_to_lead", label: "Website Speed-to-Lead Readiness", icon: FileText },
+  { id: "missed_call", label: "Missed Call Recovery Readiness", icon: AlertTriangle },
+  { id: "proof_logging", label: "Evidence/Proof Logging Readiness", icon: CheckCircle2 },
+  { id: "test_exclusion", label: "Internal/Test Record Exclusion Readiness", icon: CheckCircle2 },
+  { id: "repair_queue", label: "Repair Queue Visibility", icon: AlertTriangle },
 ];
 
 export default function FirstLaunchChecklist({ data }) {
   if (!data) return null;
 
-  const evaluated = CHECKLIST_ITEMS.map(item => {
-    const result = evaluateItem(item.key, data);
-    return { ...item, ...result };
-  });
-
-  const canLaunch = evaluated.every(e => e.status === "ready");
-  const blockedCount = evaluated.filter(e => e.status === "blocked").length;
-  const partialCount = evaluated.filter(e => e.status === "partial").length;
+  const results = ITEMS.map(item => ({ ...item, ...evaluateItem(item.id, data) }));
+  const allReady = results.every(r => r.canLaunch);
+  const readyCount = results.filter(r => r.canLaunch).length;
 
   return (
     <div className="space-y-4">
-      {/* Launch verdict */}
+      {/* Summary banner */}
       <div
         className="rounded-xl p-5 flex items-start gap-3"
         style={{
-          background: canLaunch
+          background: allReady
             ? "linear-gradient(135deg, rgba(5,150,105,0.06), rgba(5,150,105,0.02))"
             : "linear-gradient(135deg, rgba(220,38,38,0.06), rgba(220,38,38,0.02))",
-          border: `1px solid ${canLaunch ? "rgba(5,150,105,0.2)" : "rgba(220,38,38,0.2)"}`,
+          border: `1px solid ${allReady ? "rgba(5,150,105,0.2)" : "rgba(220,38,38,0.2)"}`,
         }}
       >
         <div
-          className="w-10 h-10 rounded-lg flex items-center justify-center flex-shrink-0"
+          className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
           style={{
-            background: canLaunch ? "rgba(5,150,105,0.1)" : "rgba(220,38,38,0.1)",
-            border: `1px solid ${canLaunch ? "rgba(5,150,105,0.25)" : "rgba(220,38,38,0.25)"}`,
+            background: allReady ? "rgba(5,150,105,0.1)" : "rgba(220,38,38,0.1)",
+            border: `1px solid ${allReady ? "rgba(5,150,105,0.25)" : "rgba(220,38,38,0.25)"}`,
           }}
         >
-          <Rocket className="w-5 h-5" style={{ color: canLaunch ? "#059669" : "#DC2626" }} />
+          <Rocket className="w-4 h-4" style={{ color: allReady ? "#059669" : "#DC2626" }} />
         </div>
         <div>
-          <p className="text-sm font-bold mb-1" style={{ color: canLaunch ? "#059669" : "#DC2626" }}>
-            {canLaunch ? "First Launch Scope: GO" : "First Launch Scope: NO-GO"}
+          <p className="text-sm font-bold" style={{ color: allReady ? "#059669" : "#DC2626" }}>
+            {allReady
+              ? "First Launch: READY — all checklist items pass"
+              : `First Launch: NOT READY — ${results.length - readyCount} of ${results.length} items blocked`}
           </p>
-          <p className="text-xs text-gray-500 leading-relaxed">
-            {canLaunch
-              ? "All first launch scope items are ready. This does not mean all capabilities are trusted — only that the minimum launch scope is met."
-              : `${blockedCount} blocked, ${partialCount} partial. Resolve all blocked items before launching.`}
+          <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">
+            Only first-launch-scope items are checked: Speed-to-Lead, Missed Call Recovery, Proof Logging, Test Exclusion, and Repair Queue.
+            Voice, referral, and review capabilities are intentionally excluded from first launch scope.
           </p>
         </div>
       </div>
 
       {/* Checklist items */}
-      {evaluated.map(item => {
-        const style = STATUS_STYLES[item.status] || STATUS_STYLES.blocked;
-        const Icon = style.icon;
-        const canLaunchItem = item.status === "ready";
+      {results.map(item => {
+        const style = STATUS_STYLES[item.status] || STATUS_STYLES.red;
+        const Icon = item.icon;
         return (
-          <div key={item.key} className="bg-white rounded-xl border border-gray-200 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
-            <div className="flex items-start justify-between gap-3 mb-3">
-              <div className="flex-1">
-                <p className="text-sm font-bold text-gray-900">{item.label}</p>
+          <div key={item.id} className="bg-white rounded-xl border border-gray-200 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
+            <div className="flex items-center justify-between gap-3 mb-3">
+              <div className="flex items-center gap-2.5">
+                <Icon className="w-4 h-4 text-gray-400 flex-shrink-0" />
+                <div>
+                  <h4 className="text-sm font-bold text-gray-900">{item.label}</h4>
+                </div>
               </div>
               <div className="flex items-center gap-2 flex-shrink-0">
-                <span
-                  className="rounded-full px-2.5 py-0.5 text-xs font-semibold"
-                  style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}
-                >
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold" style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}>
                   {style.label}
                 </span>
                 <span
-                  className="rounded-full px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wide"
+                  className="rounded-full px-2.5 py-0.5 text-[10px] font-bold"
                   style={{
-                    color: canLaunchItem ? "#059669" : "#DC2626",
-                    background: canLaunchItem ? "rgba(5,150,105,0.06)" : "rgba(220,38,38,0.05)",
-                    border: `1px solid ${canLaunchItem ? "rgba(5,150,105,0.2)" : "rgba(220,38,38,0.18)"}`,
+                    color: item.canLaunch ? "#059669" : "#DC2626",
+                    background: item.canLaunch ? "rgba(5,150,105,0.06)" : "rgba(220,38,38,0.05)",
+                    border: `1px solid ${item.canLaunch ? "rgba(5,150,105,0.2)" : "rgba(220,38,38,0.18)"}`,
                   }}
                 >
-                  {canLaunchItem ? "Can Launch" : "Cannot Launch"}
+                  {item.canLaunch ? "CAN LAUNCH" : "CANNOT LAUNCH"}
                 </span>
               </div>
             </div>
-
             <div className="space-y-2.5">
               <div>
                 <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Required Evidence</p>
-                <p className="text-xs text-gray-600 leading-relaxed">{item.evidence}</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{item.requiredEvidence}</p>
               </div>
-
-              {item.blocker && (
+              {item.blockers.length > 0 && (
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-red-400 mb-0.5">Blocker</p>
-                  <p className="text-xs text-red-600 flex items-start gap-1.5">
-                    <XCircle className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
-                    <span>{item.blocker}</span>
-                  </p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-red-400 mb-0.5">Blocker{item.blockers.length > 1 ? "s" : ""}</p>
+                  <ul className="space-y-1">
+                    {item.blockers.map((b, i) => (
+                      <li key={i} className="text-xs text-red-600 flex items-start gap-1.5">
+                        <XCircle className="w-3 h-3 text-red-400 mt-0.5 flex-shrink-0" />
+                        <span>{b}</span>
+                      </li>
+                    ))}
+                  </ul>
                 </div>
               )}
-
-              {item.nextAction && (
-                <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Next Action</p>
-                  <p className="text-xs text-gray-600">{item.nextAction}</p>
-                </div>
-              )}
+              <div>
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Next Action</p>
+                <p className="text-xs text-gray-600 leading-relaxed">{item.nextAction}</p>
+              </div>
             </div>
           </div>
         );

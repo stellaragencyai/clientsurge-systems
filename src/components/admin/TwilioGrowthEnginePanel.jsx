@@ -4,13 +4,16 @@ import {
   ShieldAlert, ShieldCheck, ShieldX, RefreshCw, AlertTriangle,
   CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronRight,
   Phone, MessageSquare, Mail, Zap, Star, RotateCcw, FileText,
-  Radio, Mic, ClipboardList, Database, Wrench,
+  Radio, Mic, ClipboardList, Database, Wrench, Ban, ListChecks, Maximize2,
 } from "lucide-react";
+import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
+import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
+import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import AsanaCompletionGate from "./AsanaCompletionGate";
-import DoNotBuildYetPanel from "./DoNotBuildYetPanel";
-import CoreSystemHealthMiniCard from "./twilio-growth/CoreSystemHealthMiniCard";
-import MinimumDefinitionOfDone from "./MinimumDefinitionOfDone";
+import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
+import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
+import OwnershipBadge from "./twilio-growth/OwnershipBadge";
+import OperatorNotes from "./twilio-growth/OperatorNotes";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -59,6 +62,7 @@ export default function TwilioGrowthEnginePanel() {
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
   const [activeView, setActiveView] = useState("capabilities");
+  const [drawerCap, setDrawerCap] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -108,21 +112,16 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
-      {/* Admin-only minimum definition of done */}
-      <MinimumDefinitionOfDone />
-
-      {/* Admin-only core system health */}
-      <CoreSystemHealthMiniCard data={data} />
-
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
           { id: "capabilities", label: "Capability Matrix" },
           { id: "proof", label: "Proof Center" },
           { id: "repair", label: "Repair Queue" },
-          { id: "asana", label: "Asana Gate" },
+          { id: "blocked", label: "Blocked From Green" },
+          { id: "asana", label: "Asana Sync" },
           { id: "qa", label: "QA Checklists" },
-          { id: "do_not_build", label: "Do Not Build Yet" },
+          { id: "evidence_map", label: "Evidence Map" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -156,15 +155,19 @@ export default function TwilioGrowthEnginePanel() {
       ) : (
         <>
           {activeView === "capabilities" && (
-            <CapabilityMatrix
-              capabilities={data.capabilities || []}
-              expandedRows={expandedRows}
-              toggleRow={toggleRow}
-              deliveryStats={data.delivery_stats}
-              eventStats={data.event_stats}
-              missedCallStats={data.missed_call_stats}
-              voiceReadiness={data.voice_readiness}
-            />
+            <>
+              <LaunchReadinessSummary data={data} />
+              <CapabilityMatrix
+                capabilities={data.capabilities || []}
+                expandedRows={expandedRows}
+                toggleRow={toggleRow}
+                deliveryStats={data.delivery_stats}
+                eventStats={data.event_stats}
+                missedCallStats={data.missed_call_stats}
+                voiceReadiness={data.voice_readiness}
+                onOpenDrawer={(cap) => setDrawerCap(cap)}
+              />
+            </>
           )}
           {activeView === "proof" && (
             <ProofCenter proofByService={data.proof_by_service || {}} />
@@ -172,14 +175,24 @@ export default function TwilioGrowthEnginePanel() {
           {activeView === "repair" && (
             <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
           )}
+          {activeView === "blocked" && (
+            <BlockedFromGreenPanel data={data} />
+          )}
           {activeView === "asana" && (
-            <AsanaCompletionGate data={data} />
+            <AsanaSyncNotes data={data} />
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
           )}
-          {activeView === "do_not_build" && <DoNotBuildYetPanel />}
+          {activeView === "evidence_map" && (
+            <EvidenceSourceMap />
+          )}
         </>
+      )}
+
+      {/* Capability Detail Drawer */}
+      {drawerCap && data && (
+        <CapabilityDetailDrawer capability={drawerCap} data={data} onClose={() => setDrawerCap(null)} />
       )}
 
       {/* Legend */}
@@ -312,7 +325,7 @@ function WorkItemNotes() {
 }
 
 // ── Capability Matrix ──
-function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness }) {
+function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness, onOpenDrawer }) {
   return (
     <div className="space-y-4">
       {/* Delivery stats summary */}
@@ -394,6 +407,7 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                       {cap.evidence_sources?.[0] || "No evidence checked"}
                     </p>
                   </div>
+                  <OwnershipBadge capKey={cap.key} />
                   <span
                     className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0"
                     style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}

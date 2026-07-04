@@ -32,11 +32,11 @@ export default function CinematicHero() {
   const scrollToSection = (id, eventName) => { trackCTA(eventName, "hero"); const el = document.getElementById(id); if (el) el.scrollIntoView({ behavior: "smooth", block: "start" }); };
 
   return (
-    <section className="cs-hero-shield relative flex items-center justify-center overflow-hidden" style={{ minHeight: "calc(100svh - var(--cs-nav-height))", background: "#061025" }} aria-label="ClientSurge AI automation storefront">
+    <section className="cs-hero-shield relative flex items-center justify-center overflow-hidden" style={{ minHeight: "calc(100svh - var(--cs-nav-height))", background: "#ffffff" }} aria-label="ClientSurge AI automation storefront">
       <style>{`
-        .cs-hero-shield,.cs-hero-shield h1,.cs-hero-shield p,.cs-hero-shield span,.cs-hero-shield div,.cs-hero-shield button{color:#fff!important;-webkit-text-fill-color:#fff!important}
-        .cs-hero-eyebrow{color:#35BDF1!important;-webkit-text-fill-color:#35BDF1!important}
-        .cs-hero-subcopy{color:#D4D8E0!important;-webkit-text-fill-color:#D4D8E0!important}
+        .cs-hero-shield,.cs-hero-shield h1,.cs-hero-shield p,.cs-hero-shield span,.cs-hero-shield div,.cs-hero-shield button{color:#000!important;-webkit-text-fill-color:#000!important}
+        .cs-hero-eyebrow{color:#006BB0!important;-webkit-text-fill-color:#006BB0!important}
+        .cs-hero-subcopy{color:#3a3d47!important;-webkit-text-fill-color:#3a3d47!important}
         .cs-hero-content{min-height:calc(100svh - var(--cs-nav-height));display:flex;flex-direction:column;justify-content:center}
         .cs-hero-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
         .cs-logo-anchor{width:100%;padding-top:40px;padding-bottom:0;margin-top:auto}

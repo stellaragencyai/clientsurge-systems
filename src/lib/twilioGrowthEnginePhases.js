@@ -9,11 +9,11 @@
  */
 
 export const PHASE_LABELS = {
-  0: { label: "Phase 0 — Not Started", short: "P0", color: "#6B7280", bg: "rgba(107,114,128,0.08)", border: "rgba(107,114,128,0.2)" },
-  1: { label: "Phase 1 — Schema/Config Exists", short: "P1", color: "#9333EA", bg: "rgba(147,51,234,0.06)", border: "rgba(147,51,234,0.2)" },
-  2: { label: "Phase 2 — Logs/Events Exist", short: "P2", color: "#D97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.2)" },
-  3: { label: "Phase 3 — Proof Records Exist", short: "P3", color: "#2563EB", bg: "rgba(37,99,235,0.06)", border: "rgba(37,99,235,0.2)" },
-  4: { label: "Phase 4 — Trusted Production-Ready", short: "P4", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)" },
+  0: { label: "Phase 0 — Not Started", name: "Not Started", short: "P0", color: "#6B7280", bg: "rgba(107,114,128,0.08)", border: "rgba(107,114,128,0.2)" },
+  1: { label: "Phase 1 — Schema/Config Exists", name: "Schema/Config", short: "P1", color: "#9333EA", bg: "rgba(147,51,234,0.06)", border: "rgba(147,51,234,0.2)" },
+  2: { label: "Phase 2 — Logs/Events Exist", name: "Logs/Events", short: "P2", color: "#D97706", bg: "rgba(217,119,6,0.06)", border: "rgba(217,119,6,0.2)" },
+  3: { label: "Phase 3 — Proof Records Exist", name: "Proof Exists", short: "P3", color: "#2563EB", bg: "rgba(37,99,235,0.06)", border: "rgba(37,99,235,0.2)" },
+  4: { label: "Phase 4 — Trusted Production-Ready", name: "Trusted", short: "P4", color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)" },
 };
 
 export const PHASE_ACTIONS = {
