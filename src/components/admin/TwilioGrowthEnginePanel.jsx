@@ -7,10 +7,10 @@ import {
   Radio, Mic, ClipboardList, Database, Maximize2,
 } from "lucide-react";
 import ReadinessScorecard from "./ReadinessScorecard";
-import LaunchScopeRecommendation from "./LaunchScopeRecommendation";
 import RepairQueue from "./RepairQueue";
 import CapabilityDetailDrawer from "./CapabilityDetailDrawer";
 import AsanaSyncNotes from "./AsanaSyncNotes";
+import OperatorNotesSection from "./OperatorNotesSection";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -159,7 +159,17 @@ export default function TwilioGrowthEnginePanel() {
               eventStats={data.event_stats}
               missedCallStats={data.missed_call_stats}
               voiceReadiness={data.voice_readiness}
+              onOpenDetail={setDrawerCapability}
             />
+          )}
+          {activeView === "scorecard" && (
+            <ReadinessScorecard data={data} />
+          )}
+          {activeView === "repair" && (
+            <RepairQueue data={data} />
+          )}
+          {activeView === "asana" && (
+            <AsanaSyncNotes data={data} />
           )}
           {activeView === "proof" && (
             <>
@@ -439,6 +449,9 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                         <span className="text-gray-400">Proof: <span className="text-green-600 font-semibold">{cap.proof.passed} pass</span> · <span className="text-amber-600 font-semibold">{cap.proof.pending} pending</span> · <span className="text-red-600 font-semibold">{cap.proof.failed} fail</span></span>
                       </div>
                     )}
+                    {/* Operator Notes — admin-only manual observations */}
+                    <OperatorNotesSection capabilityKey={cap.key} capabilityLabel={cap.label} />
+
                     <button
                       onClick={() => onOpenDetail(cap)}
                       className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-100 transition-colors"

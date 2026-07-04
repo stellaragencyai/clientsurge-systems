@@ -368,55 +368,372 @@ Deno.serve(async (req) => {
       all_false: !cl.twilio_configured && !cl.resend_configured && !cl.booking_link_set && !cl.review_link_set && !cl.lead_form_connected && !cl.communication_event_logging_verified && !cl.test_lead_sent && !cl.test_response_received && !cl.client_approved,
     }));
 
-    // ── Latest records per service (for capability detail drawer) ──
-    const latestProofByService = {};
-    const latestChecklistByService = {};
-    const latestCommLogByService = {};
-    for (const sk of SERVICE_KEYS) {
-      const proofs = proofLogList.filter(p => p.service_key === sk);
-      latestProofByService[sk] = proofs.length > 0 ? proofs[0] : null;
-      const checklists = checklistList.filter(c => c.service_key === sk);
-      latestChecklistByService[sk] = checklists.length > 0 ? checklists[0] : null;
-      const logs = smsLogList.filter(l =>
-        (l.trigger_name || '').includes(sk) || (l.trigger_name || '').includes(sk.replace(/_/g, ' '))
-      );
-      latestCommLogByService[sk] = logs.length > 0 ? logs[0] : null;
-    }
-
-    const auditMeta = {
-      computed_at: new Date().toISOString(),
-      data_sources_checked: [
-        'AutomationProofLog',
-        'CommunicationLog',
-        'CommunicationEvent',
-        'AdminSettings',
-        'AutomationChecklist',
-        'WebsiteLead',
-      ],
-      records_scanned: {
-        automation_proof_logs: proofLogList.length,
-        communication_logs_sms: smsLogList.length,
-        communication_events_sms: eventList.length,
-        automation_checklists: checklistList.length,
-        website_leads: websiteLeadList.length,
-        admin_settings: (adminSettings || []).length,
-        total: proofLogList.length + smsLogList.length + eventList.length + checklistList.length + websiteLeadList.length + (adminSettings || []).length,
-      },
+    // ── Readiness Scorecard (7 categories, admin-only) ──
+    const SERVICE_LABELS_MAP = {
+      instant_lead_response: 'Instant Lead Response',
+      missed_call_text_back: 'Missed Call Text-Back',
+      nurture_sequence_14d: 'Nurture Sequence (14-Day)',
+      ai_booking_agent: 'AI Booking Agent',
+      inbound_sms_assistant: 'Inbound SMS Assistant',
+      ai_voice_receptionist: 'AI Voice Receptionist',
+      review_request: 'Review Request',
+      lead_reactivation: 'Lead Reactivation',
     };
 
+    const readinessScorecard = [];
+
+    // 1. Provider configuration readiness
+    {
+      const evidence = [];
+      const blockers = [];
+      const hasTwilio = settings.twilio_enabled && settings.twilio_from_number;
+      const hasTwilioCreds = settings.twilio_account_sid_present && settings.twilio_auth_token_present;
+      const hasResend = settings.resend_enabled && settings.resend_from_email;
+      const hasElevenLabs = hasAgentIds;
+      if (hasTwilio) evidence.push('AdminSettings.twilio_enabled=true, from_number set');
+      else blockers.push('Twilio not enabled or missing from number');
+      if (hasTwilioCreds) evidence.push('Twilio Account SID + Auth Token present');
+      else blockers.push('Twilio credentials missing');
+      if (hasResend) evidence.push('Resend email configured');
+      else blockers.push('Resend email not configured');
+      if (hasElevenLabs) evidence.push('ElevenLabs agent IDs configured');
+      else blockers.push('ElevenLabs agent IDs missing');
+      const allSet = hasTwilio && hasTwilioCreds && hasResend && hasElevenLabs;
+      const partial = hasTwilio || hasResend;
+      readinessScorecard.push({
+        category: 'Provider Configuration Readiness',
+        status: allSet ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: allSet ? 'No action — all providers configured.' : 'Complete provider configuration in AdminSettings.',
+      });
+    }
+
+    // 2. Route/configuration readiness
+    {
+      const evidence = [];
+      const blockers = [];
+      if (settings.missed_call_webhook_url) evidence.push('missed_call_webhook_url set');
+      else blockers.push('missed_call_webhook_url not set');
+      if (settings.sms_webhook_url) evidence.push('sms_webhook_url set');
+      else blockers.push('sms_webhook_url not set');
+      if (settings.voice_webhook_url) evidence.push('voice_webhook_url set');
+      else blockers.push('voice_webhook_url not set');
+      if (missedCallStats.has_404) blockers.push('Missed-call webhook returning 404');
+      if (missedCallStats.has_405) blockers.push('Missed-call webhook returning 405');
+      const allRoutes = settings.missed_call_webhook_url && settings.sms_webhook_url && settings.voice_webhook_url && !missedCallStats.has_404 && !missedCallStats.has_405;
+      const partial = settings.missed_call_webhook_url || settings.sms_webhook_url;
+      readinessScorecard.push({
+        category: 'Route Configuration Readiness',
+        status: allRoutes ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: allRoutes ? 'No action — all routes configured.' : 'Set webhook URLs in AdminSettings and verify no 404/405 errors.',
+      });
+    }
+
+    // 3. Evidence/logging readiness
+    {
+      const evidence = [];
+      const blockers = [];
+      if (deliveryStats.delivered > 0) evidence.push(`CommunicationLog: ${deliveryStats.delivered} delivered SMS`);
+      else blockers.push('No delivered SMS in CommunicationLog');
+      if (deliveryStats.with_provider_message_id > 0) evidence.push(`${deliveryStats.with_provider_message_id} logs with provider_message_id`);
+      else blockers.push('No provider_message_id in CommunicationLog');
+      if (eventList.length > 0) evidence.push(`CommunicationEvent: ${eventList.length} events`);
+      else blockers.push('No CommunicationEvent records');
+      const complete = deliveryStats.delivered > 0 && deliveryStats.with_provider_message_id > 0 && eventList.length > 0;
+      const partial = deliveryStats.total > 0 || eventList.length > 0;
+      readinessScorecard.push({
+        category: 'Evidence & Logging Readiness',
+        status: complete ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: complete ? 'No action — delivery evidence exists.' : 'Generate real delivered SMS events with provider_message_id.',
+      });
+    }
+
+    // 4. Automation checklist readiness
+    {
+      const evidence = [];
+      const blockers = [];
+      const activeChecklists = checklistList.filter(cl => cl.status === 'active');
+      const withFlags = checklistList.filter(cl => cl.twilio_configured || cl.resend_configured || cl.lead_form_connected);
+      const clientApproved = checklistList.filter(cl => cl.client_approved);
+      if (activeChecklists.length > 0) evidence.push(`${activeChecklists.length} active AutomationChecklist records`);
+      else blockers.push('No active AutomationChecklist records');
+      if (withFlags.length > 0) evidence.push(`${withFlags.length} checklists with configuration flags set`);
+      else blockers.push('No checklists have configuration flags set');
+      if (clientApproved.length > 0) evidence.push(`${clientApproved.length} client-approved checklists`);
+      else blockers.push('No client-approved checklists');
+      const complete = activeChecklists.length > 0 && withFlags.length > 0 && clientApproved.length > 0;
+      const partial = checklistList.length > 0;
+      readinessScorecard.push({
+        category: 'Automation Checklist Readiness',
+        status: complete ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: complete ? 'No action — checklists are active and approved.' : 'Complete checklist configuration flags and obtain client sign-off.',
+      });
+    }
+
+    // 5. Voice assistant readiness
+    {
+      const evidence = [];
+      const blockers = [];
+      if (hasAgentIds) evidence.push('ElevenLabs agent IDs configured');
+      else blockers.push('ElevenLabs agent IDs missing');
+      if (hasPhoneIds) evidence.push('ElevenLabs phone number IDs configured');
+      else blockers.push('ElevenLabs phone number IDs missing');
+      if (settings.inbound_voice_enabled) evidence.push('inbound_voice_enabled=true');
+      else blockers.push('inbound_voice_enabled is false');
+      if (hasTranscriptProof) evidence.push('Call transcript proof exists');
+      else blockers.push('No call transcript proof');
+      const complete = hasAgentIds && hasPhoneIds && settings.inbound_voice_enabled && hasTranscriptProof;
+      const partial = hasAgentIds || settings.inbound_voice_enabled;
+      readinessScorecard.push({
+        category: 'Voice Assistant Readiness',
+        status: complete ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: complete ? 'No action — voice assistant is ready.' : 'Configure ElevenLabs agent IDs, phone numbers, and run a real call test.',
+      });
+    }
+
+    // 6. Production data cleanliness
+    {
+      const evidence = [];
+      const blockers = [];
+      if (productionLeadsCount > 0) evidence.push(`${productionLeadsCount} production leads (sample)`);
+      if (excludedLeadsCount > 0) { evidence.push(`${excludedLeadsCount} test/smoke leads excluded from metrics`); blockers.push(`${excludedLeadsCount} test records still in database`); }
+      else evidence.push('No test data detected in sample');
+      if (deliveryStats.weak_proof_count > 0) blockers.push(`${deliveryStats.weak_proof_count} weak proof records (null provider_message_id + sent status)`);
+      if (eventStats.twilio_400_errors > 0) blockers.push(`${eventStats.twilio_400_errors} Twilio 400 errors in CommunicationEvent`);
+      const clean = excludedLeadsCount === 0 && deliveryStats.weak_proof_count === 0 && eventStats.twilio_400_errors === 0;
+      const partial = productionLeadsCount > 0;
+      readinessScorecard.push({
+        category: 'Production Data Cleanliness',
+        status: clean && productionLeadsCount > 0 ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: clean ? 'No action — production data is clean.' : 'Quarantine test records, fix weak proof records, and resolve provider errors.',
+      });
+    }
+
+    // 7. Client-facing trust readiness
+    {
+      const evidence = [];
+      const blockers = [];
+      const passedProofs = proofLogList.filter(p => p.status === 'pass');
+      if (passedProofs.length > 0) evidence.push(`${passedProofs.length} passed AutomationProofLog records`);
+      else blockers.push('No passed AutomationProofLog records — cannot claim client-facing trust');
+      const servicesWithProof = SERVICE_KEYS.filter(sk => proofByService[sk]?.passed > 0);
+      if (servicesWithProof.length > 0) evidence.push(`${servicesWithProof.length}/${SERVICE_KEYS.length} services have passed proof`);
+      else blockers.push('No service has passed proof');
+      const complete = passedProofs.length > 0 && servicesWithProof.length === SERVICE_KEYS.length;
+      const partial = passedProofs.length > 0;
+      readinessScorecard.push({
+        category: 'Client-Facing Trust Readiness',
+        status: complete ? 'complete' : partial ? 'partial' : 'missing',
+        evidence_checked: evidence,
+        blocking_issue: blockers[0] || null,
+        next_admin_action: complete ? 'No action — all services have passed proof.' : 'Create and pass AutomationProofLog records for every service key.',
+      });
+    }
+
+    // ── Repair Queue (admin-only, computed from current data) ──
+    const repairQueue = [];
+
+    // Missing proof records
+    for (const sk of SERVICE_KEYS) {
+      const proof = proofByService[sk] || { passed: 0, total: 0 };
+      if (proof.passed === 0) {
+        repairQueue.push({
+          repair_type: 'Missing proof record',
+          affected_capability: SERVICE_LABELS_MAP[sk] || sk,
+          evidence_source: `AutomationProofLog (${proof.total} total, ${proof.passed} passed for ${sk})`,
+          severity: proof.total === 0 ? 'critical' : 'high',
+          why_it_matters: `No passed proof record exists for ${sk}. This capability cannot be marked trusted without proof.`,
+          recommended_next_admin_action: `Create and pass an AutomationProofLog record for ${sk}.`,
+          safe_to_mark_complete: false,
+        });
+      }
+    }
+
+    // Incomplete automation checklists
+    for (const cl of checklistList) {
+      const hasFlags = cl.twilio_configured || cl.resend_configured || cl.lead_form_connected;
+      if (!hasFlags) {
+        repairQueue.push({
+          repair_type: 'Incomplete automation checklist',
+          affected_capability: cl.business_name || 'Unknown',
+          evidence_source: `AutomationChecklist ${cl.id} (${cl.service_key})`,
+          severity: 'high',
+          why_it_matters: `Checklist for ${cl.business_name} has no configuration flags set — the client is not ready for go-live.`,
+          recommended_next_admin_action: `Configure Twilio, Resend, booking link, and lead form for ${cl.business_name}.`,
+          safe_to_mark_complete: false,
+        });
+      }
+    }
+
+    // Provider errors in logs
+    if (eventStats.twilio_400_errors > 0) {
+      repairQueue.push({
+        repair_type: 'Provider error present in logs',
+        affected_capability: 'SMS / Twilio',
+        evidence_source: `CommunicationEvent (${eventStats.twilio_400_errors} events with 400 errors)`,
+        severity: 'high',
+        why_it_matters: 'Twilio is returning 400 errors — request payloads or sender permissions may be misconfigured.',
+        recommended_next_admin_action: 'Inspect 400 error events in CommunicationEvent, check request payloads and Twilio sender permissions.',
+        safe_to_mark_complete: false,
+      });
+    }
+    if (eventStats.failed_events > 0) {
+      repairQueue.push({
+        repair_type: 'Provider error present in logs',
+        affected_capability: 'SMS / CommunicationEvent',
+        evidence_source: `CommunicationEvent (${eventStats.failed_events} failed events)`,
+        severity: 'medium',
+        why_it_matters: 'Failed communication events indicate delivery or processing failures.',
+        recommended_next_admin_action: 'Review failed CommunicationEvent records and resolve underlying errors.',
+        safe_to_mark_complete: false,
+      });
+    }
+
+    // Weak evidence records
+    if (deliveryStats.weak_proof_count > 0) {
+      repairQueue.push({
+        repair_type: 'Weak evidence record',
+        affected_capability: 'SMS Delivery Proof',
+        evidence_source: `CommunicationLog (${deliveryStats.weak_proof_count} records with null provider_message_id + sent status)`,
+        severity: 'medium',
+        why_it_matters: 'SMS logs without provider_message_id cannot be verified as truly delivered.',
+        recommended_next_admin_action: 'Ensure Twilio status callbacks populate provider_message_id on all CommunicationLog records.',
+        safe_to_mark_complete: false,
+      });
+    }
+
+    // Missing voice assistant prerequisites
+    if (!hasAgentIds) {
+      repairQueue.push({
+        repair_type: 'Missing voice assistant prerequisite',
+        affected_capability: 'AI Voice Receptionist',
+        evidence_source: 'AdminSettings.elevenlabs_agent_ids (empty)',
+        severity: 'high',
+        why_it_matters: 'AI voice receptionist cannot function without ElevenLabs agent IDs.',
+        recommended_next_admin_action: 'Configure ElevenLabs agent IDs in AdminSettings.',
+        safe_to_mark_complete: false,
+      });
+    }
+    if (!hasTranscriptProof) {
+      repairQueue.push({
+        repair_type: 'Missing voice assistant prerequisite',
+        affected_capability: 'Call Transcription / Summaries',
+        evidence_source: 'WebsiteLead (no records with transcript field)',
+        severity: 'medium',
+        why_it_matters: 'No call transcript proof exists — live call transcription cannot be marked trusted.',
+        recommended_next_admin_action: 'Run a real inbound call to generate transcript proof on WebsiteLead.',
+        safe_to_mark_complete: false,
+      });
+    }
+
+    // Internal/test data in production view
+    if (excludedLeadsCount > 0) {
+      repairQueue.push({
+        repair_type: 'Internal/test data included in production view',
+        affected_capability: 'Production Data Cleanliness',
+        evidence_source: `WebsiteLead sample (${excludedLeadsCount} excluded test/smoke/internal leads)`,
+        severity: 'low',
+        why_it_matters: 'Test data in the database can inflate production metrics if not properly excluded.',
+        recommended_next_admin_action: 'Verify test records are properly tagged with quality_reason_codes and excluded from production dashboards.',
+        safe_to_mark_complete: false,
+      });
+    }
+
+    // Missing client-facing trust evidence
+    if (proofLogList.length === 0) {
+      repairQueue.push({
+        repair_type: 'Missing client-facing trust evidence',
+        affected_capability: 'All Services',
+        evidence_source: 'AutomationProofLog (empty — 0 records)',
+        severity: 'critical',
+        why_it_matters: 'No proof logs exist at all. No automation can be claimed as production-trusted.',
+        recommended_next_admin_action: 'Create AutomationProofLog records for every service key before claiming go-live.',
+        safe_to_mark_complete: false,
+      });
+    }
+
+    // ── Capability Details (per capability, admin-only) ──
+    const capabilityDetails = {};
+    for (const cap of CAPABILITIES) {
+      const capData = capabilities.find(c => c.key === cap.key);
+      const latestProof = cap.service_key
+        ? proofLogList.find(p => p.service_key === cap.service_key)
+        : proofLogList[0] || null;
+      const latestChecklist = cap.service_key
+        ? checklistList.find(cl => cl.service_key === cap.service_key)
+        : null;
+      const latestComm = cap.service_key
+        ? smsLogList.find(l => (l.trigger_name || '').includes(cap.service_key) || (l.trigger_name || '').includes(cap.service_key.replace(/_/g, ' ')))
+        : null;
+
+      const incompleteFields = [];
+      if (cap.key === 'ai_voice_receptionist' || cap.key === 'voice_broadcasts') {
+        if (!hasAgentIds) incompleteFields.push('elevenlabs_agent_ids');
+        if (!hasPhoneIds) incompleteFields.push('elevenlabs_phone_number_ids');
+        if (!settings.inbound_voice_enabled) incompleteFields.push('inbound_voice_enabled');
+        if (!settings.voice_webhook_url) incompleteFields.push('voice_webhook_url');
+      }
+      if (cap.key === 'missed_call_text_back') {
+        if (!settings.missed_call_webhook_url) incompleteFields.push('missed_call_webhook_url');
+      }
+      if (cap.key === 'instant_lead_response') {
+        if (!settings.sms_webhook_url) incompleteFields.push('sms_webhook_url');
+      }
+
+      capabilityDetails[cap.key] = {
+        capability_name: cap.label,
+        current_status: capData?.status || 'red',
+        entities_used: cap.service_key
+          ? ['AdminSettings', 'AutomationProofLog', 'AutomationChecklist', 'CommunicationLog', 'CommunicationEvent']
+          : ['AdminSettings', 'AutomationProofLog'],
+        evidence_summary: capData?.evidence_sources?.join('; ') || 'No evidence checked',
+        blockers: capData?.blockers || [],
+        incomplete_setup_fields: incompleteFields,
+        latest_checklist: latestChecklist ? {
+          id: latestChecklist.id,
+          business_name: latestChecklist.business_name,
+          service_key: latestChecklist.service_key,
+          status: latestChecklist.status,
+          client_approved: latestChecklist.client_approved,
+        } : null,
+        latest_proof: latestProof ? {
+          id: latestProof.id,
+          service_key: latestProof.service_key,
+          status: latestProof.status,
+          tested_at: latestProof.tested_at,
+        } : null,
+        latest_communication: latestComm ? {
+          id: latestComm.id,
+          channel: latestComm.channel,
+          delivery_status: latestComm.delivery_status,
+          provider_message_id: latestComm.provider_message_id,
+          created_date: latestComm.created_date,
+        } : null,
+        next_admin_action: capData?.next_action || 'Configure this capability.',
+      };
+    }
+
     return Response.json({
-      audit_meta: auditMeta,
       capabilities,
+      readiness_scorecard: readinessScorecard,
+      repair_queue: repairQueue,
+      capability_details: capabilityDetails,
       delivery_stats: deliveryStats,
       event_stats: eventStats,
       missed_call_stats: missedCallStats,
       voice_readiness: voiceReadiness,
       proof_by_service: proofByService,
-      latest_records_by_service: {
-        proof: latestProofByService,
-        checklist: latestChecklistByService,
-        comm_log: latestCommLogByService,
-      },
       qa_checklists: qaChecklists,
       quarantine: {
         excluded_leads_count: excludedLeadsCount,

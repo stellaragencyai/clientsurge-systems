@@ -2,6 +2,7 @@ import {
   X, CheckCircle2, XCircle, AlertTriangle, MinusCircle,
   Database, FileText, ClipboardList, MessageSquare,
 } from "lucide-react";
+import OperatorNotesSection from "./OperatorNotesSection";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -217,6 +218,9 @@ export default function CapabilityDetailDrawer({ capability, data, onClose }) {
               <p className="text-xs text-blue-700 font-medium">{capability.next_action}</p>
             </div>
           )}
+
+          {/* Operator Notes — admin-only manual observations */}
+          <OperatorNotesSection capabilityKey={capability.key} capabilityLabel={capability.label} />
         </div>
       </div>
     </div>

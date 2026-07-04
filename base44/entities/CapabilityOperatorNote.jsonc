@@ -1,0 +1,61 @@
+{
+  "name": "CapabilityOperatorNote",
+  "type": "object",
+  "title": "Capability Operator Note",
+  "description": "Admin-only manual observations attached to Twilio Growth Engine capability rows. Notes never override computed status or trust.",
+  "properties": {
+    "capability_key": {
+      "type": "string",
+      "title": "Capability Key",
+      "description": "The capability key from the Twilio Growth Engine audit (e.g. instant_lead_response, missed_call_text_back)"
+    },
+    "capability_label": {
+      "type": "string",
+      "title": "Capability Label"
+    },
+    "note_text": {
+      "type": "string",
+      "title": "Note Text",
+      "maxLength": 2000
+    },
+    "author_email": {
+      "type": "string",
+      "title": "Author Email"
+    },
+    "author_name": {
+      "type": "string",
+      "title": "Author Name"
+    },
+    "edited_at": {
+      "type": "string",
+      "title": "Edited At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "capability_key",
+    "note_text"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
