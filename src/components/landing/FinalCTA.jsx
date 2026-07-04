@@ -44,7 +44,7 @@ export default function FinalCTA() {
             to="/store"
             onClick={() => trackCTA("browse_automation_store", "final_cta")}
             className="cs-btn-primary focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-            style={{ padding: "0 40px", height: "56px", fontSize: "1rem" }}
+            style={{ padding: "0 40px", height: "56px", fontSize: "1rem", boxShadow: "var(--cs-glow-md), 0 2px 12px rgba(0,121,193,0.35)" }}
           >
             <ShoppingCart className="w-5 h-5" /> Browse the Store
           </Link>

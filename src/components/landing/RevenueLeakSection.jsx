@@ -40,7 +40,7 @@ export default function RevenueLeakSection() {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
                 className="rounded-2xl p-6 cs-card-shadow"
-                style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.12)" }}
+                style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.20)" }}
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">
                   <Icon className="w-5 h-5 text-primary" />

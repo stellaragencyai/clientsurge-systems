@@ -14,6 +14,16 @@ const AUTOMATION_CARDS = [
 ];
 
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
+
+const ICON_PULSE_KEYFRAMES = `
+@keyframes csIconPulse {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); }
+  50% { box-shadow: 0 0 16px 2px rgba(53,189,241,0.30); }
+}
+@media (prefers-reduced-motion: reduce) {
+  @keyframes csIconPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); } }
+}
+`;
 const cardVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
 
 export default function SixAutomationsSection() {
@@ -21,6 +31,7 @@ export default function SixAutomationsSection() {
 
   return (
     <section className="relative py-20 md:py-32 bg-white" style={{ background: "#ffffff" }} aria-labelledby="six-automations-title">
+      <style>{ICON_PULSE_KEYFRAMES}</style>
       <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <motion.div
           className="mb-16 md:mb-20"
@@ -53,7 +64,7 @@ export default function SixAutomationsSection() {
               className="group rounded-xl p-6 md:p-8 transition-all duration-300"
               style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.18)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", scrollMarginTop: "var(--cs-anchor-offset)" }}
             >
-              <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)" }}>
+              <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>
                 <Icon className="w-6 h-6" style={{ color: "#35BDF1" }} aria-hidden="true" />
               </div>
               <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>

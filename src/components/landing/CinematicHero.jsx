@@ -21,7 +21,7 @@ function IntegrationLogo({ logo }) {
       loading="eager"
       decoding="async"
       className="cs-real-logo"
-      style={{ width: "120px", height: "32px", objectFit: "contain", display: "block" }}
+      style={{ width: "150px", height: "40px", objectFit: "contain", display: "block" }}
     />
   );
 }
@@ -39,16 +39,16 @@ export default function CinematicHero() {
         .cs-hero-subcopy{color:#D4D8E0!important;-webkit-text-fill-color:#D4D8E0!important}
         .cs-hero-content{min-height:calc(100svh - var(--cs-nav-height));display:flex;flex-direction:column;justify-content:center}
         .cs-hero-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
-        .cs-logo-anchor{width:100%;padding-top:60px;padding-bottom:clamp(10px,2.5vh,26px)}
+        .cs-logo-anchor{width:100%;padding-top:40px;padding-bottom:0;margin-top:auto}
         .cs-hero-logo-shell{position:relative;width:min(1180px,calc(100vw - 32px));margin:0 auto;overflow:hidden;padding:16px 0 14px;border-top:1px solid rgba(53,189,241,.18);background:linear-gradient(90deg,rgba(53,189,241,.02),rgba(255,255,255,.03),rgba(53,189,241,.02));-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%)}
         .cs-hero-logo-track{display:flex;align-items:center;width:max-content;gap:64px;animation:cs-logo-marquee 32s linear infinite;will-change:transform}
-        .cs-hero-logo-item{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:40px;width:120px;opacity:.85;transition:opacity .2s ease}
+        .cs-hero-logo-item{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:48px;width:150px;opacity:.85;transition:opacity .2s ease}
         .cs-hero-logo-item:hover{opacity:1}
         .cs-real-logo{filter:drop-shadow(0 0 10px rgba(53,189,241,.10))}
         .cs-logo-kicker{margin-bottom:10px;opacity:.95}
         @keyframes cs-logo-marquee{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-33.333%,0,0)}}
         @media(prefers-reduced-motion:reduce){.cs-hero-logo-track{animation:none;width:100%;justify-content:center;flex-wrap:wrap}.cs-logo-repeat{display:none}}
-        @media(max-width:720px){.cs-hero-content{min-height:auto}.cs-logo-anchor{padding-bottom:10px}.cs-hero-logo-shell{width:calc(100vw - 24px);padding:12px 0 10px}.cs-hero-logo-track{gap:40px;animation-duration:22s}.cs-hero-logo-item{height:32px;width:96px}.cs-real-logo{width:96px!important;height:26px!important}}
+        @media(max-width:720px){.cs-hero-content{min-height:auto}.cs-logo-anchor{padding-bottom:0}.cs-hero-logo-shell{width:calc(100vw - 24px);padding:12px 0 10px}.cs-hero-logo-track{gap:48px;animation-duration:22s}.cs-hero-logo-item{height:40px;width:120px}.cs-real-logo{width:120px!important;height:32px!important}}
       `}</style>
 
       <div className="absolute inset-0">
@@ -79,7 +79,7 @@ export default function CinematicHero() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
-            style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.5rem, 3.6vw, 3rem)", fontWeight: 400, lineHeight: 1.05, letterSpacing: "-0.015em", margin: "0 0 20px 0", textTransform: "uppercase", maxWidth: "1100px" }}
+            style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.5rem, 3.6vw, 3rem)", fontWeight: 400, lineHeight: 1.05, letterSpacing: "-0.015em", margin: "0 0 32px 0", textTransform: "uppercase", maxWidth: "1100px" }}
           >
             Browse AI Systems. Add to Cart. Check Out.
           </motion.h1>

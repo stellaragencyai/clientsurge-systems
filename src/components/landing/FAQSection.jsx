@@ -73,17 +73,19 @@ export default function FAQSection() {
                   <div className="flex items-center justify-between gap-4 px-5 py-4">
                     <p className="text-sm font-semibold text-gray-900">{item.q}</p>
                     <ChevronDown
-                      className={`w-4 h-4 flex-shrink-0 transition-transform duration-300 ${
+                      className={`w-4 h-4 flex-shrink-0 ${
                         isOpen ? "rotate-180" : ""
                       }`}
-                      style={{ color: isOpen ? "#00AEEF" : "#9CA3AF" }}
+                      style={{ color: isOpen ? "#00AEEF" : "#9CA3AF", transition: "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)" }}
                     />
                   </div>
                   <div
-                    className="overflow-hidden transition-all duration-300 ease-in-out"
+                    className="overflow-hidden transition-all"
                     style={{
                       maxHeight: isOpen ? "300px" : "0px",
                       opacity: isOpen ? 1 : 0,
+                      transitionDuration: "400ms",
+                      transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
                     }}
                   >
                     <p className="px-5 pb-4 text-sm leading-relaxed text-gray-500">
