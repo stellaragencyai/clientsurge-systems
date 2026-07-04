@@ -114,6 +114,14 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
+      {/* Admin-only: setup ≠ verified readiness reminder */}
+      {!loading && !error && data && <SetupVsVerifiedReminder />}
+
+      {/* Admin-only: core launch first warning */}
+      {!loading && !error && data && (
+        <CoreLaunchFirstWarning data={data} activeView={activeView} />
+      )}
+
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
