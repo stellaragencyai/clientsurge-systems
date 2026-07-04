@@ -165,7 +165,13 @@ export const AuthProvider = ({ children }) => {
   const checkUserAuth = async () => {
     try {
       setIsLoadingAuth(true);
-      const currentUser = await base44.auth.me();
+      const timeoutPromise = new Promise((_, reject) =>
+        setTimeout(() => reject(new Error("Auth check timeout")), 10000)
+      );
+      const currentUser = await Promise.race([
+        base44.auth.me(),
+        timeoutPromise,
+      ]);
       applyAuthenticatedUser(currentUser);
       setIsLoadingAuth(false);
       return currentUser;
