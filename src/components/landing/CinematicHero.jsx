@@ -52,7 +52,7 @@ export default function CinematicHero() {
       `}</style>
 
       <div className="absolute inset-0">
-        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 40%, #0A1B38 0%, #061025 70%, #040C1C 100%)" }} />
+        <div className="absolute inset-0" style={{ background: "radial-gradient(ellipse at 50% 40%, #ffffff 0%, #f8fbfe 70%, #f0f5fa 100%)" }} />
         {!shouldReduceMotion && (
           <motion.div
             className="absolute rounded-full"
