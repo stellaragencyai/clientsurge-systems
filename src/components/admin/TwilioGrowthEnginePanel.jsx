@@ -4,8 +4,9 @@ import {
   ShieldAlert, ShieldCheck, ShieldX, RefreshCw, AlertTriangle,
   CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronRight,
   Phone, MessageSquare, Mail, Zap, Star, RotateCcw, FileText,
-  Radio, Mic, ClipboardList, Database,
+  Radio, Mic, ClipboardList, Database, Wrench,
 } from "lucide-react";
+import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -108,6 +109,7 @@ export default function TwilioGrowthEnginePanel() {
         {[
           { id: "capabilities", label: "Capability Matrix" },
           { id: "proof", label: "Proof Center" },
+          { id: "repair", label: "Repair Queue" },
           { id: "qa", label: "QA Checklists" },
         ].map(tab => (
           <button
@@ -154,6 +156,9 @@ export default function TwilioGrowthEnginePanel() {
           )}
           {activeView === "proof" && (
             <ProofCenter proofByService={data.proof_by_service || {}} />
+          )}
+          {activeView === "repair" && (
+            <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
