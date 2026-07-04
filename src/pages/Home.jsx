@@ -23,6 +23,7 @@ import {
   getFAQSchema,
   getLocalBusinessSchema,
   getOrganizationSchema,
+  getProductSchema,
   getServiceSchema,
   getWebsiteSchema,
 } from "../components/SEO/SchemaMarkup";
@@ -79,6 +80,7 @@ export default function Home() {
     organization: getOrganizationSchema(),
     localBusiness: getLocalBusinessSchema(),
     service: getServiceSchema(),
+    product: getProductSchema(),
     website: getWebsiteSchema(),
     faq: getFAQSchema(FAQ_ITEMS),
   }), []);
@@ -91,17 +93,18 @@ export default function Home() {
 
     try {
       cleanups.push(setPageMetadata({
-        title: "Stop Losing Leads from Missed Calls & Slow Follow-Up | ClientSurge Systems",
-        description: "Stop losing leads from missed calls, slow follow-up, and unbooked inquiries. ClientSurge captures every lead, responds instantly, and books appointments automatically.",
+        title: "ClientSurge Systems | The Amazon of AI Services for Business",
+        description: "Browse packaged AI systems for lead capture, missed-call recovery, AI follow-up, booking, reviews, and reactivation. Add to cart, check out, and we install it — no demos required.",
         canonicalPath: "/",
-        ogTitle: "Stop Losing Leads — Convert Every Call and Inquiry",
-        ogDescription: "ClientSurge captures every lead, responds instantly, and books appointments automatically. Stop losing leads from missed calls, slow follow-up, and unbooked inquiries.",
+        ogTitle: "The Amazon of AI Services for Business | ClientSurge Systems",
+        ogDescription: "Browse AI automation systems, add to cart, and check out. Done-for-you setup included. No demos, no sales calls. Lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation.",
       }));
     } catch (_e) {}
 
     try { cleanups.push(setJsonLd("organization", schemas.organization)); } catch (_e) {}
     try { cleanups.push(setJsonLd("local-business", schemas.localBusiness)); } catch (_e) {}
     try { cleanups.push(setJsonLd("service", schemas.service)); } catch (_e) {}
+    try { cleanups.push(setJsonLd("product", schemas.product)); } catch (_e) {}
     try { cleanups.push(setJsonLd("website", schemas.website)); } catch (_e) {}
     try { cleanups.push(setJsonLd("faq", schemas.faq)); } catch (_e) {}
 
@@ -143,14 +146,14 @@ export default function Home() {
           <section className="py-16 md:py-24 px-4 bg-muted/30">
             <div className="max-w-4xl mx-auto">
               <div className="cs-section-header cs-section-header--center mb-8">
-                <p className="cs-section-eyebrow">Calculate Your Recovery</p>
+                <p className="cs-section-eyebrow">Revenue Recovery Calculator</p>
                 <div className="cs-section-title-row cs-section-header--center">
                   <span className="cs-section-bar" />
-                  <h2 className="cs-section-title">How Much Are You Losing?</h2>
+                  <h2 className="cs-section-title">How Much Revenue Are You Losing?</h2>
                 </div>
                 <p className="cs-section-subtitle">
                   Drag the sliders below to see how many leads you're losing to missed calls
-                  and slow follow-up — and what our AI automation recovers for you.
+                  and slow follow-up — then browse our store to recover them automatically.
                 </p>
               </div>
               <ROICalculator />

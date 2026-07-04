@@ -210,9 +210,9 @@ export default function Industries() {
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
          <SectionHeader
             eyebrow="Choose Your Industry"
-            title="Built For Your Industry"
-            subtitle="Pick your industry to see how much revenue you're losing and how to recover it."
-         />
+            title="AI Systems Built for Your Industry"
+            subtitle="Pick your industry to see exactly how much revenue you're losing — and which AI system from our store fixes it."
+          />
 
         {/* Filter pills */}
         <div className="flex flex-wrap justify-center gap-2 mt-6 pb-4">
@@ -348,7 +348,7 @@ export default function Industries() {
                     transition: "opacity 0.3s ease",
                   }}>
                   
-                  Open the industry landing page for this niche.
+                  Browse AI systems tailored to this industry.
                 </p>
               </div>
 

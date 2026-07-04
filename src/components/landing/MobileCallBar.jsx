@@ -37,7 +37,7 @@ export default function MobileCallBar() {
           </a>
           <button
             onClick={() => {
-              trackCTA?.("mobile_call_bar_book_demo");
+              trackCTA?.("mobile_call_bar_browse_store");
               setShowModal(true);
             }}
             className="flex min-w-0 flex-[1.4] items-center justify-center gap-1.5 rounded-full px-3 py-2 text-[12px] font-bold text-white"
@@ -47,7 +47,7 @@ export default function MobileCallBar() {
             }}
           >
             <CalendarCheck className="w-4 h-4 flex-shrink-0" />
-            <span>Get Help Choosing</span>
+            <span>Browse AI Systems</span>
           </button>
         </div>
       </div>

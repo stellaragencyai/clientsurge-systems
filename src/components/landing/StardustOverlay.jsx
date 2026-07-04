@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 // Deterministic pseudo-random so stars don't shift on re-render
 function seededRand(seed) {
@@ -14,17 +14,36 @@ const STAR_COUNT = 55;
 export default function StardustOverlay({ seed = 42, opacity = 0.55 }) {
   const canvasRef = useRef(null);
   const rafRef = useRef(null);
+  const containerRef = useRef(null);
+  const [visible, setVisible] = useState(false);
+
+  // Only render canvas when the section is in viewport — saves CPU on scroll
+  useEffect(() => {
+    if (typeof IntersectionObserver === "undefined") {
+      setVisible(true);
+      return undefined;
+    }
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setVisible(entry.isIntersecting);
+      },
+      { threshold: 0.01 }
+    );
+    if (containerRef.current) observer.observe(containerRef.current);
+    return () => observer.disconnect();
+  }, []);
 
   useEffect(() => {
+    if (!visible) return undefined;
+
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return undefined;
     const ctx = canvas.getContext("2d");
 
     const rand = seededRand(seed);
 
-    // Generate stars once
-    const stars = Array.from({ length: STAR_COUNT }, (_, i) => ({
-      x: rand(),          // 0-1 relative
+    const stars = Array.from({ length: STAR_COUNT }, () => ({
+      x: rand(),
       y: rand(),
       r: rand() * 1.4 + 0.3,
       speed: rand() * 0.0003 + 0.0001,
@@ -51,13 +70,12 @@ export default function StardustOverlay({ seed = 42, opacity = 0.55 }) {
     const draw = () => {
       ctx.clearRect(0, 0, w, h);
       t += 1;
-      stars.forEach((star) => {
+      for (let i = 0; i < stars.length; i++) {
+        const star = stars[i];
         const twinkle = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(t * star.speed * 80 + star.phase));
         const alpha = twinkle * opacity;
         ctx.beginPath();
         ctx.arc(star.x * w, star.y * h, star.r, 0, Math.PI * 2);
-        ctx.fillStyle = `${star.color}${alpha.toFixed(3)})`;
-        // Soft outer glow
         const grd = ctx.createRadialGradient(
           star.x * w, star.y * h, 0,
           star.x * w, star.y * h, star.r * 4
@@ -66,7 +84,7 @@ export default function StardustOverlay({ seed = 42, opacity = 0.55 }) {
         grd.addColorStop(1, `${star.color}0)`);
         ctx.fillStyle = grd;
         ctx.fill();
-      });
+      }
       rafRef.current = requestAnimationFrame(draw);
     };
 
@@ -76,20 +94,22 @@ export default function StardustOverlay({ seed = 42, opacity = 0.55 }) {
       cancelAnimationFrame(rafRef.current);
       window.removeEventListener("resize", resize);
     };
-  }, [seed, opacity]);
+  }, [seed, opacity, visible]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      aria-hidden="true"
-      style={{
-        position: "absolute",
-        inset: 0,
-        width: "100%",
-        height: "100%",
-        pointerEvents: "none",
-        zIndex: 0,
-      }}
-    />
+    <div ref={containerRef} style={{ position: "absolute", inset: 0, pointerEvents: "none", zIndex: 0 }}>
+      {visible && (
+        <canvas
+          ref={canvasRef}
+          aria-hidden="true"
+          style={{
+            position: "absolute",
+            inset: 0,
+            width: "100%",
+            height: "100%",
+          }}
+        />
+      )}
+    </div>
   );
 }

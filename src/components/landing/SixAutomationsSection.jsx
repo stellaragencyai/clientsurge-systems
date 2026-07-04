@@ -1,14 +1,16 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw } from "lucide-react";
+import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { trackCTA } from "@/lib/analytics";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
 const AUTOMATION_CARDS = [
-  { id: "automation-lead-capture", label: "Lead Capture", description: "Turns forms, calls, ads, and website inquiries into one trackable pipeline.", icon: Zap },
-  { id: "automation-missed-call", label: "Missed-Call Recovery", description: "Texts missed callers quickly so the conversation can continue.", icon: Phone },
-  { id: "automation-follow-up", label: "Follow-Up", description: "Keeps leads moving until they reply, book, opt out, or become closed.", icon: MessageSquare },
-  { id: "automation-booking", label: "AI Booking", description: "Moves interested prospects toward a confirmed appointment or handoff.", icon: Calendar },
-  { id: "automation-reviews", label: "Reviews", description: "Requests reviews when the customer experience is fresh and the timing is right.", icon: Star },
-  { id: "automation-reactivation", label: "Reactivation", description: "Brings old leads, past customers, no-shows, and unclosed quotes back into motion.", icon: RefreshCw },
+  { id: "automation-lead-capture", label: "Lead Capture", description: "Turns forms, calls, ads, and website inquiries into one trackable pipeline — so no lead slips through the cracks.", icon: Zap },
+  { id: "automation-missed-call", label: "Missed-Call Recovery", description: "Texts missed callers instantly so the conversation continues — before they call your competitor.", icon: Phone },
+  { id: "automation-follow-up", label: "AI Follow-Up", description: "Keeps leads moving with automated multi-step sequences until they reply, book, opt out, or close.", icon: MessageSquare },
+  { id: "automation-booking", label: "AI Booking", description: "Moves interested prospects toward a confirmed appointment — no manual back-and-forth needed.", icon: Calendar },
+  { id: "automation-reviews", label: "Review Requests", description: "Automatically requests reviews when the customer experience is fresh and the timing is right.", icon: Star },
+  { id: "automation-reactivation", label: "Lead Reactivation", description: "Brings old leads, past customers, no-shows, and unclosed quotes back into motion automatically.", icon: RefreshCw },
 ];
 
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
@@ -28,9 +30,9 @@ export default function SixAutomationsSection() {
           viewport={{ once: true, margin: "-100px" }}
         >
           <SectionHeader
-            eyebrow="Core Automation Stack"
-            title="The Systems That Protect Your Lead Flow"
-            subtitle="ClientSurge packages the front-end workflows your business needs: capture, recover, follow up, book, request reviews, and reactivate opportunities before they go quiet."
+            eyebrow="The Automation Store"
+            title="Six Systems That Protect Every Lead"
+            subtitle="Browse the automation stack — capture, recover, follow up, book, request reviews, and reactivate. Add individual modules or pick a full system. No demos required."
             align="center"
             variant="light"
           />
@@ -56,6 +58,13 @@ export default function SixAutomationsSection() {
               </div>
               <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>
               <p style={{ color: "rgba(10,22,40,0.7)", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
+              <Link
+                to="/store"
+                onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
+                className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+              >
+                <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+              </Link>
             </motion.div>
           ))}
         </motion.div>

@@ -349,7 +349,7 @@ export default function Navbar() {
           )}
           <button
             onClick={() => {
-              trackCTA("compare_packages", "navbar");
+              trackCTA("browse_systems", "navbar");
               if (location.pathname === "/") {
                 const el = document.getElementById("pricing");
                 if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
@@ -360,7 +360,7 @@ export default function Navbar() {
             className="cs-btn-primary cs-nav-cta"
             style={{ minHeight: "unset", minWidth: "unset" }}
           >
-            See Plans &amp; Pricing
+            Browse AI Systems
           </button>
         </div>
 
@@ -495,7 +495,7 @@ export default function Navbar() {
             <div className="mt-5 flex gap-2">
               <button
                 onClick={() => {
-                  trackCTA("compare_packages", "mobile_nav");
+                  trackCTA("browse_systems", "mobile_nav");
                   setOpen(false);
                   if (location.pathname === "/") {
                     setTimeout(() => {
@@ -510,15 +510,15 @@ export default function Navbar() {
                 style={{ minHeight: "unset" }}
               >
                 <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px" }}>
-                  See Plans &amp; Pricing
+                  Browse AI Systems
                 </span>
               </button>
               <button
-                onClick={() => { trackCTA("contact", "mobile_nav"); setOpen(false); navigate("/contact"); }}
+                onClick={() => { trackCTA("store", "mobile_nav"); setOpen(false); navigate("/store"); }}
                 className="inline-flex items-center justify-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
                 style={{ flex: "0 0 auto", minHeight: "unset", height: "48px", padding: "0 20px" }}
               >
-                Contact
+                Store
               </button>
             </div>
           </div>

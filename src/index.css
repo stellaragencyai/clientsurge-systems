@@ -2111,6 +2111,8 @@ a[aria-disabled="true"] {
   background: linear-gradient(90deg, #0079c1 0%, #005691 100%) !important;
   box-shadow: 0 2px 12px rgba(0,121,193,0.35) !important;
   transition: box-shadow 0.3s ease, transform 0.3s ease !important;
+  white-space: nowrap;
+  gap: 8px;
 }
 .cs-btn-primary:hover,
 .btn-primary:hover,
@@ -2120,4 +2122,99 @@ a[aria-disabled="true"] {
 .cs-btn-primary:active,
 .btn-primary:active {
   transform: translateY(0) scale(0.98) !important;
+}
+
+/* ============================================
+   STOREFRONT THEME — Amazon-of-AI visual language
+   ============================================ */
+
+/* Add-to-cart button variant — green accent for checkout actions */
+.cs-btn-add-to-cart {
+  background: linear-gradient(90deg, #059669 0%, #047857 100%) !important;
+  box-shadow: 0 2px 12px rgba(5, 150, 105, 0.35) !important;
+  transition: box-shadow 0.3s ease, transform 0.3s ease !important;
+}
+.cs-btn-add-to-cart:hover {
+  box-shadow: 0 4px 24px rgba(5, 150, 105, 0.5), 0 0 32px rgba(16, 185, 129, 0.3) !important;
+  transform: translateY(-2px);
+}
+.cs-btn-add-to-cart:active {
+  transform: translateY(0) scale(0.98) !important;
+}
+
+/* Storefront badge — "Add to Cart" pill style */
+.cs-storefront-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: rgba(5, 150, 105, 0.1);
+  border: 1px solid rgba(5, 150, 105, 0.25);
+  color: #047857;
+  font-size: 0.75rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+/* Storefront price tag — consistent pricing display */
+.cs-price-tag {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'Montserrat', sans-serif;
+}
+.cs-price-tag .cs-price-value {
+  font-size: clamp(1.75rem, 3.5vw, 2.25rem);
+  font-weight: 900;
+  letter-spacing: -0.045em;
+  color: #000000;
+}
+.cs-price-tag .cs-price-unit {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Trust badge row — consistent across all pages */
+.cs-trust-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+/* Storefront card hover — unified across pricing and product cards */
+.cs-storefront-card {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              border-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+.cs-storefront-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0,174,239,0.1);
+}
+@media (pointer: coarse) {
+  .cs-storefront-card:hover { transform: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cs-storefront-card { transition: none !important; }
+  .cs-storefront-card:hover { transform: none !important; }
+}
+
+/* Content-visibility: auto for below-the-fold sections — improves scroll performance */
+@media (min-width: 768px) {
+  section:not(.cs-industry-hero):not(:first-child) {
+    content-visibility: auto;
+    contain-intrinsic-size: auto 600px;
+  }
+}
+
+/* Font loading: prevent FOIT, use system fallback while loading */
+@font-face {
+  font-family: 'Inter Fallback';
+  src: local('system-ui');
+  font-display: swap;
 }

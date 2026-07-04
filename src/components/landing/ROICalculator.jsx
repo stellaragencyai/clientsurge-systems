@@ -44,7 +44,7 @@ export default function ROICalculator({ className = '' }) {
             Lead Recovery ROI Calculator
           </h3>
           <p className="text-sm text-muted-foreground">
-            See how much revenue you're leaving on the table
+            See how much revenue you're losing — then browse our store to fix it
           </p>
         </div>
       </div>
@@ -159,11 +159,11 @@ export default function ROICalculator({ className = '' }) {
 
       <div className="mt-6 text-center">
         <a
-          href="/book"
+          href="/store"
           className="cs-btn-primary inline-flex items-center gap-2 text-sm"
         >
           <RefreshCw className="w-4 h-4" />
-          Recover These Leads Now
+          Browse AI Systems to Recover These Leads
         </a>
       </div>
     </div>

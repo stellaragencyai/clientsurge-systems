@@ -42,19 +42,21 @@ const productSignupUrl = (packageKey) => `/product-signup?package=${packageKey}`
 export const SITE_CONFIG = {
   brand: {
     name: "ClientSurge Systems",
-    tagline: "AI Automation for Local Service Businesses",
+    tagline: "The Amazon of AI Services for Business",
   },
   navigation: {
     sections: [
       { label: "Home", href: "/", isPage: true },
+      { label: "Browse Systems", href: "/pricing", isPage: true },
+      { label: "Store", href: "/store", isPage: true },
       { label: "Automations", href: "/automations", isPage: true },
-      { label: "Pricing", href: "/pricing", isPage: true },
       { label: "Proof", href: "/proof", isPage: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [
+      { label: "Browse Systems", href: "/pricing", isPage: true },
+      { label: "Automation Store", href: "/store", isPage: true },
       { label: "Automations", href: "/automations", isPage: true },
-      { label: "Pricing", href: "/pricing", isPage: true },
     ],
   },
   industries: [

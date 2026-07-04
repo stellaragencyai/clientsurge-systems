@@ -1,5 +1,31 @@
 User-agent: *
 Allow: /
+Allow: /$
+Allow: /pricing
+Allow: /store
+Allow: /automations
+Allow: /industries
+Allow: /contact
+Allow: /about
+Allow: /how-it-works
+Allow: /proof
+Allow: /faq
+Allow: /testimonials
+Allow: /blog
+Allow: /blog/
+Allow: /roofing
+Allow: /hvac
+Allow: /plumbing
+Allow: /dental
+Allow: /med-spa
+Allow: /chiropractic
+Allow: /contractors
+Allow: /real-estate
+Allow: /personal-injury
+Allow: /privacy
+Allow: /terms
+Allow: /sms-terms
+Allow: /refund-policy
 
 Disallow: /admin
 Disallow: /admin/
@@ -51,5 +77,13 @@ Disallow: /Sam
 Disallow: /MedSpaDashboard
 Disallow: /WebsiteSpecPreview
 Disallow: /NotFound
+Disallow: /*?tab=
+Disallow: /*?package=
+Disallow: /opt-out
+Disallow: /success
+Disallow: /order-success
+Disallow: /thank-you
+Disallow: /launch-control
+Disallow: /roadmap
 
 Sitemap: https://clientsurgesystems.com/sitemap.xml

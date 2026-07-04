@@ -24,10 +24,10 @@ export default function MoneyBackGuarantee() {
 
         <div className="flex-1">
           <h3 className="font-semibold text-foreground text-lg mb-2">
-            30-Day Setup-Fee Guarantee
+            30-Day Setup-Fee Guarantee — Risk-Free Checkout
           </h3>
           <p className="text-muted-foreground mb-4">
-            If the installed system is not producing measurable lead-capture, response, or booking improvements in your first 30 days, we review the account and refund the setup cost when the guarantee terms are met. Monthly service cancellation follows the terms shown before checkout.
+            Add to cart with confidence. If the installed system is not producing measurable lead-capture, response, or booking improvements in your first 30 days, we review the account and refund the setup cost when the guarantee terms are met. Month-to-month, cancel anytime.
           </p>
 
           <div className="flex flex-wrap gap-3">

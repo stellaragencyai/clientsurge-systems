@@ -1,12 +1,14 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { PhoneOff, Clock, FileText, Users } from "lucide-react";
+import { PhoneOff, Clock, FileText, Users, ShoppingCart } from "lucide-react";
+import { Link } from "react-router-dom";
+import { trackCTA } from "@/lib/analytics";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
 const LEAKS = [
-  { icon: PhoneOff, title: "Missed Calls", desc: "A prospect calls with intent. If nobody responds, the opportunity can disappear." },
-  { icon: Clock, title: "Slow Replies", desc: "Lead interest drops fast when the next step waits on manual follow-up." },
-  { icon: FileText, title: "Forgotten Quotes", desc: "Quotes and estimates stall when nobody has a structured follow-up path." },
-  { icon: Users, title: "Unworked Old Leads", desc: "Past inquiries, no-shows, and dormant contacts often still have buying intent." },
+  { icon: PhoneOff, title: "Missed Calls = Lost Revenue", desc: "Every unanswered call is a prospect with buying intent walking away. Our AI texts them back instantly — before they call your competitor." },
+  { icon: Clock, title: "Slow Replies Kill Deals", desc: "Lead interest drops 80% within 5 minutes. Our automated follow-up keeps every lead warm until they reply, book, or opt out." },
+  { icon: FileText, title: "Quotes Stall Without Follow-Up", desc: "Quotes and estimates die when nobody has a structured follow-up path. Our nurture sequences keep them moving automatically." },
+  { icon: Users, title: "Old Leads Still Have Intent", desc: "Past inquiries, no-shows, and dormant contacts still have buying intent. Our reactivation engine brings them back to life." },
 ];
 
 export default function RevenueLeakSection() {
@@ -21,9 +23,9 @@ export default function RevenueLeakSection() {
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
         <SectionHeader
-          eyebrow="Lead Flow Gaps"
-          title="Your Business Is Losing Bookings at the Delay Points"
-          subtitle="Most teams do not need another dashboard. They need the first response, follow-up, booking handoff, review request, and reactivation path to stop depending on memory."
+          eyebrow="Revenue Leaks"
+          title="Your Business Is Losing Bookings Every Hour"
+          subtitle="You don't need another dashboard. You need the first response, follow-up, booking handoff, review request, and reactivation path to stop depending on memory. Pick a system, add to cart, and we fix it."
           align="center"
         />
 
@@ -48,6 +50,16 @@ export default function RevenueLeakSection() {
               </motion.div>
             );
           })}
+        </div>
+
+        <div className="text-center mt-10">
+          <Link
+            to="/store"
+            onClick={() => trackCTA("revenue_leak_browse_store", "revenue_leak")}
+            className="cs-btn-primary inline-flex items-center gap-2"
+          >
+            <ShoppingCart className="w-4 h-4" /> Browse AI Systems to Fix This
+          </Link>
         </div>
       </div>
     </section>

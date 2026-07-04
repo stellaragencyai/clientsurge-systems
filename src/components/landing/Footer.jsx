@@ -5,10 +5,11 @@ import { trackCTA } from "@/lib/analytics";
 
 const navColumns = [
   {
-    title: "Public Site",
+    title: "Storefront",
     links: [
       { label: "Home", href: "/" },
-      { label: "Pricing", href: "/pricing" },
+      { label: "Browse Systems", href: "/pricing" },
+      { label: "Automation Store", href: "/store" },
       { label: "Automations", href: "/automations" },
       { label: "Contact", href: "/contact" },
     ],
@@ -43,10 +44,10 @@ export default function Footer() {
         <div className="cs-footer-inner cs-footer-system-header">
           <div>
             <p className="cs-footer-eyebrow">ClientSurge Systems</p>
-            <h3 id="footer-system-heading">AI automation systems for faster lead response, follow-up, booking, and customer reactivation.</h3>
+            <h3 id="footer-system-heading">The Amazon of AI Services for Business — browse, add to cart, and check out. Done-for-you setup included.</h3>
           </div>
-          <Link className="cs-footer-system-cta" to="/pricing">
-            Compare Packages
+          <Link className="cs-footer-system-cta" to="/store">
+            Browse the Store
           </Link>
         </div>
       </section>
@@ -64,7 +65,7 @@ export default function Footer() {
             />
           </div>
           <p>
-            Lead capture, missed-call recovery, AI follow-up, appointment booking, review requests, and reactivation automation for local service businesses.
+            The Amazon of AI Services for Business. Browse packaged AI systems, add to cart, and check out — done-for-you setup included. No demos, no sales calls.
           </p>
           <div className="cs-footer-contact-list" aria-label="Contact ClientSurge">
             <a href="tel:+16025843227" className="cs-footer-contact-link" aria-label="Call ClientSurge Systems">
