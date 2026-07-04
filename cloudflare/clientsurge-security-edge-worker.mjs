@@ -931,8 +931,6 @@ const PRIVATE_ROUTE_PATTERNS = [
   /^\/adminleaddetail(?:\/|$)/,
   /^\/aistatusdashboard(?:\/|$)/,
   /^\/dashboard(?:\/|$)/,
-  /^\/client-portal(?:\/|$)/,
-  /^\/clientportal(?:\/|$)/,
   /^\/client-dashboard(?:\/|$)/,
   /^\/clientdashboard(?:\/|$)/,
   /^\/onboarding(?:\/|$)/,
@@ -1362,10 +1360,26 @@ function privateRouteBlockedResponse(pathname) {
     "Content-Type": "text/html; charset=utf-8",
     [PRIVATE_ROUTE_BLOCK_HEADER]: "edge-v1",
   }), pathname);
-  return new Response(
-    "<!doctype html><html lang=\"en\"><head><meta charset=\"utf-8\"><meta name=\"robots\" content=\"noindex,nofollow,noarchive\"><title>ClientSurge Login Required</title></head><body><main><h1>Login required</h1><p>This ClientSurge area is private.</p><p><a href=\"/login\">Go to client login</a></p></main></body></html>",
-    { status: 403, headers }
-  );
+  const html = [
+    "<!doctype html><html lang=\"en\"><head>",
+    "<meta charset=\"utf-8\">",
+    "<meta name=\"robots\" content=\"noindex,nofollow,noarchive\">",
+    "<meta name=\"viewport\" content=\"width=device-width,initial-scale=1\">",
+    "<title>ClientSurge Login Required</title>",
+    "<style>",
+    "body{margin:0;font-family:Inter,system-ui,-apple-system,sans-serif;background:linear-gradient(135deg,#f7fbff 0%,#fff 45%,#eef8ff 100%);color:#0f172a;display:flex;min-height:100vh;align-items:center;justify-content:center;padding:24px}",
+    ".box{max-width:440px;text-align:center}",
+    ".icon{width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#003B8F,#00AEEF);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:28px}",
+    ".box h1{font-family:Montserrat,sans-serif;font-size:24px;margin:0 0 12px;letter-spacing:-.02em}",
+    ".box p{color:#475569;font-size:15px;line-height:1.6;margin:0 0 24px}",
+    ".btn{display:inline-flex;align-items:center;gap:8px;padding:12px 28px;border-radius:999px;background:linear-gradient(135deg,#003B8F,#00AEEF);color:#fff;font-weight:800;text-decoration:none;font-size:14px}",
+    "</style>",
+    "</head><body>",
+    "<div id=\"root\"><div class=\"box\"><div class=\"icon\">🔒</div><h1>Login Required</h1><p>This ClientSurge area is private. Please log in to your client portal to continue.</p><a class=\"btn\" href=\"/login\">Go to Login →</a></div></div>",
+    "<script>setTimeout(function(){window.location.href=\"/login\"},4000)</script>",
+    "</body></html>",
+  ].join("");
+  return new Response(html, { status: 403, headers });
 }
 
 function serviceWorkerResponse() {

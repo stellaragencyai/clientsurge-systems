@@ -72,6 +72,7 @@ const AdminInstallGuide = lazy(() => import("./internal-pages/AdminInstallGuide"
 const AISalesCommandCenter = lazy(() => import("./internal-pages/AISalesCommandCenter"));
 const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
+const ClientPortalAccess = lazy(() => import("./components/portal/ClientPortalAccess"));
 const ClientSaasDashboard = lazy(() => import("./pages/ClientSaasDashboard"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 const Library = lazy(() => import("./pages/Library"));
@@ -410,6 +411,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
       <Route path="/opt-out" element={<LazyRoute Component={lazy(() => import("./pages/OptOut"))} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
+      <Route path="/client-portal" element={<LazyRoute Component={ClientPortalAccess} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
       <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />
       <Route path="/library" element={<LazyRoute Component={Library} />} />
@@ -447,7 +449,6 @@ const AuthenticatedAppWithTenant = () => {
         }
       >
         {[
-          { route: routePath("client-portal"), Component: ClientPortal },
           { route: routePath("client-dashboard"), Component: ClientDashboard },
           { route: routePath("client-saas"), Component: ClientSaasDashboard },
           { route: routePath("dashboard-entry"), Component: ClientDashboardEntry },
