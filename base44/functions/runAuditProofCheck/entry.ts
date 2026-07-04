@@ -1557,18 +1557,29 @@ Deno.serve(async (req) => {
         if (!gateInfo) continue;
         try {
           const existingGate = await base44.asServiceRole.entities.LaunchGate.filter({ gate_key: gateInfo.gate_key }, '-last_checked_at', 1);
-          const gateStatus = section.status === 'Trusted' ? 'proof_passed' : section.status === 'Blocked' ? 'blocked' : 'partial';
+          // For client_portal_experience: if route infrastructure checks pass (direct load,
+          // blank-page prevention, unauthenticated render, error boundary, loading timeout),
+          // the gate is "partial" (needs proof) not "blocked" — the route works, only
+          // authenticated portal data is missing.
+          const PORTAL_ROUTE_CHECK_IDS = ['portal_route_direct_load', 'portal_blank_page_prevention', 'portal_unauthenticated_render', 'portal_route_error_boundary', 'portal_loading_timeout_guard'];
+          const portalRouteChecks = section.key === 'client_portal_experience'
+            ? (section.checks?.filter(c => PORTAL_ROUTE_CHECK_IDS.includes(c.id)) || [])
+            : [];
+          const portalRoutePasses = portalRouteChecks.length > 0 && portalRouteChecks.every(c => c.status === 'passed');
+          const gateStatus = section.status === 'Trusted' ? 'proof_passed'
+            : (section.key === 'client_portal_experience' && portalRoutePasses && section.status === 'Blocked') ? 'partial'
+            : section.status === 'Blocked' ? 'blocked' : 'partial';
           const gateData = {
             ...gateInfo,
             status: gateStatus,
-            severity: section.status === 'Blocked' ? 'critical_blocker' : 'launch_blocker',
+            severity: (section.status === 'Blocked' && !(section.key === 'client_portal_experience' && portalRoutePasses)) ? 'critical_blocker' : 'launch_blocker',
             completion_percent: section.total,
             proof_percent: section.components?.find((c) => c.key === 'proof_level')?.points || 0,
             current_blocker: section.blockers[0]?.message || '',
             next_action: section.blockers[0]?.fix_action || section.warnings[0]?.fix_action || 'All checks passed.',
             evidence_summary: section.evidence_summary,
             last_checked_at: now,
-            last_verdict: section.status,
+            last_verdict: gateStatus === 'partial' ? 'Needs Proof' : section.status,
           };
           if (Array.isArray(existingGate) && existingGate.length > 0 && existingGate[0]?.id) {
             await base44.asServiceRole.entities.LaunchGate.update(existingGate[0].id, gateData);
