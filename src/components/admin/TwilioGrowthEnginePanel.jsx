@@ -4,12 +4,15 @@ import {
   ShieldAlert, ShieldCheck, ShieldX, RefreshCw, AlertTriangle,
   CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronRight,
   Phone, MessageSquare, Mail, Zap, Star, RotateCcw, FileText,
-  Radio, Mic, ClipboardList, Database, Wrench,
+  Radio, Mic, ClipboardList, Database, Wrench, Ban, ListChecks, Maximize2,
 } from "lucide-react";
+import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
+import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
+import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import { getRevenueImpact } from "@/lib/twilioGrowthRevenueImpact";
-import MinimumDefinitionOfDone from "./MinimumDefinitionOfDone";
-import AsanaSyncNotes from "./AsanaSyncNotes";
+import TwilioGrowthEnginePhaseBadge from "./TwilioGrowthEnginePhaseBadge";
+import FastestPathToGreen from "./twilio-growth/FastestPathToGreen";
+import { computeCapabilityPhase } from "@/lib/twilioGrowthEnginePhases";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -107,16 +110,12 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
-      {/* Admin-only minimum definition of done */}
-      <MinimumDefinitionOfDone />
-
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
           { id: "capabilities", label: "Capability Matrix" },
           { id: "proof", label: "Proof Center" },
           { id: "repair", label: "Repair Queue" },
-          { id: "asana", label: "Asana Gate" },
           { id: "qa", label: "QA Checklists" },
         ].map(tab => (
           <button
@@ -159,6 +158,7 @@ export default function TwilioGrowthEnginePanel() {
               eventStats={data.event_stats}
               missedCallStats={data.missed_call_stats}
               voiceReadiness={data.voice_readiness}
+              auditData={data}
             />
           )}
           {activeView === "proof" && (
@@ -166,9 +166,6 @@ export default function TwilioGrowthEnginePanel() {
           )}
           {activeView === "repair" && (
             <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
-          )}
-          {activeView === "asana" && (
-            <AsanaSyncNotes data={data} />
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
@@ -306,7 +303,7 @@ function WorkItemNotes() {
 }
 
 // ── Capability Matrix ──
-function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness }) {
+function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness, auditData }) {
   return (
     <div className="space-y-4">
       {/* Delivery stats summary */}
@@ -375,6 +372,7 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
             const style = STATUS_STYLES[cap.status] || STATUS_STYLES.red;
             const Icon = style.icon;
             const isExpanded = expandedRows[cap.key];
+            const phaseInfo = computeCapabilityPhase(cap, auditData);
             return (
               <div key={cap.key}>
                 <button
@@ -388,6 +386,7 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                       {cap.evidence_sources?.[0] || "No evidence checked"}
                     </p>
                   </div>
+                  <TwilioGrowthEnginePhaseBadge phase={phaseInfo.phase} />
                   <span
                     className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0"
                     style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}
@@ -398,6 +397,13 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                 </button>
                 {isExpanded && (
                   <div className="px-5 pb-4 pt-1 space-y-3 bg-gray-50/50">
+                    <div>
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Implementation Phase</p>
+                      <div className="flex items-center gap-2">
+                        <TwilioGrowthEnginePhaseBadge phase={phaseInfo.phase} showLabel />
+                        <span className="text-xs text-gray-500">{phaseInfo.reason}</span>
+                      </div>
+                    </div>
                     <div>
                       <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Evidence Sources Checked</p>
                       <ul className="space-y-1">
