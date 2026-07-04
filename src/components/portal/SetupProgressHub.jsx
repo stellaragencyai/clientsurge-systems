@@ -42,10 +42,10 @@ function ProgressSection({ project }) {
   return (
     <div style={{
       background: "#ffffff",
-      border: "1.5px solid rgba(0,174,239,0.15)",
-      borderRadius: "20px",
+      border: "1px solid rgba(0,174,239,0.12)",
+      borderRadius: "12px",
       overflow: "hidden",
-      boxShadow: "0 4px 20px rgba(0,59,143,0.07)",
+      boxShadow: "0 1px 2px rgba(0,59,143,0.04), 0 4px 12px rgba(0,59,143,0.06)",
     }}>
       {/* Header bar */}
       <div style={{
@@ -209,10 +209,10 @@ function AssetUploader({ project, onUploaded }) {
   return (
     <div style={{
       background: "#ffffff",
-      border: "1.5px solid rgba(0,174,239,0.15)",
-      borderRadius: "20px",
+      border: "1px solid rgba(0,174,239,0.12)",
+      borderRadius: "12px",
       overflow: "hidden",
-      boxShadow: "0 4px 20px rgba(0,59,143,0.07)",
+      boxShadow: "0 1px 2px rgba(0,59,143,0.04), 0 4px 12px rgba(0,59,143,0.06)",
     }}>
       <div style={{ padding: "20px 24px", borderBottom: "1px solid rgba(0,0,0,0.06)" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
@@ -401,10 +401,10 @@ function InlineChat({ project, user }) {
   return (
     <div style={{
       background: "#ffffff",
-      border: "1.5px solid rgba(0,174,239,0.15)",
-      borderRadius: "20px",
+      border: "1px solid rgba(0,174,239,0.12)",
+      borderRadius: "12px",
       overflow: "hidden",
-      boxShadow: "0 4px 20px rgba(0,59,143,0.07)",
+      boxShadow: "0 1px 2px rgba(0,59,143,0.04), 0 4px 12px rgba(0,59,143,0.06)",
     }}>
       {/* Header — clickable to expand */}
       <button
@@ -559,7 +559,7 @@ export default function SetupProgressHub({ project, order, user }) {
   }[installStatus] || installStatus || "Ready for Install";
 
   return (
-    <div style={{ display: "flex", flexDirection: "column", gap: "20px" }}>
+    <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
       <OnboardingTracker project={projectState} order={order} />
 
       {/* Contextual status explainer */}

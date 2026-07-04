@@ -321,10 +321,10 @@ export default function OnboardingTracker({ project, order }) {
   return (
     <div style={{
       background: "#ffffff",
-      border: "1.5px solid rgba(0,174,239,0.15)",
-      borderRadius: "20px",
+      border: "1px solid rgba(0,174,239,0.12)",
+      borderRadius: "12px",
       overflow: "hidden",
-      boxShadow: "0 4px 24px rgba(0,59,143,0.08)",
+      boxShadow: "0 1px 2px rgba(0,59,143,0.04), 0 4px 12px rgba(0,59,143,0.06)",
     }}>
       {/* Header */}
       <div style={{

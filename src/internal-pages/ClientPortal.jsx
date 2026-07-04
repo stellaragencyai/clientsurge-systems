@@ -397,7 +397,7 @@ export default function ClientPortal() {
       </div>
 
       {/* Content */}
-      <main id="main-content" className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 portal-tab-content">
+      <main id="main-content" className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-10 portal-tab-content">
         {activeTab === "quickstart" && (
           <PortalLazy>
             <QuickStartInline
@@ -407,7 +407,7 @@ export default function ClientPortal() {
           </PortalLazy>
         )}
         {activeTab === "performance" && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <div>
               <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
               <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
@@ -456,14 +456,14 @@ export default function ClientPortal() {
               <RevenueMetricsPanel />
             </PortalLazy>
 
-            <div className="border-t border-border pt-8">
-              <h3 className="text-xl font-bold text-foreground mb-4">Active Automations</h3>
+            <div className="border-t border-border pt-6">
+              <h3 className="text-lg font-bold text-foreground mb-3">Active Automations</h3>
               <PortalLazy>
                 <AutomationsOverview />
               </PortalLazy>
             </div>
-            <div className="border-t border-border pt-8">
-              <h3 className="text-xl font-bold text-foreground mb-4">System Activity</h3>
+            <div className="border-t border-border pt-6">
+              <h3 className="text-lg font-bold text-foreground mb-3">System Activity</h3>
               <PortalLazy>
                 <AutomatedResponsesLog />
               </PortalLazy>
@@ -496,7 +496,7 @@ export default function ClientPortal() {
           </PortalLazy>
         )}
         {activeTab === "progress" && (
-          <div className="space-y-6">
+          <div className="space-y-5">
             <PortalLazy>
               <GettingStartedBanner project={project} order={portalOrder} />
             </PortalLazy>
