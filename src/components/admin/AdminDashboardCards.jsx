@@ -15,10 +15,10 @@ export function LTVCard({ orders = [] }) {
   const avgLTV = orders.length > 0 ? Math.round(totalLTV / orders.length) : 0;
 
   return (
-    <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Estimated LTV</p>
-      <p className="text-3xl font-extrabold text-emerald-500 mb-1">${totalLTV.toLocaleString()}</p>
-      <p className="text-xs text-muted-foreground">Order-derived estimate · Avg ${avgLTV.toLocaleString()} / client · {orders.length} paid orders</p>
+    <div>
+      <p className="text-xs font-bold uppercase tracking-wide text-gray-400 mb-1">Estimated LTV</p>
+      <p className="text-3xl font-extrabold text-emerald-600 mb-1">${totalLTV.toLocaleString()}</p>
+      <p className="text-xs text-gray-400">Order-derived estimate · Avg ${avgLTV.toLocaleString()} / client · {orders.length} paid orders</p>
       <p className="mt-2 text-[11px] text-amber-600">Needs Stripe/subscription reconciliation before treating as collected revenue proof.</p>
     </div>
   );
@@ -39,27 +39,27 @@ export function ChurnRiskPanel({ orders = [] }) {
   }, [orders]);
 
   if (!hasInstrumentedRisk) return (
-    <div className="rounded-2xl border border-amber-200 bg-amber-50 dark:bg-amber-950/20 dark:border-amber-900 p-5">
-      <p className="text-sm font-semibold text-amber-700 dark:text-amber-400">Churn risk needs instrumentation</p>
-      <p className="mt-1 text-xs text-amber-700/80 dark:text-amber-300/80">No proven churn_risk_score source is present on the loaded paid orders. Do not read this as “no churn risk detected.”</p>
+    <div>
+      <p className="text-sm font-semibold text-amber-700">Churn risk needs instrumentation</p>
+      <p className="mt-1 text-xs text-amber-600/80">No proven churn_risk_score source is present on the loaded paid orders. Do not read this as "no churn risk detected."</p>
     </div>
   );
 
   if (!risks.length) return (
-    <div className="rounded-2xl border border-border bg-background p-5">
-      <p className="text-sm font-semibold text-foreground">No high churn risk in instrumented orders</p>
-      <p className="mt-1 text-xs text-muted-foreground">Only orders with a numeric churn_risk_score were evaluated.</p>
+    <div>
+      <p className="text-sm font-semibold text-gray-900">No high churn risk in instrumented orders</p>
+      <p className="mt-1 text-xs text-gray-400">Only orders with a numeric churn_risk_score were evaluated.</p>
     </div>
   );
 
   return (
-    <div className="rounded-2xl border border-red-200 bg-red-50 dark:bg-red-950/20 dark:border-red-900 p-5">
-      <p className="text-sm font-bold text-red-600 dark:text-red-400 mb-3">
+    <div>
+      <p className="text-sm font-bold text-red-600 mb-3">
         ⚠️ Churn Risk ({risks.length})
       </p>
       {risks.map(o => (
-        <div key={o.id} className="flex items-center justify-between py-2 border-b border-red-100 dark:border-red-900 last:border-0">
-          <span className="text-sm text-foreground">{o.business_name || o.customer_name || "Unknown client"}</span>
+        <div key={o.id} className="flex items-center justify-between py-2 border-b border-red-100 last:border-0">
+          <span className="text-sm text-gray-900">{o.business_name || o.customer_name || "Unknown client"}</span>
           <span className="text-xs font-semibold text-red-600">Score {o.churn_risk_score}</span>
         </div>
       ))}
@@ -131,31 +131,31 @@ export function InstallStatusTable({ onboardings = [] }) {
   }
 
   return (
-    <div style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)", borderRadius: 16, overflow: "hidden" }}>
-      <div style={{ padding: "14px 20px", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
-        <p style={{ color: "#fff", fontWeight: 700, fontSize: 14, margin: 0 }}>Install Status</p>
+    <div className="rounded-xl overflow-hidden" style={{ background: "#fff", border: "1px solid #E5E7EB" }}>
+      <div style={{ padding: "14px 20px", borderBottom: "1px solid #F3F4F6" }}>
+        <p style={{ color: "#111827", fontWeight: 700, fontSize: 14, margin: 0 }}>Install Status</p>
         <p style={{ color: "#9CA3AF", fontSize: 11, margin: "4px 0 0" }}>Source: {sourceLabel}</p>
       </div>
       <div style={{ overflowX: "auto" }}>
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: 12 }}>
           <thead>
-            <tr style={{ background: "rgba(255,255,255,0.02)" }}>
-              <th style={{ padding: "8px 16px", color: "#9CA3AF", textAlign: "left", fontWeight: 600 }}>Client</th>
+            <tr style={{ background: "#F9FAFB" }}>
+              <th style={{ padding: "8px 16px", color: "#6B7280", textAlign: "left", fontWeight: 600 }}>Client</th>
               {cols.map(c => (
-                <th key={c.key} style={{ padding: "8px 10px", color: "#9CA3AF", textAlign: "center", fontWeight: 600 }}>{c.label}</th>
+                <th key={c.key} style={{ padding: "8px 10px", color: "#6B7280", textAlign: "center", fontWeight: 600 }}>{c.label}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {sourceRecords.length === 0 && (
-              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#6B7280", textAlign: "center" }}>No ClientInstallationOS install records available yet</td></tr>
+              <tr><td colSpan={cols.length + 1} style={{ padding: "16px", color: "#9CA3AF", textAlign: "center" }}>No ClientInstallationOS install records available yet</td></tr>
             )}
             {sourceRecords.slice(0, 20).map(o => (
-              <tr key={o.id} style={{ borderTop: "1px solid rgba(255,255,255,0.04)" }}>
-                <td style={{ padding: "10px 16px", color: "#D1D5DB" }}>{o.business_name || o.client_name || "Unknown"}</td>
+              <tr key={o.id} style={{ borderTop: "1px solid #F3F4F6" }}>
+                <td style={{ padding: "10px 16px", color: "#374151" }}>{o.business_name || o.client_name || "Unknown"}</td>
                 {cols.map(c => (
                   <td key={c.key} style={{ padding: "10px", textAlign: "center" }}>
-                    <span style={{ color: o[c.key] && o[c.key] !== "not_started" ? "#00FFB3" : "#374151", fontSize: 11 }}>
+                    <span style={{ color: o[c.key] && o[c.key] !== "not_started" ? "#059669" : "#9CA3AF", fontSize: 11, fontWeight: 600 }}>
                       {o[c.key] || "—"}
                     </span>
                   </td>
@@ -192,13 +192,9 @@ export function AdminQuickActions({ order, onRefresh }) {
   ];
 
   return (
-    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+    <div className="flex flex-wrap gap-2">
       {actions.map(a => (
-        <button key={a.key} onClick={a.fn} disabled={loading[a.key]} style={{
-          background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)",
-          color: "#D1D5DB", borderRadius: 9999, padding: "7px 16px", fontSize: 12,
-          fontWeight: 600, cursor: loading[a.key] ? "not-allowed" : "pointer",
-        }}>
+        <button key={a.key} onClick={a.fn} disabled={loading[a.key]} className="rounded-full border border-gray-200 bg-white px-4 py-1.5 text-xs font-semibold text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
           {loading[a.key] ? "..." : a.label}
         </button>
       ))}

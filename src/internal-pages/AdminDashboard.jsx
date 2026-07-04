@@ -15,7 +15,6 @@ import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadsTable from '../components/admin/LeadsTable';
 import LeadsRecentChanges from '../components/admin/LeadsRecentChanges';
 import LeadIntelligenceDashboard from '../components/admin/LeadIntelligenceDashboard';
-import LeadIntelligenceMiniPanel from '../components/admin/LeadIntelligenceMiniPanel';
 import LeadManagementDashboard from '../components/admin/LeadManagementDashboard';
 import CrmHealthDashboard from '../components/admin/CrmHealthDashboard';
 import LeadCleanupPanel from '../components/admin/LeadCleanupPanel';
@@ -61,7 +60,6 @@ import LandingPageAnalyticsPanel from '../components/admin/LandingPageAnalyticsP
 import SalesFunnelPanel from '../components/admin/SalesFunnelPanel';
 import CustomerOnboardingPanel from '../components/admin/CustomerOnboardingPanel';
 import ResourceLibrary from '../components/admin/ResourceLibrary';
-import AdminAICommandBar from '../components/admin/AdminAICommandBar';
 import SessionTimeoutModal from '../components/admin/SessionTimeoutModal';
 import StripeTestModeBanner from '../components/admin/StripeTestModeBanner';
 import ProductionHardeningPanel from '../components/admin/ProductionHardeningPanel';
@@ -572,11 +570,6 @@ function OverviewDashboard({ onNavigate }) {
 
   return (
     <div className="space-y-6">
-      <AdminAICommandBar />
-
-      {/* Intelligence Quick KPIs */}
-      <LeadIntelligenceMiniPanel onNavigate={onNavigate} />
-
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
           <h2 className="text-xl font-bold text-gray-900">Welcome back</h2>
@@ -609,44 +602,44 @@ function OverviewDashboard({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-[1.35fr,1fr]">
-        <div className="bg-card rounded-xl border border-border p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Priority Outreach Queue</h3>
+        <div className="bg-white rounded-xl border border-gray-200/80 p-6" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Priority Outreach Queue</h3>
           <div className="space-y-3 max-h-96 overflow-y-auto">
             {loading ? (
-              <p className="text-sm text-muted-foreground">Loading...</p>
+              <p className="text-sm text-gray-400">Loading...</p>
             ) : error ? (
               <p className="text-sm text-red-600">{error}</p>
             ) : priorityQueue.length === 0 ? (
-              <p className="text-sm text-muted-foreground">No priority leads yet</p>
+              <p className="text-sm text-gray-400">No priority leads yet</p>
             ) : (
               priorityQueue.slice(0, 6).map((lead, index) => (
-                <div key={lead.id} className="rounded-lg border border-border bg-muted/20 p-4">
+                <div key={lead.id} className="rounded-lg border border-gray-100 bg-gray-50/50 p-4">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <p className="text-sm font-semibold text-foreground">#{index + 1} {lead.full_name}</p>
-                      <p className="text-xs text-muted-foreground">{lead.business_name}</p>
+                      <p className="text-sm font-semibold text-gray-900">#{index + 1} {lead.full_name}</p>
+                      <p className="text-xs text-gray-400">{lead.business_name}</p>
                     </div>
-                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground">
+                    <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 border border-gray-200">
                       {lead.activation_priority}
                     </span>
                   </div>
-                  <p className="mt-2 text-xs font-medium text-foreground">{lead.next_action?.label || "Review lead"}</p>
-                  <p className="mt-1 text-xs text-muted-foreground">{lead.next_action?.detail || "Review lead context."}</p>
-                  <p className="mt-2 text-xs text-muted-foreground">
+                  <p className="mt-2 text-xs font-medium text-gray-700">{lead.next_action?.label || "Review lead"}</p>
+                  <p className="mt-1 text-xs text-gray-400">{lead.next_action?.detail || "Review lead context."}</p>
+                  <p className="mt-2 text-xs text-gray-400">
                     Offer: {lead.recommended_offer?.package_name || lead.recommended_offer?.primary_service_name || 'No advisory offer'}
                   </p>
                 </div>
               ))
             )}
           </div>
-          <button onClick={() => onNavigate('leads')} className="mt-4 text-xs font-semibold text-primary hover:text-primary/80 transition-colors">
+          <button onClick={() => onNavigate('leads')} className="mt-4 text-xs font-semibold text-blue-600 hover:text-blue-700 transition-colors">
             View all leads →
           </button>
         </div>
 
         {/* Offer Mix — clickable */}
-        <div className="bg-card rounded-xl border border-border p-6">
-          <h3 className="text-lg font-semibold text-foreground mb-4">Offer Mix</h3>
+        <div className="bg-white rounded-xl border border-gray-200/80 p-6" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h3 className="text-lg font-semibold text-gray-900 mb-4">Offer Mix</h3>
           <div className="space-y-3">
             {[
               { key: 'starter_system', label: 'Starter System', helper: 'Response + missed-call fit' },
@@ -657,13 +650,13 @@ function OverviewDashboard({ onNavigate }) {
               <button
                 key={key}
                 onClick={() => onNavigate('leads')}
-                className="w-full flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-3 hover:bg-muted/40 transition-colors text-left"
+                className="w-full flex items-start justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/50 p-3 hover:bg-gray-100/50 transition-colors text-left"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground">{helper}</p>
+                  <p className="text-sm font-medium text-gray-900">{label}</p>
+                  <p className="text-xs text-gray-400">{helper}</p>
                 </div>
-                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground flex-shrink-0">
+                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 border border-gray-200 flex-shrink-0">
                   {(offerCounts[key] || 0) + (legacyKey ? offerCounts[legacyKey] || 0 : 0)}
                 </span>
               </button>
@@ -673,61 +666,61 @@ function OverviewDashboard({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 gap-6 xl:grid-cols-3">
-        <div className="rounded-xl border border-border bg-muted/30 p-5">
+        <div className="bg-white rounded-xl border border-gray-200/80 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
           <LTVCard orders={orders} />
         </div>
-        <div className="rounded-xl border border-border bg-muted/30 p-5">
+        <div className="bg-white rounded-xl border border-gray-200/80 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
           <ChurnRiskPanel orders={orders} />
         </div>
-        <div className="rounded-xl border border-border bg-muted/30 p-5">
+        <div className="bg-white rounded-xl border border-gray-200/80 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
           <InstallStatusTable onboardings={onboardings.slice(0, 20)} />
         </div>
       </div>
 
-      <div className="bg-card rounded-xl border border-border p-6">
+      <div className="bg-white rounded-xl border border-gray-200/80 p-6" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-lg font-semibold text-foreground">Recent Paid Orders</h3>
-            <p className="text-sm text-muted-foreground">Run the common operator actions against the latest paid orders.</p>
+            <h3 className="text-lg font-semibold text-gray-900">Recent Paid Orders</h3>
+            <p className="text-sm text-gray-400">Run the common operator actions against the latest paid orders.</p>
           </div>
-          <button onClick={fetchOverviewData} className="text-xs font-semibold text-primary hover:text-primary/80">Refresh</button>
+          <button onClick={fetchOverviewData} className="text-xs font-semibold text-blue-600 hover:text-blue-700">Refresh</button>
         </div>
         <div className="space-y-3">
           {orders.slice(0, 5).map((order) => (
-            <div key={order.id} className="flex flex-col gap-3 rounded-lg border border-border bg-muted/10 p-4 lg:flex-row lg:items-center lg:justify-between">
+            <div key={order.id} className="flex flex-col gap-3 rounded-lg border border-gray-100 bg-gray-50/50 p-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-sm font-semibold text-foreground">{order.business_name || order.customer_name || "Unnamed client"}</p>
-                <p className="text-xs text-muted-foreground">
+                <p className="text-sm font-semibold text-gray-900">{order.business_name || order.customer_name || "Unnamed client"}</p>
+                <p className="text-xs text-gray-400">
                   {order.customer_email || "No email"} · {order.selected_package_type || order.package_type || "single_service"}
                 </p>
               </div>
               <AdminQuickActions order={order} onRefresh={fetchOverviewData} />
             </div>
           ))}
-          {orders.length === 0 && <p className="text-sm text-muted-foreground">No paid orders available yet.</p>}
+          {orders.length === 0 && <p className="text-sm text-gray-400">No paid orders available yet.</p>}
         </div>
       </div>
 
       {/* Recent Leads */}
-      <div className="bg-card rounded-xl border border-border p-6">
+      <div className="bg-white rounded-xl border border-gray-200/80 p-6" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-semibold text-foreground">Recent Lead Movement</h3>
-          <button onClick={() => onNavigate('leads')} className="text-xs font-semibold text-primary hover:text-primary/80">View all →</button>
+          <h3 className="text-lg font-semibold text-gray-900">Recent Lead Movement</h3>
+          <button onClick={() => onNavigate('leads')} className="text-xs font-semibold text-blue-600 hover:text-blue-700">View all →</button>
         </div>
         <div className="space-y-3 max-h-96 overflow-y-auto">
           {loading ? (
-            <p className="text-sm text-muted-foreground">Loading...</p>
+            <p className="text-sm text-gray-400">Loading...</p>
           ) : error ? (
             <p className="text-sm text-red-600">{error}</p>
           ) : recentLeads.length === 0 ? (
-            <p className="text-sm text-muted-foreground">No leads yet</p>
+            <p className="text-sm text-gray-400">No leads yet</p>
           ) : (
             recentLeads.slice(0, 5).map((lead) => (
-              <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted transition-colors border-b border-border last:border-0">
+              <div key={lead.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-gray-50 transition-colors border-b border-gray-100 last:border-0">
                 <div>
-                  <p className="font-medium text-foreground text-sm">{lead.full_name}</p>
-                  <p className="text-xs text-muted-foreground">{lead.business_name}</p>
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <p className="font-medium text-gray-900 text-sm">{lead.full_name}</p>
+                  <p className="text-xs text-gray-400">{lead.business_name}</p>
+                  <p className="text-xs text-gray-400 mt-1">
                     {lead.recent_movement?.detail || (lead.last_activity_at ? new Date(lead.last_activity_at).toLocaleDateString() : 'Not tracked')}
                   </p>
                 </div>
@@ -747,8 +740,8 @@ function OverviewDashboard({ onNavigate }) {
 
       {/* Activation Snapshot */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-card rounded-xl border border-border p-6">
-          <h3 className="font-semibold text-foreground mb-3">Actionability Snapshot</h3>
+        <div className="bg-white rounded-xl border border-gray-200/80 p-6" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h3 className="font-semibold text-gray-900 mb-3">Actionability Snapshot</h3>
           <div className="space-y-3 text-sm">
             {[
               { label: "Reactivation Ready", key: "reactivation", helper: "Dormant leads fit reactivation." },
@@ -759,30 +752,30 @@ function OverviewDashboard({ onNavigate }) {
               <button
                 key={key}
                 onClick={() => onNavigate('leads')}
-                className="w-full flex items-start justify-between gap-3 rounded-lg border border-border bg-muted/20 p-3 hover:bg-muted/40 transition-colors text-left"
+                className="w-full flex items-start justify-between gap-3 rounded-lg border border-gray-100 bg-gray-50/50 p-3 hover:bg-gray-100/50 transition-colors text-left"
               >
                 <div>
-                  <p className="text-sm font-medium text-foreground">{label}</p>
-                  <p className="text-xs text-muted-foreground">{helper}</p>
+                  <p className="text-sm font-medium text-gray-900">{label}</p>
+                  <p className="text-xs text-gray-400">{helper}</p>
                 </div>
-                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-foreground flex-shrink-0">{snapshot.summary.segment_counts?.[key] || 0}</span>
+                <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-gray-700 border border-gray-200 flex-shrink-0">{snapshot.summary.segment_counts?.[key] || 0}</span>
               </button>
             ))}
           </div>
         </div>
-        <div className="bg-card rounded-xl border border-border p-6">
-          <h3 className="font-semibold text-foreground mb-3">Operator Guidance</h3>
-          <div className="space-y-2 text-sm text-muted-foreground">
+        <div className="bg-white rounded-xl border border-gray-200/80 p-6" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04)" }}>
+          <h3 className="font-semibold text-gray-900 mb-3">Operator Guidance</h3>
+          <div className="space-y-2 text-sm text-gray-400">
             <p>✓ Work the priority queue before broad list scanning.</p>
             <p>✓ Follow-up and demo-close signals should be handled before nurture-only leads.</p>
             <p>✓ Treat recommended offers as advisory, then confirm fit in the lead detail view.</p>
             <p>✓ Keep status changes canonical so timestamps and segments stay accurate.</p>
           </div>
           <div className="mt-4 grid grid-cols-2 gap-2">
-            <button onClick={() => onNavigate('revenue')} className="rounded-lg bg-primary/8 border border-primary/20 px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/15 transition-colors">
+            <button onClick={() => onNavigate('revenue')} className="rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-600 hover:bg-blue-100 transition-colors">
               View Revenue →
             </button>
-            <button onClick={() => onNavigate('analytics')} className="rounded-lg bg-muted border border-border px-3 py-2 text-xs font-semibold text-foreground hover:bg-muted/80 transition-colors">
+            <button onClick={() => onNavigate('analytics')} className="rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs font-semibold text-gray-700 hover:bg-gray-100 transition-colors">
               View Analytics →
             </button>
           </div>
