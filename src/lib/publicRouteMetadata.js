@@ -87,7 +87,11 @@ export const PUBLIC_DIRECTORY_PAGES = [
 
 export const PUBLIC_ROUTE_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 
-export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS];
+// /client-portal is a hybrid route: it renders publicly (no ProtectedRoute wrapper)
+// but uses useAuth() internally to decide between login prompt and full portal.
+// Including it here ensures AuthenticatedAppWithTenant doesn't block it during
+// the initial auth-loading phase — ClientPortalAccess manages its own loading/error states.
+export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS, "/client-portal"];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
   "/client",
