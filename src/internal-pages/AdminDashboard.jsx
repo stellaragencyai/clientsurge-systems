@@ -72,6 +72,7 @@ import LaunchTruthSprintPanel from '../components/admin/LaunchTruthSprintPanel';
 import LaunchProofDashboard from '../components/admin/LaunchProofDashboard';
 import SystemIdentityPanel from '../components/admin/SystemIdentityPanel';
 import GuidedOnboarding from '../components/admin/GuidedOnboarding';
+import AuditCommandCenter from '../components/admin/AuditCommandCenter';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -155,6 +156,7 @@ const NAV_GROUPS = [
   {
     group: 'System Health',
     items: [
+      { id: 'audit-command-center', label: 'Audit Command Center', icon: ShieldCheck },
       { id: 'launch-proof', label: 'Launch Proof', icon: ShieldCheck },
       { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
       { id: 'data-quality', label: 'Data Quality', icon: Activity },
@@ -337,6 +339,7 @@ export default function AdminDashboard() {
       case 'demo-bookings': return <AdminDemoBookingsTab />;
       case 'logs': return <CommunicationLogsPanel />;
       case 'resend-diagnostics': return <ResendSenderDiagnosticsPanel />;
+      case 'audit-command-center': return <AuditCommandCenter />;
       case 'launch-proof': return (
         <div className="space-y-6">
           <SystemIdentityPanel />

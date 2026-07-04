@@ -57,6 +57,7 @@ const NAV_GROUPS = [
   {
     group: "System",
     items: [
+      { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
       { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
       { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
       { id: "audit-log",        label: "Audit Log",         icon: ShieldCheck,     path: "/admin", tab: "audit-log" },
