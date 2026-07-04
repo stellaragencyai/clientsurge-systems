@@ -2,8 +2,18 @@
   if (window.__clientsurgePublicRouteExposureGuard) return;
   window.__clientsurgePublicRouteExposureGuard = true;
 
-  const INTERNAL_PATH_PATTERN = /^\/(admin|dashboard|client|client-portal|client-dashboard|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|$)/i;
-  const INTERNAL_TEXT_PATTERN = /\b(Admin Dashboard|Business Setup|Client Portal|Client Dashboard|Function Audit|System Observability|Reconciliation|Onboarding Pipeline|Install Guide|Mission Control|SaaS Admin|AI Status Dashboard|Performance Wars|Admin Settings|Lead Intelligence|Credentials Setup|Website Preview|Automation Health|Opportunity Review Queue)\b/i;
+  const pathname = window.location?.pathname || "/";
+
+  // /client-portal is intentionally public at the shell level: unauthenticated users
+  // must see the login/access screen instead of a blank page. Treating it as an
+  // internal route made the DOM sanitizer too aggressive on the portal entry page.
+  const isClientPortalEntry = /^\/client-portal\/?$/i.test(pathname);
+
+  const INTERNAL_PATH_PATTERN = isClientPortalEntry
+    ? /^\/(admin|dashboard|client|client-dashboard|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|$)/i
+    : /^\/(admin|dashboard|client|client-portal|client-dashboard|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|base44|api|saas|mission-control|lead-intelligence|sam|medspa-dashboard)(\/|$)/i;
+
+  const INTERNAL_TEXT_PATTERN = /\b(Admin Dashboard|Business Setup|Client Dashboard|Function Audit|System Observability|Reconciliation|Onboarding Pipeline|Install Guide|Mission Control|SaaS Admin|AI Status Dashboard|Performance Wars|Admin Settings|Lead Intelligence|Credentials Setup|Website Preview|Automation Health|Opportunity Review Queue)\b/i;
   const GENERATED_COPY_PATTERN = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates/i;
 
   function normalizedText(node) {
