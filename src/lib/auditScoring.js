@@ -113,4 +113,28 @@ export const AUDIT_SECTIONS = {
     gateKey: 'admin_dashboard_gate',
     description: 'Launch readiness, DashboardTruthCheck visibility, environment filters, remediation actions.',
   },
+  offer_pricing_architecture: {
+    key: 'offer_pricing_architecture',
+    label: 'Offer / Pricing / Package Architecture',
+    gateKey: 'offer_pricing_gate',
+    description: 'Package consistency, pricing_summary, discount math, funnel_identity, plan mapping.',
+  },
+  checkout_revenue_flow: {
+    key: 'checkout_revenue_flow',
+    label: 'Checkout / Revenue Flow',
+    gateKey: 'checkout_revenue_gate',
+    description: 'Checkout click proof, paid orders, identifiers, subscription links, client links, onboarding handoff.',
+  },
+  client_onboarding_flow: {
+    key: 'client_onboarding_flow',
+    label: 'Client Onboarding Flow',
+    gateKey: 'onboarding_flow_gate',
+    description: 'Onboarding chain validation: SetupAuth, WebsiteScan, Blueprint, Profile, Access, Simulation, Install OS.',
+  },
+  industry_landing_pages: {
+    key: 'industry_landing_pages',
+    label: 'Industry Landing Pages',
+    gateKey: 'industry_pages_gate',
+    description: 'Route, content, CTA, page_view, cta_click, form_submit, LandingPageAnalytics per industry page.',
+  },
 };

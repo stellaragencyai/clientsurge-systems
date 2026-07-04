@@ -1355,57 +1355,27 @@ Deno.serve(async (req) => {
     const body = await req.json().catch(() => ({}));
     const { persist = true } = body;
 
-    // Run all 6 section checks
+    // Run all 6 original section checks in parallel
     const [homepageResult, analyticsResult, adminResult, leadCaptureResult, automationResult, portalResult] = await Promise.all([
-      checkHomepageConversion(base44).catch((e) => ({
-        section_key: 'homepage_conversion',
-        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
-        checks: [],
-        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
-        warnings: [],
-        evidence_summary: `Error: ${e.message}`,
-      })),
-      checkAnalyticsTracking(base44).catch((e) => ({
-        section_key: 'analytics_tracking',
-        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
-        checks: [],
-        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
-        warnings: [],
-        evidence_summary: `Error: ${e.message}`,
-      })),
-      checkAdminDashboardTruth(base44).catch((e) => ({
-        section_key: 'admin_dashboard_truth',
-        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
-        checks: [],
-        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
-        warnings: [],
-        evidence_summary: `Error: ${e.message}`,
-      })),
-      checkLeadCaptureSystem(base44).catch((e) => ({
-        section_key: 'lead_capture_system',
-        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
-        checks: [],
-        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
-        warnings: [],
-        evidence_summary: `Error: ${e.message}`,
-      })),
-      checkAutomationDelivery(base44).catch((e) => ({
-        section_key: 'automation_delivery',
-        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
-        checks: [],
-        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
-        warnings: [],
-        evidence_summary: `Error: ${e.message}`,
-      })),
-      checkClientPortalExperience(base44).catch((e) => ({
-        section_key: 'client_portal_experience',
-        score: { total: 0, grade: 'F', status: 'Blocked', components: [] },
-        checks: [],
-        blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }],
-        warnings: [],
-        evidence_summary: `Error: ${e.message}`,
-      })),
+      checkHomepageConversion(base44).catch((e) => ({ section_key: 'homepage_conversion', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` })),
+      checkAnalyticsTracking(base44).catch((e) => ({ section_key: 'analytics_tracking', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` })),
+      checkAdminDashboardTruth(base44).catch((e) => ({ section_key: 'admin_dashboard_truth', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` })),
+      checkLeadCaptureSystem(base44).catch((e) => ({ section_key: 'lead_capture_system', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` })),
+      checkAutomationDelivery(base44).catch((e) => ({ section_key: 'automation_delivery', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` })),
+      checkClientPortalExperience(base44).catch((e) => ({ section_key: 'client_portal_experience', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` })),
     ]);
+
+    // Run 4 extended section checks via function invocation
+    const extendedResults = await Promise.all([
+      base44.functions.invoke('checkOfferPricingArchitecture', {}).catch((e) => ({ data: { section_key: 'offer_pricing_architecture', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+      base44.functions.invoke('checkCheckoutRevenueFlow', {}).catch((e) => ({ data: { section_key: 'checkout_revenue_flow', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+      base44.functions.invoke('checkClientOnboardingFlow', {}).catch((e) => ({ data: { section_key: 'client_onboarding_flow', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+      base44.functions.invoke('checkIndustryLandingPages', {}).catch((e) => ({ data: { section_key: 'industry_landing_pages', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+    ]);
+    const offerPricingResult = extendedResults[0].data || extendedResults[0];
+    const checkoutRevenueResult = extendedResults[1].data || extendedResults[1];
+    const onboardingFlowResult = extendedResults[2].data || extendedResults[2];
+    const industryPagesResult = extendedResults[3].data || extendedResults[3];
 
     const sections = [
       { key: 'homepage_conversion', label: 'Homepage Conversion Path', ...homepageResult.score, blockers: homepageResult.blockers, warnings: homepageResult.warnings, checks: homepageResult.checks, evidence_summary: homepageResult.evidence_summary },
@@ -1414,6 +1384,10 @@ Deno.serve(async (req) => {
       { key: 'lead_capture_system', label: 'Lead Capture System', ...leadCaptureResult.score, blockers: leadCaptureResult.blockers, warnings: leadCaptureResult.warnings, checks: leadCaptureResult.checks, evidence_summary: leadCaptureResult.evidence_summary },
       { key: 'automation_delivery', label: 'Automation Product Delivery', ...automationResult.score, blockers: automationResult.blockers, warnings: automationResult.warnings, checks: automationResult.checks, evidence_summary: automationResult.evidence_summary },
       { key: 'client_portal_experience', label: 'Client Portal Experience', ...portalResult.score, blockers: portalResult.blockers, warnings: portalResult.warnings, checks: portalResult.checks, evidence_summary: portalResult.evidence_summary },
+      { key: 'offer_pricing_architecture', label: 'Offer / Pricing / Package Architecture', ...offerPricingResult.score, blockers: offerPricingResult.blockers, warnings: offerPricingResult.warnings, checks: offerPricingResult.checks, evidence_summary: offerPricingResult.evidence_summary },
+      { key: 'checkout_revenue_flow', label: 'Checkout / Revenue Flow', ...checkoutRevenueResult.score, blockers: checkoutRevenueResult.blockers, warnings: checkoutRevenueResult.warnings, checks: checkoutRevenueResult.checks, evidence_summary: checkoutRevenueResult.evidence_summary },
+      { key: 'client_onboarding_flow', label: 'Client Onboarding Flow', ...onboardingFlowResult.score, blockers: onboardingFlowResult.blockers, warnings: onboardingFlowResult.warnings, checks: onboardingFlowResult.checks, evidence_summary: onboardingFlowResult.evidence_summary },
+      { key: 'industry_landing_pages', label: 'Industry Landing Pages', ...industryPagesResult.score, blockers: industryPagesResult.blockers, warnings: industryPagesResult.warnings, checks: industryPagesResult.checks, evidence_summary: industryPagesResult.evidence_summary },
     ];
 
     const allBlockers = sections.flatMap((s) => s.blockers);
@@ -1491,6 +1465,10 @@ Deno.serve(async (req) => {
         lead_capture_system: { gate_key: 'lead_capture_gate', gate_name: 'Lead Capture Gate', section_label: 'Lead Capture System' },
         automation_delivery: { gate_key: 'automation_delivery_gate', gate_name: 'Automation Delivery Gate', section_label: 'Automation Product Delivery' },
         client_portal_experience: { gate_key: 'client_portal_gate', gate_name: 'Client Portal Gate', section_label: 'Client Portal Experience' },
+        offer_pricing_architecture: { gate_key: 'offer_pricing_gate', gate_name: 'Offer / Pricing Gate', section_label: 'Offer / Pricing / Package Architecture' },
+        checkout_revenue_flow: { gate_key: 'checkout_revenue_gate', gate_name: 'Checkout / Revenue Gate', section_label: 'Checkout / Revenue Flow' },
+        client_onboarding_flow: { gate_key: 'onboarding_flow_gate', gate_name: 'Onboarding Flow Gate', section_label: 'Client Onboarding Flow' },
+        industry_landing_pages: { gate_key: 'industry_pages_gate', gate_name: 'Industry Pages Gate', section_label: 'Industry Landing Pages' },
       };
 
       for (const section of sections) {
@@ -1618,10 +1596,14 @@ Deno.serve(async (req) => {
       lead_capture_detail: leadCaptureResult,
       automation_detail: automationResult,
       portal_detail: portalResult,
+      offer_pricing_detail: offerPricingResult,
+      checkout_revenue_detail: checkoutRevenueResult,
+      onboarding_flow_detail: onboardingFlowResult,
+      industry_pages_detail: industryPagesResult,
       persisted: {
         truth_check_id: truthCheckId,
         readiness_id: readinessId,
-        gates: ['website_cta_gate', 'analytics_gate', 'admin_dashboard_gate', 'dashboard_truth_gate', 'lead_capture_gate', 'automation_delivery_gate', 'client_portal_gate', 'twilio_sms_gate', 'resend_email_gate', 'booking_flow_gate', 'twilio_voice_gate', 'elevenlabs_postcall_logging_gate', 'voice_frontline_gate', 'install_os_gate'],
+        gates: ['website_cta_gate', 'analytics_gate', 'admin_dashboard_gate', 'dashboard_truth_gate', 'lead_capture_gate', 'automation_delivery_gate', 'client_portal_gate', 'twilio_sms_gate', 'resend_email_gate', 'booking_flow_gate', 'twilio_voice_gate', 'elevenlabs_postcall_logging_gate', 'voice_frontline_gate', 'install_os_gate', 'offer_pricing_gate', 'checkout_revenue_gate', 'onboarding_flow_gate', 'industry_pages_gate'],
       },
     });
   } catch (error) {

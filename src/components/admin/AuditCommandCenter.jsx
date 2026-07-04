@@ -21,6 +21,10 @@ import { AUDIT_SECTIONS, TARGET_SCORE } from "@/lib/auditScoring";
 import LeadCaptureDetailPanel from "./audit/LeadCaptureDetailPanel";
 import AutomationDeliveryDetailPanel from "./audit/AutomationDeliveryDetailPanel";
 import ClientPortalDetailPanel from "./audit/ClientPortalDetailPanel";
+import OfferPricingDetailPanel from "./audit/OfferPricingDetailPanel";
+import CheckoutRevenueDetailPanel from "./audit/CheckoutRevenueDetailPanel";
+import ClientOnboardingDetailPanel from "./audit/ClientOnboardingDetailPanel";
+import IndustryLandingPagesDetailPanel from "./audit/IndustryLandingPagesDetailPanel";
 
 const STATUS_STYLES = {
   Trusted: {
@@ -385,6 +389,26 @@ export default function AuditCommandCenter() {
       {/* Client Portal Detail Panel */}
       {data?.portal_detail && (
         <ClientPortalDetailPanel detail={data.portal_detail} />
+      )}
+
+      {/* Offer / Pricing Detail Panel */}
+      {data?.offer_pricing_detail && (
+        <OfferPricingDetailPanel detail={data.offer_pricing_detail} />
+      )}
+
+      {/* Checkout / Revenue Detail Panel */}
+      {data?.checkout_revenue_detail && (
+        <CheckoutRevenueDetailPanel detail={data.checkout_revenue_detail} />
+      )}
+
+      {/* Client Onboarding Detail Panel */}
+      {data?.onboarding_flow_detail && (
+        <ClientOnboardingDetailPanel detail={data.onboarding_flow_detail} />
+      )}
+
+      {/* Industry Landing Pages Detail Panel */}
+      {data?.industry_pages_detail && (
+        <IndustryLandingPagesDetailPanel detail={data.industry_pages_detail} />
       )}
 
       {/* Environment filter notice */}
