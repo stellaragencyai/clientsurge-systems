@@ -2,17 +2,21 @@
  if (window.__clientsurgeTelegramClickTracker) return;
  window.__clientsurgeTelegramClickTracker = true;
 
- // ── Preview / portal guard ──────────────────────────────────────────────
- // Skip all tracking in Base44 preview environments and on the client portal
- // shell. The portal must render even if the external telemetry worker is down
- // or rejects a request.
+ // ── Portal shell guard (first priority) ────────────────────────────────
+ // Never fire the external Cloudflare Worker request from /client-portal.
+ // The portal must render even if the worker is down or returns 405.
+ const portalPath = window.location.pathname || "";
+ if (/^\/client-portal\/?$/i.test(portalPath)) {
+ return;
+ }
+
+ // ── Preview environment guard ──────────────────────────────────────────
+ // Skip all tracking in Base44 preview environments.
  const hostname = window.location.hostname || "";
- const pathname = window.location.pathname || "/";
  if (
  hostname.includes("preview-sandbox") ||
  hostname.includes("base44.app") ||
- hostname.includes("preview") ||
- /^\/client-portal\/?$/i.test(pathname)
+ hostname.includes("preview")
  ) {
  return;
  }

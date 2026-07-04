@@ -108,6 +108,11 @@
   }
 
   function runGuard() {
+    // /client-portal is a public shell route — unauthenticated users must see
+    // the login/access screen and authenticated users must see the full portal.
+    // Never run DOM removal or anchor hiding on this route.
+    if (isClientPortalEntry) return;
+
     removeGeneratedPagesDirectory();
     removeLooseGeneratedPagesDirectory();
     hardenInternalAnchors();
