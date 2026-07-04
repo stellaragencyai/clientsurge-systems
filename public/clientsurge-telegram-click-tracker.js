@@ -2,14 +2,17 @@
  if (window.__clientsurgeTelegramClickTracker) return;
  window.__clientsurgeTelegramClickTracker = true;
 
- // ── Preview sandbox guard ──────────────────────────────────────────────
- // Skip all tracking in Base44 preview environments to prevent CORS
- // preflight failures that block page rendering.
+ // ── Preview / portal guard ──────────────────────────────────────────────
+ // Skip all tracking in Base44 preview environments and on the client portal
+ // shell. The portal must render even if the external telemetry worker is down
+ // or rejects a request.
  const hostname = window.location.hostname || "";
+ const pathname = window.location.pathname || "/";
  if (
  hostname.includes("preview-sandbox") ||
  hostname.includes("base44.app") ||
- hostname.includes("preview")
+ hostname.includes("preview") ||
+ /^\/client-portal\/?$/i.test(pathname)
  ) {
  return;
  }
