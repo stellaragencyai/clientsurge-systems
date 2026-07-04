@@ -71,7 +71,8 @@ import LaunchProofDashboard from '../components/admin/LaunchProofDashboard';
 import SystemIdentityPanel from '../components/admin/SystemIdentityPanel';
 import GuidedOnboarding from '../components/admin/GuidedOnboarding';
 import AuditCommandCenter from '../components/admin/AuditCommandCenter';
-import TwilioGrowthEngineAudit from '../components/admin/TwilioGrowthEngineAudit';
+import TwilioGrowthEngineDashboard from '../components/admin/TwilioGrowthEngineDashboard';
+import ProofCenterPanel from '../components/admin/ProofCenterPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -158,10 +159,10 @@ const NAV_GROUPS = [
       { id: 'audit-command-center', label: 'Audit Command Center', icon: ShieldCheck },
       { id: 'launch-proof', label: 'Launch Proof', icon: ShieldCheck },
       { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
+      { id: 'proof-center', label: 'Proof Center', icon: ShieldCheck },
       { id: 'data-quality', label: 'Data Quality', icon: Activity },
       { id: 'platform-clients', label: 'Platform Clients', icon: Users },
       { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
-      { id: 'twilio-growth-engine', label: 'Twilio Growth Engine', icon: Zap },
       { id: 'health', label: 'Integration Health', icon: Activity },
       { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
       { id: 'resend-diagnostics', label: 'Resend Sender Diagnostics', icon: Mail },
@@ -310,7 +311,6 @@ export default function AdminDashboard() {
       case 'messaging-regression': return <MessagingProviderRegressionTest />;
       case 'analytics': return <LazyAdminPanel><AnalyticsDashboard /></LazyAdminPanel>;
       case 'twilio-health': return <TwilioRuntimeHealth />;
-      case 'twilio-growth-engine': return <TwilioGrowthEngineAudit />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
       case 'ai-sales-reps': return <AIAgentsDashboard />;
@@ -348,6 +348,7 @@ export default function AdminDashboard() {
         </div>
       );
       case 'launch-truth-sprint': return <LaunchTruthSprintPanel />;
+      case 'proof-center': return <ProofCenterPanel />;
       case 'failed-jobs': return <AdminFailedJobsPanel />;
       case 'instant-response': return <InstantLeadResponseDebugPanel />;
       case 'audit-log': return <AuditLogPanel />;
