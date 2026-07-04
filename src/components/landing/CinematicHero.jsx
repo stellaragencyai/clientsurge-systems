@@ -124,7 +124,7 @@ export default function CinematicHero() {
               to="/store"
               onClick={() => trackCTA("hero_visit_store", "hero")}
               className="inline-flex items-center justify-center rounded-full border text-sm font-bold transition-all"
-              style={{ width: "100%", maxWidth: "300px", height: "54px", borderColor: "rgba(53, 189, 241, 0.4)", background: "rgba(8, 20, 44, 0.7)" }}
+              style={{ width: "100%", maxWidth: "300px", height: "54px", borderColor: "rgba(0,107,176,0.3)", background: "#ffffff" }}
             >
               <Zap className="w-4 h-4" /> Visit the Store
             </Link>
