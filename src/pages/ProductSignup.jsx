@@ -1,12 +1,13 @@
 import { useEffect, useMemo, useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { ArrowRight, AlertCircle, Loader2, CheckCircle2, ShieldCheck, HelpCircle } from "lucide-react";
+import { Shield, X } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import Navbar from "@/components/landing/Navbar";
-import Footer from "@/components/landing/Footer";
-import MobileCallBar from "@/components/landing/MobileCallBar";
 import { trackCTA } from "@/lib/analytics";
 import { setPageMetadata } from "@/lib/seo";
+import CheckoutStepper from "@/components/checkout/CheckoutStepper";
+import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
+import CheckoutFooter from "@/components/checkout/CheckoutFooter";
+import AccountSignupForm from "@/components/checkout/AccountSignupForm";
 
 const PLANS = [
   {
@@ -41,7 +42,7 @@ const PLANS = [
 
 const DEFAULT_PLAN_ID = "growth_system";
 const FORM_STORAGE_KEY = "clientsurge_signup_form";
-const REQUIRED_FIELDS = ["fullName", "businessName", "email", "phone"];
+const REQUIRED_FIELDS = ["firstName", "lastName", "businessName", "email", "phone"];
 const CHECKOUT_TIMEOUT_MS = 20000;
 
 function normalizePlanParam(value) {
@@ -56,6 +57,10 @@ function validateField(field, value) {
   if (field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return "Please enter a valid email address.";
   if (field === "phone" && value.replace(/\D/g, "").length < 10) return "Please enter a valid phone number.";
   return "";
+}
+
+function isFieldValid(field, value) {
+  return !!(value && value.trim() && !validateField(field, value));
 }
 
 function getCheckoutErrorMessage(err) {
@@ -76,11 +81,7 @@ function withCheckoutTimeout(promise) {
 
 function isEmbeddedPreview() {
   if (typeof window === "undefined") return false;
-  try {
-    return window.self !== window.top;
-  } catch {
-    return true;
-  }
+  try { return window.self !== window.top; } catch { return true; }
 }
 
 export default function ProductSignup() {
@@ -88,17 +89,34 @@ export default function ProductSignup() {
   const pkgParam = searchParams.get("package") || searchParams.get("plan") || "";
   const selectedPlanId = normalizePlanParam(pkgParam);
   const selectedPlan = useMemo(() => PLANS.find((p) => p.id === selectedPlanId) || PLANS.find((p) => p.id === DEFAULT_PLAN_ID), [selectedPlanId]);
+
   const [formData, setFormData] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(FORM_STORAGE_KEY) || "{}");
-      return { fullName: saved.fullName || "", businessName: saved.businessName || "", email: saved.email || "", phone: saved.phone || "", industry: saved.industry || "" };
+      return {
+        firstName: saved.firstName || (saved.fullName ? saved.fullName.split(" ")[0] : ""),
+        lastName: saved.lastName || (saved.fullName ? saved.fullName.split(" ").slice(1).join(" ") : ""),
+        mi: saved.mi || "",
+        businessName: saved.businessName || "",
+        email: saved.email || "",
+        phone: saved.phone || "",
+        industry: saved.industry || "",
+        address: saved.address || "",
+        city: saved.city || "",
+        state: saved.state || "",
+        zip: saved.zip || "",
+      };
     } catch {
-      return { fullName: "", businessName: "", email: "", phone: "", industry: "" };
+      return { firstName: "", lastName: "", mi: "", businessName: "", email: "", phone: "", industry: "", address: "", city: "", state: "", zip: "" };
     }
   });
+
   const [fieldErrors, setFieldErrors] = useState({});
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
+  const [bannerVisible, setBannerVisible] = useState(true);
+  const [termsAgreed, setTermsAgreed] = useState(false);
+  const [addressConfirmed, setAddressConfirmed] = useState(false);
 
   useEffect(() => {
     return setPageMetadata({
@@ -145,12 +163,14 @@ export default function ProductSignup() {
       setCheckoutError("Checkout must run in a full browser tab, not inside an embedded preview. I opened a new tab; continue checkout there.");
       return;
     }
+    if (!termsAgreed) { setCheckoutError("Please agree to the Terms of Service and Privacy Policy to continue."); return; }
     if (!validateAll()) { setCheckoutError("Please complete the highlighted fields before checkout."); return; }
     setCheckoutLoading(true);
     try {
+      const fullName = `${formData.firstName} ${formData.mi} ${formData.lastName}`.replace(/\s+/g, " ").trim();
       const payload = {
         package_key: selectedPlanId,
-        customer_name: formData.fullName.trim(),
+        customer_name: fullName,
         customer_email: formData.email.trim(),
         customer_phone: formData.phone.trim(),
         business_name: formData.businessName.trim(),
@@ -179,59 +199,67 @@ export default function ProductSignup() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#f5fbff] via-white to-white">
-      <Navbar />
-      <main className="pt-[calc(var(--cs-nav-height)+28px)]">
-        <section className="border-b border-primary/10 bg-white/70">
-          <div className="max-w-6xl mx-auto px-4 py-8">
-            <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">Secure System Checkout</p>
-            <h1 className="text-3xl md:text-5xl font-bold text-[#001B44] font-titles leading-tight">Complete your ClientSurge signup</h1>
-            <p className="text-slate-600 mt-3 max-w-2xl leading-relaxed">Choose Starter, Growth, or Pro. Then enter your business details to create a secure checkout session.</p>
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Logo Header */}
+      <div className="border-b border-[#eee]">
+        <Link to="/" className="flex items-center justify-center gap-2 py-5">
+          <Shield className="w-7 h-7" style={{ color: "#005691" }} fill="#005691" />
+          <span className="text-xl font-bold text-[#333] tracking-tight">ClientSurge</span>
+        </Link>
+      </div>
+
+      {/* Dismissible Banner */}
+      {bannerVisible && (
+        <div className="w-full" style={{ background: "#3e4750" }}>
+          <div className="max-w-5xl mx-auto px-4 py-2.5 flex items-center justify-between gap-3">
+            <p className="text-xs text-white/90 text-center flex-1">
+              Not sure which system fits your business?{" "}
+              <Link to="/pricing" className="underline text-white font-semibold">Compare packages</Link>
+            </p>
+            <button onClick={() => setBannerVisible(false)} className="text-white/60 hover:text-white flex-shrink-0">
+              <X className="w-4 h-4" />
+            </button>
           </div>
-        </section>
+        </div>
+      )}
 
-        <section className="max-w-6xl mx-auto px-4 py-12">
-          <div className="grid md:grid-cols-[0.9fr_1.1fr] gap-8 lg:gap-12 items-start">
-            <div className="rounded-2xl border border-primary/15 bg-white p-5 md:p-6 shadow-sm">
-              <p className="text-sm font-bold text-slate-700 uppercase tracking-wide mb-5">Select a system</p>
-              <div className="space-y-4">
-                {PLANS.map((plan) => {
-                  const isSelected = selectedPlanId === plan.id;
-                  return (
-                    <button key={plan.id} onClick={() => setSelectedPlanId(plan.id)} className="w-full text-left p-5 rounded-xl border-2 transition-all duration-200 cursor-pointer" style={{ borderColor: isSelected ? "#00AEEF" : "#e5e7eb", background: isSelected ? "#f0f9ff" : "#ffffff", boxShadow: isSelected ? "0 4px 16px rgba(0,174,239,0.15)" : "none" }}>
-                      {plan.recommended && <span className="inline-block mb-2 px-3 py-1 text-xs font-bold rounded-full" style={{ background: "rgba(0,174,239,0.12)", color: "#00AEEF" }}>Recommended</span>}
-                      <div className="flex items-start justify-between gap-4">
-                        <div><h3 className="font-bold text-lg text-[#001B44]">{plan.title}</h3><p className="text-sm text-slate-600 mt-1">{plan.description}</p></div>
-                        {isSelected && <CheckCircle2 className="w-5 h-5 text-[#00AEEF] flex-shrink-0 mt-1" />}
-                      </div>
-                      <div className="mt-4"><span className="text-2xl font-extrabold text-[#001B44]">{plan.price}</span><span className="text-sm text-slate-500 font-semibold">/mo</span><p className="text-xs text-slate-500 mt-1">{plan.setup}</p></div>
-                    </button>
-                  );
-                })}
-              </div>
-              <div className="flex flex-wrap gap-3 pt-5"><span className="inline-flex items-center gap-1.5 text-xs font-semibold px-3 py-2 rounded-lg border" style={{ background: "rgba(0,174,239,0.06)", borderColor: "rgba(0,174,239,0.2)", color: "#00AEEF" }}><ShieldCheck className="h-3.5 w-3.5" /> Secure Stripe Checkout</span></div>
-            </div>
+      {/* Stepper */}
+      <CheckoutStepper currentStep={1} />
 
-            {selectedPlan && (
-              <div className="space-y-6 rounded-2xl border border-primary/15 bg-white p-5 md:p-6 shadow-sm">
-                <div className="p-5 bg-[#f8fcff] rounded-xl border border-primary/10"><h4 className="font-bold text-[#001B44] mb-4">What's included in {selectedPlan.title}:</h4><ul className="space-y-2">{selectedPlan.features.map((feature) => <li key={feature} className="text-sm text-slate-700 flex items-start gap-2"><span className="text-[#00AEEF] font-bold mt-0.5">✓</span>{feature}</li>)}</ul></div>
-                <div className="space-y-4"><p className="text-sm font-bold text-slate-700 uppercase tracking-wide">Your information</p>{[["fullName", "Full Name", "John Doe"], ["businessName", "Business Name", "Your Business"], ["email", "Email", "owner@example.com"], ["phone", "Phone", "(602) 555-0100"], ["industry", "Industry", "e.g., HVAC, Dental, Roofing"]].map(([field, label, placeholder]) => <div key={field}><label className="block text-sm font-semibold text-slate-700 mb-1">{label}{REQUIRED_FIELDS.includes(field) && <span className="text-red-500"> *</span>}</label><input type={field === "email" ? "email" : field === "phone" ? "tel" : "text"} placeholder={placeholder} value={formData[field]} onChange={(e) => handleFieldChange(field, e.target.value)} className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/30 text-slate-900 ${fieldErrors[field] ? "border-red-400 bg-red-50" : "border-slate-200 bg-white"}`} />{fieldErrors[field] && <p className="text-xs text-red-600 mt-1">{fieldErrors[field]}</p>}</div>)}</div>
-                {checkoutError && (
-                  <div className="p-4 bg-red-50 border border-red-200 rounded-xl">
-                    <div className="flex gap-3"><AlertCircle className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" /><p className="text-sm text-red-700 leading-relaxed">{checkoutError}</p></div>
-                    <div className="mt-3 flex flex-wrap gap-2 pl-8"><Link to="/book" className="rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100">Book help</Link><Link to="/contact" className="rounded-full border border-red-200 bg-white px-3 py-1.5 text-xs font-bold text-red-700 hover:bg-red-100">Contact support</Link></div>
-                  </div>
-                )}
-                <button onClick={handleCheckout} disabled={checkoutLoading} className="cs-btn-primary w-full px-6 py-3.5 rounded-full font-bold text-white transition-all flex items-center justify-center gap-2" style={{ opacity: checkoutLoading ? 0.7 : 1, cursor: checkoutLoading ? "not-allowed" : "pointer" }}>{checkoutLoading ? <><Loader2 className="w-4 h-4 animate-spin" /> Creating checkout...</> : <>Continue to Secure Checkout <ArrowRight className="w-4 h-4" /></>}</button>
-                <div className="flex flex-col gap-2 text-center text-xs text-slate-500 sm:flex-row sm:items-center sm:justify-center"><span>Secure Stripe checkout</span><span className="hidden sm:inline">•</span><span>Month-to-month billing</span></div>
-                <Link to="/book" className="flex items-center justify-center gap-2 text-sm font-semibold text-primary hover:text-primary/80"><HelpCircle className="w-4 h-4" /> Need help choosing?</Link>
+      {/* Two-column layout */}
+      <main className="max-w-5xl mx-auto w-full px-4 pb-8 flex-1">
+        <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-6 lg:gap-8 items-start">
+          <AccountSignupForm
+            formData={formData}
+            fieldErrors={fieldErrors}
+            handleFieldChange={handleFieldChange}
+            termsAgreed={termsAgreed}
+            setTermsAgreed={setTermsAgreed}
+            addressConfirmed={addressConfirmed}
+            setAddressConfirmed={setAddressConfirmed}
+            isFieldValid={isFieldValid}
+          />
+          <div className="md:sticky md:top-6">
+            <CheckoutOrderSummary
+              plans={PLANS}
+              selectedPlanId={selectedPlanId}
+              onSelectPlan={setSelectedPlanId}
+              onCheckout={handleCheckout}
+              loading={checkoutLoading}
+              error={checkoutError}
+              termsAgreed={termsAgreed}
+            />
+            {checkoutError && (
+              <div className="mt-3 flex flex-wrap gap-2 justify-center">
+                <Link to="/book" className="text-xs font-bold text-[#005691] underline">Book help</Link>
+                <Link to="/contact" className="text-xs font-bold text-[#005691] underline">Contact support</Link>
               </div>
             )}
           </div>
-        </section>
+        </div>
       </main>
-      <Footer />
-      <MobileCallBar />
+
+      <CheckoutFooter />
     </div>
   );
 }
