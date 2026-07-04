@@ -1,5 +1,4 @@
-import { ArrowRight, ShoppingCart, Zap } from "lucide-react";
-import { createElement } from "react";
+import { ShoppingCart, Zap } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
 import { Link } from "react-router-dom";
@@ -7,14 +6,27 @@ import { Link } from "react-router-dom";
 const AUTOMATION_PILLS = ["Lead Capture", "Missed-Call Recovery", "Follow-Up", "AI Booking", "Reviews", "Reactivation", "Optional AI Phone Receptionist"];
 const HOST = "https://www.vectorlogo.zone/logos/";
 const TRUST_LOGOS = [
-  { name: "Asana", src: `${HOST}asana/asana-ar21.svg` },
-  { name: "Cloudflare", src: `${HOST}cloudflare/cloudflare-ar21.svg` },
-  { name: "OpenAI", src: `${HOST}openai/openai-ar21.svg` },
   { name: "Twilio", src: `${HOST}twilio/twilio-ar21.svg` },
   { name: "Stripe", src: `${HOST}stripe/stripe-ar21.svg` },
+  { name: "OpenAI", src: `${HOST}openai/openai-ar21.svg` },
+  { name: "Cloudflare", src: `${HOST}cloudflare/cloudflare-ar21.svg` },
   { name: "Resend", src: `${HOST}resend/resend-ar21.svg` },
+  { name: "Asana", src: `${HOST}asana/asana-ar21.svg` },
 ];
-function IntegrationLogo({ logo }) { return createElement('span', { role: 'img', 'aria-label': `${logo.name} logo`, className: 'cs-real-logo', style: { backgroundImage: `url(${logo.src})` } }); }
+function IntegrationLogo({ logo }) {
+  return (
+    <img
+      src={logo.src}
+      alt={`${logo.name} logo`}
+      width="120"
+      height="32"
+      loading="eager"
+      decoding="async"
+      className="cs-real-logo"
+      style={{ width: "120px", height: "32px", objectFit: "contain", display: "block" }}
+    />
+  );
+}
 
 export default function CinematicHero() {
   const shouldReduceMotion = useReducedMotion();
@@ -30,19 +42,15 @@ export default function CinematicHero() {
         .cs-hero-content{min-height:calc(100svh - var(--cs-nav-height));display:flex;flex-direction:column;justify-content:center}
         .cs-hero-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
         .cs-logo-anchor{width:100%;padding-bottom:clamp(10px,2.5vh,26px)}
-        .cs-hero-logo-shell{position:relative;width:min(1180px,calc(100vw - 32px));margin:0 auto;overflow:hidden;padding:18px 0 10px;border-top:1px solid rgba(53,189,241,.20);border-bottom:1px solid rgba(53,189,241,.10);background:linear-gradient(90deg,rgba(53,189,241,.025),rgba(255,255,255,.035),rgba(53,189,241,.025));box-shadow:0 -18px 60px rgba(0,0,0,.12),inset 0 1px 0 rgba(255,255,255,.03);-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 7%,#000 93%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 7%,#000 93%,transparent 100%)}
-        .cs-hero-logo-shell:before{content:"";position:absolute;left:50%;top:0;width:58%;height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(53,189,241,.65),transparent)}
-        .cs-hero-logo-track{display:flex;align-items:center;width:max-content;gap:clamp(82px,8vw,142px);animation:cs-logo-marquee 42s linear infinite;will-change:transform}
-        .cs-hero-logo-shell:hover .cs-hero-logo-track{animation-play-state:paused}
-        .cs-hero-logo-item{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:58px;min-width:168px;opacity:.98;transition:opacity .18s ease,transform .18s ease}
-        .cs-hero-logo-item:hover{opacity:1;transform:translateY(-1px)}
-        .cs-real-logo{display:block;width:178px;height:43px;background-repeat:no-repeat;background-position:center;background-size:contain;filter:drop-shadow(0 0 16px rgba(53,189,241,.12))}
-        .cs-hero-logo-item[data-logo="Cloudflare"] .cs-real-logo,.cs-hero-logo-item[data-logo="OpenAI"] .cs-real-logo,.cs-hero-logo-item[data-logo="Asana"] .cs-real-logo{width:194px;height:45px}
-        .cs-hero-logo-item[data-logo="Resend"] .cs-real-logo{width:156px;height:36px}
-        .cs-logo-kicker{margin-bottom:12px;opacity:.95}
+        .cs-hero-logo-shell{position:relative;width:min(1180px,calc(100vw - 32px));margin:0 auto;overflow:hidden;padding:16px 0 14px;border-top:1px solid rgba(53,189,241,.18);background:linear-gradient(90deg,rgba(53,189,241,.02),rgba(255,255,255,.03),rgba(53,189,241,.02));-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%)}
+        .cs-hero-logo-track{display:flex;align-items:center;width:max-content;gap:64px;animation:cs-logo-marquee 32s linear infinite;will-change:transform}
+        .cs-hero-logo-item{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:40px;width:120px;opacity:.85;transition:opacity .2s ease}
+        .cs-hero-logo-item:hover{opacity:1}
+        .cs-real-logo{filter:brightness(0) invert(1) drop-shadow(0 0 10px rgba(53,189,241,.10))}
+        .cs-logo-kicker{margin-bottom:10px;opacity:.95}
         @keyframes cs-logo-marquee{0%{transform:translate3d(0,0,0)}100%{transform:translate3d(-33.333%,0,0)}}
         @media(prefers-reduced-motion:reduce){.cs-hero-logo-track{animation:none;width:100%;justify-content:center;flex-wrap:wrap}.cs-logo-repeat{display:none}}
-        @media(max-width:720px){.cs-hero-content{min-height:auto}.cs-logo-anchor{padding-bottom:10px}.cs-hero-logo-shell{width:calc(100vw - 24px);padding:14px 0 8px}.cs-hero-logo-track{gap:52px;animation-duration:26s}.cs-hero-logo-item{min-width:132px;height:44px}.cs-real-logo{width:136px;height:31px}}
+        @media(max-width:720px){.cs-hero-content{min-height:auto}.cs-logo-anchor{padding-bottom:10px}.cs-hero-logo-shell{width:calc(100vw - 24px);padding:12px 0 10px}.cs-hero-logo-track{gap:40px;animation-duration:22s}.cs-hero-logo-item{height:32px;width:96px}.cs-real-logo{width:96px!important;height:26px!important}}
       `}</style>
 
       <div className="absolute inset-0">
