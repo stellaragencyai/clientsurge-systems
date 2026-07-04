@@ -29,7 +29,7 @@ function buildPath(cap, auditData) {
 
   let nextProof = "";
   let nextConfig = "";
-  nextBlocker: "";
+  let nextBlocker = "";
   let complexity = "medium";
   let fastestStep = "";
 
