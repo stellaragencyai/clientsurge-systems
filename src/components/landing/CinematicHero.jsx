@@ -40,7 +40,7 @@ export default function CinematicHero() {
         .cs-hero-content{min-height:calc(100svh - var(--cs-nav-height));display:flex;flex-direction:column;justify-content:center}
         .cs-hero-main{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;width:100%}
         .cs-logo-anchor{width:100%;padding-top:40px;padding-bottom:0;margin-top:auto}
-        .cs-hero-logo-shell{position:relative;width:min(1180px,calc(100vw - 32px));margin:0 auto;overflow:hidden;padding:16px 0 14px;border-top:1px solid rgba(53,189,241,.18);background:linear-gradient(90deg,rgba(53,189,241,.02),rgba(255,255,255,.03),rgba(53,189,241,.02));-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%)}
+        .cs-hero-logo-shell{position:relative;width:min(1180px,calc(100vw - 32px));margin:0 auto;overflow:hidden;padding:16px 0 14px;border-top:1px solid rgba(0,107,176,.15);background:linear-gradient(90deg,rgba(0,174,239,.03),rgba(255,255,255,.5),rgba(0,174,239,.03));-webkit-mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%);mask-image:linear-gradient(90deg,transparent 0%,#000 10%,#000 90%,transparent 100%)}
         .cs-hero-logo-track{display:flex;align-items:center;width:max-content;gap:64px;animation:cs-logo-marquee 32s linear infinite;will-change:transform}
         .cs-hero-logo-item{display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;height:48px;width:150px;opacity:.85;transition:opacity .2s ease}
         .cs-hero-logo-item:hover{opacity:1}
@@ -56,7 +56,7 @@ export default function CinematicHero() {
         {!shouldReduceMotion && (
           <motion.div
             className="absolute rounded-full"
-            style={{ top: "15%", left: "10%", width: 340, height: 340, background: "radial-gradient(circle, rgba(53,189,241,0.10), transparent 70%)", filter: "blur(80px)" }}
+            style={{ top: "15%", left: "10%", width: 340, height: 340, background: "radial-gradient(circle, rgba(0,174,239,0.08), transparent 70%)", filter: "blur(80px)" }}
             animate={{ x: [0, 25, 0], y: [0, 15, 0] }}
             transition={{ duration: 14, repeat: Infinity, ease: "easeInOut" }}
           />
