@@ -10,13 +10,14 @@ import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
 import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
 import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import FirstLaunchChecklist from "./twilio-growth/FirstLaunchChecklist";
-import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
-import OwnershipBadge from "./twilio-growth/OwnershipBadge";
-import OperatorNotes from "./twilio-growth/OperatorNotes";
-import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
+import SetupNotReadinessReminder from "./twilio-growth/SetupNotReadinessReminder";
 import FirstLaunchScopeSummary from "./twilio-growth/FirstLaunchScopeSummary";
 import CoreLaunchFirstWarning from "./twilio-growth/CoreLaunchFirstWarning";
+import ProgressSinceLastAudit from "./twilio-growth/ProgressSinceLastAudit";
+import CurrentSprintFocus from "./twilio-growth/CurrentSprintFocus";
+import ProjectUpdateSummary from "./twilio-growth/ProjectUpdateSummary";
+import OwnerAttentionNeeded from "./twilio-growth/OwnerAttentionNeeded";
+import CoreSystemHealth from "./twilio-growth/CoreSystemHealth";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -106,6 +107,9 @@ export default function TwilioGrowthEnginePanel() {
         </button>
       </div>
 
+      {/* Admin-only reminder: setup is not verified readiness */}
+      <SetupNotReadinessReminder />
+
       {/* Admin-only trust warning banner */}
       <TrustWarningBanner proofLogsEmpty={data?.proof_logs_empty} />
 
@@ -124,7 +128,6 @@ export default function TwilioGrowthEnginePanel() {
           { id: "blocked", label: "Blocked From Green" },
           { id: "asana", label: "Asana Sync" },
           { id: "qa", label: "QA Checklists" },
-          { id: "first-launch", label: "First Launch Checklist" },
         ].map(tab => (
           <button
             key={tab.id}
