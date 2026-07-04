@@ -7,16 +7,15 @@ import {
   Radio, Mic, ClipboardList, Database, Wrench,
 } from "lucide-react";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import { getRevenueImpact } from "@/lib/twilioGrowthRevenueImpact";
-import MinimumDefinitionOfDone from "./MinimumDefinitionOfDone";
-import AsanaSyncNotes from "./AsanaSyncNotes";
-import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
-import FirstLaunchScopeSummary from "./twilio-growth/FirstLaunchScopeSummary";
+import DefinitionOfTrustedBanner from "./DefinitionOfTrustedBanner";
+import SetupVsVerifiedReminder from "./twilio-growth/SetupVsVerifiedReminder";
 import CoreLaunchFirstWarning from "./twilio-growth/CoreLaunchFirstWarning";
+import CurrentSprintFocusCard from "./twilio-growth/CurrentSprintFocusCard";
+import ProjectUpdateSummaryCard from "./twilio-growth/ProjectUpdateSummaryCard";
+import OwnerAttentionNeededPanel from "./twilio-growth/OwnerAttentionNeededPanel";
+import CoreSystemHealthCard from "./twilio-growth/CoreSystemHealthCard";
 import ProgressSinceLastAudit from "./twilio-growth/ProgressSinceLastAudit";
-import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
-import OwnershipBadge from "./twilio-growth/OwnershipBadge";
-import OperatorNotes from "./twilio-growth/OperatorNotes";
+import EvidenceChecklistByCapability from "./twilio-growth/EvidenceChecklistByCapability";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -65,6 +64,7 @@ export default function TwilioGrowthEnginePanel() {
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
   const [activeView, setActiveView] = useState("capabilities");
+  const [selectedCapability, setSelectedCapability] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -114,18 +114,23 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
-      {/* Admin-only minimum definition of done */}
-      <MinimumDefinitionOfDone />
+      {/* Admin-only: setup ≠ verified readiness reminder */}
+      {!loading && !error && data && <SetupVsVerifiedReminder />}
+
+      {/* Admin-only: core launch first warning */}
+      {!loading && !error && data && (
+        <CoreLaunchFirstWarning data={data} activeView={activeView} />
+      )}
 
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
+          { id: "overview", label: "Overview" },
           { id: "capabilities", label: "Capability Matrix" },
           { id: "proof", label: "Proof Center" },
+          { id: "evidence", label: "Evidence Checklist" },
           { id: "repair", label: "Repair Queue" },
-          { id: "asana", label: "Asana Gate" },
           { id: "qa", label: "QA Checklists" },
-          { id: "evidence", label: "Evidence Map" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -158,9 +163,15 @@ export default function TwilioGrowthEnginePanel() {
         </div>
       ) : (
         <>
-          <LaunchReadinessSummary data={data} />
-          <FirstLaunchScopeSummary data={data} />
-          <CoreLaunchFirstWarning data={data} activeView={activeView} />
+          {activeView === "overview" && (
+            <div className="space-y-4">
+              <CurrentSprintFocusCard data={data} />
+              <CoreSystemHealthCard data={data} />
+              <ProjectUpdateSummaryCard data={data} />
+              <OwnerAttentionNeededPanel data={data} />
+              <ProgressSinceLastAudit data={data} />
+            </div>
+          )}
           {activeView === "capabilities" && (
             <CapabilityMatrix
               capabilities={data.capabilities || []}
@@ -178,14 +189,8 @@ export default function TwilioGrowthEnginePanel() {
           {activeView === "repair" && (
             <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
           )}
-          {activeView === "asana" && (
-            <AsanaCompletionGate data={data} />
-          )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
-          )}
-          {activeView === "evidence" && (
-            <EvidenceSourceMap />
           )}
         </>
       )}

@@ -102,7 +102,7 @@ export default function CinematicHero() {
             className="flex flex-wrap justify-center gap-2 mb-8 max-w-3xl"
           >
             {AUTOMATION_PILLS.map((pill) => (
-              <span key={pill} className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "rgba(53,189,241,0.28)", background: "rgba(8,20,44,0.72)" }}>{pill}</span>
+              <span key={pill} className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "rgba(0,107,176,0.2)", background: "rgba(0,174,239,0.06)" }}>{pill}</span>
             ))}
           </motion.div>
 
