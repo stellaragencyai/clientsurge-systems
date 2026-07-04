@@ -1,41 +1,44 @@
 import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { LogOut, LayoutDashboard, Eye } from "lucide-react";
-import SetupProgressHub from "../components/portal/SetupProgressHub";
-import SupportChat from "../components/portal/SupportChat";
-import PlanManager from "../components/portal/PlanManager";
-import LeadActivityFeed from "../components/portal/LeadActivityFeed";
-import PaymentFailedBanner from "../components/portal/PaymentFailedBanner";
-import LeadFlowDashboard from "../components/portal/LeadFlowDashboard";
-import NotificationBell from "../components/portal/NotificationBell";
-import QuickStartWizard from "../components/portal/QuickStartWizard";
-import QuickStartInline from "../components/portal/QuickStartInline";
-import DeadlinesPanel from "../components/portal/DeadlinesPanel";
-import FilesPanel from "../components/portal/FilesPanel";
-import BillingDashboard from "../components/portal/BillingDashboard";
-import ReferABusiness from "../components/portal/ReferABusiness";
-import PortalSettings from "../components/portal/PortalSettings";
-import TasksDashboard from "../components/portal/TasksDashboard";
-import AutomationsOverview from "../components/portal/AutomationsOverview";
-import AutomatedResponsesLog from "../components/portal/AutomatedResponsesLog";
-import AutomationChecklist from "../components/portal/AutomationChecklist";
-import PortalWhatsNew from "../components/portal/PortalWhatsNew";
-import ClientOrderStatusTab from "../components/portal/ClientOrderStatusTab";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
-import PortalTimeline from "../components/portal/PortalTimeline";
-import SystemStatusBadge from "../components/portal/SystemStatusBadge";
-import OrderTracker from "../components/landing/OrderTracker";
-import OnboardingMissingAssetsBanner from "../components/portal/OnboardingMissingAssetsBanner";
-import EmptyStateDashboard from "../components/portal/EmptyStateDashboard";
-import GettingStartedBanner from "../components/portal/GettingStartedBanner";
-import LaunchReadinessPanel from "../components/dashboard/LaunchReadinessPanel";
-import ActiveAutomationsPanel from "../components/dashboard/ActiveAutomationsPanel";
-import RecentSystemProofPanel from "../components/dashboard/RecentSystemProofPanel";
-import RecentIssuesPanel from "../components/dashboard/RecentIssuesPanel";
-import AdminPreviewBanner from "../components/dashboard/AdminPreviewBanner";
-import InternalFilterNotice from "../components/dashboard/InternalFilterNotice";
 
+// ── All portal components lazy-loaded to keep the ClientPortal chunk small ──
+// This prevents Vite from bundling 30+ components into one massive chunk that
+// can fail to load in preview/production environments (504 Gateway Timeout).
+const SetupProgressHub = lazy(() => import("../components/portal/SetupProgressHub"));
+const SupportChat = lazy(() => import("../components/portal/SupportChat"));
+const PlanManager = lazy(() => import("../components/portal/PlanManager"));
+const LeadActivityFeed = lazy(() => import("../components/portal/LeadActivityFeed"));
+const PaymentFailedBanner = lazy(() => import("../components/portal/PaymentFailedBanner"));
+const LeadFlowDashboard = lazy(() => import("../components/portal/LeadFlowDashboard"));
+const NotificationBell = lazy(() => import("../components/portal/NotificationBell"));
+const QuickStartWizard = lazy(() => import("../components/portal/QuickStartWizard"));
+const QuickStartInline = lazy(() => import("../components/portal/QuickStartInline"));
+const DeadlinesPanel = lazy(() => import("../components/portal/DeadlinesPanel"));
+const FilesPanel = lazy(() => import("../components/portal/FilesPanel"));
+const BillingDashboard = lazy(() => import("../components/portal/BillingDashboard"));
+const ReferABusiness = lazy(() => import("../components/portal/ReferABusiness"));
+const PortalSettings = lazy(() => import("../components/portal/PortalSettings"));
+const TasksDashboard = lazy(() => import("../components/portal/TasksDashboard"));
+const AutomationsOverview = lazy(() => import("../components/portal/AutomationsOverview"));
+const AutomatedResponsesLog = lazy(() => import("../components/portal/AutomatedResponsesLog"));
+const AutomationChecklist = lazy(() => import("../components/portal/AutomationChecklist"));
+const PortalWhatsNew = lazy(() => import("../components/portal/PortalWhatsNew"));
+const ClientOrderStatusTab = lazy(() => import("../components/portal/ClientOrderStatusTab"));
+const PortalTimeline = lazy(() => import("../components/portal/PortalTimeline"));
+const SystemStatusBadge = lazy(() => import("../components/portal/SystemStatusBadge"));
+const OrderTracker = lazy(() => import("../components/landing/OrderTracker"));
+const OnboardingMissingAssetsBanner = lazy(() => import("../components/portal/OnboardingMissingAssetsBanner"));
+const EmptyStateDashboard = lazy(() => import("../components/portal/EmptyStateDashboard"));
+const GettingStartedBanner = lazy(() => import("../components/portal/GettingStartedBanner"));
+const LaunchReadinessPanel = lazy(() => import("../components/dashboard/LaunchReadinessPanel"));
+const ActiveAutomationsPanel = lazy(() => import("../components/dashboard/ActiveAutomationsPanel"));
+const RecentSystemProofPanel = lazy(() => import("../components/dashboard/RecentSystemProofPanel"));
+const RecentIssuesPanel = lazy(() => import("../components/dashboard/RecentIssuesPanel"));
+const AdminPreviewBanner = lazy(() => import("../components/dashboard/AdminPreviewBanner"));
+const InternalFilterNotice = lazy(() => import("../components/dashboard/InternalFilterNotice"));
 const RevenueMetricsPanel = lazy(() => import("../components/portal/RevenueMetricsPanel"));
 const WeeklyReports = lazy(() => import("../components/portal/WeeklyReports"));
 const RealTimeMetricsPanel = lazy(() => import("../components/portal/RealTimeMetricsPanel"));
@@ -54,7 +57,7 @@ function PortalPanelSkeleton() {
   );
 }
 
-function LazyPortalPanel({ children }) {
+function PortalLazy({ children }) {
   return <Suspense fallback={<PortalPanelSkeleton />}>{children}</Suspense>;
 }
 
@@ -281,11 +284,13 @@ export default function ClientPortal() {
     <div className="min-h-screen bg-background">
       {/* Quick Start Wizard (modal overlay) */}
       {showQuickStart && project && (
-        <QuickStartWizard
-          project={project}
-          onComplete={() => { setShowQuickStart(false); refreshProject(); }}
-          onDismiss={() => setShowQuickStart(false)}
-        />
+        <PortalLazy>
+          <QuickStartWizard
+            project={project}
+            onComplete={() => { setShowQuickStart(false); refreshProject(); }}
+            onDismiss={() => setShowQuickStart(false)}
+          />
+        </PortalLazy>
       )}
 
       {/* Top bar */}
@@ -303,13 +308,15 @@ export default function ClientPortal() {
           </div>
         </div>
         <div className="flex items-center gap-4">
-          <NotificationBell
-            notifications={notifications}
-            unreadCount={unreadCount}
-            onMarkAsRead={markAsRead}
-            onMarkAllAsRead={markAllAsRead}
-            onClear={clearNotifications}
-          />
+          <PortalLazy>
+            <NotificationBell
+              notifications={notifications}
+              unreadCount={unreadCount}
+              onMarkAsRead={markAsRead}
+              onMarkAllAsRead={markAllAsRead}
+              onClear={clearNotifications}
+            />
+          </PortalLazy>
           <div className="text-right hidden sm:block">
             <p className="text-xs font-semibold text-foreground">{project?.business_name}</p>
             <p className="text-xs text-muted-foreground">{user?.email}</p>
@@ -340,23 +347,31 @@ export default function ClientPortal() {
               <span className="ml-3">· Target go-live: <span className="font-semibold text-blue-200">{project.go_live_date}</span></span>
             )}
           </p>
-          <SystemStatusBadge project={project} />
+          <PortalLazy>
+            <SystemStatusBadge project={project} />
+          </PortalLazy>
         </div>
       </div>
 
       {/* Payment Failed Banner */}
-      <PaymentFailedBanner subscription={subscription} order={portalOrder} />
+      <PortalLazy>
+        <PaymentFailedBanner subscription={subscription} order={portalOrder} />
+      </PortalLazy>
 
       {/* Admin Preview Banner — shown globally when admin is in preview mode */}
       {isAdminPreview && (
         <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4">
-          <AdminPreviewBanner userEmail={user?.email} linkStatus={portalError || "no_paid_order"} />
+          <PortalLazy>
+            <AdminPreviewBanner userEmail={user?.email} linkStatus={portalError || "no_paid_order"} />
+          </PortalLazy>
         </div>
       )}
 
       {/* Missing assets banner — shown if onboarding is incomplete */}
       <div className="max-w-4xl mx-auto px-4 md:px-6 pt-4">
-        <OnboardingMissingAssetsBanner project={project} onNavigate={setActiveTab} />
+        <PortalLazy>
+          <OnboardingMissingAssetsBanner project={project} onNavigate={setActiveTab} />
+        </PortalLazy>
       </div>
 
       {/* Tabs — horizontally scrollable on mobile */}
@@ -384,10 +399,12 @@ export default function ClientPortal() {
       {/* Content */}
       <main id="main-content" className="max-w-4xl mx-auto px-4 md:px-6 py-6 md:py-8 portal-tab-content">
         {activeTab === "quickstart" && (
-          <QuickStartInline
-            project={project}
-            onComplete={() => { refreshProject(); setActiveTab("metrics"); }}
-          />
+          <PortalLazy>
+            <QuickStartInline
+              project={project}
+              onComplete={() => { refreshProject(); setActiveTab("metrics"); }}
+            />
+          </PortalLazy>
         )}
         {activeTab === "performance" && (
           <div className="space-y-6">
@@ -396,112 +413,158 @@ export default function ClientPortal() {
               <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
             </div>
 
-            {/* Admin Preview Banner */}
-            {isAdminPreview && <AdminPreviewBanner userEmail={user?.email} linkStatus={"no_paid_order"} />}
+            <PortalLazy>
+              {isAdminPreview && <AdminPreviewBanner userEmail={user?.email} linkStatus={"no_paid_order"} />}
+            </PortalLazy>
 
-            {/* Internal/QA Filter Notice (admin only) */}
-            <InternalFilterNotice isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
+            <PortalLazy>
+              <InternalFilterNotice isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
+            </PortalLazy>
 
-            {/* Launch Readiness Panel */}
-            <LaunchReadinessPanel
-              order={portalOrder}
-              project={project}
-              events={healthData?.recent_events || []}
-            />
+            <PortalLazy>
+              <LaunchReadinessPanel
+                order={portalOrder}
+                project={project}
+                events={healthData?.recent_events || []}
+              />
+            </PortalLazy>
 
-            {/* Active Automations Panel */}
-            <ActiveAutomationsPanel
-              packageKey={portalOrder?.package_type || portalOrder?.selected_package_type}
-              services={portalOrder?.services || []}
-              failedEvents={(healthData?.recent_events || []).filter(e => e.status === "failed")}
-              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
-            />
+            <PortalLazy>
+              <ActiveAutomationsPanel
+                packageKey={portalOrder?.package_type || portalOrder?.selected_package_type}
+                services={portalOrder?.services || []}
+                failedEvents={(healthData?.recent_events || []).filter(e => e.status === "failed")}
+                isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              />
+            </PortalLazy>
 
-            {/* Recent System Proof */}
-            <RecentSystemProofPanel
-              events={healthData?.recent_events || []}
-              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
-            />
+            <PortalLazy>
+              <RecentSystemProofPanel
+                events={healthData?.recent_events || []}
+                isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              />
+            </PortalLazy>
 
-            {/* Recent Issues */}
-            <RecentIssuesPanel
-              events={healthData?.recent_events || []}
-              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
-            />
-            <LazyPortalPanel>
+            <PortalLazy>
+              <RecentIssuesPanel
+                events={healthData?.recent_events || []}
+                isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              />
+            </PortalLazy>
+
+            <PortalLazy>
               <RevenueMetricsPanel />
-            </LazyPortalPanel>
+            </PortalLazy>
+
             <div className="border-t border-border pt-8">
               <h3 className="text-xl font-bold text-foreground mb-4">Active Automations</h3>
-              <AutomationsOverview />
+              <PortalLazy>
+                <AutomationsOverview />
+              </PortalLazy>
             </div>
             <div className="border-t border-border pt-8">
               <h3 className="text-xl font-bold text-foreground mb-4">System Activity</h3>
-              <AutomatedResponsesLog />
+              <PortalLazy>
+                <AutomatedResponsesLog />
+              </PortalLazy>
             </div>
           </div>
         )}
         {activeTab === "realtime" && (
-          <LazyPortalPanel>
+          <PortalLazy>
             <RealTimeMetricsPanel project={project} />
-          </LazyPortalPanel>
+          </PortalLazy>
         )}
         {activeTab === "metrics" && (
-          <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />
+          <PortalLazy>
+            <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />
+          </PortalLazy>
         )}
         {activeTab === "tasks" && (
-          <TasksDashboard project={project} />
+          <PortalLazy>
+            <TasksDashboard project={project} />
+          </PortalLazy>
         )}
         {activeTab === "checklist" && (
-          <AutomationChecklist order_id={portalOrder?.id} />
+          <PortalLazy>
+            <AutomationChecklist order_id={portalOrder?.id} />
+          </PortalLazy>
         )}
         {activeTab === "leads" && (
-          <LeadActivityFeed project={project} />
+          <PortalLazy>
+            <LeadActivityFeed project={project} />
+          </PortalLazy>
         )}
         {activeTab === "progress" && (
           <div className="space-y-6">
-            <GettingStartedBanner project={project} order={portalOrder} />
-            <SetupProgressHub project={project} order={portalOrder} user={user} />
-            <OrderTracker />
+            <PortalLazy>
+              <GettingStartedBanner project={project} order={portalOrder} />
+            </PortalLazy>
+            <PortalLazy>
+              <SetupProgressHub project={project} order={portalOrder} user={user} />
+            </PortalLazy>
+            <PortalLazy>
+              <OrderTracker />
+            </PortalLazy>
           </div>
         )}
         {activeTab === "order-status" && (
-          <ClientOrderStatusTab order_id={portalOrder?.id} />
+          <PortalLazy>
+            <ClientOrderStatusTab order_id={portalOrder?.id} />
+          </PortalLazy>
         )}
         {activeTab === "timeline" && (
-          <PortalTimeline order={portalOrder} project={project} />
+          <PortalLazy>
+            <PortalTimeline order={portalOrder} project={project} />
+          </PortalLazy>
         )}
         {activeTab === "deadlines" && (
-          <DeadlinesPanel project={project} />
+          <PortalLazy>
+            <DeadlinesPanel project={project} />
+          </PortalLazy>
         )}
         {activeTab === "files" && (
-          <FilesPanel project={project} />
+          <PortalLazy>
+            <FilesPanel project={project} />
+          </PortalLazy>
         )}
         {activeTab === "billing" && (
-          <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
+          <PortalLazy>
+            <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
+          </PortalLazy>
         )}
         {activeTab === "referrals" && (
-          <ReferABusiness
-            order_id={portalOrder?.id || project?.id || user?.email}
-            client_name={project?.client_name || project?.business_name || user?.full_name || user?.email}
-          />
+          <PortalLazy>
+            <ReferABusiness
+              order_id={portalOrder?.id || project?.id || user?.email}
+              client_name={project?.client_name || project?.business_name || user?.full_name || user?.email}
+            />
+          </PortalLazy>
         )}
         {activeTab === "support" && (
-          <SupportChat project={project} user={user} />
+          <PortalLazy>
+            <SupportChat project={project} user={user} />
+          </PortalLazy>
         )}
         {activeTab === "plan" && (
-          <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
+          <PortalLazy>
+            <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
+          </PortalLazy>
         )}
         {activeTab === "reports" && (
-          <LazyPortalPanel>
+          <PortalLazy>
             <WeeklyReports project={project} />
-          </LazyPortalPanel>
+          </PortalLazy>
         )}
         {activeTab === "updates" && (
-          <PortalWhatsNew />
+          <PortalLazy>
+            <PortalWhatsNew />
+          </PortalLazy>
         )}
         {activeTab === "settings" && (
-          <PortalSettings project={project} user={user} onUpdated={refreshProject} />
+          <PortalLazy>
+            <PortalSettings project={project} user={user} onUpdated={refreshProject} />
+          </PortalLazy>
         )}
       </main>
     </div>

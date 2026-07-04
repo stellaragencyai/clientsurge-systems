@@ -1,17 +1,28 @@
 import { useState, useEffect, lazy, Suspense, Component } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
-import { Loader2, LogIn, LifeBuoy, AlertTriangle, Home, RefreshCw } from "lucide-react";
+import { Loader2, LogIn, LifeBuoy, AlertTriangle, Home, RefreshCw, WifiOff } from "lucide-react";
 
-const ClientPortal = lazy(() => import("@/internal-pages/ClientPortal"));
+// Lazy import with built-in retry for transient chunk-load failures
+const ClientPortal = lazy(() =>
+  import("@/internal-pages/ClientPortal").catch((err) => {
+    // Chunk-load failures are often transient (504, network blip).
+    // Tag the error so the boundary can show a retry option.
+    console.error("ClientPortal chunk load failed:", err);
+    throw Object.assign(
+      new Error("The portal module failed to load. This is usually a temporary network issue."),
+      { isChunkLoadError: true }
+    );
+  })
+);
 
 const LOADING_TIMEOUT_MS = 8000;
 
-// ── Error boundary: catches any render exception from ClientPortal ──
+// ── Error boundary: catches render exceptions AND chunk-load failures ──
 class PortalErrorBoundary extends Component {
   constructor(props) {
     super(props);
-    this.state = { hasError: false, error: null };
+    this.state = { hasError: false, error: null, retryCount: 0 };
   }
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
@@ -19,16 +30,87 @@ class PortalErrorBoundary extends Component {
   componentDidCatch(error, errorInfo) {
     console.error("ClientPortal render error:", error, errorInfo);
   }
+  handleRetry = () => {
+    // Clear the error and force a remount by changing the key
+    this.setState((prev) => ({
+      hasError: false,
+      error: null,
+      retryCount: prev.retryCount + 1,
+    }));
+  };
   render() {
     if (this.state.hasError) {
+      const isChunkLoad = this.state.error?.isChunkLoadError ||
+        String(this.state.error?.message || "").includes("Failed to fetch dynamically imported module");
       return (
-        <PortalSetupInProgress
-          onRetry={() => this.setState({ hasError: false, error: null })}
+        <PortalLoadError
+          isChunkLoad={isChunkLoad}
+          onRetry={this.handleRetry}
+          retryCount={this.state.retryCount}
         />
       );
     }
     return this.props.children;
   }
+}
+
+function PortalLoadError({ isChunkLoad, onRetry, retryCount }) {
+  return (
+    <div className="min-h-screen flex items-center justify-center px-6 bg-background">
+      <div className="max-w-md text-center">
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          style={
+            isChunkLoad
+              ? { background: "rgba(217,119,6,0.12)" }
+              : { background: "linear-gradient(135deg, #003B8F, #00AEEF)" }
+          }
+        >
+          {isChunkLoad ? (
+            <WifiOff className="w-8 h-8" style={{ color: "#d97706" }} />
+          ) : (
+            <LifeBuoy className="w-8 h-8 text-white" />
+          )}
+        </div>
+        <h1
+          className="mb-3 text-2xl font-bold text-foreground"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          {isChunkLoad ? "Connection Issue" : "Portal Setup in Progress"}
+        </h1>
+        <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
+          {isChunkLoad
+            ? "We couldn't load the portal due to a temporary network issue. Please try again — this usually resolves on retry."
+            : "Your client portal is being prepared. If you just completed checkout, your portal will be ready shortly."}
+        </p>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <button
+            onClick={onRetry}
+            className="cs-btn-primary inline-flex items-center gap-2 text-xs"
+          >
+            <RefreshCw className="w-3.5 h-3.5" /> {retryCount > 0 ? "Retry Again" : "Retry"}
+          </button>
+          <a
+            href="/client-portal"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold border border-border text-foreground hover:bg-muted transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" /> Refresh Page
+          </a>
+          <Link
+            to="/contact"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold border border-border text-foreground hover:bg-muted transition-colors"
+          >
+            <LifeBuoy className="w-4 h-4" /> Support
+          </Link>
+        </div>
+        {retryCount >= 3 && (
+          <p className="text-xs text-muted-foreground mt-4">
+            Still having trouble? Try hard-refreshing (Ctrl+Shift+R) or clearing your browser cache.
+          </p>
+        )}
+      </div>
+    </div>
+  );
 }
 
 function PortalSetupInProgress({ onRetry }) {
