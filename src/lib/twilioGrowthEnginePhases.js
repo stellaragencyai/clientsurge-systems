@@ -78,3 +78,16 @@ export function computeAllPhases(capabilities) {
 
   return { byPhase, all, summary };
 }
+
+// Alias for badge components that import PHASES
+export const PHASES = PHASE_LABELS;
+
+/**
+ * Computes phase + human-readable reason for a capability.
+ * Wrapper around computePhase that also produces a reason string.
+ */
+export function computeCapabilityPhase(cap, auditData) {
+  const phaseInfo = computePhase(cap);
+  const reason = PHASE_ACTIONS[phaseInfo.phase] || "";
+  return { ...phaseInfo, phase_label: PHASE_LABELS[phaseInfo.phase]?.label || "", reason };
+}

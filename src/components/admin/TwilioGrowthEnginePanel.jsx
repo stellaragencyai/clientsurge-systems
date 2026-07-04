@@ -4,13 +4,13 @@ import {
   ShieldAlert, ShieldCheck, ShieldX, RefreshCw, AlertTriangle,
   CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronRight,
   Phone, MessageSquare, Mail, Zap, Star, RotateCcw, FileText,
-  Radio, Mic, ClipboardList, Database, Maximize2,
+  Radio, Mic, ClipboardList, Database, Wrench, Ban, ListChecks, Maximize2,
 } from "lucide-react";
-import ReadinessScorecard from "./ReadinessScorecard";
-import RepairQueue from "./RepairQueue";
-import CapabilityDetailDrawer from "./CapabilityDetailDrawer";
-import AsanaSyncNotes from "./AsanaSyncNotes";
-import OperatorNotesSection from "./OperatorNotesSection";
+import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
+import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
+import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
+import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
+import FirstLaunchChecklist from "./twilio-growth/FirstLaunchChecklist";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -59,7 +59,7 @@ export default function TwilioGrowthEnginePanel() {
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
   const [activeView, setActiveView] = useState("capabilities");
-  const [drawerCapability, setDrawerCapability] = useState(null);
+  const [drawerCap, setDrawerCap] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -109,15 +109,19 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
+      {/* Admin-only verification-required-before-closeout reminder */}
+      <VerificationBeforeCloseoutReminder />
+
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
           { id: "capabilities", label: "Capability Matrix" },
-          { id: "scorecard", label: "Readiness Scorecard" },
-          { id: "repair", label: "Repair Queue" },
           { id: "proof", label: "Proof Center" },
-          { id: "asana", label: "Asana Sync Notes" },
+          { id: "repair", label: "Repair Queue" },
+          { id: "blocked", label: "Blocked From Green" },
+          { id: "asana", label: "Asana Sync" },
           { id: "qa", label: "QA Checklists" },
+          { id: "first-launch", label: "First Launch Checklist" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -159,23 +163,20 @@ export default function TwilioGrowthEnginePanel() {
               eventStats={data.event_stats}
               missedCallStats={data.missed_call_stats}
               voiceReadiness={data.voice_readiness}
-              onOpenDetail={setDrawerCapability}
+              onOpenDrawer={(cap) => setDrawerCap(cap)}
             />
           )}
-          {activeView === "scorecard" && (
-            <ReadinessScorecard data={data} />
+          {activeView === "proof" && (
+            <ProofCenter proofByService={data.proof_by_service || {}} />
           )}
           {activeView === "repair" && (
-            <RepairQueue data={data} />
+            <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
+          )}
+          {activeView === "blocked" && (
+            <BlockedFromGreenPanel data={data} />
           )}
           {activeView === "asana" && (
             <AsanaSyncNotes data={data} />
-          )}
-          {activeView === "proof" && (
-            <>
-              <ReadinessScorecard data={data} />
-              <ProofCenter proofByService={data.proof_by_service || {}} />
-            </>
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
@@ -184,12 +185,8 @@ export default function TwilioGrowthEnginePanel() {
       )}
 
       {/* Capability Detail Drawer */}
-      {drawerCapability && (
-        <CapabilityDetailDrawer
-          capability={drawerCapability}
-          data={data}
-          onClose={() => setDrawerCapability(null)}
-        />
+      {drawerCap && data && (
+        <CapabilityDetailDrawer capability={drawerCap} data={data} onClose={() => setDrawerCap(null)} />
       )}
 
       {/* Legend */}
@@ -321,8 +318,40 @@ function WorkItemNotes() {
   );
 }
 
+// ── Verification Required Before Closeout Reminder ──
+function VerificationBeforeCloseoutReminder() {
+  return (
+    <div
+      className="rounded-xl p-5 flex items-start gap-3"
+      style={{
+        background: "linear-gradient(135deg, rgba(220,38,38,0.06), rgba(220,38,38,0.02))",
+        border: "1px solid rgba(220,38,38,0.2)",
+      }}
+    >
+      <div
+        className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
+        style={{
+          background: "rgba(220,38,38,0.1)",
+          border: "1px solid rgba(220,38,38,0.25)",
+        }}
+      >
+        <ShieldAlert className="w-4 h-4 text-red-600" />
+      </div>
+      <div>
+        <p className="text-sm font-bold mb-1 text-red-600">Verification Required Before Closeout — Admin Only</p>
+        <p className="text-xs text-gray-500 leading-relaxed">
+          Do not close the implementation tasks until the admin panels render correctly and computed statuses match actual records.
+        </p>
+        <p className="text-xs font-semibold text-red-600 mt-2">
+          ⚠ Closeout requires evidence-backed verification, not just UI rendering.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 // ── Capability Matrix ──
-function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness, onOpenDetail }) {
+function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness, onOpenDrawer }) {
   return (
     <div className="space-y-4">
       {/* Delivery stats summary */}
@@ -449,16 +478,6 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                         <span className="text-gray-400">Proof: <span className="text-green-600 font-semibold">{cap.proof.passed} pass</span> · <span className="text-amber-600 font-semibold">{cap.proof.pending} pending</span> · <span className="text-red-600 font-semibold">{cap.proof.failed} fail</span></span>
                       </div>
                     )}
-                    {/* Operator Notes — admin-only manual observations */}
-                    <OperatorNotesSection capabilityKey={cap.key} capabilityLabel={cap.label} />
-
-                    <button
-                      onClick={() => onOpenDetail(cap)}
-                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-100 transition-colors"
-                    >
-                      <Maximize2 className="w-3 h-3" />
-                      Open Detail Drawer
-                    </button>
                   </div>
                 )}
               </div>
