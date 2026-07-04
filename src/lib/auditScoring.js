@@ -137,4 +137,22 @@ export const AUDIT_SECTIONS = {
     gateKey: 'industry_pages_gate',
     description: 'Route, content, CTA, page_view, cta_click, form_submit, LandingPageAnalytics per industry page.',
   },
+  brand_positioning: {
+    key: 'brand_positioning',
+    label: 'Brand Positioning & Offer Clarity',
+    gateKey: 'brand_positioning_gate',
+    description: 'Homepage headline, subheadline, CTA, target audience clarity, offer clarity, problem clarity, outcome clarity, proof/trust language, unsupported claims, generic AI wording.',
+  },
+  core_website_pages: {
+    key: 'core_website_pages',
+    label: 'Core Website Pages',
+    gateKey: 'core_website_pages_gate',
+    description: 'Route existence, non-blank rendering, primary CTA, tracking events, form proof, thank-you state, legal pages, portal safe entry, error boundary coverage.',
+  },
+  technical_reliability: {
+    key: 'technical_reliability',
+    label: 'Technical Reliability / Security / Release Control',
+    gateKey: 'technical_reliability_gate',
+    description: 'LaunchGate summary, LaunchReadinessState, DashboardTruthCheck, ReconciliationRun, EventQueue health, DeadLetterLog, CommunicationEvent failures, environment/truth unknown counts, route auth, release proof.',
+  },
 };

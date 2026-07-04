@@ -1398,11 +1398,17 @@ Deno.serve(async (req) => {
       base44.functions.invoke('checkCheckoutRevenueFlow', {}).catch((e) => ({ data: { section_key: 'checkout_revenue_flow', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
       base44.functions.invoke('checkClientOnboardingFlow', {}).catch((e) => ({ data: { section_key: 'client_onboarding_flow', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
       base44.functions.invoke('checkIndustryLandingPages', {}).catch((e) => ({ data: { section_key: 'industry_landing_pages', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+      base44.functions.invoke('checkBrandPositioning', {}).catch((e) => ({ data: { section_key: 'brand_positioning', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+      base44.functions.invoke('checkCoreWebsitePages', {}).catch((e) => ({ data: { section_key: 'core_website_pages', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
+      base44.functions.invoke('checkTechnicalReliability', {}).catch((e) => ({ data: { section_key: 'technical_reliability', score: { total: 0, grade: 'F', status: 'Blocked', components: [] }, checks: [], blockers: [{ code: 'CHECK_ERROR', severity: 'critical_blocker', message: e.message, fix_action: 'Review backend function logs.' }], warnings: [], evidence_summary: `Error: ${e.message}` } })),
     ]);
     const offerPricingResult = extendedResults[0].data || extendedResults[0];
     const checkoutRevenueResult = extendedResults[1].data || extendedResults[1];
     const onboardingFlowResult = extendedResults[2].data || extendedResults[2];
     const industryPagesResult = extendedResults[3].data || extendedResults[3];
+    const brandPositioningResult = extendedResults[4].data || extendedResults[4];
+    const coreWebsitePagesResult = extendedResults[5].data || extendedResults[5];
+    const technicalReliabilityResult = extendedResults[6].data || extendedResults[6];
 
     const sections = [
       { key: 'homepage_conversion', label: 'Homepage Conversion Path', ...homepageResult.score, blockers: homepageResult.blockers, warnings: homepageResult.warnings, checks: homepageResult.checks, evidence_summary: homepageResult.evidence_summary },
@@ -1415,6 +1421,9 @@ Deno.serve(async (req) => {
       { key: 'checkout_revenue_flow', label: 'Checkout / Revenue Flow', ...checkoutRevenueResult.score, blockers: checkoutRevenueResult.blockers, warnings: checkoutRevenueResult.warnings, checks: checkoutRevenueResult.checks, evidence_summary: checkoutRevenueResult.evidence_summary },
       { key: 'client_onboarding_flow', label: 'Client Onboarding Flow', ...onboardingFlowResult.score, blockers: onboardingFlowResult.blockers, warnings: onboardingFlowResult.warnings, checks: onboardingFlowResult.checks, evidence_summary: onboardingFlowResult.evidence_summary },
       { key: 'industry_landing_pages', label: 'Industry Landing Pages', ...industryPagesResult.score, blockers: industryPagesResult.blockers, warnings: industryPagesResult.warnings, checks: industryPagesResult.checks, evidence_summary: industryPagesResult.evidence_summary },
+      { key: 'brand_positioning', label: 'Brand Positioning & Offer Clarity', ...brandPositioningResult.score, blockers: brandPositioningResult.blockers, warnings: brandPositioningResult.warnings, checks: brandPositioningResult.checks, evidence_summary: brandPositioningResult.evidence_summary },
+      { key: 'core_website_pages', label: 'Core Website Pages', ...coreWebsitePagesResult.score, blockers: coreWebsitePagesResult.blockers, warnings: coreWebsitePagesResult.warnings, checks: coreWebsitePagesResult.checks, evidence_summary: coreWebsitePagesResult.evidence_summary },
+      { key: 'technical_reliability', label: 'Technical Reliability / Security / Release Control', ...technicalReliabilityResult.score, blockers: technicalReliabilityResult.blockers, warnings: technicalReliabilityResult.warnings, checks: technicalReliabilityResult.checks, evidence_summary: technicalReliabilityResult.evidence_summary },
     ];
 
     const allBlockers = sections.flatMap((s) => s.blockers);
@@ -1496,6 +1505,9 @@ Deno.serve(async (req) => {
         checkout_revenue_flow: { gate_key: 'checkout_revenue_gate', gate_name: 'Checkout / Revenue Gate', section_label: 'Checkout / Revenue Flow' },
         client_onboarding_flow: { gate_key: 'onboarding_flow_gate', gate_name: 'Onboarding Flow Gate', section_label: 'Client Onboarding Flow' },
         industry_landing_pages: { gate_key: 'industry_pages_gate', gate_name: 'Industry Pages Gate', section_label: 'Industry Landing Pages' },
+        brand_positioning: { gate_key: 'brand_positioning_gate', gate_name: 'Brand Positioning Gate', section_label: 'Brand Positioning & Offer Clarity' },
+        core_website_pages: { gate_key: 'core_website_pages_gate', gate_name: 'Core Website Pages Gate', section_label: 'Core Website Pages' },
+        technical_reliability: { gate_key: 'technical_reliability_gate', gate_name: 'Technical Reliability Gate', section_label: 'Technical Reliability / Security / Release Control' },
       };
 
       for (const section of sections) {
@@ -1627,10 +1639,13 @@ Deno.serve(async (req) => {
       checkout_revenue_detail: checkoutRevenueResult,
       onboarding_flow_detail: onboardingFlowResult,
       industry_pages_detail: industryPagesResult,
+      brand_positioning_detail: brandPositioningResult,
+      core_website_pages_detail: coreWebsitePagesResult,
+      technical_reliability_detail: technicalReliabilityResult,
       persisted: {
         truth_check_id: truthCheckId,
         readiness_id: readinessId,
-        gates: ['website_cta_gate', 'analytics_gate', 'admin_dashboard_gate', 'dashboard_truth_gate', 'lead_capture_gate', 'automation_delivery_gate', 'client_portal_gate', 'twilio_sms_gate', 'resend_email_gate', 'booking_flow_gate', 'twilio_voice_gate', 'elevenlabs_postcall_logging_gate', 'voice_frontline_gate', 'install_os_gate', 'offer_pricing_gate', 'checkout_revenue_gate', 'onboarding_flow_gate', 'industry_pages_gate'],
+        gates: ['website_cta_gate', 'analytics_gate', 'admin_dashboard_gate', 'dashboard_truth_gate', 'lead_capture_gate', 'automation_delivery_gate', 'client_portal_gate', 'twilio_sms_gate', 'resend_email_gate', 'booking_flow_gate', 'twilio_voice_gate', 'elevenlabs_postcall_logging_gate', 'voice_frontline_gate', 'install_os_gate', 'offer_pricing_gate', 'checkout_revenue_gate', 'onboarding_flow_gate', 'industry_pages_gate', 'brand_positioning_gate', 'core_website_pages_gate', 'technical_reliability_gate'],
       },
     });
   } catch (error) {

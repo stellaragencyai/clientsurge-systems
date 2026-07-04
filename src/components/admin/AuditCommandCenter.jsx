@@ -25,6 +25,9 @@ import OfferPricingDetailPanel from "./audit/OfferPricingDetailPanel";
 import CheckoutRevenueDetailPanel from "./audit/CheckoutRevenueDetailPanel";
 import ClientOnboardingDetailPanel from "./audit/ClientOnboardingDetailPanel";
 import IndustryLandingPagesDetailPanel from "./audit/IndustryLandingPagesDetailPanel";
+import BrandPositioningDetailPanel from "./audit/BrandPositioningDetailPanel";
+import CoreWebsitePagesDetailPanel from "./audit/CoreWebsitePagesDetailPanel";
+import TechnicalReliabilityDetailPanel from "./audit/TechnicalReliabilityDetailPanel";
 
 const STATUS_STYLES = {
   Trusted: {
@@ -409,6 +412,21 @@ export default function AuditCommandCenter() {
       {/* Industry Landing Pages Detail Panel */}
       {data?.industry_pages_detail && (
         <IndustryLandingPagesDetailPanel detail={data.industry_pages_detail} />
+      )}
+
+      {/* Brand Positioning Detail Panel */}
+      {data?.brand_positioning_detail && (
+        <BrandPositioningDetailPanel detail={data.brand_positioning_detail} />
+      )}
+
+      {/* Core Website Pages Detail Panel */}
+      {data?.core_website_pages_detail && (
+        <CoreWebsitePagesDetailPanel detail={data.core_website_pages_detail} />
+      )}
+
+      {/* Technical Reliability Detail Panel */}
+      {data?.technical_reliability_detail && (
+        <TechnicalReliabilityDetailPanel detail={data.technical_reliability_detail} />
       )}
 
       {/* Environment filter notice */}
