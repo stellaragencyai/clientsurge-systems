@@ -92,20 +92,21 @@ export default function BlockedFromGreen({ data }) {
         </div>
       ) : (
         blocked.map(cap => {
-          const style = STATUS_STYLES[cap.status] || STATUS_STYLES.red;
+          const statusStyle = STATUS_STYLES[cap.status] || STATUS_STYLES.red;
+          const StatusIcon = statusStyle.icon;
           const reasons = getBlockedReasons(cap, data);
           return (
             <div key={cap.key} className="bg-white rounded-xl border border-gray-200 p-5" style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.03)" }}>
               <div className="flex items-start justify-between gap-3 mb-3">
                 <div className="flex items-center gap-2.5">
-                  <style.icon className="w-4 h-4 flex-shrink-0" style={{ color: style.color }} />
+                  <StatusIcon className="w-4 h-4 flex-shrink-0" style={{ color: statusStyle.color }} />
                   <div>
                     <h4 className="text-sm font-bold text-gray-900">{cap.label}</h4>
                     {cap.service_key && <p className="text-[11px] text-gray-400 font-mono">{cap.service_key}</p>}
                   </div>
                 </div>
-                <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0" style={{ color: style.color, background: `${style.color}11`, border: `1px solid ${style.color}30` }}>
-                  {style.label}
+                <span className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0" style={{ color: statusStyle.color, background: `${statusStyle.color}11`, border: `1px solid ${statusStyle.color}30` }}>
+                  {statusStyle.label}
                 </span>
               </div>
               {reasons.length > 0 ? (
