@@ -216,7 +216,7 @@ export default function ClientPortal() {
     // Admin preview mode — show info banner, not a confusing empty state
     if (isAdminPreview || user?.role === "admin" || user?.role === "super_admin") {
       return (
-        <div className="min-h-screen bg-background flex items-center justify-center px-6">
+        <div className="min-h-screen flex items-center justify-center px-6" style={{ background: "#F7F8FA" }}>
           <div className="max-w-md text-center">
             <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
               style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)" }}>
@@ -248,7 +248,7 @@ export default function ClientPortal() {
     }
 
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center px-6">
+      <div className="min-h-screen flex items-center justify-center px-6" style={{ background: "#F7F8FA" }}>
         <div className="max-w-md text-center">
           <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto mb-4">
             <LayoutDashboard className="w-8 h-8 text-primary" />
@@ -281,7 +281,7 @@ export default function ClientPortal() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen" style={{ background: "#F7F8FA" }}>
       {/* Quick Start Wizard (modal overlay) */}
       {showQuickStart && project && (
         <PortalLazy>
@@ -294,17 +294,17 @@ export default function ClientPortal() {
       )}
 
       {/* Top bar */}
-      <div className="sticky top-0 z-40 bg-background/95 backdrop-blur-sm border-b border-border px-4 md:px-6 h-16 flex items-center justify-between" role="banner">
+      <div className="sticky top-0 z-40 bg-white/95 backdrop-blur-sm border-b border-gray-100 px-6 h-16 flex items-center justify-between" role="banner" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
         <div className="flex items-center gap-3">
           <div
-            className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+            className="w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0"
             style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
           >
             <span className="text-white text-xs font-bold">CS</span>
           </div>
           <div className="flex flex-col leading-tight">
-            <span className="text-sm font-semibold" style={{ background: "linear-gradient(135deg,#0088CC,#00AEEF)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>ClientSurge Systems</span>
-            <span className="text-[10px] text-muted-foreground">Client Portal</span>
+            <span className="text-sm font-bold text-gray-900">ClientSurge Systems</span>
+            <span className="text-[10px] text-gray-400">Client Portal</span>
           </div>
         </div>
         <div className="flex items-center gap-4">
@@ -318,12 +318,12 @@ export default function ClientPortal() {
             />
           </PortalLazy>
           <div className="text-right hidden sm:block">
-            <p className="text-xs font-semibold text-foreground">{project?.business_name}</p>
-            <p className="text-xs text-muted-foreground">{user?.email}</p>
+            <p className="text-xs font-semibold text-gray-700">{project?.business_name}</p>
+            <p className="text-xs text-gray-400">{user?.email}</p>
           </div>
           <button
             onClick={() => base44.auth.logout("/")}
-            className="flex items-center gap-1.5 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            className="flex items-center gap-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors"
           >
             <LogOut className="w-4 h-4" />
             <span className="hidden sm:inline">Sign out</span>
@@ -332,21 +332,19 @@ export default function ClientPortal() {
       </div>
 
       {/* Hero greeting */}
-      <div
-        className="px-6 py-10"
-        style={{ background: "linear-gradient(135deg,#003B8F 0%,#006BB0 60%,#00AEEF 100%)" }}
-      >
-        <div className="max-w-4xl mx-auto">
-          <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Welcome Back</p>
-          <h1 className="font-display text-2xl md:text-3xl font-semibold text-white mb-1">
-            {project?.business_name}
-          </h1>
-          <p className="text-blue-100/70 text-sm">
-            Plan: <span className="font-semibold text-blue-200">{project?.plan}</span>
-            {project?.go_live_date && (
-              <span className="ml-3">· Target go-live: <span className="font-semibold text-blue-200">{project.go_live_date}</span></span>
-            )}
-          </p>
+      <div className="bg-white border-b border-gray-100 px-6 py-6">
+        <div className="max-w-5xl mx-auto flex items-center justify-between flex-wrap gap-4">
+          <div>
+            <h1 className="text-xl font-bold text-gray-900">
+              {project?.business_name}
+            </h1>
+            <p className="text-sm text-gray-400 mt-0.5">
+              Plan: <span className="font-semibold text-gray-600">{project?.plan}</span>
+              {project?.go_live_date && (
+                <span className="ml-3">· Target go-live: <span className="font-semibold text-gray-600">{project.go_live_date}</span></span>
+              )}
+            </p>
+          </div>
           <PortalLazy>
             <SystemStatusBadge project={project} />
           </PortalLazy>
@@ -375,9 +373,9 @@ export default function ClientPortal() {
       </div>
 
       {/* Tabs — horizontally scrollable on mobile */}
-      <div className="border-b border-border bg-background px-4 md:px-6 overflow-x-auto relative" role="tablist" aria-label="Portal sections">
-        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-background to-transparent z-10" aria-hidden="true" />
-        <div className="max-w-4xl mx-auto flex gap-0.5 min-w-max">
+      <div className="bg-white border-b border-gray-100 px-6 overflow-x-auto relative" role="tablist" aria-label="Portal sections">
+        <div className="pointer-events-none absolute right-0 top-0 h-full w-12 bg-gradient-to-l from-white to-transparent z-10" aria-hidden="true" />
+        <div className="max-w-5xl mx-auto flex gap-0.5 min-w-max">
           {TABS.map(tab => (
             <button
               key={tab.id}
@@ -386,8 +384,8 @@ export default function ClientPortal() {
               onClick={() => setActiveTab(tab.id)}
               className={`px-3 md:px-4 py-3.5 text-xs md:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap min-h-[44px] ${
                 activeTab === tab.id
-                  ? "border-primary text-primary"
-                  : "border-transparent text-muted-foreground hover:text-foreground hover:border-border"
+                  ? "border-blue-500 text-blue-600"
+                  : "border-transparent text-gray-400 hover:text-gray-700 hover:border-gray-200"
               }`}
             >
               {tab.label}
@@ -397,7 +395,7 @@ export default function ClientPortal() {
       </div>
 
       {/* Content */}
-      <main id="main-content" className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-10 portal-tab-content">
+      <main id="main-content" className="max-w-5xl mx-auto px-6 py-8 portal-tab-content">
         {activeTab === "quickstart" && (
           <PortalLazy>
             <QuickStartInline

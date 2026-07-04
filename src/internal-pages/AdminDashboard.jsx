@@ -233,21 +233,21 @@ export default function AdminDashboard() {
 
   if (isLoadingAuth) {
     return (
-      <div className="min-h-screen bg-background flex">
-        <div className="hidden lg:block w-64 border-r border-border p-4">
-          <div className="h-6 w-40 rounded bg-muted mb-6" />
+      <div className="min-h-screen flex" style={{ background: "#F7F8FA" }}>
+        <div className="hidden lg:block w-64 bg-white border-r border-gray-100 p-5">
+          <div className="h-8 w-32 rounded bg-gray-100 mb-6" />
           {Array.from({ length: 10 }).map((_, index) => (
-            <div key={index} className="mb-3 h-9 rounded-lg bg-muted/70" />
+            <div key={index} className="mb-3 h-9 rounded-lg bg-gray-100/80" />
           ))}
         </div>
         <div className="flex-1 p-6">
-          <div className="mb-6 h-8 w-56 rounded bg-muted" />
+          <div className="mb-6 h-8 w-56 rounded bg-gray-100" />
           <div className="grid gap-4 md:grid-cols-3">
-            <div className="h-28 rounded-xl border border-border bg-muted/40" />
-            <div className="h-28 rounded-xl border border-border bg-muted/40" />
-            <div className="h-28 rounded-xl border border-border bg-muted/40" />
+            <div className="h-28 rounded-xl border border-gray-200/80 bg-gray-100/40" />
+            <div className="h-28 rounded-xl border border-gray-200/80 bg-gray-100/40" />
+            <div className="h-28 rounded-xl border border-gray-200/80 bg-gray-100/40" />
           </div>
-          <div className="mt-6 h-80 rounded-xl border border-border bg-muted/30" />
+          <div className="mt-6 h-80 rounded-xl border border-gray-200/80 bg-gray-100/30" />
         </div>
       </div>
     );
@@ -372,44 +372,37 @@ export default function AdminDashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#f8f9fa] flex">
+    <div className="min-h-screen flex" style={{ background: "#F7F8FA" }}>
       <StripeTestModeBanner />
 
       {/* ── Sidebar ── */}
       <div
-        className={`fixed lg:static inset-y-0 left-0 z-40 w-60 bg-white border-r border-gray-200 transition-transform duration-300 lg:translate-x-0 flex flex-col ${
+        className={`fixed lg:static inset-y-0 left-0 z-40 w-64 bg-white border-r border-gray-100 transition-transform duration-300 lg:translate-x-0 flex flex-col ${
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         }`}
+        style={{ boxShadow: "1px 0 3px rgba(0,0,0,0.03)" }}
       >
-        {/* Admin logo — no public-facing links in admin nav */}
-        <div className="px-4 pt-5 pb-3 border-b border-gray-100">
-          <div className="block mb-3">
+        {/* Admin logo */}
+        <div className="px-5 pt-6 pb-4 border-b border-gray-100">
+          <div className="block mb-1">
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge"
-              style={{ height: 40, width: 'auto' }}
+              style={{ height: 36, width: 'auto' }}
             />
           </div>
-          <button
-            onClick={handleLogout}
-            disabled={loggingOut}
-            className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-800 transition-colors"
-          >
-            <LogOut className="w-3 h-3" />
-            {loggingOut ? 'Signing out...' : 'Sign out'}
-          </button>
         </div>
 
         {/* Search */}
-        <div className="px-3 py-2 border-b border-gray-100">
+        <div className="px-3 py-2.5 border-b border-gray-100">
           <AdminGlobalSearch onNavigate={(tab) => handleTabChange(tab)} />
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-3 px-2 space-y-4">
+        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-5">
           {NAV_GROUPS.map(({ group, items }) => (
             <div key={group}>
-              <p className="px-3 pb-1 pt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{group}</p>
+              <p className="px-2 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{group}</p>
               <div className="space-y-0.5">
                 {items.map((item) => {
                   const Icon = item.icon;
@@ -419,16 +412,17 @@ export default function AdminDashboard() {
                     <button
                       key={item.id}
                       onClick={() => handleTabChange(item.id, item.external, item.externalPath)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-[13px] font-medium ${
                         isActive
-                          ? 'bg-gray-900 text-white'
-                          : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                          ? 'text-white'
+                          : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`}
+                      style={isActive ? { background: '#3b4450' } : {}}
                     >
-                      <Icon className="w-3.5 h-3.5 flex-shrink-0" />
+                      <Icon className="w-4 h-4 flex-shrink-0" />
                       <span className="flex-1 text-left truncate">{item.label}</span>
                       {unread > 0 && (
-                        <span className={`rounded-full text-[10px] font-bold px-1.5 py-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-gray-900 text-white'}`}>
+                        <span className={`rounded-full text-[10px] font-bold px-1.5 py-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-blue-500 text-white'}`}>
                           {unread}
                         </span>
                       )}
@@ -443,11 +437,16 @@ export default function AdminDashboard() {
 
         {/* User footer */}
         <div className="px-3 py-3 border-t border-gray-100 space-y-2">
-          <p className="px-3 text-xs text-gray-400 truncate">{user?.full_name || 'Admin'}</p>
+          <div className="flex items-center gap-2 px-2">
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+              <span className="text-xs font-bold text-gray-500">{(user?.full_name || 'A')[0]?.toUpperCase()}</span>
+            </div>
+            <p className="text-xs text-gray-400 truncate flex-1">{user?.full_name || 'Admin'}</p>
+          </div>
           <button
             onClick={handlePreviewAsClient}
             disabled={previewingAsClient}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
           >
             {previewingAsClient ? <Loader2 className="w-3 h-3 animate-spin" /> : <Eye className="w-3 h-3" />}
             {previewingAsClient ? 'Opening...' : 'Preview as Client'}
@@ -455,7 +454,7 @@ export default function AdminDashboard() {
           <button
             onClick={handleLogout}
             disabled={loggingOut}
-            className="w-full flex items-center justify-center gap-2 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
           >
             {loggingOut ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
             {loggingOut ? 'Signing out...' : 'Logout'}
@@ -466,7 +465,7 @@ export default function AdminDashboard() {
       {/* ── Main Content ── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Top bar */}
-        <div className="bg-white border-b border-gray-200 px-5 py-3 flex items-center justify-between sticky top-0 z-10">
+        <div className="bg-white border-b border-gray-100 px-6 py-4 flex items-center justify-between sticky top-0 z-10" style={{ boxShadow: "0 1px 2px rgba(0,0,0,0.03)" }}>
           <div className="flex items-center gap-3">
             <button
               onClick={() => setSidebarOpen(!sidebarOpen)}
@@ -474,23 +473,30 @@ export default function AdminDashboard() {
             >
               {sidebarOpen ? <X className="w-4 h-4 text-gray-600" /> : <Menu className="w-4 h-4 text-gray-600" />}
             </button>
-            <span className="text-sm font-semibold text-gray-900">{currentTabLabel}</span>
+            <span className="text-xl font-bold text-gray-900">{currentTabLabel}</span>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3">
             {inboxUnread > 0 && activeTab !== 'inbox' && (
               <button
                 onClick={() => handleTabChange('inbox')}
-                className="flex items-center gap-1.5 rounded-lg bg-gray-900 text-white px-3 py-1.5 text-xs font-semibold"
+                className="flex items-center gap-1.5 rounded-lg text-white px-3 py-1.5 text-xs font-semibold"
+                style={{ background: "#007BFF" }}
               >
-                <Inbox className="w-3 h-3" /> {inboxUnread} unread
+                <Inbox className="w-3.5 h-3.5" /> {inboxUnread} unread
               </button>
             )}
+            <button className="relative p-2 hover:bg-gray-50 rounded-lg transition-colors">
+              <span className="text-gray-400 text-lg">🔔</span>
+            </button>
+            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center">
+              <span className="text-xs font-bold text-gray-500">{(user?.full_name || 'A')[0]?.toUpperCase()}</span>
+            </div>
           </div>
         </div>
 
         {/* Page content */}
         <div className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="max-w-7xl mx-auto space-y-6">
             <TabErrorBoundary tabName={activeTab}>
               {renderContent()}
             </TabErrorBoundary>
@@ -565,7 +571,7 @@ function OverviewDashboard({ onNavigate }) {
   ];
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
       <AdminAICommandBar />
 
       {/* Intelligence Quick KPIs */}
@@ -573,8 +579,8 @@ function OverviewDashboard({ onNavigate }) {
 
       <div className="flex items-start justify-between flex-wrap gap-3">
         <div>
-          <h2 className="text-2xl font-semibold text-foreground">Welcome back</h2>
-          <p className="text-sm text-muted-foreground mt-1">Lead activation overview — click any card to drill in.</p>
+          <h2 className="text-xl font-bold text-gray-900">Welcome back</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Lead activation overview — click any card to drill in.</p>
         </div>
         <div className="flex items-center gap-3">
           <PipelineProofAuditButton onComplete={() => fetchOverviewData()} />
@@ -583,18 +589,19 @@ function OverviewDashboard({ onNavigate }) {
         </div>
       </div>
 
-      {/* Stats Grid — monochromatic, no colored backgrounds */}
+      {/* Stats Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         {stats.map((stat, idx) => (
           <button
             key={idx}
             onClick={() => onNavigate(stat.tab)}
-            className="rounded-xl border border-border bg-card p-6 text-left hover:shadow-md transition-shadow cursor-pointer hover:border-primary/30"
+            className="bg-white rounded-xl border border-gray-200/80 p-5 text-left hover:shadow-md transition-all cursor-pointer"
+            style={{ boxShadow: "0 1px 3px rgba(0,0,0,0.04), 0 1px 2px rgba(0,0,0,0.03)" }}
           >
-            <p className="text-xs font-semibold uppercase text-muted-foreground">{stat.label}</p>
-            <p className="text-4xl font-bold mt-3 text-foreground">
+            <p className="text-xs font-semibold uppercase text-gray-400 tracking-wide">{stat.label}</p>
+            <p className="text-3xl font-bold mt-3 text-gray-900">
               {loading
-                ? <span className="inline-block w-10 h-8 rounded bg-muted animate-pulse" />
+                ? <span className="inline-block w-10 h-8 rounded bg-gray-100 animate-pulse" />
                 : stat.value}
             </p>
           </button>
