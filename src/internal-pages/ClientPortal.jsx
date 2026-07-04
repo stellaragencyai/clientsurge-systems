@@ -38,6 +38,7 @@ import InternalFilterNotice from "../components/dashboard/InternalFilterNotice";
 
 const RevenueMetricsPanel = lazy(() => import("../components/portal/RevenueMetricsPanel"));
 const WeeklyReports = lazy(() => import("../components/portal/WeeklyReports"));
+const RealTimeMetricsPanel = lazy(() => import("../components/portal/RealTimeMetricsPanel"));
 
 function PortalPanelSkeleton() {
   return (
@@ -62,6 +63,7 @@ const TABS = [
   { id: "timeline", label: "📍 Timeline" },
   { id: "quickstart", label: "⚡ Quick Start" },
   { id: "performance", label: "🎯 Performance" },
+  { id: "realtime", label: "📡 Real-Time Metrics" },
   { id: "metrics", label: "Lead Flow" },
   { id: "tasks", label: "Tasks" },
   { id: "checklist", label: "Checklist" },
@@ -438,6 +440,11 @@ export default function ClientPortal() {
               <AutomatedResponsesLog />
             </div>
           </div>
+        )}
+        {activeTab === "realtime" && (
+          <LazyPortalPanel>
+            <RealTimeMetricsPanel project={project} />
+          </LazyPortalPanel>
         )}
         {activeTab === "metrics" && (
           <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />

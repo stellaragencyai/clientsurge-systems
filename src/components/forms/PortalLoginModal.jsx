@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { motion } from "framer-motion";
-import { X, ArrowRight, Loader2, KeyRound, Mail } from "lucide-react";
+import { X, ArrowRight, Loader2, KeyRound, Mail, Shield, User } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import SignupModal from "./SignupModal";
@@ -20,6 +20,8 @@ export default function PortalLoginModal({ onClose }) {
   const [notice, setNotice] = useState("");
   const [showSignup, setShowSignup] = useState(false);
   const [view, setView] = useState("login");
+  const [adminUser, setAdminUser] = useState(null);
+  const [showRoleSelect, setShowRoleSelect] = useState(false);
 
   useEffect(() => {
     dialogRef.current?.focus();
@@ -49,19 +51,22 @@ export default function PortalLoginModal({ onClose }) {
       await base44.auth.loginViaEmailPassword(email.trim(), password);
       const currentUser = await base44.auth.me();
       applyAuthenticatedUser(currentUser);
-      onClose();
-      // Hard redirect required — the auth provider must re-initialize with the new token.
-      // navigate() leaves the app in a half-initialized state and breaks portal access.
       const role = (currentUser?.role || "").toLowerCase();
-      // Respect from_url redirect if present (e.g. user was trying to reach /client-portal)
+      // If admin, show role selection modal instead of auto-redirecting
+      if (role === "admin" || role === "super_admin") {
+        setAdminUser(currentUser);
+        setShowRoleSelect(true);
+        setLoading(false);
+        return;
+      }
+      onClose();
       const params = new URLSearchParams(window.location.search);
       const fromUrl = params.get("from_url");
       let dest;
       if (fromUrl && fromUrl.startsWith("/") && !fromUrl.startsWith("//")) {
-        // Same-origin relative URL — use it as the post-login destination
         dest = fromUrl;
       } else {
-        dest = role === "admin" || role === "super_admin" ? "/admin" : "/client-portal";
+        dest = "/client-portal";
       }
       window.location.href = dest;
     } catch (err) {
@@ -95,6 +100,109 @@ export default function PortalLoginModal({ onClose }) {
         onClose={onClose}
         onSwitchToLogin={() => setShowSignup(false)}
       />
+    );
+  }
+
+  if (showRoleSelect && adminUser) {
+    const handleRoleChoice = (dest) => {
+      onClose();
+      window.location.href = dest;
+    };
+
+    return createPortal(
+      <div className="fixed inset-0 z-[9999] overflow-y-auto">
+        <motion.div
+          className="fixed inset-0 bg-black/50 backdrop-blur-sm"
+          onClick={onClose}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.4 }}
+        />
+        <div className="flex min-h-full items-center justify-center p-4">
+          <motion.div
+            role="dialog"
+            aria-modal="true"
+            aria-label="Choose login role"
+            tabIndex={-1}
+            className="relative z-10 w-full max-w-lg overflow-hidden rounded-3xl bg-white shadow-2xl"
+            initial={{ opacity: 0, scale: 0.92, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 0.92, y: 20 }}
+            transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+          >
+            <div className="border-b border-border px-8 pb-5 pt-8">
+              <button
+                onClick={onClose}
+                className="absolute right-5 top-5 flex h-8 w-8 items-center justify-center rounded-full bg-muted transition-colors hover:bg-border"
+                type="button"
+                aria-label="Close dialog"
+              >
+                <X className="h-4 w-4 text-muted-foreground" />
+              </button>
+              <div className="mb-3 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/10 px-3 py-1">
+                <Shield className="w-3.5 h-3.5 text-primary" />
+                <span className="text-xs font-semibold uppercase tracking-wide text-primary">Admin Detected</span>
+              </div>
+              <h2 className="font-display text-2xl font-semibold text-foreground">How would you like to log in?</h2>
+              <p className="mt-1 text-sm text-muted-foreground">
+                Your account has admin privileges. Choose how you'd like to proceed.
+              </p>
+            </div>
+
+            <div className="px-8 py-6 space-y-3">
+              {/* Admin option */}
+              <button
+                type="button"
+                onClick={() => handleRoleChoice("/admin")}
+                className="w-full flex items-start gap-4 p-5 rounded-2xl border-2 text-left transition-all hover:border-primary/40 hover:bg-primary/5 cursor-pointer group"
+                style={{ borderColor: "rgba(0,174,239,0.15)" }}
+              >
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg, rgba(0,174,239,0.15), rgba(0,59,143,0.08))" }}
+                >
+                  <Shield className="w-5 h-5 text-primary" />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-foreground mb-0.5" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                    Log in as Admin
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    Full access to the admin dashboard, lead management, client onboarding, and system controls.
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors mt-1" />
+              </button>
+
+              {/* Client (Pro Package) option */}
+              <button
+                type="button"
+                onClick={() => handleRoleChoice("/client-portal")}
+                className="w-full flex items-start gap-4 p-5 rounded-2xl border-2 text-left transition-all hover:border-primary/40 hover:bg-primary/5 cursor-pointer group"
+                style={{ borderColor: "rgba(0,174,239,0.15)" }}
+              >
+                <div
+                  className="w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0"
+                  style={{ background: "linear-gradient(135deg, rgba(212,175,55,0.15), rgba(184,148,31,0.08))" }}
+                >
+                  <User className="w-5 h-5" style={{ color: "#B8941F" }} />
+                </div>
+                <div className="flex-1">
+                  <p className="text-sm font-bold text-foreground mb-0.5" style={{ fontFamily: "Montserrat, sans-serif" }}>
+                    Log in as Client (Pro Package)
+                  </p>
+                  <p className="text-xs text-muted-foreground leading-relaxed">
+                    View the client portal experience — real-time metrics, campaign statuses, lead flow, and setup progress as a member with an active Pro package.
+                  </p>
+                </div>
+                <ArrowRight className="w-4 h-4 text-muted-foreground group-hover:text-primary transition-colors mt-1" />
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </div>,
+      document.body
     );
   }
 
