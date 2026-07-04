@@ -14,6 +14,7 @@ import { FAQ_ITEMS } from "../components/landing/FAQData";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
 import ROICalculator from "../components/landing/ROICalculator.jsx";
+import FAQSection from "../components/landing/FAQSection.jsx";
 import SectionErrorBoundary from "../components/SectionErrorBoundary.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
@@ -167,7 +168,13 @@ export default function Home() {
           <ThreeSystemsSection />
         </SectionErrorBoundary>
 
-        {/* 6. Final CTA — booking conversion */}
+        {/* 6. FAQ — accordion section */}
+        <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
+          <FAQSection />
+        </SectionErrorBoundary>
+
+        {/* 7. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>
