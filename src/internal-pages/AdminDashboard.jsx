@@ -312,7 +312,6 @@ export default function AdminDashboard() {
       case 'twilio-growth-engine': return <TwilioGrowthEnginePanel />;
       case 'twilio-health': return <TwilioRuntimeHealth />;
       case 'health': return <IntegrationHealth />;
-      case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
       case 'ai-sales-reps': return <AIAgentsDashboard />;
       case 'automations': return <AutomationsPanel />;
