@@ -3,6 +3,8 @@ import {
   FileX, ClipboardX, ServerCrash, FileWarning, MicOff, Database,
 } from "lucide-react";
 
+/* Admin-only Repair Queue — derived from audit data, no external calls */
+
 const SEVERITY_STYLES = {
   critical: { color: "#DC2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.2)", icon: XCircle, label: "Critical" },
   high: { color: "#EA580C", bg: "rgba(234,88,12,0.06)", border: "rgba(234,88,12,0.2)", icon: AlertOctagon, label: "High" },
@@ -40,24 +42,6 @@ const REPAIR_TYPE_LABELS = {
   test_data_in_production: "Internal/Test Data in Production View",
   missing_client_facing_trust: "Missing Client-Facing Trust Evidence",
 };
-
-const REVENUE_IMPACT = {
-  instant_lead_response: { label: "Critical", color: "#DC2626" },
-  missed_call_text_back: { label: "Critical", color: "#DC2626" },
-  ai_voice_receptionist: { label: "High", color: "#EA580C" },
-  nurture_sequence_14d: { label: "High", color: "#EA580C" },
-  inbound_sms_assistant: { label: "Medium", color: "#D97706" },
-  review_request: { label: "Medium", color: "#D97706" },
-  lead_reactivation: { label: "Low", color: "#6B7280" },
-  ai_booking_agent: { label: "High", color: "#EA580C" },
-};
-
-function getRevenueImpactForCapability(affectedCapability) {
-  for (const [key, val] of Object.entries(REVENUE_IMPACT)) {
-    if (affectedCapability && affectedCapability.includes(key)) return val;
-  }
-  return { label: "Low", color: "#6B7280" };
-}
 
 /**
  * Derives repair items from the existing audit data returned by getTwilioGrowthEngineAudit.

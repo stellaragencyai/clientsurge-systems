@@ -59,54 +59,36 @@ export function computePhase(cap) {
 }
 
 /**
+ * Computes a phase (0-4) for a repair queue item.
+ * Repair items represent things that need fixing, so they are typically
+ * at low phases. A repair item that is safe_to_mark_complete is at phase 3+.
+ *
+ * @param {object} item - repair item from the repair queue
+ * @returns {object} { phase, has_config, has_logs, has_proof, has_blockers }
+ */
+export function computeRepairItemPhase(item) {
+  if (!item) return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: false };
+
+  // If the item is explicitly safe to mark complete, it's near resolved
+  if (item.safe_to_mark_complete) {
+    return { phase: 3, has_config: true, has_logs: true, has_proof: true, has_blockers: false };
+  }
+
+  // Critical/high severity items with evidence source are at phase 2 (logs exist, proof incomplete)
+  const hasEvidence = !!item.evidence_source;
+  if (hasEvidence) {
+    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
+  }
+
+  // Items without evidence source are at phase 1 (we know about the problem, no logs yet)
+  return { phase: 1, has_config: true, has_logs: false, has_proof: false, has_blockers: true };
+}
+
+/**
  * Computes phases for all capabilities and returns them grouped by phase.
  * @param {array} capabilities - from audit data
  * @returns {object} { byPhase: { 0: [...], 1: [...], ... }, all: [{cap, phase, ...}], summary: {0: n, 1: n, ...} }
  */
-/**
- * Computes the phase for a repair queue item.
- * Repair items are inherently blocked, so max phase is 3.
- */
-export function computeRepairItemPhase(repairItem) {
-  if (!repairItem) return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
-
-  if (repairItem.repair_type === "missing_proof_record") {
-    if (repairItem.evidence_source && repairItem.evidence_source.includes("0 passed")) {
-      return { phase: 3, has_config: true, has_logs: true, has_proof: true, has_blockers: true };
-    }
-    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
-  }
-
-  if (repairItem.repair_type === "incomplete_checklist") {
-    return { phase: 1, has_config: true, has_logs: false, has_proof: false, has_blockers: true };
-  }
-
-  if (repairItem.repair_type === "provider_error_in_logs") {
-    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
-  }
-
-  if (repairItem.repair_type === "weak_evidence_record") {
-    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
-  }
-
-  if (repairItem.repair_type === "missing_voice_prerequisite") {
-    if (repairItem.evidence_source && repairItem.evidence_source.includes("AdminSettings")) {
-      return { phase: 1, has_config: true, has_logs: false, has_proof: false, has_blockers: true };
-    }
-    return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
-  }
-
-  if (repairItem.repair_type === "test_data_in_production") {
-    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
-  }
-
-  if (repairItem.repair_type === "missing_client_facing_trust") {
-    return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
-  }
-
-  return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
-}
-
 export function computeAllPhases(capabilities) {
   const all = (capabilities || []).map(cap => {
     const phaseInfo = computePhase(cap);

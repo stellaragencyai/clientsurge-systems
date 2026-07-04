@@ -4,18 +4,19 @@ import {
   ShieldAlert, ShieldCheck, ShieldX, RefreshCw, AlertTriangle,
   CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronRight,
   Phone, MessageSquare, Mail, Zap, Star, RotateCcw, FileText,
-  Radio, Mic, ClipboardList, Database, Wrench, Ban, ListChecks, Maximize2,
+  Radio, Mic, ClipboardList, Database, Wrench,
 } from "lucide-react";
-import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
-import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
-import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import WeeklyOperatorReview from "./twilio-growth/WeeklyOperatorReview";
-import CustomerProofReadiness from "./twilio-growth/CustomerProofReadiness";
-import DoNotBuildYet from "./twilio-growth/DoNotBuildYet";
-import DefinitionOfTrustedBanner from "./twilio-growth/DefinitionOfTrustedBanner";
-import FastestPathToGreen from "./twilio-growth/FastestPathToGreen";
-import ScopeCreepGuardrail from "./twilio-growth/ScopeCreepGuardrail";
+import { getRevenueImpact } from "@/lib/twilioGrowthRevenueImpact";
+import MinimumDefinitionOfDone from "./MinimumDefinitionOfDone";
+import AsanaSyncNotes from "./AsanaSyncNotes";
+import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
+import FirstLaunchScopeSummary from "./twilio-growth/FirstLaunchScopeSummary";
+import CoreLaunchFirstWarning from "./twilio-growth/CoreLaunchFirstWarning";
+import ProgressSinceLastAudit from "./twilio-growth/ProgressSinceLastAudit";
+import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
+import OwnershipBadge from "./twilio-growth/OwnershipBadge";
+import OperatorNotes from "./twilio-growth/OperatorNotes";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -64,7 +65,6 @@ export default function TwilioGrowthEnginePanel() {
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
   const [activeView, setActiveView] = useState("capabilities");
-  const [drawerCap, setDrawerCap] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -114,20 +114,18 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
+      {/* Admin-only minimum definition of done */}
+      <MinimumDefinitionOfDone />
+
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
           { id: "capabilities", label: "Capability Matrix" },
           { id: "proof", label: "Proof Center" },
           { id: "repair", label: "Repair Queue" },
-          { id: "blocked", label: "Blocked From Green" },
-          { id: "fastest", label: "Fastest Path to Green" },
-          { id: "customer", label: "Customer Proof" },
-          { id: "weekly", label: "Weekly Review" },
-          { id: "scope", label: "Scope Guardrail" },
-          { id: "donotbuild", label: "Do Not Build Yet" },
-          { id: "asana", label: "Asana Sync" },
+          { id: "asana", label: "Asana Gate" },
           { id: "qa", label: "QA Checklists" },
+          { id: "evidence", label: "Evidence Map" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -161,59 +159,29 @@ export default function TwilioGrowthEnginePanel() {
       ) : (
         <>
           {activeView === "capabilities" && (
-            <>
-              <DefinitionOfTrustedBanner />
-              <CapabilityMatrix
-                capabilities={data.capabilities || []}
-                expandedRows={expandedRows}
-                toggleRow={toggleRow}
-                deliveryStats={data.delivery_stats}
-                eventStats={data.event_stats}
-                missedCallStats={data.missed_call_stats}
-                voiceReadiness={data.voice_readiness}
-                onOpenDrawer={(cap) => setDrawerCap(cap)}
-              />
-            </>
+            <CapabilityMatrix
+              capabilities={data.capabilities || []}
+              expandedRows={expandedRows}
+              toggleRow={toggleRow}
+              deliveryStats={data.delivery_stats}
+              eventStats={data.event_stats}
+              missedCallStats={data.missed_call_stats}
+              voiceReadiness={data.voice_readiness}
+            />
           )}
           {activeView === "proof" && (
-            <>
-              <DefinitionOfTrustedBanner />
-              <ProofCenter proofByService={data.proof_by_service || {}} />
-            </>
+            <ProofCenter proofByService={data.proof_by_service || {}} />
           )}
           {activeView === "repair" && (
             <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
           )}
-          {activeView === "blocked" && (
-            <BlockedFromGreenPanel data={data} />
-          )}
-          {activeView === "fastest" && (
-            <FastestPathToGreen data={data} />
-          )}
-          {activeView === "customer" && (
-            <CustomerProofReadiness data={data} />
-          )}
-          {activeView === "weekly" && (
-            <WeeklyOperatorReview data={data} />
-          )}
-          {activeView === "scope" && (
-            <ScopeCreepGuardrail data={data} />
-          )}
-          {activeView === "donotbuild" && (
-            <DoNotBuildYet data={data} />
-          )}
           {activeView === "asana" && (
-            <AsanaSyncNotes data={data} />
+            <AsanaCompletionGate data={data} />
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
           )}
         </>
-      )}
-
-      {/* Capability Detail Drawer */}
-      {drawerCap && data && (
-        <CapabilityDetailDrawer capability={drawerCap} data={data} onClose={() => setDrawerCap(null)} />
       )}
 
       {/* Legend */}
@@ -346,7 +314,7 @@ function WorkItemNotes() {
 }
 
 // ── Capability Matrix ──
-function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness, onOpenDrawer }) {
+function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness }) {
   return (
     <div className="space-y-4">
       {/* Delivery stats summary */}
