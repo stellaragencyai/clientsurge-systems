@@ -59,7 +59,6 @@ export default function PortalLoginModal({ onClose }) {
         setLoading(false);
         return;
       }
-      onClose();
       const params = new URLSearchParams(window.location.search);
       const fromUrl = params.get("from_url");
       let dest;
@@ -105,7 +104,6 @@ export default function PortalLoginModal({ onClose }) {
 
   if (showRoleSelect && adminUser) {
     const handleRoleChoice = (dest) => {
-      onClose();
       window.location.href = dest;
     };
 
