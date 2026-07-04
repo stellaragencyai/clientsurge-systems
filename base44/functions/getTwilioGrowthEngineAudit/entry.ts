@@ -368,6 +368,21 @@ Deno.serve(async (req) => {
       all_false: !cl.twilio_configured && !cl.resend_configured && !cl.booking_link_set && !cl.review_link_set && !cl.lead_form_connected && !cl.communication_event_logging_verified && !cl.test_lead_sent && !cl.test_response_received && !cl.client_approved,
     }));
 
+    // ── Latest records per service (for capability detail drawer) ──
+    const latestProofByService = {};
+    const latestChecklistByService = {};
+    const latestCommLogByService = {};
+    for (const sk of SERVICE_KEYS) {
+      const proofs = proofLogList.filter(p => p.service_key === sk);
+      latestProofByService[sk] = proofs.length > 0 ? proofs[0] : null;
+      const checklists = checklistList.filter(c => c.service_key === sk);
+      latestChecklistByService[sk] = checklists.length > 0 ? checklists[0] : null;
+      const logs = smsLogList.filter(l =>
+        (l.trigger_name || '').includes(sk) || (l.trigger_name || '').includes(sk.replace(/_/g, ' '))
+      );
+      latestCommLogByService[sk] = logs.length > 0 ? logs[0] : null;
+    }
+
     return Response.json({
       capabilities,
       delivery_stats: deliveryStats,
@@ -375,6 +390,11 @@ Deno.serve(async (req) => {
       missed_call_stats: missedCallStats,
       voice_readiness: voiceReadiness,
       proof_by_service: proofByService,
+      latest_records_by_service: {
+        proof: latestProofByService,
+        checklist: latestChecklistByService,
+        comm_log: latestCommLogByService,
+      },
       qa_checklists: qaChecklists,
       quarantine: {
         excluded_leads_count: excludedLeadsCount,

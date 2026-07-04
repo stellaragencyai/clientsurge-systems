@@ -7,6 +7,7 @@ import {
   Radio, Mic, ClipboardList, Database, Wrench,
 } from "lucide-react";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
+import PublicClaimSafetyCheck from "./PublicClaimSafetyCheck";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -110,6 +111,7 @@ export default function TwilioGrowthEnginePanel() {
           { id: "capabilities", label: "Capability Matrix" },
           { id: "proof", label: "Proof Center" },
           { id: "repair", label: "Repair Queue" },
+          { id: "claims", label: "Claim Safety" },
           { id: "qa", label: "QA Checklists" },
         ].map(tab => (
           <button
@@ -159,6 +161,9 @@ export default function TwilioGrowthEnginePanel() {
           )}
           {activeView === "repair" && (
             <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
+          )}
+          {activeView === "claims" && (
+            <PublicClaimSafetyCheck data={data} />
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
