@@ -119,7 +119,7 @@ export default function DoNotBuildYet({ data }) {
                   <p className="text-xs text-gray-600 leading-relaxed">{item.whyNotNow}</p>
                 </div>
                 <div>
-                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-!400 mb-0.5">Prerequisite Required</p>
+                  <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-0.5">Prerequisite Required</p>
                   <p className="text-xs text-gray-600 leading-relaxed">{item.prerequisiteRequired}</p>
                 </div>
                 <div>
