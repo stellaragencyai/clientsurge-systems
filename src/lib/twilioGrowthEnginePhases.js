@@ -63,6 +63,50 @@ export function computePhase(cap) {
  * @param {array} capabilities - from audit data
  * @returns {object} { byPhase: { 0: [...], 1: [...], ... }, all: [{cap, phase, ...}], summary: {0: n, 1: n, ...} }
  */
+/**
+ * Computes the phase for a repair queue item.
+ * Repair items are inherently blocked, so max phase is 3.
+ */
+export function computeRepairItemPhase(repairItem) {
+  if (!repairItem) return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
+
+  if (repairItem.repair_type === "missing_proof_record") {
+    if (repairItem.evidence_source && repairItem.evidence_source.includes("0 passed")) {
+      return { phase: 3, has_config: true, has_logs: true, has_proof: true, has_blockers: true };
+    }
+    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
+  }
+
+  if (repairItem.repair_type === "incomplete_checklist") {
+    return { phase: 1, has_config: true, has_logs: false, has_proof: false, has_blockers: true };
+  }
+
+  if (repairItem.repair_type === "provider_error_in_logs") {
+    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
+  }
+
+  if (repairItem.repair_type === "weak_evidence_record") {
+    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
+  }
+
+  if (repairItem.repair_type === "missing_voice_prerequisite") {
+    if (repairItem.evidence_source && repairItem.evidence_source.includes("AdminSettings")) {
+      return { phase: 1, has_config: true, has_logs: false, has_proof: false, has_blockers: true };
+    }
+    return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
+  }
+
+  if (repairItem.repair_type === "test_data_in_production") {
+    return { phase: 2, has_config: true, has_logs: true, has_proof: false, has_blockers: true };
+  }
+
+  if (repairItem.repair_type === "missing_client_facing_trust") {
+    return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
+  }
+
+  return { phase: 0, has_config: false, has_logs: false, has_proof: false, has_blockers: true };
+}
+
 export function computeAllPhases(capabilities) {
   const all = (capabilities || []).map(cap => {
     const phaseInfo = computePhase(cap);
@@ -77,17 +121,4 @@ export function computeAllPhases(capabilities) {
   const summary = { 0: byPhase[0].length, 1: byPhase[1].length, 2: byPhase[2].length, 3: byPhase[3].length, 4: byPhase[4].length };
 
   return { byPhase, all, summary };
-}
-
-// Alias for badge components that import PHASES
-export const PHASES = PHASE_LABELS;
-
-/**
- * Computes phase + human-readable reason for a capability.
- * Wrapper around computePhase that also produces a reason string.
- */
-export function computeCapabilityPhase(cap, auditData) {
-  const phaseInfo = computePhase(cap);
-  const reason = PHASE_ACTIONS[phaseInfo.phase] || "";
-  return { ...phaseInfo, phase_label: PHASE_LABELS[phaseInfo.phase]?.label || "", reason };
 }
