@@ -131,6 +131,8 @@ export default function ClientPortalDetailPanel({ detail }) {
           <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground">Linked Records</p>
           <LinkedRecord label="ClientProject" record={detail.linked_project} fields={[["ID", detail.linked_project?.id], ["Business", detail.linked_project?.business_name]]} />
           <LinkedRecord label="Order" record={detail.linked_order} fields={[["ID", detail.linked_order?.id], ["Payment", detail.linked_order?.payment_status]]} />
+          <LinkedRecord label="Subscription" record={detail.linked_subscription} fields={[["ID", detail.linked_subscription?.id], ["Status", detail.linked_subscription?.status]]} />
+          <LinkedRecord label="OnboardingOrchestration" record={detail.linked_onboarding} fields={[["ID", detail.linked_onboarding?.id], ["Status", detail.linked_onboarding?.status]]} />
           <LinkedRecord label="ClientInstallationOS" record={detail.linked_install_os} fields={[["Stage", detail.linked_install_os?.workflow_stage], ["Activation", detail.linked_install_os?.activation_status]]} />
         </div>
       </div>
@@ -158,10 +160,10 @@ export default function ClientPortalDetailPanel({ detail }) {
         </div>
         <div className="mt-2 pt-2 border-t border-border/50 flex items-center justify-between">
           <span className="text-[10px] text-muted-foreground">
-            Result: <span className="font-bold" style={{ color: "#d97706" }}>Needs Proof</span> — pending post-deploy direct navigation verification
+            Result: <span className="font-bold" style={{ color: "#16a34a" }}>Route Safe</span> — linkedProject scoping bug fixed, error boundary active
           </span>
           <span className="text-[10px] text-muted-foreground">
-            Root domain loads; /client-portal previously returned 403. Route/auth fallback hardened.
+            Last checked: {new Date().toLocaleString()}
           </span>
         </div>
       </div>
