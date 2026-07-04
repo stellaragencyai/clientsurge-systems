@@ -4,10 +4,13 @@ import {
   ShieldAlert, ShieldCheck, ShieldX, RefreshCw, AlertTriangle,
   CheckCircle2, XCircle, MinusCircle, ChevronDown, ChevronRight,
   Phone, MessageSquare, Mail, Zap, Star, RotateCcw, FileText,
-  Radio, Mic, ClipboardList, Database, Wrench,
+  Radio, Mic, ClipboardList, Database, Maximize2,
 } from "lucide-react";
-import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
-import MinimumDefinitionOfDone from "./MinimumDefinitionOfDone";
+import ReadinessScorecard from "./ReadinessScorecard";
+import LaunchScopeRecommendation from "./LaunchScopeRecommendation";
+import RepairQueue from "./RepairQueue";
+import CapabilityDetailDrawer from "./CapabilityDetailDrawer";
+import AsanaSyncNotes from "./AsanaSyncNotes";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -56,6 +59,7 @@ export default function TwilioGrowthEnginePanel() {
   const [error, setError] = useState("");
   const [expandedRows, setExpandedRows] = useState({});
   const [activeView, setActiveView] = useState("capabilities");
+  const [drawerCapability, setDrawerCapability] = useState(null);
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -105,15 +109,14 @@ export default function TwilioGrowthEnginePanel() {
       {/* Admin-only work-item ordering notes */}
       <WorkItemNotes />
 
-      {/* Admin-only minimum definition of done */}
-      <MinimumDefinitionOfDone />
-
       {/* View toggle */}
       <div className="flex gap-1 border-b border-gray-200">
         {[
           { id: "capabilities", label: "Capability Matrix" },
-          { id: "proof", label: "Proof Center" },
+          { id: "scorecard", label: "Readiness Scorecard" },
           { id: "repair", label: "Repair Queue" },
+          { id: "proof", label: "Proof Center" },
+          { id: "asana", label: "Asana Sync Notes" },
           { id: "qa", label: "QA Checklists" },
         ].map(tab => (
           <button
@@ -159,15 +162,24 @@ export default function TwilioGrowthEnginePanel() {
             />
           )}
           {activeView === "proof" && (
-            <ProofCenter proofByService={data.proof_by_service || {}} />
-          )}
-          {activeView === "repair" && (
-            <TwilioGrowthEngineRepairQueue data={data} onRefresh={fetchData} />
+            <>
+              <ReadinessScorecard data={data} />
+              <ProofCenter proofByService={data.proof_by_service || {}} />
+            </>
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
           )}
         </>
+      )}
+
+      {/* Capability Detail Drawer */}
+      {drawerCapability && (
+        <CapabilityDetailDrawer
+          capability={drawerCapability}
+          data={data}
+          onClose={() => setDrawerCapability(null)}
+        />
       )}
 
       {/* Legend */}
@@ -300,7 +312,7 @@ function WorkItemNotes() {
 }
 
 // ── Capability Matrix ──
-function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness }) {
+function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats, eventStats, missedCallStats, voiceReadiness, onOpenDetail }) {
   return (
     <div className="space-y-4">
       {/* Delivery stats summary */}
@@ -427,6 +439,13 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                         <span className="text-gray-400">Proof: <span className="text-green-600 font-semibold">{cap.proof.passed} pass</span> · <span className="text-amber-600 font-semibold">{cap.proof.pending} pending</span> · <span className="text-red-600 font-semibold">{cap.proof.failed} fail</span></span>
                       </div>
                     )}
+                    <button
+                      onClick={() => onOpenDetail(cap)}
+                      className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-gray-200 text-gray-600 text-xs font-semibold hover:bg-gray-100 transition-colors"
+                    >
+                      <Maximize2 className="w-3 h-3" />
+                      Open Detail Drawer
+                    </button>
                   </div>
                 )}
               </div>
