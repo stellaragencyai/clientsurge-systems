@@ -10,10 +10,13 @@ import CapabilityDetailDrawer from "./twilio-growth/CapabilityDetailDrawer";
 import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
 import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
+import FirstLaunchChecklist from "./twilio-growth/FirstLaunchChecklist";
 import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
-import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
 import OwnershipBadge from "./twilio-growth/OwnershipBadge";
 import OperatorNotes from "./twilio-growth/OperatorNotes";
+import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
+import FirstLaunchScopeSummary from "./twilio-growth/FirstLaunchScopeSummary";
+import CoreLaunchFirstWarning from "./twilio-growth/CoreLaunchFirstWarning";
 
 const STATUS_STYLES = {
   green: { color: "#059669", bg: "rgba(5,150,105,0.06)", border: "rgba(5,150,105,0.2)", icon: CheckCircle2, label: "Proven" },
@@ -121,7 +124,9 @@ export default function TwilioGrowthEnginePanel() {
           { id: "blocked", label: "Blocked From Green" },
           { id: "asana", label: "Asana Sync" },
           { id: "qa", label: "QA Checklists" },
-          { id: "evidence_map", label: "Evidence Map" },
+          { id: "first-launch", label: "First Launch Checklist" },
+          { id: "evidence-map", label: "Evidence Map" },
+          { id: "launch-readiness", label: "Launch Readiness" },
         ].map(tab => (
           <button
             key={tab.id}
@@ -156,7 +161,7 @@ export default function TwilioGrowthEnginePanel() {
         <>
           {activeView === "capabilities" && (
             <>
-              <LaunchReadinessSummary data={data} />
+              <CoreLaunchFirstWarning data={data} />
               <CapabilityMatrix
                 capabilities={data.capabilities || []}
                 expandedRows={expandedRows}
@@ -184,8 +189,14 @@ export default function TwilioGrowthEnginePanel() {
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
           )}
-          {activeView === "evidence_map" && (
+          {activeView === "evidence-map" && (
             <EvidenceSourceMap />
+          )}
+          {activeView === "launch-readiness" && (
+            <div className="space-y-4">
+              <LaunchReadinessSummary data={data} />
+              <FirstLaunchScopeSummary data={data} />
+            </div>
           )}
         </>
       )}
@@ -407,6 +418,7 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                       {cap.evidence_sources?.[0] || "No evidence checked"}
                     </p>
                   </div>
+                  <OwnershipBadge capabilityKey={cap.key} />
                   <span
                     className="rounded-full px-2.5 py-0.5 text-xs font-semibold flex-shrink-0"
                     style={{ color: style.color, background: style.bg, border: `1px solid ${style.border}` }}
@@ -452,6 +464,11 @@ function CapabilityMatrix({ capabilities, expandedRows, toggleRow, deliveryStats
                         <span className="text-gray-400">Proof: <span className="text-green-600 font-semibold">{cap.proof.passed} pass</span> · <span className="text-amber-600 font-semibold">{cap.proof.pending} pending</span> · <span className="text-red-600 font-semibold">{cap.proof.failed} fail</span></span>
                       </div>
                     )}
+                    <div className="pt-2">
+                      <p className="text-[10px] font-semibold uppercase tracking-wide text-gray-400 mb-1">Owner & Next Owner Action</p>
+                      <OwnershipBadge capabilityKey={cap.key} showAction />
+                    </div>
+                    <OperatorNotes capabilityKey={cap.key} />
                   </div>
                 )}
               </div>
