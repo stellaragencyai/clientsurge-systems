@@ -1,0 +1,111 @@
+{
+  "name": "TwilioCapabilityAudit",
+  "type": "object",
+  "title": "Twilio Capability Audit",
+  "description": "Admin-only persistent record of computed Twilio Growth Engine capability status. Computed by backend function, never hand-edited. Not for public display.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "capability_key": {
+      "type": "string",
+      "title": "Capability Key",
+      "enum": [
+        "ai_receptionist_voice_agent",
+        "missed_call_text_back",
+        "website_speed_to_lead",
+        "ai_sales_followup_nurture",
+        "review_request_engine",
+        "referral_engine",
+        "client_sms_onboarding_status_updates",
+        "live_call_transcription_summaries",
+        "voice_broadcasts_promotional_calling",
+        "formal_automation_proof_logs"
+      ]
+    },
+    "capability_name": {
+      "type": "string",
+      "title": "Capability Name"
+    },
+    "status_color": {
+      "type": "string",
+      "title": "Status Color",
+      "enum": [
+        "green",
+        "yellow",
+        "red"
+      ],
+      "default": "red"
+    },
+    "evidence_entities_checked": {
+      "type": "array",
+      "title": "Evidence Entities Checked",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary"
+    },
+    "blockers": {
+      "type": "array",
+      "title": "Blockers",
+      "items": {
+        "type": "string"
+      }
+    },
+    "next_required_action": {
+      "type": "string",
+      "title": "Next Required Action"
+    },
+    "last_checked_at": {
+      "type": "string",
+      "title": "Last Checked At",
+      "format": "date-time"
+    },
+    "computed_by": {
+      "type": "string",
+      "title": "Computed By"
+    },
+    "safe_to_show_public": {
+      "type": "boolean",
+      "title": "Safe To Show Public",
+      "default": false
+    },
+    "audit_run_id": {
+      "type": "string",
+      "title": "Audit Run ID",
+      "description": "Groups all capability records from the same computation run"
+    }
+  },
+  "required": [
+    "capability_key",
+    "capability_name",
+    "status_color"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

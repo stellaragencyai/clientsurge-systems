@@ -23,6 +23,8 @@ import {
   Info,
 } from 'lucide-react';
 import VoiceFrontLinePanel from './VoiceFrontLinePanel';
+import TwilioGrowthEngineTrustBanner from './TwilioGrowthEngineTrustBanner';
+import TestDataExclusionPanel from './TestDataExclusionPanel';
 
 const LEGACY_KEY_MAP = {
   missed_call_textback: 'missed_call_text_back',
@@ -303,6 +305,10 @@ export default function TwilioRuntimeHealth() {
       </div>
 
       {error && <div className="flex items-center gap-3 rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700"><AlertTriangle className="w-4 h-4 flex-shrink-0" />{error}</div>}
+
+      {/* Admin-only: trust guard + test-data exclusion explainer */}
+      <TwilioGrowthEngineTrustBanner />
+      <TestDataExclusionPanel />
 
       <VoiceFrontLinePanel frontlineGate={data?.frontlineGate || null} postCallGate={data?.postCallGate || null} onRefresh={load} />
 
