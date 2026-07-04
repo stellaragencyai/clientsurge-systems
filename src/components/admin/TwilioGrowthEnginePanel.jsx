@@ -11,6 +11,7 @@ import AsanaSyncNotes from "./twilio-growth/AsanaSyncNotes";
 import BlockedFromGreenPanel from "./twilio-growth/BlockedFromGreenPanel";
 import TwilioGrowthEngineRepairQueue from "./TwilioGrowthEngineRepairQueue";
 import EvidenceSourceMap from "./twilio-growth/EvidenceSourceMap";
+import FirstLaunchScopeRepairActions from "./twilio-growth/FirstLaunchScopeRepairActions";
 import LaunchReadinessSummary from "./twilio-growth/LaunchReadinessSummary";
 import OwnershipBadge from "./twilio-growth/OwnershipBadge";
 import OperatorNotes from "./twilio-growth/OperatorNotes";
@@ -122,6 +123,7 @@ export default function TwilioGrowthEnginePanel() {
           { id: "blocked", label: "Blocked From Green" },
           { id: "asana", label: "Asana Sync" },
           { id: "qa", label: "QA Checklists" },
+          { id: "first_launch", label: "First-Launch Repair" },
           { id: "evidence_map", label: "Evidence Map" },
         ].map(tab => (
           <button
@@ -184,6 +186,9 @@ export default function TwilioGrowthEnginePanel() {
           )}
           {activeView === "qa" && (
             <QAChecklistView checklists={data.qa_checklists || []} />
+          )}
+          {activeView === "first_launch" && (
+            <FirstLaunchScopeRepairActions />
           )}
           {activeView === "evidence_map" && (
             <EvidenceSourceMap />

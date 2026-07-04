@@ -1,14 +1,30 @@
-import { secureJson } from "../_shared/response.ts";
 /**
  * Missed Call Text-Back Handler
  * Triggered when a call comes in and no one answers
  * Sends automatic SMS to reopen conversation
  */
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
 import crypto from "node:crypto";
-import { appendSmsOptOut } from "../_shared/smsOptOut.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+
+function secureJson(data, options = {}) {
+  const status = options.status || 200;
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { "Content-Type": "application/json" },
+  });
+}
+
+function appendSmsOptOut(message) {
+  const trimmed = String(message || "").trim();
+  if (!trimmed) return "";
+  if (/\breply\s+stop\b/i.test(trimmed) || /\bstop\s+to\s+opt\s+out\b/i.test(trimmed)) return trimmed;
+  return `${trimmed}\n\nReply STOP to opt out.`;
+}
+
+async function twilioFetch(url, options) {
+  return fetch(url, options);
+}
 
 async function validateTwilioSignature(req, rawBody) {
   const webhookKey = Deno.env.get("TWILIO_WEBHOOK_KEY");
@@ -332,6 +348,17 @@ async function sendTwilioSms(toNumber, messageBody) {
 
 Deno.serve(async (req) => {
   try {
+    // GET health probe — allows route health checks without processing
+    if (req.method === "GET") {
+      return new Response(
+        '<?xml version="1.0" encoding="UTF-8"?><Response><Say voice="alice">Missed call webhook is online.</Say></Response>',
+        {
+          status: 200,
+          headers: { "Content-Type": "text/xml; charset=utf-8", "X-Frame-Options": "DENY" },
+        }
+      );
+    }
+
     if (req.method !== "POST") {
       return secureJson({ error: "Method not allowed" }, { status: 405 });
     }

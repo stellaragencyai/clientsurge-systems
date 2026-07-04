@@ -158,6 +158,11 @@ function mapTwilioStatus(twilioStatus) {
 // ─── MAIN HANDLER ───────────────────────────────────────────────────
 
 Deno.serve(async (req) => {
+  // GET health probe — allows route health checks without processing
+  if (req.method === "GET") {
+    return json({ status: "ok", route: "receiveTwilioSmsStatusCallback", method: "GET_probe" });
+  }
+
   // Read raw body before anything else
   const rawBody = await req.text();
 
