@@ -24,6 +24,7 @@ import {
   Zap,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import TrustedAnalyticsNote from "@/components/analytics/TrustedAnalyticsNote";
 
 const PIPELINE_COLORS = {
   New: "#3b82f6",
@@ -208,6 +209,9 @@ export default function AnalyticsDashboard() {
           Refresh
         </button>
       </div>
+
+      {/* ── Trusted analytics note ─────────────────────────────────────── */}
+      <TrustedAnalyticsNote />
 
       {/* ── KPI Row ──────────────────────────────────────────────────────── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-5">

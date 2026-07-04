@@ -1,4 +1,5 @@
 import { base44 } from "@/api/base44Client";
+import { isTrustedAnalyticsEvent } from "@/lib/trustedAnalyticsFilter";
 
 function shouldSkipBase44Analytics() {
   if (typeof window === "undefined") return true;
@@ -10,6 +11,10 @@ function shouldSkipBase44Analytics() {
 
 function trackBase44Event(payload, label) {
   if (shouldSkipBase44Analytics()) return;
+
+  // Trusted internal analytics: do not count non-page technical requests
+  // or obvious automated traffic as business visitor activity.
+  if (!isTrustedAnalyticsEvent()) return;
 
   Promise.resolve(base44.analytics.track(payload)).catch((error) => {
     console.warn(`Base44 analytics unavailable: ${label}`, error);
