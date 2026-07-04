@@ -2,7 +2,11 @@
   if (window.__clientsurgeTelegramClickTracker) return;
   window.__clientsurgeTelegramClickTracker = true;
 
-  const WORKER_URL = "https://clientsurge-telegram-tracker.nolanfstrommer.workers.dev/";
+  // Skip in Base44 preview sandbox and non-production origins to avoid CORS errors
+  const hostname = window.location.hostname || "";
+  if (hostname.includes("preview-sandbox") || hostname.includes("base44.app")) return;
+
+  const WORKER_URL = "https://clientsurge-telegram-tracker.nolanfstrowner.workers.dev/";
   const INTERNAL_STORAGE_KEY = "cs_internal_traffic";
   const SESSION_STORAGE_KEY = "cs_telegram_session";
   const VISITOR_STORAGE_KEY = "cs_visitor_id";
