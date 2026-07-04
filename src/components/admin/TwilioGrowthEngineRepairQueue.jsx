@@ -3,8 +3,6 @@ import {
   FileX, ClipboardX, ServerCrash, FileWarning, MicOff, Database,
 } from "lucide-react";
 
-/* Admin-only Repair Queue — derived from audit data, no external calls */
-
 const SEVERITY_STYLES = {
   critical: { color: "#DC2626", bg: "rgba(220,38,38,0.06)", border: "rgba(220,38,38,0.2)", icon: XCircle, label: "Critical" },
   high: { color: "#EA580C", bg: "rgba(234,88,12,0.06)", border: "rgba(234,88,12,0.2)", icon: AlertOctagon, label: "High" },
@@ -42,6 +40,24 @@ const REPAIR_TYPE_LABELS = {
   test_data_in_production: "Internal/Test Data in Production View",
   missing_client_facing_trust: "Missing Client-Facing Trust Evidence",
 };
+
+const REVENUE_IMPACT = {
+  instant_lead_response: { label: "Critical", color: "#DC2626" },
+  missed_call_text_back: { label: "Critical", color: "#DC2626" },
+  ai_voice_receptionist: { label: "High", color: "#EA580C" },
+  nurture_sequence_14d: { label: "High", color: "#EA580C" },
+  inbound_sms_assistant: { label: "Medium", color: "#D97706" },
+  review_request: { label: "Medium", color: "#D97706" },
+  lead_reactivation: { label: "Low", color: "#6B7280" },
+  ai_booking_agent: { label: "High", color: "#EA580C" },
+};
+
+function getRevenueImpactForCapability(affectedCapability) {
+  for (const [key, val] of Object.entries(REVENUE_IMPACT)) {
+    if (affectedCapability && affectedCapability.includes(key)) return val;
+  }
+  return { label: "Low", color: "#6B7280" };
+}
 
 /**
  * Derives repair items from the existing audit data returned by getTwilioGrowthEngineAudit.
@@ -353,6 +369,14 @@ export default function TwilioGrowthEngineRepairQueue({ data, onRefresh }) {
                   <div className="flex-1 min-w-0 space-y-2">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-bold text-gray-900">{REPAIR_TYPE_LABELS[item.repair_type] || item.repair_type}</p>
+                      {(() => {
+                        const ri = getRevenueImpactForCapability(item.affected_capability);
+                        return (
+                          <span className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide flex-shrink-0" style={{ color: ri.color, background: `${ri.color}11`, border: `1px solid ${ri.color}30` }}>
+                            {ri.label} Rev
+                          </span>
+                        );
+                      })()}
                       <span
                         className="rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide flex-shrink-0"
                         style={{ color: sevStyle.color, background: sevStyle.bg, border: `1px solid ${sevStyle.border}` }}
