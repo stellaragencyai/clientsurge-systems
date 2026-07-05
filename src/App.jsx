@@ -138,6 +138,7 @@ const INDUSTRY_ROUTE_SLUGS = [
   "auto-repair",
   "accounting",
   "fitness",
+  "law-firm",
 ];
 
 // These are functional, noindex utility routes. Setup/onboarding are intentionally

@@ -285,6 +285,35 @@ export const INDUSTRY_CONTENT = {
     ],
   },
 
+  'law-firm': {
+    hero_image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600&q=95',
+    automation_tiers: buildTiers({
+      instant_response: 'When a prospect submits a consultation request, AI responds in under 60 seconds with empathy, next steps, and a consultation booking link.',
+      missed_call: 'Missed calls from prospective clients get an instant text-back — "We received your call. Please reply with your case type and we\'ll call you back immediately."',
+      booking_agent: 'Prospects book free consultations directly through AI — synced to the attorney\'s calendar with case type pre-filled.',
+      nurture_sequence: 'Leads who aren\'t ready to consult yet receive a 14-day nurture sequence with case evaluation guides, FAQ videos, and consultation reminders.',
+      review_request: 'After each case resolution, the system sends a Google review request via SMS — timed for when the client has received their outcome.',
+      voice_ai: 'A 24/7 AI voice receptionist answers calls, captures case type and urgency, and routes high-value cases to the attorney for immediate callback.',
+    }),
+    case_study: {
+      title: 'How a Law Firm Captured 22 After-Hours Case Inquiries',
+      metric: '$410,000',
+      metricLabel: 'Case Value Captured',
+      challenge: 'A 4-attorney law firm in Phoenix was missing intake calls after hours and on weekends. Prospects don\'t wait — they call the next attorney who answers. Each missed call was potentially a $20K-$100K case.',
+      solution: 'ClientSurge installed the Pro System with instant response, missed call text-back, smart booking, nurture sequences, review requests, and AI voice receptionist. The voice agent handled all after-hours intake, captured case details, and booked consultations for the next morning.',
+      results: [
+        '22 after-hours case inquiries captured in 60 days',
+        'Average response time dropped from "next morning" to 64 seconds',
+        'Case intake details collected automatically — less back-and-forth',
+        'Google reviews increased from 21 to 58 in 90 days',
+      ],
+    },
+    testimonials: [
+      { metric: '22 cases captured', quote: 'Prospects call at night and on weekends. Before ClientSurge, those calls went to voicemail. Now the AI catches every one and books the consultation.', name: 'Attorney James Walsh', business: 'Walsh Law Group, Phoenix AZ' },
+      { metric: '64-second response', quote: 'When someone needs an attorney, they need help fast. ClientSurge responds in under 70 seconds with empathy and a consultation link. We\'ve never lost a lead to slow response.', name: 'Attorney Lisa Chen', business: 'Chen Legal Partners, Tucson AZ' },
+    ],
+  },
+
   'personal-injury': {
     hero_image: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1600&q=95',
     automation_tiers: buildTiers({

@@ -421,6 +421,28 @@ export const INDUSTRY_MARKETING_DATA = {
     features: ['Inquiry response', 'Consultation scheduling', 'Proposal follow-up', 'Client reactivation', 'Missed-call recovery', 'Review request flow'],
   }),
 
+  'law-firm': buildIndustry({
+    slug: 'law-firm',
+    industry_name: 'Law Firm',
+    display_name: 'Law Firm Intake Automation System',
+    headline: 'Capture Case Inquiries Before Prospects Call the Next Firm',
+    subheadline: 'AI systems for law firms that need after-hours intake, consultation booking, case qualification, and dormant-lead reactivation.',
+    description: 'ClientSurge helps law firms respond to case inquiries, book consultations, qualify case types, and reactivate dormant prospects without overloading intake staff.',
+    pains: [
+      { title: 'After-Hours Calls Go to Voicemail', desc: 'Injury, family law, and criminal defense callers don\'t wait — they call the next attorney who answers.' },
+      { title: 'Consultation Scheduling Friction', desc: 'Interested prospects lose momentum when booking requires back-and-forth with intake staff.' },
+      { title: 'Case Qualification Gaps', desc: 'Without case type, urgency, and facts collected upfront, intake calls waste time on unqualified leads.' },
+      { title: 'Dormant Prospects Sit Untouched', desc: 'Past consultations and old inquiries have value but receive no structured reactivation.' },
+    ],
+    useCases: [
+      { title: 'After-Hours Intake', description: 'Capture case type, urgency, and contact details before staff review the next morning.', icon: 'AlertCircle', metrics: 'Target outcome: cleaner urgent-call routing' },
+      { title: 'Missed-Call Text-Back', description: 'Missed callers receive an immediate branded reply with intake next steps.', icon: 'Phone', metrics: 'Target outcome: fewer lost case calls' },
+      { title: 'Consultation Booking', description: 'Interested prospects are routed toward a consultation slot with case context collected.', icon: 'Calendar', metrics: 'Target outcome: faster scheduling' },
+      { title: 'Dormant Lead Reactivation', description: 'Past consultations and old inquiries receive structured reactivation campaigns.', icon: 'RotateCw', metrics: 'Target outcome: more revived conversations' },
+    ],
+    features: ['After-hours intake', 'Missed-call text-back', 'Consultation booking handoff', 'Case qualification', 'Dormant lead reactivation', 'Review request flow'],
+  }),
+
   fitness: buildIndustry({
     slug: 'fitness',
     industry_name: 'Fitness',

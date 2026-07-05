@@ -19,6 +19,7 @@ import {
   Car,
   Calculator,
   Dumbbell,
+  Gavel,
 } from "lucide-react";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
@@ -277,6 +278,20 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1534438327276-14e030dce1a0?w=1200&q=95"
+},
+{
+  id: "law-firm",
+  routePath: "/law-firm",
+  icon: Gavel,
+  name: "Law Firms & Attorneys",
+  accent: {
+    color: "#7c3aed",
+    soft: "rgba(124,58,237,0.18)",
+    glow: "rgba(124,58,237,0.28)",
+    iconBg: "rgba(124,58,237,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
 }];
 
 
