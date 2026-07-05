@@ -1,0 +1,142 @@
+{
+  "name": "LeadRoutingBackfillResult",
+  "type": "object",
+  "title": "Lead Routing Backfill Result",
+  "description": "Admin-only record tracking simulation and applied runs of lead routing + CRM linkage backfill. Non-sending, non-destructive data hygiene only.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "run_at": {
+      "type": "string",
+      "title": "Run At",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "title": "Mode",
+      "enum": [
+        "simulation",
+        "applied"
+      ],
+      "description": "simulation = read-only preview; applied = safe write-back executed"
+    },
+    "total_scanned": {
+      "type": "integer",
+      "title": "Total Scanned",
+      "default": 0
+    },
+    "production_eligible": {
+      "type": "integer",
+      "title": "Production Eligible",
+      "default": 0
+    },
+    "internal_test_skipped": {
+      "type": "integer",
+      "title": "Internal/Test Skipped",
+      "default": 0
+    },
+    "missing_identity_blocked": {
+      "type": "integer",
+      "title": "Missing Identity Blocked",
+      "default": 0
+    },
+    "website_leads_updated": {
+      "type": "integer",
+      "title": "WebsiteLeads Updated",
+      "default": 0
+    },
+    "crm_links_created": {
+      "type": "integer",
+      "title": "CRM Links Created",
+      "default": 0
+    },
+    "leads_created": {
+      "type": "integer",
+      "title": "Leads Created",
+      "default": 0
+    },
+    "leads_updated": {
+      "type": "integer",
+      "title": "Leads Updated",
+      "default": 0
+    },
+    "blockers": {
+      "type": "array",
+      "title": "Blockers",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "title": "Warnings",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary"
+    },
+    "sample_updated_ids": {
+      "type": "array",
+      "title": "Sample Updated WebsiteLead IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sample_skipped_ids": {
+      "type": "array",
+      "title": "Sample Skipped WebsiteLead IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sample_created_lead_ids": {
+      "type": "array",
+      "title": "Sample Created Leads IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "safe_to_continue_to_next_phase": {
+      "type": "boolean",
+      "title": "Safe to Continue to Next Phase",
+      "default": false
+    },
+    "run_by": {
+      "type": "string",
+      "title": "Run By (Admin Email)"
+    }
+  },
+  "required": [
+    "run_at",
+    "mode",
+    "total_scanned"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

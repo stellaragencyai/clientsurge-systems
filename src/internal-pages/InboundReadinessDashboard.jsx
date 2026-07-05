@@ -2,6 +2,7 @@ import AdminShell from "@/components/admin/AdminShell";
 import InboundLeadReadinessCard from "@/components/admin/InboundLeadReadinessCard";
 import DuplicateSendProtectionCard from "@/components/admin/DuplicateSendProtectionCard";
 import AnalyticsDiagnosticsPanel from "@/components/admin/AnalyticsDiagnosticsPanel";
+import LeadRoutingCrmLinkageCard from "@/components/admin/LeadRoutingCrmLinkageCard";
 import { ShieldCheck } from "lucide-react";
 
 export default function InboundReadinessDashboard() {
@@ -24,6 +25,11 @@ export default function InboundReadinessDashboard() {
           <InboundLeadReadinessCard />
           <DuplicateSendProtectionCard />
           <AnalyticsDiagnosticsPanel />
+        </div>
+
+        {/* Lead Routing + CRM Linkage — full width */}
+        <div className="mt-4">
+          <LeadRoutingCrmLinkageCard />
         </div>
 
         {/* Footer note */}
