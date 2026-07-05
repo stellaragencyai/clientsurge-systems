@@ -509,6 +509,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "task-status"), Component: lazy(() => import("./pages/admin/TaskStatusDashboard")) },
           { route: routePath("admin", "runbook"), Component: lazy(() => import("./pages/admin/SystemRunbook")) },
           { route: routePath("admin", "automation-health"), Component: lazy(() => import("./internal-pages/AutomationHealth")) },
+          { route: routePath("admin", "ops-verification"), Component: lazy(() => import("./internal-pages/OperationsVerificationCenter")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
