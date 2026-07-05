@@ -14,6 +14,9 @@ import HistoricalRecordsPanel from "@/components/admin/ops-verification/Historic
 import InboundFollowupReadinessPanel from "@/components/admin/ops-verification/InboundFollowupReadinessPanel";
 import Sprint2Panel from "@/components/admin/ops-verification/Sprint2Panel";
 import Sprint2ScaffoldingPanel from "@/components/admin/ops-verification/Sprint2ScaffoldingPanel";
+import Phase4OnboardingPanel from "@/components/admin/ops-verification/Phase4OnboardingPanel";
+import Phase5ClientPortalPanel from "@/components/admin/ops-verification/Phase5ClientPortalPanel";
+import Phase4And5SummaryCard from "@/components/admin/ops-verification/Phase4And5SummaryCard";
 
 export default function OperationsVerificationCenter() {
   const [loading, setLoading] = useState(true);
@@ -132,6 +135,15 @@ export default function OperationsVerificationCenter() {
 
             {/* 2e. Sprint 2 Scaffolding — Proof Workflows, Cadence & Rules */}
             <Sprint2ScaffoldingPanel />
+
+            {/* ── Phase 4 + 5 Combined Readiness Summary ── */}
+            <Phase4And5SummaryCard />
+
+            {/* Phase 4 — Client Onboarding + Installation OS */}
+            <Phase4OnboardingPanel />
+
+            {/* Phase 5 — Client Portal + Status Updates */}
+            <Phase5ClientPortalPanel />
 
             {/* 3. Route Health */}
             <RouteHealthPanel adminSettings={data.adminSettings} routeGate={data.gates?.find((g) => g.gate_key === "twilio_webhook_route_health")} />
