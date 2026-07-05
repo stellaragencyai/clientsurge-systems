@@ -97,6 +97,7 @@ const RealEstate = lazy(() => import("./pages/RealEstate"));
 const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
 const LaunchControl = lazy(() => import("./pages/LaunchControl"));
 const AutomationRoadmap = lazy(() => import("./pages/AutomationRoadmap"));
+const InboundReadinessDashboard = lazy(() => import("./internal-pages/InboundReadinessDashboard"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -540,6 +541,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "runbook"), Component: lazy(() => import("./pages/admin/SystemRunbook")) },
           { route: routePath("admin", "automation-health"), Component: lazy(() => import("./internal-pages/AutomationHealth")) },
           { route: routePath("admin", "ops-verification"), Component: lazy(() => import("./internal-pages/OperationsVerificationCenter")) },
+          { route: routePath("admin", "inbound-readiness"), Component: InboundReadinessDashboard },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}

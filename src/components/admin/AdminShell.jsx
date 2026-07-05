@@ -60,6 +60,7 @@ const NAV_GROUPS = [
     group: "System",
     items: [
       { id: "ops-verification", label: "Ops Verification Center", icon: ShieldCheck, path: "/admin/ops-verification" },
+      { id: "inbound-readiness", label: "Inbound Readiness", icon: ShieldCheck, path: "/admin/inbound-readiness" },
       { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
       { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
       { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },

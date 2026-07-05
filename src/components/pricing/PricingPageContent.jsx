@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
-import { CheckCircle2, ShieldCheck, Wallet, ShoppingCart, ArrowRight, Sparkles, X } from "lucide-react";
+import { CheckCircle2, ShieldCheck, Wallet, ArrowRight, Sparkles, X } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import ScarcityBadge from "@/components/pricing/ScarcityBadge";
+import EnhancedPricingCard from "@/components/pricing/EnhancedPricingCard";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 
 const PACKAGES = [
@@ -105,36 +106,9 @@ export default function PricingPageContent() {
 
       <section className="px-6 pb-16 max-w-6xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 pricing-cards-grid">
-          {PACKAGES.map((pkg) => {
-            const highlight = Boolean(pkg.badge);
-            return (
-              <article key={pkg.key} className={`cs-glow-card relative flex flex-col ${highlight ? "ring-2 ring-primary/40" : ""}`}>
-                {pkg.badge && <div className="absolute -top-3.5 left-1/2 -translate-x-1/2 z-10"><span className="inline-flex items-center gap-1 px-4 py-1.5 rounded-full text-xs font-bold bg-primary text-primary-foreground shadow-md">✦ {pkg.badge}</span></div>}
-                <div className="p-7 flex flex-col flex-1" style={{ paddingTop: "32px" }}>
-                  <p className="text-xs font-bold uppercase tracking-widest text-primary mb-2">{pkg.problem}</p>
-                  <h2 className="font-titles text-xl font-bold text-foreground mb-2">{pkg.name}</h2>
-                  <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{pkg.promise}</p>
-                  <div className="mb-6">
-                    <span className="text-3xl font-extrabold text-foreground">{pkg.monthly}</span><span className="text-sm text-muted-foreground font-semibold">/mo</span>
-                    <p className="text-xs text-muted-foreground mt-1">{pkg.setup} one-time setup</p>
-                  </div>
-                  <ul className="space-y-2.5 mb-8 flex-1">
-                    {pkg.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2.5"><CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" /><span className="text-sm text-foreground/85">{feature}</span></li>
-                    ))}
-                  </ul>
-                  <a
-                    href={packageReviewHref(pkg.key)}
-                    onClick={() => trackCTA(`package_${pkg.key}`, "pricing_page")}
-                    className={`${highlight ? "cs-btn-primary cs-cta-glow" : "cs-btn-primary"} w-full text-center justify-center no-underline`}
-                    style={{ minHeight: "unset", minWidth: "unset" }}
-                  >
-                    <ShoppingCart className="w-4 h-4 mr-1.5" /> {pkg.cta}
-                  </a>
-                </div>
-              </article>
-            );
-          })}
+          {PACKAGES.map((pkg, index) => (
+            <EnhancedPricingCard key={pkg.key} pkg={pkg} index={index} />
+          ))}
         </div>
         <div className="text-center mt-8">
           <p className="text-sm text-muted-foreground"><strong>Not sure?</strong> <a href="/book" onClick={() => trackCTA("guided_chooser_pricing", "pricing_page")} className="text-primary font-semibold underline underline-offset-4 hover:text-primary/80">Get help choosing</a> and we will recommend the right starting point.</p>
