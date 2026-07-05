@@ -11,7 +11,7 @@ import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, PieChart, Layers, DollarSign, Inbox, RefreshCw,
-  Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck, ListChecks,
+  Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck, ListChecks, Ban,
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
 import DarkModeToggle from "./DarkModeToggle";
@@ -61,6 +61,7 @@ const NAV_GROUPS = [
     items: [
       { id: "ops-verification", label: "Ops Verification Center", icon: ShieldCheck, path: "/admin/ops-verification" },
       { id: "inbound-readiness", label: "Inbound Readiness", icon: ShieldCheck, path: "/admin/inbound-readiness" },
+      { id: "sprint2-blockers", label: "Sprint 2 Blockers", icon: Ban, path: "/admin/sprint2-blockers" },
       { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
       { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
       { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },

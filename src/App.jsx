@@ -98,6 +98,7 @@ const PersonalInjury = lazy(() => import("./pages/PersonalInjury"));
 const LaunchControl = lazy(() => import("./pages/LaunchControl"));
 const AutomationRoadmap = lazy(() => import("./pages/AutomationRoadmap"));
 const InboundReadinessDashboard = lazy(() => import("./internal-pages/InboundReadinessDashboard"));
+const Sprint2BlockerVerification = lazy(() => import("./internal-pages/Sprint2BlockerVerification"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -542,6 +543,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "automation-health"), Component: lazy(() => import("./internal-pages/AutomationHealth")) },
           { route: routePath("admin", "ops-verification"), Component: lazy(() => import("./internal-pages/OperationsVerificationCenter")) },
           { route: routePath("admin", "inbound-readiness"), Component: InboundReadinessDashboard },
+          { route: routePath("admin", "sprint2-blockers"), Component: Sprint2BlockerVerification },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}
