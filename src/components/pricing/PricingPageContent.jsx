@@ -1,7 +1,9 @@
-import { CheckCircle2, ShieldCheck, Wallet, ShoppingCart, ArrowRight } from "lucide-react";
+import { useState, useEffect } from "react";
+import { CheckCircle2, ShieldCheck, Wallet, ShoppingCart, ArrowRight, Sparkles, X } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
+import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 
 const PACKAGES = [
   {
@@ -41,8 +43,35 @@ const PROCESS_STEPS = ["Choose System", "Guided Intake", "Access Checklist", "Co
 const packageReviewHref = (packageKey) => `/store?package=${encodeURIComponent(packageKey)}`;
 
 export default function PricingPageContent() {
+  const [industryName, setIndustryName] = useState(null);
+
+  useEffect(() => {
+    try {
+      const raw = sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (parsed?.shortName) setIndustryName(parsed.shortName);
+      }
+    } catch {}
+  }, []);
+
+  const dismissIndustry = () => setIndustryName(null);
+
   return (
     <div className="min-h-screen bg-background">
+      {industryName && (
+        <div className="mx-auto max-w-3xl mt-4 px-6">
+          <div className="flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/8 px-4 py-3">
+            <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
+            <p className="text-sm text-foreground/80 flex-1">
+              Based on your <strong className="text-foreground">{industryName}</strong> selection — we've highlighted the recommended system below.
+            </p>
+            <button onClick={dismissIndustry} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Dismiss">
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
       <section className="pt-[calc(var(--cs-nav-height)+3rem)] pb-12 px-6 text-center">
         <div className="cs-section-header cs-section-header--center mb-6">
           <p className="cs-section-eyebrow">ClientSurge AI Systems</p>
