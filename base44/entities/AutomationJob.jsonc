@@ -11,6 +11,14 @@
       "type": "string",
       "title": "Lead ID"
     },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
     "job_type": {
       "type": "string",
       "title": "Job Type",
@@ -65,9 +73,18 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "read": {
       "$or": [
@@ -77,11 +94,22 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.lead_id": {
             "$in": [
               "{{leads.id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
@@ -93,10 +121,8 @@
           }
         },
         {
-          "data.lead_id": {
-            "$in": [
-              "{{leads.id}}"
-            ]
+          "user_condition": {
+            "role": "super_admin"
           }
         }
       ]
