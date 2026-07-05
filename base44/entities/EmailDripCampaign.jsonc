@@ -11,6 +11,30 @@
       "type": "string",
       "title": "Lead ID"
     },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
+    "tenant_scope_error": {
+      "type": "string",
+      "title": "Tenant Scope Error"
+    },
     "campaign_type": {
       "type": "string",
       "title": "Campaign Type",
@@ -20,8 +44,7 @@
         "pricing",
         "feature_highlight",
         "custom"
-      ],
-      "description": "Type of email sequence"
+      ]
     },
     "status": {
       "type": "string",
@@ -42,8 +65,7 @@
         "pricing_concern",
         "uncertain",
         "booking_ready"
-      ],
-      "description": "What lead intent triggered this campaign"
+      ]
     },
     "steps": {
       "type": "array",
@@ -51,8 +73,7 @@
         "type": "object",
         "properties": {
           "order": {
-            "type": "number",
-            "description": "Step sequence"
+            "type": "number"
           },
           "subject": {
             "type": "string"
@@ -61,8 +82,7 @@
             "type": "string"
           },
           "delay_hours": {
-            "type": "number",
-            "description": "Hours to wait after previous step"
+            "type": "number"
           },
           "sent_at": {
             "type": "string"
@@ -86,6 +106,10 @@
     },
     "completed_at": {
       "type": "string"
+    },
+    "provider_from_email": {
+      "type": "string",
+      "title": "Provider From Email"
     },
     "total_opened": {
       "type": "number",
@@ -115,6 +139,17 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        },
+        {
           "data.lead_id": {
             "$in": [
               "{{leads.id}}"
@@ -131,10 +166,8 @@
           }
         },
         {
-          "data.lead_id": {
-            "$in": [
-              "{{leads.id}}"
-            ]
+          "user_condition": {
+            "role": "super_admin"
           }
         }
       ]
