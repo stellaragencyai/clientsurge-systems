@@ -23,6 +23,27 @@ function isRealSid(value, prefix) {
 }
 
 async function checkRouteHealth(base44) {
+  // Read fresh route health from AdminSettings.last_webhook_test_result
+  // (not from LaunchGate cache, which may be stale if route health checker
+  // and gate recalculation ran concurrently).
+  try {
+    const [settings] = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
+    if (settings?.last_webhook_test_result) {
+      const health = JSON.parse(settings.last_webhook_test_result);
+      return {
+        gate_exists: true,
+        status: health.all_healthy ? "proof_passed" : "blocked",
+        blocker: health.all_healthy ? null : Object.entries(health.routes || {})
+          .filter(([, v]) => !v.ok)
+          .map(([k, v]) => `${k}: ${v.error || `HTTP ${v.http_status}`}`)
+          .join("; "),
+        healthy: health.all_healthy === true,
+        tested_at: health.tested_at || null,
+      };
+    }
+  } catch (_) {}
+
+  // Fallback to LaunchGate if AdminSettings unavailable
   try {
     const gates = await base44.asServiceRole.entities.LaunchGate.list("", 50);
     const routeGate = gates?.find((g) => g.gate_key === "twilio_webhook_route_health");
@@ -119,15 +140,18 @@ async function checkMissedCallEvidence(base44) {
 async function checkAutomationProofLogs(base44) {
   try {
     const logs = await base44.asServiceRole.entities.AutomationProofLog.list("-created_date", 50);
+    const all = logs || [];
     return {
-      total: logs?.length || 0,
-      passed: (logs || []).filter((p) => p.status === "pass").length,
-      pending: (logs || []).filter((p) => p.status === "pending").length,
-      failed: (logs || []).filter((p) => p.status === "fail").length,
-      is_empty: !logs || logs.length === 0,
+      total: all.length,
+      passed: all.filter((p) => p.status === "pass").length,
+      pending: all.filter((p) => p.status === "pending").length,
+      failed: all.filter((p) => p.status === "fail").length,
+      is_empty: all.length === 0,
+      instant_lead_passed: all.filter((p) => p.service_key === "instant_lead_response" && p.status === "pass").length,
+      missed_call_passed: all.filter((p) => p.service_key === "missed_call_text_back" && p.status === "pass").length,
     };
   } catch (_) {
-    return { total: 0, passed: 0, pending: 0, failed: 0, is_empty: true };
+    return { total: 0, passed: 0, pending: 0, failed: 0, is_empty: true, instant_lead_passed: 0, missed_call_passed: 0 };
   }
 }
 
@@ -200,6 +224,13 @@ Deno.serve(async (req) => {
         blocker = "No delivered Twilio SMS evidence found";
         nextAction = "Send a real lead and wait for delivery callback";
         verdict = "Routes healthy but no delivery evidence";
+      } else if (proofLogs.instant_lead_passed > 0) {
+        status = "proof_passed";
+        completion = 90;
+        proofPct = 100;
+        blocker = "Proof log passed — awaiting client sign-off for went_live_at";
+        nextAction = "Obtain client sign-off, then set went_live_at on AutomationChecklist";
+        verdict = "Proof passed — ready for go-live approval";
       } else {
         status = "partial";
         completion = 60;
@@ -266,6 +297,13 @@ Deno.serve(async (req) => {
           : "No real missed-call evidence (call + text-back delivery) found";
         nextAction = "Place a real missed call and wait for text-back delivery";
         verdict = "Routes healthy but no call/SMS evidence";
+      } else if (proofLogs.missed_call_passed > 0) {
+        status = "proof_passed";
+        completion = 90;
+        proofPct = 100;
+        blocker = "Proof log passed — awaiting client sign-off for went_live_at";
+        nextAction = "Obtain client sign-off, then set went_live_at on AutomationChecklist";
+        verdict = "Proof passed — ready for go-live approval";
       } else {
         status = "partial";
         completion = 55;
