@@ -145,7 +145,8 @@ export default function Footer() {
         .cs-footer-system-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 24px; }
         .cs-footer-eyebrow { margin: 0 0 7px; color: rgba(255,255,255,.78); font-size: 10px; font-weight: 800; letter-spacing: .18em; line-height: 1.4; text-transform: uppercase; }
         .cs-footer-system h3 { margin: 0; max-width: 760px; font-size: clamp(1.4rem, 3vw, 2.1rem); line-height: 1.1; letter-spacing: -0.04em; }
-        .cs-footer-system-cta { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 18px; border-radius: 999px; background: rgba(255,255,255,.16); border: 1px solid rgba(255,255,255,.35); font-size: 13px; font-weight: 800; white-space: nowrap; }
+        .cs-footer-system-cta { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 24px; border-radius: 999px; background: #ffffff; border: 1px solid #ffffff; color: #003B8F !important; -webkit-text-fill-color: #003B8F !important; font-size: 14px; font-weight: 800; white-space: nowrap; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
+        .cs-footer-system-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.25); }
         .cs-footer-main { padding: 48px 0 26px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: 40px; }
         .cs-footer-brand p { max-width: 560px; color: #475569; line-height: 1.65; }
         .cs-footer-logo-row img { display: block; max-width: 240px; height: auto; }
