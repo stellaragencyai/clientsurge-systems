@@ -1,4 +1,5 @@
-import { Play, Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { ArrowRight, Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
+import { useState } from "react";
 
 function extractPrice(str) {
   const match = String(str).match(/\$[\d,]+/);
@@ -13,10 +14,13 @@ export default function CheckoutOrderSummary({
   loading,
   error,
   termsAgreed,
+  step = 1,
 }) {
+  const [showFeatures, setShowFeatures] = useState(false);
   const selectedPlan = plans.find((p) => p.id === selectedPlanId) || plans[0];
   const monthlyPrice = selectedPlan?.price || "";
   const setupPrice = extractPrice(selectedPlan?.setup || "");
+  const buttonLabel = step >= 2 ? "AGREE & SUBMIT" : "AGREE & NEXT";
 
   return (
     <div
@@ -54,16 +58,45 @@ export default function CheckoutOrderSummary({
         <span className="text-sm font-bold text-[#333]">{monthlyPrice}/mo</span>
       </div>
 
-      {/* Features */}
-      <p className="text-xs font-semibold text-[#999] uppercase tracking-wide mt-3 mb-2">Features</p>
-      <ul className="space-y-1.5 mb-4">
-        {selectedPlan?.features.map((feature) => (
-          <li key={feature} className="text-xs text-[#666] flex items-start gap-2">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#005691] flex-shrink-0 mt-0.5" />
-            <span>{feature}</span>
+      {/* View Features toggle */}
+      <button
+        onClick={() => setShowFeatures(!showFeatures)}
+        className="text-xs font-semibold flex items-center gap-1"
+        style={{ color: "#005691" }}
+      >
+        {showFeatures ? "Hide Features" : "View Features"}
+        {showFeatures ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+      </button>
+
+      {showFeatures && (
+        <ul className="space-y-1.5 mt-2 mb-4">
+          {selectedPlan?.features.map((feature) => (
+            <li key={feature} className="text-xs text-[#666] flex items-start gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#005691] flex-shrink-0 mt-0.5" />
+              <span>{feature}</span>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {/* Automatic Renewal box */}
+      <div className="rounded-lg p-3 mt-3" style={{ background: "#eef6ff" }}>
+        <p className="text-xs font-bold text-[#333] mb-2">Automatic Renewal:</p>
+        <ul className="space-y-1.5">
+          <li className="text-xs text-[#666] flex items-start gap-2">
+            <span className="text-[#005691] mt-0.5">•</span>
+            <span>Your subscription automatically renews monthly on the same calendar day.</span>
           </li>
-        ))}
-      </ul>
+          <li className="text-xs text-[#666] flex items-start gap-2">
+            <span className="text-[#005691] mt-0.5">•</span>
+            <span>You may cancel anytime by contacting support or through your client portal.</span>
+          </li>
+          <li className="text-xs text-[#666] flex items-start gap-2">
+            <span className="text-[#005691] mt-0.5">•</span>
+            <span>See our <a href="/refund-policy" className="text-[#005691] underline">cancellation policy</a> for full details.</span>
+          </li>
+        </ul>
+      </div>
 
       {/* Setup + Total */}
       <div className="border-t border-[#eee] pt-3 mt-3 space-y-1.5">
@@ -77,7 +110,7 @@ export default function CheckoutOrderSummary({
         </div>
       </div>
 
-      {/* AGREE & NEXT button */}
+      {/* Submit button */}
       <button
         onClick={onCheckout}
         disabled={loading || !termsAgreed}
@@ -89,12 +122,12 @@ export default function CheckoutOrderSummary({
       >
         {loading ? (
           <>
-            <Loader2 className="w-4 h-4 animate-spin" /> Creating checkout...
+            <Loader2 className="w-4 h-4 animate-spin" /> Redirecting to Stripe...
           </>
         ) : (
           <>
-            AGREE &amp; NEXT
-            <Play className="w-4 h-4 fill-white" />
+            {buttonLabel}
+            <ArrowRight className="w-4 h-4" />
           </>
         )}
       </button>

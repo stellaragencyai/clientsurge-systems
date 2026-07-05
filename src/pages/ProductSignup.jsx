@@ -8,6 +8,7 @@ import CheckoutStepper from "@/components/checkout/CheckoutStepper";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
 import CheckoutFooter from "@/components/checkout/CheckoutFooter";
 import AccountSignupForm from "@/components/checkout/AccountSignupForm";
+import BillingInformationForm from "@/components/checkout/BillingInformationForm";
 
 const PLANS = [
   {
@@ -42,7 +43,7 @@ const PLANS = [
 
 const DEFAULT_PLAN_ID = "growth_system";
 const FORM_STORAGE_KEY = "clientsurge_signup_form";
-const REQUIRED_FIELDS = ["firstName", "lastName", "businessName", "email", "phone"];
+const REQUIRED_FIELDS_STEP1 = ["firstName", "lastName", "businessName", "email", "phone"];
 const CHECKOUT_TIMEOUT_MS = 20000;
 
 function normalizePlanParam(value) {
@@ -52,7 +53,6 @@ function normalizePlanParam(value) {
 }
 
 function validateField(field, value) {
-  if (!REQUIRED_FIELDS.includes(field)) return "";
   if (!value || !value.trim()) return "This field is required.";
   if (field === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value.trim())) return "Please enter a valid email address.";
   if (field === "phone" && value.replace(/\D/g, "").length < 10) return "Please enter a valid phone number.";
@@ -90,6 +90,7 @@ export default function ProductSignup() {
   const selectedPlanId = normalizePlanParam(pkgParam);
   const selectedPlan = useMemo(() => PLANS.find((p) => p.id === selectedPlanId) || PLANS.find((p) => p.id === DEFAULT_PLAN_ID), [selectedPlanId]);
 
+  const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(() => {
     try {
       const saved = JSON.parse(localStorage.getItem(FORM_STORAGE_KEY) || "{}");
@@ -105,9 +106,13 @@ export default function ProductSignup() {
         city: saved.city || "",
         state: saved.state || "",
         zip: saved.zip || "",
+        billingAddress: saved.billingAddress || "",
+        billingCity: saved.billingCity || "",
+        billingState: saved.billingState || "",
+        billingZip: saved.billingZip || "",
       };
     } catch {
-      return { firstName: "", lastName: "", mi: "", businessName: "", email: "", phone: "", industry: "", address: "", city: "", state: "", zip: "" };
+      return { firstName: "", lastName: "", mi: "", businessName: "", email: "", phone: "", industry: "", address: "", city: "", state: "", zip: "", billingAddress: "", billingCity: "", billingState: "", billingZip: "" };
     }
   });
 
@@ -115,8 +120,10 @@ export default function ProductSignup() {
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState(null);
   const [bannerVisible, setBannerVisible] = useState(true);
-  const [termsAgreed, setTermsAgreed] = useState(false);
-  const [addressConfirmed, setAddressConfirmed] = useState(false);
+  const [step1TermsAgreed, setStep1TermsAgreed] = useState(false);
+  const [step1AddressConfirmed, setStep1AddressConfirmed] = useState(false);
+  const [billingSameAsBusiness, setBillingSameAsBusiness] = useState(true);
+  const [step2TermsAgreed, setStep2TermsAgreed] = useState(false);
 
   useEffect(() => {
     return setPageMetadata({
@@ -146,14 +153,29 @@ export default function ProductSignup() {
     if (checkoutError) setCheckoutError(null);
   };
 
-  const validateAll = () => {
+  const validateStep1 = () => {
     const errors = {};
-    for (const field of REQUIRED_FIELDS) {
+    for (const field of REQUIRED_FIELDS_STEP1) {
       const error = validateField(field, formData[field]);
       if (error) errors[field] = error;
     }
     setFieldErrors(errors);
     return Object.keys(errors).length === 0;
+  };
+
+  const handleNext = () => {
+    setCheckoutError(null);
+    if (!step1TermsAgreed) { setCheckoutError("Please agree to the Terms of Service and Privacy Policy to continue."); return; }
+    if (!validateStep1()) { setCheckoutError("Please complete the highlighted fields before continuing."); return; }
+    setCurrentStep(2);
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    trackCTA("signup_step1_complete", "product_signup", { package_id: selectedPlanId });
+  };
+
+  const handleBack = () => {
+    setCurrentStep(1);
+    setCheckoutError(null);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   const handleCheckout = async () => {
@@ -163,8 +185,8 @@ export default function ProductSignup() {
       setCheckoutError("Checkout must run in a full browser tab, not inside an embedded preview. I opened a new tab; continue checkout there.");
       return;
     }
-    if (!termsAgreed) { setCheckoutError("Please agree to the Terms of Service and Privacy Policy to continue."); return; }
-    if (!validateAll()) { setCheckoutError("Please complete the highlighted fields before checkout."); return; }
+    if (!step2TermsAgreed) { setCheckoutError("Please agree to the terms to continue."); return; }
+    if (!validateStep1()) { setCurrentStep(1); setCheckoutError("Please complete the highlighted fields before checkout."); return; }
     setCheckoutLoading(true);
     try {
       const fullName = `${formData.firstName} ${formData.mi} ${formData.lastName}`.replace(/\s+/g, " ").trim();
@@ -198,6 +220,11 @@ export default function ProductSignup() {
     }
   };
 
+  const handlePrimaryAction = () => {
+    if (currentStep === 1) return handleNext();
+    return handleCheckout();
+  };
+
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Logo Header */}
@@ -224,30 +251,56 @@ export default function ProductSignup() {
       )}
 
       {/* Stepper */}
-      <CheckoutStepper currentStep={1} />
+      <CheckoutStepper currentStep={currentStep} />
 
       {/* Two-column layout */}
       <main className="max-w-5xl mx-auto w-full px-4 pb-8 flex-1">
         <div className="grid md:grid-cols-[1.15fr_0.85fr] gap-6 lg:gap-8 items-start">
-          <AccountSignupForm
-            formData={formData}
-            fieldErrors={fieldErrors}
-            handleFieldChange={handleFieldChange}
-            termsAgreed={termsAgreed}
-            setTermsAgreed={setTermsAgreed}
-            addressConfirmed={addressConfirmed}
-            setAddressConfirmed={setAddressConfirmed}
-            isFieldValid={isFieldValid}
-          />
+          {/* Left column */}
+          <div>
+            {currentStep === 1 && (
+              <AccountSignupForm
+                formData={formData}
+                fieldErrors={fieldErrors}
+                handleFieldChange={handleFieldChange}
+                termsAgreed={step1TermsAgreed}
+                setTermsAgreed={setStep1TermsAgreed}
+                addressConfirmed={step1AddressConfirmed}
+                setAddressConfirmed={setStep1AddressConfirmed}
+                isFieldValid={isFieldValid}
+              />
+            )}
+            {currentStep === 2 && (
+              <>
+                <BillingInformationForm
+                  formData={formData}
+                  handleFieldChange={handleFieldChange}
+                  billingSameAsBusiness={billingSameAsBusiness}
+                  setBillingSameAsBusiness={setBillingSameAsBusiness}
+                  termsAgreed={step2TermsAgreed}
+                  setTermsAgreed={setStep2TermsAgreed}
+                />
+                <button
+                  onClick={handleBack}
+                  className="mt-4 text-sm font-semibold text-[#666] hover:text-[#005691] transition-colors"
+                >
+                  ← Back to Account Info
+                </button>
+              </>
+            )}
+          </div>
+
+          {/* Right column - Order Summary */}
           <div className="md:sticky md:top-6">
             <CheckoutOrderSummary
               plans={PLANS}
               selectedPlanId={selectedPlanId}
               onSelectPlan={setSelectedPlanId}
-              onCheckout={handleCheckout}
+              onCheckout={handlePrimaryAction}
               loading={checkoutLoading}
               error={checkoutError}
-              termsAgreed={termsAgreed}
+              termsAgreed={currentStep === 1 ? step1TermsAgreed : step2TermsAgreed}
+              step={currentStep}
             />
             {checkoutError && (
               <div className="mt-3 flex flex-wrap gap-2 justify-center">
