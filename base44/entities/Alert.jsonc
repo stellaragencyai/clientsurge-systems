@@ -7,6 +7,18 @@
       "title": "Description",
       "maxLength": 1000
     },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
     "type": {
       "type": "string",
       "title": "Alert Type",
@@ -140,15 +152,29 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "read": {
       "$or": [
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
           }
         },
         {
@@ -164,6 +190,11 @@
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
           }
         },
         {
