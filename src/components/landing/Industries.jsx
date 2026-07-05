@@ -10,6 +10,15 @@ import {
   Wrench,
   Scale,
   KeyRound,
+  Zap,
+  Leaf,
+  TreePine,
+  Paintbrush,
+  Bug,
+  Scissors,
+  Car,
+  Calculator,
+  Dumbbell,
 } from "lucide-react";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
@@ -142,6 +151,132 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
+},
+{
+  id: "electrician",
+  routePath: "/electrician",
+  icon: Zap,
+  name: "Electrical Contractors",
+  accent: {
+    color: "#eab308",
+    soft: "rgba(234,179,8,0.18)",
+    glow: "rgba(234,179,8,0.28)",
+    iconBg: "rgba(234,179,8,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1621905251918-48416cbd6309?w=1200&q=95"
+},
+{
+  id: "landscaping",
+  routePath: "/landscaping",
+  icon: Leaf,
+  name: "Landscaping",
+  accent: {
+    color: "#16a34a",
+    soft: "rgba(22,163,74,0.18)",
+    glow: "rgba(22,163,74,0.28)",
+    iconBg: "rgba(22,163,74,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1558904541-efa843a96f01?w=1200&q=95"
+},
+{
+  id: "tree-service",
+  routePath: "/tree-service",
+  icon: TreePine,
+  name: "Tree Service",
+  accent: {
+    color: "#15803d",
+    soft: "rgba(21,128,61,0.18)",
+    glow: "rgba(21,128,61,0.28)",
+    iconBg: "rgba(21,128,61,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1599598275926-5e0a4b906475?w=1200&q=95"
+},
+{
+  id: "painting",
+  routePath: "/painting",
+  icon: Paintbrush,
+  name: "Painting Contractors",
+  accent: {
+    color: "#db2777",
+    soft: "rgba(219,39,119,0.18)",
+    glow: "rgba(219,39,119,0.28)",
+    iconBg: "rgba(219,39,119,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=1200&q=95"
+},
+{
+  id: "pest-control",
+  routePath: "/pest-control",
+  icon: Bug,
+  name: "Pest Control",
+  accent: {
+    color: "#ca8a04",
+    soft: "rgba(202,138,4,0.18)",
+    glow: "rgba(202,138,4,0.28)",
+    iconBg: "rgba(202,138,4,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1584468764996-15ad89a5b0b5?w=1200&q=95"
+},
+{
+  id: "salon",
+  routePath: "/salon",
+  icon: Scissors,
+  name: "Salons & Hair Studios",
+  accent: {
+    color: "#d946ef",
+    soft: "rgba(217,70,239,0.18)",
+    glow: "rgba(217,70,239,0.28)",
+    iconBg: "rgba(217,70,239,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=95"
+},
+{
+  id: "auto-repair",
+  routePath: "/auto-repair",
+  icon: Car,
+  name: "Auto Repair Shops",
+  accent: {
+    color: "#dc2626",
+    soft: "rgba(220,38,38,0.18)",
+    glow: "rgba(220,38,38,0.28)",
+    iconBg: "rgba(220,38,38,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1632823469850-2f77dd9c7f93?w=1200&q=95"
+},
+{
+  id: "accounting",
+  routePath: "/accounting",
+  icon: Calculator,
+  name: "Accounting & Tax Firms",
+  accent: {
+    color: "#0891b2",
+    soft: "rgba(8,145,178,0.18)",
+    glow: "rgba(8,145,178,0.28)",
+    iconBg: "rgba(8,145,178,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=95"
+},
+{
+  id: "fitness",
+  routePath: "/fitness",
+  icon: Dumbbell,
+  name: "Gyms & Fitness Studios",
+  accent: {
+    color: "#ea580c",
+    soft: "rgba(234,88,12,0.18)",
+    glow: "rgba(234,88,12,0.28)",
+    iconBg: "rgba(234,88,12,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1534438327276-14e030dce1a0?w=1200&q=95"
 }];
 
 

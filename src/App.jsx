@@ -129,6 +129,15 @@ const INDUSTRY_ROUTE_SLUGS = [
   "personal-injury",
   "property-services",
   "veterinary",
+  "electrician",
+  "landscaping",
+  "tree-service",
+  "painting",
+  "pest-control",
+  "salon",
+  "auto-repair",
+  "accounting",
+  "fitness",
 ];
 
 // These are functional, noindex utility routes. Setup/onboarding are intentionally
