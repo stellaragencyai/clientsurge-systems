@@ -5,7 +5,7 @@
     "status": "CORE_PRODUCTION",
     "reason": "Primary message storage - canonical storage for message bodies, templates, transcripts. Immutable. Write in all message flows.",
     "immutable": true,
-    "tenant_scoped": "Via lead_id (resolve through Leads)",
+    "tenant_scoped": "client_id + client_project_id (with lead_id fallback for backward compat)",
     "documentation": "ARCHITECTURE_CONSOLIDATION.md"
   },
   "properties": {
@@ -22,6 +22,16 @@
     "lead_id": {
       "type": "string",
       "title": "Lead ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)",
+      "description": "Business/client tenant ID. Required for multi-client scaling."
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)",
+      "description": "Project/workspace/install scope under this client."
     },
     "direction": {
       "type": "string",
@@ -84,11 +94,19 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.lead_id": {
             "$in": [
               "{{leads.id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
         }
       ]
     },
@@ -100,11 +118,22 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.lead_id": {
             "$in": [
               "{{leads.id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
@@ -116,11 +145,19 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.lead_id": {
             "$in": [
               "{{leads.id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
         }
       ]
     },
@@ -129,6 +166,11 @@
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
           }
         },
         {
