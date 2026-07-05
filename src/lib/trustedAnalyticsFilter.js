@@ -1,9 +1,9 @@
 /**
- * Trusted internal analytics filter — Step 1 cleanup.
+ * Trusted internal analytics filter — Steps 1 + 2 cleanup.
  *
- * Prevents non-page technical requests and obvious automated traffic from
- * being counted as business website visitors in the app's internal
- * (Base44) analytics tracking.
+ * Prevents non-page technical requests, obvious automated traffic, and
+ * owner/internal browser traffic from being counted as business website
+ * visitors in the app's internal (Base44) analytics tracking.
  *
  * This filter is applied at the tracking call site (before
  * base44.analytics.track is invoked). It does NOT alter Base44 platform
@@ -11,12 +11,11 @@
  * records. It never fabricates metrics — when insufficient trusted data
  * exists, callers should surface "Insufficient trusted data." instead.
  *
- * The filter evaluates three signals:
+ * The filter evaluates four signals:
  *   1. path     — the page/route being tracked
  *   2. userAgent — the browser/client identity
- *   3. referrer  — the referring URL (used for awareness, not auto-exclusion,
- *                  since same-site SPA navigation legitimately produces an
- *                  internal referrer)
+ *   3. referrer  — the referring URL (used for awareness, not auto-exclusion)
+ *   4. internal  — localStorage flag set by admin/owner to exclude own traffic
  */
 
 // Path prefixes that are never business page views.
@@ -136,6 +135,49 @@ export function isInternalReferrer(referrer) {
   }
 }
 
+/**
+ * Returns true if the current browser has the internal-traffic exclusion
+ * flag set via localStorage. Admins/owners set this to exclude their own
+ * visits from trusted analytics.
+ *
+ * To enable:  localStorage.setItem('clientsurge_internal_traffic', 'true')
+ * To disable: localStorage.removeItem('clientsurge_internal_traffic')
+ */
+export function isInternalTraffic() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return false;
+    return window.localStorage.getItem("clientsurge_internal_traffic") === "true";
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Enables internal traffic exclusion for the current browser.
+ */
+export function enableInternalTrafficExclusion() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return false;
+    window.localStorage.setItem("clientsurge_internal_traffic", "true");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Disables internal traffic exclusion for the current browser.
+ */
+export function disableInternalTrafficExclusion() {
+  try {
+    if (typeof window === "undefined" || !window.localStorage) return false;
+    window.localStorage.removeItem("clientsurge_internal_traffic");
+    return true;
+  } catch {
+    return false;
+  }
+}
+
 function resolvePath(input) {
   if (input && typeof input.path === "string") return input.path;
   if (typeof window !== "undefined" && window.location) {
@@ -165,7 +207,7 @@ function resolveReferrer(input) {
  * or null if the event is trusted.
  *
  * @param {{ path?: string, userAgent?: string, referrer?: string }} input
- * @returns {"excluded_path" | "automated_user_agent" | null}
+ * @returns {"excluded_path" | "automated_user_agent" | "internal_traffic" | null}
  */
 export function getTrustDisqualificationReason(input = {}) {
   const path = resolvePath(input);
@@ -176,6 +218,9 @@ export function getTrustDisqualificationReason(input = {}) {
   }
   if (isAutomatedUserAgent(userAgent)) {
     return "automated_user_agent";
+  }
+  if (isInternalTraffic()) {
+    return "internal_traffic";
   }
   // Internal referrer alone does NOT disqualify — see isInternalReferrer docs.
   return null;
@@ -194,3 +239,11 @@ export function isTrustedAnalyticsEvent(input = {}) {
 export function shouldTrackTrustedPageView(path) {
   return isTrustedAnalyticsEvent({ path });
 }
+
+// Re-export for diagnostic panels
+export const DIAGNOSTIC_CONFIG = {
+  EXCLUDED_PATH_PREFIXES,
+  EXCLUDED_EXACT_PATHS: Array.from(EXCLUDED_EXACT_PATHS),
+  EXCLUDED_STATIC_EXTENSIONS,
+  BOT_UA_PATTERNS,
+};
