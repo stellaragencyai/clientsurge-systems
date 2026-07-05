@@ -1,9 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getIndustryBySlug } from '@/data/industryMarketingConfig';
+import { getMergedIndustryData } from '@/data/industryContent';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
+import AutomationTierSection from '@/components/industry/AutomationTierSection';
+import CaseStudySection from '@/components/industry/CaseStudySection';
 import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
 import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
@@ -20,10 +23,11 @@ export default function IndustryPageTemplate() {
   const [industry, setIndustry] = useState(null);
 
   useEffect(() => {
-    const data = getIndustryBySlug(slug);
-    if (data) {
-      setIndustry(data);
-      document.title = `${data.display_name} | ClientSurge Systems`;
+    const baseData = getIndustryBySlug(slug);
+    if (baseData) {
+      const merged = getMergedIndustryData(slug, baseData);
+      setIndustry(merged);
+      document.title = `${merged.display_name} | ClientSurge Systems`;
     } else {
       navigate('/');
     }
@@ -36,7 +40,7 @@ export default function IndustryPageTemplate() {
     headline: industry.hero_headline,
     subheadline: industry.hero_subheadline,
     description: industry.hero_description,
-    backgroundImage: null,
+    backgroundImage: industry.hero_image || null,
     primaryCTA: { label: industry.primary_cta, path: '/pricing' },
     secondaryCTA: { label: industry.secondary_cta, path: '/automations' },
   };
@@ -112,6 +116,10 @@ export default function IndustryPageTemplate() {
           </div>
         </div>
       </section>
+
+      <AutomationTierSection industry={industry} />
+
+      <CaseStudySection industry={industry} />
 
       <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 

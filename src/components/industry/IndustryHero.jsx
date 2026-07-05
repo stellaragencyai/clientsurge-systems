@@ -29,8 +29,8 @@ export default function IndustryHero({
 }) {
   const navigate = useNavigate();
 
-  // Determine if this hero uses cinematic wallpaper (roofing and future hero-image industries)
-  const useCinematicHero = backgroundImage && industryKey && ['roofing'].includes(industryKey.toLowerCase());
+  // Determine if this hero uses cinematic wallpaper (any industry with a backgroundImage URL)
+  const useCinematicHero = backgroundImage && industryKey;
 
   if (useCinematicHero) {
     return (
