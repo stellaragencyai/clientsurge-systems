@@ -1,8 +1,9 @@
 import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import QuickApproveButton from "./QuickApproveButton";
 
 const RECONCILE_KEYS = ["instant_lead_response", "missed_call_text_back", "inbound_sms_assistant", "nurture_sequence_14d", "ai_booking_agent"];
 
-function ReconcileRow({ serviceKey, gate, proofLog, checklist }) {
+function ReconcileRow({ serviceKey, gate, proofLog, checklist, onApproved }) {
   const warnings = [];
 
   // Gate says proof_passed but checklist is pending/not_started
@@ -26,6 +27,7 @@ function ReconcileRow({ serviceKey, gate, proofLog, checklist }) {
   }
 
   const hasIssue = warnings.length > 0;
+  const alreadyApproved = checklist?.status === "active" && checklist?.client_approved;
 
   return (
     <tr className={`border-b border-gray-50 last:border-0 ${hasIssue ? "bg-amber-50/30" : ""}`}>
@@ -48,17 +50,32 @@ function ReconcileRow({ serviceKey, gate, proofLog, checklist }) {
           </span>
         )}
       </td>
+      <td className="px-3 py-2.5">
+        {checklist && !alreadyApproved ? (
+          <QuickApproveButton
+            checklistId={checklist.id}
+            onApproved={onApproved}
+            compact
+          />
+        ) : alreadyApproved ? (
+          <span className="inline-flex items-center gap-1 text-green-600 text-[10px] font-bold">
+            <CheckCircle2 className="w-3 h-3" /> Approved
+          </span>
+        ) : (
+          <span className="text-[10px] text-gray-400">—</span>
+        )}
+      </td>
     </tr>
   );
 }
 
-export default function ChecklistReconciliationPanel({ gates, proofLogs, checklists }) {
+export default function ChecklistReconciliationPanel({ gates, proofLogs, checklists, onApproved }) {
   return (
     <div>
       <div className="flex items-center gap-2 mb-3">
         <div className="w-1 h-5 rounded-full" style={{ background: "#00AEEF" }} />
         <h3 className="text-sm font-bold text-gray-900">Checklist Reconciliation</h3>
-        <span className="text-[11px] text-gray-400">(read-only — no flags are changed)</span>
+        <span className="text-[11px] text-gray-400">(Quick Approve moves blocked items to ready)</span>
       </div>
       <div className="rounded-xl border overflow-x-auto" style={{ background: "#fff", borderColor: "#E5E7EB" }}>
         <table className="w-full">
@@ -69,6 +86,7 @@ export default function ChecklistReconciliationPanel({ gates, proofLogs, checkli
               <th className="text-left px-3 py-2 font-bold text-gray-500 uppercase tracking-wide text-[10px]">Proof Status</th>
               <th className="text-left px-3 py-2 font-bold text-gray-500 uppercase tracking-wide text-[10px]">Checklist Status</th>
               <th className="text-left px-3 py-2 font-bold text-gray-500 uppercase tracking-wide text-[10px]">Warnings</th>
+              <th className="text-left px-3 py-2 font-bold text-gray-500 uppercase tracking-wide text-[10px]">Quick Approve</th>
             </tr>
           </thead>
           <tbody>
@@ -76,7 +94,7 @@ export default function ChecklistReconciliationPanel({ gates, proofLogs, checkli
               const gate = (gates || []).find((g) => g.gate_key === key);
               const proofLog = (proofLogs || []).find((p) => p.service_key === key && p.status === "pass");
               const checklist = (checklists || []).find((c) => c.service_key === key);
-              return <ReconcileRow key={key} serviceKey={key} gate={gate} proofLog={proofLog} checklist={checklist} />;
+              return <ReconcileRow key={key} serviceKey={key} gate={gate} proofLog={proofLog} checklist={checklist} onApproved={onApproved} />;
             })}
           </tbody>
         </table>

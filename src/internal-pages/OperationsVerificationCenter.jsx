@@ -156,6 +156,7 @@ export default function OperationsVerificationCenter() {
               gates={data.gates}
               proofLogs={data.proofLogs}
               checklists={data.checklists}
+              onApproved={fetchAll}
             />
 
             {/* 6. Full Platform Gates */}
