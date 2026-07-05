@@ -1,0 +1,145 @@
+{
+  "name": "OrderFulfillment",
+  "type": "object",
+  "title": "Order Fulfillment Tracking",
+  "description": "Finding #134: Tracks fulfillment milestones between payment and go-live to prevent unfulfilled orders and chargebacks.",
+  "properties": {
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "payment_received": {
+      "type": "boolean",
+      "title": "Payment Received",
+      "default": false
+    },
+    "payment_received_at": {
+      "type": "string",
+      "title": "Payment Received At",
+      "format": "date-time"
+    },
+    "onboarding_started": {
+      "type": "boolean",
+      "title": "Onboarding Started",
+      "default": false
+    },
+    "onboarding_started_at": {
+      "type": "string",
+      "title": "Onboarding Started At",
+      "format": "date-time"
+    },
+    "credentials_collected": {
+      "type": "boolean",
+      "title": "Credentials Collected",
+      "default": false
+    },
+    "credentials_collected_at": {
+      "type": "string",
+      "title": "Credentials Collected At",
+      "format": "date-time"
+    },
+    "automation_tested": {
+      "type": "boolean",
+      "title": "Automation Tested",
+      "default": false
+    },
+    "automation_tested_at": {
+      "type": "string",
+      "title": "Automation Tested At",
+      "format": "date-time"
+    },
+    "went_live": {
+      "type": "boolean",
+      "title": "Went Live",
+      "default": false
+    },
+    "went_live_at": {
+      "type": "string",
+      "title": "Went Live At",
+      "format": "date-time"
+    },
+    "days_since_payment": {
+      "type": "number",
+      "title": "Days Since Payment",
+      "default": 0
+    },
+    "fulfillment_status": {
+      "type": "string",
+      "title": "Fulfillment Status",
+      "enum": [
+        "pending",
+        "in_progress",
+        "credentials_pending",
+        "testing",
+        "live",
+        "overdue",
+        "blocked"
+      ],
+      "default": "pending"
+    },
+    "overdue_alert_sent": {
+      "type": "boolean",
+      "title": "Overdue Alert Sent",
+      "default": false
+    },
+    "overdue_alert_sent_at": {
+      "type": "string",
+      "title": "Overdue Alert Sent At",
+      "format": "date-time"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "order_id"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
+    },
+    "update": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        }
+      ]
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

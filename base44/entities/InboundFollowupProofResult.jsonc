@@ -1,0 +1,135 @@
+{
+  "name": "InboundFollowupProofResult",
+  "type": "object",
+  "title": "Inbound Follow-Up Proof Result",
+  "description": "Non-sending simulation proof result for Priority 1 inbound follow-up readiness. Admin-only.",
+  "properties": {
+    "run_at": {
+      "type": "string",
+      "title": "Run At",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "title": "Mode",
+      "enum": [
+        "simulation_only"
+      ],
+      "default": "simulation_only"
+    },
+    "overall_status": {
+      "type": "string",
+      "title": "Overall Status",
+      "enum": [
+        "pass",
+        "partial",
+        "fail"
+      ]
+    },
+    "safe_to_enable_live_sends": {
+      "type": "boolean",
+      "title": "Safe To Enable Live Sends",
+      "default": false
+    },
+    "cases_passed": {
+      "type": "number",
+      "title": "Cases Passed",
+      "default": 0
+    },
+    "cases_failed": {
+      "type": "number",
+      "title": "Cases Failed",
+      "default": 0
+    },
+    "total_cases": {
+      "type": "number",
+      "title": "Total Cases",
+      "default": 0
+    },
+    "production_lead_count": {
+      "type": "number",
+      "title": "Production Lead Count",
+      "default": 0
+    },
+    "internal_test_lead_count": {
+      "type": "number",
+      "title": "Internal/Test Lead Count",
+      "default": 0
+    },
+    "blockers": {
+      "type": "array",
+      "title": "Blockers",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "title": "Warnings",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary"
+    },
+    "sampled_website_lead_ids": {
+      "type": "array",
+      "title": "Sampled WebsiteLead IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sampled_crm_lead_ids": {
+      "type": "array",
+      "title": "Sampled CRM Lead IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "idempotency_simulation_result": {
+      "type": "string",
+      "title": "Idempotency Simulation Result"
+    },
+    "rate_limit_simulation_result": {
+      "type": "string",
+      "title": "Rate Limit Simulation Result"
+    },
+    "dead_letter_summary": {
+      "type": "string",
+      "title": "Dead Letter Summary"
+    },
+    "notes": {
+      "type": "string",
+      "title": "Notes"
+    }
+  },
+  "required": [
+    "run_at",
+    "mode",
+    "overall_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

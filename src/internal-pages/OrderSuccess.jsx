@@ -219,6 +219,41 @@ export default function OrderSuccess() {
             <GuaranteeCard />
           </div>
 
+          {/* Finding #105: Post-purchase upsell — one-time upgrade offer */}
+          {orderInfo && (
+            <div style={{
+              background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(0,107,176,0.03) 100%)",
+              border: "1.5px solid rgba(0,174,239,0.2)",
+              borderRadius: "20px",
+              padding: "24px 28px",
+              marginBottom: "32px",
+              textAlign: "left",
+            }}>
+              <p style={{
+                fontSize: "11px", fontWeight: "700", color: "#00AEEF",
+                textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "8px",
+              }}>
+                Limited-Time Upgrade Offer
+              </p>
+              <p style={{ fontSize: "15px", fontWeight: "700", color: "#1a1209", marginBottom: "8px" }}>
+                Upgrade within 48 hours and save $500
+              </p>
+              <p style={{ fontSize: "13px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5, marginBottom: "16px" }}>
+                Lock in a higher tier now while your account is being provisioned. We'll apply the upgrade instantly — no re-onboarding needed.
+              </p>
+              <Link
+                to="/pricing"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: "6px",
+                  fontSize: "13px", fontWeight: "700", color: "#00AEEF",
+                  textDecoration: "none",
+                }}
+              >
+                View upgrade options <ArrowRight style={{ width: "14px", height: "14px" }} />
+              </Link>
+            </div>
+          )}
+
           <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
             {orderInfo ? (
               <button

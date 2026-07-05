@@ -12,6 +12,7 @@ import Footer from "@/components/landing/Footer";
 import MobileCallBar from "@/components/landing/MobileCallBar";
 import SectionHeader from "@/components/design-system/SectionHeader";
 import { ChevronDown, ChevronRight, Shield, Lock, PhoneCall, BadgeCheck, ScrollText, RotateCcw, CalendarClock, Ban } from "lucide-react";
+import DataDeletionRequestForm from "@/components/legal/DataDeletionRequestForm";
 
 /* ──────────── Content Data ──────────── */
 
@@ -515,6 +516,13 @@ export default function LegalPage({ fixedType, canonicalPath }) {
               {sections.map((section) => (
                 <SectionBlock key={section.id} section={section} isActive={activeId === section.id} />
               ))}
+
+              {/* Finding #147: GDPR/CCPA data deletion request form on privacy page */}
+              {type === "privacy" && (
+                <div className="mt-10">
+                  <DataDeletionRequestForm />
+                </div>
+              )}
             </div>
 
             {/* Desktop sticky TOC */}

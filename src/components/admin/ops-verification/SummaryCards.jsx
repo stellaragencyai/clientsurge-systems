@@ -33,6 +33,29 @@ export default function SummaryCards({ gates, proofLogs, dashTruth, readinessSta
   const platformLabel = platformGo ? "Launch Ready" : "Not Fully Launch Ready";
   const platformColor = platformGo ? "green" : "red";
 
+  // ── Sprint 2 — Inbound SMS + Nurture ──
+  const inboundGate = gates?.find((g) => g.gate_key === "inbound_sms_assistant");
+  const nurtureGate = gates?.find((g) => g.gate_key === "nurture_sequence_14d");
+  const sprint2CombinedGate = gates?.find((g) => g.gate_key === "sprint2_inbound_and_nurture_gate");
+
+  let sprint2Label, sprint2Color;
+  if (sprint2CombinedGate?.status === "approved") {
+    sprint2Label = "Internal Launch Approved";
+    sprint2Color = "blue";
+  } else if (sprint2CombinedGate?.status === "proof_passed") {
+    sprint2Label = isQaEvidence(sprint2CombinedGate?.evidence_quality) ? "QA Proof Passed" : "Production Proof Passed";
+    sprint2Color = isQaEvidence(sprint2CombinedGate?.evidence_quality) ? "yellow" : "green";
+  } else if (inboundGate?.status === "ready_for_proof" || nurtureGate?.status === "ready_for_proof") {
+    sprint2Label = "Ready for QA Proof";
+    sprint2Color = "yellow";
+  } else if (inboundGate?.status === "partial" || nurtureGate?.status === "partial") {
+    sprint2Label = "Configured — Partial";
+    sprint2Color = "yellow";
+  } else {
+    sprint2Label = "Not Started";
+    sprint2Color = "gray";
+  }
+
   // Route Health
   const routeHealthy = routeGate?.status === "proof_passed";
   const routeLabel = routeHealthy ? "Healthy" : "Unhealthy";
@@ -56,12 +79,14 @@ export default function SummaryCards({ gates, proofLogs, dashTruth, readinessSta
   if (!routeHealthy) nextAction = "Repair webhook routes";
   else if (!sprint1Passed) nextAction = "Complete Sprint 1 proof logs";
   else if (sprint1AllQa && !sprint1Approved) nextAction = "Admin decision: approve for internal launch or require production proof";
+  else if (sprint1Approved && sprint2CombinedGate?.status !== "proof_passed") nextAction = "Sprint 1 approved — build Sprint 2 proof (inbound SMS + nurture)";
   else if (sprint1Approved) nextAction = "Sprint 1 internally approved — pursue production proof for public/client launch";
   else if (misaligned.length > 0) nextAction = "Reconcile checklists with gates";
   else if (!platformGo) nextAction = "Address full-platform blockers";
 
   const cards = [
     { title: "Sprint 1 Core Twilio", label: sprint1Label, color: sprint1Color },
+    { title: "Sprint 2 Inbound + Nurture", label: sprint2Label, color: sprint2Color },
     { title: "Full Platform Readiness", label: platformLabel, color: platformColor },
     { title: "Route Health", label: routeLabel, color: routeColor },
     { title: "Proof Logs", label: proofLabel, color: proofColor },

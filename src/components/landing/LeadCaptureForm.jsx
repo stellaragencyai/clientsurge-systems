@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { ArrowRight, CheckCircle2, AlertCircle } from "lucide-react";
+import { ArrowRight, CheckCircle2, AlertCircle, ShieldCheck, Lock } from "lucide-react";
+import { formatPhoneInput } from "@/lib/phoneInputMask";
 
 const NICHES = [
   "Med Spas & Aesthetic Clinics",
@@ -183,9 +184,11 @@ export default function LeadCaptureForm() {
               <FormInput
                 label="Phone"
                 required
+                type="tel"
                 value={formData.phone}
-                onChange={(e) => updateField("phone", e.target.value)}
+                onChange={(e) => updateField("phone", formatPhoneInput(e.target.value))}
                 placeholder="(555) 000-0000"
+                maxLength={14}
               />
             </div>
           )}
@@ -307,9 +310,21 @@ export default function LeadCaptureForm() {
           <p className="mt-4 text-xs text-muted-foreground text-center">
             No spam. No pressure. Just a tailored follow-up about your lead system.
           </p>
-          <p className="mt-2 text-xs text-muted-foreground text-center px-2">
-            By submitting, you consent to receive automated SMS &amp; email messages from ClientSurge Systems. Reply <strong>STOP</strong> to opt out at any time. Msg &amp; data rates may apply.
-          </p>
+          {/* Finding #97: Trust signals near submit button */}
+          <div className="mt-4 flex items-center justify-center gap-4 text-xs text-muted-foreground">
+            <span className="flex items-center gap-1.5">
+              <Lock className="w-3.5 h-3.5 text-green-600" />
+              Secure form
+            </span>
+            <span className="flex items-center gap-1.5">
+              <ShieldCheck className="w-3.5 h-3.5 text-green-600" />
+              We never share your info
+            </span>
+            <span className="flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-green-600" />
+              No spam, ever
+            </span>
+          </div>
         </form>
       </div>
     </section>
@@ -356,4 +371,3 @@ function FormSelect({ label, required, value, onChange, options }) {
     </div>
   );
 }
-

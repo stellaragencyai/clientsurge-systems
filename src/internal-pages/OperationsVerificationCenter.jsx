@@ -6,6 +6,7 @@ import SummaryCards from "@/components/admin/ops-verification/SummaryCards";
 import Sprint1Panel from "@/components/admin/ops-verification/Sprint1Panel";
 import Sprint1ApprovalPanel from "@/components/admin/ops-verification/Sprint1ApprovalPanel";
 import Sprint1ApprovalSummary from "@/components/admin/ops-verification/Sprint1ApprovalSummary";
+import Sprint2Panel from "@/components/admin/ops-verification/Sprint2Panel";
 import RouteHealthPanel from "@/components/admin/ops-verification/RouteHealthPanel";
 import ProofLogEvidencePanel from "@/components/admin/ops-verification/ProofLogEvidencePanel";
 import ChecklistReconciliationPanel from "@/components/admin/ops-verification/ChecklistReconciliationPanel";
@@ -16,6 +17,7 @@ export default function OperationsVerificationCenter() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [data, setData] = useState({});
+  const [runningSprint2Proof, setRunningSprint2Proof] = useState(false);
 
   const fetchAll = useCallback(async () => {
     setLoading(true);
@@ -58,6 +60,18 @@ export default function OperationsVerificationCenter() {
 
   useEffect(() => { fetchAll(); }, [fetchAll]);
 
+  const runSprint2ProofCheck = useCallback(async () => {
+    setRunningSprint2Proof(true);
+    try {
+      await base44.functions.invoke("runSprint2ProofCheck", {});
+      await fetchAll();
+    } catch (err) {
+      setError(`Sprint 2 proof check failed: ${err.message}`);
+    } finally {
+      setRunningSprint2Proof(false);
+    }
+  }, [fetchAll]);
+
   return (
     <AdminShell title="Operations Verification Center" activeId="ops-verification">
       <div className="p-4 lg:p-6 max-w-7xl mx-auto">
@@ -72,14 +86,25 @@ export default function OperationsVerificationCenter() {
               <p className="text-xs text-gray-400">Read-only verification of proven, QA-only, approved, blocked, and next-action status</p>
             </div>
           </div>
-          <button
-            onClick={fetchAll}
-            disabled={loading}
-            className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
-          >
-            {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
-            {loading ? "Loading…" : "Refresh"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              onClick={runSprint2ProofCheck}
+              disabled={runningSprint2Proof || loading}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-blue-200 bg-blue-50 text-xs font-bold text-blue-700 hover:bg-blue-100 disabled:opacity-50 transition-colors"
+              title="Run Sprint 2 proof check — evaluates inbound SMS and nurture gates"
+            >
+              {runningSprint2Proof ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+              {runningSprint2Proof ? "Running…" : "Run Sprint 2 Proof"}
+            </button>
+            <button
+              onClick={fetchAll}
+              disabled={loading}
+              className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-gray-200 bg-white text-xs font-bold text-gray-700 hover:bg-gray-50 disabled:opacity-50 transition-colors"
+            >
+              {loading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <RefreshCw className="w-3.5 h-3.5" />}
+              {loading ? "Loading…" : "Refresh"}
+            </button>
+          </div>
         </div>
 
         {error && (
@@ -121,6 +146,13 @@ export default function OperationsVerificationCenter() {
               onDecisionMade={fetchAll}
             />
 
+            {/* 2d. Sprint 2 — Inbound SMS Assistant + 14-Day Nurture */}
+            <Sprint2Panel
+              gates={data.gates}
+              proofLogs={data.proofLogs}
+              checklists={data.checklists}
+            />
+
             {/* 3. Route Health */}
             <RouteHealthPanel adminSettings={data.adminSettings} routeGate={data.gates?.find((g) => g.gate_key === "twilio_webhook_route_health")} />
 
@@ -148,9 +180,10 @@ export default function OperationsVerificationCenter() {
         {/* Footer note */}
         <div className="mt-8 pt-4 border-t border-gray-100">
           <p className="text-[11px] text-gray-400">
-            Operations Verification Center v2 — Sprint 1 approval layer is admin-writable. All other panels remain read-only.
+            Operations Verification Center v2 — Sprint 1 approval layer is admin-writable. Sprint 2 (Inbound SMS Assistant + 14-Day Nurture) is read-only with proof gates.
             Internal launch approval preserves evidence_quality as internal_test and does NOT imply public/client launch readiness.
             Evidence quality is classified by email/business name patterns. QA proof does not equal production live.
+            Sprint 2 hard rules: no auto-sends, no fake proof, no marking live without proof and approval, STOP/opt-out respected.
           </p>
         </div>
       </div>

@@ -1,5 +1,6 @@
 import { ArrowRight, Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
 import { useState } from "react";
+import CheckoutSocialProof from "@/components/checkout/CheckoutSocialProof";
 
 function extractPrice(str) {
   const match = String(str).match(/\$[\d,]+/);
@@ -145,6 +146,9 @@ export default function CheckoutOrderSummary({
           <p className="text-xs text-red-700 leading-relaxed">{error}</p>
         </div>
       )}
+
+      {/* Finding #92: Social proof + Finding #103: Money-back guarantee at checkout */}
+      {step === 2 && <CheckoutSocialProof />}
     </div>
   );
 }

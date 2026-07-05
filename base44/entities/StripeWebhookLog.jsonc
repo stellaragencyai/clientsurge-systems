@@ -1,0 +1,93 @@
+{
+  "name": "StripeWebhookLog",
+  "type": "object",
+  "title": "Stripe Webhook Event Log",
+  "description": "Finding #135: Audit trail for all Stripe webhook events \u2014 event ID, type, received_at, processed_at, status, error.",
+  "properties": {
+    "event_id": {
+      "type": "string",
+      "title": "Stripe Event ID"
+    },
+    "event_type": {
+      "type": "string",
+      "title": "Stripe Event Type"
+    },
+    "received_at": {
+      "type": "string",
+      "title": "Received At",
+      "format": "date-time"
+    },
+    "processed_at": {
+      "type": "string",
+      "title": "Processed At",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "title": "Processing Status",
+      "enum": [
+        "received",
+        "processed",
+        "failed",
+        "duplicate",
+        "ignored"
+      ],
+      "default": "received"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Linked Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "stripe_session_id": {
+      "type": "string",
+      "title": "Stripe Session ID"
+    },
+    "stripe_subscription_id": {
+      "type": "string",
+      "title": "Stripe Subscription ID"
+    },
+    "stripe_customer_id": {
+      "type": "string",
+      "title": "Stripe Customer ID"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Event Metadata (JSON)"
+    }
+  },
+  "required": [
+    "event_id",
+    "event_type",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

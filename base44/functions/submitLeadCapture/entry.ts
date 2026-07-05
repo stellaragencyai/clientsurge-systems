@@ -12,6 +12,24 @@ import { validatePublicFormOrigin } from '../_shared/publicFormOriginGuard.js';
 
 const MAX_MESSAGE_LENGTH = 1000;
 const rateLimiter = createLeadCaptureRateLimiter();
+
+// ── Finding #138: Input sanitization for XSS prevention ──
+const DANGEROUS_PATTERNS = [
+  /<script[^>]*>.*?<\/script>/gi,
+  /javascript:/gi,
+  /on\w+\s*=/gi,
+  /<iframe/gi,
+  /<embed/gi,
+  /<object/gi,
+];
+
+function sanitizeString(input) {
+  if (typeof input !== "string") return input;
+  let sanitized = input;
+  DANGEROUS_PATTERNS.forEach(pattern => { sanitized = sanitized.replace(pattern, ""); });
+  sanitized = sanitized.replace(/<[^>]*>/g, "");
+  return sanitized.trim();
+}
 const ALLOWED_SOURCE_VALUES = new Set([
   'website_form',
   'contact_page',
@@ -113,19 +131,20 @@ Deno.serve(async (req) => {
       return secureJson({ error: 'Too many submissions. Please try again later.' }, { status: 429 });
     }
 
-    const fullName = cleanString(body.full_name);
-    const businessName = cleanString(body.business_name);
+    // Finding #138: Sanitize all user input to prevent stored XSS
+    const fullName = sanitizeString(cleanString(body.full_name));
+    const businessName = sanitizeString(cleanString(body.business_name));
     const email = normalizeEmail(body.email);
     const submittedPhone = cleanString(body.phone_number || body.phone);
     const normalizedPhone = normalizePhone(submittedPhone);
     const requestedChannels = parseRequestedChannels(body.requested_channels);
     const consentGiven = body.consent_given === true || body.consent_given === 'true';
-    const message = cleanString(body.message || body.problem || body.biggest_problem).slice(0, MAX_MESSAGE_LENGTH);
-    const businessType = cleanString(body.business_type || body.niche) || 'Other';
+    const message = sanitizeString(cleanString(body.message || body.problem || body.biggest_problem)).slice(0, MAX_MESSAGE_LENGTH);
+    const businessType = sanitizeString(cleanString(body.business_type || body.niche)) || 'Other';
     const source = normalizeLeadSource(body.source);
-    const sourcePage = cleanString(body.source_page);
-    const consentSource = cleanString(body.consent_source) || 'lead_capture_form';
-    const consentTextVersion = cleanString(body.consent_text_version) || 'lead_capture_explicit_checkbox_v1';
+    const sourcePage = sanitizeString(cleanString(body.source_page));
+    const consentSource = sanitizeString(cleanString(body.consent_source)) || 'lead_capture_form';
+    const consentTextVersion = sanitizeString(cleanString(body.consent_text_version)) || 'lead_capture_explicit_checkbox_v1';
 
     const errors = [];
     if (!fullName) errors.push('Full name is required');

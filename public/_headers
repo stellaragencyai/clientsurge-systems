@@ -1,16 +1,21 @@
-# ClientSurge Systems — Security Headers
-# Fixes Audit Issue #144: No Content Security Policy headers
-# Fixes Audit Issue #145: No security headers (HSTS, X-Frame-Options, etc.)
+/*
+  Content-Security-Policy, security headers, and caching rules.
+  Findings #144, #145 — CSP + HSTS + X-Frame-Options + X-Content-Type-Options + Referrer-Policy
+*/
 
 /*
-  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
-  X-Frame-Options: DENY
-  X-Content-Type-Options: nosniff
-  Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self)
-  X-XSS-Protection: 1; mode=block
+  Security headers applied to every response.
+*/
+Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
+X-Frame-Options: DENY
+X-Content-Type-Options: nosniff
+Referrer-Policy: strict-origin-when-cross-origin
+Permissions-Policy: camera=(), microphone=(), geolocation=()
+Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com https://checkout.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https://api.base44.com https://api.stripe.com https://api.twilio.com https://api.resend.com https://www.google-analytics.com https://region1.google-analytics.com wss:; frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'
 
-# Cache static assets aggressively
+/*
+  Static asset caching — aggressive long-cache for immutable assets.
+*/
 /assets/*
   Cache-Control: public, max-age=31536000, immutable
 
@@ -20,6 +25,38 @@
 /*.css
   Cache-Control: public, max-age=31536000, immutable
 
-# Don't cache HTML
+/*.woff2
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.woff
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.ttf
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.png
+  Cache-Control: public, max-age=86400
+
+/*.jpg
+  Cache-Control: public, max-age=86400
+
+/*.svg
+  Cache-Control: public, max-age=86400
+
+/*.webp
+  Cache-Control: public, max-age=86400
+
+/*
+  HTML — short cache so deploys are picked up quickly.
+*/
 /*.html
   Cache-Control: public, max-age=0, must-revalidate
+
+/
+  Cache-Control: public, max-age=0, must-revalidate
+
+/*
+  API endpoints — never cached.
+*/
+/api/*
+  Cache-Control: no-store, no-cache, must-revalidate

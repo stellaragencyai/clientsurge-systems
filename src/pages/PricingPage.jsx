@@ -5,6 +5,8 @@ import MobileCallBar from "../components/landing/MobileCallBar";
 import TrustStrip from "../components/landing/TrustStrip";
 import PricingPageContent from "@/components/pricing/PricingPageContent";
 import CartSidebar from "@/components/store/CartSidebar";
+import ExitIntentPopup from "@/components/landing/ExitIntentPopup";
+import ChatBubble from "@/components/landing/ChatBubble";
 import { CartProvider } from "@/lib/cartContext";
 import { setPageMetadata } from "@/lib/seo";
 
@@ -30,6 +32,10 @@ export default function PricingPage() {
         <Footer />
         <MobileCallBar />
         <CartSidebar />
+        {/* Finding #91: Exit-intent popup on pricing page for conversion recovery */}
+        {/* Finding #101: Chat bubble on high-intent pricing page */}
+        <ExitIntentPopup pathname="/pricing" />
+        <ChatBubble />
       </div>
     </CartProvider>
   );

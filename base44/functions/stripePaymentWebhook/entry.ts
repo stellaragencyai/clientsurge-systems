@@ -694,6 +694,80 @@ async function processInvoiceEvent({ base44, event, source }) {
   return { success: true, order_id: updatedOrder.id };
 }
 
+// Finding #122 — Handle checkout.session.expired for abandoned checkout tracking
+async function processCheckoutSessionExpired({ base44, event, source }) {
+  const session = event.data.object;
+  const order = await resolveOrderFromCheckoutSession(base44, session).catch(() => null);
+
+  if (order) {
+    await base44.asServiceRole.entities.Order.update(order.id, {
+      stripe_event_id: event.id,
+      billing_status: "abandoned",
+    }).catch(() => null);
+  }
+
+  await createCommunicationEvent(base44, buildCommunicationEvent({
+    providerMessageId: event.id,
+    subject: "Stripe checkout session expired",
+    messageBody: `checkout.session.expired for session ${session?.id || "unknown"}. Order: ${order?.id || "not found"}.`,
+    order,
+    metadata: {
+      source,
+      event_id: event.id,
+      event_type: event.type,
+      stripe_session_id: session?.id || "",
+      order_id: order?.id || null,
+    },
+  }));
+
+  return { success: true, order_id: order?.id || null, expired: true };
+}
+
+// Finding #126 — Handle charge.refunded and charge.dispute.created
+async function processChargeEvent({ base44, event, source }) {
+  const charge = event.data.object;
+  const orderId = cleanString(charge?.metadata?.order_id);
+  let order = null;
+
+  if (orderId) {
+    order = await base44.asServiceRole.entities.Order.get(orderId).catch(() => null);
+  }
+
+  if (!order && charge?.id) {
+    const byCharge = await base44.asServiceRole.entities.Order.filter(
+      { stripe_charge_id: charge.id },
+      "-created_date",
+      5
+    ).catch(() => []);
+    order = (byCharge || [])[0] || null;
+  }
+
+  if (order) {
+    const newStatus = event.type === "charge.refunded" ? "refunded" : "disputed";
+    await base44.asServiceRole.entities.Order.update(order.id, {
+      stripe_event_id: event.id,
+      billing_status: newStatus,
+    }).catch(() => null);
+  }
+
+  await createCommunicationEvent(base44, buildCommunicationEvent({
+    providerMessageId: event.id,
+    subject: `Stripe ${event.type} processed`,
+    messageBody: `${event.type} for charge ${charge?.id || "unknown"}. Order: ${order?.id || "not found"}.`,
+    order,
+    metadata: {
+      source,
+      event_id: event.id,
+      event_type: event.type,
+      stripe_charge_id: charge?.id || "",
+      order_id: order?.id || null,
+      amount: charge?.amount_refunded || charge?.amount || null,
+    },
+  }));
+
+  return { success: true, order_id: order?.id || null };
+}
+
 export async function handleCanonicalStripeWebhook(
   req,
   { source = "stripeWebhookOrders" } = {}
@@ -755,6 +829,9 @@ export async function handleCanonicalStripeWebhook(
 
     if (event.type === "checkout.session.completed") {
       result = await processCheckoutSessionCompleted({ base44, event, source });
+    } else if (event.type === "checkout.session.expired") {
+      // Finding #122 — Track abandoned checkout sessions for follow-up
+      result = await processCheckoutSessionExpired({ base44, event, source });
     } else if (
       event.type === "customer.subscription.created" ||
       event.type === "customer.subscription.updated" ||
@@ -767,6 +844,12 @@ export async function handleCanonicalStripeWebhook(
       event.type === "invoice.paid"
     ) {
       result = await processInvoiceEvent({ base44, event, source });
+    } else if (
+      event.type === "charge.refunded" ||
+      event.type === "charge.dispute.created"
+    ) {
+      // Finding #126 — Sync order status with Stripe refunds and disputes
+      result = await processChargeEvent({ base44, event, source });
     }
 
     return secureJson({

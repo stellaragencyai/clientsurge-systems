@@ -3,6 +3,7 @@ import { CheckCircle2, ShieldCheck, Wallet, ShoppingCart, ArrowRight, Sparkles, 
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
+import ScarcityBadge from "@/components/pricing/ScarcityBadge";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 
 const PACKAGES = [
@@ -94,6 +95,10 @@ export default function PricingPageContent() {
               <Icon className="h-3.5 w-3.5" /> {text}
             </span>
           ))}
+        </div>
+        {/* Finding #93: Urgency/scarcity trigger */}
+        <div className="flex justify-center mb-6">
+          <ScarcityBadge />
         </div>
         <CheckoutProgress currentStep="compare" className="mt-6" />
       </section>

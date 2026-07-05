@@ -15,6 +15,7 @@ import {
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
 import DarkModeToggle from "./DarkModeToggle";
+import AdminSessionGuard from "./AdminSessionGuard";
 
 const NAV_GROUPS = [
   {
@@ -83,6 +84,7 @@ const MOBILE_QUICK_NAV = [
 
 export default function AdminShell({ children, title, activeId }) {
   const { user } = useAuth();
+  const isAdmin = user?.role === "admin" || user?.role === "super_admin";
   const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(isDesktopViewport);
@@ -139,6 +141,7 @@ export default function AdminShell({ children, title, activeId }) {
   };
 
   return (
+    <AdminSessionGuard isAdmin={isAdmin}>
     <div className="min-h-screen bg-background flex overflow-x-hidden">
       {/* Sidebar */}
       <div
@@ -300,5 +303,6 @@ export default function AdminShell({ children, title, activeId }) {
         </div>
       )}
     </div>
+    </AdminSessionGuard>
   );
 }
