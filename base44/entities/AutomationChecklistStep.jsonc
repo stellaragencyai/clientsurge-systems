@@ -10,6 +10,26 @@
       "type": "string",
       "title": "Order ID"
     },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
     "service_key": {
       "type": "string",
       "title": "Service Key",
@@ -27,13 +47,11 @@
     },
     "step_id": {
       "type": "string",
-      "title": "Step Identifier (e.g., 'lead_form_connected')",
-      "description": "Unique key for this checkbox"
+      "title": "Step Identifier"
     },
     "step_label": {
       "type": "string",
-      "title": "Display Label",
-      "description": "Human-readable label (e.g., 'Lead form connected')"
+      "title": "Display Label"
     },
     "step_order": {
       "type": "integer",
@@ -89,11 +107,22 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.order_id": {
             "$in": [
               "{{client_projects.order_id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
@@ -105,11 +134,19 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.order_id": {
             "$in": [
               "{{client_projects.order_id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
         }
       ]
     },
