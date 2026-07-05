@@ -3,8 +3,9 @@
   "type": "object",
   "_metadata": {
     "status": "CORE_PRODUCTION",
-    "reason": "Primary conversation grouping.",
-    "tenant_scoped": "client_id + client_project_id"
+    "reason": "Primary conversation grouping - groups messages and events into logical conversations. Write in thread management flows. Read by message viewers.",
+    "tenant_scoped": "client_id + client_project_id",
+    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
   },
   "properties": {
     "description": {
@@ -23,18 +24,6 @@
     "client_project_id": {
       "type": "string",
       "title": "Client Project ID (Tenant Isolation)"
-    },
-    "tenant_scope_status": {
-      "type": "string",
-      "title": "Tenant Scope Status",
-      "enum": [
-        "scoped",
-        "missing_client_id",
-        "needs_backfill",
-        "manual_review",
-        "system_internal"
-      ],
-      "default": "missing_client_id"
     },
     "primary_channel": {
       "type": "string",
