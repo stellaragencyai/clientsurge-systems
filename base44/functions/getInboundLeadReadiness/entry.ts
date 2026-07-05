@@ -109,12 +109,28 @@ Deno.serve(async (req) => {
     // the "no idempotency keys" and "no rate limit" blockers are resolved.
     const guardrailReady = counts.rate_limit_config > 0 && hasSimulationProof;
 
+    // Check for latest FailureRecoveryResult to see if failures were annotated/resolved
+    const failureRecoveryResults = await svc.entities.FailureRecoveryResult.list('-run_at', 3).catch(() => []);
+    const latestFailureRecovery = (failureRecoveryResults || [])[0] || null;
+    const failureRecoveryApplied = latestFailureRecovery?.mode === 'applied';
+    const failureRecoverySafe = latestFailureRecovery?.safe_to_continue_to_next_phase === true;
+
     const criticalBlockers = [];
     if (counts.rate_limit_config === 0) criticalBlockers.push('No RateLimitConfig records — rate-limit guardrails missing');
     if (counts.idempotency_key === 0) criticalBlockers.push('No IdempotencyKey records — dedup guardrails missing');
-    if (counts.pending_dead_letter > 0) criticalBlockers.push(`${counts.pending_dead_letter} pending DeadLetterLog record(s) awaiting review`);
-    if (counts.failed_automation_job > 0) criticalBlockers.push(`${counts.failed_automation_job} failed AutomationJob record(s)`);
-    if (counts.stale_automation_job > 0) criticalBlockers.push(`${counts.stale_automation_job} stale AutomationJob record(s)`);
+
+    // If failure recovery has been applied and safe, don't count dead letters/jobs as blockers
+    const failuresResolved = failureRecoveryApplied && failureRecoverySafe;
+
+    if (counts.pending_dead_letter > 0 && !failuresResolved) {
+      criticalBlockers.push(`${counts.pending_dead_letter} pending DeadLetterLog record(s) awaiting review`);
+    }
+    if (counts.failed_automation_job > 0 && !failuresResolved) {
+      criticalBlockers.push(`${counts.failed_automation_job} failed AutomationJob record(s)`);
+    }
+    if (counts.stale_automation_job > 0 && !failuresResolved) {
+      criticalBlockers.push(`${counts.stale_automation_job} stale AutomationJob record(s)`);
+    }
 
     let status;
     if (criticalBlockers.length > 0) {
@@ -132,15 +148,44 @@ Deno.serve(async (req) => {
         counts.website_lead_missing_dedup_key > 0 ||
         counts.website_lead_missing_crm_lead_id > 0 ||
         counts.lead_next_best_action === 0;
-      status = hasGaps ? 'PARTIAL' : 'READY_FOR_LIVE_PROOF';
+      // Even if gaps are resolved, READY_FOR_LIVE_PROOF requires:
+      // 1. LeadNextBestAction records exist
+      // 2. Failure recovery applied and safe
+      // 3. No data gaps
+      if (hasGaps) {
+        status = 'PARTIAL';
+      } else if (!failuresResolved) {
+        status = 'PARTIAL';
+      } else {
+        status = 'READY_FOR_LIVE_PROOF';
+      }
     }
 
     // ── Remediation checklist with dynamic text ──
-    const remediation_next_step = hasSimulationProof
-      ? 'Idempotency simulation passed — next required step is tenant-scope/CRM-link backfill simulation'
-      : 'Run idempotency simulation to prove duplicate suppression before live sends';
+    let remediation_next_step;
+    if (!hasSimulationProof) {
+      remediation_next_step = 'Run idempotency simulation to prove duplicate suppression before live sends';
+    } else if (counts.pending_dead_letter > 0 || counts.failed_automation_job > 0 || counts.stale_automation_job > 0) {
+      if (!failureRecoveryApplied) {
+        remediation_next_step = 'Run simulateFailureRecoveryPlan → applyFailureRecoverySafe to annotate/resolve failed/stale jobs and dead letters';
+      } else if (!failureRecoverySafe) {
+        remediation_next_step = 'Failure recovery applied but blockers remain — review manual_review_required records and repair data';
+      } else {
+        remediation_next_step = 'Failures resolved — next: generate LeadNextBestAction records, then run full non-sending inbound follow-up simulation';
+      }
+    } else if (counts.lead_next_best_action === 0) {
+      remediation_next_step = 'Generate LeadNextBestAction records for all production leads';
+    } else if (
+      counts.website_lead_missing_client_id > 0 ||
+      counts.website_lead_missing_dedup_key > 0 ||
+      counts.website_lead_missing_crm_lead_id > 0
+    ) {
+      remediation_next_step = 'Run lead routing + CRM linkage backfill simulation → apply to close data gaps';
+    } else {
+      remediation_next_step = 'Run full non-sending inbound follow-up simulation, then controlled live-safe provider proof';
+    }
 
-    const live_proof_blocked_reason = 'Live provider proof remains blocked until data hygiene and dead-letter blockers are resolved';
+    const live_proof_blocked_reason = 'Live provider proof remains blocked until: (1) failed/stale jobs and dead letters are resolved, (2) LeadNextBestAction records exist, (3) non-sending inbound follow-up simulation passes';
 
     return Response.json({
       status,

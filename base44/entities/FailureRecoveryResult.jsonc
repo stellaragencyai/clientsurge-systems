@@ -1,0 +1,218 @@
+{
+  "name": "FailureRecoveryResult",
+  "type": "object",
+  "title": "Failure Recovery Result",
+  "description": "Admin-only audit record for non-sending simulation and safe annotation of failed/stale AutomationJob, EventQueue, and DeadLetterLog records. Never sends messages or calls providers.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "run_at": {
+      "type": "string",
+      "title": "Run At",
+      "format": "date-time"
+    },
+    "mode": {
+      "type": "string",
+      "title": "Mode",
+      "enum": [
+        "simulation",
+        "applied"
+      ],
+      "description": "simulation = read-only preview; applied = safe annotation/resolution executed"
+    },
+    "total_jobs_scanned": {
+      "type": "integer",
+      "title": "Total Jobs Scanned",
+      "default": 0
+    },
+    "total_events_scanned": {
+      "type": "integer",
+      "title": "Total Events Scanned",
+      "default": 0
+    },
+    "total_dead_letters_scanned": {
+      "type": "integer",
+      "title": "Total Dead Letters Scanned",
+      "default": 0
+    },
+    "root_cause_counts": {
+      "type": "object",
+      "title": "Root Cause Counts",
+      "properties": {
+        "lead_not_found": {
+          "type": "integer",
+          "default": 0
+        },
+        "stale_processing": {
+          "type": "integer",
+          "default": 0
+        },
+        "provider_error": {
+          "type": "integer",
+          "default": 0
+        },
+        "missing_tenant_scope": {
+          "type": "integer",
+          "default": 0
+        },
+        "internal_test_suppressed": {
+          "type": "integer",
+          "default": 0
+        },
+        "duplicate_suppressed": {
+          "type": "integer",
+          "default": 0
+        },
+        "missing_consent": {
+          "type": "integer",
+          "default": 0
+        },
+        "invalid_phone_or_email": {
+          "type": "integer",
+          "default": 0
+        },
+        "unknown_error": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "recommended_action_counts": {
+      "type": "object",
+      "title": "Recommended Action Counts",
+      "properties": {
+        "safe_to_retry_later": {
+          "type": "integer",
+          "default": 0
+        },
+        "resolve_as_internal_test": {
+          "type": "integer",
+          "default": 0
+        },
+        "needs_lead_id_repair": {
+          "type": "integer",
+          "default": 0
+        },
+        "needs_tenant_scope_repair": {
+          "type": "integer",
+          "default": 0
+        },
+        "needs_provider_config_review": {
+          "type": "integer",
+          "default": 0
+        },
+        "mark_unrecoverable": {
+          "type": "integer",
+          "default": 0
+        },
+        "manual_review_required": {
+          "type": "integer",
+          "default": 0
+        }
+      }
+    },
+    "safe_resolutions_available": {
+      "type": "integer",
+      "title": "Safe Resolutions Available",
+      "default": 0
+    },
+    "manual_review_required": {
+      "type": "integer",
+      "title": "Manual Review Required Count",
+      "default": 0
+    },
+    "records_annotated": {
+      "type": "integer",
+      "title": "Records Annotated",
+      "default": 0
+    },
+    "records_resolved": {
+      "type": "integer",
+      "title": "Records Resolved",
+      "default": 0
+    },
+    "records_left_blocked": {
+      "type": "integer",
+      "title": "Records Left Blocked",
+      "default": 0
+    },
+    "blockers": {
+      "type": "array",
+      "title": "Blockers",
+      "items": {
+        "type": "string"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "title": "Warnings",
+      "items": {
+        "type": "string"
+      }
+    },
+    "evidence_summary": {
+      "type": "string",
+      "title": "Evidence Summary"
+    },
+    "sample_job_ids": {
+      "type": "array",
+      "title": "Sample Job IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sample_event_ids": {
+      "type": "array",
+      "title": "Sample Event IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "sample_dead_letter_ids": {
+      "type": "array",
+      "title": "Sample Dead Letter IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "safe_to_continue_to_next_phase": {
+      "type": "boolean",
+      "title": "Safe to Continue to Next Phase",
+      "default": false
+    },
+    "run_by": {
+      "type": "string",
+      "title": "Run By (Admin Email)"
+    }
+  },
+  "required": [
+    "run_at",
+    "mode",
+    "total_jobs_scanned"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

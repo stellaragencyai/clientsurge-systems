@@ -3,6 +3,7 @@ import InboundLeadReadinessCard from "@/components/admin/InboundLeadReadinessCar
 import DuplicateSendProtectionCard from "@/components/admin/DuplicateSendProtectionCard";
 import AnalyticsDiagnosticsPanel from "@/components/admin/AnalyticsDiagnosticsPanel";
 import LeadRoutingCrmLinkageCard from "@/components/admin/LeadRoutingCrmLinkageCard";
+import JobFailureDeadLetterRecoveryCard from "@/components/admin/JobFailureDeadLetterRecoveryCard";
 import { ShieldCheck } from "lucide-react";
 
 export default function InboundReadinessDashboard() {
@@ -30,6 +31,11 @@ export default function InboundReadinessDashboard() {
         {/* Lead Routing + CRM Linkage — full width */}
         <div className="mt-4">
           <LeadRoutingCrmLinkageCard />
+        </div>
+
+        {/* Job Failure + Dead Letter Recovery — full width */}
+        <div className="mt-4">
+          <JobFailureDeadLetterRecoveryCard />
         </div>
 
         {/* Footer note */}
