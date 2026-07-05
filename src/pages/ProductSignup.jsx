@@ -1,15 +1,19 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { Shield, X } from "lucide-react";
+import { Shield, X, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { trackCTA } from "@/lib/analytics";
 import { setPageMetadata } from "@/lib/seo";
+import { getPackageOffer, normalizePackageKey } from "@/lib/salesCatalog";
 import CheckoutStepper from "@/components/checkout/CheckoutStepper";
 import CheckoutOrderSummary from "@/components/checkout/CheckoutOrderSummary";
 import CheckoutFooter from "@/components/checkout/CheckoutFooter";
 import AccountSignupForm from "@/components/checkout/AccountSignupForm";
 import BillingInformationForm from "@/components/checkout/BillingInformationForm";
 
+// ── Safe plan definitions with fallback defaults ──
+// These are display-only; the backend (createCheckoutSession) resolves
+// the actual Stripe price IDs from the canonical salesCatalog.
 const PLANS = [
   {
     id: "starter_system",
@@ -46,10 +50,12 @@ const FORM_STORAGE_KEY = "clientsurge_signup_form";
 const REQUIRED_FIELDS_STEP1 = ["firstName", "lastName", "businessName", "email", "phone"];
 const CHECKOUT_TIMEOUT_MS = 20000;
 
-function normalizePlanParam(value) {
-  const raw = String(value || "").trim().toLowerCase().replace(/[\s_]+/g, "-");
+// ── Safe plan resolution — never throws, always returns a valid plan or null ──
+function resolvePlan(pkgParam) {
+  if (!pkgParam) return null;
+  const raw = String(pkgParam).trim().toLowerCase().replace(/[\s_]+/g, "-");
   const match = PLANS.find((plan) => plan.aliases.some((alias) => alias.replace(/_/g, "-") === raw));
-  return match?.id || DEFAULT_PLAN_ID;
+  return match || null;
 }
 
 function validateField(field, value) {
@@ -84,11 +90,80 @@ function isEmbeddedPreview() {
   try { return window.self !== window.top; } catch { return true; }
 }
 
+// ── Error fallback component for invalid/missing package ──
+function PackageError({ pkgParam, onRetry }) {
+  return (
+    <div className="min-h-screen bg-white flex items-center justify-center px-4">
+      <div className="max-w-md text-center">
+        <div
+          className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
+          style={{ background: "linear-gradient(135deg, #003B8F, #00AEEF)" }}
+        >
+          <AlertCircle className="w-8 h-8 text-white" />
+        </div>
+        <h1 className="text-2xl font-bold text-[#333] mb-3">Package Not Found</h1>
+        <p className="text-sm text-[#666] mb-6 leading-relaxed">
+          {pkgParam
+            ? `We couldn't find a package matching "${pkgParam}". Please choose from our available systems.`
+            : "No package was selected. Please choose from our available systems."}
+        </p>
+        <div className="flex flex-wrap gap-3 justify-center">
+          <Link
+            to="/pricing"
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold text-white"
+            style={{ background: "linear-gradient(90deg, #0079c1, #005691)" }}
+          >
+            <ArrowLeft className="w-4 h-4" />
+            Browse Packages
+          </Link>
+          <button
+            onClick={onRetry}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-bold border border-[#ccc] text-[#333] hover:bg-gray-50 transition-colors"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function ProductSignup() {
   const [searchParams, setSearchParams] = useSearchParams();
   const pkgParam = searchParams.get("package") || searchParams.get("plan") || "";
-  const selectedPlanId = normalizePlanParam(pkgParam);
-  const selectedPlan = useMemo(() => PLANS.find((p) => p.id === selectedPlanId) || PLANS.find((p) => p.id === DEFAULT_PLAN_ID), [selectedPlanId]);
+
+  // ── Safe plan resolution with fallback ──
+  const resolvedPlan = useMemo(() => resolvePlan(pkgParam), [pkgParam]);
+  const selectedPlanId = resolvedPlan?.id || DEFAULT_PLAN_ID;
+  const selectedPlan = useMemo(
+    () => PLANS.find((p) => p.id === selectedPlanId) || PLANS.find((p) => p.id === DEFAULT_PLAN_ID),
+    [selectedPlanId]
+  );
+
+  // ── Verify the package has valid Stripe config from salesCatalog ──
+  const packageOffer = useMemo(() => {
+    try {
+      return getPackageOffer(selectedPlanId);
+    } catch {
+      return null;
+    }
+  }, [selectedPlanId]);
+
+  const hasValidStripeConfig = !!(packageOffer?.setup_price_id && packageOffer?.monthly_price_id);
+
+  const [configError, setConfigError] = useState(null);
+
+  useEffect(() => {
+    // If package param exists but can't be resolved, show error
+    if (pkgParam && !resolvedPlan) {
+      setConfigError(`Unknown package: "${pkgParam}"`);
+    } else if (selectedPlanId && !hasValidStripeConfig) {
+      setConfigError(`Package "${selectedPlanId}" is missing Stripe pricing configuration. Please contact support.`);
+    } else {
+      setConfigError(null);
+    }
+  }, [pkgParam, resolvedPlan, selectedPlanId, hasValidStripeConfig]);
 
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState(() => {
@@ -126,26 +201,30 @@ export default function ProductSignup() {
   const [step2TermsAgreed, setStep2TermsAgreed] = useState(false);
 
   useEffect(() => {
-    return setPageMetadata({
-      title: "Complete Your ClientSurge System Signup",
-      description: "Choose Starter, Growth, or Pro and continue to secure checkout for your ClientSurge AI automation system.",
-      canonicalPath: "/product-signup",
-      robots: "noindex,nofollow",
-    });
+    try {
+      return setPageMetadata({
+        title: "Complete Your ClientSurge System Signup",
+        description: "Choose Starter, Growth, or Pro and continue to secure checkout for your ClientSurge AI automation system.",
+        canonicalPath: "/product-signup",
+        robots: "noindex,nofollow",
+      });
+    } catch (e) {
+      console.warn("[ProductSignup] setPageMetadata failed:", e);
+    }
   }, []);
 
   useEffect(() => { window.scrollTo({ top: 0, left: 0, behavior: "auto" }); }, []);
-  useEffect(() => { trackCTA("product_signup_view", "product_signup", { package_id: selectedPlanId }); }, [selectedPlanId]);
+  useEffect(() => { try { trackCTA("product_signup_view", "product_signup", { package_id: selectedPlanId }); } catch {} }, [selectedPlanId]);
   useEffect(() => { try { localStorage.setItem(FORM_STORAGE_KEY, JSON.stringify(formData)); } catch {} }, [formData]);
 
-  const setSelectedPlanId = (planId) => {
+  const setSelectedPlanId = useCallback((planId) => {
     const next = new URLSearchParams(searchParams);
     next.set("package", planId);
     next.delete("plan");
     setSearchParams(next, { replace: true });
     setCheckoutError(null);
-    trackCTA(`signup_select_${planId}`, "product_signup", { package_id: planId });
-  };
+    try { trackCTA(`signup_select_${planId}`, "product_signup", { package_id: planId }); } catch {}
+  }, [searchParams, setSearchParams]);
 
   const handleFieldChange = (field, value) => {
     setFormData((prev) => ({ ...prev, [field]: value }));
@@ -169,7 +248,7 @@ export default function ProductSignup() {
     if (!validateStep1()) { setCheckoutError("Please complete the highlighted fields before continuing."); return; }
     setCurrentStep(2);
     window.scrollTo({ top: 0, behavior: "smooth" });
-    trackCTA("signup_step1_complete", "product_signup", { package_id: selectedPlanId });
+    try { trackCTA("signup_step1_complete", "product_signup", { package_id: selectedPlanId }); } catch {}
   };
 
   const handleBack = () => {
@@ -180,13 +259,26 @@ export default function ProductSignup() {
 
   const handleCheckout = async () => {
     setCheckoutError(null);
+
+    // Guard: embedded preview iframe
     if (isEmbeddedPreview()) {
       try { window.open(window.location.href, "_blank", "noopener,noreferrer"); } catch {}
-      setCheckoutError("Checkout must run in a full browser tab, not inside an embedded preview. I opened a new tab; continue checkout there.");
+      setCheckoutError("Checkout must run in a full browser tab, not inside an embedded preview. A new tab was opened — continue checkout there.");
       return;
     }
+
+    // Guard: terms agreed
     if (!step2TermsAgreed) { setCheckoutError("Please agree to the terms to continue."); return; }
+
+    // Guard: form valid
     if (!validateStep1()) { setCurrentStep(1); setCheckoutError("Please complete the highlighted fields before checkout."); return; }
+
+    // Guard: valid Stripe config
+    if (!hasValidStripeConfig) {
+      setCheckoutError(`This package (${selectedPlanId}) is missing Stripe pricing configuration. Please contact support or choose a different package.`);
+      return;
+    }
+
     setCheckoutLoading(true);
     try {
       const fullName = `${formData.firstName} ${formData.mi} ${formData.lastName}`.replace(/\s+/g, " ").trim();
@@ -200,10 +292,16 @@ export default function ProductSignup() {
         success_url: `${window.location.origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${window.location.origin}/product-signup?package=${selectedPlanId}`,
       };
+
       const response = await withCheckoutTimeout(base44.functions.invoke("createCheckoutSession", payload));
       const url = response?.data?.url || response?.url;
-      if (!url) throw new Error(response?.data?.error || response?.error || "No checkout URL returned.");
-      trackCTA("checkout_redirect", "product_signup", { package_id: selectedPlanId });
+
+      if (!url) {
+        throw new Error(response?.data?.error || response?.error || "No checkout URL returned by the server.");
+      }
+
+      try { trackCTA("checkout_redirect", "product_signup", { package_id: selectedPlanId }); } catch {}
+
       try {
         sessionStorage.setItem("clientsurge:last-checkout-session", JSON.stringify({
           package_id: selectedPlanId,
@@ -213,9 +311,11 @@ export default function ProductSignup() {
         }));
         localStorage.removeItem(FORM_STORAGE_KEY);
       } catch {}
+
       window.location.assign(url);
     } catch (err) {
-      setCheckoutError(`${getCheckoutErrorMessage(err)} Use Book help or Contact support below if checkout does not recover.`);
+      console.error("[ProductSignup] Checkout error:", err);
+      setCheckoutError(`${getCheckoutErrorMessage(err)} Use "Retry Checkout" below, or Book help / Contact support if checkout does not recover.`);
       setCheckoutLoading(false);
     }
   };
@@ -225,6 +325,36 @@ export default function ProductSignup() {
     return handleCheckout();
   };
 
+  const handleRetryCheckout = () => {
+    setCheckoutError(null);
+    handleCheckout();
+  };
+
+  // ── Render: invalid package fallback ──
+  if (configError && !resolvedPlan) {
+    return (
+      <div className="min-h-screen bg-white flex flex-col">
+        <div className="border-b border-[#eee]">
+          <Link to="/" className="flex items-center justify-center gap-2 py-5">
+            <Shield className="w-7 h-7" style={{ color: "#005691" }} fill="#005691" />
+            <span className="text-xl font-bold text-[#333] tracking-tight">ClientSurge</span>
+          </Link>
+        </div>
+        <PackageError
+          pkgParam={pkgParam}
+          onRetry={() => {
+            const next = new URLSearchParams(searchParams);
+            next.set("package", DEFAULT_PLAN_ID);
+            next.delete("plan");
+            setSearchParams(next, { replace: true });
+          }}
+        />
+        <CheckoutFooter />
+      </div>
+    );
+  }
+
+  // ── Render: valid package (even if Stripe config warning exists, show the form) ──
   return (
     <div className="min-h-screen bg-white flex flex-col">
       {/* Logo Header */}
@@ -246,6 +376,16 @@ export default function ProductSignup() {
             <button onClick={() => setBannerVisible(false)} className="text-white/60 hover:text-white flex-shrink-0">
               <X className="w-4 h-4" />
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* Stripe config warning (non-blocking) */}
+      {configError && (
+        <div className="w-full bg-amber-50 border-b border-amber-200">
+          <div className="max-w-5xl mx-auto px-4 py-2 flex items-center gap-2">
+            <AlertCircle className="w-4 h-4 text-amber-600 flex-shrink-0" />
+            <p className="text-xs text-amber-800">{configError}</p>
           </div>
         </div>
       )}
@@ -302,10 +442,23 @@ export default function ProductSignup() {
               termsAgreed={currentStep === 1 ? step1TermsAgreed : step2TermsAgreed}
               step={currentStep}
             />
+
+            {/* Retry + help links */}
             {checkoutError && (
-              <div className="mt-3 flex flex-wrap gap-2 justify-center">
-                <Link to="/book" className="text-xs font-bold text-[#005691] underline">Book help</Link>
-                <Link to="/contact" className="text-xs font-bold text-[#005691] underline">Contact support</Link>
+              <div className="mt-3 flex flex-col gap-2">
+                <button
+                  onClick={handleRetryCheckout}
+                  disabled={checkoutLoading}
+                  className="w-full py-2.5 rounded-lg text-sm font-bold text-white flex items-center justify-center gap-2 disabled:opacity-60"
+                  style={{ background: checkoutLoading ? "#9cb3c9" : "#005691" }}
+                >
+                  <RefreshCw className={`w-4 h-4 ${checkoutLoading ? "animate-spin" : ""}`} />
+                  Retry Checkout
+                </button>
+                <div className="flex flex-wrap gap-2 justify-center">
+                  <Link to="/book" className="text-xs font-bold text-[#005691] underline">Book help</Link>
+                  <Link to="/contact" className="text-xs font-bold text-[#005691] underline">Contact support</Link>
+                </div>
               </div>
             )}
           </div>

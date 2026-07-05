@@ -7,64 +7,34 @@ import '@/design-system.css'
 import '@/admin-mobile-hotfix.css'
 import { installAdminMobileRuntime } from '@/lib/adminMobileRuntime'
 
-const CLIENTSURGE_ROOT_KEY = '__clientsurgeReactRoot__';
-const CLIENTSURGE_RUNTIME_KEY = '__clientsurgeRuntimeInstalled__';
-const CLIENTSURGE_APP_ROOT_ID = 'clientsurge-app-root';
+// ── Standard React 18 mount — no repair hacks, no nested mount divs ──
+// If #root is missing from index.html, show a visible error instead of
+// silently creating an empty div that leaves a blank white page.
 
-function getReactContainerMarkerCount(node) {
-  if (!node) return 0;
-  return Object.keys(node).filter((key) => key.startsWith('__reactContainer$')).length;
-}
-
-function getOrCreateDocumentRoot() {
-  let rootElement = document.getElementById('root');
-
-  if (!rootElement) {
-    rootElement = document.createElement('div');
-    rootElement.id = 'root';
-    rootElement.setAttribute('data-clientsurge-root-repaired', 'true');
-
-    const firstBodyChild = document.body?.firstChild || null;
-    if (document.body) {
-      document.body.insertBefore(rootElement, firstBodyChild);
-      console.warn('ClientSurge repaired missing #root element before app mount.');
-    }
-  }
-
-  return rootElement;
-}
-
-function getOrCreateClientSurgeMount(rootElement) {
-  const safeRootElement = rootElement || getOrCreateDocumentRoot();
-
-  if (!safeRootElement) {
-    throw new Error('ClientSurge root element #root could not be created.');
-  }
-
-  let mountElement = document.getElementById(CLIENTSURGE_APP_ROOT_ID);
-  if (!mountElement) {
-    mountElement = document.createElement('div');
-    mountElement.id = CLIENTSURGE_APP_ROOT_ID;
-    safeRootElement.appendChild(mountElement);
-  }
-
-  // If Base44/editor/runtime code already claimed this mount with a React root but
-  // our window handle was lost, React 18 throws minified error #299 on createRoot.
-  // Replace the empty mount node and claim the fresh node instead of crashing the site.
-  if (!window[CLIENTSURGE_ROOT_KEY] && getReactContainerMarkerCount(mountElement) > 0) {
-    const freshMount = document.createElement('div');
-    freshMount.id = CLIENTSURGE_APP_ROOT_ID;
-    mountElement.replaceWith(freshMount);
-    mountElement = freshMount;
-  }
-
-  return mountElement;
+function showFatalError(message) {
+  const body = document.body;
+  if (!body) return;
+  body.innerHTML = `
+    <div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;font-family:Inter,system-ui,sans-serif;background:#fff;">
+      <div style="max-width:480px;text-align:center;">
+        <div style="width:64px;height:64px;border-radius:16px;background:linear-gradient(135deg,#003B8F,#00AEEF);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;">
+          <span style="color:#fff;font-size:24px;font-weight:900;">!</span>
+        </div>
+        <h1 style="font-size:20px;font-weight:800;color:#0f172a;margin:0 0 8px;">Application failed to load</h1>
+        <p style="font-size:14px;color:#64748b;line-height:1.6;margin:0 0 24px;">${message}</p>
+        <div style="display:flex;gap:12px;justify-content:center;">
+          <button onclick="window.location.reload()" style="padding:10px 24px;border-radius:999px;background:linear-gradient(90deg,#0079c1,#005691);color:#fff;font-weight:700;border:none;cursor:pointer;font-size:14px;">Refresh Page</button>
+          <a href="/" style="padding:10px 24px;border-radius:999px;border:1px solid #cbd5e1;color:#0f172a;font-weight:700;text-decoration:none;font-size:14px;">Go Home</a>
+        </div>
+      </div>
+    </div>
+  `;
 }
 
 function closeInitialAdminMobileDrawer() {
-  if (typeof window === 'undefined' || typeof document === 'undefined') return;
+  if (typeof window === "undefined" || typeof document === "undefined") return;
   if (!/^\/(admin|dashboard|admin-settings)(\/|$)/i.test(window.location.pathname)) return;
-  if (!window.matchMedia || !window.matchMedia('(max-width: 1023px)').matches) return;
+  if (!window.matchMedia || !window.matchMedia("(max-width: 1023px)").matches) return;
 
   let closed = false;
   let attempts = 0;
@@ -74,8 +44,8 @@ function closeInitialAdminMobileDrawer() {
     attempts += 1;
 
     const overlay = Array.from(document.querySelectorAll('div[class*="z-30"]')).find((el) => {
-      const className = String(el.className || '');
-      return className.includes('fixed') && className.includes('inset-0') && className.includes('lg:hidden') && className.includes('bg-black');
+      const className = String(el.className || "");
+      return className.includes("fixed") && className.includes("inset-0") && className.includes("lg:hidden") && className.includes("bg-black");
     });
 
     if (overlay) {
@@ -90,79 +60,53 @@ function closeInitialAdminMobileDrawer() {
   window.setTimeout(closeIfOpen, 0);
 }
 
-function getClientSurgeRoot(rootElement) {
-  const mountElement = getOrCreateClientSurgeMount(rootElement);
-
-  if (!window[CLIENTSURGE_ROOT_KEY]) {
-    window[CLIENTSURGE_ROOT_KEY] = ReactDOM.createRoot(mountElement);
-  }
-
-  return window[CLIENTSURGE_ROOT_KEY];
-}
-
-function installClientSurgeRuntimeOnce() {
-  if (window[CLIENTSURGE_RUNTIME_KEY]) return;
-  window[CLIENTSURGE_RUNTIME_KEY] = true;
-  closeInitialAdminMobileDrawer();
-  installAdminMobileRuntime();
-}
-
-function markClientSurgeMounted() {
-  document.documentElement.classList.add('clientsurge-app-mounted');
-  const staticFallback = document.querySelector('.static-fallback');
-  if (staticFallback) {
-    staticFallback.style.display = 'none';
-  }
-}
-
-function showStaticFallback(rootElement) {
-  const safeRootElement = rootElement || getOrCreateDocumentRoot();
-  document.documentElement.classList.remove('clientsurge-app-mounted');
-  document.documentElement.classList.add('app-fallback-visible');
-  const staticFallback = document.querySelector('.static-fallback');
-  if (staticFallback) {
-    staticFallback.style.display = 'block';
-  } else if (safeRootElement) {
-    safeRootElement.innerHTML = `<div style="padding:20px;color:#0f172a;font-family:Inter,system-ui,sans-serif"><h1>ClientSurge Systems</h1><p>The site shell loaded but the application runtime failed. Please refresh.</p></div>`;
-  }
-}
-
-// Initialize with error boundary for debugging
 function initApp() {
-  const rootElement = getOrCreateDocumentRoot();
+  const rootElement = document.getElementById("root");
+
+  if (!rootElement) {
+    console.error("[ClientSurge] Fatal: #root element not found in DOM. index.html may have been modified by an edge worker or is stale.");
+    showFatalError("The page container could not be found. This may be caused by a stale cache or network issue. Please refresh the page.");
+    return;
+  }
 
   try {
-    const app = <App />
-    getClientSurgeRoot(rootElement).render(
-      import.meta.env.DEV ? <React.StrictMode>{app}</React.StrictMode> : app
-    )
-    markClientSurgeMounted();
-    installClientSurgeRuntimeOnce();
+    // Do NOT manually hide the static fallback — React's createRoot().render()
+    // will naturally replace #root's children when it mounts. The static fallback
+    // stays visible until React takes over, preventing a blank white page if
+    // the mount fails or is delayed.
+    const root = ReactDOM.createRoot(rootElement);
+    root.render(
+      import.meta.env.DEV ? <React.StrictMode><App /></React.StrictMode> : <App />
+    );
+
+    // Mark as mounted so the static fallback CSS knows to stay hidden
+    document.documentElement.classList.add("clientsurge-app-mounted");
+
+    // Install admin mobile runtime helpers
+    closeInitialAdminMobileDrawer();
+    installAdminMobileRuntime();
   } catch (err) {
-    console.error('Critical error rendering App:', err);
-    showStaticFallback(rootElement);
+    console.error("[ClientSurge] Critical error rendering App:", err);
+    showFatalError("An unexpected error occurred while loading the application. Please refresh the page or contact support if the problem persists.");
   }
 }
 
-initApp()
+initApp();
 
-// Fix #40: Register service worker for static asset caching on repeat visits.
-// Only register in production to avoid stale shells during development.
-if ('serviceWorker' in navigator && import.meta.env.PROD) {
-  window.addEventListener('load', () => {
+// Register service worker for static asset caching in production only
+if ("serviceWorker" in navigator && import.meta.env.PROD) {
+  window.addEventListener("load", () => {
     navigator.serviceWorker
-      .register('/sw.js', { scope: '/' })
+      .register("/sw.js", { scope: "/" })
       .then((registration) => {
-        // Check for updates every 60 minutes
         setInterval(() => registration.update().catch(() => {}), 60 * 60 * 1000);
       })
       .catch((error) => {
-        console.warn('Service worker registration failed:', error?.message);
+        console.warn("Service worker registration failed:", error?.message);
       });
   });
-} else if ('serviceWorker' in navigator) {
-  // Dev mode: clear existing workers to avoid stale shells
-  window.addEventListener('load', () => {
+} else if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
     navigator.serviceWorker
       .getRegistrations()
       .then((registrations) => Promise.all(registrations.map((registration) => registration.unregister())))
