@@ -60,6 +60,37 @@ const STATUS_META = {
   },
 };
 
+const INTERNAL_EVIDENCE_PATTERNS = /clientsurge-install\.internal|clientsurge\.test|test\+|test-|^test\b|smoke|\bqa\b|internal|backfill|example\.com/i;
+const OWNER_EVIDENCE_PATTERNS = /nolanf|nolan\./i;
+
+function classifyProofEvidenceQuality(proofLog) {
+  if (!proofLog) return "unknown";
+  const email = (proofLog.client_email || "").toLowerCase();
+  const businessName = (proofLog.business_name || "").toLowerCase();
+  if (OWNER_EVIDENCE_PATTERNS.test(email) || OWNER_EVIDENCE_PATTERNS.test(businessName)) return "owner";
+  if (INTERNAL_EVIDENCE_PATTERNS.test(email) || INTERNAL_EVIDENCE_PATTERNS.test(businessName)) return "internal_test";
+  return "production_customer";
+}
+
+const EVIDENCE_QUALITY_META = {
+  production_customer: { label: "Production Evidence", color: "#059669", bg: "rgba(5,150,105,0.07)", border: "rgba(5,150,105,0.2)" },
+  internal_test: { label: "QA Proof — Prod Approval Pending", color: "#d97706", bg: "rgba(217,119,6,0.07)", border: "rgba(217,119,6,0.2)" },
+  owner: { label: "Owner Evidence — Prod Approval Pending", color: "#d97706", bg: "rgba(217,119,6,0.07)", border: "rgba(217,119,6,0.2)" },
+  unknown: { label: "Evidence Quality Unknown", color: "#6b7280", bg: "rgba(107,114,128,0.07)", border: "rgba(107,114,128,0.2)" },
+};
+
+function EvidenceQualityBadge({ quality }) {
+  const meta = EVIDENCE_QUALITY_META[quality] || EVIDENCE_QUALITY_META.unknown;
+  return (
+    <span
+      className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold"
+      style={{ background: meta.bg, border: `1px solid ${meta.border}`, color: meta.color }}
+    >
+      {meta.label}
+    </span>
+  );
+}
+
 function StatusBadge({ status }) {
   const meta = STATUS_META[status] || STATUS_META.missing;
   const Icon = meta.icon;
@@ -98,7 +129,12 @@ function ServiceCard({ serviceKey, proofLog }) {
             <p className="text-[11px] text-gray-400">Proof Status</p>
           </div>
         </div>
-        <StatusBadge status={status} />
+        <div className="flex flex-wrap gap-2">
+          <StatusBadge status={status} />
+          {proofLog && status === "pass" && (
+            <EvidenceQualityBadge quality={classifyProofEvidenceQuality(proofLog)} />
+          )}
+        </div>
       </div>
 
       <div className="px-5 py-4 space-y-3 text-sm">
@@ -138,6 +174,19 @@ function ServiceCard({ serviceKey, proofLog }) {
                 <span>Provider ID: {proofLog.provider_message_id}</span>
               )}
               {proofLog.business_name && <span>Client: {proofLog.business_name}</span>}
+              {proofLog.client_email && <span>Email: {proofLog.client_email}</span>}
+            </div>
+            {/* Linked evidence IDs */}
+            <div className="flex flex-wrap gap-x-4 gap-y-1 pt-1 text-[11px] text-gray-400">
+              {proofLog.communication_log_id && (
+                <span>CommLog: {proofLog.communication_log_id.slice(0, 12)}…</span>
+              )}
+              {proofLog.communication_event_id && (
+                <span>CommEvent: {proofLog.communication_event_id.slice(0, 12)}…</span>
+              )}
+              {!proofLog.communication_log_id && !proofLog.communication_event_id && (
+                <span style={{ color: "#d97706" }}>⚠ No linked CommunicationLog/Event IDs</span>
+              )}
             </div>
           </div>
         ) : (
@@ -227,6 +276,22 @@ export default function ProofCenterPanel() {
           <p className="text-xs text-amber-700 leading-relaxed">
             <strong>This page does not run tests.</strong> It shows what evidence is required before a service can be
             marked trusted. No SMS, calls, or external communications are triggered from this view.
+          </p>
+        </div>
+
+        {/* QA proof vs production approval banner */}
+        <div
+          className="mt-3 rounded-lg p-3 flex items-start gap-2.5"
+          style={{ background: "rgba(0,174,239,0.05)", border: "1px solid rgba(0,174,239,0.18)" }}
+        >
+          <ShieldCheck className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: "#00AEEF" }} />
+          <p className="text-xs text-gray-700 leading-relaxed">
+            <strong>QA Proof vs Production Live:</strong> A "Pass" badge means the mechanical proof ran successfully.
+            The evidence quality badge distinguishes whether the proof used real production customer data (green) or
+            internal/test/owner data (amber). Capabilities with internal/test/owner evidence are{" "}
+            <strong>"QA proof passed — production approval pending"</strong> and require either re-testing with a real
+            production customer or explicit admin approval before going live. <code>went_live_at</code> and{" "}
+            <code>client_approved</code> are not set automatically.
           </p>
         </div>
 

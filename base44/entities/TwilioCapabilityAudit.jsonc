@@ -79,6 +79,25 @@
       "type": "string",
       "title": "Audit Run ID",
       "description": "Groups all capability records from the same computation run"
+    },
+    "evidence_quality": {
+      "type": "string",
+      "title": "Evidence Quality",
+      "enum": [
+        "production_customer",
+        "internal_test",
+        "owner",
+        "mixed",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Classifies whether proof evidence is from a real production customer, internal/test data, or owner account."
+    },
+    "qa_proof_passed": {
+      "type": "boolean",
+      "title": "QA Proof Passed (Production Approval Pending)",
+      "default": false,
+      "description": "True when mechanical proof passed but evidence is internal/test/owner \u2014 production live approval still pending."
     }
   },
   "required": [

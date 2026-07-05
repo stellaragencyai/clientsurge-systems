@@ -1,5 +1,17 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
+const INTERNAL_EVIDENCE_PATTERNS = /clientsurge-install\.internal|clientsurge\.test|test\+|test-|^test\b|smoke|\bqa\b|internal|backfill|example\.com/i;
+const OWNER_EVIDENCE_PATTERNS = /nolanf|nolan\./i;
+
+function classifyEvidenceQuality(proofLog) {
+  if (!proofLog) return "unknown";
+  const email = (proofLog.client_email || "").toLowerCase();
+  const businessName = (proofLog.business_name || "").toLowerCase();
+  if (OWNER_EVIDENCE_PATTERNS.test(email) || OWNER_EVIDENCE_PATTERNS.test(businessName)) return "owner";
+  if (INTERNAL_EVIDENCE_PATTERNS.test(email) || INTERNAL_EVIDENCE_PATTERNS.test(businessName)) return "internal_test";
+  return "production_customer";
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -36,6 +48,15 @@ Deno.serve(async (req) => {
       if (log.status === 'pass') proofByService[key].pass++;
       else if (log.status === 'fail') proofByService[key].fail++;
       else proofByService[key].pending++;
+    }
+
+    // ── Evidence quality per service key (for passing proof logs) ──
+    const evidenceQualityByService = {};
+    for (const log of proofLogList) {
+      if (!log.service_key || log.status !== "pass") continue;
+      if (!evidenceQualityByService[log.service_key]) {
+        evidenceQualityByService[log.service_key] = classifyEvidenceQuality(log);
+      }
     }
 
     // ── SMS delivery proof health ──
@@ -184,16 +205,22 @@ Deno.serve(async (req) => {
       if (hasProof && hasSmsRecords && missedCallLogs.some(l => l.delivery_status === 'delivered')) status = 'green';
       else if (hasUrl || hasSmsRecords) status = 'yellow';
 
+      const mctbEvidenceQuality = evidenceQualityByService['missed_call_text_back'] || 'unknown';
+      const mctbQaProofPassed = hasProof && mctbEvidenceQuality !== 'production_customer';
       capabilities.push({
         capability_key: 'missed_call_text_back',
         capability_name: 'Missed Call Text-Back',
         status_color: status,
         evidence_entities_checked: evidence,
-        evidence_summary: `Webhook URL present: ${hasUrl}. Missed-call SMS logs: ${missedCallLogs.length}. Delivered: ${missedCallLogs.filter(l => l.delivery_status === 'delivered').length}. Proof passes: ${proofByService['missed_call_text_back']?.pass || 0}.`,
+        evidence_summary: `Webhook URL present: ${hasUrl}. Missed-call SMS logs: ${missedCallLogs.length}. Delivered: ${missedCallLogs.filter(l => l.delivery_status === 'delivered').length}. Proof passes: ${proofByService['missed_call_text_back']?.pass || 0}. Evidence quality: ${mctbEvidenceQuality}.`,
         blockers,
         next_required_action: webhookTestHasError && /missed/i.test(lastTestResult)
           ? 'Repair Twilio missed-call webhook URL — Twilio is getting 404. Fix the Base44 function route, then retest with a real inbound call.'
-          : 'Run a real missed-call test and record AutomationProofLog for missed_call_text_back.',
+          : mctbQaProofPassed
+            ? 'QA proof passed but evidence is internal/test/owner — re-run with production customer missed call or admin-approve for internal launch'
+            : 'Run a real missed-call test and record AutomationProofLog for missed_call_text_back.',
+        evidence_quality: mctbEvidenceQuality,
+        qa_proof_passed: mctbQaProofPassed,
       });
     }
 
@@ -212,14 +239,20 @@ Deno.serve(async (req) => {
       if (hasProof && deliveredSpeedLogs.length > 0) status = 'green';
       else if (speedLeads.length > 0 || twLogList.some(l => l.trigger_name && l.trigger_name.includes('initial'))) status = 'yellow';
 
+      const ilrEvidenceQuality = evidenceQualityByService['instant_lead_response'] || 'unknown';
+      const ilrQaProofPassed = hasProof && ilrEvidenceQuality !== 'production_customer';
       capabilities.push({
         capability_key: 'website_speed_to_lead',
         capability_name: 'Website Speed-to-Lead SMS/Email',
         status_color: status,
         evidence_entities_checked: evidence,
-        evidence_summary: `WebsiteLeads with initial response: ${speedLeads.length}. Delivered speed-to-lead SMS: ${deliveredSpeedLogs.length}. Proof passes: ${proofByService['instant_lead_response']?.pass || 0}.`,
+        evidence_summary: `WebsiteLeads with initial response: ${speedLeads.length}. Delivered speed-to-lead SMS: ${deliveredSpeedLogs.length}. Proof passes: ${proofByService['instant_lead_response']?.pass || 0}. Evidence quality: ${ilrEvidenceQuality}.`,
         blockers,
-        next_required_action: 'Confirm delivered Twilio status callback on a new non-test lead. Record AutomationProofLog for instant_lead_response.',
+        next_required_action: ilrQaProofPassed
+          ? 'QA proof passed but evidence is internal/test/owner — re-run with production customer lead or admin-approve for internal launch'
+          : 'Confirm delivered Twilio status callback on a new non-test lead. Record AutomationProofLog for instant_lead_response.',
+        evidence_quality: ilrEvidenceQuality,
+        qa_proof_passed: ilrQaProofPassed,
       });
     }
 
@@ -437,6 +470,8 @@ Deno.serve(async (req) => {
       // Bulk create new audit records
       const records = capabilities.map(cap => ({
         ...cap,
+        evidence_quality: cap.evidence_quality || 'unknown',
+        qa_proof_passed: cap.qa_proof_passed || false,
         last_checked_at: now,
         computed_by: user.email || 'admin',
         safe_to_show_public: false,

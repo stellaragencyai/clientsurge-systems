@@ -8,11 +8,15 @@
  *   automation_delivery_gate: blocked while AutomationProofLog is empty
  *   twilio_webhook_route_health: blocked while any route returns non-200
  *
- * Route health is a blocker source — if routes return 404/405,
- * downstream gates cannot progress.
- *
- * Also checks AutomationChecklist truth: flags should not be true
- * until evidence exists.
+ * Sprint 1 proof classification tightening:
+ *   - Proof logs that pass are classified by evidence quality:
+ *     production_customer | internal_test | owner | unknown
+ *   - If evidence is internal/test/owner, gate stays proof_passed but verdict says
+ *     "QA proof passed — production approval pending"
+ *   - approval_required stays true; went_live_at and client_approved are NOT set
+ *   - Proof logs are enriched with communication_log_id and communication_event_id
+ *     when matching evidence records exist
+ *   - Warnings are returned for proof logs missing direct evidence IDs
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
@@ -22,10 +26,26 @@ function isRealSid(value, prefix) {
   return new RegExp(`^${prefix}[a-zA-Z0-9]+$`).test(value);
 }
 
+// ── Evidence quality classification ──
+const INTERNAL_EVIDENCE_PATTERNS = /clientsurge-install\.internal|clientsurge\.test|test\+|test-|^test\b|smoke|\bqa\b|internal|backfill|example\.com/i;
+const OWNER_EVIDENCE_PATTERNS = /nolanf|nolan\./i;
+
+function classifyEvidenceQuality(proofLog) {
+  if (!proofLog) return "unknown";
+  const email = (proofLog.client_email || "").toLowerCase();
+  const businessName = (proofLog.business_name || "").toLowerCase();
+
+  if (OWNER_EVIDENCE_PATTERNS.test(email) || OWNER_EVIDENCE_PATTERNS.test(businessName)) {
+    return "owner";
+  }
+  if (INTERNAL_EVIDENCE_PATTERNS.test(email) || INTERNAL_EVIDENCE_PATTERNS.test(businessName)) {
+    return "internal_test";
+  }
+  return "production_customer";
+}
+
+// ── Route health check ──
 async function checkRouteHealth(base44) {
-  // Read fresh route health from AdminSettings.last_webhook_test_result
-  // (not from LaunchGate cache, which may be stale if route health checker
-  // and gate recalculation ran concurrently).
   try {
     const [settings] = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
     if (settings?.last_webhook_test_result) {
@@ -43,7 +63,6 @@ async function checkRouteHealth(base44) {
     }
   } catch (_) {}
 
-  // Fallback to LaunchGate if AdminSettings unavailable
   try {
     const gates = await base44.asServiceRole.entities.LaunchGate.list("", 50);
     const routeGate = gates?.find((g) => g.gate_key === "twilio_webhook_route_health");
@@ -58,6 +77,7 @@ async function checkRouteHealth(base44) {
   }
 }
 
+// ── Instant lead evidence ──
 async function checkInstantLeadEvidence(base44) {
   try {
     const logs = await base44.asServiceRole.entities.CommunicationLog.filter(
@@ -97,6 +117,7 @@ async function checkInstantLeadEvidence(base44) {
   }
 }
 
+// ── Missed call evidence ──
 async function checkMissedCallEvidence(base44) {
   try {
     const callEvents = await base44.asServiceRole.entities.CommunicationEvent.filter(
@@ -137,6 +158,7 @@ async function checkMissedCallEvidence(base44) {
   }
 }
 
+// ── Automation proof logs (returns records for evidence classification) ──
 async function checkAutomationProofLogs(base44) {
   try {
     const logs = await base44.asServiceRole.entities.AutomationProofLog.list("-created_date", 50);
@@ -149,12 +171,14 @@ async function checkAutomationProofLogs(base44) {
       is_empty: all.length === 0,
       instant_lead_passed: all.filter((p) => p.service_key === "instant_lead_response" && p.status === "pass").length,
       missed_call_passed: all.filter((p) => p.service_key === "missed_call_text_back" && p.status === "pass").length,
+      records: all,
     };
   } catch (_) {
-    return { total: 0, passed: 0, pending: 0, failed: 0, is_empty: true, instant_lead_passed: 0, missed_call_passed: 0 };
+    return { total: 0, passed: 0, pending: 0, failed: 0, is_empty: true, instant_lead_passed: 0, missed_call_passed: 0, records: [] };
   }
 }
 
+// ── Automation checklist truth ──
 async function checkAutomationChecklists(base44) {
   try {
     const checklists = await base44.asServiceRole.entities.AutomationChecklist.filter(
@@ -184,6 +208,77 @@ async function checkAutomationChecklists(base44) {
   }
 }
 
+// ── Enrich proof logs with communication_log_id and communication_event_id ──
+async function enrichProofLogsWithEvidenceIds(base44, proofLogRecords) {
+  const updates = [];
+  const warnings = [];
+
+  for (const log of proofLogRecords) {
+    if (!log.provider_message_id) {
+      if (!log.communication_log_id && !log.communication_event_id) {
+        warnings.push({
+          proof_log_id: log.id,
+          service_key: log.service_key,
+          warning: "Missing provider_message_id — cannot link to CommunicationLog/CommunicationEvent",
+        });
+      }
+      continue;
+    }
+
+    // Skip if both IDs already populated
+    if (log.communication_log_id && log.communication_event_id) continue;
+
+    const [matchingLogs, matchingEvents] = await Promise.all([
+      !log.communication_log_id
+        ? base44.asServiceRole.entities.CommunicationLog.filter(
+            { provider_message_id: log.provider_message_id },
+            "-created_date",
+            1
+          ).catch(() => [])
+        : Promise.resolve([]),
+      !log.communication_event_id
+        ? base44.asServiceRole.entities.CommunicationEvent.filter(
+            { provider_message_id: log.provider_message_id },
+            "-created_date",
+            1
+          ).catch(() => [])
+        : Promise.resolve([]),
+    ]);
+
+    const commLogId = matchingLogs?.[0]?.id;
+    const commEventId = matchingEvents?.[0]?.id;
+
+    if (!commLogId && !commEventId) {
+      warnings.push({
+        proof_log_id: log.id,
+        service_key: log.service_key,
+        provider_message_id: log.provider_message_id,
+        warning: "No matching CommunicationLog or CommunicationEvent found for provider_message_id",
+      });
+      continue;
+    }
+
+    const updateData = {};
+    if (commLogId && !log.communication_log_id) updateData.communication_log_id = commLogId;
+    if (commEventId && !log.communication_event_id) updateData.communication_event_id = commEventId;
+
+    if (Object.keys(updateData).length > 0) {
+      try {
+        await base44.asServiceRole.entities.AutomationProofLog.update(log.id, updateData);
+        updates.push({ proof_log_id: log.id, service_key: log.service_key, ...updateData });
+      } catch (err) {
+        warnings.push({
+          proof_log_id: log.id,
+          service_key: log.service_key,
+          warning: `Failed to update proof log evidence IDs: ${err.message}`,
+        });
+      }
+    }
+  }
+
+  return { updates, warnings };
+}
+
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
@@ -201,19 +296,37 @@ Deno.serve(async (req) => {
     const proofLogs = await checkAutomationProofLogs(base44);
     const checklists = await checkAutomationChecklists(base44);
 
-    const launchGates = await base44.asServiceRole.entities.LaunchGate.list("", 50);
+    // ── Enrich proof logs with evidence IDs ──
+    const proofEnrichment = await enrichProofLogsWithEvidenceIds(base44, proofLogs.records || []);
 
+    // ── Classify evidence quality for passing proof logs ──
+    const instantLeadPassLogs = (proofLogs.records || []).filter(
+      (p) => p.service_key === "instant_lead_response" && p.status === "pass"
+    );
+    const missedCallPassLogs = (proofLogs.records || []).filter(
+      (p) => p.service_key === "missed_call_text_back" && p.status === "pass"
+    );
+
+    const instantLeadEvidenceQuality = instantLeadPassLogs.length > 0
+      ? instantLeadPassLogs.map(classifyEvidenceQuality)[0]
+      : "unknown";
+    const missedCallEvidenceQuality = missedCallPassLogs.length > 0
+      ? missedCallPassLogs.map(classifyEvidenceQuality)[0]
+      : "unknown";
+
+    const launchGates = await base44.asServiceRole.entities.LaunchGate.list("", 50);
     const results = {};
 
     // ── Gate 1: instant_lead_response ──
     {
       const gate = launchGates?.find((g) => g.gate_key === "instant_lead_response");
-      let status, completion, proofPct, blocker, nextAction, verdict;
+      let status, completion, proofPct, blocker, nextAction, verdict, evidenceQuality;
 
       if (!routeHealth.healthy) {
         status = "blocked";
         completion = 10;
         proofPct = 0;
+        evidenceQuality = "unknown";
         blocker = `Route health: ${routeHealth.blocker || "unhealthy"}`;
         nextAction = "Repair webhook routes (run verifyTwilioWebhookRouteHealth)";
         verdict = "Blocked by route health";
@@ -221,20 +334,33 @@ Deno.serve(async (req) => {
         status = "blocked";
         completion = 25;
         proofPct = 0;
+        evidenceQuality = "unknown";
         blocker = "No delivered Twilio SMS evidence found";
         nextAction = "Send a real lead and wait for delivery callback";
         verdict = "Routes healthy but no delivery evidence";
       } else if (proofLogs.instant_lead_passed > 0) {
-        status = "proof_passed";
-        completion = 90;
-        proofPct = 100;
-        blocker = "Proof log passed — awaiting client sign-off for went_live_at";
-        nextAction = "Obtain client sign-off, then set went_live_at on AutomationChecklist";
-        verdict = "Proof passed — ready for go-live approval";
+        evidenceQuality = instantLeadEvidenceQuality;
+        if (evidenceQuality === "production_customer") {
+          status = "proof_passed";
+          completion = 90;
+          proofPct = 100;
+          blocker = "Proof log passed — awaiting client sign-off for went_live_at";
+          nextAction = "Obtain client sign-off, then set went_live_at on AutomationChecklist";
+          verdict = "Proof passed — ready for go-live approval";
+        } else {
+          // QA proof passed but evidence is internal/test/owner — do NOT treat as production-live
+          status = "proof_passed";
+          completion = 85;
+          proofPct = 90;
+          blocker = `QA proof passed — production approval pending (evidence quality: ${evidenceQuality})`;
+          nextAction = "Re-run proof with a real production customer lead, or admin explicitly approves QA proof for internal launch";
+          verdict = `QA proof passed — production approval pending (evidence quality: ${evidenceQuality})`;
+        }
       } else {
         status = "partial";
         completion = 60;
         proofPct = 50;
+        evidenceQuality = "unknown";
         blocker = "Delivery evidence exists — AutomationProofLog pass still required";
         nextAction = "Review evidence, then create AutomationProofLog with status=pass if evidence qualifies";
         verdict = "Evidence found — awaiting proof log creation";
@@ -246,14 +372,19 @@ Deno.serve(async (req) => {
         proof_percent: proofPct,
         current_blocker: blocker,
         next_action: nextAction,
+        evidence_quality: evidenceQuality,
         evidence_summary: JSON.stringify({
           route_healthy: routeHealth.healthy,
           delivery_evidence: instantLeadEvidence.has_evidence,
           qualified_count: instantLeadEvidence.qualified_count,
           latest_evidence: instantLeadEvidence.latest,
+          evidence_quality: evidenceQuality,
+          proof_log_has_communication_log_id: instantLeadPassLogs[0]?.communication_log_id ? true : false,
+          proof_log_has_communication_event_id: instantLeadPassLogs[0]?.communication_event_id ? true : false,
         }),
         last_checked_at: now,
         last_verdict: verdict,
+        approval_required: true,
       };
 
       if (gate) {
@@ -268,9 +399,8 @@ Deno.serve(async (req) => {
           required_categories: ["sms"],
           required_tasks: ["verify_sms_route", "send_real_lead", "verify_delivery_callback"],
           required_proofs: ["delivered_sms_communication_log", "automation_proof_log_pass"],
-          approval_required: true,
           ...updates,
-          unlock_condition_summary: "Routes healthy + delivered SMS evidence + AutomationProofLog pass",
+          unlock_condition_summary: "Routes healthy + delivered SMS evidence + AutomationProofLog pass + production-customer evidence quality (or admin approval of QA proof)",
         });
         results.instant_lead_response = { gate_id: created.id, ...updates };
       }
@@ -279,12 +409,13 @@ Deno.serve(async (req) => {
     // ── Gate 2: missed_call_text_back ──
     {
       const gate = launchGates?.find((g) => g.gate_key === "missed_call_text_back");
-      let status, completion, proofPct, blocker, nextAction, verdict;
+      let status, completion, proofPct, blocker, nextAction, verdict, evidenceQuality;
 
       if (!routeHealth.healthy) {
         status = "blocked";
         completion = 5;
         proofPct = 0;
+        evidenceQuality = "unknown";
         blocker = `Route health: ${routeHealth.blocker || "unhealthy"}`;
         nextAction = "Repair missed-call webhook route (404) first";
         verdict = "Blocked by route health";
@@ -292,22 +423,35 @@ Deno.serve(async (req) => {
         status = "blocked";
         completion = 15;
         proofPct = 0;
+        evidenceQuality = "unknown";
         blocker = missedCallEvidence.has_call_event
           ? "Inbound call found but no delivered text-back SMS evidence"
           : "No real missed-call evidence (call + text-back delivery) found";
         nextAction = "Place a real missed call and wait for text-back delivery";
         verdict = "Routes healthy but no call/SMS evidence";
       } else if (proofLogs.missed_call_passed > 0) {
-        status = "proof_passed";
-        completion = 90;
-        proofPct = 100;
-        blocker = "Proof log passed — awaiting client sign-off for went_live_at";
-        nextAction = "Obtain client sign-off, then set went_live_at on AutomationChecklist";
-        verdict = "Proof passed — ready for go-live approval";
+        evidenceQuality = missedCallEvidenceQuality;
+        if (evidenceQuality === "production_customer") {
+          status = "proof_passed";
+          completion = 90;
+          proofPct = 100;
+          blocker = "Proof log passed — awaiting client sign-off for went_live_at";
+          nextAction = "Obtain client sign-off, then set went_live_at on AutomationChecklist";
+          verdict = "Proof passed — ready for go-live approval";
+        } else {
+          // QA proof passed but evidence is internal/test/owner
+          status = "proof_passed";
+          completion = 85;
+          proofPct = 90;
+          blocker = `QA proof passed — production approval pending (evidence quality: ${evidenceQuality})`;
+          nextAction = "Re-run proof with a real production customer missed call, or admin explicitly approves QA proof for internal launch";
+          verdict = `QA proof passed — production approval pending (evidence quality: ${evidenceQuality})`;
+        }
       } else {
         status = "partial";
         completion = 55;
         proofPct = 50;
+        evidenceQuality = "unknown";
         blocker = "Missed-call + delivery evidence exists — AutomationProofLog pass still required";
         nextAction = "Review evidence, then create AutomationProofLog with status=pass if evidence qualifies";
         verdict = "Evidence found — awaiting proof log creation";
@@ -319,15 +463,20 @@ Deno.serve(async (req) => {
         proof_percent: proofPct,
         current_blocker: blocker,
         next_action: nextAction,
+        evidence_quality: evidenceQuality,
         evidence_summary: JSON.stringify({
           route_healthy: routeHealth.healthy,
           has_call_event: missedCallEvidence.has_call_event,
           has_delivered_sms: missedCallEvidence.has_delivered_sms,
           call_sid: missedCallEvidence.call_sid,
           message_sid: missedCallEvidence.message_sid,
+          evidence_quality: evidenceQuality,
+          proof_log_has_communication_log_id: missedCallPassLogs[0]?.communication_log_id ? true : false,
+          proof_log_has_communication_event_id: missedCallPassLogs[0]?.communication_event_id ? true : false,
         }),
         last_checked_at: now,
         last_verdict: verdict,
+        approval_required: true,
       };
 
       if (gate) {
@@ -342,9 +491,8 @@ Deno.serve(async (req) => {
           required_categories: ["voice", "sms"],
           required_tasks: ["verify_missed_call_route", "place_real_missed_call", "verify_text_back_delivery"],
           required_proofs: ["inbound_call_comm_event", "delivered_sms_communication_log", "automation_proof_log_pass"],
-          approval_required: true,
           ...updates,
-          unlock_condition_summary: "Routes healthy + inbound call event + delivered text-back SMS + AutomationProofLog pass",
+          unlock_condition_summary: "Routes healthy + inbound call event + delivered text-back SMS + AutomationProofLog pass + production-customer evidence quality (or admin approval of QA proof)",
         });
         results.missed_call_text_back = { gate_id: created.id, ...updates };
       }
@@ -370,12 +518,28 @@ Deno.serve(async (req) => {
         nextAction = "Review pending/failed proof logs — do not mark pass without real evidence";
         verdict = "Blocked — no passing proof logs";
       } else {
+        // Check if all passing proof logs have production-quality evidence
+        const allPassLogs = (proofLogs.records || []).filter((p) => p.status === "pass");
+        const evidenceQualities = allPassLogs.map(classifyEvidenceQuality);
+        const allProductionCustomer = evidenceQualities.every((q) => q === "production_customer");
+        const anyInternal = evidenceQualities.some((q) => q === "internal_test" || q === "owner");
+
         status = "partial";
-        completion = 60;
+        completion = allProductionCustomer ? 70 : 60;
         proofPct = Math.round((proofLogs.passed / Math.max(proofLogs.total, 1)) * 100);
-        blocker = `${proofLogs.passed} proof log(s) passed — manual approval still required`;
-        nextAction = "Review passing proof logs and approve if evidence is real";
-        verdict = "Partial — proof logs exist and some passed";
+        if (allProductionCustomer) {
+          blocker = `${proofLogs.passed} proof log(s) passed with production-customer evidence — manual approval still required`;
+          nextAction = "Review passing proof logs and approve if evidence is real";
+          verdict = "Partial — proof logs passed with production evidence, awaiting approval";
+        } else if (anyInternal) {
+          blocker = `${proofLogs.passed} proof log(s) passed but some evidence is internal/test/owner — QA proof only, production approval pending`;
+          nextAction = "Re-run proofs with real production customer evidence, or admin explicitly approves QA proof for internal launch";
+          verdict = "Partial — QA proof passed, production approval pending due to evidence quality";
+        } else {
+          blocker = `${proofLogs.passed} proof log(s) passed — manual approval still required`;
+          nextAction = "Review passing proof logs and approve if evidence is real";
+          verdict = "Partial — proof logs exist and some passed";
+        }
       }
 
       const updates = {
@@ -392,6 +556,7 @@ Deno.serve(async (req) => {
         }),
         last_checked_at: now,
         last_verdict: verdict,
+        approval_required: true,
       };
 
       if (gate) {
@@ -406,9 +571,8 @@ Deno.serve(async (req) => {
           required_categories: ["proof"],
           required_tasks: ["create_proof_logs_from_real_evidence", "pass_proof_for_each_service"],
           required_proofs: ["automation_proof_log_pass_for_each_service"],
-          approval_required: true,
           ...updates,
-          unlock_condition_summary: "AutomationProofLog pass records exist for instant_lead_response and missed_call_text_back",
+          unlock_condition_summary: "AutomationProofLog pass records exist for instant_lead_response and missed_call_text_back with production-customer evidence",
         });
         results.automation_delivery_gate = { gate_id: created.id, ...updates };
       }
@@ -431,6 +595,9 @@ Deno.serve(async (req) => {
       instant_lead_evidence: instantLeadEvidence,
       missed_call_evidence: missedCallEvidence,
       proof_logs: proofLogs,
+      instant_lead_evidence_quality: instantLeadEvidenceQuality,
+      missed_call_evidence_quality: missedCallEvidenceQuality,
+      proof_log_enrichment: proofEnrichment,
       checklist_warnings: checklistWarnings,
       gates: results,
       repair_actions: [
@@ -438,6 +605,15 @@ Deno.serve(async (req) => {
         !instantLeadEvidence.has_evidence ? "Send a real lead and verify delivery callback" : null,
         !missedCallEvidence.has_evidence ? "Place a real missed call and verify text-back delivery" : null,
         proofLogs.is_empty ? "Create AutomationProofLog records only from real evidence" : null,
+        instantLeadEvidenceQuality !== "production_customer" && proofLogs.instant_lead_passed > 0
+          ? `instant_lead_response proof passed but evidence quality is '${instantLeadEvidenceQuality}' — re-run with production customer lead or admin-approve for internal launch`
+          : null,
+        missedCallEvidenceQuality !== "production_customer" && proofLogs.missed_call_passed > 0
+          ? `missed_call_text_back proof passed but evidence quality is '${missedCallEvidenceQuality}' — re-run with production customer missed call or admin-approve for internal launch`
+          : null,
+        proofEnrichment.warnings.length > 0
+          ? `${proofEnrichment.warnings.length} proof log(s) missing direct evidence IDs — review enrichment warnings`
+          : null,
         checklistWarnings.length > 0
           ? `${checklistWarnings.length} checklist(s) have truth warnings — review before go-live`
           : null,
