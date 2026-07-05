@@ -101,13 +101,23 @@ export default function ThreeSystemsSection() {
                 <div className="p-9 md:p-11 flex flex-col flex-1 items-center text-center">
                   <h3 className="font-titles text-black font-bold mb-3 mt-3" style={{ fontSize: "clamp(1.2rem, 2vw, 1.5rem)" }}>{pkg.title}</h3>
                   <p className="text-sm text-foreground/80 mb-8 leading-relaxed">{pkg.description}</p>
-                  <ul className="space-y-4 w-full text-left flex-1 mb-8">
-                    {pkg.includes.map((item) => (
-                      <li key={item} className="flex items-start gap-3">
-                        <CheckCircle2 aria-hidden="true" className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: pkg.accent, strokeWidth: 2.5 }} />
-                        <span className="text-sm text-foreground/85 leading-snug">{item}</span>
-                      </li>
-                    ))}
+                  <ul className="space-y-3 w-full text-left flex-1 mb-8">
+                    {pkg.includes.map((item, idx) => {
+                      const isCarried = item.startsWith("Everything in");
+                      return (
+                        <li key={item} className="flex items-start gap-3">
+                          <CheckCircle2 aria-hidden="true" className="w-4 h-4 flex-shrink-0 mt-0.5" style={{ color: isCarried ? "#9CA3AF" : pkg.accent, strokeWidth: 2.5 }} />
+                          <span className="text-sm leading-snug" style={{ color: isCarried ? "#9CA3AF" : "#111318", fontWeight: isCarried ? 400 : 600 }}>
+                            {isCarried ? item : (
+                              <>
+                                {idx === 1 && <span className="inline-block text-[9px] font-black uppercase tracking-wider text-white rounded px-1.5 py-0.5 mr-1.5" style={{ background: pkg.accent }}>NEW</span>}
+                                {item}
+                              </>
+                            )}
+                          </span>
+                        </li>
+                      );
+                    })}
                   </ul>
                   <div className="mb-7 w-full pt-5" style={{ borderTop: "1px solid rgba(0,0,0,0.06)" }}>
                     <div className="flex items-end justify-center gap-1.5" style={{ lineHeight: 1 }}>

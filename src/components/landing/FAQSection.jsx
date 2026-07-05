@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { ChevronDown, MessageCircle } from "lucide-react";
+import { ChevronDown, MessageCircle, Phone, Mail } from "lucide-react";
 import { FAQ_ITEMS } from "./FAQData";
 
 export default function FAQSection() {
@@ -94,6 +94,22 @@ export default function FAQSection() {
                 </div>
               );
             })}
+
+            {/* Still have questions CTA — clear next step after reading FAQ */}
+            <div className="rounded-xl p-5 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ background: "linear-gradient(135deg, rgba(0,174,239,0.06), rgba(0,59,143,0.04))", border: "1px solid rgba(0,174,239,0.2)" }}>
+              <div>
+                <p className="font-bold text-gray-900 text-sm mb-1">Still have questions?</p>
+                <p className="text-xs text-gray-500">We'll help you pick the right system — no sales pressure.</p>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                <a href="tel:+16025843227" className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border text-xs font-bold transition-colors" style={{ borderColor: "rgba(0,174,239,0.3)", color: "#006BB0", background: "#fff" }}>
+                  <Phone className="w-3.5 h-3.5" /> Call Us
+                </a>
+                <a href="mailto:support@clientsurgesystems.com" className="cs-btn-primary inline-flex items-center justify-center gap-1.5 text-xs" style={{ height: "40px", padding: "0 20px" }}>
+                  <Mail className="w-3.5 h-3.5" /> Email Support
+                </a>
+              </div>
+            </div>
           </div>
         </div>
       </div>

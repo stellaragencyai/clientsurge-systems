@@ -1,5 +1,5 @@
 import StardustOverlay from "./StardustOverlay";
-import { ArrowRight, ShoppingCart, Shield, Zap, Phone } from "lucide-react";
+import { ArrowRight, ShoppingCart, Shield, Zap, Phone, Clock } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 
@@ -35,7 +35,13 @@ export default function FinalCTA() {
           ))}
         </div>
 
-        <p className="mt-8 text-sm text-foreground">Month-to-month · Proof checked before launch · Done-for-you setup included</p>
+        {/* Urgency bar — time-sensitivity without fake scarcity */}
+        <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)" }}>
+          <Clock className="w-3.5 h-3.5 text-[#00AEEF]" />
+          <span className="text-xs font-bold text-[#006BB0]">Most systems installed in 3–5 business days</span>
+        </div>
+
+        <p className="mt-4 text-sm text-foreground">Month-to-month · Proof checked before launch · Done-for-you setup included</p>
 
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
@@ -55,11 +61,15 @@ export default function FinalCTA() {
           </Link>
         </div>
 
-        <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <a href="tel:+16025843227" className="text-sm text-foreground font-semibold hover:text-primary transition-colors inline-flex items-center gap-1.5" style={{ textDecoration: "none" }}>
-            <Phone className="w-4 h-4" /> (602) 584-3227
+        {/* Prefer to talk? — phone as a clear alternative conversion path */}
+        <div className="mt-6 flex flex-col items-center gap-1">
+          <p className="text-xs text-foreground/60">Prefer to talk to a human first?</p>
+          <a href="tel:+16025843227" className="text-base font-bold text-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5" style={{ textDecoration: "none" }}>
+            <Phone className="w-4 h-4 text-[#00AEEF]" /> (602) 584-3227
           </a>
-          <span className="hidden sm:block text-foreground/30">|</span>
+        </div>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
           <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><Shield className="w-4 h-4" /> 30-day performance review included</span>
           <span className="hidden sm:block text-foreground/30">|</span>
           <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><Zap className="w-4 h-4" /> Launch path tested before go-live</span>

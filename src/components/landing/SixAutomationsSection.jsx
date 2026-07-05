@@ -5,12 +5,12 @@ import { trackCTA } from "@/lib/analytics";
 import SectionHeader from "@/components/design-system/SectionHeader";
 
 const AUTOMATION_CARDS = [
-  { id: "automation-lead-capture", label: "Lead Capture", description: "Turns forms, calls, ads, and website inquiries into one trackable pipeline — so no lead slips through the cracks.", icon: Zap },
-  { id: "automation-missed-call", label: "Missed-Call Recovery", description: "Texts missed callers instantly so the conversation continues — before they call your competitor.", icon: Phone },
-  { id: "automation-follow-up", label: "AI Follow-Up", description: "Keeps leads moving with automated multi-step sequences until they reply, book, opt out, or close.", icon: MessageSquare },
-  { id: "automation-booking", label: "AI Booking", description: "Moves interested prospects toward a confirmed appointment — no manual back-and-forth needed.", icon: Calendar },
-  { id: "automation-reviews", label: "Review Requests", description: "Automatically requests reviews when the customer experience is fresh and the timing is right.", icon: Star },
-  { id: "automation-reactivation", label: "Lead Reactivation", description: "Brings old leads, past customers, no-shows, and unclosed quotes back into motion automatically.", icon: RefreshCw },
+  { id: "automation-lead-capture", label: "Lead Capture", description: "Turns forms, calls, ads, and website inquiries into one trackable pipeline — so no lead slips through the cracks.", icon: Zap, metric: "< 60 sec", metricLabel: "to first response" },
+  { id: "automation-missed-call", label: "Missed-Call Recovery", description: "Texts missed callers instantly so the conversation continues — before they call your competitor.", icon: Phone, metric: "78%", metricLabel: "recovery rate" },
+  { id: "automation-follow-up", label: "AI Follow-Up", description: "Keeps leads moving with automated multi-step sequences until they reply, book, opt out, or close.", icon: MessageSquare, metric: "14-day", metricLabel: "nurture sequence" },
+  { id: "automation-booking", label: "AI Booking", description: "Moves interested prospects toward a confirmed appointment — no manual back-and-forth needed.", icon: Calendar, metric: "24/7", metricLabel: "booking availability" },
+  { id: "automation-reviews", label: "Review Requests", description: "Automatically requests reviews when the customer experience is fresh and the timing is right.", icon: Star, metric: "3x", metricLabel: "more reviews" },
+  { id: "automation-reactivation", label: "Lead Reactivation", description: "Brings old leads, past customers, no-shows, and unclosed quotes back into motion automatically.", icon: RefreshCw, metric: "30-90 days", metricLabel: "dormant re-engaged" },
 ];
 
 const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
@@ -56,7 +56,7 @@ export default function SixAutomationsSection() {
           whileInView={shouldReduceMotion ? {} : "visible"}
           viewport={{ once: true, margin: "-100px" }}
         >
-          {AUTOMATION_CARDS.map(({ id, label, description, icon: Icon }) => (
+          {AUTOMATION_CARDS.map(({ id, label, description, icon: Icon, metric, metricLabel }) => (
             <motion.div
               key={id}
               id={id}
@@ -64,18 +64,27 @@ export default function SixAutomationsSection() {
               className="group rounded-xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
               style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.18)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", scrollMarginTop: "var(--cs-anchor-offset)" }}
             >
-              <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>
-                <Icon className="w-6 h-6" style={{ color: "#35BDF1" }} aria-hidden="true" />
+              <div className="flex items-start justify-between mb-4">
+                <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>
+                  <Icon className="w-6 h-6" style={{ color: "#35BDF1" }} aria-hidden="true" />
+                </div>
+                <div className="text-right">
+                  <p className="font-titles font-black" style={{ fontSize: "1.1rem", color: "#006BB0", lineHeight: 1 }}>{metric}</p>
+                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">{metricLabel}</p>
+                </div>
               </div>
               <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>
               <p style={{ color: "rgba(10,22,40,0.7)", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
-              <Link
-                to="/store"
-                onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
-                className="mt-4 inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
-              >
-                <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
-              </Link>
+              <div className="mt-4 flex items-center justify-between">
+                <Link
+                  to={`/store?focus=${encodeURIComponent(id)}`}
+                  onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
+                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
+                >
+                  <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                </Link>
+                <span className="text-[10px] font-semibold text-gray-300">ID: {id.replace("automation-", "")}</span>
+              </div>
             </motion.div>
           ))}
         </motion.div>

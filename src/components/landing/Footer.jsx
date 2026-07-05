@@ -15,6 +15,16 @@ const navColumns = [
     ],
   },
   {
+    title: "Resources",
+    links: [
+      { label: "How It Works", href: "/how-it-works" },
+      { label: "About Us", href: "/about" },
+      { label: "Blog", href: "/blog" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Testimonials", href: "/testimonials" },
+    ],
+  },
+  {
     title: "Legal",
     links: [
       { label: "Privacy Policy", href: "/privacy" },
@@ -153,7 +163,7 @@ export default function Footer() {
         .cs-footer-contact-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
         .cs-footer-contact-link { display: inline-flex; align-items: center; gap: 9px; padding: 10px 12px; border-radius: 999px; border: 1px solid rgba(0,174,239,.2); color: #075985 !important; font-size: 13px; font-weight: 800; }
         .cs-footer-contact-icon svg { width: 15px; height: 15px; }
-        .cs-footer-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 28px; }
+        .cs-footer-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
         .cs-footer-nav-column h4 { margin: 0 0 14px; color: #0f172a; font-size: 12px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
         .cs-footer-nav-column ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
         .cs-footer-nav-column a, .cs-footer-nav-column button { color: #475569; font-size: 14px; font-weight: 700; }
@@ -165,6 +175,7 @@ export default function Footer() {
         .cs-footer-top-button svg { width: 15px; height: 15px; }
         @media (max-width: 860px) { .cs-footer-system-header, .cs-footer-main { display: block; } .cs-footer-system-cta { margin-top: 18px; } .cs-footer-nav { margin-top: 32px; } .cs-footer-bottom { align-items: flex-start; flex-direction: column; } }
         @media (max-width: 560px) { .cs-footer-inner { width: min(100% - 32px, 1180px); } .cs-footer-nav { grid-template-columns: 1fr; } }
+        @media (max-width: 860px) { .cs-footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
       `}</style>
     </footer>
   );

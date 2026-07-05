@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calculator, TrendingUp, RefreshCw } from 'lucide-react';
+import { Calculator, TrendingUp, RefreshCw, ShoppingCart } from 'lucide-react';
 
 const INDUSTRY_MULTIPLIERS = {
   'Med Spa': { avg_ticket: 350, lead_value: 0.42 },
@@ -159,13 +159,53 @@ export default function ROICalculator({ className = '' }) {
         </p>
       </div>
 
+      {/* Dynamic package recommendation — connects ROI to specific tier */}
+      {annualRevenueRecovered > 0 && (
+        <div className="mt-6 rounded-xl p-5 border-2" style={{ borderColor: "rgba(0,174,239,0.3)", background: "rgba(0,174,239,0.04)" }}>
+          <div className="flex items-center gap-2 mb-3">
+            <RefreshCw className="w-4 h-4 text-[#00AEEF]" />
+            <p className="text-xs font-bold uppercase tracking-wider text-[#006BB0]">
+              Recommended System for Your Numbers
+            </p>
+          </div>
+          {(() => {
+            const recommended = annualRevenueRecovered > 60000
+              ? { name: "Pro System", id: "pro_system", price: "$1,997/mo", reason: "Your revenue at stake justifies the full recovery layer — website, reactivation, and expanded automation." }
+              : annualRevenueRecovered > 20000
+              ? { name: "Growth System", id: "growth_system", price: "$997/mo", reason: "Your lead volume needs follow-up + booking + review automation to maximize recovery." }
+              : { name: "Starter System", id: "starter_system", price: "$497/mo", reason: "Start with instant response and missed-call recovery — the foundation that stops the bleed." };
+            return (
+              <div>
+                <div className="flex items-baseline justify-between flex-wrap gap-2 mb-2">
+                  <div>
+                    <span className="font-titles font-black text-black" style={{ fontSize: "1.3rem" }}>{recommended.name}</span>
+                    <span className="text-sm font-bold text-gray-500 ml-2">{recommended.price}</span>
+                  </div>
+                  <a
+                    href={`/store?package=${recommended.id}`}
+                    className="cs-btn-primary inline-flex items-center gap-2 text-xs"
+                    style={{ height: "38px", padding: "0 20px" }}
+                  >
+                    <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+                  </a>
+                </div>
+                <p className="text-xs text-gray-600 leading-relaxed">{recommended.reason}</p>
+                <p className="text-[10px] text-gray-400 mt-2">
+                  ROI: {monthlyRevenueRecovered > 0 ? `${Math.round((monthlyRevenueRecovered / (recommended.id === "pro_system" ? 1997 : recommended.id === "growth_system" ? 997 : 497)) * 100)}%` : "—"} monthly return on system cost
+                </p>
+              </div>
+            );
+          })()}
+        </div>
+      )}
+
       <div className="mt-6 text-center">
         <a
           href="/store"
           className="cs-btn-primary inline-flex items-center gap-2 text-sm"
         >
           <RefreshCw className="w-4 h-4" />
-          Browse AI Systems to Recover These Leads
+          Browse All AI Systems
         </a>
       </div>
     </div>
