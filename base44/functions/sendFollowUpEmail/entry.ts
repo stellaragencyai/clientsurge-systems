@@ -52,6 +52,19 @@ Deno.serve(async (req) => {
       return secureJson({ error: 'Lead or email not found' }, { status: 404 });
     }
 
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    if (!lead.client_id) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: job.lead_id, channel: 'email', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'resend', status: 'failed', error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ trigger_name: 'sendFollowUpEmail', automation_job_id }),
+        });
+      } catch (_) {}
+      return secureJson({ error: 'Outbound email blocked: missing client_id tenant scope', email_sent: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true });
+    }
+    const scope = { client_id: lead.client_id, client_project_id: lead.client_project_id };
+
     const settings = await base44.asServiceRole.entities.AdminSettings.list();
     const adminSettings = settings?.[0] || {};
 
@@ -129,10 +142,14 @@ Deno.serve(async (req) => {
 
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: job.lead_id,
+      client_id: scope.client_id,
+      client_project_id: scope.client_project_id,
+      tenant_scope_status: 'scoped',
       channel: 'email',
       direction: 'outbound',
       event_type: 'email_sent',
       provider: 'resend',
+      provider_from_email: getApprovedEmailSender(adminSettings),
       status: emailResult?.id ? 'sent' : 'failed',
       subject,
       message_body: body,

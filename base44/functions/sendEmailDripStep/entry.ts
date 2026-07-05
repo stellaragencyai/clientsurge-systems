@@ -84,6 +84,20 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Lead email not found" }, { status: 400 });
     }
 
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    const resolvedClientId = lead.client_id || campaign.client_id;
+    if (!resolvedClientId) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id, channel: 'email', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'resend', status: 'failed', error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ trigger_name: 'sendEmailDripStep', campaign_id, step_number }),
+        });
+      } catch (_) {}
+      return secureJson({ error: 'Outbound email blocked: missing client_id tenant scope', email_sent: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true });
+    }
+    const scope = { client_id: resolvedClientId, client_project_id: lead.client_project_id || campaign.client_project_id };
+
     // 4. Send via Resend
     const emailResult = await base44.asServiceRole.integrations.Core.SendEmail({
       to: lead.email,
@@ -111,6 +125,9 @@ Deno.serve(async (req) => {
     // 6. Log as communication event
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id,
+      client_id: scope.client_id,
+      client_project_id: scope.client_project_id,
+      tenant_scope_status: 'scoped',
       channel: "email",
       direction: "outbound",
       event_type: "email_sent",

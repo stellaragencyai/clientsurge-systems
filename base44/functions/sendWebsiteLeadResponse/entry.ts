@@ -1,15 +1,44 @@
-import { secureJson } from "../_shared/response.ts";
 /**
  * Website Lead Immediate Response
  * Sends instant SMS + email to new website form submissions
- * Reuses patterns from processMissedCallFollowUps for consistency
  */
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { buildFailedSendRetryJob } from "../_shared/automationRetry.js";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { appendSmsOptOut } from "../_shared/smsOptOut.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
+
+function appendSmsOptOut(message) {
+  if (!message) return "";
+  const trimmed = message.trim();
+  if (/\bSTOP\b/i.test(trimmed)) return trimmed;
+  return `${trimmed}\n\nReply STOP to opt out.`;
+}
+
+async function twilioFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Twilio request failed: ${err.message || "network error"}`); }
+}
+
+async function resendFetch(url, options) {
+  try { return await fetch(url, options); }
+  catch (err) { throw new Error(`Resend request failed: ${err.message || "network error"}`); }
+}
+
+function buildFailedSendRetryJob(payload) {
+  return {
+    job_type: 'failed_send_retry',
+    lead_id: payload.lead?.id || payload.lead_id || null,
+    status: 'pending',
+    priority: 5,
+    payload: JSON.stringify(payload),
+    scheduled_for: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+  };
+}
 
 async function sendSMS(base44, lead, messageBody, fromNumber) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
@@ -147,6 +176,21 @@ Deno.serve(async (req) => {
         { status: 404 }
       );
     }
+
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    if (!lead.client_id) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: leadId, context_id: leadId, context_type: 'website_lead',
+          channel: 'sms', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'twilio', status: 'failed', error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ trigger_name: 'sendWebsiteLeadResponse' }),
+        });
+      } catch (_) {}
+      return secureJson({ error: 'Outbound blocked: missing client_id tenant scope', success: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true });
+    }
+    const sendClientId = lead.client_id;
+    const sendClientProjectId = lead.client_project_id;
 
     // Check automation enabled
     if (!lead.automation_enabled) {

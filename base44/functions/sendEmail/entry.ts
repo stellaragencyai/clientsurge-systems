@@ -93,7 +93,43 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
-    
+
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    let sendClientId = null;
+    let sendClientProjectId = null;
+    if (leadId) {
+      try {
+        const lead = await base44.asServiceRole.entities.Leads.get(leadId);
+        if (lead) {
+          sendClientId = lead.client_id || null;
+          sendClientProjectId = lead.client_project_id || null;
+        }
+      } catch (_) {
+        try {
+          const wl = await base44.asServiceRole.entities.WebsiteLead.get(leadId);
+          if (wl) {
+            sendClientId = wl.client_id || null;
+            sendClientProjectId = wl.client_project_id || null;
+          }
+        } catch (_) {}
+      }
+    }
+    if (!sendClientId && !leadId) {
+      // No lead context — treat as system internal (admin notifications)
+      sendClientId = null;
+    } else if (!sendClientId) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: leadId || undefined,
+          channel: 'email', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'resend', status: 'failed',
+          error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ to: email, trigger_name: 'sendEmail' }),
+        });
+      } catch (_) {}
+      return json({ error: 'Outbound email blocked: missing client_id tenant scope', email_sent: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true }, 200);
+    }
+
     // Resolve sender from AdminSettings
     const senderInfo = await resolveResendSender(base44);
 
@@ -125,10 +161,14 @@ Deno.serve(async (req) => {
     try {
       await base44.asServiceRole.entities.CommunicationEvent.create({
         lead_id: leadId || undefined,
+        client_id: sendClientId,
+        client_project_id: sendClientProjectId,
+        tenant_scope_status: 'scoped',
         channel: 'email',
         direction: 'outbound',
         event_type: 'email_sent',
         provider: 'resend',
+        provider_from_email: senderInfo.from_address,
         status: deliveryStatus,
         subject: subject,
         message_body: body,
@@ -138,25 +178,23 @@ Deno.serve(async (req) => {
           sender_source: senderInfo.sender_source,
         }),
       });
-    } catch (_) {
-      // Non-blocking: event log failure should not break the main flow
-    }
+    } catch (_) {}
 
     // Legacy Emails entity — keep for backward compatibility
     if (leadId) {
       try {
-        await base44.entities.Emails.create({
+        await base44.asServiceRole.entities.Emails.create({
           lead_id: leadId,
+          client_id: sendClientId,
+          client_project_id: sendClientProjectId,
+          tenant_scope_status: 'scoped',
           email_address: email,
           subject,
           body,
           status: 'sent',
-          from_address: senderInfo.from_address,
-          sender_source: senderInfo.sender_source,
+          provider_from_email: senderInfo.from_address,
         });
-      } catch (_) {
-        // Non-blocking
-      }
+      } catch (_) {}
     }
 
     return json({ success: true, emailId: data.id, sender_source: senderInfo.sender_source });

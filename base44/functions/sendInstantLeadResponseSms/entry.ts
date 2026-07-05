@@ -94,12 +94,15 @@ async function sendTwilioSms(toNumber, messageBody, fromNumber) {
   return data.sid;
 }
 
-async function logSmsEvent(base44, leadId, status, messageId, errorMessage) {
+async function logSmsEvent(base44, leadId, status, messageId, errorMessage, clientId, clientProjectId) {
   try {
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: leadId,
       context_id: leadId,
       context_type: "WebsiteLead",
+      client_id: clientId || undefined,
+      client_project_id: clientProjectId || undefined,
+      tenant_scope_status: clientId ? 'scoped' : 'missing_client_id',
       channel: "sms",
       direction: "outbound",
       event_type: status === "sent" ? "sms_sent" : "sms_failed",
@@ -225,6 +228,14 @@ Deno.serve(async (req) => {
       return json({ error: "Lead has do_not_contact flag", sms_sent: false }, 200);
     }
 
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    if (!leadData.client_id) {
+      await logSmsEvent(base44, lead_id, "failed", null, "missing_client_id_tenant_scope");
+      return json({ error: 'Outbound SMS blocked: missing client_id tenant scope', sms_sent: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true }, 200);
+    }
+    const sendClientId = leadData.client_id;
+    const sendClientProjectId = leadData.client_project_id;
+
     if (!leadData.phone_number) {
       await logSmsEvent(base44, lead_id, "failed", null, "Missing phone number");
       base44.asServiceRole.functions.invoke('logCommunication', {
@@ -333,7 +344,7 @@ Deno.serve(async (req) => {
       });
     } catch (_) {}
 
-    await logSmsEvent(base44, lead_id, "sent", messageSid);
+    await logSmsEvent(base44, lead_id, "sent", messageSid, null, sendClientId, sendClientProjectId);
     const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
     base44.asServiceRole.functions.invoke('logCommunication', {
       related_entity_type: "WebsiteLead", related_entity_id: lead_id,

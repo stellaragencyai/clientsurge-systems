@@ -128,28 +128,21 @@ Deno.serve(async (req) => {
       } catch (_) {}
     }
 
-    // ── TENANT SCOPE GUARDRAIL ──
-    // Block outbound SMS if client_id cannot be resolved (unless internal/test).
-    const scope = await resolveTenantScope(base44, {
-      lead_id: leadId,
-      client_id: resolvedClientId,
-      client_project_id: resolvedClientProjectId,
-      is_internal: false,
-    });
-    if (!scope.allowed) {
-      await logBlockedSend(base44, {
-        lead_id: leadId,
-        channel: 'sms',
-        provider: 'twilio',
-        trigger_name: 'sendSMS',
-        to_address: normalizedPhone,
-        scope,
-        metadata: { raw_phone: rawPhone },
-      });
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    if (!resolvedClientId) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: leadId || undefined,
+          channel: 'sms', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'twilio', status: 'failed',
+          error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ raw_phone: rawPhone, trigger_name: 'sendSMS' }),
+        });
+      } catch (_) {}
       return json({ error: 'Outbound SMS blocked: missing client_id tenant scope', sms_sent: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true }, 200);
     }
-    const sendClientId = scope.client_id;
-    const sendClientProjectId = scope.client_project_id;
+    const sendClientId = resolvedClientId;
+    const sendClientProjectId = resolvedClientProjectId;
 
     const auth = btoa(`${accountSid}:${authToken}`);
     const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');

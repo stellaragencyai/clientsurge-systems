@@ -34,6 +34,19 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Lead not found" }, { status: 404 });
     }
 
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    if (!lead.client_id) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id, channel: 'email', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'resend', status: 'failed', error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ trigger_name: 'sendSmartEmail' }),
+        });
+      } catch (_) {}
+      return secureJson({ error: 'Outbound email blocked: missing client_id tenant scope', email_sent: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true });
+    }
+    const scope = { client_id: lead.client_id, client_project_id: lead.client_project_id };
+
     // 2. Generate smart subject line
     const subjectResult = await base44.asServiceRole.functions.invoke(
       "generateSmartSubjectLine",
@@ -84,10 +97,14 @@ Deno.serve(async (req) => {
     // 4. Log communication event
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id,
+      client_id: scope.client_id,
+      client_project_id: scope.client_project_id,
+      tenant_scope_status: 'scoped',
       event_type: "email_sent",
       channel: "email",
       direction: "outbound",
       provider: "resend",
+      provider_from_email: from_email,
       status: "sent",
       subject,
       message_body: email_body.substring(0, 500),

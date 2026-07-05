@@ -169,7 +169,24 @@ Deno.serve(async (req) => {
       yelp_review_link,
       preferred_channel = "both",
       skip_duplicate_check = false,
+      client_id,
+      lead_id,
     } = await req.json();
+
+    // ── TENANT SCOPE GUARDRAIL (inlined) ──
+    if (!client_id) {
+      try {
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: lead_id || undefined,
+          channel: 'sms', direction: 'outbound', event_type: 'tenant_scope_blocked',
+          provider: 'twilio', status: 'failed', error_message: 'missing_client_id_tenant_scope',
+          metadata_json: JSON.stringify({ trigger_name: 'sendReviewRequest', customer_phone, customer_email }),
+        });
+      } catch (_) {}
+      return secureJson({ error: 'Outbound blocked: missing client_id tenant scope', success: false, reason: 'missing_client_id_tenant_scope', safe_to_continue: true });
+    }
+    const sendClientId = client_id;
+    const sendClientProjectId = null;
 
     // Validation
     const errors = [];
@@ -214,7 +231,9 @@ Deno.serve(async (req) => {
         smsId = await sendTwilioSms(customer_phone, smsBody);
         smsSent = true;
         await base44.asServiceRole.entities.CommunicationEvent.create({
+          client_id: sendClientId, client_project_id: sendClientProjectId, tenant_scope_status: 'scoped',
           channel: "sms", direction: "outbound", event_type: "review_request", provider: "twilio",
+          provider_from_number: TWILIO_FROM_NUMBER,
           status: "sent", subject: customer_phone, message_body: smsBody, provider_message_id: smsId,
           metadata_json: JSON.stringify({ customer_name, business_name, google_review_link, yelp_review_link, timestamp: now }),
         });
@@ -254,7 +273,9 @@ Deno.serve(async (req) => {
         emailId = await sendResendEmail(customer_email, emailSubject, emailBody, fromEmail);
         emailSent = true;
         await base44.asServiceRole.entities.CommunicationEvent.create({
+          client_id: sendClientId, client_project_id: sendClientProjectId, tenant_scope_status: 'scoped',
           channel: "email", direction: "outbound", event_type: "review_request", provider: "resend",
+          provider_from_email: fromEmail,
           status: "sent", subject: emailSubject, message_body: emailBody, provider_message_id: emailId,
           metadata_json: JSON.stringify({ customer_name, customer_email, business_name, google_review_link, yelp_review_link, timestamp: now }),
         });
