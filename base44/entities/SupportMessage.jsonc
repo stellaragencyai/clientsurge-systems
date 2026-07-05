@@ -11,6 +11,26 @@
       "type": "string",
       "title": "Project ID"
     },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
     "sender_email": {
       "type": "string",
       "title": "Sender Email"
@@ -57,6 +77,9 @@
         },
         {
           "data.sender_email": "{{user.email}}"
+        },
+        {
+          "data.client_id": "{{client_id}}"
         }
       ]
     },
@@ -68,10 +91,21 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.project_id": "{{client_projects.id}}"
         },
         {
           "data.sender_email": "{{user.email}}"
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
@@ -83,10 +117,18 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.project_id": "{{client_projects.id}}"
         },
         {
           "data.sender_email": "{{user.email}}"
+        },
+        {
+          "data.client_id": "{{client_id}}"
         }
       ]
     },
