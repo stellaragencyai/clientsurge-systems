@@ -14,6 +14,22 @@
       "type": "string",
       "title": "Client Project ID (Tenant Isolation)"
     },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
+    "tenant_scope_error": {
+      "type": "string",
+      "title": "Tenant Scope Error"
+    },
     "email_address": {
       "type": "string",
       "title": "Email Address"
@@ -35,6 +51,11 @@
         "opened",
         "failed"
       ]
+    },
+    "provider_from_email": {
+      "type": "string",
+      "title": "Provider From Email",
+      "description": "Resend from email used for this send."
     }
   },
   "required": [
