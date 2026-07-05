@@ -21,12 +21,12 @@ export default function ScrollProgressBar() {
         position: "fixed",
         top: 0,
         left: 0,
-        height: "4px",
+        height: "3px",
         background: "linear-gradient(90deg, #00AEEF 0%, #006BB0 50%, #003B8F 100%)",
         width: `${progress}%`,
         transition: "width 0.1s ease",
-        zIndex: 100,
-        boxShadow: "0 0 20px rgba(0, 174, 239, 0.6), 0 0 40px rgba(0, 107, 176, 0.3)",
+        zIndex: 60,
+        boxShadow: "0 0 12px rgba(0, 174, 239, 0.5)",
       }}
       aria-hidden="true"
     />
