@@ -76,10 +76,25 @@ Deno.serve(async (req) => {
       effectiveError = `Synthetic provider_message_id rejected: "${payload.provider_message_id}". Real provider calls must capture actual IDs.`;
     }
 
+    // ── Tenant scope propagation ──
+    // Copy client_id/client_project_id from caller payload. If not provided,
+    // mark as missing_client_id so admin can see and backfill.
+    const clientId = payload.client_id || null;
+    const clientProjectId = payload.client_project_id || null;
+    const tenantScopeStatus = clientId ? "scoped" : (payload.tenant_scope_status || "missing_client_id");
+    const tenantScopeError = payload.tenant_scope_error || (clientId ? null : "missing_client_id_tenant_scope");
+    const providerFromNumber = payload.provider_from_number || null;
+    const providerFromEmail = payload.provider_from_email || null;
+
     // Create CommunicationLog record
     const created = await base44.asServiceRole.entities.CommunicationLog.create({
       related_entity_type: payload.related_entity_type || null,
       related_entity_id: payload.related_entity_id || null,
+      lead_id: payload.lead_id || null,
+      client_id: clientId,
+      client_project_id: clientProjectId,
+      tenant_scope_status: tenantScopeStatus,
+      tenant_scope_error: tenantScopeError,
       lead_email: payload.lead_email || null,
       lead_phone: payload.lead_phone || null,
       canonical_to_address: payload.canonical_to_address || payload.to_address || null,
@@ -91,6 +106,8 @@ Deno.serve(async (req) => {
       template_name: payload.template_name || null,
       to_address: payload.to_address || null,
       from_address: payload.from_address || null,
+      provider_from_number: providerFromNumber,
+      provider_from_email: providerFromEmail,
       subject: payload.subject || null,
       body_preview: (payload.body_preview || "").slice(0, 500),
       provider_message_id: isSyntheticId(payload.provider_message_id) ? null : (payload.provider_message_id || null),
