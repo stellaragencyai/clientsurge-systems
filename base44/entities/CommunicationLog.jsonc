@@ -13,6 +13,20 @@
       "type": "string",
       "title": "Related Entity ID"
     },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)",
+      "description": "Business/client tenant ID. Copied from lead/order/context at log time."
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)",
+      "description": "Project/workspace/install scope under this client."
+    },
     "lead_email": {
       "type": "string",
       "title": "Lead Email"
@@ -196,6 +210,12 @@
           "user_condition": {
             "role": "super_admin"
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
