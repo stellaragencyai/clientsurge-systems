@@ -11,15 +11,33 @@
       "type": "string",
       "title": "Lead ID"
     },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
     "last_contact_date": {
       "type": "string",
-      "title": "Last Contact Date",
-      "description": "When we last communicated with this lead"
+      "title": "Last Contact Date"
     },
     "days_dormant": {
       "type": "number",
-      "title": "Days Dormant",
-      "description": "How many days since last contact"
+      "title": "Days Dormant"
     },
     "reactivation_stage": {
       "type": "string",
@@ -31,8 +49,7 @@
         "final_offer",
         "archived"
       ],
-      "default": "identified",
-      "description": "Where in re-engagement flow"
+      "default": "identified"
     },
     "trigger_reason": {
       "type": "string",
@@ -42,24 +59,20 @@
         "objection_timing",
         "no_booking",
         "manual_pause"
-      ],
-      "description": "Reason lead went dormant"
+      ]
     },
     "reactivation_offer": {
       "type": "string",
-      "title": "Reactivation Offer",
-      "description": "Special offer to win them back (discount, bonus, urgency)"
+      "title": "Reactivation Offer"
     },
     "attempts": {
       "type": "number",
       "title": "Reactivation Attempts",
-      "default": 0,
-      "description": "How many re-engagement attempts made"
+      "default": 0
     },
     "reopened_at": {
       "type": "string",
-      "title": "Reopened At",
-      "description": "When lead was successfully reactivated"
+      "title": "Reopened At"
     },
     "status": {
       "type": "string",
@@ -95,11 +108,22 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
           "data.lead_id": {
             "$in": [
               "{{leads.id}}"
             ]
           }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
@@ -111,10 +135,8 @@
           }
         },
         {
-          "data.lead_id": {
-            "$in": [
-              "{{leads.id}}"
-            ]
+          "user_condition": {
+            "role": "super_admin"
           }
         }
       ]
