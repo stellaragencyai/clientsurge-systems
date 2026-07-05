@@ -19,6 +19,22 @@
       "type": "string",
       "title": "Client Project ID (Tenant Isolation)"
     },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
+    "tenant_scope_error": {
+      "type": "string",
+      "title": "Tenant Scope Error"
+    },
     "job_type": {
       "type": "string",
       "title": "Job Type",
@@ -60,6 +76,14 @@
     "processed_at": {
       "type": "string",
       "title": "Processed At"
+    },
+    "provider_from_number": {
+      "type": "string",
+      "title": "Provider From Number (SMS)"
+    },
+    "provider_from_email": {
+      "type": "string",
+      "title": "Provider From Email"
     },
     "result_metadata": {
       "type": "string",
