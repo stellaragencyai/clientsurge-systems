@@ -3,10 +3,9 @@
   "type": "object",
   "_metadata": {
     "status": "CORE_PRODUCTION",
-    "reason": "Primary message storage - canonical storage for message bodies, templates, transcripts. Immutable. Write in all message flows.",
+    "reason": "Primary message storage. Immutable. Write in all message flows.",
     "immutable": true,
-    "tenant_scoped": "client_id + client_project_id (with lead_id fallback for backward compat)",
-    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+    "tenant_scoped": "client_id + client_project_id"
   },
   "properties": {
     "description": {
@@ -16,8 +15,7 @@
     },
     "funnel_identity_id": {
       "type": "string",
-      "title": "Unified Funnel Identity",
-      "description": "Unique identifier representing a single customer journey (matches lead's funnel_identity_id)"
+      "title": "Unified Funnel Identity"
     },
     "lead_id": {
       "type": "string",
@@ -25,13 +23,27 @@
     },
     "client_id": {
       "type": "string",
-      "title": "Client ID (Tenant Isolation)",
-      "description": "Business/client tenant ID. Required for multi-client scaling."
+      "title": "Client ID (Tenant Isolation)"
     },
     "client_project_id": {
       "type": "string",
-      "title": "Client Project ID (Tenant Isolation)",
-      "description": "Project/workspace/install scope under this client."
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
+    "tenant_scope_error": {
+      "type": "string",
+      "title": "Tenant Scope Error"
     },
     "direction": {
       "type": "string",
@@ -77,6 +89,16 @@
         "delivered",
         "failed"
       ]
+    },
+    "provider_from_number": {
+      "type": "string",
+      "title": "Provider From Number (SMS)",
+      "description": "Twilio from number used for this send. Supports future per-client number assignment."
+    },
+    "provider_from_email": {
+      "type": "string",
+      "title": "Provider From Email",
+      "description": "Resend from email used for this send. Supports future per-client sending domain."
     }
   },
   "required": [
