@@ -91,6 +91,19 @@ export default function Navbar() {
     return acquireBodyScrollLock("landing-mobile-nav");
   }, [open]);
 
+  // ── Escape key closes mobile drawer and dropdowns ──
+  useEffect(() => {
+    const onKey = (e) => {
+      if (e.key === "Escape") {
+        setOpen(false);
+        setSolutionsOpen(false);
+        setIndustriesOpen(false);
+      }
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
 
 
   // ── Shared helpers ──
@@ -365,21 +378,38 @@ export default function Navbar() {
           </button>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="xl:hidden w-10 h-10 rounded-full border backdrop-blur-[3px] flex items-center justify-center shadow-sm transition-colors"
-          onClick={() => setOpen(!open)}
-          style={{
-            borderColor: "rgba(53, 189, 241, 0.3)",
-            background: "rgba(53, 189, 241, 0.1)",
-            color: "#ffffff",
-          }}
-          aria-label={open ? "Close navigation menu" : "Open navigation menu"}
-          aria-expanded={open}
-        >
-          {open ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
-          <span className="sr-only">{open ? "Close navigation menu" : "Open navigation menu"}</span>
-        </button>
+        {/* Mobile: compact Browse CTA + hamburger — primary CTA always one tap away */}
+        <div className="xl:hidden flex items-center gap-2">
+          <button
+            onClick={() => {
+              trackCTA("browse_systems_mobile_bar", "navbar");
+              if (location.pathname === "/") {
+                const el = document.getElementById("pricing");
+                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+              } else {
+                navigate("/#pricing");
+              }
+            }}
+            className="cs-btn-primary cs-nav-cta"
+            style={{ minHeight: "unset", height: "36px", padding: "0 16px", fontSize: "0.75rem" }}
+          >
+            Browse
+          </button>
+          <button
+            className="w-10 h-10 rounded-full border backdrop-blur-[3px] flex items-center justify-center shadow-sm transition-colors"
+            onClick={() => setOpen(!open)}
+            style={{
+              borderColor: "rgba(53, 189, 241, 0.3)",
+              background: "rgba(53, 189, 241, 0.1)",
+              color: "#ffffff",
+            }}
+            aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-expanded={open}
+          >
+            {open ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
+            <span className="sr-only">{open ? "Close navigation menu" : "Open navigation menu"}</span>
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}

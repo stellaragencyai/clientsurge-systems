@@ -133,6 +133,26 @@ export default function CinematicHero() {
           <p className="cs-hero-subcopy text-xs font-semibold">
             No demos required · Add to cart and check out · Done-for-you setup included
           </p>
+
+          {/* Social proof metrics bar — specific outcomes, not vague claims */}
+          <motion.div
+            initial={{ opacity: 0, y: 12 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.34 }}
+            className="flex flex-wrap items-center justify-center gap-x-8 gap-y-3 mt-6 mb-2"
+          >
+            {[
+              { value: "< 60 sec", label: "Avg response time" },
+              { value: "78%", label: "Lead recovery rate" },
+              { value: "6", label: "Automated systems" },
+              { value: "0", label: "Demos required" },
+            ].map((metric) => (
+              <div key={metric.label} className="text-center">
+                <p className="font-titles font-black" style={{ fontSize: "clamp(1.1rem, 2vw, 1.5rem)", color: "#006BB0", lineHeight: 1 }}>{metric.value}</p>
+                <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mt-1">{metric.label}</p>
+              </div>
+            ))}
+          </motion.div>
         </div>
 
         <motion.div

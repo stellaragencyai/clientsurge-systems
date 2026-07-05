@@ -12,6 +12,8 @@ import ChecklistReconciliationPanel from "@/components/admin/ops-verification/Ch
 import FullPlatformGatesPanel from "@/components/admin/ops-verification/FullPlatformGatesPanel";
 import HistoricalRecordsPanel from "@/components/admin/ops-verification/HistoricalRecordsPanel";
 import InboundFollowupReadinessPanel from "@/components/admin/ops-verification/InboundFollowupReadinessPanel";
+import Sprint2Panel from "@/components/admin/ops-verification/Sprint2Panel";
+import Sprint2ScaffoldingPanel from "@/components/admin/ops-verification/Sprint2ScaffoldingPanel";
 
 export default function OperationsVerificationCenter() {
   const [loading, setLoading] = useState(true);
@@ -124,6 +126,12 @@ export default function OperationsVerificationCenter() {
               checklists={data.checklists}
               onDecisionMade={fetchAll}
             />
+
+            {/* 2d. Sprint 2 — Inbound SMS + Nurture */}
+            <Sprint2Panel gates={data.gates} proofLogs={data.proofLogs} checklists={data.checklists} />
+
+            {/* 2e. Sprint 2 Scaffolding — Proof Workflows, Cadence & Rules */}
+            <Sprint2ScaffoldingPanel />
 
             {/* 3. Route Health */}
             <RouteHealthPanel adminSettings={data.adminSettings} routeGate={data.gates?.find((g) => g.gate_key === "twilio_webhook_route_health")} />
