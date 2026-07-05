@@ -222,10 +222,10 @@ export default function Industries() {
               onClick={() => setActiveFilter(f.id)}
               className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
                 activeFilter === f.id
-                  ? "text-white border-transparent shadow-sm"
-                  : "bg-white text-foreground border-border hover:text-foreground hover:border-[#00AEEF] hover:bg-[rgba(0,174,239,0.08)] hover:shadow-[0_0_14px_rgba(0,174,239,0.35)]"
+                  ? "text-white border-transparent shadow-sm bg-[#00AEEF]"
+                  : "bg-white text-foreground border-border hover:text-foreground hover:border-[#00AEEF] hover:bg-[rgba(0,174,239,0.08)]"
               }`}
-            style={activeFilter === f.id ? { background: "var(--cs-gradient)", boxShadow: "var(--cs-glow-sm)" } : { borderColor: "rgba(0,174,239,0.22)" }}
+            style={activeFilter === f.id ? { background: "linear-gradient(90deg, #0079c1, #005691)", boxShadow: "0 2px 12px rgba(0,121,193,0.35)" } : { borderColor: "rgba(0,174,239,0.22)" }}
             >
               {f.label}
             </button>
@@ -253,7 +253,7 @@ export default function Industries() {
             type="button"
             aria-label={`View ${industry.name} automation system`}
             aria-pressed={isSelected}
-            className="group relative block overflow-hidden min-h-[60svh] sm:min-h-[45svh] md:min-h-[50svh] text-left"
+            className="group relative block overflow-hidden min-h-[320px] sm:min-h-[360px] md:min-h-[400px] text-left"
             onClick={() => handleIndustrySelect(industry)}
             onMouseEnter={() => setHoveredIndustryId(industry.id)}
             onMouseLeave={() => setHoveredIndustryId("")}

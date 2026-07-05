@@ -245,10 +245,11 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: "rgba(6, 16, 37, 0.7)",
+        background: scrolled ? "rgba(6, 16, 37, 0.92)" : "rgba(6, 16, 37, 0.7)",
         backdropFilter: "blur(12px) saturate(1.1)",
         WebkitBackdropFilter: "blur(12px) saturate(1.1)",
-        borderBottom: "1px solid rgba(53, 189, 241, 0.08)",
+        borderBottom: scrolled ? "1px solid rgba(53, 189, 241, 0.18)" : "1px solid rgba(53, 189, 241, 0.08)",
+        boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.18)" : "none",
         overflow: "visible",
       }}
     >
@@ -266,14 +267,14 @@ export default function Navbar() {
           className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
           style={{ minHeight: "unset", minWidth: "unset", background: "none", padding: 0, overflow: "visible" }}
         >
-          <span style={{ display: "block", width: "clamp(132px, 17vw, 204px)", height: "clamp(44px, 5.2vw, 64px)", overflow: "hidden" }}>
+          <span style={{ display: "flex", alignItems: "center", height: "clamp(40px, 5vw, 52px)", overflow: "hidden" }}>
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge Systems"
               width="240"
               height="112"
               decoding="async"
-              style={{ height: "clamp(80px, 9.5vw, 112px)", width: "auto", maxWidth: "none", objectFit: "contain", display: "block", transform: "translate(-15px, -20px)" }}
+              style={{ height: "clamp(40px, 5vw, 52px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
             />
           </span>
         </button>

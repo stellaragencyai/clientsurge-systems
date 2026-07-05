@@ -18,7 +18,7 @@ const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, trans
 const ICON_PULSE_KEYFRAMES = `
 @keyframes csIconPulse {
   0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); }
-  50% { box-shadow: 0 0 16px 2px rgba(53,189,241,0.30); }
+  50% { box-shadow: 0 0 14px 1px rgba(53,189,241,0.25); }
 }
 @media (prefers-reduced-motion: reduce) {
   @keyframes csIconPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); } }
@@ -61,7 +61,7 @@ export default function SixAutomationsSection() {
               key={id}
               id={id}
               variants={shouldReduceMotion ? {} : cardVariants}
-              className="group rounded-xl p-6 md:p-8 transition-all duration-300"
+              className="group rounded-xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
               style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.18)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", scrollMarginTop: "var(--cs-anchor-offset)" }}
             >
               <div className="w-12 h-12 rounded-lg mb-4 flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>

@@ -35,11 +35,9 @@ export default function FinalCTA() {
           ))}
         </div>
 
-        <p className="mt-6 text-xs text-foreground">Month-to-month · Proof checked before launch · Done-for-you setup included</p>
-      </div>
+        <p className="mt-8 text-sm text-foreground">Month-to-month · Proof checked before launch · Done-for-you setup included</p>
 
-      <div className="max-w-3xl mx-auto text-center mt-4 relative z-10">
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+        <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
           <Link
             to="/store"
             onClick={() => trackCTA("browse_automation_store", "final_cta")}
@@ -58,13 +56,13 @@ export default function FinalCTA() {
         </div>
 
         <div className="mt-8 flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-          <a href="tel:+16025843227" className="text-xs text-foreground font-medium hover:text-primary transition-colors inline-flex items-center gap-1" style={{ textDecoration: "none" }}>
-            <Phone className="w-3.5 h-3.5" /> (602) 584-3227
+          <a href="tel:+16025843227" className="text-sm text-foreground font-semibold hover:text-primary transition-colors inline-flex items-center gap-1.5" style={{ textDecoration: "none" }}>
+            <Phone className="w-4 h-4" /> (602) 584-3227
           </a>
           <span className="hidden sm:block text-foreground/30">|</span>
-          <span className="text-xs text-foreground font-medium inline-flex items-center gap-1"><Shield className="w-3.5 h-3.5" /> 30-day performance review included</span>
+          <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><Shield className="w-4 h-4" /> 30-day performance review included</span>
           <span className="hidden sm:block text-foreground/30">|</span>
-          <span className="text-xs text-foreground font-medium inline-flex items-center gap-1"><Zap className="w-3.5 h-3.5" /> Launch path tested before go-live</span>
+          <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><Zap className="w-4 h-4" /> Launch path tested before go-live</span>
         </div>
       </div>
     </section>

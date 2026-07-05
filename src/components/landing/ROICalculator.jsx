@@ -116,7 +116,8 @@ export default function ROICalculator({ className = '' }) {
 
       {/* Results */}
       <div className="grid grid-cols-2 gap-4 mb-6">
-        <div className="bg-red-50 rounded-xl p-5 border border-red-100">
+        <div className="bg-red-50 rounded-xl p-5 border border-red-100 relative">
+          <span className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 rounded-full bg-red-500 text-white text-[10px] font-bold" aria-hidden="true">✕</span>
           <p className="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">
             Leads Lost Monthly
           </p>
@@ -128,7 +129,8 @@ export default function ROICalculator({ className = '' }) {
           </p>
         </div>
 
-        <div className="bg-green-50 rounded-xl p-5 border border-green-100">
+        <div className="bg-green-50 rounded-xl p-5 border border-green-100 relative">
+          <span className="absolute top-3 right-3 inline-flex items-center justify-center w-5 h-5 rounded-full bg-green-500 text-white text-[10px] font-bold" aria-hidden="true">✓</span>
           <p className="text-xs font-bold uppercase tracking-wider text-green-600 mb-1">
             Leads Recovered
           </p>

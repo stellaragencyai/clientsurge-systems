@@ -25,20 +25,19 @@ export default function FAQSection() {
               <MessageCircle className="w-5 h-5" style={{ color: "#00AEEF" }} />
             </div>
 
-            <h2 className="font-display font-extrabold uppercase leading-[1.05] tracking-tight text-gray-900"
+            <h2 className="font-display font-extrabold leading-[1.05] tracking-tight text-gray-900 mb-3"
               style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
             >
               Find the Answers
             </h2>
-            <h2 className="font-display font-extrabold uppercase leading-[1.05] tracking-tight mb-5"
+            <h3 className="font-display font-extrabold leading-[1.05] tracking-tight mb-5"
               style={{
                 fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)",
                 color: "#00AEEF",
-                textShadow: "0 0 24px rgba(0,174,239,0.45), 0 0 48px rgba(0,174,239,0.2)",
               }}
             >
               to Your Questions
-            </h2>
+            </h3>
 
             <p className="text-sm leading-relaxed text-gray-500 max-w-sm">
               If you have any other questions, feel free to reach out to us at{" "}
@@ -82,7 +81,7 @@ export default function FAQSection() {
                   <div
                     className="overflow-hidden transition-all"
                     style={{
-                      maxHeight: isOpen ? "300px" : "0px",
+                      maxHeight: isOpen ? "500px" : "0px",
                       opacity: isOpen ? 1 : 0,
                       transitionDuration: "400ms",
                       transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",

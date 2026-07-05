@@ -39,7 +39,7 @@ export default function RevenueLeakSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="rounded-2xl p-6 cs-card-shadow"
+                className="rounded-2xl p-6 cs-card-shadow transition-all duration-300 hover:-translate-y-1"
                 style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.20)" }}
               >
                 <div className="w-12 h-12 rounded-xl flex items-center justify-center mb-4 bg-primary/10 border border-primary/20">

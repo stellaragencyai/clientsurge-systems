@@ -70,7 +70,7 @@ export default function CinematicHero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4 }}
-            style={{ fontSize: "clamp(0.7rem, 1vw, 0.8rem)", fontWeight: 800, letterSpacing: "0.25em", textShadow: "0 0 16px rgba(53,189,241,0.4)", textTransform: "uppercase", margin: "0 0 16px 0", fontFamily: "'Inter', sans-serif" }}
+            style={{ fontSize: "clamp(0.7rem, 1vw, 0.8rem)", fontWeight: 800, letterSpacing: "0.25em", textTransform: "uppercase", margin: "0 0 16px 0", fontFamily: "'Inter', sans-serif" }}
           >
             The Amazon of AI Services for Business
           </motion.div>
@@ -79,7 +79,7 @@ export default function CinematicHero() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
-            style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.5rem, 3.6vw, 3rem)", fontWeight: 400, lineHeight: 1.05, letterSpacing: "-0.015em", margin: "0 0 32px 0", textTransform: "uppercase", maxWidth: "1100px" }}
+            style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.5rem, 3.6vw, 3rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.025em", margin: "0 0 32px 0", maxWidth: "900px" }}
           >
             Browse AI Systems. Add to Cart. Check Out.
           </motion.h1>
@@ -89,7 +89,7 @@ export default function CinematicHero() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.18 }}
-            style={{ fontFamily: "'Inter', sans-serif", fontSize: "clamp(1rem, 1.9vw, 1.15rem)", lineHeight: 1.7, maxWidth: "680px", margin: "0 auto 20px auto" }}
+            style={{ fontFamily: "'Inter', sans-serif", fontSize: "clamp(1rem, 1.9vw, 1.15rem)", lineHeight: 1.7, maxWidth: "560px", margin: "0 auto 20px auto" }}
           >
             Pick a packaged AI system for missed calls, slow follow-up, booking friction, reviews, and lead reactivation.
             No demos, no sales calls — just add your system to the cart and check out. We configure, test, and install it for you.
@@ -99,7 +99,7 @@ export default function CinematicHero() {
             initial={{ opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.22 }}
-            className="flex flex-wrap justify-center gap-2 mb-8 max-w-3xl"
+            className="flex flex-wrap justify-center gap-2 mb-8 max-w-2xl px-2"
           >
             {AUTOMATION_PILLS.map((pill) => (
               <span key={pill} className="inline-flex items-center rounded-full border px-3 py-1.5 text-xs font-semibold" style={{ borderColor: "rgba(0,107,176,0.2)", background: "rgba(0,174,239,0.06)" }}>{pill}</span>
@@ -123,8 +123,8 @@ export default function CinematicHero() {
             <Link
               to="/store"
               onClick={() => trackCTA("hero_visit_store", "hero")}
-              className="inline-flex items-center justify-center rounded-full border text-sm font-bold transition-all"
-              style={{ width: "100%", maxWidth: "300px", height: "54px", borderColor: "rgba(0,107,176,0.3)", background: "#ffffff" }}
+              className="inline-flex items-center justify-center rounded-full border text-sm font-bold transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              style={{ width: "100%", maxWidth: "300px", height: "54px", borderColor: "rgba(0,107,176,0.3)", background: "#ffffff", color: "#0079c1" }}
             >
               <Zap className="w-4 h-4" /> Visit the Store
             </Link>
