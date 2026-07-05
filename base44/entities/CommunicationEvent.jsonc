@@ -3,10 +3,9 @@
   "type": "object",
   "_metadata": {
     "status": "CORE_PRODUCTION",
-    "reason": "Primary event log - immutable append-only audit trail for all system activity. Write in all production flows. Critical for compliance, debugging, analytics.",
+    "reason": "Primary event log - immutable append-only audit trail.",
     "immutable": true,
-    "tenant_scoped": "client_id + client_project_id (optional)",
-    "documentation": "ARCHITECTURE_CONSOLIDATION.md"
+    "tenant_scoped": "client_id + client_project_id"
   },
   "properties": {
     "description": {
@@ -29,6 +28,22 @@
     "client_project_id": {
       "type": "string",
       "title": "Client Project ID"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
+    "tenant_scope_error": {
+      "type": "string",
+      "title": "Tenant Scope Error"
     },
     "onboarding_client_id": {
       "type": "string",
@@ -103,7 +118,8 @@
         "voice_call_initiated",
         "voice_call_answered",
         "voice_call_no_answer",
-        "voice_call_completed"
+        "voice_call_completed",
+        "tenant_scope_blocked"
       ]
     },
     "provider": {
@@ -119,6 +135,14 @@
         "internal",
         "elevenlabs"
       ]
+    },
+    "provider_from_number": {
+      "type": "string",
+      "title": "Provider From Number (SMS/Voice)"
+    },
+    "provider_from_email": {
+      "type": "string",
+      "title": "Provider From Email"
     },
     "status": {
       "type": "string",
@@ -210,6 +234,11 @@
         {
           "user_condition": {
             "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
           }
         },
         {
