@@ -1,4 +1,4 @@
-import { StatusPill, isQaEvidence } from "./helpers";
+import { StatusPill, isQaEvidence, safeJsonParse } from "./helpers";
 
 export default function SummaryCards({ gates, proofLogs, dashTruth, readinessState, checklists }) {
   const instantGate = gates?.find((g) => g.gate_key === "instant_lead_response");
@@ -6,15 +6,29 @@ export default function SummaryCards({ gates, proofLogs, dashTruth, readinessSta
   const routeGate = gates?.find((g) => g.gate_key === "twilio_webhook_route_health");
   const deliveryGate = gates?.find((g) => g.gate_key === "automation_delivery_gate");
 
+  // ── Sprint 1 approval state ──
+  const instantInternalApproved = instantGate?.status === "approved" && isQaEvidence(instantGate?.evidence_quality);
+  const missedInternalApproved = missedGate?.status === "approved" && isQaEvidence(missedGate?.evidence_quality);
+  const bothInternalApproved = instantInternalApproved && missedInternalApproved;
+
   // Sprint 1 Core Twilio
   const sprint1Passed = instantGate?.status === "proof_passed" && missedGate?.status === "proof_passed";
   const sprint1AllQa = sprint1Passed && isQaEvidence(instantGate?.evidence_quality) && isQaEvidence(missedGate?.evidence_quality);
-  const sprint1Label = sprint1Passed
-    ? sprint1AllQa ? "Conditional Go / QA Proof / Prod Approval Pending" : "Conditional Go"
-    : "Not Ready";
-  const sprint1Color = sprint1Passed ? (sprint1AllQa ? "yellow" : "green") : "red";
+  const sprint1Approved = bothInternalApproved;
 
-  // Full Platform
+  let sprint1Label, sprint1Color;
+  if (sprint1Approved) {
+    sprint1Label = "Internal Launch Approved";
+    sprint1Color = "blue";
+  } else if (sprint1Passed) {
+    sprint1Label = sprint1AllQa ? "QA Proof Passed — Approval Pending" : "Conditional Go";
+    sprint1Color = sprint1AllQa ? "yellow" : "green";
+  } else {
+    sprint1Label = "Not Ready";
+    sprint1Color = "red";
+  }
+
+  // Full Platform — guardrail: internal approval never changes this
   const platformGo = readinessState?.go_no_go_decision === "go";
   const platformLabel = platformGo ? "Launch Ready" : "Not Fully Launch Ready";
   const platformColor = platformGo ? "green" : "red";
@@ -40,8 +54,9 @@ export default function SummaryCards({ gates, proofLogs, dashTruth, readinessSta
   // Next Action
   let nextAction = "No action needed";
   if (!routeHealthy) nextAction = "Repair webhook routes";
-  else if (sprint1AllQa) nextAction = "Clear production proof or admin-approve for internal launch";
   else if (!sprint1Passed) nextAction = "Complete Sprint 1 proof logs";
+  else if (sprint1AllQa && !sprint1Approved) nextAction = "Admin decision: approve for internal launch or require production proof";
+  else if (sprint1Approved) nextAction = "Sprint 1 internally approved — pursue production proof for public/client launch";
   else if (misaligned.length > 0) nextAction = "Reconcile checklists with gates";
   else if (!platformGo) nextAction = "Address full-platform blockers";
 

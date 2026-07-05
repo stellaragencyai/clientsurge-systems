@@ -4,6 +4,8 @@ import AdminShell from "@/components/admin/AdminShell";
 import { ShieldCheck, RefreshCw, Loader2 } from "lucide-react";
 import SummaryCards from "@/components/admin/ops-verification/SummaryCards";
 import Sprint1Panel from "@/components/admin/ops-verification/Sprint1Panel";
+import Sprint1ApprovalPanel from "@/components/admin/ops-verification/Sprint1ApprovalPanel";
+import Sprint1ApprovalSummary from "@/components/admin/ops-verification/Sprint1ApprovalSummary";
 import RouteHealthPanel from "@/components/admin/ops-verification/RouteHealthPanel";
 import ProofLogEvidencePanel from "@/components/admin/ops-verification/ProofLogEvidencePanel";
 import ChecklistReconciliationPanel from "@/components/admin/ops-verification/ChecklistReconciliationPanel";
@@ -105,6 +107,20 @@ export default function OperationsVerificationCenter() {
             {/* 2. Sprint 1 Panel */}
             <Sprint1Panel gates={data.gates} />
 
+            {/* 2b. Sprint 1 Approval Summary */}
+            <Sprint1ApprovalSummary
+              gates={data.gates}
+              readinessState={data.readinessStates?.[0]}
+            />
+
+            {/* 2c. Sprint 1 Approval Layer */}
+            <Sprint1ApprovalPanel
+              gates={data.gates}
+              proofLogs={data.proofLogs}
+              checklists={data.checklists}
+              onDecisionMade={fetchAll}
+            />
+
             {/* 3. Route Health */}
             <RouteHealthPanel adminSettings={data.adminSettings} routeGate={data.gates?.find((g) => g.gate_key === "twilio_webhook_route_health")} />
 
@@ -132,7 +148,8 @@ export default function OperationsVerificationCenter() {
         {/* Footer note */}
         <div className="mt-8 pt-4 border-t border-gray-100">
           <p className="text-[11px] text-gray-400">
-            Operations Verification Center v1 — read-only. No records are created, updated, or deleted from this view.
+            Operations Verification Center v2 — Sprint 1 approval layer is admin-writable. All other panels remain read-only.
+            Internal launch approval preserves evidence_quality as internal_test and does NOT imply public/client launch readiness.
             Evidence quality is classified by email/business name patterns. QA proof does not equal production live.
           </p>
         </div>
