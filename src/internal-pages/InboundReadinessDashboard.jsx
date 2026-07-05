@@ -1,5 +1,6 @@
 import AdminShell from "@/components/admin/AdminShell";
 import InboundLeadReadinessCard from "@/components/admin/InboundLeadReadinessCard";
+import DuplicateSendProtectionCard from "@/components/admin/DuplicateSendProtectionCard";
 import AnalyticsDiagnosticsPanel from "@/components/admin/AnalyticsDiagnosticsPanel";
 import { ShieldCheck } from "lucide-react";
 
@@ -18,18 +19,20 @@ export default function InboundReadinessDashboard() {
           </div>
         </div>
 
-        {/* Two-column layout on desktop */}
+        {/* Cards grid */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
           <InboundLeadReadinessCard />
+          <DuplicateSendProtectionCard />
           <AnalyticsDiagnosticsPanel />
         </div>
 
         {/* Footer note */}
         <div className="mt-6 pt-4 border-t border-gray-100">
           <p className="text-[11px] text-gray-400">
-            Safe Patch — This panel is read-only. It creates default rate-limit guardrails on demand and displays trusted analytics diagnostics.
+            Safe Patch — This panel is read-only. It creates default rate-limit guardrails and simulation-only idempotency keys on demand.
             No SMS, email, Twilio, Resend, Stripe, or external provider calls are triggered. All provider settings, templates, webhook URLs,
-            existing leads, logs, and jobs are preserved unchanged. Trusted metrics use defensive fallbacks for missing userAgent, referrer, IP, or path.
+            existing leads, logs, and jobs are preserved unchanged. Simulation-only IdempotencyKey records contain metadata_json with
+            simulation_only:true and no_provider_call:true — they do not imply a real provider send occurred.
           </p>
         </div>
       </div>

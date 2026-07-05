@@ -45,6 +45,36 @@ Deno.serve(async (req) => {
       return false;
     });
 
+    // ── Idempotency breakdown ──
+    const allKeys = idempotencyKeys || [];
+    const idemCompleted = allKeys.filter((k) => k.status === 'completed').length;
+    const idemProcessing = allKeys.filter((k) => k.status === 'processing').length;
+    const idemFailed = allKeys.filter((k) => k.status === 'failed').length;
+    const idemSkipped = allKeys.filter((k) => k.status === 'skipped').length;
+    const idemPending = allKeys.filter((k) => k.status === 'pending').length;
+
+    // Detect simulation proof — keys with simulation_only in metadata_json
+    const simulationKeys = allKeys.filter((k) => {
+      try {
+        const meta = k.metadata_json || '';
+        return meta.includes('simulation_only');
+      } catch {
+        return false;
+      }
+    });
+    const hasSimulationProof = simulationKeys.length > 0;
+
+    // Latest idempotency key timestamp
+    let latestKeyTimestamp = null;
+    if (allKeys.length > 0) {
+      const sorted = [...allKeys].sort((a, b) => {
+        const aTime = a.last_executed_at ? new Date(a.last_executed_at).getTime() : 0;
+        const bTime = b.last_executed_at ? new Date(b.last_executed_at).getTime() : 0;
+        return bTime - aTime;
+      });
+      latestKeyTimestamp = sorted[0]?.last_executed_at || sorted[0]?.first_executed_at || null;
+    }
+
     // WebsiteLead field-gap counts
     const wl = websiteLeads || [];
     const missingClientId = wl.filter((l) => !l.client_id);
@@ -54,7 +84,15 @@ Deno.serve(async (req) => {
 
     const counts = {
       rate_limit_config: (rateLimitConfigs || []).length,
-      idempotency_key: (idempotencyKeys || []).length,
+      idempotency_key: allKeys.length,
+      idempotency_completed: idemCompleted,
+      idempotency_processing: idemProcessing,
+      idempotency_failed: idemFailed,
+      idempotency_skipped: idemSkipped,
+      idempotency_pending: idemPending,
+      idempotency_simulation_keys: simulationKeys.length,
+      idempotency_simulation_proof: hasSimulationProof,
+      idempotency_latest_timestamp: latestKeyTimestamp,
       lead_next_best_action: (leadNextBestActions || []).length,
       pending_dead_letter: (pendingDeadLetters || []).length,
       failed_automation_job: (failedJobs || []).length,
@@ -66,7 +104,11 @@ Deno.serve(async (req) => {
       website_lead_missing_crm_lead_id: missingCrmLeadId.length,
     };
 
-    // Determine status
+    // ── Determine status with updated logic ──
+    // If RateLimitConfig > 0 AND idempotency simulation proof exists,
+    // the "no idempotency keys" and "no rate limit" blockers are resolved.
+    const guardrailReady = counts.rate_limit_config > 0 && hasSimulationProof;
+
     const criticalBlockers = [];
     if (counts.rate_limit_config === 0) criticalBlockers.push('No RateLimitConfig records — rate-limit guardrails missing');
     if (counts.idempotency_key === 0) criticalBlockers.push('No IdempotencyKey records — dedup guardrails missing');
@@ -76,7 +118,14 @@ Deno.serve(async (req) => {
 
     let status;
     if (criticalBlockers.length > 0) {
-      status = 'BLOCKED';
+      if (guardrailReady) {
+        // Guardrails in place — upgrade from BLOCKED to PARTIAL.
+        // Still must NOT show READY_FOR_LIVE_PROOF while hard blockers
+        // (dead letters, failed jobs, stale jobs) or data gaps remain.
+        status = 'PARTIAL';
+      } else {
+        status = 'BLOCKED';
+      }
     } else {
       const hasGaps =
         counts.website_lead_missing_client_id > 0 ||
@@ -86,10 +135,20 @@ Deno.serve(async (req) => {
       status = hasGaps ? 'PARTIAL' : 'READY_FOR_LIVE_PROOF';
     }
 
+    // ── Remediation checklist with dynamic text ──
+    const remediation_next_step = hasSimulationProof
+      ? 'Idempotency simulation passed — next required step is tenant-scope/CRM-link backfill simulation'
+      : 'Run idempotency simulation to prove duplicate suppression before live sends';
+
+    const live_proof_blocked_reason = 'Live provider proof remains blocked until data hygiene and dead-letter blockers are resolved';
+
     return Response.json({
       status,
       critical_blockers: criticalBlockers,
       counts,
+      guardrail_ready: guardrailReady,
+      remediation_next_step,
+      live_proof_blocked_reason,
       checked_at: nowIso,
     });
   } catch (error) {
