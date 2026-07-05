@@ -8,188 +8,130 @@ function json(data, status = 200) {
 }
 
 /**
- * Safe admin-only reconciliation/backfill function.
- * Infers client_id/client_project_id for existing records that are missing tenant scope.
+ * Admin-only: Audit and backfill tenant scope (client_id/client_project_id)
+ * on existing communication, automation, lead, and campaign records.
  *
- * Strategy (non-destructive):
- * 1. Query records with tenant_scope_status=missing_client_id (or null/blank).
- * 2. For each record, attempt to resolve client_id from:
- *    a. lead_id → Leads.client_id
- *    b. website_lead_id → WebsiteLead.client_id
- *    c. order_id → ClientProject.client_id
- *    d. onboarding_client_id → OnboardingClient.client_id
- *    e. client_email/customer_email → Client.client_id
- * 3. If exactly one confident match → update record, set tenant_scope_status=scoped.
- * 4. If no match or ambiguous → set tenant_scope_status=manual_review.
- * 5. Log what was inferred and why to an audit summary.
+ * Non-destructive: only adds fields, never deletes or overwrites existing client_id.
+ * Records that can't be confidently mapped → tenant_scope_status=manual_review.
  *
- * Entities scanned:
- * - CommunicationLog, CommunicationEvent, Messages, Emails
- * - AutomationJob, DripCampaign, NurtureCampaign, EmailDripCampaign
- * - Alert, DemoRequest, LeadRevenue, LeadReactivation, WebsiteLead
- *
- * Payload: { entity_name, limit, dry_run }
+ * POST body:
+ *   { "action": "audit" | "backfill", "entity": "CommunicationLog" | ... , "limit": 100 }
  */
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-
     if (!user || (user.role !== 'admin' && user.role !== 'super_admin')) {
       return json({ error: 'Admin access required' }, 403);
     }
 
-    const payload = await req.json().catch(() => ({}));
-    const entityName = payload.entity_name || 'CommunicationLog';
-    const limit = Math.min(payload.limit || 100, 500);
-    const dryRun = payload.dry_run === true;
+    const { action = 'audit', entity = 'CommunicationLog', limit = 100 } = await req.json().catch(() => ({}));
+    const sr = base44.asServiceRole;
 
-    const entities = base44.asServiceRole.entities;
-    if (!entities[entityName]) {
-      return json({ error: `Entity ${entityName} not found` }, 400);
-    }
-
-    // Fetch records missing tenant scope
-    // Query for records where client_id is null/empty
-    const records = await entities[entityName].filter({
-      client_id: null,
-    }, '-created_date', limit).catch((e) => {
-      throw new Error(`Filter failed: ${e.message}`);
-    });
-
-    const results = {
-      entity_name: entityName,
-      scanned: records.length,
-      scoped: 0,
-      manual_review: 0,
-      no_match: 0,
-      dry_run: dryRun,
-      updates: [],
-      audit_log: [],
+    // Entities to scan and their lead_id field
+    const ENTITY_CONFIG = {
+      CommunicationLog: { leadField: 'lead_id', hasClient: true },
+      CommunicationEvent: { leadField: 'lead_id', hasClient: true },
+      Messages: { leadField: 'lead_id', hasClient: true },
+      Emails: { leadField: 'lead_id', hasClient: true },
+      AutomationJob: { leadField: 'lead_id', hasClient: true },
+      DripCampaign: { leadField: 'lead_id', hasClient: true },
+      NurtureCampaign: { leadField: 'lead_id', hasClient: true },
+      EmailDripCampaign: { leadField: 'lead_id', hasClient: true },
+      Alert: { leadField: 'lead_id', hasClient: true },
+      DemoRequest: { leadField: 'lead_id', hasClient: true },
+      LeadRevenue: { leadField: 'lead_id', hasClient: true },
+      LeadReactivation: { leadField: 'lead_id', hasClient: true },
+      ConversationThread: { leadField: 'lead_id', hasClient: true },
     };
 
-    for (const record of records) {
+    const config = ENTITY_CONFIG[entity];
+    if (!config) {
+      return json({ error: `Entity ${entity} not supported for tenant scope backfill` }, 400);
+    }
+
+    // Fetch records missing client_id
+    const records = await sr.entities[entity].filter(
+      { client_id: { $in: [null, ""] } },
+      "-created_date",
+      Math.min(limit, 500)
+    );
+
+    const results = { entity, action, scanned: records.length, updated: 0, manual_review: 0, already_scoped: 0, errors: 0, details: [] };
+
+    for (const rec of records) {
+      const leadId = rec[config.leadField];
       let resolvedClientId = null;
       let resolvedClientProjectId = null;
-      let source = 'none';
-      let confidence = 'none';
+      let resolutionSource = null;
 
-      // a. Resolve from lead_id
-      if (!resolvedClientId && record.lead_id) {
+      // Try Leads lookup
+      if (leadId) {
         try {
-          const lead = await entities.Leads.get(record.lead_id);
+          const lead = await sr.entities.Leads.get(leadId);
           if (lead?.client_id) {
             resolvedClientId = lead.client_id;
             resolvedClientProjectId = lead.client_project_id || null;
-            source = 'leads';
-            confidence = 'high';
+            resolutionSource = `lead:${leadId}`;
           }
         } catch (_) {}
       }
 
-      // b. Resolve from website_lead_id (if field exists)
-      if (!resolvedClientId && record.website_lead_id) {
+      // Try order_id → ClientProject
+      if (!resolvedClientId && rec.order_id) {
         try {
-          const wl = await entities.WebsiteLead.get(record.website_lead_id);
-          if (wl?.client_id) {
-            resolvedClientId = wl.client_id;
-            resolvedClientProjectId = wl.client_project_id || null;
-            source = 'website_lead';
-            confidence = 'high';
-          }
-        } catch (_) {}
-      }
-
-      // c. Resolve from order_id → ClientProject
-      if (!resolvedClientId && record.order_id) {
-        try {
-          const projects = await entities.ClientProject.filter({ order_id: record.order_id }, '-created_date', 1);
+          const projects = await sr.entities.ClientProject.filter({ order_id: rec.order_id }, "-created_date", 1);
           if (projects?.length === 1 && projects[0].client_id) {
             resolvedClientId = projects[0].client_id;
-            resolvedClientProjectId = projects[0].id || null;
-            source = 'order_to_project';
-            confidence = 'high';
-          } else if (projects?.length > 1) {
-            confidence = 'ambiguous';
+            resolvedClientProjectId = projects[0].id;
+            resolutionSource = `order_project:${rec.order_id}`;
           }
         } catch (_) {}
       }
 
-      // d. Resolve from onboarding_client_id
-      if (!resolvedClientId && record.onboarding_client_id) {
+      // Try client_email → ClientAccountConfig
+      if (!resolvedClientId && rec.client_email) {
         try {
-          const oc = await entities.OnboardingClient.get(record.onboarding_client_id);
-          if (oc?.client_id) {
-            resolvedClientId = oc.client_id;
-            resolvedClientProjectId = oc.client_project_id || null;
-            source = 'onboarding_client';
-            confidence = 'high';
+          const configs = await sr.entities.ClientAccountConfig.filter({ client_email: rec.client_email }, "-created_date", 1);
+          if (configs?.length === 1 && configs[0].client_id) {
+            resolvedClientId = configs[0].client_id;
+            resolvedClientProjectId = configs[0].client_project_id || null;
+            resolutionSource = `client_config:${rec.client_email}`;
           }
         } catch (_) {}
       }
 
-      // e. Resolve from client_email / customer_email
-      if (!resolvedClientId && (record.client_email || record.lead_email)) {
-        const emailToLookup = record.client_email || record.lead_email;
-        try {
-          const clients = await entities.Client.filter({ email: emailToLookup }, '-created_date', 1);
-          if (clients?.length === 1 && clients[0].id) {
-            resolvedClientId = clients[0].id;
-            source = 'client_email';
-            confidence = 'medium';
-          } else if (clients?.length > 1) {
-            confidence = 'ambiguous';
+      if (resolvedClientId) {
+        if (action === 'backfill') {
+          try {
+            await sr.entities[entity].update(rec.id, {
+              client_id: resolvedClientId,
+              client_project_id: resolvedClientProjectId,
+              tenant_scope_status: 'scoped',
+            });
+            results.updated++;
+            results.details.push({ id: rec.id, status: 'scoped', source: resolutionSource });
+          } catch (e) {
+            results.errors++;
+            results.details.push({ id: rec.id, status: 'error', error: e.message });
           }
-        } catch (_) {}
-      }
-
-      // Apply result
-      if (resolvedClientId && confidence === 'high' || (resolvedClientId && confidence === 'medium')) {
-        if (!dryRun) {
-          await entities[entityName].update(record.id, {
-            client_id: resolvedClientId,
-            client_project_id: resolvedClientProjectId,
-            tenant_scope_status: 'scoped',
-            tenant_scope_error: null,
-          }).catch((e) => {
-            console.warn(`[backfill] Update failed for ${record.id}:`, e.message);
-          });
+        } else {
+          results.updated++; // would update
+          results.details.push({ id: rec.id, status: 'would_scope', source: resolutionSource });
         }
-        results.scoped++;
-        results.updates.push({ id: record.id, action: 'scoped', client_id: resolvedClientId, source });
-      } else if (confidence === 'ambiguous') {
-        if (!dryRun) {
-          await entities[entityName].update(record.id, {
-            tenant_scope_status: 'manual_review',
-            tenant_scope_error: 'ambiguous_client_match',
-          }).catch((e) => {
-            console.warn(`[backfill] Manual review update failed for ${record.id}:`, e.message);
-          });
+      } else {
+        // Mark for manual review
+        if (action === 'backfill') {
+          try {
+            await sr.entities[entity].update(rec.id, { tenant_scope_status: 'manual_review' });
+          } catch (_) {}
         }
         results.manual_review++;
-        results.updates.push({ id: record.id, action: 'manual_review', reason: 'ambiguous_match' });
-      } else {
-        if (!dryRun) {
-          await entities[entityName].update(record.id, {
-            tenant_scope_status: 'manual_review',
-            tenant_scope_error: 'no_confident_match',
-          }).catch((e) => {
-            console.warn(`[backfill] No-match update failed for ${record.id}:`, e.message);
-          });
-        }
-        results.no_match++;
-        results.updates.push({ id: record.id, action: 'manual_review', reason: 'no_confident_match' });
+        results.details.push({ id: rec.id, status: 'manual_review', lead_id: leadId, order_id: rec.order_id, client_email: rec.client_email });
       }
-
-      results.audit_log.push({
-        record_id: record.id,
-        source,
-        confidence,
-        resolved_client_id: resolvedClientId,
-      });
     }
 
-    return json(results);
+    return json({ success: true, ...results });
   } catch (error) {
     console.error('[backfillTenantScope] Error:', error.message);
     return json({ error: error.message }, 500);
