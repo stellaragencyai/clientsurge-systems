@@ -1,6 +1,11 @@
 {
   "name": "WebsiteLead",
   "type": "object",
+  "_metadata": {
+    "status": "CORE_PRODUCTION",
+    "reason": "Inbound lead capture from website forms, contact pages, pricing pages, landing pages, and AI receptionist. Source of client_id/client_project_id for downstream automation.",
+    "tenant_scoped": "client_id + client_project_id"
+  },
   "properties": {
     "description": {
       "type": "string",
@@ -70,6 +75,11 @@
         "elevenlabs_sarah_ai_receptionist"
       ],
       "default": "website_form"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID (Tenant Isolation)",
+      "description": "Business/client tenant ID. Derived from routing_key, source_page, webhook registration, or explicit form metadata at capture time."
     },
     "client_project_id": {
       "type": "string",
@@ -341,9 +351,18 @@
   "required": [],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "read": {
       "$or": [
@@ -353,14 +372,37 @@
           }
         },
         {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
           "data.client_project_id": "{{client_project_id}}"
         }
       ]
     },
     "update": {
-      "user_condition": {
-        "role": "admin"
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_project_id": "{{client_project_id}}"
+        }
+      ]
     },
     "delete": {
       "user_condition": {
