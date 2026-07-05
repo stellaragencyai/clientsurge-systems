@@ -2,12 +2,11 @@
   "name": "CommunicationLog",
   "type": "object",
   "title": "Communication Log",
-  "description": "Durable provider log for every Twilio SMS and Resend email send attempt. Proves what sent, what failed, and what leads are stuck.",
+  "description": "Durable provider log for every Twilio SMS and Resend email send attempt.",
   "properties": {
     "related_entity_type": {
       "type": "string",
-      "title": "Related Entity Type",
-      "description": "WebsiteLead, Leads, Order, etc."
+      "title": "Related Entity Type"
     },
     "related_entity_id": {
       "type": "string",
@@ -19,13 +18,28 @@
     },
     "client_id": {
       "type": "string",
-      "title": "Client ID (Tenant Isolation)",
-      "description": "Business/client tenant ID. Copied from lead/order/context at log time."
+      "title": "Client ID (Tenant Isolation)"
     },
     "client_project_id": {
       "type": "string",
-      "title": "Client Project ID (Tenant Isolation)",
-      "description": "Project/workspace/install scope under this client."
+      "title": "Client Project ID (Tenant Isolation)"
+    },
+    "tenant_scope_status": {
+      "type": "string",
+      "title": "Tenant Scope Status",
+      "enum": [
+        "scoped",
+        "missing_client_id",
+        "needs_backfill",
+        "manual_review",
+        "system_internal"
+      ],
+      "default": "missing_client_id"
+    },
+    "tenant_scope_error": {
+      "type": "string",
+      "title": "Tenant Scope Error",
+      "description": "e.g. missing_client_id_tenant_scope when send was blocked"
     },
     "lead_email": {
       "type": "string",
@@ -33,13 +47,11 @@
     },
     "lead_phone": {
       "type": "string",
-      "title": "Lead Phone",
-      "description": "Raw phone as stored on the lead record (for reference)"
+      "title": "Lead Phone"
     },
     "canonical_to_address": {
       "type": "string",
-      "title": "Canonical To Address (E.164)",
-      "description": "Normalized E.164 phone actually sent to provider. For SMS this is the exact To= value in the Twilio request."
+      "title": "Canonical To Address (E.164)"
     },
     "lead_name": {
       "type": "string",
@@ -78,8 +90,7 @@
     },
     "trigger_name": {
       "type": "string",
-      "title": "Trigger Name",
-      "description": "initial_response, missed_call_text_back, nurture_follow_up, booking_link, manual_test, etc."
+      "title": "Trigger Name"
     },
     "template_name": {
       "type": "string",
@@ -87,12 +98,21 @@
     },
     "to_address": {
       "type": "string",
-      "title": "To Address",
-      "description": "Normalized E.164 for SMS, email address for email"
+      "title": "To Address"
     },
     "from_address": {
       "type": "string",
       "title": "From Address"
+    },
+    "provider_from_number": {
+      "type": "string",
+      "title": "Provider From Number (SMS)",
+      "description": "Twilio from number used for this send."
+    },
+    "provider_from_email": {
+      "type": "string",
+      "title": "Provider From Email",
+      "description": "Resend from email used for this send."
     },
     "subject": {
       "type": "string",
@@ -109,8 +129,7 @@
     },
     "provider_status": {
       "type": "string",
-      "title": "Provider Status",
-      "description": "Raw provider status: queued, sent, delivered, undelivered, failed"
+      "title": "Provider Status"
     },
     "delivery_status": {
       "type": "string",
@@ -123,8 +142,7 @@
         "skipped",
         "unknown"
       ],
-      "default": "unknown",
-      "description": "queued = provider accepted; sent = carrier accepted upstream; delivered = final delivery confirmed; failed = undelivered/failed"
+      "default": "unknown"
     },
     "error_code": {
       "type": "string",
@@ -136,13 +154,11 @@
     },
     "request_payload_redacted": {
       "type": "string",
-      "title": "Request Payload (Redacted)",
-      "description": "API request payload with all secrets/tokens redacted. Must show To= in E.164 format."
+      "title": "Request Payload (Redacted)"
     },
     "response_payload_redacted": {
       "type": "string",
-      "title": "Response Payload (Redacted)",
-      "description": "API response payload with all secrets/tokens redacted"
+      "title": "Response Payload (Redacted)"
     },
     "sent_at": {
       "type": "string",
@@ -152,14 +168,12 @@
     "delivered_at": {
       "type": "string",
       "title": "Delivered At",
-      "format": "date-time",
-      "description": "Set only when Twilio status callback reports delivered"
+      "format": "date-time"
     },
     "failed_at": {
       "type": "string",
       "title": "Failed At",
-      "format": "date-time",
-      "description": "Set when Twilio reports undelivered/failed"
+      "format": "date-time"
     },
     "environment": {
       "type": "string",
@@ -173,8 +187,7 @@
     },
     "superseded_note": {
       "type": "string",
-      "title": "Superseded Note",
-      "description": "Admin-visible annotation when this log record used a stale/incorrect phone and is not valid proof."
+      "title": "Superseded Note"
     }
   },
   "required": [
