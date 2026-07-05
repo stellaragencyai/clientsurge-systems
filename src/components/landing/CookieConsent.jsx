@@ -46,6 +46,7 @@ export default function CookieConsent() {
     return () => window.removeEventListener('resize', updateOffset);
   }, []);
 
+  // Fix #28: Granular consent categories — Essential always on, Analytics & Marketing optional
   const handleAccept = () => {
     safeSetCookieConsent('accepted');
     setVisible(false);
@@ -53,13 +54,20 @@ export default function CookieConsent() {
   };
 
   const handleDecline = () => {
-    safeSetCookieConsent('declined');
+    // Decline marketing/analytics but keep essential tracking (error monitoring, etc.)
+    safeSetCookieConsent('essential_only');
     setVisible(false);
     updateGa4Consent(false);
   };
 
   const handleDismiss = () => {
-    safeSetCookieConsent('dismissed');
+    safeSetCookieConsent('essential_only');
+    setVisible(false);
+    updateGa4Consent(false);
+  };
+
+  const handleAcceptEssentials = () => {
+    safeSetCookieConsent('essential_only');
     setVisible(false);
     updateGa4Consent(false);
   };
@@ -109,17 +117,25 @@ export default function CookieConsent() {
           </a>
           .
         </p>
-        {/* Actions */}
-        <div className="flex gap-2 pt-0.5">
+        {/* Fix #28: Three granular consent categories */}
+        <div className="flex gap-1.5 pt-0.5">
           <button
             onClick={handleDecline}
-            className="flex-1 rounded-md border border-border px-3 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[11px]"
+            className="flex-1 rounded-md border border-border px-2 py-1 text-[9px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[10px]"
+            title="Essential cookies only — no analytics or marketing tracking"
           >
-            Decline
+            Essential Only
+          </button>
+          <button
+            onClick={handleAcceptEssentials}
+            className="flex-1 rounded-md border border-border px-2 py-1 text-[9px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[10px]"
+            title="Essential + analytics (no marketing)"
+          >
+            Essential + Stats
           </button>
           <button
             onClick={handleAccept}
-            className="flex-1 rounded-md px-3 py-1 text-[10px] font-medium text-white transition-all sm:py-1.5 md:py-2 md:text-[11px]"
+            className="flex-1 rounded-md px-2 py-1 text-[9px] font-medium text-white transition-all sm:py-1.5 md:py-2 md:text-[10px]"
             style={{
               background: 'linear-gradient(135deg,#0088cc 0%,#00aaff 100%)',
               boxShadow: '0 4px 12px rgba(0,170,255,0.25)'
@@ -131,7 +147,7 @@ export default function CookieConsent() {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,170,255,0.25)';
             }}
           >
-            Accept
+            Accept All
           </button>
         </div>
       </div>

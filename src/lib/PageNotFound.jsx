@@ -36,23 +36,58 @@ export default function PageNotFound() {
           This page doesn't exist.
         </h1>
         <p className="text-muted-foreground text-base max-w-md mb-10 leading-relaxed">
-          But your next booked appointment could. Head back home or book a free 15-minute demo to see how ClientSurge works.
+          The page you're looking for doesn't exist. Try searching or head to one of these popular pages.
         </p>
 
-        {/* Actions */}
-        <div className="flex flex-wrap gap-4 justify-center">
+        {/* Fix #71: Search bar and suggested pages */}
+        <div className="w-full max-w-md mb-8">
+          <input
+            type="text"
+            placeholder="Search for a page..."
+            className="w-full px-4 py-3 rounded-lg border border-border bg-card text-foreground placeholder:text-muted-foreground"
+            onChange={(e) => {
+              const query = e.target.value.toLowerCase();
+              const links = document.querySelectorAll('[data-suggestion-link]');
+              links.forEach((link) => {
+                const text = link.textContent.toLowerCase();
+                link.style.display = text.includes(query) ? '' : 'none';
+              });
+            }}
+          />
+        </div>
+
+        <div className="flex flex-wrap gap-3 justify-center mb-8">
           <button
             onClick={() => navigate('/')}
-            className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-semibold text-sm border"
-            style={{
-              borderColor: "rgba(154,92,46,0.3)",
-              color: "#9a5c2e",
-              background: "rgba(154,92,46,0.06)",
-            }}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm border border-border text-foreground hover:bg-muted transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Home
+            Home
           </button>
+          <button
+            onClick={() => navigate('/pricing')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm border border-border text-foreground hover:bg-muted transition-colors"
+            data-suggestion-link
+          >
+            Browse Pricing
+          </button>
+          <button
+            onClick={() => navigate('/store')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm border border-border text-foreground hover:bg-muted transition-colors"
+            data-suggestion-link
+          >
+            Automation Store
+          </button>
+          <button
+            onClick={() => navigate('/contact')}
+            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full font-semibold text-sm border border-border text-foreground hover:bg-muted transition-colors"
+            data-suggestion-link
+          >
+            Contact Support
+          </button>
+        </div>
+
+        <div className="flex justify-center">
           <button
             onClick={() => setShowModal(true)}
             className="inline-flex items-center gap-2 px-6 py-3 rounded-full font-bold text-sm text-white"

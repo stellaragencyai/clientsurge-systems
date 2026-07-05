@@ -26,6 +26,11 @@ export default defineConfig({
           "vendor-framer": ["framer-motion"],
           "vendor-charts": ["recharts"],
           "vendor-lucide": ["lucide-react"],
+          // Fix #44: Split heavy libraries into separate chunks so they're not
+          // loaded eagerly on pages that don't use them.
+          "vendor-dnd": ["@hello-pangea/dnd"],
+          "vendor-query": ["@tanstack/react-query"],
+          "vendor-stripe": ["@stripe/react-stripe-js", "@stripe/stripe-js"],
         },
       },
     },

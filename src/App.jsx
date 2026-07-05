@@ -22,6 +22,12 @@ import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
 import { installGa4 } from "@/lib/ga4";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
+// Fix #20: UTM parameter capture for analytics attribution
+import { captureUtmParameters } from "@/lib/utmTracking";
+// Fix #23: Scroll depth tracking for sales pages
+import { initScrollDepthTracking, resetScrollTracking } from "@/lib/scrollDepth";
+// Fix #68: Core Web Vitals monitoring
+import { initPerformanceMonitoring } from "@/lib/performanceMonitoring";
 import {
   APP_SHELL_PUBLIC_PATHS,
   LEGACY_REDIRECTS as PUBLIC_ROUTE_REDIRECTS,
@@ -173,6 +179,8 @@ function ScrollToTop() {
     if (!location.hash) {
       return forceScrollToTop();
     }
+    // Fix #23: Reset scroll depth tracking on route change
+    resetScrollTracking();
   }, [location.hash, location.key, location.pathname]);
   return null;
 }
@@ -186,14 +194,36 @@ function AppInner() {
     if (window.location.hostname.includes("preview-sandbox")) return;
     installGa4();
     initializeAnalyticsObserver();
+    // Fix #20: Capture UTM params on app init for attribution
+    captureUtmParameters();
+    // Fix #23: Initialize scroll depth tracking
+    initScrollDepthTracking();
+    // Fix #68: Initialize Core Web Vitals monitoring
+    initPerformanceMonitoring();
 
     const trackFormSubmits = () => {
       document.querySelectorAll("form").forEach((form) => {
         form.addEventListener("submit", () => {
           if (window.gtag) {
+            // Fix #20: Include UTM parameters in form_submit events for attribution
+            const utmParams = new URLSearchParams(window.location.search);
+            const utmData = {};
+            ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach((key) => {
+              const val = utmParams.get(key);
+              if (val) utmData[key] = val;
+            });
+            // Also check sessionStorage for persisted UTMs
+            try {
+              const stored = JSON.parse(sessionStorage.getItem("cs_utm_session") || "{}");
+              Object.keys(stored).forEach((key) => {
+                if (!utmData[key]) utmData[key] = stored[key];
+              });
+            } catch {}
+
             window.gtag("event", "form_submit", {
               form_id: form.id || form.name,
               page_path: window.location.pathname,
+              ...utmData,
             });
           }
         });

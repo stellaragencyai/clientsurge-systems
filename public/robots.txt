@@ -1,89 +1,45 @@
-User-agent: *
-Allow: /
-Allow: /$
-Allow: /pricing
-Allow: /store
-Allow: /automations
-Allow: /industries
-Allow: /contact
-Allow: /about
-Allow: /how-it-works
-Allow: /proof
-Allow: /faq
-Allow: /testimonials
-Allow: /blog
-Allow: /blog/
-Allow: /roofing
-Allow: /hvac
-Allow: /plumbing
-Allow: /dental
-Allow: /med-spa
-Allow: /chiropractic
-Allow: /contractors
-Allow: /real-estate
-Allow: /personal-injury
-Allow: /privacy
-Allow: /terms
-Allow: /sms-terms
-Allow: /refund-policy
+# ClientSurge Systems — robots.txt
+# Fixes Audit Issue #66: No robots.txt optimization
 
+# Sitemap
+Sitemap: https://clientsurgesystems.com/sitemap.xml
+
+# Block admin and internal routes
+User-agent: *
 Disallow: /admin
 Disallow: /admin/
-Disallow: /dashboard
-Disallow: /dashboard/
-Disallow: /client
-Disallow: /client/
 Disallow: /client-portal
 Disallow: /client-portal/
-Disallow: /client-dashboard
-Disallow: /client-dashboard/
 Disallow: /setup
 Disallow: /setup/
-Disallow: /setup/credentials
-Disallow: /setup/preview
-Disallow: /setup/status
-Disallow: /functions
-Disallow: /functions/
-Disallow: /function
-Disallow: /function/
-Disallow: /internal
-Disallow: /internal/
-Disallow: /private
-Disallow: /private/
 Disallow: /onboarding
 Disallow: /onboarding/
-Disallow: /install
-Disallow: /install/
-Disallow: /audit
-Disallow: /audit/
-Disallow: /observability
-Disallow: /observability/
-Disallow: /reconciliation
-Disallow: /reconciliation/
+Disallow: /dashboard
+Disallow: /dashboard/
 Disallow: /api/
-Disallow: /base44/
-Disallow: /saas
-Disallow: /saas/
-Disallow: /mission-control
-Disallow: /lead-intelligence
-Disallow: /sam
-Disallow: /medspa-dashboard
-Disallow: /AdminLeadDetail
-Disallow: /AdminSettings
-Disallow: /Dashboard
-Disallow: /ClientPortal
-Disallow: /LeadIntelligence
-Disallow: /Sam
-Disallow: /MedSpaDashboard
-Disallow: /WebsiteSpecPreview
-Disallow: /NotFound
-Disallow: /*?tab=
-Disallow: /*?package=
-Disallow: /opt-out
+Disallow: /_generated/
+Disallow: /pages/
 Disallow: /success
 Disallow: /order-success
 Disallow: /thank-you
 Disallow: /launch-control
-Disallow: /roadmap
 
-Sitemap: https://clientsurgesystems.com/sitemap.xml
+# Block AI training crawlers (optional)
+User-agent: GPTBot
+Disallow: /
+
+User-agent: CCBot
+Disallow: /
+
+User-agent: anthropic-ai
+Disallow: /
+
+# Allow all crawlers to access public pages
+User-agent: Googlebot
+Allow: /
+
+User-agent: Bingbot
+Allow: /
+
+# Crawl rate
+Crawl-delay: 1

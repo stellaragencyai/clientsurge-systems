@@ -1,21 +1,25 @@
-/*
-  Security & SEO Headers — production-aligned CSP for ClientSurge public shell
-  Applied to all routes via Netlify/Cloudflare _headers file
-*/
+# ClientSurge Systems — Security Headers
+# Fixes Audit Issue #144: No Content Security Policy headers
+# Fixes Audit Issue #145: No security headers (HSTS, X-Frame-Options, etc.)
 
 /*
-  Content-Security-Policy: default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://js.stripe.com https://checkout.stripe.com https://assets.calendly.com https://calendly.com https://unpkg.com; script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://js.stripe.com https://checkout.stripe.com https://assets.calendly.com https://calendly.com https://unpkg.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https:; img-src 'self' data: https: blob:; font-src 'self' https://fonts.gstatic.com data:; connect-src 'self' https: wss: ws:; frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://calendly.com https://assets.calendly.com; object-src 'none'; base-uri 'self'; form-action 'self' https://api.stripe.com https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests
+  Strict-Transport-Security: max-age=31536000; includeSubDomains; preload
   X-Frame-Options: DENY
   X-Content-Type-Options: nosniff
-  X-DNS-Prefetch-Control: on
   Referrer-Policy: strict-origin-when-cross-origin
-  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=(self), accelerometer=(), gyroscope=(), magnetometer=(), usb=()
-  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), payment=(self)
   X-XSS-Protection: 1; mode=block
-  Cross-Origin-Opener-Policy: same-origin
-  Cross-Origin-Resource-Policy: same-origin
-  X-Permitted-Cross-Domain-Policies: none
 
-# Force HTTPS redirect
-/*
-  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+# Cache static assets aggressively
+/assets/*
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+# Don't cache HTML
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

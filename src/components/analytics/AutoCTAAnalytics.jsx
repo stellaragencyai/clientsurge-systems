@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { trackEvent } from "@/lib/analytics";
 
@@ -11,6 +11,16 @@ function normalizeLabel(text = "") {
 
 export default function AutoCTAAnalytics() {
   const location = useLocation();
+
+  // Fix #26: Use refs to persist dedup state across effect re-runs (React StrictMode double-fire)
+  const lastSignatureRef = useRef("");
+  const lastTimestampRef = useRef(0);
+  const firedForPathRef = useRef(false);
+
+  useEffect(() => {
+    // Reset per-path dedup so CTA impressions fire once per page view
+    firedForPathRef.current = false;
+  }, [location.pathname]);
 
   useEffect(() => {
     let lastSignature = "";
@@ -39,12 +49,14 @@ export default function AutoCTAAnalytics() {
 
       const signature = `${location.pathname}|${label}|${destination}`;
       const now = Date.now();
-      if (signature === lastSignature && now - lastTimestamp < 1000) {
+
+      // Fix #26: Use refs to prevent double-fire across effect re-runs
+      if (signature === lastSignatureRef.current && now - lastTimestampRef.current < 1000) {
         return;
       }
 
-      lastSignature = signature;
-      lastTimestamp = now;
+      lastSignatureRef.current = signature;
+      lastTimestampRef.current = now;
 
       trackEvent("cta_click_auto", {
         cta_label: label,

@@ -146,10 +146,22 @@ function initApp() {
 
 initApp()
 
-// Launch hardening: do not register a service worker while custom-domain routing
-// and Base44 publishing are being stabilized. A stale worker can keep serving old
-// app shells after rollback/publish events. Clear existing workers safely.
-if ('serviceWorker' in navigator) {
+// Fix #40: Register service worker for static asset caching on repeat visits.
+// Only register in production to avoid stale shells during development.
+if ('serviceWorker' in navigator && import.meta.env.PROD) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker
+      .register('/sw.js', { scope: '/' })
+      .then((registration) => {
+        // Check for updates every 60 minutes
+        setInterval(() => registration.update().catch(() => {}), 60 * 60 * 1000);
+      })
+      .catch((error) => {
+        console.warn('Service worker registration failed:', error?.message);
+      });
+  });
+} else if ('serviceWorker' in navigator) {
+  // Dev mode: clear existing workers to avoid stale shells
   window.addEventListener('load', () => {
     navigator.serviceWorker
       .getRegistrations()

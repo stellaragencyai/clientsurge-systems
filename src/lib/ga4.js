@@ -78,7 +78,14 @@ export function installGa4({
   }
 
   windowRef.gtag("js", new Date());
-  windowRef.gtag("config", measurementId, { send_page_view: true });
+  windowRef.gtag("config", measurementId, {
+    send_page_view: true,
+    // Fix #16: Cross-domain linker to maintain session across public site ↔ authenticated portal
+    linker: {
+      domains: ["clientsurgesystems.com", "www.clientsurgesystems.com"],
+      use_incoming: true,
+    },
+  });
 
   const script = documentRef.createElement("script");
   script.async = true;

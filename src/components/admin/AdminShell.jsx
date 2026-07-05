@@ -14,6 +14,7 @@ import {
   Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck, ListChecks,
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
+import DarkModeToggle from "./DarkModeToggle";
 
 const NAV_GROUPS = [
   {
@@ -247,6 +248,7 @@ export default function AdminShell({ children, title, activeId }) {
             <h2 className="truncate text-sm sm:text-base font-semibold text-foreground">{title}</h2>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
+            <DarkModeToggle />
             {inboxUnread > 0 && (
               <button
                 onClick={() => navigate("/admin?tab=inbox")}
