@@ -116,7 +116,8 @@ export default function ClientPortal() {
       const me = await base44.auth.me();
       setUser(me);
       try {
-        const context = await base44.functions.invoke("getClientPortalContext", {});
+        const resp = await base44.functions.invoke("getClientPortalContext", {});
+        const context = resp.data || resp;
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
@@ -154,7 +155,8 @@ export default function ClientPortal() {
   const refreshProject = async () => {
     if (!user) return;
     try {
-      const context = await base44.functions.invoke("getClientPortalContext", {});
+      const resp = await base44.functions.invoke("getClientPortalContext", {});
+      const context = resp.data || resp;
       if (context?.project) {
         setProject(context.project);
         setPortalOrder(context.order || null);
