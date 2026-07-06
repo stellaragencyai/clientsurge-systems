@@ -73,9 +73,10 @@ Deno.serve(async (req) => {
       }
     }
 
-    // Step 2: Transition pipeline status
+    // Step 2: Transition pipeline status — ONLY if the value is actually changing
+    // (prevents recursive Order update → automation re-trigger loop)
     const validStatuses = ["Paid", "Ready for Install", "Configuring", "Testing", "Live", "Error"];
-    if (stage && validStatuses.includes(stage)) {
+    if (stage && validStatuses.includes(stage) && order.pipeline_status !== stage) {
       await base44.asServiceRole.entities.Order.update(order_id, {
         pipeline_status: stage,
         last_install_event_at: new Date().toISOString(),
@@ -93,11 +94,14 @@ Deno.serve(async (req) => {
         orderStatus = liveItems === 0 ? "paid_setup_in_progress" : 
                       liveItems < totalItems ? "partially_live" : "fully_live";
       }
-      
-      await base44.asServiceRole.entities.Order.update(order_id, {
-        order_status: orderStatus,
-      }).catch(() => null);
-      tasks.push(`order_status: ${orderStatus}`);
+
+      // Only update if order_status is actually changing (prevents re-trigger loop)
+      if (order.order_status !== orderStatus) {
+        await base44.asServiceRole.entities.Order.update(order_id, {
+          order_status: orderStatus,
+        }).catch(() => null);
+        tasks.push(`order_status: ${orderStatus}`);
+      }
     }
 
     // Step 4: Log installation event
