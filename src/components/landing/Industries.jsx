@@ -20,6 +20,7 @@ import {
   Calculator,
   Dumbbell,
   Gavel,
+  PawPrint,
 } from "lucide-react";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
@@ -292,6 +293,34 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
+},
+{
+  id: "veterinary",
+  routePath: "/veterinary",
+  icon: PawPrint,
+  name: "Veterinary Clinics",
+  accent: {
+    color: "#14b8a6",
+    soft: "rgba(20,184,166,0.18)",
+    glow: "rgba(20,184,166,0.28)",
+    iconBg: "rgba(20,184,166,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=1200&q=95"
+},
+{
+  id: "property-services",
+  routePath: "/property-services",
+  icon: Building2,
+  name: "Property Services",
+  accent: {
+    color: "#6366f1",
+    soft: "rgba(99,102,241,0.18)",
+    glow: "rgba(99,102,241,0.28)",
+    iconBg: "rgba(99,102,241,0.18)"
+  },
+  image:
+  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=95"
 }];
 
 
