@@ -1,12 +1,133 @@
-import { secureJson } from "../_shared/response.ts";
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
-import { resolveClientPortalAccess } from "../_shared/portalOwnership.js";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
+
+// ── inlined helpers (no local imports — Deno deploys each function independently) ──
+
+function secureJson(data: Record<string, unknown> = {}, options: ResponseInit = {}): Response {
+  return new Response(JSON.stringify(data), {
+    status: options.status || 200,
+    headers: { "Content-Type": "application/json", "X-Frame-Options": "DENY", "Cache-Control": "no-store" },
+  });
+}
+
+function cleanString(value: unknown): string {
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function normalizeEmail(value: string): string {
+  return cleanString(value).toLowerCase();
+}
+
+function sortByCreatedDateDesc(a: any, b: any): number {
+  return new Date(b.created_date || 0).getTime() - new Date(a.created_date || 0).getTime();
+}
+
+function dedupeById(records: any[] = []): any[] {
+  const seen = new Set();
+  return records.filter((record) => {
+    if (!record?.id || seen.has(record.id)) return false;
+    seen.add(record.id);
+    return true;
+  });
+}
+
+async function safeFilter(collection: any, query: any, sort = "-created_date", limit = 25): Promise<any[]> {
+  try {
+    const results = await collection.filter(query, sort, limit);
+    return Array.isArray(results) ? results : [];
+  } catch {
+    return [];
+  }
+}
+
+async function safeGet(collection: any, id: string): Promise<any | null> {
+  if (!id) return null;
+  try {
+    return await collection.get(id);
+  } catch {
+    return null;
+  }
+}
+
+async function resolveClientPortalAccess(base44: any, userEmail: string) {
+  const normalizedUserEmail = normalizeEmail(userEmail);
+  if (!normalizedUserEmail) {
+    return { status: "not_found", code: "portal_user_email_missing" };
+  }
+
+  const [clientsByEmail, paidOrdersByEmail, projectsByEmail] = await Promise.all([
+    safeFilter(base44.asServiceRole.entities.Client, { email: normalizedUserEmail }, "-created_date", 25),
+    safeFilter(base44.asServiceRole.entities.Order, { customer_email: normalizedUserEmail }, "-created_date", 50),
+    safeFilter(base44.asServiceRole.entities.ClientProject, { client_email: normalizedUserEmail }, "-created_date", 25),
+  ]);
+
+  const exactClients = dedupeById(
+    clientsByEmail.filter((c: any) => normalizeEmail(c.email) === normalizedUserEmail)
+  ).sort(sortByCreatedDateDesc);
+  const uniqueClient = exactClients.length === 1 ? exactClients[0] : null;
+
+  const linkedPaidOrders = paidOrdersByEmail
+    .filter((o: any) => normalizeEmail(o.customer_email) === normalizedUserEmail)
+    .filter((o: any) => o.payment_status === "paid" && o.client_project_id)
+    .sort(sortByCreatedDateDesc);
+
+  const linkedOrderCandidates: any[] = [];
+  for (const order of linkedPaidOrders) {
+    const project = await safeGet(base44.asServiceRole.entities.ClientProject, order.client_project_id);
+    if (!project) continue;
+    const linkedClient =
+      (order.client_id && await safeGet(base44.asServiceRole.entities.Client, order.client_id)) || uniqueClient;
+    linkedOrderCandidates.push({ order, project, client: linkedClient || null });
+  }
+
+  const uniqueLinkedProjects = dedupeById(linkedOrderCandidates.map((c) => c.project));
+  if (uniqueLinkedProjects.length > 1) {
+    return { status: "ambiguous", code: "portal_project_ambiguous", resolution_type: "linked_paid_order_conflict" };
+  }
+
+  if (linkedOrderCandidates.length === 1) {
+    return {
+      status: "resolved",
+      resolution_type: "linked_paid_order",
+      project: linkedOrderCandidates[0].project,
+      client: linkedOrderCandidates[0].client,
+      order: linkedOrderCandidates[0].order,
+    };
+  }
+
+  if (uniqueClient) {
+    const projectsByClientId = dedupeById(
+      await safeFilter(base44.asServiceRole.entities.ClientProject, { client_id: uniqueClient.id }, "-created_date", 25)
+    ).sort(sortByCreatedDateDesc);
+
+    if (projectsByClientId.length > 1) {
+      return { status: "ambiguous", code: "portal_project_ambiguous", resolution_type: "client_link_conflict" };
+    }
+    if (projectsByClientId.length === 1) {
+      return { status: "resolved", resolution_type: "client_id_link", project: projectsByClientId[0], client: uniqueClient, order: null };
+    }
+  }
+
+  const exactEmailProjects = dedupeById(
+    projectsByEmail.filter((p: any) => normalizeEmail(p.client_email) === normalizedUserEmail)
+  ).sort(sortByCreatedDateDesc);
+
+  if (exactEmailProjects.length > 1) {
+    return { status: "ambiguous", code: "portal_project_ambiguous", resolution_type: "legacy_email_conflict" };
+  }
+  if (exactEmailProjects.length === 1) {
+    return { status: "resolved", resolution_type: "legacy_email_match", project: exactEmailProjects[0], client: uniqueClient, order: null };
+  }
+
+  return { status: "not_found", code: "portal_project_not_found" };
+}
+
+// ── main handler ──
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!user) return secureJson({ error: 'Unauthorized' }, { status: 401 });
+    if (!user) return secureJson({ error: "Unauthorized" }, { status: 401 });
 
     const body = await req.json().catch(() => ({}));
     const {
@@ -30,22 +151,17 @@ Deno.serve(async (req) => {
       email_confirmation_template,
     } = body;
 
-    const access = await resolveClientPortalAccess({
-      base44,
-      userEmail: user.email,
-    });
+    const access = await resolveClientPortalAccess(base44, user.email);
 
     if (access.status !== "resolved" || !access.project?.id) {
-      return secureJson({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: "Forbidden — no client project found for your account" }, { status: 403 });
     }
 
     if (project_id && project_id !== access.project.id) {
-      return secureJson({ error: 'Forbidden' }, { status: 403 });
+      return secureJson({ error: "Forbidden — project mismatch" }, { status: 403 });
     }
 
-    const updates = {
-      quick_start_completed: true,
-    };
+    const updates: Record<string, unknown> = { quick_start_completed: true };
 
     if (business_name !== undefined) updates.business_name = business_name || "";
     if (industry !== undefined) updates.industry = industry || "";
@@ -70,7 +186,7 @@ Deno.serve(async (req) => {
     console.log(`[saveQuickStartConfig] Quick start config saved for project ${access.project.id} by ${user.email}`);
     return secureJson({ success: true, project: updatedProject });
   } catch (error) {
-    console.error('[saveQuickStartConfig] saveQuickStartConfig error:', error);
-    return secureJson({ error: error.message }, { status: 500 });
+    console.error("[saveQuickStartConfig] error:", error);
+    return secureJson({ error: error.message || "Failed to save configuration" }, { status: 500 });
   }
 });
