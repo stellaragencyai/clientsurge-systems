@@ -1,6 +1,7 @@
 import { useState, useEffect, lazy, Suspense, Component } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
+import { base44 } from "@/api/base44Client";
 import { Loader2, LogIn, LifeBuoy, AlertTriangle, Home, RefreshCw, WifiOff } from "lucide-react";
 
 // Lazy import with built-in retry for transient chunk-load failures
@@ -243,9 +244,11 @@ function UnauthenticatedAccess() {
 }
 
 export default function ClientPortalAccess() {
-  const { user, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } =
+  const { user: ctxUser, isAuthenticated, isLoadingAuth, isLoadingPublicSettings, applyAuthenticatedUser } =
     useAuth();
   const [timedOut, setTimedOut] = useState(false);
+  const [localAuthChecking, setLocalAuthChecking] = useState(false);
+  const [localUser, setLocalUser] = useState(null);
 
   // Loading timeout guard — show visible fallback instead of remaining blank
   useEffect(() => {
@@ -254,11 +257,40 @@ export default function ClientPortalAccess() {
     return () => clearTimeout(timer);
   }, [isLoadingAuth, isLoadingPublicSettings]);
 
+  // /client-portal is a public route, so AuthContext skips its auth check.
+  // Do our own check here so logged-in users go straight to the dashboard.
+  useEffect(() => {
+    if (isLoadingAuth || isLoadingPublicSettings) return;
+    if (isAuthenticated && ctxUser) return;
+
+    let cancelled = false;
+    setLocalAuthChecking(true);
+    base44.auth.isAuthenticated().then(async (authed) => {
+      if (cancelled) return;
+      if (!authed) {
+        setLocalAuthChecking(false);
+        return;
+      }
+      try {
+        const me = await base44.auth.me();
+        if (cancelled) return;
+        setLocalUser(me);
+        if (applyAuthenticatedUser) applyAuthenticatedUser(me);
+      } catch {
+        if (!cancelled) setLocalAuthChecking(false);
+      }
+    }).catch(() => {
+      if (!cancelled) setLocalAuthChecking(false);
+    });
+
+    return () => { cancelled = true; };
+  }, [isLoadingAuth, isLoadingPublicSettings, isAuthenticated, ctxUser, applyAuthenticatedUser]);
+
   if (timedOut && (isLoadingAuth || isLoadingPublicSettings)) {
     return <PortalLoadingTimeout />;
   }
 
-  if (isLoadingAuth || isLoadingPublicSettings) {
+  if (isLoadingAuth || isLoadingPublicSettings || localAuthChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -266,8 +298,11 @@ export default function ClientPortalAccess() {
     );
   }
 
+  const effectiveUser = ctxUser || localUser;
+  const effectiveAuthed = isAuthenticated || Boolean(effectiveUser);
+
   // Unauthenticated → show clean public access screen (never a 403 or blank)
-  if (!isAuthenticated || !user) {
+  if (!effectiveAuthed || !effectiveUser) {
     return <UnauthenticatedAccess />;
   }
 
