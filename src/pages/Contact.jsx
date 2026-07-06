@@ -17,6 +17,7 @@ import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
+import FloatingConfirmation from "@/components/ui/FloatingConfirmation";
 import { setPageMetadata } from "@/lib/seo";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -63,6 +64,7 @@ export default function Contact() {
   });
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [showFloat, setShowFloat] = useState(false);
   const [errors, setErrors] = useState({});
 
   useEffect(() => {
@@ -128,6 +130,7 @@ export default function Contact() {
       const result = await base44.functions.invoke("submitContactInquiry", form);
       if (!result.data?.success) throw new Error(result.data?.error || "Submission failed");
       setSuccess(true);
+      setShowFloat(true);
     } catch {
       setErrors({ submit: "Something went wrong. Please try again or email us directly." });
     } finally {
@@ -345,6 +348,12 @@ export default function Contact() {
       </main>
       <Footer />
       <MobileCallBar />
+      <FloatingConfirmation
+        show={showFloat}
+        onDismiss={() => setShowFloat(false)}
+        title="Message Received"
+        message="Thanks for reaching out. We'll respond within one business day."
+      />
     </div>
   );
 }

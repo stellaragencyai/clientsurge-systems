@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { trackCTA } from '@/lib/analytics';
+import FloatingConfirmation from '@/components/ui/FloatingConfirmation';
 
 const formatPhone = (value) => {
   const digits = value.replace(/\D/g, '');
@@ -83,6 +84,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [showFloat, setShowFloat] = useState(false);
 
   const update = (field, value) => {
     setForm(prev => ({ ...prev, [field]: value }));
@@ -132,6 +134,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
         consent_source: `industry_page_${industrySlug}`,
       });
       setSubmitted(true);
+      setShowFloat(true);
     } catch {
       setErrors({ submit: 'Something went wrong. Please try again.' });
     } finally {
@@ -277,6 +280,13 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
       <p className="text-center text-xs text-muted-foreground">
         No spam. No pressure. Just a tailored recommendation from our team.
       </p>
+
+      <FloatingConfirmation
+        show={showFloat}
+        onDismiss={() => setShowFloat(false)}
+        title="Audit Request Received"
+        message="Our team will review your answers and reach out within one business day to discuss your automation options."
+      />
     </form>
   );
 }

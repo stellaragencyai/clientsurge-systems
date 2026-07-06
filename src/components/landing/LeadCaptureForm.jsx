@@ -2,6 +2,7 @@ import { useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { ArrowRight, CheckCircle2, AlertCircle, ShieldCheck, Lock } from "lucide-react";
 import { formatPhoneInput } from "@/lib/phoneInputMask";
+import FloatingConfirmation from "@/components/ui/FloatingConfirmation";
 
 const NICHES = [
   "Med Spas & Aesthetic Clinics",
@@ -32,6 +33,7 @@ export default function LeadCaptureForm() {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const [showFloat, setShowFloat] = useState(false);
 
   const [formData, setFormData] = useState({
     full_name: "",
@@ -103,6 +105,7 @@ export default function LeadCaptureForm() {
       }
 
       setSubmitted(true);
+      setShowFloat(true);
     } catch (err) {
       setError(err.message || "Failed to submit form");
       setLoading(false);
@@ -347,6 +350,13 @@ export default function LeadCaptureForm() {
           </div>
         </form>
       </div>
+
+      <FloatingConfirmation
+        show={showFloat}
+        onDismiss={() => setShowFloat(false)}
+        title="Request Received"
+        message="We've received your info. A specialist will contact you within 24 hours to discuss your automation plan."
+      />
     </section>
   );
 }
