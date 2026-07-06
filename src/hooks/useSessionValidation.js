@@ -1,47 +1,47 @@
 /**
- * Hook to re-validate user session on route changes
+ * Hook to re-validate user session periodically
  * Ensures token hasn't been revoked at server-level
  * Prevents stale sessions from accessing protected routes
+ *
+ * NOTE: The initial auth check is already done by AuthContext on mount.
+ * This hook only runs a periodic background check and redirects to login
+ * ONLY on definitive 401/403 responses — transient errors are ignored
+ * so they don't log out users with valid sessions.
  */
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useAuth } from "@/lib/AuthContext";
-import { useLocation } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 
+const SESSION_CHECK_INTERVAL = 5 * 60 * 1000; // 5 minutes
+
 export function useSessionValidation() {
-  const { user, redirectToLogin } = useAuth();
-  const location = useLocation();
+  const { user, navigateToLogin } = useAuth();
+  const navigateRef = useRef(navigateToLogin);
+  navigateRef.current = navigateToLogin;
 
   useEffect(() => {
     if (!user) return;
 
-    // Validate session on route change to protected areas
-    const isProtectedRoute = location.pathname.startsWith("/admin") ||
-                            location.pathname.startsWith("/client-portal") ||
-                            location.pathname.startsWith("/dashboard");
-
-    if (!isProtectedRoute) return;
-
     const validateSession = async () => {
       try {
-        // Call auth.me() to validate token is still valid
         const currentUser = await base44.auth.me();
         if (!currentUser) {
-          redirectToLogin();
+          navigateRef.current();
         }
       } catch (error) {
-        console.warn("Session validation failed:", error);
-        redirectToLogin();
+        // Only redirect on definitive auth failures (401/403).
+        // Transient errors (network, timeout, 500) should NOT log the user out.
+        const status = error?.status || error?.response?.status;
+        if (status === 401 || status === 403) {
+          navigateRef.current();
+        }
       }
     };
 
-    // Validate immediately and then every 5 minutes
-    validateSession();
-    const interval = setInterval(validateSession, 5 * 60 * 1000);
-
+    const interval = setInterval(validateSession, SESSION_CHECK_INTERVAL);
     return () => clearInterval(interval);
-  }, [user, location.pathname, redirectToLogin]);
+  }, [user]);
 }
 
 export default useSessionValidation;
