@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { Link, useSearchParams } from "react-router-dom";
-import { base44 } from "@/api/base44Client";
+import { appParams } from "@/lib/app-params";
 
 /**
  * ProductSignup — resilient, self-contained checkout page.
@@ -37,6 +37,8 @@ const PACKAGES = [
 
 const DEFAULT_PACKAGE = "growth_system";
 const VALID_KEYS = ["starter_system", "growth_system", "pro_system"];
+const CHECKOUT_FUNCTION_NAME = "createCheckoutSession";
+const FALLBACK_APP_ID = "69dc4a79656fdba136d413d3";
 
 function resolvePackage(pkgParam) {
   if (!pkgParam) return DEFAULT_PACKAGE;
@@ -46,6 +48,50 @@ function resolvePackage(pkgParam) {
   const aliasMap = { starter: "starter_system", growth: "growth_system", pro: "pro_system", elite: "pro_system" };
   if (aliasMap[normalized]) return aliasMap[normalized];
   return DEFAULT_PACKAGE;
+}
+
+async function invokePublicCheckoutSession(payload) {
+  const appId = appParams?.appId || FALLBACK_APP_ID;
+  const endpoint = `/api/apps/${appId}/functions/${CHECKOUT_FUNCTION_NAME}`;
+
+  const response = await fetch(endpoint, {
+    method: "POST",
+    headers: {
+      "Accept": "application/json",
+      "Content-Type": "application/json",
+    },
+    credentials: "same-origin",
+    body: JSON.stringify(payload),
+  });
+
+  const rawText = await response.text();
+  let result = {};
+
+  if (rawText) {
+    try {
+      result = JSON.parse(rawText);
+    } catch {
+      result = { error: rawText.slice(0, 500) };
+    }
+  }
+
+  const checkoutUrl = result?.url || result?.data?.url;
+
+  if (!response.ok || !checkoutUrl) {
+    const message =
+      result?.error ||
+      result?.data?.error ||
+      `Checkout server returned HTTP ${response.status || "error"}.`;
+    throw new Error(message);
+  }
+
+  return {
+    data: {
+      ...result,
+      url: checkoutUrl,
+    },
+    url: checkoutUrl,
+  };
 }
 
 export default function ProductSignup() {
@@ -97,7 +143,10 @@ export default function ProductSignup() {
         cancel_url: `${origin}/product-signup?package=${selectedPackage}`,
       };
 
-      const response = await base44.functions.invoke("createCheckoutSession", payload);
+      // Public checkout must not use the Base44 browser SDK here. The SDK can run an
+      // implicit auth probe against /entities/User/me, which breaks anonymous buyers
+      // with a 401 before Stripe checkout starts.
+      const response = await invokePublicCheckoutSession(payload);
       const url = response?.data?.url || response?.url;
 
       if (!url) {

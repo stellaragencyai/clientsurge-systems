@@ -25,6 +25,7 @@ const requiredMarkers = [
 
 const routes = [
   "/product-signup",
+  "/product_signup",
   "/product-signup?package=growth_system",
   "/product-signup?package=starter_system",
   "/product-signup?package=pro_system",

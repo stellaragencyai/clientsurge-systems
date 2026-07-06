@@ -68,6 +68,8 @@ export const STATIC_ROUTE_ALIASES = {
   "/legal/sms": "/sms-terms",
   "/legal/refund": "/refund-policy",
   "/product-landing": "/pricing",
+  "/product-sign-up": "/product-signup",
+  "/product_signup": "/product-signup",
 };
 
 export const LEGACY_REDIRECTS = Object.entries(STATIC_ROUTE_ALIASES);
@@ -91,7 +93,9 @@ export const PUBLIC_ROUTE_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 // but uses useAuth() internally to decide between login prompt and full portal.
 // Including it here ensures AuthenticatedAppWithTenant doesn't block it during
 // the initial auth-loading phase — ClientPortalAccess manages its own loading/error states.
-export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS, "/client-portal"];
+// /product_signup is a public typo/legacy alias frequently entered by users; keep it
+// public so the app shell can redirect without triggering auth-loading behavior.
+export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS, "/product_signup", "/client-portal"];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
   "/client",
@@ -146,6 +150,8 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/store",
   "/product",
   "/product-signup",
+  "/product-sign-up",
+  "/product_signup",
   "/signup",
   "/success",
   "/order-success",

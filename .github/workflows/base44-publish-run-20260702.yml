@@ -6,6 +6,13 @@ on:
       - main
     paths:
       - ".github/workflows/base44-publish-run-20260702.yml"
+      - "src/pages/ProductSignup.jsx"
+      - "src/lib/publicRouteMetadata.js"
+      - "public/product-signup"
+      - "public/product-sign-up"
+      - "public/product_signup"
+      - "scripts/product-signup-route-smoke.mjs"
+      - "base44/functions/createCheckoutSession/**"
 
 jobs:
   publish:
