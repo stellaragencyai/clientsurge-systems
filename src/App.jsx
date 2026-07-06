@@ -42,7 +42,7 @@ const Start = lazy(() => import("./pages/Start"));
 const Book = lazy(() => import("./pages/Book"));
 const PricingPage = lazy(() => import("./pages/PricingPage"));
 const ProductLanding = lazy(() => import("./pages/ProductLanding"));
-const ProductSignup = lazy(() => import("./pages/ProductSignup"));
+import ProductSignup from "./pages/ProductSignup";
 const ClientDashboardEntry = lazy(() => import("./pages/ClientDashboardEntry"));
 const FAQPage = lazy(() => import("./pages/FAQPage"));
 const OurSystemPage = lazy(() => import("./pages/OurSystemPage"));
@@ -438,8 +438,9 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/automations" element={<LazyRoute Component={Automations} />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/signup" element={<SignupForward />} />
-      <Route path="/product-signup" element={<ErrorBoundary><LazyRoute Component={ProductSignup} /></ErrorBoundary>} />
+      <Route path="/product-signup" element={<ProductSignup />} />
       <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
+      <Route path="/product-sign-up" element={<Navigate to="/product-signup" replace />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
       <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
