@@ -89,6 +89,16 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
     setErrors(prev => ({ ...prev, [field]: undefined }));
   };
 
+  const allValid = Boolean(
+    form.full_name.trim() &&
+    EMAIL_RE.test(form.email) &&
+    form.phone.replace(/\D/g, '').length >= 10 &&
+    form.business_name.trim() &&
+    form.lead_volume &&
+    form.problem.trim() &&
+    form.consent
+  );
+
   const validate = () => {
     const e = {};
     if (!form.full_name.trim()) e.full_name = 'Required';
@@ -153,6 +163,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
             onChange={v => update('full_name', v)}
             placeholder="Jane Smith"
             autoComplete="name"
+            allValid={allValid}
           />
         </Field>
         <Field label="Business Name" required error={errors.business_name}>
@@ -161,6 +172,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
             onChange={v => update('business_name', v)}
             placeholder="ABC Roofing Co."
             autoComplete="organization"
+            allValid={allValid}
           />
         </Field>
       </div>
@@ -174,6 +186,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
             onChange={v => update('email', v)}
             placeholder="owner@yourbiz.com"
             autoComplete="email"
+            allValid={allValid}
           />
         </Field>
         <Field label="Business Phone" required error={errors.phone}>
@@ -183,6 +196,7 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
             onChange={v => update('phone', formatPhone(v))}
             placeholder="(602) 555-0100"
             autoComplete="tel"
+            allValid={allValid}
           />
         </Field>
       </div>
@@ -210,13 +224,18 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
 
       {/* Industry-specific problem prompt */}
       <Field label={q.problem_prompt} required error={errors.problem}>
-        <textarea
-          value={form.problem}
-          onChange={e => update('problem', e.target.value)}
-          rows={3}
-          className="w-full px-3 py-2.5 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition-all"
-          placeholder="Describe what's happening now with your leads..."
-        />
+        <div className="relative">
+          <textarea
+            value={form.problem}
+            onChange={e => update('problem', e.target.value)}
+            rows={3}
+            className="w-full px-3 py-2.5 pr-9 rounded-lg border border-border bg-background text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary resize-none transition-all"
+            placeholder="Describe what's happening now with your leads..."
+          />
+          {allValid && !errors.problem && form.problem.trim() && (
+            <CheckCircle2 className="absolute right-2.5 top-3 w-4 h-4 text-green-500 pointer-events-none" />
+          )}
+        </div>
       </Field>
 
       {/* Consent */}
@@ -274,12 +293,8 @@ function Field({ label, required, error, children }) {
   );
 }
 
-function QInput({ type = 'text', value, onChange, placeholder, autoComplete = '' }) {
-  const isEmail = type === 'email';
-  const isTel = type === 'tel';
-  const isValidEmail = isEmail && value && EMAIL_RE.test(value);
-  const isValidPhone = isTel && value && value.replace(/\D/g, '').length >= 10;
-  const showCheck = isValidEmail || isValidPhone;
+function QInput({ type = 'text', value, onChange, placeholder, autoComplete = '', allValid = false }) {
+  const showCheck = allValid && value && value.trim().length > 0;
 
   return (
     <div className="relative">

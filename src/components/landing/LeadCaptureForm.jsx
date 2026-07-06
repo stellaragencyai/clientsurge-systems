@@ -50,6 +50,14 @@ export default function LeadCaptureForm() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  const stepAllValid = (() => {
+    if (step === 1) return Boolean(formData.full_name.trim() && /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) && formData.phone.replace(/\D/g, '').length >= 10);
+    if (step === 2) return Boolean(formData.business_name.trim() && formData.niche);
+    if (step === 3) return Boolean(formData.monthly_leads.trim() && formData.contact_method);
+    if (step === 4) return Boolean(formData.biggest_problem.trim() && formData.consent_given);
+    return false;
+  })();
+
   const buildProblemSummary = () => {
     const details = [];
 
@@ -172,6 +180,7 @@ export default function LeadCaptureForm() {
                 value={formData.full_name}
                 onChange={(e) => updateField("full_name", e.target.value)}
                 placeholder="Your full name"
+                allValid={stepAllValid}
               />
               <FormInput
                 label="Email"
@@ -180,6 +189,7 @@ export default function LeadCaptureForm() {
                 value={formData.email}
                 onChange={(e) => updateField("email", e.target.value)}
                 placeholder="you@company.com"
+                allValid={stepAllValid}
               />
               <FormInput
                 label="Phone"
@@ -189,6 +199,7 @@ export default function LeadCaptureForm() {
                 onChange={(e) => updateField("phone", formatPhoneInput(e.target.value))}
                 placeholder="(555) 000-0000"
                 maxLength={14}
+                allValid={stepAllValid}
               />
             </div>
           )}
@@ -202,6 +213,7 @@ export default function LeadCaptureForm() {
                 value={formData.business_name}
                 onChange={(e) => updateField("business_name", e.target.value)}
                 placeholder="Your business name"
+                allValid={stepAllValid}
               />
               <FormSelect
                 label="Industry / Niche"
@@ -209,6 +221,7 @@ export default function LeadCaptureForm() {
                 value={formData.niche}
                 onChange={(e) => updateField("niche", e.target.value)}
                 options={NICHES}
+                allValid={stepAllValid}
               />
             </div>
           )}
@@ -222,6 +235,7 @@ export default function LeadCaptureForm() {
                 value={formData.monthly_leads}
                 onChange={(e) => updateField("monthly_leads", e.target.value)}
                 placeholder="e.g., 50, 150, etc."
+                allValid={stepAllValid}
               />
               <FormSelect
                 label="Preferred Contact Method"
@@ -229,6 +243,7 @@ export default function LeadCaptureForm() {
                 value={formData.contact_method}
                 onChange={(e) => updateField("contact_method", e.target.value)}
                 options={CONTACT_METHODS}
+                allValid={stepAllValid}
               />
             </div>
           )}
@@ -240,14 +255,19 @@ export default function LeadCaptureForm() {
                 <label className="block text-sm font-medium text-foreground mb-2">
                   Your Biggest Follow-Up Challenge
                 </label>
-                <textarea
-                  required
-                  value={formData.biggest_problem}
-                  onChange={(e) => updateField("biggest_problem", e.target.value)}
-                  placeholder="What's making it hard to convert leads?"
-                  rows={4}
-                  className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
-                />
+                <div className="relative">
+                  <textarea
+                    required
+                    value={formData.biggest_problem}
+                    onChange={(e) => updateField("biggest_problem", e.target.value)}
+                    placeholder="What's making it hard to convert leads?"
+                    rows={4}
+                    className="w-full px-4 py-3 pr-10 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary resize-none"
+                  />
+                  {stepAllValid && formData.biggest_problem.trim() && (
+                    <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500 pointer-events-none" />
+                  )}
+                </div>
               </div>
               <label className="flex items-start gap-3 rounded-lg border border-border bg-muted/30 p-3 text-xs leading-relaxed text-muted-foreground">
                 <input
@@ -331,43 +351,53 @@ export default function LeadCaptureForm() {
   );
 }
 
-function FormInput({ label, required, type = "text", value, onChange, placeholder }) {
+function FormInput({ label, required, type = "text", value, onChange, placeholder, allValid = false }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">
         {label} {required && <span className="text-primary">*</span>}
       </label>
-      <input
-        type={type}
-        value={value}
-        onChange={onChange}
-        placeholder={placeholder}
-        required={required}
-        className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-      />
+      <div className="relative">
+        <input
+          type={type}
+          value={value}
+          onChange={onChange}
+          placeholder={placeholder}
+          required={required}
+          className="w-full px-4 py-3 pr-10 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+        />
+        {allValid && value && value.trim() && (
+          <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+        )}
+      </div>
     </div>
   );
 }
 
-function FormSelect({ label, required, value, onChange, options }) {
+function FormSelect({ label, required, value, onChange, options, allValid = false }) {
   return (
     <div>
       <label className="block text-sm font-medium text-foreground mb-2">
         {label} {required && <span className="text-primary">*</span>}
       </label>
-      <select
-        value={value}
-        onChange={onChange}
-        required={required}
-        className="w-full px-4 py-3 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
-      >
-        <option value="">Select an option...</option>
-        {options.map((option) => (
-          <option key={option} value={option}>
-            {option}
-          </option>
-        ))}
-      </select>
+      <div className="relative">
+        <select
+          value={value}
+          onChange={onChange}
+          required={required}
+          className="w-full px-4 py-3 pr-10 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-1 focus:ring-primary"
+        >
+          <option value="">Select an option...</option>
+          {options.map((option) => (
+            <option key={option} value={option}>
+              {option}
+            </option>
+          ))}
+        </select>
+        {allValid && value && (
+          <CheckCircle2 className="absolute right-8 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+        )}
+      </div>
     </div>
   );
 }

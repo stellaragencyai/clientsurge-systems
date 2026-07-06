@@ -4,7 +4,8 @@ const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
 ];
 
-function ValidatedInput({ label, value, onChange, type, placeholder, error, required, isValid, ...props }) {
+function ValidatedInput({ label, value, onChange, type, placeholder, error, required, isValid, allValid, ...props }) {
+  const showCheck = allValid && value && !error && value.trim().length > 0;
   return (
     <div>
       <label className="block text-xs font-semibold text-[#333] mb-1 uppercase tracking-wide">
@@ -21,7 +22,7 @@ function ValidatedInput({ label, value, onChange, type, placeholder, error, requ
           }`}
           {...props}
         />
-        {isValid && !error && value && (
+        {showCheck && (
           <CheckCircle2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
         )}
       </div>
@@ -39,6 +40,7 @@ export default function AccountSignupForm({
   addressConfirmed,
   setAddressConfirmed,
   isFieldValid,
+  allValid = false,
 }) {
   return (
     <div className="bg-white rounded-xl border border-[#eee] p-5 md:p-6">
@@ -56,6 +58,7 @@ export default function AccountSignupForm({
             placeholder="John"
             error={fieldErrors.firstName}
             isValid={isFieldValid("firstName", formData.firstName)}
+            allValid={allValid}
           />
           <ValidatedInput
             label="MI"
@@ -63,6 +66,7 @@ export default function AccountSignupForm({
             onChange={(e) => handleFieldChange("mi", e.target.value)}
             placeholder="—"
             maxLength={2}
+            allValid={allValid}
           />
           <ValidatedInput
             label="Last Name"
@@ -72,6 +76,7 @@ export default function AccountSignupForm({
             placeholder="Doe"
             error={fieldErrors.lastName}
             isValid={isFieldValid("lastName", formData.lastName)}
+            allValid={allValid}
           />
         </div>
 
@@ -85,6 +90,7 @@ export default function AccountSignupForm({
             placeholder="owner@example.com"
             error={fieldErrors.email}
             isValid={isFieldValid("email", formData.email)}
+            allValid={allValid}
           />
           <ValidatedInput
             label="Phone"
@@ -95,6 +101,7 @@ export default function AccountSignupForm({
             placeholder="(602) 555-0100"
             error={fieldErrors.phone}
             isValid={isFieldValid("phone", formData.phone)}
+            allValid={allValid}
           />
         </div>
       </div>
@@ -111,12 +118,14 @@ export default function AccountSignupForm({
             placeholder="Your Business LLC"
             error={fieldErrors.businessName}
             isValid={isFieldValid("businessName", formData.businessName)}
+            allValid={allValid}
           />
           <ValidatedInput
             label="Industry"
             value={formData.industry}
             onChange={(e) => handleFieldChange("industry", e.target.value)}
             placeholder="e.g., HVAC, Dental, Roofing"
+            allValid={allValid}
           />
         </div>
 
@@ -125,6 +134,7 @@ export default function AccountSignupForm({
           value={formData.address}
           onChange={(e) => handleFieldChange("address", e.target.value)}
           placeholder="123 Main St"
+          allValid={allValid}
         />
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -133,19 +143,25 @@ export default function AccountSignupForm({
             value={formData.city}
             onChange={(e) => handleFieldChange("city", e.target.value)}
             placeholder="Phoenix"
+            allValid={allValid}
           />
           <div>
             <label className="block text-xs font-semibold text-[#333] mb-1 uppercase tracking-wide">State</label>
-            <select
-              value={formData.state}
-              onChange={(e) => handleFieldChange("state", e.target.value)}
-              className="w-full px-3 py-2.5 border border-[#ccc] rounded-lg text-sm text-[#333] bg-white focus:outline-none focus:ring-2 focus:ring-[#005691]/20 focus:border-[#005691]"
-            >
-              <option value="">Select...</option>
-              {US_STATES.map((s) => (
-                <option key={s} value={s}>{s}</option>
-              ))}
-            </select>
+            <div className="relative">
+              <select
+                value={formData.state}
+                onChange={(e) => handleFieldChange("state", e.target.value)}
+                className="w-full px-3 py-2.5 pr-9 border border-[#ccc] rounded-lg text-sm text-[#333] bg-white focus:outline-none focus:ring-2 focus:ring-[#005691]/20 focus:border-[#005691]"
+              >
+                <option value="">Select...</option>
+                {US_STATES.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+              {allValid && formData.state && (
+                <CheckCircle2 className="absolute right-8 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500 pointer-events-none" />
+              )}
+            </div>
           </div>
         </div>
 
@@ -155,6 +171,7 @@ export default function AccountSignupForm({
           onChange={(e) => handleFieldChange("zip", e.target.value)}
           placeholder="85001"
           maxLength={10}
+          allValid={allValid}
         />
       </div>
 

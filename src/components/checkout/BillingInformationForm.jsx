@@ -1,10 +1,11 @@
-import { Lock } from "lucide-react";
+import { Lock, CheckCircle2 } from "lucide-react";
 
 const US_STATES = [
   "AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY",
 ];
 
-function BillingInput({ label, value, onChange, type, placeholder, required, icon: Icon, maxLength }) {
+function BillingInput({ label, value, onChange, type, placeholder, required, icon: Icon, maxLength, allValid }) {
+  const showCheck = allValid && value && value.trim().length > 0 && !Icon;
   return (
     <div>
       <label className="block text-xs font-semibold text-[#333] mb-1 uppercase tracking-wide">
@@ -19,6 +20,9 @@ function BillingInput({ label, value, onChange, type, placeholder, required, ico
           maxLength={maxLength}
           className="w-full px-3 py-2.5 pr-9 border border-[#ccc] rounded-lg text-sm text-[#333] focus:outline-none focus:ring-2 focus:ring-[#005691]/20 focus:border-[#005691] bg-white"
         />
+        {showCheck && (
+          <CheckCircle2 className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500" />
+        )}
         {Icon && (
           <Icon className="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#005691]" />
         )}
@@ -34,6 +38,7 @@ export default function BillingInformationForm({
   setBillingSameAsBusiness,
   termsAgreed,
   setTermsAgreed,
+  allValid = false,
 }) {
   return (
     <div className="bg-white rounded-xl border border-[#eee] p-5 md:p-6">
@@ -71,6 +76,7 @@ export default function BillingInformationForm({
             value={formData.billingAddress}
             onChange={(e) => handleFieldChange("billingAddress", e.target.value)}
             placeholder="123 Main St"
+            allValid={allValid}
           />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
             <BillingInput
@@ -78,19 +84,25 @@ export default function BillingInformationForm({
               value={formData.billingCity}
               onChange={(e) => handleFieldChange("billingCity", e.target.value)}
               placeholder="Phoenix"
+              allValid={allValid}
             />
             <div>
               <label className="block text-xs font-semibold text-[#333] mb-1 uppercase tracking-wide">State</label>
-              <select
-                value={formData.billingState}
-                onChange={(e) => handleFieldChange("billingState", e.target.value)}
-                className="w-full px-3 py-2.5 border border-[#ccc] rounded-lg text-sm text-[#333] bg-white focus:outline-none focus:ring-2 focus:ring-[#005691]/20 focus:border-[#005691]"
-              >
-                <option value="">Select...</option>
-                {US_STATES.map((s) => (
-                  <option key={s} value={s}>{s}</option>
-                ))}
-              </select>
+              <div className="relative">
+                <select
+                  value={formData.billingState}
+                  onChange={(e) => handleFieldChange("billingState", e.target.value)}
+                  className="w-full px-3 py-2.5 pr-9 border border-[#ccc] rounded-lg text-sm text-[#333] bg-white focus:outline-none focus:ring-2 focus:ring-[#005691]/20 focus:border-[#005691]"
+                >
+                  <option value="">Select...</option>
+                  {US_STATES.map((s) => (
+                    <option key={s} value={s}>{s}</option>
+                  ))}
+                </select>
+                {allValid && formData.billingState && (
+                  <CheckCircle2 className="absolute right-8 top-1/2 -translate-y-1/2 w-4 h-4 text-green-500 pointer-events-none" />
+                )}
+              </div>
             </div>
           </div>
           <BillingInput
@@ -99,6 +111,7 @@ export default function BillingInformationForm({
             onChange={(e) => handleFieldChange("billingZip", e.target.value)}
             placeholder="85001"
             maxLength={10}
+            allValid={allValid}
           />
         </div>
       )}

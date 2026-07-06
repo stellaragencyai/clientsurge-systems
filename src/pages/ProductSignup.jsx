@@ -330,6 +330,28 @@ export default function ProductSignup() {
     handleCheckout();
   };
 
+  // Green checkmark: all fields in the current step must be filled
+  const step1AllValid = Boolean(
+    formData.firstName.trim() &&
+    formData.mi.trim() &&
+    formData.lastName.trim() &&
+    formData.businessName.trim() &&
+    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email) &&
+    formData.phone.replace(/\D/g, '').length >= 10 &&
+    formData.industry.trim() &&
+    formData.address.trim() &&
+    formData.city.trim() &&
+    formData.state &&
+    formData.zip.trim()
+  );
+
+  const step2AllValid = billingSameAsBusiness || Boolean(
+    formData.billingAddress.trim() &&
+    formData.billingCity.trim() &&
+    formData.billingState &&
+    formData.billingZip.trim()
+  );
+
   // ── Render: invalid package fallback ──
   if (configError && !resolvedPlan) {
     return (
@@ -408,6 +430,7 @@ export default function ProductSignup() {
                 addressConfirmed={step1AddressConfirmed}
                 setAddressConfirmed={setStep1AddressConfirmed}
                 isFieldValid={isFieldValid}
+                allValid={step1AllValid}
               />
             )}
             {currentStep === 2 && (
@@ -419,6 +442,7 @@ export default function ProductSignup() {
                   setBillingSameAsBusiness={setBillingSameAsBusiness}
                   termsAgreed={step2TermsAgreed}
                   setTermsAgreed={setStep2TermsAgreed}
+                  allValid={step2AllValid}
                 />
                 <button
                   onClick={handleBack}

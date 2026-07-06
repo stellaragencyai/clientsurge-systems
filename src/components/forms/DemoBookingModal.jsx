@@ -362,7 +362,19 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
   };
 
   const inputClass =
-    "w-full min-h-12 rounded-lg border border-white/15 bg-white px-4 py-3 text-[16px] text-slate-950 outline-none transition focus:border-[#00aeef] focus:ring-2 focus:ring-[#00aeef]/25";
+    "w-full min-h-12 rounded-lg border border-white/15 bg-white px-4 py-3 pr-9 text-[16px] text-slate-950 outline-none transition focus:border-[#00aeef] focus:ring-2 focus:ring-[#00aeef]/25";
+
+  const allInputsFilled = Boolean(
+    form.full_name.trim() &&
+    EMAIL_REGEX.test(form.email.trim()) &&
+    form.phone.trim() && form.phone.replace(/\D/g, '').length >= 10 &&
+    form.business_name.trim() &&
+    form.business_type.trim() &&
+    form.business_website_url.trim() &&
+    form.message.trim() &&
+    form.scheduled_date &&
+    form.scheduled_time
+  );
   const labelClass = "mb-1.5 block text-xs font-semibold uppercase tracking-wide text-slate-500";
 
   return createPortal(
@@ -487,31 +499,41 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label htmlFor="demo-full-name" className={labelClass}>Full name</label>
-                    <input
-                      id="demo-full-name"
-                      name="full_name"
-                      value={form.full_name}
-                      onChange={handleChange}
-                      className={inputClass}
-                      autoComplete="name"
-                      required
-                      aria-invalid={Boolean(errors.full_name)}
-                    />
+                    <div className="relative">
+                      <input
+                        id="demo-full-name"
+                        name="full_name"
+                        value={form.full_name}
+                        onChange={handleChange}
+                        className={inputClass}
+                        autoComplete="name"
+                        required
+                        aria-invalid={Boolean(errors.full_name)}
+                      />
+                      {allInputsFilled && !errors.full_name && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.full_name && <p className="mt-1 text-xs text-red-600">{errors.full_name}</p>}
                   </div>
                   <div>
                     <label htmlFor="demo-email" className={labelClass}>Email</label>
-                    <input
-                      id="demo-email"
-                      name="email"
-                      type="email"
-                      value={form.email}
-                      onChange={handleChange}
-                      className={inputClass}
-                      autoComplete="email"
-                      required
-                      aria-invalid={Boolean(errors.email)}
-                    />
+                    <div className="relative">
+                      <input
+                        id="demo-email"
+                        name="email"
+                        type="email"
+                        value={form.email}
+                        onChange={handleChange}
+                        className={inputClass}
+                        autoComplete="email"
+                        required
+                        aria-invalid={Boolean(errors.email)}
+                      />
+                      {allInputsFilled && !errors.email && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.email && <p className="mt-1 text-xs text-red-600">{errors.email}</p>}
                   </div>
                 </div>
@@ -519,32 +541,42 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label htmlFor="demo-phone" className={labelClass}>Phone</label>
-                    <input
-                      id="demo-phone"
-                      name="phone"
-                      type="tel"
-                      value={form.phone}
-                      onChange={handleChange}
-                      className={inputClass}
-                      autoComplete="tel"
-                      inputMode="tel"
-                      required
-                      aria-invalid={Boolean(errors.phone)}
-                    />
+                    <div className="relative">
+                      <input
+                        id="demo-phone"
+                        name="phone"
+                        type="tel"
+                        value={form.phone}
+                        onChange={handleChange}
+                        className={inputClass}
+                        autoComplete="tel"
+                        inputMode="tel"
+                        required
+                        aria-invalid={Boolean(errors.phone)}
+                      />
+                      {allInputsFilled && !errors.phone && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.phone && <p className="mt-1 text-xs text-red-600">{errors.phone}</p>}
                   </div>
                   <div>
                     <label htmlFor="demo-business-name" className={labelClass}>Business name</label>
-                    <input
-                      id="demo-business-name"
-                      name="business_name"
-                      value={form.business_name}
-                      onChange={handleChange}
-                      className={inputClass}
-                      autoComplete="organization"
-                      required
-                      aria-invalid={Boolean(errors.business_name)}
-                    />
+                    <div className="relative">
+                      <input
+                        id="demo-business-name"
+                        name="business_name"
+                        value={form.business_name}
+                        onChange={handleChange}
+                        className={inputClass}
+                        autoComplete="organization"
+                        required
+                        aria-invalid={Boolean(errors.business_name)}
+                      />
+                      {allInputsFilled && !errors.business_name && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.business_name && <p className="mt-1 text-xs text-red-600">{errors.business_name}</p>}
                   </div>
                 </div>
@@ -552,91 +584,116 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label htmlFor="demo-business-type" className={labelClass}>Industry</label>
-                    <input
-                      id="demo-business-type"
-                      name="business_type"
-                      value={form.business_type}
-                      onChange={handleChange}
-                      className={inputClass}
-                      placeholder="Dental, roofing, med spa..."
-                      required
-                      aria-invalid={Boolean(errors.business_type)}
-                    />
-                    <input type="hidden" name="industry_slug" value={form.industry_slug} />
+                    <div className="relative">
+                      <input
+                        id="demo-business-type"
+                        name="business_type"
+                        value={form.business_type}
+                        onChange={handleChange}
+                        className={inputClass}
+                        placeholder="Dental, roofing, med spa..."
+                        required
+                        aria-invalid={Boolean(errors.business_type)}
+                      />
+                      <input type="hidden" name="industry_slug" value={form.industry_slug} />
+                      {allInputsFilled && !errors.business_type && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.business_type && <p className="mt-1 text-xs text-red-600">{errors.business_type}</p>}
                   </div>
                   <div>
                     <label htmlFor="demo-business-website" className={labelClass}>Website</label>
-                    <input
-                      id="demo-business-website"
-                      name="business_website_url"
-                      type="url"
-                      value={form.business_website_url}
-                      onChange={handleChange}
-                      className={inputClass}
-                      placeholder="https://"
-                      autoComplete="url"
-                      required
-                      aria-invalid={Boolean(errors.business_website_url)}
-                    />
+                    <div className="relative">
+                      <input
+                        id="demo-business-website"
+                        name="business_website_url"
+                        type="url"
+                        value={form.business_website_url}
+                        onChange={handleChange}
+                        className={inputClass}
+                        placeholder="https://"
+                        autoComplete="url"
+                        required
+                        aria-invalid={Boolean(errors.business_website_url)}
+                      />
+                      {allInputsFilled && !errors.business_website_url && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.business_website_url && <p className="mt-1 text-xs text-red-600">{errors.business_website_url}</p>}
                   </div>
                 </div>
 
                 <div>
                   <label htmlFor="demo-message" className={labelClass}>What should we review?</label>
-                  <textarea
-                    id="demo-message"
-                    name="message"
-                    value={form.message}
-                    onChange={handleChange}
-                    className={`${inputClass} min-h-28 resize-y`}
-                    required
-                    aria-invalid={Boolean(errors.message)}
-                  />
+                  <div className="relative">
+                    <textarea
+                      id="demo-message"
+                      name="message"
+                      value={form.message}
+                      onChange={handleChange}
+                      className={`${inputClass} min-h-28 resize-y`}
+                      required
+                      aria-invalid={Boolean(errors.message)}
+                    />
+                    {allInputsFilled && !errors.message && (
+                      <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500 pointer-events-none" />
+                    )}
+                  </div>
                   {errors.message && <p className="mt-1 text-xs text-red-600">{errors.message}</p>}
                 </div>
 
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div>
                     <label htmlFor="demo-scheduled-date" className={labelClass}>Audit date</label>
-                    <input
-                      id="demo-scheduled-date"
-                      name="scheduled_date"
-                      type="date"
-                      value={form.scheduled_date}
-                      min={new Date().toISOString().split("T")[0]}
-                      onChange={handleDateChange}
-                      className={inputClass}
-                      required
-                      aria-invalid={Boolean(errors.scheduled_date)}
-                    />
+                    <div className="relative">
+                      <input
+                        id="demo-scheduled-date"
+                        name="scheduled_date"
+                        type="date"
+                        value={form.scheduled_date}
+                        min={new Date().toISOString().split("T")[0]}
+                        onChange={handleDateChange}
+                        className={inputClass}
+                        required
+                        aria-invalid={Boolean(errors.scheduled_date)}
+                      />
+                      {allInputsFilled && !errors.scheduled_date && (
+                        <CheckCircle2 className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.scheduled_date && <p className="mt-1 text-xs text-red-600">{errors.scheduled_date}</p>}
                   </div>
                   <div>
                     <label htmlFor="demo-scheduled-time" className={labelClass}>
                       Audit time {loadingSlots && <span className="normal-case tracking-normal text-slate-400">Loading...</span>}
                     </label>
-                    <select
-                      id="demo-scheduled-time"
-                      name="scheduled_time"
-                      value={form.scheduled_time}
-                      onChange={handleChange}
-                      disabled={!form.scheduled_date || loadingSlots}
-                      className={inputClass}
-                      required
-                      aria-invalid={Boolean(errors.scheduled_time)}
-                    >
-                      <option value="">{form.scheduled_date ? "Choose a time" : "Choose a date first"}</option>
-                      {TIME_SLOTS.map(({ value, label }) => {
-                        const booked = bookedSlots.includes(value);
-                        return (
-                          <option key={value} value={value} disabled={booked}>
-                            {label}{booked ? " - Booked" : ""}
-                          </option>
-                        );
-                      })}
-                    </select>
+                    <div className="relative">
+                      <select
+                        id="demo-scheduled-time"
+                        name="scheduled_time"
+                        value={form.scheduled_time}
+                        onChange={handleChange}
+                        disabled={!form.scheduled_date || loadingSlots}
+                        className={inputClass}
+                        required
+                        aria-invalid={Boolean(errors.scheduled_time)}
+                      >
+                        <option value="">{form.scheduled_date ? "Choose a time" : "Choose a date first"}</option>
+                        {TIME_SLOTS.map(({ value, label }) => {
+                          const booked = bookedSlots.includes(value);
+                          return (
+                            <option key={value} value={value} disabled={booked}>
+                              {label}{booked ? " - Booked" : ""}
+                            </option>
+                          );
+                        })}
+                      </select>
+                      {allInputsFilled && !errors.scheduled_time && (
+                        <CheckCircle2 className="absolute right-8 top-1/2 -translate-y-1/2 w-5 h-5 text-green-500 pointer-events-none" />
+                      )}
+                    </div>
                     {errors.scheduled_time && <p className="mt-1 text-xs text-red-600">{errors.scheduled_time}</p>}
                   </div>
                 </div>

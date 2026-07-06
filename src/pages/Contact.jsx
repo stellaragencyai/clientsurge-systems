@@ -101,6 +101,15 @@ export default function Contact() {
     return e;
   };
 
+  const allValid = Boolean(
+    form.full_name.trim() &&
+    EMAIL_REGEX.test(form.email) &&
+    form.phone.trim() && form.phone.replace(/\D/g, '').length >= 10 &&
+    form.business_name.trim() &&
+    form.business_type.trim() &&
+    form.message.trim()
+  );
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setForm((c) => ({ ...c, [name]: value }));
@@ -251,27 +260,32 @@ export default function Contact() {
                   <div className="rounded-3xl border border-slate-100 bg-slate-50/60 p-4 md:p-5">
                     <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Contact details</p>
                     <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                      <FormInput label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} error={errors.full_name} required autoComplete="name" />
-                      <FormInput label="Business Name" name="business_name" value={form.business_name} onChange={handleChange} autoComplete="organization" />
-                      <FormInput label="Email Address" type="email" name="email" value={form.email} onChange={handleChange} error={errors.email} required autoComplete="email" />
-                      <FormInput label="Phone No." type="tel" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="(123) 456-7890" autoComplete="tel" />
+                      <FormInput label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} error={errors.full_name} required autoComplete="name" allValid={allValid} />
+                      <FormInput label="Business Name" name="business_name" value={form.business_name} onChange={handleChange} autoComplete="organization" allValid={allValid} />
+                      <FormInput label="Email Address" type="email" name="email" value={form.email} onChange={handleChange} error={errors.email} required autoComplete="email" allValid={allValid} />
+                      <FormInput label="Phone No." type="tel" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="(123) 456-7890" autoComplete="tel" allValid={allValid} />
                     </div>
                   </div>
 
                   <div className="rounded-3xl border border-slate-100 bg-slate-50/60 p-4 md:p-5">
                     <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Business context</p>
                     <div className="space-y-5">
-                      <FormInput label="Business Type / Industry" name="business_type" value={form.business_type} onChange={handleChange} placeholder="e.g., HVAC, Dental, Roofing" />
+                      <FormInput label="Business Type / Industry" name="business_type" value={form.business_type} onChange={handleChange} placeholder="e.g., HVAC, Dental, Roofing" allValid={allValid} />
                       <Field label="Message" required error={errors.message}>
-                        <textarea
-                          name="message"
-                          value={form.message}
-                          onChange={handleChange}
-                          rows={5}
-                          aria-invalid={Boolean(errors.message)}
-                          className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 text-base text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00AEEF] focus:shadow-[0_0_0_4px_rgba(0,174,239,0.12)]"
-                          placeholder="Tell us what is not working: missed calls, slow follow-up, poor booking, low website conversion, or something else."
-                        />
+                        <div className="relative">
+                          <textarea
+                            name="message"
+                            value={form.message}
+                            onChange={handleChange}
+                            rows={5}
+                            aria-invalid={Boolean(errors.message)}
+                            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-10 text-base text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00AEEF] focus:shadow-[0_0_0_4px_rgba(0,174,239,0.12)]"
+                            placeholder="Tell us what is not working: missed calls, slow follow-up, poor booking, low website conversion, or something else."
+                          />
+                          {allValid && !errors.message && form.message.trim() && (
+                            <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500 flex-shrink-0 pointer-events-none" />
+                          )}
+                        </div>
                       </Field>
                     </div>
                   </div>

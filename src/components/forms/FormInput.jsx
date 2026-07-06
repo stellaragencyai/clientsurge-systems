@@ -28,6 +28,7 @@ export default function FormInput({
   placeholder = '',
   autoComplete = '',
   onBlur = null,
+  allValid = false,
 }) {
   // Keep controlled inputs editable by preserving the field name when forwarding
   // a normalized event to parent forms. The old spread-based event clone dropped
@@ -51,16 +52,17 @@ export default function FormInput({
     });
   };
 
-  // Determine validity indicator
-  let isValid = false;
+  // Green checkmark appears only when ALL fields in the form are filled
   let showCheckmark = false;
-  
-  if (type === 'email' && value) {
-    isValid = isValidEmail(value);
-    showCheckmark = isValid && !error;
-  } else if (type === 'tel' && value) {
-    isValid = isValidPhone(value);
-    showCheckmark = isValid && !error;
+
+  if (allValid && value && !error) {
+    if (type === 'email') {
+      showCheckmark = isValidEmail(value);
+    } else if (type === 'tel') {
+      showCheckmark = isValidPhone(value);
+    } else {
+      showCheckmark = value.trim().length > 0;
+    }
   }
 
   return (
