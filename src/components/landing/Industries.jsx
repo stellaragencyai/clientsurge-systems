@@ -127,7 +127,7 @@ const industries = [
 },
 {
   id: "real-estate",
-  routePath: "/industries?industry=real-estate",
+  routePath: "/real-estate",
   icon: KeyRound,
   name: "Real Estate Agents",
   accent: {
