@@ -244,11 +244,11 @@ function UnauthenticatedAccess() {
 }
 
 export default function ClientPortalAccess() {
-  const { user: ctxUser, isAuthenticated, isLoadingAuth, isLoadingPublicSettings, applyAuthenticatedUser } =
+  const { user: ctxUser, isAuthenticated, isLoadingAuth, isLoadingPublicSettings } =
     useAuth();
   const [timedOut, setTimedOut] = useState(false);
-  const [localAuthChecking, setLocalAuthChecking] = useState(false);
-  const [localUser, setLocalUser] = useState(null);
+  const [portalChecking, setPortalChecking] = useState(true);
+  const [portalUser, setPortalUser] = useState(null);
 
   // Loading timeout guard — show visible fallback instead of remaining blank
   useEffect(() => {
@@ -261,36 +261,39 @@ export default function ClientPortalAccess() {
   // Do our own check here so logged-in users go straight to the dashboard.
   useEffect(() => {
     if (isLoadingAuth || isLoadingPublicSettings) return;
-    if (isAuthenticated && ctxUser) return;
+    if (isAuthenticated && ctxUser) {
+      setPortalChecking(false);
+      return;
+    }
 
     let cancelled = false;
-    setLocalAuthChecking(true);
     base44.auth.isAuthenticated().then(async (authed) => {
       if (cancelled) return;
       if (!authed) {
-        setLocalAuthChecking(false);
+        setPortalChecking(false);
         return;
       }
       try {
         const me = await base44.auth.me();
         if (cancelled) return;
-        setLocalUser(me);
-        if (applyAuthenticatedUser) applyAuthenticatedUser(me);
+        setPortalUser(me);
       } catch {
-        if (!cancelled) setLocalAuthChecking(false);
+        if (!cancelled) setPortalUser(null);
+      } finally {
+        if (!cancelled) setPortalChecking(false);
       }
     }).catch(() => {
-      if (!cancelled) setLocalAuthChecking(false);
+      if (!cancelled) setPortalChecking(false);
     });
 
     return () => { cancelled = true; };
-  }, [isLoadingAuth, isLoadingPublicSettings, isAuthenticated, ctxUser, applyAuthenticatedUser]);
+  }, [isLoadingAuth, isLoadingPublicSettings, isAuthenticated, ctxUser]);
 
   if (timedOut && (isLoadingAuth || isLoadingPublicSettings)) {
     return <PortalLoadingTimeout />;
   }
 
-  if (isLoadingAuth || isLoadingPublicSettings || localAuthChecking) {
+  if (isLoadingAuth || isLoadingPublicSettings || portalChecking) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <Loader2 className="w-8 h-8 text-primary animate-spin" />
@@ -298,7 +301,7 @@ export default function ClientPortalAccess() {
     );
   }
 
-  const effectiveUser = ctxUser || localUser;
+  const effectiveUser = ctxUser || portalUser;
   const effectiveAuthed = isAuthenticated || Boolean(effectiveUser);
 
   // Unauthenticated → show clean public access screen (never a 403 or blank)
