@@ -4,8 +4,9 @@ Complete every item before switching from test to live Stripe payments.
 
 ## Canonical Webhook Endpoint
 
-- Canonical Stripe webhook URL: `https://clientsurgesystems.com/api/functions/stripeWebhookOrders`
-- Base44 hostname fallback: `https://grinning-apex-flow-growth.base44.app/api/functions/stripeWebhookOrders`
+- **Canonical Stripe webhook URL (use this in Stripe Dashboard):** `https://clientsurgesystems.com/api/functions/stripeWebhookOrders`
+- ⚠️ **WARNING:** The Stripe Dashboard webhook endpoint **must** point to the custom-domain URL above. Do **not** use the Base44 preview/testing URL as the active Stripe Dashboard endpoint.
+- Base44 hostname (testing/fallback only — **never** use as the live Stripe Dashboard endpoint): `https://grinning-apex-flow-growth.base44.app/api/functions/stripeWebhookOrders`
 - Stripe should deliver to the canonical custom-domain URL only.
 
 ## Required Stripe Events

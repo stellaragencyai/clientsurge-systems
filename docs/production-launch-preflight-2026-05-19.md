@@ -89,9 +89,12 @@ Required fix:
 
 ### 2. Stripe Test-Mode Proof Requires Staging Checkout Overrides
 
-Live Stripe currently has one enabled webhook endpoint:
+Live Stripe must use the canonical custom-domain webhook endpoint:
 
-- `https://grinning-apex-flow-growth.base44.app/api/functions/stripePaymentWebhook`
+- **Canonical custom-domain endpoint (use this in Stripe Dashboard):** `https://clientsurgesystems.com/api/functions/stripeWebhookOrders`
+- ⚠️ **WARNING:** The Stripe Dashboard webhook endpoint **must** point to the custom-domain URL above. Do **not** use the Base44 preview/testing URL as the active Stripe Dashboard endpoint.
+- Base44 hostname (testing/fallback only — **never** use as the live Stripe Dashboard endpoint): `https://grinning-apex-flow-growth.base44.app/api/functions/stripePaymentWebhook`
+- Required events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`.
 
 Local source confirms `stripePaymentWebhook` is a legacy compatibility wrapper that delegates to the same canonical shared handler used by `stripeWebhookOrders`. Stripe test mode now has package products/prices and a webhook endpoint. The remaining Stripe blocker is making the app checkout path use the test-mode package IDs in a staging/test Base44 environment before completing the test checkout.
 

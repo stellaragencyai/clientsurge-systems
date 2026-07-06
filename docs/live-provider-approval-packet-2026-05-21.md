@@ -50,9 +50,11 @@ Current Stripe test-mode package resources:
 
 Current Stripe test-mode webhook endpoint:
 
-- `we_1TZELjBVGjsISdG0oOblz0gd`
-- `https://grinning-apex-flow-growth.base44.app/api/functions/stripePaymentWebhook`
-- Enabled events include `checkout.session.completed`, invoice payment success/failure, subscription updates/deletes, and `payment_intent.payment_failed`.
+- **Canonical custom-domain endpoint (use this in Stripe Dashboard):** `https://clientsurgesystems.com/api/functions/stripeWebhookOrders`
+- ⚠️ **WARNING:** The Stripe Dashboard webhook endpoint **must** point to the custom-domain URL above. Do **not** use the Base44 preview/testing URL as the active Stripe Dashboard endpoint.
+- Base44 hostname (testing/fallback only — **never** use as the live Stripe Dashboard endpoint): `https://grinning-apex-flow-growth.base44.app/api/functions/stripePaymentWebhook`
+- Endpoint ID (test mode): `we_1TZELjBVGjsISdG0oOblz0gd`
+- Required events: `checkout.session.completed`, `customer.subscription.created`, `customer.subscription.updated`, `customer.subscription.deleted`, `invoice.payment_succeeded`, `invoice.payment_failed`.
 
 App-path test checkout requirement:
 
