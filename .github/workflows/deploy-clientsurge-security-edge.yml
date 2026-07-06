@@ -28,6 +28,7 @@ jobs:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
       CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
       VERIFY_URL: https://clientsurgesystems.com
+      VERIFY_PRODUCT_SIGNUP_URL: https://clientsurgesystems.com/product-signup?package=growth_system
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -45,7 +46,7 @@ jobs:
         run: |
           echo "ACTIVE ClientSurge Cloudflare Security Edge deploy workflow"
           echo "Commit: $GITHUB_SHA"
-          echo "This is the only active Cloudflare security-edge deployment workflow."
+          echo "This deploy is forcing the product-signup edge hotfix live."
 
       - name: Require Cloudflare credentials
         shell: bash
@@ -64,6 +65,16 @@ jobs:
 
       - name: Upsert Cloudflare Worker routes
         run: node scripts/cloudflare/upsert-worker-routes.mjs
+
+      - name: Verify product signup edge hotfix
+        shell: bash
+        run: |
+          set -euo pipefail
+          URL="$VERIFY_PRODUCT_SIGNUP_URL&edge_verify=$(date +%s)"
+          echo "Verifying $URL"
+          HTML="$(curl -fsSL -H 'Cache-Control: no-cache' "$URL")"
+          echo "$HTML" | grep -F "Complete your ClientSurge signup."
+          echo "$HTML" | grep -F "Edge hotfix: 2026-07-05-product-signup-edge-hotfix-v1"
 
       - name: Verify live public route exposure
         run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
