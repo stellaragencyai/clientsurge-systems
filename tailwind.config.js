@@ -10,7 +10,7 @@ module.exports = {
   			titles: ['Montserrat', 'system-ui', 'sans-serif'],
   			bebas: ['Montserrat', 'system-ui', 'sans-serif'],
   			montserrat: ['Montserrat', 'system-ui', 'sans-serif'],
-  			sans: ['var(--font-inter)', 'system-ui', 'sans-serif'],
+  			sans: ['Montserrat', 'system-ui', 'sans-serif'],
   		},
   		borderRadius: {
   			lg: 'var(--radius)',

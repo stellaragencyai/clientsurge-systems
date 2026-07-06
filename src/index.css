@@ -4,7 +4,7 @@
 
 @layer base {
   :root {
-    --font-inter: 'Inter', sans-serif;
+    --font-inter: 'Montserrat', sans-serif;
     --font-display: 'Montserrat', sans-serif;
     --font-titles: 'Montserrat', sans-serif;
 
@@ -794,7 +794,7 @@ h1, h2, h3,
    Only body + p get explicit color; span/div inherit from parent so
    dark-background sections can control their own text color. */
 body, p {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Montserrat', system-ui, sans-serif;
   -webkit-font-smoothing: subpixel-antialiased;
   color: #000000;
   opacity: 1;
@@ -1108,7 +1108,7 @@ select:focus-visible,
 
 /* 1. Font rendering — crisp on all OS/browsers */
 body, input, button, select, textarea {
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Montserrat', system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   font-synthesis: none;
@@ -2306,7 +2306,7 @@ a[aria-disabled="true"] {
 
 /* Font loading: prevent FOIT, use system fallback while loading */
 @font-face {
-  font-family: 'Inter Fallback';
+  font-family: 'Montserrat Fallback';
   src: local('system-ui');
   font-display: swap;
 }
