@@ -333,34 +333,19 @@ export default function Navbar() {
 
         {/* Desktop right actions */}
         <div className="hidden xl:flex items-center gap-2 shrink-0">
-          {user ? (
-            <button
-              onClick={() => { trackCTA("client_dashboard", "navbar"); navigate("/client-dashboard"); }}
-              className="hidden md:flex items-center gap-1.5 text-xs font-bold transition-colors px-4 py-1.5 rounded-lg"
-              style={{
-                minHeight: "unset",
-                minWidth: "unset",
-                color: "#ffffff",
-                background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-                boxShadow: "0 2px 8px rgba(0,174,239,0.25)",
-              }}
-            >
-              Dashboard
-            </button>
-          ) : (
-            <button
-              onClick={() => { trackCTA("login", "navbar"); setShowLoginModal(true); }}
-              className="hidden md:block text-xs font-semibold transition-colors px-3 py-1.5 rounded-lg border"
-              style={{
-                minHeight: "unset",
-                minWidth: "unset",
-                color: "#ffffff",
-                borderColor: "rgba(53, 189, 241, 0.3)",
-              }}
-            >
-              Login
-            </button>
-          )}
+          <button
+            onClick={() => { trackCTA("client_portal", "navbar"); navigate("/client-portal"); }}
+            className="hidden md:flex items-center gap-1.5 text-xs font-bold transition-all duration-300 px-4 py-1.5 rounded-lg"
+            style={{
+              minHeight: "unset",
+              minWidth: "unset",
+              color: "#ffffff",
+              background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+              boxShadow: "0 2px 8px rgba(0,174,239,0.25)",
+            }}
+          >
+            Client Portal
+          </button>
           <button
             onClick={() => {
               trackCTA("browse_systems", "navbar");
@@ -469,7 +454,7 @@ export default function Navbar() {
                 </>
               ) : (
                 <button
-                  onClick={() => { trackCTA("login", "mobile_nav"); setOpen(false); setShowLoginModal(true); }}
+                  onClick={() => { trackCTA("client_portal", "mobile_nav"); setOpen(false); navigate("/client-portal"); }}
                   className="w-full inline-flex items-center justify-center rounded-xl border text-[14px] font-bold transition-all hover:-translate-y-0.5 focus:ring-2 focus:ring-primary focus:outline-none"
                   style={{
                     minHeight: "48px",
