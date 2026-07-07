@@ -120,6 +120,10 @@ const AUTOMATION_SERVICE_ROUTES = [
   routePath("customer-reactivation"),
 ];
 
+// LEGACY: Canonical short routes (/:slug) for existing industries.
+// New industries use /industries/:slug (DB-driven) — do NOT add new slugs here.
+// To create a new industry: add an IndustryConfig record with status='published'
+// and it will be accessible at /industries/:slug without any code changes.
 const INDUSTRY_ROUTE_SLUGS = [
   "med-spa",
   "dental",
@@ -429,7 +433,7 @@ const AuthenticatedAppWithTenant = () => {
       ))}
       <Route path="/industries/real-estate" element={<Navigate to="/real-estate" replace />} />
       <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
-      {/* PART 6: Scalable dynamic /industries/:slug → /:slug redirect */}
+      {/* Legacy: redirect known /industries/:slug → /:slug canonical for SEO */}
       {INDUSTRY_ROUTE_SLUGS.map((slug) => (
         <Route
           key={`industries-${slug}`}
@@ -437,6 +441,10 @@ const AuthenticatedAppWithTenant = () => {
           element={<Navigate to={`/${slug}`} replace />}
         />
       ))}
+      {/* Dynamic industry route — DB-driven via IndustryConfig entity.
+          New industries created in DB are accessible here WITHOUT editing App.jsx.
+          Active configs render; draft shows "Coming Soon"; archived/invalid → 404. */}
+      <Route path="/industries/:slug" element={<LazyRoute Component={IndustryPageTemplate} />} />
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />

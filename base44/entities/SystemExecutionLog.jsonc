@@ -1,0 +1,133 @@
+{
+  "name": "SystemExecutionLog",
+  "type": "object",
+  "title": "System Execution Log",
+  "description": "Platform-level execution log for system/admin jobs not tied to a single ClientDeployment \u2014 e.g., daily_business_digest, platform scheduled jobs, admin maintenance tasks.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "job_key": {
+      "type": "string",
+      "title": "Job Key",
+      "description": "Unique identifier for the system job (e.g., 'daily_business_digest', 'nightly_tenant_audit', 'orphaned_order_sweep')"
+    },
+    "job_name": {
+      "type": "string",
+      "title": "Job Name",
+      "description": "Human-readable name for display"
+    },
+    "execution_status": {
+      "type": "string",
+      "title": "Execution Status",
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "failed",
+        "blocked",
+        "skipped",
+        "test_mode"
+      ],
+      "default": "queued"
+    },
+    "trigger_event": {
+      "type": "string",
+      "title": "Trigger Event",
+      "description": "What triggered this execution (e.g., 'scheduled_daily', 'manual_admin', 'scheduled_hourly', 'automation_webhook')"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Started At",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    },
+    "execution_time_ms": {
+      "type": "number",
+      "title": "Execution Time (ms)"
+    },
+    "recipient": {
+      "type": "string",
+      "title": "Recipient",
+      "description": "Email address or phone number that received the output (null for non-delivery jobs)"
+    },
+    "recipient_count": {
+      "type": "number",
+      "title": "Recipient Count",
+      "default": 0
+    },
+    "deployment_count": {
+      "type": "number",
+      "title": "Deployment Count",
+      "description": "Number of deployments scanned or affected by this system job",
+      "default": 0
+    },
+    "lead_count": {
+      "type": "number",
+      "title": "Lead Count",
+      "description": "Number of leads scanned or affected",
+      "default": 0
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "error_code": {
+      "type": "string",
+      "title": "Error Code",
+      "description": "Structured error code (e.g., 'resend_api_error', 'no_authorized_deployment', 'config_missing')"
+    },
+    "metadata": {
+      "type": "object",
+      "title": "Metadata",
+      "description": "Flexible JSON metadata for event-specific payload data (stats, provider IDs, etc.)",
+      "properties": {
+        "event": {
+          "type": "string"
+        },
+        "provider_message_id": {
+          "type": "string"
+        },
+        "stats": {
+          "type": "object"
+        },
+        "dry_run": {
+          "type": "boolean"
+        }
+      }
+    }
+  },
+  "required": [
+    "job_key",
+    "trigger_event",
+    "execution_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

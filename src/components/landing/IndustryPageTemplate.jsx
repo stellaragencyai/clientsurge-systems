@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, Link } from 'react-router-dom';
 import { getIndustryBySlug } from '@/data/industryMarketingConfig';
 import { getMergedIndustryData } from '@/data/industryContent';
 import { getPremiumContent } from '@/data/industryPremiumContent';
+import { resolveIndustryContent, INDUSTRY_RESOLUTION_STATUS } from '@/lib/industryContentBridge';
 import { buildIndustryPricingUrl, buildIndustrySignupUrl } from '@/lib/industryCtaHelpers';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
@@ -44,27 +45,76 @@ export default function IndustryPageTemplate() {
   const navigate = useNavigate();
   const [industry, setIndustry] = useState(null);
   const [premium, setPremium] = useState(null);
+  const [resolutionStatus, setResolutionStatus] = useState(INDUSTRY_RESOLUTION_STATUS.LOADING);
 
   useEffect(() => {
-    const baseData = getIndustryBySlug(slug);
-    if (baseData) {
-      const merged = getMergedIndustryData(slug, baseData);
-      setIndustry(merged);
-      const premiumContent = getPremiumContent(slug);
-      setPremium(premiumContent);
+    let cancelled = false;
+    setResolutionStatus(INDUSTRY_RESOLUTION_STATUS.LOADING);
+    setIndustry(null);
+    setPremium(null);
 
-      // SEO metadata injection
-      if (premiumContent?.seo) {
-        document.title = premiumContent.seo.title;
-        setMetaTag('description', premiumContent.seo.metaDescription);
-        setMetaTag('keywords', premiumContent.seo.keywords.join(', '));
-      } else {
-        document.title = `${merged.display_name} | ClientSurge Systems`;
+    (async () => {
+      const result = await resolveIndustryContent(slug);
+      if (cancelled) return;
+
+      setResolutionStatus(result.status);
+
+      if (result.status === INDUSTRY_RESOLUTION_STATUS.FOUND_STATIC || result.status === INDUSTRY_RESOLUTION_STATUS.FOUND_DB) {
+        setIndustry(result.data);
+        setPremium(result.premium);
+
+        // SEO metadata injection
+        if (result.premium?.seo) {
+          document.title = result.premium.seo.title;
+          setMetaTag('description', result.premium.seo.metaDescription);
+          setMetaTag('keywords', result.premium.seo.keywords.join(', '));
+        } else if (result.data?.seo) {
+          document.title = result.data.seo.meta_title || `${result.data.display_name} | ClientSurge Systems`;
+          setMetaTag('description', result.data.seo.meta_description || '');
+          if (result.data.seo.keywords) setMetaTag('keywords', result.data.seo.keywords.join(', '));
+        } else {
+          document.title = `${result.data.display_name} | ClientSurge Systems`;
+        }
       }
-    } else {
-      navigate('/');
-    }
+    })();
+
+    return () => { cancelled = true; };
   }, [slug, navigate]);
+
+  // Loading state
+  if (resolutionStatus === INDUSTRY_RESOLUTION_STATUS.LOADING) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
+      </div>
+    );
+  }
+
+  // Draft industry — admin preview or "coming soon"
+  if (resolutionStatus === INDUSTRY_RESOLUTION_STATUS.DRAFT) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">Coming Soon</h1>
+          <p className="text-gray-500 mb-6">This industry page is being prepared. Please check back soon.</p>
+          <Link to="/" className="cs-btn-primary inline-flex">Back to Home</Link>
+        </div>
+      </div>
+    );
+  }
+
+  // Archived or not found
+  if (resolutionStatus === INDUSTRY_RESOLUTION_STATUS.ARCHIVED || resolutionStatus === INDUSTRY_RESOLUTION_STATUS.NOT_FOUND) {
+    return (
+      <div className="min-h-screen flex items-center justify-center px-6">
+        <div className="max-w-md text-center">
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">Page Not Found</h1>
+          <p className="text-gray-500 mb-6">The industry page you're looking for doesn't exist or is no longer available.</p>
+          <Link to="/" className="cs-btn-primary inline-flex">Back to Home</Link>
+        </div>
+      </div>
+    );
+  }
 
   if (!industry) return null;
 

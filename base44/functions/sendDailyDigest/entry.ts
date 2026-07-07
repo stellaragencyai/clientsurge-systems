@@ -41,10 +41,38 @@ function formatPhoenixDate(reference = new Date()) {
   return reference.toLocaleDateString('en-US', { timeZone: BUSINESS_TZ });
 }
 
+/**
+ * Creates a SystemExecutionLog record directly via the entity SDK.
+ * This replaces the old logAutomationExecution calls that required client_deployment_id.
+ */
+async function logSystemEvent(base44, params) {
+  try {
+    const log = await base44.asServiceRole.entities.SystemExecutionLog.create({
+      job_key: 'daily_business_digest',
+      job_name: 'Daily Business Digest',
+      execution_status: params.execution_status,
+      trigger_event: params.trigger_event || 'scheduled_daily',
+      started_at: params.started_at || new Date().toISOString(),
+      completed_at: params.completed_at || null,
+      execution_time_ms: params.execution_time_ms || null,
+      recipient: params.recipient || null,
+      recipient_count: params.recipient_count || 0,
+      deployment_count: params.deployment_count || 0,
+      lead_count: params.lead_count || 0,
+      error_message: params.error_message || null,
+      error_code: params.error_code || null,
+      metadata: params.metadata || null,
+    });
+    return log;
+  } catch (err) {
+    console.warn('[sendDailyDigest] SystemExecutionLog creation failed:', err.message);
+    return null;
+  }
+}
+
 Deno.serve(async (req) => {
-  // Declared at function scope so the catch block can access them for failure logging
   const _obsStartTime = Date.now();
-  let _obsCtx = null;
+  const _startedAt = new Date(_obsStartTime).toISOString();
   try {
     if (req.method !== 'POST') {
       return secureJson({ error: 'Method not allowed' }, { status: 405 });
@@ -61,69 +89,93 @@ Deno.serve(async (req) => {
       return secureJson({ error: 'Forbidden' }, { status: 403 });
     }
 
+    const body = await req.json().catch(() => ({}));
+    const dryRun = body.dry_run === true;
+
     const [settings] = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
     const notificationEmail =
       settings?.lead_notification_email ||
       Deno.env.get('ADMIN_NOTIFICATION_EMAIL') ||
       Deno.env.get('ADMIN_EMAIL');
 
+    // ── Log digest_started ──
+    await logSystemEvent(base44, {
+      execution_status: 'running',
+      trigger_event: dryRun ? 'manual_test' : 'scheduled_daily',
+      started_at: _startedAt,
+      metadata: { event: 'digest_started', dry_run: dryRun, timestamp: _startedAt },
+    });
+
     if (!notificationEmail) {
+      // ── Log digest_skipped — no recipient configured ──
+      await logSystemEvent(base44, {
+        execution_status: 'skipped',
+        trigger_event: dryRun ? 'manual_test' : 'scheduled_daily',
+        started_at: _startedAt,
+        completed_at: new Date().toISOString(),
+        execution_time_ms: Date.now() - _obsStartTime,
+        error_message: 'No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret.',
+        error_code: 'config_missing',
+        metadata: { event: 'digest_skipped', reason: 'no_recipient_email', dry_run: dryRun },
+      });
       return secureJson(
-        { error: 'No admin notification email configured. Set AdminSettings.lead_notification_email or ADMIN_NOTIFICATION_EMAIL secret.' },
+        { skipped: true, reason: 'no_recipient_email', message: 'No admin notification email configured.' },
         { status: 400 }
       );
     }
 
-    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
-    // Daily digest runs across all leads; we check the first deployment that has daily_digest module
+    // ── Resolve deployments ──
+    let deploymentCount = 0;
+    let liveDep = null;
     try {
       const allDeployments = await base44.asServiceRole.entities.ClientDeployment.filter(
         { deployment_status: 'live' }, '-created_date', 50
       );
-      // Find the first deployment that has daily_digest in activated_modules
-      const liveDep = (allDeployments || []).find(d => (d.activated_modules || []).includes('daily_digest'));
+      deploymentCount = allDeployments?.length || 0;
+      liveDep = (allDeployments || []).find(d => (d.activated_modules || []).includes('daily_digest'));
+
       if (liveDep) {
         const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
           deployment_id: liveDep.id, module_key: 'daily_digest'
         });
         if (permRes.data?.authorized !== true) {
-          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
-            client_deployment_id: liveDep.id, client_id: liveDep.client_id,
-            module_key: 'daily_digest', trigger_event: 'scheduled_daily',
-            execution_status: 'blocked',
-            error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
-            error_code: permRes.data?.reason || 'module_not_authorized',
-            started_at: new Date(_obsStartTime).toISOString(),
+          // ── Log digest_skipped — module not authorized ──
+          await logSystemEvent(base44, {
+            execution_status: 'skipped',
+            trigger_event: dryRun ? 'manual_test' : 'scheduled_daily',
+            started_at: _startedAt,
             completed_at: new Date().toISOString(),
             execution_time_ms: Date.now() - _obsStartTime,
-          }).catch(() => {});
-          return secureJson({ blocked: true, reason: permRes.data?.reason, message: 'daily_digest not authorized' }, { status: 403 });
+            recipient: notificationEmail,
+            deployment_count: deploymentCount,
+            error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+            error_code: permRes.data?.reason || 'module_not_authorized',
+            metadata: { event: 'digest_skipped', reason: 'module_not_authorized', dry_run: dryRun },
+          });
+          return secureJson({ skipped: true, reason: permRes.data?.reason, message: 'daily_digest not authorized' }, { status: 403 });
         }
-        _obsCtx = { deployment_id: liveDep.id, client_id: liveDep.client_id, module_key: 'daily_digest', trigger_event: 'scheduled_daily' };
-        // Log digest_started
-        try {
-          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
-            ..._obsCtx,
-            execution_status: 'queued',
-            response_data: JSON.stringify({ event: 'digest_started', deployment_count: allDeployments?.length || 0, timestamp: new Date(_obsStartTime).toISOString() }),
-          });
-        } catch (_) {}
       } else {
-        // No live deployment with daily_digest — log digest_skipped
-        try {
-          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
-            module_key: 'daily_digest', trigger_event: 'scheduled_daily',
-            execution_status: 'blocked',
-            error_message: 'No live deployment with daily_digest module activated',
-            error_code: 'no_authorized_deployment',
-            response_data: JSON.stringify({ event: 'digest_skipped', deployment_count: allDeployments?.length || 0, reason: 'no_live_deployment_with_daily_digest' }),
-          });
-        } catch (_) {}
+        // ── Log digest_skipped — no live deployment with daily_digest ──
+        await logSystemEvent(base44, {
+          execution_status: 'skipped',
+          trigger_event: dryRun ? 'manual_test' : 'scheduled_daily',
+          started_at: _startedAt,
+          completed_at: new Date().toISOString(),
+          execution_time_ms: Date.now() - _obsStartTime,
+          recipient: notificationEmail,
+          deployment_count: deploymentCount,
+          error_message: 'No live deployment with daily_digest module activated',
+          error_code: 'no_authorized_deployment',
+          metadata: { event: 'digest_skipped', reason: 'no_live_deployment_with_daily_digest', dry_run: dryRun },
+        });
+        return secureJson({ skipped: true, reason: 'no_live_deployment_with_daily_digest', deployment_count: deploymentCount }, { status: 200 });
       }
     } catch (err) {
-      console.warn('[sendDailyDigest] Observability init failed:', err.message);
+      console.warn('[sendDailyDigest] Deployment resolution failed:', err.message);
+      // Continue — we can still generate a digest from all leads
     }
 
+    // ── Fetch leads and compute stats ──
     const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
     const now = Date.now();
     const dayMs = 86400000;
@@ -153,21 +205,26 @@ Deno.serve(async (req) => {
       overdue_follow_ups: overdueFollowUp.length,
       replied: replied.length,
       recipient: notificationEmail,
+      dry_run: dryRun,
     };
 
-    // Log digest_generated
-    if (_obsCtx) {
-      try {
-        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
-          ..._obsCtx,
-          execution_status: 'running',
-          response_data: JSON.stringify({ event: 'digest_generated', ...digestMetadata }),
-        });
-      } catch (_) {}
-    }
+    // ── Log digest_generated ──
+    await logSystemEvent(base44, {
+      execution_status: 'running',
+      trigger_event: dryRun ? 'manual_test' : 'scheduled_daily',
+      started_at: _startedAt,
+      recipient: notificationEmail,
+      recipient_count: 1,
+      deployment_count: deploymentCount,
+      lead_count: allLeads.length,
+      metadata: { event: 'digest_generated', ...digestMetadata },
+    });
 
-    const body = `
+    const subject = `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue${dryRun ? ' [DRY RUN]' : ''}`;
+
+    const body_html = `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
+  ${dryRun ? '<p style="background:#fef3c7;color:#92400e;padding:8px 16px;border-radius:8px;font-size:12px;font-weight:bold;text-align:center;">⚠️ DRY RUN — No email was sent. This is a test payload.</p>' : ''}
   <h2 style="color:#003B8F;">📊 Daily Lead Digest — ${formatPhoenixDate()}</h2>
   
   <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin:20px 0;">
@@ -207,8 +264,46 @@ Deno.serve(async (req) => {
   </p>
 </div>`;
 
+    // ── DRY RUN: return payload without sending ──
+    if (dryRun) {
+      await logSystemEvent(base44, {
+        execution_status: 'test_mode',
+        trigger_event: 'manual_test',
+        started_at: _startedAt,
+        completed_at: new Date().toISOString(),
+        execution_time_ms: Date.now() - _obsStartTime,
+        recipient: notificationEmail,
+        recipient_count: 1,
+        deployment_count: deploymentCount,
+        lead_count: allLeads.length,
+        metadata: { event: 'digest_generated', ...digestMetadata, dry_run: true },
+      });
+      return secureJson({
+        dry_run: true,
+        email_sent: false,
+        recipient: notificationEmail,
+        subject,
+        html_preview: body_html.substring(0, 500) + '...',
+        stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length, total: allLeads.length },
+        log_created: true,
+      });
+    }
+
+    // ── REAL SEND ──
     const resendKey = Deno.env.get('RESEND_API_KEY');
     if (!resendKey) {
+      await logSystemEvent(base44, {
+        execution_status: 'failed',
+        trigger_event: 'scheduled_daily',
+        started_at: _startedAt,
+        completed_at: new Date().toISOString(),
+        execution_time_ms: Date.now() - _obsStartTime,
+        recipient: notificationEmail,
+        lead_count: allLeads.length,
+        error_message: 'RESEND_API_KEY not set',
+        error_code: 'config_missing',
+        metadata: { event: 'digest_failed', reason: 'resend_key_missing', ...digestMetadata },
+      });
       return secureJson({ error: 'RESEND_API_KEY not set' }, { status: 500 });
     }
     const fromEmail = settings?.resend_from_email || Deno.env.get('RESEND_FROM_EMAIL') || 'noreply@clientsurgesystems.com';
@@ -222,48 +317,65 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         from: fromEmail,
         to: notificationEmail,
-        subject: `Daily Lead Digest — ${newToday} new, ${hotLeads.length} hot, ${overdueFollowUp.length} overdue`,
-        html: body,
+        subject,
+        html: body_html,
       }),
     });
 
     if (!res.ok) {
       const err = await res.json().catch(() => ({}));
-      throw new Error(err?.message || `Resend error ${res.status}`);
+      const errMsg = err?.message || `Resend error ${res.status}`;
+      await logSystemEvent(base44, {
+        execution_status: 'failed',
+        trigger_event: 'scheduled_daily',
+        started_at: _startedAt,
+        completed_at: new Date().toISOString(),
+        execution_time_ms: Date.now() - _obsStartTime,
+        recipient: notificationEmail,
+        lead_count: allLeads.length,
+        error_message: errMsg,
+        error_code: 'resend_api_error',
+        metadata: { event: 'digest_failed', resend_status: res.status, ...digestMetadata },
+      });
+      throw new Error(errMsg);
     }
 
     const result = await res.json().catch(() => ({}));
 
-    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
-    if (_obsCtx) {
-      try {
-        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
-          ..._obsCtx,
-          execution_status: 'completed',
-          external_provider_reference: result?.id || null,
-          execution_time_ms: Date.now() - _obsStartTime,
-          response_data: JSON.stringify({ event: 'digest_sent', ...digestMetadata, provider_message_id: result?.id }),
-        });
-      } catch (_) {}
-    }
+    // ── Log digest_sent ──
+    await logSystemEvent(base44, {
+      execution_status: 'completed',
+      trigger_event: 'scheduled_daily',
+      started_at: _startedAt,
+      completed_at: new Date().toISOString(),
+      execution_time_ms: Date.now() - _obsStartTime,
+      recipient: notificationEmail,
+      recipient_count: 1,
+      deployment_count: deploymentCount,
+      lead_count: allLeads.length,
+      metadata: { event: 'digest_sent', provider_message_id: result?.id, ...digestMetadata },
+    });
 
-    return secureJson({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
+    return secureJson({
+      success: true,
+      email_sent: true,
+      provider_message_id: result?.id,
+      stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length, total: allLeads.length },
+      log_created: true,
+    });
   } catch (error) {
     console.error('[sendDailyDigest] error:', error);
-    // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health check ──
-    if (_obsCtx) {
-      try {
-        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
-          ..._obsCtx,
-          execution_status: 'failed',
-          error_message: error.message,
-          error_code: error.message.includes('Resend') ? 'resend_api_error' : 'digest_send_failed',
-          execution_time_ms: Date.now() - _obsStartTime,
-          response_data: JSON.stringify({ event: 'digest_failed', error: error.message }),
-        });
-        await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
-      } catch (_) {}
-    }
+    // ── Log digest_failed ──
+    await logSystemEvent(base44, {
+      execution_status: 'failed',
+      trigger_event: 'scheduled_daily',
+      started_at: _startedAt,
+      completed_at: new Date().toISOString(),
+      execution_time_ms: Date.now() - _obsStartTime,
+      error_message: error.message,
+      error_code: error.message.includes('Resend') ? 'resend_api_error' : 'digest_send_failed',
+      metadata: { event: 'digest_failed', error: error.message, dry_run: dryRun },
+    });
     return secureJson({ error: error.message }, { status: 500 });
   }
 });

@@ -9,25 +9,25 @@
 export const MODULE_INFO = {
   instant_lead_response: {
     name: "Instant Lead Response",
-    description: "Automatically texts new leads within 60 seconds — 24/7, even after hours.",
+    description: "Sends an automatic text to new leads within 60 seconds of receiving their inquiry.",
     icon: "Zap",
     minTier: "starter",
   },
   missed_call_text_back: {
     name: "Missed Call Text-Back",
-    description: "When you miss a call, the system automatically texts the caller back so you don't lose the lead.",
+    description: "When a call is missed, the system sends a text reply so the caller knows you received their message.",
     icon: "PhoneMissed",
     minTier: "starter",
   },
   lead_nurture: {
     name: "Lead Nurture Sequence",
-    description: "A 30-day automated email sequence that keeps leads engaged until they're ready to book.",
+    description: "A 30-day email sequence that keeps leads engaged until they're ready to book.",
     icon: "Mail",
     minTier: "growth",
   },
   ai_booking_agent: {
     name: "AI Booking Agent",
-    description: "Detects when a lead is ready to book and automatically sends your booking link.",
+    description: "When a lead shows booking intent, the system sends your booking link to move them toward scheduling.",
     icon: "CalendarCheck",
     minTier: "growth",
   },
@@ -39,7 +39,7 @@ export const MODULE_INFO = {
   },
   review_reactivation: {
     name: "Review Reactivation",
-    description: "Automatically requests reviews from happy customers to boost your online reputation.",
+    description: "Sends review requests to customers after completed service to build your online reputation.",
     icon: "Star",
     minTier: "pro",
   },
