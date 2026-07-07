@@ -42,6 +42,9 @@ function formatPhoenixDate(reference = new Date()) {
 }
 
 Deno.serve(async (req) => {
+  // Declared at function scope so the catch block can access them for failure logging
+  const _obsStartTime = Date.now();
+  let _obsCtx = null;
   try {
     if (req.method !== 'POST') {
       return secureJson({ error: 'Method not allowed' }, { status: 405 });
@@ -73,8 +76,6 @@ Deno.serve(async (req) => {
 
     // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
     // Daily digest runs across all leads; we check the first deployment that has daily_digest module
-    const _obsStartTime = Date.now();
-    let _obsCtx = null;
     try {
       const allDeployments = await base44.asServiceRole.entities.ClientDeployment.filter(
         { deployment_status: 'live' }, '-created_date', 50
