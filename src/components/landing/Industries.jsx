@@ -292,7 +292,7 @@ const industries = [
     iconBg: "rgba(124,58,237,0.18)"
   },
   image:
-  "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
+  "https://images.unsplash.com/photo-1589216532372-1c2a367900d9?w=1200&q=95"
 },
 {
   id: "veterinary",
@@ -453,7 +453,7 @@ export default function Industries() {
               
               <img
                 {...imageProps}
-                alt={`${industry.name} service illustration`}
+                alt={`${industry.name} — AI lead response, missed-call recovery, and booking automation | ClientSurge Systems`}
                 loading="lazy"
                 decoding="async"
                 width="600"

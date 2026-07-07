@@ -199,6 +199,18 @@ export const industryPatterns = {
       <rect width="100%" height="100%" fill="url(#pat-fitness)"/>
     </svg>
   ),
+  "law-firm": (
+    <svg className="absolute inset-0 w-full h-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs><pattern id="pat-lawfirm" x="0" y="0" width="36" height="36" patternUnits="userSpaceOnUse">
+        <line x1="18" y1="2" x2="18" y2="34" stroke="white" strokeWidth="1"/>
+        <line x1="6" y1="10" x2="30" y2="10" stroke="white" strokeWidth="1"/>
+        <circle cx="10" cy="14" r="4" fill="none" stroke="white" strokeWidth="1"/>
+        <circle cx="26" cy="14" r="4" fill="none" stroke="white" strokeWidth="1"/>
+        <rect x="14" y="30" width="8" height="4" fill="none" stroke="white" strokeWidth="1"/>
+      </pattern></defs>
+      <rect width="100%" height="100%" fill="url(#pat-lawfirm)"/>
+    </svg>
+  ),
 };
 
 export const FILTER_TAGS = [
@@ -229,4 +241,5 @@ export const INDUSTRY_TAGS = {
   "auto-repair": "home",
   "accounting": "professional",
   "fitness": "health",
+  "law-firm": "professional",
 };
