@@ -4,10 +4,12 @@ import { Loader2, RefreshCw, Zap, ScrollText, AlertCircle } from "lucide-react";
 import TaskStatsRow from "./tasks/TaskStatsRow";
 import TaskJobRow from "./tasks/TaskJobRow";
 import ActivityLogRow from "./tasks/ActivityLogRow";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const FILTERS = ["all", "queued", "processing", "completed", "failed"];
 
-export default function TasksDashboard({ project }) {
+export default function TasksDashboard({ project, portalState, isAdmin = false }) {
   const [jobs, setJobs] = useState([]);
   const [events, setEvents] = useState([]);
   const [stats, setStats] = useState(null);
@@ -18,6 +20,10 @@ export default function TasksDashboard({ project }) {
   const [retriggering, setRetriggering] = useState(null);
   const [lastRefreshed, setLastRefreshed] = useState(null);
   const [tickNow, setTickNow] = useState(Date.now());
+
+  // Phase A.4: Proof gate — success-metric stats suppressed until proof-validated
+  const cardState = getCardState(portalState, "activity_log");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
 
   const load = useCallback(async () => {
     setError("");
@@ -95,8 +101,13 @@ export default function TasksDashboard({ project }) {
         </div>
       )}
 
-      {/* Stats */}
-      {stats && <TaskStatsRow stats={stats} />}
+      {/* Phase A.4: Stats — suppressed when proof not Live (success metrics) */}
+      {isProofLive && stats && <TaskStatsRow stats={stats} />}
+      {!isProofLive && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-3 text-sm text-blue-700 font-medium">
+          {cardState.display_text}
+        </div>
+      )}
 
       {error && (
         <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700">
@@ -202,6 +213,8 @@ export default function TasksDashboard({ project }) {
       <div className="rounded-xl border border-border bg-muted/40 p-4 text-xs text-muted-foreground leading-relaxed">
         <strong className="text-foreground">Auto-refreshes every 15 seconds.</strong> Jobs are queued automatically when leads interact with your system. Failed jobs can be manually re-triggered using the "Run" button.
       </div>
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }

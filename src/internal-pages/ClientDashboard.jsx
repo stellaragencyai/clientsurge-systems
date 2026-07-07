@@ -21,6 +21,7 @@ import AdminPreviewBanner from "@/components/dashboard/AdminPreviewBanner";
 import AdminPreviewToggler from "@/components/dashboard/AdminPreviewToggler";
 import InternalFilterNotice from "@/components/dashboard/InternalFilterNotice";
 import OverallProgressTracker from "@/components/dashboard/OverallProgressTracker";
+import { usePortalState } from "@/hooks/usePortalState";
 
 export const STAGE_MAP = {
   "Paid": 0,
@@ -156,6 +157,16 @@ export default function ClientDashboard() {
   const [simulatedState, setSimulatedState] = useState("paid");
   const [simulatedData, setSimulatedData] = useState(null);
   const [onboardingData, setOnboardingData] = useState(null);
+
+  // Phase A.4: PortalStateEngine — normalized proof-validated card states
+  const portalContextData = portalData ? {
+    project: portalData?.project,
+    order: portalData?.order,
+    subscription: portalData?.subscription,
+    health: portalData?.health,
+    is_admin_preview: isAdminPreview,
+  } : null;
+  const { portalState } = usePortalState(portalContextData);
 
   const fetchPortal = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
@@ -366,6 +377,8 @@ export default function ClientDashboard() {
                   order={order}
                   project={project}
                   events={effectiveHealthEvents}
+                  portalState={portalState}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
                 {/* Active Automations Panel */}
@@ -374,6 +387,7 @@ export default function ClientDashboard() {
                   services={order?.services || []}
                   failedEvents={effectiveHealthEvents.filter(e => e.status === "failed")}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
                 />
 
                 {/* Client Action Required Panel */}
@@ -388,12 +402,14 @@ export default function ClientDashboard() {
                 <RecentSystemProofPanel
                   events={effectiveHealthEvents}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
                 />
 
                 {/* Recent Issues */}
                 <RecentIssuesPanel
                   events={effectiveHealthEvents}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
                 />
 
                 {activeServices.length === 0 ? (

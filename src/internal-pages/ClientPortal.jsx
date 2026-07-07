@@ -426,6 +426,8 @@ export default function ClientPortal() {
                   order={portalOrder}
                   project={project}
                   events={healthData?.recent_events || []}
+                  portalState={portalState}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
               </PortalLazy>
 
@@ -443,6 +445,7 @@ export default function ClientPortal() {
                 <RecentSystemProofPanel
                   events={healthData?.recent_events || []}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
                 />
               </PortalLazy>
 
@@ -450,6 +453,7 @@ export default function ClientPortal() {
                 <RecentIssuesPanel
                   events={healthData?.recent_events || []}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
                 />
               </PortalLazy>
 
@@ -484,7 +488,11 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <RealTimeMetricsPanel project={project} isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
+                <RealTimeMetricsPanel
+                  project={project}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
+                />
               </PortalLazy>
             </PortalTabWrapper>
           )}
@@ -510,7 +518,11 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <TasksDashboard project={project} />
+                <TasksDashboard
+                  project={project}
+                  portalState={portalState}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
               </PortalLazy>
             </PortalTabWrapper>
           )}

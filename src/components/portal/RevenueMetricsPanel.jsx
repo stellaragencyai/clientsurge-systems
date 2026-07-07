@@ -203,8 +203,8 @@ export default function RevenueMetricsPanel({ portalState, isAdmin = false }) {
         <StatCard icon={TrendingUp} label="Est. Revenue" value={displayValue(formatCurrency(safeTotals.estimatedRevenue))} sub={isProofLive ? "Based on bookings" : "Verifying"} color="navy" />
       </div>
 
-      {/* Weekly trend chart */}
-      {weeksData.length > 0 && (
+      {/* Phase A.4: Weekly trend chart — suppressed when proof not Live */}
+      {isProofLive && weeksData.length > 0 && (
         <div className="bg-card border border-border rounded-2xl p-6">
           <h4 className="font-semibold text-foreground mb-4">Weekly Lead Trend</h4>
           <ResponsiveContainer width="100%" height={180}>
@@ -225,8 +225,8 @@ export default function RevenueMetricsPanel({ portalState, isAdmin = false }) {
         </div>
       )}
 
-      {/* Pipeline breakdown */}
-      {pipeline.length > 0 && (
+      {/* Phase A.4: Pipeline breakdown — suppressed when proof not Live */}
+      {isProofLive && pipeline.length > 0 && (
         <div className="bg-card border border-border rounded-2xl p-6">
           <h4 className="font-semibold text-foreground mb-4">Pipeline Breakdown</h4>
           <div className="space-y-3">

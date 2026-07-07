@@ -1,7 +1,13 @@
 import { CheckCircle2, Zap } from "lucide-react";
 import { getFriendlyEventLabel } from "@/lib/dashboardHelpers";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-export default function RecentSystemProofPanel({ events = [], isAdmin = false }) {
+export default function RecentSystemProofPanel({ events = [], isAdmin = false, portalState }) {
+  // Phase A.4: Gate success-claim activity list behind proof-validated state
+  const cardState = getCardState(portalState, "automation_health");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
+
   const proofEvents = (events || []).filter(
     (e) =>
       e.status !== "failed" &&
@@ -25,6 +31,22 @@ export default function RecentSystemProofPanel({ events = [], isAdmin = false })
 
   const display = unique.slice(0, 8);
 
+  // Phase A.4: When proof not Live, suppress the green success activity list
+  if (!isProofLive) {
+    return (
+      <div className="rounded-2xl p-5 mb-5" style={{ border: "1px solid rgba(0,174,239,0.13)", background: "rgba(255,255,255,0.6)" }}>
+        <div className="flex items-center gap-2.5 mb-2">
+          <CheckCircle2 className="w-4 h-4" style={{ color: "#0088CC" }} />
+          <p className="text-[11px] font-black uppercase tracking-[0.15em]" style={{ color: "#0088CC" }}>Recent System Activity</p>
+        </div>
+        <p className="text-[13px] text-muted-foreground pl-6.5">
+          {cardState.display_text}
+        </p>
+        <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
+      </div>
+    );
+  }
+
   if (display.length === 0) {
     return (
       <div className="rounded-2xl p-5 mb-5" style={{ border: "1px solid rgba(0,174,239,0.13)", background: "rgba(255,255,255,0.6)" }}>
@@ -33,6 +55,7 @@ export default function RecentSystemProofPanel({ events = [], isAdmin = false })
           <p className="text-[11px] font-black uppercase tracking-[0.15em]" style={{ color: "#22c55e" }}>Recent System Activity</p>
         </div>
         <p className="text-[13px] text-muted-foreground pl-6.5">No recent activity logged yet.</p>
+        <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
       </div>
     );
   }
@@ -56,6 +79,8 @@ export default function RecentSystemProofPanel({ events = [], isAdmin = false })
           </div>
         ))}
       </div>
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }

@@ -571,7 +571,12 @@ export default function SetupProgressHub({ project, order, user, portalState, is
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      <OnboardingTracker project={projectState} order={order} />
+      <OnboardingTracker
+        project={projectState}
+        order={order}
+        portalState={portalState}
+        isAdmin={isAdmin}
+      />
 
       {/* Contextual status explainer */}
       {order && <AutomationStatusExplainer status={displayStatus} serviceName="Your System Status" />}

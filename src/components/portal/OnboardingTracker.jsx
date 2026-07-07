@@ -16,6 +16,8 @@ import {
   CreditCard,
   Settings,
 } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 // ─── SETUP TRACK DEFINITIONS ─────────────────────────────────────────────────
 // Each track maps to a provider/integration that must be configured.
@@ -303,7 +305,11 @@ function GroupSection({ name, tracks, project, order }) {
 }
 
 // ─── MAIN COMPONENT ───────────────────────────────────────────────────────────
-export default function OnboardingTracker({ project, order }) {
+export default function OnboardingTracker({ project, order, portalState, isAdmin = false }) {
+  // Phase A.4: Gate "Live" celebration behind proof-validated state
+  const cardState = getCardState(portalState, "installation_progress");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
+
   // Derive overall progress
   const allStatuses = PROVIDER_TRACKS.map(t => resolveStatus(t, project, order));
   const relevant = PROVIDER_TRACKS.filter((_, i) => allStatuses[i] !== "not_purchased");
@@ -313,7 +319,8 @@ export default function OnboardingTracker({ project, order }) {
   }).length;
   const inProgress = allStatuses.filter(s => s === "in_progress").length;
   const pct = relevant.length > 0 ? Math.round((done / relevant.length) * 100) : 0;
-  const isLive = pct === 100;
+  // Phase A.4: "Live" only when all steps done AND proof validated
+  const isLive = pct === 100 && isProofLive;
 
   // Group tracks
   const groups = ["Account", "Connections", "Automations", "Launch"];
@@ -337,13 +344,15 @@ export default function OnboardingTracker({ project, order }) {
               Setup Progress
             </p>
             <h3 style={{ fontSize: "20px", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
-              {isLive ? "🎉 Your System Is Live!" : inProgress > 0 ? "Setup In Progress" : "Onboarding Tracker"}
+              {isLive ? "🎉 Your System Is Live!" : pct === 100 ? "Verifying Your System…" : inProgress > 0 ? "Setup In Progress" : "Onboarding Tracker"}
             </h3>
             {!isLive && (
               <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: "5px 0 0" }}>
-                {inProgress > 0
-                  ? `${inProgress} step${inProgress > 1 ? "s" : ""} currently being configured`
-                  : `${relevant.length - done} step${relevant.length - done !== 1 ? "s" : ""} remaining before go-live`}
+                {pct === 100
+                  ? "All steps complete — awaiting final verification"
+                  : inProgress > 0
+                    ? `${inProgress} step${inProgress > 1 ? "s" : ""} currently being configured`
+                    : `${relevant.length - done} step${relevant.length - done !== 1 ? "s" : ""} remaining before go-live`}
               </p>
             )}
           </div>
@@ -368,7 +377,9 @@ export default function OnboardingTracker({ project, order }) {
               height: "100%", borderRadius: "9999px",
               background: isLive
                 ? "linear-gradient(90deg, #4ade80, #22c55e)"
-                : "linear-gradient(90deg, #60c8ff, #ffffff)",
+                : pct === 100
+                  ? "linear-gradient(90deg, #60c8ff, #00AEEF)"
+                  : "linear-gradient(90deg, #60c8ff, #ffffff)",
             }}
           />
         </div>
@@ -418,12 +429,23 @@ export default function OnboardingTracker({ project, order }) {
             background: "rgba(0,174,239,0.05)", border: "1px solid rgba(0,174,239,0.12)",
           }}>
             <p style={{ fontSize: "12px", color: "rgba(10,22,40,0.6)", margin: 0, lineHeight: 1.5 }}>
-              <strong style={{ color: "#0088CC" }}>Our team is handling all of this.</strong>{" "}
-              Most clients go live within 24–48 hours. You'll receive an email when each step is complete.
+              {pct === 100 ? (
+                <>
+                  <strong style={{ color: "#0088CC" }}>All steps complete.</strong>{" "}
+                  We're running final verification checks. Your system will go live shortly.
+                </>
+              ) : (
+                <>
+                  <strong style={{ color: "#0088CC" }}>Our team is handling all of this.</strong>{" "}
+                  Most clients go live within 24–48 hours. You'll receive an email when each step is complete.
+                </>
+              )}
             </p>
           </div>
         )}
       </div>
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
 
       <style dangerouslySetInnerHTML={{ __html: `
         @keyframes onb-spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }

@@ -1,10 +1,15 @@
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { groupFailedEventsByCategory, getFriendlyEventLabel } from "@/lib/dashboardHelpers";
 import { useState } from "react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-export default function RecentIssuesPanel({ events = [], isAdmin = false }) {
+export default function RecentIssuesPanel({ events = [], isAdmin = false, portalState }) {
   const [expanded, setExpanded] = useState({});
   const groups = groupFailedEventsByCategory(events);
+
+  // Phase A.4: Track proof state for admin diagnostics
+  const cardState = getCardState(portalState, "automation_health");
 
   if (groups.length === 0) {
     return null; // Nothing to show — clean
@@ -69,6 +74,8 @@ export default function RecentIssuesPanel({ events = [], isAdmin = false }) {
           <a href="mailto:support@clientsurgesystems.com" className="text-primary underline">support@clientsurgesystems.com</a>.
         </p>
       )}
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }
