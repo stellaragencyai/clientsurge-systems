@@ -801,3 +801,33 @@ body, p, li, span, td, th, input, textarea, select, button, label {
     transform: none !important;
   }
 }
+
+/* ── Button Size Variants ── */
+.cs-btn-sm {
+  padding: 0.5rem 1.25rem;
+  font-size: var(--cs-size-xs);
+  min-height: 36px;
+}
+.cs-btn-md {
+  padding: 0.75rem 1.75rem;
+  font-size: var(--cs-size-small);
+  min-height: 44px;
+}
+.cs-btn-lg {
+  padding: 1rem 2.25rem;
+  font-size: var(--cs-size-body);
+  min-height: 52px;
+}
+
+/* ── No-hover utility (for static cards) ── */
+.cs-no-hover:hover {
+  transform: none !important;
+  box-shadow: var(--cs-shadow-card) !important;
+}
+
+/* ── Icon Glow Container (for feature card icons) ── */
+.cs-icon-glow {
+  background: linear-gradient(135deg, rgba(0,174,239,0.12), rgba(0,107,176,0.08));
+  border: 1px solid rgba(0,174,239,0.2);
+  box-shadow: 0 0 16px rgba(0,174,239,0.15);
+}
