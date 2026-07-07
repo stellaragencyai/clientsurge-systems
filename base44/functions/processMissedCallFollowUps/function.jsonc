@@ -1,6 +1,6 @@
 {
   "name": "processMissedCallFollowUps",
-  "entry": "main.ts",
+  "entry": "entry.ts",
   "automations": [
     {
       "name": "Missed-Call Follow-Up Processor — Every 5 Minutes",

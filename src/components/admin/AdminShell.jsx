@@ -68,6 +68,7 @@ const NAV_GROUPS = [
       { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
       { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
       { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
+      { id: "automation-activity", label: "Automation Activity", icon: Activity,    path: "/admin/automation-activity" },
       { id: "audit-log",        label: "Audit Log",         icon: ShieldCheck,     path: "/admin", tab: "audit-log" },
       { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs", badge: "webhook-errors" },
       { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },

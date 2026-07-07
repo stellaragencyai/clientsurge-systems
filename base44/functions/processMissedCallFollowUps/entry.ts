@@ -13,9 +13,49 @@ function secureJson(data, opts = {}) {
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
-import { getApprovedEmailSender, getEmailOutreachGate } from "../_shared/emailDeliverabilityGate.js";
-import { twilioFetch } from "../_shared/providerFetch.js";
+
+// ── INLINED SHARED UTILITIES (relative imports not supported in deployed Deno runtime) ──
+
+function fetchWithTimeout(url, init = {}, { timeoutMs = 10000, label = "external API request" } = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    return fetch(url, { ...init, signal: controller.signal });
+  } catch (error) {
+    if (error?.name === "AbortError") throw new Error(`${label} timed out after ${timeoutMs}ms`);
+    throw error;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+function twilioFetch(url, init = {}, options = {}) {
+  return fetchWithTimeout(url, init, { timeoutMs: 10000, label: "Twilio API request", ...options });
+}
+
+const RETRYABLE_RESEND_STATUSES = new Set([429, 500, 502, 503, 504]);
+function delay(ms) { return new Promise((resolve) => setTimeout(resolve, ms)); }
+
+async function resendFetch(url, init = {}, { retryDelayMs = 2000, timeoutMs = 10000 } = {}) {
+  const firstResponse = await fetchWithTimeout(url, init, { timeoutMs, label: "Resend API request" });
+  if (!RETRYABLE_RESEND_STATUSES.has(firstResponse.status)) return firstResponse;
+  await delay(retryDelayMs);
+  return fetchWithTimeout(url, init, { timeoutMs, label: "Resend API request" });
+}
+
+const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
+function getApprovedEmailSender(settings = {}, { preferLeads = false } = {}) {
+  const primaryEnv = preferLeads ? "RESEND_FROM_LEADS" : "RESEND_FROM_EMAIL";
+  const secondaryEnv = preferLeads ? "RESEND_FROM_EMAIL" : "RESEND_FROM_LEADS";
+  return settings.resend_from_email || Deno.env.get(primaryEnv) || Deno.env.get(secondaryEnv) || Deno.env.get("SUPPORT_EMAIL") || "support@clientsurgesystems.com";
+}
+function getEmailOutreachGate(label = "outreach email") {
+  const campaignEnabled = String(Deno.env.get("EMAIL_CAMPAIGN_ENABLED") || "").trim().toLowerCase() === "true";
+  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
+  if (!campaignEnabled) return { ok: false, reason: `EMAIL_CAMPAIGN_ENABLED must be true before ${label} sends.`, proof_status: proofStatus || "missing" };
+  if (!PROOF_READY_VALUES.has(proofStatus)) return { ok: false, reason: `EMAIL_DELIVERABILITY_PROOF_STATUS must be verified before ${label} sends.`, proof_status: proofStatus || "missing" };
+  return { ok: true, proof_status: proofStatus };
+}
 
 // ── E.164 PHONE NORMALIZATION ──
 function normalizePhoneToE164(phone) {
@@ -305,6 +345,9 @@ Deno.serve(async (req) => {
       failed: 0,
     };
 
+    // ── DEPLOYMENT OBSERVABILITY: Cache for per-client deployment lookups ──
+    const deploymentCache = {};
+
     // ─────────────────────────────────────────────────────
     // STEP 2: Process each lead
     // ─────────────────────────────────────────────────────
@@ -362,6 +405,35 @@ Deno.serve(async (req) => {
             const freshLead = await base44.asServiceRole.entities.Leads.get(
               lead.id
             );
+            // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+            if (freshLead && freshLead.client_id && !deploymentCache[freshLead.client_id]) {
+              try {
+                const deps = await base44.asServiceRole.entities.ClientDeployment.filter(
+                  { client_id: freshLead.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+                  '-created_date', 1
+                );
+                const dep = deps?.[0] || null;
+                if (dep) {
+                  const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+                    deployment_id: dep.id, module_key: 'missed_call_text_back'
+                  });
+                  deploymentCache[freshLead.client_id] = {
+                    deployment_id: dep.id, authorized: permRes.data?.authorized === true, reason: permRes.data?.reason,
+                  };
+                } else { deploymentCache[freshLead.client_id] = null; }
+              } catch (e) { deploymentCache[freshLead.client_id] = null; }
+            }
+            const _depCtx = freshLead?.client_id ? deploymentCache[freshLead.client_id] : null;
+            if (_depCtx && !_depCtx.authorized) {
+              await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+                client_deployment_id: _depCtx.deployment_id, client_id: freshLead.client_id,
+                module_key: 'missed_call_text_back', trigger_event: 'missed_call_followup',
+                execution_status: 'blocked',
+                error_message: `Module not authorized (reason: ${_depCtx.reason || 'unknown'})`,
+                error_code: _depCtx.reason || 'module_not_authorized', lead_id: freshLead.id,
+              }).catch(() => {});
+              results.skipped++; continue;
+            }
             if (!freshLead || !["Contacted"].includes(freshLead.status)) {
               console.log(
                 `[processMissedCallFollowUps] Lead ${lead.id} no longer in Contacted status — stopping`
@@ -532,6 +604,14 @@ Deno.serve(async (req) => {
               });
 
               results.sent++;
+              // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+              if (_depCtx) {
+                await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+                  client_deployment_id: _depCtx.deployment_id, client_id: freshLead.client_id,
+                  module_key: 'missed_call_text_back', trigger_event: 'missed_call_followup',
+                  execution_status: 'completed', external_provider_reference: messageId, lead_id: freshLead.id,
+                }).catch(() => {});
+              }
             } else if (error) {
               await base44.asServiceRole.entities.CommunicationEvent.create(
                 buildMissedCallEvent({
@@ -548,6 +628,15 @@ Deno.serve(async (req) => {
                 })
               );
               results.failed++;
+              // ── DEPLOYMENT OBSERVABILITY: Log failed execution ──
+              if (_depCtx) {
+                await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+                  client_deployment_id: _depCtx.deployment_id, client_id: freshLead.client_id,
+                  module_key: 'missed_call_text_back', trigger_event: 'missed_call_followup',
+                  execution_status: 'failed', error_message: error,
+                  error_code: stepConfig.channel === 'sms' ? 'twilio_send_failed' : 'resend_send_failed', lead_id: freshLead.id,
+                }).catch(() => {});
+              }
             }
           } catch (stepError) {
             console.error(

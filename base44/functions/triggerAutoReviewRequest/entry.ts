@@ -174,6 +174,17 @@ Deno.serve(async (req) => {
     });
 
     if (result.data?.success) {
+      // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+      if (_obsCtx) {
+        try {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            ..._obsCtx,
+            execution_status: 'completed',
+            response_data: JSON.stringify({ sms_sent: result.data.sms_sent, email_sent: result.data.email_sent }),
+            execution_time_ms: Date.now() - _obsStartTime,
+          });
+        } catch (_) {}
+      }
       console.log(
         `[AutoReviewRequest] Review request sent for order ${order.id} — SMS: ${result.data.sms_sent}, Email: ${result.data.email_sent}`
       );
@@ -195,6 +206,19 @@ Deno.serve(async (req) => {
       );
     }
   } catch (error) {
+    // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health check ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'failed',
+          error_message: error.message,
+          error_code: 'review_request_failed',
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+        await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
+      } catch (_) {}
+    }
     console.error("[AutoReviewRequest] Fatal error:", error.message);
     return secureJson(
       { error: error.message, success: false },

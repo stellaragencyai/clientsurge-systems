@@ -569,6 +569,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "sprint2-blockers"), Component: Sprint2BlockerVerification },
           { route: routePath("admin", "saas-audit"), Component: SaaSAuditDashboard },
           { route: routePath("admin", "marketing"), Component: AIMarketingCommandCenter },
+          { route: routePath("admin", "automation-activity"), Component: lazy(() => import("./pages/admin/AutomationActivity")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}

@@ -348,6 +348,8 @@ Deno.serve(async (req) => {
     }
 
     const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };
+    // ── DEPLOYMENT OBSERVABILITY: Cache for per-client deployment lookups ──
+    const deploymentCache = {};
 
     for (const campaign of campaigns) {
       try {
@@ -356,6 +358,36 @@ Deno.serve(async (req) => {
           await base44.asServiceRole.entities.NurtureCampaign.update(campaign.id, { status: "stopped", stop_reason: "manual_stop", notes: "Lead not found." });
           results.stopped++;
           continue;
+        }
+
+        // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+        if (lead.client_id && !deploymentCache[lead.client_id]) {
+          try {
+            const deps = await base44.asServiceRole.entities.ClientDeployment.filter(
+              { client_id: lead.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+              '-created_date', 1
+            );
+            const dep = deps?.[0] || null;
+            if (dep) {
+              const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+                deployment_id: dep.id, module_key: 'lead_nurture'
+              });
+              deploymentCache[lead.client_id] = {
+                deployment_id: dep.id, authorized: permRes.data?.authorized === true, reason: permRes.data?.reason,
+              };
+            } else { deploymentCache[lead.client_id] = null; }
+          } catch (e) { deploymentCache[lead.client_id] = null; }
+        }
+        const _depCtx = lead.client_id ? deploymentCache[lead.client_id] : null;
+        if (_depCtx && !_depCtx.authorized) {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            client_deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
+            module_key: 'lead_nurture', trigger_event: 'scheduled_nurture',
+            execution_status: 'blocked',
+            error_message: `Module not authorized (reason: ${_depCtx.reason || 'unknown'})`,
+            error_code: _depCtx.reason || 'module_not_authorized', lead_id: lead.id,
+          }).catch(() => {});
+          results.skipped++; continue;
         }
 
         // Auto-stop if lead converted
@@ -418,9 +450,26 @@ Deno.serve(async (req) => {
           try {
             await sendEmail(lead.email || campaign.lead_email, subject, html, resendKey, fromEmail);
             sent = true;
+            // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+            if (_depCtx) {
+              await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+                client_deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
+                module_key: 'lead_nurture', trigger_event: 'scheduled_nurture',
+                execution_status: 'completed', lead_id: lead.id,
+              }).catch(() => {});
+            }
           } catch (err) {
             error = err.message;
             console.error(`[processNurtureCampaigns] processNurtureCampaigns [step${step.num}] error for ${campaign.lead_id}:`, err.message);
+            // ── DEPLOYMENT OBSERVABILITY: Log failed execution ──
+            if (_depCtx) {
+              await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+                client_deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
+                module_key: 'lead_nurture', trigger_event: 'scheduled_nurture',
+                execution_status: 'failed', error_message: err.message,
+                error_code: 'resend_send_failed', lead_id: lead.id,
+              }).catch(() => {});
+            }
           }
 
           updates[statusKey] = sent ? "sent" : "failed";

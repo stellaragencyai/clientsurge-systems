@@ -1,6 +1,6 @@
 {
   "name": "triggerAutoReviewRequest",
-  "entry": "main.ts",
+  "entry": "entry.ts",
   "automations": [
     {
       "name": "Send Auto Review Request on Order Live",
