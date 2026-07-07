@@ -1,0 +1,100 @@
+{
+  "name": "MarketingPublishingJob",
+  "type": "object",
+  "title": "Marketing Publishing Job",
+  "description": "Tracks each publishing attempt for a MarketingPost \u2014 status, retries, and provider response.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "post_id": {
+      "type": "string",
+      "title": "Post ID",
+      "description": "FK to MarketingPost"
+    },
+    "platform": {
+      "type": "string",
+      "title": "Platform",
+      "enum": [
+        "linkedin",
+        "tiktok",
+        "instagram_business",
+        "facebook_ads"
+      ]
+    },
+    "scheduled_at": {
+      "type": "string",
+      "title": "Scheduled At",
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "queued",
+        "in_progress",
+        "completed",
+        "failed",
+        "retrying",
+        "cancelled"
+      ],
+      "default": "queued"
+    },
+    "attempt_count": {
+      "type": "number",
+      "title": "Attempt Count",
+      "default": 0
+    },
+    "last_attempt_at": {
+      "type": "string",
+      "title": "Last Attempt At",
+      "format": "date-time"
+    },
+    "response_payload": {
+      "type": "string",
+      "title": "Response Payload (JSON)"
+    },
+    "failure_reason": {
+      "type": "string",
+      "title": "Failure Reason"
+    },
+    "retry_after": {
+      "type": "string",
+      "title": "Retry After",
+      "format": "date-time"
+    },
+    "published_url": {
+      "type": "string",
+      "title": "Published URL"
+    }
+  },
+  "required": [
+    "post_id",
+    "platform",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

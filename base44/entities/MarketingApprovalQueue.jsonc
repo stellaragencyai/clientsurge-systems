@@ -1,0 +1,86 @@
+{
+  "name": "MarketingApprovalQueue",
+  "type": "object",
+  "title": "Marketing Approval Queue",
+  "description": "Approval record for a MarketingPost \u2014 reviewer, status, required changes, timestamps.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "post_id": {
+      "type": "string",
+      "title": "Post ID"
+    },
+    "reviewer": {
+      "type": "string",
+      "title": "Reviewer (Admin Email)"
+    },
+    "status": {
+      "type": "string",
+      "title": "Approval Status",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "changes_requested"
+      ],
+      "default": "pending"
+    },
+    "required_changes": {
+      "type": "string",
+      "title": "Required Changes",
+      "description": "Feedback for the AI to regenerate with"
+    },
+    "approved_at": {
+      "type": "string",
+      "title": "Approved At",
+      "format": "date-time"
+    },
+    "rejected_reason": {
+      "type": "string",
+      "title": "Rejected Reason"
+    },
+    "campaign_id": {
+      "type": "string",
+      "title": "Campaign ID"
+    },
+    "platform": {
+      "type": "string",
+      "title": "Platform",
+      "enum": [
+        "linkedin",
+        "tiktok",
+        "instagram_business",
+        "facebook_ads"
+      ]
+    }
+  },
+  "required": [
+    "post_id",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

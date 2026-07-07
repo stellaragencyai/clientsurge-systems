@@ -1,0 +1,131 @@
+{
+  "name": "MarketingBrandProfile",
+  "type": "object",
+  "title": "Marketing Brand Profile",
+  "description": "Central brand voice, offer, and compliance profile for AI-generated marketing content.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "website_url": {
+      "type": "string",
+      "title": "Website URL"
+    },
+    "offer_summary": {
+      "type": "string",
+      "title": "Offer Summary",
+      "description": "Core value proposition in plain language"
+    },
+    "target_industries": {
+      "type": "array",
+      "title": "Target Industries",
+      "items": {
+        "type": "string"
+      }
+    },
+    "target_customers": {
+      "type": "array",
+      "title": "Target Customer Personas",
+      "items": {
+        "type": "string"
+      }
+    },
+    "brand_voice": {
+      "type": "string",
+      "title": "Brand Voice",
+      "description": "e.g. 'confident, practical, no-hype, automation-focused'"
+    },
+    "banned_claims": {
+      "type": "array",
+      "title": "Banned Claims",
+      "items": {
+        "type": "string"
+      },
+      "description": "Claims AI must never make (e.g. 'guaranteed revenue', '10x results')"
+    },
+    "approved_claims": {
+      "type": "array",
+      "title": "Approved Claims",
+      "items": {
+        "type": "string"
+      },
+      "description": "Defensible claims AI may use (e.g. 'reduce missed lead response time')"
+    },
+    "primary_cta": {
+      "type": "string",
+      "title": "Primary CTA",
+      "description": "e.g. 'Book a demo', 'Start free audit'"
+    },
+    "secondary_cta": {
+      "type": "string",
+      "title": "Secondary CTA"
+    },
+    "proof_assets": {
+      "type": "array",
+      "title": "Proof Assets",
+      "items": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string"
+          },
+          "url": {
+            "type": "string"
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "screenshot",
+              "testimonial",
+              "case_study",
+              "metric",
+              "video"
+            ]
+          }
+        }
+      },
+      "description": "Real, verified proof assets AI may reference. Never fabricate."
+    },
+    "compliance_notes": {
+      "type": "string",
+      "title": "Compliance Notes"
+    },
+    "is_active": {
+      "type": "boolean",
+      "title": "Is Active",
+      "default": true
+    }
+  },
+  "required": [
+    "business_name",
+    "website_url"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -121,6 +121,7 @@ const NAV_GROUPS = [
       { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'deployment-manager', label: 'Deployment Manager', icon: ShieldCheck },
+      { id: 'marketing', label: 'AI Marketing', icon: Sparkles, external: true, externalPath: '/admin/marketing' },
       { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
       { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: ClipboardList },
       { id: 'install-queue', label: 'Install Queue', icon: Server },

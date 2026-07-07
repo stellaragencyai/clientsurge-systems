@@ -26,6 +26,7 @@ const NAV_GROUPS = [
       { id: "crm-health",       label: "CRM Health",        icon: ShieldCheck,     path: "/admin", tab: "crm-health" },
       { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
       { id: "deployment-manager", label: "Deployment Manager", icon: ShieldCheck, path: "/admin", tab: "deployment-manager" },
+      { id: "marketing",          label: "AI Marketing",        icon: Sparkles,        path: "/admin/marketing" },
       { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
       { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
       { id: "onboarding-pipeline", label: "Onboarding Pipeline", icon: LayoutDashboard, path: "/admin/onboarding-pipeline" },

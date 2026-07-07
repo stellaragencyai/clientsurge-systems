@@ -100,6 +100,7 @@ const AutomationRoadmap = lazy(() => import("./pages/AutomationRoadmap"));
 const InboundReadinessDashboard = lazy(() => import("./internal-pages/InboundReadinessDashboard"));
 const Sprint2BlockerVerification = lazy(() => import("./internal-pages/Sprint2BlockerVerification"));
 const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboard"));
+const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 
@@ -567,6 +568,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "inbound-readiness"), Component: InboundReadinessDashboard },
           { route: routePath("admin", "sprint2-blockers"), Component: Sprint2BlockerVerification },
           { route: routePath("admin", "saas-audit"), Component: SaaSAuditDashboard },
+          { route: routePath("admin", "marketing"), Component: AIMarketingCommandCenter },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}

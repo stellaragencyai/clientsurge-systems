@@ -1,0 +1,165 @@
+{
+  "name": "MarketingPost",
+  "type": "object",
+  "title": "Marketing Post",
+  "description": "A single social media post with platform-specific variants, UTM tracking, approval and publish status.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "campaign_id": {
+      "type": "string",
+      "title": "Campaign ID"
+    },
+    "platform": {
+      "type": "string",
+      "title": "Platform",
+      "enum": [
+        "linkedin",
+        "tiktok",
+        "instagram_business",
+        "facebook_ads"
+      ]
+    },
+    "post_type": {
+      "type": "string",
+      "title": "Post Type",
+      "enum": [
+        "text",
+        "image",
+        "video",
+        "carousel",
+        "reel",
+        "article",
+        "ad_draft"
+      ],
+      "default": "text"
+    },
+    "draft_text": {
+      "type": "string",
+      "title": "Draft Text",
+      "description": "AI-generated draft"
+    },
+    "final_text": {
+      "type": "string",
+      "title": "Final Text",
+      "description": "Approved/edited final version"
+    },
+    "hashtags": {
+      "type": "array",
+      "title": "Hashtags",
+      "items": {
+        "type": "string"
+      }
+    },
+    "asset_url": {
+      "type": "string",
+      "title": "Asset URL",
+      "description": "Image/video URL if applicable"
+    },
+    "landing_page_url": {
+      "type": "string",
+      "title": "Landing Page URL"
+    },
+    "utm_url": {
+      "type": "string",
+      "title": "UTM URL",
+      "description": "Full URL with UTM parameters"
+    },
+    "scheduled_at": {
+      "type": "string",
+      "title": "Scheduled At",
+      "format": "date-time"
+    },
+    "approval_status": {
+      "type": "string",
+      "title": "Approval Status",
+      "enum": [
+        "pending",
+        "approved",
+        "rejected",
+        "changes_requested",
+        "auto_approved"
+      ],
+      "default": "pending"
+    },
+    "publish_status": {
+      "type": "string",
+      "title": "Publish Status",
+      "enum": [
+        "not_scheduled",
+        "scheduled",
+        "publishing",
+        "published",
+        "failed",
+        "cancelled"
+      ],
+      "default": "not_scheduled"
+    },
+    "published_url": {
+      "type": "string",
+      "title": "Published URL",
+      "description": "URL of the live post on the platform"
+    },
+    "published_at": {
+      "type": "string",
+      "title": "Published At",
+      "format": "date-time"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "content_pillar": {
+      "type": "string",
+      "title": "Content Pillar"
+    },
+    "target_audience": {
+      "type": "string",
+      "title": "Target Audience"
+    },
+    "cta": {
+      "type": "string",
+      "title": "CTA"
+    },
+    "video_script": {
+      "type": "string",
+      "title": "Video Script",
+      "description": "TikTok/Reel script if applicable"
+    },
+    "post_variant_group_id": {
+      "type": "string",
+      "title": "Post Variant Group ID",
+      "description": "Groups platform-specific variants of the same content idea"
+    }
+  },
+  "required": [
+    "platform",
+    "approval_status",
+    "publish_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,126 @@
+{
+  "name": "MarketingCampaign",
+  "type": "object",
+  "title": "Marketing Campaign",
+  "description": "A marketing campaign with goals, content pillars, posting cadence, and target audience.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "campaign_name": {
+      "type": "string",
+      "title": "Campaign Name"
+    },
+    "campaign_goal": {
+      "type": "string",
+      "title": "Campaign Goal",
+      "enum": [
+        "lead_generation",
+        "brand_awareness",
+        "traffic",
+        "engagement",
+        "thought_leadership",
+        "product_launch"
+      ],
+      "default": "lead_generation"
+    },
+    "target_audience": {
+      "type": "string",
+      "title": "Target Audience"
+    },
+    "offer": {
+      "type": "string",
+      "title": "Offer"
+    },
+    "landing_page_url": {
+      "type": "string",
+      "title": "Landing Page URL"
+    },
+    "start_date": {
+      "type": "string",
+      "format": "date",
+      "title": "Start Date"
+    },
+    "end_date": {
+      "type": "string",
+      "format": "date",
+      "title": "End Date"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "active",
+        "paused",
+        "completed",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "content_pillars": {
+      "type": "array",
+      "title": "Content Pillars",
+      "items": {
+        "type": "string"
+      },
+      "description": "Key themes the campaign covers (e.g. 'missed call recovery', 'AI booking')"
+    },
+    "daily_posting_goal": {
+      "type": "number",
+      "title": "Daily Posting Goal",
+      "default": 1
+    },
+    "weekly_posting_goal": {
+      "type": "number",
+      "title": "Weekly Posting Goal",
+      "default": 5
+    },
+    "target_platforms": {
+      "type": "array",
+      "title": "Target Platforms",
+      "items": {
+        "type": "string",
+        "enum": [
+          "linkedin",
+          "tiktok",
+          "instagram_business",
+          "facebook_ads"
+        ]
+      }
+    },
+    "brand_profile_id": {
+      "type": "string",
+      "title": "Brand Profile ID"
+    }
+  },
+  "required": [
+    "campaign_name",
+    "campaign_goal",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

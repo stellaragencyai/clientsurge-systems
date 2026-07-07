@@ -1,0 +1,134 @@
+{
+  "name": "SocialChannelConnection",
+  "type": "object",
+  "title": "Social Channel Connection",
+  "description": "Tracks OAuth connection state, publish capability, and health for each social platform.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "platform": {
+      "type": "string",
+      "title": "Platform",
+      "enum": [
+        "linkedin",
+        "tiktok",
+        "instagram_business",
+        "facebook_ads"
+      ]
+    },
+    "account_name": {
+      "type": "string",
+      "title": "Account Name"
+    },
+    "account_id": {
+      "type": "string",
+      "title": "Account ID"
+    },
+    "page_id": {
+      "type": "string",
+      "title": "Page ID",
+      "description": "Facebook/Instagram Page ID or LinkedIn organization URN"
+    },
+    "organization_id": {
+      "type": "string",
+      "title": "Organization ID"
+    },
+    "connected_status": {
+      "type": "string",
+      "title": "Connected Status",
+      "enum": [
+        "not_connected",
+        "connected",
+        "expired",
+        "error",
+        "audit_required",
+        "private_mode"
+      ],
+      "default": "not_connected"
+    },
+    "publish_capability_status": {
+      "type": "string",
+      "title": "Publish Capability Status",
+      "enum": [
+        "not_ready",
+        "ready_to_publish",
+        "blocked_missing_scope",
+        "blocked_audit_required",
+        "blocked_no_media",
+        "read_only"
+      ],
+      "default": "not_ready"
+    },
+    "permissions_granted": {
+      "type": "array",
+      "title": "Permissions Granted",
+      "items": {
+        "type": "string"
+      }
+    },
+    "token_expires_at": {
+      "type": "string",
+      "title": "Token Expires At",
+      "format": "date-time"
+    },
+    "last_verified_at": {
+      "type": "string",
+      "title": "Last Verified At",
+      "format": "date-time"
+    },
+    "setup_notes": {
+      "type": "string",
+      "title": "Setup Notes"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "posting_cadence_per_week": {
+      "type": "number",
+      "title": "Posting Cadence Per Week",
+      "default": 3
+    },
+    "autopilot_mode": {
+      "type": "string",
+      "title": "Autopilot Mode",
+      "enum": [
+        "draft_only",
+        "approval_required",
+        "autopilot_limited",
+        "autopilot_full"
+      ],
+      "default": "approval_required"
+    }
+  },
+  "required": [
+    "platform",
+    "connected_status",
+    "publish_capability_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

@@ -1,0 +1,102 @@
+{
+  "name": "SEOContentSeed",
+  "type": "object",
+  "title": "SEO Content Seed",
+  "description": "AI-generated blog/landing-page content ideas tied to keywords, search intent, and social post repurposing.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "topic": {
+      "type": "string",
+      "title": "Topic"
+    },
+    "keyword": {
+      "type": "string",
+      "title": "Target Keyword"
+    },
+    "target_industry": {
+      "type": "string",
+      "title": "Target Industry"
+    },
+    "search_intent": {
+      "type": "string",
+      "title": "Search Intent",
+      "enum": [
+        "informational",
+        "commercial",
+        "transactional",
+        "navigational"
+      ],
+      "default": "informational"
+    },
+    "proposed_blog_title": {
+      "type": "string",
+      "title": "Proposed Blog Title"
+    },
+    "proposed_landing_page": {
+      "type": "string",
+      "title": "Proposed Landing Page URL"
+    },
+    "related_social_posts": {
+      "type": "array",
+      "title": "Related Social Post IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "idea",
+        "approved",
+        "in_progress",
+        "published",
+        "archived"
+      ],
+      "default": "idea"
+    },
+    "internal_link_targets": {
+      "type": "array",
+      "title": "Internal Link Targets",
+      "items": {
+        "type": "string"
+      },
+      "description": "Existing site pages this content should link to"
+    },
+    "campaign_id": {
+      "type": "string",
+      "title": "Campaign ID"
+    }
+  },
+  "required": [
+    "topic",
+    "keyword",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
