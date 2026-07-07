@@ -5,7 +5,7 @@ import {
   MessageCircle, Send, ChevronDown, ChevronUp
 } from "lucide-react";
 import OnboardingTracker from "./OnboardingTracker";
-import OnboardingExperienceHub from "./OnboardingExperienceHub";
+import DeploymentTimeline from "./DeploymentTimeline";
 import SetupVideoGuide from "./SetupVideoGuide";
 import AutomationStatusExplainer from "./AutomationStatusExplainer";
 import GuaranteeCard from "./GuaranteeCard";
@@ -548,7 +548,7 @@ export default function SetupProgressHub({ project, order, user, portalState, is
   const cardState = getCardState(portalState, "installation_progress");
   const isProofLive = cardState.status === CARD_STATUS.LIVE;
 
-  // Derive deployment from portalState meta for OnboardingExperienceHub
+  // Derive deployment from portalState meta for DeploymentTimeline stage header
   const deployment = portalState?.meta?.deployment_id
     ? {
         id: portalState.meta.deployment_id,
@@ -584,13 +584,13 @@ export default function SetupProgressHub({ project, order, user, portalState, is
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
-      {/* Phase 4.4: Unified Onboarding Experience */}
-      <OnboardingExperienceHub
+      {/* Phase 4.5: DeploymentTimeline with merged stage header (replaces OnboardingExperienceHub) */}
+      <DeploymentTimeline
         project={projectState}
         deployment={deployment}
-        portalState={portalState}
         order={order}
-        isAdmin={isAdmin}
+        showStageHeader={true}
+        portalState={portalState}
       />
 
       {/* Legacy tracker — kept for detailed per-provider track view */}

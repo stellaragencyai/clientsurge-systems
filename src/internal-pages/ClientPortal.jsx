@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { LayoutDashboard, Eye } from "lucide-react";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
-import { useLeadNotifications } from "../hooks/useLeadNotifications";
+import { useClientNotifications } from "../hooks/useClientNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalShell from "../components/portal/PortalShell";
 import PortalDashboardOverview from "../components/portal/PortalDashboardOverview";
@@ -35,12 +35,9 @@ const AutomatedResponsesLog = lazy(() => import("../components/portal/AutomatedR
 const AutomationChecklist = lazy(() => import("../components/portal/AutomationChecklist"));
 const PortalWhatsNew = lazy(() => import("../components/portal/PortalWhatsNew"));
 const ClientOrderStatusTab = lazy(() => import("../components/portal/ClientOrderStatusTab"));
-const PortalTimeline = lazy(() => import("../components/portal/PortalTimeline"));
 const DeploymentTimeline = lazy(() => import("../components/portal/DeploymentTimeline"));
-const SystemStatusBadge = lazy(() => import("../components/portal/SystemStatusBadge"));
 const OrderTracker = lazy(() => import("../components/landing/OrderTracker"));
 const OnboardingMissingAssetsBanner = lazy(() => import("../components/portal/OnboardingMissingAssetsBanner"));
-const EmptyStateDashboard = lazy(() => import("../components/portal/EmptyStateDashboard"));
 const GettingStartedBanner = lazy(() => import("../components/portal/GettingStartedBanner"));
 const LaunchReadinessPanel = lazy(() => import("../components/dashboard/LaunchReadinessPanel"));
 const ActiveAutomationsPanel = lazy(() => import("../components/dashboard/ActiveAutomationsPanel"));
@@ -94,7 +91,13 @@ export default function ClientPortal() {
   const [isAdminPreview, setIsAdminPreview] = useState(false);
   const [healthData, setHealthData] = useState(null);
   const [userRole, setUserRole] = useState(null);
-  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
+  const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useClientNotifications({
+    project,
+    deployment,
+    portalState,
+    portalStateLoading,
+    subscription,
+  });
 
   // Phase A.1 + Phase 3: PortalStateEngine with ClientDeployment as source of truth
   const portalContextData = loading ? null : { project, order: portalOrder, subscription, deployment, health: healthData, is_admin_preview: isAdminPreview };
@@ -413,6 +416,10 @@ export default function ClientPortal() {
                 refreshProject={refreshProject}
                 portalState={portalState}
                 portalStateLoading={portalStateLoading}
+                notifications={notifications}
+                unreadCount={unreadCount}
+                onMarkAsRead={markAsRead}
+                onMarkAllAsRead={markAllAsRead}
               />
             </PortalStateBoundary>
           )}
@@ -647,10 +654,13 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                {deployment
-                  ? <DeploymentTimeline deployment={deployment} project={project} order={portalOrder} />
-                  : <PortalTimeline order={portalOrder} project={project} />
-                }
+                <DeploymentTimeline
+                  deployment={deployment}
+                  project={project}
+                  order={portalOrder}
+                  showStageHeader={false}
+                  portalState={portalState}
+                />
               </PortalLazy>
             </PortalTabWrapper>
           )}

@@ -25,7 +25,7 @@ const PortalLazy = ({ children }) => (
   <Suspense fallback={<div className="h-32 rounded-xl bg-muted/30 animate-pulse" />}>{children}</Suspense>
 );
 
-const SystemStatusBadge = lazy(() => import("./SystemStatusBadge"));
+const PortalStatusBadge = lazy(() => import("./PortalStatusBadge"));
 const GettingStartedBanner = lazy(() => import("./GettingStartedBanner"));
 const OnboardingMissingAssetsBanner = lazy(() => import("./OnboardingMissingAssetsBanner"));
 const LaunchReadinessPanel = lazy(() => import("../dashboard/LaunchReadinessPanel"));
@@ -45,6 +45,10 @@ export default function PortalDashboardOverview({
   refreshProject,
   portalState,
   portalStateLoading,
+  notifications = [],
+  unreadCount = 0,
+  onMarkAsRead,
+  onMarkAllAsRead,
 }) {
   const services = portalOrder?.services || [];
   const activeCount = services.filter((s) => s.install_status === "Live").length;
@@ -191,7 +195,7 @@ export default function PortalDashboardOverview({
                   <span className="text-[10px] text-gray-300">Last updated pending</span>
                 )}
                 <PortalLazy>
-                  <SystemStatusBadge project={project} />
+                  <PortalStatusBadge status={systemReadinessCard?.status || "Syncing"} />
                 </PortalLazy>
               </div>
             </div>
@@ -243,15 +247,12 @@ export default function PortalDashboardOverview({
 
         {/* Side column (1/3) */}
         <div className="space-y-6">
-          {/* Notification Center — Phase 4.4 Phase 4 */}
+          {/* Notification Center — Phase 4.5: powered by useClientNotifications hook */}
           <ClientNotificationCenter
-            project={project}
-            deployment={deployment}
-            portalState={portalState}
-            portalStateLoading={portalStateLoading}
-            subscription={subscription}
-            healthData={healthData}
-            onNavigate={navigateTab}
+            notifications={notifications}
+            unreadCount={unreadCount}
+            onMarkAsRead={onMarkAsRead}
+            onMarkAllAsRead={onMarkAllAsRead}
           />
 
           {/* Getting Started / Action Required */}

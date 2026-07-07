@@ -1,232 +1,39 @@
 /**
- * ClientNotificationCenter — Phase 4.4 Phase 4
+ * ClientNotificationCenter — Phase 4.5
  *
- * Foundation for client-facing notifications.
- * Derives notifications from real system events:
- *   - Deployment updates (status changes)
- *   - Automation verified (proof logs)
- *   - Action needed (portal state blocked/action required)
- *   - System issue (failed events, deployment error)
- *   - Report available (weekly/monthly reports generated)
+ * Unified notification panel powered by useClientNotifications hook.
+ * Notifications are passed as props from the hook (single source of truth).
  *
- * Each notification: title, description, timestamp, priority, read state.
- * Stored in client-side localStorage for read/unread state (no entity changes).
+ * Read/unread state managed by the hook via localStorage key "cs_portal_notifications_read".
  */
-import { useEffect, useState, useMemo } from "react";
-import { base44 } from "@/api/base44Client";
-import {
-  Bell, CheckCircle2, AlertCircle, Zap, ShieldCheck, FileText,
-  Rocket, Settings, Clock, X, Inbox,
-} from "lucide-react";
-import { format, formatDistanceToNow } from "date-fns";
-import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import { CheckCircle2, AlertCircle, ShieldCheck, FileText, Rocket, Bell, Inbox } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
-const NOTIFICATION_TYPES = {
-  DEPLOYMENT_UPDATE: { label: "Update", icon: Rocket, color: "#0088CC", priority: 2 },
-  AUTOMATION_VERIFIED: { label: "Verified", icon: ShieldCheck, color: "#10B981", priority: 3 },
-  ACTION_NEEDED: { label: "Action Needed", icon: AlertCircle, color: "#F59E0B", priority: 1 },
-  SYSTEM_ISSUE: { label: "System Issue", icon: AlertCircle, color: "#EF4444", priority: 1 },
-  REPORT_AVAILABLE: { label: "Report", icon: FileText, color: "#0088CC", priority: 4 },
+const NOTIFICATION_TYPE_CONFIG = {
+  new_lead: { label: "New Lead", icon: Rocket, color: "#0088CC" },
+  lead_booked: { label: "Booked", icon: CheckCircle2, color: "#10B981" },
+  lead_replied: { label: "Replied", icon: AlertCircle, color: "#00AEEF" },
+  lead_qualified: { label: "Qualified", icon: ShieldCheck, color: "#10B981" },
+  deployment_update: { label: "Update", icon: Rocket, color: "#0088CC" },
+  automation_verified: { label: "Verified", icon: ShieldCheck, color: "#10B981" },
+  action_needed: { label: "Action Needed", icon: AlertCircle, color: "#F59E0B" },
+  system_issue: { label: "System Issue", icon: AlertCircle, color: "#EF4444" },
+  report_available: { label: "Report", icon: FileText, color: "#0088CC" },
 };
 
-const STORAGE_KEY = "cs_portal_notifications_read";
-
 export default function ClientNotificationCenter({
-  project,
-  deployment,
-  portalState,
-  portalStateLoading,
-  subscription,
-  healthData,
-  onNavigate,
+  notifications = [],
+  unreadCount = 0,
+  onMarkAsRead,
+  onMarkAllAsRead,
+  loading = false,
 }) {
-  const [proofLogs, setProofLogs] = useState([]);
-  const [execLogs, setExecLogs] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [readIds, setReadIds] = useState(() => {
-    try {
-      return new Set(JSON.parse(localStorage.getItem(STORAGE_KEY) || "[]"));
-    } catch {
-      return new Set();
-    }
-  });
-
-  const deploymentId = deployment?.id || project?.client_deployment_id;
-
-  useEffect(() => {
-    if (!deploymentId) {
-      setLoading(false);
-      return;
-    }
-    loadNotificationSources(deploymentId);
-  }, [deploymentId]);
-
-  async function loadNotificationSources(depId) {
-    try {
-      const [proofs, execs] = await Promise.all([
-        fetchProofLogs(depId),
-        fetchExecLogs(depId),
-      ]);
-      setProofLogs(proofs);
-      setExecLogs(execs);
-    } catch {
-      // Silent
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function fetchProofLogs(depId) {
-    try {
-      return await base44.asServiceRole.entities.AutomationProofLog.filter(
-        { client_deployment_id: depId },
-        "-tested_at",
-        20
-      ) || [];
-    } catch {
-      return [];
-    }
-  }
-
-  async function fetchExecLogs(depId) {
-    try {
-      return await base44.asServiceRole.entities.AutomationExecutionLog.filter(
-        { client_deployment_id: depId },
-        "-created_date",
-        30
-      ) || [];
-    } catch {
-      return [];
-    }
-  }
-
-  // ── Build notifications from real data ──
-  const notifications = useMemo(() => {
-    const items = [];
-
-    // 1. Deployment status updates
-    if (deployment?.went_live_at) {
-      items.push({
-        id: `deploy_live_${deployment.id}`,
-        type: "DEPLOYMENT_UPDATE",
-        title: "Your System Is Live",
-        description: "Your automation system has been verified and is now live.",
-        timestamp: deployment.went_live_at,
-      });
-    }
-    if (deployment?.created_date && deployment?.deployment_status !== "live") {
-      items.push({
-        id: `deploy_created_${deployment.id}`,
-        type: "DEPLOYMENT_UPDATE",
-        title: "Setup Started",
-        description: "Your automation system setup has begun. We're configuring your modules.",
-        timestamp: deployment.created_date,
-      });
-    }
-
-    // 2. Automation verified (proof logs)
-    for (const proof of proofLogs) {
-      if (proof.status === "pass" && proof.tested_at) {
-        const moduleName = (proof.service_key || "automation").replace(/_/g, " ");
-        items.push({
-          id: `proof_${proof.id}`,
-          type: "AUTOMATION_VERIFIED",
-          title: `${moduleName.replace(/\b\w/g, (c) => c.toUpperCase())} Verified`,
-          description: "This automation module passed verification testing.",
-          timestamp: proof.tested_at,
-        });
-      }
-    }
-
-    // 3. Action needed (from portal state)
-    if (!portalStateLoading) {
-      const billingCard = getCardState(portalState, "billing");
-      if (billingCard.status === CARD_STATUS.BLOCKED) {
-        items.push({
-          id: "action_billing",
-          type: "ACTION_NEEDED",
-          title: "Payment Method Needs Update",
-          description: "Your subscription payment requires attention to keep your system running.",
-          timestamp: new Date().toISOString(),
-        });
-      }
-
-      if (project?.client_approval_status === "Requested") {
-        items.push({
-          id: "action_approval",
-          type: "ACTION_NEEDED",
-          title: "Review Your System",
-          description: "Your system is ready for your review and approval.",
-          timestamp: project.updated_date || new Date().toISOString(),
-        });
-      }
-    }
-
-    // 4. System issue (failed events, deployment error)
-    if (deployment?.deployment_status === "error") {
-      items.push({
-        id: `issue_deploy_${deployment.id}`,
-        type: "SYSTEM_ISSUE",
-        title: "System Issue Detected",
-        description: "Our team is aware and actively working to resolve it.",
-        timestamp: deployment.health_checked_at || deployment.updated_date || new Date().toISOString(),
-      });
-    }
-
-    const failedExecs = execLogs.filter((e) => e.execution_status === "failed").slice(0, 3);
-    for (const exec of failedExecs) {
-      const moduleName = (exec.module_key || "automation").replace(/_/g, " ");
-      items.push({
-        id: `issue_exec_${exec.id}`,
-        type: "SYSTEM_ISSUE",
-        title: `${moduleName.replace(/\b\w/g, (c) => c.toUpperCase())} Issue`,
-        description: exec.error_message
-          ? `An automation encountered an issue. Our team has been notified.`
-          : "An automation encountered an issue. Our team has been notified.",
-        timestamp: exec.completed_at || exec.started_at || exec.created_date,
-      });
-    }
-
-    // 5. Report available
-    if (deployment?.deployment_status === "live" && project?.client_project_status === "Live") {
-      const lastWeek = new Date();
-      lastWeek.setDate(lastWeek.getDate() - 7);
-      items.push({
-        id: "report_weekly",
-        type: "REPORT_AVAILABLE",
-        title: "Weekly Report Available",
-        description: "Your weekly performance summary is ready to view.",
-        timestamp: lastWeek.toISOString(),
-      });
-    }
-
-    // Sort by timestamp descending
-    items.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-    return items;
-  }, [deployment, proofLogs, execLogs, portalState, portalStateLoading, project]);
-
-  const unreadCount = notifications.filter((n) => !readIds.has(n.id)).length;
-
-  const markAsRead = (id) => {
-    const newRead = new Set(readIds);
-    newRead.add(id);
-    setReadIds(newRead);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...newRead]));
-    } catch {
-      // localStorage may be unavailable
-    }
+  const handleMarkAsRead = (id) => {
+    if (onMarkAsRead) onMarkAsRead(id);
   };
 
-  const markAllAsRead = () => {
-    const newRead = new Set(notifications.map((n) => n.id));
-    setReadIds(newRead);
-    try {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify([...newRead]));
-    } catch {
-      // localStorage may be unavailable
-    }
+  const handleMarkAllAsRead = () => {
+    if (onMarkAllAsRead) onMarkAllAsRead();
   };
 
   return (
@@ -257,7 +64,7 @@ export default function ClientNotificationCenter({
         </div>
         {unreadCount > 0 && (
           <button
-            onClick={markAllAsRead}
+            onClick={handleMarkAllAsRead}
             className="text-xs font-semibold text-[#0088CC] hover:text-[#006BB0] transition-colors"
           >
             Mark all read
@@ -269,7 +76,6 @@ export default function ClientNotificationCenter({
       <div className="max-h-[400px] overflow-y-auto">
         {loading ? (
           <div className="flex items-center justify-center py-8 gap-2">
-            <Clock className="w-4 h-4 text-gray-300 animate-spin" />
             <span className="text-sm text-gray-400">Loading notifications…</span>
           </div>
         ) : notifications.length === 0 ? (
@@ -283,15 +89,15 @@ export default function ClientNotificationCenter({
         ) : (
           <div>
             {notifications.slice(0, 15).map((notif) => {
-              const cfg = NOTIFICATION_TYPES[notif.type] || NOTIFICATION_TYPES.DEPLOYMENT_UPDATE;
+              const cfg = NOTIFICATION_TYPE_CONFIG[notif.type] || NOTIFICATION_TYPE_CONFIG.deployment_update;
               const Icon = cfg.icon;
-              const isUnread = !readIds.has(notif.id);
+              const isUnread = !notif.read;
               const date = notif.timestamp ? new Date(notif.timestamp) : null;
 
               return (
                 <button
                   key={notif.id}
-                  onClick={() => markAsRead(notif.id)}
+                  onClick={() => handleMarkAsRead(notif.id)}
                   className={`w-full flex items-start gap-3 px-5 py-3 text-left transition-colors border-b border-gray-50 last:border-0 ${
                     isUnread ? "bg-blue-50/30 hover:bg-blue-50/50" : "hover:bg-gray-50"
                   }`}
@@ -309,7 +115,7 @@ export default function ClientNotificationCenter({
                         <span className="w-2 h-2 rounded-full bg-[#00AEEF] flex-shrink-0" />
                       )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{notif.description}</p>
+                    <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{notif.message}</p>
                     {date && (
                       <p className="text-[10px] text-gray-400 mt-1">
                         {formatDistanceToNow(date, { addSuffix: true })}
