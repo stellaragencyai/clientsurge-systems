@@ -168,12 +168,16 @@ export default function OnboardingExperienceHub({
 
   async function fetchChecklistSteps(depId) {
     try {
-      const steps = await base44.asServiceRole.entities.AutomationChecklistStep.filter(
-        { client_deployment_id: depId },
-        "sort_order",
-        100
-      );
-      return steps || [];
+      // AutomationChecklistStep uses order_id/client_project_id, not client_deployment_id
+      const orderId = deployment?.order_id || order?.id || project?.order_id;
+      if (orderId) {
+        return await base44.asServiceRole.entities.AutomationChecklistStep.filter(
+          { order_id: orderId },
+          "step_order",
+          100
+        ) || [];
+      }
+      return [];
     } catch {
       return [];
     }

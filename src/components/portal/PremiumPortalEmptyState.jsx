@@ -27,6 +27,8 @@ export default function PremiumPortalEmptyState({
   const finalActionLabel = actionLabel || copy.actionLabel;
   const finalActionTab = actionTab || copy.actionTab;
 
+  const canTakeAction = !!(onAction || (onNavigate && finalActionTab));
+
   const handleAction = () => {
     if (onAction) {
       onAction();
@@ -46,7 +48,7 @@ export default function PremiumPortalEmptyState({
       <h3 className="text-base font-bold text-gray-900 mb-2 font-display">{finalTitle}</h3>
       <p className="text-sm text-gray-500 leading-relaxed mb-1 max-w-md mx-auto">{finalDescription}</p>
       <p className="text-xs text-gray-400 mb-4">{finalTiming}</p>
-      {finalActionLabel && (handleAction !== noop) && (
+      {finalActionLabel && canTakeAction && (
         <button
           onClick={handleAction}
           className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
@@ -59,5 +61,3 @@ export default function PremiumPortalEmptyState({
     </div>
   );
 }
-
-const noop = () => {};

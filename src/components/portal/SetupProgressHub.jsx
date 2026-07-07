@@ -5,6 +5,7 @@ import {
   MessageCircle, Send, ChevronDown, ChevronUp
 } from "lucide-react";
 import OnboardingTracker from "./OnboardingTracker";
+import OnboardingExperienceHub from "./OnboardingExperienceHub";
 import SetupVideoGuide from "./SetupVideoGuide";
 import AutomationStatusExplainer from "./AutomationStatusExplainer";
 import GuaranteeCard from "./GuaranteeCard";
@@ -547,6 +548,18 @@ export default function SetupProgressHub({ project, order, user, portalState, is
   const cardState = getCardState(portalState, "installation_progress");
   const isProofLive = cardState.status === CARD_STATUS.LIVE;
 
+  // Derive deployment from portalState meta for OnboardingExperienceHub
+  const deployment = portalState?.meta?.deployment_id
+    ? {
+        id: portalState.meta.deployment_id,
+        deployment_status: portalState.meta.deployment_status,
+        package_tier_key: portalState.meta.deployment_package_tier,
+        industry_slug: portalState.meta.deployment_industry,
+        created_date: portalState.meta.deployment_created_date,
+        went_live_at: portalState.meta.deployment_went_live_at,
+      }
+    : null;
+
   useEffect(() => {
     if (!project?.id) return;
     const unsub = base44.entities.ClientProject.subscribe(event => {
@@ -571,6 +584,16 @@ export default function SetupProgressHub({ project, order, user, portalState, is
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
+      {/* Phase 4.4: Unified Onboarding Experience */}
+      <OnboardingExperienceHub
+        project={projectState}
+        deployment={deployment}
+        portalState={portalState}
+        order={order}
+        isAdmin={isAdmin}
+      />
+
+      {/* Legacy tracker — kept for detailed per-provider track view */}
       <OnboardingTracker
         project={projectState}
         order={order}

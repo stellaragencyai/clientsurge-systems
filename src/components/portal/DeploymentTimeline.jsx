@@ -248,8 +248,11 @@ export default function DeploymentTimeline({ deployment, project, order }) {
         ) : events.length === 0 ? (
           <div className="py-8 text-center">
             <Clock className="w-8 h-8 text-gray-300 mx-auto mb-3" />
-            <p className="text-sm text-gray-400">No events recorded yet.</p>
-            <p className="text-xs text-gray-400 mt-1">Events will appear here as your deployment progresses.</p>
+            <p className="text-sm font-semibold text-gray-500">No Timeline Events Yet</p>
+            <p className="text-xs text-gray-400 mt-1 max-w-sm mx-auto">
+              Timeline events will appear here as your deployment progresses through setup and verification.
+              Events are recorded automatically from real system activity.
+            </p>
           </div>
         ) : (
           <div>

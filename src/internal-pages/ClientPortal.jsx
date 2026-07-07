@@ -427,7 +427,7 @@ export default function ClientPortal() {
               <PortalLazy>
                 <QuickStartInline
                   project={project}
-                  onComplete={() => { refreshProject(); setActiveTab("dashboard"); }}
+                  onComplete={() => { refreshProject(); navigatePortalTab("dashboard"); }}
                 />
               </PortalLazy>
             </PortalTabWrapper>
@@ -543,7 +543,7 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <LeadFlowDashboard portalState={portalState} emptyState={<EmptyStateDashboard variant="leads" />} />
+                <LeadFlowDashboard portalState={portalState} emptyState={<PremiumPortalEmptyState title="No Lead Flow Data Yet" description="Your lead flow metrics will appear here once your system is live and capturing leads." expectedTiming="Data populates after your system goes live and starts receiving leads." actionLabel="View Setup Progress" onAction={() => navigatePortalTab("progress")} />} />
               </PortalLazy>
             </PortalTabWrapper>
           )}

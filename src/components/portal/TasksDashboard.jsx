@@ -4,6 +4,7 @@ import { Loader2, RefreshCw, Zap, ScrollText, AlertCircle } from "lucide-react";
 import TaskStatsRow from "./tasks/TaskStatsRow";
 import TaskJobRow from "./tasks/TaskJobRow";
 import ActivityLogRow from "./tasks/ActivityLogRow";
+import PremiumPortalEmptyState from "./PremiumPortalEmptyState";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
@@ -163,10 +164,12 @@ export default function TasksDashboard({ project, portalState, isAdmin = false }
                 <Loader2 className="w-4 h-4 animate-spin" /> Loading tasks…
               </div>
             ) : filteredJobs.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground text-sm">
-                <Zap className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                No {filter === "all" ? "" : filter} jobs yet.
-                <p className="text-xs mt-1 opacity-70">Jobs are created automatically when leads enter your pipeline.</p>
+              <div className="py-6">
+                <PremiumPortalEmptyState
+                  icon={Zap}
+                  contextKey="tasks"
+                  onNavigate={(tab) => {}}
+                />
               </div>
             ) : (
               filteredJobs.map(job => (
@@ -196,9 +199,12 @@ export default function TasksDashboard({ project, portalState, isAdmin = false }
                 <Loader2 className="w-4 h-4 animate-spin" /> Loading activity…
               </div>
             ) : events.length === 0 ? (
-              <div className="py-12 text-center text-muted-foreground text-sm">
-                <ScrollText className="w-8 h-8 mx-auto mb-2 opacity-20" />
-                No activity logged yet.
+              <div className="py-6">
+                <PremiumPortalEmptyState
+                  icon={ScrollText}
+                  contextKey="activity"
+                  onNavigate={(tab) => {}}
+                />
               </div>
             ) : (
               events.map(event => (
