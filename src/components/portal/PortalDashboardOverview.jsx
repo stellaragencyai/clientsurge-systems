@@ -10,6 +10,7 @@ import {
   ArrowRight, ShieldCheck, AlertCircle, CheckCircle2, Info,
 } from "lucide-react";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import { translateCard, getClientStatusConfig } from "@/lib/clientStatusLanguage";
 
 const PortalLazy = ({ children }) => (
   <Suspense fallback={<div className="h-32 rounded-xl bg-muted/30 animate-pulse" />}>{children}</Suspense>
@@ -93,8 +94,10 @@ export default function PortalDashboardOverview({
   const leadCaptureCard = getCardState(portalState, "lead_capture");
   const billingCard = getCardState(portalState, "billing");
 
-  // Use engine-provided readiness status instead of raw health data
-  const readinessStatus = systemReadinessCard?.display_text || "Pending";
+  // Phase 4.1: Use centralized client status language for all status labels
+  const systemReadinessTranslated = translateCard(systemReadinessCard);
+  const readinessStatus = systemReadinessTranslated.friendlyStatus;
+  const automationHealthTranslated = translateCard(automationHealthCard);
 
   // Quick Start is complete only when BOTH flags are true
   const quickStartDone = project?.quick_start_completed === true && project?.onboarding_wizard_completed === true;
@@ -107,7 +110,7 @@ export default function PortalDashboardOverview({
   // Issues count comes from normalized state, not raw events
   const issuesValue = portalStateLoading
     ? "—"
-    : (automationHealthCard?.status === CARD_STATUS.LIVE ? "0" : "Pending");
+    : (automationHealthCard?.status === CARD_STATUS.LIVE ? "0" : "Review");
 
   return (
     <div className="space-y-5">
@@ -138,11 +141,11 @@ export default function PortalDashboardOverview({
               Welcome back, {project?.business_name || user?.full_name || "Client"}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-               Your system status:{" "}
-               <span className="font-semibold text-gray-700">
-                 {portalStateLoading ? "Syncing" : (systemReadinessCard?.display_text || readinessStatus)}
-               </span>
-             </p>
+                Your system status:{" "}
+                <span className="font-semibold text-gray-700">
+                  {portalStateLoading ? "Syncing Data" : readinessStatus}
+                </span>
+              </p>
           </div>
         </div>
         <button

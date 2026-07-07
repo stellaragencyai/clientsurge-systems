@@ -1,17 +1,14 @@
-import { CheckCircle2, Clock, AlertTriangle, Ban, Settings, TestTube, Zap } from "lucide-react";
-import { getPackageAutomations, getDisplayServiceName } from "@/lib/dashboardHelpers";
+import { Zap } from "lucide-react";
+import { getPackageAutomations } from "@/lib/dashboardHelpers";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import { getClientStatusConfig, translateCard } from "@/lib/clientStatusLanguage";
 import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-const STATUS_CONFIG = {
-  NotIncluded: { icon: Ban, color: "#9ca3af", label: "Not Included", bg: "rgba(156,163,175,0.05)", glow: "none" },
-  SetupPending: { icon: Settings, color: "#8b5cf6", label: "Setup Pending", bg: "rgba(139,92,246,0.05)", glow: "none" },
-  Testing: { icon: TestTube, color: "#00AEEF", label: "Testing", bg: "rgba(0,174,239,0.05)", glow: "0 0 10px rgba(0,174,239,0.2)" },
-  Verifying: { icon: Clock, color: "#00AEEF", label: "Verifying", bg: "rgba(0,174,239,0.05)", glow: "none" },
-  Live: { icon: CheckCircle2, color: "#22c55e", label: "Live", bg: "rgba(34,197,94,0.05)", glow: "0 0 12px rgba(34,197,94,0.15)" },
-  NeedsAttention: { icon: AlertTriangle, color: "#ef4444", label: "Needs Attention", bg: "rgba(239,68,68,0.05)", glow: "none" },
-};
-
+/**
+ * ActiveAutomationsPanel — Phase 4.1
+ * Uses centralized ClientStatusLanguage for all status labels and descriptions.
+ * Never exposes internal terms (Live, NeedsProof, SetupRequired, etc.) directly.
+ */
 function resolveAutomationStatus(automationKey, services, failedEvents) {
   const svc = (services || []).find(
     (s) => {
@@ -21,20 +18,20 @@ function resolveAutomationStatus(automationKey, services, failedEvents) {
     }
   );
 
-  if (!svc) return "SetupPending";
+  if (!svc) return CARD_STATUS.SETUP_REQUIRED;
 
   const status = svc.install_status || "Paid";
-  if (status === "Live") return "Live";
-  if (status === "Testing") return "Testing";
-  if (status === "Error") return "NeedsAttention";
+  if (status === "Live") return CARD_STATUS.LIVE;
+  if (status === "Testing") return CARD_STATUS.NEEDS_PROOF;
+  if (status === "Error") return CARD_STATUS.BLOCKED;
 
   const hasFailedEvents = (failedEvents || []).some((e) => {
     const svcKey = e?.service_key || e?.metadata_json || "";
     return svcKey.includes(automationKey) && e.status === "failed";
   });
-  if (hasFailedEvents) return "NeedsAttention";
+  if (hasFailedEvents) return CARD_STATUS.BLOCKED;
 
-  return "SetupPending";
+  return CARD_STATUS.SETUP_REQUIRED;
 }
 
 export default function ActiveAutomationsPanel({ packageKey, services = [], failedEvents = [], isAdmin = false, portalState }) {
@@ -58,7 +55,7 @@ export default function ActiveAutomationsPanel({ packageKey, services = [], fail
         </p>
       </div>
 
-      {/* Phase A.3: Proof gate — suppress "Live" until proof validated */}
+      {/* Proof gate — show friendly status when not yet verified */}
       {!isProofLive && (
         <div style={{
           padding: "10px 14px", marginBottom: "12px", borderRadius: "10px",
@@ -76,12 +73,12 @@ export default function ActiveAutomationsPanel({ packageKey, services = [], fail
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {automations.map((auto) => {
-            let resolved = resolveAutomationStatus(auto.key, services, failedEvents);
-            // Phase A.3: Gate "Live" behind PortalStateEngine proof validation
-            if (resolved === "Live" && !isProofLive) {
-              resolved = "Verifying";
+            let resolvedStatus = resolveAutomationStatus(auto.key, services, failedEvents);
+            // Gate "Live" behind PortalStateEngine proof validation
+            if (resolvedStatus === CARD_STATUS.LIVE && !isProofLive) {
+              resolvedStatus = CARD_STATUS.NEEDS_PROOF;
             }
-            const config = STATUS_CONFIG[resolved] || STATUS_CONFIG.SetupPending;
+            const config = getClientStatusConfig(resolvedStatus);
             const Icon = config.icon;
 
             return (
@@ -91,8 +88,7 @@ export default function ActiveAutomationsPanel({ packageKey, services = [], fail
                   display: "flex", alignItems: "center", justifyContent: "space-between",
                   padding: "12px 16px", borderRadius: "12px",
                   background: config.bg,
-                  border: `1px solid ${config.color}18`,
-                  boxShadow: config.glow,
+                  border: `1px solid ${config.border}`,
                   transition: "all 0.25s ease",
                 }}
               >
