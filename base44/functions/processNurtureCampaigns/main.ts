@@ -191,6 +191,10 @@ Deno.serve(async (req) => {
     if (!sendGate.ok) return secureJson({ success: false, error: "Nurture campaign sending is blocked until deliverability proof is complete.", email_sent: false, safe_to_continue: false, requires_owner_action: true, reason: sendGate.reason, proof_status: sendGate.proof_status }, { status: 403 });
 
     const results = { fired: 0, skipped: 0, stopped: 0, errors: 0 };
+
+    // ── DEPLOYMENT OBSERVABILITY: Cache for per-client deployment lookups ──
+    const _deploymentCache = {};
+
     for (const campaign of campaigns) {
       try {
         const lead = await base44.asServiceRole.entities.Leads.get(campaign.lead_id);
@@ -231,12 +235,72 @@ Deno.serve(async (req) => {
 
           let sent = false;
           let error = null;
+
+          // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+          let _obsCtx = null;
+          if (lead.client_id && !_deploymentCache[lead.client_id]) {
+            try {
+              const deps = await base44.asServiceRole.entities.ClientDeployment.filter(
+                { client_id: lead.client_id, deployment_status: { $in: ["live", "onboarding", "configuring", "ready"] } },
+                "-created_date", 1
+              );
+              const dep = deps?.[0] || null;
+              if (dep) {
+                const permRes = await base44.asServiceRole.functions.invoke("checkModulePermission", {
+                  deployment_id: dep.id, module_key: "lead_nurture",
+                });
+                _deploymentCache[lead.client_id] = {
+                  deployment_id: dep.id,
+                  authorized: permRes.data?.authorized === true,
+                  reason: permRes.data?.reason,
+                };
+              } else { _deploymentCache[lead.client_id] = null; }
+            } catch (_depErr) {
+              _deploymentCache[lead.client_id] = null;
+            }
+          }
+          const _depCtx = lead.client_id ? _deploymentCache[lead.client_id] : null;
+          if (_depCtx && !_depCtx.authorized) {
+            await base44.asServiceRole.functions.invoke("logAutomationExecution", {
+              client_deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
+              module_key: "lead_nurture", trigger_event: "nurture_scheduled",
+              execution_status: "blocked",
+              error_message: `Module not authorized (reason: ${_depCtx.reason || "unknown"})`,
+              error_code: _depCtx.reason || "module_not_authorized",
+              lead_id: lead.id,
+            }).catch(() => {});
+            updates[statusKey] = "skipped";
+            results.skipped++;
+            break;
+          }
+          if (_depCtx) {
+            _obsCtx = {
+              deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
+              module_key: "lead_nurture", trigger_event: "nurture_scheduled",
+              lead_id: lead.id,
+            };
+          }
+
           try {
             await sendEmail(lead.email || campaign.lead_email, subject, html, resendKey, fromEmail, signature.replyTo, senderTags("sales", `nurture_step_${step.num}`));
             sent = true;
+            // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+            if (_obsCtx) {
+              await base44.asServiceRole.functions.invoke("logAutomationExecution", {
+                ..._obsCtx, execution_status: "completed",
+                response_data: JSON.stringify({ step: step.num, theme: step.theme }),
+              }).catch(() => {});
+            }
           } catch (err) {
             error = err.message;
             console.error(`[processNurtureCampaigns] step${step.num} error for ${campaign.lead_id}:`, err.message);
+            // ── DEPLOYMENT OBSERVABILITY: Log failed execution ──
+            if (_obsCtx) {
+              await base44.asServiceRole.functions.invoke("logAutomationExecution", {
+                ..._obsCtx, execution_status: "failed",
+                error_message: error, error_code: "resend_send_failed",
+              }).catch(() => {});
+            }
           }
 
           updates[statusKey] = sent ? "sent" : "failed";

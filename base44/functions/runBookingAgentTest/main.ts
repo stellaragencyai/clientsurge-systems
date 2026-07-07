@@ -34,9 +34,14 @@ Deno.serve(async (req) => {
       return Response.json({ error: "order_id is required" }, { status: 400 });
     }
 
-    const order = await base44.asServiceRole.entities.Order.get(order_id);
+    const order = await base44.asServiceRole.entities.Order.get(order_id)
+      .catch(() => null);
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return Response.json({
+        error: "Order not found",
+        code: "order_not_found",
+        order_id,
+      }, { status: 404 });
     }
 
     // ── 1. DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
@@ -238,6 +243,11 @@ Deno.serve(async (req) => {
     }
 
     const message = error instanceof Error ? error.message : "Failed to run booking agent test";
-    return Response.json({ error: message }, { status: 500 });
+    const isNotFound = message.toLowerCase().includes("not found");
+    return Response.json({
+      error: isNotFound ? "Order not found" : message,
+      code: isNotFound ? "order_not_found" : "booking_agent_failed",
+      order_id: payload?.order_id || null,
+    }, { status: isNotFound ? 404 : 500 });
   }
 });

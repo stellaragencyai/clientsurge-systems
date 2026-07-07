@@ -469,8 +469,53 @@ Deno.serve(async (req) => {
         : smsTemplate.replace("{first_name}", "there").replace("{business_name}", "our business")
     );
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (lead?.client_id) {
+      try {
+        const deps = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: lead.client_id, deployment_status: { $in: ["live", "onboarding", "configuring", "ready"] } },
+          "-created_date", 1
+        );
+        const dep = deps?.[0] || null;
+        if (dep) {
+          const permRes = await base44.asServiceRole.functions.invoke("checkModulePermission", {
+            deployment_id: dep.id, module_key: "missed_call_text_back",
+          });
+          if (permRes.data?.authorized !== true) {
+            await base44.asServiceRole.functions.invoke("logAutomationExecution", {
+              client_deployment_id: dep.id, client_id: lead.client_id,
+              module_key: "missed_call_text_back", trigger_event: "missed_call_webhook",
+              execution_status: "blocked",
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || "unknown"})`,
+              error_code: permRes.data?.reason || "module_not_authorized",
+              lead_id: lead.id,
+            }).catch(() => {});
+            return voiceTwilioResponse();
+          }
+          _obsCtx = {
+            deployment_id: dep.id, client_id: lead.client_id,
+            module_key: "missed_call_text_back", trigger_event: "missed_call_webhook",
+            lead_id: lead.id,
+          };
+        }
+      } catch (_obsErr) {
+        console.warn("[MissedCall] Observability init failed:", _obsErr.message);
+      }
+    }
+
     // Send SMS
     const messageSid = await sendTwilioSms(normalizedPhone, messageBody);
+
+    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+    if (_obsCtx) {
+      await base44.asServiceRole.functions.invoke("logAutomationExecution", {
+        ..._obsCtx, execution_status: "completed",
+        external_provider_reference: messageSid,
+        execution_time_ms: Date.now() - _obsStartTime,
+      }).catch(() => {});
+    }
 
     // ─────────────────────────────────────────────────────────
     // STEP 2: Update lead and log missed-call inbound event
