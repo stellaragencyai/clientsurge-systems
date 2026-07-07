@@ -1,11 +1,15 @@
 /**
- * PortalSidebar — Phase 4.2 premium SaaS sidebar.
- * Shows 8 consolidated sections with icons, active state, business identity, and logout.
+ * PortalSidebar — Phase 4.3 reduced-overwhelm sidebar.
+ * Primary nav visible: Dashboard, Setup Progress, Performance, Leads,
+ * Reports, Billing, Support.
+ * Lower-frequency tools (Settings) in a collapsible "More" group.
  */
+import { useState } from "react";
 import {
   LayoutDashboard, Rocket, Zap, Target, Activity, Users, UserCheck,
   CheckSquare, ListChecks, CreditCard, FolderOpen, Calendar, Gift,
   MessageSquare, Package, FileText, Bell, Settings, LogOut, X, MapPin,
+  ChevronDown, MoreHorizontal,
 } from "lucide-react";
 import { PORTAL_SECTIONS } from "@/lib/portalNavigationConfig";
 
@@ -14,6 +18,10 @@ const ICON_MAP = {
   CheckSquare, ListChecks, CreditCard, FolderOpen, Calendar, Gift,
   MessageSquare, Package, FileText, Bell, Settings, MapPin,
 };
+
+const PRIMARY_SECTION_IDS = [
+  "overview", "onboarding", "automations", "leads", "reports", "billing", "support",
+];
 
 export default function PortalSidebar({
   section,
@@ -25,12 +33,39 @@ export default function PortalSidebar({
   mobileOpen,
   onCloseMobile,
 }) {
+  const [moreExpanded, setMoreExpanded] = useState(false);
   const safeBusiness = businessName || "Your Business";
   const safeEmail = userEmail || "—";
 
+  const primarySections = PORTAL_SECTIONS.filter((s) => PRIMARY_SECTION_IDS.includes(s.id));
+  const secondarySections = PORTAL_SECTIONS.filter((s) => !PRIMARY_SECTION_IDS.includes(s.id));
+
+  const renderNavButton = (item) => {
+    const Icon = ICON_MAP[item.icon] || LayoutDashboard;
+    const isActive = section === item.id;
+    return (
+      <button
+        key={item.id}
+        onClick={() => {
+          onSectionChange(item.id);
+          onCloseMobile?.();
+        }}
+        aria-current={isActive ? "page" : undefined}
+        title={item.label}
+        className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF] ${
+          isActive
+            ? "bg-[#00AEEF] text-white shadow-[0_2px_8px_rgba(0,174,239,0.3)]"
+            : "text-gray-600 hover:bg-blue-50 hover:text-[#0088CC]"
+        }`}
+      >
+        <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
+        <span className="truncate">{item.label}</span>
+      </button>
+    );
+  };
+
   return (
     <>
-      {/* Mobile overlay */}
       {mobileOpen && (
         <div
           className="fixed inset-0 bg-black/40 z-40 lg:hidden"
@@ -84,31 +119,31 @@ export default function PortalSidebar({
           )}
         </div>
 
-        {/* Nav sections — 8 consolidated destinations */}
+        {/* Primary nav — 7 visible destinations */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {PORTAL_SECTIONS.map((item) => {
-            const Icon = ICON_MAP[item.icon] || LayoutDashboard;
-            const isActive = section === item.id;
-            return (
+          {primarySections.map(renderNavButton)}
+
+          {/* Collapsible "More" for lower-frequency tools */}
+          {secondarySections.length > 0 && (
+            <div className="pt-2">
               <button
-                key={item.id}
-                onClick={() => {
-                  onSectionChange(item.id);
-                  onCloseMobile?.();
-                }}
-                aria-current={isActive ? "page" : undefined}
-                title={item.label}
-                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF] ${
-                  isActive
-                    ? "bg-[#00AEEF] text-white shadow-[0_2px_8px_rgba(0,174,239,0.3)]"
-                    : "text-gray-600 hover:bg-blue-50 hover:text-[#0088CC]"
-                }`}
+                onClick={() => setMoreExpanded(!moreExpanded)}
+                aria-expanded={moreExpanded}
+                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
               >
-                <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
-                <span className="truncate">{item.label}</span>
+                <MoreHorizontal className="w-[18px] h-[18px] flex-shrink-0 text-gray-400" />
+                <span className="truncate">More</span>
+                <ChevronDown
+                  className={`w-4 h-4 ml-auto flex-shrink-0 transition-transform ${moreExpanded ? "rotate-180" : ""}`}
+                />
               </button>
-            );
-          })}
+              {moreExpanded && (
+                <div className="space-y-1 mt-1 ml-3 border-l border-gray-100 pl-2">
+                  {secondarySections.map(renderNavButton)}
+                </div>
+              )}
+            </div>
+          )}
         </nav>
 
         {/* User footer + logout */}

@@ -6,6 +6,7 @@ import CinematicHero from "../components/landing/CinematicHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
+import LoggedOutConfirmationBanner from "../components/landing/LoggedOutConfirmationBanner";
 import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
 import ScrollProgressBar from "../components/landing/ScrollProgressBar";
@@ -119,6 +120,7 @@ export default function Home() {
     <DemoBookingProvider>
       <div className="min-h-screen">
         <ScrollProgressBar />
+        <LoggedOutConfirmationBanner />
         <Navbar />
 
         {/* 1. Cinematic Hero — primary value prop + CTA */}

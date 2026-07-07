@@ -7,14 +7,14 @@
 export const PORTAL_SECTIONS = [
   {
     id: "overview",
-    label: "Overview",
+    label: "Dashboard",
     icon: "LayoutDashboard",
     defaultTab: "dashboard",
     description: "Executive summary",
   },
   {
     id: "onboarding",
-    label: "Onboarding",
+    label: "Setup Progress",
     icon: "Rocket",
     defaultTab: "progress",
     description: "Everything required to launch",
@@ -31,7 +31,7 @@ export const PORTAL_SECTIONS = [
   },
   {
     id: "automations",
-    label: "Automations",
+    label: "Performance",
     icon: "Target",
     defaultTab: "performance",
     description: "Automation control center",

@@ -2,6 +2,7 @@ import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { LayoutDashboard, Eye } from "lucide-react";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalShell from "../components/portal/PortalShell";
@@ -9,7 +10,7 @@ import PortalDashboardOverview from "../components/portal/PortalDashboardOvervie
 import PortalStateBoundary from "../components/portal/PortalStateBoundary";
 import PortalTabWrapper from "../components/portal/PortalTabWrapper";
 import { usePortalState } from "../hooks/usePortalState";
-import { getPortalSection } from "@/lib/portalNavigationConfig";
+import { getPortalSection, getSectionTabs } from "@/lib/portalNavigationConfig";
 
 // ── All portal components lazy-loaded to keep the ClientPortal chunk small ──
 // This prevents Vite from bundling 30+ components into one massive chunk that
@@ -230,12 +231,34 @@ export default function ClientPortal() {
   }, [portalOrder?.id]);
 
   // Phase 4.2: Sync activeTab when URL section changes
+  // Phase 4.3: Deep link support — read ?tab= from URL on section change
   useEffect(() => {
     const sec = getPortalSection(section);
     if (sec) {
-      setActiveTab(sec.defaultTab);
+      const urlParams = new URLSearchParams(window.location.search);
+      const tabFromUrl = urlParams.get("tab");
+      const sectionTabs = getSectionTabs(section);
+      const validTabs = sectionTabs.map((t) => t.id);
+
+      if (tabFromUrl && validTabs.includes(tabFromUrl)) {
+        setActiveTab(tabFromUrl);
+      } else {
+        setActiveTab(sec.defaultTab);
+      }
     }
   }, [section]);
+
+  // Phase 4.3: Persist activeTab to URL ?tab= for refresh persistence
+  useEffect(() => {
+    if (!activeTab) return;
+    const urlParams = new URLSearchParams(window.location.search);
+    const currentTabInUrl = urlParams.get("tab");
+    if (currentTabInUrl !== activeTab) {
+      urlParams.set("tab", activeTab);
+      const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
+      window.history.replaceState(null, "", newUrl);
+    }
+  }, [activeTab]);
 
   const handleSectionChange = (sectionId) => {
     const sec = getPortalSection(sectionId);
@@ -327,7 +350,7 @@ export default function ClientPortal() {
       businessName={project?.business_name}
       userEmail={user?.email}
       user={user}
-      project={project}
+      project={{ ...project, _deploymentStatus: deployment?.deployment_status }}
       notifications={notifications}
       unreadCount={unreadCount}
       onMarkAsRead={markAsRead}
@@ -399,10 +422,15 @@ export default function ClientPortal() {
              onRetry={refreshProject}
            >
             <div className="space-y-5">
-              <div>
-                <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
-                <p className="text-muted-foreground">Track your system performance, active automations, and revenue impact.</p>
-              </div>
+               <div>
+                 <CSSectionHeader
+                   eyebrow="Automations"
+                   title="Revenue & Automations"
+                   subtitle="Track your system performance, active automations, and revenue impact."
+                   align="left"
+                   className="mb-4"
+                 />
+               </div>
 
               <PortalLazy>
                 {isAdminPreview && <AdminPreviewBanner userEmail={user?.email} linkStatus={"no_paid_order"} />}
@@ -456,13 +484,13 @@ export default function ClientPortal() {
               </PortalLazy>
 
               <div className="border-t border-border pt-6">
-                <h3 className="text-lg font-bold text-foreground mb-3">Active Automations</h3>
+                <CSSectionHeader eyebrow="Live" title="Active Automations" align="left" className="mb-3" />
                 <PortalLazy>
                   <AutomationsOverview portalState={portalState} order_id={portalOrder?.id} />
                 </PortalLazy>
               </div>
               <div className="border-t border-border pt-6">
-                <h3 className="text-lg font-bold text-foreground mb-3">System Activity</h3>
+                <CSSectionHeader eyebrow="Logs" title="System Activity" align="left" className="mb-3" />
                 <PortalLazy>
                   <AutomatedResponsesLog portalState={portalState} />
                 </PortalLazy>
