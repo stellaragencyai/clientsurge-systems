@@ -4,6 +4,9 @@ import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
+import SolutionSection from "../components/landing/SolutionSection.jsx";
+import WorkflowSection from "../components/landing/WorkflowSection.jsx";
+import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
 import LoggedOutConfirmationBanner from "../components/landing/LoggedOutConfirmationBanner";
@@ -96,11 +99,11 @@ export default function Home() {
 
     try {
       cleanups.push(setPageMetadata({
-        title: "ClientSurge Systems | The Amazon of AI Services for Business",
-        description: "Browse packaged AI systems for lead capture, missed-call recovery, AI follow-up, booking, reviews, and reactivation. Add to cart, check out, and we install it — no demos required.",
+        title: "ClientSurge Systems | Turn Your Website Into an AI-Powered Sales System",
+        description: "ClientSurge turns your website into an AI-powered sales system. Capture leads, respond instantly, book appointments automatically, and reactivate dormant prospects — no staff required. Browse packaged AI automation systems, add to cart, and we install it for you.",
         canonicalPath: "/",
-        ogTitle: "The Amazon of AI Services for Business | ClientSurge Systems",
-        ogDescription: "Browse AI automation systems, add to cart, and check out. Done-for-you setup included. No demos, no sales calls. Lead capture, missed-call recovery, follow-up, booking, reviews, and reactivation.",
+        ogTitle: "Turn Your Website Into an AI-Powered Sales System | ClientSurge Systems",
+        ogDescription: "AI automation for lead capture, instant response, booking, follow-up, reviews, and reactivation. Browse packaged systems, add to cart, and we install it — no demos required.",
       }));
     } catch (_e) {}
 
@@ -123,29 +126,44 @@ export default function Home() {
         <LoggedOutConfirmationBanner />
         <Navbar />
 
-        {/* 1. Cinematic Hero — primary value prop + CTA */}
+        {/* 1. Hero — SaaS value prop + animated product demo */}
         <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
           <HomeHero />
         </SectionErrorBoundary>
 
-        {/* 2. Industries — first post-hero section so visitors immediately find their vertical */}
-        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
-          <Industries />
-        </LazyHomepageSection>
+        {/* 2. Problem — revenue leak framing */}
+        <SectionErrorBoundary sectionName="revenue-leak">
+          <RevenueLeakSection />
+        </SectionErrorBoundary>
 
-        {/* 3. Six Core Automations — what the system does */}
+        {/* 3. Solution — the 5-step AI Growth System */}
+        <SectionErrorBoundary sectionName="solution">
+          <SolutionSection />
+        </SectionErrorBoundary>
+
+        {/* 4. Six Core Automations — product-style showcase */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
           <SixAutomationsSection />
         </SectionErrorBoundary>
 
-        {/* 4. Revenue Leak — problem framing */}
-        <SectionErrorBoundary sectionName="revenue-leak">
-          <RevenueLeakSection />
+        {/* 5. Interactive Workflow — SaaS product demonstration */}
+        <SectionErrorBoundary sectionName="workflow">
+          <WorkflowSection />
         </SectionErrorBoundary>
 
-        {/* 4b. ROI Calculator — interactive lead recovery estimator */}
+        {/* 6. Industries — vertical-specific templates */}
+        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
+          <Industries />
+        </LazyHomepageSection>
+
+        {/* 7. Trust — security, verification, architecture, transparency */}
+        <SectionErrorBoundary sectionName="trust">
+          <TrustSection />
+        </SectionErrorBoundary>
+
+        {/* 8. ROI Calculator — interactive lead recovery estimator */}
         <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
           <section className="py-16 md:py-24 px-4 bg-muted/30">
             <div className="max-w-4xl mx-auto">
@@ -161,19 +179,19 @@ export default function Home() {
           </section>
         </div>
 
-        {/* 5. Pricing / Core Offer */}
+        {/* 9. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="pricing">
           <ThreeSystemsSection />
         </SectionErrorBoundary>
 
-        {/* 6. FAQ — accordion section */}
+        {/* 10. FAQ — accordion section */}
         <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
           <FAQSection />
         </SectionErrorBoundary>
 
-        {/* 7. Final CTA — booking conversion */}
+        {/* 11. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>

@@ -1,134 +1,204 @@
-import { useState, useRef, useCallback } from "react";
-import { Zap, MessageSquare, PhoneOff, CalendarCheck, RotateCcw, Database } from "lucide-react";
+import { motion, useReducedMotion } from 'framer-motion';
+import { Zap, MessageSquare, Calendar, RefreshCw, TrendingUp, ArrowRight } from 'lucide-react';
+import { trackCTA } from '@/lib/analytics';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
+import CSButton from '@/components/design-system/CSButton';
 
-const services = [
+const STEPS = [
   {
     icon: Zap,
-    title: "Instant Lead Response",
-    outcome: "Capture leads before competitors respond.",
-    desc: "",
+    step: '01',
+    title: 'Capture',
+    description: 'Every form submission, phone call, ad click, and website inquiry flows into one trackable pipeline — so no lead slips through the cracks.',
+    metric: 'All sources',
+    metricLabel: 'unified',
   },
   {
     icon: MessageSquare,
-    title: "Automated Follow-Up",
-    outcome: "Turn more inquiries into booked appointments.",
-    desc: "",
+    step: '02',
+    title: 'Respond',
+    description: 'AI replies via SMS in under 60 seconds, 24/7. Missed calls trigger instant text-back. Your leads never wait for a human to be available.',
+    metric: '< 60 sec',
+    metricLabel: 'response',
   },
   {
-    icon: PhoneOff,
-    title: "Missed Call Text-Back",
-    outcome: "Recover revenue from every missed call.",
-    desc: "",
+    icon: Calendar,
+    step: '03',
+    title: 'Book',
+    description: 'Interested prospects receive a booking link and confirm their appointment automatically — no manual back-and-forth, no phone tag.',
+    metric: '24/7',
+    metricLabel: 'booking',
   },
   {
-    icon: CalendarCheck,
-    title: "Booking Flow Automation",
-    outcome: "Guide leads directly to scheduling without friction.",
-    desc: "",
+    icon: RefreshCw,
+    step: '04',
+    title: 'Follow Up',
+    description: 'A 14-day nurture sequence keeps unresponsive leads warm with automated SMS and email touchpoints until they reply, book, or opt out.',
+    metric: '14-day',
+    metricLabel: 'nurture',
   },
   {
-    icon: RotateCcw,
-    title: "Lead Reactivation",
-    outcome: "Turn old leads into new revenue.",
-    desc: "",
-  },
-  {
-    icon: Database,
-    title: "Pipeline Tracking",
-    outcome: "See exactly where every lead stands.",
-    desc: "",
+    icon: TrendingUp,
+    step: '05',
+    title: 'Optimize',
+    description: 'Reactivation engines bring dormant leads back. Review requests go out at the right moment. The system compounds revenue over time.',
+    metric: '30-90 days',
+    metricLabel: 'reactivation',
   },
 ];
 
-const ServiceCard = ({ service }) => {
-  const cardRef = useRef(null);
-  const [tilt, setTilt] = useState({ x: 0, y: 0 });
-  const [sheen, setSheen] = useState({ x: 50, y: 50 });
-  const [hovered, setHovered] = useState(false);
-  const Icon = service.icon;
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.05 } },
+};
 
-  const handleMouseMove = useCallback((e) => {
-    const card = cardRef.current;
-    if (!card) return;
-    const rect = card.getBoundingClientRect();
-    const cx = rect.left + rect.width / 2;
-    const cy = rect.top + rect.height / 2;
-    const dx = (e.clientX - cx) / (rect.width / 2);
-    const dy = (e.clientY - cy) / (rect.height / 2);
-    setTilt({ x: dy * -12, y: dx * 12 });
-    setSheen({
-      x: ((e.clientX - rect.left) / rect.width) * 100,
-      y: ((e.clientY - rect.top) / rect.height) * 100,
-    });
-  }, []);
-
-  const handleMouseLeave = () => {
-    setTilt({ x: 0, y: 0 });
-    setSheen({ x: 50, y: 50 });
-    setHovered(false);
-  };
-
-  return (
-    <div
-      ref={cardRef}
-      onMouseMove={handleMouseMove}
-      onMouseEnter={() => setHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      style={{
-        transform: hovered ? `perspective(800px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) scale(1.03)` : "perspective(800px) rotateX(0) rotateY(0) scale(1)",
-        transition: hovered ? "transform 0.1s ease-out" : "transform 0.5s ease-out",
-        background: "rgba(255,255,255,0.08)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        border: hovered ? "1px solid rgba(255,255,255,0.25)" : "1px solid rgba(255,255,255,0.1)",
-        boxShadow: hovered ? "0 24px 48px rgba(0,0,0,0.15), 0 8px 16px rgba(0,0,0,0.1)" : "0 4px 16px rgba(0,0,0,0.06)",
-        borderRadius: "1rem",
-        padding: "1.5rem",
-        position: "relative",
-        overflow: "hidden",
-        transformStyle: "preserve-3d",
-      }}
-    >
-      {/* Glass sheen highlight */}
-      <div
-        style={{
-          position: "absolute",
-          inset: 0,
-          borderRadius: "inherit",
-          opacity: hovered ? 1 : 0,
-          transition: "opacity 0.3s ease",
-          background: `radial-gradient(circle at ${sheen.x}% ${sheen.y}%, rgba(255,255,255,0.18) 0%, rgba(255,255,255,0) 60%)`,
-          pointerEvents: "none",
-        }}
-      />
-      <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center mb-5" style={{ transform: "translateZ(20px)" }}>
-        <Icon className="w-5 h-5 text-primary" />
-      </div>
-      <h3 className="text-base font-semibold text-foreground mb-2" style={{ transform: "translateZ(16px)" }}>{service.title}</h3>
-      <p className="text-sm text-primary font-medium leading-relaxed" style={{ transform: "translateZ(14px)" }}>{service.outcome}</p>
-    </div>
-  );
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };
 
 export default function SolutionSection() {
-  return (
-    <section id="services" className="py-24 md:py-32 px-6 bg-gradient-to-b from-background to-card">
-      <div className="max-w-6xl mx-auto">
-        <div className="max-w-2xl mx-auto text-center mb-16">
-          <p className="text-xs font-semibold text-primary tracking-widest uppercase mb-4">What We Build</p>
-          <h2 className="font-display text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-foreground">
-            Stop Losing Leads — Turn Every Inquiry Into a <span className="text-primary">Booked Appointment</span>
-          </h2>
-          <p className="mt-5 text-muted-foreground text-lg leading-relaxed">
-            We install systems that respond instantly, follow up automatically, and turn more leads into paying customers — without adding extra work to your team.
-          </p>
-        </div>
+  const shouldReduceMotion = useReducedMotion();
 
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-5">
-          {services.map((s, i) => (
-            <ServiceCard key={i} service={s} />
-          ))}
-        </div>
+  return (
+    <section id="solution" className="relative py-20 md:py-28 overflow-hidden" style={{ background: '#ffffff' }}>
+      {/* Subtle gradient backdrop */}
+      <div
+        className="absolute inset-0 pointer-events-none"
+        style={{
+          background: 'radial-gradient(ellipse at 50% 0%, rgba(0,174,239,0.04) 0%, transparent 50%)',
+        }}
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-80px' }}
+          transition={{ duration: 0.6 }}
+          className="mb-14 md:mb-16"
+        >
+          <CSSectionHeader
+            eyebrow="The ClientSurge AI Growth System"
+            title="One System. Five Steps. Every Lead Protected."
+            subtitle="ClientSurge turns your website into an automated sales engine — capturing leads, responding instantly, booking appointments, following up automatically, and reactivating dormant prospects."
+            align="center"
+          />
+        </motion.div>
+
+        {/* Horizontal step flow (desktop) / vertical (mobile) */}
+        <motion.div
+          variants={shouldReduceMotion ? {} : containerVariants}
+          initial={shouldReduceMotion ? {} : 'hidden'}
+          whileInView={shouldReduceMotion ? {} : 'visible'}
+          viewport={{ once: true, margin: '-80px' }}
+          className="relative"
+        >
+          {/* Connecting line — desktop only */}
+          <div
+            className="hidden lg:block absolute top-8 left-[10%] right-[10%] h-0.5"
+            style={{
+              background: 'linear-gradient(90deg, transparent, rgba(0,174,239,0.25), rgba(0,174,239,0.25), transparent)',
+            }}
+            aria-hidden="true"
+          />
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-5 lg:gap-4">
+            {STEPS.map((step, idx) => {
+              const Icon = step.icon;
+              return (
+                <motion.div key={step.step} variants={shouldReduceMotion ? {} : itemVariants} className="relative">
+                  {/* Step number badge */}
+                  <div className="flex items-center justify-center mb-4 relative">
+                    <div
+                      className="flex items-center justify-center w-16 h-16 rounded-2xl relative z-10"
+                      style={{
+                        background: '#ffffff',
+                        border: '1.5px solid rgba(0,174,239,0.2)',
+                        boxShadow: '0 4px 16px rgba(0,174,239,0.08)',
+                      }}
+                    >
+                      <Icon className="w-6 h-6" style={{ color: '#00AEEF' }} aria-hidden="true" />
+                    </div>
+                    {/* Step number overlay */}
+                    <span
+                      className="absolute -top-1 -right-1 z-20 flex items-center justify-center w-6 h-6 rounded-full text-[10px] font-black"
+                      style={{
+                        background: 'linear-gradient(135deg, #0079c1, #00AEEF)',
+                        color: '#ffffff',
+                        boxShadow: '0 2px 8px rgba(0,174,239,0.3)',
+                      }}
+                    >
+                      {step.step}
+                    </span>
+                  </div>
+
+                  {/* Content */}
+                  <div className="text-center">
+                    <h3
+                      className="font-titles font-black text-black mb-2"
+                      style={{ fontSize: '1.1rem', letterSpacing: '-0.015em' }}
+                    >
+                      {step.title}
+                    </h3>
+                    <p
+                      className="text-sm leading-relaxed mb-3"
+                      style={{ color: '#3a3d47', fontSize: '0.85rem' }}
+                    >
+                      {step.description}
+                    </p>
+                    {/* Metric */}
+                    <div className="inline-flex flex-col items-center">
+                      <span
+                        className="font-titles font-black"
+                        style={{ fontSize: '1.1rem', color: '#006BB0', lineHeight: 1 }}
+                      >
+                        {step.metric}
+                      </span>
+                      <span
+                        className="text-[9px] font-bold uppercase tracking-wider mt-0.5"
+                        style={{ color: '#9ca3af' }}
+                      >
+                        {step.metricLabel}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Arrow connector — mobile only (between items) */}
+                  {idx < STEPS.length - 1 && (
+                    <div className="flex justify-center mt-5 lg:hidden">
+                      <ArrowRight
+                        className="w-4 h-4 rotate-90"
+                        style={{ color: 'rgba(0,174,239,0.3)' }}
+                        aria-hidden="true"
+                      />
+                    </div>
+                  )}
+                </motion.div>
+              );
+            })}
+          </div>
+        </motion.div>
+
+        {/* CTA */}
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="text-center mt-12"
+        >
+          <CSButton
+            to="/store"
+            variant="primary"
+            size="md"
+            iconRight={ArrowRight}
+            onClick={() => trackCTA('solution_browse_systems', 'solution_section')}
+          >
+            Browse AI Systems
+          </CSButton>
+        </motion.div>
       </div>
     </section>
   );
