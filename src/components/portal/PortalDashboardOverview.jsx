@@ -9,6 +9,7 @@ import {
   Bell, TrendingUp, Zap, Target, Rocket,
   ArrowRight, ShieldCheck, AlertCircle, CheckCircle2, Info,
 } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 
 const PortalLazy = ({ children }) => (
   <Suspense fallback={<div className="h-32 rounded-xl bg-muted/30 animate-pulse" />}>{children}</Suspense>
@@ -79,18 +80,34 @@ export default function PortalDashboardOverview({
   userRole,
   setActiveTab,
   refreshProject,
+  portalState,
+  portalStateLoading,
 }) {
   const services = portalOrder?.services || [];
   const activeCount = services.filter((s) => s.install_status === "Live").length;
   const totalCount = services.length;
-  const failedEvents = (healthData?.recent_events || []).filter((e) => e.status === "failed");
-  const readinessStatus = healthData?.readiness_status || portalOrder?.pipeline_status || "Pending";
+
+  // Phase A.1: Use normalized portal state for truth-validated display values
+  const systemReadinessCard = getCardState(portalState, "system_readiness");
+  const automationHealthCard = getCardState(portalState, "automation_health");
+  const leadCaptureCard = getCardState(portalState, "lead_capture");
+  const billingCard = getCardState(portalState, "billing");
+
+  // Use engine-provided readiness status instead of raw health data
+  const readinessStatus = systemReadinessCard?.display_text || "Pending";
 
   // Quick Start is complete only when BOTH flags are true
   const quickStartDone = project?.quick_start_completed === true && project?.onboarding_wizard_completed === true;
 
-  // No fake 0/0 confidence — show "Pending" when no services exist yet
-  const servicesValue = totalCount > 0 ? `${activeCount}/${totalCount}` : "Pending";
+  // Services value from normalized state — never fake 0/0
+  const servicesValue = portalStateLoading
+    ? "Syncing"
+    : (totalCount > 0 ? `${activeCount}/${totalCount}` : "Pending");
+
+  // Issues count comes from normalized state, not raw events
+  const issuesValue = portalStateLoading
+    ? "—"
+    : (automationHealthCard?.status === CARD_STATUS.LIVE ? "0" : "Pending");
 
   return (
     <div className="space-y-5">
@@ -121,8 +138,11 @@ export default function PortalDashboardOverview({
               Welcome back, {project?.business_name || user?.full_name || "Client"}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-              Your system status: <span className="font-semibold text-gray-700">{readinessStatus}</span>
-            </p>
+               Your system status:{" "}
+               <span className="font-semibold text-gray-700">
+                 {portalStateLoading ? "Syncing" : (systemReadinessCard?.display_text || readinessStatus)}
+               </span>
+             </p>
           </div>
         </div>
         <button
@@ -155,28 +175,28 @@ export default function PortalDashboardOverview({
               </PortalLazy>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-              <MetricCard
-                icon={Rocket}
-                label="Services Active"
-                value={servicesValue}
-                accent="#0088CC"
-                onClick={() => setActiveTab("performance")}
-              />
-              <MetricCard
-                icon={Zap}
-                label="Quick Start"
-                value={quickStartDone ? "Done" : "Pending"}
-                accent={quickStartDone ? "#10B981" : "#D4AF37"}
-                onClick={() => setActiveTab("quickstart")}
-              />
-              <MetricCard
-                icon={AlertCircle}
-                label="Recent Issues"
-                value={failedEvents.length}
-                accent={failedEvents.length > 0 ? "#EF4444" : "#10B981"}
-                onClick={() => setActiveTab("performance")}
-              />
-            </div>
+               <MetricCard
+                 icon={Rocket}
+                 label="Services Active"
+                 value={servicesValue}
+                 accent="#0088CC"
+                 onClick={() => setActiveTab("performance")}
+               />
+               <MetricCard
+                 icon={Zap}
+                 label="Quick Start"
+                 value={quickStartDone ? "Done" : "Pending"}
+                 accent={quickStartDone ? "#10B981" : "#D4AF37"}
+                 onClick={() => setActiveTab("quickstart")}
+               />
+               <MetricCard
+                 icon={AlertCircle}
+                 label="Recent Issues"
+                 value={issuesValue}
+                 accent={issuesValue === "0" ? "#10B981" : "#D4AF37"}
+                 onClick={() => setActiveTab("performance")}
+               />
+             </div>
           </div>
 
           {/* Launch Readiness / Score Tracker equivalent */}
@@ -193,7 +213,7 @@ export default function PortalDashboardOverview({
             <ActiveAutomationsPanel
               packageKey={portalOrder?.package_type || portalOrder?.selected_package_type}
               services={services}
-              failedEvents={failedEvents}
+              failedEvents={(healthData?.recent_events || []).filter((e) => e.status === "failed")}
               isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
             />
           </PortalLazy>

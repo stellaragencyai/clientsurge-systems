@@ -5,6 +5,8 @@ import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalSidebar from "../components/portal/PortalSidebar";
 import PortalDashboardOverview from "../components/portal/PortalDashboardOverview";
+import PortalStateBoundary from "../components/portal/PortalStateBoundary";
+import { usePortalState } from "../hooks/usePortalState";
 
 // ── All portal components lazy-loaded to keep the ClientPortal chunk small ──
 // This prevents Vite from bundling 30+ components into one massive chunk that
@@ -109,6 +111,10 @@ export default function ClientPortal() {
   const [healthData, setHealthData] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
+
+  // Phase A.1: PortalStateEngine — normalized proof-validated card states
+  const portalContextData = loading ? null : { project, order: portalOrder, subscription, health: healthData, is_admin_preview: isAdminPreview };
+  const { portalState, loading: portalStateLoading } = usePortalState(portalContextData);
 
   useEffect(() => {
     const init = async () => {
@@ -359,18 +365,22 @@ export default function ClientPortal() {
         {/* Content */}
         <main id="main-content" className="flex-1 px-6 py-6 overflow-y-auto">
           {activeTab === "dashboard" && (
-            <PortalDashboardOverview
-              project={project}
-              portalOrder={portalOrder}
-              subscription={subscription}
-              healthData={healthData}
-              user={user}
-              userEmail={user?.email}
-              isAdminPreview={isAdminPreview}
-              userRole={userRole}
-              setActiveTab={setActiveTab}
-              refreshProject={refreshProject}
-            />
+            <PortalStateBoundary onRetry={refreshProject}>
+              <PortalDashboardOverview
+                project={project}
+                portalOrder={portalOrder}
+                subscription={subscription}
+                healthData={healthData}
+                user={user}
+                userEmail={user?.email}
+                isAdminPreview={isAdminPreview}
+                userRole={userRole}
+                setActiveTab={setActiveTab}
+                refreshProject={refreshProject}
+                portalState={portalState}
+                portalStateLoading={portalStateLoading}
+              />
+            </PortalStateBoundary>
           )}
           {activeTab === "quickstart" && (
             <PortalLazy>
