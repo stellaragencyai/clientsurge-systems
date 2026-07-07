@@ -1,7 +1,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Search, Map, Link2, TestTube, Rocket } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const STEPS = [
   { num: "01", icon: Search, title: "Audit Your Lead Flow", desc: "We review where leads enter, where they stall, and where follow-up breaks." },
@@ -29,7 +29,7 @@ export default function WhatHappensAfter() {
       />
 
       <div className="relative z-10 max-w-7xl mx-auto px-6">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Implementation Process"
           title="What Happens After You Start"
           subtitle="A clear, proven process — not a black box. Here's exactly how we get your lead response system live."

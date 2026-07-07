@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
 import { ShieldCheck } from "lucide-react";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const trustItems = [
   {
@@ -68,7 +68,7 @@ export default function SecurityPriority() {
             <ShieldCheck aria-hidden="true" />
             Trust & Security
           </div>
-          <SectionHeader
+          <CSSectionHeader
             title="Your Trust & Security Are Our Priority"
             subtitle="We are committed to providing a secure and reliable platform. Your success and safety are the cornerstones of ClientSurge Systems."
           />

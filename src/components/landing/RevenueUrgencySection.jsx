@@ -1,6 +1,6 @@
 import { ArrowRight, Clock, PhoneOff, TrendingUp, AlertCircle } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const URGENCY_POINTS = [
   {
@@ -36,11 +36,11 @@ export default function RevenueUrgencySection() {
     >
       <div className="max-w-5xl mx-auto">
         <div className="mb-14">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="The Cost of Waiting"
             title="Revenue you're losing right now."
             subtitle="Most local service businesses don't have a lead problem — they have a lead response problem. Here's what that costs."
-            variant="dark"
+            theme="dark"
           />
         </div>
 

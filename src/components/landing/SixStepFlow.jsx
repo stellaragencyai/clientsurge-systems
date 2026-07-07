@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { Target, Zap, Filter, CalendarCheck, Star, RefreshCw } from "lucide-react";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const STEPS = [
   {
@@ -53,7 +53,7 @@ export default function SixStepFlow() {
   return (
     <section className="relative py-16 md:py-24 overflow-hidden" style={{ background: "#ffffff" }}>
       <div className="max-w-7xl mx-auto px-6">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="The ClientSurge Flow"
           title="Six Steps From Lead to Revenue"
           subtitle="Every step is tied to an existing ClientSurge automation — working together as one system."

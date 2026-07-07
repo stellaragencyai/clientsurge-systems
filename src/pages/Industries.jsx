@@ -5,7 +5,7 @@ import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import { setPageMetadata } from "@/lib/seo";
 import { forceScrollToTop } from "@/lib/scroll";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const industries = [
   { id: "roofing", title: "Roofing & Restoration", icon: Hammer, description: "For teams that need faster inspection response, quote follow-up, and reactivation.", href: "/roofing" },
@@ -41,7 +41,7 @@ export default function Industries() {
     <div className="min-h-screen bg-background">
       <Navbar />
       <section className="text-center pr-4 pl-4 pt-24 pb-8 bg-background">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Industries"
           title="Automation for Lead-Driven Service Businesses"
           subtitle="We build done-for-you systems for businesses that depend on fast lead response, follow-up, booking, reviews, and reactivation."

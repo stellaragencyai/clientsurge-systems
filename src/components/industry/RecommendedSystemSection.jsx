@@ -1,6 +1,7 @@
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import CSSectionHeader from '@/components/design-system/CSSectionHeader';
+import CSButton from '@/components/design-system/CSButton';
 
 const TIER_DETAILS = {
   starter: { price: '$497/mo', setup: '$797 setup', automations: '6 Automations' },
@@ -32,7 +33,7 @@ export default function RecommendedSystemSection({ recommendedSystem }) {
           title="Recommended System for This Industry"
           align="center"
         />
-        <div className="mt-8 relative rounded-2xl border-2 border-primary/30 bg-white p-6 md:p-10 shadow-[0_20px_60px_rgba(0,107,176,0.16)] overflow-hidden">
+        <div className="mt-8 relative cs-glow-card p-6 md:p-10 overflow-hidden" style={{ border: '2px solid hsla(199, 100%, 47%, 0.3)' }}>
           {/* Badge */}
           <div className="absolute -top-3 left-1/2 -translate-x-1/2">
             <span
@@ -60,13 +61,14 @@ export default function RecommendedSystemSection({ recommendedSystem }) {
           </div>
 
           <div className="mt-6 text-center">
-            <button
+            <CSButton
               onClick={() => navigate(checkoutPath)}
-              className="cs-btn-primary inline-flex items-center justify-center gap-2"
+              variant="primary"
+              size="md"
+              iconRight={ArrowRight}
             >
               Get {tier}
-              <ArrowRight className="w-4 h-4" />
-            </button>
+            </CSButton>
           </div>
         </div>
       </div>

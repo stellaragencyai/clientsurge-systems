@@ -1,6 +1,7 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
+import CSButton from "@/components/design-system/CSButton";
 
 const WORKFLOW_PREVIEWS = [
   {
@@ -57,7 +58,7 @@ export default function IndustrySuccessGallery({ industry = {}, industrySlug = "
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
           {WORKFLOW_PREVIEWS.map((item) => (
-            <article key={item.title} className="rounded-3xl border border-primary/15 bg-white p-6 md:p-8 shadow-sm">
+            <article key={item.title} className="cs-glow-card p-6 md:p-8">
               <p className="text-xs font-bold uppercase tracking-widest text-primary mb-3">{industrySlug || "workflow"}</p>
               <h3 className="font-titles text-xl font-bold text-foreground mb-5">{item.title}</h3>
               <div className="space-y-4">
@@ -75,12 +76,12 @@ export default function IndustrySuccessGallery({ industry = {}, industrySlug = "
           ))}
         </div>
 
-        <div className="rounded-2xl overflow-hidden mb-12" style={{ background: "linear-gradient(135deg, #003B8F 0%, #006BB0 50%, #00AEEF 100%)" }}>
+        <div className="cs-card rounded-2xl overflow-hidden mb-12" style={{ background: "linear-gradient(135deg, #003B8F 0%, #006BB0 50%, #00AEEF 100%)" }}>
           <div className="p-8 md:p-12">
             <h3 className="text-center text-white text-xl md:text-2xl font-bold mb-8 font-titles">Launch Checks We Want Visible</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {CHECKS.map((check) => (
-                <div key={check} className="rounded-xl border border-white/15 bg-white/10 p-4 text-white text-sm font-semibold flex items-start gap-3">
+                <div key={check} className="cs-card rounded-xl border border-white/15 bg-white/10 p-4 text-white text-sm font-semibold flex items-start gap-3">
                   <CheckCircle2 className="w-4 h-4 flex-shrink-0 mt-0.5" /> {check}
                 </div>
               ))}
@@ -92,9 +93,14 @@ export default function IndustrySuccessGallery({ industry = {}, industrySlug = "
           <p className="text-muted-foreground text-sm mb-6 max-w-xl mx-auto">
             Compare the ClientSurge packages and choose how much of your lead flow you want installed first.
           </p>
-          <button onClick={() => navigate("/pricing")} className="cs-btn-primary" style={{ minHeight: "52px", borderRadius: "9999px", padding: "0 2.5rem", fontSize: "0.95rem" }}>
-            Compare Packages →
-          </button>
+          <CSButton
+            onClick={() => navigate("/pricing")}
+            variant="primary"
+            size="lg"
+            iconRight={ArrowRight}
+          >
+            Compare Packages
+          </CSButton>
         </div>
       </div>
     </section>

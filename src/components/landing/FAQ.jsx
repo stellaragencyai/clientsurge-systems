@@ -31,12 +31,7 @@ export default function FAQ() {
               <AccordionItem
                 key={idx}
                 value={`faq-${idx}`}
-                className="rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-colors duration-200"
-                style={{
-                  background: "rgba(255,255,255,0.90)",
-                  border: "1.5px solid rgba(200,205,215,0.55)",
-                  boxShadow: "0 2px 14px rgba(0,0,0,0.04), inset 0 1px 0 rgba(255,255,255,0.9)",
-                }}
+                className="cs-card rounded-xl px-6 overflow-hidden focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2 transition-colors duration-200"
               >
                 <AccordionTrigger className="text-left text-base font-semibold hover:no-underline py-5 focus-visible:outline-none min-h-[48px] border-b border-border/20 last:border-b-0">
                   {faq.q}

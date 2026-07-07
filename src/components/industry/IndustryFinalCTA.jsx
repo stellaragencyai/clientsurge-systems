@@ -1,5 +1,6 @@
 import { ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import CSButton from '@/components/design-system/CSButton';
 
 /**
  * Premium final CTA section.
@@ -22,21 +23,23 @@ export default function IndustryFinalCTA({ finalCTA }) {
         <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight">{headline}</h2>
         <p className="mx-auto mt-4 max-w-2xl text-sm md:text-base leading-relaxed text-white/82">{body}</p>
         <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-          <button
+          <CSButton
             onClick={() => navigate('/pricing')}
-            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition-transform hover:-translate-y-0.5"
-            style={{ minHeight: '44px' }}
+            variant="primary"
+            size="md"
+            iconRight={ArrowRight}
+            className="!bg-white !text-[#003b8f] !shadow-lg"
           >
             {buttonLabel}
-            <ArrowRight className="w-4 h-4" />
-          </button>
-          <button
+          </CSButton>
+          <CSButton
             onClick={() => navigate('/automations')}
-            className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 bg-white/10 text-sm font-bold text-white backdrop-blur hover:bg-white/16 transition-colors"
-            style={{ minHeight: '44px' }}
+            variant="outline"
+            size="md"
+            className="!border-white/30 !bg-white/10 !text-white backdrop-blur"
           >
             View Automation Stack
-          </button>
+          </CSButton>
         </div>
       </div>
     </section>

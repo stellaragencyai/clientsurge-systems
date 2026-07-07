@@ -1,8 +1,6 @@
 import { AlertTriangle } from 'lucide-react';
 import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
-const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
-
 /**
  * Premium industry problem section.
  * Renders 3 industry-specific pain points with numbered cards.
@@ -26,7 +24,7 @@ export default function IndustryProblemSection({ painPoints }) {
           {painPoints.map((point, i) => (
             <div
               key={i}
-              className={`${PREMIUM_SURFACE} p-6 md:p-7 transition-transform duration-200 hover:-translate-y-1`}
+              className="cs-glow-card p-6 md:p-7"
             >
               <div className="flex items-center gap-3 mb-4">
                 <div className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-red-200 bg-red-50 text-red-500 font-black">

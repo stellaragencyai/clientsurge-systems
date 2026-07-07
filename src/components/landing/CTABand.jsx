@@ -1,6 +1,6 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { trackCTA } from "@/lib/analytics";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 function scrollToSection(id, ctaName, location) {
   trackCTA(ctaName, location);
@@ -42,7 +42,7 @@ export default function CTABand({ headline, subcopy, primaryLabel, primaryAction
       />
 
       <div className="relative z-10 max-w-4xl mx-auto px-6 text-center">
-        <SectionHeader
+        <CSSectionHeader
           title={headline}
           subtitle={subcopy}
           align="center"

@@ -10,7 +10,7 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { setPageMetadata } from "@/lib/seo";
 import { trackCTA } from "@/lib/analytics";
 import { useSearchParams } from "react-router-dom";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import Breadcrumb from "@/components/seo/Breadcrumb";
 
 const checkoutHrefForPackage = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
@@ -60,7 +60,7 @@ function StoreInner() {
       </div>
       <main className="pt-[calc(var(--cs-nav-height)+40px)]">
         <section className="px-6 pb-10 text-center">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="AI Automation Storefront"
             title={selectedPackageOffer ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} System` : "The AI Automation Storefront for Service Businesses"}
             subtitle={selectedPackageOffer ? "Your selected ClientSurge system is preloaded. Review what is included, then continue into checkout and guided setup." : "Browse installable AI systems for missed calls, lead response, follow-up, booking, reviews, and reactivation. Choose what you need. ClientSurge installs it."}

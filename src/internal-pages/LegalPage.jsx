@@ -10,7 +10,7 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import MobileCallBar from "@/components/landing/MobileCallBar";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import { ChevronDown, ChevronRight, Shield, Lock, PhoneCall, BadgeCheck, ScrollText, RotateCcw, CalendarClock, Ban } from "lucide-react";
 import DataDeletionRequestForm from "@/components/legal/DataDeletionRequestForm";
 

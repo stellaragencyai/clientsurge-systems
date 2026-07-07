@@ -1,6 +1,6 @@
 import { ArrowRight, CheckCircle2, MessageSquare, PhoneCall, Calendar, Star, RefreshCw, ClipboardList } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const STEPS = [
   { icon: ClipboardList, title: "Choose the system", body: "Pick Starter, Growth, Pro, or an individual automation based on the lead flow gap you want fixed first." },
@@ -20,7 +20,7 @@ export default function CoreOffer() {
     <section id="how-it-works" className="pt-16 md:pt-24 pb-16 md:pb-24 px-4 md:px-6 bg-white relative" style={{ overflowX: "hidden" }}>
       <div className="absolute inset-0 pointer-events-none" aria-hidden="true" style={{ background: "radial-gradient(ellipse 80% 100% at 50% 0%, rgba(0,136,204,0.08) 0%, transparent 70%)" }} />
       <div className="max-w-6xl mx-auto relative z-10 pt-10">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="How It Works"
           title="From System Selection to Launch Review"
           subtitle="ClientSurge turns buying AI automation into a clear setup path: choose the system, complete guided intake, configure the workflows, test the launch path, and go live with proof."

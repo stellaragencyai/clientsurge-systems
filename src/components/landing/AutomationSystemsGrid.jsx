@@ -1,7 +1,7 @@
 import { ArrowRight, Check, ChevronRight } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 // Premium custom SVG icons — each uniquely designed for its automation system
 const IconLeadCapture = () => (
@@ -201,7 +201,7 @@ export default function AutomationSystemsGrid() {
       {/* ── Section 1: Browse Systems ── */}
       <section id="automation-systems" className="py-20 px-6 bg-white" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
         <div className="max-w-6xl mx-auto">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="AI Automation Marketplace"
             title="Browse Business AI Automation Systems"
             subtitle="Choose from practical automation systems that solve real business problems: missed calls, slow follow-up, unbooked leads, forgotten quotes, review gaps, and old opportunities sitting untouched."
@@ -313,7 +313,7 @@ export default function AutomationSystemsGrid() {
       {/* ── Section 2: How the AI Brain Works ── */}
       <section className="py-20 px-6 bg-white border-t border-border">
         <div className="max-w-6xl mx-auto">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="Remote Setup Engine"
             title="How the ClientSurge AI Brain Works"
             subtitle="ClientSurge does not just sell automation ideas. After a business chooses a system, the ClientSurge AI brain helps collect business details, lead sources, phone and email requirements, booking links, CRM details, and automation goals. It turns that information into a setup plan so the automation can be remotely configured, tested, and launched."

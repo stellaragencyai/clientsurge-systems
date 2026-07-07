@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 export default function IndustryFAQ({ faqs }) {
   const [open, setOpen] = useState(null);
@@ -8,20 +9,20 @@ export default function IndustryFAQ({ faqs }) {
   return (
     <section className="px-4 py-14 md:px-6 md:py-20" style={{ overflowX: "hidden", background: "radial-gradient(ellipse 80% 60% at 50% 20%, rgba(0,174,239,0.07) 0%, transparent 60%), radial-gradient(ellipse 55% 50% at 15% 80%, rgba(0,59,143,0.05) 0%, transparent 55%), linear-gradient(180deg, #f4f9ff 0%, #eef6ff 100%)" }}>
       <div className="max-w-3xl mx-auto">
-        <div className="text-center mb-10">
-          <p className="text-xs font-bold uppercase tracking-[0.18em] text-primary mb-3">FAQ</p>
-          <h2 className="font-display text-3xl md:text-4xl font-bold text-foreground">
-            Questions We Always Get
-          </h2>
+        <div className="mb-10">
+          <CSSectionHeader
+            eyebrow="FAQ"
+            title="Questions We Always Get"
+            align="center"
+          />
         </div>
 
         <div className="space-y-3">
           {faqs.map((faq, i) => (
             <div
               key={i}
-              className="rounded-2xl overflow-hidden"
+              className="cs-card rounded-2xl overflow-hidden"
               style={{
-                background: "#ffffff",
                 border: open === i
                   ? "1px solid rgba(0,136,204,0.36)"
                   : "1px solid rgba(0,136,204,0.14)",

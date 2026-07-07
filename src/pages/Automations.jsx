@@ -6,7 +6,7 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import Navbar from "@/components/landing/Navbar";
 import Footer from "@/components/landing/Footer";
 import MobileCallBar from "@/components/landing/MobileCallBar";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const SERVICES = [
   { id: "ai-voice-agent", icon: Headphones, title: "AI Phone Receptionist", tagline: "Answers, triages, and routes calls when your team is busy, closed, or overloaded.", included: "Optional premium call layer" },
@@ -35,7 +35,7 @@ export default function Automations() {
         <Navbar />
         <main className="pt-[var(--cs-nav-height)]">
           <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
-            <SectionHeader
+            <CSSectionHeader
               eyebrow="Automation Stack"
               title="Explore the ClientSurge Automation Stack"
               subtitle="Starter, Growth, and Pro include different combinations of these systems depending on how much of your lead flow you want ClientSurge to handle."

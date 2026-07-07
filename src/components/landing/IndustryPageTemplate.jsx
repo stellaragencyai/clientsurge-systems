@@ -19,7 +19,7 @@ import RecommendedSystemSection from '@/components/industry/RecommendedSystemSec
 import IndustryFAQ from '@/components/industry/IndustryFAQ';
 import IndustryFinalCTA from '@/components/industry/IndustryFinalCTA';
 import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 import CSButton from '@/components/design-system/CSButton';
 import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
 import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery';
@@ -27,7 +27,6 @@ import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery
 const ICON_MAP = { MessageSquare, Calendar, Phone, AlertCircle, Zap, TrendingUp, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer, CheckCircle };
 
 const SECTION_SHELL = 'relative overflow-hidden';
-const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
 
 function setMetaTag(name, content) {
   if (!content) return;
@@ -178,7 +177,7 @@ export default function IndustryPageTemplate() {
           {/* PART 1 FIX: Testimonials removed — no verified proof. Safe empty state shown. */}
           <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
             <div className="max-w-3xl mx-auto text-center">
-              <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
+              <CSSectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
               <div className="mt-8 rounded-2xl border border-dashed border-border bg-muted/30 p-8 md:p-12">
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                   Verified client proof has not been added yet. This section will display
@@ -197,9 +196,9 @@ export default function IndustryPageTemplate() {
           <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
             <div className="max-w-2xl mx-auto">
               <div className="mb-8">
-                <SectionHeader eyebrow="Guided System Match" title={`Which ${industry.industry_name} System Fits?`} subtitle="Answer 4 quick questions and we will help match your lead flow to Starter, Growth, or Pro." align="center" />
+                <CSSectionHeader eyebrow="Guided System Match" title={`Which ${industry.industry_name} System Fits?`} subtitle="Answer 4 quick questions and we will help match your lead flow to Starter, Growth, or Pro." align="center" />
               </div>
-              <div className="rounded-3xl border border-primary/15 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.10)] p-5 md:p-8"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
+              <div className="rounded-3xl border border-primary/15 bg-white cs-glow-card p-5 md:p-8 rounded-3xl"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
             </div>
           </section>
 
@@ -212,10 +211,10 @@ export default function IndustryPageTemplate() {
           <section className={`${SECTION_SHELL} py-14 md:py-20 px-4 md:px-6`}>
             <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
             <div className="max-w-6xl mx-auto">
-              <SectionHeader eyebrow="The Lead Leak" title={`Where ${industry.industry_name} Opportunities Slip`} align="center" />
+              <CSSectionHeader eyebrow="The Lead Leak" title={`Where ${industry.industry_name} Opportunities Slip`} align="center" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 mt-8">
                 {industry.pain_points.map((point, i) => (
-                  <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-7 transition-transform duration-200 hover:-translate-y-1`}>
+                  <div key={i} className={`cs-glow-card p-6 md:p-7`}>
                     <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/8 text-primary font-black">{i + 1}</div>
                     <h3 className="font-titles text-lg md:text-xl font-bold text-foreground mb-2 tracking-tight">{point.title}</h3>
                     <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{point.desc}</p>
@@ -227,12 +226,12 @@ export default function IndustryPageTemplate() {
 
           <section className="py-14 md:py-20 px-4 md:px-6 bg-white/70">
             <div className="max-w-6xl mx-auto">
-              <SectionHeader eyebrow="Operating Layer" title={`How ClientSurge Supports ${industry.industry_name}`} align="center" />
+              <CSSectionHeader eyebrow="Operating Layer" title={`How ClientSurge Supports ${industry.industry_name}`} align="center" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
                 {industry.use_cases.map((useCase, i) => {
                   const IconComponent = ICON_MAP[useCase.icon] || CheckCircle;
                   return (
-                    <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
+                    <div key={i} className={`cs-glow-card p-6 md:p-8`}>
                       <div className="flex items-start gap-4">
                         <div className="flex-shrink-0">
                           <div className="flex items-center justify-center w-11 h-11 md:w-13 md:h-13 rounded-2xl bg-gradient-to-br from-primary/12 to-sky-100 text-primary border border-primary/20 shadow-sm">
@@ -254,10 +253,10 @@ export default function IndustryPageTemplate() {
 
           <section className="py-14 md:py-20 px-4 md:px-6">
             <div className="max-w-5xl mx-auto">
-              <SectionHeader eyebrow="Launch Focus" title={`What the ${industry.industry_name} System Is Built to Improve`} align="center" />
+              <CSSectionHeader eyebrow="Launch Focus" title={`What the ${industry.industry_name} System Is Built to Improve`} align="center" />
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6 mt-8">
                 {Object.entries(industry.roi_metrics).map(([key, value]) => (
-                  <div key={key} className={`${PREMIUM_SURFACE} p-5 md:p-6 text-center`}>
+                  <div key={key} className={`cs-glow-card p-5 md:p-6 text-center`}>
                     <p className="text-lg md:text-xl font-titles font-bold text-primary mb-2 tracking-tight">{value}</p>
                     <p className="text-[11px] md:text-xs text-muted-foreground capitalize font-semibold tracking-wide">{key.replace(/_/g, ' ')}</p>
                   </div>
@@ -275,7 +274,7 @@ export default function IndustryPageTemplate() {
           {/* PART 1 FIX: Testimonials removed — no verified proof. Safe empty state shown. */}
           <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
             <div className="max-w-3xl mx-auto text-center">
-              <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
+              <CSSectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
               <div className="mt-8 rounded-2xl border border-dashed border-border bg-muted/30 p-8 md:p-12">
                 <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
                   Verified client proof has not been added yet. This section will display
@@ -287,7 +286,7 @@ export default function IndustryPageTemplate() {
 
           <section className="py-14 md:py-20 px-4 md:px-6">
             <div className="max-w-5xl mx-auto">
-              <SectionHeader eyebrow="What's Included" title={`Your ${industry.industry_name} System Includes`} align="center" />
+              <CSSectionHeader eyebrow="What's Included" title={`Your ${industry.industry_name} System Includes`} align="center" />
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3 md:gap-4 max-w-3xl mx-auto mt-8">
                 {industry.key_features.map((feature, i) => (
                   <div key={i} className="flex items-center gap-3 rounded-xl border border-primary/10 bg-white/80 p-4 shadow-sm"><CheckCircle className="w-5 h-5 text-primary flex-shrink-0" /><span className="text-sm md:text-base text-foreground/80 font-semibold">{feature}</span></div>
@@ -299,9 +298,9 @@ export default function IndustryPageTemplate() {
           <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
             <div className="max-w-2xl mx-auto">
               <div className="mb-8">
-                <SectionHeader eyebrow="Guided System Match" title={`Which ${industry.industry_name} System Fits?`} subtitle="Answer 4 quick questions and we will help match your lead flow to Starter, Growth, or Pro." align="center" />
+                <CSSectionHeader eyebrow="Guided System Match" title={`Which ${industry.industry_name} System Fits?`} subtitle="Answer 4 quick questions and we will help match your lead flow to Starter, Growth, or Pro." align="center" />
               </div>
-              <div className="rounded-3xl border border-primary/15 bg-white shadow-[0_20px_70px_rgba(15,23,42,0.10)] p-5 md:p-8"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
+              <div className="rounded-3xl border border-primary/15 bg-white cs-glow-card p-5 md:p-8 rounded-3xl"><IndustryQualificationForm industrySlug={slug} industryName={industry.industry_name} /></div>
             </div>
           </section>
 

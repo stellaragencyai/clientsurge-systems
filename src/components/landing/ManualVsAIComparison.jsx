@@ -1,5 +1,5 @@
 import { Check, X, Clock, Users, PhoneCall, Calendar, FileText, Repeat, TrendingUp } from "lucide-react";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const COMPARISON_ROWS = [
   { icon: Clock, task: "Lead Response", manual: "Response depends on staff availability", ai: "Approved response path triggers quickly", manualTime: "manual timing", aiTime: "structured timing" },
@@ -15,7 +15,7 @@ export default function ManualVsAIComparison() {
   return (
     <section className="py-16 md:py-24 px-6 bg-white overflow-hidden">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="The Difference Is Clear"
           title="Manual Lead Flow vs. ClientSurge Systems"
           subtitle="The goal is not hype. The goal is a cleaner operating path for response, follow-up, booking, reviews, and reactivation."

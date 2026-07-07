@@ -19,7 +19,7 @@ export default function CaseStudySection({ industry }) {
             title="Verified Client Proof Coming Soon"
             align="center"
           />
-          <div className="mt-8 rounded-2xl border border-dashed border-border bg-muted/30 p-8 md:p-12">
+          <div className="mt-8 cs-card border-dashed border-border bg-muted/30 p-8 md:p-12 rounded-2xl">
             <div className="flex flex-col items-center gap-4">
               <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/8 border border-primary/15">
                 <TrendingUp className="w-6 h-6 text-primary" />
@@ -49,14 +49,14 @@ export default function CaseStudySection({ industry }) {
         />
 
         <div className="mt-8 mb-10 text-center">
-          <div className="inline-flex flex-col items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent px-8 py-6">
+          <div className="inline-flex flex-col items-center cs-glow-card px-8 py-6">
             <span className="text-4xl md:text-5xl font-titles font-black text-primary tracking-tight">{cs.metric}</span>
             <span className="text-sm font-bold text-muted-foreground mt-1 uppercase tracking-wide">{cs.metricLabel}</span>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
-          <div className="rounded-2xl border border-red-100 bg-red-50/50 p-6 md:p-7">
+          <div className="cs-card rounded-2xl border border-red-100 bg-red-50/50 p-6 md:p-7">
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-red-100 border border-red-200">
                 <span className="text-red-600 font-black text-sm">!</span>
@@ -66,7 +66,7 @@ export default function CaseStudySection({ industry }) {
             <p className="text-sm md:text-base text-muted-foreground leading-relaxed">{cs.challenge}</p>
           </div>
 
-          <div className="rounded-2xl border border-primary/15 bg-primary/5 p-6 md:p-7">
+          <div className="cs-card rounded-2xl border border-primary/15 bg-primary/5 p-6 md:p-7">
             <div className="flex items-center gap-2 mb-4">
               <div className="flex items-center justify-center w-8 h-8 rounded-lg bg-primary/10 border border-primary/20">
                 <TrendingUp className="w-4 h-4 text-primary" />

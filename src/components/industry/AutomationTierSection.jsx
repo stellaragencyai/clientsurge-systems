@@ -28,11 +28,8 @@ export default function AutomationTierSection({ industry }) {
           {tierEntries.map(({ key, data, badge, highlight }) => (
             <div
               key={key}
-              className={`relative rounded-2xl border p-6 md:p-8 transition-all duration-300 ${
-                highlight
-                  ? 'border-primary/30 bg-white shadow-[0_20px_60px_rgba(0,107,176,0.16)] md:-translate-y-2'
-                  : 'border-primary/10 bg-white/90 shadow-[0_10px_40px_rgba(15,23,42,0.06)]'
-              }`}
+              className={`relative cs-glow-card p-6 md:p-8 ${highlight ? 'md:-translate-y-2' : ''}`}
+              style={highlight ? { borderColor: 'hsla(199, 100%, 47%, 0.3)' } : undefined}
             >
               {badge && (
                 <div className="absolute -top-3 left-1/2 -translate-x-1/2">

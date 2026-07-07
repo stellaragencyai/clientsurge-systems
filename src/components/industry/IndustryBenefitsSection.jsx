@@ -1,8 +1,6 @@
 import { CheckCircle } from 'lucide-react';
 import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
-const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
-
 /**
  * Premium benefits section.
  * Renders industry-specific benefits with checkmark icons.
@@ -25,7 +23,7 @@ export default function IndustryBenefitsSection({ benefits }) {
           {benefits.map((benefit, i) => (
             <div
               key={i}
-              className={`${PREMIUM_SURFACE} p-6 md:p-7 transition-transform duration-200 hover:-translate-y-1`}
+              className="cs-glow-card p-6 md:p-7"
             >
               <div className="mb-4 inline-flex h-9 w-9 items-center justify-center rounded-xl border border-primary/15 bg-primary/8 text-primary">
                 <CheckCircle className="w-5 h-5" />

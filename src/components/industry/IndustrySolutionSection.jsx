@@ -5,8 +5,6 @@ const ICON_MAP = {
   CheckCircle, Zap, Phone, Calendar, Send, Star, MessageSquare, RotateCw, AlertCircle, FileCheck, Thermometer,
 };
 
-const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
-
 /**
  * Premium automation solution section.
  * Renders industry-specific automation solutions with icons and descriptions.
@@ -29,7 +27,7 @@ export default function IndustrySolutionSection({ solutions, industryName }) {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
           {solutions.map((solution, i) => {
             return (
-              <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
+              <div key={i} className="cs-glow-card p-6 md:p-8">
                 <div className="flex items-start gap-4">
                   <div className="flex-shrink-0">
                     <div className="flex items-center justify-center w-11 h-11 md:w-13 md:h-13 rounded-2xl bg-gradient-to-br from-primary/12 to-sky-100 text-primary border border-primary/20 shadow-sm">

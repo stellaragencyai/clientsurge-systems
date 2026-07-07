@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 import { CalendarCheck, ShieldCheck, TimerReset, Zap } from "lucide-react";
 import { motion } from "framer-motion";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 function useCountUp(value, inView, duration = 1800) {
   const [count, setCount] = useState(typeof value === "number" ? 1 : value);
@@ -141,7 +141,7 @@ export default function TrustBar() {
     >
       <div className="max-w-6xl mx-auto px-6">
         <div className="mb-10">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="What You Can Expect"
             title="Clear Commitments. Cleaner Buying Decision."
             subtitle="No guessing. No long contracts. Here's exactly what you can expect when you work with ClientSurge Systems — from first response speed to how the engagement is structured."

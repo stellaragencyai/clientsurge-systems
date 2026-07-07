@@ -1,6 +1,6 @@
 import { useDemoBooking } from "./DemoBookingContext";
 import StardustOverlay from "./StardustOverlay";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const testimonials = [
   {
@@ -45,7 +45,7 @@ export default function Testimonials() {
       <StardustOverlay seed={21} opacity={0.4} />
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="mb-16">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="Real Workflow Results"
             title="What Happens When the System Goes Live"
             subtitle="Three industry workflows — what the lead experience looks like before the system is installed versus after it's running."
