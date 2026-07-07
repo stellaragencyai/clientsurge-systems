@@ -1,0 +1,128 @@
+{
+  "name": "AutomationExecutionLog",
+  "type": "object",
+  "title": "Automation Execution Log",
+  "description": "Deployment-level automation history \u2014 tracks every automation attempt against a ClientDeployment, including status, timing, provider references, and errors.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "client_deployment_id": {
+      "type": "string",
+      "title": "Client Deployment ID",
+      "description": "FK to ClientDeployment record"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID",
+      "description": "Tenant isolation key"
+    },
+    "automation_module_id": {
+      "type": "string",
+      "title": "Automation Module ID",
+      "description": "FK to AutomationModule record"
+    },
+    "module_key": {
+      "type": "string",
+      "title": "Module Key",
+      "description": "Denormalized key (e.g., 'instant_lead_response')"
+    },
+    "trigger_event": {
+      "type": "string",
+      "title": "Trigger Event",
+      "description": "What triggered this execution (e.g., 'lead_created', 'missed_call', 'scheduled_nurture')"
+    },
+    "execution_status": {
+      "type": "string",
+      "title": "Execution Status",
+      "enum": [
+        "queued",
+        "running",
+        "completed",
+        "failed",
+        "blocked"
+      ],
+      "default": "queued"
+    },
+    "response_data": {
+      "type": "string",
+      "title": "Response Data (JSON)",
+      "description": "Raw response or result payload from the automation execution"
+    },
+    "error_message": {
+      "type": "string",
+      "title": "Error Message"
+    },
+    "error_code": {
+      "type": "string",
+      "title": "Error Code",
+      "description": "Structured error code for categorization (e.g., 'twilio_auth_failed', 'resend_rate_limit', 'module_not_authorized')"
+    },
+    "execution_time_ms": {
+      "type": "number",
+      "title": "Execution Time (ms)",
+      "description": "How long the automation took to execute"
+    },
+    "external_provider_reference": {
+      "type": "string",
+      "title": "External Provider Reference",
+      "description": "Provider message/event ID (e.g., Twilio message SID, Resend email ID, AI request ID)"
+    },
+    "lead_id": {
+      "type": "string",
+      "title": "Lead ID",
+      "description": "If triggered by a lead"
+    },
+    "conversation_id": {
+      "type": "string",
+      "title": "Conversation ID"
+    },
+    "started_at": {
+      "type": "string",
+      "title": "Started At",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": "string",
+      "title": "Completed At",
+      "format": "date-time"
+    }
+  },
+  "required": [
+    "client_deployment_id",
+    "module_key",
+    "trigger_event",
+    "execution_status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        }
+      ]
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

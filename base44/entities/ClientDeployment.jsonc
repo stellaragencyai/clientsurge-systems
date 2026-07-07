@@ -48,14 +48,16 @@
       "type": "string",
       "title": "Deployment Status",
       "enum": [
+        "pending",
         "onboarding",
         "configuring",
         "ready",
         "live",
         "error",
-        "paused"
+        "paused",
+        "cancelled"
       ],
-      "default": "onboarding"
+      "default": "pending"
     },
     "activated_modules": {
       "type": "array",
@@ -64,6 +66,79 @@
         "type": "string"
       },
       "description": "List of AutomationModule keys currently activated for this deployment"
+    },
+    "module_installation_status": {
+      "type": "object",
+      "title": "Module Installation Status",
+      "description": "Per-module verification status \u2014 tracks whether each module is truly installed and verified, not just listed as active",
+      "properties": {
+        "instant_lead_response": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "installing",
+            "installed",
+            "verified",
+            "failed"
+          ],
+          "default": "not_started"
+        },
+        "missed_call_text_back": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "installing",
+            "installed",
+            "verified",
+            "failed"
+          ],
+          "default": "not_started"
+        },
+        "lead_nurture": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "installing",
+            "installed",
+            "verified",
+            "failed"
+          ],
+          "default": "not_started"
+        },
+        "ai_booking_agent": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "installing",
+            "installed",
+            "verified",
+            "failed"
+          ],
+          "default": "not_started"
+        },
+        "daily_digest": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "installing",
+            "installed",
+            "verified",
+            "failed"
+          ],
+          "default": "not_started"
+        },
+        "review_reactivation": {
+          "type": "string",
+          "enum": [
+            "not_started",
+            "installing",
+            "installed",
+            "verified",
+            "failed"
+          ],
+          "default": "not_started"
+        }
+      }
     },
     "installation_progress": {
       "type": "object",
@@ -91,7 +166,7 @@
     },
     "errors": {
       "type": "array",
-      "title": "Errors",
+      "title": "Deployment Errors",
       "items": {
         "type": "object",
         "properties": {
@@ -101,10 +176,84 @@
           "message": {
             "type": "string"
           },
+          "module_key": {
+            "type": "string",
+            "description": "Which module this error relates to"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "warning",
+              "critical",
+              "advisory"
+            ],
+            "default": "warning"
+          },
+          "suggested_action": {
+            "type": "string",
+            "description": "Recommended fix action for admin"
+          },
           "occurred_at": {
             "type": "string",
             "format": "date-time"
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time"
           }
+        }
+      }
+    },
+    "health_status": {
+      "type": "string",
+      "title": "Health Status",
+      "enum": [
+        "healthy",
+        "warning",
+        "critical",
+        "unknown"
+      ],
+      "default": "unknown",
+      "description": "Computed by calculateDeploymentHealth \u2014 cached for quick admin lookup"
+    },
+    "health_summary": {
+      "type": "string",
+      "title": "Health Summary",
+      "description": "Human-readable health summary (e.g., 'All required modules installed and verified')"
+    },
+    "health_checked_at": {
+      "type": "string",
+      "title": "Last Health Check At",
+      "format": "date-time"
+    },
+    "analytics": {
+      "type": "object",
+      "title": "Deployment Analytics",
+      "description": "Tracking infrastructure for future metrics \u2014 values populated by automation execution pipeline",
+      "properties": {
+        "leads_generated": {
+          "type": "number",
+          "default": 0
+        },
+        "conversations_started": {
+          "type": "number",
+          "default": 0
+        },
+        "appointments_booked": {
+          "type": "number",
+          "default": 0
+        },
+        "automation_executions": {
+          "type": "number",
+          "default": 0
+        },
+        "recovered_opportunities": {
+          "type": "number",
+          "default": 0
+        },
+        "last_activity_at": {
+          "type": "string",
+          "format": "date-time"
         }
       }
     },
