@@ -1,11 +1,12 @@
 /**
- * PortalStateEngine — Phase A.1 Truth Hardening
+ * PortalStateEngine — Phase 3.5 Complete Deployment Source-of-Truth Migration
  *
  * Pure normalization layer that converts raw portal context data into
  * proof-validated, environment-filtered, client-safe card states.
  *
  * Every card produces:
- *   { status, display_text, admin_diagnostics, proof_metadata }
+ *   { status, display_text, admin_diagnostics, proof_metadata,
+ *     source_of_truth, deployment_id, module_key, proof_status, last_verified }
  *
  * Statuses:
  *   Live          — proof exists, fresh (<24h), production environment
@@ -13,7 +14,23 @@
  *   Blocked       — blocking condition (failed events, missing links)
  *   SetupRequired — onboarding/quick-start not complete
  *   Syncing       — data stale or environment unknown
+ *
+ * Source-of-truth fallback hierarchy (Phase 3.5):
+ *   1. ClientDeployment (activated_modules + module_installation_status)
+ *   2. AutomationProofLog
+ *   3. AutomationExecutionLog
+ *   4. Legacy order.services (only if deployment unavailable)
  */
+
+import {
+  DEPLOYMENT_MODULE_MAP,
+  isModuleActivated,
+  getModuleInstallStatus,
+  isModuleReady,
+  isModuleFailed,
+  findLatestExecutionLog,
+  resolveModuleAvailability,
+} from "@/lib/deploymentModuleMap";
 
 // ── Constants ──────────────────────────────────────────────
 const PROOF_FRESHNESS_HOURS = 24;
@@ -41,10 +58,6 @@ export const CARD_STATUS = {
 
 // ── Environment Filtering ─────────────────────────────────
 
-/**
- * Filter a list of records to production-trusted only.
- * Excludes anything where environment != production OR tenant_scope_status != scoped.
- */
 export function filterProductionOnly(records) {
   if (!Array.isArray(records)) return [];
   return records.filter((r) => {
@@ -55,9 +68,6 @@ export function filterProductionOnly(records) {
   });
 }
 
-/**
- * Check if a single record is production-trusted.
- */
 export function isProductionTrusted(record) {
   if (!record) return false;
   const env = (record.environment || "").toLowerCase();
@@ -67,10 +77,6 @@ export function isProductionTrusted(record) {
 
 // ── Safe Language ─────────────────────────────────────────
 
-/**
- * Sanitize any raw text before it reaches the client.
- * Replaces forbidden backend terms with safe equivalents.
- */
 export function sanitizeClientText(raw) {
   if (!raw || typeof raw !== "string") return "";
   let clean = raw;
@@ -92,7 +98,6 @@ export function sanitizeClientText(raw) {
   for (const [bad, good] of Object.entries(replacements)) {
     clean = clean.replace(new RegExp(bad, "gi"), good);
   }
-  // Final safety: if any forbidden term remains, mask it
   for (const term of FORBIDDEN_TERMS) {
     if (clean.toLowerCase().includes(term.toLowerCase())) {
       clean = clean.replace(new RegExp(term, "gi"), "—");
@@ -103,10 +108,6 @@ export function sanitizeClientText(raw) {
 
 // ── Proof Freshness ───────────────────────────────────────
 
-/**
- * Find the most recent passing proof log for a given service_key.
- * Returns { proof, isFresh, isStale } or null if no proof exists.
- */
 function findLatestProof(proofLogs, serviceKey) {
   if (!Array.isArray(proofLogs) || !serviceKey) return null;
   const matching = proofLogs
@@ -128,9 +129,6 @@ function findLatestProof(proofLogs, serviceKey) {
   };
 }
 
-/**
- * Build proof_metadata object for a card.
- */
 function buildProofMetadata(proofResult, fallbackEnv) {
   if (!proofResult) {
     return {
@@ -150,22 +148,54 @@ function buildProofMetadata(proofResult, fallbackEnv) {
   };
 }
 
+// ── Phase 3.5: Unified Proof Resolver ─────────────────────
+
+/**
+ * Resolve proof for a module using the fallback hierarchy:
+ *   1. AutomationProofLog (priority 2)
+ *   2. AutomationExecutionLog (priority 3, only if completed)
+ *
+ * @param {Array} proofLogs - AutomationProofLog records
+ * @param {Array} executionLogs - AutomationExecutionLog records
+ * @param {string} moduleKey - canonical module key
+ * @returns {object|null} - proof result with source field
+ */
+function resolveProof(proofLogs, executionLogs, moduleKey) {
+  const config = DEPLOYMENT_MODULE_MAP[moduleKey];
+  if (!config) return null;
+
+  // Priority 2: AutomationProofLog
+  const proofResult = findLatestProof(proofLogs, config.proof_service_key);
+  if (proofResult) {
+    return { ...proofResult, source: "proof_log" };
+  }
+
+  // Priority 3: AutomationExecutionLog (only if completed successfully)
+  const execResult = findLatestExecutionLog(executionLogs, moduleKey);
+  if (execResult && execResult.execution_status === "completed") {
+    const completedAt = execResult.completed_at
+      ? new Date(execResult.completed_at)
+      : null;
+    if (completedAt && !isNaN(completedAt.getTime())) {
+      const ageHours = (Date.now() - completedAt.getTime()) / (1000 * 60 * 60);
+      return {
+        proof: { id: execResult.log?.id, status: "pass" },
+        isFresh: ageHours <= PROOF_FRESHNESS_HOURS,
+        isStale: ageHours > STALE_THRESHOLD_HOURS,
+        ageHours,
+        testedAt: completedAt.toISOString(),
+        source: "execution_log",
+      };
+    }
+  }
+
+  return null;
+}
+
 // ── Card State Builder ────────────────────────────────────
 
 /**
- * Build a normalized card state.
- * @param {string} cardKey - identifier for the card
- * @param {object} opts
- * @param {string} opts.liveText - client-facing text when Live
- * @param {string} opts.needsProofText - client-facing text when NeedsProof
- * @param {string} opts.blockedText - client-facing text when Blocked
- * @param {string} opts.setupText - client-facing text when SetupRequired
- * @param {string} opts.syncingText - client-facing text when Syncing
- * @param {object|null} opts.proofResult - result from findLatestProof
- * @param {string} opts.envTrust - "production" | "unknown"
- * @param {boolean} opts.setupComplete - whether setup prerequisites are met
- * @param {boolean} opts.hasBlockingCondition - whether a blocking condition exists
- * @param {string} opts.adminDetail - technical reason for the status
+ * Build a normalized card state with Phase 3.5 source-of-truth metadata.
  */
 function buildCardState({
   cardKey,
@@ -179,6 +209,10 @@ function buildCardState({
   setupComplete,
   hasBlockingCondition,
   adminDetail,
+  moduleKey = null,
+  deployment = null,
+  executionLog = null,
+  sourceOfTruth = "none",
 }) {
   const proofMetadata = buildProofMetadata(proofResult, envTrust);
 
@@ -199,7 +233,7 @@ function buildCardState({
   } else if (!proofResult) {
     status = CARD_STATUS.NEEDS_PROOF;
     displayText = sanitizeClientText(needsProofText);
-    adminDiagnostics = `${cardKey}: NeedsProof — no passing AutomationProofLog found`;
+    adminDiagnostics = `${cardKey}: NeedsProof — no passing proof found`;
   } else if (!proofResult.isFresh) {
     status = CARD_STATUS.SYNCING;
     displayText = sanitizeClientText(syncingText);
@@ -211,31 +245,147 @@ function buildCardState({
     adminDiagnostics = `${cardKey}: Live — proof verified at ${proofResult.testedAt}`;
   }
 
+  // Resolve source_of_truth
+  let resolvedSource = sourceOfTruth;
+  if (deployment && moduleKey) {
+    resolvedSource = "deployment";
+  } else if (proofResult?.source === "proof_log") {
+    resolvedSource = "proof_log";
+  } else if (proofResult?.source === "execution_log") {
+    resolvedSource = "execution_log";
+  } else if (sourceOfTruth !== "none") {
+    resolvedSource = sourceOfTruth;
+  }
+
   return {
     card_key: cardKey,
     status,
     display_text: displayText,
     admin_diagnostics: adminDiagnostics,
     proof_metadata: proofMetadata,
+    // Phase 3.5: Source-of-truth metadata
+    source_of_truth: resolvedSource,
+    deployment_id: deployment?.id || null,
+    module_key: moduleKey,
+    proof_status: proofResult?.proof?.status ||
+      (executionLog ? executionLog.execution_status : null),
+    last_verified: proofResult?.testedAt || executionLog?.completed_at || null,
   };
+}
+
+// ── Phase 3.5: Module Card Builder ────────────────────────
+
+/**
+ * Build a capability card using deployment-first resolution.
+ *
+ * Truth rules (Phase 3.5):
+ *   - Blocked if deployment is paused OR module status is "failed"
+ *   - SetupRequired if module not activated OR not verified in deployment
+ *   - NeedsProof if module is ready but no proof/execution log exists
+ *   - Live only when: module enabled AND proof exists AND proof is fresh
+ *
+ * @param {object} opts
+ * @param {string} opts.moduleKey - canonical module key
+ * @param {object|null} opts.deployment
+ * @param {Array} opts.services - legacy order.services (fallback)
+ * @param {Array} opts.proofLogs
+ * @param {Array} opts.executionLogs
+ * @param {object} opts.envTrust
+ * @param {boolean} opts.hasBlockingCondition - global blocking condition
+ * @param {boolean} opts.isPaused - deployment is paused
+ * @param {object} opts.texts - { liveText, needsProofText, blockedText, setupText, syncingText }
+ * @param {string} opts.cardKey - card key override (defaults to portal_card from map)
+ */
+function buildModuleCard({
+  moduleKey,
+  deployment,
+  services,
+  proofLogs,
+  executionLogs,
+  envTrust,
+  hasBlockingCondition: globalBlocking,
+  isPaused,
+  texts,
+  cardKey,
+}) {
+  const config = DEPLOYMENT_MODULE_MAP[moduleKey];
+  if (!config) {
+    return buildCardState({
+      cardKey: cardKey || moduleKey,
+      ...texts,
+      proofResult: null,
+      envTrust,
+      setupComplete: false,
+      hasBlockingCondition: true,
+      adminDetail: `Unknown module key: ${moduleKey}`,
+    });
+  }
+
+  const resolvedCardKey = cardKey || config.portal_card;
+
+  // Resolve module availability (deployment first, legacy fallback)
+  const availability = resolveModuleAvailability(deployment, services, moduleKey);
+
+  // Resolve proof (proof log first, execution log fallback)
+  const proofResult = resolveProof(proofLogs, executionLogs, moduleKey);
+  const execLog = findLatestExecutionLog(executionLogs, moduleKey);
+
+  // Determine blocking conditions
+  const moduleFailed = deployment
+    ? isModuleFailed(deployment, moduleKey)
+    : false;
+  const isBlocked = isPaused || moduleFailed || (availability.installStatus === "failed");
+
+  // Determine setup completion
+  // Module is "setup complete" when:
+  //   - Deployment exists: module is activated AND installation status is ready
+  //   - No deployment (legacy): module service exists with non-Paid status
+  let moduleSetupComplete;
+  if (deployment) {
+    moduleSetupComplete = availability.isAvailable && isModuleReady(deployment, moduleKey);
+  } else {
+    moduleSetupComplete = availability.isAvailable;
+  }
+
+  return buildCardState({
+    cardKey: resolvedCardKey,
+    liveText: texts.liveText,
+    needsProofText: texts.needsProofText,
+    blockedText: isPaused
+      ? "This automation is paused. Contact support to resume."
+      : texts.blockedText,
+    setupText: texts.setupText,
+    syncingText: texts.syncingText,
+    proofResult,
+    envTrust,
+    setupComplete: moduleSetupComplete,
+    hasBlockingCondition: isBlocked || globalBlocking,
+    adminDetail: isPaused
+      ? "Deployment is paused"
+      : moduleFailed
+        ? `Module '${moduleKey}' installation status is 'failed'`
+        : availability.source === "deployment" && !availability.isAvailable
+          ? `Module '${moduleKey}' not in activated_modules for this deployment`
+          : null,
+    moduleKey,
+    deployment,
+    executionLog: execLog,
+    sourceOfTruth: availability.source,
+  });
 }
 
 // ── Main Engine: normalizePortalState ─────────────────────
 
 /**
- * Main entry point. Takes raw portal context + proof logs and returns
- * a normalized portal state object with card-level trust statuses.
- *
- * PHASE 3: When a ClientDeployment is present in the context, it becomes the
- * primary source of truth for system_readiness, installation_progress, and
- * automation_health cards. Legacy order/project/onboarding data is used as
- * fallback only when no deployment exists.
+ * Main entry point. Takes raw portal context + proof logs + execution logs
+ * and returns a normalized portal state object with card-level trust statuses.
  *
  * @param {object} rawContext - from getClientPortalContext
  * @param {Array} proofLogs - AutomationProofLog records (already scoped)
+ * @param {Array} executionLogs - AutomationExecutionLog records (already scoped)
  * @returns {object} normalized portal state
  */
-export function normalizePortalState(rawContext, proofLogs = []) {
+export function normalizePortalState(rawContext, proofLogs = [], executionLogs = []) {
   const ctx = rawContext || {};
   const project = ctx.project || null;
   const order = ctx.order || null;
@@ -244,14 +394,12 @@ export function normalizePortalState(rawContext, proofLogs = []) {
   const deployment = ctx.deployment || null;
 
   // ── Environment trust ──
-  // PHASE 3: Deployment presence implies production trust if deployment is live/ready
   const envTrust = isProductionTrusted(order) || isProductionTrusted(project) ||
     (deployment && ["live", "ready", "onboarding", "configuring", "testing"].includes(deployment.deployment_status))
     ? "production"
     : "unknown";
 
-  // ── Setup completion ──
-  // PHASE 3: When deployment exists, use deployment_status as primary indicator
+  // ── Setup completion (global) ──
   const deploymentSetupComplete = deployment
     ? ["live", "ready", "testing"].includes(deployment.deployment_status)
     : false;
@@ -261,22 +409,26 @@ export function normalizePortalState(rawContext, proofLogs = []) {
       project?.onboarding_wizard_completed === true) ||
     (order?.services || []).every((s) => s.install_status === "Live");
 
+  // ── Deployment state ──
+  const isPaused = deployment?.deployment_status === "paused";
+  const deploymentIsBlocked = deployment && ["paused", "error", "cancelled"].includes(deployment.deployment_status);
+  const deploymentIsLive = deployment?.deployment_status === "live";
+
   // ── Event filtering ──
   const rawEvents = filterProductionOnly(health?.recent_events || []);
   const failedEvents = rawEvents.filter(
     (e) => e.status === "failed" && !(e.event_type || "").includes("portal_login")
   );
-  const hasBlockingCondition = failedEvents.length > 0 && !ctx.is_admin_preview;
+  const hasGlobalBlockingCondition = failedEvents.length > 0 && !ctx.is_admin_preview;
 
-  // ── Services ──
+  // ── Services (legacy fallback) ──
   const services = (order?.services || []).filter((s) => s != null);
 
   // ── Card: System Readiness ──
-  // PHASE 3: When deployment exists, deployment_status is the primary source of truth
   const allServicesLive = services.length > 0 && services.every((s) => s.install_status === "Live");
-  const deploymentIsLive = deployment?.deployment_status === "live";
-  const deploymentIsBlocked = deployment && ["paused", "error", "cancelled"].includes(deployment.deployment_status);
-  const systemReadinessProof = (allServicesLive || deploymentIsLive) ? findLatestProof(proofLogs, "instant_lead_response") : null;
+  const systemReadinessProof = (allServicesLive || deploymentIsLive)
+    ? resolveProof(proofLogs, executionLogs, "instant_lead_response")
+    : null;
 
   const systemReadiness = buildCardState({
     cardKey: "system_readiness",
@@ -290,15 +442,18 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     proofResult: systemReadinessProof,
     envTrust,
     setupComplete: (deployment ? deploymentSetupComplete : false) || setupComplete || allServicesLive,
-    hasBlockingCondition: deploymentIsBlocked || hasBlockingCondition,
+    hasBlockingCondition: deploymentIsBlocked || hasGlobalBlockingCondition,
     adminDetail: deploymentIsBlocked
       ? `Deployment status '${deployment.deployment_status}' blocks execution`
       : (failedEvents.length > 0 ? `${failedEvents.length} recent failed events` : null),
+    moduleKey: "instant_lead_response",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Card: Installation Progress ──
-  const installationProof = services.some((s) => s.install_status === "Live")
-    ? findLatestProof(proofLogs, "instant_lead_response")
+  const installationProof = services.some((s) => s.install_status === "Live") || deploymentIsLive
+    ? resolveProof(proofLogs, executionLogs, "instant_lead_response")
     : null;
 
   const installationProgress = buildCardState({
@@ -313,11 +468,14 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     setupComplete: services.length > 0 && services.every((s) => s.install_status !== "Paid" && s.install_status !== "Ready for Install"),
     hasBlockingCondition: false,
     adminDetail: null,
+    moduleKey: "instant_lead_response",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Card: Automation Health ──
-  const automationProof = findLatestProof(proofLogs, "instant_lead_response") ||
-    findLatestProof(proofLogs, "missed_call_text_back");
+  const automationProof = resolveProof(proofLogs, executionLogs, "instant_lead_response") ||
+    resolveProof(proofLogs, executionLogs, "missed_call_text_back");
   const automationHealth = buildCardState({
     cardKey: "automation_health",
     liveText: "Your automations are running smoothly.",
@@ -328,165 +486,169 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     proofResult: automationProof,
     envTrust,
     setupComplete,
-    hasBlockingCondition,
+    hasBlockingCondition: hasGlobalBlockingCondition,
     adminDetail: failedEvents.length > 0 ? `${failedEvents.length} failed automation events` : null,
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
-  // ── Card: Lead Capture ──
-  const leadCaptureProof = findLatestProof(proofLogs, "instant_lead_response");
-  const productionLeads = rawEvents.filter(
-    (e) => e.event_type && e.event_type.includes("lead") && e.status !== "failed"
-  );
-  const leadCapture = buildCardState({
-    cardKey: "lead_capture",
-    liveText: productionLeads.length > 0
-      ? `${productionLeads.length} leads captured.`
-      : "Lead capture is active and ready.",
-    needsProofText: "Waiting for your first verified lead.",
-    blockedText: "Lead capture needs attention. Our team is on it.",
-    setupText: "Lead capture will activate after setup is complete.",
-    syncingText: "Lead data is syncing.",
-    proofResult: leadCaptureProof,
+  // ── Card: Lead Capture (Phase 2 migration) ──
+  const leadCapture = buildModuleCard({
+    moduleKey: "instant_lead_response",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete,
-    hasBlockingCondition,
-    adminDetail: null,
+    hasBlockingCondition: hasGlobalBlockingCondition,
+    isPaused,
+    cardKey: "lead_capture",
+    texts: {
+      liveText: "Lead capture is active and ready.",
+      needsProofText: "Waiting for your first verified lead.",
+      blockedText: "Lead capture needs attention. Our team is on it.",
+      setupText: "Lead capture will activate after setup is complete.",
+      syncingText: "Lead data is syncing.",
+    },
   });
 
   // ── Card: Missed Call Text-Back ──
-  const missedCallProof = findLatestProof(proofLogs, "missed_call_text_back");
-  const missedCallService = services.find(
-    (s) => s.service_key === "missed_call_text_back" || s.display_name?.toLowerCase().includes("missed call")
-  );
-  const missedCallTextBack = buildCardState({
-    cardKey: "missed_call_text_back",
-    liveText: "Missed call text-back is active.",
-    needsProofText: "Missed call text-back is being verified.",
-    blockedText: "Missed call text-back needs attention.",
-    setupText: "Missed call text-back will activate after setup.",
-    syncingText: "Missed call text-back is syncing.",
-    proofResult: missedCallProof,
+  const missedCallTextBack = buildModuleCard({
+    moduleKey: "missed_call_text_back",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!missedCallService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "Missed call text-back is active.",
+      needsProofText: "Missed call text-back is being verified.",
+      blockedText: "Missed call text-back needs attention.",
+      setupText: "Missed call text-back will activate after setup.",
+      syncingText: "Missed call text-back is syncing.",
+    },
   });
 
-  // ── Card: AI Booking Agent ──
-  const bookingProof = findLatestProof(proofLogs, "ai_booking_agent");
-  const bookingService = services.find(
-    (s) => s.service_key === "ai_booking_agent" || s.display_name?.toLowerCase().includes("booking")
-  );
-  const aiBookingAgent = buildCardState({
-    cardKey: "ai_booking_agent",
-    liveText: "AI booking agent is active.",
-    needsProofText: "AI booking agent is being verified.",
-    blockedText: "AI booking agent needs attention.",
-    setupText: "AI booking agent will activate after setup.",
-    syncingText: "AI booking agent is syncing.",
-    proofResult: bookingProof,
+  // ── Card: AI Booking Agent (Phase 3 migration) ──
+  const aiBookingAgent = buildModuleCard({
+    moduleKey: "ai_booking_agent",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!bookingService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "AI booking agent is active.",
+      needsProofText: "AI booking agent is being verified.",
+      blockedText: "AI booking agent needs attention.",
+      setupText: "AI booking agent will activate after setup.",
+      syncingText: "AI booking agent is syncing.",
+    },
   });
 
-  // ── Card: Nurture Sequence ──
-  const nurtureProof = findLatestProof(proofLogs, "nurture_sequence_14d");
-  const nurtureService = services.find(
-    (s) => s.service_key === "nurture_sequence_14d" || s.display_name?.toLowerCase().includes("nurture")
-  );
-  const nurtureSequence = buildCardState({
-    cardKey: "nurture_sequence",
-    liveText: "Nurture sequence is active.",
-    needsProofText: "Nurture sequence is being verified.",
-    blockedText: "Nurture sequence needs attention.",
-    setupText: "Nurture sequence will activate after setup.",
-    syncingText: "Nurture sequence is syncing.",
-    proofResult: nurtureProof,
+  // ── Card: AI Voice Agent (Phase 3 migration) ──
+  const aiVoiceAgent = buildModuleCard({
+    moduleKey: "ai_voice_receptionist",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!nurtureService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "AI voice agent is active.",
+      needsProofText: "AI voice agent is being verified.",
+      blockedText: "AI voice agent needs attention.",
+      setupText: "AI voice agent will activate after setup.",
+      syncingText: "AI voice agent is syncing.",
+    },
   });
 
-  // ── Card: AI Voice Agent ──
-  const voiceProof = findLatestProof(proofLogs, "ai_voice_receptionist");
-  const voiceService = services.find(
-    (s) => s.service_key === "ai_voice_receptionist" || s.display_name?.toLowerCase().includes("voice")
-  );
-  const aiVoiceAgent = buildCardState({
-    cardKey: "ai_voice_agent",
-    liveText: "AI voice agent is active.",
-    needsProofText: "AI voice agent is being verified.",
-    blockedText: "AI voice agent needs attention.",
-    setupText: "AI voice agent will activate after setup.",
-    syncingText: "AI voice agent is syncing.",
-    proofResult: voiceProof,
+  // ── Card: Nurture Sequence (Phase 4 migration) ──
+  const nurtureSequence = buildModuleCard({
+    moduleKey: "nurture_sequence_14d",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!voiceService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "Nurture sequence is active.",
+      needsProofText: "Nurture sequence is being verified.",
+      blockedText: "Nurture sequence needs attention.",
+      setupText: "Nurture sequence will activate after setup.",
+      syncingText: "Nurture sequence is syncing.",
+    },
   });
 
-  // ── Card: Daily Digest ──
-  const digestProof = findLatestProof(proofLogs, "daily_lead_digest");
-  const digestService = services.find(
-    (s) => s.service_key === "daily_lead_digest" || s.display_name?.toLowerCase().includes("digest")
-  );
-  const dailyDigest = buildCardState({
-    cardKey: "daily_digest",
-    liveText: "Daily digest is active.",
-    needsProofText: "Daily digest is being verified.",
-    blockedText: "Daily digest needs attention.",
-    setupText: "Daily digest will activate after setup.",
-    syncingText: "Daily digest is syncing.",
-    proofResult: digestProof,
+  // ── Card: Daily Digest (Phase 4 migration) ──
+  const dailyDigest = buildModuleCard({
+    moduleKey: "daily_digest",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!digestService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "Daily digest is active.",
+      needsProofText: "Daily digest is being verified.",
+      blockedText: "Daily digest needs attention.",
+      setupText: "Daily digest will activate after setup.",
+      syncingText: "Daily digest is syncing.",
+    },
   });
 
-  // ── Card: Lead Reactivation ──
-  const reactivationProof = findLatestProof(proofLogs, "lead_reactivation");
-  const reactivationService = services.find(
-    (s) => s.service_key === "lead_reactivation" || s.display_name?.toLowerCase().includes("reactivation")
-  );
-  const leadReactivation = buildCardState({
-    cardKey: "lead_reactivation",
-    liveText: "Lead reactivation is active.",
-    needsProofText: "Lead reactivation is being verified.",
-    blockedText: "Lead reactivation needs attention.",
-    setupText: "Lead reactivation will activate after setup.",
-    syncingText: "Lead reactivation is syncing.",
-    proofResult: reactivationProof,
+  // ── Card: Lead Reactivation (Phase 5 migration) ──
+  const leadReactivation = buildModuleCard({
+    moduleKey: "lead_reactivation",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!reactivationService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "Lead reactivation is active.",
+      needsProofText: "Lead reactivation is being verified.",
+      blockedText: "Lead reactivation needs attention.",
+      setupText: "Lead reactivation will activate after setup.",
+      syncingText: "Lead reactivation is syncing.",
+    },
   });
 
-  // ── Card: Review Request ──
-  const reviewProof = findLatestProof(proofLogs, "review_request");
-  const reviewService = services.find(
-    (s) => s.service_key === "review_request" || s.display_name?.toLowerCase().includes("review")
-  );
-  const reviewRequest = buildCardState({
-    cardKey: "review_request",
-    liveText: "Review request automation is active.",
-    needsProofText: "Review request automation is being verified.",
-    blockedText: "Review request automation needs attention.",
-    setupText: "Review request automation will activate after setup.",
-    syncingText: "Review request automation is syncing.",
-    proofResult: reviewProof,
+  // ── Card: Review Request (Phase 5 migration) ──
+  const reviewRequest = buildModuleCard({
+    moduleKey: "review_request",
+    deployment,
+    services,
+    proofLogs,
+    executionLogs,
     envTrust,
-    setupComplete: setupComplete && !!reviewService,
     hasBlockingCondition: false,
-    adminDetail: null,
+    isPaused,
+    texts: {
+      liveText: "Review request automation is active.",
+      needsProofText: "Review request automation is being verified.",
+      blockedText: "Review request automation needs attention.",
+      setupText: "Review request automation will activate after setup.",
+      syncingText: "Review request automation is syncing.",
+    },
   });
 
   // ── Card: ROI / Revenue Impact ──
+  const roiProof = (allServicesLive || deploymentIsLive)
+    ? systemReadinessProof
+    : null;
   const roiImpact = buildCardState({
     cardKey: "roi_revenue_impact",
     liveText: "Revenue tracking is active.",
@@ -494,30 +656,47 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     blockedText: "Revenue tracking is temporarily unavailable.",
     setupText: "Revenue tracking will begin after your system goes live.",
     syncingText: "Revenue data is syncing.",
-    proofResult: allServicesLive ? systemReadinessProof : null,
+    proofResult: roiProof,
     envTrust,
-    setupComplete: setupComplete && allServicesLive,
-    hasBlockingCondition,
+    setupComplete: setupComplete && (allServicesLive || deploymentIsLive),
+    hasBlockingCondition: hasGlobalBlockingCondition,
     adminDetail: null,
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
-  // ── Card: Billing ──
-  const billingBlocked =
-    subscription?.status === "canceled" ||
-    subscription?.status === "unpaid" ||
-    subscription?.status === "incomplete_expired";
+  // ── Card: Billing (Phase 6 migration) ──
+  // Truth states: active subscription → "Your plan is active"
+  //              payment issue → "Action required"
+  //              cancelled → "Plan inactive"
+  const subStatus = (subscription?.status || "").toLowerCase();
+  const billingActive = subStatus === "active" || subStatus === "trialing";
+  const billingPaymentIssue = ["past_due", "unpaid", "incomplete"].includes(subStatus);
+  const billingCancelled = ["canceled", "cancelled", "incomplete_expired"].includes(subStatus);
+  const deploymentCancelled = deployment?.deployment_status === "cancelled";
+
   const billing = buildCardState({
     cardKey: "billing",
-    liveText: "Your subscription is active.",
+    liveText: "Your plan is active.",
     needsProofText: "Billing is being set up.",
-    blockedText: billingBlocked ? "Your subscription needs attention." : "Billing is temporarily unavailable.",
+    blockedText: billingPaymentIssue ? "Action required — please update your payment method." : "Billing is temporarily unavailable.",
     setupText: "Billing will be available after checkout is complete.",
     syncingText: "Billing information is syncing.",
-    proofResult: subscription?.status === "active" ? { proof: { id: "subscription" }, isFresh: true, isStale: false, testedAt: new Date().toISOString() } : null,
+    proofResult: billingActive
+      ? { proof: { id: "subscription" }, isFresh: true, isStale: false, testedAt: new Date().toISOString(), source: "proof_log" }
+      : null,
     envTrust: "production",
     setupComplete: !!subscription,
-    hasBlockingCondition: billingBlocked,
-    adminDetail: billingBlocked ? `subscription status: ${subscription?.status}` : null,
+    hasBlockingCondition: billingPaymentIssue || billingCancelled || deploymentCancelled,
+    adminDetail: billingPaymentIssue
+      ? `Subscription status: ${subStatus} — payment action required`
+      : billingCancelled
+        ? `Subscription status: ${subStatus} — plan inactive`
+        : deploymentCancelled
+          ? "Deployment status: cancelled"
+          : null,
+    deployment,
+    sourceOfTruth: "deployment",
   });
 
   // ── Card: Website Scan ──
@@ -533,6 +712,8 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     setupComplete,
     hasBlockingCondition: false,
     adminDetail: "No WebsiteIntelligenceScan proof log found",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "none",
   });
 
   // ── Card: Timeline ──
@@ -548,6 +729,8 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     setupComplete: !!order,
     hasBlockingCondition: false,
     adminDetail: "Timeline derived from order/project events",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Card: Activity Log ──
@@ -558,11 +741,15 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     blockedText: "Activity log is temporarily unavailable.",
     setupText: "Activity will appear after your system is live.",
     syncingText: "Activity log is syncing.",
-    proofResult: rawEvents.length > 0 ? { proof: { id: "events" }, isFresh: true, isStale: false, testedAt: new Date().toISOString() } : null,
+    proofResult: rawEvents.length > 0
+      ? { proof: { id: "events" }, isFresh: true, isStale: false, testedAt: new Date().toISOString(), source: "execution_log" }
+      : null,
     envTrust,
     setupComplete,
     hasBlockingCondition: false,
     adminDetail: `${rawEvents.length} production-trusted events available`,
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Card: Support ──
@@ -573,11 +760,12 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     blockedText: "Support is temporarily unavailable.",
     setupText: "Support is available — reach out anytime.",
     syncingText: "Support is available.",
-    proofResult: { proof: { id: "always" }, isFresh: true, isStale: false, testedAt: new Date().toISOString() },
+    proofResult: { proof: { id: "always" }, isFresh: true, isStale: false, testedAt: new Date().toISOString(), source: "proof_log" },
     envTrust: "production",
     setupComplete: true,
     hasBlockingCondition: false,
     adminDetail: "Support card is always available",
+    sourceOfTruth: "none",
   });
 
   // ── Card: Reports ──
@@ -590,9 +778,11 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     syncingText: "Reports are syncing.",
     proofResult: null,
     envTrust,
-    setupComplete: setupComplete && allServicesLive,
+    setupComplete: setupComplete && (allServicesLive || deploymentIsLive),
     hasBlockingCondition: false,
     adminDetail: "No weekly report proof found",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Card: Documents ──
@@ -608,6 +798,8 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     setupComplete: !!project,
     hasBlockingCondition: false,
     adminDetail: "No document proof found",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Card: Recommendations ──
@@ -620,9 +812,11 @@ export function normalizePortalState(rawContext, proofLogs = []) {
     syncingText: "Recommendations are syncing.",
     proofResult: null,
     envTrust,
-    setupComplete: setupComplete && allServicesLive,
+    setupComplete: setupComplete && (allServicesLive || deploymentIsLive),
     hasBlockingCondition: false,
     adminDetail: "No recommendation proof found",
+    deployment,
+    sourceOfTruth: deployment ? "deployment" : "legacy",
   });
 
   // ── Assemble normalized state ──
@@ -631,16 +825,20 @@ export function normalizePortalState(rawContext, proofLogs = []) {
       generated_at: new Date().toISOString(),
       env_trust: envTrust,
       setup_complete: setupComplete,
-      has_blocking_condition: hasBlockingCondition,
+      has_blocking_condition: hasGlobalBlockingCondition,
       proof_logs_count: proofLogs.length,
+      execution_logs_count: executionLogs.length,
       production_events_count: rawEvents.length,
       is_admin_preview: ctx.is_admin_preview || false,
-      // PHASE 3: Deployment source-of-truth metadata
+      // Phase 3.5: Deployment source-of-truth metadata
       has_deployment: !!deployment,
       deployment_id: deployment?.id || null,
       deployment_status: deployment?.deployment_status || null,
       deployment_package_tier: deployment?.package_tier_key || null,
       deployment_industry: deployment?.industry_slug || null,
+      deployment_is_paused: isPaused,
+      deployment_activated_modules: deployment?.activated_modules || [],
+      source_of_truth: deployment ? "deployment" : "legacy",
     },
     cards: {
       system_readiness: systemReadiness,
@@ -669,10 +867,6 @@ export function normalizePortalState(rawContext, proofLogs = []) {
 
 // ── Helper: get card by key safely ───────────────────────
 
-/**
- * Safely retrieve a card's normalized state.
- * Returns a Blocked fallback if the card key doesn't exist.
- */
 export function getCardState(portalState, cardKey) {
   if (!portalState?.cards) {
     return {
@@ -681,6 +875,11 @@ export function getCardState(portalState, cardKey) {
       display_text: "This section is temporarily unavailable.",
       admin_diagnostics: "Portal state not loaded",
       proof_metadata: { has_proof: false, last_verified: null, proof_log_id: null, environment: "unknown", freshness: "none" },
+      source_of_truth: "none",
+      deployment_id: null,
+      module_key: null,
+      proof_status: null,
+      last_verified: null,
     };
   }
   const card = portalState.cards[cardKey];
@@ -691,6 +890,11 @@ export function getCardState(portalState, cardKey) {
       display_text: "This section is temporarily unavailable.",
       admin_diagnostics: `Unknown card key: ${cardKey}`,
       proof_metadata: { has_proof: false, last_verified: null, proof_log_id: null, environment: "unknown", freshness: "none" },
+      source_of_truth: "none",
+      deployment_id: null,
+      module_key: null,
+      proof_status: null,
+      last_verified: null,
     };
   }
   return card;

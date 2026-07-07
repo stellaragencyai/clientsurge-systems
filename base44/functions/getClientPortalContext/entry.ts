@@ -364,6 +364,26 @@ Deno.serve(async (req) => {
       (e) => e.status !== "failed" && e.direction !== "inbound" && !(e.event_type || "").includes("portal_login")
     );
 
+    // ── PHASE 3.5: Fetch AutomationExecutionLog records for secondary proof ──
+    // These are fetched server-side because the entity RLS requires client_id
+    // matching, which most portal users don't have on their User record.
+    let executionLogs = [];
+    try {
+      const execQuery = {};
+      if (deployment?.id) {
+        execQuery.client_deployment_id = deployment.id;
+      } else if (order.client_id) {
+        execQuery.client_id = order.client_id;
+      }
+      if (Object.keys(execQuery).length > 0) {
+        executionLogs = await base44.asServiceRole.entities.AutomationExecutionLog.filter(
+          execQuery, "-started_at", 50
+        );
+      }
+    } catch {
+      // Non-critical — engine degrades gracefully without execution logs
+    }
+
     // Readiness check — not "Live" if recent critical failures exist
     const hasFailedNonProof = failedEvents.some(
       (e) =>
@@ -402,6 +422,7 @@ Deno.serve(async (req) => {
         recent_failed_events_count: failedEvents.length,
         recent_proof_events_count: proofEvents.length,
         recent_events: recentEvents.slice(0, 50),
+        execution_logs: executionLogs || [],
       },
     });
   } catch (error) {

@@ -12,6 +12,7 @@ import {
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, PieChart, Layers, DollarSign, Inbox, RefreshCw,
   Server, RotateCcw, BookOpen, Star, ArrowLeft, ShieldCheck, ListChecks, Ban,
+  Sparkles,
 } from "lucide-react";
 import AdminGlobalSearch from "./AdminGlobalSearch";
 import DarkModeToggle from "./DarkModeToggle";
