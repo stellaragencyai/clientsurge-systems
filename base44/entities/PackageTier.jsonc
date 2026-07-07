@@ -1,0 +1,105 @@
+{
+  "name": "PackageTier",
+  "type": "object",
+  "title": "Package Tier Configuration",
+  "description": "Defines which automation modules are included at each package tier. Acts as the source of truth for permission enforcement. Synced with Stripe products.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "tier_key": {
+      "type": "string",
+      "title": "Tier Key",
+      "description": "Unique identifier (e.g., 'starter', 'growth', 'pro')"
+    },
+    "name": {
+      "type": "string",
+      "title": "Display Name"
+    },
+    "rank": {
+      "type": "number",
+      "title": "Rank",
+      "description": "Numeric ordering (1=Starter, 2=Growth, 3=Pro)",
+      "default": 1
+    },
+    "enabled_module_keys": {
+      "type": "array",
+      "title": "Enabled Module Keys",
+      "items": {
+        "type": "string"
+      },
+      "description": "AutomationModule keys included in this tier"
+    },
+    "stripe_product_id": {
+      "type": "string",
+      "title": "Stripe Product ID",
+      "description": "Stripe product ID for this tier (e.g., prod_xxx)"
+    },
+    "stripe_price_id": {
+      "type": "string",
+      "title": "Stripe Price ID",
+      "description": "Stripe price ID for recurring billing (e.g., price_xxx)"
+    },
+    "one_time_price_id": {
+      "type": "string",
+      "title": "One-Time Setup Price ID",
+      "description": "Stripe price ID for one-time setup fee (e.g., price_xxx)"
+    },
+    "monthly_price_cents": {
+      "type": "number",
+      "title": "Monthly Price (cents)"
+    },
+    "setup_fee_cents": {
+      "type": "number",
+      "title": "Setup Fee (cents)"
+    },
+    "upgrade_path": {
+      "type": "string",
+      "title": "Upgrade Path",
+      "description": "Next tier key for upgrade flow (e.g., starter \u2192 growth)"
+    },
+    "features_summary": {
+      "type": "array",
+      "title": "Features Summary",
+      "items": {
+        "type": "string"
+      },
+      "description": "Marketing-friendly feature list for display"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "active",
+        "deprecated",
+        "hidden"
+      ],
+      "default": "active"
+    }
+  },
+  "required": [
+    "tier_key",
+    "name",
+    "rank"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

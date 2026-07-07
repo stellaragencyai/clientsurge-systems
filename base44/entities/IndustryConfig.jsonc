@@ -1,0 +1,347 @@
+{
+  "name": "IndustryConfig",
+  "type": "object",
+  "title": "Industry Configuration",
+  "description": "Represents a complete Vertical AI Growth System configuration \u2014 marketing content, AI personality, lead intelligence, and branding for a specific industry vertical.",
+  "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "slug": {
+      "type": "string",
+      "title": "Slug",
+      "description": "Unique URL-safe identifier (e.g., 'hvac-ai-growth-system')"
+    },
+    "display_name": {
+      "type": "string",
+      "title": "Display Name",
+      "description": "Human-readable name (e.g., 'HVAC AI Growth System')"
+    },
+    "industry_category": {
+      "type": "string",
+      "title": "Industry Category",
+      "description": "Broad category (e.g., 'Trade Services', 'Healthcare', 'Legal')"
+    },
+    "status": {
+      "type": "string",
+      "title": "Status",
+      "enum": [
+        "draft",
+        "published",
+        "archived"
+      ],
+      "default": "draft"
+    },
+    "version": {
+      "type": "string",
+      "title": "Version",
+      "default": "1.0.0",
+      "description": "Content version for this industry config"
+    },
+    "schema_version": {
+      "type": "string",
+      "title": "Schema Version",
+      "default": "1.0.0",
+      "description": "Platform schema version this config was built against"
+    },
+    "branding_config": {
+      "type": "object",
+      "title": "Branding Configuration",
+      "properties": {
+        "primary_color": {
+          "type": "string"
+        },
+        "secondary_color": {
+          "type": "string"
+        },
+        "asset_map": {
+          "type": "object",
+          "properties": {
+            "hero_image": {
+              "type": "string"
+            },
+            "logo": {
+              "type": "string"
+            },
+            "favicon": {
+              "type": "string"
+            },
+            "og_image": {
+              "type": "string"
+            }
+          }
+        },
+        "layout_options": {
+          "type": "object",
+          "properties": {
+            "hero_style": {
+              "type": "string"
+            },
+            "section_order": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    "website_content": {
+      "type": "object",
+      "title": "Website Content Registry",
+      "properties": {
+        "hero_config": {
+          "type": "object",
+          "properties": {
+            "headline": {
+              "type": "string"
+            },
+            "subheadline": {
+              "type": "string"
+            },
+            "cta_text": {
+              "type": "string"
+            },
+            "cta_destination": {
+              "type": "string"
+            }
+          }
+        },
+        "pain_points": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "use_cases": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "title": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "metrics": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "services": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "name": {
+                "type": "string"
+              },
+              "description": {
+                "type": "string"
+              },
+              "urgency_level": {
+                "type": "string"
+              },
+              "cta": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "faq": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "question": {
+                "type": "string"
+              },
+              "answer": {
+                "type": "string"
+              },
+              "category": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "seo_config": {
+          "type": "object",
+          "properties": {
+            "meta_title": {
+              "type": "string"
+            },
+            "meta_description": {
+              "type": "string"
+            },
+            "keywords": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "og_title": {
+              "type": "string"
+            },
+            "og_description": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ai_config": {
+      "type": "object",
+      "title": "AI Configuration",
+      "properties": {
+        "ai_personality_id": {
+          "type": "string",
+          "description": "Reference to AI personality profile"
+        },
+        "ai_role": {
+          "type": "string",
+          "description": "e.g., '24/7 HVAC customer assistant'"
+        },
+        "ai_tone": {
+          "type": "string",
+          "description": "e.g., 'professional, reassuring, urgent'"
+        },
+        "system_prompt_overrides": {
+          "type": "string",
+          "description": "Additional system prompt instructions specific to this industry"
+        },
+        "knowledge_base_id": {
+          "type": "string",
+          "description": "Reference to industry knowledge base / RAG document store"
+        },
+        "escalation_rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "trigger": {
+                "type": "string"
+              },
+              "action": {
+                "type": "string"
+              },
+              "recipient": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "booking_rules": {
+          "type": "object",
+          "properties": {
+            "booking_link": {
+              "type": "string"
+            },
+            "booking_window_hours": {
+              "type": "number"
+            },
+            "emergency_routing": {
+              "type": "boolean"
+            }
+          }
+        },
+        "prohibited_responses": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "lead_crm_config": {
+      "type": "object",
+      "title": "Lead & CRM Configuration",
+      "properties": {
+        "lead_types": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "key": {
+                "type": "string"
+              },
+              "label": {
+                "type": "string"
+              },
+              "urgency": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "qualification_workflow": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": {
+                "type": "string"
+              },
+              "question": {
+                "type": "string"
+              },
+              "field_type": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "pipeline_template": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "stage": {
+                "type": "string"
+              },
+              "order": {
+                "type": "number"
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "required": [
+    "slug",
+    "display_name",
+    "status"
+  ],
+  "rls": {
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {},
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}
