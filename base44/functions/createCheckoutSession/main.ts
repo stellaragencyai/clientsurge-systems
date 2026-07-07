@@ -316,9 +316,8 @@ Deno.serve(async (req) => {
         const failedMessage = error instanceof Error ? error.message : String(error);
         await createClientFromRequest(req).asServiceRole.entities.Order.update(createdOrderId, {
           payment_status: "failed",
-          order_status: "failed",
           pipeline_error: failedMessage,
-          notes: `Checkout session creation failed: ${failedMessage}`,
+          notes: `Checkout session creation failed (request_id: ${requestId}): ${failedMessage}`,
         });
       } catch {
         // Preserve the original Stripe error response even if order cleanup fails.

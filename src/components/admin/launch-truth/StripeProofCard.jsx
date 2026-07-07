@@ -62,6 +62,35 @@ export default function StripeProofCard({ stripeData, onboardingData, onRerun, l
         <StatusBadge status={evidenceStatus} />
       </div>
 
+      {/* Webhook Configuration Notice */}
+      <div className="rounded-lg border border-blue-200 bg-blue-50 p-3 space-y-1.5">
+        <p className="text-xs font-bold text-blue-800 flex items-center gap-1.5">
+          <AlertCircle className="w-3.5 h-3.5" />
+          Stripe Webhook Endpoint
+        </p>
+        <p className="text-xs text-blue-700">
+          <span className="font-semibold">Canonical Dashboard endpoint:</span>{" "}
+          <code className="bg-blue-100 px-1 rounded text-[10px] break-all">https://clientsurgesystems.com/api/functions/stripeWebhookOrders</code>
+        </p>
+        <p className="text-xs text-blue-700">
+          The Base44 app/preview URL is <span className="font-semibold">fallback/testing only</span> and must not be used as the active Stripe Dashboard endpoint.
+        </p>
+        <p className="text-xs text-blue-700">
+          {stripeData?.webhook_delivery_proven
+            ? "✅ Webhook delivery proven — at least one Stripe event has been received and logged in Base44 records."
+            : "⚠ Webhook URL configured, delivery not yet proven — no Stripe event delivery evidence found in Base44 records."}
+        </p>
+      </div>
+
+      {/* Pending Checkout Notice */}
+      <div className="rounded-lg border border-amber-200 bg-amber-50 p-3">
+        <p className="text-xs text-amber-700">
+          <span className="font-semibold">Note:</span> Pending checkout records with no event proof should be treated as{" "}
+          <span className="font-semibold">incomplete checkout attempts</span>, not automatically as webhook failures.
+          A pending order only becomes a webhook concern if a successful Stripe checkout was completed but no webhook event arrived.
+        </p>
+      </div>
+
       {/* Latest Paid Order — Full Field Display */}
       {order ? (
         <div className="rounded-lg border border-border bg-muted/20 p-3 space-y-1.5">
