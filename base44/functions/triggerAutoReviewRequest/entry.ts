@@ -1,4 +1,3 @@
-import { secureJson } from "../_shared/response.ts";
 /**
  * Auto Review Request Trigger
  * Called via entity automation when Order.order_status = "fully_live"
@@ -6,6 +5,13 @@ import { secureJson } from "../_shared/response.ts";
  */
 
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", "Cache-Control": "no-store", ...(init.headers || {}) },
+  });
+}
 
 Deno.serve(async (req) => {
   try {
@@ -41,6 +47,48 @@ Deno.serve(async (req) => {
         skipped: true,
         reason: "No phone or email on order",
       });
+    }
+
+    // ── PART 4: PACKAGE PERMISSION ENFORCEMENT ──
+    // Resolve ClientDeployment and check module permission before sending review request.
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (order.client_id) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: order.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'review_reactivation'
+          });
+          if (permRes.data?.authorized !== true) {
+            // PART 5: Log blocked execution
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: order.client_id,
+              module_key: 'review_reactivation', trigger_event: 'order_fully_live',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+            }).catch(() => {});
+            return secureJson({
+              blocked: true,
+              reason: permRes.data?.reason,
+              message: 'Module not authorized for this deployment',
+            }, { status: 403 });
+          }
+          _obsCtx = {
+            deployment_id: deployment.id,
+            client_id: order.client_id,
+            module_key: 'review_reactivation',
+            trigger_event: 'order_fully_live'
+          };
+        }
+      } catch (err) {
+        console.warn('[AutoReviewRequest] Permission check failed:', err.message);
+      }
     }
 
     // ─────────────────────────────────────────────────────────

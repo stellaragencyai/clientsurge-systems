@@ -54,6 +54,51 @@ Deno.serve(async (req) => {
       return Response.json({ skipped: true, reason: 'test_lead', lead_id });
     }
 
+    // ── PART 4: PACKAGE PERMISSION ENFORCEMENT ──
+    // Resolve ClientDeployment and check module permission before creating any automation jobs.
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (lead.client_id) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: lead.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'instant_lead_response'
+          });
+          if (permRes.data?.authorized !== true) {
+            // PART 5: Log blocked execution
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: lead.client_id,
+              module_key: 'instant_lead_response', trigger_event: 'lead_created',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+              lead_id: lead_id,
+            }).catch(() => {});
+            return Response.json({
+              blocked: true,
+              reason: permRes.data?.reason,
+              message: 'Module not authorized for this deployment',
+              lead_id
+            }, { status: 403 });
+          }
+          _obsCtx = {
+            deployment_id: deployment.id,
+            client_id: lead.client_id,
+            module_key: 'instant_lead_response',
+            trigger_event: 'lead_created',
+            lead_id: lead_id
+          };
+        }
+      } catch (err) {
+        console.warn('[handleInstantLeadResponse] Permission check failed:', err.message);
+      }
+    }
+
     // 3. Log workflow_triggered
     const workflowEvent = await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id,
@@ -225,6 +270,21 @@ Deno.serve(async (req) => {
           console.warn('[handleInstantLeadResponse] DashboardTruthCheck create failed:', err.message)
         );
       }
+    }
+
+    // ── PART 5: LOG AUTOMATION EXECUTION ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: jobs.length > 0 ? 'completed' : 'skipped',
+          response_data: JSON.stringify({
+            jobs_created: jobs.length,
+            job_types: jobs.map(j => j.job_type),
+          }),
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
     }
 
     return Response.json({

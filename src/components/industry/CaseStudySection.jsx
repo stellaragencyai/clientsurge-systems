@@ -1,9 +1,42 @@
-import { TrendingUp, CheckCircle2 } from 'lucide-react';
+import { TrendingUp } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
 
+/**
+ * CaseStudySection — PART 1 FIX
+ *
+ * Previously rendered fabricated case studies with fake names, businesses, and
+ * revenue metrics. Now renders a safe empty state until real verified client
+ * proof is added.
+ */
 export default function CaseStudySection({ industry }) {
-  if (!industry?.case_study) return null;
+  if (!industry?.case_study) {
+    // Safe empty state — no fabricated proof to display
+    return (
+      <section className="py-14 md:py-20 px-4 md:px-6 bg-white">
+        <div className="max-w-3xl mx-auto text-center">
+          <SectionHeader
+            eyebrow="Case Study"
+            title="Verified Client Proof Coming Soon"
+            align="center"
+          />
+          <div className="mt-8 rounded-2xl border border-dashed border-border bg-muted/30 p-8 md:p-12">
+            <div className="flex flex-col items-center gap-4">
+              <div className="flex items-center justify-center w-14 h-14 rounded-2xl bg-primary/8 border border-primary/15">
+                <TrendingUp className="w-6 h-6 text-primary" />
+              </div>
+              <p className="text-sm md:text-base text-muted-foreground leading-relaxed max-w-xl">
+                Verified client proof has not been added yet. This section will display
+                real case studies, results, and outcome data after client deployment and
+                verification.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
+  // If real verified case_study data is provided in the future, render it here
   const cs = industry.case_study;
 
   return (
@@ -15,7 +48,6 @@ export default function CaseStudySection({ industry }) {
           align="center"
         />
 
-        {/* Big metric */}
         <div className="mt-8 mb-10 text-center">
           <div className="inline-flex flex-col items-center rounded-2xl border border-primary/15 bg-gradient-to-br from-primary/5 to-transparent px-8 py-6">
             <span className="text-4xl md:text-5xl font-titles font-black text-primary tracking-tight">{cs.metric}</span>
@@ -23,7 +55,6 @@ export default function CaseStudySection({ industry }) {
           </div>
         </div>
 
-        {/* Challenge & Solution */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8">
           <div className="rounded-2xl border border-red-100 bg-red-50/50 p-6 md:p-7">
             <div className="flex items-center gap-2 mb-4">
@@ -46,18 +77,19 @@ export default function CaseStudySection({ industry }) {
           </div>
         </div>
 
-        {/* Results */}
-        <div className="mt-8 rounded-2xl border border-primary/15 bg-gradient-to-br from-[#003b8f] to-[#00aeef] p-6 md:p-8">
-          <h3 className="text-center text-white font-titles text-xl md:text-2xl font-bold mb-6">Results</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            {cs.results.map((result, i) => (
-              <div key={i} className="flex items-start gap-3 rounded-xl border border-white/15 bg-white/10 p-4">
-                <CheckCircle2 className="w-5 h-5 text-white flex-shrink-0 mt-0.5" />
-                <p className="text-sm md:text-base text-white font-semibold leading-relaxed">{result}</p>
-              </div>
-            ))}
+        {cs.results?.length > 0 && (
+          <div className="mt-8 rounded-2xl border border-primary/15 bg-gradient-to-br from-[#003b8f] to-[#00aeef] p-6 md:p-8">
+            <h3 className="text-center text-white font-titles text-xl md:text-2xl font-bold mb-6">Results</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {cs.results.map((result, i) => (
+                <div key={i} className="flex items-start gap-3 rounded-xl border border-white/15 bg-white/10 p-4">
+                  <span className="text-white flex-shrink-0 mt-0.5">✓</span>
+                  <p className="text-sm md:text-base text-white font-semibold leading-relaxed">{result}</p>
+                </div>
+              ))}
+            </div>
           </div>
-        </div>
+        )}
       </div>
     </section>
   );

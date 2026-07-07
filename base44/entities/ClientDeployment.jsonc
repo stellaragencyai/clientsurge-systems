@@ -70,16 +70,22 @@
     "module_installation_status": {
       "type": "object",
       "title": "Module Installation Status",
-      "description": "Per-module verification status \u2014 tracks whether each module is truly installed and verified, not just listed as active",
+      "description": "Per-module verification status \u2014 tracks whether each module is truly installed and verified, not just listed as active. Initialized to {} on creation \u2014 each module property defaults to 'not_started' via property-level default.",
+      "default": {},
       "properties": {
         "instant_lead_response": {
           "type": "string",
           "enum": [
             "not_started",
+            "needs_setup",
+            "connected",
+            "test_mode",
+            "tested",
+            "failed",
+            "ready",
             "installing",
             "installed",
-            "verified",
-            "failed"
+            "verified"
           ],
           "default": "not_started"
         },
@@ -87,10 +93,15 @@
           "type": "string",
           "enum": [
             "not_started",
+            "needs_setup",
+            "connected",
+            "test_mode",
+            "tested",
+            "failed",
+            "ready",
             "installing",
             "installed",
-            "verified",
-            "failed"
+            "verified"
           ],
           "default": "not_started"
         },
@@ -98,10 +109,15 @@
           "type": "string",
           "enum": [
             "not_started",
+            "needs_setup",
+            "connected",
+            "test_mode",
+            "tested",
+            "failed",
+            "ready",
             "installing",
             "installed",
-            "verified",
-            "failed"
+            "verified"
           ],
           "default": "not_started"
         },
@@ -109,10 +125,15 @@
           "type": "string",
           "enum": [
             "not_started",
+            "needs_setup",
+            "connected",
+            "test_mode",
+            "tested",
+            "failed",
+            "ready",
             "installing",
             "installed",
-            "verified",
-            "failed"
+            "verified"
           ],
           "default": "not_started"
         },
@@ -120,10 +141,15 @@
           "type": "string",
           "enum": [
             "not_started",
+            "needs_setup",
+            "connected",
+            "test_mode",
+            "tested",
+            "failed",
+            "ready",
             "installing",
             "installed",
-            "verified",
-            "failed"
+            "verified"
           ],
           "default": "not_started"
         },
@@ -131,10 +157,15 @@
           "type": "string",
           "enum": [
             "not_started",
+            "needs_setup",
+            "connected",
+            "test_mode",
+            "tested",
+            "failed",
+            "ready",
             "installing",
             "installed",
-            "verified",
-            "failed"
+            "verified"
           ],
           "default": "not_started"
         }

@@ -427,6 +427,14 @@ const AuthenticatedAppWithTenant = () => {
       ))}
       <Route path="/industries/real-estate" element={<Navigate to="/real-estate" replace />} />
       <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
+      {/* PART 6: Scalable dynamic /industries/:slug → /:slug redirect */}
+      {INDUSTRY_ROUTE_SLUGS.map((slug) => (
+        <Route
+          key={`industries-${slug}`}
+          path={`/industries/${slug}`}
+          element={<Navigate to={`/${slug}`} replace />}
+        />
+      ))}
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />

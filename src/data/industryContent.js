@@ -669,14 +669,18 @@ export function getIndustryContent(slug) {
 }
 
 // ── Helper: merge marketing config with content enrichment ──
+// PART 1 FIX: case_study and testimonials are set to null/empty because they
+// contain fabricated proof data that must NOT be rendered until real verified
+// client proof is added. The source data is retained but suppressed from output.
 export function getMergedIndustryData(slug, marketingData) {
   const content = INDUSTRY_CONTENT[slug];
-  if (!content) return marketingData;
+  if (!content) return { ...marketingData, case_study: null, testimonials: [] };
   return {
     ...marketingData,
     hero_image: content.hero_image,
     automation_tiers: content.automation_tiers,
-    case_study: content.case_study,
-    testimonials: content.testimonials,
+    // Fabricated proof suppressed — see PART 1 FIX comment above
+    case_study: null,
+    testimonials: [],
   };
 }

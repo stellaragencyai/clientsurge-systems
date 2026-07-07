@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { getIndustryBySlug } from '@/data/industryMarketingConfig';
 import { getMergedIndustryData } from '@/data/industryContent';
 import { getPremiumContent } from '@/data/industryPremiumContent';
+import { buildIndustryPricingUrl, buildIndustrySignupUrl } from '@/lib/industryCtaHelpers';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
 import IndustryHero from '@/components/industry/IndustryHero';
@@ -73,7 +74,7 @@ export default function IndustryPageTemplate() {
         subheadline: premium.hero.subheadline,
         description: premium.hero.description,
         backgroundImage: industry.hero_image || null,
-        primaryCTA: { label: premium.hero.primaryCTA, path: '/pricing' },
+        primaryCTA: { label: premium.hero.primaryCTA, path: buildIndustryPricingUrl(slug, 'industry_hero') },
         secondaryCTA: { label: premium.hero.secondaryCTA, path: '/automations' },
       }
     : {
@@ -82,7 +83,7 @@ export default function IndustryPageTemplate() {
         subheadline: industry.hero_subheadline,
         description: industry.hero_description,
         backgroundImage: industry.hero_image || null,
-        primaryCTA: { label: industry.primary_cta, path: '/pricing' },
+        primaryCTA: { label: industry.primary_cta, path: buildIndustryPricingUrl(slug, 'industry_hero') },
         secondaryCTA: { label: industry.secondary_cta, path: '/automations' },
       };
 
@@ -123,23 +124,18 @@ export default function IndustryPageTemplate() {
 
           <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 
-          {industry.testimonials?.length > 0 && (
-            <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
-              <div className="max-w-5xl mx-auto">
-                <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
-                  {industry.testimonials.map((testimonial, i) => (
-                    <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
-                      <p className="font-titles text-xl md:text-2xl font-bold text-primary mb-4">{testimonial.metric}</p>
-                      <blockquote className="text-sm md:text-base text-foreground/80 mb-5 italic leading-relaxed">&quot;{testimonial.quote}&quot;</blockquote>
-                      <p className="font-bold text-foreground text-sm md:text-base">{testimonial.name}</p>
-                      <p className="text-xs md:text-sm text-muted-foreground">{testimonial.business}</p>
-                    </div>
-                  ))}
-                </div>
+          {/* PART 1 FIX: Testimonials removed — no verified proof. Safe empty state shown. */}
+          <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
+            <div className="max-w-3xl mx-auto text-center">
+              <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
+              <div className="mt-8 rounded-2xl border border-dashed border-border bg-muted/30 p-8 md:p-12">
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  Verified client proof has not been added yet. This section will display
+                  real reviews, testimonials, and results after client deployment and verification.
+                </p>
               </div>
-            </section>
-          )}
+            </div>
+          </section>
 
           <IndustryBenefitsSection benefits={premium.benefits} />
 
@@ -225,23 +221,18 @@ export default function IndustryPageTemplate() {
 
           <IndustrySuccessGallery industry={industry} industrySlug={slug} />
 
-          {industry.testimonials?.length > 0 && (
-            <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
-              <div className="max-w-5xl mx-auto">
-                <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 md:gap-8 mt-8">
-                  {industry.testimonials.map((testimonial, i) => (
-                    <div key={i} className={`${PREMIUM_SURFACE} p-6 md:p-8`}>
-                      <p className="font-titles text-xl md:text-2xl font-bold text-primary mb-4">{testimonial.metric}</p>
-                      <blockquote className="text-sm md:text-base text-foreground/80 mb-5 italic leading-relaxed">&quot;{testimonial.quote}&quot;</blockquote>
-                      <p className="font-bold text-foreground text-sm md:text-base">{testimonial.name}</p>
-                      <p className="text-xs md:text-sm text-muted-foreground">{testimonial.business}</p>
-                    </div>
-                  ))}
-                </div>
+          {/* PART 1 FIX: Testimonials removed — no verified proof. Safe empty state shown. */}
+          <section className="py-14 md:py-20 px-4 md:px-6 bg-white/80">
+            <div className="max-w-3xl mx-auto text-center">
+              <SectionHeader eyebrow="Proof" title={`Verified ${industry.industry_name} Proof`} align="center" />
+              <div className="mt-8 rounded-2xl border border-dashed border-border bg-muted/30 p-8 md:p-12">
+                <p className="text-sm md:text-base text-muted-foreground leading-relaxed">
+                  Verified client proof has not been added yet. This section will display
+                  real reviews, testimonials, and results after client deployment and verification.
+                </p>
               </div>
-            </section>
-          )}
+            </div>
+          </section>
 
           <section className="py-14 md:py-20 px-4 md:px-6">
             <div className="max-w-5xl mx-auto">
@@ -269,7 +260,7 @@ export default function IndustryPageTemplate() {
               <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight">Install a {industry.industry_name} Lead Flow System</h2>
               <p className="mx-auto mt-4 max-w-2xl text-sm md:text-base leading-relaxed text-white/82">Compare packages, choose the system, and move into guided setup with a clearer path from first inquiry to booked appointment.</p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <button onClick={() => navigate('/pricing')} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition-transform hover:-translate-y-0.5" style={{ minHeight: '44px' }}>{industry.primary_cta}<ArrowRight className="w-4 h-4" /></button>
+                <button onClick={() => navigate(buildIndustryPricingUrl(slug, 'industry_final_cta'))} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition-transform hover:-translate-y-0.5" style={{ minHeight: '44px' }}>{industry.primary_cta}<ArrowRight className="w-4 h-4" /></button>
                 <button onClick={() => navigate('/automations')} className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 bg-white/10 text-sm font-bold text-white backdrop-blur hover:bg-white/16 transition-colors" style={{ minHeight: '44px' }}>View Automation Stack</button>
               </div>
             </div>

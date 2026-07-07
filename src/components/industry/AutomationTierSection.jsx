@@ -1,5 +1,6 @@
 import { CheckCircle, Zap, Phone, Calendar, Send, Star, MessageSquare } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
+import { buildIndustrySignupUrl } from '@/lib/industryCtaHelpers';
 
 const ICON_MAP = { Zap, Phone, Calendar, Send, Star, MessageSquare };
 
@@ -76,7 +77,7 @@ export default function AutomationTierSection({ industry }) {
               </div>
 
               <a
-                href={`/product-signup?package=${key}_system`}
+                href={buildIndustrySignupUrl(key, industry.slug, 'industry_automation_tier')}
                 className={`block w-full text-center rounded-full px-6 py-3 text-sm font-black transition-all duration-300 ${
                   highlight
                     ? 'text-white shadow-lg hover:-translate-y-0.5'

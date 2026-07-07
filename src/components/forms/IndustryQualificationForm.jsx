@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { CheckCircle2, AlertCircle, Loader2, ArrowRight } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import { trackCTA } from '@/lib/analytics';
+import { normalizeIndustryLeadPayload } from '@/lib/normalizeIndustryLeadPayload';
 import FloatingConfirmation from '@/components/ui/FloatingConfirmation';
 
 const formatPhone = (value) => {
@@ -120,18 +121,27 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
     setLoading(true);
     try {
       trackCTA(`industry_qualification_submit_${industrySlug}`, `/${industrySlug}`);
-      await base44.functions.invoke('submitLeadCapture', {
+      // PART 3 FIX: Normalize lead payload to ensure all required fields are present
+      const normalizedPayload = normalizeIndustryLeadPayload({
         full_name: form.full_name,
         email: form.email,
         phone: form.phone,
         business_name: form.business_name,
-        business_type: industryName,
+        industrySlug,
+        leadType: 'industry_qualification',
+        urgency: form.lead_volume || 'not_selected',
+        serviceRequested: 'automation_audit',
+        sourcePage: `/${industrySlug}`,
+        packageTier: 'not_selected',
         problem: `[Volume: ${form.lead_volume}] ${form.problem}`,
-        source: 'industry_qualification_form',
-        source_page: `/${industrySlug}`,
-        intake_type: 'industry_qualification',
         consent_given: form.consent,
         consent_source: `industry_page_${industrySlug}`,
+      });
+      await base44.functions.invoke('submitLeadCapture', {
+        ...normalizedPayload,
+        business_type: industryName,
+        source: 'industry_qualification_form',
+        intake_type: 'industry_qualification',
       });
       setSubmitted(true);
       setShowFloat(true);
