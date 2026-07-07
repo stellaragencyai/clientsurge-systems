@@ -1,0 +1,4 @@
+{
+  "name": "_shared/deploymentObservability",
+  "entry": "entry.ts"
+}

@@ -173,6 +173,38 @@ Deno.serve(async (req) => {
       lead_id,
     } = await req.json();
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (client_id) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'review_reactivation'
+          });
+          if (permRes.data?.authorized !== true) {
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: client_id,
+              module_key: 'review_reactivation', trigger_event: 'review_request',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+              lead_id: lead_id || null,
+            }).catch(() => {});
+            return secureJson({ success: false, blocked: true, reason: permRes.data?.reason, message: 'Module not authorized for this deployment' }, { status: 403 });
+          }
+          _obsCtx = { deployment_id: deployment.id, client_id: client_id, module_key: 'review_reactivation', trigger_event: 'review_request', lead_id: lead_id || null };
+        }
+      } catch (err) {
+        console.warn('[sendReviewRequest] Observability init failed:', err.message);
+      }
+    }
+
     // ── TENANT SCOPE GUARDRAIL (inlined) ──
     if (!client_id) {
       try {
@@ -296,6 +328,23 @@ Deno.serve(async (req) => {
 
     const allFailed = (preferred_channel === "sms" || preferred_channel === "both") && !smsSent
       && (preferred_channel === "email" || preferred_channel === "both") && !emailSent;
+
+    // ── DEPLOYMENT OBSERVABILITY: Log execution result ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: allFailed ? 'failed' : 'completed',
+          error_message: allFailed ? [smsError, emailError].filter(Boolean).join('; ') : null,
+          error_code: allFailed ? 'review_send_failed' : null,
+          external_provider_reference: smsId || emailId || null,
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+        if (allFailed) {
+          await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
+        }
+      } catch (_) {}
+    }
 
     return secureJson({
       success: !allFailed,

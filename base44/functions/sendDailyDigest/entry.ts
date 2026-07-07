@@ -71,6 +71,36 @@ Deno.serve(async (req) => {
       );
     }
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    // Daily digest runs across all leads; we check the first deployment that has daily_digest module
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    try {
+      const allDeployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+        { deployment_status: 'live' }, '-created_date', 50
+      );
+      // Find the first deployment that has daily_digest in activated_modules
+      const liveDep = (allDeployments || []).find(d => (d.activated_modules || []).includes('daily_digest'));
+      if (liveDep) {
+        const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+          deployment_id: liveDep.id, module_key: 'daily_digest'
+        });
+        if (permRes.data?.authorized !== true) {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            client_deployment_id: liveDep.id, client_id: liveDep.client_id,
+            module_key: 'daily_digest', trigger_event: 'scheduled_daily',
+            execution_status: 'blocked',
+            error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+            error_code: permRes.data?.reason || 'module_not_authorized',
+          }).catch(() => {});
+          return secureJson({ blocked: true, reason: permRes.data?.reason, message: 'daily_digest not authorized' }, { status: 403 });
+        }
+        _obsCtx = { deployment_id: liveDep.id, client_id: liveDep.client_id, module_key: 'daily_digest', trigger_event: 'scheduled_daily' };
+      }
+    } catch (err) {
+      console.warn('[sendDailyDigest] Observability init failed:', err.message);
+    }
+
     const allLeads = await base44.asServiceRole.entities.Leads.list('-updated_date', LEAD_LIMIT);
     const now = Date.now();
     const dayMs = 86400000;
@@ -159,9 +189,36 @@ Deno.serve(async (req) => {
       throw new Error(err?.message || `Resend error ${res.status}`);
     }
 
+    const result = await res.json().catch(() => ({}));
+
+    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'completed',
+          external_provider_reference: result?.id || null,
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
+    }
+
     return secureJson({ success: true, stats: { newToday, hot: hotLeads.length, overdue: overdueFollowUp.length, replied: replied.length } });
   } catch (error) {
     console.error('[sendDailyDigest] error:', error);
+    // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health check ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'failed',
+          error_message: error.message,
+          error_code: error.message.includes('Resend') ? 'resend_api_error' : 'digest_send_failed',
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+        await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
+      } catch (_) {}
+    }
     return secureJson({ error: error.message }, { status: 500 });
   }
 });

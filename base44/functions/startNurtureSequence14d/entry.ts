@@ -125,6 +125,38 @@ Deno.serve(async (req) => {
       return secureJson({ success: true, skipped: true, reason: "Active nurture campaign already exists for this lead." });
     }
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (lead.client_id) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: lead.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'lead_nurture'
+          });
+          if (permRes.data?.authorized !== true) {
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: lead.client_id,
+              module_key: 'lead_nurture', trigger_event: 'nurture_enrollment',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+              lead_id: leadId,
+            }).catch(() => {});
+            return secureJson({ success: false, blocked: true, reason: permRes.data?.reason, message: 'Module not authorized for this deployment' }, { status: 403 });
+          }
+          _obsCtx = { deployment_id: deployment.id, client_id: lead.client_id, module_key: 'lead_nurture', trigger_event: 'nurture_enrollment', lead_id: leadId };
+        }
+      } catch (err) {
+        console.warn('[startNurtureSequence14d] Observability init failed:', err.message);
+      }
+    }
+
     // ── Classify evidence quality ──
     const email = (lead.email || "").toLowerCase();
     const name = (lead.business_name || "").toLowerCase();
@@ -177,6 +209,18 @@ Deno.serve(async (req) => {
         enrolled_at: new Date().toISOString(),
       }),
     });
+
+    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'completed',
+          response_data: JSON.stringify({ campaign_id: campaign.id, evidence_quality: evidenceQuality }),
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
+    }
 
     return secureJson({
       success: true,

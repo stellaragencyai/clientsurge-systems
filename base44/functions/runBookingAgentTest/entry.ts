@@ -1,6 +1,12 @@
-import { secureJson } from "../_shared/response.ts";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { executeBookingSimulation, RuntimeExecutionError } from "../_shared/installRuntime.js";
+import { executeBookingSimulation, RuntimeExecutionError } from "../_shared/installRuntime/entry.ts";
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: { "Content-Type": "application/json", ...(init.headers || {}) },
+  });
+}
 
 async function requireAdmin(base44: ReturnType<typeof createClientFromRequest>) {
   const user = await base44.auth.me();
@@ -36,6 +42,37 @@ Deno.serve(async (req) => {
       return secureJson({ error: "Order not found" }, { status: 404 });
     }
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (order.client_id) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: order.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'ai_booking_agent'
+          });
+          if (permRes.data?.authorized !== true) {
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: order.client_id,
+              module_key: 'ai_booking_agent', trigger_event: 'booking_test',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+            }).catch(() => {});
+            return secureJson({ error: 'Module not authorized for this deployment', blocked: true, reason: permRes.data?.reason }, { status: 403 });
+          }
+          _obsCtx = { deployment_id: deployment.id, client_id: order.client_id, module_key: 'ai_booking_agent', trigger_event: 'booking_test' };
+        }
+      } catch (err) {
+        console.warn('[runBookingAgentTest] Observability init failed:', err.message);
+      }
+    }
+
     const result = await executeBookingSimulation({
       base44,
       order,
@@ -45,6 +82,18 @@ Deno.serve(async (req) => {
       leadPhone: lead_phone,
       scheduledAt: scheduled_at,
     });
+
+    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'completed',
+          response_data: JSON.stringify(result),
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
+    }
 
     return secureJson({
       success: true,

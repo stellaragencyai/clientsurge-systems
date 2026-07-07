@@ -210,6 +210,39 @@ Deno.serve(async (req) => {
       return json({ error: "Lead not found" }, 404);
     }
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    if (leadData.client_id) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: leadData.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'instant_lead_response'
+          });
+          if (permRes.data?.authorized !== true) {
+            // Permission denied — log block and exit
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: leadData.client_id,
+              module_key: 'instant_lead_response', trigger_event: 'lead_created',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+              lead_id,
+            }).catch(() => {});
+            return json({ error: 'Module not authorized for this deployment', blocked: true, reason: permRes.data?.reason }, 403);
+          }
+          _obsCtx = { deployment_id: deployment.id, client_id: leadData.client_id, module_key: 'instant_lead_response', trigger_event: 'lead_created', lead_id };
+        }
+      } catch (err) {
+        console.warn('[sendInstantLeadResponseSms] Observability init failed:', err.message);
+      }
+    }
+
     // Idempotency guard
     if (leadData.initial_response_sent_at) {
       return json({ success: false, reason: "Already sent" }, 409);
@@ -328,6 +361,19 @@ Deno.serve(async (req) => {
         trigger_name: "initial_response", to_address: normalizedPhone, canonical_to_address: normalizedPhone,
         delivery_status: "failed", error_message: smsError.message, skip_lead_update: true,
       }).catch(() => {});
+      // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health check ──
+      if (_obsCtx) {
+        try {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            ..._obsCtx,
+            execution_status: 'failed',
+            error_message: smsError.message,
+            error_code: smsError.message.includes('Twilio') ? 'twilio_api_error' : 'sms_send_failed',
+            execution_time_ms: Date.now() - _obsStartTime,
+          });
+          await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
+        } catch (_) {}
+      }
       return json({ error: smsError.message, normalized_phone: normalizedPhone }, 500);
     }
 
@@ -345,6 +391,19 @@ Deno.serve(async (req) => {
     } catch (_) {}
 
     await logSmsEvent(base44, lead_id, "sent", messageSid, null, sendClientId, sendClientProjectId);
+
+    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'completed',
+          external_provider_reference: messageSid,
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
+    }
+
     const statusCallbackUrl = Deno.env.get("TWILIO_SMS_STATUS_CALLBACK_URL");
     base44.asServiceRole.functions.invoke('logCommunication', {
       related_entity_type: "WebsiteLead", related_entity_id: lead_id,

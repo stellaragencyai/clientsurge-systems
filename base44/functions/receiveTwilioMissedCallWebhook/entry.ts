@@ -496,8 +496,71 @@ Deno.serve(async (req) => {
         : smsTemplate.replace("{first_name}", "there").replace("{business_name}", "our business")
     );
 
+    // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    const _missedCallClientId = lead?.client_id || null;
+    if (_missedCallClientId) {
+      try {
+        const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+          { client_id: _missedCallClientId, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+          '-created_date', 1
+        );
+        const deployment = deployments?.[0] || null;
+        if (deployment) {
+          const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+            deployment_id: deployment.id, module_key: 'missed_call_text_back'
+          });
+          if (permRes.data?.authorized !== true) {
+            await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+              client_deployment_id: deployment.id, client_id: _missedCallClientId,
+              module_key: 'missed_call_text_back', trigger_event: 'missed_call',
+              execution_status: 'blocked',
+              error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+              error_code: permRes.data?.reason || 'module_not_authorized',
+              lead_id: lead?.id || null,
+            }).catch(() => {});
+            return secureJson({ blocked: true, reason: permRes.data?.reason, message: 'Module not authorized for this deployment' }, { status: 403 });
+          }
+          _obsCtx = { deployment_id: deployment.id, client_id: _missedCallClientId, module_key: 'missed_call_text_back', trigger_event: 'missed_call', lead_id: lead?.id || null };
+        }
+      } catch (err) {
+        console.warn('[MissedCall] Observability init failed:', err.message);
+      }
+    }
+
     // Send SMS
-    const messageSid = await sendTwilioSms(normalizedPhone, messageBody);
+    let messageSid;
+    try {
+      messageSid = await sendTwilioSms(normalizedPhone, messageBody);
+    } catch (smsError) {
+      // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health check ──
+      if (_obsCtx) {
+        try {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            ..._obsCtx,
+            execution_status: 'failed',
+            error_message: smsError.message,
+            error_code: 'twilio_sms_failed',
+            execution_time_ms: Date.now() - _obsStartTime,
+          });
+          await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
+        } catch (_) {}
+      }
+      throw smsError;
+    }
+
+    // ── DEPLOYMENT OBSERVABILITY: Log successful execution ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'completed',
+          external_provider_reference: messageSid,
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
+    }
 
     // ─────────────────────────────────────────────────────────
     // STEP 2: Update lead and log missed-call inbound event
