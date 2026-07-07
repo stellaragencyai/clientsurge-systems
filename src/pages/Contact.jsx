@@ -171,7 +171,7 @@ export default function Contact() {
                 <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#0079c1] shadow-sm">
                   <MessageSquareText className="h-3.5 w-3.5" /> Contact command panel
                 </span>
-                <h2 className="font-titles text-3xl font-black leading-[1.02] tracking-[-0.04em] text-[#07111f] md:text-4xl">
+                <h2 className="font-titles text-3xl font-black leading-[1.02] tracking-[-0.04em] text-foreground md:text-4xl">
                   Contact ClientSurge Systems
                 </h2>
                 <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-600 md:text-base">
@@ -238,7 +238,7 @@ export default function Contact() {
                 <form onSubmit={handleSubmit} noValidate className="space-y-7">
                   <div>
                     <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-[#00AEEF]">Send a message</p>
-                    <h2 className="font-titles text-4xl font-black tracking-[-0.04em] text-slate-950 md:text-5xl">Contact Us</h2>
+                    <h2 className="font-titles text-4xl font-black tracking-[-0.04em] text-foreground md:text-5xl">Contact Us</h2>
                     <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
                       Share the basics and we will respond with a clear next step for your business.
                     </p>

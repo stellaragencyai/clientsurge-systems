@@ -40,7 +40,7 @@ export default function ROICalculator({ className = '' }) {
           <Calculator className="w-5 h-5 text-[#00AEEF]" />
         </div>
         <div>
-          <h3 className="font-titles text-xl font-bold text-black">
+          <h3 className="font-titles text-xl font-bold text-foreground">
             Lead Recovery ROI Calculator
           </h3>
           <p className="text-sm text-muted-foreground">

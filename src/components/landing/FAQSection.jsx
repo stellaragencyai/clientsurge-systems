@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, MessageCircle, Phone, Mail } from "lucide-react";
 import { FAQ_ITEMS } from "./FAQData";
+import SectionHeader from "@/components/design-system/SectionHeader";
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -25,21 +26,13 @@ export default function FAQSection() {
               <MessageCircle className="w-5 h-5" style={{ color: "#00AEEF" }} />
             </div>
 
-            <h2 className="font-display font-extrabold leading-[1.05] tracking-tight text-gray-900 mb-3"
-              style={{ fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)" }}
-            >
-              Find the Answers
-            </h2>
-            <h3 className="font-display font-extrabold leading-[1.05] tracking-tight mb-5"
-              style={{
-                fontSize: "clamp(1.75rem, 3.5vw, 2.75rem)",
-                color: "#00AEEF",
-              }}
-            >
-              to Your Questions
-            </h3>
+            <SectionHeader
+              eyebrow="FAQ"
+              title="Answers to Your Questions"
+              align="left"
+            />
 
-            <p className="text-sm leading-relaxed text-gray-500 max-w-sm">
+            <p className="text-sm leading-relaxed text-muted-foreground max-w-sm mt-4">
               If you have any other questions, feel free to reach out to us at{" "}
               <a
                 href="mailto:support@clientsurgesystems.com"

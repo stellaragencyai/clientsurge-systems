@@ -12,7 +12,7 @@ export default function FinalCTA() {
           <p className="cs-section-eyebrow">Ready to Install Your AI System?</p>
           <div className="cs-section-title-row justify-center" style={{ gap: "10px" }}>
             <span className="cs-section-bar" aria-hidden="true" />
-            <h2 className="cs-section-title" style={{ fontSize: "clamp(1.5rem, 3.8vw, 2.5rem)" }}>
+            <h2 className="cs-section-title">
               Add to Cart. Check Out. We Handle the Rest.
             </h2>
           </div>
@@ -55,7 +55,7 @@ export default function FinalCTA() {
           <Link
             to="/pricing"
             onClick={() => trackCTA("compare_packages", "final_cta")}
-            className="inline-flex items-center justify-center h-14 px-6 rounded-lg border-2 border-primary/30 bg-white text-sm font-semibold text-primary hover:bg-primary/10 hover:border-primary/50 transition-all duration-200"
+            className="btn-secondary"
           >
             Compare Packages <ArrowRight className="w-4 h-4 ml-1" />
           </Link>
