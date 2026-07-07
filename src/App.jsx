@@ -573,6 +573,8 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "saas-audit"), Component: SaaSAuditDashboard },
           { route: routePath("admin", "marketing"), Component: AIMarketingCommandCenter },
           { route: routePath("admin", "automation-activity"), Component: lazy(() => import("./pages/admin/AutomationActivity")) },
+          { route: routePath("admin", "deployment-control"), Component: lazy(() => import("./pages/admin/DeploymentControlCenter")) },
+          { route: routePath("admin", "deployment-control"), Component: lazy(() => import("./pages/admin/DeploymentControlCenter")) },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route
             key={route}

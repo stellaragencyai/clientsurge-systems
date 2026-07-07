@@ -1,48 +1,126 @@
 /**
- * PortalSidebar — Phase 4.3 reduced-overwhelm sidebar.
- * Primary nav visible: Dashboard, Setup Progress, Performance, Leads,
- * Reports, Billing, Support.
- * Lower-frequency tools (Settings) in a collapsible "More" group.
+ * PortalSidebar — Enhancement #6, #7
+ * Primary nav: Dashboard, Setup Progress, Performance, My Leads, Weekly Report, Billing, Support.
+ * Lower-frequency tools in collapsible groups: More Setup, Work Tools, Account Tools.
+ * Section badges shown only when real data exists — never fabricated.
  */
 import { useState } from "react";
 import {
   LayoutDashboard, Rocket, Zap, Target, Activity, Users, UserCheck,
   CheckSquare, ListChecks, CreditCard, FolderOpen, Calendar, Gift,
   MessageSquare, Package, FileText, Bell, Settings, LogOut, X, MapPin,
-  ChevronDown, MoreHorizontal,
+  ChevronDown, MoreHorizontal, ClipboardList,
 } from "lucide-react";
 import { PORTAL_SECTIONS } from "@/lib/portalNavigationConfig";
 
 const ICON_MAP = {
   LayoutDashboard, Rocket, Zap, Target, Activity, Users, UserCheck,
   CheckSquare, ListChecks, CreditCard, FolderOpen, Calendar, Gift,
-  MessageSquare, Package, FileText, Bell, Settings, MapPin,
+  MessageSquare, Package, FileText, Bell, Settings, MapPin, ClipboardList,
 };
 
 const PRIMARY_SECTION_IDS = [
   "overview", "onboarding", "automations", "leads", "reports", "billing", "support",
 ];
 
+// Sub-tab groups for collapsible sections
+const COLLAPSIBLE_GROUPS = [
+  {
+    label: "More Setup",
+    tabs: [
+      { id: "timeline", label: "Timeline", icon: "MapPin" },
+      { id: "quickstart", label: "Quick Start", icon: "Zap" },
+      { id: "tasks", label: "Tasks", icon: "CheckSquare" },
+      { id: "checklist", label: "Checklist", icon: "ListChecks" },
+      { id: "deadlines", label: "Deadlines", icon: "Calendar" },
+      { id: "files", label: "Files & Docs", icon: "FolderOpen" },
+      { id: "order-status", label: "Order Status", icon: "Package" },
+    ],
+  },
+  {
+    label: "Work Tools",
+    tabs: [
+      { id: "realtime", label: "Real-Time Metrics", icon: "Activity" },
+      { id: "metrics", label: "Lead Flow", icon: "Users" },
+      { id: "referrals", label: "Referrals", icon: "Gift" },
+      { id: "updates", label: "What's New", icon: "Bell" },
+      { id: "plan", label: "My Plan", icon: "Package" },
+    ],
+  },
+  {
+    label: "Account Tools",
+    tabs: [
+      { id: "settings", label: "Settings", icon: "Settings" },
+    ],
+  },
+];
+
+// Map tab IDs to badge keys
+const TAB_BADGE_MAP = {
+  tasks: "tasks",
+  checklist: "tasks",
+  performance: "issues",
+  realtime: "issues",
+  billing: "billing",
+  plan: "billing",
+  files: "files",
+  support: "notifications",
+  referrals: "notifications",
+};
+
 export default function PortalSidebar({
   section,
   onSectionChange,
-  onLogout,
+  onSignOut,
+  navigateTab,
   businessName,
   userEmail,
   project,
+  badges = {},
   mobileOpen,
   onCloseMobile,
 }) {
-  const [moreExpanded, setMoreExpanded] = useState(false);
+  const [expandedGroup, setExpandedGroup] = useState(null);
   const safeBusiness = businessName || "Your Business";
   const safeEmail = userEmail || "—";
 
   const primarySections = PORTAL_SECTIONS.filter((s) => PRIMARY_SECTION_IDS.includes(s.id));
-  const secondarySections = PORTAL_SECTIONS.filter((s) => !PRIMARY_SECTION_IDS.includes(s.id));
 
-  const renderNavButton = (item) => {
+  const getBadgeForTab = (tabId) => {
+    const badgeKey = TAB_BADGE_MAP[tabId];
+    if (!badgeKey) return null;
+    const value = badges[badgeKey];
+    if (value === undefined || value === null || value === 0 || value === false) return null;
+    return value;
+  };
+
+  const renderBadge = (count) => {
+    if (count === null || count === undefined) return null;
+    const isBool = typeof count === "boolean";
+    if (isBool) {
+      return (
+        <span
+          className="w-2 h-2 rounded-full bg-red-500 flex-shrink-0"
+          title="Needs attention"
+        />
+      );
+    }
+    const num = typeof count === "number" ? count : 0;
+    if (num <= 0) return null;
+    return (
+      <span
+        className="inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full text-[10px] font-bold text-white flex-shrink-0"
+        style={{ background: num > 0 ? "#EF4444" : "#9CA3AF" }}
+      >
+        {num}
+      </span>
+    );
+  };
+
+  const renderNavButton = (item, isPrimary = true) => {
     const Icon = ICON_MAP[item.icon] || LayoutDashboard;
     const isActive = section === item.id;
+    const badgeCount = isPrimary ? getBadgeForTab(item.defaultTab) : null;
     return (
       <button
         key={item.id}
@@ -59,7 +137,28 @@ export default function PortalSidebar({
         }`}
       >
         <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
-        <span className="truncate">{item.label}</span>
+        <span className="truncate flex-1 text-left">{item.label}</span>
+        {badgeCount !== null && renderBadge(badgeCount)}
+      </button>
+    );
+  };
+
+  const renderSubTabButton = (tab) => {
+    const Icon = ICON_MAP[tab.icon] || LayoutDashboard;
+    const badgeCount = getBadgeForTab(tab.id);
+    return (
+      <button
+        key={tab.id}
+        onClick={() => {
+          navigateTab?.(tab.id);
+          onCloseMobile?.();
+        }}
+        title={tab.label}
+        className="w-full flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium text-gray-500 hover:bg-gray-50 hover:text-gray-700 transition-colors min-h-[40px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
+      >
+        <Icon className="w-4 h-4 flex-shrink-0 text-gray-400" />
+        <span className="truncate flex-1 text-left">{tab.label}</span>
+        {badgeCount !== null && renderBadge(badgeCount)}
       </button>
     );
   };
@@ -121,36 +220,45 @@ export default function PortalSidebar({
 
         {/* Primary nav — 7 visible destinations */}
         <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
-          {primarySections.map(renderNavButton)}
+          {primarySections.map((item) => renderNavButton(item))}
 
-          {/* Collapsible "More" for lower-frequency tools */}
-          {secondarySections.length > 0 && (
-            <div className="pt-2">
-              <button
-                onClick={() => setMoreExpanded(!moreExpanded)}
-                aria-expanded={moreExpanded}
-                className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
-              >
-                <MoreHorizontal className="w-[18px] h-[18px] flex-shrink-0 text-gray-400" />
-                <span className="truncate">More</span>
-                <ChevronDown
-                  className={`w-4 h-4 ml-auto flex-shrink-0 transition-transform ${moreExpanded ? "rotate-180" : ""}`}
-                />
-              </button>
-              {moreExpanded && (
-                <div className="space-y-1 mt-1 ml-3 border-l border-gray-100 pl-2">
-                  {secondarySections.map(renderNavButton)}
-                </div>
-              )}
-            </div>
-          )}
+          {/* Collapsible groups for lower-frequency tools */}
+          {COLLAPSIBLE_GROUPS.map((group) => {
+            // Only show groups that have tabs
+            if (!group.tabs || group.tabs.length === 0) return null;
+            const isExpanded = expandedGroup === group.label;
+            // Check if any tab in this group has a badge
+            const hasBadge = group.tabs.some((t) => getBadgeForTab(t.id) !== null);
+            return (
+              <div key={group.label} className="pt-1">
+                <button
+                  onClick={() => setExpandedGroup(isExpanded ? null : group.label)}
+                  aria-expanded={isExpanded}
+                  className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium text-gray-400 hover:bg-gray-50 hover:text-gray-600 transition-colors min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
+                >
+                  <MoreHorizontal className="w-[18px] h-[18px] flex-shrink-0 text-gray-400" />
+                  <span className="truncate flex-1 text-left">{group.label}</span>
+                  {hasBadge && renderBadge(1)}
+                  <ChevronDown
+                    className={`w-4 h-4 flex-shrink-0 transition-transform ${isExpanded ? "rotate-180" : ""}`}
+                  />
+                </button>
+                {isExpanded && (
+                  <div className="space-y-0.5 mt-0.5 ml-3 border-l border-gray-100 pl-2">
+                    {group.tabs.map(renderSubTabButton)}
+                  </div>
+                )}
+              </div>
+            );
+          })}
         </nav>
 
         {/* User footer + logout */}
         <div className="px-4 py-3 border-t border-gray-100 flex-shrink-0">
           <div className="flex items-center gap-3 mb-2">
-            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-bold text-gray-500">
+            <div className="w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0"
+              style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}>
+              <span className="text-xs font-bold text-white">
                 {(safeBusiness || "U")[0].toUpperCase()}
               </span>
             </div>
@@ -160,7 +268,7 @@ export default function PortalSidebar({
             </div>
           </div>
           <button
-            onClick={onLogout}
+            onClick={onSignOut}
             className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-xs font-medium text-gray-400 hover:text-gray-700 hover:bg-gray-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
             aria-label="Sign out of your account"
           >

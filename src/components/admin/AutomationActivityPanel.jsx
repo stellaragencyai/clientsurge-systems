@@ -25,6 +25,10 @@ import {
   ShieldAlert,
   Wrench,
   AlertTriangle,
+  Copy,
+  Download,
+  ExternalLink,
+  Zap,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -85,9 +89,63 @@ export default function AutomationActivityPanel() {
     }
   }, [filterModule, filterStatus, filterClient, filterIndustry, filterDateFrom, filterDateTo]);
 
+  // URL query param persistence — read on mount, write on filter change
   useEffect(() => {
-    fetchData();
-  }, [fetchData]);
+    const params = new URLSearchParams(window.location.search);
+    if (params.get("status")) setFilterStatus(params.get("status"));
+    if (params.get("module")) setFilterModule(params.get("module"));
+    if (params.get("client_id")) setFilterClient(params.get("client_id"));
+    if (params.get("industry")) setFilterIndustry(params.get("industry"));
+    if (params.get("deployment_id")) setFilterClient(params.get("deployment_id"));
+    if (params.get("from")) setFilterDateFrom(params.get("from"));
+    if (params.get("to")) setFilterDateTo(params.get("to"));
+  }, []);
+
+  useEffect(() => {
+    const params = new URLSearchParams();
+    if (filterStatus !== "all") params.set("status", filterStatus);
+    if (filterModule !== "all") params.set("module", filterModule);
+    if (filterClient) params.set("client_id", filterClient);
+    if (filterIndustry !== "all") params.set("industry", filterIndustry);
+    if (filterDateFrom) params.set("from", filterDateFrom);
+    if (filterDateTo) params.set("to", filterDateTo);
+    const qs = params.toString();
+    const newUrl = qs ? `${window.location.pathname}?${qs}` : window.location.pathname;
+    window.history.replaceState(null, "", newUrl);
+  }, [filterStatus, filterModule, filterClient, filterIndustry, filterDateFrom, filterDateTo]);
+
+  // Quick filter handlers
+  const quickFilterFailed = () => setFilterStatus("failed");
+  const quickFilterBlocked = () => setFilterStatus("blocked");
+  const quickFilterLast24h = () => {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split("T")[0];
+    setFilterDateFrom(yesterday);
+    setFilterDateTo("");
+  };
+  const quickFilterClear = () => {
+    setFilterStatus("all");
+    setFilterModule("all");
+    setFilterClient("");
+    setFilterIndustry("all");
+    setFilterDateFrom("");
+    setFilterDateTo("");
+  };
+
+  const copyLogToClipboard = (log) => {
+    const logData = JSON.stringify(log, null, 2);
+    navigator.clipboard.writeText(logData).catch(() => {});
+  };
+
+  const exportLog = (log) => {
+    const logData = JSON.stringify(log, null, 2);
+    const blob = new Blob([logData], { type: "application/json" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `automation-log-${log.id || "record"}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  };
 
   const fetchDeploymentHealth = async (deploymentId) => {
     if (deploymentHealth[deploymentId]) {
@@ -115,9 +173,26 @@ export default function AutomationActivityPanel() {
         <SummaryCard label="Running" value={stats.running} icon={Clock} color="text-blue-600" bg="bg-blue-50" />
       </div>
 
-      {/* Failed Modules + Recommended Actions */}
+      {/* Quick Filters */}
+      <div className="flex flex-wrap items-center gap-2">
+        <span className="text-xs font-bold text-gray-500 uppercase tracking-wide mr-1">Quick Filters:</span>
+        <Button variant={filterStatus === "failed" ? "default" : "outline"} size="sm" className="h-8 text-xs" onClick={quickFilterFailed}>
+          <XCircle className="w-3.5 h-3.5 mr-1" /> Failed
+        </Button>
+        <Button variant={filterStatus === "blocked" ? "default" : "outline"} size="sm" className="h-8 text-xs" onClick={quickFilterBlocked}>
+          <ShieldAlert className="w-3.5 h-3.5 mr-1" /> Blocked
+        </Button>
+        <Button variant={filterDateFrom ? "default" : "outline"} size="sm" className="h-8 text-xs" onClick={quickFilterLast24h}>
+          <Clock className="w-3.5 h-3.5 mr-1" /> Last 24 Hours
+        </Button>
+        <Button variant="ghost" size="sm" className="h-8 text-xs text-gray-500" onClick={quickFilterClear}>
+          Clear All
+        </Button>
+      </div>
+
+      {/* Needs Attention + Recommended Actions */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <FailedModulesPanel logs={logs} />
+        <NeedsAttentionPanel logs={logs} />
         <RecommendedActionsPanel logs={logs} />
       </div>
 
@@ -232,7 +307,10 @@ export default function AutomationActivityPanel() {
                 <tr>
                   <td colSpan={9} className="px-4 py-12 text-center text-gray-400">
                     <Activity className="w-8 h-8 mx-auto mb-2 opacity-30" />
-                    No automation executions found. Try adjusting filters.
+                    No automation executions found matching the current filters.
+                    {stats.total === 0
+                      ? " When automations run, their execution logs will appear here."
+                      : " Try clearing filters or widening the date range."}
                   </td>
                 </tr>
               ) : (
@@ -307,6 +385,39 @@ export default function AutomationActivityPanel() {
                                health={deploymentHealth[log.client_deployment_id]}
                                deploymentId={log.client_deployment_id}
                              />
+                             {/* Drill-down links + copy/export */}
+                             <div className="flex flex-wrap items-center gap-3 mt-3 pt-3 border-t border-gray-200">
+                               {log.client_deployment_id && (
+                                 <a
+                                   href={`/admin/deployment-control?deployment_id=${log.client_deployment_id}`}
+                                   className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700"
+                                   onClick={(e) => e.stopPropagation()}
+                                 >
+                                   <ExternalLink className="w-3.5 h-3.5" /> View Deployment
+                                 </a>
+                               )}
+                               {log.lead_id && (
+                                 <a
+                                   href={`/admin/leads/${log.lead_id}`}
+                                   className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-700"
+                                   onClick={(e) => e.stopPropagation()}
+                                 >
+                                   <ExternalLink className="w-3.5 h-3.5" /> View Lead
+                                 </a>
+                               )}
+                               <button
+                                 className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-gray-700"
+                                 onClick={(e) => { e.stopPropagation(); copyLogToClipboard(log); }}
+                               >
+                                 <Copy className="w-3.5 h-3.5" /> Copy JSON
+                               </button>
+                               <button
+                                 className="inline-flex items-center gap-1 text-xs font-bold text-gray-500 hover:text-gray-700"
+                                 onClick={(e) => { e.stopPropagation(); exportLog(log); }}
+                               >
+                                 <Download className="w-3.5 h-3.5" /> Export
+                               </button>
+                             </div>
                            </td>
                          </tr>
                        )}
@@ -336,7 +447,7 @@ function SummaryCard({ label, value, icon: Icon, color, bg }) {
   );
 }
 
-function FailedModulesPanel({ logs }) {
+function NeedsAttentionPanel({ logs }) {
   const failedLogs = logs.filter((l) => l.execution_status === "failed" || l.execution_status === "blocked");
   const failedByModule = {};
   failedLogs.forEach((l) => {
@@ -355,7 +466,7 @@ function FailedModulesPanel({ logs }) {
     <Card className="p-4">
       <div className="flex items-center gap-2 mb-3">
         <AlertTriangle className="w-4 h-4 text-red-500" />
-        <h3 className="text-sm font-bold text-gray-800">Failed / Blocked Modules</h3>
+        <h3 className="text-sm font-bold text-gray-800">Needs Attention</h3>
       </div>
       {failedEntries.length === 0 ? (
         <div className="flex items-center gap-2 text-sm text-green-600 py-2">

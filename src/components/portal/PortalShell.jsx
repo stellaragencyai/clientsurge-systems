@@ -1,13 +1,15 @@
 /**
- * PortalShell — unified SaaS workspace shell for the client portal.
- * Wraps sidebar + header + sub-tab nav + mobile bottom nav.
- * All portal pages share the same layout, spacing, navigation, and error behavior.
+ * PortalShell — Enhancement #1, #2, #3, #12
+ * Unified SaaS workspace shell for the client portal.
+ * Wraps sidebar + premium top bar + sub-tab nav + mobile bottom nav + support pill.
+ * Manages logout confirmation modal internally.
  */
 import { lazy, Suspense, useState } from "react";
 import PortalSidebar from "./PortalSidebar";
 import PortalMobileBottomNav from "./PortalMobileBottomNav";
-import PortalHeader from "./PortalHeader";
+import PremiumPortalTopBar from "./PremiumPortalTopBar";
 import PortalLogoutConfirm from "./PortalLogoutConfirm";
+import PortalSupportPill from "./PortalSupportPill";
 import { getSectionTabs, getPortalSection, getClientPortalTab } from "@/lib/portalNavigationConfig";
 
 const NotificationBell = lazy(() => import("./NotificationBell"));
@@ -22,28 +24,39 @@ export default function PortalShell({
   section,
   onSectionChange,
   onLogout,
-  showLogoutConfirm = false,
-  onLogoutConfirm,
-  onLogoutCancel,
+  navigateTab,
   businessName,
   userEmail,
   user,
   project,
   plan,
+  subscription,
+  supportStatus,
   notifications = [],
   unreadCount = 0,
   onMarkAsRead,
   onMarkAllAsRead,
   onClearNotifications,
+  badges = {},
   overlay,
   children,
 }) {
   const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
   const sectionTabs = getSectionTabs(section);
   const showSubTabs = sectionTabs.length > 1;
   const sectionConfig = getPortalSection(section);
   const sectionLabel = sectionConfig?.label || "Dashboard";
   const deploymentStatus = project?._deploymentStatus || null;
+
+  const handleSignOutClick = () => setShowLogoutConfirm(true);
+  const handleLogoutConfirm = () => {
+    setShowLogoutConfirm(false);
+    onLogout();
+  };
+  const handleLogoutCancel = () => setShowLogoutConfirm(false);
+
+  const tabLabel = getClientPortalTab(activeTab)?.label || sectionLabel;
 
   return (
     <div className="min-h-screen flex" style={{ background: "#f8f9fc" }}>
@@ -52,23 +65,27 @@ export default function PortalShell({
       <PortalSidebar
         section={section}
         onSectionChange={onSectionChange}
-        onLogout={onLogout}
+        onSignOut={handleSignOutClick}
+        navigateTab={navigateTab}
         businessName={businessName}
         userEmail={userEmail}
         project={project}
+        badges={badges}
         mobileOpen={mobileSidebarOpen}
         onCloseMobile={() => setMobileSidebarOpen(false)}
       />
 
       <div className="flex-1 min-w-0 flex flex-col">
-        {/* Enhanced Header (Phase 4.3) */}
-        <PortalHeader
-          sectionLabel={getClientPortalTab(activeTab)?.label || sectionLabel}
+        <PremiumPortalTopBar
+          sectionLabel={tabLabel}
           businessName={businessName}
           plan={plan || project?.plan}
           deploymentStatus={deploymentStatus}
+          supportStatus={supportStatus}
           onOpenMobile={() => setMobileSidebarOpen(true)}
-          onSupportClick={() => onSectionChange("support")}
+          onNavigateTab={navigateTab}
+          onSignOut={handleSignOutClick}
+          user={user}
         >
           <ShellLazy>
             <NotificationBell
@@ -79,14 +96,8 @@ export default function PortalShell({
               onClear={onClearNotifications}
             />
           </ShellLazy>
-          <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-bold text-gray-500">
-              {(user?.full_name || user?.email || "U")[0].toUpperCase()}
-            </span>
-          </div>
-        </PortalHeader>
+        </PremiumPortalTopBar>
 
-        {/* Sub-tab navigation bar — shown when section has multiple tabs */}
         {showSubTabs && (
           <div className="bg-white border-b border-gray-100 px-4 md:px-6 py-2 flex items-center gap-1 overflow-x-auto">
             {sectionTabs.map((tab) => {
@@ -108,17 +119,18 @@ export default function PortalShell({
           </div>
         )}
 
-        {/* Main content */}
         <main id="main-content" className="flex-1 px-6 py-6 overflow-y-auto pb-24 lg:pb-6">
           {children}
         </main>
       </div>
 
       {showLogoutConfirm && (
-        <PortalLogoutConfirm onConfirm={onLogoutConfirm} onCancel={onLogoutCancel} />
+        <PortalLogoutConfirm onConfirm={handleLogoutConfirm} onCancel={handleLogoutCancel} />
       )}
 
       <PortalMobileBottomNav section={section} onSectionChange={onSectionChange} />
+
+      <PortalSupportPill onNavigate={() => navigateTab?.("support")} />
     </div>
   );
 }

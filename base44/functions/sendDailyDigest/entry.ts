@@ -99,6 +99,25 @@ Deno.serve(async (req) => {
           return secureJson({ blocked: true, reason: permRes.data?.reason, message: 'daily_digest not authorized' }, { status: 403 });
         }
         _obsCtx = { deployment_id: liveDep.id, client_id: liveDep.client_id, module_key: 'daily_digest', trigger_event: 'scheduled_daily' };
+        // Log digest_started
+        try {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            ..._obsCtx,
+            execution_status: 'queued',
+            response_data: JSON.stringify({ event: 'digest_started', deployment_count: allDeployments?.length || 0, timestamp: new Date(_obsStartTime).toISOString() }),
+          });
+        } catch (_) {}
+      } else {
+        // No live deployment with daily_digest — log digest_skipped
+        try {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            module_key: 'daily_digest', trigger_event: 'scheduled_daily',
+            execution_status: 'blocked',
+            error_message: 'No live deployment with daily_digest module activated',
+            error_code: 'no_authorized_deployment',
+            response_data: JSON.stringify({ event: 'digest_skipped', deployment_count: allDeployments?.length || 0, reason: 'no_live_deployment_with_daily_digest' }),
+          });
+        } catch (_) {}
       }
     } catch (err) {
       console.warn('[sendDailyDigest] Observability init failed:', err.message);
@@ -125,6 +144,26 @@ Deno.serve(async (req) => {
     const hotRows = hotLeads.slice(0, 5).map(l =>
       `<tr><td style="padding:6px 12px;">${l.full_name}</td><td style="padding:6px 12px;">${l.business_name}</td><td style="padding:6px 12px;">${l.status}</td><td style="padding:6px 12px;">${l.lead_score ?? 0}</td></tr>`
     ).join('');
+
+    const digestMetadata = {
+      lead_count: allLeads.length,
+      new_today: newToday,
+      hot_leads: hotLeads.length,
+      overdue_follow_ups: overdueFollowUp.length,
+      replied: replied.length,
+      recipient: notificationEmail,
+    };
+
+    // Log digest_generated
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'running',
+          response_data: JSON.stringify({ event: 'digest_generated', ...digestMetadata }),
+        });
+      } catch (_) {}
+    }
 
     const body = `
 <div style="font-family:sans-serif;max-width:600px;margin:0 auto;">
@@ -202,6 +241,7 @@ Deno.serve(async (req) => {
           execution_status: 'completed',
           external_provider_reference: result?.id || null,
           execution_time_ms: Date.now() - _obsStartTime,
+          response_data: JSON.stringify({ event: 'digest_sent', ...digestMetadata, provider_message_id: result?.id }),
         });
       } catch (_) {}
     }
@@ -218,6 +258,7 @@ Deno.serve(async (req) => {
           error_message: error.message,
           error_code: error.message.includes('Resend') ? 'resend_api_error' : 'digest_send_failed',
           execution_time_ms: Date.now() - _obsStartTime,
+          response_data: JSON.stringify({ event: 'digest_failed', error: error.message }),
         });
         await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', { deployment_id: _obsCtx.deployment_id });
       } catch (_) {}

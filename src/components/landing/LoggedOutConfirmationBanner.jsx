@@ -3,7 +3,7 @@
  * is present in the URL. Shows a polished confirmation and cleans the query
  * param after rendering so refresh doesn't repeat the banner.
  *
- * Buttons: "Log back in" → /login, "Browse systems" → /store
+ * Buttons: "Log back in" → /client-portal, "Browse systems" → /pricing
  */
 import { useEffect, useState } from "react";
 import { CheckCircle, LogIn, Store } from "lucide-react";
@@ -50,7 +50,7 @@ export default function LoggedOutConfirmationBanner() {
         </div>
         <div className="flex items-center gap-2.5">
           <a
-            href="/login"
+            href="/client-portal"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-white transition-all hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
             style={{ background: "linear-gradient(90deg,#0079c1,#005691)" }}
           >
@@ -58,7 +58,7 @@ export default function LoggedOutConfirmationBanner() {
             Log back in
           </a>
           <a
-            href="/store"
+            href="/pricing"
             className="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-xs font-bold text-gray-700 border border-gray-200 hover:bg-gray-50 transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
           >
             <Store className="w-3.5 h-3.5" />

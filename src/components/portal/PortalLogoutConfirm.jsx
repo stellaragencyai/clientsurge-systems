@@ -29,7 +29,7 @@ export default function PortalLogoutConfirm({ onConfirm, onCancel }) {
           <AlertTriangle className="w-6 h-6 text-red-500" />
         </div>
         <h3 id="logout-confirm-title" className="text-lg font-bold text-gray-900 text-center mb-2 font-display">
-          Sign out of your portal?
+          Sign out of ClientSurge?
         </h3>
         <p className="text-sm text-gray-500 text-center mb-6 leading-relaxed">
           You'll be returned to the main website. You can sign back in anytime to continue managing your system.
@@ -40,7 +40,7 @@ export default function PortalLogoutConfirm({ onConfirm, onCancel }) {
             className="w-full py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
             style={{ background: "linear-gradient(90deg,#0079c1,#005691)" }}
           >
-            Yes, sign me out
+            Sign out
           </button>
           <button
             onClick={onCancel}

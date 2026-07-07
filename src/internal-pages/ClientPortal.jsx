@@ -1,4 +1,4 @@
-import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
+import { lazy, Suspense, useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import { LayoutDashboard, Eye } from "lucide-react";
@@ -9,8 +9,9 @@ import PortalShell from "../components/portal/PortalShell";
 import PortalDashboardOverview from "../components/portal/PortalDashboardOverview";
 import PortalStateBoundary from "../components/portal/PortalStateBoundary";
 import PortalTabWrapper from "../components/portal/PortalTabWrapper";
+import PremiumPortalEmptyState from "../components/portal/PremiumPortalEmptyState";
 import { usePortalState } from "../hooks/usePortalState";
-import { getPortalSection, getSectionTabs } from "@/lib/portalNavigationConfig";
+import { getPortalSection, getSectionTabs, getSectionForTab } from "@/lib/portalNavigationConfig";
 
 // ── All portal components lazy-loaded to keep the ClientPortal chunk small ──
 // This prevents Vite from bundling 30+ components into one massive chunk that
@@ -68,30 +69,6 @@ function PortalPanelSkeleton() {
 function PortalLazy({ children }) {
   return <Suspense fallback={<PortalPanelSkeleton />}>{children}</Suspense>;
 }
-
-// Tab labels for the dashboard title lookup
-const TAB_LABELS = {
-  dashboard: "Dashboard",
-  progress: "Setup Progress",
-  timeline: "Timeline",
-  quickstart: "Quick Start",
-  performance: "Performance",
-  realtime: "Real-Time Metrics",
-  metrics: "Lead Flow",
-  tasks: "Tasks",
-  checklist: "Checklist",
-  leads: "My Leads",
-  deadlines: "Deadlines",
-  files: "Files & Docs",
-  billing: "Billing",
-  referrals: "Referrals",
-  support: "Support & Messaging",
-  plan: "My Plan",
-  reports: "Weekly Report",
-  updates: "What's New",
-  settings: "Settings",
-  "order-status": "Order Status",
-};
 
 export default function ClientPortal() {
   // Prevent search engines from indexing private portal
@@ -230,13 +207,20 @@ export default function ClientPortal() {
     return unsubscribe;
   }, [portalOrder?.id]);
 
-  // Phase 4.2: Sync activeTab when URL section changes
-  // Phase 4.3: Deep link support — read ?tab= from URL on section change
+  // Enhancement: Deep link support — read ?tab= or #tab= from URL on section change
   useEffect(() => {
     const sec = getPortalSection(section);
     if (sec) {
+      // Check ?tab= query param first (backward compat)
       const urlParams = new URLSearchParams(window.location.search);
-      const tabFromUrl = urlParams.get("tab");
+      let tabFromUrl = urlParams.get("tab");
+
+      // Fall back to #tab= hash
+      if (!tabFromUrl) {
+        const hashMatch = window.location.hash.match(/tab=([^&]+)/);
+        if (hashMatch) tabFromUrl = hashMatch[1];
+      }
+
       const sectionTabs = getSectionTabs(section);
       const validTabs = sectionTabs.map((t) => t.id);
 
@@ -248,17 +232,23 @@ export default function ClientPortal() {
     }
   }, [section]);
 
-  // Phase 4.3: Persist activeTab to URL ?tab= for refresh persistence
+  // Enhancement: Persist activeTab to URL #tab= hash for refresh/deep-link persistence
   useEffect(() => {
     if (!activeTab) return;
-    const urlParams = new URLSearchParams(window.location.search);
-    const currentTabInUrl = urlParams.get("tab");
-    if (currentTabInUrl !== activeTab) {
-      urlParams.set("tab", activeTab);
-      const newUrl = `${window.location.pathname}?${urlParams.toString()}${window.location.hash}`;
-      window.history.replaceState(null, "", newUrl);
+    const newHash = `#tab=${activeTab}`;
+    if (window.location.hash !== newHash) {
+      window.history.replaceState(null, "", `${window.location.pathname}${window.location.search}${newHash}`);
     }
   }, [activeTab]);
+
+  // Enhancement: Unified navigatePortalTab — handles both same-section and cross-section tab navigation
+  const navigatePortalTab = useCallback((tabId) => {
+    const targetSection = getSectionForTab(tabId);
+    if (targetSection && targetSection !== section) {
+      navigate(`/client-portal/${targetSection}#tab=${tabId}`);
+    }
+    setActiveTab(tabId);
+  }, [section, navigate]);
 
   const handleSectionChange = (sectionId) => {
     const sec = getPortalSection(sectionId);
@@ -267,6 +257,32 @@ export default function ClientPortal() {
       navigate(`/client-portal/${sectionId}`);
     }
   };
+
+  // Enhancement #7: Compute sidebar badges from real data — never fabricated
+  const portalBadges = useMemo(() => {
+    const badges = {};
+    // Tasks: count open deadlines
+    if (project?.deadlines) {
+      const openTasks = project.deadlines.filter(d => d.status === "pending" || d.status === "in_progress" || d.status === "overdue");
+      if (openTasks.length > 0) badges.tasks = openTasks.length;
+    }
+    // Issues: count failed events from health data
+    if (healthData?.recent_events) {
+      const failedEvents = healthData.recent_events.filter(e => e.status === "failed");
+      if (failedEvents.length > 0) badges.issues = failedEvents.length;
+    }
+    // Notifications: unread count
+    if (unreadCount > 0) badges.notifications = unreadCount;
+    // Billing: subscription issue
+    if (subscription && ["past_due", "unpaid", "canceled"].includes(subscription.status)) {
+      badges.billing = true;
+    }
+    // Files: missing onboarding assets
+    if (project && !project.onboarding_wizard_completed) {
+      badges.files = true;
+    }
+    return badges;
+  }, [project, healthData, unreadCount, subscription]);
 
   if (loading) {
     return <PortalLoadingSkeleton />;
@@ -346,17 +362,20 @@ export default function ClientPortal() {
       setActiveTab={setActiveTab}
       section={section}
       onSectionChange={handleSectionChange}
-      onLogout={() => base44.auth.logout("/logout")}
+      onLogout={() => base44.auth.logout("/?logged_out=1")}
+      navigateTab={navigatePortalTab}
       businessName={project?.business_name}
       userEmail={user?.email}
       user={user}
       project={{ ...project, _deploymentStatus: deployment?.deployment_status }}
+      subscription={subscription}
+      supportStatus={project?.support_status}
       notifications={notifications}
       unreadCount={unreadCount}
       onMarkAsRead={markAsRead}
       onMarkAllAsRead={markAllAsRead}
       onClearNotifications={clearNotifications}
-      tabLabels={TAB_LABELS}
+      badges={portalBadges}
       overlay={
         showQuickStart && project ? (
           <PortalLazy>
@@ -390,7 +409,7 @@ export default function ClientPortal() {
                 userEmail={user?.email}
                 isAdminPreview={isAdminPreview}
                 userRole={userRole}
-                setActiveTab={setActiveTab}
+                navigateTab={navigatePortalTab}
                 refreshProject={refreshProject}
                 portalState={portalState}
                 portalStateLoading={portalStateLoading}

@@ -231,7 +231,14 @@ export default function DeploymentTimeline({ deployment, project, order }) {
 
       {/* Timeline events */}
       <div className="bg-white rounded-xl border border-gray-100 p-6">
-        <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400 mb-4">Event History</p>
+        <div className="flex items-center justify-between mb-4">
+          <p className="text-[10px] font-bold uppercase tracking-widest text-gray-400">Event History</p>
+          {events.length > 0 && (
+            <span className="text-[10px] font-semibold text-gray-400">
+              {events.length} milestone{events.length !== 1 ? "s" : ""}
+            </span>
+          )}
+        </div>
 
         {loading ? (
           <div className="flex items-center gap-2 py-8">
@@ -266,19 +273,45 @@ export default function DeploymentTimeline({ deployment, project, order }) {
                   >
                     <Icon className="w-4 h-4" style={{ color: eventInfo.color }} />
                   </div>
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
+                    {/* Milestone label + Date */}
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-sm font-bold text-gray-900">{evt.label}</span>
-                      <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
-                        {evt.source}
-                      </span>
+                      {date && (
+                        <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-500">
+                          {format(date, "MMM d, yyyy")}
+                        </span>
+                      )}
                     </div>
-                    <p className="text-xs text-gray-500 mt-0.5">{evt.description}</p>
-                    {date && (
-                      <p className="text-[10px] text-gray-400 mt-1">
-                        {format(date, "MMM d, yyyy 'at' h:mm a")} · {formatDistanceToNow(date, { addSuffix: true })}
-                      </p>
-                    )}
+                    {/* Description */}
+                    <p className="text-xs text-gray-500 mt-0.5 leading-relaxed">{evt.description}</p>
+                    {/* Status + relative time + next milestone */}
+                    <div className="flex items-center gap-3 mt-1 flex-wrap">
+                      <span
+                        className="text-[10px] font-bold px-1.5 py-0.5 rounded-full uppercase tracking-wide"
+                        style={{
+                          background: eventInfo.color + "12",
+                          color: eventInfo.color,
+                        }}
+                      >
+                        Completed
+                      </span>
+                      {date && (
+                        <span className="text-[10px] text-gray-400">
+                          {formatDistanceToNow(date, { addSuffix: true })}
+                        </span>
+                      )}
+                      {!isLast && events[idx + 1] && (
+                        <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                          <span className="text-gray-300">→</span>
+                          Next: {events[idx + 1].label}
+                        </span>
+                      )}
+                    </div>
+                    {/* Source badge — subtle, not a technical ID */}
+                    <span className="inline-block mt-1 text-[9px] font-medium text-gray-300">
+                      via {evt.source}
+                    </span>
                   </div>
                 </div>
               );

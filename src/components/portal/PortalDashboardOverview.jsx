@@ -7,7 +7,7 @@
 import { lazy, Suspense } from "react";
 import {
   Bell, TrendingUp, Zap, Target, Rocket,
-  ArrowRight, ShieldCheck, AlertCircle, CheckCircle2, Info,
+  ArrowRight, ShieldCheck, AlertCircle, CheckCircle2, Info, Clock,
 } from "lucide-react";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 import { translateCard, getClientStatusConfig } from "@/lib/clientStatusLanguage";
@@ -16,7 +16,10 @@ import CSButton from "@/components/design-system/CSButton";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import PortalMetricCard from "./PortalMetricCard";
 import PortalActionCard from "./PortalActionCard";
-import NextBestActionCard from "./NextBestActionCard";
+import ClientActionCenter from "./ClientActionCenter";
+import ClientNotificationCenter from "./ClientNotificationCenter";
+import PortalTrustStrip from "./PortalTrustStrip";
+import PortalStatusTimeline from "./PortalStatusTimeline";
 
 const PortalLazy = ({ children }) => (
   <Suspense fallback={<div className="h-32 rounded-xl bg-muted/30 animate-pulse" />}>{children}</Suspense>
@@ -38,7 +41,7 @@ export default function PortalDashboardOverview({
   userEmail,
   isAdminPreview,
   userRole,
-  setActiveTab,
+  navigateTab,
   refreshProject,
   portalState,
   portalStateLoading,
@@ -66,6 +69,17 @@ export default function PortalDashboardOverview({
     ? "Syncing"
     : (totalCount > 0 ? `${activeCount}/${totalCount}` : "Pending");
 
+  // Derive deployment from portalState meta for action center
+  const deployment = portalState?.meta?.deployment_id
+    ? {
+        id: portalState.meta.deployment_id,
+        deployment_status: portalState.meta.deployment_status,
+        package_tier_key: portalState.meta.deployment_package_tier,
+        industry_slug: portalState.meta.deployment_industry,
+        analytics: { last_activity_at: portalState.meta.last_activity_at },
+      }
+    : null;
+
   // Issues count comes from normalized state, not raw events
   const issuesValue = portalStateLoading
     ? "—"
@@ -73,16 +87,16 @@ export default function PortalDashboardOverview({
 
   return (
     <div className="space-y-6">
-      {/* Next best action — priority guidance */}
-      <NextBestActionCard
+      {/* Client Action Center — Phase 4.4 Phase 2 */}
+      <ClientActionCenter
         project={project}
-        portalOrder={portalOrder}
-        subscription={subscription}
-        healthData={healthData}
+        deployment={deployment}
         portalState={portalState}
         portalStateLoading={portalStateLoading}
+        subscription={subscription}
+        order={portalOrder}
         isAdminPreview={isAdminPreview}
-        setActiveTab={setActiveTab}
+        onNavigate={navigateTab}
       />
 
       {/* Client-data scoping notice */}
@@ -129,37 +143,57 @@ export default function PortalDashboardOverview({
           variant="primary"
           size="md"
           iconRight={ArrowRight}
-          onClick={() => setActiveTab("performance")}
+          onClick={() => navigateTab("performance")}
         >
           View Performance
         </CSButton>
       </div>
+
+      {/* Trust strip — Phase 4.4 Phase 6 */}
+      <PortalTrustStrip
+        portalState={portalState}
+        portalStateLoading={portalStateLoading}
+        deployment={deployment}
+      />
+
+      {/* System status timeline — visual progress from Payment → Monitoring */}
+      <PortalStatusTimeline project={project} portalOrder={portalOrder} />
 
       {/* Payment failed / missing assets banners */}
       <PortalLazy>
         <PaymentFailedBanner subscription={subscription} order={portalOrder} />
       </PortalLazy>
       <PortalLazy>
-        <OnboardingMissingAssetsBanner project={project} onNavigate={setActiveTab} />
+        <OnboardingMissingAssetsBanner project={project} onNavigate={navigateTab} />
       </PortalLazy>
 
       {/* Main grid: 70/30 split */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main column (2/3) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* System Status section */}
-          <div>
-            <CSSectionHeader
-              eyebrow="Overview"
-              title="System Status"
-              align="left"
-              className="mb-4"
-            />
+          {/* System Status section — primary, visually dominant */}
+          <div className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm text-gray-500">Real-time system health</span>
-              <PortalLazy>
-                <SystemStatusBadge project={project} />
-              </PortalLazy>
+              <CSSectionHeader
+                eyebrow="Overview"
+                title="System Status"
+                align="left"
+                className="mb-0"
+              />
+              {/* Last updated indicator — Enhancement #14 */}
+              <div className="flex items-center gap-2">
+                {project?.updated_date ? (
+                  <span className="text-[10px] text-gray-400 flex items-center gap-1">
+                    <Clock className="w-3 h-3" />
+                    Updated {new Date(project.updated_date).toLocaleDateString()}
+                  </span>
+                ) : (
+                  <span className="text-[10px] text-gray-300">Last updated pending</span>
+                )}
+                <PortalLazy>
+                  <SystemStatusBadge project={project} />
+                </PortalLazy>
+              </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                <PortalMetricCard
@@ -167,26 +201,26 @@ export default function PortalDashboardOverview({
                  label="Services Active"
                  value={servicesValue}
                  accent="#0088CC"
-                 onClick={() => setActiveTab("performance")}
+                 onClick={() => navigateTab("performance")}
                />
                <PortalMetricCard
                  icon={Zap}
                  label="Quick Start"
                  value={quickStartDone ? "Done" : "Pending"}
                  accent={quickStartDone ? "#10B981" : "#D4AF37"}
-                 onClick={() => setActiveTab("quickstart")}
+                 onClick={() => navigateTab("quickstart")}
                />
                <PortalMetricCard
                  icon={AlertCircle}
                  label="Recent Issues"
                  value={issuesValue}
                  accent={issuesValue === "0" ? "#10B981" : "#D4AF37"}
-                 onClick={() => setActiveTab("performance")}
+                 onClick={() => navigateTab("performance")}
                />
              </div>
           </div>
 
-          {/* Launch Readiness / Score Tracker equivalent */}
+          {/* Launch Readiness — secondary, smaller */}
           <PortalLazy>
             <LaunchReadinessPanel
               order={portalOrder}
@@ -209,41 +243,52 @@ export default function PortalDashboardOverview({
 
         {/* Side column (1/3) */}
         <div className="space-y-6">
+          {/* Notification Center — Phase 4.4 Phase 4 */}
+          <ClientNotificationCenter
+            project={project}
+            deployment={deployment}
+            portalState={portalState}
+            portalStateLoading={portalStateLoading}
+            subscription={subscription}
+            healthData={healthData}
+            onNavigate={navigateTab}
+          />
+
           {/* Getting Started / Action Required */}
           <PortalLazy>
             <GettingStartedBanner project={project} order={portalOrder} />
           </PortalLazy>
 
-          {/* Quick Start upsell */}
+          {/* Quick Start upsell — secondary, compact */}
           {!quickStartDone && (
             <PortalActionCard
               icon={Zap}
               title="Complete Quick Start"
-              description="Configure your SMS, email, and booking settings in under 10 minutes to activate your lead system."
+              description="Configure your SMS, email, and booking settings in under 10 minutes."
               buttonText="Start Setup"
               buttonColor="#0088CC"
-              onClick={() => setActiveTab("quickstart")}
+              onClick={() => navigateTab("quickstart")}
             />
           )}
 
-          {/* Billing upsell */}
+          {/* Billing — secondary, compact */}
           <PortalActionCard
             icon={ShieldCheck}
             title="Manage Your Plan"
-            description="View your subscription, update payment methods, or request plan changes."
+            description="View your subscription, update payment methods, or request changes."
             buttonText="View Billing"
             buttonColor="#0088CC"
-            onClick={() => setActiveTab("billing")}
+            onClick={() => navigateTab("billing")}
           />
 
-          {/* Support — direct CTA */}
+          {/* Support — secondary, compact */}
           <PortalActionCard
             icon={Target}
             title="Need Help?"
-            description="Chat with our support team or browse our knowledge base for quick answers."
+            description="Chat with our support team or browse our knowledge base."
             buttonText="Contact Support"
             buttonColor="#0088CC"
-            onClick={() => setActiveTab("support")}
+            onClick={() => navigateTab("support")}
           />
         </div>
       </div>
