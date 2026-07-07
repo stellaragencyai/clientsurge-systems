@@ -1,4 +1,4 @@
-import { ArrowRight, Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp } from "lucide-react";
+import { ArrowRight, Loader2, AlertCircle, CheckCircle2, ChevronDown, ChevronUp, ShieldCheck, Lock } from "lucide-react";
 import { useState } from "react";
 import CheckoutSocialProof from "@/components/checkout/CheckoutSocialProof";
 
@@ -146,6 +146,22 @@ export default function CheckoutOrderSummary({
           <p className="text-xs text-red-700 leading-relaxed">{error}</p>
         </div>
       )}
+
+      {/* Trust & security signals — SaaS Audit #25 */}
+      <div className="mt-4 pt-4 border-t border-[#eee] flex items-center justify-center gap-4 flex-wrap">
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#666]">
+          <Lock className="w-3.5 h-3.5 text-[#0088CC]" />
+          <span>SSL Encrypted</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#666]">
+          <ShieldCheck className="w-3.5 h-3.5 text-[#0088CC]" />
+          <span>Stripe Secured</span>
+        </div>
+        <div className="flex items-center gap-1.5 text-[11px] font-bold text-[#666]">
+          <CheckCircle2 className="w-3.5 h-3.5 text-[#10B981]" />
+          <span>GDPR Compliant</span>
+        </div>
+      </div>
 
       {/* Finding #92: Social proof + Finding #103: Money-back guarantee at checkout */}
       {step === 2 && <CheckoutSocialProof />}

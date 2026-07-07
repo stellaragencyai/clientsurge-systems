@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { CheckCircle2, ShieldCheck, Wallet, ArrowRight, Sparkles, X } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "@/components/landing/MoneyBackGuarantee";
+import Breadcrumb from "@/components/seo/Breadcrumb";
 import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import ScarcityBadge from "@/components/pricing/ScarcityBadge";
 import EnhancedPricingCard from "@/components/pricing/EnhancedPricingCard";
@@ -61,6 +62,9 @@ export default function PricingPageContent() {
 
   return (
     <div className="min-h-screen bg-background">
+      <div className="mx-auto max-w-6xl px-6 pt-[calc(var(--cs-nav-height)+1rem)]">
+        <Breadcrumb items={[{ label: "Pricing", path: "/pricing" }]} />
+      </div>
       {industryName && (
         <div className="mx-auto max-w-3xl mt-4 px-6">
           <div className="flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/8 px-4 py-3">

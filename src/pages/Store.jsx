@@ -11,6 +11,7 @@ import { setPageMetadata } from "@/lib/seo";
 import { trackCTA } from "@/lib/analytics";
 import { useSearchParams } from "react-router-dom";
 import SectionHeader from "@/components/design-system/SectionHeader";
+import Breadcrumb from "@/components/seo/Breadcrumb";
 
 const checkoutHrefForPackage = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
 
@@ -54,6 +55,9 @@ function StoreInner() {
   return (
     <div className="min-h-screen bg-background">
       <Navbar />
+      <div className="mx-auto max-w-6xl px-6 pt-[calc(var(--cs-nav-height)+1rem)]">
+        <Breadcrumb items={[{ label: "Store", path: "/store" }]} />
+      </div>
       <main className="pt-[calc(var(--cs-nav-height)+40px)]">
         <section className="px-6 pb-10 text-center">
           <SectionHeader
