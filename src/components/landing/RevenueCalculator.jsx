@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, TrendingDown, DollarSign } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import CSButton from "@/components/design-system/CSButton";
 
 export default function RevenueCalculator() {
   const [leads, setLeads] = useState(50);
@@ -138,12 +138,9 @@ export default function RevenueCalculator() {
                 </div>
               </div>
 
-              <a href="/book">
-                <Button className="rounded-full w-full font-semibold gap-2 h-12">
-                  Stop the Leak - Free Automation Audit
-                  <ArrowRight className="w-4 h-4" />
-                </Button>
-              </a>
+              <CSButton href="/book" size="lg" iconRight={ArrowRight} className="w-full h-12">
+                Stop the Leak - Free Automation Audit
+              </CSButton>
               <p className="text-xs text-muted-foreground text-center mt-3">
                 Estimate only. Actual results depend on lead quality, close rate, offer, and response coverage.
               </p>
@@ -154,4 +151,3 @@ export default function RevenueCalculator() {
     </section>
   );
 }
-

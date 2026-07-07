@@ -1,5 +1,5 @@
 import { X, ArrowRight } from "lucide-react";
-import { Button } from "@/components/ui/button";
+import CSButton from "@/components/design-system/CSButton";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 
 const industryImages = {
@@ -75,12 +75,9 @@ export default function IndustryModal({ industry, onClose }) {
           </div>
 
           {/* CTA Button */}
-          <a href={industry.href} className="block">
-            <Button className="w-full rounded-full h-12 text-base font-semibold gap-2">
-              {industry.cta}
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </a>
+          <CSButton href={industry.href} size="lg" iconRight={ArrowRight} className="w-full h-12">
+            {industry.cta}
+          </CSButton>
 
           {/* Trust signal */}
           <p className="text-center text-xs text-muted-foreground mt-4">

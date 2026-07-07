@@ -88,8 +88,8 @@ export default function PackageCard({
           onClick={ctaAction}
           className={`w-full py-3 rounded-lg font-semibold flex items-center justify-center gap-2 transition ${
             highlighted
-              ? 'bg-primary text-white hover:bg-primary/90'
-              : 'bg-primary/10 text-primary hover:bg-primary/20'
+              ? 'cs-btn-primary'
+              : 'cs-btn-outline'
           }`}
         >
           {ctaLabel}
