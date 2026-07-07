@@ -1,9 +1,12 @@
 /**
  * AutomationChecklist + SetupProgressBar — #265 #266
  * Reads live data from AutomationChecklist and AutomationChecklistStep entities.
+ * Phase A.3: Raw "active" status and green 100% progress gated by PortalStateEngine.
  */
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const FALLBACK_FIELDS = [
   { key: "twilio_configured", label: "Twilio SMS configured", icon: "📱" },
@@ -17,9 +20,13 @@ const FALLBACK_FIELDS = [
   { key: "went_live", label: "System is live", icon: "🚀" },
 ];
 
-export default function AutomationChecklist({ order_id }) {
+export default function AutomationChecklist({ order_id, portalState, isAdmin = false }) {
   const [checklists, setChecklists] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // Phase A.3: Normalized proof state
+  const cardState = getCardState(portalState, "installation_progress");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
 
   useEffect(() => {
     if (!order_id) {
@@ -63,10 +70,23 @@ export default function AutomationChecklist({ order_id }) {
 
   return (
     <div>
+      {/* Phase A.3: Proof notice when not Live */}
+      {!isProofLive && (
+        <div style={{
+          padding: "10px 14px", marginBottom: "16px", borderRadius: "10px",
+          background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)",
+          fontSize: "12px", color: "#0088CC", fontWeight: "600",
+        }}>
+          {cardState.display_text}
+        </div>
+      )}
+
       <div style={{ marginBottom: 20 }}>
         <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 8 }}>
           <span style={{ color: "#9CA3AF", fontSize: 13 }}>Setup Progress</span>
-          <span style={{ color: pct === 100 ? "#00FFB3" : "#F59E0B", fontWeight: 700, fontSize: 13 }}>{pct}%</span>
+          <span style={{ color: pct === 100 && isProofLive ? "#00FFB3" : "#00AEEF", fontWeight: 700, fontSize: 13 }}>
+            {pct}%
+          </span>
         </div>
         <div style={{ background: "rgba(255,255,255,0.08)", borderRadius: 9999, height: 8, overflow: "hidden" }}>
           <div
@@ -75,7 +95,10 @@ export default function AutomationChecklist({ order_id }) {
               borderRadius: 9999,
               width: `${pct}%`,
               transition: "width 0.6s ease",
-              background: pct === 100 ? "linear-gradient(90deg,#00D4FF,#00FFB3)" : "linear-gradient(90deg,#00AEEF,#7C3AED)",
+              // Phase A.3: Green gradient only when proof-validated; otherwise blue
+              background: pct === 100 && isProofLive
+                ? "linear-gradient(90deg,#00D4FF,#00FFB3)"
+                : "linear-gradient(90deg,#00AEEF,#7C3AED)",
             }}
           />
         </div>
@@ -113,8 +136,12 @@ export default function AutomationChecklist({ order_id }) {
                       {checklist.service_key} · {doneCount}/{stepCount} steps complete
                     </p>
                   </div>
-                  <span style={{ color: checklist.status === "active" ? "#00FFB3" : "#F59E0B", fontSize: 11, fontWeight: 700 }}>
-                    {checklist.status || "not_started"}
+                  {/* Phase A.3: Gate green "active" status behind proof */}
+                  <span style={{
+                    color: checklist.status === "active" && isProofLive ? "#00FFB3" : "#00AEEF",
+                    fontSize: 11, fontWeight: 700,
+                  }}>
+                    {checklist.status === "active" && !isProofLive ? "Verifying" : (checklist.status || "not_started")}
                   </span>
                 </div>
                 {(steps.length ? steps : FALLBACK_FIELDS).map((item) => {
@@ -146,6 +173,8 @@ export default function AutomationChecklist({ order_id }) {
           })
         )}
       </div>
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }

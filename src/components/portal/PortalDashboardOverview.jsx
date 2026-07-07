@@ -215,6 +215,7 @@ export default function PortalDashboardOverview({
               services={services}
               failedEvents={(healthData?.recent_events || []).filter((e) => e.status === "failed")}
               isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              portalState={portalState}
             />
           </PortalLazy>
         </div>

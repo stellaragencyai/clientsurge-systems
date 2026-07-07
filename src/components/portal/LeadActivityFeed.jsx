@@ -12,6 +12,8 @@ import {
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import LeadScoreCard from "./LeadScoreCard";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const STATUS_COLORS = {
   New: "bg-blue-100 text-blue-700",
@@ -91,10 +93,15 @@ function LeadRow({ lead }) {
   );
 }
 
-export default function LeadActivityFeed({ project }) {
+export default function LeadActivityFeed({ project, portalState, isAdmin = false }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Phase A.3: Proof gate — aggregate stats suppressed until proof-validated
+  const cardState = getCardState(portalState, "lead_capture");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
+  const displayValue = (val) => isProofLive ? val : "Pending";
 
   const loadLeads = useCallback(async () => {
     setLoading(true);
@@ -187,7 +194,14 @@ export default function LeadActivityFeed({ project }) {
         </div>
       </div>
 
-      {/* Stats */}
+      {/* Phase A.3: Proof notice */}
+      {!isProofLive && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-3 text-sm text-blue-700 font-medium">
+          {cardState.display_text}
+        </div>
+      )}
+
+      {/* Stats — values suppressed when proof not Live */}
       {total === 0 ? (
         <div className="rounded-2xl border border-dashed border-border p-10 text-center text-muted-foreground">
           <Users className="w-10 h-10 mx-auto mb-3 opacity-20" />
@@ -197,33 +211,39 @@ export default function LeadActivityFeed({ project }) {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <StatCard icon={Users} label="Total Leads" value={total} sub="All time" color="blue" />
-            <StatCard icon={MessageSquare} label="Contacted" value={contacted} sub="Reached by your system" color="purple" />
-            <StatCard icon={TrendingUp} label="Qualified" value={qualified} sub="High-intent leads" color="amber" />
-            <StatCard icon={CheckCircle2} label="Booked" value={booked} sub="Converted to appointment" color="emerald" />
+            <StatCard icon={Users} label="Total Leads" value={displayValue(total)} sub="All time" color="blue" />
+            <StatCard icon={MessageSquare} label="Contacted" value={displayValue(contacted)} sub={isProofLive ? "Reached by your system" : "Verifying"} color="purple" />
+            <StatCard icon={TrendingUp} label="Qualified" value={displayValue(qualified)} sub={isProofLive ? "High-intent leads" : "Verifying"} color="amber" />
+            <StatCard icon={CheckCircle2} label="Booked" value={displayValue(booked)} sub={isProofLive ? "Converted to appointment" : "Verifying"} color="emerald" />
           </div>
 
-          {/* Conversion bar */}
-          <div className="rounded-2xl border border-border bg-white p-5">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-sm font-semibold text-foreground">Pipeline Conversion</p>
-              <p className="text-xs text-muted-foreground">{booked} of {total} leads booked</p>
+          {/* Conversion bar — suppressed when proof not Live */}
+          {isProofLive ? (
+            <div className="rounded-2xl border border-border bg-white p-5">
+              <div className="flex items-center justify-between mb-3">
+                <p className="text-sm font-semibold text-foreground">Pipeline Conversion</p>
+                <p className="text-xs text-muted-foreground">{booked} of {total} leads booked</p>
+              </div>
+              <div className="h-3 rounded-full bg-muted overflow-hidden">
+                <div
+                  className="h-full rounded-full transition-all duration-700"
+                  style={{
+                    width: `${Math.round((booked / total) * 100)}%`,
+                    background: "linear-gradient(90deg, #7a4825, #c8965c)",
+                  }}
+                />
+              </div>
+              <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
+                <span>0%</span>
+                <span className="font-semibold text-foreground">{Math.round((booked / total) * 100)}% book rate</span>
+                <span>100%</span>
+              </div>
             </div>
-            <div className="h-3 rounded-full bg-muted overflow-hidden">
-              <div
-                className="h-full rounded-full transition-all duration-700"
-                style={{
-                  width: `${Math.round((booked / total) * 100)}%`,
-                  background: "linear-gradient(90deg, #7a4825, #c8965c)",
-                }}
-              />
+          ) : (
+            <div className="rounded-2xl border border-blue-200 bg-blue-50/30 p-5 text-sm text-blue-700 font-medium">
+              Pipeline conversion metrics will display once your system is verified.
             </div>
-            <div className="flex justify-between mt-2 text-[11px] text-muted-foreground">
-              <span>0%</span>
-              <span className="font-semibold text-foreground">{Math.round((booked / total) * 100)}% book rate</span>
-              <span>100%</span>
-            </div>
-          </div>
+          )}
 
           {/* Leads table with bulk select */}
           <div
@@ -261,33 +281,37 @@ export default function LeadActivityFeed({ project }) {
             )}
           </div>
 
-          {/* Status breakdown */}
-          <div className="rounded-2xl border border-border bg-white p-5">
-            <h3 className="font-semibold text-foreground mb-4">Status Breakdown</h3>
-            <div className="space-y-2">
-              {["New","Contacted","Replied","Qualified","Booking Prompt Sent","Booked","Closed"].map(status => {
-                const count = leads.filter(l => l.status === status).length;
-                if (count === 0) return null;
-                const pct = Math.round((count / total) * 100);
-                return (
-                  <div key={status} className="flex items-center gap-3">
-                    <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold w-28 justify-center flex-shrink-0 ${STATUS_COLORS[status]}`}>
-                      {status}
-                    </span>
-                    <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
-                      <div
-                        className="h-full rounded-full"
-                        style={{ width: `${pct}%`, background: "linear-gradient(90deg,#9a5c2e,#c8965c)" }}
-                      />
+          {/* Status breakdown — suppressed when proof not Live */}
+          {isProofLive ? (
+            <div className="rounded-2xl border border-border bg-white p-5">
+              <h3 className="font-semibold text-foreground mb-4">Status Breakdown</h3>
+              <div className="space-y-2">
+                {["New","Contacted","Replied","Qualified","Booking Prompt Sent","Booked","Closed"].map(status => {
+                  const count = leads.filter(l => l.status === status).length;
+                  if (count === 0) return null;
+                  const pct = Math.round((count / total) * 100);
+                  return (
+                    <div key={status} className="flex items-center gap-3">
+                      <span className={`inline-flex rounded-full px-2 py-0.5 text-[10px] font-bold w-28 justify-center flex-shrink-0 ${STATUS_COLORS[status]}`}>
+                        {status}
+                      </span>
+                      <div className="flex-1 h-2 rounded-full bg-muted overflow-hidden">
+                        <div
+                          className="h-full rounded-full"
+                          style={{ width: `${pct}%`, background: "linear-gradient(90deg,#9a5c2e,#c8965c)" }}
+                        />
+                      </div>
+                      <span className="text-xs font-semibold text-foreground w-6 text-right">{count}</span>
                     </div>
-                    <span className="text-xs font-semibold text-foreground w-6 text-right">{count}</span>
-                  </div>
-                );
-              })}
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          ) : null}
         </>
       )}
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }

@@ -435,6 +435,7 @@ export default function ClientPortal() {
                   services={portalOrder?.services || []}
                   failedEvents={(healthData?.recent_events || []).filter(e => e.status === "failed")}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  portalState={portalState}
                 />
               </PortalLazy>
 
@@ -453,7 +454,10 @@ export default function ClientPortal() {
               </PortalLazy>
 
               <PortalLazy>
-                <RevenueMetricsPanel />
+                <RevenueMetricsPanel
+                  portalState={portalState}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
               </PortalLazy>
 
               <div className="border-t border-border pt-6">
@@ -519,7 +523,11 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <AutomationChecklist order_id={portalOrder?.id} />
+                <AutomationChecklist
+                  order_id={portalOrder?.id}
+                  portalState={portalState}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
               </PortalLazy>
             </PortalTabWrapper>
           )}
@@ -532,7 +540,11 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <LeadActivityFeed project={project} />
+                <LeadActivityFeed
+                  project={project}
+                  portalState={portalState}
+                  isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                />
               </PortalLazy>
             </PortalTabWrapper>
           )}
@@ -549,7 +561,13 @@ export default function ClientPortal() {
                   <GettingStartedBanner project={project} order={portalOrder} />
                 </PortalLazy>
                 <PortalLazy>
-                  <SetupProgressHub project={project} order={portalOrder} user={user} />
+                  <SetupProgressHub
+                    project={project}
+                    order={portalOrder}
+                    user={user}
+                    portalState={portalState}
+                    isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+                  />
                 </PortalLazy>
                 <PortalLazy>
                   <OrderTracker />

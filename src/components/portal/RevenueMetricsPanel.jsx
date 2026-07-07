@@ -2,6 +2,8 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import { TrendingUp, Users, CheckCircle2, Zap, Loader2, RefreshCw, Download, AlertCircle } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, Cell } from "recharts";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const CLIENTSURGE_BLUE = "#00AEEF";
 const CLIENTSURGE_BLUE_DEEP = "#006BB0";
@@ -46,10 +48,14 @@ function EmptyState({ message }) {
   );
 }
 
-export default function RevenueMetricsPanel() {
+export default function RevenueMetricsPanel({ portalState, isAdmin = false }) {
   const [data, setData] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // Phase A.3: Proof gate — revenue/ROI numbers only show when proof-validated
+  const cardState = getCardState(portalState, "roi_revenue_impact");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
 
   const load = async () => {
     setLoading(true);
@@ -157,6 +163,9 @@ export default function RevenueMetricsPanel() {
     </div>
   );
 
+  // Phase A.3: When proof not Live, suppress unproven revenue/ROI numbers
+  const displayValue = (val) => isProofLive ? val : "Pending";
+
   return (
     <div className="space-y-6">
       {/* Header actions */}
@@ -171,18 +180,27 @@ export default function RevenueMetricsPanel() {
           <button onClick={load} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-border text-sm text-muted-foreground hover:bg-muted transition">
             <RefreshCw className="w-4 h-4" /> Refresh
           </button>
-          <button onClick={handleDownload} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition">
-            <Download className="w-4 h-4" /> Download Report
-          </button>
+          {isProofLive && (
+            <button onClick={handleDownload} className="flex items-center gap-1.5 px-3 py-2 rounded-lg border border-primary/25 bg-primary/5 text-sm font-semibold text-primary hover:bg-primary/10 transition">
+              <Download className="w-4 h-4" /> Download Report
+            </button>
+          )}
         </div>
       </div>
 
-      {/* KPI cards */}
+      {/* Phase A.3: Proof notice */}
+      {!isProofLive && (
+        <div className="rounded-xl border border-blue-200 bg-blue-50/50 px-4 py-3 text-sm text-blue-700 font-medium">
+          {cardState.display_text}
+        </div>
+      )}
+
+      {/* KPI cards — values suppressed when proof not Live */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <StatCard icon={Users} label="Total Leads" value={safeTotals.totalLeads} sub="All time" color="blue" />
-        <StatCard icon={CheckCircle2} label="Booked" value={safeTotals.bookedLeads} sub={`${safeTotals.conversionRate}% conversion`} color="green" />
-        <StatCard icon={Zap} label="Automations Fired" value={safeTotals.totalAutomations} sub={`${safeTotals.smsSent} SMS · ${safeTotals.emailSent} email`} color="amber" />
-        <StatCard icon={TrendingUp} label="Est. Revenue" value={formatCurrency(safeTotals.estimatedRevenue)} sub="Based on bookings" color="navy" />
+        <StatCard icon={Users} label="Total Leads" value={displayValue(safeTotals.totalLeads)} sub="All time" color="blue" />
+        <StatCard icon={CheckCircle2} label="Booked" value={displayValue(safeTotals.bookedLeads)} sub={isProofLive ? `${safeTotals.conversionRate}% conversion` : "Verifying"} color="green" />
+        <StatCard icon={Zap} label="Automations Fired" value={displayValue(safeTotals.totalAutomations)} sub={isProofLive ? `${safeTotals.smsSent} SMS · ${safeTotals.emailSent} email` : "Verifying"} color="amber" />
+        <StatCard icon={TrendingUp} label="Est. Revenue" value={displayValue(formatCurrency(safeTotals.estimatedRevenue))} sub={isProofLive ? "Based on bookings" : "Verifying"} color="navy" />
       </div>
 
       {/* Weekly trend chart */}
@@ -229,16 +247,16 @@ export default function RevenueMetricsPanel() {
         </div>
       )}
 
-      {/* Key metrics table */}
+      {/* Key metrics table — values suppressed when proof not Live */}
       <div className="bg-card border border-border rounded-2xl p-6">
         <h4 className="font-semibold text-foreground mb-4">Key Metrics</h4>
         <div className="space-y-3">
           {[
-            { label: "Conversion Rate", value: `${safeTotals.conversionRate}%` },
-            { label: "Response Rate", value: `${safeTotals.responseRate}%` },
-            { label: "SMS Messages Sent", value: safeTotals.smsSent },
-            { label: "Emails Sent", value: safeTotals.emailSent },
-            { label: "Failed Events", value: safeTotals.failedEvents },
+            { label: "Conversion Rate", value: isProofLive ? `${safeTotals.conversionRate}%` : "Pending" },
+            { label: "Response Rate", value: isProofLive ? `${safeTotals.responseRate}%` : "Pending" },
+            { label: "SMS Messages Sent", value: displayValue(safeTotals.smsSent) },
+            { label: "Emails Sent", value: displayValue(safeTotals.emailSent) },
+            { label: "Failed Events", value: displayValue(safeTotals.failedEvents) },
           ].map(item => (
             <div key={item.label} className="flex justify-between items-center py-2 border-b border-border/50 last:border-0">
               <span className="text-sm text-muted-foreground">{item.label}</span>
@@ -247,6 +265,8 @@ export default function RevenueMetricsPanel() {
           ))}
         </div>
       </div>
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }

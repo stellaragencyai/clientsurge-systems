@@ -8,6 +8,8 @@ import OnboardingTracker from "./OnboardingTracker";
 import SetupVideoGuide from "./SetupVideoGuide";
 import AutomationStatusExplainer from "./AutomationStatusExplainer";
 import GuaranteeCard from "./GuaranteeCard";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 // ─── STEP CONFIG ────────────────────────────────────────────────────────────
 const STEPS = [
@@ -30,13 +32,15 @@ const ASSET_CATEGORIES = [
 ];
 
 // ─── PROGRESS BAR ────────────────────────────────────────────────────────────
-function ProgressSection({ project }) {
+function ProgressSection({ project, isProofLive, cardState }) {
   const steps = STEPS.map(s => ({ ...s, status: project[s.key] || "pending" }));
   const completed = steps.filter(s => s.status === "complete").length;
   const pct = Math.round((completed / steps.length) * 100);
   const allDone = completed === steps.length;
   const [expanded, setExpanded] = useState(false);
 
+  // Phase A.3: "Live" celebration only when proof-validated
+  const canCelebrateLive = allDone && isProofLive;
   const current = steps.find(s => s.status === "in_progress") || steps.find(s => s.status === "pending");
 
   return (
@@ -58,7 +62,7 @@ function ProgressSection({ project }) {
               Configuration Progress
             </p>
             <h3 style={{ fontSize: "18px", fontWeight: "800", color: "#ffffff", margin: 0 }}>
-              {allDone ? "🎉 Your System Is Live!" : `Step ${completed + 1} of ${steps.length}`}
+              {canCelebrateLive ? "🎉 Your System Is Live!" : allDone ? "Verifying Your System…" : `Step ${completed + 1} of ${steps.length}`}
             </h3>
           </div>
           <div style={{
@@ -536,8 +540,12 @@ function InlineChat({ project, user }) {
 }
 
 // ─── MAIN EXPORT ─────────────────────────────────────────────────────────────
-export default function SetupProgressHub({ project, order, user }) {
+export default function SetupProgressHub({ project, order, user, portalState, isAdmin = false }) {
   const [projectState, setProjectState] = useState(project);
+
+  // Phase A.3: Proof gate — "Live" celebration gated by PortalStateEngine
+  const cardState = getCardState(portalState, "installation_progress");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
 
   useEffect(() => {
     if (!project?.id) return;
@@ -551,12 +559,15 @@ export default function SetupProgressHub({ project, order, user }) {
 
   // Determine current install status for contextual explainer
   const installStatus = order?.pipeline_status || order?.order_status || null;
-  const displayStatus = {
+  const rawDisplayStatus = {
     "pending_payment": "Paid",
     "paid_setup_in_progress": "Ready for Install",
     "partially_live": "Configuring",
     "fully_live": "Live",
   }[installStatus] || installStatus || "Ready for Install";
+
+  // Phase A.3: Gate "Live" status — show "Testing" when proof not yet validated
+  const displayStatus = rawDisplayStatus === "Live" && !isProofLive ? "Testing" : rawDisplayStatus;
 
   return (
     <div style={{ display: "flex", flexDirection: "column", gap: "16px" }}>
@@ -565,7 +576,7 @@ export default function SetupProgressHub({ project, order, user }) {
       {/* Contextual status explainer */}
       {order && <AutomationStatusExplainer status={displayStatus} serviceName="Your System Status" />}
 
-      <ProgressSection project={projectState} />
+      <ProgressSection project={projectState} isProofLive={isProofLive} cardState={cardState} />
 
       {/* Setup video guides */}
       <SetupVideoGuide />
@@ -575,6 +586,8 @@ export default function SetupProgressHub({ project, order, user }) {
 
       <AssetUploader project={projectState} onUploaded={setProjectState} />
       <InlineChat project={projectState} user={user} />
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }

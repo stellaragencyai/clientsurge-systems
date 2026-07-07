@@ -1,10 +1,13 @@
 import { CheckCircle2, Clock, AlertTriangle, Ban, Settings, TestTube, Zap } from "lucide-react";
 import { getPackageAutomations, getDisplayServiceName } from "@/lib/dashboardHelpers";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const STATUS_CONFIG = {
   NotIncluded: { icon: Ban, color: "#9ca3af", label: "Not Included", bg: "rgba(156,163,175,0.05)", glow: "none" },
   SetupPending: { icon: Settings, color: "#8b5cf6", label: "Setup Pending", bg: "rgba(139,92,246,0.05)", glow: "none" },
   Testing: { icon: TestTube, color: "#00AEEF", label: "Testing", bg: "rgba(0,174,239,0.05)", glow: "0 0 10px rgba(0,174,239,0.2)" },
+  Verifying: { icon: Clock, color: "#00AEEF", label: "Verifying", bg: "rgba(0,174,239,0.05)", glow: "none" },
   Live: { icon: CheckCircle2, color: "#22c55e", label: "Live", bg: "rgba(34,197,94,0.05)", glow: "0 0 12px rgba(34,197,94,0.15)" },
   NeedsAttention: { icon: AlertTriangle, color: "#ef4444", label: "Needs Attention", bg: "rgba(239,68,68,0.05)", glow: "none" },
 };
@@ -34,7 +37,9 @@ function resolveAutomationStatus(automationKey, services, failedEvents) {
   return "SetupPending";
 }
 
-export default function ActiveAutomationsPanel({ packageKey, services = [], failedEvents = [], isAdmin = false }) {
+export default function ActiveAutomationsPanel({ packageKey, services = [], failedEvents = [], isAdmin = false, portalState }) {
+  const cardState = getCardState(portalState, "automation_health");
+  const isProofLive = cardState.status === CARD_STATUS.LIVE;
   const automations = getPackageAutomations(packageKey);
 
   return (
@@ -53,6 +58,17 @@ export default function ActiveAutomationsPanel({ packageKey, services = [], fail
         </p>
       </div>
 
+      {/* Phase A.3: Proof gate — suppress "Live" until proof validated */}
+      {!isProofLive && (
+        <div style={{
+          padding: "10px 14px", marginBottom: "12px", borderRadius: "10px",
+          background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)",
+          fontSize: "12px", color: "#0088CC", fontWeight: "600",
+        }}>
+          {cardState.display_text}
+        </div>
+      )}
+
       {automations.length === 0 ? (
         <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.45)", margin: 0 }}>
           No automation package detected for this account.
@@ -60,7 +76,11 @@ export default function ActiveAutomationsPanel({ packageKey, services = [], fail
       ) : (
         <div style={{ display: "flex", flexDirection: "column", gap: "10px" }}>
           {automations.map((auto) => {
-            const resolved = resolveAutomationStatus(auto.key, services, failedEvents);
+            let resolved = resolveAutomationStatus(auto.key, services, failedEvents);
+            // Phase A.3: Gate "Live" behind PortalStateEngine proof validation
+            if (resolved === "Live" && !isProofLive) {
+              resolved = "Verifying";
+            }
             const config = STATUS_CONFIG[resolved] || STATUS_CONFIG.SetupPending;
             const Icon = config.icon;
 
@@ -102,6 +122,8 @@ export default function ActiveAutomationsPanel({ packageKey, services = [], fail
           })}
         </div>
       )}
+
+      <PortalAdminDiagnostics card={cardState} isAdmin={isAdmin} />
     </div>
   );
 }
