@@ -98,6 +98,43 @@ Deno.serve(async (req) => {
     }
     const scope = { client_id: resolvedClientId, client_project_id: lead.client_project_id || campaign.client_project_id };
 
+    // ── PHASE 2: DEPLOYMENT CONTEXT + MODULE PERMISSION ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    try {
+      const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+        { client_id: resolvedClientId, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+        '-created_date', 1
+      );
+      const deployment = deployments?.[0] || null;
+      if (deployment) {
+        const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+          deployment_id: deployment.id, module_key: 'lead_nurture',
+          client_id: resolvedClientId, environment: lead.environment || null,
+        });
+        if (permRes.data?.authorized !== true) {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            client_deployment_id: deployment.id, client_id: resolvedClientId,
+            module_key: 'lead_nurture', trigger_event: 'email_drip_step',
+            execution_status: 'blocked',
+            error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+            error_code: permRes.data?.reason || 'module_not_authorized',
+            lead_id: lead_id,
+          }).catch(() => {});
+          return secureJson({ success: false, blocked: true, reason: permRes.data?.reason, message: 'Module not authorized for this deployment' }, { status: 403 });
+        }
+        _obsCtx = {
+          deployment_id: deployment.id, client_id: resolvedClientId,
+          client_project_id: scope.client_project_id,
+          industry_config_id: deployment.industry_config_id || null,
+          module_key: 'lead_nurture', trigger_event: 'email_drip_step',
+          lead_id: lead_id, environment: lead.environment || null,
+        };
+      }
+    } catch (err) {
+      console.warn('[sendEmailDripStep] Deployment/permission check failed:', err.message);
+    }
+
     // 4. Send via Resend
     const emailResult = await base44.asServiceRole.integrations.Core.SendEmail({
       to: lead.email,
@@ -157,6 +194,18 @@ Deno.serve(async (req) => {
         }
       );
       console.log(`[SendEmailDrip] Campaign ${campaign_id} completed`);
+    }
+
+    // ── PHASE 2: LOG EXECUTION RESULT ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: 'completed',
+          external_provider_reference: emailResult?.id || null,
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
     }
 
     return secureJson({

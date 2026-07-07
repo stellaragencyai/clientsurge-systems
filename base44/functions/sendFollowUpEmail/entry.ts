@@ -65,6 +65,43 @@ Deno.serve(async (req) => {
     }
     const scope = { client_id: lead.client_id, client_project_id: lead.client_project_id };
 
+    // ── PHASE 2: DEPLOYMENT CONTEXT + MODULE PERMISSION ──
+    const _obsStartTime = Date.now();
+    let _obsCtx = null;
+    try {
+      const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+        { client_id: lead.client_id, deployment_status: { $in: ['live', 'onboarding', 'configuring', 'ready'] } },
+        '-created_date', 1
+      );
+      const deployment = deployments?.[0] || null;
+      if (deployment) {
+        const permRes = await base44.asServiceRole.functions.invoke('checkModulePermission', {
+          deployment_id: deployment.id, module_key: 'lead_nurture',
+          client_id: lead.client_id, environment: lead.environment || null,
+        });
+        if (permRes.data?.authorized !== true) {
+          await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+            client_deployment_id: deployment.id, client_id: lead.client_id,
+            module_key: 'lead_nurture', trigger_event: 'follow_up_email',
+            execution_status: 'blocked',
+            error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
+            error_code: permRes.data?.reason || 'module_not_authorized',
+            lead_id: job.lead_id,
+          }).catch(() => {});
+          return secureJson({ success: false, blocked: true, reason: permRes.data?.reason, message: 'Module not authorized for this deployment' }, { status: 403 });
+        }
+        _obsCtx = {
+          deployment_id: deployment.id, client_id: lead.client_id,
+          client_project_id: scope.client_project_id,
+          industry_config_id: deployment.industry_config_id || null,
+          module_key: 'lead_nurture', trigger_event: 'follow_up_email',
+          lead_id: job.lead_id, environment: lead.environment || null,
+        };
+      }
+    } catch (err) {
+      console.warn('[sendFollowUpEmail] Deployment/permission check failed:', err.message);
+    }
+
     const settings = await base44.asServiceRole.entities.AdminSettings.list();
     const adminSettings = settings?.[0] || {};
 
@@ -162,6 +199,19 @@ Deno.serve(async (req) => {
       processed_at: new Date().toISOString(),
       result_metadata: JSON.stringify(emailResult),
     });
+
+    // ── PHASE 2: LOG EXECUTION RESULT ──
+    if (_obsCtx) {
+      try {
+        await base44.asServiceRole.functions.invoke('logAutomationExecution', {
+          ..._obsCtx,
+          execution_status: emailResult?.id ? 'completed' : 'failed',
+          external_provider_reference: emailResult?.id || null,
+          error_message: emailResult?.id ? null : 'Email send returned no provider ID',
+          execution_time_ms: Date.now() - _obsStartTime,
+        });
+      } catch (_) {}
+    }
 
     return secureJson({
       success: true,

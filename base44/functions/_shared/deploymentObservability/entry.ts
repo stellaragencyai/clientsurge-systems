@@ -60,8 +60,9 @@ export async function checkPermission(base44, deploymentId, moduleKey) {
     };
   } catch (err) {
     console.warn('[deploymentObservability] checkModulePermission failed:', err.message);
-    // Fail open — don't block automation if the permission service is down
-    return { authorized: true, reason: 'permission_check_failed_fail_open', error: err.message };
+    // FAIL-CLOSED: If the permission service is down, block automation rather than
+    // risk executing a module the deployment may not be entitled to.
+    return { authorized: false, reason: 'permission_check_failed_fail_closed', error: err.message };
   }
 }
 
