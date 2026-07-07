@@ -1,55 +1,44 @@
-import { ArrowRight, Check } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import { ArrowRight } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 
-export default function IndustryFinalCTA({ config }) {
+/**
+ * Premium final CTA section.
+ * Renders industry-specific CTA with gradient background.
+ *
+ * Props:
+ *   - finalCTA: { headline: string, body: string, buttonLabel: string }
+ */
+export default function IndustryFinalCTA({ finalCTA }) {
+  const navigate = useNavigate();
+
+  if (!finalCTA) return null;
+
+  const { headline, body, buttonLabel } = finalCTA;
+
   return (
-    <div className="max-w-4xl mx-auto text-center text-white">
-      <h2 className="text-4xl md:text-5xl font-bold mb-6">Ready to Recover Lost Revenue?</h2>
-
-      <p className="text-xl opacity-90 mb-10 max-w-2xl mx-auto">
-        Stop losing leads to slow response times. Start capturing every opportunity with AI-powered automation.
-      </p>
-
-      {/* CTA Buttons */}
-      <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-12">
-        <Link
-          to="/pricing"
-          className="inline-flex items-center gap-2 bg-white text-primary px-8 py-4 rounded-lg font-semibold hover:shadow-xl hover:scale-105 transition-all"
-        >
-          {config.cta}
-          <ArrowRight className="w-5 h-5" />
-        </Link>
-
-        <Link
-          to="/book"
-          className="inline-flex items-center gap-2 border-2 border-white text-white px-8 py-4 rounded-lg font-semibold hover:bg-white/10 transition-colors"
-        >
-          Book a Free Audit
-          <ArrowRight className="w-5 h-5" />
-        </Link>
-      </div>
-
-      {/* Trust indicators */}
-      <div className="space-y-4">
-        <div className="flex flex-col sm:flex-row gap-6 justify-center items-center text-sm opacity-90">
-          <div className="flex items-center gap-2">
-            <Check className="w-5 h-5" />
-            <span>Free setup (we handle it)</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="w-5 h-5" />
-            <span>Live within 48 hours</span>
-          </div>
-          <div className="flex items-center gap-2">
-            <Check className="w-5 h-5" />
-            <span>Dedicated onboarding</span>
-          </div>
+    <section className="py-16 md:py-24 px-4 md:px-6">
+      <div className="max-w-4xl mx-auto text-center rounded-3xl border border-primary/15 bg-gradient-to-br from-[#003b8f] to-[#00aeef] p-8 md:p-12 text-white shadow-[0_24px_80px_rgba(0,107,176,0.24)]">
+        <p className="mb-3 text-xs font-black uppercase tracking-[0.24em] text-white/75">Get Started</p>
+        <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight">{headline}</h2>
+        <p className="mx-auto mt-4 max-w-2xl text-sm md:text-base leading-relaxed text-white/82">{body}</p>
+        <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
+          <button
+            onClick={() => navigate('/pricing')}
+            className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition-transform hover:-translate-y-0.5"
+            style={{ minHeight: '44px' }}
+          >
+            {buttonLabel}
+            <ArrowRight className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => navigate('/automations')}
+            className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 bg-white/10 text-sm font-bold text-white backdrop-blur hover:bg-white/16 transition-colors"
+            style={{ minHeight: '44px' }}
+          >
+            View Automation Stack
+          </button>
         </div>
-
-        <p className="text-sm opacity-75">
-          Questions? <a href="mailto:support@clientsurgesystems.com" className="underline hover:opacity-100">Email our team</a> or <Link to="/contact" className="underline hover:opacity-100">contact us</Link>
-        </p>
       </div>
-    </div>
+    </section>
   );
 }
