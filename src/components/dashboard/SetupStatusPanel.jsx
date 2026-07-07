@@ -4,6 +4,8 @@
  * Renders prominently in the ClientDashboard above the service cards.
  */
 import { AlertCircle, CheckCircle2, Clock, Settings, TestTube, Zap, RefreshCw, ExternalLink } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const STATUS_CONFIG = {
   "Paid": {
@@ -72,18 +74,41 @@ const DEFAULT_CONFIG = {
   action: null,
 };
 
-export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshing }) {
-  const config = STATUS_CONFIG[installStatus] || DEFAULT_CONFIG;
-  const Icon = config.icon;
+export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshing, portalState }) {
+  // Phase A.6: Gate "Live" / completion states behind PortalStateEngine proof
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
 
-  // Don't show the panel when fully live — keeps dashboard clean
-  if (installStatus === "Live") return null;
+  // When raw says Live but proof not validated, show verifying state instead
+  const effectiveStatus = isProofLive
+    ? installStatus
+    : installStatus === "Live" ? "Testing" : installStatus;
 
+  const config = STATUS_CONFIG[effectiveStatus] || DEFAULT_CONFIG;
+
+  // Don't show the panel when fully live AND proof-validated — keeps dashboard clean
+  if (effectiveStatus === "Live" && isProofLive) return null;
+
+  // When raw says Live but proof not validated, override with verifying config
+  const displayConfig = (!isProofLive && installStatus === "Live")
+    ? {
+        icon: Clock,
+        color: "#0088CC",
+        bg: "rgba(0,136,204,0.07)",
+        border: "rgba(0,136,204,0.18)",
+        title: "Verifying Your System — Almost Live",
+        instruction: "Your setup is complete. We're running final verification checks before confirming your system is fully live. This typically takes a short while — no action needed from you.",
+        action: null,
+      }
+    : config;
+
+  const DisplayIcon = displayConfig.icon;
   return (
     <div style={{
       borderRadius: "14px",
-      background: config.bg,
-      border: `1px solid ${config.border}`,
+      background: displayConfig.bg,
+      border: `1px solid ${displayConfig.border}`,
       padding: "18px 22px",
       marginBottom: "20px",
       display: "flex",
@@ -92,38 +117,39 @@ export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshin
     }}>
       <div style={{
         width: "38px", height: "38px", borderRadius: "10px",
-        background: `${config.color}18`,
-        border: `1px solid ${config.color}30`,
+        background: `${displayConfig.color}18`,
+        border: `1px solid ${displayConfig.color}30`,
         display: "flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
       }}>
-        <Icon style={{ width: "18px", height: "18px", color: config.color }} />
+        <DisplayIcon style={{ width: "18px", height: "18px", color: displayConfig.color }} />
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: "13px", fontWeight: "800", color: config.color, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        <p style={{ fontSize: "13px", fontWeight: "800", color: displayConfig.color, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
           Current Status
         </p>
         <p style={{ fontSize: "15px", fontWeight: "700", color: "#0A1628", margin: "0 0 5px" }}>
-          {config.title}
+          {displayConfig.title}
         </p>
         <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.6)", margin: 0, lineHeight: 1.6 }}>
-          {config.instruction}
+          {displayConfig.instruction}
         </p>
 
-        {config.action && (
+        {displayConfig.action && (
           <a
-            href={config.action.href}
+            href={displayConfig.action.href}
             style={{
               display: "inline-flex", alignItems: "center", gap: "5px",
               marginTop: "10px", padding: "7px 14px", borderRadius: "9999px",
-              background: config.color, color: "#fff",
+              background: displayConfig.color, color: "#fff",
               fontSize: "12px", fontWeight: "700", textDecoration: "none",
             }}
           >
-            {config.action.label} <ExternalLink style={{ width: "11px", height: "11px" }} />
+            {displayConfig.action.label} <ExternalLink style={{ width: "11px", height: "11px" }} />
           </a>
         )}
+        <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
       </div>
 
       {onRefresh && (
@@ -134,11 +160,11 @@ export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshin
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
             width: "32px", height: "32px", borderRadius: "8px",
-            background: "transparent", border: `1px solid ${config.border}`,
+            background: "transparent", border: `1px solid ${displayConfig.border}`,
             cursor: "pointer", flexShrink: 0, opacity: isRefreshing ? 0.5 : 1,
           }}
         >
-          <RefreshCw style={{ width: "13px", height: "13px", color: config.color, animation: isRefreshing ? "spin 1s linear infinite" : "none" }} />
+          <RefreshCw style={{ width: "13px", height: "13px", color: displayConfig.color, animation: isRefreshing ? "spin 1s linear infinite" : "none" }} />
         </button>
       )}
     </div>

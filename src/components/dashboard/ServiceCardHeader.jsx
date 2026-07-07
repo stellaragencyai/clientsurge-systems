@@ -1,9 +1,15 @@
 import ServiceIcon from "./ServiceIcon";
 import ServiceStatusBadge from "./ServiceStatusBadge";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 
-export default function ServiceCardHeader({ service }) {
+export default function ServiceCardHeader({ service, portalState }) {
   const { serviceKey, productName, orderId, installStatus, stageIndex } = service;
-  const percentComplete = Math.round((stageIndex / 5) * 100);
+
+  // Phase A.6: Gate "% Complete" celebration behind proof validation
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const safePercent = isProofLive ? Math.round((stageIndex / 5) * 100) : 0;
+  const percentLabel = isProofLive ? `${safePercent}% Complete` : "In Progress";
 
   const descriptionMap = {
     instant_lead_response: "SMS & Email automation • AI instant responses",
@@ -28,7 +34,7 @@ export default function ServiceCardHeader({ service }) {
             {description}
           </p>
         </div>
-        <ServiceStatusBadge installStatus={installStatus} />
+        <ServiceStatusBadge installStatus={installStatus} portalState={portalState} />
       </div>
       <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: "12px", flexWrap: "wrap" }}>
         <div style={{ display: "flex", alignItems: "center", gap: "12px", flexWrap: "wrap" }}>
@@ -36,7 +42,7 @@ export default function ServiceCardHeader({ service }) {
             Order #{orderId.slice(0, 8).toUpperCase()}
           </span>
           <span style={{ fontSize: "11px", fontWeight: "600", color: "#0088CC", background: "rgba(0,174,239,0.08)", padding: "4px 10px", borderRadius: "6px" }}>
-            {percentComplete}% Complete
+            {percentLabel}
           </span>
         </div>
       </div>

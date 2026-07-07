@@ -3,10 +3,22 @@ import ServiceCardHeader from "./ServiceCardHeader";
 import ServiceCardProgressBar from "./ServiceCardProgressBar";
 import ServiceCardTimeline from "./ServiceCardTimeline";
 import ServiceCardActions from "./ServiceCardActions";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-export default function ResponsiveServiceCard({ service }) {
+export default function ResponsiveServiceCard({ service, portalState }) {
   const { serviceKey, stageIndex = 0 } = service;
   const [expanded, setExpanded] = useState(false);
+
+  // Phase A.6: Gate service success states behind PortalStateEngine proof
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
+  // Suppress "Live" installStatus for the badge/header when proof not validated
+  const safeInstallStatus = isProofLive
+    ? service.installStatus
+    : service.installStatus === "Live" ? "Testing" : service.installStatus;
+  const safeService = { ...service, installStatus: safeInstallStatus };
 
   return (
     <div style={{
@@ -34,8 +46,21 @@ export default function ResponsiveServiceCard({ service }) {
       <div style={{ height: "3px", background: `linear-gradient(90deg, transparent, #00AEEF, transparent)` }} />
 
       <div style={{ padding: "20px" }}>
-        <ServiceCardHeader service={service} />
+        <ServiceCardHeader service={safeService} portalState={portalState} />
         <ServiceCardProgressBar stageIndex={stageIndex} totalStages={5} />
+
+        {/* Phase A.6: Proof gate notice when raw status is Live but proof not validated */}
+        {!isProofLive && service.installStatus === "Live" && (
+          <div style={{
+            marginTop: "8px", marginBottom: "12px", padding: "8px 12px",
+            borderRadius: "8px", background: "rgba(0,174,239,0.06)",
+            border: "1px solid rgba(0,174,239,0.15)",
+          }}>
+            <p style={{ fontSize: "11px", fontWeight: "600", color: "#0088CC", margin: 0 }}>
+              {readinessCard.display_text}
+            </p>
+          </div>
+        )}
 
         {/* Collapsible timeline on mobile, always visible on desktop */}
         <div style={{ display: window.innerWidth < 768 ? (expanded ? "block" : "none") : "block" }}>
@@ -70,6 +95,7 @@ export default function ResponsiveServiceCard({ service }) {
             {expanded ? "−  Collapse Details" : "+  Show Details"}
           </button>
         )}
+        <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
       </div>
     </div>
   );

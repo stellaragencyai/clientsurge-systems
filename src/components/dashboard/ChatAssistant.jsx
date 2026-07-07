@@ -1,8 +1,9 @@
 import { useState, useRef, useEffect } from "react";
 import { X, MessageCircle, Send, Loader2, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 
-export default function ChatAssistant({ installStatus, services = [] }) {
+export default function ChatAssistant({ installStatus, services = [], portalState }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
     { role: "assistant", text: "Hi! 👋 I\'m here to help with questions about your installation. What can I help with?" }
@@ -24,6 +25,16 @@ export default function ChatAssistant({ installStatus, services = [] }) {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
+  // Phase A.6: Proof-safe context — never tell the LLM the system is live/healthy/complete
+  // unless PortalStateEngine has validated proof.
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const proofSafeStatus = isProofLive
+    ? "Live and verified"
+    : installStatus === "Error"
+      ? "Experiencing an issue"
+      : "Being set up — not yet live";
+
   const handleSend = async () => {
     const text = input.trim();
     if (!text || loading) return;
@@ -35,11 +46,12 @@ export default function ChatAssistant({ installStatus, services = [] }) {
 
     try {
       const serviceNames = services.map(s => s.name || s.service_key).join(", ") || "unknown services";
-      const systemContext = `You are a helpful, concise support assistant for ClientSurge Systems. 
-The client\'s current install status is: "${installStatus || "Unknown"}".
+      const systemContext = `You are a helpful, concise support assistant for ClientSurge Systems.
+The client\'s current system status is: "${proofSafeStatus}".
 Their purchased services are: ${serviceNames}.
 Answer questions about their installation progress, what each stage means, and how to get support.
 Keep answers to 2-4 sentences. Be warm but efficient.
+IMPORTANT: Do NOT state or imply that the system is live, installed, healthy, completed, or ready unless the status above explicitly says "Live and verified". If the status says "Being set up", reassure the client that setup is in progress and direct them to support for timelines.
 If they need urgent help, direct them to call (602) 587-4608 or email support@clientsurgesystems.com.
 Do NOT make up specific dates or promises about delivery times.`;
 

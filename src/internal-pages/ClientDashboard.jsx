@@ -267,7 +267,7 @@ export default function ClientDashboard() {
 
   return (
     <DemoBookingProvider>
-      <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} />
+      <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} portalState={portalState} />
       <MobileBottomNav />
 
       {/* Full page wrapper with same background as landing site */}
@@ -338,6 +338,7 @@ export default function ClientDashboard() {
                   activeServices={activeServices}
                   project={project}
                   order={order}
+                  portalState={portalState}
                 />
 
                 {lastUpdated && (
@@ -354,6 +355,7 @@ export default function ClientDashboard() {
                       installStatus={activeServices[0]?.installStatus}
                       onRefresh={() => fetchPortal(true)}
                       isRefreshing={isRefreshing}
+                      portalState={portalState}
                     />
                     <DeploymentProgressBar
                       pipelineStatus={order?.pipeline_status}
@@ -459,7 +461,7 @@ export default function ClientDashboard() {
                               border: "1px solid rgba(0,174,239,0.13)",
                               boxShadow: "0 2px 14px rgba(0,59,143,0.05), 0 0 0 1px rgba(0,174,239,0.04)"
                             }}>
-                            <ResponsiveServiceCard service={service} />
+                            <ResponsiveServiceCard service={service} portalState={portalState} />
                           </div>
                         ))}
                       </div>
