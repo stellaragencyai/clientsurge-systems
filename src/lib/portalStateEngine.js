@@ -226,6 +226,11 @@ function buildCardState({
  * Main entry point. Takes raw portal context + proof logs and returns
  * a normalized portal state object with card-level trust statuses.
  *
+ * PHASE 3: When a ClientDeployment is present in the context, it becomes the
+ * primary source of truth for system_readiness, installation_progress, and
+ * automation_health cards. Legacy order/project/onboarding data is used as
+ * fallback only when no deployment exists.
+ *
  * @param {object} rawContext - from getClientPortalContext
  * @param {Array} proofLogs - AutomationProofLog records (already scoped)
  * @returns {object} normalized portal state
@@ -236,14 +241,22 @@ export function normalizePortalState(rawContext, proofLogs = []) {
   const order = ctx.order || null;
   const subscription = ctx.subscription || null;
   const health = ctx.health || null;
+  const deployment = ctx.deployment || null;
 
   // ── Environment trust ──
-  const envTrust = isProductionTrusted(order) || isProductionTrusted(project)
+  // PHASE 3: Deployment presence implies production trust if deployment is live/ready
+  const envTrust = isProductionTrusted(order) || isProductionTrusted(project) ||
+    (deployment && ["live", "ready", "onboarding", "configuring", "testing"].includes(deployment.deployment_status))
     ? "production"
     : "unknown";
 
   // ── Setup completion ──
+  // PHASE 3: When deployment exists, use deployment_status as primary indicator
+  const deploymentSetupComplete = deployment
+    ? ["live", "ready", "testing"].includes(deployment.deployment_status)
+    : false;
   const setupComplete =
+    deploymentSetupComplete ||
     (project?.quick_start_completed === true &&
       project?.onboarding_wizard_completed === true) ||
     (order?.services || []).every((s) => s.install_status === "Live");
@@ -259,21 +272,28 @@ export function normalizePortalState(rawContext, proofLogs = []) {
   const services = (order?.services || []).filter((s) => s != null);
 
   // ── Card: System Readiness ──
+  // PHASE 3: When deployment exists, deployment_status is the primary source of truth
   const allServicesLive = services.length > 0 && services.every((s) => s.install_status === "Live");
-  const systemReadinessProof = allServicesLive ? findLatestProof(proofLogs, "instant_lead_response") : null;
+  const deploymentIsLive = deployment?.deployment_status === "live";
+  const deploymentIsBlocked = deployment && ["paused", "error", "cancelled"].includes(deployment.deployment_status);
+  const systemReadinessProof = (allServicesLive || deploymentIsLive) ? findLatestProof(proofLogs, "instant_lead_response") : null;
 
   const systemReadiness = buildCardState({
     cardKey: "system_readiness",
     liveText: "Your system is live and running.",
     needsProofText: "We're verifying your system before it goes live.",
-    blockedText: "Your system needs attention. Our team is on it.",
+    blockedText: deploymentIsBlocked
+      ? `Your system is currently ${deployment.deployment_status === "paused" ? "paused" : "needs review"}. Our team is on it.`
+      : "Your system needs attention. Our team is on it.",
     setupText: "Setup is in progress. Complete your Quick Start to activate.",
     syncingText: "Your system is syncing. Check back shortly.",
     proofResult: systemReadinessProof,
     envTrust,
-    setupComplete: setupComplete || allServicesLive,
-    hasBlockingCondition,
-    adminDetail: failedEvents.length > 0 ? `${failedEvents.length} recent failed events` : null,
+    setupComplete: (deployment ? deploymentSetupComplete : false) || setupComplete || allServicesLive,
+    hasBlockingCondition: deploymentIsBlocked || hasBlockingCondition,
+    adminDetail: deploymentIsBlocked
+      ? `Deployment status '${deployment.deployment_status}' blocks execution`
+      : (failedEvents.length > 0 ? `${failedEvents.length} recent failed events` : null),
   });
 
   // ── Card: Installation Progress ──
@@ -615,6 +635,12 @@ export function normalizePortalState(rawContext, proofLogs = []) {
       proof_logs_count: proofLogs.length,
       production_events_count: rawEvents.length,
       is_admin_preview: ctx.is_admin_preview || false,
+      // PHASE 3: Deployment source-of-truth metadata
+      has_deployment: !!deployment,
+      deployment_id: deployment?.id || null,
+      deployment_status: deployment?.deployment_status || null,
+      deployment_package_tier: deployment?.package_tier_key || null,
+      deployment_industry: deployment?.industry_slug || null,
     },
     cards: {
       system_readiness: systemReadiness,

@@ -33,6 +33,7 @@ const AutomationChecklist = lazy(() => import("../components/portal/AutomationCh
 const PortalWhatsNew = lazy(() => import("../components/portal/PortalWhatsNew"));
 const ClientOrderStatusTab = lazy(() => import("../components/portal/ClientOrderStatusTab"));
 const PortalTimeline = lazy(() => import("../components/portal/PortalTimeline"));
+const DeploymentTimeline = lazy(() => import("../components/portal/DeploymentTimeline"));
 const SystemStatusBadge = lazy(() => import("../components/portal/SystemStatusBadge"));
 const OrderTracker = lazy(() => import("../components/landing/OrderTracker"));
 const OnboardingMissingAssetsBanner = lazy(() => import("../components/portal/OnboardingMissingAssetsBanner"));
@@ -102,6 +103,7 @@ export default function ClientPortal() {
   const [project, setProject] = useState(null);
   const [portalOrder, setPortalOrder] = useState(null);
   const [subscription, setSubscription] = useState(null);
+  const [deployment, setDeployment] = useState(null);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
   const [portalError, setPortalError] = useState("");
@@ -113,8 +115,8 @@ export default function ClientPortal() {
   const [userRole, setUserRole] = useState(null);
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useLeadNotifications();
 
-  // Phase A.1: PortalStateEngine — normalized proof-validated card states
-  const portalContextData = loading ? null : { project, order: portalOrder, subscription, health: healthData, is_admin_preview: isAdminPreview };
+  // Phase A.1 + Phase 3: PortalStateEngine with ClientDeployment as source of truth
+  const portalContextData = loading ? null : { project, order: portalOrder, subscription, deployment, health: healthData, is_admin_preview: isAdminPreview };
   const { portalState, loading: portalStateLoading } = usePortalState(portalContextData);
 
   useEffect(() => {
@@ -132,6 +134,7 @@ export default function ClientPortal() {
         setProject(context.project || null);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
+        setDeployment(context.deployment || null);
         setShowQuickStart(context.project?.quick_start_completed !== true);
         setIsAdminPreview(context.is_admin_preview === true);
         setHealthData(context.health || null);
@@ -172,6 +175,7 @@ export default function ClientPortal() {
         setProject(context.project);
         setPortalOrder(context.order || null);
         setSubscription(context.subscription || null);
+        setDeployment(context.deployment || null);
         setIsAdminPreview(context.is_admin_preview === true);
         setHealthData(context.health || null);
         setNotFound(false);
@@ -180,6 +184,7 @@ export default function ClientPortal() {
         setProject(null);
         setPortalOrder(context?.order || null);
         setSubscription(context?.subscription || null);
+        setDeployment(context?.deployment || null);
         setIsAdminPreview(context?.is_admin_preview === true);
         setHealthData(context?.health || null);
         setNotFound(!context?.is_admin_preview);
@@ -609,7 +614,10 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <PortalTimeline order={portalOrder} project={project} />
+                {deployment
+                  ? <DeploymentTimeline deployment={deployment} project={project} order={portalOrder} />
+                  : <PortalTimeline order={portalOrder} project={project} />
+                }
               </PortalLazy>
             </PortalTabWrapper>
           )}

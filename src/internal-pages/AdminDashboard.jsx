@@ -72,6 +72,7 @@ import SystemIdentityPanel from '../components/admin/SystemIdentityPanel';
 import GuidedOnboarding from '../components/admin/GuidedOnboarding';
 import AuditCommandCenter from '../components/admin/AuditCommandCenter';
 import TwilioGrowthEnginePanel from '../components/admin/TwilioGrowthEnginePanel';
+import DeploymentManagerPanel from '../components/admin/DeploymentManagerPanel';
 
 const AnalyticsDashboard = lazy(() => import('../components/admin/AnalyticsDashboard'));
 const EmailCampaignPanel = lazy(() => import('../components/admin/EmailCampaignPanel'));
@@ -119,6 +120,7 @@ const NAV_GROUPS = [
       { id: 'guided-onboarding', label: 'Launch Guide', icon: Zap },
       { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
+      { id: 'deployment-manager', label: 'Deployment Manager', icon: ShieldCheck },
       { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
       { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: ClipboardList },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
@@ -313,6 +315,7 @@ export default function AdminDashboard() {
       case 'twilio-health': return <TwilioRuntimeHealth />;
       case 'health': return <IntegrationHealth />;
       case 'client-projects': return <ClientProjectsPanel />;
+      case 'deployment-manager': return <DeploymentManagerPanel />;
       case 'ai-sales-reps': return <AIAgentsDashboard />;
       case 'automations': return <AutomationsPanel />;
       case 'drip': return <DripCampaignPanel />;

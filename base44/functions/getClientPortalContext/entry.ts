@@ -331,6 +331,21 @@ Deno.serve(async (req) => {
     const projectSummary = buildProjectSummary(project);
     const subscription = buildSubscriptionSummary(order, projectSummary);
 
+    // ── PHASE 3: Resolve ClientDeployment for this client ──────────────
+    // ClientDeployment is now the primary source of truth for portal visibility.
+    // We resolve it here so the PortalStateEngine can prioritize it over legacy sources.
+    let deployment = null;
+    try {
+      const deployments = await base44.asServiceRole.entities.ClientDeployment.filter(
+        { client_id: order.client_id },
+        "-created_date",
+        1
+      );
+      deployment = (deployments || [])[0] || null;
+    } catch {
+      // Non-critical — portal falls back to legacy order-based status
+    }
+
     // Fetch onboarding orchestration for progress tracker
     let onboardingRecord = null;
     try {
@@ -369,6 +384,7 @@ Deno.serve(async (req) => {
       client,
       order: orderSummary,
       subscription,
+      deployment,
       link_status: "linked",
       empty_state: false,
       is_admin_preview: false,
