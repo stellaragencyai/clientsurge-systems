@@ -70,6 +70,7 @@ export const STATIC_ROUTE_ALIASES = {
   "/product-landing": "/pricing",
   "/product-sign-up": "/product-signup",
   "/product_signup": "/product-signup",
+  "/client-dashboard": "/client-portal",
 };
 
 /**
@@ -114,7 +115,7 @@ export const PUBLIC_ROUTE_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 // the initial auth-loading phase — ClientPortalAccess manages its own loading/error states.
 // /product_signup is a public typo/legacy alias frequently entered by users; keep it
 // public so the app shell can redirect without triggering auth-loading behavior.
-export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS, "/product_signup", "/client-portal"];
+export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS, "/product_signup", "/client-portal", "/client-dashboard"];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
   "/client",

@@ -455,6 +455,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/reset-password" element={<LazyRoute Component={ResetPassword} />} />
       <Route path="/opt-out" element={<LazyRoute Component={lazy(() => import("./pages/OptOut"))} />} />
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
+      <Route path="/client-dashboard" element={<Navigate to="/client-portal" replace />} />
       <Route path="/client-portal" element={<ErrorBoundary><LazyRoute Component={ClientPortalAccess} /></ErrorBoundary>} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
       <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />

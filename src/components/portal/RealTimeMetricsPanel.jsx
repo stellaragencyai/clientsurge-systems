@@ -76,7 +76,7 @@ function EmptyMetrics({ message }) {
   );
 }
 
-export default function RealTimeMetricsPanel({ project }) {
+export default function RealTimeMetricsPanel({ project, isAdmin }) {
   const [funnels, setFunnels] = useState([]);
   const [campaigns, setCampaigns] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -84,22 +84,39 @@ export default function RealTimeMetricsPanel({ project }) {
   const [error, setError] = useState(null);
   const [lastUpdated, setLastUpdated] = useState(null);
 
+  const projectId = project?.id || project?._id;
+  const clientId = project?.client_id || project?.clientId;
+  const clientProjectId = project?.client_project_id || projectId;
+  const canViewCampaigns = Boolean(isAdmin);
+
   const fetchData = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     else setRefreshing(true);
     setError(null);
 
     try {
-      const projectId = project?.id || project?._id;
-      const clientId = project?.client_id || project?.clientId;
+      // Always scope funnel queries to the client's project
+      const funnelQuery = clientProjectId
+        ? { client_project_id: clientProjectId }
+        : clientId
+        ? { client_id: clientId }
+        : {};
 
-      const funnelQuery = projectId ? { client_project_id: projectId } : clientId ? { client_id: clientId } : {};
-      const campaignQuery = projectId ? {} : {};
+      // Only query AcquisitionCampaign for admins — clients never see broad campaign data
+      const campaignQuery = canViewCampaigns
+        ? (clientProjectId ? { client_project_id: clientProjectId } : clientId ? { client_id: clientId } : {})
+        : null;
 
-      const [funnelResult, campaignResult] = await Promise.all([
+      const requests = [
         base44.entities.ConversionFunnel.filter(funnelQuery, "-computed_at", 10).catch(() => []),
-        base44.entities.AcquisitionCampaign.filter(campaignQuery, "-last_activity_at", 20).catch(() => []),
-      ]);
+      ];
+      if (campaignQuery) {
+        requests.push(base44.entities.AcquisitionCampaign.filter(campaignQuery, "-last_activity_at", 20).catch(() => []));
+      }
+
+      const results = await Promise.all(requests);
+      const funnelResult = results[0];
+      const campaignResult = results[1] || [];
 
       setFunnels(Array.isArray(funnelResult) ? funnelResult : []);
       setCampaigns(Array.isArray(campaignResult) ? campaignResult : []);
@@ -110,16 +127,23 @@ export default function RealTimeMetricsPanel({ project }) {
       setLoading(false);
       setRefreshing(false);
     }
-  }, [project?.id, project?.client_id, project?.clientId]);
+  }, [clientProjectId, clientId, canViewCampaigns]);
 
   useEffect(() => {
     fetchData(false);
   }, [fetchData]);
 
-  // Real-time subscriptions
+  // Real-time subscriptions — scoped to client project
   useEffect(() => {
     const unsubFunnel = base44.entities.ConversionFunnel.subscribe((event) => {
       if (event.type === "create" || event.type === "update") {
+        // Filter subscription updates by client/project scope
+        const eventData = event.data || {};
+        const matchesScope =
+          (clientProjectId && eventData.client_project_id === clientProjectId) ||
+          (clientId && eventData.client_id === clientId);
+        if (!matchesScope && !canViewCampaigns) return;
+
         setFunnels((prev) => {
           const idx = prev.findIndex((f) => f.id === event.data.id);
           if (idx >= 0) {
@@ -133,26 +157,35 @@ export default function RealTimeMetricsPanel({ project }) {
       }
     });
 
-    const unsubCampaign = base44.entities.AcquisitionCampaign.subscribe((event) => {
-      if (event.type === "create" || event.type === "update") {
-        setCampaigns((prev) => {
-          const idx = prev.findIndex((c) => c.id === event.data.id);
-          if (idx >= 0) {
-            const next = [...prev];
-            next[idx] = event.data;
-            return next;
-          }
-          return [event.data, ...prev].slice(0, 20);
-        });
-        setLastUpdated(new Date());
-      }
-    });
+    let unsubCampaign = () => {};
+    if (canViewCampaigns) {
+      unsubCampaign = base44.entities.AcquisitionCampaign.subscribe((event) => {
+        if (event.type === "create" || event.type === "update") {
+          const eventData = event.data || {};
+          const matchesScope =
+            (clientProjectId && eventData.client_project_id === clientProjectId) ||
+            (clientId && eventData.client_id === clientId);
+          if (!matchesScope) return;
+
+          setCampaigns((prev) => {
+            const idx = prev.findIndex((c) => c.id === event.data.id);
+            if (idx >= 0) {
+              const next = [...prev];
+              next[idx] = event.data;
+              return next;
+            }
+            return [event.data, ...prev].slice(0, 20);
+          });
+          setLastUpdated(new Date());
+        }
+      });
+    }
 
     return () => {
       unsubFunnel();
       unsubCampaign();
     };
-  }, []);
+  }, [clientProjectId, clientId, canViewCampaigns]);
 
   // Aggregate metrics from funnels
   const totalRevenue = funnels.reduce((sum, f) => sum + (f.total_revenue_attributed || 0), 0);
@@ -165,7 +198,7 @@ export default function RealTimeMetricsPanel({ project }) {
     : 0;
   const revenuePerLead = totalLeads > 0 ? totalRevenue / totalLeads : 0;
 
-  // Active campaigns
+  // Active campaigns — only for admin
   const activeCampaigns = campaigns.filter((c) => c.status === "active");
   const totalCampaignLeads = campaigns.reduce((sum, c) => sum + (c.leads_generated || 0), 0);
   const totalCampaignRevenue = campaigns.reduce((sum, c) => sum + (c.revenue_attributed || 0), 0);
@@ -208,7 +241,7 @@ export default function RealTimeMetricsPanel({ project }) {
             Real-Time Metrics
           </h2>
           <p className="text-sm text-muted-foreground mt-1">
-            Live progress metrics and active campaign statuses for {project?.business_name || "your project"}.
+            Live progress metrics {canViewCampaigns ? "and active campaign statuses" : ""} for {project?.business_name || "your project"}.
           </p>
         </div>
         <button
@@ -243,7 +276,7 @@ export default function RealTimeMetricsPanel({ project }) {
           icon={DollarSign}
           label="Revenue Attributed"
           value={`$${totalRevenue.toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 })}`}
-          sublabel={`$${revenuePerLead.toFixed(0)}/lead`}
+          sublabel={totalLeads > 0 ? `$${revenuePerLead.toFixed(0)}/lead` : "No leads yet"}
           accent="rgba(5,150,105,0.1)"
         />
         <MetricCard
@@ -255,9 +288,9 @@ export default function RealTimeMetricsPanel({ project }) {
         />
         <MetricCard
           icon={TrendingUp}
-          label="Campaign ROI"
-          value={`${overallROI.toFixed(0)}%`}
-          sublabel={`${activeCampaigns.length} active campaign${activeCampaigns.length !== 1 ? "s" : ""}`}
+          label={canViewCampaigns ? "Campaign ROI" : "Funnels Tracked"}
+          value={canViewCampaigns ? `${overallROI.toFixed(0)}%` : `${funnels.length}`}
+          sublabel={canViewCampaigns ? `${activeCampaigns.length} active campaign${activeCampaigns.length !== 1 ? "s" : ""}` : "Conversion funnels"}
           accent="rgba(0,174,239,0.1)"
         />
       </div>
@@ -294,8 +327,8 @@ export default function RealTimeMetricsPanel({ project }) {
         <EmptyMetrics message="No funnel data has been computed yet. Funnel metrics are generated by your automation system." />
       )}
 
-      {/* Campaign Status Pie + Campaign List */}
-      {campaigns.length > 0 && (
+      {/* Campaign sections — admin only */}
+      {canViewCampaigns && campaigns.length > 0 && (
         <div className="grid md:grid-cols-2 gap-4">
           {/* Campaign Status Pie */}
           {campaignStatusData.length > 0 && (
@@ -355,8 +388,8 @@ export default function RealTimeMetricsPanel({ project }) {
         </div>
       )}
 
-      {/* Active Campaigns Table */}
-      {campaigns.length > 0 && (
+      {/* Active Campaigns Table — admin only */}
+      {canViewCampaigns && campaigns.length > 0 && (
         <div className="rounded-2xl border border-border bg-white overflow-hidden">
           <div className="px-5 py-4 border-b border-border flex items-center gap-2">
             <Activity className="w-4 h-4 text-primary" />
@@ -411,7 +444,7 @@ export default function RealTimeMetricsPanel({ project }) {
         </div>
       )}
 
-      {funnels.length === 0 && campaigns.length === 0 && !error && (
+      {funnels.length === 0 && !canViewCampaigns && !error && (
         <EmptyMetrics />
       )}
     </div>

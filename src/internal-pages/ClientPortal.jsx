@@ -446,7 +446,7 @@ export default function ClientPortal() {
           )}
           {activeTab === "realtime" && (
             <PortalLazy>
-              <RealTimeMetricsPanel project={project} />
+              <RealTimeMetricsPanel project={project} isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
             </PortalLazy>
           )}
           {activeTab === "metrics" && (

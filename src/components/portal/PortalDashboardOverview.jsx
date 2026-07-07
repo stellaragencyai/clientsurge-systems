@@ -1,12 +1,13 @@
 /**
  * PortalDashboardOverview — the default "Dashboard" tab.
- * Grid layout inspired by the IdentityIQ screenshot: main column (70%)
- * with metric cards, and a side column (30%) with action/upsell cards.
+ * Verified/client-scoped status messaging, no fake 0/0 service confidence,
+ * Quick Start using both quick_start_completed and onboarding_wizard_completed,
+ * blue brand CTAs, direct support CTA, visible client-data scoping notice.
  */
 import { lazy, Suspense } from "react";
 import {
-  Bell, User, TrendingUp, Zap, Target, Rocket,
-  ArrowRight, ShieldCheck, AlertCircle, CheckCircle2,
+  Bell, TrendingUp, Zap, Target, Rocket,
+  ArrowRight, ShieldCheck, AlertCircle, CheckCircle2, Info,
 } from "lucide-react";
 
 const PortalLazy = ({ children }) => (
@@ -24,7 +25,7 @@ function MetricCard({ icon: Icon, label, value, accent, onClick }) {
   return (
     <button
       onClick={onClick}
-      className="text-left bg-white rounded-xl border border-gray-100 p-5 transition-all hover:shadow-md hover:border-blue-200 cs-interactive-card"
+      className="text-left bg-white rounded-xl border border-gray-100 p-5 transition-all hover:shadow-md hover:border-blue-200 cs-interactive-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
     >
       <div className="flex items-center justify-between mb-3">
         <div
@@ -58,7 +59,7 @@ function ActionCard({ icon: Icon, title, description, buttonText, buttonColor, o
       <p className="text-xs text-gray-500 leading-relaxed mb-4">{description}</p>
       <button
         onClick={onClick}
-        className="w-full py-2.5 rounded-lg text-xs font-bold text-white transition-all hover:opacity-90"
+        className="w-full py-2.5 rounded-lg text-xs font-bold text-white transition-all hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
         style={{ background: buttonColor }}
       >
         {buttonText}
@@ -85,8 +86,24 @@ export default function PortalDashboardOverview({
   const failedEvents = (healthData?.recent_events || []).filter((e) => e.status === "failed");
   const readinessStatus = healthData?.readiness_status || portalOrder?.pipeline_status || "Pending";
 
+  // Quick Start is complete only when BOTH flags are true
+  const quickStartDone = project?.quick_start_completed === true && project?.onboarding_wizard_completed === true;
+
+  // No fake 0/0 confidence — show "Pending" when no services exist yet
+  const servicesValue = totalCount > 0 ? `${activeCount}/${totalCount}` : "Pending";
+
   return (
     <div className="space-y-5">
+      {/* Client-data scoping notice */}
+      <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-3 flex items-center gap-2.5">
+        <Info className="w-4 h-4 text-[#0088CC] flex-shrink-0" />
+        <p className="text-xs text-gray-600">
+          You are viewing <span className="font-semibold text-gray-800">{project?.business_name || "your client account"}</span> data.
+          All metrics are scoped to your project only.
+          {isAdminPreview && <span className="ml-1 font-semibold text-amber-700">Admin preview mode active.</span>}
+        </p>
+      </div>
+
       {/* Top banner */}
       <div
         className="rounded-xl p-5 flex items-center justify-between flex-wrap gap-4"
@@ -110,7 +127,7 @@ export default function PortalDashboardOverview({
         </div>
         <button
           onClick={() => setActiveTab("performance")}
-          className="px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90"
+          className="px-5 py-2.5 rounded-lg text-sm font-bold text-white transition-all hover:opacity-90 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
           style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
         >
           View Performance
@@ -141,15 +158,15 @@ export default function PortalDashboardOverview({
               <MetricCard
                 icon={Rocket}
                 label="Services Active"
-                value={`${activeCount}/${totalCount || 0}`}
+                value={servicesValue}
                 accent="#0088CC"
                 onClick={() => setActiveTab("performance")}
               />
               <MetricCard
                 icon={Zap}
                 label="Quick Start"
-                value={project?.quick_start_completed ? "Done" : "Pending"}
-                accent="#D4AF37"
+                value={quickStartDone ? "Done" : "Pending"}
+                accent={quickStartDone ? "#10B981" : "#D4AF37"}
                 onClick={() => setActiveTab("quickstart")}
               />
               <MetricCard
@@ -190,13 +207,13 @@ export default function PortalDashboardOverview({
           </PortalLazy>
 
           {/* Quick Start upsell */}
-          {!project?.quick_start_completed && (
+          {!quickStartDone && (
             <ActionCard
               icon={Zap}
               title="Complete Quick Start"
               description="Configure your SMS, email, and booking settings in under 10 minutes to activate your lead system."
               buttonText="Start Setup"
-              buttonColor="#6f42c1"
+              buttonColor="#0088CC"
               onClick={() => setActiveTab("quickstart")}
             />
           )}
@@ -211,13 +228,13 @@ export default function PortalDashboardOverview({
             onClick={() => setActiveTab("billing")}
           />
 
-          {/* Support */}
+          {/* Support — direct CTA */}
           <ActionCard
             icon={Target}
             title="Need Help?"
             description="Chat with our support team or browse our knowledge base for quick answers."
             buttonText="Contact Support"
-            buttonColor="#10B981"
+            buttonColor="#0088CC"
             onClick={() => setActiveTab("support")}
           />
         </div>
