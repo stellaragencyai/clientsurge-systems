@@ -6,6 +6,7 @@ import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
 import PortalSidebar from "../components/portal/PortalSidebar";
 import PortalDashboardOverview from "../components/portal/PortalDashboardOverview";
 import PortalStateBoundary from "../components/portal/PortalStateBoundary";
+import PortalTabWrapper from "../components/portal/PortalTabWrapper";
 import { usePortalState } from "../hooks/usePortalState";
 
 // ── All portal components lazy-loaded to keep the ClientPortal chunk small ──
@@ -383,14 +384,29 @@ export default function ClientPortal() {
             </PortalStateBoundary>
           )}
           {activeTab === "quickstart" && (
-            <PortalLazy>
-              <QuickStartInline
-                project={project}
-                onComplete={() => { refreshProject(); setActiveTab("dashboard"); }}
-              />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="installation_progress"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <QuickStartInline
+                  project={project}
+                  onComplete={() => { refreshProject(); setActiveTab("dashboard"); }}
+                />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "performance" && (
+           <PortalTabWrapper
+             portalState={portalState}
+             portalStateLoading={portalStateLoading}
+             cardKey="automation_health"
+             isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+             onRetry={refreshProject}
+           >
             <div className="space-y-5">
               <div>
                 <h2 className="text-2xl font-bold text-foreground mb-2">Revenue & Automations</h2>
@@ -453,102 +469,239 @@ export default function ClientPortal() {
                 </PortalLazy>
               </div>
             </div>
+           </PortalTabWrapper>
           )}
           {activeTab === "realtime" && (
-            <PortalLazy>
-              <RealTimeMetricsPanel project={project} isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="automation_health"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <RealTimeMetricsPanel project={project} isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "metrics" && (
-            <PortalLazy>
-              <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="lead_capture"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "tasks" && (
-            <PortalLazy>
-              <TasksDashboard project={project} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="activity_log"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <TasksDashboard project={project} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "checklist" && (
-            <PortalLazy>
-              <AutomationChecklist order_id={portalOrder?.id} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="installation_progress"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <AutomationChecklist order_id={portalOrder?.id} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "leads" && (
-            <PortalLazy>
-              <LeadActivityFeed project={project} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="lead_capture"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <LeadActivityFeed project={project} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "progress" && (
-            <div className="space-y-5">
-              <PortalLazy>
-                <GettingStartedBanner project={project} order={portalOrder} />
-              </PortalLazy>
-              <PortalLazy>
-                <SetupProgressHub project={project} order={portalOrder} user={user} />
-              </PortalLazy>
-              <PortalLazy>
-                <OrderTracker />
-              </PortalLazy>
-            </div>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="installation_progress"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <div className="space-y-5">
+                <PortalLazy>
+                  <GettingStartedBanner project={project} order={portalOrder} />
+                </PortalLazy>
+                <PortalLazy>
+                  <SetupProgressHub project={project} order={portalOrder} user={user} />
+                </PortalLazy>
+                <PortalLazy>
+                  <OrderTracker />
+                </PortalLazy>
+              </div>
+            </PortalTabWrapper>
           )}
           {activeTab === "order-status" && (
-            <PortalLazy>
-              <ClientOrderStatusTab order_id={portalOrder?.id} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="installation_progress"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <ClientOrderStatusTab order_id={portalOrder?.id} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "timeline" && (
-            <PortalLazy>
-              <PortalTimeline order={portalOrder} project={project} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="timeline"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <PortalTimeline order={portalOrder} project={project} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "deadlines" && (
-            <PortalLazy>
-              <DeadlinesPanel project={project} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="timeline"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <DeadlinesPanel project={project} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "files" && (
-            <PortalLazy>
-              <FilesPanel project={project} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="documents"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <FilesPanel project={project} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "billing" && (
-            <PortalLazy>
-              <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="billing"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <BillingDashboard project={project} order={portalOrder} subscription={subscription} onSubscriptionChanged={refreshProject} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "referrals" && (
-            <PortalLazy>
-              <ReferABusiness
-                order_id={portalOrder?.id || project?.id || user?.email}
-                client_name={project?.client_name || project?.business_name || user?.full_name || user?.email}
-              />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="recommendations"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <ReferABusiness
+                  order_id={portalOrder?.id || project?.id || user?.email}
+                  client_name={project?.client_name || project?.business_name || user?.full_name || user?.email}
+                />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "support" && (
-            <PortalLazy>
-              <SupportChat project={project} user={user} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="support"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <SupportChat project={project} user={user} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "plan" && (
-            <PortalLazy>
-              <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="billing"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <PlanManager project={project} subscription={subscription} onUpdated={refreshProject} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "reports" && (
-            <PortalLazy>
-              <WeeklyReports project={project} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="reports"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <WeeklyReports project={project} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "updates" && (
-            <PortalLazy>
-              <PortalWhatsNew />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="recommendations"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <PortalWhatsNew />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
           {activeTab === "settings" && (
-            <PortalLazy>
-              <PortalSettings project={project} user={user} onUpdated={refreshProject} />
-            </PortalLazy>
+            <PortalTabWrapper
+              portalState={portalState}
+              portalStateLoading={portalStateLoading}
+              cardKey="support"
+              isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
+              onRetry={refreshProject}
+            >
+              <PortalLazy>
+                <PortalSettings project={project} user={user} onUpdated={refreshProject} />
+              </PortalLazy>
+            </PortalTabWrapper>
           )}
         </main>
       </div>
