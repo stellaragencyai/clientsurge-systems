@@ -104,7 +104,8 @@ Rules:
     // Store as MarketingPost with post_type=ad_draft
     const createdPosts = [];
     for (const creative of result.ad_creative_variants) {
-      const utmUrl = `${creative.landing_page_url || campaign.landing_page_url || '/'}?utm_source=facebook&utm_medium=paid_social&utm_campaign=${campaign.campaign_name.toLowerCase().replace(/\s+/g, '-').slice(0, 30)}&utm_content=ad_draft`;
+      const campaignSlug = campaign.campaign_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+      const utmUrl = `${creative.landing_page_url || campaign.landing_page_url || '/'}?utm_source=facebook&utm_medium=paid_social&utm_campaign=${campaignSlug}&utm_content=ad_draft`;
 
       const post = await base44.asServiceRole.entities.MarketingPost.create({
         campaign_id,

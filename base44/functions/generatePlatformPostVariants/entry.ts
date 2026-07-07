@@ -123,7 +123,8 @@ Rules:
     const createdPosts = [];
 
     for (const postData of result.posts) {
-      const utmUrl = `${postData.landing_page_url || campaign.landing_page_url || '/'}?utm_source=${postData.platform}&utm_medium=organic_social&utm_campaign=${campaign.campaign_name.toLowerCase().replace(/\s+/g, '-').slice(0, 30)}&utm_content=${variantGroupId}`;
+      const campaignSlug = campaign.campaign_name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 30);
+      const utmUrl = `${postData.landing_page_url || campaign.landing_page_url || '/'}?utm_source=${postData.platform}&utm_medium=organic_social&utm_campaign=${campaignSlug}&utm_content=${variantGroupId}`;
 
       const post = await base44.asServiceRole.entities.MarketingPost.create({
         campaign_id,

@@ -86,31 +86,40 @@ export default function MarketingIntegrationSetupWizard({ channels, onRefresh })
 
   const getChannel = (platform) => channels.find(c => c.platform === platform);
 
+  const [connectMessage, setConnectMessage] = useState(null);
+
   const handleConnect = async (platform) => {
     setConnecting(platform);
+    setConnectMessage(null);
     try {
       if (platform === 'linkedin') {
-        await request_oauth_authorization({
-          integration_type: 'linkedin',
-          reason: 'To publish organic posts to the ClientSurge Systems LinkedIn company page and read post performance analytics',
-          scopes: PLATFORM_CONFIG.linkedin.scopes,
+        setConnectMessage({
+          platform,
+          type: 'info',
+          text: 'LinkedIn OAuth must be initiated by the AI assistant. In the Base44 chat, ask: "Connect the LinkedIn integration with scopes: openid, profile, email, w_organization_social, r_organization_social, rw_organization_admin."',
         });
       } else if (platform === 'tiktok') {
-        await request_oauth_authorization({
-          integration_type: 'tiktok',
-          reason: 'To read TikTok profile info and stats for the ClientSurge Systems account',
-          scopes: PLATFORM_CONFIG.tiktok.scopes,
+        setConnectMessage({
+          platform,
+          type: 'warning',
+          text: 'TikTok Base44 connector is read-only (profile/stats only). Video publishing requires a custom TikTok Developer App with Content Posting API. You can still connect for profile stats, but publishing will remain blocked.',
         });
       } else if (platform === 'instagram_business') {
-        await request_oauth_authorization({
-          integration_type: 'instagram',
-          reason: 'To publish content and manage comments on the ClientSurge Systems Instagram Business account',
-          scopes: PLATFORM_CONFIG.instagram_business.scopes,
+        setConnectMessage({
+          platform,
+          type: 'info',
+          text: 'Instagram OAuth must be initiated by the AI assistant. In the Base44 chat, ask: "Connect the Instagram integration with scopes: instagram_business_basic, instagram_business_content_publish, instagram_business_manage_comments." You also need a Meta Business account with an Instagram Business account linked to a Facebook Page.',
+        });
+      } else if (platform === 'facebook_ads') {
+        setConnectMessage({
+          platform,
+          type: 'warning',
+          text: 'Facebook Ads module is draft-only. No OAuth connection needed. No ads will be created or launched.',
         });
       }
-      onRefresh();
     } catch (e) {
       console.error('Connection failed:', e);
+      setConnectMessage({ platform, type: 'error', text: 'Connection failed: ' + e.message });
     } finally {
       setConnecting(null);
     }
@@ -211,6 +220,17 @@ export default function MarketingIntegrationSetupWizard({ channels, onRefresh })
                   </div>
                 )}
 
+                {/* Connect message */}
+                {connectMessage && connectMessage.platform === platformKey && (
+                  <div className={`rounded-lg p-3 text-sm ${
+                    connectMessage.type === 'info' ? 'bg-blue-50 text-blue-800 border border-blue-200' :
+                    connectMessage.type === 'warning' ? 'bg-amber-50 text-amber-800 border border-amber-200' :
+                    'bg-red-50 text-red-800 border border-red-200'
+                  }`}>
+                    {connectMessage.text}
+                  </div>
+                )}
+
                 {/* Action buttons */}
                 <div className="flex gap-2 flex-wrap">
                   {!isConnected && platformKey !== 'facebook_ads' && (
@@ -239,11 +259,4 @@ export default function MarketingIntegrationSetupWizard({ channels, onRefresh })
       })}
     </div>
   );
-}
-
-// Helper function — uses request_oauth_authorization tool internally
-async function request_oauth_authorization(params) {
-  // This is a placeholder — actual OAuth is triggered through the Base44 platform
-  // The admin connects via the dashboard or the LLM tool
-  throw new Error('OAuth connection must be initiated through the Base44 platform. Please use the Connect button in the Base44 integration screen or ask the AI assistant to connect the integration.');
 }
