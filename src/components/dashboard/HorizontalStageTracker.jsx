@@ -1,4 +1,6 @@
 import { CheckCircle2, Loader2, Zap } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const DEFAULT_STAGES = ["Payment Confirmed", "Queued for Setup", "Being Configured", "Being Tested", "You're Live! ✦"];
 
@@ -13,9 +15,16 @@ const stageConfig = {
 
 const LEVEL_LABELS = ["Lv. 1", "Lv. 2", "Lv. 3", "Lv. 4", "MAX"];
 
-export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus }) {
+export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus, portalState }) {
   const stages = (serviceKey && stageConfig[serviceKey]) ? stageConfig[serviceKey] : DEFAULT_STAGES;
-  const safeStage = Math.min(Math.max(currentStage, 0), stages.length - 1);
+  const rawStage = Math.min(Math.max(currentStage, 0), stages.length - 1);
+  // Phase A.5: Gate "ONLINE" / final stage behind PortalStateEngine proof
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
+  // Suppress final stage completion when proof not validated
+  const safeStage = isProofLive ? rawStage : Math.min(rawStage, stages.length - 2);
+  const effectiveInstallStatus = isProofLive ? installStatus : (installStatus === "Live" ? "Testing" : installStatus);
 
   return (
     <div style={{
@@ -58,24 +67,24 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
           </div>
           <div style={{
             padding: "6px 16px", borderRadius: "9999px",
-            background: installStatus === "Live"
+            background: effectiveInstallStatus === "Live"
               ? "rgba(34,197,94,0.18)"
-              : installStatus === "Error"
+              : effectiveInstallStatus === "Error"
               ? "rgba(239,68,68,0.16)"
               : "rgba(0,174,239,0.16)",
             border: `1px solid ${
-              installStatus === "Live"
+              effectiveInstallStatus === "Live"
                 ? "rgba(34,197,94,0.4)"
-                : installStatus === "Error"
+                : effectiveInstallStatus === "Error"
                 ? "rgba(239,68,68,0.35)"
                 : "rgba(0,174,239,0.35)"
             }`,
             fontSize: "12px", fontWeight: "700",
-            color: installStatus === "Live" ? "#4ade80" : installStatus === "Error" ? "#f87171" : "#00AEEF",
+            color: effectiveInstallStatus === "Live" ? "#4ade80" : effectiveInstallStatus === "Error" ? "#f87171" : "#00AEEF",
           }}>
-            {installStatus === "Live"
+            {effectiveInstallStatus === "Live"
               ? "✦ ONLINE"
-              : installStatus === "Error"
+              : effectiveInstallStatus === "Error"
               ? "⚠ OFFLINE"
               : `Step ${Math.min(safeStage + 1, stages.length)} of ${stages.length}`}
           </div>
@@ -149,6 +158,7 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
           })}
         </div>
       </div>
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
       <style>{`
         @keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }
         @keyframes trackerPulse { 0%,100%{opacity:0.6} 50%{opacity:1} }

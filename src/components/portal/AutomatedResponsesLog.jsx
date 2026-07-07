@@ -1,6 +1,8 @@
 import { useState, useEffect, useMemo } from "react";
 import { Mail, MessageSquare, CheckCircle2, AlertCircle, Search, Loader2, RefreshCw } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const TYPE_CONFIG = {
   sms: { label: "SMS", icon: MessageSquare, bg: "bg-blue-50 text-blue-700" },
@@ -19,13 +21,18 @@ const STATUS_CONFIG = {
   received: { label: "Received", color: "bg-purple-50 text-purple-700" },
 };
 
-export default function AutomatedResponsesLog() {
+export default function AutomatedResponsesLog({ portalState }) {
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [filterType, setFilterType] = useState("all");
   const [filterStatus, setFilterStatus] = useState("all");
+
+  // Phase A.5: Gate success stats behind PortalStateEngine proof
+  const readinessCard = getCardState(portalState, "automation_health");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   const load = async () => {
     setLoading(true);
@@ -67,22 +74,29 @@ export default function AutomatedResponsesLog() {
 
   return (
     <div className="space-y-6">
-      {/* Summary Stats */}
+      {/* Phase A.5: Proof gate notice when not Live */}
+      {!isProofLive && (
+        <div className="rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary font-medium">
+          {readinessCard.display_text}
+        </div>
+      )}
+
+      {/* Summary Stats — Phase A.5: gated behind proof */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div className="bg-card border border-border rounded-xl p-4">
-          <p className="text-2xl font-bold text-foreground">{stats.total}</p>
+          <p className="text-2xl font-bold text-foreground">{isProofLive ? stats.total : "—"}</p>
           <p className="text-xs text-muted-foreground mt-1">Total Events</p>
         </div>
         <div className="bg-green-50 border border-green-200 rounded-xl p-4">
-          <p className="text-2xl font-bold text-green-700">{stats.delivered}</p>
+          <p className="text-2xl font-bold text-green-700">{isProofLive ? stats.delivered : "—"}</p>
           <p className="text-xs text-green-600 mt-1">Delivered</p>
         </div>
         <div className="bg-blue-50 border border-blue-200 rounded-xl p-4">
-          <p className="text-2xl font-bold text-blue-700">{stats.opened}</p>
+          <p className="text-2xl font-bold text-blue-700">{isProofLive ? stats.opened : "—"}</p>
           <p className="text-xs text-blue-600 mt-1">Opened/Read</p>
         </div>
         <div className="bg-red-50 border border-red-200 rounded-xl p-4">
-          <p className="text-2xl font-bold text-red-700">{stats.failed}</p>
+          <p className="text-2xl font-bold text-red-700">{isProofLive ? stats.failed : "—"}</p>
           <p className="text-xs text-red-600 mt-1">Failed</p>
         </div>
       </div>
@@ -173,6 +187,7 @@ export default function AutomatedResponsesLog() {
           </div>
         )}
       </div>
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
     </div>
   );
 }

@@ -1,8 +1,10 @@
 import { Clock, CheckCircle2, AlertCircle, TrendingUp } from "lucide-react";
 import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-export default function DashboardMetricsBar({ activeServices, project }) {
+export default function DashboardMetricsBar({ activeServices, project, portalState }) {
   const [snapshot, setSnapshot] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,17 +33,34 @@ export default function DashboardMetricsBar({ activeServices, project }) {
     return () => clearInterval(interval);
   }, [project?.order_id]);
 
+  // Phase A.5: Gate all success metrics behind PortalStateEngine proof
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
+
   // Use snapshot data if available, fall back to activeServices
   const totalServices = activeServices.length;
   const completedServices = activeServices.filter(s => s.installStatus === "Live").length;
   const inProgressServices = activeServices.filter(s => ["Configuring", "Testing"].includes(s.installStatus)).length;
-  const errorServices = activeServices.filter(s => s.installStatus === "Error").length;
+
+  // When proof not validated, show safe pending values instead of raw numbers
+  const safeLeadsCaptured = isProofLive ? (snapshot?.leads_captured_total || 0) : "Pending";
+  const safeAutomationsActive = isProofLive ? (snapshot?.automations_active || completedServices) : "Pending";
+  const safeSystemHealth = isProofLive
+    ? (snapshot?.system_health_status === "healthy" ? "✓" : "⚠")
+    : "Syncing";
+  const systemHealthColor = isProofLive
+    ? (snapshot?.system_health_status === "healthy" ? "#22c55e" : "#ef4444")
+    : "#D4AF37";
+  const systemHealthBg = isProofLive
+    ? (snapshot?.system_health_status === "healthy" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)")
+    : "rgba(212,175,55,0.08)";
 
   const metrics = [
-    { icon: TrendingUp, label: "Leads Captured", value: snapshot?.leads_captured_total || 0, color: "#9a5c2e", bgColor: "rgba(154,92,46,0.08)" },
-    { icon: CheckCircle2, label: "Automations Active", value: snapshot?.automations_active || completedServices, color: "#22c55e", bgColor: "rgba(34,197,94,0.08)" },
+    { icon: TrendingUp, label: "Leads Captured", value: safeLeadsCaptured, color: "#9a5c2e", bgColor: "rgba(154,92,46,0.08)" },
+    { icon: CheckCircle2, label: "Automations Active", value: safeAutomationsActive, color: "#22c55e", bgColor: "rgba(34,197,94,0.08)" },
     { icon: Clock, label: "In Progress", value: inProgressServices, color: "#3b82f6", bgColor: "rgba(59,130,246,0.08)" },
-    { icon: AlertCircle, label: "System Health", value: snapshot?.system_health_status === "healthy" ? "✓" : "⚠", color: snapshot?.system_health_status === "healthy" ? "#22c55e" : "#ef4444", bgColor: snapshot?.system_health_status === "healthy" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)", hidden: false },
+    { icon: AlertCircle, label: "System Health", value: safeSystemHealth, color: systemHealthColor, bgColor: systemHealthBg, hidden: false },
   ];
 
   return (
@@ -91,6 +110,7 @@ export default function DashboardMetricsBar({ activeServices, project }) {
           </div>
         );
       })}
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
     </div>
   );
 }

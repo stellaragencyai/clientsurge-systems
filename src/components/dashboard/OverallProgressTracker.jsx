@@ -1,4 +1,6 @@
 import { CheckCircle2, Clock, AlertCircle, ArrowRight, Zap } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const STAGES = [
   {
@@ -38,13 +40,17 @@ const STAGES = [
   },
 ];
 
-export default function OverallProgressTracker({ onboarding, completionPercentage }) {
+export default function OverallProgressTracker({ onboarding, completionPercentage, portalState }) {
   if (!onboarding) return null;
 
   const currentStageIndex = STAGES.findIndex(s => s.id === onboarding.unified_stage);
   const isBlocked = onboarding.unified_stage === "blocked";
   const activeIdx = isBlocked ? -1 : (currentStageIndex === -1 ? 0 : currentStageIndex);
-  const isLive = onboarding.unified_stage === "live";
+  // Phase A.5: Gate "Live" celebration behind PortalStateEngine proof
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isLive = onboarding.unified_stage === "live" && isProofLive;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
   const currentStage = STAGES[activeIdx];
   const missingItems = onboarding.missing_setup_items || [];
   const hasNextAction = !isLive && (missingItems.length > 0 || isBlocked || currentStage?.id === "awaiting_client_approval");
@@ -248,6 +254,17 @@ export default function OverallProgressTracker({ onboarding, completionPercentag
         })}
       </div>
 
+      {/* Phase A.5: Proof gate notice when onboarding says live but proof not validated */}
+      {!isProofLive && onboarding.unified_stage === "live" && (
+        <div className="mt-4 p-4 rounded-xl" style={{ background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.15)" }}>
+          <div className="flex items-center gap-2 mb-1">
+            <Clock className="w-4 h-4 text-primary" />
+            <p className="text-[12px] font-bold text-primary uppercase tracking-wider">Verification In Progress</p>
+          </div>
+          <p className="text-[13px] text-muted-foreground">{readinessCard.display_text}</p>
+        </div>
+      )}
+
       {/* Blockers */}
       {isBlocked && onboarding.blockers && onboarding.blockers.length > 0 && (
         <div className="mt-6 pt-6 border-t border-border rounded-lg p-4" style={{ background: "rgba(239,68,68,0.04)" }}>
@@ -286,6 +303,7 @@ export default function OverallProgressTracker({ onboarding, completionPercentag
           </div>
         </div>
       )}
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
     </div>
   );
 }

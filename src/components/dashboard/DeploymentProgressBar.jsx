@@ -1,6 +1,8 @@
 import { Loader2, CheckCircle2, Zap } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-export default function DeploymentProgressBar({ pipelineStatus, installStatus }) {
+export default function DeploymentProgressBar({ pipelineStatus, installStatus, portalState }) {
   const stages = [
     { key: "Paid", label: "Payment Confirmed", icon: "✓", status: "Complete" },
     { key: "Configuring", label: "AI Configuring", icon: "⚙", status: "Active" },
@@ -9,9 +11,13 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
   ];
 
   const currentIndex = stages.findIndex((s) => s.key === installStatus);
-  const isComplete = installStatus === "Live";
+  // Phase A.5: Gate "System Live" behind PortalStateEngine proof validation
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isComplete = installStatus === "Live" && isProofLive;
   const isError = installStatus === "Error";
   const isActive = currentIndex >= 0 && currentIndex < stages.length;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   const getStatusLabel = (idx) => {
     if (idx < currentIndex) return "Completed";
@@ -182,6 +188,20 @@ export default function DeploymentProgressBar({ pipelineStatus, installStatus })
         )}
       </div>
 
+      {/* Phase A.5: Proof gate notice when raw status is Live but proof not validated */}
+      {!isProofLive && installStatus === "Live" && (
+        <div style={{
+          marginTop: "16px", padding: "12px 16px",
+          background: "rgba(0,174,239,0.06)", border: "1px solid rgba(0,174,239,0.18)",
+          borderRadius: "10px",
+        }}>
+          <p style={{ fontSize: "12px", fontWeight: "600", color: "#0088CC", margin: 0 }}>
+            We're running final verification checks before your system goes fully live.
+          </p>
+        </div>
+      )}
+
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
       <style>{`@keyframes spin { from{transform:rotate(0deg)} to{transform:rotate(360deg)} }`}</style>
     </div>
   );

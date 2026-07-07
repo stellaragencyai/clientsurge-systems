@@ -323,12 +323,14 @@ export default function ClientDashboard() {
                   user={portalUser || { email: userEmail }}
                   order={order}
                   hasSetupInfo={hasSetupInfo}
+                  portalState={portalState}
                 />
 
                 {onboardingData && (
                   <OverallProgressTracker
                     onboarding={onboardingData}
                     completionPercentage={onboardingData.completion_metrics?.completion_percentage || 0}
+                    portalState={portalState}
                   />
                 )}
 
@@ -356,6 +358,7 @@ export default function ClientDashboard() {
                     <DeploymentProgressBar
                       pipelineStatus={order?.pipeline_status}
                       installStatus={activeServices[0]?.installStatus}
+                      portalState={portalState}
                     />
                   </>
                 )}
@@ -394,7 +397,8 @@ export default function ClientDashboard() {
                 <ClientActionRequiredPanel
                   order={order}
                   project={project}
-                  readiness={{ canGoLive: (order?.pipeline_status === "Live" && !effectiveHealthEvents.some(e => e.status === "failed")) }}
+                  readiness={{ canGoLive: false }}
+                  portalState={portalState}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
@@ -428,11 +432,12 @@ export default function ClientDashboard() {
                         currentStage={activeServices[0].stageIndex}
                         productName={activeServices[0].productName}
                         installStatus={activeServices[0].installStatus}
+                        portalState={portalState}
                       />
                     </div>
 
                     {/* Metrics bar */}
-                    <DashboardMetricsBar activeServices={activeServices} project={project} />
+                    <DashboardMetricsBar activeServices={activeServices} project={project} portalState={portalState} />
 
                     {/* ── SERVICE CARDS ── */}
                     <div className="mb-4 mt-2">

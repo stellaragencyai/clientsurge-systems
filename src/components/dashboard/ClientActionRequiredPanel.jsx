@@ -1,7 +1,9 @@
 import { ClipboardList, Check } from "lucide-react";
 import { isAdminUser } from "@/lib/dashboardHelpers";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-export default function ClientActionRequiredPanel({ order, project, readiness, isAdmin = false }) {
+export default function ClientActionRequiredPanel({ order, project, readiness, isAdmin = false, portalState }) {
   const actions = [];
 
   // Build actionable items based on current state
@@ -33,19 +35,31 @@ export default function ClientActionRequiredPanel({ order, project, readiness, i
     actions.push({ id: "failed_setup", label: `Review failed setup: ${failedSvc.display_name || failedSvc.service_key || "service"}`, priority: "high" });
   }
 
-  // Admin view extras
-  if (isAdmin && readiness && !readiness.canGoLive && readiness.status !== "Needs Attention") {
+  // Phase A.5: Use PortalStateEngine proof instead of raw readiness.canGoLive
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  // Replace raw readiness.canGoLive with proof-validated status
+  const safeCanGoLive = isProofLive;
+
+  // Admin view extras — use proof-validated status instead of raw readiness
+  if (isAdmin && !safeCanGoLive && readiness?.status !== "Needs Attention") {
     actions.push({ id: "admin_review", label: "Admin: Review readiness status", priority: "low" });
   }
 
   if (actions.length === 0) {
+    // Phase A.5: Only show "No action required" when proof-validated Live
     return (
       <div className="rounded-2xl p-5 mb-5" style={{ border: "1px solid rgba(0,174,239,0.13)", background: "rgba(255,255,255,0.6)" }}>
         <div className="flex items-center gap-2.5 mb-1">
           <ClipboardList className="w-4 h-4 text-primary" />
           <p className="text-[11px] font-black uppercase tracking-[0.15em] text-primary">Action Required</p>
         </div>
-        <p className="text-[13px] text-muted-foreground pl-6.5">No client action required at this time.</p>
+        <p className="text-[13px] text-muted-foreground pl-6.5">
+          {isProofLive
+            ? "No client action required at this time."
+            : "Your system is being set up — no action needed from you right now."}
+        </p>
+        <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
       </div>
     );
   }
@@ -81,6 +95,7 @@ export default function ClientActionRequiredPanel({ order, project, readiness, i
           </div>
         ))}
       </div>
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
     </div>
   );
 }

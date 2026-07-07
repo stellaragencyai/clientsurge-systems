@@ -467,13 +467,13 @@ export default function ClientPortal() {
               <div className="border-t border-border pt-6">
                 <h3 className="text-lg font-bold text-foreground mb-3">Active Automations</h3>
                 <PortalLazy>
-                  <AutomationsOverview />
+                  <AutomationsOverview portalState={portalState} order_id={portalOrder?.id} />
                 </PortalLazy>
               </div>
               <div className="border-t border-border pt-6">
                 <h3 className="text-lg font-bold text-foreground mb-3">System Activity</h3>
                 <PortalLazy>
-                  <AutomatedResponsesLog />
+                  <AutomatedResponsesLog portalState={portalState} />
                 </PortalLazy>
               </div>
             </div>
@@ -505,7 +505,7 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <LeadFlowDashboard emptyState={<EmptyStateDashboard variant="leads" />} />
+                <LeadFlowDashboard portalState={portalState} emptyState={<EmptyStateDashboard variant="leads" />} />
               </PortalLazy>
             </PortalTabWrapper>
           )}
@@ -703,7 +703,7 @@ export default function ClientPortal() {
               onRetry={refreshProject}
             >
               <PortalLazy>
-                <WeeklyReports project={project} />
+                <WeeklyReports project={project} portalState={portalState} />
               </PortalLazy>
             </PortalTabWrapper>
           )}

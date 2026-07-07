@@ -1,4 +1,6 @@
 import { ArrowRight, CheckCircle2, Clock, Zap } from "lucide-react";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const STAGES = [
   { label: "Payment Confirmed", key: "paid" },
@@ -15,13 +17,18 @@ function getStageIndex(order, hasSetupInfo) {
   return 0;
 }
 
-export default function WelcomeBanner({ user, order, hasSetupInfo }) {
+export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }) {
   const businessName = order?.business_name || order?.customer_name || null;
   const firstName = user?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "there";
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
-  const stageIndex = getStageIndex({ order }, hasSetupInfo);
-  const currentStage = STAGES[stageIndex];
-  const isLive = stageIndex === 3;
+  const rawStageIndex = getStageIndex({ order }, hasSetupInfo);
+  const currentStage = STAGES[rawStageIndex];
+  // Phase A.5: Gate "Live" celebration behind PortalStateEngine proof validation
+  const readinessCard = getCardState(portalState, "system_readiness");
+  const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
+  const isLive = rawStageIndex === 3 && isProofLive;
+  const stageIndex = isProofLive ? rawStageIndex : Math.min(rawStageIndex, 2);
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   return (
     <div style={{
@@ -184,7 +191,27 @@ export default function WelcomeBanner({ user, order, hasSetupInfo }) {
             </p>
           </div>
         )}
+
+        {/* Phase A.5: Proof gate notice when not Live */}
+        {!isProofLive && rawStageIndex === 3 && (
+          <div style={{
+            background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)",
+            borderRadius: "12px", padding: "14px 18px",
+            display: "flex", alignItems: "center", gap: "12px",
+          }}>
+            <Clock style={{ width: "18px", height: "18px", color: "#00AEEF", flexShrink: 0 }} />
+            <div>
+              <p style={{ fontSize: "13px", fontWeight: "700", color: "#00AEEF", margin: "0 0 2px" }}>
+                We're verifying your system is fully live
+              </p>
+              <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
+                Your setup is complete — we're running final checks before confirming go-live.
+              </p>
+            </div>
+          </div>
+        )}
       </div>
+      <PortalAdminDiagnostics card={readinessCard} isAdmin={isAdmin} />
     </div>
   );
 }

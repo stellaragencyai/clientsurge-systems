@@ -6,6 +6,8 @@ import {
 } from "lucide-react";
 import { RadialBarChart, RadialBar, ResponsiveContainer } from "recharts";
 import { BUILD_STEPS } from "@/utils/weeklyReportsBuildSteps";
+import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
+import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const STATUS_COLORS = {
   New: "#3b82f6",
@@ -137,13 +139,18 @@ function PipelineChart({ leads }) {
   );
 }
 
-export default function WeeklyReports({ project }) {
+export default function WeeklyReports({ project, portalState }) {
   const [leads, setLeads] = useState([]);
   const [summary, setSummary] = useState({ total: 0, new_this_week: 0, qualified: 0, booked: 0 });
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const [sent, setSent] = useState(false);
   const [error, setError] = useState("");
+
+  // Phase A.5: Gate report data and success states behind PortalStateEngine proof
+  const reportsCard = getCardState(portalState, "reports");
+  const isProofLive = reportsCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   const loadLeads = useCallback(async () => {
     if (!project?.id) {
@@ -226,7 +233,15 @@ export default function WeeklyReports({ project }) {
         </div>
       </div>
 
-      {sent && (
+      {/* Phase A.5: Proof gate notice when not Live */}
+      {!isProofLive && (
+        <div className="flex items-center gap-2 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3 text-sm text-primary">
+          <Calendar className="w-4 h-4 flex-shrink-0" />
+          {reportsCard.display_text}
+        </div>
+      )}
+
+      {sent && isProofLive && (
         <div className="flex items-center gap-2 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-800">
           <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
           Report sent successfully to <strong className="ml-1">{project.client_email}</strong>
@@ -255,10 +270,10 @@ export default function WeeklyReports({ project }) {
       ) : (
         <>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <StatCard icon={Users} label="Total Leads" value={summary.total || leads.length} sub="All time" color="blue" />
-            <StatCard icon={TrendingUp} label="New This Week" value={newThisWeek} sub="Last 7 days" color="purple" />
-            <StatCard icon={BarChart3} label="Qualified" value={qualified} sub="High-intent" color="amber" />
-            <StatCard icon={CheckCircle2} label="Booked" value={booked} sub="Appointments" color="green" />
+            <StatCard icon={Users} label="Total Leads" value={isProofLive ? (summary.total || leads.length) : "—"} sub="All time" color="blue" />
+            <StatCard icon={TrendingUp} label="New This Week" value={isProofLive ? newThisWeek : "—"} sub="Last 7 days" color="purple" />
+            <StatCard icon={BarChart3} label="Qualified" value={isProofLive ? qualified : "—"} sub="High-intent" color="amber" />
+            <StatCard icon={CheckCircle2} label="Booked" value={isProofLive ? booked : "—"} sub="Appointments" color="green" />
           </div>
 
           {/* Charts */}
@@ -273,12 +288,15 @@ export default function WeeklyReports({ project }) {
             <div>
               <p className="text-sm font-semibold text-foreground">Automated Weekly Emails</p>
               <p className="text-xs text-muted-foreground mt-1">
-                This report is automatically emailed to <strong>{project.client_email}</strong> every Monday morning. You can also send it manually anytime using the button above.
+                {isProofLive
+                  ? <>This report is automatically emailed to <strong>{project.client_email}</strong> every Monday morning. You can also send it manually anytime using the button above.</>
+                  : "Automated weekly reports will begin after your system is verified live."}
               </p>
             </div>
           </div>
         </>
       )}
+      <PortalAdminDiagnostics card={reportsCard} isAdmin={isAdmin} />
     </div>
   );
 }

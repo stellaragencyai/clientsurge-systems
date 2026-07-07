@@ -2,6 +2,8 @@ import { useEffect, useState } from 'react';
 import { Activity, CheckCircle2, PhoneOff, RefreshCw, TrendingUp, Loader2, Download } from 'lucide-react';
 import { base44 } from '@/api/base44Client';
 import ConversionFunnel from './ConversionFunnel';
+import { getCardState, CARD_STATUS } from '@/lib/portalStateEngine';
+import PortalAdminDiagnostics from '@/components/portal/PortalAdminDiagnostics';
 
 function MetricCard({ icon: Icon, label, value, trend, color = 'blue' }) {
   const colors = {
@@ -27,7 +29,7 @@ function MetricCard({ icon: Icon, label, value, trend, color = 'blue' }) {
   );
 }
 
-export default function LeadFlowDashboard() {
+export default function LeadFlowDashboard({ portalState, emptyState }) {
   const [metrics, setMetrics] = useState({
     active_leads: 0,
     appointments_booked: 0,
@@ -36,6 +38,11 @@ export default function LeadFlowDashboard() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [lastUpdated, setLastUpdated] = useState(null);
+
+  // Phase A.5: Gate lead-flow metrics behind PortalStateEngine proof
+  const leadCard = getCardState(portalState, "lead_capture");
+  const isProofLive = leadCard.status === CARD_STATUS.LIVE;
+  const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   const handleExport = async () => {
     try {
@@ -118,27 +125,34 @@ export default function LeadFlowDashboard() {
         </div>
       )}
 
-      {/* Metrics Grid */}
+      {/* Phase A.5: Proof gate notice when not Live */}
+      {!isProofLive && (
+        <div className="rounded-lg border border-primary/20 bg-primary/5 p-4 text-sm text-primary font-medium">
+          {leadCard.display_text}
+        </div>
+      )}
+
+      {/* Metrics Grid — Phase A.5: values gated behind proof */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <MetricCard
           icon={Activity}
           label="Active Leads"
-          value={metrics.active_leads}
-          trend="Leads in pipeline"
+          value={isProofLive ? metrics.active_leads : "Pending"}
+          trend={isProofLive ? "Leads in pipeline" : undefined}
           color="blue"
         />
         <MetricCard
           icon={CheckCircle2}
           label="Appointments Booked"
-          value={metrics.appointments_booked}
-          trend="Confirmed bookings"
+          value={isProofLive ? metrics.appointments_booked : "Pending"}
+          trend={isProofLive ? "Confirmed bookings" : undefined}
           color="green"
         />
         <MetricCard
           icon={PhoneOff}
           label="Missed Calls Recovered"
-          value={metrics.missed_calls_recovered}
-          trend="Last 7 days"
+          value={isProofLive ? metrics.missed_calls_recovered : "Pending"}
+          trend={isProofLive ? "Last 7 days" : undefined}
           color="purple"
         />
       </div>
@@ -150,10 +164,19 @@ export default function LeadFlowDashboard() {
         </p>
       )}
 
-      {/* Conversion Funnel */}
-      <div className="mt-8 border-t border-border pt-8">
-        <ConversionFunnel />
-      </div>
+      {/* Conversion Funnel — Phase A.5: gated behind proof */}
+      {isProofLive ? (
+        <div className="mt-8 border-t border-border pt-8">
+          <ConversionFunnel />
+        </div>
+      ) : (
+        <div className="mt-8 border-t border-border pt-8">
+          <div className="rounded-xl border border-border bg-muted/20 p-8 text-center">
+            <p className="text-sm text-muted-foreground">Conversion funnel data will appear after your system is verified live.</p>
+          </div>
+        </div>
+      )}
+      <PortalAdminDiagnostics card={leadCard} isAdmin={isAdmin} />
     </div>
   );
 }
