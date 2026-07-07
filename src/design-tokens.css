@@ -579,3 +579,225 @@ body, p, li, span, td, th, input, textarea, select, button, label {
   -webkit-background-clip: unset !important;
   background-clip: unset !important;
 }
+
+/* ════════════════════════════════════════════════════════════════════
+   14. SPRINT 1 FOUNDATION — Semantic Aliases + Utility Classes
+   Additive only — no existing tokens or classes modified
+   ════════════════════════════════════════════════════════════════════ */
+
+/* ── Semantic Color Aliases ── */
+:root {
+  --cs-primary:        var(--cs-brand);
+  --cs-primary-dark:   var(--cs-brand-deep);
+  --cs-primary-light:  #5ED4FF;
+  --cs-electric:       var(--cs-brand);
+  --cs-dark:           var(--cs-neutral-bg);
+  --cs-surface:        var(--cs-neutral-surface);
+  --cs-muted:          var(--cs-neutral-surface2);
+  --cs-border:         var(--cs-neutral-border);
+}
+
+/* ── Typography Utility Classes ── */
+.cs-display {
+  font-family: var(--cs-font-heading) !important;
+  font-weight: var(--cs-weight-black);
+  font-size: clamp(3rem, 7vw, 5rem);
+  line-height: var(--cs-leading-tight);
+  letter-spacing: var(--cs-tracking-tight);
+  color: var(--cs-text-heading);
+}
+
+.cs-h1 {
+  font-family: var(--cs-font-heading) !important;
+  font-weight: var(--cs-weight-black);
+  font-size: var(--cs-size-h1);
+  line-height: var(--cs-leading-tight);
+  letter-spacing: var(--cs-tracking-tight);
+  color: var(--cs-text-heading);
+}
+
+.cs-h2 {
+  font-family: var(--cs-font-heading) !important;
+  font-weight: var(--cs-weight-extrabold);
+  font-size: var(--cs-size-h2);
+  line-height: var(--cs-leading-heading);
+  letter-spacing: var(--cs-tracking-heading);
+  color: var(--cs-text-heading);
+}
+
+.cs-h3 {
+  font-family: var(--cs-font-heading) !important;
+  font-weight: var(--cs-weight-bold);
+  font-size: var(--cs-size-h3);
+  line-height: var(--cs-leading-heading);
+  letter-spacing: var(--cs-tracking-heading);
+  color: var(--cs-text-heading);
+}
+
+.cs-h4 {
+  font-family: var(--cs-font-heading) !important;
+  font-weight: var(--cs-weight-bold);
+  font-size: var(--cs-size-h4);
+  line-height: var(--cs-leading-snug);
+  color: var(--cs-text-heading);
+}
+
+.cs-body {
+  font-family: var(--cs-font-body);
+  font-weight: var(--cs-weight-regular);
+  font-size: var(--cs-size-body);
+  line-height: var(--cs-leading-body);
+  color: var(--cs-text-primary);
+}
+
+.cs-small {
+  font-family: var(--cs-font-body);
+  font-weight: var(--cs-weight-regular);
+  font-size: var(--cs-size-small);
+  line-height: 1.5;
+  color: var(--cs-text-secondary);
+}
+
+/* ── Section Variants ── */
+.cs-section-tight {
+  padding-top: 2rem;
+  padding-bottom: 2rem;
+}
+@media (min-width: 1025px) {
+  .cs-section-tight {
+    padding-top: 3rem;
+    padding-bottom: 3rem;
+  }
+}
+
+.cs-section-large {
+  padding-top: 6rem;
+  padding-bottom: 6rem;
+}
+@media (min-width: 1025px) {
+  .cs-section-large {
+    padding-top: 8rem;
+    padding-bottom: 8rem;
+  }
+}
+
+/* ── Button Outline Variant ── */
+.cs-btn-outline {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border-radius: var(--cs-btn-radius);
+  padding: 0.75rem 1.75rem;
+  font-family: var(--cs-font-body);
+  font-size: var(--cs-size-small);
+  font-weight: var(--cs-weight-semibold);
+  color: var(--cs-brand-deep);
+  background: transparent;
+  border: 1.5px solid var(--cs-brand-border);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-height: 44px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.cs-btn-outline:hover {
+  border-color: var(--cs-brand);
+  background: var(--cs-brand-pale);
+}
+.cs-btn-outline:focus-visible {
+  outline: 2px solid var(--cs-brand);
+  outline-offset: 3px;
+}
+
+/* ── Glass Card ── */
+.cs-glass-card {
+  background: rgba(255, 255, 255, 0.72) !important;
+  backdrop-filter: blur(14px) saturate(1.5) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(1.5) !important;
+  border: 1px solid rgba(255, 255, 255, 0.55) !important;
+  border-radius: var(--cs-card-radius) !important;
+  box-shadow: var(--cs-shadow-card) !important;
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s ease !important;
+  padding: 1.5rem;
+}
+.cs-glass-card:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--cs-shadow-md) !important;
+}
+@media (pointer: coarse) {
+  .cs-glass-card:hover { transform: none !important; }
+}
+
+/* ── Feature Card ── */
+.cs-feature-card {
+  border-radius: var(--cs-card-radius);
+  border: 1px solid var(--cs-brand-border);
+  background: var(--cs-neutral-surface);
+  padding: 1.5rem;
+  box-shadow: var(--cs-shadow-sm);
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+              box-shadow 0.3s ease,
+              border-color 0.3s ease;
+  will-change: transform, box-shadow;
+}
+.cs-feature-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--cs-brand);
+  box-shadow: var(--cs-shadow-lg), var(--cs-glow-brand);
+}
+@media (pointer: coarse) {
+  .cs-feature-card:hover { transform: none; }
+}
+
+/* ── Animation Utilities ── */
+.cs-fade-in {
+  opacity: 0;
+  animation: csFadeInKey 0.6s ease-out forwards;
+}
+@keyframes csFadeInKey {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.cs-slide-up {
+  opacity: 0;
+  transform: translateY(20px);
+  animation: csSlideUpKey 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards;
+}
+@keyframes csSlideUpKey {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.cs-scale-hover {
+  transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+.cs-scale-hover:hover {
+  transform: scale(1.03);
+}
+@media (pointer: coarse) {
+  .cs-scale-hover:hover { transform: none; }
+}
+
+.cs-glow-hover {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.cs-glow-hover:hover {
+  box-shadow: 0 0 24px rgba(0, 174, 239, 0.18);
+  border-color: var(--cs-brand);
+}
+
+/* Reduced motion compliance */
+@media (prefers-reduced-motion: reduce) {
+  .cs-fade-in,
+  .cs-slide-up,
+  .cs-scale-hover,
+  .cs-glow-hover {
+    animation: none !important;
+    transition: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
