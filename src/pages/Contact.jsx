@@ -11,8 +11,8 @@ import {
   Sparkles,
   MessageSquareText,
 } from "lucide-react";
-import { Link } from "react-router-dom";
 import FormInput from "../components/forms/FormInput";
+import CSButton from "@/components/design-system/CSButton";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -213,9 +213,7 @@ export default function Contact() {
                   <p className="mt-2 text-sm leading-relaxed text-slate-600">
                     Not sure what you need yet? Start with the package comparison, then send us your current lead-flow problem.
                   </p>
-                  <Link to="/pricing" className="cs-btn-primary cs-cta-glow mt-5 inline-flex">
-                    View Packages <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <CSButton variant="primary" size="md" iconRight={ArrowRight} href="/pricing" className="mt-5">View Packages</CSButton>
                 </div>
               </div>
             </aside>
@@ -230,9 +228,7 @@ export default function Contact() {
                   <p className="mx-auto mt-3 max-w-sm text-base leading-relaxed text-slate-600">
                     {`Thanks for reaching out. We'll respond within one business day.`}
                   </p>
-                  <Link to="/" className="cs-btn-primary cs-cta-glow mt-8 inline-flex">
-                    Back to Home <ArrowRight className="w-4 h-4" />
-                  </Link>
+                  <CSButton variant="primary" size="md" iconRight={ArrowRight} href="/" className="mt-8">Back to Home</CSButton>
                 </div>
               ) : (
                 <form onSubmit={handleSubmit} noValidate className="space-y-7">
@@ -294,14 +290,18 @@ export default function Contact() {
                   </div>
 
                   <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <button
-                      type="submit"
+                    <CSButton
+                      variant="primary"
+                      size="lg"
+                      loading={loading}
                       disabled={loading}
-                      className="cs-btn-primary cs-cta-glow disabled:cursor-not-allowed disabled:opacity-60"
-                      style={{ minHeight: "52px", paddingLeft: "2rem", paddingRight: "2rem" }}
+                      iconRight={!loading ? ArrowRight : undefined}
+                      onClick={() => {}}
+                      type="submit"
+                      className="disabled:opacity-60"
                     >
-                      {loading ? <><Loader2 className="w-4 h-4 animate-spin" /> Sending...</> : <><span>Send Message</span><ArrowRight className="w-4 h-4" /></>}
-                    </button>
+                      {loading ? 'Sending...' : 'Send Message'}
+                    </CSButton>
                     <p className="text-sm font-semibold text-slate-500">No spam. No pressure. Just a clear next step.</p>
                   </div>
                 </form>
@@ -336,12 +336,8 @@ export default function Contact() {
               </h2>
             </div>
             <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
-              <Link to="/pricing" className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-[#006bb0] shadow-[0_18px_45px_rgba(0,0,0,0.18)] transition hover:-translate-y-0.5 cs-cta-glow" style={{ color: "#006bb0" }}>
-                Compare Packages <ArrowRight className="h-4 w-4" />
-              </Link>
-              <Link to="/automations" className="inline-flex items-center justify-center gap-2 rounded-full border border-white/30 bg-white/10 px-6 py-3 text-sm font-black text-white backdrop-blur transition hover:bg-white/15">
-                View Automation Stack
-              </Link>
+              <CSButton variant="secondary" size="md" iconRight={ArrowRight} href="/pricing" className="!bg-white !text-[#006bb0]">Compare Packages</CSButton>
+              <CSButton variant="outline" size="md" href="/automations" className="!border-white/30 !bg-white/10 !text-white backdrop-blur">View Automation Stack</CSButton>
             </div>
           </div>
         </section>

@@ -19,6 +19,7 @@ import IndustryFAQ from '@/components/industry/IndustryFAQ';
 import IndustryFinalCTA from '@/components/industry/IndustryFinalCTA';
 import { ArrowRight, CheckCircle, TrendingUp, Zap, Phone, Calendar, MessageSquare, AlertCircle, Users, Shield, RotateCw, Smile, Cloud, FileText, FileCheck, MapPin, ClipboardList, Send, Search, Home, CheckSquare, Thermometer } from 'lucide-react';
 import SectionHeader from '@/components/design-system/SectionHeader';
+import CSButton from '@/components/design-system/CSButton';
 import IndustryQualificationForm from '@/components/forms/IndustryQualificationForm';
 import IndustrySuccessGallery from '@/components/industry/IndustrySuccessGallery';
 
@@ -260,8 +261,8 @@ export default function IndustryPageTemplate() {
               <h2 className="font-titles text-3xl md:text-4xl font-bold tracking-tight">Install a {industry.industry_name} Lead Flow System</h2>
               <p className="mx-auto mt-4 max-w-2xl text-sm md:text-base leading-relaxed text-white/82">Compare packages, choose the system, and move into guided setup with a clearer path from first inquiry to booked appointment.</p>
               <div className="mt-8 flex flex-col sm:flex-row gap-4 justify-center">
-                <button onClick={() => navigate(buildIndustryPricingUrl(slug, 'industry_final_cta'))} className="inline-flex items-center justify-center gap-2 rounded-full bg-white px-6 py-3 text-sm font-black text-primary shadow-lg transition-transform hover:-translate-y-0.5" style={{ minHeight: '44px' }}>{industry.primary_cta}<ArrowRight className="w-4 h-4" /></button>
-                <button onClick={() => navigate('/automations')} className="inline-flex items-center justify-center px-6 py-3 rounded-full border border-white/30 bg-white/10 text-sm font-bold text-white backdrop-blur hover:bg-white/16 transition-colors" style={{ minHeight: '44px' }}>View Automation Stack</button>
+                <CSButton variant="secondary" size="lg" iconRight={ArrowRight} onClick={() => navigate(buildIndustryPricingUrl(slug, 'industry_final_cta'))} className="!bg-white !text-[#006bb0] !shadow-lg">{industry.primary_cta}</CSButton>
+                <CSButton variant="outline" size="lg" onClick={() => navigate('/automations')} className="!border-white/30 !bg-white/10 !text-white backdrop-blur">View Automation Stack</CSButton>
               </div>
             </div>
           </section>

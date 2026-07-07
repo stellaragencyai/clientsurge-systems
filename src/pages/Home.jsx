@@ -16,6 +16,7 @@ import SixAutomationsSection from "../components/landing/SixAutomationsSection.j
 import ROICalculator from "../components/landing/ROICalculator.jsx";
 import FAQSection from "../components/landing/FAQSection.jsx";
 import SectionErrorBoundary from "../components/SectionErrorBoundary.jsx";
+import CSSectionHeader from "../components/design-system/CSSectionHeader.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
@@ -146,17 +147,13 @@ export default function Home() {
         <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
           <section className="py-16 md:py-24 px-4 bg-muted/30">
             <div className="max-w-4xl mx-auto">
-              <div className="cs-section-header cs-section-header--center mb-8">
-                <p className="cs-section-eyebrow">Revenue Recovery Calculator</p>
-                <div className="cs-section-title-row cs-section-header--center">
-                  <span className="cs-section-bar" />
-                  <h2 className="cs-section-title">How Much Revenue Are You Losing?</h2>
-                </div>
-                <p className="cs-section-subtitle">
-                  Drag the sliders below to see how many leads you're losing to missed calls
-                  and slow follow-up — then browse our store to recover them automatically.
-                </p>
-              </div>
+              <CSSectionHeader
+                eyebrow="Revenue Recovery Calculator"
+                title="How Much Revenue Are You Losing?"
+                subtitle="Drag the sliders below to see how many leads you're losing to missed calls and slow follow-up — then browse our store to recover them automatically."
+                align="center"
+                className="mb-8"
+              />
               <ROICalculator />
             </div>
           </section>
