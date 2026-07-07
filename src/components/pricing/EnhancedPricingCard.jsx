@@ -19,7 +19,7 @@ const TIER_VALUE_PRICES = {
   pro_system: "$5,997",
 };
 
-const packageReviewHref = (packageKey) => `/store?package=${encodeURIComponent(packageKey)}`;
+const packageReviewHref = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
 
 export default function EnhancedPricingCard({ pkg, index }) {
   const highlight = Boolean(pkg.badge);

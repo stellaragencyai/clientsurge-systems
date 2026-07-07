@@ -47,7 +47,7 @@ const PACKAGES = [
   },
 ];
 
-const getPackageCheckoutPath = (packageId) => `/store?package=${encodeURIComponent(packageId)}`;
+const getPackageCheckoutPath = (packageId) => `/product-signup?package=${encodeURIComponent(packageId)}`;
 
 export default function ThreeSystemsSection() {
   return (

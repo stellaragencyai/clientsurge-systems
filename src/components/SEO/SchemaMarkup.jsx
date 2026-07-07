@@ -85,7 +85,7 @@ export function getProductSchema() {
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
-        url: 'https://clientsurgesystems.com/store?package=starter_system',
+        url: 'https://clientsurgesystems.com/product-signup?package=starter_system',
         availability: 'https://schema.org/InStock',
       },
       {
@@ -99,7 +99,7 @@ export function getProductSchema() {
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
-        url: 'https://clientsurgesystems.com/store?package=growth_system',
+        url: 'https://clientsurgesystems.com/product-signup?package=growth_system',
         availability: 'https://schema.org/InStock',
       },
       {
@@ -113,7 +113,7 @@ export function getProductSchema() {
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
-        url: 'https://clientsurgesystems.com/store?package=pro_system',
+        url: 'https://clientsurgesystems.com/product-signup?package=pro_system',
         availability: 'https://schema.org/InStock',
       },
     ],

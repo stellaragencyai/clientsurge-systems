@@ -72,6 +72,25 @@ export const STATIC_ROUTE_ALIASES = {
   "/product_signup": "/product-signup",
 };
 
+/**
+ * ADMIN/INTERNAL NOTE — Package Checkout Canonical Route
+ *
+ * There is exactly ONE canonical public route for package checkout:
+ *   /product-signup?package={starter_system|growth_system|pro_system}
+ *
+ * All legacy aliases (/product_signup, /product-sign-up, /signup) redirect
+ * to /product-signup preserving the ?package= query parameter.
+ *
+ * The /store route is for browsing individual services only — it must NOT
+ * be used as a primary package checkout path. All pricing CTAs, schema
+ * markup URLs, and landing-page package buttons point exclusively to
+ * /product-signup?package=X.
+ *
+ * The ProductSignup page uses direct fetch to the createCheckoutSession
+ * backend function — no Base44 browser SDK, no login required.
+ * App ID: 69dc4a79656fdba136d413d3
+ */
+
 export const LEGACY_REDIRECTS = Object.entries(STATIC_ROUTE_ALIASES);
 
 export const PUBLIC_DIRECTORY_PAGES = [

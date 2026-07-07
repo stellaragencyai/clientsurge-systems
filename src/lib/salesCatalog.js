@@ -275,7 +275,7 @@ export function getPackageOffer(packageKey) {
 
 export function getPackageStorePath(packageKey) {
   const normalizedKey = normalizePackageKey(packageKey);
-  return normalizedKey ? `/store?package=${encodeURIComponent(normalizedKey)}` : "/store";
+  return normalizedKey ? `/product-signup?package=${encodeURIComponent(normalizedKey)}` : "/product-signup";
 }
 
 export function getBestPackageOfferForServiceKeys(serviceKeys = []) {

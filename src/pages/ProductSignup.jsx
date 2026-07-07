@@ -82,7 +82,9 @@ async function invokePublicCheckoutSession(payload) {
       result?.error ||
       result?.data?.error ||
       `Checkout server returned HTTP ${response.status || "error"}.`;
-    throw new Error(message);
+    const err = new Error(message);
+    err.request_id = result?.request_id || result?.data?.request_id || null;
+    throw err;
   }
 
   return {
@@ -158,7 +160,8 @@ export default function ProductSignup() {
       setTimeout(() => { window.location.assign(url); }, 800);
     } catch (err) {
       const msg = err?.data?.error || err?.message || "Checkout could not be started.";
-      setError(`${msg} Click "Retry Checkout" to try again, or contact support if it persists.`);
+      const requestId = err?.request_id;
+      setError(requestId ? `${msg} (Request ID: ${requestId}) Click "Retry Checkout" to try again, or contact support if it persists.` : `${msg} Click "Retry Checkout" to try again, or contact support if it persists.`);
       setLoading(false);
     }
   }, [selectedPackage, fullName, businessName, email, phone, industry]);

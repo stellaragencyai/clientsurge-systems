@@ -182,7 +182,7 @@ export default function ROICalculator({ className = '' }) {
                     <span className="text-sm font-bold text-gray-500 ml-2">{recommended.price}</span>
                   </div>
                   <a
-                    href={`/store?package=${recommended.id}`}
+                    href={`/product-signup?package=${recommended.id}`}
                     className="cs-btn-primary inline-flex items-center gap-2 text-xs"
                     style={{ height: "38px", padding: "0 20px" }}
                   >

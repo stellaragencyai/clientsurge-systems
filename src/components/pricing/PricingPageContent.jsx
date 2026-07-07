@@ -42,7 +42,7 @@ const PACKAGES = [
 ];
 
 const PROCESS_STEPS = ["Choose System", "Guided Intake", "Access Checklist", "Configuration", "Testing", "Launch Review"];
-const packageReviewHref = (packageKey) => `/store?package=${encodeURIComponent(packageKey)}`;
+const packageReviewHref = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
 
 export default function PricingPageContent() {
   const [industryName, setIndustryName] = useState(null);
