@@ -1,13 +1,15 @@
 import { lazy, Suspense, useState, useEffect, useLayoutEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LogOut, LayoutDashboard, Eye, Menu, X } from "lucide-react";
+import { LayoutDashboard, Eye } from "lucide-react";
 import { useLeadNotifications } from "../hooks/useLeadNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
-import PortalSidebar from "../components/portal/PortalSidebar";
+import PortalShell from "../components/portal/PortalShell";
 import PortalDashboardOverview from "../components/portal/PortalDashboardOverview";
 import PortalStateBoundary from "../components/portal/PortalStateBoundary";
 import PortalTabWrapper from "../components/portal/PortalTabWrapper";
 import { usePortalState } from "../hooks/usePortalState";
+import { getPortalSection } from "@/lib/portalNavigationConfig";
 
 // ── All portal components lazy-loaded to keep the ClientPortal chunk small ──
 // This prevents Vite from bundling 30+ components into one massive chunk that
@@ -18,7 +20,6 @@ const PlanManager = lazy(() => import("../components/portal/PlanManager"));
 const LeadActivityFeed = lazy(() => import("../components/portal/LeadActivityFeed"));
 const PaymentFailedBanner = lazy(() => import("../components/portal/PaymentFailedBanner"));
 const LeadFlowDashboard = lazy(() => import("../components/portal/LeadFlowDashboard"));
-const NotificationBell = lazy(() => import("../components/portal/NotificationBell"));
 const QuickStartWizard = lazy(() => import("../components/portal/QuickStartWizard"));
 const QuickStartInline = lazy(() => import("../components/portal/QuickStartInline"));
 const DeadlinesPanel = lazy(() => import("../components/portal/DeadlinesPanel"));
@@ -109,7 +110,9 @@ export default function ClientPortal() {
   const [portalError, setPortalError] = useState("");
   const [activeTab, setActiveTab] = useState("dashboard");
   const [showQuickStart, setShowQuickStart] = useState(false);
-  const [mobileSidebarOpen, setMobileSidebarOpen] = useState(false);
+  const navigate = useNavigate();
+  const { section: urlSection } = useParams();
+  const section = urlSection || "overview";
   const [isAdminPreview, setIsAdminPreview] = useState(false);
   const [healthData, setHealthData] = useState(null);
   const [userRole, setUserRole] = useState(null);
@@ -226,6 +229,22 @@ export default function ClientPortal() {
     return unsubscribe;
   }, [portalOrder?.id]);
 
+  // Phase 4.2: Sync activeTab when URL section changes
+  useEffect(() => {
+    const sec = getPortalSection(section);
+    if (sec) {
+      setActiveTab(sec.defaultTab);
+    }
+  }, [section]);
+
+  const handleSectionChange = (sectionId) => {
+    const sec = getPortalSection(sectionId);
+    if (sec) {
+      setActiveTab(sec.defaultTab);
+      navigate(`/client-portal/${sectionId}`);
+    }
+  };
+
   if (loading) {
     return <PortalLoadingSkeleton />;
   }
@@ -299,66 +318,34 @@ export default function ClientPortal() {
   }
 
   return (
-    <div className="min-h-screen flex" style={{ background: "#f8f9fc" }}>
-      {/* Quick Start Wizard (modal overlay) */}
-      {showQuickStart && project && (
-        <PortalLazy>
-          <QuickStartWizard
-            project={project}
-            onComplete={() => { setShowQuickStart(false); refreshProject(); }}
-            onDismiss={() => setShowQuickStart(false)}
-          />
-        </PortalLazy>
-      )}
-
-      {/* Sidebar Navigation */}
-      <PortalSidebar
-        activeTab={activeTab}
-        setActiveTab={setActiveTab}
-        onLogout={() => base44.auth.logout("/")}
-        businessName={project?.business_name}
-        userEmail={user?.email}
-        mobileOpen={mobileSidebarOpen}
-        onCloseMobile={() => setMobileSidebarOpen(false)}
-      />
-
-      {/* Main content area */}
-      <div className="flex-1 min-w-0 flex flex-col">
-        {/* Top header bar */}
-        <header
-          className="sticky top-0 z-30 bg-white border-b border-gray-100 px-6 h-16 flex items-center justify-between flex-shrink-0"
-          role="banner"
-        >
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => setMobileSidebarOpen(true)}
-              className="lg:hidden p-2 -ml-2 rounded-lg text-gray-500 hover:bg-gray-50"
-              aria-label="Open menu"
-            >
-              <Menu className="w-5 h-5" />
-            </button>
-            <h1 className="text-xl font-bold text-gray-900 font-display">
-              {TAB_LABELS[activeTab] || "Dashboard"}
-            </h1>
-          </div>
-          <div className="flex items-center gap-3">
-            <PortalLazy>
-              <NotificationBell
-                notifications={notifications}
-                unreadCount={unreadCount}
-                onMarkAsRead={markAsRead}
-                onMarkAllAsRead={markAllAsRead}
-                onClear={clearNotifications}
-              />
-            </PortalLazy>
-            <div className="w-9 h-9 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
-              <span className="text-xs font-bold text-gray-500">
-                {(user?.full_name || user?.email || "U")[0].toUpperCase()}
-              </span>
-            </div>
-          </div>
-        </header>
-
+    <PortalShell
+      activeTab={activeTab}
+      setActiveTab={setActiveTab}
+      section={section}
+      onSectionChange={handleSectionChange}
+      onLogout={() => base44.auth.logout("/logout")}
+      businessName={project?.business_name}
+      userEmail={user?.email}
+      user={user}
+      project={project}
+      notifications={notifications}
+      unreadCount={unreadCount}
+      onMarkAsRead={markAsRead}
+      onMarkAllAsRead={markAllAsRead}
+      onClearNotifications={clearNotifications}
+      tabLabels={TAB_LABELS}
+      overlay={
+        showQuickStart && project ? (
+          <PortalLazy>
+            <QuickStartWizard
+              project={project}
+              onComplete={() => { setShowQuickStart(false); refreshProject(); }}
+              onDismiss={() => setShowQuickStart(false)}
+            />
+          </PortalLazy>
+        ) : null
+      }
+    >
         {/* Admin Preview Banner */}
         {isAdminPreview && (
           <div className="px-6 pt-4">
@@ -369,7 +356,6 @@ export default function ClientPortal() {
         )}
 
         {/* Content */}
-        <main id="main-content" className="flex-1 px-6 py-6 overflow-y-auto">
           {activeTab === "dashboard" && (
             <PortalStateBoundary onRetry={refreshProject}>
               <PortalDashboardOverview
@@ -741,8 +727,6 @@ export default function ClientPortal() {
               </PortalLazy>
             </PortalTabWrapper>
           )}
-        </main>
-      </div>
-    </div>
+    </PortalShell>
   );
 }

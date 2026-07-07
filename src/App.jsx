@@ -79,6 +79,7 @@ const AISalesCommandCenter = lazy(() => import("./internal-pages/AISalesCommandC
 const PerformanceWars = lazy(() => import("./internal-pages/PerformanceWars"));
 const ClientPortal = lazy(() => import("./internal-pages/ClientPortal"));
 const ClientPortalAccess = lazy(() => import("./components/portal/ClientPortalAccess"));
+const Logout = lazy(() => import("./pages/Logout"));
 const ClientSaasDashboard = lazy(() => import("./pages/ClientSaasDashboard"));
 const ClientDashboard = lazy(() => import("./internal-pages/ClientDashboard"));
 const Library = lazy(() => import("./pages/Library"));
@@ -467,6 +468,8 @@ const AuthenticatedAppWithTenant = () => {
       <Route path={routePath("ClientPortal")} element={<Navigate to={routePath("client-portal")} replace />} />
       <Route path="/client-dashboard" element={<Navigate to="/client-portal" replace />} />
       <Route path="/client-portal" element={<ErrorBoundary><LazyRoute Component={ClientPortalAccess} /></ErrorBoundary>} />
+      <Route path="/client-portal/:section" element={<ErrorBoundary><LazyRoute Component={ClientPortalAccess} /></ErrorBoundary>} />
+      <Route path="/logout" element={<LazyRoute Component={Logout} />} />
       <Route path="/blog" element={<LazyRoute Component={Blog} />} />
       <Route path="/blog/:slug" element={<LazyRoute Component={Blog} />} />
       <Route path="/library" element={<LazyRoute Component={Library} />} />

@@ -1,25 +1,30 @@
 /**
- * PortalSidebar — uses the shared CLIENT_PORTAL_NAV_GROUPS contract.
- * ClientSurge blue active styling, mobile close button, accessible labels,
- * focus rings, current-section summary, and safe business/email fallbacks.
+ * PortalSidebar — Phase 4.2 premium SaaS sidebar.
+ * Shows 8 consolidated sections with icons, active state, business identity, and logout.
  */
 import {
-  LayoutDashboard, Rocket, MapPin, Zap, Target, Activity,
-  Users, UserCheck, CheckSquare, ListChecks, CreditCard,
-  FolderOpen, Calendar, Gift, MessageSquare, Package,
-  FileText, Bell, Settings, LogOut, X,
+  LayoutDashboard, Rocket, Zap, Target, Activity, Users, UserCheck,
+  CheckSquare, ListChecks, CreditCard, FolderOpen, Calendar, Gift,
+  MessageSquare, Package, FileText, Bell, Settings, LogOut, X, MapPin,
 } from "lucide-react";
-import { CLIENT_PORTAL_NAV_GROUPS, getClientPortalTab } from "@/lib/portalNavigationConfig";
+import { PORTAL_SECTIONS } from "@/lib/portalNavigationConfig";
 
 const ICON_MAP = {
-  LayoutDashboard, Rocket, MapPin, Zap, Target, Activity,
-  Users, UserCheck, CheckSquare, ListChecks, CreditCard,
-  FolderOpen, Calendar, Gift, MessageSquare, Package,
-  FileText, Bell, Settings,
+  LayoutDashboard, Rocket, Zap, Target, Activity, Users, UserCheck,
+  CheckSquare, ListChecks, CreditCard, FolderOpen, Calendar, Gift,
+  MessageSquare, Package, FileText, Bell, Settings, MapPin,
 };
 
-export default function PortalSidebar({ activeTab, setActiveTab, onLogout, businessName, userEmail, mobileOpen, onCloseMobile }) {
-  const currentTab = getClientPortalTab(activeTab);
+export default function PortalSidebar({
+  section,
+  onSectionChange,
+  onLogout,
+  businessName,
+  userEmail,
+  project,
+  mobileOpen,
+  onCloseMobile,
+}) {
   const safeBusiness = businessName || "Your Business";
   const safeEmail = userEmail || "—";
 
@@ -35,7 +40,7 @@ export default function PortalSidebar({ activeTab, setActiveTab, onLogout, busin
       )}
 
       <aside
-        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-auto h-screen w-[240px] flex-shrink-0 bg-white border-r border-gray-100 flex flex-col transition-transform duration-300 ${
+        className={`fixed lg:sticky top-0 left-0 z-50 lg:z-auto h-screen w-[260px] flex-shrink-0 bg-white border-r border-gray-100 flex flex-col transition-transform duration-300 ${
           mobileOpen ? "translate-x-0" : "-translate-x-full lg:translate-x-0"
         }`}
         role="navigation"
@@ -55,7 +60,6 @@ export default function PortalSidebar({ activeTab, setActiveTab, onLogout, busin
               <span className="text-[10px] text-gray-400">Client Portal</span>
             </div>
           </div>
-          {/* Mobile close button */}
           <button
             onClick={onCloseMobile}
             className="lg:hidden p-1.5 rounded-lg text-gray-400 hover:bg-gray-50 hover:text-gray-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF]"
@@ -66,49 +70,48 @@ export default function PortalSidebar({ activeTab, setActiveTab, onLogout, busin
           </button>
         </div>
 
-        {/* Current section summary */}
+        {/* Business identity + plan badge */}
         <div className="px-4 py-3 border-b border-gray-50 bg-blue-50/50">
-          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Current Section</p>
-          <p className="text-sm font-bold text-gray-900 truncate">{currentTab.label}</p>
+          <p className="text-[10px] font-bold uppercase tracking-wider text-gray-400 mb-0.5">Business</p>
+          <p className="text-sm font-bold text-gray-900 truncate" title={safeBusiness}>{safeBusiness}</p>
+          {project?.plan && (
+            <span
+              className="mt-1.5 inline-flex px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide text-white"
+              style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}
+            >
+              {project.plan}
+            </span>
+          )}
         </div>
 
-        {/* Nav groups */}
-        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-5">
-          {CLIENT_PORTAL_NAV_GROUPS.map((group) => (
-            <div key={group.id}>
-              <p className="px-3 mb-2 text-[10px] font-bold uppercase tracking-wider text-gray-400" aria-hidden="true">
-                {group.label}
-              </p>
-              <div className="space-y-0.5" role="group" aria-label={group.label}>
-                {group.tabs.map((item) => {
-                  const Icon = ICON_MAP[item.icon] || LayoutDashboard;
-                  const isActive = activeTab === item.id;
-                  return (
-                    <button
-                      key={item.id}
-                      onClick={() => {
-                        setActiveTab(item.id);
-                        onCloseMobile?.();
-                      }}
-                      aria-current={isActive ? "page" : undefined}
-                      title={item.label}
-                      className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[40px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF] ${
-                        isActive
-                          ? "bg-[#00AEEF] text-white shadow-[0_2px_8px_rgba(0,174,239,0.3)]"
-                          : "text-gray-600 hover:bg-blue-50 hover:text-[#0088CC]"
-                      }`}
-                    >
-                      <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
-                      <span className="truncate">{item.label}</span>
-                    </button>
-                  );
-                })}
-              </div>
-            </div>
-          ))}
+        {/* Nav sections — 8 consolidated destinations */}
+        <nav className="flex-1 overflow-y-auto px-3 py-4 space-y-1">
+          {PORTAL_SECTIONS.map((item) => {
+            const Icon = ICON_MAP[item.icon] || LayoutDashboard;
+            const isActive = section === item.id;
+            return (
+              <button
+                key={item.id}
+                onClick={() => {
+                  onSectionChange(item.id);
+                  onCloseMobile?.();
+                }}
+                aria-current={isActive ? "page" : undefined}
+                title={item.label}
+                className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors min-h-[44px] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#00AEEF] ${
+                  isActive
+                    ? "bg-[#00AEEF] text-white shadow-[0_2px_8px_rgba(0,174,239,0.3)]"
+                    : "text-gray-600 hover:bg-blue-50 hover:text-[#0088CC]"
+                }`}
+              >
+                <Icon className={`w-[18px] h-[18px] flex-shrink-0 ${isActive ? "text-white" : "text-gray-400"}`} />
+                <span className="truncate">{item.label}</span>
+              </button>
+            );
+          })}
         </nav>
 
-        {/* User footer */}
+        {/* User footer + logout */}
         <div className="px-4 py-3 border-t border-gray-100 flex-shrink-0">
           <div className="flex items-center gap-3 mb-2">
             <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
