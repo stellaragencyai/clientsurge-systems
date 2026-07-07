@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, Fragment } from "react";
 import { base44 } from "@/api/base44Client";
 import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -113,6 +113,12 @@ export default function AutomationActivityPanel() {
         <SummaryCard label="Failed" value={stats.failed} icon={XCircle} color="text-red-600" bg="bg-red-50" />
         <SummaryCard label="Blocked" value={stats.blocked} icon={ShieldAlert} color="text-orange-600" bg="bg-orange-50" />
         <SummaryCard label="Running" value={stats.running} icon={Clock} color="text-blue-600" bg="bg-blue-50" />
+      </div>
+
+      {/* Failed Modules + Recommended Actions */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <FailedModulesPanel logs={logs} />
+        <RecommendedActionsPanel logs={logs} />
       </div>
 
       {/* Filters */}
@@ -231,15 +237,14 @@ export default function AutomationActivityPanel() {
                 </tr>
               ) : (
                 logs.map((log, idx) => {
-                  const cfg = STATUS_CONFIG[log.execution_status] || STATUS_CONFIG.queued;
-                  const Icon = cfg.icon;
-                  const isExpanded = expandedRow === log.id;
-                  const hasDeployment = !!log.client_deployment_id;
-                  return (
-                    <>
-                      <tr
-                        key={log.id || idx}
-                        className={`border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer ${isExpanded ? "bg-blue-50/30" : ""}`}
+                   const cfg = STATUS_CONFIG[log.execution_status] || STATUS_CONFIG.queued;
+                   const Icon = cfg.icon;
+                   const isExpanded = expandedRow === log.id;
+                   const hasDeployment = !!log.client_deployment_id;
+                   return (
+                     <Fragment key={log.id || idx}>
+                       <tr
+                         className={`border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer ${isExpanded ? "bg-blue-50/30" : ""}`}
                         onClick={() => hasDeployment ? fetchDeploymentHealth(log.client_deployment_id) : setExpandedRow(isExpanded ? null : log.id)}
                       >
                         <td className="px-4 py-3 text-gray-700 font-medium truncate max-w-[120px]">
@@ -296,18 +301,18 @@ export default function AutomationActivityPanel() {
                         </td>
                       </tr>
                       {isExpanded && (
-                        <tr className="bg-gray-50/40">
-                          <td colSpan={8} className="px-6 py-4">
-                            <DeploymentHealthDetail
-                              health={deploymentHealth[log.client_deployment_id]}
-                              deploymentId={log.client_deployment_id}
-                            />
-                          </td>
-                        </tr>
-                      )}
-                    </>
-                  );
-                })
+                         <tr className="bg-gray-50/40">
+                           <td colSpan={9} className="px-6 py-4">
+                             <DeploymentHealthDetail
+                               health={deploymentHealth[log.client_deployment_id]}
+                               deploymentId={log.client_deployment_id}
+                             />
+                           </td>
+                         </tr>
+                       )}
+                      </Fragment>
+                      );
+                      })
               )}
             </tbody>
           </table>
@@ -327,6 +332,119 @@ function SummaryCard({ label, value, icon: Icon, color, bg }) {
         </div>
         <Icon className={`w-5 h-5 ${color} opacity-50`} />
       </div>
+    </Card>
+  );
+}
+
+function FailedModulesPanel({ logs }) {
+  const failedLogs = logs.filter((l) => l.execution_status === "failed" || l.execution_status === "blocked");
+  const failedByModule = {};
+  failedLogs.forEach((l) => {
+    if (!failedByModule[l.module_key]) {
+      failedByModule[l.module_key] = { count: 0, latest: null, error: null };
+    }
+    failedByModule[l.module_key].count++;
+    if (!failedByModule[l.module_key].latest || l.created_date > failedByModule[l.module_key].latest) {
+      failedByModule[l.module_key].latest = l.created_date;
+      failedByModule[l.module_key].error = l.error_message;
+    }
+  });
+  const failedEntries = Object.entries(failedByModule).sort((a, b) => b[1].count - a[1].count);
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <AlertTriangle className="w-4 h-4 text-red-500" />
+        <h3 className="text-sm font-bold text-gray-800">Failed / Blocked Modules</h3>
+      </div>
+      {failedEntries.length === 0 ? (
+        <div className="flex items-center gap-2 text-sm text-green-600 py-2">
+          <CheckCircle2 className="w-4 h-4" /> No failed modules in current results.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {failedEntries.map(([moduleKey, data]) => (
+            <div key={moduleKey} className="flex items-start justify-between rounded-lg border border-red-100 bg-red-50/50 px-3 py-2">
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-bold text-gray-800">{MODULE_LABELS[moduleKey] || moduleKey}</p>
+                {data.error && (
+                  <p className="text-xs text-red-600 truncate mt-0.5" title={data.error}>{data.error}</p>
+                )}
+                {data.latest && (
+                  <p className="text-[10px] text-gray-400 mt-0.5">
+                    Last: {new Date(data.latest).toLocaleString()}
+                  </p>
+                )}
+              </div>
+              <Badge variant="destructive" className="text-xs ml-2 flex-shrink-0">{data.count}</Badge>
+            </div>
+          ))}
+        </div>
+      )}
+    </Card>
+  );
+}
+
+function RecommendedActionsPanel({ logs }) {
+  const actions = [];
+  const failedLogs = logs.filter((l) => l.execution_status === "failed" || l.execution_status === "blocked");
+
+  const moduleFailCounts = {};
+  failedLogs.forEach((l) => {
+    moduleFailCounts[l.module_key] = (moduleFailCounts[l.module_key] || 0) + 1;
+  });
+
+  Object.entries(moduleFailCounts).forEach(([moduleKey, count]) => {
+    if (moduleKey === "instant_lead_response") {
+      actions.push({ module: moduleKey, action: "Verify Twilio SMS credentials and messaging service configuration", severity: count > 3 ? "critical" : "warning" });
+    }
+    if (moduleKey === "missed_call_text_back") {
+      actions.push({ module: moduleKey, action: "Check Twilio voice webhook URL and missed-call webhook endpoint", severity: count > 3 ? "critical" : "warning" });
+    }
+    if (moduleKey === "lead_nurture") {
+      actions.push({ module: moduleKey, action: "Review nurture sequence templates and send-hour configuration", severity: "warning" });
+    }
+    if (moduleKey === "ai_booking_agent") {
+      actions.push({ module: moduleKey, action: "Verify booking link is set and AI intent classification thresholds", severity: count > 2 ? "critical" : "warning" });
+    }
+    if (moduleKey === "daily_digest") {
+      actions.push({ module: moduleKey, action: "Check Resend email provider configuration and digest scheduling", severity: "warning" });
+    }
+    if (moduleKey === "review_reactivation") {
+      actions.push({ module: moduleKey, action: "Verify review request templates and opt-out compliance", severity: "warning" });
+    }
+  });
+
+  const blockedCount = logs.filter((l) => l.execution_status === "blocked").length;
+  if (blockedCount > 0) {
+    actions.push({ module: "permission", action: `${blockedCount} execution(s) blocked — review module permissions and package tier assignments`, severity: "warning" });
+  }
+
+  return (
+    <Card className="p-4">
+      <div className="flex items-center gap-2 mb-3">
+        <Wrench className="w-4 h-4 text-blue-500" />
+        <h3 className="text-sm font-bold text-gray-800">Recommended Actions</h3>
+      </div>
+      {actions.length === 0 ? (
+        <div className="flex items-center gap-2 text-sm text-green-600 py-2">
+          <CheckCircle2 className="w-4 h-4" /> No actions needed — all systems operational.
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {actions.map((a, i) => (
+            <div key={i} className={`flex items-start gap-2 rounded-lg border px-3 py-2 ${
+              a.severity === "critical" ? "border-red-200 bg-red-50/50" : "border-yellow-200 bg-yellow-50/50"
+            }`}>
+              <AlertCircle className={`w-4 h-4 flex-shrink-0 mt-0.5 ${a.severity === "critical" ? "text-red-500" : "text-yellow-500"}`} />
+              <div className="min-w-0 flex-1">
+                <p className="text-xs font-semibold text-gray-700">{MODULE_LABELS[a.module] || a.module}</p>
+                <p className="text-xs text-gray-600 mt-0.5">{a.action}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
     </Card>
   );
 }
