@@ -7,7 +7,7 @@ import { resolveIndustryContent, INDUSTRY_RESOLUTION_STATUS } from '@/lib/indust
 import { buildIndustryPricingUrl, buildIndustrySignupUrl } from '@/lib/industryCtaHelpers';
 import Navbar from '@/components/landing/Navbar';
 import Footer from '@/components/landing/Footer';
-import IndustryHero from '@/components/industry/IndustryHero';
+import CSIndustryHero from '@/components/design-system/CSIndustryHero';
 import AutomationTierSection from '@/components/industry/AutomationTierSection';
 import CaseStudySection from '@/components/industry/CaseStudySection';
 import IndustryProblemSection from '@/components/industry/IndustryProblemSection';
@@ -141,15 +141,14 @@ export default function IndustryPageTemplate() {
     <div className="min-h-screen bg-[radial-gradient(circle_at_18%_8%,rgba(0,174,239,0.10),transparent_30%),linear-gradient(180deg,#f8fcff_0%,#ffffff_34%,#f7fbff_100%)]">
       <Navbar />
 
-      <IndustryHero
-        industryKey={slug}
+      <CSIndustryHero
         eyebrow={heroConfig.eyebrow}
-        headline={heroConfig.headline}
-        subheadline={heroConfig.subheadline}
+        title={heroConfig.headline}
+        subtitle={heroConfig.subheadline}
         description={heroConfig.description}
         backgroundImage={heroConfig.backgroundImage}
-        primaryCTA={heroConfig.primaryCTA}
-        secondaryCTA={heroConfig.secondaryCTA}
+        primaryCTA={{ ...heroConfig.primaryCTA, to: heroConfig.primaryCTA.path }}
+        secondaryCTA={{ ...heroConfig.secondaryCTA, to: heroConfig.secondaryCTA.path }}
       />
 
       {premium ? (

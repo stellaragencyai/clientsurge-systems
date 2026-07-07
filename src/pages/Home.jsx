@@ -2,7 +2,7 @@ import { useEffect, useMemo, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
-import CinematicHero from "../components/landing/CinematicHero.jsx";
+import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
@@ -125,7 +125,7 @@ export default function Home() {
 
         {/* 1. Cinematic Hero — primary value prop + CTA */}
         <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
-          <CinematicHero />
+          <HomeHero />
         </SectionErrorBoundary>
 
         {/* 2. Industries — first post-hero section so visitors immediately find their vertical */}

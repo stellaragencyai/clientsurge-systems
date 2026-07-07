@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
 import {
-  Loader2,
-  CheckCircle2,
   ArrowRight,
   Phone,
   Mail,
@@ -10,30 +8,24 @@ import {
   ShieldCheck,
   Sparkles,
   MessageSquareText,
+  CheckCircle2,
+  User,
+  Building2,
 } from "lucide-react";
-import FormInput from "../components/forms/FormInput";
 import CSButton from "@/components/design-system/CSButton";
+import CSFormContainer from "@/components/design-system/CSFormContainer";
+import CSFormField from "@/components/design-system/CSFormField";
+import CSConfirmationCard from "@/components/design-system/CSConfirmationCard";
 import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import FloatingConfirmation from "@/components/ui/FloatingConfirmation";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import { setPageMetadata } from "@/lib/seo";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
-
-function Field({ label, required, error, children }) {
-  return (
-    <div className="group">
-      <label className="mb-2 block text-sm font-semibold text-slate-900">
-        {label} {required && <span className="text-[#00AEEF]">*</span>}
-      </label>
-      {children}
-      {error && <p className="mt-1.5 text-xs font-semibold text-red-500">{error}</p>}
-    </div>
-  );
-}
 
 const contactMethods = [
   { Icon: Phone, label: "Phone", value: "(602) 584-3227", href: "tel:+16025843227" },
@@ -66,6 +58,7 @@ export default function Contact() {
   const [success, setSuccess] = useState(false);
   const [showFloat, setShowFloat] = useState(false);
   const [errors, setErrors] = useState({});
+  const [touched, setTouched] = useState({});
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -112,10 +105,13 @@ export default function Contact() {
     form.message.trim()
   );
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
+  const updateField = (name, value) => {
     setForm((c) => ({ ...c, [name]: value }));
     setErrors((c) => ({ ...c, [name]: undefined, submit: undefined }));
+  };
+
+  const handleBlur = (name) => {
+    setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
   const handleSubmit = async (e) => {
@@ -123,6 +119,7 @@ export default function Contact() {
     const nextErrors = validate();
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
+      setTouched({ full_name: true, email: true, phone: true, message: true });
       return;
     }
     setLoading(true);
@@ -147,22 +144,16 @@ export default function Contact() {
 
         <section className="px-6 pb-10 sm:px-10 md:px-12">
           <div className="mx-auto mb-10 max-w-4xl">
-            <div className="cs-section-header cs-section-header--center">
-              <p className="cs-section-eyebrow">Get in touch</p>
-              <div className="cs-section-title-row cs-section-header--center">
-                <span className="cs-section-bar" />
-                <h1 className="cs-section-title">
-                  Let's map the fastest path to a cleaner lead system.
-                </h1>
-              </div>
-              <p className="cs-section-subtitle">
-                Ask a question, request a walkthrough, or tell us where leads are slipping through the cracks.
-                We will help you identify the most practical next step.
-              </p>
-            </div>
+            <CSSectionHeader
+              eyebrow="Get in touch"
+              title="Let's map the fastest path to a cleaner lead system."
+              subtitle="Ask a question, request a walkthrough, or tell us where leads are slipping through the cracks. We will help you identify the most practical next step."
+              align="center"
+            />
           </div>
 
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
+            {/* Left: Contact info panel */}
             <aside className="relative overflow-hidden rounded-[2rem] cs-glow-card p-8 backdrop-blur-xl md:p-10">
               <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#00AEEF]/15 blur-2xl" />
               <div className="absolute -bottom-20 left-8 h-44 w-44 rounded-full bg-[#003B8F]/10 blur-2xl" />
@@ -218,93 +209,154 @@ export default function Contact() {
               </div>
             </aside>
 
+            {/* Right: Form / Success */}
             <section className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl md:p-9">
               {success ? (
-                <div className="px-4 py-10 text-center md:py-16">
-                  <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-3xl bg-emerald-50 text-emerald-600">
-                    <CheckCircle2 className="h-9 w-9" />
-                  </div>
-                  <h2 className="font-titles text-3xl font-black text-slate-950">Message Received</h2>
-                  <p className="mx-auto mt-3 max-w-sm text-base leading-relaxed text-slate-600">
-                    {`Thanks for reaching out. We'll respond within one business day.`}
-                  </p>
-                  <CSButton variant="primary" size="md" iconRight={ArrowRight} href="/" className="mt-8">Back to Home</CSButton>
-                </div>
+                <CSConfirmationCard
+                  title="Message Received"
+                  message="Thanks for reaching out. We'll respond within one business day with a clear next step."
+                  responseTime="within one business day"
+                  nextSteps={[
+                    "Our team reviews your message",
+                    "We identify the best automation path for your business",
+                    "You receive a tailored response — no pressure, no demos",
+                  ]}
+                />
               ) : (
-                <form onSubmit={handleSubmit} noValidate className="space-y-7">
-                  <div>
-                    <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-[#00AEEF]">Send a message</p>
-                    <h2 className="font-titles text-4xl font-black tracking-[-0.04em] text-foreground md:text-5xl">Contact Us</h2>
-                    <p className="mt-4 max-w-xl text-base leading-relaxed text-slate-600">
-                      Share the basics and we will respond with a clear next step for your business.
-                    </p>
-                  </div>
+                <CSFormContainer title="Contact Us" subtitle="Share the basics and we will respond with a clear next step for your business." maxWidth="100%">
+                  <form onSubmit={handleSubmit} noValidate className="space-y-5">
+                    {errors.submit && (
+                      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                        {errors.submit}
+                      </div>
+                    )}
 
-                  {errors.submit && (
-                    <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
-                      {errors.submit}
+                    {/* Honeypot */}
+                    <input
+                      type="text"
+                      name="website_url"
+                      value={form.website_url}
+                      onChange={(e) => updateField("website_url", e.target.value)}
+                      className="hidden"
+                      tabIndex={-1}
+                      aria-hidden="true"
+                    />
+
+                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                      <CSFormField
+                        label="Full Name"
+                        name="full_name"
+                        value={form.full_name}
+                        onChange={(v) => updateField("full_name", v)}
+                        onBlur={() => handleBlur("full_name")}
+                        error={errors.full_name}
+                        touched={touched.full_name}
+                        required
+                        autoComplete="name"
+                        allValid={allValid}
+                        icon={User}
+                        placeholder="John Doe"
+                      />
+                      <CSFormField
+                        label="Business Name"
+                        name="business_name"
+                        value={form.business_name}
+                        onChange={(v) => updateField("business_name", v)}
+                        onBlur={() => handleBlur("business_name")}
+                        autoComplete="organization"
+                        allValid={allValid}
+                        icon={Building2}
+                        placeholder="ABC Roofing Co."
+                      />
+                      <CSFormField
+                        label="Email Address"
+                        type="email"
+                        name="email"
+                        value={form.email}
+                        onChange={(v) => updateField("email", v)}
+                        onBlur={() => handleBlur("email")}
+                        error={errors.email}
+                        touched={touched.email}
+                        required
+                        autoComplete="email"
+                        allValid={allValid}
+                        icon={Mail}
+                        placeholder="john@example.com"
+                      />
+                      <CSFormField
+                        label="Phone No."
+                        type="tel"
+                        name="phone"
+                        value={form.phone}
+                        onChange={(v) => updateField("phone", v)}
+                        onBlur={() => handleBlur("phone")}
+                        error={errors.phone}
+                        touched={touched.phone}
+                        placeholder="(123) 456-7890"
+                        autoComplete="tel"
+                        allValid={allValid}
+                        icon={Phone}
+                      />
                     </div>
-                  )}
 
-                  <input
-                    type="text"
-                    name="website_url"
-                    value={form.website_url}
-                    onChange={handleChange}
-                    className="hidden"
-                    tabIndex={-1}
-                    aria-hidden="true"
-                  />
-
-                  <div className="rounded-3xl border border-slate-100 bg-slate-50/60 p-4 md:p-5">
-                    <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Contact details</p>
-                    <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                      <FormInput label="Full Name" name="full_name" value={form.full_name} onChange={handleChange} error={errors.full_name} required autoComplete="name" allValid={allValid} />
-                      <FormInput label="Business Name" name="business_name" value={form.business_name} onChange={handleChange} autoComplete="organization" allValid={allValid} />
-                      <FormInput label="Email Address" type="email" name="email" value={form.email} onChange={handleChange} error={errors.email} required autoComplete="email" allValid={allValid} />
-                      <FormInput label="Phone No." type="tel" name="phone" value={form.phone} onChange={handleChange} error={errors.phone} placeholder="(123) 456-7890" autoComplete="tel" allValid={allValid} />
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: '#475569' }}>
+                        Business Type / Industry
+                      </label>
+                      <input
+                        type="text"
+                        name="business_type"
+                        value={form.business_type}
+                        onChange={(e) => updateField("business_type", e.target.value)}
+                        placeholder="e.g., HVAC, Dental, Roofing"
+                        className="w-full px-3 py-2.5 text-sm border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                        style={{ borderColor: 'hsl(var(--border))' }}
+                      />
                     </div>
-                  </div>
 
-                  <div className="rounded-3xl border border-slate-100 bg-slate-50/60 p-4 md:p-5">
-                    <p className="mb-4 text-xs font-black uppercase tracking-[0.18em] text-slate-500">Business context</p>
-                    <div className="space-y-5">
-                      <FormInput label="Business Type / Industry" name="business_type" value={form.business_type} onChange={handleChange} placeholder="e.g., HVAC, Dental, Roofing" allValid={allValid} />
-                      <Field label="Message" required error={errors.message}>
-                        <div className="relative">
-                          <textarea
-                            name="message"
-                            value={form.message}
-                            onChange={handleChange}
-                            rows={5}
-                            aria-invalid={Boolean(errors.message)}
-                            className="w-full resize-none rounded-2xl border border-slate-200 bg-white px-4 py-3 pr-10 text-base text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00AEEF] focus:shadow-[0_0_0_4px_rgba(0,174,239,0.12)]"
-                            placeholder="Tell us what is not working: missed calls, slow follow-up, poor booking, low website conversion, or something else."
-                          />
-                          {allValid && !errors.message && form.message.trim() && (
-                            <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500 flex-shrink-0 pointer-events-none" />
-                          )}
-                        </div>
-                      </Field>
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: '#475569' }}>
+                        Message <span className="text-red-500">*</span>
+                      </label>
+                      <div className="relative">
+                        <textarea
+                          name="message"
+                          value={form.message}
+                          onChange={(e) => updateField("message", e.target.value)}
+                          onBlur={() => handleBlur("message")}
+                          rows={5}
+                          aria-invalid={Boolean(errors.message)}
+                          className="w-full resize-none rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00AEEF] focus:shadow-[0_0_0_4px_rgba(0,174,239,0.12)]"
+                          style={{
+                            borderColor: errors.message && touched.message ? '#ef4444' : 'hsl(var(--border))',
+                          }}
+                          placeholder="Tell us what is not working: missed calls, slow follow-up, poor booking, low website conversion, or something else."
+                        />
+                        {allValid && !errors.message && form.message.trim() && (
+                          <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500 flex-shrink-0 pointer-events-none" />
+                        )}
+                      </div>
+                      {errors.message && touched.message && (
+                        <p className="mt-1 text-xs text-red-500" role="alert">{errors.message}</p>
+                      )}
                     </div>
-                  </div>
 
-                  <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                    <CSButton
-                      variant="primary"
-                      size="lg"
-                      loading={loading}
-                      disabled={loading}
-                      iconRight={!loading ? ArrowRight : undefined}
-                      onClick={() => {}}
-                      type="submit"
-                      className="disabled:opacity-60"
-                    >
-                      {loading ? 'Sending...' : 'Send Message'}
-                    </CSButton>
-                    <p className="text-sm font-semibold text-slate-500">No spam. No pressure. Just a clear next step.</p>
-                  </div>
-                </form>
+                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
+                      <CSButton
+                        variant="primary"
+                        size="lg"
+                        loading={loading}
+                        disabled={loading}
+                        iconRight={!loading ? ArrowRight : undefined}
+                        type="submit"
+                        className="disabled:opacity-60"
+                      >
+                        {loading ? 'Sending...' : 'Send Message'}
+                      </CSButton>
+                      <p className="text-sm font-semibold text-slate-500">No spam. No pressure. Just a clear next step.</p>
+                    </div>
+                  </form>
+                </CSFormContainer>
               )}
             </section>
           </div>
