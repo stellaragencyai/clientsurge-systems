@@ -92,6 +92,9 @@ Deno.serve(async (req) => {
             execution_status: 'blocked',
             error_message: `Module not authorized (reason: ${permRes.data?.reason || 'unknown'})`,
             error_code: permRes.data?.reason || 'module_not_authorized',
+            started_at: new Date(_obsStartTime).toISOString(),
+            completed_at: new Date().toISOString(),
+            execution_time_ms: Date.now() - _obsStartTime,
           }).catch(() => {});
           return secureJson({ blocked: true, reason: permRes.data?.reason, message: 'daily_digest not authorized' }, { status: 403 });
         }

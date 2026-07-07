@@ -360,6 +360,8 @@ Deno.serve(async (req) => {
           continue;
         }
 
+        const _obsStartTime = Date.now();
+
         // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
         if (lead.client_id && !deploymentCache[lead.client_id]) {
           try {
@@ -386,6 +388,9 @@ Deno.serve(async (req) => {
             execution_status: 'blocked',
             error_message: `Module not authorized (reason: ${_depCtx.reason || 'unknown'})`,
             error_code: _depCtx.reason || 'module_not_authorized', lead_id: lead.id,
+            started_at: new Date(_obsStartTime).toISOString(),
+            completed_at: new Date().toISOString(),
+            execution_time_ms: Date.now() - _obsStartTime,
           }).catch(() => {});
           results.skipped++; continue;
         }
@@ -456,18 +461,27 @@ Deno.serve(async (req) => {
                 client_deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
                 module_key: 'lead_nurture', trigger_event: 'scheduled_nurture',
                 execution_status: 'completed', lead_id: lead.id,
+                started_at: new Date(_obsStartTime).toISOString(),
+                completed_at: new Date().toISOString(),
+                execution_time_ms: Date.now() - _obsStartTime,
               }).catch(() => {});
             }
           } catch (err) {
             error = err.message;
             console.error(`[processNurtureCampaigns] processNurtureCampaigns [step${step.num}] error for ${campaign.lead_id}:`, err.message);
-            // ── DEPLOYMENT OBSERVABILITY: Log failed execution ──
+            // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health recalc ──
             if (_depCtx) {
               await base44.asServiceRole.functions.invoke('logAutomationExecution', {
                 client_deployment_id: _depCtx.deployment_id, client_id: lead.client_id,
                 module_key: 'lead_nurture', trigger_event: 'scheduled_nurture',
                 execution_status: 'failed', error_message: err.message,
                 error_code: 'resend_send_failed', lead_id: lead.id,
+                started_at: new Date(_obsStartTime).toISOString(),
+                completed_at: new Date().toISOString(),
+                execution_time_ms: Date.now() - _obsStartTime,
+              }).catch(() => {});
+              await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', {
+                deployment_id: _depCtx.deployment_id
               }).catch(() => {});
             }
           }

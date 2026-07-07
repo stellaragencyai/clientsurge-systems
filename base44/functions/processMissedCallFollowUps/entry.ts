@@ -405,6 +405,8 @@ Deno.serve(async (req) => {
             const freshLead = await base44.asServiceRole.entities.Leads.get(
               lead.id
             );
+            const _obsStartTime = Date.now();
+
             // ── DEPLOYMENT OBSERVABILITY: Resolve deployment + check permission ──
             if (freshLead && freshLead.client_id && !deploymentCache[freshLead.client_id]) {
               try {
@@ -431,6 +433,9 @@ Deno.serve(async (req) => {
                 execution_status: 'blocked',
                 error_message: `Module not authorized (reason: ${_depCtx.reason || 'unknown'})`,
                 error_code: _depCtx.reason || 'module_not_authorized', lead_id: freshLead.id,
+                started_at: new Date(_obsStartTime).toISOString(),
+                completed_at: new Date().toISOString(),
+                execution_time_ms: Date.now() - _obsStartTime,
               }).catch(() => {});
               results.skipped++; continue;
             }
@@ -610,6 +615,9 @@ Deno.serve(async (req) => {
                   client_deployment_id: _depCtx.deployment_id, client_id: freshLead.client_id,
                   module_key: 'missed_call_text_back', trigger_event: 'missed_call_followup',
                   execution_status: 'completed', external_provider_reference: messageId, lead_id: freshLead.id,
+                  started_at: new Date(_obsStartTime).toISOString(),
+                  completed_at: new Date().toISOString(),
+                  execution_time_ms: Date.now() - _obsStartTime,
                 }).catch(() => {});
               }
             } else if (error) {
@@ -628,13 +636,19 @@ Deno.serve(async (req) => {
                 })
               );
               results.failed++;
-              // ── DEPLOYMENT OBSERVABILITY: Log failed execution ──
+              // ── DEPLOYMENT OBSERVABILITY: Log failed execution + trigger health recalc ──
               if (_depCtx) {
                 await base44.asServiceRole.functions.invoke('logAutomationExecution', {
                   client_deployment_id: _depCtx.deployment_id, client_id: freshLead.client_id,
                   module_key: 'missed_call_text_back', trigger_event: 'missed_call_followup',
                   execution_status: 'failed', error_message: error,
                   error_code: stepConfig.channel === 'sms' ? 'twilio_send_failed' : 'resend_send_failed', lead_id: freshLead.id,
+                  started_at: new Date(_obsStartTime).toISOString(),
+                  completed_at: new Date().toISOString(),
+                  execution_time_ms: Date.now() - _obsStartTime,
+                }).catch(() => {});
+                await base44.asServiceRole.functions.invoke('calculateDeploymentHealth', {
+                  deployment_id: _depCtx.deployment_id
                 }).catch(() => {});
               }
             }
