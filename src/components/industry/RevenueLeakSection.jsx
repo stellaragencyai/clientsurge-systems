@@ -1,5 +1,5 @@
 import { TrendingDown, AlertCircle } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 /**
  * Revenue leak / missed lead section.
@@ -14,7 +14,7 @@ export default function RevenueLeakSection({ revenueLeak }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6">
       <div className="max-w-5xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="The Revenue Leak"
           title={revenueLeak.headline}
           align="center"

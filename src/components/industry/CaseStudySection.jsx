@@ -1,5 +1,5 @@
 import { TrendingUp } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 /**
  * CaseStudySection — PART 1 FIX
@@ -14,7 +14,7 @@ export default function CaseStudySection({ industry }) {
     return (
       <section className="py-14 md:py-20 px-4 md:px-6 bg-white">
         <div className="max-w-3xl mx-auto text-center">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="Case Study"
             title="Verified Client Proof Coming Soon"
             align="center"
@@ -42,7 +42,7 @@ export default function CaseStudySection({ industry }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6 bg-white">
       <div className="max-w-5xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Case Study"
           title={cs.title}
           align="center"

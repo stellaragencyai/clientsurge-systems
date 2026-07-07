@@ -1,6 +1,6 @@
 import { Sparkles, ArrowRight } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 const TIER_DETAILS = {
   starter: { price: '$497/mo', setup: '$797 setup', automations: '6 Automations' },
@@ -27,7 +27,7 @@ export default function RecommendedSystemSection({ recommendedSystem }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6 bg-gradient-to-b from-white to-blue-50/40">
       <div className="max-w-4xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Recommended System"
           title="Recommended System for This Industry"
           align="center"

@@ -1,5 +1,5 @@
 import { CheckCircle, Zap, Phone, Calendar, Send, Star, MessageSquare, RotateCw, AlertCircle, FileCheck, Thermometer } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 const ICON_MAP = {
   CheckCircle, Zap, Phone, Calendar, Send, Star, MessageSquare, RotateCw, AlertCircle, FileCheck, Thermometer,
@@ -21,7 +21,7 @@ export default function IndustrySolutionSection({ solutions, industryName }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6 bg-white/70">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Operating Layer"
           title={`How ClientSurge Automates ${industryName} Lead Response`}
           align="center"

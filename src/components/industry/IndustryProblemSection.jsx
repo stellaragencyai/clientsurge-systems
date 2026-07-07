@@ -1,5 +1,5 @@
 import { AlertTriangle } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
 
@@ -17,7 +17,7 @@ export default function IndustryProblemSection({ painPoints }) {
     <section className="relative overflow-hidden py-14 md:py-20 px-4 md:px-6">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-primary/30 to-transparent" />
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="The Lead Leak"
           title="Where Opportunities Slip Away"
           align="center"

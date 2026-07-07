@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { ChevronDown, MessageCircle, Phone, Mail } from "lucide-react";
 import { FAQ_ITEMS } from "./FAQData";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -26,7 +26,7 @@ export default function FAQSection() {
               <MessageCircle className="w-5 h-5" style={{ color: "#00AEEF" }} />
             </div>
 
-            <SectionHeader
+            <CSSectionHeader
               eyebrow="FAQ"
               title="Answers to Your Questions"
               align="left"

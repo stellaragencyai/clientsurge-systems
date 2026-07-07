@@ -1,7 +1,7 @@
 import StardustOverlay from "./StardustOverlay";
 import { ArrowRight, ShoppingCart, Shield, Zap, Phone, Clock } from "lucide-react";
-import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
+import CSButton from "@/components/design-system/CSButton";
 
 export default function FinalCTA() {
   return (
@@ -44,21 +44,24 @@ export default function FinalCTA() {
         <p className="mt-4 text-sm text-foreground">Month-to-month · Proof checked before launch · Done-for-you setup included</p>
 
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
-          <Link
+          <CSButton
             to="/store"
+            variant="primary"
+            size="lg"
+            icon={ShoppingCart}
             onClick={() => trackCTA("browse_automation_store", "final_cta")}
-            className="cs-btn-primary focus:outline-none focus:ring-2 focus:ring-primary rounded-lg"
-            style={{ padding: "0 40px", height: "56px", fontSize: "1rem", boxShadow: "var(--cs-glow-md), 0 2px 12px rgba(0,121,193,0.35)" }}
           >
-            <ShoppingCart className="w-5 h-5" /> Browse the Store
-          </Link>
-          <Link
+            Browse the Store
+          </CSButton>
+          <CSButton
             to="/pricing"
+            variant="secondary"
+            size="md"
+            iconRight={ArrowRight}
             onClick={() => trackCTA("compare_packages", "final_cta")}
-            className="btn-secondary"
           >
-            Compare Packages <ArrowRight className="w-4 h-4 ml-1" />
-          </Link>
+            Compare Packages
+          </CSButton>
         </div>
 
         {/* Prefer to talk? — phone as a clear alternative conversion path */}

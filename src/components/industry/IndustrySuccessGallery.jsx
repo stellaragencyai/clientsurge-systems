@@ -1,6 +1,6 @@
 import { ArrowRight, CheckCircle2 } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const WORKFLOW_PREVIEWS = [
   {
@@ -47,7 +47,7 @@ export default function IndustrySuccessGallery({ industry = {}, industrySlug = "
 
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="mb-14">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="Workflow Proof Preview"
             title={`What a ${label} Launch Should Prove`}
             subtitle="No fake testimonials. No invented revenue screenshots. This section shows the operational proof the system should make visible before launch."

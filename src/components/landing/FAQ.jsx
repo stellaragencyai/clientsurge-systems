@@ -5,7 +5,7 @@ import {
   AccordionTrigger } from
   "@/components/ui/accordion";
 import { FAQ_ITEMS } from "./FAQData";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 export default function FAQ() {
 
@@ -14,9 +14,10 @@ export default function FAQ() {
 
       <div className="max-w-3xl mx-auto relative z-10">
         <div className="mb-8 md:mb-14">
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="Questions"
             title="Frequently Asked Questions"
+            align="center"
           />
           <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base text-center">
             Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">Get Help Choosing</a> or <a href="/pricing" className="text-primary font-semibold hover:underline">Compare Packages</a>

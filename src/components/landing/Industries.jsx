@@ -25,7 +25,7 @@ import {
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
 import { industryPatterns, FILTER_TAGS, INDUSTRY_TAGS } from "@/lib/industryAssets.jsx";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const industries = [
 {
@@ -387,10 +387,11 @@ export default function Industries() {
       className="pt-16 md:pt-24 pb-16 md:pb-24 px-0 bg-white">
       
       <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
-         <SectionHeader
+         <CSSectionHeader
             eyebrow="Choose Your Industry"
             title="AI Systems Built for Your Industry"
             subtitle="Pick your industry to see exactly how much revenue you're losing — and which AI system from our store fixes it."
+            align="center"
           />
 
         {/* Filter pills */}

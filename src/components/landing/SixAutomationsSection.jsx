@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from "framer-motion";
 import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ShoppingCart } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const AUTOMATION_CARDS = [
   { id: "automation-lead-capture", label: "Lead Capture", description: "Turns forms, calls, ads, and website inquiries into one trackable pipeline — so no lead slips through the cracks.", icon: Zap, metric: "< 60 sec", metricLabel: "to first response" },
@@ -40,12 +40,12 @@ export default function SixAutomationsSection() {
           transition={{ duration: 0.6 }}
           viewport={{ once: true, margin: "-100px" }}
         >
-          <SectionHeader
+          <CSSectionHeader
             eyebrow="The Automation Store"
             title="Six Systems That Protect Every Lead"
             subtitle="Browse the automation stack — capture, recover, follow up, book, request reviews, and reactivate. Add individual modules or pick a full system. No demos required."
             align="center"
-            variant="light"
+            theme="light"
           />
         </motion.div>
 
@@ -61,8 +61,8 @@ export default function SixAutomationsSection() {
               key={id}
               id={id}
               variants={shouldReduceMotion ? {} : cardVariants}
-              className="group rounded-xl p-6 md:p-8 transition-all duration-300 hover:-translate-y-1.5 hover:shadow-xl"
-              style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.18)", boxShadow: "0 2px 8px rgba(0,0,0,0.04)", scrollMarginTop: "var(--cs-anchor-offset)" }}
+              className="cs-feature-card p-6 md:p-8"
+              style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}
             >
               <div className="flex items-start justify-between mb-4">
                 <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>

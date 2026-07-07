@@ -1,5 +1,5 @@
 import { CheckCircle, Zap, Phone, Calendar, Send, Star, MessageSquare } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 import { buildIndustrySignupUrl } from '@/lib/industryCtaHelpers';
 
 const ICON_MAP = { Zap, Phone, Calendar, Send, Star, MessageSquare };
@@ -17,7 +17,7 @@ export default function AutomationTierSection({ industry }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6 bg-gradient-to-b from-white to-blue-50/40">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Automation Packages"
           title={`Choose Your ${industry.industry_name} System`}
           subtitle="Every system includes a high-converting website with AI automations built in. Pick 2, 4, or 6 automations depending on your plan."

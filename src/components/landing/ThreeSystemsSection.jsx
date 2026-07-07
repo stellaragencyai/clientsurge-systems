@@ -2,7 +2,8 @@ import { ArrowRight, CheckCircle2, ShieldCheck, Sparkles, Wallet, ShoppingCart, 
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import MoneyBackGuarantee from "./MoneyBackGuarantee";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
+import CSButton from "@/components/design-system/CSButton";
 import IndustryContextBanner from "./IndustryContextBanner";
 
 const PACKAGES = [
@@ -120,10 +121,11 @@ export default function ThreeSystemsSection() {
       `}</style>
 
       <div className="max-w-7xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="AI Systems Storefront"
           title="Pick Your AI System — Add to Cart and Check Out"
           subtitle="Starter fixes response gaps. Growth adds follow-up and booking. Pro adds the full lead recovery layer. No demos, no sales calls — just add to cart and we handle the rest."
+          align="center"
         />
 
         <IndustryContextBanner />
@@ -298,9 +300,15 @@ export default function ThreeSystemsSection() {
         <MoneyBackGuarantee />
 
         <div className="text-center mt-6 space-y-4">
-          <Link to="/store" onClick={() => trackCTA("browse_automation_store", "three_systems_section")} className="cs-btn-primary inline-flex">
-            Browse the Automation Store <ArrowRight className="w-4 h-4 inline ml-1" />
-          </Link>
+          <CSButton
+            to="/store"
+            variant="primary"
+            size="md"
+            iconRight={ArrowRight}
+            onClick={() => trackCTA("browse_automation_store", "three_systems_section")}
+          >
+            Browse the Automation Store
+          </CSButton>
           <div>
             <Link to="/automations" onClick={() => trackCTA("view_automations", "three_systems_section")} className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors underline underline-offset-4">
               View Automation Stack

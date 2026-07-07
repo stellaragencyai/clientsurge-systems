@@ -175,6 +175,75 @@ select:focus-visible,
   @apply cs-btn-primary;
 }
 
+/* CSButton variant system — secondary, outline, ghost */
+.cs-btn-secondary {
+  @apply inline-flex items-center justify-center rounded-full cursor-pointer font-semibold px-6 py-3 transition-all duration-300;
+  background: transparent;
+  border: 1.5px solid hsl(var(--border));
+  color: hsl(215, 25%, 35%);
+}
+.cs-btn-secondary:hover {
+  background: hsl(var(--muted));
+  border-color: hsla(199, 100%, 47%, 0.3);
+}
+.cs-btn-secondary:active {
+  transform: translateY(0) scale(0.98);
+}
+.cs-btn-secondary:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(199, 100%, 47%, 0.2);
+}
+
+.cs-btn-outline {
+  @apply inline-flex items-center justify-center rounded-full cursor-pointer font-semibold px-6 py-3 transition-all duration-300;
+  background: transparent;
+  border: 1.5px solid hsl(var(--primary));
+  color: hsl(var(--primary));
+}
+.cs-btn-outline:hover {
+  background: hsla(199, 100%, 47%, 0.08);
+  box-shadow: 0 2px 12px hsla(199, 100%, 47%, 0.15);
+}
+.cs-btn-outline:active {
+  transform: translateY(0) scale(0.98);
+}
+.cs-btn-outline:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(199, 100%, 47%, 0.2);
+}
+
+.cs-btn-ghost {
+  @apply inline-flex items-center justify-center rounded-full cursor-pointer font-semibold px-4 py-2 transition-all duration-300;
+  background: transparent;
+  border: none;
+  color: hsl(var(--primary));
+}
+.cs-btn-ghost:hover {
+  background: hsla(199, 100%, 47%, 0.08);
+}
+.cs-btn-ghost:active {
+  transform: translateY(0) scale(0.98);
+}
+.cs-btn-ghost:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(199, 100%, 47%, 0.2);
+}
+
+/* CSButton size system */
+.cs-btn-sm { font-size: 0.8125rem; padding: 0.5rem 1.25rem; min-height: 36px; }
+.cs-btn-md { font-size: 0.875rem; padding: 0.75rem 1.5rem; min-height: 44px; }
+.cs-btn-lg { font-size: 1rem; padding: 0.875rem 2rem; min-height: 52px; }
+
+/* CSFeatureCard — explicit card surface styling */
+.cs-feature-card {
+  background: hsl(var(--card));
+  border: 1px solid hsla(199, 100%, 47%, 0.15);
+  border-radius: 0.75rem;
+}
+
 /* ============================================
    PILLAR 1 TASK 34 — External link normalization
    All external links get noopener noreferrer

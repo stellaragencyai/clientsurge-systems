@@ -1,5 +1,5 @@
 import { CheckCircle } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 const PREMIUM_SURFACE = 'rounded-2xl border border-primary/10 bg-white/90 shadow-[0_18px_60px_rgba(15,23,42,0.08)]';
 
@@ -16,7 +16,7 @@ export default function IndustryBenefitsSection({ benefits }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="What Changes"
           title="What Changes When Leads Get Automated"
           align="center"

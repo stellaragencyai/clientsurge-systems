@@ -1,5 +1,5 @@
 import { ChevronRight, User, Bot, Filter, Mail, Calendar, Bell } from 'lucide-react';
-import SectionHeader from '@/components/design-system/SectionHeader';
+import CSSectionHeader from '@/components/design-system/CSSectionHeader';
 
 const STEP_ICONS = [User, Bot, Filter, Mail, Calendar, Bell];
 
@@ -18,7 +18,7 @@ export default function LeadCaptureWorkflowSection({ workflow }) {
   return (
     <section className="py-14 md:py-20 px-4 md:px-6 bg-white/70">
       <div className="max-w-6xl mx-auto">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Lead Capture Workflow"
           title={title}
           align="center"

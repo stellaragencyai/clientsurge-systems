@@ -1,8 +1,8 @@
 import { motion, useReducedMotion } from "framer-motion";
 import { PhoneOff, Clock, FileText, Users, ShoppingCart } from "lucide-react";
-import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
-import SectionHeader from "@/components/design-system/SectionHeader";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
+import CSButton from "@/components/design-system/CSButton";
 
 const LEAKS = [
   { icon: PhoneOff, title: "Missed Calls = Lost Revenue", desc: "Every unanswered call is a prospect with buying intent walking away. Our AI texts them back instantly — before they call your competitor.", severity: "Critical", impactValue: "$500+/mo", impactLabel: "per missed call batch" },
@@ -22,7 +22,7 @@ export default function RevenueLeakSection() {
       />
 
       <div className="relative z-10 max-w-6xl mx-auto px-6">
-        <SectionHeader
+        <CSSectionHeader
           eyebrow="Revenue Leaks"
           title="Your Business Is Losing Bookings Every Hour"
           subtitle="You don't need another dashboard. You need the first response, follow-up, booking handoff, review request, and reactivation path to stop depending on memory. Pick a system, add to cart, and we fix it."
@@ -39,8 +39,7 @@ export default function RevenueLeakSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.4, delay: i * 0.1 }}
-                className="rounded-2xl p-6 cs-card-shadow transition-all duration-300 hover:-translate-y-1 relative overflow-hidden"
-                style={{ background: "#ffffff", border: "1px solid rgba(0,174,239,0.20)" }}
+                className="cs-glow-card p-6 relative overflow-hidden"
               >
                 {/* Severity indicator — top-right corner */}
                 <div className="absolute top-0 right-0 px-3 py-1 rounded-bl-xl text-[9px] font-black uppercase tracking-wider" style={{ background: `rgba(239, 68, 68, ${0.08 + i * 0.04})`, color: "#DC2626" }}>
@@ -90,13 +89,15 @@ export default function RevenueLeakSection() {
         </motion.div>
 
         <div className="text-center mt-10">
-          <Link
+          <CSButton
             to="/store"
+            variant="primary"
+            size="md"
+            icon={ShoppingCart}
             onClick={() => trackCTA("revenue_leak_browse_store", "revenue_leak")}
-            className="cs-btn-primary inline-flex items-center gap-2"
           >
-            <ShoppingCart className="w-4 h-4" /> Browse AI Systems to Fix This
-          </Link>
+            Browse AI Systems to Fix This
+          </CSButton>
         </div>
       </div>
     </section>

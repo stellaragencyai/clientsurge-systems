@@ -1,4 +1,5 @@
 import { Loader2 } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 /**
  * CSButton — Unified atomic button component using Sprint 1 design tokens.
@@ -14,6 +15,7 @@ import { Loader2 } from 'lucide-react';
  *   loading   — boolean (shows spinner, disables interaction)
  *   disabled  — boolean
  *   href      — string (renders <a> instead of <button>)
+ *   to        — string (renders react-router <Link> for SPA navigation)
  *   onClick   — function
  *   children  — ReactNode
  *   className — string (appended to base classes)
@@ -39,6 +41,7 @@ export default function CSButton({
   loading = false,
   disabled = false,
   href,
+  to,
   onClick,
   children,
   className = '',
@@ -62,6 +65,20 @@ export default function CSButton({
       {IconRight && <IconRight className="w-4 h-4 flex-shrink-0" />}
     </>
   );
+
+  if (to && !isDisabled) {
+    return (
+      <Link
+        to={to}
+        className={classes}
+        onClick={onClick}
+        data-loading={loading || undefined}
+        {...props}
+      >
+        {content}
+      </Link>
+    );
+  }
 
   if (href && !isDisabled) {
     return (
