@@ -18,7 +18,7 @@ import { useEffect, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   RefreshCw, Loader2, ShieldCheck, AlertCircle, Pause, Play, RotateCw,
-  Eye, ChevronDown, ChevronUp, Search, Filter,
+  Eye, ChevronDown, ChevronUp, Search,
 } from "lucide-react";
 import { getDeploymentDisplayStatus, getModuleDisplayStatus, DEPLOYMENT_STATUS } from "@/lib/deploymentStatusModel";
 import { buildAutomationSummary } from "@/lib/deploymentCardBuilder";
