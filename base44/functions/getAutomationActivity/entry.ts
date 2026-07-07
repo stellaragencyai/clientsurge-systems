@@ -23,6 +23,7 @@ Deno.serve(async (req) => {
       industry_slug,
       module_key,
       execution_status,
+      deployment_id,
       date_from,
       date_to,
       limit = 100,
@@ -34,6 +35,7 @@ Deno.serve(async (req) => {
     if (client_id) query.client_id = client_id;
     if (module_key) query.module_key = module_key;
     if (execution_status) query.execution_status = execution_status;
+    if (deployment_id) query.client_deployment_id = deployment_id;
     if (date_from || date_to) {
       query.created_date = {};
       if (date_from) query.created_date.$gte = date_from;

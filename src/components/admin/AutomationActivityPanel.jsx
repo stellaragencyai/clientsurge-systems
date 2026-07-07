@@ -23,6 +23,8 @@ import {
   ChevronDown,
   ChevronUp,
   ShieldAlert,
+  Wrench,
+  AlertTriangle,
 } from "lucide-react";
 
 const STATUS_CONFIG = {
@@ -55,6 +57,8 @@ export default function AutomationActivityPanel() {
   const [filterStatus, setFilterStatus] = useState("all");
   const [filterClient, setFilterClient] = useState("");
   const [filterIndustry, setFilterIndustry] = useState("all");
+  const [filterDateFrom, setFilterDateFrom] = useState("");
+  const [filterDateTo, setFilterDateTo] = useState("");
 
   const fetchData = useCallback(async () => {
     setLoading(true);
@@ -66,6 +70,8 @@ export default function AutomationActivityPanel() {
         ...(filterStatus !== "all" && { execution_status: filterStatus }),
         ...(filterClient && { client_id: filterClient }),
         ...(filterIndustry !== "all" && { industry_slug: filterIndustry }),
+        ...(filterDateFrom && { date_from: new Date(filterDateFrom).toISOString() }),
+        ...(filterDateTo && { date_to: new Date(filterDateTo + "T23:59:59").toISOString() }),
       };
       const res = await base44.functions.invoke("getAutomationActivity", payload);
       const data = res.data || res;
@@ -77,7 +83,7 @@ export default function AutomationActivityPanel() {
     } finally {
       setLoading(false);
     }
-  }, [filterModule, filterStatus, filterClient, filterIndustry]);
+  }, [filterModule, filterStatus, filterClient, filterIndustry, filterDateFrom, filterDateTo]);
 
   useEffect(() => {
     fetchData();
@@ -159,6 +165,21 @@ export default function AutomationActivityPanel() {
             onChange={(e) => setFilterClient(e.target.value)}
             className="w-[160px] h-9"
           />
+          <div className="flex items-center gap-1.5">
+            <input
+              type="date"
+              value={filterDateFrom}
+              onChange={(e) => setFilterDateFrom(e.target.value)}
+              className="h-9 rounded-md border border-gray-200 px-2 text-sm text-gray-700"
+            />
+            <span className="text-xs text-gray-400">to</span>
+            <input
+              type="date"
+              value={filterDateTo}
+              onChange={(e) => setFilterDateTo(e.target.value)}
+              className="h-9 rounded-md border border-gray-200 px-2 text-sm text-gray-700"
+            />
+          </div>
           <Button variant="outline" size="sm" onClick={fetchData} disabled={loading} className="h-9">
             <RefreshCw className={`w-4 h-4 mr-1.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -183,26 +204,27 @@ export default function AutomationActivityPanel() {
             <thead>
               <tr className="border-b border-gray-100 bg-gray-50">
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Client</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Deployment</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Industry</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Package</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Module</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Status</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Trigger</th>
                 <th className="px-4 py-3 text-left font-semibold text-gray-600">Timestamp</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Provider Ref</th>
-                <th className="px-4 py-3 text-left font-semibold text-gray-600">Error</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Provider Result</th>
+                <th className="px-4 py-3 text-left font-semibold text-gray-600">Errors</th>
               </tr>
             </thead>
             <tbody>
               {loading ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={9} className="px-4 py-12 text-center text-gray-400">
                     <Loader2 className="w-6 h-6 animate-spin mx-auto mb-2" />
                     Loading automation activity...
                   </td>
                 </tr>
               ) : logs.length === 0 ? (
                 <tr>
-                  <td colSpan={8} className="px-4 py-12 text-center text-gray-400">
+                  <td colSpan={9} className="px-4 py-12 text-center text-gray-400">
                     <Activity className="w-8 h-8 mx-auto mb-2 opacity-30" />
                     No automation executions found. Try adjusting filters.
                   </td>
@@ -220,11 +242,31 @@ export default function AutomationActivityPanel() {
                         className={`border-b border-gray-50 hover:bg-gray-50/50 cursor-pointer ${isExpanded ? "bg-blue-50/30" : ""}`}
                         onClick={() => hasDeployment ? fetchDeploymentHealth(log.client_deployment_id) : setExpandedRow(isExpanded ? null : log.id)}
                       >
-                        <td className="px-4 py-3 text-gray-700 font-medium truncate max-w-[140px]">
+                        <td className="px-4 py-3 text-gray-700 font-medium truncate max-w-[120px]">
                           {log.client_id ? log.client_id.substring(0, 12) + "..." : "—"}
+                        </td>
+                        <td className="px-4 py-3">
+                          {log.deployment ? (
+                            <div className="flex flex-col gap-0.5">
+                              <Badge variant="outline" className="text-xs font-normal w-fit">{log.deployment.deployment_status}</Badge>
+                              {log.deployment.health_status && (
+                                <span className={`text-[10px] font-semibold ${
+                                  log.deployment.health_status === "healthy" ? "text-green-600" :
+                                  log.deployment.health_status === "warning" ? "text-yellow-600" : "text-red-600"
+                                }`}>
+                                  {log.deployment.health_status}
+                                </span>
+                              )}
+                            </div>
+                          ) : (
+                            <span className="text-gray-400 text-xs">No deployment</span>
+                          )}
                         </td>
                         <td className="px-4 py-3 text-gray-600">
                           <Badge variant="outline" className="text-xs font-normal">{log.industry_slug || "—"}</Badge>
+                        </td>
+                        <td className="px-4 py-3 text-gray-600 text-xs font-semibold">
+                          {log.package_tier_key || "—"}
                         </td>
                         <td className="px-4 py-3 text-gray-700">
                           {MODULE_LABELS[log.module_key] || log.module_key}
@@ -235,7 +277,6 @@ export default function AutomationActivityPanel() {
                             {cfg.label}
                           </span>
                         </td>
-                        <td className="px-4 py-3 text-gray-600 text-xs">{log.trigger_event || "—"}</td>
                         <td className="px-4 py-3 text-gray-500 text-xs whitespace-nowrap">
                           {log.created_date ? new Date(log.created_date).toLocaleString() : "—"}
                         </td>
