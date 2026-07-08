@@ -1,0 +1,36 @@
+name: Live Setup Pipeline Smoke
+
+on:
+  workflow_dispatch:
+    inputs:
+      base_url:
+        description: "Production/base URL to smoke test"
+        required: false
+        default: "https://clientsurgesystems.com"
+      test_order_id:
+        description: "Optional order ID for setup/status route checks"
+        required: false
+      test_setup_token:
+        description: "Optional signed setup token for the test order"
+        required: false
+
+jobs:
+  live-setup-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run live setup pipeline smoke
+        env:
+          CLIENTSURGE_BASE_URL: ${{ inputs.base_url }}
+          CLIENTSURGE_TEST_ORDER_ID: ${{ inputs.test_order_id }}
+          CLIENTSURGE_TEST_SETUP_TOKEN: ${{ inputs.test_setup_token }}
+        run: node scripts/smoke/setup-pipeline-live-smoke.mjs
+      - name: Upload smoke report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: setup-pipeline-live-smoke-report
+          path: reports/setup-pipeline-live-smoke.json
