@@ -11,6 +11,7 @@
  * No auth required — this is a public checkout endpoint.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.34";
+import { buildCheckoutRedirectUrls } from "./checkoutUrls.shared.js";
 
 // ── Canonical package definitions (mirrors src/lib/salesCatalog.js) ──
 const PACKAGE_DEFINITIONS = {
@@ -44,19 +45,23 @@ const PACKAGE_ALIASES = {
   starter: "starter_system",
   "starter system": "starter_system",
   starter_system: "starter_system",
+  "starter-system": "starter_system",
   growth: "growth_system",
   "growth system": "growth_system",
   growth_system: "growth_system",
+  "growth-system": "growth_system",
   elite: "pro_system",
   "elite system": "pro_system",
   elite_system: "pro_system",
+  "elite-system": "pro_system",
   pro: "pro_system",
   "pro system": "pro_system",
   pro_system: "pro_system",
+  "pro-system": "pro_system",
 };
 
 function normalizePackageKey(key) {
-  const normalized = String(key || "").trim().toLowerCase();
+  const normalized = String(key || "").trim().toLowerCase().replace(/[\s-]+/g, "_");
   return PACKAGE_ALIASES[normalized] || (PACKAGE_DEFINITIONS[normalized] ? normalized : null);
 }
 
@@ -67,8 +72,20 @@ function isTruthy(value) {
   return ["1", "true", "yes", "y", "on"].includes(normalized);
 }
 
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeText(value, maxLength = 240) {
+  return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
 function isCheckoutSmokeRequest({ customer_email, smoke_test, source }) {
-  const email = String(customer_email || "").trim().toLowerCase();
+  const email = normalizeEmail(customer_email);
   const sourceValue = String(source || "").trim().toLowerCase();
   return (
     isTruthy(smoke_test) ||
@@ -95,7 +112,10 @@ Deno.serve(async (req) => {
 
   try {
     if (req.method !== "POST") {
-      return Response.json({ error: "Method not allowed" }, { status: 405 });
+      return Response.json(
+        { error: "Method not allowed", code: "method_not_allowed", request_id: requestId },
+        { status: 405, headers: { Allow: "POST" } }
+      );
     }
 
     let body;
@@ -103,7 +123,7 @@ Deno.serve(async (req) => {
       body = await req.json();
     } catch {
       return Response.json(
-        { error: "Invalid JSON body", request_id: requestId },
+        { error: "Invalid JSON body", code: "invalid_json", request_id: requestId },
         { status: 400 }
       );
     }
@@ -121,42 +141,50 @@ Deno.serve(async (req) => {
       source,
     } = body || {};
 
-    const isSmokeCheckout = isCheckoutSmokeRequest({ customer_email, smoke_test, source });
+    const normalizedKey = normalizePackageKey(package_key);
+    const normalizedEmail = normalizeEmail(customer_email);
+    const normalizedCustomerName = normalizeText(customer_name);
+    const normalizedPhone = normalizeText(customer_phone, 80);
+    const normalizedBusinessName = normalizeText(business_name);
+    const normalizedIndustry = normalizeText(industry, 120);
+    const normalizedSource = normalizeText(source || "product_signup", 120) || "product_signup";
+    const isSmokeCheckout = isCheckoutSmokeRequest({ customer_email: normalizedEmail, smoke_test, source: normalizedSource });
 
-    // ── Validate required fields ──
     if (!package_key) {
       return Response.json(
-        { error: "Missing package_key parameter", request_id: requestId },
-        { status: 400 }
-      );
-    }
-    if (!customer_email) {
-      return Response.json(
-        { error: "Missing customer_email", request_id: requestId },
-        { status: 400 }
-      );
-    }
-    if (!customer_name) {
-      return Response.json(
-        { error: "Missing customer_name", request_id: requestId },
-        { status: 400 }
-      );
-    }
-    if (!business_name) {
-      return Response.json(
-        { error: "Missing business_name", request_id: requestId },
+        { error: "Missing package_key parameter", code: "package_key_required", request_id: requestId },
         { status: 400 }
       );
     }
 
-    // ── Normalize and validate package ──
-    const normalizedKey = normalizePackageKey(package_key);
     if (!normalizedKey) {
       return Response.json(
         {
           error: `Unknown package: "${package_key}". Valid packages: starter_system, growth_system, pro_system`,
+          code: "unknown_package",
           request_id: requestId,
         },
+        { status: 400 }
+      );
+    }
+
+    if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
+      return Response.json(
+        { error: "A valid customer email is required", code: "customer_email_required", request_id: requestId },
+        { status: 400 }
+      );
+    }
+
+    if (!normalizedCustomerName) {
+      return Response.json(
+        { error: "Customer name is required", code: "customer_name_required", request_id: requestId },
+        { status: 400 }
+      );
+    }
+
+    if (!normalizedBusinessName) {
+      return Response.json(
+        { error: "Business name is required", code: "business_name_required", request_id: requestId },
         { status: 400 }
       );
     }
@@ -169,7 +197,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── Validate Stripe price IDs exist ──
     if (!pkgDef.setup_price_id || !pkgDef.monthly_price_id) {
       return Response.json(
         {
@@ -180,12 +207,14 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── Validate URLs ──
-    const origin = req.headers.get("origin") || "https://clientsurgesystems.com";
-    const finalSuccessUrl = success_url || `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`;
-    const finalCancelUrl = cancel_url || `${origin}/product-signup?package=${normalizedKey}`;
+    const redirectUrls = buildCheckoutRedirectUrls({
+      originHeader: req.headers.get("origin") || "",
+      requestUrl: req.url,
+      packageKey: normalizedKey,
+      successUrl: success_url,
+      cancelUrl: cancel_url,
+    });
 
-    // ── Initialize Stripe ──
     const secretKey =
       Deno.env.get("STRIPE_SECRET_KEY") ||
       Deno.env.get("STRIPE_LIVE_SECRET_KEY");
@@ -204,16 +233,16 @@ Deno.serve(async (req) => {
       appInfo: { name: "ClientSurge Systems" },
     });
 
-    // ── Create Order record (pending) ──
     const base44 = createClientFromRequest(req);
 
     let order;
     try {
       const orderPayload = {
-        customer_email: customer_email.trim().toLowerCase(),
-        customer_name: customer_name.trim(),
-        customer_phone: customer_phone?.trim() || "",
-        business_name: business_name.trim(),
+        customer_email: normalizedEmail,
+        customer_name: normalizedCustomerName,
+        customer_phone: normalizedPhone,
+        business_name: normalizedBusinessName,
+        industry: normalizedIndustry,
         payment_status: "pending",
         order_status: "pending_payment",
         payment_source: "stripe",
@@ -230,6 +259,8 @@ Deno.serve(async (req) => {
         },
         environment: "production",
         dashboard_truth_status: "trusted",
+        checkout_origin: redirectUrls.origin,
+        checkout_cancel_url: redirectUrls.cancel_url,
       };
 
       if (isSmokeCheckout) {
@@ -246,27 +277,26 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── Create Stripe Checkout Session ──
     let session;
     try {
       session = await stripe.checkout.sessions.create({
         mode: "subscription",
-        customer_email: customer_email.trim().toLowerCase(),
+        customer_email: normalizedEmail,
         line_items: [
           { price: pkgDef.setup_price_id, quantity: 1 },
           { price: pkgDef.monthly_price_id, quantity: 1 },
         ],
-        success_url: finalSuccessUrl,
-        cancel_url: finalCancelUrl,
+        success_url: redirectUrls.success_url,
+        cancel_url: redirectUrls.cancel_url,
         metadata: {
           base44_app_id: Deno.env.get("BASE44_APP_ID") || "",
           order_id: order.id,
           package_key: normalizedKey,
           package_name: pkgDef.name,
-          customer_name: customer_name.trim(),
-          business_name: business_name.trim(),
-          industry: industry?.trim() || "",
-          source: source ? String(source).slice(0, 120) : "product_signup",
+          customer_name: normalizedCustomerName,
+          business_name: normalizedBusinessName,
+          industry: normalizedIndustry,
+          source: normalizedSource,
           smoke_test: isSmokeCheckout ? "true" : "false",
           request_id: requestId,
         },
@@ -275,9 +305,10 @@ Deno.serve(async (req) => {
             base44_app_id: Deno.env.get("BASE44_APP_ID") || "",
             order_id: order.id,
             package_key: normalizedKey,
-            customer_email: customer_email.trim().toLowerCase(),
-            business_name: business_name.trim(),
-            source: source ? String(source).slice(0, 120) : "product_signup",
+            customer_email: normalizedEmail,
+            business_name: normalizedBusinessName,
+            industry: normalizedIndustry,
+            source: normalizedSource,
             smoke_test: isSmokeCheckout ? "true" : "false",
             request_id: requestId,
           },
@@ -291,9 +322,9 @@ Deno.serve(async (req) => {
     } catch (err) {
       console.error("[createCheckoutSession] Stripe session creation failed:", err.message);
 
-      // Update order to reflect failure
       try {
         await base44.asServiceRole.entities.Order.update(order.id, {
+          payment_status: "failed",
           pipeline_error: `Stripe checkout session creation failed: ${err.message}`,
         });
       } catch {}
@@ -307,7 +338,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    // ── Update order with Stripe session ID ──
     try {
       await base44.asServiceRole.entities.Order.update(order.id, {
         stripe_session_id: session.id,
