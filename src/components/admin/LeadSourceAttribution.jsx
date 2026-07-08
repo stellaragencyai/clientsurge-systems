@@ -1,8 +1,3 @@
-/**
- * LeadSourceAttribution — aggregates all Leads by their `source` field.
- * Shows total, qualified rate, booked rate, avg score, and pipeline breakdown per source.
- */
-
 import { useEffect, useState } from "react";
 import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip,
@@ -41,6 +36,14 @@ function buildEventBuckets(events) {
   }, {});
 }
 
+function getFunctionData(response) {
+  return response?.data || response || {};
+}
+
+function getErrorMessage(error, fallback) {
+  return error?.data?.error || error?.message || fallback;
+}
+
 function PerformanceBadge({ rate, label }) {
   const isHigh = rate >= 30;
   const isMid  = rate >= 15;
@@ -70,13 +73,11 @@ function SourceRow({ source, data, rank, color, isSelected, onSelect }) {
       }`}
     >
       <div className="flex items-start gap-3">
-        {/* Rank + color dot */}
         <div className="flex-shrink-0 flex flex-col items-center gap-1 pt-0.5">
           <div className="w-3 h-3 rounded-full" style={{ background: color }} />
           <span className="text-[10px] font-bold text-muted-foreground">#{rank}</span>
         </div>
 
-        {/* Main info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2 flex-wrap">
             <p className="font-semibold text-foreground capitalize truncate">{source || "unknown"}</p>
@@ -86,7 +87,6 @@ function SourceRow({ source, data, rank, color, isSelected, onSelect }) {
             </div>
           </div>
 
-          {/* Mini pipeline bar */}
           <div className="mt-2 flex h-2 rounded-full overflow-hidden gap-px">
             {STATUS_ORDER.map((s) => {
               const count = data.by_status[s] || 0;
@@ -109,7 +109,6 @@ function SourceRow({ source, data, rank, color, isSelected, onSelect }) {
             })}
           </div>
 
-          {/* Stats row */}
           <div className="mt-2 flex items-center gap-4 flex-wrap">
             <span className="text-xs text-muted-foreground">
               <span className="font-bold text-foreground">{data.total}</span> leads
@@ -131,7 +130,6 @@ function SourceRow({ source, data, rank, color, isSelected, onSelect }) {
           </div>
         </div>
 
-        {/* Total badge */}
         <div className="flex-shrink-0 text-right">
           <p className="text-2xl font-bold text-foreground">{data.total}</p>
           <p className="text-[10px] text-muted-foreground">leads</p>
@@ -161,7 +159,6 @@ function DrillDown({ source, data, color }) {
         </span>
       </div>
 
-      {/* KPI row */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
         {[
           { label: "Total Leads",    value: data.total,             color: "blue" },
@@ -190,7 +187,6 @@ function DrillDown({ source, data, color }) {
         ))}
       </div>
 
-      {/* Status bar chart */}
       <div>
         <p className="text-xs font-semibold uppercase tracking-wide text-muted-foreground mb-3">Pipeline Breakdown</p>
         <ResponsiveContainer width="100%" height={180}>
@@ -216,7 +212,6 @@ function DrillDown({ source, data, color }) {
         </ResponsiveContainer>
       </div>
 
-      {/* Underperformance alert */}
       {bookedRate < 10 && data.total >= 5 && (
         <div className="flex items-start gap-3 rounded-lg border border-amber-200 bg-amber-50 p-3">
           <AlertTriangle className="h-4 w-4 text-amber-600 flex-shrink-0 mt-0.5" />
@@ -241,33 +236,32 @@ export default function LeadSourceAttribution() {
   const [leads, setLeads] = useState([]);
   const [eventsByLead, setEventsByLead] = useState({});
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [selectedSource, setSelectedSource] = useState(null);
-  const [sortBy, setSortBy] = useState("total"); // total | qualified | booked | score
+  const [sortBy, setSortBy] = useState("total");
 
   useEffect(() => { loadLeads(); }, []);
 
   const loadLeads = async () => {
     setLoading(true);
+    setError("");
     try {
-      const data = await base44.entities.Leads.list("-created_date", 1000);
-      const nextLeads = data || [];
-      const leadIds = nextLeads.map((lead) => lead.id).filter(Boolean);
-      const communicationEvents = leadIds.length
-        ? await base44.asServiceRole.entities.CommunicationEvent.filter(
-            { lead_id: { $in: leadIds } },
-            "-created_date",
-            2000
-          ).catch(() => [])
-        : [];
+      const response = await base44.functions.invoke("getLeadSourceAttribution", { limit: 1000 });
+      const data = getFunctionData(response);
+      if (data.error) throw new Error(data.error);
 
-      setLeads(nextLeads);
-      setEventsByLead(buildEventBuckets(communicationEvents));
+      setLeads(data.leads || []);
+      setEventsByLead(buildEventBuckets(data.communicationEvents || []));
+    } catch (err) {
+      console.error("Failed to load lead source attribution:", err);
+      setError(getErrorMessage(err, "Failed to load lead source attribution"));
+      setLeads([]);
+      setEventsByLead({});
     } finally {
       setLoading(false);
     }
   };
 
-  // Aggregate by source
   const attribution = {};
   for (const lead of leads) {
     const src = (lead.source || "unknown").toLowerCase().trim();
@@ -294,15 +288,13 @@ export default function LeadSourceAttribution() {
     d.failed_count += events.filter((event) => event.status === "failed").length;
   }
 
-  // Sort sources
   const sortedSources = Object.entries(attribution).sort(([, a], [, b]) => {
     if (sortBy === "qualified") return pct(b.qualified + b.booked + b.closed, b.total) - pct(a.qualified + a.booked + a.closed, a.total);
     if (sortBy === "booked")    return pct(b.booked + b.closed, b.total) - pct(a.booked + a.closed, a.total);
     if (sortBy === "score")     return avg(b.scores) - avg(a.scores);
-    return b.total - a.total; // default: total
+    return b.total - a.total;
   });
 
-  // Chart data — top 8 sources by total
   const chartData = sortedSources.slice(0, 8).map(([src, d]) => ({
     source: src.length > 12 ? src.slice(0, 12) + "…" : src,
     fullSource: src,
@@ -322,10 +314,9 @@ export default function LeadSourceAttribution() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-        <h2 className="text-2xl font-semibold text-foreground">Lead Source Attribution</h2>
+          <h2 className="text-2xl font-semibold text-foreground">Lead Source Attribution</h2>
           <p className="mt-1 text-sm text-muted-foreground">
             Which marketing channels drive the most qualified traffic — with live CommunicationEvent touches and replies layered in by source.
           </p>
@@ -340,7 +331,12 @@ export default function LeadSourceAttribution() {
         </button>
       </div>
 
-      {/* KPI row */}
+      {error && (
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
+          {error}
+        </div>
+      )}
+
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {[
           { icon: TrendingUp, label: "Total Leads",    value: totalLeads,   color: "blue"    },
@@ -363,7 +359,6 @@ export default function LeadSourceAttribution() {
         })}
       </div>
 
-      {/* Chart */}
       {!loading && chartData.length > 0 && (
         <div className="rounded-xl border border-border bg-white p-6">
           <p className="text-sm font-semibold text-foreground mb-4">Volume vs. Qualification (Top Sources)</p>
@@ -386,9 +381,7 @@ export default function LeadSourceAttribution() {
         </div>
       )}
 
-      {/* Sort controls + source list */}
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* Source list */}
         <div className="flex-1 space-y-3">
           <div className="flex items-center justify-between gap-3 flex-wrap">
             <p className="text-sm font-semibold text-foreground">{sortedSources.length} Sources</p>
@@ -438,7 +431,6 @@ export default function LeadSourceAttribution() {
           )}
         </div>
 
-        {/* Drill-down panel */}
         {selectedSource && (
           <div className="lg:w-80 xl:w-96 flex-shrink-0">
             <DrillDown
