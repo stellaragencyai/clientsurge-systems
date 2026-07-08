@@ -9,6 +9,7 @@ const baseUrlArg = process.argv.find((arg) => arg.startsWith("--base-url="));
 const strictHttp = process.env.PRODUCT_SIGNUP_SMOKE_STRICT_HTTP === "1";
 const baseUrl = new URL(baseUrlArg ? baseUrlArg.split("=").slice(1).join("=") : defaultBaseUrl);
 const builtFallbackPath = "dist/product-signup";
+const requireBuiltFallback = process.env.PRODUCT_SIGNUP_SMOKE_REQUIRE_BUILT_FALLBACK !== "0";
 
 const requiredMarkers = [
   "Complete your ClientSurge signup",
@@ -69,6 +70,15 @@ function validateHtml(html) {
 }
 
 function checkBuiltFallback() {
+  if (!requireBuiltFallback) {
+    return {
+      status: "skipped",
+      bytes: 0,
+      failures: [],
+      note: "Built fallback check skipped because PRODUCT_SIGNUP_SMOKE_REQUIRE_BUILT_FALLBACK=0.",
+    };
+  }
+
   if (!fs.existsSync(builtFallbackPath)) {
     return {
       status: "fail",
@@ -169,7 +179,7 @@ const builtFallback = checkBuiltFallback();
 const routeResults = await Promise.all(routes.map(checkRoute));
 const routeFailures = routeResults.filter((result) => result.status !== "pass");
 const hardFailures = [
-  ...(builtFallback.status === "pass" ? [] : [{ check: "built-fallback", failures: builtFallback.failures }]),
+  ...(builtFallback.status === "fail" ? [{ check: "built-fallback", failures: builtFallback.failures }] : []),
   ...(strictHttp ? routeFailures.map((result) => ({ check: result.route, failures: result.failures })) : []),
 ];
 
@@ -177,14 +187,15 @@ const summary = {
   generated_at: new Date().toISOString(),
   base_url: baseUrl.href.replace(/\/$/, ""),
   strict_http: strictHttp,
+  require_built_fallback: requireBuiltFallback,
   built_fallback: builtFallback,
   route_results: routeResults,
-  checked_count: 1 + routeResults.length,
-  pass_count: 1 + routeResults.filter((result) => result.status === "pass").length,
+  checked_count: (requireBuiltFallback ? 1 : 0) + routeResults.length,
+  pass_count: (builtFallback.status === "pass" ? 1 : 0) + routeResults.filter((result) => result.status === "pass").length,
   warn_count: routeFailures.length,
   fail_count: hardFailures.length,
   note: strictHttp
-    ? "Strict mode verifies HTTP route delivery and the built fallback."
+    ? "Strict mode verifies HTTP route delivery. Built fallback is required unless PRODUCT_SIGNUP_SMOKE_REQUIRE_BUILT_FALLBACK=0 is set for live-only monitors."
     : "CI mode hard-fails if the built product-signup fallback is missing or blank. HTTP route checks are reported as warnings because local Vite preview may serve the SPA shell before production rewrites/static hosting behavior.",
 };
 
