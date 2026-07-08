@@ -13,6 +13,10 @@ const submitLeadCaptureSource = readFileSync(
   "utf8"
 );
 const submitContactInquirySource = readFileSync(
+  new URL("../base44/functions/submitContactInquiry/main.ts", import.meta.url),
+  "utf8"
+);
+const submitContactInquiryEntrySource = readFileSync(
   new URL("../base44/functions/submitContactInquiry/entry.ts", import.meta.url),
   "utf8"
 );
@@ -51,9 +55,10 @@ test("public form origin guard can include configured deployment origins", () =>
   assert.equal(allowedOrigins.has("https://staging.example"), true);
 });
 
-test("public lead and contact endpoints call the shared origin guard before parsing payloads", () => {
+test("public lead and contact endpoints call the shared origin guard before accepting payloads", () => {
   assert.match(submitLeadCaptureSource, /validatePublicFormOrigin\(req\)/);
   assert.match(submitLeadCaptureSource, /if \(!originGuard\.ok\)/);
   assert.match(submitContactInquirySource, /validatePublicFormOrigin\(req\)/);
   assert.match(submitContactInquirySource, /if \(!originGuard\.ok\)/);
+  assert.match(submitContactInquiryEntrySource, /import '\.\/main\.ts';/);
 });
