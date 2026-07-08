@@ -10,7 +10,9 @@ function json(data, status = 200) {
 function appendSmsOptOut(message) {
   if (!message) return "";
   const trimmed = message.trim();
-  if (/\bSTOP\b/i.test(trimmed)) return trimmed;
+  if (/\breply\s+stop\b/i.test(trimmed) || /\btext\s+stop\b/i.test(trimmed) || /\bstop\s+to\s+(unsubscribe|opt\s*out)\b/i.test(trimmed)) {
+    return trimmed;
+  }
   return `${trimmed}\n\nReply STOP to opt out.`;
 }
 
@@ -30,6 +32,56 @@ function normalizePhoneToE164(phone) {
   }
   if (cleaned.length >= 11 && cleaned.length <= 15) return `+${cleaned}`;
   return null;
+}
+
+const SMS_BLOCK_STATUSES = new Set(['opted_out', 'unsubscribed', 'stopped', 'blocked', 'do_not_contact']);
+
+function cleanStatus(value) {
+  return String(value || '').trim().toLowerCase();
+}
+
+function getLeadSmsBlockReason(lead = {}) {
+  if (!lead) return 'lead_missing';
+  if (lead.do_not_contact === true) return 'do_not_contact';
+  if (lead.sms_opted_out === true) return 'sms_opted_out';
+  if (lead.sms_permission === false) return 'sms_permission_false';
+  if (SMS_BLOCK_STATUSES.has(cleanStatus(lead.sms_opt_out_status))) return `sms_opt_out_status:${cleanStatus(lead.sms_opt_out_status)}`;
+  if (SMS_BLOCK_STATUSES.has(cleanStatus(lead.sms_status))) return `sms_status:${cleanStatus(lead.sms_status)}`;
+  if (SMS_BLOCK_STATUSES.has(cleanStatus(lead.outreach_status))) return `outreach_status:${cleanStatus(lead.outreach_status)}`;
+  if (SMS_BLOCK_STATUSES.has(cleanStatus(lead.status))) return `lead_status:${cleanStatus(lead.status)}`;
+  if (lead.consent_given === false || lead.sms_consent === false) return 'consent_not_given';
+  return '';
+}
+
+function getOptOutPhoneFromMessageRecord(record = {}) {
+  return normalizePhoneToE164(
+    record.from_address ||
+    record.from_number ||
+    record.from_phone ||
+    record.lead_phone ||
+    record.phone ||
+    record.to_address ||
+    ''
+  );
+}
+
+async function logSmsComplianceBlock(base44, { leadId, clientId, clientProjectId, rawPhone, normalizedPhone, reason, message }) {
+  try {
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      lead_id: leadId || undefined,
+      client_id: clientId || undefined,
+      client_project_id: clientProjectId || undefined,
+      channel: 'sms',
+      direction: 'outbound',
+      event_type: 'sms_blocked',
+      provider: 'internal_compliance_guard',
+      status: 'blocked',
+      subject: 'Outbound SMS blocked by compliance guard',
+      message_body: message || '',
+      error_message: reason,
+      metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone, reason, trigger_name: 'sendSMS', timestamp: new Date().toISOString() }),
+    });
+  } catch (_) {}
 }
 
 // ── Finding #76: Circuit breaker for Twilio API calls ──
@@ -108,6 +160,10 @@ async function fetchTwilioWithRetry(url, options) {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== 'POST') {
+      return json({ error: 'Method not allowed' }, 405);
+    }
+
     const { phone, message, leadId } = await req.json();
 
     if (!phone || !message) {
@@ -181,25 +237,27 @@ Deno.serve(async (req) => {
         if (lead) {
           resolvedClientId = lead.client_id || null;
           resolvedClientProjectId = lead.client_project_id || null;
-          if (lead.do_not_contact === true) {
-            return json({ error: 'Lead has do_not_contact flag', sms_sent: false, reason: 'do_not_contact', safe_to_continue: true }, 200);
-          }
-          if (lead.consent_given === false) {
-            return json({ error: 'Lead has not given consent', sms_sent: false, reason: 'consent_not_given', safe_to_continue: true }, 200);
+          const smsBlockReason = getLeadSmsBlockReason(lead);
+          if (smsBlockReason) {
+            await logSmsComplianceBlock(base44, { leadId, clientId: resolvedClientId, clientProjectId: resolvedClientProjectId, rawPhone, normalizedPhone, reason: smsBlockReason, message });
+            return json({ error: 'Outbound SMS blocked by compliance guard', sms_sent: false, reason: smsBlockReason, safe_to_continue: true }, 200);
           }
 
-          // ── Finding #142: SMS opt-out compliance ──
-          // Check if the phone number is on the opt-out list
+          // ── Area 8: SMS opt-out compliance ──
+          // Check if the phone number is on the persisted inbound opt-out list.
           try {
             const optOutRecords = await base44.asServiceRole.entities.Messages.filter(
-              { direction: 'inbound', channel: 'sms', message_text: { $regex: /STOP|UNSUBSCRIBE|CANCEL|END|QUIT/i } },
+              { direction: 'inbound', channel: 'sms', message_text: { $regex: /STOP|UNSUBSCRIBE|CANCEL|END|QUIT|OPT.?OUT/i } },
               '-created_date',
-              50
+              100
             );
             const optedOutPhones = new Set(
-              (optOutRecords || []).map(m => normalizePhoneToE164(m.to_address || m.lead_phone || ''))
+              (optOutRecords || [])
+                .map(getOptOutPhoneFromMessageRecord)
+                .filter(Boolean)
             );
             if (optedOutPhones.has(normalizedPhone)) {
+              await logSmsComplianceBlock(base44, { leadId, clientId: resolvedClientId, clientProjectId: resolvedClientProjectId, rawPhone, normalizedPhone, reason: 'sms_opt_out_persisted_inbound', message });
               return json({ error: 'Phone number has opted out of SMS', sms_sent: false, reason: 'sms_opt_out', safe_to_continue: true }, 200);
             }
           } catch (_) {}
@@ -250,6 +308,7 @@ Deno.serve(async (req) => {
 
     const auth = btoa(`${accountSid}:${authToken}`);
     const statusCallbackUrl = Deno.env.get('TWILIO_SMS_STATUS_CALLBACK_URL');
+    const outboundBody = appendSmsOptOut(message);
 
     // ── Finding #83 + #86: Retry with exponential backoff + 10s timeout ──
     const response = await fetchTwilioWithRetry(
@@ -263,7 +322,7 @@ Deno.serve(async (req) => {
         body: new URLSearchParams({
           From: fromNumber,
           To: normalizedPhone,
-          Body: appendSmsOptOut(message),
+          Body: outboundBody,
           ...(statusCallbackUrl && { StatusCallback: statusCallbackUrl }),
         }).toString(),
       }
@@ -292,7 +351,7 @@ Deno.serve(async (req) => {
             provider: 'twilio',
             provider_from_number: fromNumber,
             status: 'failed',
-            message_body: message,
+            message_body: outboundBody,
             error_message: errorData?.message || `Twilio error ${response?.status || 'timeout'}`,
             metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone, status_callback_url: statusCallbackUrl }),
           });
@@ -317,7 +376,7 @@ Deno.serve(async (req) => {
           provider: 'twilio',
           provider_from_number: fromNumber,
           status: 'sent',
-          message_body: message,
+          message_body: outboundBody,
           provider_message_id: data.sid || null,
           metadata_json: JSON.stringify({ raw_phone: rawPhone, normalized_phone: normalizedPhone, status_callback_url: statusCallbackUrl }),
         });
@@ -329,9 +388,10 @@ Deno.serve(async (req) => {
           tenant_scope_status: 'scoped',
           direction: 'outbound',
           channel: 'sms',
-          message_text: message,
+          message_text: outboundBody,
           status: 'sent',
           provider_from_number: fromNumber,
+          to_address: normalizedPhone,
         });
       } catch (_) {}
     }
