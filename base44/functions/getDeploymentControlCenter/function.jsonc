@@ -1,0 +1,4 @@
+{
+  "name": "getDeploymentControlCenter",
+  "entry": "entry.ts"
+}
