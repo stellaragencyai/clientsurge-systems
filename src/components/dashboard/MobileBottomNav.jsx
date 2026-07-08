@@ -5,14 +5,24 @@ export default function MobileBottomNav() {
   const location = useLocation();
   const navigate = useNavigate();
 
+  const scrollOrNavigate = (path, targetId) => {
+    if (targetId && location.pathname === "/client-portal") {
+      const target = document.getElementById(targetId);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.replaceState(null, "", `#${targetId}`);
+        return;
+      }
+    }
+    navigate(path);
+  };
+
   const tabs = [
     { icon: LayoutDashboard, label: "Dashboard", path: "/client-portal" },
-    { icon: Package, label: "Systems", path: "/client-portal?tab=services" },
+    { icon: Package, label: "Systems", path: "/client-portal#dashboard-systems", targetId: "dashboard-systems" },
     { icon: Headphones, label: "Support", path: "/contact" },
     { icon: Home, label: "Home", path: "/" },
   ];
-
-  const currentPath = `${location.pathname}${location.search || ""}`;
 
   return (
     <>
@@ -38,15 +48,15 @@ export default function MobileBottomNav() {
         {tabs.map((tab) => {
           const Icon = tab.icon;
           const isActive = tab.path === "/client-portal"
-            ? location.pathname === "/client-portal" && !location.search
-            : currentPath === tab.path || location.pathname === tab.path;
+            ? location.pathname === "/client-portal" && !location.hash
+            : location.pathname === tab.path || location.hash === `#${tab.targetId}`;
           return (
             <button
               key={tab.label}
               type="button"
               aria-label={tab.label}
               aria-current={isActive ? "page" : undefined}
-              onClick={() => navigate(tab.path)}
+              onClick={() => scrollOrNavigate(tab.path, tab.targetId)}
               style={{
                 flex: 1,
                 display: "flex",
