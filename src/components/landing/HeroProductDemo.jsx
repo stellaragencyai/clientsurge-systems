@@ -3,16 +3,16 @@ import { motion, useReducedMotion, AnimatePresence } from 'framer-motion';
 import { PhoneIncoming, MessageSquare, CalendarCheck, CheckCircle2 } from 'lucide-react';
 
 /**
- * HeroProductDemo — Animated SaaS product demonstration for the homepage hero.
+ * HeroProductDemo — simulated SaaS product demonstration for the homepage hero.
  *
- * Shows a simulated AI conversation flow:
+ * Shows an example AI conversation flow:
  *   1. Lead submits a form / missed call notification
- *   2. AI responds instantly via SMS
- *   3. Booking link sent
- *   4. Appointment confirmed
+ *   2. AI response workflow starts
+ *   3. Booking link is sent
+ *   4. Appointment is confirmed
  *
- * Uses glassmorphism + electric blue accents to feel like a premium SaaS product.
- * Reduced-motion: shows all steps statically without animation.
+ * This is intentionally labeled as a simulation. Do not present it as a live
+ * dashboard or verified performance proof unless it is wired to production data.
  */
 
 const STEPS = [
@@ -20,28 +20,28 @@ const STEPS = [
     icon: PhoneIncoming,
     label: 'New Lead',
     text: 'Website form submitted — "Need AC repair this week"',
-    time: '0:00',
+    time: 'Step 1',
     accent: '#00AEEF',
   },
   {
     icon: MessageSquare,
     label: 'AI Response',
     text: 'Hi! Thanks for reaching out. We have openings Tuesday and Thursday. Which works better for you?',
-    time: '0:42',
+    time: 'Step 2',
     accent: '#0079c1',
   },
   {
     icon: CalendarCheck,
     label: 'Booking Sent',
-    text: 'Great — here is your booking link: clientsurge.app/book/tue-2pm',
-    time: '1:15',
+    text: 'Great — here is the booking link for the next available appointment window.',
+    time: 'Step 3',
     accent: '#003B8F',
   },
   {
     icon: CheckCircle2,
     label: 'Appointment Confirmed',
-    text: 'Appointment confirmed for Tuesday, 2:00 PM. We will text a reminder 1 hour before.',
-    time: '2:03',
+    text: 'Appointment confirmed for Tuesday at 2:00 PM. The customer receives an automated reminder before the visit.',
+    time: 'Step 4',
     accent: '#059669',
   },
 ];
@@ -51,7 +51,7 @@ export default function HeroProductDemo() {
   const [activeStep, setActiveStep] = useState(0);
 
   useEffect(() => {
-    if (shouldReduceMotion) return;
+    if (shouldReduceMotion) return undefined;
     const interval = setInterval(() => {
       setActiveStep((prev) => (prev + 1) % STEPS.length);
     }, 2800);
@@ -61,7 +61,7 @@ export default function HeroProductDemo() {
   const stepsToShow = shouldReduceMotion ? STEPS : STEPS.slice(0, activeStep + 1);
 
   return (
-    <div className="w-full max-w-2xl mx-auto" aria-label="AI system demonstration">
+    <div className="w-full max-w-2xl mx-auto" aria-label="Simulated AI system demonstration">
       <style>{`
         .cs-hero-demo-shell {
           position: relative;
@@ -99,7 +99,6 @@ export default function HeroProductDemo() {
       `}</style>
 
       <div className="cs-hero-demo-shell">
-        {/* Browser-style header */}
         <div className="cs-hero-demo-header">
           <div className="flex items-center gap-2">
             <span className="cs-hero-demo-dot" aria-hidden="true" />
@@ -112,18 +111,17 @@ export default function HeroProductDemo() {
                 letterSpacing: '0.02em',
               }}
             >
-              ClientSurge AI Dashboard
+              ClientSurge AI Workflow Preview
             </span>
           </div>
-          <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5" aria-hidden="true">
             <span style={{ width: 6, height: 6, borderRadius: 99, background: 'rgba(0,174,239,0.2)' }} />
             <span style={{ width: 6, height: 6, borderRadius: 99, background: 'rgba(0,174,239,0.2)' }} />
             <span style={{ width: 6, height: 6, borderRadius: 99, background: 'rgba(0,174,239,0.2)' }} />
           </div>
         </div>
 
-        {/* Conversation flow */}
-        <div className="p-4 md:p-5 space-y-3" style={{ minHeight: '260px' }}>
+        <div className="p-4 md:p-5 space-y-3" style={{ minHeight: '260px' }} aria-live="polite">
           <AnimatePresence mode="popLayout">
             {stepsToShow.map((step, idx) => {
               const Icon = step.icon;
@@ -190,7 +188,7 @@ export default function HeroProductDemo() {
                       transition={{ delay: 0.3, type: 'spring', stiffness: 200 }}
                       className="flex-shrink-0"
                     >
-                      <CheckCircle2 className="w-4 h-4" style={{ color: '#059669' }} />
+                      <CheckCircle2 className="w-4 h-4" style={{ color: '#059669' }} aria-hidden="true" />
                     </motion.div>
                   )}
                 </motion.div>
@@ -198,7 +196,6 @@ export default function HeroProductDemo() {
             })}
           </AnimatePresence>
 
-          {/* Progress indicator */}
           {!shouldReduceMotion && (
             <div className="flex items-center gap-1.5 pt-2" aria-hidden="true">
               {STEPS.map((_, idx) => (
@@ -217,7 +214,6 @@ export default function HeroProductDemo() {
           )}
         </div>
 
-        {/* Footer stat */}
         <div
           className="px-4 md:px-5 py-3 flex items-center justify-between"
           style={{
@@ -226,19 +222,19 @@ export default function HeroProductDemo() {
           }}
         >
           <span style={{ fontSize: '0.7rem', fontWeight: 700, color: '#64748b' }}>
-            Total response time: 2 min 3 sec
+            Example automation sequence
           </span>
           <span
             style={{
               fontSize: '0.65rem',
               fontWeight: 800,
-              color: '#059669',
-              background: 'rgba(5,150,105,0.08)',
+              color: '#075985',
+              background: 'rgba(0,174,239,0.08)',
               padding: '3px 8px',
               borderRadius: 99,
             }}
           >
-            ● LIVE DEMO
+            SIMULATED FLOW
           </span>
         </div>
       </div>
