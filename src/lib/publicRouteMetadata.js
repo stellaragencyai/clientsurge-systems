@@ -108,6 +108,15 @@ export const STATIC_ROUTE_ALIASES = {
   "/product_signup": "/product-signup",
   "/signup": "/product-signup",
   "/client-dashboard": "/client-portal",
+  "/ClientPortal": "/client-portal",
+  "/Dashboard": "/admin",
+  "/AdminSettings": "/admin",
+  "/AdminLeadDetail": "/admin/leads",
+  "/LeadIntelligence": "/admin",
+  "/Sam": "/admin",
+  "/MedSpaDashboard": "/admin",
+  "/WebsiteSpecPreview": "/setup/preview",
+  "/NotFound": "/",
 };
 
 /**
@@ -149,20 +158,35 @@ export const PUBLIC_DIRECTORY_PAGES = [
 
 export const PUBLIC_ROUTE_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 
-// Minimal app-shell public routes. Buyer utility routes can render publicly,
-// but noindex rules below keep them out of search and proof surfaces.
-export const APP_SHELL_PUBLIC_PATHS = [
-  ...PUBLIC_ROUTE_PATHS,
+export const APP_SHELL_PUBLIC_UTILITY_PATHS = [
+  "/login",
+  "/register",
+  "/forgot-password",
+  "/reset-password",
+  "/opt-out",
+  "/product",
   "/product-signup",
   "/product-sign-up",
   "/product_signup",
   "/signup",
+  "/start",
+  "/book",
+  "/book-demo",
+  "/store",
+  "/setup-lookup",
   "/client-portal",
   "/client-dashboard",
 ];
 
+// Routes the React shell may render without treating the visitor as an admin.
+// This is intentionally broader than sitemap/public-directory routes, because
+// auth and checkout utilities must render but remain noindex.
+export const APP_SHELL_PUBLIC_PATHS = [
+  ...PUBLIC_ROUTE_PATHS,
+  ...APP_SHELL_PUBLIC_UTILITY_PATHS,
+];
+
 export const AUTHENTICATED_ROUTE_PREFIXES = [
-  "/client",
   "/client-portal",
   "/client-dashboard",
   "/client-saas",
@@ -177,16 +201,24 @@ export const AUTHENTICATED_ROUTE_PREFIXES = [
 export const ADMIN_ROUTE_PREFIXES = [
   "/admin",
   "/admin-settings",
+  "/adminsettings",
+  "/admindashboard",
+  "/adminleaddetail",
+  "/aistatusdashboard",
   "/dashboard",
   "/lead-intelligence",
+  "/leadintelligence",
   "/sam",
   "/medspa-dashboard",
+  "/medspadashboard",
   "/mission-control",
   "/saas/admin",
   "/saas",
 ];
 
 export const INTERNAL_ROUTE_PREFIXES = [
+  "/_generated",
+  "/pages",
   "/functions",
   "/function",
   "/internal",
@@ -199,7 +231,14 @@ export const INTERNAL_ROUTE_PREFIXES = [
   "/api",
   "/api/apps",
   "/motion-lab",
-  "/admin/AIStatusDashboard",
+  "/motionlab",
+  "/performancewars",
+  "/websitepreview",
+  "/websitespecpreview",
+  "/businesssetup",
+  "/credentialssetup",
+  "/setupstatus",
+  "/admin/aistatusdashboard",
 ];
 
 export const NOINDEX_ROUTE_PREFIXES = [
@@ -233,16 +272,24 @@ export const SITEMAP_STATIC_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 export const BLOG_SITEMAP_PATHS = [];
 
 export const ROBOTS_DISALLOW_PATHS = [
+  "/_generated",
+  "/_generated/",
+  "/pages",
+  "/pages/",
   "/admin",
   "/admin/",
+  "/admin-settings",
+  "/adminsettings",
   "/dashboard",
   "/dashboard/",
-  "/client",
-  "/client/",
   "/client-portal",
   "/client-portal/",
   "/client-dashboard",
   "/client-dashboard/",
+  "/client-saas",
+  "/client-saas/",
+  "/dashboard-entry",
+  "/dashboard-entry/",
   "/setup",
   "/setup/",
   "/setup/credentials",
@@ -272,8 +319,10 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/saas/",
   "/mission-control",
   "/lead-intelligence",
+  "/leadintelligence",
   "/sam",
   "/medspa-dashboard",
+  "/medspadashboard",
   "/setup-lookup",
   "/product-signup",
   "/product-sign-up",
