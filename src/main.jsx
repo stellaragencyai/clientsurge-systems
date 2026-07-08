@@ -5,6 +5,7 @@ import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
 import '@/admin-mobile-hotfix.css'
+import '@/area10-mobile-a11y.css'
 import { installAdminMobileRuntime } from '@/lib/adminMobileRuntime'
 
 // ── Standard React 18 mount — no repair hacks, no nested mount divs ──
@@ -18,12 +19,15 @@ function showFatalError(message) {
   // DOM-safe construction — no innerHTML injection to avoid XSS risk
   // and ensure the error screen renders even if the page state is degraded.
   const wrapper = document.createElement('div');
+  wrapper.setAttribute('role', 'alert');
+  wrapper.setAttribute('aria-live', 'assertive');
+  wrapper.setAttribute('aria-label', 'Application failed to load');
   Object.assign(wrapper.style, {
-    minHeight: '100vh',
+    minHeight: '100svh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    padding: '24px',
+    padding: 'max(24px, env(safe-area-inset-top, 0px)) max(24px, env(safe-area-inset-right, 0px)) max(24px, env(safe-area-inset-bottom, 0px)) max(24px, env(safe-area-inset-left, 0px))',
     fontFamily: 'Inter, system-ui, sans-serif',
     background: '#fff',
   });
@@ -32,6 +36,7 @@ function showFatalError(message) {
   Object.assign(card.style, { maxWidth: '480px', textAlign: 'center' });
 
   const icon = document.createElement('div');
+  icon.setAttribute('aria-hidden', 'true');
   Object.assign(icon.style, {
     width: '64px',
     height: '64px',
@@ -52,14 +57,18 @@ function showFatalError(message) {
   heading.textContent = 'Application failed to load';
 
   const para = document.createElement('p');
-  Object.assign(para.style, { fontSize: '14px', color: '#64748b', lineHeight: '1.6', margin: '0 0 24px' });
+  Object.assign(para.style, { fontSize: '16px', color: '#64748b', lineHeight: '1.6', margin: '0 0 24px' });
   para.textContent = message;
 
   const buttonRow = document.createElement('div');
-  Object.assign(buttonRow.style, { display: 'flex', gap: '12px', justifyContent: 'center' });
+  Object.assign(buttonRow.style, { display: 'flex', gap: '12px', justifyContent: 'center', flexWrap: 'wrap' });
 
   const refreshBtn = document.createElement('button');
+  refreshBtn.type = 'button';
+  refreshBtn.setAttribute('aria-label', 'Refresh the page');
   Object.assign(refreshBtn.style, {
+    minHeight: '44px',
+    minWidth: '44px',
     padding: '10px 24px',
     borderRadius: '999px',
     background: 'linear-gradient(90deg,#0079c1,#005691)',
@@ -74,7 +83,13 @@ function showFatalError(message) {
 
   const homeLink = document.createElement('a');
   homeLink.href = '/';
+  homeLink.setAttribute('aria-label', 'Go to the homepage');
   Object.assign(homeLink.style, {
+    display: 'inline-flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: '44px',
+    minWidth: '44px',
     padding: '10px 24px',
     borderRadius: '999px',
     border: '1px solid #cbd5e1',
