@@ -2,7 +2,7 @@ import { useState, useEffect } from "react";
 import { base44 } from "@/api/base44Client";
 import {
   ArrowLeft, ArrowRight, Loader2, CheckCircle2, Shield,
-  Building2, Globe, Plug, Palette, Beaker, FileCheck, Rocket,
+  Building2, Globe, Plug, Palette, Rocket,
 } from "lucide-react";
 import SetupAuthorizationStep from "@/components/onboarding/SetupAuthorizationStep";
 import IntegrationStatusStep from "@/components/onboarding/IntegrationStatusStep";
@@ -19,6 +19,49 @@ const STEPS = [
   { id: "review",        icon: Rocket,       title: "Review & Submit",        desc: "Confirm everything looks good" },
 ];
 
+function trim(value) {
+  return String(value || "").trim();
+}
+
+function normalizePhone(value = "") {
+  const digits = String(value || "").replace(/\D/g, "");
+  if (!digits) return "";
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return trim(value);
+}
+
+function isValidUSPhone(value = "") {
+  const digits = String(value || "").replace(/\D/g, "");
+  return digits.length === 10 || (digits.length === 11 && digits.startsWith("1"));
+}
+
+function isValidEmail(value = "") {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(trim(value));
+}
+
+function normalizeUrl(value = "") {
+  const raw = trim(value);
+  if (!raw) return "";
+  if (/^https?:\/\//i.test(raw)) return raw;
+  return `https://${raw}`;
+}
+
+function isValidUrl(value = "") {
+  const raw = trim(value);
+  if (!raw) return true;
+  try {
+    const url = new URL(normalizeUrl(raw));
+    return ["http:", "https:"].includes(url.protocol) && Boolean(url.hostname.includes("."));
+  } catch {
+    return false;
+  }
+}
+
+function readFunctionPayload(result) {
+  return result?.data || result || {};
+}
+
 function Field({ label, hint, children, required }) {
   return (
     <div className="space-y-1.5">
@@ -31,13 +74,15 @@ function Field({ label, hint, children, required }) {
   );
 }
 
-function TextInput({ value, onChange, placeholder, type = "text" }) {
+function TextInput({ value, onChange, placeholder, type = "text", onBlur, autoComplete }) {
   return (
     <input
       type={type}
       value={value || ""}
       onChange={e => onChange(e.target.value)}
+      onBlur={onBlur}
       placeholder={placeholder}
+      autoComplete={autoComplete}
       className="w-full px-4 py-2.5 rounded-xl border border-border bg-white text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
     />
   );
@@ -102,26 +147,26 @@ function BusinessStep({ data, onChange }) {
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <Field label="Business Name" required>
-          <TextInput value={data.business_name} onChange={v => onChange("business_name", v)} placeholder="Acme Med Spa" />
+          <TextInput value={data.business_name} onChange={v => onChange("business_name", v)} placeholder="Acme Med Spa" autoComplete="organization" />
         </Field>
         <Field label="Industry / Niche" required>
           <TextInput value={data.industry} onChange={v => onChange("industry", v)} placeholder="Med Spa, HVAC, Dental…" />
         </Field>
         <Field label="Owner / Contact Name">
-          <TextInput value={data.contact_name} onChange={v => onChange("contact_name", v)} placeholder="Jane Smith" />
+          <TextInput value={data.contact_name} onChange={v => onChange("contact_name", v)} placeholder="Jane Smith" autoComplete="name" />
         </Field>
         <Field label="Business Phone" required>
-          <TextInput value={data.business_phone} onChange={v => onChange("business_phone", v)} placeholder="+1 (602) 555-0100" type="tel" />
+          <TextInput value={data.business_phone} onChange={v => onChange("business_phone", v)} onBlur={() => onChange("business_phone", normalizePhone(data.business_phone))} placeholder="+1 (602) 555-0100" type="tel" autoComplete="tel" />
         </Field>
         <Field label="Business Email">
-          <TextInput value={data.business_email} onChange={v => onChange("business_email", v)} placeholder="hello@yourbusiness.com" type="email" />
+          <TextInput value={data.business_email} onChange={v => onChange("business_email", v)} placeholder="hello@yourbusiness.com" type="email" autoComplete="email" />
         </Field>
         <Field label="Website URL">
-          <TextInput value={data.website} onChange={v => onChange("website", v)} placeholder="https://yourbusiness.com" />
+          <TextInput value={data.website} onChange={v => onChange("website", v)} onBlur={() => onChange("website", normalizeUrl(data.website))} placeholder="https://yourbusiness.com" type="url" autoComplete="url" />
         </Field>
       </div>
       <Field label="Business Address" hint="Used for local SEO and lead routing">
-        <TextInput value={data.address} onChange={v => onChange("address", v)} placeholder="123 Main St, Phoenix, AZ 85001" />
+        <TextInput value={data.address} onChange={v => onChange("address", v)} placeholder="123 Main St, Phoenix, AZ 85001" autoComplete="street-address" />
       </Field>
       <Field label="Brand Voice / Tone">
         <ChipSelect options={["Professional", "Friendly", "Luxury", "Casual", "Energetic"]} value={data.brand_voice} onChange={v => onChange("brand_voice", v)} />
@@ -166,15 +211,15 @@ function MessagingStep({ data, onChange }) {
   return (
     <div className="space-y-5">
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <Field label="Twilio Business Phone" hint="Leave blank if you don't have one yet">
-          <TextInput value={data.twilio_business_phone} onChange={v => onChange("twilio_business_phone", v)} placeholder="+1 (602) 555-0200" type="tel" />
+        <Field label="Twilio Business Phone" hint="Leave blank if you don't have one yet; we will use the business phone for setup checks.">
+          <TextInput value={data.twilio_business_phone} onChange={v => onChange("twilio_business_phone", v)} onBlur={() => onChange("twilio_business_phone", normalizePhone(data.twilio_business_phone))} placeholder="+1 (602) 555-0200" type="tel" autoComplete="tel" />
         </Field>
         <Field label="Booking / Scheduling Link" required>
-          <TextInput value={data.booking_link} onChange={v => onChange("booking_link", v)} placeholder="https://calendly.com/yourbusiness" />
+          <TextInput value={data.booking_link} onChange={v => onChange("booking_link", v)} onBlur={() => onChange("booking_link", normalizeUrl(data.booking_link))} placeholder="https://calendly.com/yourbusiness" type="url" />
         </Field>
       </div>
       <Field label="Lead Notification Email" required>
-        <TextInput value={data.lead_notification_email} onChange={v => onChange("lead_notification_email", v)} placeholder="you@yourbusiness.com" type="email" />
+        <TextInput value={data.lead_notification_email} onChange={v => onChange("lead_notification_email", v)} placeholder="you@yourbusiness.com" type="email" autoComplete="email" />
       </Field>
       <Field label="After-Hours Behavior">
         <ChipSelect options={["Send after-hours SMS", "Hold until we open"]} value={data.after_hours_behavior} onChange={v => onChange("after_hours_behavior", v)} />
@@ -193,7 +238,7 @@ function IntegrationsStep({ data, onChange }) {
         <ChipSelect options={["Calendly", "Acuity", "Jane App", "MindBody", "GoHighLevel", "HubSpot", "None / Other"]} value={data.crm_system} onChange={v => onChange("crm_system", v)} />
       </Field>
       <Field label="Google Review Link">
-        <TextInput value={data.google_review_link} onChange={v => onChange("google_review_link", v)} placeholder="https://g.page/r/yourbusiness/review" />
+        <TextInput value={data.google_review_link} onChange={v => onChange("google_review_link", v)} onBlur={() => onChange("google_review_link", normalizeUrl(data.google_review_link))} placeholder="https://g.page/r/yourbusiness/review" type="url" />
       </Field>
       <Field label="Other Lead Sources" hint="Angi, Thumbtack, Yelp, etc.">
         <TextInput value={data.other_lead_sources} onChange={v => onChange("other_lead_sources", v)} placeholder="e.g. Angi, Thumbtack, HomeAdvisor" />
@@ -210,7 +255,7 @@ function ReviewStep({ data, order }) {
     { title: "Business Info", fields: [
       { label: "Business Name", value: data.business_name },
       { label: "Industry", value: data.industry },
-      { label: "Phone", value: data.business_phone },
+      { label: "Phone", value: normalizePhone(data.business_phone) },
       { label: "Email", value: data.business_email },
       { label: "Website", value: data.website },
     ]},
@@ -218,14 +263,15 @@ function ReviewStep({ data, order }) {
       { label: "Logo", value: data.logo_url ? "✓ Uploaded" : "Not uploaded" },
       { label: "Primary Color", value: data.primary_color },
       { label: "Tagline", value: data.tagline },
+      { label: "Brand Voice", value: data.brand_voice },
     ]},
     { title: "Messaging", fields: [
-      { label: "Twilio Phone", value: data.twilio_business_phone || "To be provisioned" },
+      { label: "Twilio Phone", value: normalizePhone(data.twilio_business_phone || data.business_phone) || "To be provisioned" },
       { label: "Booking Link", value: data.booking_link },
       { label: "Notification Email", value: data.lead_notification_email },
     ]},
     { title: "Integrations", fields: [
-      { label: "CRM System", value: data.crm_system },
+      { label: "CRM System", value: data.crm_system || "None / Other" },
       { label: "Review Link", value: data.google_review_link },
       { label: "Lead Sources", value: data.other_lead_sources },
     ]},
@@ -234,7 +280,7 @@ function ReviewStep({ data, order }) {
   return (
     <div className="space-y-6">
       <div className="rounded-xl border border-green-200 bg-green-50 p-4 text-sm text-green-800">
-        <strong>Almost done!</strong> Review your information, then click Submit to send it to our team.
+        <strong>Almost done.</strong> Review your information, then click Submit to send it to our team.
       </div>
       {sections.map(section => (
         <div key={section.title} className="rounded-xl border border-border bg-white overflow-hidden">
@@ -245,7 +291,7 @@ function ReviewStep({ data, order }) {
             {section.fields.filter(f => f.value).map(f => (
               <div key={f.label} className="flex items-start justify-between px-4 py-2.5 gap-4">
                 <p className="text-xs font-semibold text-muted-foreground w-32 flex-shrink-0">{f.label}</p>
-                <p className="text-sm text-foreground text-right truncate">{f.value}</p>
+                <p className="text-sm text-foreground text-right break-all">{f.value}</p>
               </div>
             ))}
           </div>
@@ -269,7 +315,7 @@ export default function CredentialsWizard({ order, onComplete }) {
       business_name: order?.business_name || "",
       industry: "",
       contact_name: order?.customer_name || "",
-      business_phone: order?.customer_phone || "",
+      business_phone: normalizePhone(order?.customer_phone || ""),
       business_email: order?.customer_email || "",
       website: "",
       address: "",
@@ -284,7 +330,7 @@ export default function CredentialsWizard({ order, onComplete }) {
       lead_notification_email: order?.customer_email || "",
       after_hours_behavior: "",
       customer_questions: "",
-      crm_system: "",
+      crm_system: "None / Other",
       google_review_link: "",
       other_lead_sources: "",
       special_notes: "",
@@ -297,11 +343,11 @@ export default function CredentialsWizard({ order, onComplete }) {
   });
 
   useEffect(() => {
-    // Check if authorization already accepted
     const checkAuth = async () => {
       try {
         const result = await base44.functions.invoke("checkSetupAuthorization", { order_id: order?.id });
-        if (result?.authorized) {
+        const payload = readFunctionPayload(result);
+        if (payload?.authorized) {
           setAuthorized(true);
           setCurrentStep(1);
         }
@@ -319,31 +365,47 @@ export default function CredentialsWizard({ order, onComplete }) {
   const handleLogoUpload = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (!file.type?.startsWith("image/")) {
+      setError("Please upload an image file for the logo.");
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setError("Logo file is too large. Please upload an image under 5MB.");
+      return;
+    }
     setLogoUploading(true);
     try {
       const { file_url } = await base44.integrations.Core.UploadFile({ file });
       onChange("logo_url", file_url);
-    } catch { setError("Logo upload failed."); }
+    } catch { setError("Logo upload failed. Please try a smaller PNG or JPG."); }
     finally { setLogoUploading(false); }
   };
 
-  // Defensive guard: if authorized but somehow still on step 0, bump to step 1.
-  // This prevents any state corruption from exposing business details before authorization.
-  if (authorized && currentStep === 0) {
-    setCurrentStep(1);
-  }
+  useEffect(() => {
+    if (authorized && currentStep === 0) setCurrentStep(1);
+  }, [authorized, currentStep]);
 
   const step = STEPS[currentStep];
   const isLast = currentStep === STEPS.length - 1;
 
   const validateStep = () => {
     if (step.id === "business") {
-      if (!data.business_name.trim()) return "Business name is required.";
-      if (!data.business_phone.trim()) return "Business phone is required.";
+      if (!trim(data.business_name)) return "Business name is required.";
+      if (!trim(data.industry)) return "Industry / niche is required.";
+      if (!trim(data.business_phone)) return "Business phone is required.";
+      if (!isValidUSPhone(data.business_phone)) return "Enter a valid US business phone number.";
+      if (trim(data.business_email) && !isValidEmail(data.business_email)) return "Enter a valid business email address.";
+      if (!isValidUrl(data.website)) return "Enter a valid website URL or leave it blank.";
     }
     if (step.id === "messaging") {
-      if (!data.booking_link.trim()) return "Booking link is required.";
-      if (!data.lead_notification_email.trim()) return "Lead notification email is required.";
+      if (trim(data.twilio_business_phone) && !isValidUSPhone(data.twilio_business_phone)) return "Enter a valid Twilio/business SMS phone number or leave it blank.";
+      if (!trim(data.booking_link)) return "Booking link is required.";
+      if (!isValidUrl(data.booking_link)) return "Enter a valid booking link.";
+      if (!trim(data.lead_notification_email)) return "Lead notification email is required.";
+      if (!isValidEmail(data.lead_notification_email)) return "Enter a valid lead notification email.";
+    }
+    if (step.id === "integrations") {
+      if (!isValidUrl(data.google_review_link)) return "Enter a valid Google review link or leave it blank.";
     }
     return null;
   };
@@ -364,54 +426,71 @@ export default function CredentialsWizard({ order, onComplete }) {
     setSaving(true);
     setError("");
     try {
+      const businessPhone = normalizePhone(data.business_phone);
+      const twilioPhone = normalizePhone(data.twilio_business_phone || data.business_phone);
+      const websiteUrl = normalizeUrl(data.website);
+      const bookingLink = normalizeUrl(data.booking_link);
+      const googleReviewLink = normalizeUrl(data.google_review_link);
       const installConfig = {
         shared: {
-          twilio_business_phone: data.twilio_business_phone,
-          business_hours: data.business_hours,
+          twilio_business_phone: twilioPhone,
+          business_hours: trim(data.business_hours),
           after_hours_behavior: data.after_hours_behavior === "Hold until we open" ? "hold_until_open" : "send_after_hours_sms",
           consent_behavior: "include_opt_out_language",
         },
         brand: {
-          business_name: data.business_name,
-          industry: data.industry,
-          contact_name: data.contact_name,
-          business_email: data.business_email,
-          website: data.website,
-          address: data.address,
-          logo_url: data.logo_url,
-          primary_color: data.primary_color,
-          secondary_color: data.secondary_color,
-          tagline: data.tagline,
-          brand_voice: data.brand_voice,
+          business_name: trim(data.business_name),
+          industry: trim(data.industry),
+          contact_name: trim(data.contact_name),
+          business_phone: businessPhone,
+          business_email: trim(data.business_email).toLowerCase(),
+          website: websiteUrl,
+          website_url: websiteUrl,
+          address: trim(data.address),
+          logo_url: trim(data.logo_url),
+          primary_color: trim(data.primary_color) || "#00AEEF",
+          secondary_color: trim(data.secondary_color) || "#003B8F",
+          tagline: trim(data.tagline),
+          brand_voice: trim(data.brand_voice),
+          tone_of_voice: trim(data.brand_voice),
+          google_business_url: googleReviewLink,
         },
         messaging: {
-          booking_link: data.booking_link,
-          lead_notification_email: data.lead_notification_email,
-          customer_questions: data.customer_questions,
+          booking_link: bookingLink,
+          lead_notification_email: trim(data.lead_notification_email).toLowerCase(),
+          customer_questions: trim(data.customer_questions),
+        },
+        services: {
+          ai_booking_agent: { booking_link: bookingLink },
         },
         integrations: {
-          crm_system: data.crm_system,
-          google_review_link: data.google_review_link,
-          other_lead_sources: data.other_lead_sources,
-          special_notes: data.special_notes,
+          crm_system: data.crm_system || "None / Other",
+          google_review_link: googleReviewLink,
+          google_business_url: googleReviewLink,
+          other_lead_sources: trim(data.other_lead_sources),
+          special_notes: trim(data.special_notes),
         },
       };
 
-      await base44.functions.invoke("saveClientCredentials", {
+      const result = await base44.functions.invoke("saveClientCredentials", {
         order_id: order.id,
         install_configuration: installConfig,
       });
+      const payload = readFunctionPayload(result);
+      if (payload?.success === false || payload?.error) {
+        const validationMessage = payload?.validation_errors?.map((item) => item.message).join(" ");
+        throw new Error(validationMessage || payload.error || "Failed to save setup information.");
+      }
 
       try { sessionStorage.removeItem(storageKey); } catch {}
-      onComplete?.();
-    } catch {
-      setError("Failed to save. Please try again.");
+      onComplete?.(payload);
+    } catch (err) {
+      setError(err?.message || "Failed to save. Please try again.");
     } finally {
       setSaving(false);
     }
   };
 
-  // Step 0: Authorization gate
   if (!authorized) {
     return (
       <div className="min-h-screen flex flex-col">
