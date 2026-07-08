@@ -5,7 +5,7 @@
     "status": "CORE_PRODUCTION",
     "reason": "Primary message storage. Immutable. Write in all message flows.",
     "immutable": true,
-    "tenant_scoped": "client_id + client_project_id"
+    "tenant_scoped": "client_id + client_project_id; unmatched inbound evidence allowed when tenant is not resolved yet"
   },
   "properties": {
     "description": {
@@ -150,7 +150,6 @@
     }
   },
   "required": [
-    "lead_id",
     "direction",
     "channel",
     "message_text"
