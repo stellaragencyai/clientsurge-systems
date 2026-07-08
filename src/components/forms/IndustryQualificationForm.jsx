@@ -4,6 +4,7 @@ import { base44 } from '@/api/base44Client';
 import { trackCTA } from '@/lib/analytics';
 import { normalizeIndustryLeadPayload } from '@/lib/normalizeIndustryLeadPayload';
 import FloatingConfirmation from '@/components/ui/FloatingConfirmation';
+import CSConfirmationCard from '@/components/design-system/CSConfirmationCard';
 
 const formatPhone = (value) => {
   const digits = value.replace(/\D/g, '');
@@ -154,15 +155,16 @@ export default function IndustryQualificationForm({ industrySlug = '', industryN
 
   if (submitted) {
     return (
-      <div className="text-center py-10 px-6">
-        <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-5">
-          <CheckCircle2 className="w-8 h-8 text-green-600" />
-        </div>
-        <h3 className="text-2xl font-bold text-foreground mb-2">We'll Be In Touch</h3>
-        <p className="text-muted-foreground text-sm max-w-sm mx-auto leading-relaxed">
-          Your qualification has been received. Our team will review your answers and reach out within one business day to discuss your automation options.
-        </p>
-      </div>
+      <CSConfirmationCard
+        title="We'll Be In Touch"
+        message="Your qualification has been received. Our team will review your answers and reach out within one business day to discuss your automation options."
+        responseTime="within 1 business day"
+        nextSteps={[
+          'Our team reviews your qualification answers',
+          'We reach out to discuss your automation options',
+          'No demos, no sales pressure — just a tailored recommendation',
+        ]}
+      />
     );
   }
 

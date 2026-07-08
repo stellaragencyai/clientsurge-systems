@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
+import CSConfirmationCard from '@/components/design-system/CSConfirmationCard';
 import { base44 } from "@/api/base44Client";
 
 const TIME_SLOTS = [
@@ -217,21 +218,16 @@ export default function DemoBookingInline({
 
   if (success) {
     return (
-      <div className="py-10 flex flex-col items-center text-center">
-        <div className={isLight ? "w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4" : "w-16 h-16 bg-green-500/20 rounded-full flex items-center justify-center mb-4"}>
-          <CheckCircle2 className={isLight ? "w-8 h-8 text-green-700" : "w-8 h-8 text-green-400"} />
-        </div>
-        <h3 className={isLight ? "text-xl font-bold text-[#001B44] mb-2" : "text-xl font-semibold text-white mb-2"}>You're all set.</h3>
-        <p className={isLight ? "text-sm text-slate-600" : "text-sm text-white/50"}>Nolan will confirm your {flowLabel.toLowerCase()} within 24 hours.</p>
-        <p className={isLight ? "mt-3 text-xs text-slate-500 max-w-sm" : "mt-3 text-xs text-white/45 max-w-sm"}>
-          Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.
-        </p>
-        {submitWarnings.length > 0 && (
-          <p className={isLight ? "mt-3 text-xs text-amber-700 max-w-sm" : "mt-3 text-xs text-amber-300 max-w-sm"}>
-            Your request was saved, but one or more follow-up actions still need review.
-          </p>
-        )}
-      </div>
+      <CSConfirmationCard
+        title="You're All Set"
+        message={`Nolan will confirm your ${flowLabel.toLowerCase()} within 24 hours. Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.`}
+        responseTime="within 24 hours"
+        nextSteps={[
+          `Your ${flowLabel.toLowerCase()} request has been received`,
+          'Our team confirms the scheduled time',
+          'You receive a confirmation email with details',
+        ]}
+      />
     );
   }
 

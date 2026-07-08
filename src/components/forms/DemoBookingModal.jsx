@@ -443,20 +443,26 @@ export default function DemoBookingModal({ isOpen = true, onClose, prefillIndust
           <div className="p-6 md:p-8">
             {success ? (
               <div className="flex min-h-[420px] flex-col items-center justify-center text-center">
-                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-emerald-100">
-                  <CheckCircle2 className="h-8 w-8 text-emerald-600" />
+                <div className="mb-5 flex h-16 w-16 items-center justify-center rounded-full" style={{ background: 'linear-gradient(135deg, rgba(0,174,239,0.12), rgba(0,136,204,0.08))', border: '2px solid rgba(0,174,239,0.25)' }}>
+                  <CheckCircle2 className="h-8 w-8" style={{ color: '#00AEEF' }} />
                 </div>
-                <h3 className="text-2xl font-semibold text-slate-950">Audit booked</h3>
+                <h3 className="text-2xl font-semibold text-slate-950">Audit Booked</h3>
                 <p className="mt-3 max-w-sm text-sm leading-6 text-slate-600">
                   {auditCopy.success}
                 </p>
+                <div className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: 'rgba(0,174,239,0.08)', border: '1px solid rgba(0,174,239,0.2)' }}>
+                  <span className="text-xs font-semibold" style={{ color: '#006BB0' }}>
+                    We'll reach out within 24 hours
+                  </span>
+                </div>
                 <p className="mt-3 max-w-sm text-xs leading-5 text-slate-500">
                   Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.
                 </p>
                 <div className="mt-6 flex flex-col gap-3 sm:flex-row">
                   <a
                     href="tel:+16025843227"
-                    className="inline-flex min-h-11 items-center justify-center rounded-full bg-slate-950 px-5 text-sm font-semibold text-white"
+                    className="inline-flex min-h-11 items-center justify-center rounded-full px-5 text-sm font-semibold text-white"
+                    style={{ background: 'linear-gradient(90deg, #0079c1 0%, #005691 100%)' }}
                   >
                     Call now
                   </a>

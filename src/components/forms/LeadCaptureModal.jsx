@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { ArrowRight, ChevronLeft, X, CheckCircle2, User, Building2, Mail, Phone, Loader2 } from 'lucide-react';
 import confetti from 'canvas-confetti';
+import CSSuccessModal from '@/components/design-system/CSSuccessModal';
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const phoneDigits = (value) => String(value || '').replace(/\D/g, '');
@@ -158,7 +159,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         particleCount: 100,
         spread: 70,
         origin: { y: 0.6 },
-        colors: ['#a0714f', '#c8965c', '#f5d9a8', '#6b3f1f'],
+        colors: ['#00AEEF', '#0088CC', '#006BB0', '#003B8F'],
       });
       setShowSuccess(true);
       setTimeout(() => {
@@ -207,28 +208,27 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         onClick={handleClose}
       />
 
-      {/* Success Modal Overlay */}
+      {/* Success Modal */}
       {showSuccess && (
-        <div className="absolute inset-0 flex items-center justify-center z-50">
-          <div className="relative bg-white rounded-3xl shadow-2xl p-8 md:p-12 max-w-md w-full text-center animate-in zoom-in duration-500">
-            <div className="flex justify-center mb-6">
-              <div className="relative">
-                <div className="w-20 h-20 rounded-full bg-gradient-to-br from-amber-400 to-amber-600 flex items-center justify-center animate-bounce">
-                  <CheckCircle2 className="w-10 h-10 text-white" />
-                </div>
-              </div>
-            </div>
-            <h3 className="font-display text-2xl font-semibold text-foreground mb-3">Demo Scheduled!</h3>
-            <p className="text-muted-foreground mb-6">We've got your info. You'll hear from us within 24 hours.</p>
-            <p className="text-xs text-foreground/50">Redirecting...</p>
-          </div>
-        </div>
+        <CSSuccessModal
+          isOpen={showSuccess}
+          onClose={handleClose}
+          title="Demo Scheduled!"
+          message="We've got your info. Our team will reach out to discuss your automation options."
+          responseTime="within 24 hours"
+          nextSteps={[
+            'Our team reviews your information',
+            'We reach out to discuss your automation options',
+            'No demos, no sales pressure — just a tailored recommendation',
+          ]}
+          primaryCTA={{ label: 'Browse AI Systems', to: '/store' }}
+        />
       )}
 
       {/* Modal */}
       <div className={`relative bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[95vh] overflow-y-auto animate-in fade-in zoom-in duration-500 transition-opacity ${showSuccess ? 'opacity-50' : 'opacity-100'}`}>
         {/* Left accent bar */}
-        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-amber-400 via-amber-500 to-amber-600 rounded-l-3xl" />
+        <div className="absolute left-0 top-0 bottom-0 w-1.5 bg-gradient-to-b from-[#00AEEF] via-[#0088CC] to-[#003B8F] rounded-l-3xl" />
 
         {/* Close button */}
         <button
@@ -243,7 +243,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
         <div className="p-5 md:p-6" style={{ opacity: showSuccess ? 0.5 : 1, pointerEvents: showSuccess ? 'none' : 'auto' }}>
            {/* Header with Logo */}
           <div className="flex items-start gap-3 mb-6">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-amber-600 to-amber-800 flex items-center justify-center flex-shrink-0">
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#0088CC] to-[#003B8F] flex items-center justify-center flex-shrink-0">
               <span className="font-display font-bold text-white text-sm">CS</span>
             </div>
             <div>
@@ -274,7 +274,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                  <div>
                    <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Full Name</label>
                    <div className="flex gap-2.5">
-                     <User className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                     <User className="w-4 h-4 text-[#00AEEF] flex-shrink-0 mt-2.5" />
                      <input
                        type="text"
                        name="full_name"
@@ -283,7 +283,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                        onBlur={handleBlur}
                        disabled={loading}
                        placeholder="John Doe"
-                       className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.full_name && touched.full_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                       className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 bg-background transition-all ${errors.full_name && touched.full_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
                      />
                    </div>
                    {errors.full_name && touched.full_name && <p className="text-xs text-red-500 mt-0.5 ml-6.5">{errors.full_name}</p>}
@@ -294,7 +294,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                    <div>
                      <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Business</label>
                      <div className="flex gap-2">
-                       <Building2 className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                       <Building2 className="w-4 h-4 text-[#00AEEF] flex-shrink-0 mt-2.5" />
                        <input
                          type="text"
                          name="business_name"
@@ -303,7 +303,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                          onBlur={handleBlur}
                          disabled={loading}
                          placeholder="Med Spa"
-                         className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.business_name && touched.business_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                         className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 bg-background transition-all ${errors.business_name && touched.business_name ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
                        />
                      </div>
                      {errors.business_name && touched.business_name && <p className="text-xs text-red-500 mt-0.5">{errors.business_name}</p>}
@@ -311,7 +311,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                    <div>
                      <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Phone</label>
                      <div className="flex gap-2">
-                       <Phone className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                       <Phone className="w-4 h-4 text-[#00AEEF] flex-shrink-0 mt-2.5" />
                        <input
                          type="tel"
                          name="phone"
@@ -320,7 +320,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                          onBlur={handleBlur}
                          disabled={loading}
                          placeholder="(555) 1234"
-                         className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.phone && touched.phone ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                         className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 bg-background transition-all ${errors.phone && touched.phone ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
                        />
                      </div>
                      {errors.phone && touched.phone && <p className="text-xs text-red-500 mt-0.5">{errors.phone}</p>}
@@ -331,7 +331,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                  <div>
                    <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-1.5">Email</label>
                    <div className="flex gap-2.5">
-                     <Mail className="w-4 h-4 text-amber-600 flex-shrink-0 mt-2.5" />
+                     <Mail className="w-4 h-4 text-[#00AEEF] flex-shrink-0 mt-2.5" />
                      <input
                        type="email"
                        name="email"
@@ -340,7 +340,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                        onBlur={handleBlur}
                        disabled={loading}
                        placeholder="john@example.com"
-                       className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background transition-all ${errors.email && touched.email ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
+                       className={`flex-1 px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 bg-background transition-all ${errors.email && touched.email ? 'border-red-500 focus:ring-red-500/50' : 'border-border'} disabled:opacity-50 disabled:cursor-not-allowed`}
                      />
                    </div>
                    {errors.email && touched.email && <p className="text-xs text-red-500 mt-0.5 ml-6">{errors.email}</p>}
@@ -358,7 +358,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      value={formData.business_type}
                      onChange={handleInputChange}
                      disabled={loading}
-                     className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all ${errors.business_type && touched.business_type ? 'border-red-500' : 'border-border'}`}
+                     className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all ${errors.business_type && touched.business_type ? 'border-red-500' : 'border-border'}`}
                    >
                      <option value="">Select type</option>
                      <option value="med_spa">Med Spas & Aesthetic Clinics</option>
@@ -378,7 +378,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      value={formData.monthly_leads}
                      onChange={handleInputChange}
                      disabled={loading}
-                     className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-500/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all ${errors.monthly_leads && touched.monthly_leads ? 'border-red-500' : 'border-border'}`}
+                     className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#00AEEF]/50 bg-background disabled:opacity-50 disabled:cursor-not-allowed transition-all ${errors.monthly_leads && touched.monthly_leads ? 'border-red-500' : 'border-border'}`}
                    >
                      <option value="">Select range</option>
                      <option value="1-10">1-10/month</option>
@@ -398,7 +398,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                    <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-2.5">Biggest Issue</label>
                    <div className="space-y-2">
                      {['slow_response', 'missed_calls', 'no_follow_up', 'low_bookings'].map(option => (
-                       <label key={option} className="flex items-center p-2.5 border border-border rounded-lg hover:border-amber-500/50 hover:bg-amber-50/30 cursor-pointer transition-all text-sm" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
+                       <label key={option} className="flex items-center p-2.5 border border-border rounded-lg hover:border-[#00AEEF]/50 hover:bg-[#00AEEF]/5 cursor-pointer transition-all text-sm" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
                          <input
                            type="radio"
                            name="biggest_issue"
@@ -406,7 +406,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                            checked={formData.biggest_issue === option}
                            onChange={handleInputChange}
                            disabled={loading}
-                           className="w-4 h-4 accent-amber-600"
+                           className="w-4 h-4 accent-[#00AEEF]"
                          />
                          <span className="ml-2 text-xs font-medium text-foreground capitalize">
                            {option.replace(/_/g, ' ')}
@@ -421,14 +421,14 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                    <label className="block text-xs font-semibold text-foreground/70 uppercase tracking-wide mb-2.5">Lead Sources</label>
                    <div className="space-y-2">
                      {['Instagram', 'Website', 'Ads', 'Calls'].map(source => (
-                       <label key={source} className="flex items-center p-2.5 border border-border rounded-lg hover:border-amber-500/50 hover:bg-amber-50/30 cursor-pointer transition-all text-sm" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
+                       <label key={source} className="flex items-center p-2.5 border border-border rounded-lg hover:border-[#00AEEF]/50 hover:bg-[#00AEEF]/5 cursor-pointer transition-all text-sm" style={{opacity: loading ? 0.5 : 1, pointerEvents: loading ? 'none' : 'auto'}}>
                          <input
                            type="checkbox"
                            value={source.toLowerCase()}
                            checked={formData.lead_source.includes(source.toLowerCase())}
                            onChange={handleCheckboxChange}
                            disabled={loading}
-                           className="w-4 h-4 rounded accent-amber-600"
+                           className="w-4 h-4 rounded accent-[#00AEEF]"
                          />
                          <span className="ml-2 text-xs font-medium text-foreground">{source}</span>
                        </label>
@@ -448,7 +448,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                      }}
                      disabled={loading}
                      required
-                     className="mt-0.5 h-4 w-4 rounded accent-amber-600"
+                     className="mt-0.5 h-4 w-4 rounded accent-[#00AEEF]"
                    />
                    <span>
                      I agree to receive automated SMS and email messages from ClientSurge Systems about my inquiry.
@@ -471,7 +471,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                 type="button"
                 onClick={() => setStep(step - 1)}
                 disabled={step === 1 || loading}
-                className="flex items-center gap-1 px-4 py-2 text-xs font-medium text-foreground hover:text-amber-700 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="flex items-center gap-1 px-4 py-2 text-xs font-medium text-foreground hover:text-[#006BB0] disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 Back
@@ -483,7 +483,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                   onClick={() => { if (validateStep(step)) setStep(step + 1); }}
                   disabled={step === 1 ? !canProceedStep1 : !canProceedStep2 || loading}
                   className="ml-auto flex items-center gap-1.5 px-6 py-2 rounded-full font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
-                  style={{background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)'}}
+                  style={{background: 'linear-gradient(90deg, #0079c1 0%, #005691 100%)'}}
                 >
                   Next
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -493,7 +493,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                   type="submit"
                   disabled={!canSubmit || loading}
                   className="ml-auto flex items-center gap-1.5 px-6 py-2 rounded-full font-semibold text-sm transition-all disabled:opacity-50 disabled:cursor-not-allowed text-primary-foreground"
-                  style={{background: 'linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)'}}
+                  style={{background: 'linear-gradient(90deg, #0079c1 0%, #005691 100%)'}}
                 >
                   {loading ? <><Loader2 className="w-3.5 h-3.5 animate-spin" /> Submitting…</> : <>Schedule <ArrowRight className="w-3.5 h-3.5" /></>}
                 </button>
@@ -514,7 +514,7 @@ export default function LeadCaptureModal({ isOpen, onClose, onSuccess }) {
                   <div
                     key={dot}
                     className={`h-1.5 rounded-full transition-all ${
-                      dot <= step ? 'w-6 bg-amber-600' : 'w-1.5 bg-border'
+                      dot <= step ? 'w-6 bg-[#00AEEF]' : 'w-1.5 bg-border'
                     }`}
                   />
                 ))}

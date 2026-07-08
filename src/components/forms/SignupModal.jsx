@@ -2,6 +2,7 @@ import { useState } from "react";
 import { createPortal } from "react-dom";
 import { X, ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
+import CSSuccessModal from '@/components/design-system/CSSuccessModal';
 
 const PAID_ORDER_REQUIRED_MESSAGE =
   "We could not find a paid ClientSurge order for that email yet. Finish checkout first, then create your portal account with the same email.";
@@ -104,21 +105,8 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
 
         {/* Success */}
         {success ? (
-          <div className="px-8 py-12 flex flex-col items-center text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-5">
-              <CheckCircle2 className="w-8 h-8 text-green-600" />
-            </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">Account Linked!</h3>
-            <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-              If this email was not already registered, check your inbox for an activation link. Once your account is active you can log in to your client portal and track your system setup.
-            </p>
-            <button
-              onClick={onClose}
-              style={{ background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)", borderRadius: "9999px", boxShadow: "0 4px 18px rgba(120,70,20,0.35)" }}
-              className="h-11 px-8 flex items-center gap-2 text-sm font-bold text-amber-100 hover:opacity-90 transition"
-            >
-              Done
-            </button>
+          <div className="px-8 py-16 flex flex-col items-center justify-center text-center">
+            <p className="text-sm text-muted-foreground">Redirecting...</p>
           </div>
         ) : (
           <form onSubmit={handleSubmit} className="px-8 py-6 space-y-4">
@@ -181,6 +169,21 @@ export default function SignupModal({ onClose, onSwitchToLogin }) {
           </form>
         )}
       </div>
+      {success && (
+        <CSSuccessModal
+          isOpen={success}
+          onClose={onClose}
+          title="Account Linked!"
+          message="Check your inbox for an activation link. Once your account is active, you can log in to your client portal and track your system setup."
+          responseTime="within 1 business day"
+          nextSteps={[
+            'Check your email for an activation link',
+            'Click the link to verify your account',
+            'Log in to your client portal to track setup',
+          ]}
+          primaryCTA={{ label: 'Go to Client Portal', to: '/client-portal' }}
+        />
+      )}
       </div>
     </div>,
     document.body
