@@ -6,11 +6,13 @@ export default function MobileBottomNav() {
   const navigate = useNavigate();
 
   const tabs = [
-    { icon: LayoutDashboard, label: "Dashboard", path: "/client-dashboard" },
-    { icon: Package, label: "Services", path: "/client-dashboard?tab=services" },
-    { icon: Headphones, label: "Support", path: "/client-dashboard?tab=support" },
+    { icon: LayoutDashboard, label: "Dashboard", path: "/client-portal" },
+    { icon: Package, label: "Systems", path: "/client-portal?tab=services" },
+    { icon: Headphones, label: "Support", path: "/contact" },
     { icon: Home, label: "Home", path: "/" },
   ];
+
+  const currentPath = `${location.pathname}${location.search || ""}`;
 
   return (
     <>
@@ -32,13 +34,18 @@ export default function MobileBottomNav() {
           .mobile-bottom-nav { display: flex; }
         }
       `}</style>
-      <div className="mobile-bottom-nav">
+      <nav className="mobile-bottom-nav" aria-label="Client dashboard mobile navigation">
         {tabs.map((tab) => {
           const Icon = tab.icon;
-          const isActive = location.pathname === tab.path;
+          const isActive = tab.path === "/client-portal"
+            ? location.pathname === "/client-portal" && !location.search
+            : currentPath === tab.path || location.pathname === tab.path;
           return (
             <button
               key={tab.label}
+              type="button"
+              aria-label={tab.label}
+              aria-current={isActive ? "page" : undefined}
               onClick={() => navigate(tab.path)}
               style={{
                 flex: 1,
@@ -56,14 +63,14 @@ export default function MobileBottomNav() {
                 transition: "color 0.2s ease",
               }}
             >
-              <Icon style={{ width: "20px", height: "20px" }} />
+              <Icon style={{ width: "20px", height: "20px" }} aria-hidden="true" />
               <span style={{ fontSize: "10px", fontWeight: "600" }}>
                 {tab.label}
               </span>
             </button>
           );
         })}
-      </div>
+      </nav>
     </>
   );
 }
