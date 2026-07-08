@@ -17,18 +17,24 @@ const SCOPES = [
   { key: "client_go_live_approval", label: "Client go-live approval", desc: "You approve the system before it goes live" },
 ];
 
-export default function SetupAuthorizationStep({ order, onAuthorized }) {
+function parseError(err) {
+  const data = err?.data || err?.response?.data || err || {};
+  const suffix = data.request_id ? ` Reference: ${data.request_id}` : "";
+  return `${data.error || data.message || err?.message || "Failed to save authorization. Please try again."}${suffix}`;
+}
+
+export default function SetupAuthorizationStep({ order, setupToken = "", onAuthorized }) {
   const [accepted, setAccepted] = useState(false);
   const [acceptedScopes, setAcceptedScopes] = useState({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState("");
 
+  const effectiveSetupToken = setupToken || order?.setup_token || "";
   const allScopesChecked = SCOPES.every((s) => acceptedScopes[s.key]);
 
   const handleToggleAll = () => {
-    if (allScopesChecked) {
-      setAcceptedScopes({});
-    } else {
+    if (allScopesChecked) setAcceptedScopes({});
+    else {
       const all = {};
       SCOPES.forEach((s) => (all[s.key] = true));
       setAcceptedScopes(all);
@@ -48,6 +54,7 @@ export default function SetupAuthorizationStep({ order, onAuthorized }) {
       const scopes = Object.keys(acceptedScopes).filter((k) => acceptedScopes[k]);
       await base44.functions.invoke("saveSetupAuthorization", {
         order_id: order.id,
+        token: effectiveSetupToken,
         client_id: order.client_id || "",
         client_project_id: order.client_project_id || "",
         accepted_scopes: scopes,
@@ -55,8 +62,8 @@ export default function SetupAuthorizationStep({ order, onAuthorized }) {
         business_name: order.business_name,
       });
       onAuthorized?.();
-    } catch {
-      setError("Failed to save authorization. Please try again.");
+    } catch (err) {
+      setError(parseError(err));
     } finally {
       setSaving(false);
     }
@@ -80,75 +87,34 @@ export default function SetupAuthorizationStep({ order, onAuthorized }) {
       <div className="space-y-3">
         <div className="flex items-center justify-between">
           <p className="text-sm font-semibold text-foreground">Authorization Scopes</p>
-          <button
-            type="button"
-            onClick={handleToggleAll}
-            className="text-xs font-semibold text-primary hover:underline"
-          >
+          <button type="button" onClick={handleToggleAll} className="text-xs font-semibold text-primary hover:underline">
             {allScopesChecked ? "Uncheck all" : "Check all"}
           </button>
         </div>
 
         {SCOPES.map((scope) => (
-          <label
-            key={scope.key}
-            className="flex items-start gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 cursor-pointer transition-colors"
-          >
-            <input
-              type="checkbox"
-              checked={!!acceptedScopes[scope.key]}
-              onChange={(e) => setAcceptedScopes((prev) => ({ ...prev, [scope.key]: e.target.checked }))}
-              className="mt-1 w-4 h-4 rounded border-border"
-            />
-            <div>
-              <p className="text-sm font-medium text-foreground">{scope.label}</p>
-              <p className="text-xs text-muted-foreground">{scope.desc}</p>
-            </div>
+          <label key={scope.key} className="flex items-start gap-3 p-3 rounded-xl border border-border hover:bg-muted/30 cursor-pointer transition-colors">
+            <input type="checkbox" checked={!!acceptedScopes[scope.key]} onChange={(e) => setAcceptedScopes((prev) => ({ ...prev, [scope.key]: e.target.checked }))} className="mt-1 w-4 h-4 rounded border-border" />
+            <div><p className="text-sm font-medium text-foreground">{scope.label}</p><p className="text-xs text-muted-foreground">{scope.desc}</p></div>
           </label>
         ))}
       </div>
 
       <label className="flex items-start gap-3 p-4 rounded-xl border-2 border-border cursor-pointer hover:bg-muted/30 transition-colors">
-        <input
-          type="checkbox"
-          checked={accepted}
-          onChange={(e) => setAccepted(e.target.checked)}
-          className="mt-0.5 w-5 h-5 rounded border-border"
-        />
+        <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className="mt-0.5 w-5 h-5 rounded border-border" />
         <div>
-          <p className="text-sm font-semibold text-foreground">
-            I confirm that I am authorized to grant this access on behalf of {order.business_name || "my business"}.
-          </p>
-          <p className="text-xs text-muted-foreground mt-1">
-            By checking this box, I accept the Setup Authorization Agreement (v{AGREEMENT_VERSION}) and grant ClientSurge Systems
-            permission to perform the actions described above for the purpose of setting up and testing my automation system.
-          </p>
+          <p className="text-sm font-semibold text-foreground">I confirm that I am authorized to grant this access on behalf of {order.business_name || "my business"}.</p>
+          <p className="text-xs text-muted-foreground mt-1">By checking this box, I accept the Setup Authorization Agreement (v{AGREEMENT_VERSION}) and grant ClientSurge Systems permission to perform the actions described above for the purpose of setting up and testing my automation system.</p>
         </div>
       </label>
 
-      {error && (
-        <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700">
-          <AlertCircle className="w-4 h-4 flex-shrink-0" />
-          {error}
-        </div>
-      )}
+      {error && <div className="flex items-center gap-2 rounded-xl border border-red-200 bg-red-50 p-3 text-sm text-red-700"><AlertCircle className="w-4 h-4 flex-shrink-0" />{error}</div>}
 
-      <button
-        onClick={handleSubmit}
-        disabled={saving || !accepted || !allScopesChecked}
-        className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50"
-        style={{ background: "linear-gradient(135deg,#00AEEF,#003B8F)" }}
-      >
-        {saving ? (
-          <><Loader2 className="w-4 h-4 animate-spin" /> Saving Authorization...</>
-        ) : (
-          <><CheckCircle2 className="w-4 h-4" /> Accept & Continue to Setup</>
-        )}
+      <button onClick={handleSubmit} disabled={saving || !accepted || !allScopesChecked} className="w-full flex items-center justify-center gap-2 px-6 py-3 rounded-xl text-sm font-semibold text-white transition-all disabled:opacity-50" style={{ background: "linear-gradient(135deg,#00AEEF,#003B8F)" }}>
+        {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Saving Authorization...</> : <><CheckCircle2 className="w-4 h-4" /> Accept & Continue to Setup</>}
       </button>
 
-      <p className="text-center text-xs text-muted-foreground">
-        You cannot proceed to business details, access setup, or any later step until this agreement is accepted.
-      </p>
+      <p className="text-center text-xs text-muted-foreground">You cannot proceed to business details, access setup, or any later step until this agreement is accepted.</p>
     </div>
   );
 }
