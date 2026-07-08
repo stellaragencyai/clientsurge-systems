@@ -34,6 +34,7 @@ jobs:
         env:
           CLIENTSURGE_PRODUCT_SIGNUP_SMOKE_BASE_URL: https://clientsurgesystems.com
           PRODUCT_SIGNUP_SMOKE_STRICT_HTTP: '1'
+          PRODUCT_SIGNUP_SMOKE_REQUIRE_BUILT_FALLBACK: '0'
         run: node scripts/product-signup-route-smoke.mjs
 
       - name: Live monitor summary
@@ -43,6 +44,6 @@ jobs:
           echo "- Domain: https://clientsurgesystems.com" >> "$GITHUB_STEP_SUMMARY"
           echo "- Required route: /product-signup" >> "$GITHUB_STEP_SUMMARY"
           echo "- Package variants: growth, starter, pro" >> "$GITHUB_STEP_SUMMARY"
-          echo "- This monitor checks the live production URL, not only the built GitHub source." >> "$GITHUB_STEP_SUMMARY"
-          echo "- It now runs manually, every six hours, and after main branch pushes." >> "$GITHUB_STEP_SUMMARY"
+          echo "- This monitor checks the live production URL only; build fallback proof belongs to Release Proof after npm build." >> "$GITHUB_STEP_SUMMARY"
+          echo "- It runs manually, every six hours, and after main branch pushes." >> "$GITHUB_STEP_SUMMARY"
           echo "- If this fails while Release Gate passes, Base44 publish/sync is the likely gap." >> "$GITHUB_STEP_SUMMARY"
