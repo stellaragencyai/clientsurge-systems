@@ -1,273 +1,240 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import {
+  normalizeInstallConfiguration,
+  resolvePackageKey,
+  validateInstallConfiguration,
+} from '../_shared/setupPayloadContract.ts';
 
 /**
  * saveClientCredentials
- * Called when a client submits the /setup/credentials wizard.
+ * Called when a client submits /setup/credentials.
  *
- * This function intentionally accepts the wizard's public payload shape and
- * normalizes it into the canonical install_configuration structure. Do not add
- * hidden required fields here unless the wizard visibly collects them.
+ * Hardened guarantees:
+ * - Validates against the same visible required fields as the wizard.
+ * - Accepts legacy/canonical aliases instead of rejecting valid submissions.
+ * - Saves first, then reports readiness blockers separately.
+ * - Auto-creates ClientInstallationOS if it is missing.
+ * - Creates an AuditLog event for credentials submission.
+ * - Enforces setup authorization + owner/admin access.
  */
 
-const REQUIRED_FIELDS_BY_TIER = {
-  starter_system: ["business_name", "business_phone", "booking_link", "lead_notification_email"],
-  growth_system: ["business_name", "business_phone", "booking_link", "lead_notification_email"],
-  pro_system: ["business_name", "business_phone", "booking_link", "lead_notification_email"],
-  elite_system: ["business_name", "business_phone", "booking_link", "lead_notification_email"],
-};
+function getAppUrl() {
+  return Deno.env.get("APP_URL") || Deno.env.get("VITE_BASE44_APP_BASE_URL") || "https://clientsurgesystems.com";
+}
 
-const FIELD_MESSAGES = {
-  business_name: "Business name is required for SMS personalization",
-  business_phone: "Business phone is required for Twilio SMS setup",
-  booking_link: "Booking link is required for the AI Booking Agent",
-  lead_notification_email: "Lead notification email is required for notifications",
-  website_url: "Website URL is required for Growth setup",
-  google_business_url: "Google Business Profile URL is required for review request setup",
-  industry: "Industry selection is required for AI template generation",
-  tone_of_voice: "Brand voice is required for AI-personalized messaging",
-};
-
-function json(data: Record<string, unknown>, status = 200) {
+function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
     status,
     headers: {
       "Content-Type": "application/json",
       "Cache-Control": "no-store",
       "X-Frame-Options": "DENY",
+      "X-Request-ID": data?.request_id || "",
     },
   });
 }
 
-function getAppUrl() {
-  return Deno.env.get("APP_URL") || Deno.env.get("VITE_BASE44_APP_BASE_URL") || "https://clientsurgesystems.com";
+function isAdmin(user) {
+  return user?.role === "admin" || user?.role === "super_admin";
 }
 
-function resolvePackageKey(raw: unknown) {
-  if (!raw) return null;
-  const k = String(raw).toLowerCase().trim();
-  if (k.includes("pro") || k.includes("elite")) return "pro_system";
-  if (k.includes("growth")) return "growth_system";
-  return "starter_system";
+function cleanEmail(value) {
+  return String(value || "").trim().toLowerCase();
 }
 
-function firstNonEmpty(...values: unknown[]) {
-  for (const value of values) {
-    if (typeof value === "string" && value.trim()) return value.trim();
-    if (value !== undefined && value !== null && typeof value !== "string") return value;
+function safeStringify(value) {
+  try {
+    return JSON.stringify(value ?? null);
+  } catch {
+    return "null";
   }
-  return "";
 }
 
-function getRequiredFieldValue(field: string, config: any = {}) {
-  const brand = config.brand || {};
-  const shared = config.shared || {};
-  const messaging = config.messaging || {};
-  const integrations = config.integrations || {};
-  const services = config.services || {};
+async function ensureInstallationOS(base44, order, normalizedConfig, requestId) {
+  const existing = await base44.asServiceRole.entities.ClientInstallationOS.filter(
+    { order_id: order.id },
+    "-created_date",
+    1
+  ).catch(() => []);
 
-  const aliases: Record<string, unknown[]> = {
-    business_name: [brand.business_name, config.business_name],
-    business_phone: [brand.business_phone, shared.business_phone, shared.twilio_business_phone, config.business_phone],
-    booking_link: [messaging.booking_link, services.ai_booking_agent?.booking_link, config.booking_link],
-    lead_notification_email: [messaging.lead_notification_email, config.lead_notification_email],
-    website_url: [brand.website_url, brand.website, config.website_url, config.website],
-    google_business_url: [integrations.google_business_url, integrations.google_review_link, services.review_request?.review_link, config.google_business_url],
-    industry: [brand.industry, config.industry],
-    tone_of_voice: [brand.tone_of_voice, brand.brand_voice, config.tone_of_voice, config.brand_voice],
+  const payload = {
+    order_id: order.id,
+    client_id: order.client_id || "",
+    client_project_id: order.client_project_id || "",
+    client_email: order.customer_email,
+    business_name: normalizedConfig.brand?.business_name || order.business_name || order.customer_email,
+    workflow_stage: "website_building",
+    website_status: "not_started",
+    activation_status: "not_ready",
+    activation_eligible: false,
+    missing_requirements: [],
+    activation_blockers: [],
+    next_required_action: {
+      action_type: "configure_integration",
+      description: "Review submitted credentials and begin installation setup.",
+      estimated_time_minutes: 15,
+    },
+    integration_readiness: {
+      sms_ready: Boolean(normalizedConfig.shared?.twilio_business_phone),
+      email_ready: Boolean(normalizedConfig.messaging?.lead_notification_email || normalizedConfig.brand?.business_email),
+      booking_link_ready: Boolean(normalizedConfig.messaging?.booking_link),
+      lead_form_connected: false,
+      webhooks_verified: false,
+    },
+    checklist_completion_percent: 10,
+    admin_notes: `Credentials submitted. request_id=${requestId}`,
+    last_readiness_check_at: new Date().toISOString(),
+    environment: order.environment || "production",
+    dashboard_truth_status: "warning",
+    dashboard_truth_notes: "Credentials received; installation proof pending.",
   };
 
-  return firstNonEmpty(...(aliases[field] || [config[field]]));
+  if (existing?.length > 0) {
+    await base44.asServiceRole.entities.ClientInstallationOS.update(existing[0].id, payload)
+      .catch((e) => console.warn(`[saveClientCredentials] ClientInstallationOS update failed: ${e.message}`));
+    return existing[0].id;
+  }
+
+  const created = await base44.asServiceRole.entities.ClientInstallationOS.create(payload)
+    .catch((e) => {
+      console.warn(`[saveClientCredentials] ClientInstallationOS create failed: ${e.message}`);
+      return null;
+    });
+  return created?.id || null;
+}
+
+async function createSubmissionAuditLog(base44, order, normalizedConfig, currentUser, requestId, readiness) {
+  await base44.asServiceRole.entities.AuditLog.create({
+    admin_email: currentUser?.email || order.customer_email || "system@clientsurgesystems.com",
+    action: "credentials_submitted",
+    entity_name: "Order",
+    record_id: order.id,
+    before: safeStringify({ install_configuration_present: Boolean(order.install_configuration), install_configuration_updated_at: order.install_configuration_updated_at || null }),
+    after: safeStringify({
+      request_id: requestId,
+      business_name: normalizedConfig.brand?.business_name || order.business_name,
+      client_email: order.customer_email,
+      readiness_blockers: readiness?.blockers || [],
+      ready_to_activate: Boolean(readiness?.ready_to_activate),
+    }),
+    timestamp: new Date().toISOString(),
+    notes: "Setup credentials submitted through /setup/credentials. Readiness blockers are non-blocking and must be handled in install review.",
+  }).catch((e) => console.warn(`[saveClientCredentials] AuditLog create failed: ${e.message}`));
 }
 
 Deno.serve(async (req) => {
+  const requestId = crypto.randomUUID();
+
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
     const { order_id, install_configuration, admin_bypass } = body;
 
-    if (!order_id) return json({ error: "order_id required" }, 400);
-    if (!install_configuration) return json({ error: "install_configuration required" }, 400);
+    if (!order_id) return json({ error: "order_id required", request_id: requestId }, 400);
+    if (!install_configuration) return json({ error: "install_configuration required", request_id: requestId }, 400);
 
-    let isAdminBypass = false;
-    if (admin_bypass === true) {
-      const user = await base44.auth.me().catch(() => null);
-      if (!user || (user.role !== "admin" && user.role !== "super_admin")) {
-        return json({ error: "admin_bypass requires admin role" }, 403);
-      }
-      isAdminBypass = true;
-      console.log(`[saveClientCredentials] Admin bypass by ${user.email} for order ${order_id}`);
+    const currentUser = await base44.auth.me().catch(() => null);
+    const requestedAdminBypass = admin_bypass === true;
+
+    if (requestedAdminBypass && !isAdmin(currentUser)) {
+      return json({ error: "admin_bypass requires admin role", request_id: requestId }, 403);
     }
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
-    if (!order) return json({ error: "Order not found" }, 404);
+    if (!order) return json({ error: "Order not found", request_id: requestId }, 404);
 
-    if (!isAdminBypass) {
+    const userEmail = cleanEmail(currentUser?.email);
+    const orderEmail = cleanEmail(order.customer_email);
+    if (!isAdmin(currentUser) && userEmail && orderEmail && userEmail !== orderEmail) {
+      return json({ error: "This setup link does not belong to the signed-in account.", code: "setup_link_email_mismatch", request_id: requestId }, 403);
+    }
+
+    if (!requestedAdminBypass) {
       const authCheck = await base44.asServiceRole.entities.SetupAuthorization.filter(
-        { order_id, authorization_status: "accepted" },
-        "-created_date",
-        1
+        { order_id, authorization_status: "accepted" }, "-created_date", 1
       ).catch(() => []);
       if (!authCheck || authCheck.length === 0) {
-        return json({ error: "Setup Authorization Agreement must be accepted before submitting setup data.", code: "authorization_required" }, 403);
+        return json({ error: "Setup Authorization Agreement must be accepted before submitting setup data.", code: "authorization_required", request_id: requestId }, 403);
       }
     }
 
-    const pkgKey = resolvePackageKey(order.package_key || order.package_type || order.selected_package_type);
-    const requiredFields = REQUIRED_FIELDS_BY_TIER[pkgKey as keyof typeof REQUIRED_FIELDS_BY_TIER] || REQUIRED_FIELDS_BY_TIER.starter_system;
+    const pkgKey = resolvePackageKey(order.package_key || order.package_type || order.selected_package_type || order.pricing_summary?.package_key);
+    const validationErrors = validateInstallConfiguration(install_configuration, pkgKey, requestedAdminBypass);
 
-    if (!isAdminBypass) {
-      const validationErrors = [];
-      for (const field of requiredFields) {
-        const value = getRequiredFieldValue(field, install_configuration);
-        if (!value || (typeof value === "string" && !value.trim())) {
-          validationErrors.push({
-            field,
-            message: FIELD_MESSAGES[field as keyof typeof FIELD_MESSAGES] || `${field} is required`,
-          });
-        }
-      }
-
-      if (validationErrors.length > 0) {
-        return json({
-          error: `Missing required fields: ${validationErrors.map(e => e.field).join(", ")}`,
-          validation_errors: validationErrors,
-        }, 400);
-      }
+    if (validationErrors.length > 0) {
+      return json({
+        error: `Missing required fields: ${validationErrors.map(e => e.field).join(", ")}`,
+        validation_errors: validationErrors,
+        request_id: requestId,
+      }, 400);
     }
 
-    const brand = install_configuration.brand || {};
-    const shared = install_configuration.shared || {};
-    const messaging = install_configuration.messaging || {};
-    const integrations = install_configuration.integrations || {};
-    const services = install_configuration.services || {};
-
-    const businessPhone = firstNonEmpty(brand.business_phone, shared.business_phone, shared.twilio_business_phone);
-    const twilioBusinessPhone = firstNonEmpty(shared.twilio_business_phone, businessPhone);
-    const bookingLink = firstNonEmpty(messaging.booking_link, services.ai_booking_agent?.booking_link);
-    const reviewLink = firstNonEmpty(integrations.google_business_url, integrations.google_review_link, services.review_request?.review_link, brand.google_business_url);
-    const toneOfVoice = firstNonEmpty(brand.tone_of_voice, brand.brand_voice);
-    const websiteUrl = firstNonEmpty(brand.website_url, brand.website);
-
-    const normalizedConfig = {
-      ...install_configuration,
-      shared: {
-        ...shared,
-        business_phone: businessPhone,
-        twilio_business_phone: twilioBusinessPhone,
-        business_hours: shared.business_hours || brand.business_hours || "",
-      },
-      services: {
-        ...services,
-        ai_booking_agent: {
-          ...(services.ai_booking_agent || {}),
-          booking_link: bookingLink,
-          booking_mode: services.ai_booking_agent?.booking_mode || "external_link",
-        },
-        review_request: {
-          ...(services.review_request || {}),
-          review_link: reviewLink,
-        },
-      },
-      brand: {
-        ...brand,
-        business_phone: businessPhone,
-        website_url: websiteUrl,
-        website: brand.website || websiteUrl,
-        tone_of_voice: toneOfVoice,
-        brand_voice: brand.brand_voice || toneOfVoice,
-        google_business_url: brand.google_business_url || reviewLink,
-        logo_url: brand.logo_url || "",
-        primary_color: brand.primary_color || "#00AEEF",
-        secondary_color: brand.secondary_color || "#003B8F",
-      },
-      messaging: {
-        ...messaging,
-        booking_link: bookingLink,
-      },
-      integrations: {
-        ...integrations,
-        google_business_url: reviewLink,
-        google_review_link: integrations.google_review_link || reviewLink,
-      },
-    };
+    const normalizedConfig = normalizeInstallConfiguration(install_configuration);
+    const previousHandoff = order.purchase_onboarding_handoff || {};
 
     await base44.asServiceRole.entities.Order.update(order_id, {
       install_configuration: normalizedConfig,
       install_configuration_updated_at: new Date().toISOString(),
+      purchase_onboarding_handoff: {
+        ...previousHandoff,
+        credentials_draft: null,
+        credentials_submitted_at: new Date().toISOString(),
+        credentials_request_id: requestId,
+      },
+      pipeline_status: order.pipeline_status === "Live" ? order.pipeline_status : "Ready for Install",
+      order_status: order.order_status === "fully_live" ? order.order_status : "paid_setup_in_progress",
     });
-    console.log(`[saveClientCredentials] install_configuration saved for order ${order_id}`);
+    console.log(`[saveClientCredentials] Saved install_configuration for order ${order_id}; request_id=${requestId}`);
 
-    const existing = await base44.asServiceRole.entities.ClientInstallationOS.filter(
-      { order_id },
-      "-created_date",
-      1
-    ).catch(() => []);
-
-    if (existing?.length > 0) {
-      await base44.asServiceRole.entities.ClientInstallationOS.update(existing[0].id, {
-        workflow_stage: "website_building",
-      }).catch((error) => console.warn(`[saveClientCredentials] workflow_stage update failed: ${error.message}`));
-      console.log("[saveClientCredentials] workflow_stage → website_building");
-    }
+    const installationOsId = await ensureInstallationOS(base44, { ...order, id: order_id }, normalizedConfig, requestId);
 
     let intelligenceResult = null;
     try {
       intelligenceResult = await base44.asServiceRole.functions.invoke("aiOnboardingIntelligence", { order_id });
-      console.log(`[saveClientCredentials] pre-flight check: ready=${intelligenceResult?.ready_to_activate}, blockers=${intelligenceResult?.blockers?.length || 0}`);
-    } catch (error) {
-      console.warn(`[saveClientCredentials] aiOnboardingIntelligence warning: ${error.message}`);
+      console.log(`[saveClientCredentials] pre-flight: ready=${intelligenceResult?.ready_to_activate}, blockers=${intelligenceResult?.blockers?.length || 0}; request_id=${requestId}`);
+    } catch (e) {
+      intelligenceResult = { ready_to_activate: false, blockers: [`aiOnboardingIntelligence warning: ${e.message}`], auto_filled: [] };
+      console.warn(`[saveClientCredentials] aiOnboardingIntelligence warning: ${e.message}; request_id=${requestId}`);
     }
 
-    let activationDeferredReason = null;
-    if (intelligenceResult?.ready_to_activate) {
-      activationDeferredReason = "Legacy aiPackageOrchestrator is retired. Continue activation from the canonical install workspace.";
-      console.log(`[saveClientCredentials] ${activationDeferredReason}`);
-    } else {
-      console.log(`[saveClientCredentials] activation deferred — blockers present: ${(intelligenceResult?.blockers || []).join(", ")}`);
-    }
+    await createSubmissionAuditLog(base44, { ...order, id: order_id }, normalizedConfig, currentUser, requestId, intelligenceResult);
 
     try {
       const adminEmail = Deno.env.get("ADMIN_NOTIFICATION_EMAIL") || "nolan@clientsurgesystems.com";
       const appUrl = getAppUrl();
       const blockers = intelligenceResult?.blockers || [];
-      const autoFilled = intelligenceResult?.auto_filled || [];
+      const isReady = intelligenceResult?.ready_to_activate;
 
       await base44.asServiceRole.integrations.Core.SendEmail({
         to: adminEmail,
         from_name: "ClientSurge Systems",
-        subject: `✅ Setup Credentials Submitted — ${order.business_name}`,
-        body: `
-<div style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;max-width:600px;margin:0 auto;padding:32px 20px;">
-  <h2 style="color:#0A1628;margin:0 0 16px;">Credentials Submitted</h2>
-  <p style="color:#555;margin:0 0 20px;"><strong>${order.business_name}</strong> (${order.customer_email}) just completed their setup intake form.</p>
-
-  <div style="background:${intelligenceResult?.ready_to_activate ? "#f0fdf4" : "#fffbeb"};border:1px solid ${intelligenceResult?.ready_to_activate ? "#86efac" : "#fcd34d"};border-radius:10px;padding:16px;margin-bottom:20px;">
-    <p style="font-weight:700;color:${intelligenceResult?.ready_to_activate ? "#16a34a" : "#92400e"};margin:0 0 8px;">
-      ${intelligenceResult?.ready_to_activate ? "✅ Ready for Canonical Install Review" : "⚠️ Activation Deferred — Blockers Found"}
-    </p>
-    ${blockers.length > 0 ? `<ul style="margin:0;padding-left:20px;color:#92400e;font-size:13px;">${blockers.map((blocker) => `<li>${blocker}</li>`).join("")}</ul>` : ""}
-    ${autoFilled.length > 0 ? `<p style="font-size:13px;color:#555;margin:8px 0 0;">Auto-filled: ${autoFilled.join(", ")}</p>` : ""}
-    ${activationDeferredReason ? `<p style="font-size:13px;color:#166534;margin:8px 0 0;">${activationDeferredReason}</p>` : ""}
-  </div>
-
-  <a href="${appUrl}/admin/onboarding" style="display:inline-block;background:#0A1628;color:#fff;padding:12px 28px;border-radius:9999px;text-decoration:none;font-weight:600;font-size:14px;">View in Admin →</a>
-</div>`,
+        subject: `✅ Credentials Submitted — ${order.business_name || order.customer_email}`,
+        body: `<div style="font-family:sans-serif;max-width:600px;padding:32px 20px;">
+          <h2 style="color:#0A1628;">Credentials Submitted</h2>
+          <p><strong>${order.business_name}</strong> (${order.customer_email}) completed the setup intake.</p>
+          <p><strong>Request ID:</strong> ${requestId}</p>
+          <p style="color:${isReady ? "#16a34a" : "#92400e"};font-weight:bold;">
+            ${isReady ? "✅ Ready for install review" : "⚠️ Blockers found — review required"}
+          </p>
+          ${blockers.length > 0 ? `<ul>${blockers.map(b => `<li>${b}</li>`).join("")}</ul>` : ""}
+          <a href="${appUrl}/admin/onboarding" style="display:inline-block;background:#0A1628;color:#fff;padding:12px 28px;border-radius:9999px;text-decoration:none;font-weight:600;font-size:14px;">View in Admin →</a>
+        </div>`,
       });
-    } catch (error) {
-      console.warn(`[saveClientCredentials] admin notification failed: ${error.message}`);
+    } catch (e) {
+      console.warn(`[saveClientCredentials] Admin notification failed: ${e.message}; request_id=${requestId}`);
     }
 
     return json({
       success: true,
+      request_id: requestId,
+      installation_os_id: installationOsId,
       ready_to_activate: intelligenceResult?.ready_to_activate || false,
       blockers: intelligenceResult?.blockers || [],
       auto_filled: intelligenceResult?.auto_filled || [],
-      activation_launched: false,
-      activation_deferred_reason: activationDeferredReason,
       redirect_to: `/setup/status/${order_id}`,
     });
-  } catch (error) {
-    console.error("[saveClientCredentials] Error:", error.message);
-    return json({ error: error.message }, 500);
+  } catch (err) {
+    console.error(`[saveClientCredentials] Error: ${err.message}; request_id=${requestId}`);
+    return json({ error: err.message, request_id: requestId }, 500);
   }
 });
