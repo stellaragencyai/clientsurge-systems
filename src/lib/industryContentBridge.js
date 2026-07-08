@@ -32,6 +32,22 @@ export const INDUSTRY_RESOLUTION_STATUS = {
   NOT_FOUND: 'not_found',
 };
 
+function deriveIndustryName(displayName = '', slug = '') {
+  const clean = displayName
+    .replace(/\s+AI\s+Growth\s+System$/i, '')
+    .replace(/\s+Growth\s+System$/i, '')
+    .trim();
+
+  if (clean) return clean;
+
+  return slug
+    .replace(/-ai-growth-system$/i, '')
+    .split('-')
+    .filter(Boolean)
+    .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+    .join(' ');
+}
+
 /**
  * Maps DB IndustryConfig.website_content to the shape IndustryPageTemplate expects.
  */
@@ -39,14 +55,15 @@ function mapDbConfigToContent(slug, dbConfig) {
   const wc = dbConfig.website_content || {};
   const hero = wc.hero_config || {};
   const branding = dbConfig.branding_config || {};
+  const industryName = deriveIndustryName(dbConfig.display_name, slug);
 
   return {
     slug,
-    industry_name: dbConfig.display_name || slug,
-    display_name: dbConfig.display_name || slug,
-    hero_headline: hero.headline || `${dbConfig.display_name} AI Growth System`,
+    industry_name: industryName,
+    display_name: dbConfig.display_name || `${industryName} AI Growth System`,
+    hero_headline: hero.headline || `${dbConfig.display_name || industryName} AI Growth System`,
     hero_subheadline: hero.subheadline || '',
-    hero_description: hero.cta_text || '',
+    hero_description: hero.description || hero.cta_text || '',
     hero_image: branding.asset_map?.hero_image || null,
     primary_cta: hero.cta_text || 'Compare Packages',
     secondary_cta: 'View Automation Stack',
@@ -54,7 +71,7 @@ function mapDbConfigToContent(slug, dbConfig) {
     use_cases: (wc.use_cases || []).map(u => ({
       title: u.title,
       description: u.description,
-      icon: 'Zap',
+      icon: u.icon || 'Zap',
       metrics: u.metrics || '',
     })),
     roi_metrics: {
@@ -66,6 +83,10 @@ function mapDbConfigToContent(slug, dbConfig) {
     testimonials: [],
     recommended_plan: 'growth_system',
     key_features: (wc.services || []).map(s => s.name),
+    faq: wc.faq || [],
+    services: wc.services || [],
+    ai_config: dbConfig.ai_config || null,
+    lead_crm_config: dbConfig.lead_crm_config || null,
     _source: 'db',
     seo: wc.seo_config || null,
   };
