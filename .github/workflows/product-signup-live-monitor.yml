@@ -2,9 +2,6 @@ name: Product Signup Live Monitor
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - main
   schedule:
     - cron: '17 */6 * * *'
 
@@ -45,5 +42,5 @@ jobs:
           echo "- Required route: /product-signup" >> "$GITHUB_STEP_SUMMARY"
           echo "- Package variants: growth, starter, pro" >> "$GITHUB_STEP_SUMMARY"
           echo "- This monitor checks the live production URL only; build fallback proof belongs to Release Proof after npm build." >> "$GITHUB_STEP_SUMMARY"
-          echo "- It runs manually, every six hours, and after main branch pushes." >> "$GITHUB_STEP_SUMMARY"
+          echo "- It runs manually and every six hours. It does not run on every main push to prevent notification storms from unrelated code changes." >> "$GITHUB_STEP_SUMMARY"
           echo "- If this fails while Release Gate passes, Base44 publish/sync is the likely gap." >> "$GITHUB_STEP_SUMMARY"
