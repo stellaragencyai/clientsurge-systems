@@ -11,8 +11,6 @@ on:
       - "scripts/public-exposure-live-smoke.mjs"
       - "src/lib/publicRouteMetadata.js"
       - "wrangler.clientsurge-security.toml"
-      - "package.json"
-      - "package-lock.json"
       - ".github/workflows/deploy-clientsurge-security-edge.yml"
 
 concurrency:
@@ -46,7 +44,7 @@ jobs:
         run: |
           echo "ACTIVE ClientSurge Cloudflare Security Edge deploy workflow"
           echo "Commit: $GITHUB_SHA"
-          echo "This deploy is forcing the product-signup edge hotfix live."
+          echo "This deploy only runs for Cloudflare edge, route metadata, live exposure smoke, or workflow changes."
 
       - name: Require Cloudflare credentials
         shell: bash
