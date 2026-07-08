@@ -5,6 +5,14 @@ import {
   NOINDEX_ROUTE_PREFIXES,
   PUBLIC_ROUTE_PATHS,
 } from "./publicRouteMetadata.js";
+import { installPublicPageDirectoryGuard } from "./publicPageDirectoryGuard.js";
+
+// Production defense-in-depth: if Base44 ever renders its generated public
+// page directory before/around the React app shell, remove it and replace it
+// with a safe public fallback instead of exposing admin/client/setup route names.
+if (typeof window !== "undefined") {
+  queueMicrotask(() => installPublicPageDirectoryGuard());
+}
 
 export const ROUTE_ACCESS = {
   PUBLIC: "public",
