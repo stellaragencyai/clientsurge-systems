@@ -2,6 +2,18 @@
 
 Use this before any TestFlight external review or App Store submission.
 
+## Build Identity
+
+- App name: ClientSurge Systems
+- Bundle ID: `com.clientsurgesystems.app`
+- SKU: `clientsurge-systems-ios`
+- Marketing version:
+- iOS build number:
+- TestFlight build ID:
+- Apple Developer Team ID:
+- Signing/provisioning status:
+- Build identity checklist reviewed: `mobile/ios-build-readiness.json`
+
 ## Review Account / Demo Mode
 
 - Demo account or demo mode is active.
@@ -26,6 +38,7 @@ Use this before any TestFlight external review or App Store submission.
 - Workflow previews and setup states are not guaranteed revenue outcomes.
 - SMS/email communications require consent and include opt-out handling.
 - Admin/internal routes are not intended for public indexing.
+- iOS build depends on the live ClientSurge/Base44 runtime unless a future fully native build path replaces it.
 
 ## Privacy Label Checklist
 
@@ -36,6 +49,8 @@ Confirm App Store Connect privacy details match app behavior for name, email, ph
 ## TestFlight Checklist
 
 - Internal build tested on real iPhone.
+- Build number is unique for this upload.
+- Build identity matches `mobile/ios-build-readiness.json`.
 - External review notes are complete.
 - Crash logs reviewed.
 - Tester feedback reviewed.
