@@ -36,6 +36,7 @@ export const STAGE_MAP = {
 const SUPPORT_EMAIL = "support@clientsurgesystems.com";
 const SUPPORT_PHONE_DISPLAY = "(602) 584-3227";
 const SUPPORT_PHONE_LINK = "tel:+16025843227";
+const CLIENTSURGE_LOGO_URL = "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png";
 
 function LoadingState() {
   return (
@@ -301,34 +302,40 @@ export default function ClientDashboard() {
       <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} portalState={portalState} />
       <MobileBottomNav />
 
-      <div className="min-h-screen flex flex-col" style={{ background: "hsl(var(--background))" }}>
-        <header className="sticky top-0 z-50 flex items-center justify-between border-b border-primary/10 bg-white/70 backdrop-blur-2xl"
-          style={{ height: "72px", padding: "0 clamp(1rem,4vw,2.5rem)" }}>
-          <Link to="/client-portal" className="flex items-center no-underline" aria-label="Client dashboard home">
+      <div className="min-h-screen flex flex-col" style={{ background: "linear-gradient(180deg,#F7FBFF 0%,#FFFFFF 38%,#F8FCFF 100%)" }}>
+        <header className="sticky top-0 z-50 flex items-center justify-between border-b border-primary/10 backdrop-blur-2xl"
+          style={{
+            minHeight: "clamp(92px,10vw,152px)",
+            padding: "0 clamp(1rem,4vw,3.25rem)",
+            background: "rgba(255,255,255,0.92)",
+            boxShadow: "0 12px 34px rgba(0,59,143,0.06)",
+          }}>
+          <Link to="/client-portal" className="flex items-center no-underline" aria-label="Client dashboard home" style={{ minWidth: "clamp(160px, 18vw, 280px)" }}>
             <img
-              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+              src={CLIENTSURGE_LOGO_URL}
               alt="ClientSurge Systems"
-              style={{ height: "48px", width: "auto" }}
+              style={{ height: "clamp(72px,9vw,144px)", width: "auto", objectFit: "contain", display: "block" }}
             />
           </Link>
 
-          <div className="hidden sm:flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-primary" style={{ boxShadow: "0 0 8px rgba(0,174,239,0.7)" }} />
-            <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-muted-foreground">
+          <div className="hidden sm:flex items-center gap-3 rounded-full px-4 py-2" style={{ background: "rgba(0,174,239,0.07)", border: "1px solid rgba(0,174,239,0.14)" }}>
+            <div className="w-2 h-2 rounded-full bg-primary" style={{ boxShadow: "0 0 12px rgba(0,174,239,0.75)" }} />
+            <span className="text-[11px] font-black tracking-[0.24em] uppercase text-primary">
               Client Dashboard
             </span>
           </div>
 
           <div className="flex items-center gap-3">
             <a href={`mailto:${SUPPORT_EMAIL}`}
-              className="text-[12px] font-semibold text-primary no-underline hover:text-primary/80 transition-colors">
+              className="hidden sm:inline-flex text-[12px] font-bold no-underline transition-colors"
+              style={{ color: "#003B8F" }}>
               Need help?
             </a>
             <button
               type="button"
               onClick={() => base44.auth.logout("/?logged_out=1")}
-              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold"
-              style={{ border: "1px solid rgba(0,174,239,0.22)", color: "#003B8F", background: "#fff" }}
+              className="inline-flex items-center gap-1.5 px-4 py-2.5 rounded-full text-[12px] font-bold transition-all hover:-translate-y-0.5"
+              style={{ border: "1px solid rgba(0,174,239,0.22)", color: "#003B8F", background: "#fff", boxShadow: "0 8px 20px rgba(0,59,143,0.08)" }}
             >
               <LogOut className="w-3.5 h-3.5" /> Logout
             </button>
@@ -336,14 +343,14 @@ export default function ClientDashboard() {
         </header>
 
         <main id="main-content" className="flex-1">
-          <div className="w-full h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.4), transparent)" }} />
+          <div className="w-full h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.45), transparent)" }} />
 
           <div className="relative w-full" aria-hidden="true">
             <div className="absolute inset-0 pointer-events-none"
-              style={{ background: "radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,136,204,0.06) 0%, transparent 70%)" }} />
+              style={{ background: "radial-gradient(ellipse 70% 34% at 50% 0%, rgba(0,136,204,0.08) 0%, transparent 72%)" }} />
           </div>
 
-          <div className="max-w-[1100px] mx-auto px-[clamp(1.25rem,4vw,2.5rem)] py-[clamp(1.5rem,4vw,3rem)] relative z-10">
+          <div className="max-w-[1240px] mx-auto px-[clamp(1.25rem,4vw,2.75rem)] py-[clamp(1.25rem,3vw,2.25rem)] relative z-10">
             {loading ? (
               <LoadingState />
             ) : error ? (
@@ -381,7 +388,7 @@ export default function ClientDashboard() {
                 )}
 
                 {activeServices.length > 0 && (
-                  <div id="dashboard-status" style={{ scrollMarginTop: "96px" }}>
+                  <div id="dashboard-status" style={{ scrollMarginTop: "160px" }}>
                     <SetupStatusPanel
                       installStatus={activeServices[0]?.installStatus}
                       onRefresh={() => fetchPortal(true)}
@@ -463,7 +470,7 @@ export default function ClientDashboard() {
 
                     <DashboardMetricsBar activeServices={activeServices} project={project} portalState={portalState} />
 
-                    <section id="dashboard-systems" className="mb-4 mt-2" style={{ scrollMarginTop: "96px" }}>
+                    <section id="dashboard-systems" className="mb-4 mt-2" style={{ scrollMarginTop: "160px" }}>
                       <div className="flex items-center gap-3 mb-4">
                         <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.3))" }} />
                         <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">Your Verified Systems</p>
