@@ -16,7 +16,7 @@ const requiredMarkers = [
   "Starter System",
   "Growth System",
   "Pro System",
-  "Your information",
+  "Your Information",
   "Continue to Secure Checkout",
   "createCheckoutSession",
   "69dc4a79656fdba136d413d3",
@@ -27,9 +27,12 @@ const requiredMarkers = [
 const routes = [
   "/product-signup",
   "/product_signup",
+  "/product-sign-up",
   "/product-signup?package=growth_system",
   "/product-signup?package=starter_system",
   "/product-signup?package=pro_system",
+  "/product-signup?package=starter",
+  "/product-signup?plan=pro",
 ];
 
 function looksBlank(html) {
@@ -58,6 +61,10 @@ function validateHtml(html) {
 
   if (/Access Restricted/i.test(html)) {
     failures.push("page appears to be behind an auth/access restriction screen");
+  }
+
+  if (/ClientSurge Systems manages\s+\d+\s+data types/i.test(html) || /<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>/i.test(html)) {
+    failures.push("page appears to expose the generated Base44 directory instead of checkout");
   }
 
   for (const marker of requiredMarkers) {
