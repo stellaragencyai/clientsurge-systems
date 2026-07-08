@@ -75,7 +75,7 @@ export const PUBLIC_ROUTE_METADATA = {
     key: "privacy",
     title: "Privacy Policy | ClientSurge Systems",
     description:
-      "Read the ClientSurge Systems privacy policy covering lead forms, SMS communications, AI voice and call automation, analytics, payment processors, data retention, and privacy rights.",
+      "Read the ClientSurge Systems privacy policy covering lead forms, SMS communications, AI voice and call automation, analytics, payment processors, account deletion, data retention, and privacy rights.",
   },
   "/terms": {
     key: "terms",
@@ -99,6 +99,9 @@ export const PUBLIC_ROUTE_METADATA = {
 
 export const STATIC_ROUTE_ALIASES = {
   "/privacy-policy": "/privacy",
+  "/account-deletion": "/privacy#account-deletion",
+  "/delete-account": "/privacy#account-deletion",
+  "/data-deletion": "/privacy#data-deletion-request",
   "/legal/privacy": "/privacy",
   "/legal/terms": "/terms",
   "/legal/sms": "/sms-terms",
@@ -165,6 +168,9 @@ export const APP_SHELL_PUBLIC_UTILITY_PATHS = [
   "/forgot-password",
   "/reset-password",
   "/opt-out",
+  "/account-deletion",
+  "/delete-account",
+  "/data-deletion",
   "/product",
   "/product-signup",
   "/product-sign-up",
@@ -248,6 +254,9 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/forgot-password",
   "/reset-password",
   "/opt-out",
+  "/account-deletion",
+  "/delete-account",
+  "/data-deletion",
   "/book",
   "/book-demo",
   "/start",
@@ -325,6 +334,9 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/medspa-dashboard",
   "/medspadashboard",
   "/setup-lookup",
+  "/account-deletion",
+  "/delete-account",
+  "/data-deletion",
   "/product-signup",
   "/product-sign-up",
   "/product_signup",
