@@ -26,6 +26,35 @@ function toStripeAmount(amount) {
   return Math.round(Number(amount || 0) * 100);
 }
 
+function isTruthy(value) {
+  if (value === true) return true;
+  if (typeof value === "number") return value === 1;
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["1", "true", "yes", "y", "on"].includes(normalized);
+}
+
+function isCheckoutSmokeRequest({ customer_email, smoke_test, source }) {
+  const email = String(customer_email || "").trim().toLowerCase();
+  const sourceValue = String(source || "").trim().toLowerCase();
+  return (
+    isTruthy(smoke_test) ||
+    sourceValue.includes("smoke") ||
+    email.includes("+checkout-smoke@") ||
+    email.endsWith("@clientsurge.test")
+  );
+}
+
+function smokeOrderFields(requestId) {
+  return {
+    environment: "smoke",
+    dashboard_excluded: true,
+    dashboard_exclusion_reason: `Automated checkout smoke test (${requestId})`,
+    dashboard_truth_status: "blocked",
+    dashboard_truth_notes: "Automated checkout smoke test. Exclude from production metrics and public proof.",
+    notes: `Automated checkout smoke test. Safe to archive. request_id: ${requestId}`,
+  };
+}
+
 function buildTestStripeLineItems(pricingSummary) {
   const packageOffer = pricingSummary?.package_offer || null;
   const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
@@ -117,7 +146,11 @@ Deno.serve(async (req) => {
       success_url,
       cancel_url,
       deploy_immediately,
+      smoke_test,
+      source,
     } = await req.json();
+
+    const isSmokeCheckout = isCheckoutSmokeRequest({ customer_email, smoke_test, source });
 
     // Product Signup sends package_key only. Resolve it here so /product-signup
     // and older cart/product_ids payloads both hit the same canonical checkout path.
@@ -190,6 +223,7 @@ Deno.serve(async (req) => {
       packageType,
       livemode,
       stripeMode,
+      isSmokeCheckout,
     });
 
     const orderItems = pricingSummary.priced_items.map((item) => ({
@@ -211,7 +245,7 @@ Deno.serve(async (req) => {
       service_access_status: "active",
     }));
 
-    const order = await base44.asServiceRole.entities.Order.create({
+    const orderPayload = {
       customer_email,
       customer_name,
       customer_phone: customer_phone || "",
@@ -225,11 +259,18 @@ Deno.serve(async (req) => {
       pricing_summary: buildStoredPricingSummary(pricingSummary.priced_items),
       install_configuration: normalizeInstallConfiguration({}, orderItems),
       payment_status: "pending",
+      payment_source: "stripe",
       order_status: "pending_payment",
       selected_package_type: pricingSummary.package_offer?.package_key || null,
       package_type: pricingSummary.package_offer?.package_key || null,
       plan_type: packageLabel,
-    });
+    };
+
+    if (isSmokeCheckout) {
+      Object.assign(orderPayload, smokeOrderFields(requestId));
+    }
+
+    const order = await base44.asServiceRole.entities.Order.create(orderPayload);
     createdOrderId = order.id;
 
     const line_items = stripeMode === "test"
@@ -262,6 +303,8 @@ Deno.serve(async (req) => {
       stripe_livemode: livemode ? "true" : "false",
       request_id: requestId,
       deploy_immediately: deploy_immediately ? "true" : "false",
+      source: source ? String(source).slice(0, 120) : "product_signup",
+      smoke_test: isSmokeCheckout ? "true" : "false",
     };
 
     const session = await stripe.checkout.sessions.create({
@@ -289,6 +332,8 @@ Deno.serve(async (req) => {
             }))
           ),
           request_id: requestId,
+          source: source ? String(source).slice(0, 120) : "product_signup",
+          smoke_test: isSmokeCheckout ? "true" : "false",
         },
       },
       success_url: success_url || `${req.headers.get("origin")}/order-success?session_id={CHECKOUT_SESSION_ID}`,
@@ -307,9 +352,10 @@ Deno.serve(async (req) => {
       livemode: session.livemode,
       packageType,
       stripeMode,
+      isSmokeCheckout,
     });
 
-    return secureJson({ url: session.url, session_id: session.id, request_id: requestId, stripe_mode: stripeMode, livemode });
+    return secureJson({ url: session.url, session_id: session.id, request_id: requestId, stripe_mode: stripeMode, livemode, smoke_test: isSmokeCheckout });
   } catch (error) {
     if (createdOrderId) {
       try {
