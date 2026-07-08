@@ -1,7 +1,8 @@
 import { ArrowRight, ShieldCheck } from 'lucide-react';
 import { trackCTA } from '@/lib/analytics';
 import CSProductHero from '@/components/design-system/CSProductHero';
-import HeroProductDemo from '@/components/landing/HeroProductDemo';
+import CSButton from '@/components/design-system/CSButton';
+import HeroLogoCarousel from '@/components/landing/HeroLogoCarousel';
 
 /**
  * HomeHero — premium B2B automation positioning.
@@ -69,26 +70,40 @@ export default function HomeHero() {
       subtitle="ClientSurge installs the lead capture, instant response, booking, follow-up, review, and reactivation workflows your website needs to turn more visitors into real opportunities — without forcing a mandatory demo call first."
       automationPills={AUTOMATION_PILLS}
       stats={STATS}
-      primaryCTA={{
-        label: 'Compare Packages',
-        href: '/#pricing',
-        onClick: scrollToPricing,
-        icon: ArrowRight,
-      }}
-      secondaryCTA={{
-        label: 'See How It Works',
-        href: '/how-it-works',
-        onClick: scrollToSolution,
-        icon: ShieldCheck,
-      }}
       trustBadges={[
         'Clear packages',
         'Secure checkout path',
         'Setup handled for you',
       ]}
     >
-      <div className="w-full mt-6 mb-2">
-        <HeroProductDemo />
+      <div className="w-full mt-6 mb-2 flex flex-col items-center gap-7">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full sm:w-auto">
+          <CSButton
+            variant="primary"
+            size="lg"
+            href="/#pricing"
+            onClick={scrollToPricing}
+            icon={ArrowRight}
+            className="w-full sm:w-auto"
+            style={{ maxWidth: '300px', height: '54px' }}
+          >
+            Compare Packages
+          </CSButton>
+
+          <CSButton
+            variant="outline"
+            size="lg"
+            href="/how-it-works"
+            onClick={scrollToSolution}
+            iconRight={ShieldCheck}
+            className="w-full sm:w-auto"
+            style={{ maxWidth: '300px', height: '54px' }}
+          >
+            See How It Works
+          </CSButton>
+        </div>
+
+        <HeroLogoCarousel />
       </div>
     </CSProductHero>
   );
