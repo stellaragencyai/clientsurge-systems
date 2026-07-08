@@ -7,43 +7,39 @@ import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import ScarcityBadge from "@/components/pricing/ScarcityBadge";
 import EnhancedPricingCard from "@/components/pricing/EnhancedPricingCard";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
+import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 
-const PACKAGES = [
-  {
-    key: "starter_system",
-    name: "Starter System",
-    setup: "$797",
-    monthly: "$497",
+const PACKAGE_COPY = {
+  starter_system: {
     problem: "We miss calls or reply too late.",
     promise: "Lead capture, instant response, and missed-call recovery installed first.",
-    features: ["Instant lead response", "Missed-call text-back", "Lead capture foundation", "Owner notification", "Remote setup workflow"],
-    cta: "Review Starter System",
+    cta: "Choose Starter System",
   },
-  {
-    key: "growth_system",
-    name: "Growth System",
-    badge: "Recommended",
-    setup: "$1,297",
-    monthly: "$997",
+  growth_system: {
     problem: "We need follow-up and booking handled.",
     promise: "Response, nurture, booking, and lead status tracking working together.",
-    features: ["Everything in Starter", "14-day SMS/email nurture", "AI booking handoff", "Lead status tracking", "Testing workflow"],
-    cta: "Review Growth System",
+    cta: "Choose Growth System",
   },
-  {
-    key: "pro_system",
-    name: "Pro System",
-    setup: "$2,497",
-    monthly: "$1,997",
+  pro_system: {
     problem: "We want the full lead recovery layer.",
     promise: "The complete system for response, booking, reviews, reactivation, reporting, and priority setup.",
-    features: ["Everything in Growth", "Lead reactivation", "Review automation", "Advanced reporting", "Priority launch support"],
-    cta: "Review Pro System",
+    cta: "Choose Pro System",
   },
-];
+};
+
+const PACKAGES = PACKAGE_OFFERS.filter((offer) => offer.checkout_enabled).map((offer) => ({
+  key: offer.package_key,
+  name: offer.name,
+  badge: offer.badge,
+  setup: `$${Number(offer.setup_total).toLocaleString()}`,
+  monthly: `$${Number(offer.monthly_total).toLocaleString()}`,
+  problem: PACKAGE_COPY[offer.package_key]?.problem || offer.fit,
+  promise: PACKAGE_COPY[offer.package_key]?.promise || offer.description,
+  features: offer.features,
+  cta: PACKAGE_COPY[offer.package_key]?.cta || `Choose ${offer.name}`,
+}));
 
 const PROCESS_STEPS = ["Choose System", "Guided Intake", "Access Checklist", "Configuration", "Testing", "Launch Review"];
-const packageReviewHref = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
 
 export default function PricingPageContent() {
   const [industryName, setIndustryName] = useState(null);
@@ -51,10 +47,9 @@ export default function PricingPageContent() {
   useEffect(() => {
     try {
       const raw = sessionStorage.getItem(INDUSTRY_SELECTION_STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (parsed?.shortName) setIndustryName(parsed.shortName);
-      }
+      if (!raw) return;
+      const parsed = JSON.parse(raw);
+      if (parsed?.shortName) setIndustryName(parsed.shortName);
     } catch {}
   }, []);
 
@@ -70,9 +65,9 @@ export default function PricingPageContent() {
           <div className="flex items-center gap-3 rounded-xl border border-primary/25 bg-primary/8 px-4 py-3">
             <Sparkles className="w-4 h-4 text-primary flex-shrink-0" />
             <p className="text-sm text-foreground/80 flex-1">
-              Based on your <strong className="text-foreground">{industryName}</strong> selection — we've highlighted the recommended system below.
+              Based on your <strong className="text-foreground">{industryName}</strong> selection — compare the systems below and choose the closest starting point.
             </p>
-            <button onClick={dismissIndustry} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Dismiss">
+            <button onClick={dismissIndustry} className="text-muted-foreground hover:text-foreground transition-colors" aria-label="Dismiss industry notice">
               <X className="w-4 h-4" />
             </button>
           </div>
@@ -101,7 +96,6 @@ export default function PricingPageContent() {
             </span>
           ))}
         </div>
-        {/* Finding #93: Urgency/scarcity trigger */}
         <div className="flex justify-center mb-6">
           <ScarcityBadge />
         </div>
@@ -115,7 +109,7 @@ export default function PricingPageContent() {
           ))}
         </div>
         <div className="text-center mt-8">
-          <p className="text-sm text-muted-foreground"><strong>Not sure?</strong> <a href="/book" onClick={() => trackCTA("guided_chooser_pricing", "pricing_page")} className="text-primary font-semibold underline underline-offset-4 hover:text-primary/80">Get help choosing</a> and we will recommend the right starting point.</p>
+          <p className="text-sm text-muted-foreground"><strong>Not sure?</strong> <a href="/contact" onClick={() => trackCTA("guided_chooser_pricing", "pricing_page")} className="text-primary font-semibold underline underline-offset-4 hover:text-primary/80">Contact ClientSurge</a> and we will recommend the right starting point.</p>
         </div>
         <MoneyBackGuarantee />
       </section>

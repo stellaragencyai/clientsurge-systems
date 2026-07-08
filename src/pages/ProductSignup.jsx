@@ -1,53 +1,62 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { appParams } from "@/lib/app-params";
+import { PACKAGE_OFFERS, normalizePackageKey } from "@/lib/salesCatalog";
 
 /**
  * ProductSignup — resilient, self-contained checkout page.
- * Zero non-essential imports. Never returns null. Every state renders visible HTML.
  * Defaults to growth_system. Calls createCheckoutSession backend function.
  */
-const PACKAGES = [
-  {
-    id: "starter_system",
-    title: "Starter System",
-    price: "$497",
-    setup: "$797 setup",
-    description: "Instant lead response + missed-call recovery foundation.",
-    features: ["Lead capture", "Instant lead response", "Missed-call text-back", "Basic follow-up"],
-  },
-  {
-    id: "growth_system",
-    title: "Growth System",
-    price: "$997",
-    setup: "$1,297 setup",
-    description: "Response, follow-up, and booking automation system.",
-    features: ["Everything in Starter", "AI scheduling handoff", "Multi-step follow-up", "Booking automation", "Client dashboard"],
-    recommended: true,
-  },
-  {
-    id: "pro_system",
-    title: "Pro System",
-    price: "$1,997",
-    setup: "$2,497 setup",
-    description: "Full lead recovery, website, and automation layer.",
-    features: ["Everything in Growth", "Website design & build", "Lead reactivation", "Advanced reporting", "Priority setup"],
-  },
-];
-
 const DEFAULT_PACKAGE = "growth_system";
-const VALID_KEYS = ["starter_system", "growth_system", "pro_system"];
 const CHECKOUT_FUNCTION_NAME = "createCheckoutSession";
 const FALLBACK_APP_ID = "69dc4a79656fdba136d413d3";
 
+const CHECKOUT_PACKAGES = PACKAGE_OFFERS.filter((offer) => offer.checkout_enabled);
+const PACKAGE_BY_KEY = Object.fromEntries(CHECKOUT_PACKAGES.map((offer) => [offer.package_key, offer]));
+
+const PACKAGE_SUMMARIES = {
+  starter_system: {
+    problem: "We miss calls or reply too late.",
+    shortDescription: "Instant response and missed-call recovery foundation.",
+  },
+  growth_system: {
+    problem: "We need follow-up and booking handled.",
+    shortDescription: "Response, nurture, and booking automation system.",
+    recommended: true,
+  },
+  pro_system: {
+    problem: "We want the full lead recovery layer.",
+    shortDescription: "Full response, reactivation, review, and reporting layer.",
+  },
+};
+
+const INDUSTRIES = [
+  "Med Spa / Aesthetics",
+  "Dental / Orthodontics",
+  "HVAC / Home Services",
+  "Plumbing",
+  "Roofing / Contractors",
+  "Chiropractic / Physical Therapy",
+  "Real Estate",
+  "Legal / Personal Injury",
+  "Auto Repair",
+  "Salon / Spa",
+  "Fitness / Gym",
+  "Accounting / Finance",
+  "Other",
+];
+
+function currency(amount) {
+  return `$${Number(amount || 0).toLocaleString()}`;
+}
+
 function resolvePackage(pkgParam) {
-  if (!pkgParam) return DEFAULT_PACKAGE;
-  const normalized = String(pkgParam).trim().toLowerCase().replace(/[\s-]+/g, "_");
-  if (VALID_KEYS.includes(normalized)) return normalized;
-  // Try common aliases
-  const aliasMap = { starter: "starter_system", growth: "growth_system", pro: "pro_system", elite: "pro_system" };
-  if (aliasMap[normalized]) return aliasMap[normalized];
-  return DEFAULT_PACKAGE;
+  const normalized = normalizePackageKey(pkgParam || DEFAULT_PACKAGE);
+  return PACKAGE_BY_KEY[normalized]?.package_key || DEFAULT_PACKAGE;
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
 async function invokePublicCheckoutSession(payload) {
@@ -57,7 +66,7 @@ async function invokePublicCheckoutSession(payload) {
   const response = await fetch(endpoint, {
     method: "POST",
     headers: {
-      "Accept": "application/json",
+      Accept: "application/json",
       "Content-Type": "application/json",
     },
     credentials: "same-origin",
@@ -84,6 +93,7 @@ async function invokePublicCheckoutSession(payload) {
       `Checkout server returned HTTP ${response.status || "error"}.`;
     const err = new Error(message);
     err.request_id = result?.request_id || result?.data?.request_id || null;
+    err.code = result?.code || result?.data?.code || null;
     throw err;
   }
 
@@ -109,27 +119,56 @@ export default function ProductSignup() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
-  // Sync URL param → selected package
   useEffect(() => {
     const resolved = resolvePackage(pkgParam);
     setSelectedPackage(resolved);
-  }, [pkgParam]);
+    if (pkgParam && normalizePackageKey(pkgParam) !== resolved) {
+      const next = new URLSearchParams(searchParams);
+      next.set("package", resolved);
+      next.delete("plan");
+      setSearchParams(next, { replace: true });
+    }
+  }, [pkgParam, searchParams, setSearchParams]);
+
+  const currentPkg = PACKAGE_BY_KEY[selectedPackage] || PACKAGE_BY_KEY[DEFAULT_PACKAGE];
+  const currentSummary = PACKAGE_SUMMARIES[currentPkg.package_key] || {};
+  const monthlyLabel = currency(currentPkg.monthly_total);
+  const setupLabel = currency(currentPkg.setup_total);
+
+  const featureList = useMemo(() => {
+    const features = currentPkg.features?.length
+      ? currentPkg.features
+      : currentPkg.included_services?.map((service) => service.name) || [];
+    return features.slice(0, 6);
+  }, [currentPkg]);
 
   const selectPackage = useCallback((pkgId) => {
-    setSelectedPackage(pkgId);
+    const resolved = resolvePackage(pkgId);
+    setSelectedPackage(resolved);
+    setError("");
     const next = new URLSearchParams(searchParams);
-    next.set("package", pkgId);
+    next.set("package", resolved);
+    next.delete("plan");
     setSearchParams(next, { replace: true });
   }, [searchParams, setSearchParams]);
 
-  const handleCheckout = useCallback(async () => {
+  const validate = () => {
+    if (!fullName.trim()) return "Please enter your full name.";
+    if (!businessName.trim()) return "Please enter your business name.";
+    if (!isValidEmail(email)) return "Please enter a valid email address.";
+    if (phone.replace(/\D/g, "").length < 10) return "Please enter a valid phone number.";
+    return "";
+  };
+
+  const handleCheckout = useCallback(async (event) => {
+    event?.preventDefault?.();
     setError("");
 
-    // Basic validation
-    if (!fullName.trim()) { setError("Please enter your full name."); return; }
-    if (!businessName.trim()) { setError("Please enter your business name."); return; }
-    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) { setError("Please enter a valid email address."); return; }
-    if (phone.replace(/\D/g, "").length < 10) { setError("Please enter a valid phone number."); return; }
+    const validationError = validate();
+    if (validationError) {
+      setError(validationError);
+      return;
+    }
 
     setLoading(true);
     try {
@@ -137,17 +176,15 @@ export default function ProductSignup() {
       const payload = {
         package_key: selectedPackage,
         customer_name: fullName.trim(),
-        customer_email: email.trim(),
+        customer_email: email.trim().toLowerCase(),
         customer_phone: phone.trim(),
         business_name: businessName.trim(),
         industry: industry.trim(),
         success_url: `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-        cancel_url: `${origin}/product-signup?package=${selectedPackage}`,
+        cancel_url: `${origin}/product-signup?package=${encodeURIComponent(selectedPackage)}`,
+        source: "product_signup",
       };
 
-      // Public checkout must not use the Base44 browser SDK here. The SDK can run an
-      // implicit auth probe against /entities/User/me, which breaks anonymous buyers
-      // with a 401 before Stripe checkout starts.
       const response = await invokePublicCheckoutSession(payload);
       const url = response?.data?.url || response?.url;
 
@@ -156,44 +193,38 @@ export default function ProductSignup() {
       }
 
       setSuccess(true);
-      // Brief delay so user sees confirmation before redirect
-      setTimeout(() => { window.location.assign(url); }, 800);
+      window.setTimeout(() => { window.location.assign(url); }, 500);
     } catch (err) {
-      const msg = err?.data?.error || err?.message || "Checkout could not be started.";
+      const msg = err?.message || "Checkout could not be started.";
       const requestId = err?.request_id;
-      setError(requestId ? `${msg} (Request ID: ${requestId}) Click "Retry Checkout" to try again, or contact support if it persists.` : `${msg} Click "Retry Checkout" to try again, or contact support if it persists.`);
+      const suffix = requestId
+        ? ` Request ID: ${requestId}.`
+        : "";
+      setError(`${msg}.${suffix} Retry checkout or contact support if it continues.`.replace("..", "."));
+      setSuccess(false);
       setLoading(false);
     }
   }, [selectedPackage, fullName, businessName, email, phone, industry]);
 
-  const handleRetry = useCallback(() => {
-    setError("");
-    handleCheckout();
-  }, [handleCheckout]);
-
-  const currentPkg = PACKAGES.find((p) => p.id === selectedPackage) || PACKAGES[1];
-
-  // ── ALWAYS render visible HTML — never return null ──
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: "Montserrat, system-ui, sans-serif" }}>
-      {/* ── Route-level verification marker (hidden but in DOM for production verification) ── */}
       <div data-route-verify="product-signup" data-selected-package={selectedPackage} style={{ position: "absolute", left: "-9999px", top: "-9999px" }} aria-hidden="true">
         Checkout page loaded — package: {selectedPackage}
       </div>
 
-      {/* ── Logo Header ── */}
       <header className="border-b border-gray-100 bg-white">
-        <div className="max-w-4xl mx-auto px-4 py-5 flex items-center justify-center gap-2">
-          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="#005691" aria-hidden="true">
-            <path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z" />
-          </svg>
-          <span className="text-xl font-black text-gray-900 tracking-tight">ClientSurge</span>
+        <div className="max-w-4xl mx-auto px-4 py-5 flex items-center justify-between gap-4">
+          <Link to="/" className="flex items-center gap-2 text-gray-900 no-underline" aria-label="ClientSurge Systems home">
+            <svg className="w-7 h-7" viewBox="0 0 24 24" fill="#005691" aria-hidden="true">
+              <path d="M12 2L4 6v6c0 5 3.5 9.5 8 10 4.5-.5 8-5 8-10V6l-8-4z" />
+            </svg>
+            <span className="text-xl font-black tracking-tight">ClientSurge</span>
+          </Link>
+          <Link to="/pricing" className="text-xs font-bold underline" style={{ color: "#0088CC" }}>Compare packages</Link>
         </div>
       </header>
 
-      {/* ── Main Content ── */}
       <main className="flex-1 max-w-4xl mx-auto w-full px-4 py-8 md:py-12">
-        {/* Heading */}
         <div className="text-center mb-8">
           <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: "#0088CC" }}>
             Secure Checkout
@@ -202,30 +233,30 @@ export default function ProductSignup() {
             Complete your ClientSurge signup
           </h1>
           <p className="text-sm text-gray-500">
-            {/* Verification text per requirement #12 */}
-            Checkout page loaded — selected package: <strong className="text-gray-900">{currentPkg.title}</strong>
+            Checkout page loaded — selected package: <strong className="text-gray-900">{currentPkg.name}</strong>
           </p>
         </div>
 
-        {/* Package Selector */}
         <div className="mb-8">
           <h2 className="text-sm font-bold text-gray-700 uppercase tracking-wide mb-4">Choose Your System</h2>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            {PACKAGES.map((pkg) => {
-              const isSelected = pkg.id === selectedPackage;
+            {CHECKOUT_PACKAGES.map((pkg) => {
+              const summary = PACKAGE_SUMMARIES[pkg.package_key] || {};
+              const isSelected = pkg.package_key === selectedPackage;
               return (
                 <button
-                  key={pkg.id}
+                  key={pkg.package_key}
                   type="button"
-                  onClick={() => selectPackage(pkg.id)}
+                  onClick={() => selectPackage(pkg.package_key)}
                   className={`relative text-left p-5 rounded-xl border-2 transition-all ${
                     isSelected
                       ? "border-blue-500 bg-blue-50 shadow-md"
                       : "border-gray-200 bg-white hover:border-blue-300"
                   }`}
                   style={isSelected ? { borderColor: "#0088CC" } : {}}
+                  aria-pressed={isSelected}
                 >
-                  {pkg.recommended && (
+                  {(summary.recommended || pkg.highlight) && (
                     <span
                       className="absolute -top-3 left-4 px-2 py-0.5 rounded-full text-[10px] font-black text-white uppercase tracking-wide"
                       style={{ background: "#0088CC" }}
@@ -233,13 +264,13 @@ export default function ProductSignup() {
                       Recommended
                     </span>
                   )}
-                  <h3 className="font-black text-gray-900 text-lg">{pkg.title}</h3>
-                  <p className="text-2xl font-black text-gray-900 mt-1">{pkg.price}<span className="text-sm font-medium text-gray-400">/mo</span></p>
-                  <p className="text-xs text-gray-500 mt-0.5">{pkg.setup}</p>
-                  <p className="text-xs text-gray-600 mt-2">{pkg.description}</p>
+                  <h3 className="font-black text-gray-900 text-lg">{pkg.name}</h3>
+                  <p className="text-2xl font-black text-gray-900 mt-1">{currency(pkg.monthly_total)}<span className="text-sm font-medium text-gray-400">/mo</span></p>
+                  <p className="text-xs text-gray-500 mt-0.5">{currency(pkg.setup_total)} one-time setup</p>
+                  <p className="text-xs text-gray-600 mt-2">{summary.shortDescription || pkg.description}</p>
                   {isSelected && (
                     <div className="mt-3 flex items-center gap-1.5 text-xs font-bold" style={{ color: "#0088CC" }}>
-                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z"/></svg>
+                      <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path d="M16.7 5.3a1 1 0 010 1.4l-8 8a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4L8 12.6l7.3-7.3a1 1 0 011.4 0z"/></svg>
                       Selected
                     </div>
                   )}
@@ -249,130 +280,135 @@ export default function ProductSignup() {
           </div>
         </div>
 
-        {/* Checkout Form */}
-        <div className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
+        <form onSubmit={handleCheckout} className="bg-white rounded-2xl border border-gray-200 shadow-sm p-6 md:p-8">
+          <div className="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <p className="text-xs font-bold uppercase tracking-widest" style={{ color: "#0088CC" }}>Order Summary</p>
+            <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
+              <div>
+                <p className="text-lg font-black text-gray-900">{currentPkg.name}</p>
+                <p className="text-sm text-gray-600">{setupLabel} setup + {monthlyLabel}/month</p>
+              </div>
+              <p className="text-xs text-gray-500">Billed securely through Stripe after you continue.</p>
+            </div>
+            <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
+              {featureList.map((feature) => (
+                <li key={feature} className="flex gap-2">
+                  <span aria-hidden="true" style={{ color: "#0088CC" }}>✓</span>
+                  <span>{feature}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+
           <h2 className="text-lg font-black text-gray-900 mb-1">Your Information</h2>
           <p className="text-sm text-gray-500 mb-6">Enter your details to continue to secure Stripe checkout.</p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {/* Full Name */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
+              <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
               <input
+                id="fullName"
+                name="name"
                 type="text"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
                 placeholder="John Smith"
+                autoComplete="name"
+                required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                 style={{ fontSize: "16px" }}
               />
             </div>
 
-            {/* Business Name */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Business Name *</label>
+              <label htmlFor="businessName" className="block text-sm font-semibold text-gray-700 mb-1.5">Business Name *</label>
               <input
+                id="businessName"
+                name="organization"
                 type="text"
                 value={businessName}
                 onChange={(e) => setBusinessName(e.target.value)}
                 placeholder="Acme Landscaping LLC"
+                autoComplete="organization"
+                required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                 style={{ fontSize: "16px" }}
               />
             </div>
 
-            {/* Email */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address *</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address *</label>
               <input
+                id="email"
+                name="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="john@yourbusiness.com"
+                autoComplete="email"
+                required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                 style={{ fontSize: "16px" }}
               />
             </div>
 
-            {/* Phone */}
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number *</label>
+              <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number *</label>
               <input
+                id="phone"
+                name="phone"
                 type="tel"
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
                 placeholder="(555) 123-4567"
+                autoComplete="tel"
+                required
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
                 style={{ fontSize: "16px" }}
               />
             </div>
 
-            {/* Industry */}
             <div className="md:col-span-2">
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Industry / Business Type</label>
+              <label htmlFor="industry" className="block text-sm font-semibold text-gray-700 mb-1.5">Industry / Business Type</label>
               <select
+                id="industry"
+                name="industry"
                 value={industry}
                 onChange={(e) => setIndustry(e.target.value)}
                 className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white"
                 style={{ fontSize: "16px" }}
               >
                 <option value="">— Select your industry —</option>
-                <option value="Med Spa">Med Spa / Aesthetics</option>
-                <option value="Dental">Dental / Orthodontics</option>
-                <option value="HVAC">HVAC / Home Services</option>
-                <option value="Plumbing">Plumbing</option>
-                <option value="Roofing">Roofing / Contractors</option>
-                <option value="Chiropractic">Chiropractic / Physical Therapy</option>
-                <option value="Real Estate">Real Estate</option>
-                <option value="Legal / Personal Injury">Legal / Personal Injury</option>
-                <option value="Automotive">Automotive / Auto Repair</option>
-                <option value="Salon / Spa">Salon / Spa</option>
-                <option value="Fitness">Fitness / Gym</option>
-                <option value="Accounting">Accounting / Finance</option>
-                <option value="Other">Other</option>
+                {INDUSTRIES.map((option) => (
+                  <option key={option} value={option}>{option}</option>
+                ))}
               </select>
             </div>
           </div>
 
-          {/* Error Message */}
           {error && (
-            <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4">
+            <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4" role="alert">
               <div className="flex items-start gap-3">
-                <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.7 7.3a1 1 0 011.4 0L10 7.6l.3-.3a1 1 0 111.4 1.4l-.3.3.3.3a1 1 0 11-1.4 1.4L10 10.4l-.3.3a1 1 0 11-1.4-1.4l.3-.3-.3-.3a1 1 0 010-1.4z" clipRule="evenodd"/></svg>
+                <svg className="w-5 h-5 text-red-600 flex-shrink-0 mt-0.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.7 7.3a1 1 0 011.4 0L10 7.6l.3-.3a1 1 0 111.4 1.4l-.3.3.3.3a1 1 0 11-1.4 1.4L10 10.4l-.3.3a1 1 0 11-1.4-1.4l.3-.3-.3-.3a1 1 0 010-1.4z" clipRule="evenodd"/></svg>
                 <div className="flex-1">
                   <p className="text-sm font-semibold text-red-900">Checkout Error</p>
                   <p className="text-sm text-red-700 mt-1">{error}</p>
                 </div>
               </div>
-              <button
-                onClick={handleRetry}
-                disabled={loading}
-                className="mt-3 w-full py-2.5 rounded-lg text-sm font-bold text-white flex items-center justify-center gap-2 disabled:opacity-60"
-                style={{ background: loading ? "#9cb3c9" : "#dc2626" }}
-              >
-                {loading ? (
-                  <svg className="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
-                ) : (
-                  <svg className="w-4 h-4" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M4 2a1 1 0 011 1v2.1a8 8 0 0113 6.9 8 8 0 01-13 6.9V17a1 1 0 11-2 0v-5a1 1 0 011-1h5a1 1 0 110 2H6.7A6 6 0 1016 10a1 1 0 112 0 8 8 0 11-14-5.3V3a1 1 0 011-1z" clipRule="evenodd"/></svg>
-                )}
-                Retry Checkout
-              </button>
             </div>
           )}
 
-          {/* Success Message */}
           {success && (
-            <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-center">
-              <svg className="w-8 h-8 text-green-600 mx-auto mb-2" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clipRule="evenodd"/></svg>
+            <div className="mt-6 rounded-xl border border-green-200 bg-green-50 p-4 text-center" role="status">
+              <svg className="w-8 h-8 text-green-600 mx-auto mb-2" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.7-9.3a1 1 0 00-1.4-1.4L9 10.6 7.7 9.3a1 1 0 00-1.4 1.4l2 2a1 1 0 001.4 0l4-4z" clipRule="evenodd"/></svg>
               <p className="text-sm font-bold text-green-900">Redirecting to secure checkout…</p>
-              <p className="text-xs text-green-700 mt-1">You'll be transferred to Stripe to complete your payment safely.</p>
+              <p className="text-xs text-green-700 mt-1">You will be transferred to Stripe to complete your payment safely.</p>
             </div>
           )}
 
-          {/* Checkout Button */}
           {!success && (
             <button
-              onClick={handleCheckout}
+              type="submit"
               disabled={loading}
               className="mt-6 w-full py-4 rounded-xl font-black text-white text-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60"
               style={{
@@ -383,13 +419,13 @@ export default function ProductSignup() {
             >
               {loading ? (
                 <>
-                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
+                  <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
                   Preparing secure checkout…
                 </>
               ) : (
                 <>
-                  <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
-                  Continue to Secure Checkout — {currentPkg.title}
+                  <svg className="w-5 h-5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
+                  Continue to Secure Checkout — {currentPkg.name}
                 </>
               )}
             </button>
@@ -397,13 +433,12 @@ export default function ProductSignup() {
 
           {!success && (
             <p className="mt-4 text-center text-xs text-gray-400 flex items-center justify-center gap-1.5">
-              <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
-              Secured by Stripe · 256-bit encryption · Your information is protected
+              <svg className="w-3.5 h-3.5" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true"><path fillRule="evenodd" d="M5 9V7a5 5 0 0110 0v2a2 2 0 012 2v5a2 2 0 01-2 2H5a2 2 0 01-2-2v-5a2 2 0 012-2zm8-2v2H7V7a3 3 0 016 0z" clipRule="evenodd"/></svg>
+              Stripe checkout · encrypted payment form · no card details stored by ClientSurge
             </p>
           )}
-        </div>
+        </form>
 
-        {/* Help links */}
         <div className="mt-6 text-center">
           <p className="text-xs text-gray-400">
             Need help? <Link to="/contact" className="font-semibold underline" style={{ color: "#0088CC" }}>Contact support</Link> · <Link to="/pricing" className="font-semibold underline" style={{ color: "#0088CC" }}>Compare packages</Link>
@@ -411,11 +446,10 @@ export default function ProductSignup() {
         </div>
       </main>
 
-      {/* Footer */}
       <footer className="border-t border-gray-100 bg-white py-6">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <p className="text-xs text-gray-400">
-            © {new Date().getFullYear()} ClientSurge Systems · The Amazon of AI Services for Business
+            © {new Date().getFullYear()} ClientSurge Systems · AI-powered sales systems for local service businesses
           </p>
           <div className="mt-2 flex justify-center gap-4 text-xs">
             <Link to="/privacy" className="text-gray-500 hover:text-gray-700">Privacy</Link>
