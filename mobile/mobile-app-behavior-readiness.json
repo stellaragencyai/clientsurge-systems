@@ -1,0 +1,54 @@
+{
+  "app_name": "ClientSurge Systems",
+  "area": 14,
+  "status": "mobile_behavior_readiness_gate",
+  "last_reviewed": "2026-07-08",
+  "removable_sections_safe": true,
+  "section_removal_note": "This file validates mobile app behavior patterns and does not require specific marketing sections to remain on the site.",
+  "navigation": {
+    "requires_safe_area_layout": true,
+    "requires_mobile_menu_review": true,
+    "requires_back_button_behavior_review": true,
+    "must_not_depend_on_marketing_sections": true
+  },
+  "session_behavior": {
+    "requires_login_persistence_after_app_restart": true,
+    "requires_logout_clears_session": true,
+    "requires_expired_session_redirect_test": true
+  },
+  "offline_and_connectivity": {
+    "offline_fallback_url": "/offline.html",
+    "service_worker_must_cache_offline_fallback": true,
+    "requires_poor_connection_state_review": true,
+    "requires_offline_retry_action": true,
+    "live_features_require_network_notice": ["dashboards", "setup status", "checkout", "messaging", "client portal"]
+  },
+  "notifications": {
+    "status": "not_enabled_until_product_decision",
+    "must_be_opt_in": true,
+    "must_explain_value_before_permission_prompt": true,
+    "must_have_preferences_path": true,
+    "must_not_block_core_app_if_denied": true
+  },
+  "app_links": {
+    "requires_email_link_test": true,
+    "requires_text_link_test": true,
+    "requires_client_portal_link_test": true,
+    "requires_setup_status_link_test": true,
+    "requires_fallback_to_web_if_app_unavailable": true
+  },
+  "forms_and_keyboard": {
+    "requires_ios_keyboard_test": true,
+    "requires_input_zoom_prevention": true,
+    "requires_autocomplete_review": true,
+    "requires_error_messages_visible_above_keyboard": true
+  },
+  "release_proof": {
+    "requires_area_13_build_manifest": true,
+    "requires_area_15_privacy_security_manifest": true,
+    "requires_area_12_base44_publish_proof": true,
+    "requires_real_device_smoke_record": true,
+    "requires_offline_smoke_record": true,
+    "requires_session_smoke_record": true
+  }
+}
