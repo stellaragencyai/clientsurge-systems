@@ -24,21 +24,42 @@ function cleanString(value) {
   return typeof value === "string" ? value.trim() : "";
 }
 
+function cleanEmail(value) {
+  return cleanString(value).toLowerCase();
+}
+
+function isAdmin(user) {
+  return user?.role === "admin" || user?.role === "super_admin";
+}
+
+function safeDraft(order) {
+  const draft = order?.purchase_onboarding_handoff?.credentials_draft;
+  if (!draft || typeof draft !== "object") return null;
+  return {
+    data: draft.data || {},
+    current_step: Number.isFinite(draft.current_step) ? draft.current_step : 1,
+    updated_at: cleanString(draft.updated_at),
+  };
+}
+
 Deno.serve(async (req) => {
   if (req.method !== "POST") {
     return Response.json({ error: "Method not allowed" }, { status: 405 });
   }
 
+  const requestId = crypto.randomUUID();
+
   try {
     const base44 = createClientFromRequest(req);
+    const currentUser = await base44.auth.me().catch(() => null);
     const payload = await req.json().catch(() => ({}));
     const orderId = cleanString(payload?.order_id);
     const sessionId = cleanString(payload?.session_id);
-    const email = cleanString(payload?.email);
+    const email = cleanEmail(payload?.email);
 
     if (!orderId && !sessionId && !email) {
       return Response.json(
-        { error: "order_id, session_id, or email is required" },
+        { error: "order_id, session_id, or email is required", request_id: requestId },
         { status: 400 }
       );
     }
@@ -64,7 +85,16 @@ Deno.serve(async (req) => {
     }
 
     if (!order) {
-      return Response.json({ error: "Order not found" }, { status: 404 });
+      return Response.json({ error: "Order not found", request_id: requestId }, { status: 404 });
+    }
+
+    const userEmail = cleanEmail(currentUser?.email);
+    const orderEmail = cleanEmail(order.customer_email);
+    if (!isAdmin(currentUser) && userEmail && orderEmail && userEmail !== orderEmail) {
+      return Response.json(
+        { error: "This setup link does not belong to the signed-in account.", code: "setup_link_email_mismatch", request_id: requestId },
+        { status: 403 }
+      );
     }
 
     const packageKey = normalizePackageKey(
@@ -79,6 +109,7 @@ Deno.serve(async (req) => {
       business_name: cleanString(order.business_name),
       customer_name: cleanString(order.customer_name),
       customer_email: cleanString(order.customer_email),
+      customer_phone: cleanString(order.customer_phone),
       package_key: packageKey,
       activation_package_key: cleanString(order.selected_package_type) || packageKey || "",
       activation_package_name: packageKey ? packageKey.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()) : "",
@@ -89,19 +120,21 @@ Deno.serve(async (req) => {
       payment_status: cleanString(order.payment_status) || "pending",
       updated_date: cleanString(order.updated_date),
       created_date: cleanString(order.created_date),
+      credentials_draft: safeDraft(order),
     };
 
     const eligible = safeOrder.payment_status.toLowerCase() === "paid";
 
     return Response.json({
       success: true,
+      request_id: requestId,
       eligible,
       order: safeOrder,
     });
   } catch (error) {
-    console.error("[getOrderStatus] error:", error instanceof Error ? error.message : String(error));
+    console.error("[getOrderStatus] error:", error instanceof Error ? error.message : String(error), `request_id=${requestId}`);
     return Response.json(
-      { error: "Unable to look up order status. Please try again or contact support." },
+      { error: "Unable to look up order status. Please try again or contact support.", request_id: requestId },
       { status: 500 }
     );
   }
