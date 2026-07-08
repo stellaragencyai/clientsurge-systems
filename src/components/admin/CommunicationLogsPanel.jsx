@@ -2,21 +2,24 @@ import { useState, useEffect } from 'react';
 import { base44 } from '@/api/base44Client';
 import { AlertCircle, Check, Download, Loader2, Send } from 'lucide-react';
 import {
-  buildCommunicationLogQuery,
   buildCommunicationLogsCsv,
   getCommunicationLogFilterLabel,
 } from '@/lib/communicationLogExport';
-import {
-  COMMUNICATION_LOG_PAGE_SIZE,
-  getCommunicationLogFetchLimit,
-  getCommunicationLogOffset,
-  getCommunicationLogPage,
-} from '@/lib/communicationLogPagination';
+
+const COMMUNICATION_LOG_PAGE_SIZE = 20;
+
+function getFunctionData(response) {
+  return response?.data || response || {};
+}
+
+function getErrorMessage(error, fallback) {
+  return error?.data?.error || error?.message || fallback;
+}
 
 export default function CommunicationLogsPanel() {
   const [logs, setLogs] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [loadError, setLoadError] = useState(null); // Task 8 — error state
+  const [loadError, setLoadError] = useState(null);
   const [filter, setFilter] = useState('all');
   const [expandedId, setExpandedId] = useState(null);
   const [reassignModal, setReassignModal] = useState(null);
@@ -35,21 +38,25 @@ export default function CommunicationLogsPanel() {
   const loadLogs = async (nextPage = page) => {
     try {
       setLoading(true);
-      setLoadError(null); // Task 8 — clear error on reload
-      const query = buildCommunicationLogQuery(filter);
+      setLoadError(null);
 
-      const fetchLimit = getCommunicationLogFetchLimit({ page: nextPage });
-      const data = await base44.asServiceRole.entities.CommunicationEvent.filter(
-        query,
-        '-created_date',
-        fetchLimit
-      );
-      const pageLogs = getCommunicationLogPage(data, { page: nextPage });
-      setLogs(pageLogs);
-      setHasNextPage((data || []).length > getCommunicationLogOffset({ page: nextPage }) + COMMUNICATION_LOG_PAGE_SIZE);
+      const response = await base44.functions.invoke('getCommunicationLogs', {
+        filter,
+        page: nextPage,
+        page_size: COMMUNICATION_LOG_PAGE_SIZE,
+      });
+      const data = getFunctionData(response);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setLogs(data.logs || []);
+      setHasNextPage(Boolean(data.hasNextPage));
     } catch (error) {
       console.error('Failed to load logs:', error);
-      setLoadError(error.message || 'Failed to load communication logs'); // Task 8
+      setLoadError(getErrorMessage(error, 'Failed to load communication logs'));
+      setLogs([]);
       setHasNextPage(false);
     } finally {
       setLoading(false);
@@ -59,13 +66,18 @@ export default function CommunicationLogsPanel() {
   const exportLogs = async () => {
     try {
       setExporting(true);
-      const query = buildCommunicationLogQuery(filter);
-      const data = await base44.asServiceRole.entities.CommunicationEvent.filter(
-        query,
-        '-created_date',
-        1000
-      );
-      const csv = buildCommunicationLogsCsv(data || []);
+      const response = await base44.functions.invoke('getCommunicationLogs', {
+        filter,
+        page: 0,
+        page_size: 1000,
+      });
+      const data = getFunctionData(response);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      const csv = buildCommunicationLogsCsv(data.logs || []);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
@@ -77,7 +89,7 @@ export default function CommunicationLogsPanel() {
       URL.revokeObjectURL(url);
     } catch (error) {
       console.error('Failed to export logs:', error);
-      alert('Failed to export logs: ' + error.message);
+      alert('Failed to export logs: ' + getErrorMessage(error, 'Unknown error'));
     } finally {
       setExporting(false);
     }
@@ -95,7 +107,7 @@ export default function CommunicationLogsPanel() {
     return colors[status] || 'bg-gray-100 text-gray-800 border-gray-300';
   };
 
-  const getEventIcon = (eventType) => {
+  const getEventIcon = (eventType = '') => {
     if (eventType.includes('failed')) return <AlertCircle className="w-4 h-4" />;
     if (eventType.includes('received')) return <Check className="w-4 h-4" />;
     return <Send className="w-4 h-4" />;
@@ -148,7 +160,6 @@ export default function CommunicationLogsPanel() {
         ))}
       </div>
 
-      {/* Task 8 — Error state */}
       {loadError && !loading && (
         <div className="flex gap-2 p-4 rounded-lg bg-red-50 border border-red-200 text-sm text-red-700">
           <AlertCircle className="w-4 h-4 flex-shrink-0 mt-0.5" />
@@ -298,7 +309,7 @@ export default function CommunicationLogsPanel() {
           onClose={() => setReassignModal(null)}
           onSuccess={() => {
             setReassignModal(null);
-            loadLogs();
+            loadLogs(page);
           }}
         />
       )}
@@ -311,6 +322,7 @@ function ReassignModal({ log, onClose, onSuccess }) {
   const [leads, setLeads] = useState([]);
   const [loading, setLoading] = useState(true);
   const [assigning, setAssigning] = useState(false);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     loadLeads();
@@ -318,14 +330,20 @@ function ReassignModal({ log, onClose, onSuccess }) {
 
   const loadLeads = async () => {
     try {
-      const data = await base44.asServiceRole.entities.WebsiteLead.filter(
-        { lead_status: { $in: ['new', 'contacted'] } },
-        '-created_date',
-        50
-      );
-      setLeads(data || []);
+      setLoading(true);
+      setError(null);
+      const response = await base44.functions.invoke('getCommunicationLogLeadOptions', { limit: 50 });
+      const data = getFunctionData(response);
+
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      setLeads(data.leads || []);
     } catch (error) {
       console.error('Failed to load leads:', error);
+      setError(getErrorMessage(error, 'Failed to load leads'));
+      setLeads([]);
     } finally {
       setLoading(false);
     }
@@ -336,36 +354,21 @@ function ReassignModal({ log, onClose, onSuccess }) {
 
     try {
       setAssigning(true);
-      const metadata = log.metadata_json ? JSON.parse(log.metadata_json) : {};
-
-      await base44.asServiceRole.entities.CommunicationEvent.create({
-        context_type: 'website_lead',
-        context_id: leadId,
-        channel: log.channel,
-        direction: log.direction,
-        event_type: 'sms_received',
-        provider: log.provider,
-        status: 'received',
-        subject: `[MANUAL] ${log.subject}`,
-        message_body: log.message_body,
-        provider_message_id: log.provider_message_id,
-        metadata_json: JSON.stringify({
-          ...metadata,
-          manually_assigned: true,
-          original_log_id: log.id,
-        }),
+      setError(null);
+      const response = await base44.functions.invoke('assignCommunicationLogToLead', {
+        log_id: log.id,
+        lead_id: leadId,
       });
+      const data = getFunctionData(response);
 
-      await base44.asServiceRole.entities.WebsiteLead.update(leadId, {
-        reply_status: 'responded',
-        lead_status: 'responded',
-        automation_enabled: false,
-      });
+      if (data.error) {
+        throw new Error(data.error);
+      }
 
       onSuccess();
     } catch (error) {
       console.error('Failed to assign:', error);
-      alert('Failed to assign: ' + error.message);
+      setError(getErrorMessage(error, 'Failed to assign communication log'));
     } finally {
       setAssigning(false);
     }
@@ -384,6 +387,12 @@ function ReassignModal({ log, onClose, onSuccess }) {
             <strong>Message:</strong> {log.message_body?.substring(0, 80)}...
           </p>
         </div>
+
+        {error && (
+          <div className="bg-red-50 border border-red-200 text-red-700 rounded p-3 mb-4 text-xs">
+            {error}
+          </div>
+        )}
 
         {loading ? (
           <p className="text-center text-muted-foreground py-4">Loading leads...</p>
