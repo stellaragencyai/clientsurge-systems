@@ -25,19 +25,19 @@ function StoreHeroHeader({ selectedPackageOffer }) {
 
   return (
     <div className="mx-auto flex max-w-6xl flex-col items-center text-center">
-      <p className="mb-8 text-xs font-black uppercase tracking-[0.28em] text-primary md:text-sm">
+      <p className="mb-6 text-xs font-black uppercase tracking-[0.28em] text-primary md:text-sm">
         {eyebrow}
       </p>
-      <div className="flex w-full items-center justify-center gap-5 md:gap-7">
+      <div className="flex w-full items-center justify-center gap-4 md:gap-6">
         <span
           aria-hidden="true"
-          className="hidden h-[clamp(3.25rem,6vw,5rem)] w-1.5 flex-shrink-0 rounded-full bg-primary shadow-[0_0_18px_rgba(0,174,239,0.55)] sm:block"
+          className="hidden h-[clamp(2.25rem,4vw,3.5rem)] w-1.5 flex-shrink-0 rounded-full bg-primary shadow-[0_0_18px_rgba(0,174,239,0.55)] sm:block"
         />
-        <h1 className="max-w-[1180px] text-center font-titles text-[clamp(2.5rem,6vw,5.5rem)] font-black leading-[0.96] tracking-[-0.065em] text-foreground">
+        <h1 className="max-w-[940px] text-center font-titles text-[clamp(2rem,3.4vw,3.75rem)] font-black leading-[1.03] tracking-[-0.045em] text-foreground">
           {title}
         </h1>
       </div>
-      <p className="mx-auto mt-10 max-w-6xl text-center text-[clamp(1.15rem,2.1vw,1.75rem)] leading-relaxed text-muted-foreground">
+      <p className="mx-auto mt-7 max-w-5xl text-center text-[clamp(1.05rem,1.55vw,1.35rem)] leading-relaxed text-muted-foreground">
         {subtitle}
       </p>
     </div>
