@@ -1,0 +1,41 @@
+name: Setup Pipeline Smoke
+
+on:
+  pull_request:
+    paths:
+      - "base44/functions/saveClientCredentials/**"
+      - "base44/functions/saveClientCredentialsDraft/**"
+      - "base44/functions/getOrderStatus/**"
+      - "base44/functions/getBrokenFlows/**"
+      - "base44/functions/_shared/setupPayloadContract.ts"
+      - "src/components/onboarding/CredentialsWizardHardened.jsx"
+      - "src/internal-pages/CredentialsSetup.jsx"
+      - "src/pages/admin/BrokenFlows.jsx"
+      - "src/components/system/BuildVersionBeacon.jsx"
+      - "scripts/smoke/setup-pipeline-contract-smoke.mjs"
+      - "package.json"
+  push:
+    branches: [main]
+    paths:
+      - "base44/functions/saveClientCredentials/**"
+      - "base44/functions/saveClientCredentialsDraft/**"
+      - "base44/functions/getOrderStatus/**"
+      - "base44/functions/getBrokenFlows/**"
+      - "base44/functions/_shared/setupPayloadContract.ts"
+      - "src/components/onboarding/CredentialsWizardHardened.jsx"
+      - "src/internal-pages/CredentialsSetup.jsx"
+      - "src/pages/admin/BrokenFlows.jsx"
+      - "src/components/system/BuildVersionBeacon.jsx"
+      - "scripts/smoke/setup-pipeline-contract-smoke.mjs"
+      - "package.json"
+
+jobs:
+  setup-pipeline-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Run setup pipeline contract smoke
+        run: npm run smoke:setup-pipeline
