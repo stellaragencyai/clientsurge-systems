@@ -1,5 +1,6 @@
-const CACHE_NAME = "clientsurge-shell-v2";
-const CORE_ASSETS = ["/manifest.json", "/pwa-icon.svg"];
+const CACHE_NAME = "clientsurge-shell-v3";
+const OFFLINE_FALLBACK_URL = "/offline.html";
+const CORE_ASSETS = ["/manifest.json", "/pwa-icon.svg", OFFLINE_FALLBACK_URL];
 
 // Detect if we are running inside the Base44 visual editor sandbox.
 // In that environment we must not intercept ANY requests.
@@ -49,10 +50,13 @@ self.addEventListener("fetch", (event) => {
   if (url.origin !== self.location.origin) return;
   if (url.hostname.includes("preview-sandbox") || url.hostname.includes("base44")) return;
 
-  // For navigation/HTML, always go to network with a safe fallback
+  // For navigation/HTML, always try network first with a clear offline fallback.
   if (event.request.mode === "navigate" || event.request.headers.get("accept")?.includes("text/html")) {
     event.respondWith(
-      fetch(event.request).catch(() => caches.match("/") || Response.error())
+      fetch(event.request).catch(async () => {
+        const fallback = await caches.match(OFFLINE_FALLBACK_URL);
+        return fallback || caches.match("/") || Response.error();
+      })
     );
     return;
   }
