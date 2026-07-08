@@ -13,7 +13,6 @@ import { validatePublicFormOrigin } from '../_shared/publicFormOriginGuard.js';
 const MAX_MESSAGE_LENGTH = 1000;
 const rateLimiter = createLeadCaptureRateLimiter();
 
-// ── Finding #138: Input sanitization for XSS prevention ──
 const DANGEROUS_PATTERNS = [
   /<script[^>]*>.*?<\/script>/gi,
   /javascript:/gi,
@@ -23,18 +22,17 @@ const DANGEROUS_PATTERNS = [
   /<object/gi,
 ];
 
-function sanitizeString(input) {
-  if (typeof input !== "string") return input;
-  let sanitized = input;
-  DANGEROUS_PATTERNS.forEach(pattern => { sanitized = sanitized.replace(pattern, ""); });
-  sanitized = sanitized.replace(/<[^>]*>/g, "");
-  return sanitized.trim();
-}
 const ALLOWED_SOURCE_VALUES = new Set([
   'website_form',
   'contact_page',
   'pricing_page',
   'landing_page',
+  'home_page',
+  'industry_page',
+  'exit_intent',
+  'chat_widget',
+  'sam_chat_widget',
+  'lead_capture_page',
   'elevenlabs_sarah_ai_receptionist',
 ]);
 
@@ -49,6 +47,16 @@ function secureJson(data = {}, init = {}) {
   });
 }
 
+function sanitizeString(input) {
+  if (typeof input !== 'string') return input;
+  let sanitized = input;
+  DANGEROUS_PATTERNS.forEach((pattern) => {
+    sanitized = sanitized.replace(pattern, '');
+  });
+  sanitized = sanitized.replace(/<[^>]*>/g, '');
+  return sanitized.trim();
+}
+
 function getRequestIp(req) {
   const forwardedFor = cleanString(req.headers.get('x-forwarded-for')).split(',')[0]?.trim();
   return (
@@ -60,36 +68,24 @@ function getRequestIp(req) {
 }
 
 function parseRequestedChannels(value) {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-
+  if (!Array.isArray(value)) return [];
   return value.map((channel) => cleanString(channel).toLowerCase()).filter(Boolean);
 }
 
-function normalizeLeadSource(value) {
-  const source = cleanString(value);
+function normalizeLeadSource(value, sourcePage = '') {
+  const source = cleanString(value).toLowerCase();
+  const page = cleanString(sourcePage).toLowerCase();
+  const combined = `${source} ${page}`;
 
-  if (!source) {
-    return 'website_form';
-  }
-
-  if (ALLOWED_SOURCE_VALUES.has(source)) {
-    return source;
-  }
-
-  if (source.includes('landing')) {
-    return 'landing_page';
-  }
-
-  if (source.includes('contact')) {
-    return 'contact_page';
-  }
-
-  if (source.includes('pricing')) {
-    return 'pricing_page';
-  }
-
+  if (source && ALLOWED_SOURCE_VALUES.has(source)) return source;
+  if (combined.includes('contact')) return 'contact_page';
+  if (combined.includes('pricing')) return 'pricing_page';
+  if (combined.includes('industry')) return 'industry_page';
+  if (combined.includes('exit')) return 'exit_intent';
+  if (combined.includes('chat') || combined.includes('sam')) return 'chat_widget';
+  if (combined.includes('lead')) return 'lead_capture_page';
+  if (combined.includes('landing')) return 'landing_page';
+  if (page === '/' || combined.includes('home')) return 'home_page';
   return 'website_form';
 }
 
@@ -97,41 +93,43 @@ function uniqueById(leads) {
   const seen = new Set();
   return (leads || []).filter((lead) => {
     const id = lead?.id || `${lead?.email || ''}:${lead?.phone_number || ''}:${lead?.created_date || ''}`;
-    if (seen.has(id)) {
-      return false;
-    }
+    if (seen.has(id)) return false;
     seen.add(id);
     return true;
   });
 }
 
 Deno.serve(async (req) => {
+  const requestId = `lead_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
   try {
     if (req.method !== 'POST') {
-      return secureJson({ error: 'Method not allowed' }, { status: 405 });
+      return secureJson(
+        { error: 'Method not allowed', code: 'method_not_allowed', request_id: requestId },
+        { status: 405, headers: { Allow: 'POST' } }
+      );
     }
 
     const originGuard = validatePublicFormOrigin(req);
     if (!originGuard.ok) {
-      return secureJson({ error: originGuard.error }, { status: originGuard.status });
+      return secureJson({ error: originGuard.error, code: 'invalid_origin', request_id: requestId }, { status: originGuard.status });
     }
 
     const body = await req.json().catch(() => null);
     if (!body || typeof body !== 'object') {
-      return secureJson({ error: 'Invalid JSON body' }, { status: 400 });
+      return secureJson({ error: 'Invalid JSON body', code: 'invalid_json', request_id: requestId }, { status: 400 });
     }
 
     const honeypot = cleanString(body.website_url);
     if (honeypot) {
-      return secureJson({ success: true, ignored: true, reason: "bot_detected" });
+      return secureJson({ success: true, ignored: true, reason: 'bot_detected', request_id: requestId });
     }
 
     const ipAddress = getRequestIp(req);
     if (rateLimiter.isRateLimited(ipAddress)) {
-      return secureJson({ error: 'Too many submissions. Please try again later.' }, { status: 429 });
+      return secureJson({ error: 'Too many submissions. Please try again later.', code: 'rate_limited', request_id: requestId }, { status: 429 });
     }
 
-    // Finding #138: Sanitize all user input to prevent stored XSS
     const fullName = sanitizeString(cleanString(body.full_name));
     const businessName = sanitizeString(cleanString(body.business_name));
     const email = normalizeEmail(body.email);
@@ -140,10 +138,10 @@ Deno.serve(async (req) => {
     const requestedChannels = parseRequestedChannels(body.requested_channels);
     const consentGiven = body.consent_given === true || body.consent_given === 'true';
     const message = sanitizeString(cleanString(body.message || body.problem || body.biggest_problem)).slice(0, MAX_MESSAGE_LENGTH);
-    const businessType = sanitizeString(cleanString(body.business_type || body.niche)) || 'Other';
-    const source = normalizeLeadSource(body.source);
-    const sourcePage = sanitizeString(cleanString(body.source_page));
-    const consentSource = sanitizeString(cleanString(body.consent_source)) || 'lead_capture_form';
+    const businessType = sanitizeString(cleanString(body.business_type || body.niche || body.industry)) || 'Other';
+    const sourcePage = sanitizeString(cleanString(body.source_page || body.page_path || body.pathname));
+    const source = normalizeLeadSource(body.source, sourcePage);
+    const consentSource = sanitizeString(cleanString(body.consent_source)) || `${source}_form`;
     const consentTextVersion = sanitizeString(cleanString(body.consent_text_version)) || 'lead_capture_explicit_checkbox_v1';
 
     const errors = [];
@@ -157,11 +155,10 @@ Deno.serve(async (req) => {
     if (!consentGiven) errors.push('SMS and email consent is required');
 
     if (errors.length > 0) {
-      return secureJson({ error: errors[0], errors }, { status: 400 });
+      return secureJson({ error: errors[0], errors, code: 'validation_failed', request_id: requestId }, { status: 400 });
     }
 
     const base44 = createClientFromRequest(req);
-
     const emailMatches = await base44.asServiceRole.entities.WebsiteLead.filter({ email }, '-created_date', 10);
     const phoneMatches = normalizedPhone
       ? await base44.asServiceRole.entities.WebsiteLead.filter({ phone_number: normalizedPhone }, '-created_date', 10)
@@ -178,6 +175,7 @@ Deno.serve(async (req) => {
         lead_id: duplicate.id,
         action: 'duplicate_recent',
         duplicate: true,
+        request_id: requestId,
       });
     }
 
@@ -209,9 +207,10 @@ Deno.serve(async (req) => {
       ip_address: ipAddress,
       dedup_key: buildDedupKey({ email, phone: normalizedPhone }),
       sms_permission: consentGiven && requestedChannels.includes('sms'),
+      request_id: requestId,
     });
 
-    base44.asServiceRole.functions.invoke('processWebsiteLeadInitialResponse', { lead_id: newLead.id }).catch((err) =>
+    base44.asServiceRole.functions.invoke('processWebsiteLeadInitialResponse', { lead_id: newLead.id, request_id: requestId }).catch((err) =>
       console.warn('[submitLeadCapture] Initial response trigger failed (non-blocking):', err.message)
     );
 
@@ -219,11 +218,12 @@ Deno.serve(async (req) => {
       success: true,
       lead_id: newLead.id,
       action: 'created',
+      request_id: requestId,
     });
   } catch (error) {
     console.error('submitLeadCapture error:', error);
     return secureJson(
-      { error: error.message || 'Failed to submit lead' },
+      { error: error.message || 'Failed to submit lead', request_id: requestId },
       { status: 500 }
     );
   }

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
   Phone,
@@ -16,16 +16,17 @@ import CSButton from "@/components/design-system/CSButton";
 import CSFormContainer from "@/components/design-system/CSFormContainer";
 import CSFormField from "@/components/design-system/CSFormField";
 import CSConfirmationCard from "@/components/design-system/CSConfirmationCard";
-import { base44 } from "@/api/base44Client";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import FloatingConfirmation from "@/components/ui/FloatingConfirmation";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import { setPageMetadata } from "@/lib/seo";
+import { invokePublicBase44Function } from "@/lib/publicFunctionClient";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
+const CONTACT_CONSENT_VERSION = "contact_form_explicit_consent_v1";
 
 const contactMethods = [
   { Icon: Phone, label: "Phone", value: "(602) 584-3227", href: "tel:+16025843227" },
@@ -35,48 +36,73 @@ const contactMethods = [
 
 const trustPoints = [
   { Icon: Clock3, title: "Fast response", detail: "Replies within one business day." },
-  { Icon: ShieldCheck, title: "No-pressure clarity", detail: "We help identify the right next step." },
+  { Icon: ShieldCheck, title: "Clean tracking", detail: "Every inquiry creates a traceable lead record." },
   { Icon: Sparkles, title: "Built for operators", detail: "Designed around local service-business lead flow." },
 ];
 
+const initialForm = {
+  full_name: "",
+  business_name: "",
+  email: "",
+  phone: "",
+  business_type: "",
+  message: "",
+  website_url: "",
+  business_website_url: "",
+  utm_source: "",
+  utm_medium: "",
+  utm_campaign: "",
+  utm_content: "",
+  utm_term: "",
+  referrer: "",
+  consent_given: false,
+};
+
+function getStoredUtm() {
+  try {
+    return JSON.parse(sessionStorage.getItem("cs_utm_session") || "{}");
+  } catch {
+    return {};
+  }
+}
+
+function sourceMetadata() {
+  const params = new URLSearchParams(window.location.search);
+  const stored = getStoredUtm();
+  const fromParamOrStorage = (key) => params.get(key) || stored[key] || "";
+
+  return {
+    utm_source: fromParamOrStorage("utm_source"),
+    utm_medium: fromParamOrStorage("utm_medium"),
+    utm_campaign: fromParamOrStorage("utm_campaign"),
+    utm_content: fromParamOrStorage("utm_content"),
+    utm_term: fromParamOrStorage("utm_term"),
+    referrer: document.referrer || stored.referrer || "",
+  };
+}
+
+function formatRequestSuffix(error) {
+  return error?.request_id ? ` Request ID: ${error.request_id}.` : "";
+}
+
 export default function Contact() {
-  const [form, setForm] = useState({
-    full_name: "",
-    business_name: "",
-    email: "",
-    phone: "",
-    business_type: "",
-    message: "",
-    website_url: "",
-    utm_source: "",
-    utm_medium: "",
-    utm_campaign: "",
-    utm_content: "",
-    referrer: "",
-  });
+  const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [showFloat, setShowFloat] = useState(false);
   const [errors, setErrors] = useState({});
   const [touched, setTouched] = useState({});
+  const [submittedLead, setSubmittedLead] = useState(null);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    setForm((prev) => ({
-      ...prev,
-      utm_source: params.get("utm_source") || "",
-      utm_medium: params.get("utm_medium") || "",
-      utm_campaign: params.get("utm_campaign") || "",
-      utm_content: params.get("utm_content") || "",
-      referrer: document.referrer || "",
-    }));
+    setForm((prev) => ({ ...prev, ...sourceMetadata() }));
   }, []);
 
   useEffect(() => {
     return setPageMetadata({
-      title: "Contact ClientSurge Systems | Questions and Demo Requests",
+      title: "Contact ClientSurge Systems | Questions and Support",
       description:
-        "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
+        "Contact ClientSurge Systems to ask questions or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
       canonicalPath: "/contact",
       ogTitle: "Contact ClientSurge Systems",
       ogDescription: "Reach out to discuss your lead flow, booking process, or automation questions.",
@@ -86,50 +112,94 @@ export default function Contact() {
   const validate = () => {
     const e = {};
     if (!form.full_name.trim()) e.full_name = "Required";
+    if (!form.business_name.trim()) e.business_name = "Required";
     if (!form.email.trim()) e.email = "Required";
     else if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email";
-    if (form.phone.trim()) {
+    if (!form.phone.trim()) e.phone = "Required";
+    else {
       const digits = form.phone.replace(/\D/g, "");
       if (!PHONE_REGEX.test(form.phone) || digits.length < 10) e.phone = "Enter a valid phone number";
     }
+    if (!form.business_type.trim()) e.business_type = "Required";
     if (!form.message.trim()) e.message = "Required";
+    if (!form.consent_given) e.consent_given = "Consent is required so we can respond to your inquiry";
     return e;
   };
 
-  const allValid = Boolean(
-    form.full_name.trim() &&
-    EMAIL_REGEX.test(form.email) &&
-    form.phone.trim() && form.phone.replace(/\D/g, '').length >= 10 &&
-    form.business_name.trim() &&
-    form.business_type.trim() &&
-    form.message.trim()
-  );
+  const allValid = useMemo(() => {
+    const digits = form.phone.replace(/\D/g, "");
+    return Boolean(
+      form.full_name.trim() &&
+      form.business_name.trim() &&
+      EMAIL_REGEX.test(form.email) &&
+      form.phone.trim() &&
+      digits.length >= 10 &&
+      form.business_type.trim() &&
+      form.message.trim() &&
+      form.consent_given
+    );
+  }, [form]);
 
   const updateField = (name, value) => {
-    setForm((c) => ({ ...c, [name]: value }));
-    setErrors((c) => ({ ...c, [name]: undefined, submit: undefined }));
+    setForm((current) => ({ ...current, [name]: value }));
+    setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
   };
 
   const handleBlur = (name) => {
     setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     const nextErrors = validate();
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
-      setTouched({ full_name: true, email: true, phone: true, message: true });
+      setTouched({
+        full_name: true,
+        business_name: true,
+        email: true,
+        phone: true,
+        business_type: true,
+        message: true,
+        consent_given: true,
+      });
       return;
     }
+
     setLoading(true);
+    setErrors({});
+
     try {
-      const result = await base44.functions.invoke("submitContactInquiry", form);
+      const payload = {
+        ...form,
+        full_name: form.full_name.trim(),
+        business_name: form.business_name.trim(),
+        email: form.email.trim().toLowerCase(),
+        phone: form.phone.trim(),
+        business_type: form.business_type.trim(),
+        message: form.message.trim(),
+        business_website_url: form.business_website_url.trim(),
+        source: "contact_page",
+        source_page: "/contact",
+        consent_source: "contact_page_form",
+        consent_text_version: CONTACT_CONSENT_VERSION,
+      };
+
+      const result = await invokePublicBase44Function("submitContactInquiry", payload);
       if (!result.data?.success) throw new Error(result.data?.error || "Submission failed");
+
+      setSubmittedLead({
+        lead_id: result.data.lead_id || null,
+        website_lead_id: result.data.website_lead_id || null,
+        request_id: result.data.request_id || result.request_id || null,
+        action: result.data.action || "created",
+      });
       setSuccess(true);
       setShowFloat(true);
-    } catch {
-      setErrors({ submit: "Something went wrong. Please try again or email us directly." });
+    } catch (error) {
+      setErrors({
+        submit: `Something went wrong. Please try again or email support@clientsurgesystems.com directly.${formatRequestSuffix(error)}`,
+      });
     } finally {
       setLoading(false);
     }
@@ -147,13 +217,12 @@ export default function Contact() {
             <CSSectionHeader
               eyebrow="Get in touch"
               title="Let's map the fastest path to a cleaner lead system."
-              subtitle="Ask a question, request a walkthrough, or tell us where leads are slipping through the cracks. We will help you identify the most practical next step."
+              subtitle="Ask a question or tell us where leads are slipping through the cracks. We will help you identify the most practical next step."
               align="center"
             />
           </div>
 
           <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
-            {/* Left: Contact info panel */}
             <aside className="relative overflow-hidden rounded-[2rem] cs-glow-card p-8 backdrop-blur-xl md:p-10">
               <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#00AEEF]/15 blur-2xl" />
               <div className="absolute -bottom-20 left-8 h-44 w-44 rounded-full bg-[#003B8F]/10 blur-2xl" />
@@ -209,29 +278,31 @@ export default function Contact() {
               </div>
             </aside>
 
-            {/* Right: Form / Success */}
             <section className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl md:p-9">
               {success ? (
                 <CSConfirmationCard
                   title="Message Received"
-                  message="Thanks for reaching out. We'll respond within one business day with a clear next step."
+                  message="Thanks for reaching out. Your inquiry has been captured in the ClientSurge lead system. We'll respond within one business day with a clear next step."
                   responseTime="within one business day"
                   nextSteps={[
-                    "Our team reviews your message",
-                    "We identify the best automation path for your business",
-                    "You receive a tailored response — no pressure, no demos",
+                    "Your inquiry is logged with source attribution",
+                    "Our team reviews your lead-flow problem",
+                    "You receive a tailored response — no pressure, no fake urgency",
                   ]}
-                />
+                >
+                  {submittedLead?.request_id && (
+                    <p className="mt-4 text-xs text-slate-500">Reference: {submittedLead.request_id}</p>
+                  )}
+                </CSConfirmationCard>
               ) : (
                 <CSFormContainer title="Contact Us" subtitle="Share the basics and we will respond with a clear next step for your business." maxWidth="100%">
                   <form onSubmit={handleSubmit} noValidate className="space-y-5">
                     {errors.submit && (
-                      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700">
+                      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700" role="alert">
                         {errors.submit}
                       </div>
                     )}
 
-                    {/* Honeypot */}
                     <input
                       type="text"
                       name="website_url"
@@ -240,6 +311,7 @@ export default function Contact() {
                       className="hidden"
                       tabIndex={-1}
                       aria-hidden="true"
+                      autoComplete="off"
                     />
 
                     <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -247,7 +319,7 @@ export default function Contact() {
                         label="Full Name"
                         name="full_name"
                         value={form.full_name}
-                        onChange={(v) => updateField("full_name", v)}
+                        onChange={(value) => updateField("full_name", value)}
                         onBlur={() => handleBlur("full_name")}
                         error={errors.full_name}
                         touched={touched.full_name}
@@ -261,8 +333,11 @@ export default function Contact() {
                         label="Business Name"
                         name="business_name"
                         value={form.business_name}
-                        onChange={(v) => updateField("business_name", v)}
+                        onChange={(value) => updateField("business_name", value)}
                         onBlur={() => handleBlur("business_name")}
+                        error={errors.business_name}
+                        touched={touched.business_name}
+                        required
                         autoComplete="organization"
                         allValid={allValid}
                         icon={Building2}
@@ -273,7 +348,7 @@ export default function Contact() {
                         type="email"
                         name="email"
                         value={form.email}
-                        onChange={(v) => updateField("email", v)}
+                        onChange={(value) => updateField("email", value)}
                         onBlur={() => handleBlur("email")}
                         error={errors.email}
                         touched={touched.email}
@@ -284,14 +359,15 @@ export default function Contact() {
                         placeholder="john@example.com"
                       />
                       <CSFormField
-                        label="Phone No."
+                        label="Phone Number"
                         type="tel"
                         name="phone"
                         value={form.phone}
-                        onChange={(v) => updateField("phone", v)}
+                        onChange={(value) => updateField("phone", value)}
                         onBlur={() => handleBlur("phone")}
                         error={errors.phone}
                         touched={touched.phone}
+                        required
                         placeholder="(123) 456-7890"
                         autoComplete="tel"
                         allValid={allValid}
@@ -300,22 +376,42 @@ export default function Contact() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: '#475569' }}>
-                        Business Type / Industry
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "#475569" }}>
+                        Business Type / Industry <span className="text-red-500">*</span>
                       </label>
                       <input
                         type="text"
                         name="business_type"
                         value={form.business_type}
                         onChange={(e) => updateField("business_type", e.target.value)}
+                        onBlur={() => handleBlur("business_type")}
                         placeholder="e.g., HVAC, Dental, Roofing"
+                        aria-invalid={Boolean(errors.business_type)}
                         className="w-full px-3 py-2.5 text-sm border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                        style={{ borderColor: 'hsl(var(--border))' }}
+                        style={{ borderColor: errors.business_type && touched.business_type ? "#ef4444" : "hsl(var(--border))" }}
+                      />
+                      {errors.business_type && touched.business_type && (
+                        <p className="mt-1 text-xs text-red-500" role="alert">{errors.business_type}</p>
+                      )}
+                    </div>
+
+                    <div>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "#475569" }}>
+                        Business Website <span className="text-slate-400 normal-case tracking-normal">optional</span>
+                      </label>
+                      <input
+                        type="text"
+                        name="business_website_url"
+                        value={form.business_website_url}
+                        onChange={(e) => updateField("business_website_url", e.target.value)}
+                        placeholder="https://yourbusiness.com"
+                        className="w-full px-3 py-2.5 text-sm border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
+                        style={{ borderColor: "hsl(var(--border))" }}
                       />
                     </div>
 
                     <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: '#475569' }}>
+                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "#475569" }}>
                         Message <span className="text-red-500">*</span>
                       </label>
                       <div className="relative">
@@ -327,9 +423,7 @@ export default function Contact() {
                           rows={5}
                           aria-invalid={Boolean(errors.message)}
                           className="w-full resize-none rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00AEEF] focus:shadow-[0_0_0_4px_rgba(0,174,239,0.12)]"
-                          style={{
-                            borderColor: errors.message && touched.message ? '#ef4444' : 'hsl(var(--border))',
-                          }}
+                          style={{ borderColor: errors.message && touched.message ? "#ef4444" : "hsl(var(--border))" }}
                           placeholder="Tell us what is not working: missed calls, slow follow-up, poor booking, low website conversion, or something else."
                         />
                         {allValid && !errors.message && form.message.trim() && (
@@ -341,6 +435,22 @@ export default function Contact() {
                       )}
                     </div>
 
+                    <label className="flex items-start gap-3 rounded-2xl border border-sky-100 bg-sky-50/70 p-4 text-sm text-slate-700">
+                      <input
+                        type="checkbox"
+                        checked={form.consent_given}
+                        onChange={(e) => updateField("consent_given", e.target.checked)}
+                        onBlur={() => handleBlur("consent_given")}
+                        className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
+                      />
+                      <span>
+                        I agree that ClientSurge Systems may contact me by email, phone, or SMS about this inquiry. Message/data rates may apply. Reply STOP to opt out.
+                        {errors.consent_given && touched.consent_given && (
+                          <span className="mt-1 block text-xs font-semibold text-red-500" role="alert">{errors.consent_given}</span>
+                        )}
+                      </span>
+                    </label>
+
                     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
                       <CSButton
                         variant="primary"
@@ -351,7 +461,7 @@ export default function Contact() {
                         type="submit"
                         className="disabled:opacity-60"
                       >
-                        {loading ? 'Sending...' : 'Send Message'}
+                        {loading ? "Sending..." : "Send Message"}
                       </CSButton>
                       <p className="text-sm font-semibold text-slate-500">No spam. No pressure. Just a clear next step.</p>
                     </div>
@@ -400,7 +510,7 @@ export default function Contact() {
         show={showFloat}
         onDismiss={() => setShowFloat(false)}
         title="Message Received"
-        message="Thanks for reaching out. We'll respond within one business day."
+        message="Thanks for reaching out. Your inquiry has been logged."
       />
     </div>
   );

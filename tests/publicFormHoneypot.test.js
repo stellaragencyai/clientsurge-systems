@@ -4,7 +4,8 @@ import { readFileSync } from "node:fs";
 
 const sources = {
   submitLeadCapture: readFileSync(new URL("../base44/functions/submitLeadCapture/entry.ts", import.meta.url), "utf8"),
-  submitContactInquiry: readFileSync(new URL("../base44/functions/submitContactInquiry/entry.ts", import.meta.url), "utf8"),
+  submitContactInquiry: readFileSync(new URL("../base44/functions/submitContactInquiry/main.ts", import.meta.url), "utf8"),
+  submitContactInquiryEntry: readFileSync(new URL("../base44/functions/submitContactInquiry/entry.ts", import.meta.url), "utf8"),
   contactPage: readFileSync(new URL("../src/pages/Contact.jsx", import.meta.url), "utf8"),
   exitIntent: readFileSync(new URL("../src/components/landing/ExitIntentPopup.jsx", import.meta.url), "utf8"),
   samChat: readFileSync(new URL("../src/components/sam/SamChatWidget.jsx", import.meta.url), "utf8"),
@@ -15,9 +16,13 @@ const sources = {
 
 test("public backend form endpoints treat website_url as the honeypot field", () => {
   assert.match(sources.submitLeadCapture, /cleanString\(body\.website_url\)/);
-  assert.match(sources.submitLeadCapture, /reason: "bot_detected"/);
+  assert.match(sources.submitLeadCapture, /reason: 'bot_detected'|reason: "bot_detected"/);
   assert.match(sources.submitContactInquiry, /payload\.website_url \|\| payload\.website_hp/);
   assert.match(sources.submitContactInquiry, /if \(contact\.honeypot\)/);
+});
+
+test("submitContactInquiry entry delegates to the canonical main handler", () => {
+  assert.match(sources.submitContactInquiryEntry, /import '\.\/main\.ts';/);
 });
 
 test("submitContactInquiry preserves real business website separately from honeypot website_url", () => {
