@@ -14,45 +14,45 @@ const TOOL_LOGOS = [
   {
     name: 'Asana',
     src: 'https://upload.wikimedia.org/wikipedia/commons/3/3b/Asana_logo.svg',
-    itemWidth: 172,
-    imageWidth: 160,
-    imageMaxHeight: 46,
+    itemWidth: 86,
+    imageWidth: 80,
+    imageMaxHeight: 23,
   },
   {
     name: 'Cloudflare',
     src: 'https://upload.wikimedia.org/wikipedia/commons/9/94/Cloudflare_Logo.png',
-    itemWidth: 206,
-    imageWidth: 198,
-    imageMaxHeight: 54,
+    itemWidth: 103,
+    imageWidth: 99,
+    imageMaxHeight: 27,
   },
   {
     name: 'ChatGPT',
     src: 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/09317eed9_Chatgpt-logo-1672775463-logotic-brandsvg.png',
-    itemWidth: 204,
-    imageWidth: 246,
-    imageMaxHeight: 246,
+    itemWidth: 102,
+    imageWidth: 123,
+    imageMaxHeight: 123,
     crop: true,
   },
   {
     name: 'Twilio',
     src: 'https://upload.wikimedia.org/wikipedia/commons/7/7e/Twilio-logo-red.svg',
-    itemWidth: 192,
-    imageWidth: 180,
-    imageMaxHeight: 52,
+    itemWidth: 96,
+    imageWidth: 90,
+    imageMaxHeight: 26,
   },
   {
     name: 'Stripe',
     src: 'https://upload.wikimedia.org/wikipedia/commons/b/ba/Stripe_Logo%2C_revised_2016.svg',
-    itemWidth: 150,
-    imageWidth: 138,
-    imageMaxHeight: 54,
+    itemWidth: 75,
+    imageWidth: 69,
+    imageMaxHeight: 27,
   },
   {
     name: 'Resend',
     src: 'https://media.base44.com/images/public/69dc4a79656fdba136d413d3/edd28679a_resend-logo-png_seeklogo-623015.png',
-    itemWidth: 200,
-    imageWidth: 238,
-    imageMaxHeight: 238,
+    itemWidth: 100,
+    imageWidth: 119,
+    imageMaxHeight: 119,
     crop: true,
   },
 ];
@@ -106,13 +106,13 @@ export default function HeroLogoCarousel() {
         .cs-hero-logo-carousel__viewport {
           position: relative;
           width: 100%;
-          height: clamp(86px, 7.5vw, 112px);
+          height: clamp(68px, 6vw, 82px);
           overflow: hidden;
           border-radius: 999px;
           border: 1px solid rgba(15, 23, 42, 0.08);
           background: rgba(255, 255, 255, 0.92);
           box-shadow:
-            0 20px 55px rgba(15, 23, 42, 0.08),
+            0 16px 42px rgba(15, 23, 42, 0.07),
             inset 0 1px 0 rgba(255, 255, 255, 0.86);
           -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
           mask-image: linear-gradient(to right, transparent 0%, #000 8%, #000 92%, transparent 100%);
@@ -121,7 +121,7 @@ export default function HeroLogoCarousel() {
         .cs-hero-logo-carousel__track {
           display: flex;
           align-items: center;
-          gap: clamp(2.6rem, 5.1vw, 4.5rem);
+          gap: clamp(2.2rem, 4.2vw, 3.6rem);
           width: max-content;
           height: 100%;
           padding-inline: clamp(2rem, 5vw, 4rem);
@@ -133,7 +133,7 @@ export default function HeroLogoCarousel() {
           position: relative;
           flex: 0 0 auto;
           width: var(--cs-logo-item-width);
-          height: 70px;
+          height: 42px;
           display: flex;
           align-items: center;
           justify-content: center;
@@ -170,13 +170,13 @@ export default function HeroLogoCarousel() {
         .cs-hero-logo-carousel__static {
           display: grid;
           grid-template-columns: repeat(3, minmax(0, 1fr));
-          gap: 0.9rem;
-          padding: 1rem;
+          gap: 0.75rem;
+          padding: 0.9rem;
         }
 
         .cs-hero-logo-carousel__static .cs-hero-logo-carousel__mark {
           width: 100%;
-          height: 54px;
+          height: 38px;
         }
 
         @keyframes csHeroLogoFlow {
@@ -197,20 +197,20 @@ export default function HeroLogoCarousel() {
           }
 
           .cs-hero-logo-carousel__viewport {
-            height: 92px;
-            border-radius: 26px;
+            height: 72px;
+            border-radius: 22px;
             -webkit-mask-image: linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
             mask-image: linear-gradient(to right, transparent 0%, #000 12%, #000 88%, transparent 100%);
           }
 
           .cs-hero-logo-carousel__track {
-            gap: 2.35rem;
+            gap: 2rem;
             padding-inline: 1.5rem;
             animation-duration: 28s;
           }
 
           .cs-hero-logo-carousel__mark {
-            transform: scale(0.86) translateZ(0);
+            transform: scale(0.92) translateZ(0);
             transform-origin: center;
           }
 
