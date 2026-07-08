@@ -10,10 +10,39 @@ import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import { setPageMetadata } from "@/lib/seo";
 import { trackCTA } from "@/lib/analytics";
 import { useSearchParams } from "react-router-dom";
-import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import Breadcrumb from "@/components/seo/Breadcrumb";
 
 const checkoutHrefForPackage = (packageKey) => `/product-signup?package=${encodeURIComponent(packageKey)}`;
+
+function StoreHeroHeader({ selectedPackageOffer }) {
+  const eyebrow = selectedPackageOffer ? "SELECTED SYSTEM" : "THE AUTOMATION STORE";
+  const title = selectedPackageOffer
+    ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} System`
+    : "Six Systems That Protect Every Lead";
+  const subtitle = selectedPackageOffer
+    ? "Your selected ClientSurge system is preloaded. Review what is included, then continue into checkout and guided setup."
+    : "Browse the automation stack — capture, recover, follow up, book, request reviews, and reactivate. Add individual modules or pick a full system. No demos required.";
+
+  return (
+    <div className="mx-auto flex max-w-6xl flex-col items-center text-center">
+      <p className="mb-8 text-xs font-black uppercase tracking-[0.28em] text-primary md:text-sm">
+        {eyebrow}
+      </p>
+      <div className="flex w-full items-center justify-center gap-5 md:gap-7">
+        <span
+          aria-hidden="true"
+          className="hidden h-[clamp(3.25rem,6vw,5rem)] w-1.5 flex-shrink-0 rounded-full bg-primary shadow-[0_0_18px_rgba(0,174,239,0.55)] sm:block"
+        />
+        <h1 className="max-w-[1180px] text-center font-titles text-[clamp(2.5rem,6vw,5.5rem)] font-black leading-[0.96] tracking-[-0.065em] text-foreground">
+          {title}
+        </h1>
+      </div>
+      <p className="mx-auto mt-10 max-w-6xl text-center text-[clamp(1.15rem,2.1vw,1.75rem)] leading-relaxed text-muted-foreground">
+        {subtitle}
+      </p>
+    </div>
+  );
+}
 
 function StoreInner() {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -25,10 +54,10 @@ function StoreInner() {
 
   useEffect(() => {
     return setPageMetadata({
-      title: "AI Automation Storefront — Browse Installable Systems | ClientSurge Systems",
-      description: "Browse installable AI automation systems for lead response, missed-call recovery, follow-up, booking, reviews, and reactivation. Done-for-you setup by ClientSurge.",
+      title: "The Automation Store | Six Systems That Protect Every Lead | ClientSurge Systems",
+      description: "Browse the ClientSurge automation stack: capture, recover, follow up, book, request reviews, and reactivate. Add individual modules or pick a full system.",
       canonicalPath: "/store",
-      ogTitle: "AI Automation Storefront | ClientSurge Systems",
+      ogTitle: "The Automation Store | ClientSurge Systems",
       ogDescription: "Choose a packaged AI system, complete guided intake, and let ClientSurge handle setup, testing, and launch readiness.",
       robots: "noindex,nofollow",
     });
@@ -59,13 +88,9 @@ function StoreInner() {
         <Breadcrumb items={[{ label: "Store", path: "/store" }]} />
       </div>
       <main className="pt-[calc(var(--cs-nav-height)+40px)]">
-        <section className="px-6 pb-10 text-center">
-          <CSSectionHeader
-            eyebrow="AI Automation Storefront"
-            title={selectedPackageOffer ? `${selectedPackageOffer.customer_facing_name || selectedPackageOffer.name} System` : "The AI Automation Storefront for Service Businesses"}
-            subtitle={selectedPackageOffer ? "Your selected ClientSurge system is preloaded. Review what is included, then continue into checkout and guided setup." : "Browse installable AI systems for missed calls, lead response, follow-up, booking, reviews, and reactivation. Choose what you need. ClientSurge installs it."}
-          />
-          <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
+        <section className="px-6 pb-12 text-center">
+          <StoreHeroHeader selectedPackageOffer={selectedPackageOffer} />
+          <div className="mt-10 grid grid-cols-1 md:grid-cols-3 gap-3 max-w-3xl mx-auto">
             {[
               { label: "Packaged Systems", value: "Starter / Growth / Pro", Icon: LayoutGrid },
               { label: "Launch Quality", value: "Proof Checked", Icon: Clock },
