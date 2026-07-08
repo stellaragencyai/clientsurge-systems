@@ -6,9 +6,9 @@ import HeroProductDemo from '@/components/landing/HeroProductDemo';
 /**
  * HomeHero — premium B2B automation positioning.
  *
- * Keep the public buyer path clean:
- *   Primary: compare packages -> pricing section
- *   Secondary: see workflow -> solution section
+ * Rules for the public buyer path:
+ *   Primary: compare packages -> pricing
+ *   Secondary: how it works -> explanation page / solution section
  *
  * Do not present unverifiable performance stats as live proof.
  */
@@ -24,24 +24,43 @@ const AUTOMATION_PILLS = [
 ];
 
 const STATS = [
-  { value: 'Fast', label: 'lead response workflow' },
-  { value: '24/7', label: 'automation coverage' },
   { value: '6', label: 'core automation modules' },
-  { value: 'Done-for-you', label: 'setup and launch support' },
+  { value: '24/7', label: 'coverage after launch' },
+  { value: 'Done-for-you', label: 'setup support' },
+  { value: 'No demo gate', label: 'package-first buyer path' },
 ];
 
-export default function HomeHero() {
-  const scrollToPricing = () => {
-    trackCTA('hero_compare_packages_click', 'hero');
-    const el = document.getElementById('pricing');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+function scrollToSection(event, sectionId, fallbackPath, analyticsName) {
+  trackCTA(analyticsName, 'hero');
 
-  const scrollToSolution = () => {
-    trackCTA('hero_see_how_it_works', 'hero');
-    const el = document.getElementById('solution');
-    if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-  };
+  if (event?.preventDefault) {
+    event.preventDefault();
+  }
+
+  const el = document.getElementById(sectionId);
+  if (el) {
+    el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    window.history.replaceState(null, '', `/#${sectionId}`);
+    return;
+  }
+
+  window.location.href = fallbackPath;
+}
+
+export default function HomeHero() {
+  const scrollToPricing = (event) => scrollToSection(
+    event,
+    'pricing',
+    '/pricing',
+    'hero_compare_packages_click'
+  );
+
+  const scrollToSolution = (event) => scrollToSection(
+    event,
+    'solution',
+    '/how-it-works',
+    'hero_see_how_it_works'
+  );
 
   return (
     <CSProductHero
@@ -52,18 +71,20 @@ export default function HomeHero() {
       stats={STATS}
       primaryCTA={{
         label: 'Compare Packages',
+        href: '/#pricing',
         onClick: scrollToPricing,
         icon: ArrowRight,
       }}
       secondaryCTA={{
         label: 'See How It Works',
+        href: '/how-it-works',
         onClick: scrollToSolution,
         icon: ShieldCheck,
       }}
       trustBadges={[
-        'No mandatory demo call',
-        'Secure checkout available',
-        'Done-for-you setup included',
+        'Clear packages',
+        'Secure checkout path',
+        'Setup handled for you',
       ]}
     >
       <div className="w-full mt-6 mb-2">

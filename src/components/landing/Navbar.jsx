@@ -2,7 +2,6 @@ import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
-import PortalLoginModal from "../forms/PortalLoginModal";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
@@ -12,129 +11,91 @@ import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { INDUSTRY_GROUPS } from "@/lib/industryNavConfig";
 
 const sectionLinks = SITE_CONFIG.navigation.sections;
-const solutionsLinks = SITE_CONFIG.navigation.solutions;
-const industryLinks = SITE_CONFIG.industries;
+const menuItemClass = "w-full text-left flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-foreground border-l-2 border-transparent hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 hover:text-foreground transition-colors bg-transparent cursor-pointer whitespace-nowrap";
+
+function analyticsKey(label) {
+  return label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
+}
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [showLoginModal, setShowLoginModal] = useState(false);
-  const [solutionsOpen, setSolutionsOpen] = useState(false);
   const [industriesOpen, setIndustriesOpen] = useState(false);
-  const [dropdownPos, setDropdownPos] = useState({ solutions: null, industries: null });
-
-  const solutionsTriggerRef = useRef(null);
+  const [industryDropdownPos, setIndustryDropdownPos] = useState(null);
   const industriesTriggerRef = useRef(null);
-  const solutionsCloseTimerRef = useRef(null);
   const industriesCloseTimerRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
 
-  // Pages with dark/photo hero backgrounds get a transparent navbar at top
-  const INDUSTRY_HERO_SLUGS = ['roofing', 'hvac', 'plumbing', 'dental', 'med-spa', 'chiropractic', 'contractors', 'real-estate', 'personal-injury'];
-  const navbarTransparentAtTop = false;
-
   const mobileUserName = user?.full_name || user?.email?.split("@")[0] || null;
   const mobileUserRole = user?.role ? user.role.replace(/_/g, " ") : null;
+
+  usePageViewTracking();
 
   const isActivePage = (href) => {
     if (href === "/") return location.pathname === "/";
     if (href.startsWith("/#")) return location.pathname === "/" && location.hash === href.replace("/", "");
-    return location.pathname.startsWith(href);
+    return location.pathname === href || location.pathname.startsWith(`${href}/`);
   };
 
   const closeAll = () => {
-    setSolutionsOpen(false);
     setIndustriesOpen(false);
     setOpen(false);
   };
 
-  const handleHashLinkClick = (e, href) => {
-    e.preventDefault();
-    const hash = href.replace("/", "");
-    trackCTA(`nav_${hash.replace("#", "")}`, "navbar");
-    closeAll();
-
-    if (location.pathname === "/") {
-      const target = document.getElementById(hash.slice(1));
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.replaceState(null, "", `/${hash}`);
-      }
-    } else {
-      navigate(`/${hash}`);
+  const clearIndustriesTimer = () => {
+    if (industriesCloseTimerRef.current) {
+      clearTimeout(industriesCloseTimerRef.current);
+      industriesCloseTimerRef.current = null;
     }
   };
 
-  usePageViewTracking();
-
-  // ── Clear timers on unmount ──
-  useEffect(() => {
-    return () => {
-      if (solutionsCloseTimerRef.current) clearTimeout(solutionsCloseTimerRef.current);
-      if (industriesCloseTimerRef.current) clearTimeout(industriesCloseTimerRef.current);
-    };
-  }, []);
-
-  // ── Scroll detection ──
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
-
-  // ── Body scroll lock ──
-  useEffect(() => {
-    if (!open) return undefined;
-    return acquireBodyScrollLock("landing-mobile-nav");
-  }, [open]);
-
-  // ── Escape key closes mobile drawer and dropdowns ──
-  useEffect(() => {
-    const onKey = (e) => {
-      if (e.key === "Escape") {
-        setOpen(false);
-        setSolutionsOpen(false);
-        setIndustriesOpen(false);
-      }
-    };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
-
-
-
-  // ── Shared helpers ──
-  const clearTimer = (ref) => { if (ref.current) { clearTimeout(ref.current); ref.current = null; } };
-
-  const openSolutions = () => {
-    clearTimer(solutionsCloseTimerRef);
-    setIndustriesOpen(false);
-    const rect = solutionsTriggerRef.current?.getBoundingClientRect();
-    setDropdownPos(prev => ({ ...prev, solutions: rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null }));
-    setSolutionsOpen(true);
-  };
-  const closeSolutionsSoon = () => { clearTimer(solutionsCloseTimerRef); solutionsCloseTimerRef.current = setTimeout(() => setSolutionsOpen(false), 250); };
   const openIndustries = () => {
-    clearTimer(industriesCloseTimerRef);
-    setSolutionsOpen(false);
+    clearIndustriesTimer();
     const rect = industriesTriggerRef.current?.getBoundingClientRect();
-    setDropdownPos(prev => ({ ...prev, industries: rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null }));
+    setIndustryDropdownPos(rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null);
     setIndustriesOpen(true);
   };
-  const closeIndustriesSoon = () => { clearTimer(industriesCloseTimerRef); industriesCloseTimerRef.current = setTimeout(() => setIndustriesOpen(false), 250); };
 
-  const handleLogoClick = (e) => {
-    e.preventDefault();
+  const closeIndustriesSoon = () => {
+    clearIndustriesTimer();
+    industriesCloseTimerRef.current = setTimeout(() => setIndustriesOpen(false), 180);
+  };
+
+  const navigateTo = (href) => {
+    if (href.startsWith("/#") && location.pathname === "/") {
+      const id = href.slice(2);
+      const target = document.getElementById(id);
+      if (target) {
+        target.scrollIntoView({ behavior: "smooth", block: "start" });
+        window.history.replaceState(null, "", href);
+        return;
+      }
+    }
+
+    if (href === location.pathname) {
+      window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
+      return;
+    }
+
+    navigate(href);
+  };
+
+  const handleNavClick = (event, item, source = "navbar") => {
+    event.preventDefault();
+    trackCTA(`nav_${analyticsKey(item.label)}`, source);
+    closeAll();
+    navigateTo(item.href);
+  };
+
+  const handleLogoClick = (event) => {
+    event.preventDefault();
     trackCTA("nav_logo", "navbar");
     closeAll();
-    // #3 — Robust scroll-to-top on logo click, even if already on home
     if (location.pathname === "/") {
-      if (location.hash) {
-        window.history.replaceState(null, "", "/");
-      }
+      if (location.hash) window.history.replaceState(null, "", "/");
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       return;
     }
@@ -142,60 +103,52 @@ export default function Navbar() {
     setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }), 50);
   };
 
-  // ── Dropdown menu item style with blue vertical spine ──
-  const menuItemClass = "w-full text-left flex items-center px-3 py-2.5 text-sm font-medium text-foreground border-l-2 border-transparent hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 hover:text-foreground transition-colors bg-transparent cursor-pointer whitespace-nowrap";
+  const handleIndustrySelect = (item, source) => {
+    try {
+      const slug = item.href.split("/").pop();
+      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
+      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
+    } catch (_error) {}
 
-  // ── Solutions dropdown portal ──
-  const SolutionsDropdown = solutionsOpen && typeof document !== "undefined" ? createPortal(
-    <div
-      onMouseEnter={openSolutions}
-      onMouseLeave={closeSolutionsSoon}
-      className="fixed rounded-lg border border-border/60 p-3 shadow-xl cs-dropdown-portal"
-      role="menu"
-      aria-label="Solutions"
-      style={{
-        left: dropdownPos.solutions?.left ?? "50%",
-        transform: "translateX(-50%)",
-        top: dropdownPos.solutions?.top ?? "calc(var(--cs-nav-height) + 6px)",
-        background: "rgba(255,255,255,0.98)",
-        backdropFilter: "blur(16px)",
-        WebkitBackdropFilter: "blur(16px)",
-        boxShadow: "0 8px 32px rgba(0,0,0,0.10), 0 0 0 1px rgba(0,174,239,0.08)",
-      }}
-    >
-      <div className="flex flex-col gap-0.5 min-w-[180px]">
-        {solutionsLinks.map((item) => (
-          <a
-            key={item.href}
-            href={item.href}
-            role="menuitem"
-            onClick={(e) => {
-              if (item.isHashLink) { handleHashLinkClick(e, item.href); return; }
-              e.preventDefault();
-              trackCTA(`nav_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "solutions_dropdown");
-              navigate(item.href);
-              setSolutionsOpen(false);
-            }}
-            className={menuItemClass}
-          >
-            {item.label}
-          </a>
-        ))}
-      </div>
-    </div>,
-    document.body
-  ) : null;
+    trackCTA(`industry_${analyticsKey(item.label)}`, source);
+    closeAll();
+    navigate(item.href);
+  };
 
-  // ── Industries dropdown portal ──
+  useEffect(() => {
+    return () => clearIndustriesTimer();
+  }, []);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    onScroll();
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    if (!open) return undefined;
+    return acquireBodyScrollLock("landing-mobile-nav");
+  }, [open]);
+
+  useEffect(() => {
+    const onKey = (event) => {
+      if (event.key === "Escape") closeAll();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   const IndustriesDropdown = industriesOpen && typeof document !== "undefined" ? createPortal(
     <div
       onMouseEnter={openIndustries}
       onMouseLeave={closeIndustriesSoon}
       className="fixed cs-dropdown-portal"
       style={{
-        left: dropdownPos.industries?.left ?? "50%",
+        left: industryDropdownPos?.left ?? "50%",
         transform: "translateX(-50%)",
-        top: dropdownPos.industries?.top ?? "calc(var(--cs-nav-height) + 6px)",
+        top: industryDropdownPos?.top ?? "calc(var(--cs-nav-height) + 6px)",
+        zIndex: 60,
       }}
     >
       <div
@@ -221,14 +174,7 @@ export default function Navbar() {
                     key={item.label}
                     type="button"
                     role="menuitem"
-                    onClick={() => {
-                      const slug = item.href.split("/").pop();
-                      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
-                      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
-                      trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar_dropdown");
-                      navigate(item.href);
-                      setIndustriesOpen(false);
-                    }}
+                    onClick={() => handleIndustrySelect(item, "navbar_dropdown")}
                     className={menuItemClass}
                   >
                     {item.label}
@@ -241,7 +187,7 @@ export default function Navbar() {
         <div className="mt-3 pt-3 border-t border-border/50 text-center">
           <a
             href="/industries"
-            onClick={(e) => { e.preventDefault(); trackCTA("all_industries", "navbar_dropdown"); navigate("/industries"); setIndustriesOpen(false); }}
+            onClick={(event) => handleNavClick(event, { label: "View All Industries", href: "/industries" }, "navbar_dropdown")}
             className="text-[12px] font-bold text-primary hover:underline"
           >
             View All Industries →
@@ -274,37 +220,29 @@ export default function Navbar() {
           paddingRight: "max(1.25rem, env(safe-area-inset-right))",
         }}
       >
-        {/* Logo */}
-        <button
+        <a
+          href="/"
           onClick={handleLogoClick}
-          className="shrink-0 bg-none border-none cursor-pointer transition-transform duration-300 hover:-translate-y-0.5"
-          style={{ minHeight: "unset", minWidth: "unset", background: "none", padding: 0, overflow: "visible" }}
+          className="shrink-0 transition-transform duration-300 hover:-translate-y-0.5"
+          aria-label="ClientSurge Systems home"
+          style={{ display: "inline-flex", alignItems: "center", overflow: "visible" }}
         >
-          <span style={{ display: "flex", alignItems: "center", height: "clamp(40px, 5vw, 52px)", overflow: "hidden" }}>
-            <img
-              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
-              alt="ClientSurge Systems"
-              width="240"
-              height="112"
-              decoding="async"
-              style={{ height: "clamp(40px, 5vw, 52px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
-            />
-          </span>
-        </button>
+          <img
+            src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
+            alt="ClientSurge Systems"
+            width="240"
+            height="112"
+            decoding="async"
+            style={{ height: "clamp(42px, 5vw, 58px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+          />
+        </a>
 
-        {/* Desktop center links */}
         <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.filter(l => l.label !== "Industries").map((link) => (
+          {sectionLinks.filter((link) => link.label !== "Industries").map((link) => (
             <a
               key={link.href}
               href={link.href}
-              onClick={(e) => {
-                if (link.isHashLink) { handleHashLinkClick(e, link.href); return; }
-                e.preventDefault();
-                trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "navbar");
-                closeAll();
-                navigate(link.href);
-              }}
+              onClick={(event) => handleNavClick(event, link, "navbar")}
               className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
               style={{ color: isActivePage(link.href) ? "#35BDF1" : "#ffffff", textDecoration: "none" }}
             >
@@ -313,74 +251,71 @@ export default function Navbar() {
             </a>
           ))}
 
-          {/* Industries dropdown (no text link — only hover/click opens it) */}
           <div className="relative" onMouseEnter={openIndustries} onMouseLeave={closeIndustriesSoon}>
             <button
               ref={industriesTriggerRef}
               type="button"
-              onClick={() => setIndustriesOpen(!industriesOpen)}
+              onClick={() => (industriesOpen ? setIndustriesOpen(false) : openIndustries())}
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
               className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: industriesOpen ? "#35BDF1" : "#ffffff" }}
+              style={{ color: industriesOpen || isActivePage("/industries") ? "#35BDF1" : "#ffffff" }}
             >
               Industries
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen || isActivePage("/industries") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </button>
             {IndustriesDropdown}
           </div>
         </div>
 
-        {/* Desktop right actions */}
         <div className="hidden xl:flex items-center gap-2 shrink-0">
           <button
-            onClick={() => { trackCTA("client_portal", "navbar"); navigate("/client-portal"); }}
+            type="button"
+            onClick={() => {
+              trackCTA("client_login", "navbar");
+              closeAll();
+              navigate("/login");
+            }}
             className="hidden md:flex items-center gap-1.5 text-xs font-bold transition-all duration-300 px-4 py-1.5 rounded-lg"
             style={{
               minHeight: "unset",
               minWidth: "unset",
               color: "#ffffff",
-              background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-              boxShadow: "0 2px 8px rgba(0,174,239,0.25)",
+              background: "rgba(255,255,255,0.10)",
+              border: "1px solid rgba(255,255,255,0.22)",
             }}
           >
-            Client Portal
+            Client Login
           </button>
           <button
+            type="button"
             onClick={() => {
-              trackCTA("browse_systems", "navbar");
-              if (location.pathname === "/") {
-                const el = document.getElementById("pricing");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              } else {
-                navigate("/#pricing");
-              }
+              trackCTA("compare_packages", "navbar");
+              closeAll();
+              navigateTo("/#pricing");
             }}
             className="cs-btn-primary cs-nav-cta"
             style={{ minHeight: "unset", minWidth: "unset" }}
           >
-            Browse AI Systems
+            Compare Packages
           </button>
         </div>
 
-        {/* Mobile: compact Browse CTA + hamburger — primary CTA always one tap away */}
         <div className="xl:hidden flex items-center gap-2">
           <button
+            type="button"
             onClick={() => {
-              trackCTA("browse_systems_mobile_bar", "navbar");
-              if (location.pathname === "/") {
-                const el = document.getElementById("pricing");
-                if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-              } else {
-                navigate("/#pricing");
-              }
+              trackCTA("compare_packages_mobile_bar", "navbar");
+              closeAll();
+              navigateTo("/#pricing");
             }}
             className="cs-btn-primary cs-nav-cta"
             style={{ minHeight: "unset", height: "36px", padding: "0 16px", fontSize: "0.75rem" }}
           >
-            Browse
+            Compare
           </button>
           <button
+            type="button"
             className="w-10 h-10 rounded-full border backdrop-blur-[3px] flex items-center justify-center shadow-sm transition-colors"
             onClick={() => setOpen(!open)}
             style={{
@@ -389,6 +324,7 @@ export default function Navbar() {
               color: "#ffffff",
             }}
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
+            aria-controls="mobile-nav-drawer"
             aria-expanded={open}
           >
             {open ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
@@ -397,11 +333,11 @@ export default function Navbar() {
         </div>
       </div>
 
-      {/* Mobile drawer */}
       {open && (
         <>
           <div className="fixed inset-0 z-40 xl:hidden bg-black/30" aria-hidden="true" onClick={() => setOpen(false)} />
           <div
+            id="mobile-nav-drawer"
             className="xl:hidden px-5 pb-8 pt-2 relative z-50 mobile-nav-drawer"
             style={{
               maxWidth: "min(420px, 90vw)",
@@ -416,28 +352,20 @@ export default function Navbar() {
               boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
             }}
           >
-            {/* Primary nav pages */}
             <div className="pt-3 pb-2 space-y-0.5">
-              {sectionLinks.filter(l => l.label !== "Industries").map((link) => (
+              {sectionLinks.filter((link) => link.label !== "Industries").map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
                   className="flex items-center text-[15px] font-semibold text-black hover:text-[#00AEEF] focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-[#00AEEF]/5"
                   style={{ minHeight: "44px" }}
-                  onClick={(e) => {
-                    if (link.isHashLink) { handleHashLinkClick(e, link.href); return; }
-                    e.preventDefault();
-                    trackCTA(`nav_${link.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                    navigate(link.href);
-                    setOpen(false);
-                  }}
+                  onClick={(event) => handleNavClick(event, link, "mobile_nav")}
                 >
                   {link.label}
                 </a>
               ))}
             </div>
 
-            {/* Mobile account action — kept above the long Industries list so it is visible immediately */}
             <div className="mt-2 mb-3 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
               {mobileUserName ? (
                 <>
@@ -445,31 +373,54 @@ export default function Navbar() {
                   <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
                   <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
                   <button
-                    onClick={() => { trackCTA("client_dashboard", "mobile_nav"); navigate("/client-dashboard"); setOpen(false); }}
+                    type="button"
+                    onClick={() => {
+                      trackCTA("client_dashboard", "mobile_nav");
+                      closeAll();
+                      navigate("/client-portal");
+                    }}
                     className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-white text-[13px] font-bold transition-all hover:-translate-y-0.5"
                     style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)" }}
                   >
-                    Go to Dashboard →
+                    Go to Client Portal →
                   </button>
                 </>
               ) : (
-                <button
-                  onClick={() => { trackCTA("client_portal", "mobile_nav"); setOpen(false); navigate("/client-portal"); }}
-                  className="w-full inline-flex items-center justify-center rounded-xl border text-[14px] font-bold transition-all hover:-translate-y-0.5 focus:ring-2 focus:ring-primary focus:outline-none"
-                  style={{
-                    minHeight: "48px",
-                    color: "#ffffff",
-                    background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-                    borderColor: "rgba(53, 189, 241, 0.35)",
-                    boxShadow: "0 8px 22px rgba(0,174,239,0.22)",
-                  }}
-                >
-                  Login to Client Portal
-                </button>
+                <div className="grid grid-cols-1 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackCTA("client_login", "mobile_nav");
+                      closeAll();
+                      navigate("/login");
+                    }}
+                    className="w-full inline-flex items-center justify-center rounded-xl border text-[14px] font-bold transition-all hover:-translate-y-0.5 focus:ring-2 focus:ring-primary focus:outline-none"
+                    style={{
+                      minHeight: "48px",
+                      color: "#ffffff",
+                      background: "linear-gradient(135deg, #0088CC, #00AEEF)",
+                      borderColor: "rgba(53, 189, 241, 0.35)",
+                      boxShadow: "0 8px 22px rgba(0,174,239,0.22)",
+                    }}
+                  >
+                    Client Login
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      trackCTA("contact", "mobile_nav");
+                      closeAll();
+                      navigate("/contact");
+                    }}
+                    className="w-full inline-flex items-center justify-center rounded-xl border border-border text-[14px] font-bold text-foreground hover:bg-muted transition-colors"
+                    style={{ minHeight: "48px" }}
+                  >
+                    Contact ClientSurge
+                  </button>
+                </div>
               )}
             </div>
 
-            {/* Industries compact section — grouped by category */}
             <div className="pt-3 mt-1 border-t border-border">
               <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-3" style={{ color: "#00AEEF" }}>Industries</p>
               <div className="space-y-3">
@@ -481,14 +432,7 @@ export default function Navbar() {
                         <button
                           key={item.label}
                           type="button"
-                          onClick={() => {
-                            const slug = item.href.split("/").pop();
-                            window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
-                            window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
-                            trackCTA(`industry_${item.label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "mobile_nav");
-                            navigate(item.href);
-                            setOpen(false);
-                          }}
+                          onClick={() => handleIndustrySelect(item, "mobile_nav")}
                           className="w-full text-left flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
                           style={{ minHeight: "44px" }}
                         >
@@ -501,7 +445,7 @@ export default function Navbar() {
               </div>
               <a
                 href="/industries"
-                onClick={(e) => { e.preventDefault(); trackCTA("all_industries", "mobile_nav"); navigate("/industries"); setOpen(false); }}
+                onClick={(event) => handleNavClick(event, { label: "View All Industries", href: "/industries" }, "mobile_nav")}
                 className="block text-center text-[12px] font-bold text-primary hover:underline mt-3 py-2"
               >
                 View All Industries →
@@ -510,38 +454,35 @@ export default function Navbar() {
 
             <div className="mt-5 flex gap-2">
               <button
+                type="button"
                 onClick={() => {
-                  trackCTA("browse_systems", "mobile_nav");
-                  setOpen(false);
-                  if (location.pathname === "/") {
-                    setTimeout(() => {
-                      const el = document.getElementById("pricing");
-                      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
-                    }, 100);
-                  } else {
-                    navigate("/#pricing");
-                  }
+                  trackCTA("compare_packages", "mobile_nav");
+                  closeAll();
+                  navigateTo("/#pricing");
                 }}
                 className="cs-btn-primary cs-nav-cta flex-1"
                 style={{ minHeight: "unset" }}
               >
                 <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px" }}>
-                  Browse AI Systems
+                  Compare Packages
                 </span>
               </button>
               <button
-                onClick={() => { trackCTA("store", "mobile_nav"); setOpen(false); navigate("/store"); }}
+                type="button"
+                onClick={() => {
+                  trackCTA("automations", "mobile_nav");
+                  closeAll();
+                  navigate("/automations");
+                }}
                 className="inline-flex items-center justify-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
                 style={{ flex: "0 0 auto", minHeight: "unset", height: "48px", padding: "0 20px" }}
               >
-                Store
+                Automations
               </button>
             </div>
           </div>
         </>
       )}
-
-      {showLoginModal && <PortalLoginModal onClose={() => setShowLoginModal(false)} />}
     </nav>
   );
 }
