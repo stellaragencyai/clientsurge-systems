@@ -5,7 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
   Loader2, RefreshCw, ShieldCheck, AlertTriangle, XCircle,
-  Package, Server, Activity, ChevronRight, ArrowUpCircle,
+  Package, Server, Activity, ChevronRight,
 } from "lucide-react";
 
 const MODULE_LABELS = {
@@ -61,6 +61,23 @@ const HEALTH_COLORS = {
   unknown: "text-gray-400",
 };
 
+function getFunctionData(response) {
+  return response?.data || response || {};
+}
+
+function getErrorMessage(error, fallback) {
+  return error?.data?.error || error?.message || fallback;
+}
+
+function getTrackedModuleKeys(dep) {
+  const activated = Array.isArray(dep.activated_modules) ? dep.activated_modules : [];
+  const statusMap = dep.module_installation_status || {};
+
+  // Only show modules that are actually activated for the deployment/package.
+  // This avoids showing Pro-only modules as "not_started" on Starter deployments.
+  return activated.filter((key) => Object.prototype.hasOwnProperty.call(statusMap, key) || MODULE_LABELS[key]);
+}
+
 export default function DeploymentControlCenterPanel() {
   const [deployments, setDeployments] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -73,32 +90,19 @@ export default function DeploymentControlCenterPanel() {
     setLoading(true);
     setError("");
     try {
-      const allDeps = await base44.asServiceRole.entities.ClientDeployment.list("-created_date", 200);
-      setDeployments(allDeps || []);
-
-      // Fetch recent failed/blocked execution counts per deployment
-      const recentLogs = await base44.asServiceRole.entities.AutomationExecutionLog.filter(
-        { execution_status: { $in: ["failed", "blocked"] } },
-        "-created_date", 500
-      ).catch(() => []);
-
-      const statsByDeployment = {};
-      (recentLogs || []).forEach((log) => {
-        const depId = log.client_deployment_id;
-        if (!depId) return;
-        if (!statsByDeployment[depId]) {
-          statsByDeployment[depId] = { failed: 0, blocked: 0, lastExecution: null };
-        }
-        if (log.execution_status === "failed") statsByDeployment[depId].failed++;
-        if (log.execution_status === "blocked") statsByDeployment[depId].blocked++;
-        if (!statsByDeployment[depId].lastExecution || log.created_date > statsByDeployment[depId].lastExecution) {
-          statsByDeployment[depId].lastExecution = log.created_date;
-        }
+      const response = await base44.functions.invoke("getDeploymentControlCenter", {
+        limit: 200,
+        log_limit: 500,
       });
-      setExecutionStats(statsByDeployment);
+      const data = getFunctionData(response);
+      if (data.error) throw new Error(data.error);
+
+      setDeployments(data.deployments || []);
+      setExecutionStats(data.executionStats || {});
     } catch (err) {
-      setError(err?.message || "Failed to load deployments");
+      setError(getErrorMessage(err, "Failed to load deployments"));
       setDeployments([]);
+      setExecutionStats({});
     } finally {
       setLoading(false);
     }
@@ -115,7 +119,7 @@ export default function DeploymentControlCenterPanel() {
     }
     try {
       const res = await base44.functions.invoke("calculateDeploymentHealth", { deployment_id: deploymentId });
-      const data = res.data || res;
+      const data = getFunctionData(res);
       setHealthCache((prev) => ({ ...prev, [deploymentId]: data }));
     } catch (err) {
       setHealthCache((prev) => ({ ...prev, [deploymentId]: { error: err.message } }));
@@ -132,7 +136,6 @@ export default function DeploymentControlCenterPanel() {
 
   return (
     <div className="space-y-4">
-      {/* Summary */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         <SummaryCard label="Total Deployments" value={stats.total} icon={Server} color="text-gray-700" bg="bg-gray-50" />
         <SummaryCard label="Live" value={stats.live} icon={ShieldCheck} color="text-green-600" bg="bg-green-50" />
@@ -192,7 +195,7 @@ export default function DeploymentControlCenterPanel() {
                   const depStats = executionStats[dep.id] || { failed: 0, blocked: 0, lastExecution: null };
                   const isActive = expandedRow === dep.id;
                   const moduleStatus = dep.module_installation_status || {};
-                  const moduleKeys = Object.keys(moduleStatus);
+                  const moduleKeys = getTrackedModuleKeys(dep);
                   return (
                     <DeploymentRow
                       key={dep.id}
@@ -219,6 +222,7 @@ function DeploymentRow({ dep, depStats, isActive, onToggle, health, moduleKeys, 
   const statusClass = STATUS_COLORS[dep.deployment_status] || STATUS_COLORS.pending;
   const healthClass = HEALTH_COLORS[dep.health_status] || HEALTH_COLORS.unknown;
   const hasIssues = depStats.failed > 0 || depStats.blocked > 0;
+  const readyCount = moduleKeys.filter((k) => ["verified", "ready", "installed", "tested", "connected"].includes(moduleStatus[k])).length;
 
   return (
     <>
@@ -242,7 +246,7 @@ function DeploymentRow({ dep, depStats, isActive, onToggle, health, moduleKeys, 
         </td>
         <td className="px-4 py-3 text-gray-600 text-xs">
           {moduleKeys.length > 0 ? (
-            <span>{moduleKeys.filter((k) => moduleStatus[k] === "verified" || moduleStatus[k] === "ready" || moduleStatus[k] === "installed").length}/{moduleKeys.length} active</span>
+            <span>{readyCount}/{moduleKeys.length} active</span>
           ) : (
             <span className="text-gray-400">None activated</span>
           )}
