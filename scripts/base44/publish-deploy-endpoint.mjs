@@ -24,6 +24,7 @@ function parseArgs(argv) {
     showBrowser: false,
     dryRun: false,
     summary: false,
+    output: "",
   };
   for (let i = 0; i < argv.length; i += 1) {
     const arg = argv[i];
@@ -33,6 +34,7 @@ function parseArgs(argv) {
     else if (arg === "--verify-url") args.verifyUrl = argv[++i] || "";
     else if (arg === "--verify-wait-ms") args.verifyWaitMs = Number(argv[++i] || args.verifyWaitMs);
     else if (arg === "--verify-poll-ms") args.verifyPollMs = Number(argv[++i] || args.verifyPollMs);
+    else if (arg === "--output") args.output = resolve(argv[++i] || "");
     else if (arg === "--show-browser") args.showBrowser = true;
     else if (arg === "--dry-run") args.dryRun = true;
     else if (arg === "--summary") args.summary = true;
@@ -44,6 +46,12 @@ function readBase44AppId() {
   const appConfigPath = resolve(repoRoot, "base44/.app.jsonc");
   const raw = readFileSync(appConfigPath, "utf8").replace(/^\/\/.*$/gm, "");
   return JSON.parse(raw).id;
+}
+
+function writeJsonIfRequested(outputPath, payload) {
+  if (!outputPath) return;
+  mkdirSync(dirname(outputPath), { recursive: true });
+  writeFileSync(outputPath, `${JSON.stringify(payload, null, 2)}\n`, "utf8");
 }
 
 async function fetchLiveSignal(url) {
@@ -66,9 +74,7 @@ function normalizeAuth(parsed) {
 
 function readCliAuth() {
   const envRaw = process.env[PRIMARY_ENV_KEY] || process.env[ALT_ENV_KEY];
-  if (envRaw) {
-    return { authPath: null, auth: normalizeAuth(JSON.parse(envRaw)) };
-  }
+  if (envRaw) return { authPath: null, auth: normalizeAuth(JSON.parse(envRaw)) };
 
   const authPath = resolve(homedir(), ".base44/auth/auth.json");
   if (!existsSync(authPath)) return null;
@@ -103,9 +109,7 @@ async function refreshCliAuthIfNeeded() {
     [REFRESH_KEY]: payload.refresh_token || refreshValue,
     expiresAt: Date.now() + Number(payload.expires_in || 0) * 1000,
   };
-  if (authRecord.authPath) {
-    writeFileSync(authRecord.authPath, `${JSON.stringify(refreshed, null, 2)}\n`, "utf8");
-  }
+  if (authRecord.authPath) writeFileSync(authRecord.authPath, `${JSON.stringify(refreshed, null, 2)}\n`, "utf8");
   return refreshed[ACCESS_KEY];
 }
 
@@ -124,10 +128,20 @@ async function postDeployWithToken(appId, token) {
   return { ok: response.ok, status: response.status, body };
 }
 
-function buildSummary({ ok, appId, beforeSignal, deployResult, afterSignal }) {
+function buildSummary({ ok, appId, beforeSignal, deployResult, verification, afterSignal, outputPath }) {
   return {
     ok,
     appId,
+    generatedAt: new Date().toISOString(),
+    source: {
+      repository: process.env.GITHUB_REPOSITORY || null,
+      sha: process.env.GITHUB_SHA || null,
+      ref: process.env.GITHUB_REF || null,
+      runId: process.env.GITHUB_RUN_ID || null,
+      runAttempt: process.env.GITHUB_RUN_ATTEMPT || null,
+      workflow: process.env.GITHUB_WORKFLOW || null,
+      eventName: process.env.GITHUB_EVENT_NAME || null,
+    },
     beforeSignal,
     deploy: {
       ok: deployResult?.ok ?? null,
@@ -135,7 +149,14 @@ function buildSummary({ ok, appId, beforeSignal, deployResult, afterSignal }) {
       updatedDate: deployResult?.body?.updated_date || null,
       appName: deployResult?.body?.name || null,
     },
+    verification: verification ? {
+      changed: verification.changed,
+      attempts: verification.attempts,
+      elapsedMs: verification.elapsedMs,
+      reason: verification.reason,
+    } : null,
     afterSignal,
+    outputPath: outputPath || null,
   };
 }
 
@@ -155,9 +176,7 @@ async function waitForLiveSignalChange({ verifyUrl, beforeSignal, waitMs, pollMs
     if (attempts > 0) await new Promise((resolvePromise) => setTimeout(resolvePromise, pollMs));
     attempts += 1;
     finalSignal = await fetchLiveSignal(verifyUrl);
-    if (!signalsMatch(beforeSignal, finalSignal)) {
-      return { changed: true, attempts, elapsedMs: Date.now() - startedAt, finalSignal, reason: "signal_changed" };
-    }
+    if (!signalsMatch(beforeSignal, finalSignal)) return { changed: true, attempts, elapsedMs: Date.now() - startedAt, finalSignal, reason: "signal_changed" };
   } while (Date.now() - startedAt < waitMs);
   return { changed: false, attempts, elapsedMs: Date.now() - startedAt, finalSignal, reason: "timeout_waiting_for_signal_change" };
 }
@@ -173,10 +192,7 @@ function isProbablyAuthUrl(url) {
 }
 
 async function checkBrowserAppAccess(page, appId) {
-  if (!page.url().startsWith(BASE44_ORIGIN)) {
-    return { ok: false, status: 0, body: `browser_not_on_base44_origin:${page.url()}` };
-  }
-
+  if (!page.url().startsWith(BASE44_ORIGIN)) return { ok: false, status: 0, body: `browser_not_on_base44_origin:${page.url()}` };
   return page.evaluate(async (path) => {
     const response = await fetch(path, { credentials: "include" });
     const text = await response.text();
@@ -199,9 +215,7 @@ async function waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs, showBr
   let access = await checkBrowserAppAccess(page, appId).catch((error) => ({ ok: false, status: 0, body: error.message }));
   if (access.ok) return access;
 
-  if (!showBrowser) {
-    throw new Error(`Base44 browser session is not authenticated for app ${appId}. Run once with --show-browser to sign in. Last access status: ${access.status} ${JSON.stringify(access.body)}`);
-  }
+  if (!showBrowser) throw new Error(`Base44 browser session is not authenticated for app ${appId}. Run once with --show-browser to sign in. Last access status: ${access.status} ${JSON.stringify(access.body)}`);
 
   console.error("Base44 browser authentication is required.");
   console.error("Complete the Base44 sign-in in the opened browser window. The script will keep polling until the app API becomes authorized.");
@@ -241,24 +255,30 @@ async function main() {
         await context.close();
       }
     }
-    console.log(JSON.stringify({
+    const dryRunPayload = {
       ok: true,
       dryRun: true,
+      generatedAt: new Date().toISOString(),
       dashboardUrl,
       endpoint,
       profileDir: args.profileDir,
       hasCliAuth: Boolean(cliToken),
       browserAuth: browserAuth ? { ok: browserAuth.ok, status: browserAuth.status } : null,
-    }, null, 2));
+      source: {
+        repository: process.env.GITHUB_REPOSITORY || null,
+        sha: process.env.GITHUB_SHA || null,
+        runId: process.env.GITHUB_RUN_ID || null,
+      },
+    };
+    writeJsonIfRequested(args.output, dryRunPayload);
+    console.log(JSON.stringify(dryRunPayload, null, 2));
     return;
   }
 
   let deployResult = await postDeployWithToken(appId, cliToken);
 
   if (!deployResult?.ok) {
-    if (deployResult) {
-      console.error(`Base44 token deploy failed with HTTP ${deployResult.status}; trying persistent browser session next.`);
-    }
+    if (deployResult) console.error(`Base44 token deploy failed with HTTP ${deployResult.status}; trying persistent browser session next.`);
     const context = await openBrowserContext(args);
     try {
       const page = context.pages()[0] || await context.newPage();
@@ -287,7 +307,9 @@ async function main() {
   });
   const afterSignal = verification.finalSignal;
   const result = { ok: true, appId, beforeSignal, deployResult, verification, afterSignal };
-  console.log(JSON.stringify(args.summary ? buildSummary(result) : result, null, 2));
+  const summary = buildSummary({ ...result, outputPath: args.output });
+  writeJsonIfRequested(args.output, summary);
+  console.log(JSON.stringify(args.summary ? summary : result, null, 2));
 }
 
 main().catch((error) => {
