@@ -38,6 +38,10 @@ function normalizePath(pathname = "/") {
   return value;
 }
 
+function buildFallbackUrl(trustedOrigin, fallbackPath) {
+  return `${trustedOrigin}${normalizePath(fallbackPath)}`;
+}
+
 function candidateUrlFor(candidate, trustedOrigin) {
   if (!candidate) return null;
 
@@ -50,6 +54,13 @@ function candidateUrlFor(candidate, trustedOrigin) {
   }
 }
 
+function preserveCandidate(candidate, trustedOrigin) {
+  const value = String(candidate || "");
+  if (!value) return "";
+  if (value.startsWith("/") && !value.startsWith("//")) return `${trustedOrigin}${value}`;
+  return value;
+}
+
 export function safeCheckoutUrl({
   candidate,
   trustedOrigin,
@@ -57,19 +68,22 @@ export function safeCheckoutUrl({
   allowedPathPrefixes,
   requireSessionPlaceholder = false,
 }) {
-  const fallback = new URL(normalizePath(fallbackPath), trustedOrigin);
-  const url = candidateUrlFor(candidate, trustedOrigin) || fallback;
-  const allowed = (allowedPathPrefixes || [fallback.pathname]).some((prefix) =>
+  const fallback = buildFallbackUrl(trustedOrigin, fallbackPath);
+  const fallbackUrl = new URL(fallback);
+  const candidateUrl = candidateUrlFor(candidate, trustedOrigin);
+  const url = candidateUrl || fallbackUrl;
+  const allowed = (allowedPathPrefixes || [fallbackUrl.pathname]).some((prefix) =>
     url.pathname === prefix || url.pathname.startsWith(`${prefix}/`)
   );
 
-  if (!allowed) return fallback.toString();
+  if (!allowed) return fallback;
 
-  if (requireSessionPlaceholder && !url.search.includes("{CHECKOUT_SESSION_ID}")) {
-    return fallback.toString();
+  if (requireSessionPlaceholder) {
+    const raw = candidateUrl ? preserveCandidate(candidate, trustedOrigin) : fallback;
+    return raw.includes("{CHECKOUT_SESSION_ID}") ? raw : fallback;
   }
 
-  return url.toString();
+  return candidateUrl ? url.toString() : fallback;
 }
 
 export function buildCheckoutRedirectUrls({
