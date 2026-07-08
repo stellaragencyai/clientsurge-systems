@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import CredentialsWizard from "@/components/onboarding/CredentialsWizard";
+import CredentialsWizard from "@/components/onboarding/CredentialsWizardHardened";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const SUPPORT_EMAIL = "support@clientsurgesystems.com";
@@ -50,7 +50,7 @@ export default function CredentialsSetup() {
       }
     } catch (err) {
       setRequestId(err?.data?.request_id || err?.request_id || "");
-      setError("Unable to verify your order. Please try again or contact support.");
+      setError(err?.data?.error || err?.message || "Unable to verify your order. Please try again or contact support.");
       setLoading(false);
     }
   };
@@ -70,15 +70,16 @@ export default function CredentialsSetup() {
       setOrder(result.order);
     } catch (err) {
       setRequestId(err?.data?.request_id || err?.request_id || "");
-      setError("Unable to verify your order. Please try again or contact support.");
+      setError(err?.data?.error || err?.message || "Unable to verify your order. Please try again or contact support.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleComplete = () => {
+  const handleComplete = (result) => {
     const id = order?.id || orderId;
-    if (id) navigate(`/setup/status/${id}`);
+    const target = result?.redirect_to || (id ? `/setup/status/${id}` : null);
+    if (target) navigate(target);
     else setSubmitted(true);
   };
 
