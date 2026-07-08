@@ -42,7 +42,7 @@ const productSignupUrl = (packageKey) => `/product-signup?package=${packageKey}`
 export const SITE_CONFIG = {
   brand: {
     name: "ClientSurge Systems",
-    tagline: "Turn your website into an AI sales system",
+    tagline: "The Amazon of AI Services for Business",
   },
   navigation: {
     sections: [
