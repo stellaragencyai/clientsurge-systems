@@ -3,7 +3,11 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 function secureJson(data, options = {}) {
   return new Response(JSON.stringify(data), {
     status: options.status || 200,
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      "Cache-Control": "no-store",
+      ...(options.headers || {}),
+    },
   });
 }
 
@@ -12,143 +16,159 @@ function cleanString(value) {
 }
 
 function isAdminRole(user) {
-  if (!user) return false;
-  const role = (user.role || "").toLowerCase();
+  const role = cleanString(user?.role).toLowerCase();
   return role === "admin" || role === "super_admin";
-}
-
-async function fetchRecentEvents(base44, order, project, limit = 50) {
-  const clientId = order?.client_id || project?.client_id || null;
-  const projectId = order?.client_project_id || project?.id || null;
-  const query = {};
-  if (clientId) query.client_id = clientId;
-  if (projectId) query.client_project_id = projectId;
-  if (!clientId && !projectId) return [];
-
-  try {
-    const events = await base44.asServiceRole.entities.CommunicationEvent.filter(
-      query, "-created_date", limit
-    );
-    return events || [];
-  } catch {
-    return [];
-  }
 }
 
 function normalizePackageKey(key) {
   if (!key) return null;
-  return String(key).toLowerCase().replace(/\s+/g, "_");
+  return String(key).toLowerCase().replace(/[\s-]+/g, "_");
 }
 
-function getPackageDisplayLabel(pricingSummary) {
-  if (!pricingSummary) return "Custom Service Bundle";
-  return pricingSummary.package_name || "Custom Service Bundle";
+function paid(order) {
+  return ["paid", "succeeded", "complete"].includes(cleanString(order?.payment_status).toLowerCase());
 }
 
-function buildServiceStates(order) {
-  const items = order?.items || [];
-  return items.map((item) => ({
-    service_key: item.service_key || item.product_id,
-    display_name: item.product_name || item.service_key || "Service",
-    install_status: item.install_status || "Paid",
-    configuration_complete: Boolean(item.install_status && item.install_status !== "Paid"),
-    missing_configuration_fields: [],
-  }));
+function ts(value) {
+  const ms = Date.parse(value || "");
+  return Number.isFinite(ms) ? ms : 0;
 }
 
-function buildOrderSummary(order) {
-  const packageKey = normalizePackageKey(
-    order?.pricing_summary?.package_key ||
-      order?.selected_package_type ||
-      order?.package_type
-  );
-  const services = buildServiceStates(order);
-  const statuses = services.map((s) => s.install_status);
-  let pipelineStatus = "Paid";
-  if (statuses.every((s) => s === "Live")) pipelineStatus = "Live";
-  else if (statuses.some((s) => s === "Error")) pipelineStatus = "Error";
-  else if (statuses.some((s) => s === "Testing")) pipelineStatus = "Testing";
-  else if (statuses.some((s) => s === "Configuring")) pipelineStatus = "Configuring";
-  else if (statuses.some((s) => s === "Ready for Install")) pipelineStatus = "Ready for Install";
+function latest(records = []) {
+  const ms = records.reduce((max, row) => Math.max(max, ts(row?.updated_date || row?.created_date)), 0);
+  return ms ? new Date(ms).toISOString() : null;
+}
 
+function serviceLabel(item) {
+  return item?.product_name || item?.service_name || item?.display_name || item?.service_key || item?.product_id || "Automation Service";
+}
+
+function buildServices(order) {
+  return (Array.isArray(order?.items) ? order.items : []).map((item) => {
+    const status = cleanString(item.install_status || item.service_access_status || item.status) || "Paid";
+    return {
+      service_key: item.service_key || item.product_id || item.key || serviceLabel(item).toLowerCase().replace(/\W+/g, "_"),
+      display_name: serviceLabel(item),
+      install_status: status,
+      configuration_complete: Boolean(status && !["paid", "pending", "not_started"].includes(status.toLowerCase())),
+      missing_configuration_fields: Array.isArray(item.missing_configuration_fields) ? item.missing_configuration_fields : [],
+    };
+  });
+}
+
+function summarizeOrder(order) {
+  if (!order) return null;
+  const services = buildServices(order);
+  const statuses = services.map((service) => cleanString(service.install_status).toLowerCase());
+  let pipeline = cleanString(order.pipeline_status || order.workflow_stage || order.order_status) || "Paid";
+  if (statuses.length) {
+    if (statuses.every((status) => status === "live" || status === "installed")) pipeline = "Live";
+    else if (statuses.some((status) => status.includes("error") || status.includes("fail"))) pipeline = "Issue";
+    else if (statuses.some((status) => status.includes("testing"))) pipeline = "Testing";
+    else if (statuses.some((status) => status.includes("config") || status.includes("install"))) pipeline = "Configuring";
+    else if (statuses.some((status) => status.includes("ready"))) pipeline = "Ready for Install";
+  }
+  const packageKey = normalizePackageKey(order?.pricing_summary?.package_key || order?.selected_package_type || order?.package_type);
   return {
     id: order.id,
     payment_status: order.payment_status,
     billing_status: order.billing_status,
     subscription_status: order.subscription_status,
-    pipeline_status: pipelineStatus,
+    pipeline_status: pipeline,
+    workflow_stage: order.workflow_stage || null,
     order_status: order.order_status,
-    client_id: order.client_id,
-    client_project_id: order.client_project_id,
-    onboarding_client_id: order.onboarding_client_id,
+    client_id: order.client_id || null,
+    client_project_id: order.client_project_id || null,
+    onboarding_client_id: order.onboarding_client_id || null,
     selected_package_type: packageKey,
     package_type: packageKey,
-    plan_type:
-      order.pricing_summary?.package_name ||
-      order.plan_type ||
-      getPackageDisplayLabel(order.pricing_summary),
+    plan_type: order.pricing_summary?.package_name || order.plan_type || order.package_name || "Custom Service Bundle",
+    business_name: order.business_name || null,
+    customer_name: order.customer_name || null,
+    customer_email: order.customer_email || null,
     total_setup: order.total_setup,
     total_monthly: order.total_monthly,
     current_period_start: order.current_period_start,
     current_period_end: order.current_period_end,
     pricing_summary: order.pricing_summary || null,
     services,
+    updated_date: order.updated_date || order.created_date || null,
   };
 }
 
-function buildSubscriptionSummary(order, project) {
-  const services = buildServiceStates(order);
+function summarizeProject(project) {
+  if (!project) return null;
+  return {
+    ...project,
+    quick_start_completed: project.quick_start_completed === true,
+    onboarding_wizard_completed: project.onboarding_wizard_completed === true,
+  };
+}
+
+function summarizeSubscription(order, project) {
+  if (!order) return null;
+  const services = buildServices(order);
   return {
     id: order.stripe_subscription_id || order.subscription_id || null,
-    status: order.subscription_status || order.billing_status || order.payment_status,
-    plan_type:
-      order.pricing_summary?.package_name || order.plan_type || project?.plan || "Custom Service Bundle",
-    plan_name:
-      order.pricing_summary?.package_name || order.plan_type || project?.plan || "Custom Service Bundle",
-    plan_key: normalizePackageKey(
-      order.pricing_summary?.package_key ||
-        order.selected_package_type ||
-        order.package_type
-    ),
+    status: order.subscription_status || order.billing_status || order.payment_status || "unknown",
+    plan_type: order.pricing_summary?.package_name || order.plan_type || project?.plan || "Custom Service Bundle",
+    plan_name: order.pricing_summary?.package_name || order.plan_type || project?.plan || "Custom Service Bundle",
+    plan_key: normalizePackageKey(order.pricing_summary?.package_key || order.selected_package_type || order.package_type),
     amount: Math.round(Number(order.total_monthly || 0) * 100),
     currency: "usd",
     interval: "month",
     current_period_start: order.current_period_start,
     current_period_end: order.current_period_end,
-    cancel_at_period_end: false,
-    services_included: services.map((s) => s.service_key),
-    change_request_status:
-      project?.plan_change_request && project.plan_change_request !== "None"
-        ? "pending_review"
-        : "none",
-    change_request_type:
-      project?.plan_change_request && project.plan_change_request !== "None"
-        ? project.plan_change_request === project.plan
-          ? "current"
-          : "change"
-        : null,
-    requested_plan_type:
-      project?.plan_change_request && project.plan_change_request !== "None"
-        ? project.plan_change_request
-        : null,
+    cancel_at_period_end: Boolean(order.cancel_at_period_end),
+    services_included: services.map((service) => service.service_key),
+    change_request_status: project?.plan_change_request && project.plan_change_request !== "None" ? "pending_review" : "none",
   };
 }
 
-function buildProjectSummary(project) {
-  if (!project) return null;
+function coverage({ requestId, email, linkStatus, orders = [], projects = [], events = [], clientFound = false, warnings = [] }) {
   return {
-    ...project,
-    quick_start_completed: project.quick_start_completed === true,
+    request_id: requestId,
+    user_email: email,
+    link_status: linkStatus,
+    orders_sampled: orders.length,
+    projects_sampled: projects.length,
+    client_record_found: clientFound,
+    communication_events_sampled: events.length,
+    latest_order_at: latest(orders),
+    latest_project_at: latest(projects),
+    latest_event_at: latest(events),
+    warnings,
+    proof_label: "Portal status is based on Base44 records only — not live provider proof.",
   };
 }
 
-function buildPortalLoginEvent({ user, email, linkStatus, order = null, client = null, project = null }) {
-  const clientId = client?.id || order?.client_id || null;
-  const clientProjectId = project?.id || order?.client_project_id || null;
-  const contextId = order?.id
-    ? `portal_login:${order.id}:${linkStatus}`
-    : `portal_login:${email}:${linkStatus}`;
+async function safeFilter(entity, query, sort = "-created_date", limit = 50) {
+  try {
+    if (!entity?.filter) return [];
+    return (await entity.filter(query, sort, limit)) || [];
+  } catch {
+    return [];
+  }
+}
 
+async function recentEvents(base44, order, project, limit = 100) {
+  const queries = [];
+  if (order?.client_id || project?.client_id) queries.push({ client_id: order?.client_id || project?.client_id });
+  if (order?.client_project_id || project?.id) queries.push({ client_project_id: order?.client_project_id || project?.id });
+  if (!queries.length) return [];
+  const rows = (await Promise.all(queries.map((query) => safeFilter(base44.asServiceRole.entities.CommunicationEvent, query, "-created_date", limit)))).flat();
+  const seen = new Set();
+  return rows.filter((row) => {
+    const key = row?.id || `${row?.created_date}:${row?.event_type}:${row?.status}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  }).sort((a, b) => ts(b.created_date) - ts(a.created_date)).slice(0, limit);
+}
+
+function loginEvent({ user, email, linkStatus, order = null, client = null, project = null, requestId }) {
+  const clientId = client?.id || order?.client_id || null;
+  const projectId = project?.id || order?.client_project_id || null;
   return {
     channel: "internal",
     direction: "system",
@@ -157,220 +177,91 @@ function buildPortalLoginEvent({ user, email, linkStatus, order = null, client =
     status: "processed",
     subject: "Client portal login",
     message_body: `Authenticated portal login resolved with status: ${linkStatus}.`,
-    description: `Authenticated portal login for ${email} resolved as ${linkStatus}.`,
     order_id: order?.id,
     client_id: clientId,
-    client_project_id: clientProjectId,
+    client_project_id: projectId,
     context_type: "client_portal",
-    context_id: contextId,
-    metadata_json: JSON.stringify({
-      link_status: linkStatus,
-      user_id: user?.id || null,
-      user_email: email,
-      order_id: order?.id || null,
-      client_id: clientId,
-      client_project_id: clientProjectId,
-      has_paid_order: Boolean(order?.id),
-    }),
+    context_id: order?.id ? `portal_login:${order.id}:${linkStatus}` : `portal_login:${email}:${linkStatus}`,
+    metadata_json: JSON.stringify({ request_id: requestId, link_status: linkStatus, user_id: user?.id || null, user_email: email, order_id: order?.id || null, client_id: clientId, client_project_id: projectId, has_paid_order: Boolean(order?.id) }),
   };
 }
 
-async function logPortalLoginEvent(base44, args) {
+async function logPortalLogin(base44, args) {
   try {
-    await base44.asServiceRole.entities.CommunicationEvent.create(
-      buildPortalLoginEvent(args)
-    );
+    await base44.asServiceRole.entities.CommunicationEvent.create(loginEvent(args));
   } catch (error) {
     console.error("[getClientPortalContext] portal login event failed:", error.message);
   }
 }
 
 Deno.serve(async (req) => {
+  const requestId = `portal_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   try {
+    if (req.method !== "POST") {
+      return secureJson({ error: "Method not allowed", code: "method_not_allowed", request_id: requestId }, { status: 405, headers: { Allow: "POST" } });
+    }
     const base44 = createClientFromRequest(req);
     let user = null;
     try {
       user = await base44.auth.me();
     } catch (authError) {
       const message = authError instanceof Error ? authError.message : String(authError);
-      if (/authentication required/i.test(message)) {
-        return secureJson(
-          { error: "Authentication required", code: "portal_auth_required" },
-          { status: 401 }
-        );
-      }
+      if (/authentication required/i.test(message)) return secureJson({ error: "Authentication required", code: "portal_auth_required", request_id: requestId }, { status: 401 });
       throw authError;
     }
-
-    if (!user?.email) {
-      return secureJson(
-        { error: "Authentication required", code: "portal_auth_required" },
-        { status: 401 }
-      );
-    }
+    if (!user?.email) return secureJson({ error: "Authentication required", code: "portal_auth_required", request_id: requestId }, { status: 401 });
 
     const email = cleanString(user.email).toLowerCase();
+    const orders = await safeFilter(base44.asServiceRole.entities.Order, { customer_email: email }, "-created_date", 50);
+    const matchingOrders = orders.filter((order) => cleanString(order.customer_email).toLowerCase() === email);
+    const paidOrders = matchingOrders.filter(paid);
+    const role = user?.role || "user";
 
-    // Check paid orders first
-    const orders = await base44.asServiceRole.entities.Order.filter(
-      { customer_email: email },
-      "-created_date",
-      50
-    );
-    const matchingOrders = (orders || []).filter(
-      (order) => cleanString(order.customer_email).toLowerCase() === email
-    );
-    const paidOrders = matchingOrders.filter(
-      (order) => order.payment_status === "paid"
-    );
-
-    if (paidOrders.length === 0) {
-      // Fallback: check for a ClientProject directly linked by client_email (demo/manual accounts)
-      const projectsByEmail = await base44.asServiceRole.entities.ClientProject.filter(
-        { client_email: email },
-        "-created_date",
-        5
-      );
-      const directProject = (projectsByEmail || []).find(
-        (p) => cleanString(p.client_email).toLowerCase() === email
-      );
-
+    if (!paidOrders.length) {
+      const projects = await safeFilter(base44.asServiceRole.entities.ClientProject, { client_email: email }, "-created_date", 5);
+      const directProject = projects.find((project) => cleanString(project.client_email).toLowerCase() === email);
       if (directProject) {
-        const projectSummary = buildProjectSummary(directProject);
-        await logPortalLoginEvent(base44, {
-          user,
-          email,
-          linkStatus: "direct_project_link",
-          project: directProject,
-        });
-        return secureJson({
-          success: true,
-          project: projectSummary,
-          order: null,
-          subscription: null,
-          link_status: "direct_project_link",
-          empty_state: false,
-          is_admin_preview: false,
-          user_role: user?.role || "user",
-        });
+        await logPortalLogin(base44, { user, email, linkStatus: "direct_project_link", project: directProject, requestId });
+        return secureJson({ success: true, request_id: requestId, project: summarizeProject(directProject), order: null, subscription: null, link_status: "direct_project_link", empty_state: false, is_admin_preview: false, user_role: role, portal_truth_label: "Project-only portal context. Billing/order proof is not linked yet.", data_coverage: coverage({ requestId, email, orders: matchingOrders, projects, linkStatus: "direct_project_link", warnings: ["No paid order is linked to this portal context."] }) });
       }
-
-      await logPortalLoginEvent(base44, { user, email, linkStatus: "no_paid_order" });
-      const isAdmin = isAdminRole(user);
-      return secureJson({
-        success: true,
-        project: null,
-        order: null,
-        subscription: null,
-        link_status: "no_paid_order",
-        empty_state: true,
-        is_admin_preview: isAdmin,
-        user_role: user?.role || "user",
-        message: isAdmin
-          ? "Admin Preview Mode — no client selected."
-          : "No paid order is linked to this login yet. Complete checkout or contact support.",
-      });
+      await logPortalLogin(base44, { user, email, linkStatus: "no_paid_order", requestId });
+      return secureJson({ success: true, request_id: requestId, project: null, order: null, subscription: null, link_status: "no_paid_order", empty_state: true, is_admin_preview: isAdminRole(user), user_role: role, portal_truth_label: "No paid order or client project is linked to this login.", message: isAdminRole(user) ? "Admin Preview Mode — no client selected." : "No paid order is linked to this login yet. Complete checkout or contact support.", data_coverage: coverage({ requestId, email, orders: matchingOrders, projects: [], linkStatus: "no_paid_order", warnings: ["No paid order found for authenticated email."] }) });
     }
 
-    const businessNames = [
-      ...new Set(paidOrders.map((order) => cleanString(order.business_name)).filter(Boolean)),
-    ];
+    const businessNames = [...new Set(paidOrders.map((order) => cleanString(order.business_name)).filter(Boolean))];
     if (businessNames.length > 1) {
-      await logPortalLoginEvent(base44, { user, email, linkStatus: "ambiguous_paid_orders" });
-      return secureJson({
-        success: true,
-        project: null,
-        order: null,
-        subscription: null,
-        link_status: "ambiguous_paid_orders",
-        empty_state: false,
-        is_admin_preview: false,
-        user_role: user?.role || "user",
-        message: "Multiple paid businesses are linked to this email. Support needs to finish portal routing before access can be shown safely.",
-      });
+      await logPortalLogin(base44, { user, email, linkStatus: "ambiguous_paid_orders", requestId });
+      return secureJson({ success: true, request_id: requestId, project: null, order: null, subscription: null, link_status: "ambiguous_paid_orders", empty_state: false, is_admin_preview: false, user_role: role, portal_truth_label: "Multiple paid businesses are linked. Portal routing must be resolved manually.", message: "Multiple paid businesses are linked to this email. Support needs to finish portal routing before access can be shown safely.", data_coverage: coverage({ requestId, email, orders: paidOrders, projects: [], linkStatus: "ambiguous_paid_orders", warnings: ["Multiple paid business names found for the same login."] }) });
     }
 
     const order = paidOrders[0];
-    const orderSummary = buildOrderSummary(order);
-
+    const orderSummary = summarizeOrder(order);
     if (!order.client_project_id || !order.client_id) {
-      await logPortalLoginEvent(base44, { user, email, linkStatus: "missing_canonical_links", order });
-      return secureJson({
-        success: true,
-        project: null,
-        order: orderSummary,
-        subscription: null,
-        link_status: "missing_canonical_links",
-        empty_state: false,
-        is_admin_preview: false,
-        user_role: user?.role || "user",
-        message: "Your payment is confirmed, but your client/project linkage is not complete yet. Our team needs to finish linking your portal records.",
-      });
+      const warnings = ["Paid order exists, but client_id or client_project_id is missing."];
+      await logPortalLogin(base44, { user, email, linkStatus: "missing_canonical_links", order, requestId });
+      return secureJson({ success: true, request_id: requestId, project: null, order: orderSummary, subscription: null, link_status: "missing_canonical_links", empty_state: false, is_admin_preview: false, user_role: role, portal_truth_label: "Payment confirmed, but canonical client/project linkage is incomplete.", message: "Your payment is confirmed, but your client/project linkage is not complete yet. Our team needs to finish linking your portal records.", data_coverage: coverage({ requestId, email, orders: paidOrders, projects: [], linkStatus: "missing_canonical_links", warnings }) });
     }
 
-    const [project, client] = await Promise.all([
-      base44.asServiceRole.entities.ClientProject.get(order.client_project_id).catch(() => null),
-      base44.asServiceRole.entities.Client.get(order.client_id).catch(() => null),
-    ]);
-
+    const [project, client] = await Promise.all([base44.asServiceRole.entities.ClientProject.get(order.client_project_id).catch(() => null), base44.asServiceRole.entities.Client.get(order.client_id).catch(() => null)]);
     if (!project || !client) {
-      await logPortalLoginEvent(base44, { user, email, linkStatus: "linked_records_missing", order });
-      return secureJson({
-        success: true,
-        project: null,
-        order: orderSummary,
-        subscription: null,
-        link_status: "linked_records_missing",
-        empty_state: false,
-        is_admin_preview: false,
-        user_role: user?.role || "user",
-        message: "Your order is paid, but the linked client records are incomplete. Support needs to repair the portal linkage.",
-      });
+      const warnings = ["Paid order points to missing Client or ClientProject records."];
+      await logPortalLogin(base44, { user, email, linkStatus: "linked_records_missing", order, requestId });
+      return secureJson({ success: true, request_id: requestId, project: null, order: orderSummary, subscription: null, link_status: "linked_records_missing", empty_state: false, is_admin_preview: false, user_role: role, portal_truth_label: "Payment confirmed, but linked client records are missing.", message: "Your order is paid, but the linked client records are incomplete. Support needs to repair the portal linkage.", data_coverage: coverage({ requestId, email, orders: paidOrders, projects: [], linkStatus: "linked_records_missing", warnings }) });
     }
 
-    const projectSummary = buildProjectSummary(project);
-    const subscription = buildSubscriptionSummary(order, projectSummary);
+    const projectSummary = summarizeProject(project);
+    const subscription = summarizeSubscription(order, projectSummary);
+    const events = await recentEvents(base44, order, projectSummary, 100);
+    const failed = events.filter((event) => event.status === "failed");
+    const proof = events.filter((event) => event.status !== "failed" && event.direction !== "inbound" && !(event.event_type || "").includes("portal_login"));
+    const hasCriticalFailure = failed.some((event) => event.event_type && !/simulation|test|proof/i.test(event.event_type));
+    const allLive = orderSummary.services.length > 0 && orderSummary.services.every((service) => service.install_status === "Live");
+    const readiness = allLive && !hasCriticalFailure ? "Live" : orderSummary.pipeline_status;
 
-    // Fetch recent events for health/readiness panels
-    const recentEvents = await fetchRecentEvents(base44, order, projectSummary, 100);
-    const failedEvents = (recentEvents || []).filter((e) => e.status === "failed");
-    const proofEvents = (recentEvents || []).filter(
-      (e) => e.status !== "failed" && e.direction !== "inbound" && !(e.event_type || "").includes("portal_login")
-    );
-
-    // Readiness check — not "Live" if recent critical failures exist
-    const hasFailedNonProof = failedEvents.some(
-      (e) =>
-        e.event_type &&
-        !e.event_type.includes("simulation") &&
-        !e.event_type.includes("test") &&
-        !e.event_type.includes("proof")
-    );
-    const allLive = (orderSummary.services || []).length > 0 &&
-      (orderSummary.services || []).every((s) => s.install_status === "Live");
-    const readinessStatus = allLive && !hasFailedNonProof ? "Live" : orderSummary.pipeline_status;
-
-    await logPortalLoginEvent(base44, { user, email, linkStatus: "linked", order, client, project: projectSummary });
-
-    return secureJson({
-      success: true,
-      project: projectSummary,
-      client,
-      order: orderSummary,
-      subscription,
-      link_status: "linked",
-      empty_state: false,
-      is_admin_preview: false,
-      user_role: user?.role || "user",
-      health: {
-        readiness_status: readinessStatus,
-        recent_failed_events_count: failedEvents.length,
-        recent_proof_events_count: proofEvents.length,
-        recent_events: recentEvents.slice(0, 50),
-      },
-    });
+    await logPortalLogin(base44, { user, email, linkStatus: "linked", order, client, project: projectSummary, requestId });
+    return secureJson({ success: true, request_id: requestId, project: projectSummary, client, order: orderSummary, subscription, link_status: "linked", empty_state: false, is_admin_preview: false, user_role: role, portal_truth_label: "Portal status is based on Base44 order, project, client, and communication records.", data_coverage: coverage({ requestId, email, orders: paidOrders, projects: [projectSummary], events, clientFound: true, linkStatus: "linked" }), health: { readiness_status: readiness, recent_failed_events_count: failed.length, recent_proof_events_count: proof.length, recent_events: events.slice(0, 50), proof_label: "Recent activity is sampled CommunicationEvent data, not direct provider proof." } });
   } catch (error) {
     console.error("[getClientPortalContext] Error:", error.message);
-    return secureJson({ error: error.message }, { status: 500 });
+    return secureJson({ error: error.message || "Failed to resolve client portal context", request_id: requestId }, { status: 500 });
   }
 });

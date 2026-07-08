@@ -1,49 +1,55 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import CredentialsWizard from "@/components/onboarding/CredentialsWizard";
-import { Loader2, AlertCircle, CheckCircle2 } from "lucide-react";
+import { AlertCircle, CheckCircle2 } from "lucide-react";
+
+const SUPPORT_EMAIL = "support@clientsurgesystems.com";
+
+function payload(raw) {
+  return raw?.data || raw || {};
+}
+
+function supportHref(requestId) {
+  const subject = requestId ? `Credentials setup help ${requestId}` : "Credentials setup help";
+  return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}`;
+}
 
 export default function CredentialsSetup() {
   const navigate = useNavigate();
-  const [orderId, setOrderId] = useState(() => {
-    const params = new URLSearchParams(window.location.search);
-    return params.get("order_id") || null;
-  });
-
+  const [orderId, setOrderId] = useState(() => new URLSearchParams(window.location.search).get("order_id") || null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [requestId, setRequestId] = useState("");
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    if (orderId) {
-      validateOrder(orderId);
-      return;
-    }
-
-    // No order_id — try resolving from Stripe session_id
     const params = new URLSearchParams(window.location.search);
     const sessionId = params.get("session_id");
-    if (sessionId) {
+    if (orderId) {
+      validateOrder(orderId);
+    } else if (sessionId) {
       resolveOrderFromSession(sessionId);
     } else {
-      navigate("/pricing");
+      setError("This credentials setup link is missing an order ID or Stripe session ID.");
+      setLoading(false);
     }
   }, []);
 
   const resolveOrderFromSession = async (sessionId) => {
     try {
-      const result = await base44.functions.invoke("getOrderStatus", {
-        session_id: sessionId,
-      });
+      const result = payload(await base44.functions.invoke("getOrderStatus", { session_id: sessionId }));
+      setRequestId(result.request_id || "");
       if (result?.eligible && result?.order?.id) {
         setOrderId(result.order.id);
         validateOrder(result.order.id);
       } else {
-        navigate("/pricing");
+        setError("We could not match this checkout session to an eligible order yet. Please use the link from your confirmation email or contact support.");
+        setLoading(false);
       }
-    } catch {
+    } catch (err) {
+      setRequestId(err?.data?.request_id || err?.request_id || "");
       setError("Unable to verify your order. Please try again or contact support.");
       setLoading(false);
     }
@@ -51,22 +57,19 @@ export default function CredentialsSetup() {
 
   const validateOrder = async (id) => {
     try {
-      const result = await base44.functions.invoke("getOrderStatus", {
-        order_id: id,
-      });
-
+      const result = payload(await base44.functions.invoke("getOrderStatus", { order_id: id }));
+      setRequestId(result.request_id || "");
       if (!result?.order) {
-        setError("Order not found. Please check your confirmation email for the correct link.");
+        setError("Order not found. Please check your confirmation email for the correct setup link.");
         return;
       }
-
       if (!result.eligible) {
-        navigate("/pricing");
+        setError("This order is not eligible for credentials setup yet. If payment already completed, contact support so we can verify it.");
         return;
       }
-
       setOrder(result.order);
-    } catch {
+    } catch (err) {
+      setRequestId(err?.data?.request_id || err?.request_id || "");
       setError("Unable to verify your order. Please try again or contact support.");
     } finally {
       setLoading(false);
@@ -74,34 +77,18 @@ export default function CredentialsSetup() {
   };
 
   const handleComplete = () => {
-    if (order?.id || orderId) {
-      navigate(`/setup/status/${order?.id || orderId}`);
-    } else {
-      setSubmitted(true);
-    }
+    const id = order?.id || orderId;
+    if (id) navigate(`/setup/status/${id}`);
+    else setSubmitted(true);
   };
 
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-        <div className="max-w-2xl mx-auto px-6 py-12">
-          <div className="text-center mb-8">
-            <div className="w-10 h-10 rounded-full border-4 border-slate-200 border-t-[#00AEEF] animate-spin mx-auto mb-4" />
-            <p className="text-sm font-semibold text-slate-600">Verifying your order...</p>
-          </div>
-          <div className="rounded-2xl border border-slate-200 bg-white overflow-hidden shadow-sm">
-            <div className="p-6 space-y-4">
-              <div className="h-6 w-48 rounded-lg bg-slate-100 animate-pulse" />
-              <div className="h-4 w-full rounded-lg bg-slate-100 animate-pulse" />
-              <div className="h-4 w-3/4 rounded-lg bg-slate-100 animate-pulse" />
-              <div className="space-y-3 pt-4">
-                <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
-                <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
-                <div className="h-10 w-full rounded-xl bg-slate-100 animate-pulse" />
-              </div>
-              <div className="h-12 w-full rounded-xl bg-slate-100 animate-pulse" />
-            </div>
-          </div>
+        <div className="max-w-2xl mx-auto px-6 py-12 text-center">
+          <div className="w-10 h-10 rounded-full border-4 border-slate-200 border-t-[#00AEEF] animate-spin mx-auto mb-4" />
+          <p className="text-sm font-semibold text-slate-600">Verifying your order before collecting credentials...</p>
+          <p className="mt-2 text-xs text-slate-400">No credentials form is shown until the order source is verified.</p>
         </div>
       </div>
     );
@@ -110,18 +97,15 @@ export default function CredentialsSetup() {
   if (error) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
-        <div className="max-w-md w-full text-center space-y-5">
-          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto">
-            <AlertCircle className="w-7 h-7 text-red-600" />
-          </div>
+        <div className="max-w-md w-full text-center space-y-5 rounded-3xl border border-border bg-white p-8 shadow-sm">
+          <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto"><AlertCircle className="w-7 h-7 text-red-600" /></div>
           <h1 className="text-2xl font-semibold text-foreground">Unable to Load Setup</h1>
           <p className="text-muted-foreground">{error}</p>
-          <a
-            href="mailto:support@clientsurgesystems.com"
-            className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-          >
-            Contact Support
-          </a>
+          {requestId && <p className="rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">Reference: {requestId}</p>}
+          <div className="flex flex-col gap-3 sm:flex-row sm:justify-center">
+            <a href={supportHref(requestId)} className="inline-flex items-center justify-center rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">Contact Support</a>
+            <Link to="/client-portal/progress" className="inline-flex items-center justify-center rounded-full border border-border px-5 py-2.5 text-sm font-semibold text-foreground hover:bg-muted transition-colors">Open Portal</Link>
+          </div>
         </div>
       </div>
     );
@@ -131,19 +115,10 @@ export default function CredentialsSetup() {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6">
         <div className="max-w-md w-full text-center space-y-5">
-          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto">
-            <CheckCircle2 className="w-8 h-8 text-green-600" />
-          </div>
-          <h1 className="text-2xl font-semibold text-foreground">Setup Info Received!</h1>
-          <p className="text-muted-foreground leading-relaxed">
-            Thank you - our team will review your details and have your system configured within <strong>24-48 hours</strong>. You'll receive a confirmation email when your automations are live.
-          </p>
-          <p className="text-sm text-muted-foreground">
-            Questions? Email{" "}
-            <a href="mailto:support@clientsurgesystems.com" className="text-primary underline">
-              support@clientsurgesystems.com
-            </a>
-          </p>
+          <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto"><CheckCircle2 className="w-8 h-8 text-green-600" /></div>
+          <h1 className="text-2xl font-semibold text-foreground">Setup Info Received</h1>
+          <p className="text-muted-foreground leading-relaxed">Thank you. Our team will review your details and update your client portal as each setup step is verified.</p>
+          <Link to="/client-portal/progress" className="cs-btn-primary text-sm">View Setup Progress</Link>
         </div>
       </div>
     );
@@ -151,6 +126,11 @@ export default function CredentialsSetup() {
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
+      <div className="mx-auto max-w-3xl px-6 pt-8">
+        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          Credentials are only used for setup and verification. Your portal will show status based on posted ClientSurge records, not assumptions.
+        </div>
+      </div>
       <CredentialsWizard order={order} onComplete={handleComplete} />
     </div>
   );
