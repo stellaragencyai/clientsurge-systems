@@ -17,7 +17,6 @@ import ActiveAutomationsPanel from "@/components/dashboard/ActiveAutomationsPane
 import ClientActionRequiredPanel from "@/components/dashboard/ClientActionRequiredPanel";
 import RecentSystemProofPanel from "@/components/dashboard/RecentSystemProofPanel";
 import RecentIssuesPanel from "@/components/dashboard/RecentIssuesPanel";
-import AdminPreviewBanner from "@/components/dashboard/AdminPreviewBanner";
 import AdminPreviewToggler from "@/components/dashboard/AdminPreviewToggler";
 import InternalFilterNotice from "@/components/dashboard/InternalFilterNotice";
 import OverallProgressTracker from "@/components/dashboard/OverallProgressTracker";
@@ -464,7 +463,7 @@ export default function ClientDashboard() {
 
                     <DashboardMetricsBar activeServices={activeServices} project={project} portalState={portalState} />
 
-                    <div className="mb-4 mt-2">
+                    <section id="dashboard-systems" className="mb-4 mt-2" style={{ scrollMarginTop: "96px" }}>
                       <div className="flex items-center gap-3 mb-4">
                         <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.3))" }} />
                         <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">Your Verified Systems</p>
@@ -487,7 +486,7 @@ export default function ClientDashboard() {
                           </div>
                         ))}
                       </div>
-                    </div>
+                    </section>
 
                     <SupportCard />
                   </>
