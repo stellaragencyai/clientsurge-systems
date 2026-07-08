@@ -91,6 +91,11 @@ export default function ClientPortal() {
   const [isAdminPreview, setIsAdminPreview] = useState(false);
   const [healthData, setHealthData] = useState(null);
   const [userRole, setUserRole] = useState(null);
+
+  // Phase A.1 + Phase 3: PortalStateEngine with ClientDeployment as source of truth
+  const portalContextData = loading ? null : { project, order: portalOrder, subscription, deployment, health: healthData, is_admin_preview: isAdminPreview };
+  const { portalState, loading: portalStateLoading } = usePortalState(portalContextData);
+
   const { notifications, unreadCount, markAsRead, markAllAsRead, clearNotifications } = useClientNotifications({
     project,
     deployment,
@@ -98,10 +103,6 @@ export default function ClientPortal() {
     portalStateLoading,
     subscription,
   });
-
-  // Phase A.1 + Phase 3: PortalStateEngine with ClientDeployment as source of truth
-  const portalContextData = loading ? null : { project, order: portalOrder, subscription, deployment, health: healthData, is_admin_preview: isAdminPreview };
-  const { portalState, loading: portalStateLoading } = usePortalState(portalContextData);
 
   useEffect(() => {
     const init = async () => {
