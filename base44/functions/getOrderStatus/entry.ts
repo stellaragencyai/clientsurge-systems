@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { validateSetupLinkToken } from "../_shared/setupLinkToken.ts";
 
 const PACKAGE_KEY_ALIASES = {
   starter: "starter_system",
@@ -56,6 +57,7 @@ Deno.serve(async (req) => {
     const orderId = cleanString(payload?.order_id);
     const sessionId = cleanString(payload?.session_id);
     const email = cleanEmail(payload?.email);
+    const setupToken = cleanString(payload?.token || payload?.setup_token);
 
     if (!orderId && !sessionId && !email) {
       return Response.json(
@@ -90,9 +92,25 @@ Deno.serve(async (req) => {
 
     const userEmail = cleanEmail(currentUser?.email);
     const orderEmail = cleanEmail(order.customer_email);
-    if (!isAdmin(currentUser) && userEmail && orderEmail && userEmail !== orderEmail) {
+    const tokenResult = setupToken ? await validateSetupLinkToken(setupToken, order.id, orderEmail) : { valid: false, reason: "missing_token" };
+
+    if (setupToken && !tokenResult.valid) {
+      return Response.json(
+        { error: "This setup link is expired or invalid.", code: tokenResult.reason, request_id: requestId },
+        { status: 403 }
+      );
+    }
+
+    if (!isAdmin(currentUser) && !tokenResult.valid && userEmail && orderEmail && userEmail !== orderEmail) {
       return Response.json(
         { error: "This setup link does not belong to the signed-in account.", code: "setup_link_email_mismatch", request_id: requestId },
+        { status: 403 }
+      );
+    }
+
+    if (!isAdmin(currentUser) && !tokenResult.valid && !userEmail) {
+      return Response.json(
+        { error: "Sign in with the order email or use the signed setup link from your confirmation email.", code: "setup_auth_required", request_id: requestId },
         { status: 403 }
       );
     }
@@ -121,6 +139,8 @@ Deno.serve(async (req) => {
       updated_date: cleanString(order.updated_date),
       created_date: cleanString(order.created_date),
       credentials_draft: safeDraft(order),
+      setup_token_valid: tokenResult.valid,
+      setup_token_expires_at: tokenResult.expires_at || null,
     };
 
     const eligible = safeOrder.payment_status.toLowerCase() === "paid";
