@@ -230,10 +230,10 @@ export default function Navbar() {
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
             alt="ClientSurge Systems"
-            width="240"
-            height="112"
+            width="480"
+            height="224"
             decoding="async"
-            style={{ height: "clamp(42px, 5vw, 58px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+            style={{ height: "clamp(84px, 10vw, 116px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
           />
         </a>
 
