@@ -2,7 +2,7 @@ import { useDemoBooking } from "./DemoBookingContext";
 import StardustOverlay from "./StardustOverlay";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
-const testimonials = [
+const scenarios = [
   {
     name: "Med spa lead flow",
     businessType: "Med Spa",
@@ -46,17 +46,20 @@ export default function Testimonials() {
       <div className="max-w-6xl mx-auto relative z-10">
         <div className="mb-16">
           <CSSectionHeader
-            eyebrow="Real Workflow Results"
-            title="What Happens When the System Goes Live"
-            subtitle="Three industry workflows — what the lead experience looks like before the system is installed versus after it's running."
+            eyebrow="Workflow Scenarios"
+            title="What the Lead Experience Can Look Like"
+            subtitle="Three example industry workflows. These are system previews and target outcomes, not verified customer testimonials or guaranteed results."
           />
         </div>
 
-        {/* CSS-only staggered fade-in — no GPU compositing overhead */}
+        <div className="mb-8 rounded-lg border border-amber-200 bg-amber-50 px-4 py-4 text-sm text-amber-900 leading-relaxed">
+          <strong>Proof label:</strong> The cards below are workflow scenarios. Verified customer quotes, revenue metrics, or live case studies should only appear here after they are backed by source evidence.
+        </div>
+
         <div className="testimonial-grid grid md:grid-cols-3 gap-6">
-          {testimonials.map((testimonial, idx) => (
+          {scenarios.map((scenario, idx) => (
             <article
-              key={testimonial.name}
+              key={scenario.name}
               className="flex flex-col rounded-2xl p-6 testimonial-card"
               style={{
                 background: "rgba(240,249,255,0.95)",
@@ -67,44 +70,44 @@ export default function Testimonials() {
             >
               <div className="mb-4 flex items-center justify-between gap-3">
                 <span className="inline-flex text-xs font-semibold text-primary/90 bg-primary/10 px-3 py-1 rounded-full">
-                  {testimonial.businessType}
+                  {scenario.businessType}
                 </span>
-                <span className="text-xs text-muted-foreground">{testimonial.location}</span>
+                <span className="text-xs text-muted-foreground">{scenario.location}</span>
               </div>
 
               <div className="mb-5 space-y-3 pb-5 border-b border-border/80">
                 <div>
                   <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">Before</p>
-                  <p className="text-sm text-foreground/70">{testimonial.before}</p>
+                  <p className="text-sm text-foreground/70">{scenario.before}</p>
                 </div>
                 <div>
                   <p className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wide mb-1">After</p>
-                  <p className="text-sm font-semibold text-foreground">{testimonial.after}</p>
+                  <p className="text-sm font-semibold text-foreground">{scenario.after}</p>
                 </div>
               </div>
 
               <div className="mb-5 mt-5">
                 <span className="inline-flex items-center text-sm font-bold text-white px-4 py-2 rounded-full bg-gradient-to-r from-[#0088CC] to-[#00AEEF]">
-                  {testimonial.result}
+                  {scenario.result}
                 </span>
               </div>
 
               <div className="text-sm text-foreground/75 leading-relaxed flex-1 mb-6">
-                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">Workflow preview</p>
-                &ldquo;{testimonial.quote}&rdquo;
+                <p className="mb-2 text-[11px] font-semibold uppercase tracking-wide text-primary/80">Scenario note</p>
+                &ldquo;{scenario.quote}&rdquo;
               </div>
 
               <div className="flex items-center gap-4">
                 <div
                   className="w-14 h-14 rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-primary/20 shadow-md text-white text-sm font-bold"
-                  style={{ background: `linear-gradient(135deg, ${testimonial.color} 0%, ${testimonial.color}cc 100%)` }}
-                  aria-label={`${testimonial.name} scenario`}
+                  style={{ background: `linear-gradient(135deg, ${scenario.color} 0%, ${scenario.color}cc 100%)` }}
+                  aria-label={`${scenario.name} scenario`}
                 >
-                  {testimonial.initials}
+                  {scenario.initials}
                 </div>
                 <div>
-                  <p className="text-sm font-bold text-foreground">{testimonial.name}</p>
-                  <p className="text-xs text-muted-foreground">{testimonial.businessType}</p>
+                  <p className="text-sm font-bold text-foreground">{scenario.name}</p>
+                  <p className="text-xs text-muted-foreground">{scenario.businessType}</p>
                 </div>
               </div>
             </article>
@@ -116,21 +119,14 @@ export default function Testimonials() {
           data-clientsurge-testimonials-cta-align="centered"
         >
           <p className="mb-4 text-center text-lg font-semibold text-foreground">
-            Ready to deploy this system for your business?
+            Ready to plan this system for your business?
           </p>
           {demoBooking ? (
-            <button
-              type="button"
-              onClick={demoBooking.openDemoBooking}
-              className="cs-btn-primary mx-auto"
-            >
+            <button type="button" onClick={demoBooking.openDemoBooking} className="cs-btn-primary mx-auto">
               Plan My System
             </button>
           ) : (
-            <a
-              href="/book"
-              className="cs-btn-primary mx-auto"
-            >
+            <a href="/book" className="cs-btn-primary mx-auto">
               Plan My System
             </a>
           )}
