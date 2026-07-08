@@ -1,30 +1,29 @@
-import { CheckCircle2, Loader2, Zap } from "lucide-react";
+import { CheckCircle2, Loader2 } from "lucide-react";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
-const DEFAULT_STAGES = ["Payment Confirmed", "Queued for Setup", "Being Configured", "Being Tested", "You're Live! ✦"];
+const DEFAULT_STAGES = ["Payment Confirmed", "Queued for Setup", "Being Configured", "Being Tested", "Live & Verified"];
 
 const stageConfig = {
-  instant_lead_response: ["Payment Confirmed", "Queued for Setup", "Connecting Lead Forms", "Being Tested", "You're Live! ✦"],
-  missed_call_text_back: ["Payment Confirmed", "Queued for Setup", "Setting Up Your Number", "Being Tested", "You're Live! ✦"],
-  nurture_sequence_14d:  ["Payment Confirmed", "Queued for Setup", "Writing Your Messages", "Being Tested", "You're Live! ✦"],
-  ai_booking_agent:      ["Payment Confirmed", "Queued for Setup", "Connecting Your Calendar", "Being Tested", "You're Live! ✦"],
-  lead_reactivation:     ["Payment Confirmed", "Queued for Setup", "Importing Your Leads", "Being Tested", "You're Live! ✦"],
-  review_request:        ["Payment Confirmed", "Queued for Setup", "Setting Up Review Link", "Being Tested", "You're Live! ✦"],
+  instant_lead_response: ["Payment Confirmed", "Queued for Setup", "Connecting Lead Forms", "Being Tested", "Live & Verified"],
+  missed_call_text_back: ["Payment Confirmed", "Queued for Setup", "Setting Up Your Number", "Being Tested", "Live & Verified"],
+  nurture_sequence_14d:  ["Payment Confirmed", "Queued for Setup", "Writing Your Messages", "Being Tested", "Live & Verified"],
+  ai_booking_agent:      ["Payment Confirmed", "Queued for Setup", "Connecting Your Calendar", "Being Tested", "Live & Verified"],
+  lead_reactivation:     ["Payment Confirmed", "Queued for Setup", "Importing Your Leads", "Being Tested", "Live & Verified"],
+  review_request:        ["Payment Confirmed", "Queued for Setup", "Setting Up Review Link", "Being Tested", "Live & Verified"],
 };
 
-const LEVEL_LABELS = ["Lv. 1", "Lv. 2", "Lv. 3", "Lv. 4", "MAX"];
+const LEVEL_LABELS = ["1", "2", "3", "4", "5"];
 
 export default function HorizontalStageTracker({ serviceKey, currentStage = 0, productName, installStatus, portalState }) {
   const stages = (serviceKey && stageConfig[serviceKey]) ? stageConfig[serviceKey] : DEFAULT_STAGES;
-  const rawStage = Math.min(Math.max(currentStage, 0), stages.length - 1);
-  // Phase A.5: Gate "ONLINE" / final stage behind PortalStateEngine proof
+  const rawStage = Math.min(Math.max(Number(currentStage) || 0, 0), stages.length - 1);
   const readinessCard = getCardState(portalState, "system_readiness");
   const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
   const isAdmin = portalState?.meta?.is_admin_preview || false;
-  // Suppress final stage completion when proof not validated
   const safeStage = isProofLive ? rawStage : Math.min(rawStage, stages.length - 2);
   const effectiveInstallStatus = isProofLive ? installStatus : (installStatus === "Live" ? "Testing" : installStatus);
+  const isError = effectiveInstallStatus === "Error";
 
   return (
     <div style={{
@@ -37,7 +36,6 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
       position: "relative",
       overflow: "hidden",
     }}>
-      {/* Ambient pulse glow */}
       <div style={{
         position: "absolute", top: "-40%", right: "-10%",
         width: "320px", height: "320px", borderRadius: "50%",
@@ -45,7 +43,6 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
         pointerEvents: "none",
         animation: "trackerPulse 3s ease-in-out infinite",
       }} />
-      {/* Subtle scan line */}
       <div style={{
         position: "absolute", inset: 0,
         background: "linear-gradient(0deg, transparent 49%, rgba(0,174,239,0.03) 50%, transparent 51%)",
@@ -55,51 +52,48 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
       }} />
 
       <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "28px", flexWrap: "wrap", gap: "10px" }}>
           <div>
             <p style={{ fontSize: "10px", fontWeight: "700", color: "rgba(0,174,239,0.6)", textTransform: "uppercase", letterSpacing: "0.22em", margin: "0 0 5px" }}>
               System Tracker
             </p>
             <h3 style={{ fontSize: "clamp(16px, 2.5vw, 22px)", fontWeight: "800", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>
-              {productName}
+              {productName || "Automation System"}
             </h3>
           </div>
           <div style={{
             padding: "6px 16px", borderRadius: "9999px",
             background: effectiveInstallStatus === "Live"
               ? "rgba(34,197,94,0.18)"
-              : effectiveInstallStatus === "Error"
+              : isError
               ? "rgba(239,68,68,0.16)"
               : "rgba(0,174,239,0.16)",
             border: `1px solid ${
               effectiveInstallStatus === "Live"
                 ? "rgba(34,197,94,0.4)"
-                : effectiveInstallStatus === "Error"
+                : isError
                 ? "rgba(239,68,68,0.35)"
                 : "rgba(0,174,239,0.35)"
             }`,
             fontSize: "12px", fontWeight: "700",
-            color: effectiveInstallStatus === "Live" ? "#4ade80" : effectiveInstallStatus === "Error" ? "#f87171" : "#00AEEF",
+            color: effectiveInstallStatus === "Live" ? "#4ade80" : isError ? "#f87171" : "#00AEEF",
           }}>
             {effectiveInstallStatus === "Live"
-              ? "✦ ONLINE"
-              : effectiveInstallStatus === "Error"
-              ? "⚠ OFFLINE"
+              ? "Live & Verified"
+              : isError
+              ? "Needs Review"
               : `Step ${Math.min(safeStage + 1, stages.length)} of ${stages.length}`}
           </div>
         </div>
 
-        {/* Step indicators */}
         <div style={{ display: "flex", alignItems: "center", gap: 0 }}>
           {stages.map((stage, idx) => {
             const isComplete = idx < safeStage;
             const isCurrent = idx === safeStage;
             const isLast = idx === stages.length - 1;
             return (
-              <div key={idx} style={{ display: "flex", alignItems: "center", flex: isLast ? "0 0 auto" : 1, minWidth: 0 }}>
+              <div key={stage} style={{ display: "flex", alignItems: "center", flex: isLast ? "0 0 auto" : 1, minWidth: 0 }}>
                 <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "8px" }}>
-                  {/* Circle with level indicator */}
                   <div style={{
                     width: "42px", height: "42px", borderRadius: "50%", flexShrink: 0,
                     background: isComplete
@@ -123,16 +117,15 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
                     transition: "all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1)",
                   }}>
                     {isComplete ? (
-                      <CheckCircle2 style={{ width: "19px", height: "19px", color: "#fff" }} />
+                      <CheckCircle2 style={{ width: "19px", height: "19px", color: "#fff" }} aria-hidden="true" />
                     ) : isCurrent ? (
-                      <Loader2 style={{ width: "17px", height: "17px", color: "#00AEEF", animation: "spin 1.5s linear infinite" }} />
+                      <Loader2 style={{ width: "17px", height: "17px", color: "#00AEEF", animation: "spin 1.5s linear infinite" }} aria-hidden="true" />
                     ) : (
                       <span style={{ fontSize: "11px", fontWeight: "800", color: "rgba(255,255,255,0.3)", letterSpacing: "0.02em" }}>
                         {LEVEL_LABELS[idx]}
                       </span>
                     )}
                   </div>
-                  {/* Level label */}
                   <span style={{
                     fontSize: "9px", fontWeight: "700", textAlign: "center",
                     color: isComplete ? "#4ade80" : isCurrent ? "#ffffff" : "rgba(255,255,255,0.35)",
@@ -141,7 +134,6 @@ export default function HorizontalStageTracker({ serviceKey, currentStage = 0, p
                     {stage}
                   </span>
                 </div>
-                {/* Connector line — glows when active */}
                 {!isLast && (
                   <div style={{
                     flex: 1, height: "2px", margin: "0 4px", marginBottom: "24px",
