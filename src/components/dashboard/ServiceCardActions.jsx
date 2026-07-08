@@ -14,10 +14,11 @@ export default function ServiceCardActions({ serviceKey, orderId }) {
     }
 
     if (actionType === "tasks") {
-      window.dispatchEvent(new CustomEvent("clientsurge:portal-open-files", {
-        detail: { serviceKey, orderId },
-      }));
-      window.location.hash = "tab=tasks";
+      if (orderId) {
+        window.location.href = `/setup/credentials?order_id=${encodeURIComponent(orderId)}`;
+        return;
+      }
+      window.location.href = "mailto:support@clientsurgesystems.com?subject=ClientSurge%20Setup%20Help";
       return;
     }
 
