@@ -40,8 +40,8 @@ const STATUS_CONFIG = {
     color: "#0088CC",
     bg: "rgba(0,136,204,0.07)",
     border: "rgba(0,136,204,0.18)",
-    title: "Testing Your System — Almost Live!",
-    instruction: "Your automations are configured and we're running final quality tests. You may receive a test message on your business phone. This is expected and normal.",
+    title: "Testing Your System — Almost Live",
+    instruction: "Your automations are configured and final quality checks are running. You may receive a test message on your business phone. This is expected and normal.",
     action: null,
   },
   "Live": {
@@ -50,7 +50,7 @@ const STATUS_CONFIG = {
     bg: "rgba(34,197,94,0.07)",
     border: "rgba(34,197,94,0.18)",
     title: "Your System is Live and Running",
-    instruction: "All automations are active. Your leads are being captured, followed up, and nurtured automatically. Check your dashboard metrics for real-time activity.",
+    instruction: "All automations are active. Your leads are being captured, followed up, and nurtured automatically. Check your dashboard metrics for verified activity.",
     action: null,
   },
   "Error": {
@@ -98,7 +98,7 @@ export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshin
         bg: "rgba(0,136,204,0.07)",
         border: "rgba(0,136,204,0.18)",
         title: "Verifying Your System — Almost Live",
-        instruction: "Your setup is complete. We're running final verification checks before confirming your system is fully live. This typically takes a short while — no action needed from you.",
+        instruction: "Your setup is complete. We're running final verification checks before confirming your system is fully live. This dashboard waits for proof before showing live status.",
         action: null,
       }
     : config;
@@ -106,33 +106,37 @@ export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshin
   const DisplayIcon = displayConfig.icon;
   return (
     <div style={{
-      borderRadius: "14px",
-      background: displayConfig.bg,
+      borderRadius: "22px",
+      background: "linear-gradient(180deg,#ffffff 0%,#F6FBFF 100%)",
       border: `1px solid ${displayConfig.border}`,
-      padding: "18px 22px",
-      marginBottom: "20px",
+      padding: "20px 22px",
+      marginBottom: "18px",
       display: "flex",
       alignItems: "flex-start",
-      gap: "14px",
+      gap: "16px",
+      boxShadow: "0 12px 34px rgba(0,59,143,0.07)",
+      position: "relative",
+      overflow: "hidden",
     }}>
+      <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: "4px", background: displayConfig.color }} />
       <div style={{
-        width: "38px", height: "38px", borderRadius: "10px",
-        background: `${displayConfig.color}18`,
+        width: "42px", height: "42px", borderRadius: "14px",
+        background: `${displayConfig.color}14`,
         border: `1px solid ${displayConfig.color}30`,
         display: "flex", alignItems: "center", justifyContent: "center",
         flexShrink: 0,
       }}>
-        <DisplayIcon style={{ width: "18px", height: "18px", color: displayConfig.color }} />
+        <DisplayIcon style={{ width: "19px", height: "19px", color: displayConfig.color }} />
       </div>
 
       <div style={{ flex: 1, minWidth: 0 }}>
-        <p style={{ fontSize: "13px", fontWeight: "800", color: displayConfig.color, margin: "0 0 3px", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+        <p style={{ fontSize: "11px", fontWeight: "900", color: displayConfig.color, margin: "0 0 5px", textTransform: "uppercase", letterSpacing: "0.14em" }}>
           Current Status
         </p>
-        <p style={{ fontSize: "15px", fontWeight: "700", color: "#0A1628", margin: "0 0 5px" }}>
+        <p style={{ fontSize: "17px", fontWeight: "850", color: "#0A1628", margin: "0 0 7px", letterSpacing: "-0.02em" }}>
           {displayConfig.title}
         </p>
-        <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.6)", margin: 0, lineHeight: 1.6 }}>
+        <p style={{ fontSize: "13px", color: "rgba(10,22,40,0.64)", margin: 0, lineHeight: 1.65, maxWidth: "820px" }}>
           {displayConfig.instruction}
         </p>
 
@@ -140,10 +144,11 @@ export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshin
           <a
             href={displayConfig.action.href}
             style={{
-              display: "inline-flex", alignItems: "center", gap: "5px",
-              marginTop: "10px", padding: "7px 14px", borderRadius: "9999px",
+              display: "inline-flex", alignItems: "center", gap: "6px",
+              marginTop: "12px", padding: "8px 15px", borderRadius: "9999px",
               background: displayConfig.color, color: "#fff",
-              fontSize: "12px", fontWeight: "700", textDecoration: "none",
+              fontSize: "12px", fontWeight: "800", textDecoration: "none",
+              boxShadow: `0 8px 20px ${displayConfig.color}30`,
             }}
           >
             {displayConfig.action.label} <ExternalLink style={{ width: "11px", height: "11px" }} />
@@ -159,12 +164,13 @@ export default function SetupStatusPanel({ installStatus, onRefresh, isRefreshin
           title="Refresh status"
           style={{
             display: "flex", alignItems: "center", justifyContent: "center",
-            width: "32px", height: "32px", borderRadius: "8px",
-            background: "transparent", border: `1px solid ${displayConfig.border}`,
+            width: "36px", height: "36px", borderRadius: "12px",
+            background: "#ffffff", border: `1px solid ${displayConfig.border}`,
             cursor: "pointer", flexShrink: 0, opacity: isRefreshing ? 0.5 : 1,
+            boxShadow: "0 6px 16px rgba(0,59,143,0.06)",
           }}
         >
-          <RefreshCw style={{ width: "13px", height: "13px", color: displayConfig.color, animation: isRefreshing ? "spin 1s linear infinite" : "none" }} />
+          <RefreshCw style={{ width: "14px", height: "14px", color: displayConfig.color, animation: isRefreshing ? "spin 1s linear infinite" : "none" }} />
         </button>
       )}
     </div>
