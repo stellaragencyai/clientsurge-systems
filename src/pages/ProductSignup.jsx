@@ -2,14 +2,12 @@ import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { appParams } from "@/lib/app-params";
 import { PACKAGE_OFFERS, normalizePackageKey } from "@/lib/salesCatalog";
+import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone } from "@/lib/formSanitizers";
 
-/**
- * ProductSignup — resilient, self-contained checkout page.
- * Defaults to growth_system. Calls createCheckoutSession backend function.
- */
 const DEFAULT_PACKAGE = "growth_system";
 const CHECKOUT_FUNCTION_NAME = "createCheckoutSession";
 const FALLBACK_APP_ID = "69dc4a79656fdba136d413d3";
+const CHECKOUT_CONSENT_VERSION = "checkout_contact_consent_v1";
 
 const CHECKOUT_PACKAGES = PACKAGE_OFFERS.filter((offer) => offer.checkout_enabled);
 const PACKAGE_BY_KEY = Object.fromEntries(CHECKOUT_PACKAGES.map((offer) => [offer.package_key, offer]));
@@ -53,10 +51,6 @@ function currency(amount) {
 function resolvePackage(pkgParam) {
   const normalized = normalizePackageKey(pkgParam || DEFAULT_PACKAGE);
   return PACKAGE_BY_KEY[normalized]?.package_key || DEFAULT_PACKAGE;
-}
-
-function isValidEmail(value) {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
 }
 
 async function invokePublicCheckoutSession(payload) {
@@ -115,6 +109,7 @@ export default function ProductSignup() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [industry, setIndustry] = useState("");
+  const [consentGiven, setConsentGiven] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -156,7 +151,8 @@ export default function ProductSignup() {
     if (!fullName.trim()) return "Please enter your full name.";
     if (!businessName.trim()) return "Please enter your business name.";
     if (!isValidEmail(email)) return "Please enter a valid email address.";
-    if (phone.replace(/\D/g, "").length < 10) return "Please enter a valid phone number.";
+    if (!isValidPhone(phone)) return "Please enter a valid US phone number.";
+    if (!consentGiven) return "Please confirm consent so we can contact you about your purchase and setup.";
     return "";
   };
 
@@ -170,19 +166,26 @@ export default function ProductSignup() {
       return;
     }
 
+    const normalizedEmail = normalizeEmail(email);
+    const normalizedPhone = normalizePhone(phone);
+
     setLoading(true);
     try {
       const origin = typeof window !== "undefined" ? window.location.origin : "https://clientsurgesystems.com";
       const payload = {
         package_key: selectedPackage,
         customer_name: fullName.trim(),
-        customer_email: email.trim().toLowerCase(),
-        customer_phone: phone.trim(),
+        customer_email: normalizedEmail,
+        customer_phone: normalizedPhone,
         business_name: businessName.trim(),
         industry: industry.trim(),
         success_url: `${origin}/order-success?session_id={CHECKOUT_SESSION_ID}`,
         cancel_url: `${origin}/product-signup?package=${encodeURIComponent(selectedPackage)}`,
         source: "product_signup",
+        consent_given: true,
+        consent_source: "product_signup_checkout_form",
+        consent_text_version: CHECKOUT_CONSENT_VERSION,
+        requested_channels: ["email", "sms", "call"],
       };
 
       const response = await invokePublicCheckoutSession(payload);
@@ -197,14 +200,12 @@ export default function ProductSignup() {
     } catch (err) {
       const msg = err?.message || "Checkout could not be started.";
       const requestId = err?.request_id;
-      const suffix = requestId
-        ? ` Request ID: ${requestId}.`
-        : "";
+      const suffix = requestId ? ` Request ID: ${requestId}.` : "";
       setError(`${msg}.${suffix} Retry checkout or contact support if it continues.`.replace("..", "."));
       setSuccess(false);
       setLoading(false);
     }
-  }, [selectedPackage, fullName, businessName, email, phone, industry]);
+  }, [selectedPackage, fullName, businessName, email, phone, industry, consentGiven]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col" style={{ fontFamily: "Montserrat, system-ui, sans-serif" }}>
@@ -306,85 +307,39 @@ export default function ProductSignup() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
               <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name *</label>
-              <input
-                id="fullName"
-                name="name"
-                type="text"
-                value={fullName}
-                onChange={(e) => setFullName(e.target.value)}
-                placeholder="John Smith"
-                autoComplete="name"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                style={{ fontSize: "16px" }}
-              />
+              <input id="fullName" name="name" type="text" value={fullName} onChange={(e) => setFullName(e.target.value)} placeholder="John Smith" autoComplete="name" required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" style={{ fontSize: "16px" }} />
             </div>
 
             <div className="md:col-span-2">
               <label htmlFor="businessName" className="block text-sm font-semibold text-gray-700 mb-1.5">Business Name *</label>
-              <input
-                id="businessName"
-                name="organization"
-                type="text"
-                value={businessName}
-                onChange={(e) => setBusinessName(e.target.value)}
-                placeholder="Acme Landscaping LLC"
-                autoComplete="organization"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                style={{ fontSize: "16px" }}
-              />
+              <input id="businessName" name="organization" type="text" value={businessName} onChange={(e) => setBusinessName(e.target.value)} placeholder="Acme Landscaping LLC" autoComplete="organization" required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" style={{ fontSize: "16px" }} />
             </div>
 
             <div>
               <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address *</label>
-              <input
-                id="email"
-                name="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="john@yourbusiness.com"
-                autoComplete="email"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                style={{ fontSize: "16px" }}
-              />
+              <input id="email" name="email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} placeholder="john@yourbusiness.com" autoComplete="email" required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" style={{ fontSize: "16px" }} />
             </div>
 
             <div>
               <label htmlFor="phone" className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number *</label>
-              <input
-                id="phone"
-                name="phone"
-                type="tel"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="(555) 123-4567"
-                autoComplete="tel"
-                required
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400"
-                style={{ fontSize: "16px" }}
-              />
+              <input id="phone" name="phone" type="tel" value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="(555) 123-4567" autoComplete="tel" required className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400" style={{ fontSize: "16px" }} />
             </div>
 
             <div className="md:col-span-2">
               <label htmlFor="industry" className="block text-sm font-semibold text-gray-700 mb-1.5">Industry / Business Type</label>
-              <select
-                id="industry"
-                name="industry"
-                value={industry}
-                onChange={(e) => setIndustry(e.target.value)}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white"
-                style={{ fontSize: "16px" }}
-              >
+              <select id="industry" name="industry" value={industry} onChange={(e) => setIndustry(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-blue-400 bg-white" style={{ fontSize: "16px" }}>
                 <option value="">— Select your industry —</option>
-                {INDUSTRIES.map((option) => (
-                  <option key={option} value={option}>{option}</option>
-                ))}
+                {INDUSTRIES.map((option) => <option key={option} value={option}>{option}</option>)}
               </select>
             </div>
           </div>
+
+          <label className="mt-5 flex items-start gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-gray-700">
+            <input type="checkbox" checked={consentGiven} onChange={(e) => setConsentGiven(e.target.checked)} className="mt-1 h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" />
+            <span>
+              I agree that ClientSurge Systems may contact me by email, phone, or SMS about this purchase and setup. Message/data rates may apply. Reply STOP to opt out. See <Link to="/privacy" className="font-semibold underline">Privacy</Link>, <Link to="/terms" className="font-semibold underline">Terms</Link>, and <Link to="/sms-terms" className="font-semibold underline">SMS Terms</Link>.
+            </span>
+          </label>
 
           {error && (
             <div className="mt-6 rounded-xl border border-red-200 bg-red-50 p-4" role="alert">
@@ -407,16 +362,7 @@ export default function ProductSignup() {
           )}
 
           {!success && (
-            <button
-              type="submit"
-              disabled={loading}
-              className="mt-6 w-full py-4 rounded-xl font-black text-white text-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60"
-              style={{
-                background: loading ? "#9cb3c9" : "linear-gradient(135deg, #003B8F 0%, #0088CC 60%, #00AEEF 100%)",
-                boxShadow: loading ? "none" : "0 4px 16px rgba(0,136,204,0.35)",
-                minHeight: "56px",
-              }}
-            >
+            <button type="submit" disabled={loading} className="mt-6 w-full py-4 rounded-xl font-black text-white text-lg flex items-center justify-center gap-2 transition-all disabled:opacity-60" style={{ background: loading ? "#9cb3c9" : "linear-gradient(135deg, #003B8F 0%, #0088CC 60%, #00AEEF 100%)", boxShadow: loading ? "none" : "0 4px 16px rgba(0,136,204,0.35)", minHeight: "56px" }}>
               {loading ? (
                 <>
                   <svg className="w-5 h-5 animate-spin" viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"/><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"/></svg>
