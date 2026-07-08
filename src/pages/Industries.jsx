@@ -8,16 +8,37 @@ import { forceScrollToTop } from "@/lib/scroll";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 const industries = [
-  { id: "roofing", title: "Roofing & Restoration", icon: Hammer, description: "For teams that need faster inspection response, quote follow-up, and reactivation.", href: "/roofing" },
-  { id: "hvac", title: "HVAC & Heating/Cooling", icon: Wrench, description: "For teams handling seasonal spikes, missed calls, service requests, and booking handoffs.", href: "/hvac" },
-  { id: "plumbing", title: "Plumbing & Drain Services", icon: Droplets, description: "For urgent service inquiries, missed-call recovery, and dispatch-ready booking paths.", href: "/plumbing" },
-  { id: "dental", title: "Dental & Orthodontics", icon: SmilePlus, description: "For new-patient response, appointment routing, recall follow-up, and review requests.", href: "/dental" },
-  { id: "med-spas-clinics", title: "Med Spas & Aesthetic Clinics", icon: HeartPulse, description: "For consultation inquiries, treatment follow-up, booking handoff, and reactivation.", href: "/med-spa" },
-  { id: "chiropractic", title: "Chiropractic & Physical Therapy", icon: Activity, description: "For new-patient inquiries, reminders, booking handoff, and patient reactivation.", href: "/chiropractic" },
-  { id: "contractors", title: "Contractors & Trades", icon: HardHat, description: "For project inquiries, estimate follow-up, walkthrough scheduling, and reviews.", href: "/contractors" },
-  { id: "real-estate", title: "Real Estate", icon: Building2, description: "For buyer and seller inquiries, showing handoff, follow-up, and old prospect reactivation.", href: "/real-estate" },
-  { id: "personal-injury", title: "Personal Injury", icon: Scale, description: "For intake response, consultation scheduling, missed-call recovery, and follow-up.", href: "/personal-injury" },
-  { id: "veterinary", title: "Veterinary Clinics", icon: PawPrint, description: "For appointment requests, reminders, missed-call text-back, and client reactivation.", href: "/veterinary" },
+  {
+    id: "hvac-ai-growth-system",
+    title: "HVAC AI Growth System",
+    icon: Wrench,
+    description: "The flagship vertical system for emergency HVAC calls, missed-call recovery, AI booking, tune-up nurture, and package-based automation activation.",
+    href: "/industries/hvac-ai-growth-system",
+    badge: "Flagship",
+  },
+  {
+    id: "dental",
+    title: "Dental AI Growth System",
+    icon: SmilePlus,
+    description: "For new-patient inquiries, appointment routing, insurance questions, recall follow-up, reviews, and patient reactivation.",
+    href: "/dental",
+    badge: "Next",
+  },
+  {
+    id: "roofing",
+    title: "Roofing AI Growth System",
+    icon: Hammer,
+    description: "For storm damage, leak repairs, inspection requests, insurance-claim conversations, estimate follow-up, and review automation.",
+    href: "/roofing",
+    badge: "Next",
+  },
+  { id: "plumbing", title: "Plumbing & Drain Services", icon: Droplets, description: "For urgent service inquiries, missed-call recovery, and dispatch-ready booking paths.", href: "/plumbing", badge: "Legacy" },
+  { id: "med-spas-clinics", title: "Med Spas & Aesthetic Clinics", icon: HeartPulse, description: "For consultation inquiries, treatment follow-up, booking handoff, and reactivation.", href: "/med-spa", badge: "Legacy" },
+  { id: "chiropractic", title: "Chiropractic & Physical Therapy", icon: Activity, description: "For new-patient inquiries, reminders, booking handoff, and patient reactivation.", href: "/chiropractic", badge: "Legacy" },
+  { id: "contractors", title: "Contractors & Trades", icon: HardHat, description: "For project inquiries, estimate follow-up, walkthrough scheduling, and reviews.", href: "/contractors", badge: "Legacy" },
+  { id: "real-estate", title: "Real Estate", icon: Building2, description: "For buyer and seller inquiries, showing handoff, follow-up, and old prospect reactivation.", href: "/real-estate", badge: "Legacy" },
+  { id: "personal-injury", title: "Personal Injury", icon: Scale, description: "For intake response, consultation scheduling, missed-call recovery, and follow-up.", href: "/personal-injury", badge: "Legacy" },
+  { id: "veterinary", title: "Veterinary Clinics", icon: PawPrint, description: "For appointment requests, reminders, missed-call text-back, and client reactivation.", href: "/veterinary", badge: "Legacy" },
 ];
 
 export default function Industries() {
@@ -29,11 +50,11 @@ export default function Industries() {
 
   useEffect(() => {
     return setPageMetadata({
-      title: "Industries We Serve | ClientSurge Systems",
-      description: "Explore ClientSurge systems for roofing, HVAC, plumbing, dental, med spa, chiropractic, contractors, real estate, personal injury, and veterinary clinics.",
+      title: "AI Growth Systems by Industry | ClientSurge Systems",
+      description: "Explore ClientSurge vertical AI Growth Systems for HVAC, dental, roofing, plumbing, med spas, legal intake, and local service businesses. Each system combines an industry website experience with package-controlled automation modules.",
       canonicalPath: "/industries",
-      ogTitle: "ClientSurge Systems by Industry",
-      ogDescription: "See which ClientSurge automation systems fit your industry and lead flow.",
+      ogTitle: "ClientSurge Vertical AI Growth Systems",
+      ogDescription: "Industry-specific customer acquisition systems powered by AI automation, package permissions, deployment health, and ClientDeployment visibility.",
     });
   }, []);
 
@@ -42,24 +63,33 @@ export default function Industries() {
       <Navbar />
       <section className="text-center pr-4 pl-4 pt-24 pb-8 bg-background">
         <CSSectionHeader
-          eyebrow="Industries"
-          title="Automation for Lead-Driven Service Businesses"
-          subtitle="We build done-for-you systems for businesses that depend on fast lead response, follow-up, booking, reviews, and reactivation."
+          eyebrow="Vertical AI Growth Systems"
+          title="Industry Systems, Not Generic Website Templates"
+          subtitle="Each ClientSurge vertical combines a conversion-focused website, industry-specific AI configuration, CRM pipeline logic, and package-controlled automation modules. The industry defines the experience. The package controls which automations activate."
         />
+      </section>
+
+      <section className="px-6 pb-6">
+        <div className="max-w-5xl mx-auto rounded-3xl border border-primary/15 bg-white/80 p-5 md:p-7 shadow-sm">
+          <p className="text-sm md:text-base text-muted-foreground leading-relaxed text-center">
+            A basic website is like a house with no utilities. ClientSurge installs the digital plumbing, electricity, security, and smart systems that make the website function as automated revenue infrastructure.
+          </p>
+        </div>
       </section>
 
       <section className="py-16 px-6">
         <div className="max-w-6xl mx-auto grid md:grid-cols-2 xl:grid-cols-3 gap-6">
           {industries.map((industry) => {
             const IndustryIcon = industry.icon;
+            const isFlagship = industry.badge === "Flagship";
             return (
-              <article key={industry.id} id={industry.id} className="cs-card p-6 scroll-mt-24">
+              <article key={industry.id} id={industry.id} className={`cs-card p-6 scroll-mt-24 ${isFlagship ? "ring-1 ring-primary/25 shadow-[0_18px_60px_rgba(0,107,176,0.14)]" : ""}`}>
                 <div className="flex items-center justify-between gap-3 mb-4">
                   <div className="flex items-center gap-3">
                     <div className="inline-flex h-11 w-11 items-center justify-center rounded-2xl border bg-primary/10 border-primary/20"><IndustryIcon className="h-5 w-5 text-primary" /></div>
                     <h2 className="font-display text-2xl font-semibold text-foreground">{industry.title}</h2>
                   </div>
-                  <span className="inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap bg-primary/10 text-primary border border-primary/25"><CheckCircle2 className="w-3.5 h-3.5" /> Live</span>
+                  <span className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-[11px] font-semibold uppercase tracking-wide whitespace-nowrap border ${isFlagship ? "bg-primary text-primary-foreground border-primary" : "bg-primary/10 text-primary border-primary/25"}`}><CheckCircle2 className="w-3.5 h-3.5" /> {industry.badge}</span>
                 </div>
                 <p className="text-sm text-muted-foreground leading-relaxed mb-6">{industry.description}</p>
                 <a href={industry.href} onClick={(event) => handleIndustryNavigation(event, industry.href)} className="cs-btn-secondary">
