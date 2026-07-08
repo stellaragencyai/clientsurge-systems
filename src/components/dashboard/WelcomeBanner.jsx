@@ -5,8 +5,8 @@ import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 const STAGES = [
   { label: "Payment Confirmed", key: "paid" },
   { label: "Setup Info Received", key: "setup_submitted" },
-  { label: "We're Configuring", key: "configuring" },
-  { label: "You're Live!", key: "live" },
+  { label: "Being Configured", key: "configuring" },
+  { label: "Live & Verified", key: "live" },
 ];
 
 function getStageIndex(order, hasSetupInfo) {
@@ -22,8 +22,6 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
   const firstName = user?.full_name?.split(" ")[0] || user?.email?.split("@")[0] || "there";
   const displayName = firstName.charAt(0).toUpperCase() + firstName.slice(1);
   const rawStageIndex = getStageIndex({ order }, hasSetupInfo);
-  const currentStage = STAGES[rawStageIndex];
-  // Phase A.5: Gate "Live" celebration behind PortalStateEngine proof validation
   const readinessCard = getCardState(portalState, "system_readiness");
   const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
   const isLive = rawStageIndex === 3 && isProofLive;
@@ -39,7 +37,6 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
       boxShadow: "0 12px 40px rgba(0,59,143,0.22)",
       position: "relative", overflow: "hidden",
     }}>
-      {/* Ambient glow */}
       <div style={{
         position: "absolute", top: "-40%", right: "-5%",
         width: "350px", height: "350px", borderRadius: "50%",
@@ -48,23 +45,21 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
       }} />
 
       <div style={{ position: "relative", zIndex: 1 }}>
-        {/* Greeting */}
         <div style={{ marginBottom: "20px" }}>
           <p style={{ fontSize: "11px", fontWeight: "700", color: "rgba(0,174,239,0.7)", textTransform: "uppercase", letterSpacing: "0.18em", margin: "0 0 6px" }}>
             ClientSurge Systems
           </p>
           <h1 style={{ fontSize: "clamp(22px,4vw,30px)", fontWeight: "800", color: "#ffffff", margin: "0 0 6px", lineHeight: 1.2 }}>
-            {isLive ? `🎉 You're live, ${displayName}!` : `Welcome, ${displayName}! 👋`}
+            {isLive ? `Your system is live, ${displayName}` : `Welcome, ${displayName}`}
           </h1>
           <p style={{ fontSize: "14px", color: "rgba(255,255,255,0.65)", margin: 0 }}>
             {businessName ? `${businessName} · ` : ""}
             {isLive
-              ? "Your automation system is active and capturing leads."
-              : "Here's exactly where things stand with your setup."}
+              ? "Your automation system is active and verified."
+              : "Here is where your setup currently stands."}
           </p>
         </div>
 
-        {/* Progress timeline */}
         <div style={{
           display: "flex", alignItems: "center", gap: 0,
           background: "rgba(255,255,255,0.06)", borderRadius: "14px",
@@ -113,7 +108,6 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
           })}
         </div>
 
-        {/* Single primary CTA based on state */}
         {stageIndex === 0 && (
           <div style={{
             background: "rgba(0,174,239,0.15)", border: "1px solid rgba(0,174,239,0.4)",
@@ -122,10 +116,10 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
           }}>
             <div>
               <p style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff", margin: "0 0 2px" }}>
-                ✦ One thing left — we need 5 minutes of your time
+                Setup information needed
               </p>
               <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
-                Submit your business details so we can build your system.
+                Submit your business details so we can configure your system.
               </p>
             </div>
             {order?.id && (
@@ -153,10 +147,10 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             borderRadius: "12px", padding: "14px 18px",
           }}>
             <p style={{ fontSize: "13px", fontWeight: "700", color: "#4ade80", margin: "0 0 2px" }}>
-              ✓ We received your setup info!
+              Setup information received
             </p>
             <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
-              Our team is reviewing your details and will start configuration within 24–48 hours. No action needed.
+              Our team is reviewing your details and the dashboard will update as setup advances.
             </p>
           </div>
         )}
@@ -170,10 +164,10 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             <Zap style={{ width: "18px", height: "18px", color: "#fbbf24", flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: "13px", fontWeight: "700", color: "#fbbf24", margin: "0 0 2px" }}>
-                We're actively building your system
+                We are configuring your system
               </p>
               <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
-                You'll receive an email when everything is tested and ready to go live.
+                You will receive an update when testing and verification are complete.
               </p>
             </div>
           </div>
@@ -185,14 +179,13 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             borderRadius: "12px", padding: "14px 18px",
             display: "flex", alignItems: "center", gap: "12px",
           }}>
-            <span style={{ fontSize: "22px" }}>🚀</span>
+            <span style={{ fontSize: "22px" }}>✓</span>
             <p style={{ fontSize: "13px", fontWeight: "700", color: "#4ade80", margin: 0 }}>
-              Your automation is live and working. New leads will be responded to automatically.
+              Your automation is live and verified.
             </p>
           </div>
         )}
 
-        {/* Phase A.5: Proof gate notice when not Live */}
         {!isProofLive && rawStageIndex === 3 && (
           <div style={{
             background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)",
@@ -202,10 +195,10 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             <Clock style={{ width: "18px", height: "18px", color: "#00AEEF", flexShrink: 0 }} />
             <div>
               <p style={{ fontSize: "13px", fontWeight: "700", color: "#00AEEF", margin: "0 0 2px" }}>
-                We're verifying your system is fully live
+                We are verifying your system before marking it live
               </p>
               <p style={{ fontSize: "12px", color: "rgba(255,255,255,0.6)", margin: 0 }}>
-                Your setup is complete — we're running final checks before confirming go-live.
+                Setup may be complete, but the dashboard waits for proof before showing live status.
               </p>
             </div>
           </div>
