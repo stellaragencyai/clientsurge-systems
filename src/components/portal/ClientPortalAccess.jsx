@@ -1,21 +1,9 @@
-import { useState, useEffect, lazy, Suspense, Component } from "react";
+import { useState, useEffect, Component } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
-import { Loader2, LogIn, LifeBuoy, AlertTriangle, Home, RefreshCw, WifiOff } from "lucide-react";
-
-// The public /client-portal entry must show the actual client dashboard once a
-// user is authenticated. The previous premium portal shell could throw before
-// render and trap users behind the "Portal Setup in Progress" screen.
-const ClientDashboard = lazy(() =>
-  import("@/internal-pages/ClientDashboard").catch((err) => {
-    console.error("ClientDashboard chunk load failed:", err);
-    throw Object.assign(
-      new Error("The client dashboard module failed to load. This is usually a temporary network issue."),
-      { isChunkLoadError: true }
-    );
-  })
-);
+import ClientDashboard from "@/internal-pages/ClientDashboard";
+import { Loader2, LogIn, LifeBuoy, AlertTriangle, Home, RefreshCw } from "lucide-react";
 
 const LOADING_TIMEOUT_MS = 8000;
 
@@ -24,12 +12,15 @@ class PortalErrorBoundary extends Component {
     super(props);
     this.state = { hasError: false, error: null, retryCount: 0 };
   }
+
   static getDerivedStateFromError(error) {
     return { hasError: true, error };
   }
+
   componentDidCatch(error, errorInfo) {
     console.error("Client dashboard render error:", error, errorInfo);
   }
+
   handleRetry = () => {
     this.setState((prev) => ({
       hasError: false,
@@ -37,50 +28,39 @@ class PortalErrorBoundary extends Component {
       retryCount: prev.retryCount + 1,
     }));
   };
+
   render() {
     if (this.state.hasError) {
-      const isChunkLoad = this.state.error?.isChunkLoadError ||
-        String(this.state.error?.message || "").includes("Failed to fetch dynamically imported module");
       return (
-        <PortalLoadError
-          isChunkLoad={isChunkLoad}
+        <PortalRenderError
           onRetry={this.handleRetry}
           retryCount={this.state.retryCount}
         />
       );
     }
+
     return this.props.children;
   }
 }
 
-function PortalLoadError({ isChunkLoad, onRetry, retryCount }) {
+function PortalRenderError({ onRetry, retryCount }) {
   return (
     <div className="min-h-screen flex items-center justify-center px-6 bg-background">
       <div className="max-w-md text-center">
         <div
           className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-          style={
-            isChunkLoad
-              ? { background: "rgba(217,119,6,0.12)" }
-              : { background: "linear-gradient(135deg, #003B8F, #00AEEF)" }
-          }
+          style={{ background: "linear-gradient(135deg, #003B8F, #00AEEF)" }}
         >
-          {isChunkLoad ? (
-            <WifiOff className="w-8 h-8" style={{ color: "#d97706" }} />
-          ) : (
-            <LifeBuoy className="w-8 h-8 text-white" />
-          )}
+          <LifeBuoy className="w-8 h-8 text-white" />
         </div>
         <h1
           className="mb-3 text-2xl font-bold text-foreground"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          {isChunkLoad ? "Connection Issue" : "Client Dashboard Temporarily Unavailable"}
+          Client Dashboard Loading Issue
         </h1>
         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-          {isChunkLoad
-            ? "We couldn't load the dashboard due to a temporary network issue. Please try again."
-            : "The client dashboard could not render cleanly. Retry, refresh, or contact support if the issue continues."}
+          The dashboard did not render cleanly. Retry first. If it continues, refresh the page so the newest portal build is loaded.
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
           <button
@@ -102,11 +82,6 @@ function PortalLoadError({ isChunkLoad, onRetry, retryCount }) {
             <LifeBuoy className="w-4 h-4" /> Support
           </Link>
         </div>
-        {retryCount >= 3 && (
-          <p className="text-xs text-muted-foreground mt-4">
-            Still having trouble? Try hard-refreshing (Ctrl+Shift+R) or clearing your browser cache.
-          </p>
-        )}
       </div>
     </div>
   );
@@ -126,10 +101,10 @@ function PortalLoadingTimeout() {
           className="mb-3 text-2xl font-bold text-foreground"
           style={{ fontFamily: "Montserrat, sans-serif" }}
         >
-          Taking Longer Than Expected
+          Loading Your Dashboard
         </h1>
         <p className="text-sm text-muted-foreground mb-6 leading-relaxed">
-          We're having trouble loading your client dashboard. Please try refreshing the page.
+          Authentication is taking longer than expected. Refresh the portal once to reload the latest session state.
         </p>
         <div className="flex flex-wrap gap-3 justify-center">
           <a
@@ -176,8 +151,7 @@ function UnauthenticatedAccess() {
           Client Portal
         </h1>
         <p className="text-base text-muted-foreground mb-8 leading-relaxed max-w-md mx-auto">
-          Log in to view your onboarding progress, automation status, reports, and
-          support messages.
+          Log in to view your onboarding progress, automation status, reports, and support messages.
         </p>
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <a
@@ -213,11 +187,10 @@ export default function ClientPortalAccess() {
     return () => clearTimeout(timer);
   }, [isLoadingAuth, isLoadingPublicSettings]);
 
-  // /client-portal is a public route, so AuthContext may skip its auth check.
-  // Do our own check here so logged-in users go straight to the dashboard.
   useEffect(() => {
     if (isLoadingAuth || isLoadingPublicSettings) return;
     if (isAuthenticated && ctxUser) {
+      setPortalUser(ctxUser);
       setPortalChecking(false);
       return;
     }
@@ -266,15 +239,7 @@ export default function ClientPortalAccess() {
 
   return (
     <PortalErrorBoundary>
-      <Suspense
-        fallback={
-          <div className="min-h-screen flex items-center justify-center">
-            <Loader2 className="w-8 h-8 text-primary animate-spin" />
-          </div>
-        }
-      >
-        <ClientDashboard />
-      </Suspense>
+      <ClientDashboard />
     </PortalErrorBoundary>
   );
 }
