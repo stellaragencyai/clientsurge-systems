@@ -17,7 +17,9 @@ function supportHref(requestId) {
 
 export default function CredentialsSetup() {
   const navigate = useNavigate();
-  const [orderId, setOrderId] = useState(() => new URLSearchParams(window.location.search).get("order_id") || null);
+  const params = new URLSearchParams(window.location.search);
+  const setupToken = params.get("token") || params.get("setup_token") || "";
+  const [orderId, setOrderId] = useState(() => params.get("order_id") || null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -25,7 +27,6 @@ export default function CredentialsSetup() {
   const [submitted, setSubmitted] = useState(false);
 
   useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
     const sessionId = params.get("session_id");
     if (orderId) {
       validateOrder(orderId);
@@ -39,7 +40,7 @@ export default function CredentialsSetup() {
 
   const resolveOrderFromSession = async (sessionId) => {
     try {
-      const result = payload(await base44.functions.invoke("getOrderStatus", { session_id: sessionId }));
+      const result = payload(await base44.functions.invoke("getOrderStatus", { session_id: sessionId, token: setupToken }));
       setRequestId(result.request_id || "");
       if (result?.eligible && result?.order?.id) {
         setOrderId(result.order.id);
@@ -57,7 +58,7 @@ export default function CredentialsSetup() {
 
   const validateOrder = async (id) => {
     try {
-      const result = payload(await base44.functions.invoke("getOrderStatus", { order_id: id }));
+      const result = payload(await base44.functions.invoke("getOrderStatus", { order_id: id, token: setupToken }));
       setRequestId(result.request_id || "");
       if (!result?.order) {
         setError("Order not found. Please check your confirmation email for the correct setup link.");
@@ -67,7 +68,7 @@ export default function CredentialsSetup() {
         setError("This order is not eligible for credentials setup yet. If payment already completed, contact support so we can verify it.");
         return;
       }
-      setOrder(result.order);
+      setOrder({ ...result.order, setup_token: setupToken });
     } catch (err) {
       setRequestId(err?.data?.request_id || err?.request_id || "");
       setError(err?.data?.error || err?.message || "Unable to verify your order. Please try again or contact support.");
@@ -132,7 +133,7 @@ export default function CredentialsSetup() {
           Credentials are only used for setup and verification. Your portal will show status based on posted ClientSurge records, not assumptions.
         </div>
       </div>
-      <CredentialsWizard order={order} onComplete={handleComplete} />
+      <CredentialsWizard order={order} setupToken={setupToken} onComplete={handleComplete} />
     </div>
   );
 }
