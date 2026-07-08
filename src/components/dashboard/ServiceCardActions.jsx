@@ -1,14 +1,30 @@
-import { Headphones, Eye, Download } from "lucide-react";
+import { Headphones, Eye, ClipboardList } from "lucide-react";
 
 export default function ServiceCardActions({ serviceKey, orderId }) {
   const actions = [
-    { icon: Eye, label: "View Details", action: "view" },
-    { icon: Download, label: "Setup Guide", action: "guide" },
+    { icon: Eye, label: "View Status", action: "status" },
+    { icon: ClipboardList, label: "Setup Tasks", action: "tasks" },
     { icon: Headphones, label: "Get Help", action: "help" },
   ];
 
   const handleAction = (actionType) => {
-    // Placeholder for actions — can integrate modals or navigation later
+    if (actionType === "help") {
+      window.location.href = "mailto:support@clientsurgesystems.com?subject=ClientSurge%20Dashboard%20Support";
+      return;
+    }
+
+    if (actionType === "tasks") {
+      window.dispatchEvent(new CustomEvent("clientsurge:portal-open-files", {
+        detail: { serviceKey, orderId },
+      }));
+      window.location.hash = "tab=tasks";
+      return;
+    }
+
+    window.dispatchEvent(new CustomEvent("clientsurge:dashboard-focus-status", {
+      detail: { serviceKey, orderId },
+    }));
+    document.getElementById("dashboard-status")?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
   return (
@@ -17,11 +33,13 @@ export default function ServiceCardActions({ serviceKey, orderId }) {
       gridTemplateColumns: "repeat(auto-fit, minmax(90px, 1fr))",
       gap: "8px",
     }}>
-      {actions.map((action, idx) => {
+      {actions.map((action) => {
         const Icon = action.icon;
         return (
           <button
-            key={idx}
+            key={action.action}
+            type="button"
+            aria-label={`${action.label}${serviceKey ? ` for ${serviceKey}` : ""}`}
             onClick={() => handleAction(action.action)}
             style={{
               borderRadius: "10px",
@@ -47,7 +65,7 @@ export default function ServiceCardActions({ serviceKey, orderId }) {
               e.currentTarget.style.boxShadow = "none";
             }}
           >
-            <Icon style={{ width: "16px", height: "16px" }} />
+            <Icon style={{ width: "16px", height: "16px" }} aria-hidden="true" />
             <span style={{ fontSize: "10px", fontWeight: "600", lineHeight: 1.2 }}>
               {action.label}
             </span>
