@@ -1,16 +1,15 @@
 import { ArrowUp, Mail, Phone, Shield } from "lucide-react";
-
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 
 const navColumns = [
   {
-    title: "Storefront",
+    title: "Platform",
     links: [
       { label: "Home", href: "/" },
-      { label: "Browse Systems", href: "/pricing" },
-      { label: "Automation Store", href: "/store" },
+      { label: "AI Packages", href: "/pricing" },
       { label: "Automations", href: "/automations" },
+      { label: "Industries", href: "/industries" },
       { label: "Contact", href: "/contact" },
     ],
   },
@@ -18,10 +17,11 @@ const navColumns = [
     title: "Resources",
     links: [
       { label: "How It Works", href: "/how-it-works" },
-      { label: "About Us", href: "/about" },
-      { label: "Blog", href: "/blog" },
+      { label: "Proof Standards", href: "/proof" },
       { label: "FAQ", href: "/faq" },
       { label: "Testimonials", href: "/testimonials" },
+      { label: "Blog", href: "/blog" },
+      { label: "About", href: "/about" },
     ],
   },
   {
@@ -36,14 +36,11 @@ const navColumns = [
 ];
 
 export default function Footer() {
-  const navigate = useNavigate();
-
   const scrollTop = () => window.scrollTo({ top: 0, behavior: "smooth" });
 
-  const handleClick = (label, href) => {
+  const handleClick = (label) => {
     trackCTA(`footer_${label.toLowerCase().replace(/[^a-z0-9]+/g, "_")}`, "footer");
     window.scrollTo({ top: 0, behavior: "auto" });
-    navigate(href);
   };
 
   return (
@@ -54,11 +51,9 @@ export default function Footer() {
         <div className="cs-footer-inner cs-footer-system-header">
           <div>
             <p className="cs-footer-eyebrow">ClientSurge Systems</p>
-            <h3 id="footer-system-heading">The Amazon of AI Services for Business — browse, add to cart, and check out. Done-for-you setup included.</h3>
+            <h3 id="footer-system-heading">AI-powered lead capture, follow-up, booking, reviews, and reactivation for local service businesses.</h3>
           </div>
-          <Link className="cs-footer-system-cta" to="/store">
-            Browse the Store
-          </Link>
+          <Link className="cs-footer-system-cta" to="/pricing" onClick={() => handleClick("Compare Packages")}>Compare Packages</Link>
         </div>
       </section>
 
@@ -75,7 +70,7 @@ export default function Footer() {
             />
           </div>
           <p>
-            The Amazon of AI Services for Business. Browse packaged AI systems, add to cart, and check out — done-for-you setup included. No demos, no sales calls.
+            ClientSurge Systems installs packaged AI automation systems that help local service businesses respond faster, recover missed opportunities, and move leads toward booked appointments.
           </p>
           <div className="cs-footer-contact-list" aria-label="Contact ClientSurge">
             <a href="tel:+16025843227" className="cs-footer-contact-link" aria-label="Call ClientSurge Systems">
@@ -96,9 +91,9 @@ export default function Footer() {
               <ul>
                 {col.links.map((link) => (
                   <li key={link.label}>
-                    <button type="button" onClick={() => handleClick(link.label, link.href)}>
+                    <Link to={link.href} onClick={() => handleClick(link.label)}>
                       {link.label}
-                    </button>
+                    </Link>
                   </li>
                 ))}
               </ul>
@@ -122,7 +117,7 @@ export default function Footer() {
           <div className="cs-footer-status">
             <div className="cs-footer-secure">
               <Shield aria-hidden="true" />
-              <span>SSL Encrypted</span>
+              <span>Secure HTTPS</span>
             </div>
             <button
               onClick={scrollTop}
