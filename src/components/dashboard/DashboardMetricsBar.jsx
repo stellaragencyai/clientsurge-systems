@@ -9,58 +9,61 @@ export default function DashboardMetricsBar({ activeServices, project, portalSta
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let cancelled = false;
+
     const fetchSnapshot = async () => {
       try {
-        if (project?.order_id) {
-          const snapshots = await base44.entities.MetricsSnapshot.filter(
-            { order_id: project.order_id },
-            "-snapshot_date",
-            1
-          );
-          if (snapshots?.length > 0) {
-            setSnapshot(snapshots[0]);
-          }
+        if (!project?.order_id) {
+          if (!cancelled) setSnapshot(null);
+          return;
         }
+        const snapshots = await base44.entities.MetricsSnapshot.filter(
+          { order_id: project.order_id },
+          "-snapshot_date",
+          1
+        );
+        if (!cancelled) setSnapshot(snapshots?.[0] || null);
       } catch (err) {
         console.warn("Failed to load metrics snapshot:", err.message);
+        if (!cancelled) setSnapshot(null);
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
 
     fetchSnapshot();
-    const interval = setInterval(fetchSnapshot, 60000); // Refresh every minute
-    return () => clearInterval(interval);
+    const interval = setInterval(fetchSnapshot, 60000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [project?.order_id]);
 
-  // Phase A.5: Gate all success metrics behind PortalStateEngine proof
   const readinessCard = getCardState(portalState, "system_readiness");
   const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
   const isAdmin = portalState?.meta?.is_admin_preview || false;
 
-  // Use snapshot data if available, fall back to activeServices
-  const totalServices = activeServices.length;
   const completedServices = activeServices.filter(s => s.installStatus === "Live").length;
-  const inProgressServices = activeServices.filter(s => ["Configuring", "Testing"].includes(s.installStatus)).length;
+  const inProgressServices = activeServices.filter(s => ["Configuring", "Testing", "Ready for Install"].includes(s.installStatus)).length;
+  const hasSnapshot = Boolean(snapshot);
 
-  // When proof not validated, show safe pending values instead of raw numbers
-  const safeLeadsCaptured = isProofLive ? (snapshot?.leads_captured_total || 0) : "Pending";
-  const safeAutomationsActive = isProofLive ? (snapshot?.automations_active || completedServices) : "Pending";
-  const safeSystemHealth = isProofLive
-    ? (snapshot?.system_health_status === "healthy" ? "✓" : "⚠")
-    : "Syncing";
-  const systemHealthColor = isProofLive
-    ? (snapshot?.system_health_status === "healthy" ? "#22c55e" : "#ef4444")
-    : "#D4AF37";
-  const systemHealthBg = isProofLive
-    ? (snapshot?.system_health_status === "healthy" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)")
+  const safeLeadsCaptured = isProofLive && hasSnapshot ? (snapshot.leads_captured_total || 0) : "No verified data yet";
+  const safeAutomationsActive = isProofLive && hasSnapshot ? (snapshot.automations_active ?? completedServices) : "Pending proof";
+  const safeSystemHealth = isProofLive && hasSnapshot
+    ? (snapshot.system_health_status === "healthy" ? "Verified" : "Needs review")
+    : loading ? "Checking" : "Awaiting proof";
+  const systemHealthColor = isProofLive && hasSnapshot
+    ? (snapshot.system_health_status === "healthy" ? "#16a34a" : "#dc2626")
+    : "#B8941F";
+  const systemHealthBg = isProofLive && hasSnapshot
+    ? (snapshot.system_health_status === "healthy" ? "rgba(34,197,94,0.08)" : "rgba(239,68,68,0.08)")
     : "rgba(212,175,55,0.08)";
 
   const metrics = [
-    { icon: TrendingUp, label: "Leads Captured", value: safeLeadsCaptured, color: "#9a5c2e", bgColor: "rgba(154,92,46,0.08)" },
-    { icon: CheckCircle2, label: "Automations Active", value: safeAutomationsActive, color: "#22c55e", bgColor: "rgba(34,197,94,0.08)" },
-    { icon: Clock, label: "In Progress", value: inProgressServices, color: "#3b82f6", bgColor: "rgba(59,130,246,0.08)" },
-    { icon: AlertCircle, label: "System Health", value: safeSystemHealth, color: systemHealthColor, bgColor: systemHealthBg, hidden: false },
+    { icon: TrendingUp, label: "Leads Captured", value: safeLeadsCaptured, color: isProofLive && hasSnapshot ? "#0088CC" : "#B8941F", bgColor: isProofLive && hasSnapshot ? "rgba(0,136,204,0.08)" : "rgba(212,175,55,0.08)" },
+    { icon: CheckCircle2, label: "Automations Active", value: safeAutomationsActive, color: isProofLive && hasSnapshot ? "#16a34a" : "#B8941F", bgColor: isProofLive && hasSnapshot ? "rgba(34,197,94,0.08)" : "rgba(212,175,55,0.08)" },
+    { icon: Clock, label: "Being Set Up", value: inProgressServices, color: "#3b82f6", bgColor: "rgba(59,130,246,0.08)" },
+    { icon: AlertCircle, label: "System Health", value: safeSystemHealth, color: systemHealthColor, bgColor: systemHealthBg },
   ];
 
   return (
@@ -70,12 +73,12 @@ export default function DashboardMetricsBar({ activeServices, project, portalSta
       gap: "12px",
       marginBottom: "28px",
     }}>
-      {metrics.map((metric, idx) => {
-        if (metric.hidden) return null;
+      {metrics.map((metric) => {
         const Icon = metric.icon;
         return (
           <div
-            key={idx}
+            key={metric.label}
+            aria-label={`${metric.label}: ${metric.value}`}
             style={{
               borderRadius: "14px",
               background: "rgba(255,255,255,0.9)",
@@ -97,13 +100,13 @@ export default function DashboardMetricsBar({ activeServices, project, portalSta
               justifyContent: "center",
               flexShrink: 0,
             }}>
-              <Icon style={{ width: "18px", height: "18px", color: metric.color }} />
+              <Icon style={{ width: "18px", height: "18px", color: metric.color }} aria-hidden="true" />
             </div>
             <div>
               <p style={{ fontSize: "11px", fontWeight: "600", color: "rgba(27,20,13,0.5)", margin: 0, textTransform: "uppercase", letterSpacing: "0.05em" }}>
                 {metric.label}
               </p>
-              <p style={{ fontSize: "20px", fontWeight: "800", color: metric.color, margin: "2px 0 0" }}>
+              <p style={{ fontSize: typeof metric.value === "number" ? "20px" : "13px", fontWeight: "800", color: metric.color, margin: "2px 0 0" }}>
                 {metric.value}
               </p>
             </div>
