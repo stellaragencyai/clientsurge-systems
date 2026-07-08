@@ -9,19 +9,7 @@ export const PUBLIC_ROUTE_METADATA = {
     key: "pricing",
     title: "Pricing | Starter, Growth, and Pro AI Automation Packages | ClientSurge Systems",
     description:
-      "Compare ClientSurge Systems packages: Starter System, Growth System, and Pro System with crawlable setup and monthly pricing for AI automation services.",
-  },
-  "/product-signup": {
-    key: "product-signup",
-    title: "Complete Your ClientSurge Signup | ClientSurge Systems",
-    description:
-      "Choose Starter, Growth, or Pro and continue to secure checkout for your ClientSurge AI automation system.",
-  },
-  "/signup": {
-    key: "signup",
-    title: "Complete Your ClientSurge Signup | ClientSurge Systems",
-    description:
-      "Start your ClientSurge signup and continue to secure checkout for a Starter, Growth, or Pro AI automation system.",
+      "Compare ClientSurge Systems packages with clear setup fees, monthly subscription scope, install expectations, and support paths for AI automation services.",
   },
   "/automations": {
     key: "automations",
@@ -31,9 +19,45 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/contact": {
     key: "contact",
-    title: "Contact ClientSurge Systems | Questions and Demo Requests",
+    title: "Contact ClientSurge Systems | Questions and Support",
     description:
-      "Contact ClientSurge Systems to ask questions, request a walkthrough, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
+      "Contact ClientSurge Systems to ask questions, get support, or discuss AI voice agents, lead follow-up, booking automation, and local service business systems.",
+  },
+  "/industries": {
+    key: "industries",
+    title: "Industries Served | ClientSurge Systems",
+    description:
+      "See how ClientSurge Systems adapts AI automation workflows for service businesses such as HVAC, plumbing, roofing, med spas, dental, legal intake, and home services.",
+  },
+  "/proof": {
+    key: "proof",
+    title: "Proof and Trust Standards | ClientSurge Systems",
+    description:
+      "Review ClientSurge Systems proof standards, including what is verified, what is operational, and what still requires evidence before becoming a public claim.",
+  },
+  "/faq": {
+    key: "faq",
+    title: "FAQ | ClientSurge Systems",
+    description:
+      "Answers to common questions about ClientSurge Systems packages, setup, AI automation workflows, billing, support, and implementation.",
+  },
+  "/how-it-works": {
+    key: "how-it-works",
+    title: "How It Works | ClientSurge Systems",
+    description:
+      "Learn how ClientSurge Systems turns a business website into a lead capture, response, booking, follow-up, review, and reactivation system.",
+  },
+  "/about": {
+    key: "about",
+    title: "About ClientSurge Systems",
+    description:
+      "Learn about ClientSurge Systems and its done-for-you AI automation systems for local service businesses.",
+  },
+  "/roadmap": {
+    key: "roadmap",
+    title: "Automation Roadmap | ClientSurge Systems",
+    description:
+      "Review the ClientSurge Systems automation roadmap and planned improvements without treating unverified future items as live proof.",
   },
   "/privacy": {
     key: "privacy",
@@ -70,25 +94,23 @@ export const STATIC_ROUTE_ALIASES = {
   "/product-landing": "/pricing",
   "/product-sign-up": "/product-signup",
   "/product_signup": "/product-signup",
+  "/signup": "/product-signup",
   "/client-dashboard": "/client-portal",
 };
 
 /**
  * ADMIN/INTERNAL NOTE — Package Checkout Canonical Route
  *
- * There is exactly ONE canonical public route for package checkout:
+ * There is exactly ONE canonical public package checkout route:
  *   /product-signup?package={starter_system|growth_system|pro_system}
  *
- * All legacy aliases (/product_signup, /product-sign-up, /signup) redirect
- * to /product-signup preserving the ?package= query parameter.
+ * Product signup is a public buyer utility route, but it is intentionally
+ * noindex and excluded from the sitemap. Marketing pages should lead users to
+ * /pricing first unless they are selecting a specific package.
  *
  * The /store route is for browsing individual services only — it must NOT
- * be used as a primary package checkout path. All pricing CTAs, schema
- * markup URLs, and landing-page package buttons point exclusively to
- * /product-signup?package=X.
+ * be used as a primary package checkout path.
  *
- * The ProductSignup page uses direct fetch to the createCheckoutSession
- * backend function — no Base44 browser SDK, no login required.
  * App ID: 69dc4a79656fdba136d413d3
  */
 
@@ -97,9 +119,13 @@ export const LEGACY_REDIRECTS = Object.entries(STATIC_ROUTE_ALIASES);
 export const PUBLIC_DIRECTORY_PAGES = [
   "/",
   "/pricing",
-  "/product-signup",
-  "/signup",
   "/automations",
+  "/industries",
+  "/proof",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/roadmap",
   "/contact",
   "/privacy",
   "/terms",
@@ -109,13 +135,17 @@ export const PUBLIC_DIRECTORY_PAGES = [
 
 export const PUBLIC_ROUTE_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 
-// /client-portal is a hybrid route: it renders publicly (no ProtectedRoute wrapper)
-// but uses useAuth() internally to decide between login prompt and full portal.
-// Including it here ensures AuthenticatedAppWithTenant doesn't block it during
-// the initial auth-loading phase — ClientPortalAccess manages its own loading/error states.
-// /product_signup is a public typo/legacy alias frequently entered by users; keep it
-// public so the app shell can redirect without triggering auth-loading behavior.
-export const APP_SHELL_PUBLIC_PATHS = [...PUBLIC_ROUTE_PATHS, "/product_signup", "/client-portal", "/client-dashboard"];
+// Minimal app-shell public routes. Buyer utility routes can render publicly,
+// but noindex rules below keep them out of search and proof surfaces.
+export const APP_SHELL_PUBLIC_PATHS = [
+  ...PUBLIC_ROUTE_PATHS,
+  "/product-signup",
+  "/product-sign-up",
+  "/product_signup",
+  "/signup",
+  "/client-portal",
+  "/client-dashboard",
+];
 
 export const AUTHENTICATED_ROUTE_PREFIXES = [
   "/client",
@@ -230,6 +260,12 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/lead-intelligence",
   "/sam",
   "/medspa-dashboard",
+  "/setup-lookup",
+  "/product-signup",
+  "/product-sign-up",
+  "/product_signup",
+  "/signup",
+  "/store",
   "/AdminLeadDetail",
   "/AdminSettings",
   "/Dashboard",
