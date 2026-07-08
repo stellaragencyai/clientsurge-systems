@@ -54,6 +54,11 @@ const PRIVACY_SECTIONS = [
     title: "Data Retention",
     body: "We retain contact records and business inquiry data for as long as reasonably needed to provide services, maintain records, support legal obligations, and improve operations. We may delete or anonymize records that are no longer needed.",
   },
+  {
+    id: "account-deletion",
+    title: "Account and Data Deletion",
+    body: "If you create or use an account, client portal, lead record, or communication record with ClientSurge Systems, you can request deletion of account-related data or personal information using the request form on this page or by contacting support. Some records may be retained when needed for billing, security, fraud prevention, legal compliance, dispute handling, or legitimate business records.",
+  },
 ];
 
 const TERMS_SECTIONS = [
@@ -141,7 +146,7 @@ const LEGAL_META = {
     summary: [
       { icon: Lock, text: "We do not sell personal information" },
       { icon: PhoneCall, text: "SMS opt-out: reply STOP anytime" },
-      { icon: Shield, text: "Data shared only with service providers needed to operate the system" },
+      { icon: Shield, text: "Account/data deletion requests are available" },
       { icon: ScrollText, text: "Consent records are maintained for auditability" },
     ],
   },
@@ -174,7 +179,7 @@ const LEGAL_META = {
 const TRUST_LABELS = [
   { label: "SMS Opt-Out Guardrails", desc: "STOP handling and compliance-block logging are part of the system design." },
   { label: "Truthful Proof Labels", desc: "Previews, roadmap items, and verified results are labeled separately." },
-  { label: "Data-Minimization Standard", desc: "Data is used for requested service, support, operations, analytics, and compliance records." },
+  { label: "Account/Data Deletion Path", desc: "Deletion requests can be submitted from the privacy page and support channels." },
   { label: "Arizona Terms", desc: "Terms identify Arizona law without implying third-party certification." },
 ];
 
@@ -217,7 +222,7 @@ function ContactBlock() {
   return (
     <section className="rounded-xl border border-border bg-muted/30 p-6 mt-10">
       <h2 className="text-lg font-bold text-foreground mb-2">Contact</h2>
-      <p className="text-sm text-muted-foreground mb-3">Questions, requests, or communication preference changes can be sent to:</p>
+      <p className="text-sm text-muted-foreground mb-3">Questions, requests, account deletion, data deletion, or communication preference changes can be sent to:</p>
       <div className="flex flex-wrap items-center gap-2">
         <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm font-bold text-primary border-b border-primary/30 hover:border-primary transition-colors pb-px">{SUPPORT_EMAIL}</a>
         <span className="text-muted-foreground text-xs">or</span>
@@ -255,10 +260,10 @@ export default function LegalPage({ fixedType, canonicalPath }) {
 
   useEffect(() => setPageMetadata({
     title: `${title} | ClientSurge Systems`,
-    description: `Read the ClientSurge Systems ${title.toLowerCase()} covering data, messaging, billing, service terms, and support contacts.`,
+    description: `Read the ClientSurge Systems ${title.toLowerCase()} covering data, account deletion, messaging, billing, service terms, and support contacts.`,
     canonicalPath: canonicalPath || meta.canonicalPath || `/legal/${type}`,
     ogTitle: `${title} | ClientSurge Systems`,
-    ogDescription: `Review the latest ClientSurge Systems ${title.toLowerCase()} for lead capture, messaging, billing, and service operations.`,
+    ogDescription: `Review the latest ClientSurge Systems ${title.toLowerCase()} for lead capture, messaging, billing, account deletion, and service operations.`,
   }), [canonicalPath, meta.canonicalPath, title, type]);
 
   return (
@@ -306,7 +311,11 @@ export default function LegalPage({ fixedType, canonicalPath }) {
           <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-10 items-start">
             <div>
               {sections.map((section, index) => <SectionBlock key={section.id} section={section} index={index} />)}
-              {type === "privacy" && <div className="mt-10"><DataDeletionRequestForm /></div>}
+              {type === "privacy" && (
+                <div id="data-deletion-request" className="mt-10" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}>
+                  <DataDeletionRequestForm />
+                </div>
+              )}
               <ContactBlock />
             </div>
             <aside className="hidden lg:block sticky" style={{ top: "calc(var(--cs-nav-height) + 32px)" }}>
@@ -317,6 +326,11 @@ export default function LegalPage({ fixedType, canonicalPath }) {
                     {index + 1}. {section.title}
                   </a>
                 ))}
+                {type === "privacy" && (
+                  <a href="#data-deletion-request" className="text-sm text-muted-foreground hover:text-primary transition-colors">
+                    Request deletion
+                  </a>
+                )}
               </nav>
             </aside>
           </div>
