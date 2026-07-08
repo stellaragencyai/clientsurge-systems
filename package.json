@@ -46,6 +46,7 @@
     "cloudflare:security:upsert-headers": "node scripts/cloudflare/upsert-security-header-transform.mjs",
     "smoke:public-routes": "node scripts/public-route-smoke.mjs",
     "smoke:clientsurge-production": "node scripts/smoke/clientsurge-production-smoke.mjs",
+    "smoke:product-signup-checkout": "node scripts/product-signup-checkout-live-smoke.mjs",
     "proof:production-release": "node scripts/release/prove-production-release.mjs --write-report",
     "smoke:public-exposure-live": "node scripts/public-exposure-live-smoke.mjs",
     "audit:raw-route-html": "node scripts/audit-raw-route-html.mjs",

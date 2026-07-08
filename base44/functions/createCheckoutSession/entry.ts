@@ -60,6 +60,35 @@ function normalizePackageKey(key) {
   return PACKAGE_ALIASES[normalized] || (PACKAGE_DEFINITIONS[normalized] ? normalized : null);
 }
 
+function isTruthy(value) {
+  if (value === true) return true;
+  if (typeof value === "number") return value === 1;
+  const normalized = String(value || "").trim().toLowerCase();
+  return ["1", "true", "yes", "y", "on"].includes(normalized);
+}
+
+function isCheckoutSmokeRequest({ customer_email, smoke_test, source }) {
+  const email = String(customer_email || "").trim().toLowerCase();
+  const sourceValue = String(source || "").trim().toLowerCase();
+  return (
+    isTruthy(smoke_test) ||
+    sourceValue.includes("smoke") ||
+    email.includes("+checkout-smoke@") ||
+    email.endsWith("@clientsurge.test")
+  );
+}
+
+function smokeOrderFields(requestId) {
+  return {
+    environment: "smoke",
+    dashboard_excluded: true,
+    dashboard_exclusion_reason: `Automated checkout smoke test (${requestId})`,
+    dashboard_truth_status: "blocked",
+    dashboard_truth_notes: "Automated checkout smoke test. Exclude from production metrics and public proof.",
+    notes: `Automated checkout smoke test. Safe to archive. request_id: ${requestId}`,
+  };
+}
+
 Deno.serve(async (req) => {
   const requestId = `req_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   console.log(`[createCheckoutSession] ${requestId} — start`);
@@ -88,7 +117,11 @@ Deno.serve(async (req) => {
       industry,
       success_url,
       cancel_url,
+      smoke_test,
+      source,
     } = body || {};
+
+    const isSmokeCheckout = isCheckoutSmokeRequest({ customer_email, smoke_test, source });
 
     // ── Validate required fields ──
     if (!package_key) {
@@ -176,7 +209,7 @@ Deno.serve(async (req) => {
 
     let order;
     try {
-      order = await base44.asServiceRole.entities.Order.create({
+      const orderPayload = {
         customer_email: customer_email.trim().toLowerCase(),
         customer_name: customer_name.trim(),
         customer_phone: customer_phone?.trim() || "",
@@ -197,7 +230,13 @@ Deno.serve(async (req) => {
         },
         environment: "production",
         dashboard_truth_status: "trusted",
-      });
+      };
+
+      if (isSmokeCheckout) {
+        Object.assign(orderPayload, smokeOrderFields(requestId));
+      }
+
+      order = await base44.asServiceRole.entities.Order.create(orderPayload);
       console.log(`[createCheckoutSession] ${requestId} — Order created: ${order.id}`);
     } catch (err) {
       console.error("[createCheckoutSession] Order creation failed:", err.message);
@@ -227,6 +266,9 @@ Deno.serve(async (req) => {
           customer_name: customer_name.trim(),
           business_name: business_name.trim(),
           industry: industry?.trim() || "",
+          source: source ? String(source).slice(0, 120) : "product_signup",
+          smoke_test: isSmokeCheckout ? "true" : "false",
+          request_id: requestId,
         },
         subscription_data: {
           metadata: {
@@ -235,6 +277,9 @@ Deno.serve(async (req) => {
             package_key: normalizedKey,
             customer_email: customer_email.trim().toLowerCase(),
             business_name: business_name.trim(),
+            source: source ? String(source).slice(0, 120) : "product_signup",
+            smoke_test: isSmokeCheckout ? "true" : "false",
+            request_id: requestId,
           },
         },
         allow_promotion_codes: true,
@@ -280,6 +325,7 @@ Deno.serve(async (req) => {
       session_id: session.id,
       order_id: order.id,
       request_id: requestId,
+      smoke_test: isSmokeCheckout,
     });
   } catch (error) {
     console.error(`[createCheckoutSession] ${requestId} — unhandled error:`, error);
