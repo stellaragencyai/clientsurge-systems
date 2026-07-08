@@ -9,13 +9,13 @@ import { setPageMetadata } from "@/lib/seo";
 export default function TestimonialsPage() {
   useEffect(() => {
     return setPageMetadata({
-      title: "Launch Scenarios & Testimonials | ClientSurge Systems",
+      title: "Workflow Scenarios & Trust Signals | ClientSurge Systems",
       description:
-        "See the launch scenarios, workflow outcomes, and proof-oriented testimonial framing ClientSurge uses for med spas, HVAC, dental, and local service businesses.",
+        "See ClientSurge workflow scenarios and trust signals. These are system previews, not verified customer testimonials unless specifically labeled as verified customer quotes.",
       canonicalPath: "/testimonials",
-      ogTitle: "ClientSurge Launch Scenarios",
+      ogTitle: "ClientSurge Workflow Scenarios & Trust Signals",
       ogDescription:
-        "See the workflow outcomes ClientSurge is built to create across lead capture, follow-up, missed calls, and booking.",
+        "See workflow previews ClientSurge is built to support across lead capture, follow-up, missed calls, and booking without treating previews as verified testimonials.",
     });
   }, []);
 

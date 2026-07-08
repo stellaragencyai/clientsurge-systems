@@ -31,9 +31,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/proof": {
     key: "proof",
-    title: "Proof and Trust Standards | ClientSurge Systems",
+    title: "Proof Standards and Trust Labels | ClientSurge Systems",
     description:
-      "Review ClientSurge Systems proof standards, including what is verified, what is operational, and what still requires evidence before becoming a public claim.",
+      "Review ClientSurge Systems proof standards, verified evidence labels, workflow previews, and the claims we will not publish without support.",
   },
   "/faq": {
     key: "faq",
@@ -61,9 +61,9 @@ export const PUBLIC_ROUTE_METADATA = {
   },
   "/testimonials": {
     key: "testimonials",
-    title: "Testimonials | ClientSurge Systems",
+    title: "Workflow Scenarios and Trust Signals | ClientSurge Systems",
     description:
-      "Review ClientSurge Systems testimonials and trust signals. Public claims should remain truthful, verified, and clearly labeled.",
+      "Review ClientSurge Systems workflow scenarios and trust signals. These previews are not client testimonials unless clearly labeled as verified customer quotes.",
   },
   "/roadmap": {
     key: "roadmap",
@@ -103,6 +103,7 @@ export const STATIC_ROUTE_ALIASES = {
   "/legal/terms": "/terms",
   "/legal/sms": "/sms-terms",
   "/legal/refund": "/refund-policy",
+  "/automation-roadmap": "/roadmap",
   "/product-landing": "/pricing",
   "/product-sign-up": "/product-signup",
   "/product_signup": "/product-signup",
