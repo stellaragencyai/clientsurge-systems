@@ -1,161 +1,246 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 
-/**
- * System Observability Dashboard Metrics
- * Returns aggregated system health and activity data for real-time monitoring
- * READ-ONLY: No data modifications
- */
-Deno.serve(async (req) => {
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      'Content-Type': 'application/json',
+      'Cache-Control': 'no-store',
+      ...(init.headers || {}),
+    },
+  });
+}
+
+function adminAllowed(user) {
+  return user?.role === 'admin' || user?.role === 'super_admin';
+}
+
+async function safeEntityList(base44, entityName, limit, label) {
   try {
-    const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    
-    // Admin-only access
-    if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Unauthorized' }, { status: 403 });
+    const entity = base44.asServiceRole.entities[entityName];
+    if (!entity?.filter) {
+      return { ok: false, records: [], warning: `${label} entity is not available.` };
+    }
+    const records = await entity.filter({}, '-created_date', limit);
+    return { ok: true, records: records || [], warning: null };
+  } catch (error) {
+    return {
+      ok: false,
+      records: [],
+      warning: `${label} query failed: ${error?.message || String(error)}`,
+    };
+  }
+}
+
+function dateMs(value) {
+  const ms = Date.parse(value || '');
+  return Number.isFinite(ms) ? ms : 0;
+}
+
+function latestTimestamp(records = []) {
+  const latest = records.reduce((max, record) => Math.max(max, dateMs(record?.created_date || record?.updated_date)), 0);
+  return latest ? new Date(latest).toISOString() : null;
+}
+
+function percent(numerator, denominator) {
+  if (!denominator) return null;
+  return Math.round((numerator / denominator) * 100);
+}
+
+function healthStatusFromRate({ hasData, failureRate, warningAt = 10, issueAt = 20 }) {
+  if (!hasData) return 'Unknown';
+  if (failureRate >= issueAt) return 'Issue';
+  if (failureRate >= warningAt) return 'Degraded';
+  return 'Healthy';
+}
+
+function automationStatus({ hasData, successRate, failedJobs }) {
+  if (!hasData) return 'Unknown';
+  if (failedJobs > 0 && successRate < 70) return 'Issue';
+  if (failedJobs > 0 || successRate < 85) return 'Degraded';
+  return 'Healthy';
+}
+
+function queueStatus({ queried, queuedItems }) {
+  if (!queried) return 'Unknown';
+  if (queuedItems > 100) return 'Issue';
+  if (queuedItems > 25) return 'Degraded';
+  return 'Healthy';
+}
+
+function buildCoverage(sources) {
+  const warnings = [];
+  const coverage = {};
+
+  for (const [key, source] of Object.entries(sources)) {
+    coverage[key] = {
+      queried: source.ok,
+      count: source.records.length,
+      latest_record_at: latestTimestamp(source.records),
+      warning: source.warning,
+    };
+    if (source.warning) warnings.push(source.warning);
+  }
+
+  return { coverage, warnings };
+}
+
+Deno.serve(async (req) => {
+  const requestId = `obs_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+
+  try {
+    if (req.method !== 'POST') {
+      return secureJson(
+        { error: 'Method not allowed', code: 'method_not_allowed', request_id: requestId },
+        { status: 405, headers: { Allow: 'POST' } }
+      );
     }
 
-    // Fetch all required data in parallel
-    const [
-      allLeads,
-      allEvents,
-      allJobs,
-      eventQueue,
-    ] = await Promise.all([
-      base44.asServiceRole.entities.Leads.filter({}, '-created_date', 5000),
-      base44.asServiceRole.entities.CommunicationEvent.filter({}, '-created_date', 1000),
-      base44.asServiceRole.entities.AutomationJob?.filter({}, '-created_date', 1000).catch(() => []),
-      base44.asServiceRole.entities.EventQueue?.filter({}, '-created_date', 500).catch(() => []),
+    const base44 = createClientFromRequest(req);
+    const user = await base44.auth.me();
+    if (!adminAllowed(user)) {
+      return secureJson({ error: 'Admin access required', code: 'admin_required', request_id: requestId }, { status: 403 });
+    }
+
+    const [leadsSource, eventsSource, jobsSource, queueSource, executionLogsSource] = await Promise.all([
+      safeEntityList(base44, 'Leads', 5000, 'Leads'),
+      safeEntityList(base44, 'CommunicationEvent', 1000, 'CommunicationEvent'),
+      safeEntityList(base44, 'AutomationJob', 1000, 'AutomationJob'),
+      safeEntityList(base44, 'EventQueue', 500, 'EventQueue'),
+      safeEntityList(base44, 'AutomationExecutionLog', 500, 'AutomationExecutionLog'),
     ]);
 
-    // Compute time ranges
+    const sources = {
+      leads: leadsSource,
+      communication_events: eventsSource,
+      automation_jobs: jobsSource,
+      event_queue: queueSource,
+      automation_execution_logs: executionLogsSource,
+    };
+    const { coverage: dataCoverage, warnings: coverageWarnings } = buildCoverage(sources);
+
+    const allLeads = leadsSource.records;
+    const allEvents = eventsSource.records;
+    const allJobs = jobsSource.records;
+    const eventQueue = queueSource.records;
+    const executionLogs = executionLogsSource.records;
+
     const now = new Date();
     const oneDay = new Date(now.getTime() - 24 * 60 * 60 * 1000);
-    const sevenDays = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
 
-    // === CORE METRICS ===
     const totalLeads = allLeads.length;
     const totalEvents = allEvents.length;
     const totalJobs = allJobs.length;
-    const successfulJobs = allJobs.filter(j => j.status === 'completed').length;
-    const failedJobs = allJobs.filter(j => j.status === 'failed').length;
-    const successRate = totalJobs > 0 ? Math.round((successfulJobs / totalJobs) * 100) : 0;
-    const failedEvents = allEvents.filter(e => e.status === 'failed').length;
+    const successfulJobs = allJobs.filter((job) => job.status === 'completed').length;
+    const failedJobs = allJobs.filter((job) => job.status === 'failed').length;
+    const successRate = percent(successfulJobs, totalJobs);
+    const failedEvents = allEvents.filter((event) => event.status === 'failed').length;
 
-    // === LEAD FLOW (24H) ===
-    const leadsLast24h = allLeads.filter(l => new Date(l.created_date) > oneDay);
-    const contactedLeads = leadsLast24h.filter(l => l.outreach_status === 'contacted').length;
-    const respondedLeads = leadsLast24h.filter(l => l.outreach_status === 'replied').length;
-    const bookedLeads = leadsLast24h.filter(l => l.outreach_status === 'booked').length;
+    const leadsLast24h = allLeads.filter((lead) => dateMs(lead.created_date) > oneDay.getTime());
+    const contactedLeads = leadsLast24h.filter((lead) => ['contacted', 'sent', 'replied', 'booked'].includes(String(lead.outreach_status || '').toLowerCase())).length;
+    const respondedLeads = leadsLast24h.filter((lead) => String(lead.outreach_status || '').toLowerCase() === 'replied').length;
+    const bookedLeads = leadsLast24h.filter((lead) => String(lead.outreach_status || '').toLowerCase() === 'booked').length;
 
-    // === HEALTH INDICATORS ===
-    const smsEvents = allEvents.filter(e => e.event_type === 'sms_sent');
-    const smsFailed = smsEvents.filter(e => e.status === 'failed').length;
-    const smsHealth = smsEvents.length > 0 
-      ? Math.round((smsFailed / smsEvents.length) * 100) 
-      : 0;
+    const smsEvents = allEvents.filter((event) => event.channel === 'sms' || event.event_type === 'sms_sent');
+    const smsFailed = smsEvents.filter((event) => event.status === 'failed').length;
+    const smsFailureRate = percent(smsFailed, smsEvents.length);
 
-    const emailEvents = allEvents.filter(e => e.event_type === 'email_sent');
-    const emailFailed = emailEvents.filter(e => e.status === 'failed').length;
-    const emailHealth = emailEvents.length > 0 
-      ? Math.round((emailFailed / emailEvents.length) * 100) 
-      : 0;
+    const emailEvents = allEvents.filter((event) => event.channel === 'email' || event.event_type === 'email_sent');
+    const emailFailed = emailEvents.filter((event) => event.status === 'failed').length;
+    const emailFailureRate = percent(emailFailed, emailEvents.length);
 
-    const queuedItems = eventQueue?.filter(q => q.status === 'pending').length || 0;
-    const processedQueue = eventQueue?.filter(q => q.status === 'processed').length || 0;
+    const queuedItems = eventQueue.filter((item) => ['pending', 'queued'].includes(String(item.status || '').toLowerCase())).length;
+    const processedQueue = eventQueue.filter((item) => String(item.status || '').toLowerCase() === 'processed').length;
+    const failedExecutions = executionLogs.filter((log) => ['failed', 'blocked'].includes(String(log.execution_status || '').toLowerCase())).length;
 
-    // === ACTIVITY FEED ===
     const activityFeed = [
-      ...allEvents.slice(0, 10).map(e => ({
+      ...allEvents.slice(0, 10).map((event) => ({
         type: 'event',
-        timestamp: e.created_date,
-        event_type: e.event_type,
-        status: e.status,
-        channel: e.channel,
-        provider: e.provider,
-        lead_id: e.lead_id,
+        timestamp: event.created_date,
+        event_type: event.event_type,
+        status: event.status,
+        channel: event.channel,
+        provider: event.provider,
+        lead_id: event.lead_id,
       })),
-      ...allJobs.slice(0, 10).map(j => ({
+      ...allJobs.slice(0, 10).map((job) => ({
         type: 'job',
-        timestamp: j.created_date,
-        job_type: j.automation_type,
-        status: j.status,
-        lead_id: j.lead_id,
+        timestamp: job.created_date,
+        job_type: job.automation_type || job.job_type,
+        status: job.status,
+        lead_id: job.lead_id,
       })),
-      ...leadsLast24h.slice(0, 5).map(l => ({
+      ...executionLogs.slice(0, 10).map((log) => ({
+        type: 'execution_log',
+        timestamp: log.created_date,
+        job_type: log.module_key,
+        status: log.execution_status,
+        lead_id: log.lead_id,
+      })),
+      ...leadsLast24h.slice(0, 5).map((lead) => ({
         type: 'lead',
-        timestamp: l.created_date,
-        business_name: l.business_name,
-        status: l.outreach_status,
-        lead_id: l.id,
+        timestamp: lead.created_date,
+        business_name: lead.business_name,
+        status: lead.outreach_status || lead.status || 'new',
+        lead_id: lead.id,
       })),
     ]
-    .sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
-    .slice(0, 20);
+      .filter((item) => item.timestamp)
+      .sort((a, b) => dateMs(b.timestamp) - dateMs(a.timestamp))
+      .slice(0, 20);
 
-    // === SUGGESTIONS ===
     const suggestions = [];
-
-    // 1. High-activity leads not yet contacted
-    const highActivityNotContacted = allLeads.filter(l => {
-      const score = l.intelligence_score || l.lead_score || 0;
-      const contacted = l.outreach_status === 'contacted' || l.outreach_status === 'replied';
-      return score >= 70 && !contacted;
-    });
-    if (highActivityNotContacted.length > 0) {
+    if (!jobsSource.ok || totalJobs === 0) {
       suggestions.push({
-        title: 'High-Activity Leads Waiting for Contact',
-        description: `${highActivityNotContacted.length} high-score leads haven't been contacted yet. Prioritize outreach.`,
+        title: 'Automation job source is not proven',
+        description: 'No AutomationJob records were available. Do not label automation health as healthy until execution logs or jobs exist.',
         priority: 'high',
-        category: 'Leads',
+        category: 'Observability',
       });
     }
-
-    // 2. Recent activity spike
-    const recentLeadCount = leadsLast24h.length;
-    const avgDaily = allLeads.length > 30 ? allLeads.length / 30 : allLeads.length;
-    if (recentLeadCount > avgDaily * 1.5) {
+    if (failedExecutions > 0) {
       suggestions.push({
-        title: 'Lead Volume Spike Detected',
-        description: `Unusual high volume in last 24h (${recentLeadCount} leads). Consider capacity review.`,
-        priority: 'medium',
-        category: 'System',
+        title: 'Automation execution failures need review',
+        description: `${failedExecutions} failed or blocked execution logs were found in the sampled window.`,
+        priority: 'high',
+        category: 'Automation',
       });
     }
-
-    // 3. Messaging health issues
-    if (smsHealth > 15 || emailHealth > 15) {
-      const worstChannel = smsHealth > emailHealth ? `SMS (${smsHealth}%)` : `Email (${emailHealth}%)`;
+    if (smsFailureRate !== null && smsFailureRate >= 15) {
       suggestions.push({
-        title: 'High Failure Rate in Messaging',
-        description: `${worstChannel} showing elevated failure rates. Check provider health.`,
+        title: 'SMS failure rate elevated',
+        description: `SMS failure rate is ${smsFailureRate}% in sampled CommunicationEvent records.`,
         priority: 'high',
         category: 'Messaging',
       });
     }
-
-    // 4. Automation queue backlog
-    if (queuedItems > 50) {
+    if (emailFailureRate !== null && emailFailureRate >= 15) {
       suggestions.push({
-        title: 'Automation Queue Building Up',
-        description: `${queuedItems} jobs queued. Processing may be slower than usual.`,
-        priority: 'medium',
-        category: 'Automation',
-      });
-    }
-
-    // 5. Success rate trend
-    if (successRate < 70 && totalJobs > 20) {
-      suggestions.push({
-        title: 'Low Automation Success Rate',
-        description: `Only ${successRate}% of jobs succeeded. Review error patterns.`,
+        title: 'Email failure rate elevated',
+        description: `Email failure rate is ${emailFailureRate}% in sampled CommunicationEvent records.`,
         priority: 'high',
-        category: 'Automation',
+        category: 'Messaging',
+      });
+    }
+    if (queuedItems > 25) {
+      suggestions.push({
+        title: 'Event queue backlog detected',
+        description: `${queuedItems} event queue items are pending/queued.`,
+        priority: queuedItems > 100 ? 'high' : 'medium',
+        category: 'Queue',
       });
     }
 
-    return Response.json({
-      timestamp: new Date().toISOString(),
+    const messagingHasData = smsEvents.length > 0 || emailEvents.length > 0;
+    const messagingWorstFailureRate = Math.max(smsFailureRate ?? 0, emailFailureRate ?? 0);
+
+    return secureJson({
+      success: true,
+      request_id: requestId,
+      timestamp: now.toISOString(),
+      proof_label: 'Posted records only — not live provider proof',
+      data_coverage: dataCoverage,
+      coverage_warnings: coverageWarnings,
       core_metrics: {
         total_leads: totalLeads,
         total_events: totalEvents,
@@ -164,6 +249,7 @@ Deno.serve(async (req) => {
         failed_events: failedEvents,
         successful_jobs: successfulJobs,
         failed_jobs: failedJobs,
+        failed_execution_logs: failedExecutions,
       },
       lead_flow_24h: {
         new_leads: leadsLast24h.length,
@@ -173,28 +259,32 @@ Deno.serve(async (req) => {
       },
       health_indicators: {
         messaging_health: {
-          sms_failure_rate: smsHealth,
-          email_failure_rate: emailHealth,
-          status: Math.max(smsHealth, emailHealth) > 20 ? 'Degraded' : 'Healthy',
+          sms_failure_rate: smsFailureRate,
+          email_failure_rate: emailFailureRate,
+          status: healthStatusFromRate({ hasData: messagingHasData, failureRate: messagingWorstFailureRate, warningAt: 10, issueAt: 20 }),
+          evidence_count: smsEvents.length + emailEvents.length,
         },
         automation_health: {
           success_rate: successRate,
           failed_count: failedJobs,
-          status: successRate > 80 ? 'Healthy' : successRate > 60 ? 'Degraded' : 'Issue',
+          failed_execution_logs: failedExecutions,
+          status: automationStatus({ hasData: totalJobs > 0 || executionLogs.length > 0, successRate: successRate ?? 0, failedJobs: failedJobs + failedExecutions }),
+          evidence_count: totalJobs + executionLogs.length,
         },
         event_queue_health: {
           queued: queuedItems,
           processed: processedQueue,
-          status: queuedItems > 100 ? 'Degraded' : 'Healthy',
+          status: queueStatus({ queried: queueSource.ok, queuedItems }),
+          evidence_count: eventQueue.length,
         },
       },
       activity_feed: activityFeed,
-      suggestions: suggestions.slice(0, 5),
+      suggestions: suggestions.slice(0, 6),
     });
   } catch (error) {
     console.error('[getSystemObservabilityMetrics]', error);
-    return Response.json(
-      { error: error.message || 'Failed to fetch observability metrics' },
+    return secureJson(
+      { error: error.message || 'Failed to fetch observability metrics', request_id: requestId },
       { status: 500 }
     );
   }
