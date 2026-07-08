@@ -1,53 +1,16 @@
-name: Base44 Publish Run 20260705 Product Signup Hotfix
+name: Base44 Product Signup Hotfix Publish Superseded
 
 on:
-  push:
-    branches:
-      - main
-    paths:
-      - ".github/workflows/base44-publish-run-20260702.yml"
-      - "src/pages/ProductSignup.jsx"
-      - "src/lib/publicRouteMetadata.js"
-      - "public/product-signup"
-      - "public/product-sign-up"
-      - "public/product_signup"
-      - "scripts/product-signup-route-smoke.mjs"
-      - "base44/functions/createCheckoutSession/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
 
 jobs:
-  publish:
+  superseded:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: npm
-      - name: Install packages
+      - name: Use Base44 Auto Publish instead
         run: |
-          npm ci
-          npm ci --prefix tools/browser-audit
-          npm run --prefix tools/browser-audit install:browsers
-      - name: Publish app
-        env:
-          BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
-        run: |
-          set +e
-          echo "# Base44 Product Signup Hotfix Publish" > BASE44_PUBLISH_RUN_20260702_RESULT.md
-          echo "Run at: $(date -u +%Y-%m-%dT%H:%M:%SZ)" >> BASE44_PUBLISH_RUN_20260702_RESULT.md
-          echo "Target route: https://clientsurgesystems.com/product-signup?package=growth_system" >> BASE44_PUBLISH_RUN_20260702_RESULT.md
-          echo '```text' >> BASE44_PUBLISH_RUN_20260702_RESULT.md
-          node scripts/base44/publish-deploy-endpoint.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url "https://clientsurgesystems.com/product-signup?package=growth_system" --verify-wait-ms 180000 --verify-poll-ms 10000 --summary >> BASE44_PUBLISH_RUN_20260702_RESULT.md 2>&1
-          STATUS=$?
-          echo '```' >> BASE44_PUBLISH_RUN_20260702_RESULT.md
-          echo "Exit status: $STATUS" >> BASE44_PUBLISH_RUN_20260702_RESULT.md
-          sed -i -E 's/(accessToken|refreshToken|Authorization|Bearer)[^,}\n]*/[REDACTED]/g' BASE44_PUBLISH_RUN_20260702_RESULT.md || true
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -B base44-publish-run-20260702-result
-          git add BASE44_PUBLISH_RUN_20260702_RESULT.md
-          git commit -m "Record Base44 product signup hotfix publish result"
-          git push --force origin base44-publish-run-20260702-result
-          exit $STATUS
+          echo "This one-off product-signup publish workflow is superseded."
+          echo "Use .github/workflows/base44-auto-publish.yml for GitHub -> Base44 production publishing and checkout proof."
