@@ -1,7 +1,7 @@
 export const PUBLIC_ROUTE_METADATA = {
   "/": {
     key: "home",
-    title: "ClientSurge Systems | AI Automation for Local Businesses",
+    title: "ClientSurge Systems | AI-Powered Sales Systems for Local Businesses",
     description:
       "ClientSurge Systems installs AI automation for local service businesses, including lead capture, missed-call recovery, AI follow-up, appointment booking, review requests, and reactivation workflows.",
   },
@@ -52,6 +52,18 @@ export const PUBLIC_ROUTE_METADATA = {
     title: "About ClientSurge Systems",
     description:
       "Learn about ClientSurge Systems and its done-for-you AI automation systems for local service businesses.",
+  },
+  "/blog": {
+    key: "blog",
+    title: "Blog | ClientSurge Systems",
+    description:
+      "Read ClientSurge Systems articles about AI automation, lead capture, follow-up, booking workflows, reviews, and local service business growth systems.",
+  },
+  "/testimonials": {
+    key: "testimonials",
+    title: "Testimonials | ClientSurge Systems",
+    description:
+      "Review ClientSurge Systems testimonials and trust signals. Public claims should remain truthful, verified, and clearly labeled.",
   },
   "/roadmap": {
     key: "roadmap",
@@ -125,6 +137,8 @@ export const PUBLIC_DIRECTORY_PAGES = [
   "/faq",
   "/how-it-works",
   "/about",
+  "/blog",
+  "/testimonials",
   "/roadmap",
   "/contact",
   "/privacy",
