@@ -5,7 +5,7 @@
     "status": "CORE_PRODUCTION",
     "reason": "Primary message storage. Immutable. Write in all message flows.",
     "immutable": true,
-    "tenant_scoped": "client_id + client_project_id"
+    "tenant_scoped": "client_id + client_project_id; unmatched inbound evidence allowed when tenant is not resolved yet"
   },
   "properties": {
     "description": {
@@ -37,7 +37,8 @@
         "missing_client_id",
         "needs_backfill",
         "manual_review",
-        "system_internal"
+        "system_internal",
+        "unmatched"
       ],
       "default": "missing_client_id"
     },
@@ -69,10 +70,16 @@
       "type": "string",
       "title": "Status",
       "enum": [
+        "pending",
         "sent",
         "delivered",
         "failed",
-        "received"
+        "received",
+        "blocked",
+        "skipped",
+        "opt_out",
+        "opt_out_unmatched",
+        "received_unmatched"
       ]
     },
     "ai_generated": {
@@ -87,8 +94,25 @@
         "pending",
         "sent",
         "delivered",
-        "failed"
+        "failed",
+        "blocked",
+        "skipped"
       ]
+    },
+    "provider": {
+      "type": "string",
+      "title": "Provider",
+      "enum": [
+        "twilio",
+        "resend",
+        "internal",
+        "internal_guardrail",
+        "internal_compliance_guard"
+      ]
+    },
+    "provider_message_id": {
+      "type": "string",
+      "title": "Provider Message ID"
     },
     "provider_from_number": {
       "type": "string",
@@ -99,10 +123,33 @@
       "type": "string",
       "title": "Provider From Email",
       "description": "Resend from email used for this send. Supports future per-client sending domain."
+    },
+    "from_address": {
+      "type": "string",
+      "title": "From Address"
+    },
+    "from_number": {
+      "type": "string",
+      "title": "From Number"
+    },
+    "from_phone": {
+      "type": "string",
+      "title": "From Phone"
+    },
+    "lead_phone": {
+      "type": "string",
+      "title": "Lead Phone"
+    },
+    "to_address": {
+      "type": "string",
+      "title": "To Address"
+    },
+    "metadata_json": {
+      "type": "string",
+      "title": "Metadata"
     }
   },
   "required": [
-    "lead_id",
     "direction",
     "channel",
     "message_text"

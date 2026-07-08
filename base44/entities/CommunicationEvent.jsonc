@@ -89,6 +89,7 @@
         "sms_sent",
         "sms_failed",
         "sms_skipped",
+        "sms_blocked",
         "sms_received",
         "sms_delivered",
         "sms_link_clicked",
@@ -96,6 +97,8 @@
         "email_sent",
         "email_failed",
         "email_skipped",
+        "email_blocked",
+        "outbound_hold",
         "webhook_sent",
         "order_paid",
         "install_initialized",
@@ -133,6 +136,8 @@
         "zapier",
         "n8n",
         "internal",
+        "internal_guardrail",
+        "internal_compliance_guard",
         "elevenlabs"
       ]
     },
@@ -155,7 +160,9 @@
         "opened",
         "clicked",
         "received",
-        "processed"
+        "processed",
+        "skipped",
+        "blocked"
       ]
     },
     "subject": {
