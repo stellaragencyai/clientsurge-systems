@@ -101,99 +101,106 @@ function LazyAdminPanel({ children }) {
   return <Suspense fallback={<AdminPanelSkeleton />}>{children}</Suspense>;
 }
 
+// Keep the rendered admin menu focused. Secondary/legacy tools stay reachable by URL/search,
+// but no longer clog the left sidebar.
 const NAV_GROUPS = [
   {
-    group: 'Leads & Intelligence',
+    group: 'Command',
     items: [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-      { id: 'leads', label: 'Leads', icon: Users },
       { id: 'lead-intelligence', label: 'Lead Intelligence', icon: Flame },
-      { id: 'priority', label: 'Priority Queue', icon: Star },
-      { id: 'lead-quality', label: 'Lead Quality Control', icon: ShieldCheck },
-      { id: 'crm-health', label: 'CRM Health', icon: Activity },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
     ],
   },
   {
-    group: 'Clients & Onboarding',
+    group: 'Leads & Sales',
+    items: [
+      { id: 'leads', label: 'Leads', icon: Users },
+      { id: 'priority', label: 'Priority Queue', icon: Star },
+      { id: 'website-leads', label: 'Website Leads', icon: Target },
+      { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
+      { id: 'sales-funnel', label: 'Sales Funnel', icon: TrendingDown },
+    ],
+  },
+  {
+    group: 'Client Launch',
     items: [
       { id: 'guided-onboarding', label: 'Launch Guide', icon: Zap },
       { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
       { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
       { id: 'deployment-manager', label: 'Deployment Manager', icon: ShieldCheck },
-      { id: 'marketing', label: 'AI Marketing', icon: Sparkles, external: true, externalPath: '/admin/marketing' },
-      { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
-      { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: ClipboardList },
       { id: 'install-queue', label: 'Install Queue', icon: Server },
-      { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
       { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
-      { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
-      { id: 'website-leads', label: 'Website Leads', icon: Target },
     ],
   },
   {
-    group: 'Automation',
+    group: 'Automation & Messaging',
     items: [
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
-      { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
-      { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
-      { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
-      { id: 'routing', label: 'Lead Routing', icon: Target },
-      { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
       { id: 'instant-response', label: 'Instant Response', icon: Send },
+      { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
+      { id: 'routing', label: 'Lead Routing', icon: Target },
+      { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
+      { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
+      { id: 'marketing', label: 'AI Marketing', icon: Sparkles, external: true, externalPath: '/admin/marketing' },
     ],
   },
   {
-    group: 'Revenue & Funnels',
+    group: 'Revenue & Analytics',
     items: [
-      { id: 'sales-funnel', label: 'Sales Funnel', icon: TrendingDown },
-      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
-      { id: 'revenue-tracking', label: 'Revenue Tracking', icon: DollarSign },
+      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
       { id: 'attribution', label: 'Source Attribution', icon: PieChart },
       { id: 'landing-traffic', label: 'Landing Traffic', icon: BarChart3 },
-      { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
     ],
   },
   {
-    group: 'System Health',
+    group: 'System',
     items: [
       { id: 'audit-command-center', label: 'Audit Command Center', icon: ShieldCheck },
       { id: 'launch-proof', label: 'Launch Proof', icon: ShieldCheck },
-      { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
-      { id: 'data-quality', label: 'Data Quality', icon: Activity },
-      { id: 'platform-clients', label: 'Platform Clients', icon: Users },
-      { id: 'twilio-growth-engine', label: 'Twilio Growth Engine', icon: Zap },
-      { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
       { id: 'health', label: 'Integration Health', icon: Activity },
-      { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
-      { id: 'resend-diagnostics', label: 'Resend Sender Diagnostics', icon: Mail },
-      { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
       { id: 'settings', label: 'Settings', icon: Settings },
-    ],
-  },
-  {
-    group: 'Tools',
-    items: [
-      { id: 'canonical-map', label: 'System Map', icon: Database },
-      { id: 'resource-library', label: 'Resource Library', icon: BookOpen },
-      { id: 'messaging-regression', label: 'Messaging Provider Test', icon: Send },
-      { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
-      { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
-      { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
-      { id: 'performance-wars', label: 'Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
-      { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
-      { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
-      { id: 'task-board', label: 'Task Board', icon: ClipboardList },
-      { id: 'templates', label: 'Templates', icon: MessageSquare },
-      { id: 'review-request', label: 'Review Requests', icon: Star },
-      { id: 'qa', label: 'QA Tools', icon: RefreshCw },
-      { id: 'install-guide', label: 'Install Guide', icon: BookOpen, external: true, externalPath: '/admin/install-guide' },
     ],
   },
 ];
 
-const ALL_NAV = NAV_GROUPS.flatMap(g => g.items);
+const SECONDARY_NAV_ITEMS = [
+  { id: 'lead-quality', label: 'Lead Quality Control', icon: ShieldCheck },
+  { id: 'crm-health', label: 'CRM Health', icon: Activity },
+  { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
+  { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: ClipboardList },
+  { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
+  { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
+  { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
+  { id: 'drip', label: 'Drip Campaigns', icon: Mail },
+  { id: 'nurture', label: 'Nurture Campaigns', icon: Mail },
+  { id: 'revenue-tracking', label: 'Revenue Tracking', icon: DollarSign },
+  { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
+  { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
+  { id: 'data-quality', label: 'Data Quality', icon: Activity },
+  { id: 'platform-clients', label: 'Platform Clients', icon: Users },
+  { id: 'twilio-growth-engine', label: 'Twilio Growth Engine', icon: Zap },
+  { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
+  { id: 'resend-diagnostics', label: 'Resend Sender Diagnostics', icon: Mail },
+  { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
+  { id: 'canonical-map', label: 'System Map', icon: Database },
+  { id: 'resource-library', label: 'Resource Library', icon: BookOpen },
+  { id: 'messaging-regression', label: 'Messaging Provider Test', icon: Send },
+  { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
+  { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
+  { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
+  { id: 'performance-wars', label: 'Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
+  { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
+  { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
+  { id: 'task-board', label: 'Task Board', icon: ClipboardList },
+  { id: 'templates', label: 'Templates', icon: MessageSquare },
+  { id: 'review-request', label: 'Review Requests', icon: Star },
+  { id: 'qa', label: 'QA Tools', icon: RefreshCw },
+  { id: 'install-guide', label: 'Install Guide', icon: BookOpen, external: true, externalPath: '/admin/install-guide' },
+];
+
+const ALL_NAV = [...NAV_GROUPS.flatMap(g => g.items), ...SECONDARY_NAV_ITEMS];
 const VALID_TAB_IDS = new Set(ALL_NAV.filter(item => !item.external).map(item => item.id));
 
 function getActiveTabFromSearch(search) {
@@ -388,26 +395,26 @@ export default function AdminDashboard() {
         style={{ boxShadow: "1px 0 3px rgba(0,0,0,0.03)" }}
       >
         {/* Admin logo */}
-        <div className="px-5 pt-6 pb-4 border-b border-gray-100">
+        <div className="px-4 pt-5 pb-3 border-b border-gray-100">
           <div className="block mb-1">
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge"
-              style={{ height: 36, width: 'auto' }}
+              style={{ height: 32, width: 'auto' }}
             />
           </div>
         </div>
 
         {/* Search */}
-        <div className="px-3 py-2.5 border-b border-gray-100">
+        <div className="px-2.5 py-2 border-b border-gray-100">
           <AdminGlobalSearch onNavigate={(tab) => handleTabChange(tab)} />
         </div>
 
         {/* Navigation */}
-        <nav className="flex-1 overflow-y-auto py-3 px-3 space-y-5">
+        <nav className="flex-1 overflow-y-auto py-2 px-2.5 space-y-3">
           {NAV_GROUPS.map(({ group, items }) => (
             <div key={group}>
-              <p className="px-2 pb-1.5 pt-1 text-[10px] font-bold uppercase tracking-widest text-gray-400">{group}</p>
+              <p className="px-2 pb-1 pt-1 text-[9px] font-bold uppercase tracking-[0.16em] text-gray-400">{group}</p>
               <div className="space-y-0.5">
                 {items.map((item) => {
                   const Icon = item.icon;
@@ -417,14 +424,14 @@ export default function AdminDashboard() {
                     <button
                       key={item.id}
                       onClick={() => handleTabChange(item.id, item.external, item.externalPath)}
-                      className={`w-full flex items-center gap-2.5 px-3 py-2 rounded-lg transition-all text-[13px] font-medium ${
+                      className={`w-full flex items-center gap-2 px-2.5 py-1.5 rounded-md transition-all text-[12px] font-medium ${
                         isActive
                           ? 'text-white'
                           : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900'
                       }`}
                       style={isActive ? { background: '#3b4450' } : {}}
                     >
-                      <Icon className="w-4 h-4 flex-shrink-0" />
+                      <Icon className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="flex-1 text-left truncate">{item.label}</span>
                       {unread > 0 && (
                         <span className={`rounded-full text-[10px] font-bold px-1.5 py-0.5 ${isActive ? 'bg-white/20 text-white' : 'bg-blue-500 text-white'}`}>
@@ -441,9 +448,9 @@ export default function AdminDashboard() {
         </nav>
 
         {/* User footer */}
-        <div className="px-3 py-3 border-t border-gray-100 space-y-2">
+        <div className="px-2.5 py-2.5 border-t border-gray-100 space-y-1.5">
           <div className="flex items-center gap-2 px-2">
-            <div className="w-8 h-8 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
+            <div className="w-7 h-7 rounded-full bg-gray-100 flex items-center justify-center flex-shrink-0">
               <span className="text-xs font-bold text-gray-500">{(user?.full_name || 'A')[0]?.toUpperCase()}</span>
             </div>
             <p className="text-xs text-gray-400 truncate flex-1">{user?.full_name || 'Admin'}</p>
@@ -451,7 +458,7 @@ export default function AdminDashboard() {
           <button
             onClick={handlePreviewAsClient}
             disabled={previewingAsClient}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
           >
             {previewingAsClient ? <Loader2 className="w-3 h-3 animate-spin" /> : <Eye className="w-3 h-3" />}
             {previewingAsClient ? 'Opening...' : 'Preview as Client'}
@@ -459,7 +466,7 @@ export default function AdminDashboard() {
           <button
             onClick={handleLogout}
             disabled={loggingOut}
-            className="w-full flex items-center justify-center gap-1.5 px-3 py-2 rounded-lg border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
+            className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-md border border-gray-200 text-gray-600 text-xs font-medium hover:bg-gray-50 transition-colors disabled:opacity-60"
           >
             {loggingOut ? <Loader2 className="w-3 h-3 animate-spin" /> : <LogOut className="w-3 h-3" />}
             {loggingOut ? 'Signing out...' : 'Logout'}
