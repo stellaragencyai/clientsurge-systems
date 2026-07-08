@@ -41,6 +41,8 @@ const SAFE_MARKETING_PATTERNS = [
   /Capture\. Follow Up\. Book\./i,
 ];
 
+const BASE44_EDITOR_BADGE_TEXT = /edit\s+with\s+base44/i;
+
 function textOf(node) {
   return (node?.textContent || "").replace(/\s+/g, " ").trim();
 }
@@ -107,6 +109,38 @@ function removeNode(node) {
   if (!node || !node.parentNode) return false;
   node.parentNode.removeChild(node);
   return true;
+}
+
+function hideNode(node) {
+  if (!node) return false;
+  node.setAttribute?.("aria-hidden", "true");
+  node.style?.setProperty?.("display", "none", "important");
+  node.style?.setProperty?.("visibility", "hidden", "important");
+  node.style?.setProperty?.("pointer-events", "none", "important");
+  return true;
+}
+
+export function removeBase44EditorBadge() {
+  if (typeof document === "undefined") return 0;
+  let hidden = 0;
+
+  const elements = Array.from(document.body?.querySelectorAll?.("button,a,div,aside,section") || []);
+  for (const element of elements) {
+    const text = textOf(element);
+    if (!BASE44_EDITOR_BADGE_TEXT.test(text)) continue;
+
+    const fixedAncestor = element.closest?.('[style*="fixed"], [class*="fixed"]');
+    const target = fixedAncestor || element;
+
+    // Avoid hiding the whole app if a large ancestor happens to contain the words.
+    if ((target.textContent || "").length > 300) {
+      hidden += hideNode(element) ? 1 : 0;
+    } else {
+      hidden += hideNode(target) ? 1 : 0;
+    }
+  }
+
+  return hidden;
 }
 
 function removeGeneratedDirectoryHeadingBlock(root) {
@@ -205,6 +239,8 @@ function setRobots(value) {
 export function runPublicPageDirectoryGuard() {
   if (typeof window === "undefined" || typeof document === "undefined") return false;
   if (window.location.hostname.includes("preview-sandbox")) return false;
+
+  removeBase44EditorBadge();
 
   const body = document.body;
   const root = document.getElementById("root");
