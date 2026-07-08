@@ -1,0 +1,65 @@
+/* Area 10 — Performance, Mobile UX, Accessibility, and Loading States
+   Low-risk global guardrails layered after the main design system. */
+
+.cs-mobile-action-bar {
+  padding-left: max(0px, env(safe-area-inset-left, 0px));
+  padding-right: max(0px, env(safe-area-inset-right, 0px));
+}
+
+.cs-mobile-action {
+  min-height: 44px;
+  min-width: 44px;
+  -webkit-tap-highlight-color: transparent;
+  touch-action: manipulation;
+}
+
+.cs-mobile-action:focus-visible {
+  outline: 2px solid hsl(var(--primary));
+  outline-offset: 3px;
+  box-shadow: 0 0 0 4px hsla(var(--primary), 0.22);
+}
+
+@media (max-width: 380px) {
+  .cs-mobile-action-bar .cs-mobile-action {
+    font-size: 11px;
+    padding-left: 0.625rem;
+    padding-right: 0.625rem;
+  }
+}
+
+.area10-screen-reader-only,
+.sr-only-area10 {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotating-border-glow,
+  .cs-beam,
+  .testimonial-card,
+  .cs-hover-lift,
+  .cs-card-shadow,
+  .overlay-card,
+  .glass-card,
+  .cs-mobile-action,
+  .cs-btn-primary,
+  .cs-btn-secondary,
+  .cs-btn-outline,
+  .cs-btn-ghost {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+
+  .animate-spin,
+  [class*="animate-"] {
+    animation: none !important;
+  }
+}
