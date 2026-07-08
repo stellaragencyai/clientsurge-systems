@@ -23,10 +23,17 @@ function flow({ id, severity = "warning", status = "needs_review", title, messag
 }
 
 async function safeFilter(base44, entityName, filter, sort = "-created_date", limit = 50) {
-  return await base44.asServiceRole.entities[entityName].filter(filter, sort, limit).catch((error) => {
+  const entityApi = base44.asServiceRole.entities?.[entityName];
+  if (!entityApi?.filter) {
+    console.warn(`[getBrokenFlows] ${entityName} entity is not available in this app`);
+    return [];
+  }
+  try {
+    return await entityApi.filter(filter, sort, limit);
+  } catch (error) {
     console.warn(`[getBrokenFlows] ${entityName}.filter failed: ${error.message}`);
     return [];
-  });
+  }
 }
 
 Deno.serve(async (req) => {
