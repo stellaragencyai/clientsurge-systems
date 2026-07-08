@@ -1,0 +1,98 @@
+{
+  "app_name": "ClientSurge Systems",
+  "platform": "ios",
+  "area": 13,
+  "status": "pre_build_configuration",
+  "last_reviewed": "2026-07-08",
+  "build_source": {
+    "base44_app_id": "69dc4a79656fdba136d413d3",
+    "production_url": "https://clientsurgesystems.com",
+    "github_repository": "stellaragencyai/clientsurge-systems",
+    "github_merge_is_not_live_proof": true,
+    "requires_area_12_base44_publish_proof": true
+  },
+  "ios_identity": {
+    "bundle_id": "com.clientsurgesystems.app",
+    "display_name": "ClientSurge Systems",
+    "sku": "clientsurge-systems-ios",
+    "minimum_ios_version_review_required": true,
+    "apple_developer_team_id": "required_before_signing",
+    "signing_certificate_status": "required_before_testflight",
+    "provisioning_profile_status": "required_before_testflight"
+  },
+  "versioning": {
+    "marketing_version": "1.0.0",
+    "build_number_source": "App Store Connect / Base44 iOS build export",
+    "requires_unique_build_number_per_upload": true,
+    "requires_web_commit_sha_in_release_notes": true,
+    "requires_base44_publish_artifact_in_release_notes": true
+  },
+  "app_shell": {
+    "expected_mode": "Base44 iOS wrapper or export around the production ClientSurge app",
+    "requires_login_session_persistence_test": true,
+    "requires_logout_test": true,
+    "requires_open_in_app_link_test": true,
+    "requires_deep_link_review": true,
+    "requires_offline_state_review": true,
+    "requires_push_notification_review_if_enabled": true
+  },
+  "assets": {
+    "app_icon": {
+      "required": true,
+      "source_file_status": "required_before_testflight",
+      "must_not_include_alpha": true,
+      "must_match_brand": true
+    },
+    "splash_screen": {
+      "required": true,
+      "source_file_status": "required_before_testflight",
+      "must_respect_safe_area": true
+    },
+    "screenshots": {
+      "required_for_app_store": true,
+      "must_match_actual_ios_experience": true,
+      "must_not_show_fake_metrics_or_unverified_testimonials": true,
+      "required_device_sets": [
+        "iPhone large display",
+        "iPhone standard display"
+      ]
+    }
+  },
+  "testflight": {
+    "internal_testing_required": true,
+    "external_testing_requires_review_notes": true,
+    "real_device_smoke_required": true,
+    "required_smoke_paths": [
+      "launch app",
+      "login",
+      "logout",
+      "privacy policy link",
+      "terms link",
+      "account deletion path",
+      "contact/support path",
+      "client portal route",
+      "pricing route",
+      "product signup route",
+      "poor connection or offline behavior"
+    ]
+  },
+  "app_store_metadata": {
+    "subtitle_status": "required_before_submission",
+    "description_status": "required_before_submission",
+    "keywords_status": "required_before_submission",
+    "support_url": "https://clientsurgesystems.com/contact",
+    "privacy_policy_url": "https://clientsurgesystems.com/privacy",
+    "marketing_url": "https://clientsurgesystems.com",
+    "copyright_owner": "ClientSurge Systems",
+    "category_review_required": true
+  },
+  "release_proof": {
+    "ios_build_number_required": true,
+    "testflight_build_id_required": true,
+    "base44_publish_proof_required": true,
+    "web_commit_sha_required": true,
+    "release_notes_required": true,
+    "post_upload_smoke_required": true,
+    "app_review_notes_required": true
+  }
+}
