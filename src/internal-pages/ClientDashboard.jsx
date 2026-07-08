@@ -7,7 +7,7 @@ import ResponsiveServiceCard from "@/components/dashboard/ResponsiveServiceCard"
 import MobileBottomNav from "@/components/dashboard/MobileBottomNav";
 import DashboardHeader from "@/components/dashboard/DashboardHeader";
 import ChatAssistant from "@/components/dashboard/ChatAssistant";
-import { Loader2, ShoppingBag, Mail, Phone, RefreshCw, Zap } from "lucide-react";
+import { Loader2, ShoppingBag, Mail, Phone, RefreshCw, Zap, LogOut } from "lucide-react";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
 import WelcomeBanner from "@/components/dashboard/WelcomeBanner";
 import DeploymentProgressBar from "@/components/dashboard/DeploymentProgressBar";
@@ -25,12 +25,18 @@ import { usePortalState } from "@/hooks/usePortalState";
 
 export const STAGE_MAP = {
   "Paid": 0,
+  "Pending Review": 0,
+  "Status Pending": 0,
   "Ready for Install": 1,
   "Configuring": 2,
   "Testing": 3,
   "Live": 4,
   "Error": 2,
 };
+
+const SUPPORT_EMAIL = "support@clientsurgesystems.com";
+const SUPPORT_PHONE_DISPLAY = "(602) 584-3227";
+const SUPPORT_PHONE_LINK = "tel:+16025843227";
 
 function LoadingState() {
   return (
@@ -40,7 +46,7 @@ function LoadingState() {
         <Loader2 className="w-7 h-7 text-primary animate-spin" />
       </div>
       <p className="text-[15px] font-semibold text-foreground">Loading your dashboard…</p>
-      <p className="text-[13px] text-muted-foreground">Fetching your installation status</p>
+      <p className="text-[13px] text-muted-foreground">Fetching verified installation status</p>
     </div>
   );
 }
@@ -54,13 +60,23 @@ function ErrorState({ message, onRetry }) {
     }}>
       <p className="text-base font-bold mb-2" style={{ color: "#003B8F" }}>Unable to Load Dashboard</p>
       <p className="text-sm text-muted-foreground mb-5">{message}</p>
-      {onRetry && (
-        <button onClick={onRetry}
-          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-white font-semibold text-sm cursor-pointer transition-all hover:-translate-y-0.5"
-          style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 4px 14px rgba(0,174,239,0.3)" }}>
-          <RefreshCw className="w-3 h-3" /> Try Again
-        </button>
-      )}
+      <div className="flex flex-wrap gap-3 justify-center">
+        {onRetry && (
+          <button onClick={onRetry}
+            className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full text-white font-semibold text-sm cursor-pointer transition-all hover:-translate-y-0.5"
+            style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 4px 14px rgba(0,174,239,0.3)" }}>
+            <RefreshCw className="w-3 h-3" /> Try Again
+          </button>
+        )}
+        <a href={`mailto:${SUPPORT_EMAIL}?subject=ClientSurge%20Dashboard%20Support`}
+          className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-semibold text-sm"
+          style={{ color: "#003B8F", background: "#fff", border: "1px solid rgba(0,174,239,0.22)" }}>
+          <Mail className="w-3 h-3" /> Contact Support
+        </a>
+        <Link to="/" className="inline-flex items-center gap-1.5 px-5 py-2 rounded-full font-semibold text-sm text-muted-foreground hover:text-foreground">
+          Back to Home
+        </Link>
+      </div>
     </div>
   );
 }
@@ -73,22 +89,28 @@ function EmptyState() {
         border: "1px solid rgba(0,174,239,0.15)",
         boxShadow: "0 8px 40px rgba(0,59,143,0.08)"
       }}>
-      {/* Top gradient bar */}
       <div className="absolute inset-x-0 top-0 h-1 rounded-t-3xl"
         style={{ background: "linear-gradient(90deg, #003B8F, #00AEEF, #66D9FF)" }} />
       <div className="w-20 h-20 rounded-2xl mx-auto mb-5 flex items-center justify-center"
         style={{ background: "linear-gradient(135deg,rgba(0,174,239,0.12),rgba(0,59,143,0.07))", border: "1px solid rgba(0,174,239,0.2)" }}>
         <ShoppingBag className="w-9 h-9 text-primary" />
       </div>
-      <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>No Services Yet</h3>
-      <p className="text-sm text-muted-foreground mb-7 max-w-xs mx-auto leading-relaxed">
-        You don't have any active orders yet. Browse our AI automation store to get started.
+      <h3 className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>No Verified Systems Yet</h3>
+      <p className="text-sm text-muted-foreground mb-7 max-w-sm mx-auto leading-relaxed">
+        Your dashboard is active, but no purchased automation system has been verified for this account yet. Compare packages or contact support if you already completed checkout.
       </p>
-      <a href="/store"
-        className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-white font-bold text-sm transition-all hover:-translate-y-0.5"
-        style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 6px 20px rgba(0,174,239,0.35)" }}>
-        <ShoppingBag className="w-4 h-4" /> Browse the AI Store →
-      </a>
+      <div className="flex flex-wrap gap-3 justify-center">
+        <a href="/pricing"
+          className="inline-flex items-center gap-2 px-7 py-3 rounded-full text-white font-bold text-sm transition-all hover:-translate-y-0.5"
+          style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)", boxShadow: "0 6px 20px rgba(0,174,239,0.35)" }}>
+          <ShoppingBag className="w-4 h-4" /> Compare Packages
+        </a>
+        <a href={`mailto:${SUPPORT_EMAIL}?subject=ClientSurge%20Portal%20Access`}
+          className="inline-flex items-center gap-2 px-7 py-3 rounded-full font-bold text-sm transition-all hover:-translate-y-0.5"
+          style={{ color: "#003B8F", background: "#fff", border: "1px solid rgba(0,174,239,0.22)" }}>
+          <Mail className="w-4 h-4" /> I Already Purchased
+        </a>
+      </div>
     </div>
   );
 }
@@ -104,12 +126,12 @@ function SupportCard() {
       <div>
         <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary mb-1">Need Help?</p>
         <p className="text-[15px] font-bold text-foreground mb-0.5" style={{ fontFamily: "Montserrat, sans-serif" }}>Our onboarding team is here for you</p>
-        <p className="text-[13px] text-muted-foreground">Average response time: under 4 hours</p>
+        <p className="text-[13px] text-muted-foreground">Email or call support for account, setup, or dashboard access issues.</p>
       </div>
       <div className="flex gap-3 flex-wrap">
         {[
-          { Icon: Mail, label: "Email Support", href: "mailto:support@clientsurgesystems.com" },
-          { Icon: Phone, label: "(602) 584-3227", href: "tel:+16025843227" },
+          { Icon: Mail, label: "Email Support", href: `mailto:${SUPPORT_EMAIL}` },
+          { Icon: Phone, label: SUPPORT_PHONE_DISPLAY, href: SUPPORT_PHONE_LINK },
         ].map(({ Icon, label, href }) => (
           <a key={label} href={href}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-full bg-white text-primary font-semibold text-[13px] no-underline transition-all hover:shadow-md"
@@ -123,10 +145,11 @@ function SupportCard() {
 }
 
 function LiveIndicator({ lastUpdated, onRefresh, isRefreshing }) {
+  const label = lastUpdated ? lastUpdated.toLocaleTimeString([], { hour: "numeric", minute: "2-digit" }) : "not checked yet";
   return (
     <div className="flex items-center gap-2 justify-end mb-5">
-      <span className="w-1.5 h-1.5 rounded-full bg-green-500 flex-shrink-0" style={{ boxShadow: "0 0 6px #22c55e" }} />
-      <span className="text-[11px] text-muted-foreground/60 font-medium">Live — updates every 30s</span>
+      <span className="w-1.5 h-1.5 rounded-full bg-amber-500 flex-shrink-0" />
+      <span className="text-[11px] text-muted-foreground/70 font-medium">Last checked {label}</span>
       <button onClick={onRefresh} disabled={isRefreshing}
         className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-primary text-[11px] font-semibold transition-opacity disabled:opacity-40 cursor-pointer"
         style={{ background: "rgba(0,174,239,0.07)", border: "1px solid rgba(0,174,239,0.15)" }}>
@@ -135,6 +158,20 @@ function LiveIndicator({ lastUpdated, onRefresh, isRefreshing }) {
       </button>
     </div>
   );
+}
+
+function normalizePortalContext(raw) {
+  const context = raw?.data || raw || {};
+  if (context?.success && context?.data && typeof context.data === "object") return context.data;
+  return context;
+}
+
+function statusLabel(value) {
+  return value || "Status Pending";
+}
+
+function serviceName(service) {
+  return service?.display_name || service?.product_name || service?.service_name || service?.service_key || "Automation System";
 }
 
 export default function ClientDashboard() {
@@ -158,7 +195,6 @@ export default function ClientDashboard() {
   const [simulatedData, setSimulatedData] = useState(null);
   const [onboardingData, setOnboardingData] = useState(null);
 
-  // Phase A.4: PortalStateEngine — normalized proof-validated card states
   const portalContextData = portalData ? {
     project: portalData?.project,
     order: portalData?.order,
@@ -178,18 +214,20 @@ export default function ClientDashboard() {
       setUserEmail(user.email);
       setPortalUser(user);
       const res = await base44.functions.invoke("getClientPortalContext", {});
-      if (res.data?.success) {
-        setPortalData(res.data);
-        setIsAdminPreview(res.data.is_admin_preview === true);
-        setHealthEvents(res.data.health?.recent_events || []);
-        setUserRole(res.data.user_role || null);
-        setOnboardingData(res.data.onboarding || null);
+      const context = normalizePortalContext(res);
+      const hasContext = Boolean(context?.project || context?.order || context?.subscription || context?.deployment || context?.health || context?.is_admin_preview || context?.success);
+      if (hasContext) {
+        setPortalData({ success: true, ...context });
+        setIsAdminPreview(context.is_admin_preview === true);
+        setHealthEvents(context.health?.recent_events || []);
+        setUserRole(context.user_role || null);
+        setOnboardingData(context.onboarding || null);
         setLastUpdated(new Date());
-      } else if (res.data?.code === "portal_project_not_found") {
+      } else if (context?.code === "portal_project_not_found") {
         setPortalData({ success: true, project: null, order: null });
         setLastUpdated(new Date());
       } else {
-        setError(res.data?.error || "Unable to load your portal data.");
+        setError(context?.error || context?.message || "Unable to load your portal data.");
       }
     } catch (err) {
       const status = err?.response?.status || err?.status;
@@ -198,7 +236,7 @@ export default function ClientDashboard() {
         setPortalData({ success: true, project: null, order: null });
         setLastUpdated(new Date());
       } else {
-        setError("Unable to load dashboard. Please try again.");
+        setError("Unable to load dashboard. Please try again or contact support if this continues.");
       }
     } finally {
       setLoading(false);
@@ -217,7 +255,7 @@ export default function ClientDashboard() {
         setLastUpdated(new Date());
       }
     } catch {
-      // Silently fail — real data is the fallback
+      // Real data remains the fallback.
     } finally {
       setLoading(false);
     }
@@ -229,27 +267,21 @@ export default function ClientDashboard() {
   }, [fetchSimulated]);
 
   useEffect(() => {
-    const interval = setInterval(() => fetchPortal(true), 30000);
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") fetchPortal(true);
+    }, 30000);
     return () => clearInterval(interval);
   }, [fetchPortal]);
 
-  // Admin preview overrides: use simulated data when available
   const effectiveData = (isAdminPreview && simulatedData) ? simulatedData : portalData;
   const services = effectiveData?.order?.services || [];
   const project = effectiveData?.project;
   const order = effectiveData?.order;
   const effectiveHealthEvents = (isAdminPreview && simulatedData) ? (simulatedData?.health?.recent_events || []) : healthEvents;
   const hasSetupInfo = !!(order?.install_configuration?.brand?.business_name || order?.install_configuration?.shared?.twilio_business_phone);
+  const canGoLive = activeServicesFromOrder(services, order).some((service) => ["Testing", "Live"].includes(service.installStatus));
 
-  const activeServices = services.map(svc => ({
-    serviceKey: svc.service_key,
-    productName: svc.display_name,
-    orderId: order?.id || "",
-    installStatus: svc.install_status || "Paid",
-    stageIndex: STAGE_MAP[svc.install_status] ?? 0,
-    orderStatus: order?.order_status || "",
-    paymentStatus: order?.payment_status || "",
-  }));
+  const activeServices = activeServicesFromOrder(services, order);
 
   if (!loading && !portalData && !error) {
     return (
@@ -258,7 +290,7 @@ export default function ClientDashboard() {
           <div className="text-center p-12">
             <p className="text-xl font-bold text-foreground mb-2" style={{ fontFamily: "Montserrat, sans-serif" }}>Something went wrong</p>
             <p className="text-sm text-muted-foreground mb-6">We could not load your dashboard. Please refresh or contact support.</p>
-            <a href="mailto:support@clientsurgesystems.com" className="text-primary font-semibold text-sm">support@clientsurgesystems.com</a>
+            <a href={`mailto:${SUPPORT_EMAIL}`} className="text-primary font-semibold text-sm">{SUPPORT_EMAIL}</a>
           </div>
         </div>
       </DemoBookingProvider>
@@ -270,14 +302,10 @@ export default function ClientDashboard() {
       <ChatAssistant installStatus={activeServices[0]?.installStatus} services={activeServices} portalState={portalState} />
       <MobileBottomNav />
 
-      {/* Full page wrapper with same background as landing site */}
       <div className="min-h-screen flex flex-col" style={{ background: "hsl(var(--background))" }}>
-
-        {/* ── HEADER — matches landing page Navbar style ── */}
         <header className="sticky top-0 z-50 flex items-center justify-between border-b border-primary/10 bg-white/70 backdrop-blur-2xl"
           style={{ height: "72px", padding: "0 clamp(1rem,4vw,2.5rem)" }}>
-          {/* Left: Logo */}
-          <Link to="/" className="flex items-center no-underline">
+          <Link to="/client-portal" className="flex items-center no-underline" aria-label="Client dashboard home">
             <img
               src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
               alt="ClientSurge Systems"
@@ -285,34 +313,38 @@ export default function ClientDashboard() {
             />
           </Link>
 
-          {/* Center: Label */}
-          <div className="flex items-center gap-2">
+          <div className="hidden sm:flex items-center gap-2">
             <div className="w-1.5 h-1.5 rounded-full bg-primary" style={{ boxShadow: "0 0 8px rgba(0,174,239,0.7)" }} />
             <span className="text-[11px] font-bold tracking-[0.22em] uppercase text-muted-foreground">
               Client Dashboard
             </span>
           </div>
 
-          {/* Right: Help link */}
-          <a href="mailto:support@clientsurgesystems.com"
-            className="text-[12px] font-semibold text-primary no-underline hover:text-primary/80 transition-colors">
-            Need help?
-          </a>
+          <div className="flex items-center gap-3">
+            <a href={`mailto:${SUPPORT_EMAIL}`}
+              className="text-[12px] font-semibold text-primary no-underline hover:text-primary/80 transition-colors">
+              Need help?
+            </a>
+            <button
+              type="button"
+              onClick={() => base44.auth.logout("/?logged_out=1")}
+              className="hidden sm:inline-flex items-center gap-1.5 px-3 py-2 rounded-full text-[12px] font-semibold"
+              style={{ border: "1px solid rgba(0,174,239,0.22)", color: "#003B8F", background: "#fff" }}
+            >
+              <LogOut className="w-3.5 h-3.5" /> Logout
+            </button>
+          </div>
         </header>
 
-        {/* ── MAIN CONTENT ── */}
         <main id="main-content" className="flex-1">
-          {/* Top electric gradient bar — matches landing page sections */}
           <div className="w-full h-px" style={{ background: "linear-gradient(90deg, transparent, rgba(0,174,239,0.4), transparent)" }} />
 
-          {/* Subtle radial glow behind content — matches landing hero atmosphere */}
           <div className="relative w-full" aria-hidden="true">
             <div className="absolute inset-0 pointer-events-none"
               style={{ background: "radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,136,204,0.06) 0%, transparent 70%)" }} />
           </div>
 
           <div className="max-w-[1100px] mx-auto px-[clamp(1.25rem,4vw,2.5rem)] py-[clamp(1.5rem,4vw,3rem)] relative z-10">
-
             {loading ? (
               <LoadingState />
             ) : error ? (
@@ -350,7 +382,7 @@ export default function ClientDashboard() {
                 )}
 
                 {activeServices.length > 0 && (
-                  <>
+                  <div id="dashboard-status" style={{ scrollMarginTop: "96px" }}>
                     <SetupStatusPanel
                       installStatus={activeServices[0]?.installStatus}
                       onRefresh={() => fetchPortal(true)}
@@ -362,10 +394,9 @@ export default function ClientDashboard() {
                       installStatus={activeServices[0]?.installStatus}
                       portalState={portalState}
                     />
-                  </>
+                  </div>
                 )}
 
-                {/* Admin Preview Toggler — switch between simulated pipeline states */}
                 {isAdminPreview && (
                   <AdminPreviewToggler
                     currentState={simulatedData?.simulated_state || simulatedState}
@@ -374,10 +405,8 @@ export default function ClientDashboard() {
                   />
                 )}
 
-                {/* Internal/QA Filter Notice */}
                 <InternalFilterNotice isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"} />
 
-                {/* Launch Readiness Panel */}
                 <LaunchReadinessPanel
                   order={order}
                   project={project}
@@ -386,7 +415,6 @@ export default function ClientDashboard() {
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
-                {/* Active Automations Panel */}
                 <ActiveAutomationsPanel
                   packageKey={order?.package_type || order?.selected_package_type}
                   services={order?.services || []}
@@ -395,23 +423,20 @@ export default function ClientDashboard() {
                   portalState={portalState}
                 />
 
-                {/* Client Action Required Panel */}
                 <ClientActionRequiredPanel
                   order={order}
                   project={project}
-                  readiness={{ canGoLive: false }}
+                  readiness={{ canGoLive }}
                   portalState={portalState}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                 />
 
-                {/* Recent System Proof */}
                 <RecentSystemProofPanel
                   events={effectiveHealthEvents}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
                   portalState={portalState}
                 />
 
-                {/* Recent Issues */}
                 <RecentIssuesPanel
                   events={effectiveHealthEvents}
                   isAdmin={isAdminPreview || userRole === "admin" || userRole === "super_admin"}
@@ -422,7 +447,6 @@ export default function ClientDashboard() {
                   <EmptyState />
                 ) : (
                   <>
-                    {/* Stage tracker — wrapped in a premium card */}
                     <div className="rounded-2xl overflow-hidden mb-5"
                       style={{
                         background: "linear-gradient(135deg,rgba(255,255,255,0.95) 0%, rgba(232,246,255,0.7) 100%)",
@@ -438,14 +462,12 @@ export default function ClientDashboard() {
                       />
                     </div>
 
-                    {/* Metrics bar */}
                     <DashboardMetricsBar activeServices={activeServices} project={project} portalState={portalState} />
 
-                    {/* ── SERVICE CARDS ── */}
                     <div className="mb-4 mt-2">
                       <div className="flex items-center gap-3 mb-4">
                         <div className="h-px flex-1" style={{ background: "linear-gradient(to right, transparent, rgba(0,174,239,0.3))" }} />
-                        <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">Your Active Systems</p>
+                        <p className="text-[11px] font-black uppercase tracking-[0.24em] text-primary">Your Verified Systems</p>
                         <div className="h-px flex-1" style={{ background: "linear-gradient(to left, transparent, rgba(0,174,239,0.3))" }} />
                       </div>
                       <div style={{
@@ -475,18 +497,35 @@ export default function ClientDashboard() {
           </div>
         </main>
 
-        {/* ── FOOTER ── */}
         <footer className="flex items-center justify-between flex-wrap gap-2 border-t border-primary/8 px-[clamp(1rem,4vw,2.5rem)] py-4">
           <div className="flex items-center gap-2">
             <Zap className="w-3 h-3 text-primary/50" />
             <span className="text-[11px] text-muted-foreground/50">© {new Date().getFullYear()} ClientSurge Systems</span>
           </div>
-          <div className="flex gap-4">
-            <Link to="/privacy-policy" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Privacy</Link>
+          <div className="flex gap-4 flex-wrap">
+            <Link to="/privacy" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Privacy</Link>
             <Link to="/terms" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Terms</Link>
+            <Link to="/sms-terms" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">SMS</Link>
+            <Link to="/refund-policy" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Refunds</Link>
+            <Link to="/contact" className="text-[11px] text-muted-foreground/50 hover:text-primary transition-colors no-underline">Contact</Link>
           </div>
         </footer>
       </div>
     </DemoBookingProvider>
   );
+}
+
+function activeServicesFromOrder(services, order) {
+  return (services || []).map(svc => {
+    const installStatus = statusLabel(svc.install_status);
+    return {
+      serviceKey: svc.service_key || svc.key || svc.id,
+      productName: serviceName(svc),
+      orderId: order?.id || "",
+      installStatus,
+      stageIndex: STAGE_MAP[installStatus] ?? 0,
+      orderStatus: order?.order_status || "",
+      paymentStatus: order?.payment_status || "",
+    };
+  });
 }
