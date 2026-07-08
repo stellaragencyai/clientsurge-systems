@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import ServiceCardHeader from "./ServiceCardHeader";
 import ServiceCardProgressBar from "./ServiceCardProgressBar";
 import ServiceCardTimeline from "./ServiceCardTimeline";
@@ -21,6 +21,10 @@ function useIsMobile() {
   return isMobile;
 }
 
+function safeDomId(value) {
+  return String(value || "unknown").toLowerCase().replace(/[^a-z0-9_-]+/g, "-").replace(/^-+|-+$/g, "") || "unknown";
+}
+
 export default function ResponsiveServiceCard({ service, portalState }) {
   const { serviceKey, stageIndex = 0 } = service;
   const [expanded, setExpanded] = useState(false);
@@ -32,8 +36,9 @@ export default function ResponsiveServiceCard({ service, portalState }) {
   const safeInstallStatus = isProofLive
     ? service.installStatus
     : service.installStatus === "Live" ? "Testing" : service.installStatus;
-  const safeService = { ...service, installStatus: safeInstallStatus };
-  const detailsId = `service-card-details-${serviceKey || "unknown"}`;
+  const safeStageIndex = isProofLive ? stageIndex : Math.min(stageIndex, 3);
+  const safeService = { ...service, installStatus: safeInstallStatus, stageIndex: safeStageIndex };
+  const detailsId = useMemo(() => `service-card-details-${safeDomId(serviceKey)}`, [serviceKey]);
 
   return (
     <div style={{
@@ -61,7 +66,7 @@ export default function ResponsiveServiceCard({ service, portalState }) {
 
       <div style={{ padding: "20px" }}>
         <ServiceCardHeader service={safeService} portalState={portalState} />
-        <ServiceCardProgressBar stageIndex={stageIndex} totalStages={5} />
+        <ServiceCardProgressBar stageIndex={safeStageIndex} totalStages={5} />
 
         {!isProofLive && service.installStatus === "Live" && (
           <div style={{
@@ -76,7 +81,7 @@ export default function ResponsiveServiceCard({ service, portalState }) {
         )}
 
         <div id={detailsId} style={{ display: isMobile ? (expanded ? "block" : "none") : "block" }}>
-          <ServiceCardTimeline serviceKey={serviceKey} currentStage={stageIndex} />
+          <ServiceCardTimeline serviceKey={serviceKey} currentStage={safeStageIndex} />
           <ServiceCardActions serviceKey={serviceKey} orderId={service.orderId} />
         </div>
 
