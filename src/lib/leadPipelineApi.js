@@ -26,9 +26,40 @@ const CRM_STAGES = [
   "Follow Up Later",
 ];
 const STAGE_GROUPS = ["new", "working", "qualified", "booked", "closed"];
+const ACTIONABILITY_SEGMENTS = [
+  "reactivation",
+  "nurture",
+  "qualification",
+  "follow_up",
+  "high_value_outreach",
+  "demo_requested",
+  "awaiting_close",
+];
 
-export function getLeadPipelineError(error, fallback) {
-  return error?.data?.error || error?.message || fallback;
+const DEFAULT_PIPELINE_SUMMARY = {
+  summary: {},
+  leads: [],
+  pagination: {},
+  filter_options: {},
+};
+
+function safeMessage(error) {
+  return String(error?.data?.error || error?.message || "").trim();
+}
+
+export function getLeadPipelineError(error, fallback = "Unable to load lead overview right now.") {
+  const message = safeMessage(error);
+  const status = error?.status || error?.response?.status || error?.data?.status;
+
+  if (status === 404 || /\b404\b/.test(message) || /not found/i.test(message)) {
+    return "Lead pipeline service is unavailable. Direct lead records are used where possible.";
+  }
+
+  if (/network|timeout|failed to fetch/i.test(message)) {
+    return "Lead pipeline service timed out. Refresh or run the pipeline check.";
+  }
+
+  return message || fallback;
 }
 
 function countBy(rows, key) {
@@ -37,6 +68,21 @@ function countBy(rows, key) {
     counts[value] = (counts[value] || 0) + 1;
     return counts;
   }, {});
+}
+
+function sortObjectKeys(object = {}) {
+  return Object.keys(object).sort().reduce((result, key) => {
+    result[key] = object[key];
+    return result;
+  }, {});
+}
+
+function numberValue(...values) {
+  for (const value of values) {
+    const number = Number(value);
+    if (Number.isFinite(number)) return number;
+  }
+  return 0;
 }
 
 function deriveStageGroup(status) {
@@ -56,26 +102,81 @@ function deriveCrmStage(lead) {
   return "Not Contacted";
 }
 
+function normalizeOfferKey(value) {
+  const text = String(value || "").trim().toLowerCase();
+  if (!text) return "unassigned";
+  if (text.includes("starter")) return "starter_system";
+  if (text.includes("growth")) return "growth_system";
+  if (text.includes("elite") || text.includes("pro")) return "elite_system";
+  if (text.includes("single")) return "single_service";
+  return text.replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "") || "unassigned";
+}
+
+function offerKeyForLead(lead) {
+  const offer = lead.recommended_offer || {};
+  return normalizeOfferKey(
+    offer.package_key ||
+    offer.package_name ||
+    offer.primary_service_name ||
+    lead.recommended_offer_key ||
+    lead.package_key ||
+    lead.package_type ||
+    lead.selected_package_type
+  );
+}
+
+function deriveActionability(lead) {
+  const segments = new Set(Array.isArray(lead.actionability) ? lead.actionability.filter(Boolean) : []);
+  const score = numberValue(lead.lead_score, lead.intent_score, lead.intelligence_score);
+  const status = lead.status;
+  const stage = lead.crm_stage;
+
+  if (score >= 75) segments.add("high_value_outreach");
+  if (status === "Replied" || status === "Contacted" || stage === "Follow Up Later") segments.add("follow_up");
+  if (status === "Qualified" || status === "Booking Prompt Sent") segments.add("qualification");
+  if (status === "Booked" || stage === "Audit Booked") segments.add("demo_requested");
+  if (stage === "Won Pending Payment" || stage === "Proposal Sent") segments.add("awaiting_close");
+  if (status === "New" && score < 50) segments.add("nurture");
+
+  const lastActivity = lead.last_activity_at || lead.updated_date || lead.created_date;
+  if (lastActivity) {
+    const daysSinceActivity = Math.floor((Date.now() - new Date(lastActivity).getTime()) / 86400000);
+    if (Number.isFinite(daysSinceActivity) && daysSinceActivity >= 30 && status !== "Closed") segments.add("reactivation");
+  }
+
+  return Array.from(segments).filter((segment) => ACTIONABILITY_SEGMENTS.includes(segment));
+}
+
 function normalizeLead(lead) {
-  const stageGroup = lead.stage_group || deriveStageGroup(lead.status);
-  return {
+  const status = lead.status || lead.lead_status || "New";
+  const leadScore = numberValue(lead.lead_score, lead.intent_score, lead.intelligence_score, lead.score);
+  const stageGroup = lead.stage_group || deriveStageGroup(status);
+  const normalized = {
     ...lead,
+    status,
+    lead_score: leadScore,
     stage_group: stageGroup,
-    crm_stage: deriveCrmStage(lead),
+    crm_stage: lead.crm_stage || deriveCrmStage({ ...lead, status }),
     industry: lead.industry || lead.business_type || lead.niche || "",
     intake_type: lead.intake_type || "legacy",
-    source: lead.source || "unknown",
-    actionability: lead.actionability || [],
-    next_action: lead.next_action || {
-      label: lead.status === "New" ? "Review lead" : "Follow up",
-      detail: "Review lead context and choose the next operator action.",
-    },
+    source: lead.source || lead.lead_source || "unknown",
+    activation_priority: lead.activation_priority || (leadScore >= 80 ? "Critical" : leadScore >= 60 ? "High" : leadScore >= 35 ? "Medium" : "Review"),
     recommended_offer: lead.recommended_offer || null,
     recent_movement: lead.recent_movement || {
       label: "Imported lead",
-      detail: lead.updated_date || lead.created_date ? `Last updated ${new Date(lead.updated_date || lead.created_date).toLocaleDateString()}` : "No tracked activity yet.",
+      detail: lead.updated_date || lead.created_date
+        ? `Last updated ${new Date(lead.updated_date || lead.created_date).toLocaleDateString()}`
+        : "No tracked activity yet.",
+    },
+    next_action: lead.next_action || {
+      label: status === "New" ? "Review lead" : "Follow up",
+      detail: "Review lead context and choose the next operator action.",
     },
   };
+
+  normalized.crm_stage = deriveCrmStage(normalized);
+  normalized.actionability = deriveActionability(normalized);
+  return normalized;
 }
 
 function matchesFilter(lead, filters = {}) {
@@ -92,12 +193,21 @@ function matchesFilter(lead, filters = {}) {
     if (!haystack.includes(search)) return false;
   }
 
-  if (filters.status && filters.status !== "all" && lead.status !== filters.status) return false;
+  const status = filters.status || filters.lead_status;
+  if (status && status !== "all" && lead.status !== status) return false;
   if (filters.source && filters.source !== "all" && lead.source !== filters.source) return false;
   if (filters.intake_type && filters.intake_type !== "all" && lead.intake_type !== filters.intake_type) return false;
   if (filters.stage_group && filters.stage_group !== "all" && lead.stage_group !== filters.stage_group) return false;
   if (filters.priority && filters.priority !== "all" && lead.activation_priority !== filters.priority) return false;
   if (filters.segment && filters.segment !== "all" && !(lead.actionability || []).includes(filters.segment)) return false;
+  if (filters.lead_state && filters.lead_state !== "all" && lead.lead_state !== filters.lead_state) return false;
+  if (filters.intelligence_segment && filters.intelligence_segment !== "all" && lead.intelligence_segment !== filters.intelligence_segment) return false;
+
+  const scoreMin = filters.scoreMin || filters.score_min;
+  const scoreMax = filters.scoreMax || filters.score_max;
+  if (scoreMin && Number(lead.lead_score || 0) < Number(scoreMin)) return false;
+  if (scoreMax && Number(lead.lead_score || 0) > Number(scoreMax)) return false;
+
   if (filters.industry && filters.industry !== "all") {
     const requested = String(filters.industry).trim().toLowerCase();
     const tokens = [
@@ -112,8 +222,63 @@ function matchesFilter(lead, filters = {}) {
   return true;
 }
 
+function isTrustedLead(lead) {
+  try {
+    return isLeadVisibleInSalesViews(lead);
+  } catch {
+    return true;
+  }
+}
+
 function scopeTrustedLeads(leads, filters = {}) {
-  return filters.includeFlagged === true ? leads : leads.filter(isLeadVisibleInSalesViews);
+  return filters.includeFlagged === true ? leads : leads.filter(isTrustedLead);
+}
+
+function countSegments(leads) {
+  return leads.reduce((counts, lead) => {
+    (lead.actionability || []).forEach((segment) => {
+      counts[segment] = (counts[segment] || 0) + 1;
+    });
+    return counts;
+  }, {});
+}
+
+function countRecommendedOffers(leads) {
+  return leads.reduce((counts, lead) => {
+    const key = offerKeyForLead(lead);
+    counts[key] = (counts[key] || 0) + 1;
+    return counts;
+  }, {});
+}
+
+function dayKey(date) {
+  return date.toISOString().slice(0, 10);
+}
+
+function buildLast7Days(leads) {
+  const counts = {};
+  leads.forEach((lead) => {
+    const value = lead.created_date || lead.created_at || lead.last_activity_at;
+    if (!value) return;
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) return;
+    const key = dayKey(date);
+    counts[key] = (counts[key] || 0) + 1;
+  });
+
+  return Array.from({ length: 7 }).map((_, index) => {
+    const date = new Date();
+    date.setDate(date.getDate() - (6 - index));
+    const key = dayKey(date);
+    return { date: key, leads: counts[key] || 0 };
+  });
+}
+
+function isEmptySummary(data) {
+  const total = Number(data?.summary?.total_leads || 0);
+  const rawTotal = Number(data?.summary?.raw_total_leads || 0);
+  const rowsLoaded = Number(data?.data_window?.rows_loaded?.leads || data?.data_window?.rows_loaded || 0);
+  return !data?.leads?.length && total === 0 && rawTotal === 0 && rowsLoaded === 0;
 }
 
 async function fetchDirectLeadsSnapshot(filters = {}) {
@@ -145,21 +310,21 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
       hidden_junk_leads: Math.max(0, normalized.length - trustedScope.length),
       filtered_leads: filtered.length,
       actionable_leads: filtered.filter((lead) => lead.status !== "Closed").length,
-      status_counts: countBy(trustedScope, "status"),
-      crm_stage_counts: countBy(trustedScope, "crm_stage"),
-      stage_counts: countBy(trustedScope, "stage_group"),
-      source_counts: countBy(trustedScope, "source"),
-      intake_counts: countBy(trustedScope, "intake_type"),
-      industry_counts: countBy(trustedScope, "industry"),
-      segment_counts: {},
-      recommended_offer_counts: {},
+      status_counts: sortObjectKeys(countBy(trustedScope, "status")),
+      crm_stage_counts: sortObjectKeys(countBy(trustedScope, "crm_stage")),
+      stage_counts: sortObjectKeys(countBy(trustedScope, "stage_group")),
+      source_counts: sortObjectKeys(countBy(trustedScope, "source")),
+      intake_counts: sortObjectKeys(countBy(trustedScope, "intake_type")),
+      industry_counts: sortObjectKeys(countBy(trustedScope, "industry")),
+      segment_counts: sortObjectKeys(countSegments(trustedScope)),
+      recommended_offer_counts: sortObjectKeys(countRecommendedOffers(trustedScope)),
       recent_imports: [],
       recent_lead_activity: recentLeadActivity,
       priority_queue: [...filtered]
         .sort((left, right) => (right.lead_score ?? 0) - (left.lead_score ?? 0))
         .slice(0, 12),
-      activation_segments: [],
-      last7Days: [],
+      activation_segments: ACTIONABILITY_SEGMENTS,
+      last7Days: buildLast7Days(trustedScope),
       truth_source: "client_direct_leads_fallback",
     },
     leads,
@@ -175,7 +340,7 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
       crm_stages: CRM_STAGES,
       stage_groups: STAGE_GROUPS,
       intake_types: Object.keys(countBy(trustedScope, "intake_type")).sort(),
-      segments: [],
+      segments: ACTIONABILITY_SEGMENTS,
       sources: Object.keys(countBy(trustedScope, "source")).sort(),
       industries: Object.keys(countBy(trustedScope, "industry")).sort(),
     },
@@ -191,22 +356,15 @@ async function fetchDirectLeadsSnapshot(filters = {}) {
   };
 }
 
-function isEmptySummary(data) {
-  const total = Number(data?.summary?.total_leads || 0);
-  const rawTotal = Number(data?.summary?.raw_total_leads || 0);
-  const rowsLoaded = Number(data?.data_window?.rows_loaded?.leads || data?.data_window?.rows_loaded || 0);
-  return !data?.leads?.length && total === 0 && rawTotal === 0 && rowsLoaded === 0;
-}
-
 function applyTrustedLeadScope(data, filters = {}) {
   if (filters.includeFlagged === true) return data;
 
-  const leads = Array.isArray(data.leads) ? data.leads.filter(isLeadVisibleInSalesViews) : [];
+  const leads = Array.isArray(data.leads) ? data.leads.filter(isTrustedLead) : [];
   const priorityQueue = Array.isArray(data.summary?.priority_queue)
-    ? data.summary.priority_queue.filter(isLeadVisibleInSalesViews)
+    ? data.summary.priority_queue.filter(isTrustedLead)
     : [];
   const recentLeadActivity = Array.isArray(data.summary?.recent_lead_activity)
-    ? data.summary.recent_lead_activity.filter(isLeadVisibleInSalesViews)
+    ? data.summary.recent_lead_activity.filter(isTrustedLead)
     : [];
 
   const rawTotal = Number(
@@ -243,32 +401,62 @@ function applyTrustedLeadScope(data, filters = {}) {
   };
 }
 
+function sortLeadCollections(data) {
+  if (Array.isArray(data.leads)) {
+    data.leads = [...data.leads].sort((left, right) => (right.lead_score ?? 0) - (left.lead_score ?? 0));
+  }
+  if (Array.isArray(data.summary?.priority_queue)) {
+    data.summary.priority_queue = [...data.summary.priority_queue].sort(
+      (left, right) => (right.lead_score ?? 0) - (left.lead_score ?? 0)
+    );
+  }
+  return data;
+}
+
 export async function fetchLeadPipelineSummary(filters = {}) {
-  const response = await base44.functions.invoke("getLeadPipelineSummary", filters);
-  let data = response?.data || {
-    summary: {},
-    leads: [],
-    pagination: {},
-    filter_options: {},
-  };
+  let data = null;
+  let usedDirectFallback = false;
+  let pipelineError = null;
+
+  try {
+    const response = await base44.functions.invoke("getLeadPipelineSummary", filters);
+    data = response?.data || DEFAULT_PIPELINE_SUMMARY;
+  } catch (error) {
+    pipelineError = error;
+    usedDirectFallback = true;
+    try {
+      data = await fetchDirectLeadsSnapshot(filters);
+    } catch (fallbackError) {
+      fallbackError.data = fallbackError.data || {};
+      fallbackError.data.error = "Lead records are temporarily unavailable. Verify Leads entity access or run Pipeline Check.";
+      fallbackError.pipelineError = error;
+      throw fallbackError;
+    }
+  }
 
   if (isEmptySummary(data)) {
+    usedDirectFallback = true;
     data = await fetchDirectLeadsSnapshot(filters);
   }
 
   data = applyTrustedLeadScope(data, filters);
 
-  // Sort lead list and priority queue by lead_score descending (high-intent first)
-  if (Array.isArray(data.leads)) {
-    data.leads = [...data.leads].sort((a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0));
-  }
-  if (Array.isArray(data.summary?.priority_queue)) {
-    data.summary.priority_queue = [...data.summary.priority_queue].sort(
-      (a, b) => (b.lead_score ?? 0) - (a.lead_score ?? 0)
-    );
+  if (usedDirectFallback) {
+    data = {
+      ...data,
+      summary: {
+        ...(data.summary || {}),
+        truth_source: "client_direct_leads_fallback",
+      },
+      data_window: {
+        ...(data.data_window || {}),
+        direct_entity_fallback: true,
+        fallback_reason: pipelineError ? getLeadPipelineError(pipelineError) : "Pipeline returned an empty summary.",
+      },
+    };
   }
 
-  return data;
+  return sortLeadCollections(data);
 }
 
 export function subscribeToLeadPipelineChanges({ onChange, onError } = {}) {
