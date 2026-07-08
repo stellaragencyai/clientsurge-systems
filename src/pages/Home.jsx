@@ -100,10 +100,10 @@ export default function Home() {
     try {
       cleanups.push(setPageMetadata({
         title: "ClientSurge Systems | Turn Your Website Into an AI-Powered Sales System",
-        description: "ClientSurge turns your website into an AI-powered sales system. Capture leads, respond instantly, book appointments automatically, and reactivate dormant prospects — no staff required. Browse packaged AI automation systems, add to cart, and we install it for you.",
+        description: "ClientSurge turns your website into an AI-powered sales system for local service businesses. Compare packaged automation systems for lead capture, instant response, booking, follow-up, reviews, and reactivation.",
         canonicalPath: "/",
         ogTitle: "Turn Your Website Into an AI-Powered Sales System | ClientSurge Systems",
-        ogDescription: "AI automation for lead capture, instant response, booking, follow-up, reviews, and reactivation. Browse packaged systems, add to cart, and we install it — no demos required.",
+        ogDescription: "AI automation for lead capture, instant response, booking, follow-up, reviews, and reactivation. Compare clear packages and choose the system that fits your business.",
       }));
     } catch (_e) {}
 
@@ -170,7 +170,7 @@ export default function Home() {
               <CSSectionHeader
                 eyebrow="Revenue Recovery Calculator"
                 title="How Much Revenue Are You Losing?"
-                subtitle="Drag the sliders below to see how many leads you're losing to missed calls and slow follow-up — then browse our store to recover them automatically."
+                subtitle="Drag the sliders below to see how many leads you're losing to missed calls and slow follow-up — then browse our packages to recover them automatically."
                 align="center"
                 className="mb-8"
               />
