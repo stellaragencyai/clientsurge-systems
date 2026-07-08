@@ -3,10 +3,14 @@ import { X, MessageCircle, Send, Loader2, Sparkles } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 
+const SUPPORT_PHONE_DISPLAY = "(602) 584-3227";
+const SUPPORT_PHONE_E164 = "+16025843227";
+const SUPPORT_EMAIL = "support@clientsurgesystems.com";
+
 export default function ChatAssistant({ installStatus, services = [], portalState }) {
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([
-    { role: "assistant", text: "Hi! 👋 I\'m here to help with questions about your installation. What can I help with?" }
+    { role: "assistant", text: "Hi — I can help explain your installation status and route you to support when needed. What do you want to check?" }
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -25,8 +29,6 @@ export default function ChatAssistant({ installStatus, services = [], portalStat
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages, loading]);
 
-  // Phase A.6: Proof-safe context — never tell the LLM the system is live/healthy/complete
-  // unless PortalStateEngine has validated proof.
   const readinessCard = getCardState(portalState, "system_readiness");
   const isProofLive = readinessCard.status === CARD_STATUS.LIVE;
   const proofSafeStatus = isProofLive
@@ -45,15 +47,15 @@ export default function ChatAssistant({ installStatus, services = [], portalStat
     setLoading(true);
 
     try {
-      const serviceNames = services.map(s => s.name || s.service_key).join(", ") || "unknown services";
+      const serviceNames = services.map(s => s.productName || s.display_name || s.serviceKey || s.service_key).filter(Boolean).join(", ") || "no verified services loaded yet";
       const systemContext = `You are a helpful, concise support assistant for ClientSurge Systems.
-The client\'s current system status is: "${proofSafeStatus}".
-Their purchased services are: ${serviceNames}.
-Answer questions about their installation progress, what each stage means, and how to get support.
+The client's current system status is: "${proofSafeStatus}".
+Their visible services are: ${serviceNames}.
+Answer questions about installation progress, setup stages, dashboard status, and how to get support.
 Keep answers to 2-4 sentences. Be warm but efficient.
-IMPORTANT: Do NOT state or imply that the system is live, installed, healthy, completed, or ready unless the status above explicitly says "Live and verified". If the status says "Being set up", reassure the client that setup is in progress and direct them to support for timelines.
-If they need urgent help, direct them to call (602) 587-4608 or email support@clientsurgesystems.com.
-Do NOT make up specific dates or promises about delivery times.`;
+IMPORTANT: Do NOT state or imply that the system is live, installed, healthy, completed, or ready unless the status above explicitly says "Live and verified". If the status says "Being set up", explain that setup is in progress and direct them to support for timelines.
+If they need urgent help, direct them to call ${SUPPORT_PHONE_DISPLAY} or email ${SUPPORT_EMAIL}.
+Do NOT make up dates, delivery promises, lead counts, revenue results, or system-health claims.`;
 
       const history = messages.slice(-8).map(m => `${m.role === "user" ? "Client" : "Support"}: ${m.text}`).join("\n");
       const prompt = `${systemContext}\n\nConversation so far:\n${history}\nClient: ${text}\nSupport:`;
@@ -62,10 +64,10 @@ Do NOT make up specific dates or promises about delivery times.`;
         messages: [{ role: "user", content: prompt }],
       });
 
-      const replyText = reply?.data?.reply || "I\'m having trouble connecting right now. For urgent support, call (602) 587-4608.";
+      const replyText = reply?.data?.reply || `I'm having trouble connecting right now. For support, call ${SUPPORT_PHONE_DISPLAY} or email ${SUPPORT_EMAIL}.`;
       setMessages(prev => [...prev, { role: "assistant", text: replyText }]);
     } catch {
-      setMessages(prev => [...prev, { role: "assistant", text: "Connection issue. For urgent help, email support@clientsurgesystems.com or call (602) 587-4608." }]);
+      setMessages(prev => [...prev, { role: "assistant", text: `Connection issue. For help, email ${SUPPORT_EMAIL} or call ${SUPPORT_PHONE_DISPLAY}.` }]);
     } finally {
       setLoading(false);
     }
@@ -77,7 +79,6 @@ Do NOT make up specific dates or promises about delivery times.`;
 
   return (
     <>
-      {/* Floating bubble button — blue with pulse ring */}
       <button
         onClick={() => setOpen(!open)}
         style={{
@@ -98,13 +99,13 @@ Do NOT make up specific dates or promises about delivery times.`;
           e.currentTarget.style.boxShadow = "0 4px 20px rgba(0,136,204,0.45), 0 0 0 0 rgba(0,174,239,0.4)";
         }}
         title="Chat with support"
-        aria-label="Open support chat"
+        aria-label={open ? "Close support chat" : "Open support chat"}
+        aria-expanded={open}
       >
         {open
           ? <X style={{ width: "22px", height: "22px", color: "#fff" }} />
           : <MessageCircle style={{ width: "24px", height: "24px", color: "#fff" }} />
         }
-        {/* Unread badge */}
         {hasUnread && !open && (
           <span style={{
             position: "absolute", top: "2px", right: "2px",
@@ -116,7 +117,6 @@ Do NOT make up specific dates or promises about delivery times.`;
         )}
       </button>
 
-      {/* Chat window */}
       {open && (
         <div style={{
           position: "fixed", bottom: "92px", right: "24px",
@@ -128,8 +128,6 @@ Do NOT make up specific dates or promises about delivery times.`;
           fontFamily: "Inter, sans-serif",
           animation: "chatSlideUp 0.25s cubic-bezier(0.16,1,0.3,1) both",
         }}>
-
-          {/* Header — blue gradient with subtle mesh */}
           <div style={{
             display: "flex", alignItems: "center", justifyContent: "space-between",
             padding: "16px 18px",
@@ -137,7 +135,6 @@ Do NOT make up specific dates or promises about delivery times.`;
             borderRadius: "24px 24px 0 0",
             position: "relative", overflow: "hidden",
           }}>
-            {/* Decorative circles */}
             <div style={{ position: "absolute", top: "-20px", right: "-10px", width: "80px", height: "80px", borderRadius: "50%", background: "rgba(255,255,255,0.06)", pointerEvents: "none" }} />
             <div style={{ position: "absolute", bottom: "-30px", left: "60px", width: "100px", height: "100px", borderRadius: "50%", background: "rgba(0,174,239,0.1)", pointerEvents: "none" }} />
 
@@ -152,12 +149,12 @@ Do NOT make up specific dates or promises about delivery times.`;
               <div>
                 <p style={{ fontSize: "13px", fontWeight: "700", color: "#ffffff", margin: 0, lineHeight: 1.2 }}>Installation Support</p>
                 <div style={{ display: "flex", alignItems: "center", gap: "5px", marginTop: "2px" }}>
-                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#4ade80", boxShadow: "0 0 5px #4ade80" }} />
-                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", margin: 0 }}>Online · ClientSurge Systems</p>
+                  <span style={{ width: "6px", height: "6px", borderRadius: "50%", background: "#fde68a" }} />
+                  <p style={{ fontSize: "11px", color: "rgba(255,255,255,0.75)", margin: 0 }}>Support replies by email/phone</p>
                 </div>
               </div>
             </div>
-            <button onClick={() => setOpen(false)} style={{
+            <button onClick={() => setOpen(false)} aria-label="Close support chat" style={{
               background: "rgba(255,255,255,0.15)", border: "1px solid rgba(255,255,255,0.2)",
               borderRadius: "8px", cursor: "pointer", color: "rgba(255,255,255,0.9)",
               display: "flex", padding: "5px", transition: "background 0.2s", zIndex: 1,
@@ -169,7 +166,6 @@ Do NOT make up specific dates or promises about delivery times.`;
             </button>
           </div>
 
-          {/* Messages */}
           <div style={{
             flex: 1, overflowY: "auto", padding: "16px 14px 8px",
             display: "flex", flexDirection: "column", gap: "10px",
@@ -222,7 +218,6 @@ Do NOT make up specific dates or promises about delivery times.`;
             <div ref={bottomRef} />
           </div>
 
-          {/* Input */}
           <div style={{
             padding: "10px 12px 14px", borderTop: "1px solid rgba(0,174,239,0.1)",
             display: "flex", gap: "8px", alignItems: "center",
@@ -234,6 +229,7 @@ Do NOT make up specific dates or promises about delivery times.`;
               onChange={e => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
               placeholder="Ask about your installation…"
+              aria-label="Ask about your installation"
               style={{
                 flex: 1, border: "1.5px solid rgba(0,174,239,0.2)", borderRadius: "999px",
                 padding: "9px 16px", fontSize: "13px", outline: "none",
@@ -246,6 +242,7 @@ Do NOT make up specific dates or promises about delivery times.`;
             <button
               onClick={handleSend}
               disabled={loading || !input.trim()}
+              aria-label="Send support message"
               style={{
                 width: "38px", height: "38px", borderRadius: "50%", flexShrink: 0,
                 background: input.trim()
