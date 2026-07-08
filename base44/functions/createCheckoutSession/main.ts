@@ -1,6 +1,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { getStripeClient, safeStripeError } from "./stripeInit.local.js";
 import { assertCheckoutCapacityAvailable } from "./checkoutCapacity.shared.js";
+import { buildCheckoutRedirectUrls } from "./checkoutUrls.shared.js";
 import { getTrackedServiceConfig, normalizeInstallConfiguration } from "./installPipeline.shared.js";
 import {
   buildPricingSummaryForProducts,
@@ -33,8 +34,20 @@ function isTruthy(value) {
   return ["1", "true", "yes", "y", "on"].includes(normalized);
 }
 
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function normalizeText(value, maxLength = 240) {
+  return String(value || "").trim().replace(/\s+/g, " ").slice(0, maxLength);
+}
+
+function isValidEmail(value) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(String(value || "").trim());
+}
+
 function isCheckoutSmokeRequest({ customer_email, smoke_test, source }) {
-  const email = String(customer_email || "").trim().toLowerCase();
+  const email = normalizeEmail(customer_email);
   const sourceValue = String(source || "").trim().toLowerCase();
   return (
     isTruthy(smoke_test) ||
@@ -114,7 +127,77 @@ function buildTestStripeLineItems(pricingSummary) {
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
   let createdOrderId = null;
+
+  if (req.method !== "POST") {
+    return secureJson(
+      { error: "Method not allowed", code: "method_not_allowed", request_id: requestId },
+      { status: 405, headers: { Allow: "POST" } }
+    );
+  }
+
+  let body;
   try {
+    body = await req.json();
+  } catch {
+    return secureJson(
+      { error: "Invalid JSON body", code: "invalid_json", request_id: requestId },
+      { status: 400 }
+    );
+  }
+
+  try {
+    const {
+      items,
+      product_ids,
+      package_key,
+      customer_name,
+      customer_email,
+      customer_phone,
+      business_name,
+      industry,
+      lead_id,
+      crm_lead_id,
+      website_lead_id,
+      success_url,
+      cancel_url,
+      deploy_immediately,
+      smoke_test,
+      source,
+    } = body || {};
+
+    const normalizedEmail = normalizeEmail(customer_email);
+    const normalizedCustomerName = normalizeText(customer_name);
+    const normalizedPhone = normalizeText(customer_phone, 80);
+    const normalizedBusinessName = normalizeText(business_name);
+    const normalizedIndustry = normalizeText(industry, 120);
+    const normalizedSource = normalizeText(source || "product_signup", 120) || "product_signup";
+    const isSmokeCheckout = isCheckoutSmokeRequest({
+      customer_email: normalizedEmail,
+      smoke_test,
+      source: normalizedSource,
+    });
+
+    if (!normalizedEmail || !isValidEmail(normalizedEmail)) {
+      return secureJson(
+        { error: "A valid customer email is required", code: "customer_email_required", request_id: requestId },
+        { status: 400 }
+      );
+    }
+
+    if (!normalizedCustomerName) {
+      return secureJson(
+        { error: "Customer name is required", code: "customer_name_required", request_id: requestId },
+        { status: 400 }
+      );
+    }
+
+    if (!normalizedBusinessName) {
+      return secureJson(
+        { error: "Business name is required", code: "business_name_required", request_id: requestId },
+        { status: 400 }
+      );
+    }
+
     let stripeContext;
     try {
       stripeContext = getStripeClient();
@@ -132,25 +215,6 @@ Deno.serve(async (req) => {
 
     const { stripe, livemode, mode: stripeMode } = stripeContext;
     const base44 = createClientFromRequest(req);
-    const {
-      items,
-      product_ids,
-      package_key,
-      customer_name,
-      customer_email,
-      customer_phone,
-      business_name,
-      lead_id,
-      crm_lead_id,
-      website_lead_id,
-      success_url,
-      cancel_url,
-      deploy_immediately,
-      smoke_test,
-      source,
-    } = await req.json();
-
-    const isSmokeCheckout = isCheckoutSmokeRequest({ customer_email, smoke_test, source });
 
     // Product Signup sends package_key only. Resolve it here so /product-signup
     // and older cart/product_ids payloads both hit the same canonical checkout path.
@@ -175,13 +239,6 @@ Deno.serve(async (req) => {
       : Array.isArray(items)
       ? items.map((item) => item?.product_id || item).filter(Boolean)
       : [];
-
-    if (!customer_email) {
-      return secureJson(
-        { error: "Customer email is required", code: "customer_email_required", request_id: requestId },
-        { status: 400 }
-      );
-    }
 
     if (!requestedProductIds.length) {
       return secureJson(
@@ -216,6 +273,14 @@ Deno.serve(async (req) => {
 
     const packageType = pricingSummary.package_offer?.package_key || "custom_service_bundle";
     const packageLabel = pricingSummary.package_offer?.name || "Custom Service Bundle";
+    const redirectUrls = buildCheckoutRedirectUrls({
+      originHeader: req.headers.get("origin") || "",
+      requestUrl: req.url,
+      packageKey: packageType,
+      successUrl: success_url,
+      cancelUrl: cancel_url,
+    });
+
     console.log("[createCheckoutSession] checkout request accepted", {
       requestId,
       requestedProductCount: requestedProductIds.length,
@@ -224,6 +289,7 @@ Deno.serve(async (req) => {
       livemode,
       stripeMode,
       isSmokeCheckout,
+      checkoutOrigin: redirectUrls.origin,
     });
 
     const orderItems = pricingSummary.priced_items.map((item) => ({
@@ -246,13 +312,14 @@ Deno.serve(async (req) => {
     }));
 
     const orderPayload = {
-      customer_email,
-      customer_name,
-      customer_phone: customer_phone || "",
+      customer_email: normalizedEmail,
+      customer_name: normalizedCustomerName,
+      customer_phone: normalizedPhone,
       lead_id: lead_id || crm_lead_id || "",
       crm_lead_id: crm_lead_id || lead_id || "",
       website_lead_id: website_lead_id || "",
-      business_name,
+      business_name: normalizedBusinessName,
+      industry: normalizedIndustry,
       items: orderItems,
       total_setup: pricingSummary.total_setup,
       total_monthly: pricingSummary.total_monthly,
@@ -277,22 +344,23 @@ Deno.serve(async (req) => {
       ? buildTestStripeLineItems(pricingSummary)
       : buildStripeLineItemsForPricingSummary(pricingSummary);
 
+    const selectedServices = pricingSummary.priced_items.map((item) => ({
+      product_id: item.product_id,
+      product_name: item.name,
+      service_key: item.service_key,
+    }));
+
     const sessionMetadata = {
       order_id: order.id,
       lead_id: lead_id || crm_lead_id || "",
       crm_lead_id: crm_lead_id || lead_id || "",
       website_lead_id: website_lead_id || "",
       base44_app_id: Deno.env.get("BASE44_APP_ID"),
-      customer_name,
-      customer_phone: customer_phone || "",
-      business_name,
-      items_json: JSON.stringify(
-        pricingSummary.priced_items.map((item) => ({
-          product_id: item.product_id,
-          product_name: item.name,
-          service_key: item.service_key,
-        }))
-      ),
+      customer_name: normalizedCustomerName,
+      customer_phone: normalizedPhone,
+      business_name: normalizedBusinessName,
+      industry: normalizedIndustry,
+      items_json: JSON.stringify(selectedServices),
       package_key: pricingSummary.package_offer?.package_key || "",
       package_type: pricingSummary.package_offer?.package_key || "",
       selected_package_type: pricingSummary.package_offer?.package_key || "",
@@ -303,14 +371,14 @@ Deno.serve(async (req) => {
       stripe_livemode: livemode ? "true" : "false",
       request_id: requestId,
       deploy_immediately: deploy_immediately ? "true" : "false",
-      source: source ? String(source).slice(0, 120) : "product_signup",
+      source: normalizedSource,
       smoke_test: isSmokeCheckout ? "true" : "false",
     };
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
-      customer_email: customer_email,
+      customer_email: normalizedEmail,
       line_items,
       subscription_data: {
         metadata: {
@@ -322,26 +390,31 @@ Deno.serve(async (req) => {
           package_key: pricingSummary.package_offer?.package_key || "",
           package_type: pricingSummary.package_offer?.package_key || "",
           selected_package_type: pricingSummary.package_offer?.package_key || "",
+          customer_email: normalizedEmail,
+          business_name: normalizedBusinessName,
+          industry: normalizedIndustry,
           stripe_mode: stripeMode,
           stripe_livemode: livemode ? "true" : "false",
-          services_json: JSON.stringify(
-            pricingSummary.priced_items.map((item) => ({
-              product_id: item.product_id,
-              product_name: item.name,
-              service_key: item.service_key,
-            }))
-          ),
+          services_json: JSON.stringify(selectedServices),
           request_id: requestId,
-          source: source ? String(source).slice(0, 120) : "product_signup",
+          source: normalizedSource,
           smoke_test: isSmokeCheckout ? "true" : "false",
         },
       },
-      success_url: success_url || `${req.headers.get("origin")}/order-success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: cancel_url || `${req.headers.get("origin")}/store`,
+      success_url: redirectUrls.success_url,
+      cancel_url: redirectUrls.cancel_url,
       metadata: sessionMetadata,
+      allow_promotion_codes: true,
+      billing_address_collection: "required",
+      phone_number_collection: { enabled: true },
     });
+
     await base44.asServiceRole.entities.Order.update(order.id, {
       stripe_session_id: session.id,
+      stripe_customer_id: session.customer || undefined,
+      stripe_subscription_id: session.subscription || undefined,
+      checkout_origin: redirectUrls.origin,
+      checkout_cancel_url: redirectUrls.cancel_url,
     });
 
     console.log("[createCheckoutSession] session created", {
@@ -355,7 +428,14 @@ Deno.serve(async (req) => {
       isSmokeCheckout,
     });
 
-    return secureJson({ url: session.url, session_id: session.id, request_id: requestId, stripe_mode: stripeMode, livemode, smoke_test: isSmokeCheckout });
+    return secureJson({
+      url: session.url,
+      session_id: session.id,
+      request_id: requestId,
+      stripe_mode: stripeMode,
+      livemode,
+      smoke_test: isSmokeCheckout,
+    });
   } catch (error) {
     if (createdOrderId) {
       try {
