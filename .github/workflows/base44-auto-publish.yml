@@ -2,18 +2,13 @@ name: Base44 Auto Publish
 
 on:
   workflow_dispatch:
-  push:
+  workflow_run:
+    workflows:
+      - ClientSurge Release Gate
+    types:
+      - completed
     branches:
       - main
-    paths:
-      - "src/**"
-      - "base44/**"
-      - "public/**"
-      - "package.json"
-      - "package-lock.json"
-      - "scripts/base44/**"
-      - "scripts/product-signup-*.mjs"
-      - ".github/workflows/base44-auto-publish.yml"
 
 permissions:
   contents: read
@@ -27,6 +22,7 @@ jobs:
     name: Publish ClientSurge app and prove checkout
     runs-on: ubuntu-latest
     timeout-minutes: 25
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
 
     env:
       CLIENTSURGE_APP_ID: 69dc4a79656fdba136d413d3
@@ -39,6 +35,8 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -86,6 +84,7 @@ jobs:
         run: |
           echo "## Base44 Auto Publish" >> "$GITHUB_STEP_SUMMARY"
           echo "- App ID: $CLIENTSURGE_APP_ID" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Trigger: release-gate success on main, or manual workflow dispatch" >> "$GITHUB_STEP_SUMMARY"
           echo "- Verified route: $CLIENTSURGE_VERIFY_URL" >> "$GITHUB_STEP_SUMMARY"
           echo "- Live checkout smoke creates a smoke-only Stripe Checkout Session and dashboard-excluded Order." >> "$GITHUB_STEP_SUMMARY"
           echo "- If publish fails with HTTP 401, replace BASE44_AUTH_JSON / BASE_44_AUTH_JSON with a fresh Base44 auth JSON secret." >> "$GITHUB_STEP_SUMMARY"
