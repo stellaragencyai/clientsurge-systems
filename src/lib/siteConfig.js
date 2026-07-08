@@ -1,40 +1,23 @@
 /**
- * Centralized site configuration & constants
- * Replaces hardcoded strings scattered across Navbar, Footer, Pricing, etc.
+ * Centralized site configuration & constants.
  *
- * ── AREA 1 QA: CANONICAL PUBLIC NAVIGATION (PACKAGE-FIRST) ──
- * Public header: AI Packages→/pricing | Automations→/automations |
- *                Industries→/industries | How It Works→/#how-it-works |
- *                Contact→/contact | Login→/login | CTA→/pricing
+ * AREA 1 QA: CANONICAL PUBLIC NAVIGATION
+ * Public header: Home -> / | AI Packages -> /pricing | Automations -> /automations |
+ * Industries -> /industries | How It Works -> /how-it-works | Contact -> /contact |
+ * Client Login -> /login | primary CTA -> /pricing
  *
- * ── AREA 1 QA: CANONICAL CTA DESTINATION MAP ──
- * "Compare Packages"                → /pricing
- * "Choose Your System"              → /pricing
- * "View Included Automations"       → /automations
- * "Get Help Choosing"               → /book
- * "Contact Us" / support CTAs       → /contact
- * "Client Login"                    → /login
- * Phone CTAs                        → tel:+16025843227
- * Email CTAs                        → mailto:support@clientsurgesystems.com
- * Fallback (buyer CTA)              → /pricing
- * Fallback (support CTA)            → /contact
+ * AREA 1 QA: CANONICAL CTA DESTINATION MAP
+ * "Compare Packages" / "Choose Your System" -> /pricing
+ * "View Included Automations" -> /automations
+ * "Get Help Choosing" / support CTAs -> /contact
+ * "Client Login" -> /login
+ * Phone CTAs -> tel:+16025843227
+ * Email CTAs -> mailto:support@clientsurgesystems.com
+ * Fallback buyer CTA -> /pricing
  *
- * ── AREA 1 QA: PUBLIC ROUTE CLASSIFICATION ──
- * PUBLIC: / /pricing /automations /industries /about /contact /book
- *         /privacy-policy /terms /login /faq /blog /testimonials /start /setup-lookup
- *         /roofing /hvac /plumbing /dental /med-spa /chiropractic /contractors
- *         /lead-capture-automation /missed-call-text-back /ai-lead-follow-up
- *         /appointment-booking-automation /review-automation /customer-reactivation
- *         /success /onboarding /leads/capture /legal/:type /order-success
- *         /thank-you /setup /setup/* /product /signup /our-system /library /register
- *         /reset-password /forgot-password
- * AUTH_PUBLIC: /login /register /forgot-password /reset-password
- * PROTECTED_CLIENT: /client-portal /client-dashboard /dashboard-entry
- * PROTECTED_ADMIN: /admin/* /mission-control /saas/admin
- * DEPRECATED: /product /signup /our-system /library (template pages, redirect or sunset)
- *
- * ── FOOTER: PUBLIC LINKS ONLY (no admin/dashboard/setup/internal) ──
- * Platform | Company links only
+ * AREA 1 QA: PUBLIC ROUTE CLASSIFICATION
+ * Public marketing routes stay limited to buyer-facing pages. Internal/admin/setup
+ * routes must not appear in header, footer, sitemap, or generated public route lists.
  */
 
 const productSignupUrl = (packageKey) => `/product-signup?package=${packageKey}`;
@@ -42,21 +25,22 @@ const productSignupUrl = (packageKey) => `/product-signup?package=${packageKey}`
 export const SITE_CONFIG = {
   brand: {
     name: "ClientSurge Systems",
-    tagline: "The Amazon of AI Services for Business",
+    tagline: "AI-Powered Sales Systems for Local Service Businesses",
   },
   navigation: {
     sections: [
       { label: "Home", href: "/", isPage: true },
-      { label: "Browse Systems", href: "/pricing", isPage: true },
-      { label: "Store", href: "/store", isPage: true },
+      { label: "AI Packages", href: "/pricing", isPage: true },
       { label: "Automations", href: "/automations", isPage: true },
-      { label: "Proof", href: "/proof", isPage: true },
+      { label: "Industries", href: "/industries", isPage: true },
+      { label: "How It Works", href: "/how-it-works", isPage: true },
       { label: "Contact", href: "/contact", isPage: true },
     ],
     solutions: [
-      { label: "Browse Systems", href: "/pricing", isPage: true },
-      { label: "Automation Store", href: "/store", isPage: true },
-      { label: "Automations", href: "/automations", isPage: true },
+      { label: "Compare AI Packages", href: "/pricing", isPage: true },
+      { label: "Included Automations", href: "/automations", isPage: true },
+      { label: "How It Works", href: "/how-it-works", isPage: true },
+      { label: "Talk to ClientSurge", href: "/contact", isPage: true },
     ],
   },
   industries: [
@@ -71,9 +55,9 @@ export const SITE_CONFIG = {
   links: {
     packages: "/pricing",
     automations: "/automations",
-    help: "/book",
+    help: "/contact",
     contact: "/contact",
-    privacyPolicy: "/privacy-policy",
+    privacyPolicy: "/privacy",
     terms: "/terms",
     login: "/login",
   },
