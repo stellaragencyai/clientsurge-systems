@@ -4,7 +4,6 @@ import { base44 } from "@/api/base44Client";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
 
 const SUPPORT_PHONE_DISPLAY = "(602) 584-3227";
-const SUPPORT_PHONE_E164 = "+16025843227";
 const SUPPORT_EMAIL = "support@clientsurgesystems.com";
 
 export default function ChatAssistant({ installStatus, services = [], portalState }) {
