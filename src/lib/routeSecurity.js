@@ -1,5 +1,6 @@
 import {
   ADMIN_ROUTE_PREFIXES,
+  APP_SHELL_PUBLIC_PATHS,
   AUTHENTICATED_ROUTE_PREFIXES,
   INTERNAL_ROUTE_PREFIXES,
   NOINDEX_ROUTE_PREFIXES,
@@ -11,7 +12,7 @@ import { installPublicPageDirectoryGuard } from "./publicPageDirectoryGuard.js";
 // page directory before/around the React app shell, remove it and replace it
 // with a safe public fallback instead of exposing admin/client/setup route names.
 if (typeof window !== "undefined") {
-  queueMicrotask(() => installPublicPageDirectoryGuard());
+  installPublicPageDirectoryGuard();
 }
 
 export const ROUTE_ACCESS = {
@@ -22,6 +23,7 @@ export const ROUTE_ACCESS = {
 };
 
 export const PUBLIC_ROUTES = PUBLIC_ROUTE_PATHS;
+export const APP_SHELL_PUBLIC_ROUTES = APP_SHELL_PUBLIC_PATHS;
 export const AUTHENTICATED_ROUTES = AUTHENTICATED_ROUTE_PREFIXES;
 export const ADMIN_ROUTES = ADMIN_ROUTE_PREFIXES;
 export const INTERNAL_ROUTES = INTERNAL_ROUTE_PREFIXES;
@@ -35,7 +37,7 @@ function normalize(pathname = "/") {
   return value || "/";
 }
 
-function matchesPath(pathname, route) {
+export function matchesRoutePrefix(pathname, route) {
   const normalizedPathname = normalize(pathname);
   const normalizedRoute = normalize(route);
   return (
@@ -45,15 +47,15 @@ function matchesPath(pathname, route) {
 }
 
 export function classifyRoute(pathname = "/") {
-  if (INTERNAL_ROUTES.some((route) => matchesPath(pathname, route))) {
+  if (INTERNAL_ROUTES.some((route) => matchesRoutePrefix(pathname, route))) {
     return ROUTE_ACCESS.INTERNAL;
   }
 
-  if (ADMIN_ROUTES.some((route) => matchesPath(pathname, route))) {
+  if (ADMIN_ROUTES.some((route) => matchesRoutePrefix(pathname, route))) {
     return ROUTE_ACCESS.ADMIN;
   }
 
-  if (AUTHENTICATED_ROUTES.some((route) => matchesPath(pathname, route))) {
+  if (AUTHENTICATED_ROUTES.some((route) => matchesRoutePrefix(pathname, route))) {
     return ROUTE_ACCESS.AUTHENTICATED;
   }
 
@@ -64,12 +66,17 @@ export function isPublicRoute(pathname = "/") {
   return classifyRoute(pathname) === ROUTE_ACCESS.PUBLIC;
 }
 
+export function isAppShellPublicRoute(pathname = "/") {
+  return APP_SHELL_PUBLIC_ROUTES.some((route) => matchesRoutePrefix(pathname, route));
+}
+
 export function shouldNoindexRoute(pathname = "/") {
-  return NOINDEX_PREFIXES.some((prefix) => matchesPath(pathname, prefix));
+  return NOINDEX_PREFIXES.some((prefix) => matchesRoutePrefix(pathname, prefix));
 }
 
 export const routeSecurityMap = {
   public: PUBLIC_ROUTES,
+  appShellPublic: APP_SHELL_PUBLIC_ROUTES,
   authenticated: AUTHENTICATED_ROUTES,
   admin: ADMIN_ROUTES,
   internal: INTERNAL_ROUTES,
