@@ -24,20 +24,16 @@ const PACKAGES = [
     tagline: "Response Foundation",
     subtitle: "Best for businesses that need instant response and missed-call recovery first.",
     description: "Capture every new inquiry and missed call before leads disappear. The essential response foundation.",
-    featureIntro: "Start with immediate website lead response plus automatic missed-call text-back.",
+    featureIntro: "Start with the two response automations that stop new leads and missed calls from going cold.",
     price: "$497",
     setupPrice: "$797",
-    automationCount: 6,
+    automationCount: 2,
     websiteScope: "Connects to your existing site",
     hostingScope: "Uses your current hosting",
     qaScope: "Launch-Proof QA: lead path + response flow tested",
     automations: [
-      "Instant Lead Response (SMS)",
+      "Instant Lead Response",
       "Missed-Call Text-Back",
-      "Owner Notification",
-      "CRM Handoff (where supported)",
-      "Basic Follow-Up Path",
-      "Lead Capture Form Integration",
     ],
     cta: "Add to Cart",
     packageId: "starter_system",
@@ -51,21 +47,19 @@ const PACKAGES = [
     title: "Growth System",
     tagline: "Most Popular",
     subtitle: "Best for steady lead flow that needs response, recovery, nurture, and booking.",
-    description: "Automated follow-up, booking handoff, and review systems working together — our most popular package.",
-    featureIntro: "The core response and nurture stack for businesses actively converting inbound demand.",
+    description: "Automated follow-up and booking handoff working together — our most popular package.",
+    featureIntro: "Includes the Starter automations, then adds nurture and booking handoff.",
     price: "$997",
     setupPrice: "$1,297",
-    automationCount: 11,
+    automationCount: 4,
     websiteScope: "Connects to your existing site",
     hostingScope: "Uses your current hosting",
     qaScope: "Launch-Proof QA: lead path, response flow, booking handoff + proof logs",
     automations: [
-      "Everything in Starter, plus:",
-      "14-Day Nurture Sequence (SMS + Email)",
+      "Instant Lead Response",
+      "Missed-Call Text-Back",
+      "14-Day Nurture Sequence",
       "AI Booking Agent Handoff",
-      "Review Request Engine",
-      "Lead Status & Pipeline Tracking",
-      "Client Portal Dashboard",
     ],
     cta: "Add to Cart",
     packageId: "growth_system",
@@ -78,22 +72,22 @@ const PACKAGES = [
     name: "Pro",
     title: "Pro System",
     tagline: "Full Revenue Layer",
-    subtitle: "Best for teams that want the full response, reactivation, reporting, and website layer.",
-    description: "The full revenue operating layer — website, reactivation, reporting, and expanded automation. Done-for-you.",
-    featureIntro: "The complete AI automation bundle — every service, fully managed.",
+    subtitle: "Best for teams that want the full response, reactivation, review, and website layer.",
+    description: "The full revenue operating layer — website, reactivation, reviews, reporting, and expanded automation. Done-for-you.",
+    featureIntro: "Includes the Growth automations, then adds reactivation and review automation.",
     price: "$1,997",
     setupPrice: "$2,497",
-    automationCount: 16,
+    automationCount: 6,
     websiteScope: "Full website build & design included",
     hostingScope: "Hosting included for your website",
     qaScope: "Launch-Proof QA + proof logs + priority setup",
     automations: [
-      "Everything in Growth, plus:",
-      "Full Website Build & Design",
+      "Instant Lead Response",
+      "Missed-Call Text-Back",
+      "14-Day Nurture Sequence",
+      "AI Booking Agent Handoff",
       "Lead Reactivation Engine",
-      "Advanced Revenue Reporting",
-      "Expanded Automation Stack",
-      "Priority Setup & Onboarding",
+      "Review Request Automation",
     ],
     cta: "Add to Cart",
     packageId: "pro_system",
@@ -439,20 +433,15 @@ export default function ThreeSystemsSection() {
                       </div>
 
                       <ul className="cs-pricing-feature-list">
-                        {pkg.automations.map((item) => {
-                          const isCarried = item.startsWith("Everything in");
-                          return (
-                            <li key={item} className="cs-pricing-feature-row">
-                              <CheckCircle2
-                                aria-hidden="true"
-                                style={{ color: isCarried ? "#9CA3AF" : "#22C55E", strokeWidth: 2.6 }}
-                              />
-                              <span style={{ color: isCarried ? "#9CA3AF" : "#506078", fontWeight: isCarried ? 800 : 650 }}>
-                                {item}
-                              </span>
-                            </li>
-                          );
-                        })}
+                        {pkg.automations.map((item) => (
+                          <li key={item} className="cs-pricing-feature-row">
+                            <CheckCircle2
+                              aria-hidden="true"
+                              style={{ color: "#22C55E", strokeWidth: 2.6 }}
+                            />
+                            <span>{item}</span>
+                          </li>
+                        ))}
                       </ul>
 
                       <div className="cs-pricing-ops">
