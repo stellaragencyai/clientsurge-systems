@@ -174,23 +174,23 @@ export default function ThreeSystemsSection() {
         .cs-pricing-price-row {
           display: flex;
           align-items: flex-end;
-          gap: 9px;
+          gap: 8px;
           line-height: 1;
         }
         .cs-pricing-price {
           color: #06122b;
           font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
-          font-size: clamp(2.85rem, 4.7vw, 3.45rem);
-          font-weight: 950;
-          line-height: 0.94;
-          letter-spacing: -0.072em;
+          font-size: clamp(2.35rem, 3.75vw, 2.95rem);
+          font-weight: 825;
+          line-height: 0.98;
+          letter-spacing: -0.052em;
         }
         .cs-pricing-period {
-          padding-bottom: 0.45rem;
+          padding-bottom: 0.33rem;
           color: #60718f;
-          font-size: 0.88rem;
-          font-weight: 850;
-          letter-spacing: -0.02em;
+          font-size: 0.8rem;
+          font-weight: 700;
+          letter-spacing: -0.015em;
         }
         .cs-pricing-setup-pill {
           display: inline-flex;
@@ -202,8 +202,8 @@ export default function ThreeSystemsSection() {
           background: rgba(0,174,239,0.10);
           padding: 6px 14px;
           color: #0079c1;
-          font-size: 0.78rem;
-          font-weight: 900;
+          font-size: 0.74rem;
+          font-weight: 800;
           line-height: 1;
         }
         .cs-pricing-contract {
@@ -289,8 +289,8 @@ export default function ThreeSystemsSection() {
         .cs-pricing-footer-note {
           margin-top: 16px;
           color: #64748b;
-          font-size: 0.76rem;
-          font-weight: 650;
+          font-size: 0.74rem;
+          font-weight: 600;
           line-height: 1.35;
           text-align: center;
         }
