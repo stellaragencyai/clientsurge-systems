@@ -92,7 +92,7 @@ function buildSafeFallback() {
   wrapper.innerHTML = `
     <section style="max-width:760px;width:100%;border:1px solid rgba(15,23,42,.12);border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 24px 80px rgba(15,23,42,.12);padding:40px;text-align:left;">
       <p style="margin:0 0 12px;color:#006bb0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;">ClientSurge Systems</p>
-      <h1 style="margin:0 0 16px;color:#0f172a;font-size:clamp(32px,5vw,54px);line-height:1.02;font-weight:900;">AI automation systems for service businesses.</h1>
+      <h1 style="margin:0 0 16px;color:#0f172a;font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:900;">AI automation systems for service businesses.</h1>
       <p style="margin:0 0 28px;color:#475569;font-size:18px;line-height:1.7;">The generated Base44 page directory was blocked because internal admin, setup, and client routes are not public marketing pages. Continue through the verified public paths below.</p>
       <div style="display:flex;flex-wrap:wrap;gap:12px;">
         <a href="/pricing" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#003b8f;color:white;padding:13px 20px;font-weight:800;text-decoration:none;">Compare Packages</a>
