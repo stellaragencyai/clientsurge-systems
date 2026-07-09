@@ -141,18 +141,16 @@ export const STATIC_ROUTE_ALIASES = {
 
 export const LEGACY_REDIRECTS = Object.entries(STATIC_ROUTE_ALIASES);
 
+// Public directory output is intentionally narrower than all routes the React app
+// can render. This is the only set allowed in public page lists, sitemaps, and
+// static fallbacks. Utility routes remain noindex and must never appear as public
+// marketing navigation.
 export const PUBLIC_DIRECTORY_PAGES = [
   "/",
   "/pricing",
   "/automations",
   "/industries",
   "/proof",
-  "/faq",
-  "/how-it-works",
-  "/about",
-  "/blog",
-  "/testimonials",
-  "/roadmap",
   "/contact",
   "/privacy",
   "/terms",
@@ -180,6 +178,12 @@ export const APP_SHELL_PUBLIC_UTILITY_PATHS = [
   "/book",
   "/book-demo",
   "/store",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/blog",
+  "/testimonials",
+  "/roadmap",
 ];
 
 // Routes the React shell may render without treating the visitor as an admin.
@@ -271,6 +275,12 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/setup-lookup",
   "/launch-control",
   "/leads/capture",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/blog",
+  "/testimonials",
+  "/roadmap",
   ...AUTHENTICATED_ROUTE_PREFIXES,
   ...ADMIN_ROUTE_PREFIXES,
   ...INTERNAL_ROUTE_PREFIXES,
