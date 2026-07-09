@@ -208,7 +208,7 @@ function HeroDeviceMockup() {
               </div>
               <div className="flex items-center gap-4 rounded-2xl border border-white/10 bg-white/10 px-4 py-3 shadow-[0_12px_30px_rgba(0,0,0,0.28)] backdrop-blur-md">
                 <AppIcon icon={MessageSquare} label="Messages" className="bg-emerald-400 text-white" />
-                <AppIcon icon={CalendarDays} label="Calendar" className="bg-white text-red-500" />
+                <AppIcon icon={CalendarDays} label="Calendar" className="bg-white text-[#006BB0]" />
                 <AppIcon icon={Zap} label="ClientSurge" className="bg-[#00AEEF] text-white" />
                 <AppIcon icon={Settings} label="Settings" className="bg-white/30 text-white" />
               </div>
