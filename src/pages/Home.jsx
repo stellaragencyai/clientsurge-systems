@@ -3,11 +3,14 @@ import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
+import IntegrationCredibilityStrip from "../components/landing/IntegrationCredibilityStrip.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import ConversionEnhancementSuite from "../components/landing/ConversionEnhancementSuite.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
+import AutomationCommandPreview from "../components/landing/AutomationCommandPreview.jsx";
 import WorkflowSection from "../components/landing/WorkflowSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
+import ProofStackSection from "../components/landing/ProofStackSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
 import LoggedOutConfirmationBanner from "../components/landing/LoggedOutConfirmationBanner";
@@ -132,44 +135,54 @@ export default function Home() {
           <HomeHero />
         </SectionErrorBoundary>
 
-        {/* 2. Problem — revenue leak framing */}
+        {/* 2. Credibility strip — toolchain proof without fake client claims */}
+        <SectionErrorBoundary sectionName="integration-credibility-strip">
+          <IntegrationCredibilityStrip />
+        </SectionErrorBoundary>
+
+        {/* 3. Problem — revenue leak framing */}
         <SectionErrorBoundary sectionName="revenue-leak">
           <RevenueLeakSection />
         </SectionErrorBoundary>
 
-        {/* 3. Proof-first conversion enhancements — audit path, trust ledger, package fit, demo status */}
+        {/* 4. Proof-first conversion enhancements — audit path, trust ledger, package fit, demo status */}
         <SectionErrorBoundary sectionName="conversion-enhancement-suite">
           <ConversionEnhancementSuite />
         </SectionErrorBoundary>
 
-        {/* 4. Solution — the 5-step AI Growth System */}
+        {/* 5. Solution — the 5-step AI Growth System */}
         <SectionErrorBoundary sectionName="solution">
           <SolutionSection />
         </SectionErrorBoundary>
 
-        {/* 5. Six Core Automations — product-style showcase */}
+        {/* 6. Product visual — IdentityIQ-style tabs, containers, and floating popups */}
+        <SectionErrorBoundary sectionName="automation-command-preview">
+          <AutomationCommandPreview />
+        </SectionErrorBoundary>
+
+        {/* 7. Six Core Automations — product-style showcase */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
           <SixAutomationsSection />
         </SectionErrorBoundary>
 
-        {/* 6. Interactive Workflow — SaaS product demonstration */}
+        {/* 8. Interactive Workflow — SaaS product demonstration */}
         <SectionErrorBoundary sectionName="workflow">
           <WorkflowSection />
         </SectionErrorBoundary>
 
-        {/* 7. Industries — vertical-specific templates */}
+        {/* 9. Industries — vertical-specific templates */}
         <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
           <Industries />
         </LazyHomepageSection>
 
-        {/* 8. Trust — security, verification, architecture, transparency */}
+        {/* 10. Trust — security, verification, architecture, transparency */}
         <SectionErrorBoundary sectionName="trust">
           <TrustSection />
         </SectionErrorBoundary>
 
-        {/* 9. ROI Calculator — interactive lead recovery estimator */}
+        {/* 11. ROI Calculator — interactive lead recovery estimator */}
         <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
           <section className="py-16 md:py-24 px-4 bg-muted/30">
             <div className="max-w-4xl mx-auto">
@@ -185,19 +198,24 @@ export default function Home() {
           </section>
         </div>
 
-        {/* 10. Pricing / Core Offer */}
+        {/* 12. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="pricing">
           <ThreeSystemsSection />
         </SectionErrorBoundary>
 
-        {/* 11. FAQ — accordion section */}
+        {/* 13. Proof stack — truthful evidence labels before FAQs */}
+        <SectionErrorBoundary sectionName="proof-stack">
+          <ProofStackSection />
+        </SectionErrorBoundary>
+
+        {/* 14. FAQ — accordion section */}
         <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
           <FAQSection />
         </SectionErrorBoundary>
 
-        {/* 12. Final CTA — booking conversion */}
+        {/* 15. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>
