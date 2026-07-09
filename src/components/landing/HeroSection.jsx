@@ -74,7 +74,7 @@ export default function HeroSection({
           )}
 
           {/* Heading — parallax depth layers */}
-          <h1 className="font-display text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-semibold tracking-tight leading-[1.1] mb-5 md:mb-6" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 2px 12px rgba(0,0,0,0.5)" : "none"}}>
+          <h1 className="font-display text-3xl sm:text-4xl md:text-5xl lg:text-5xl font-semibold tracking-tight leading-[1.12] mb-5 md:mb-6 max-w-3xl mx-auto" style={{color: backgroundType === "image" ? "white" : "inherit", textShadow: backgroundType === "image" ? "0 2px 12px rgba(0,0,0,0.5)" : "none"}}>
             {title ? (
               <span
                 className="inline-block will-change-transform"
