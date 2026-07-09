@@ -3,12 +3,10 @@ import {
   CheckCircle2,
   ShieldCheck,
   Sparkles,
-  Wallet,
   ShoppingCart,
   Zap,
   Globe,
   Server,
-  ClipboardCheck,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
@@ -98,14 +96,6 @@ const PACKAGES = [
   },
 ];
 
-const ASSURANCE_PILLS = [
-  { Icon: ShieldCheck, text: "Secure Stripe checkout" },
-  { Icon: Wallet, text: "No lock-in contracts" },
-  { Icon: CheckCircle2, text: "Proof checked before launch" },
-  { Icon: Zap, text: "SMS + email included" },
-  { Icon: ClipboardCheck, text: "Fully managed setup" },
-];
-
 const getPackageCheckoutPath = (packageId) => `/product-signup?package=${encodeURIComponent(packageId)}`;
 
 export default function ThreeSystemsSection() {
@@ -116,6 +106,17 @@ export default function ThreeSystemsSection() {
           background:
             radial-gradient(circle at 50% 15%, rgba(0,174,239,0.12), transparent 30%),
             linear-gradient(180deg, #f8fdff 0%, #f3fbff 54%, #ffffff 100%);
+        }
+        .cs-pricing-shell {
+          position: relative;
+          padding: 28px;
+          border: 1px solid rgba(0,174,239,0.14);
+          border-radius: 40px;
+          background: linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(247,252,255,0.68) 100%);
+          box-shadow:
+            inset 0 1px 0 rgba(255,255,255,0.85),
+            0 28px 90px rgba(15,23,42,0.06);
+          overflow: visible;
         }
         .cs-pricing-card {
           min-height: 820px;
@@ -303,6 +304,9 @@ export default function ThreeSystemsSection() {
           border-radius: 38px;
         }
         @media (min-width: 1024px) {
+          .cs-pricing-shell {
+            padding: 34px;
+          }
           .cs-pricing-card {
             min-height: 850px;
           }
@@ -321,6 +325,13 @@ export default function ThreeSystemsSection() {
           }
         }
         @media (max-width: 767px) {
+          .cs-pricing-shell {
+            padding: 0;
+            border: none;
+            border-radius: 0;
+            background: transparent;
+            box-shadow: none;
+          }
           .cs-pricing-card {
             min-height: auto;
           }
@@ -370,152 +381,137 @@ export default function ThreeSystemsSection() {
         </div>
 
         <div className="relative pt-8">
-          <div className="cs-pricing-glow" aria-hidden="true" />
+          <div className="cs-pricing-shell">
+            <div className="cs-pricing-glow" aria-hidden="true" />
 
-          <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
-            {PACKAGES.map((pkg) => {
-              const isGrowth = pkg.highlight;
-              return (
-                <div key={pkg.name} className="relative flex flex-col">
-                  {isGrowth && (
-                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
-                      <span
-                        className="inline-flex items-center gap-2 rounded-full px-6 py-2 text-sm font-black whitespace-nowrap"
-                        style={{
-                          background: "linear-gradient(135deg, #00AEEF 0%, #005bb8 100%)",
-                          color: "#ffffff",
-                          boxShadow: "0 10px 28px rgba(0,121,193,0.36)",
-                          letterSpacing: "0.01em",
-                        }}
-                      >
-                        <Sparkles className="w-3.5 h-3.5" /> Most Popular
-                      </span>
-                    </div>
-                  )}
-
-                  <div
-                    className="cs-pricing-card cs-pricing-card-hover"
-                    data-growth={isGrowth ? "true" : "false"}
-                    style={{
-                      background: isGrowth
-                        ? "linear-gradient(155deg, #f0fbff 0%, #eaf8ff 46%, #f9fdff 100%)"
-                        : "linear-gradient(155deg, #ffffff 0%, #f8fcff 100%)",
-                      border: isGrowth
-                        ? "2px solid rgba(0,174,239,0.60)"
-                        : `1.5px solid ${pkg.accentBorder}`,
-                      boxShadow: isGrowth
-                        ? "0 24px 72px rgba(0,174,239,0.20), 0 0 0 1px rgba(0,174,239,0.09), 0 8px 18px rgba(2,8,23,0.05)"
-                        : "0 14px 44px rgba(15,23,42,0.055), 0 2px 8px rgba(15,23,42,0.035)",
-                      ["--hover-border"]: pkg.accentBorderHover,
-                    }}
-                  >
-                    <div className="cs-pricing-card-inner">
-                      <div className="cs-pricing-copy-zone">
-                        <h3 className="cs-pricing-title">{pkg.title}</h3>
-                        {isGrowth && <p className="cs-pricing-popular-line">Most Popular</p>}
-                        <p className="cs-pricing-subtitle">{pkg.subtitle}</p>
-                        <p className="cs-pricing-description">{pkg.description}</p>
-                      </div>
-
-                      <div className="cs-pricing-price-zone">
-                        <div className="cs-pricing-price-row" aria-label={`${pkg.price} per month`}>
-                          <span className="cs-pricing-price">{pkg.price}</span>
-                          <span className="cs-pricing-period">/month</span>
-                        </div>
-                        <div className="cs-pricing-setup-pill">{pkg.setupPrice} one-time setup</div>
-                        <p className="cs-pricing-contract">No long-term contracts. Cancel anytime.</p>
-                      </div>
-
-                      <div className="cs-pricing-divider" aria-hidden="true" />
-
-                      <div className="cs-pricing-feature-intro">
-                        {pkg.featureIntro}
-                      </div>
-
-                      <ul className="cs-pricing-feature-list">
-                        {pkg.automations.map((item) => (
-                          <li key={item} className="cs-pricing-feature-row">
-                            <CheckCircle2
-                              aria-hidden="true"
-                              style={{ color: "#22C55E", strokeWidth: 2.6 }}
-                            />
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <div className="cs-pricing-ops">
-                        <div className="cs-pricing-ops-row">
-                          <Zap aria-hidden="true" />
-                          <span><strong>{pkg.automationCount} automations</strong> included in this system.</span>
-                        </div>
-                        <div className="cs-pricing-ops-row">
-                          <Globe aria-hidden="true" />
-                          <span><strong>Website:</strong> {pkg.websiteScope}</span>
-                        </div>
-                        <div className="cs-pricing-ops-row">
-                          <Server aria-hidden="true" />
-                          <span><strong>Hosting:</strong> {pkg.hostingScope}</span>
-                        </div>
-                        <div className="cs-pricing-ops-row">
-                          <ShieldCheck aria-hidden="true" />
-                          <span><strong>QA:</strong> {pkg.qaScope}</span>
-                        </div>
-                      </div>
-
-                      <div className="cs-pricing-card-footer">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.packageId });
-                            window.location.href = getPackageCheckoutPath(pkg.packageId);
+            <div className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-8 items-stretch">
+              {PACKAGES.map((pkg) => {
+                const isGrowth = pkg.highlight;
+                return (
+                  <div key={pkg.name} className="relative flex flex-col">
+                    {isGrowth && (
+                      <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                        <span
+                          className="inline-flex items-center gap-2 rounded-full px-6 py-2 text-sm font-black whitespace-nowrap"
+                          style={{
+                            background: "linear-gradient(135deg, #00AEEF 0%, #005bb8 100%)",
+                            color: "#ffffff",
+                            boxShadow: "0 10px 28px rgba(0,121,193,0.36)",
+                            letterSpacing: "0.01em",
                           }}
-                          className="cs-pricing-cta inline-flex items-center justify-center gap-2 rounded-full font-black text-sm cursor-pointer"
-                          style={isGrowth
-                            ? {
-                                background: "linear-gradient(90deg, #0095d9 0%, #005bb8 100%)",
-                                color: "#fff",
-                                border: "1px solid rgba(0,91,184,0.15)",
-                                boxShadow: "0 14px 32px rgba(0,92,170,0.28)",
-                              }
-                            : {
-                                background: "rgba(255,255,255,0.72)",
-                                color: "#0079c1",
-                                border: "1.5px solid rgba(0,174,239,0.35)",
-                                boxShadow: "0 8px 22px rgba(15,23,42,0.035)",
-                              }
-                          }
-                          data-highlight={isGrowth ? "true" : "false"}
                         >
-                          <ShoppingCart className="w-4 h-4" /> {pkg.cta}
-                        </button>
-                        <p className="cs-pricing-footer-note">
-                          {pkg.setupPrice} setup &middot; {pkg.price}/mo &middot; cancel anytime
-                        </p>
+                          <Sparkles className="w-3.5 h-3.5" /> Most Popular
+                        </span>
+                      </div>
+                    )}
+
+                    <div
+                      className="cs-pricing-card cs-pricing-card-hover"
+                      data-growth={isGrowth ? "true" : "false"}
+                      style={{
+                        background: isGrowth
+                          ? "linear-gradient(155deg, #f0fbff 0%, #eaf8ff 46%, #f9fdff 100%)"
+                          : "linear-gradient(155deg, #ffffff 0%, #f8fcff 100%)",
+                        border: isGrowth
+                          ? "2px solid rgba(0,174,239,0.60)"
+                          : `1.5px solid ${pkg.accentBorder}`,
+                        boxShadow: isGrowth
+                          ? "0 24px 72px rgba(0,174,239,0.20), 0 0 0 1px rgba(0,174,239,0.09), 0 8px 18px rgba(2,8,23,0.05)"
+                          : "0 14px 44px rgba(15,23,42,0.055), 0 2px 8px rgba(15,23,42,0.035)",
+                        ["--hover-border"]: pkg.accentBorderHover,
+                      }}
+                    >
+                      <div className="cs-pricing-card-inner">
+                        <div className="cs-pricing-copy-zone">
+                          <h3 className="cs-pricing-title">{pkg.title}</h3>
+                          {isGrowth && <p className="cs-pricing-popular-line">Most Popular</p>}
+                          <p className="cs-pricing-subtitle">{pkg.subtitle}</p>
+                          <p className="cs-pricing-description">{pkg.description}</p>
+                        </div>
+
+                        <div className="cs-pricing-price-zone">
+                          <div className="cs-pricing-price-row" aria-label={`${pkg.price} per month`}>
+                            <span className="cs-pricing-price">{pkg.price}</span>
+                            <span className="cs-pricing-period">/month</span>
+                          </div>
+                          <div className="cs-pricing-setup-pill">{pkg.setupPrice} one-time setup</div>
+                          <p className="cs-pricing-contract">No long-term contracts. Cancel anytime.</p>
+                        </div>
+
+                        <div className="cs-pricing-divider" aria-hidden="true" />
+
+                        <div className="cs-pricing-feature-intro">
+                          {pkg.featureIntro}
+                        </div>
+
+                        <ul className="cs-pricing-feature-list">
+                          {pkg.automations.map((item) => (
+                            <li key={item} className="cs-pricing-feature-row">
+                              <CheckCircle2
+                                aria-hidden="true"
+                                style={{ color: "#22C55E", strokeWidth: 2.6 }}
+                              />
+                              <span>{item}</span>
+                            </li>
+                          ))}
+                        </ul>
+
+                        <div className="cs-pricing-ops">
+                          <div className="cs-pricing-ops-row">
+                            <Zap aria-hidden="true" />
+                            <span><strong>{pkg.automationCount} automations</strong> included in this system.</span>
+                          </div>
+                          <div className="cs-pricing-ops-row">
+                            <Globe aria-hidden="true" />
+                            <span><strong>Website:</strong> {pkg.websiteScope}</span>
+                          </div>
+                          <div className="cs-pricing-ops-row">
+                            <Server aria-hidden="true" />
+                            <span><strong>Hosting:</strong> {pkg.hostingScope}</span>
+                          </div>
+                          <div className="cs-pricing-ops-row">
+                            <ShieldCheck aria-hidden="true" />
+                            <span><strong>QA:</strong> {pkg.qaScope}</span>
+                          </div>
+                        </div>
+
+                        <div className="cs-pricing-card-footer">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.packageId });
+                              window.location.href = getPackageCheckoutPath(pkg.packageId);
+                            }}
+                            className="cs-pricing-cta inline-flex items-center justify-center gap-2 rounded-full font-black text-sm cursor-pointer"
+                            style={isGrowth
+                              ? {
+                                  background: "linear-gradient(90deg, #0095d9 0%, #005bb8 100%)",
+                                  color: "#fff",
+                                  border: "1px solid rgba(0,91,184,0.15)",
+                                  boxShadow: "0 14px 32px rgba(0,92,170,0.28)",
+                                }
+                              : {
+                                  background: "rgba(255,255,255,0.72)",
+                                  color: "#0079c1",
+                                  border: "1.5px solid rgba(0,174,239,0.35)",
+                                  boxShadow: "0 8px 22px rgba(15,23,42,0.035)",
+                                }
+                            }
+                            data-highlight={isGrowth ? "true" : "false"}
+                          >
+                            <ShoppingCart className="w-4 h-4" /> {pkg.cta}
+                          </button>
+                          <p className="cs-pricing-footer-note">
+                            {pkg.setupPrice} setup &middot; {pkg.price}/mo &middot; cancel anytime
+                          </p>
+                        </div>
                       </div>
                     </div>
                   </div>
-                </div>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
-        </div>
-
-        <div className="mt-10 flex flex-wrap justify-center gap-3">
-          {ASSURANCE_PILLS.map(({ Icon, text }) => (
-            <span
-              key={text}
-              className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-xs font-black"
-              style={{
-                background: "rgba(0,174,239,0.075)",
-                borderColor: "rgba(0,174,239,0.22)",
-                color: "#0079c1",
-              }}
-            >
-              <Icon className="h-3.5 w-3.5" aria-hidden="true" />
-              {text}
-            </span>
-          ))}
         </div>
 
         <div className="text-center mt-10 mb-2">
