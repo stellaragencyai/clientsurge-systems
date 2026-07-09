@@ -66,22 +66,22 @@ export default function BeforeAfter() {
         </div>
 
         <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl p-7 border border-red-100" style={{ background: "#fff8f8" }}>
+          <div className="rounded-2xl p-7 border border-slate-200" style={{ background: "#f8fafc" }}>
             <div className="flex items-center gap-3 mb-5">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-red-100">
-                <X className="w-4 h-4 text-red-500" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-slate-100">
+                <X className="w-4 h-4 text-slate-500" />
               </div>
-              <span className="font-bold text-sm text-red-600 uppercase tracking-wider">Without ClientSurge</span>
+              <span className="font-bold text-sm text-slate-600 uppercase tracking-wider">Without ClientSurge</span>
             </div>
             <p className="text-foreground/80 leading-relaxed text-base">{scenarios[active].without}</p>
           </div>
 
-          <div className="rounded-2xl p-7 border border-green-100" style={{ background: "#f6fff8" }}>
+          <div className="rounded-2xl p-7 border border-sky-100" style={{ background: "#f3fbff" }}>
             <div className="flex items-center gap-3 mb-5">
-              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-green-100">
-                <Check className="w-4 h-4 text-green-600" />
+              <div className="flex items-center justify-center w-8 h-8 rounded-full bg-sky-100">
+                <Check className="w-4 h-4 text-[#006BB0]" />
               </div>
-              <span className="font-bold text-sm text-green-700 uppercase tracking-wider">With ClientSurge</span>
+              <span className="font-bold text-sm text-[#006BB0] uppercase tracking-wider">With ClientSurge</span>
             </div>
             <p className="text-foreground/80 leading-relaxed text-base">{scenarios[active].withCS}</p>
           </div>
