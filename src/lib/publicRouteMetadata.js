@@ -180,14 +180,12 @@ export const APP_SHELL_PUBLIC_UTILITY_PATHS = [
   "/book",
   "/book-demo",
   "/store",
-  "/setup-lookup",
-  "/client-portal",
-  "/client-dashboard",
 ];
 
 // Routes the React shell may render without treating the visitor as an admin.
-// This is intentionally broader than sitemap/public-directory routes, because
-// auth and checkout utilities must render but remain noindex.
+// Client/dashboard/setup surfaces are intentionally excluded here because they
+// are authenticated/private surfaces and should never appear in public route
+// directories, sitemap output, or public-safe fallbacks.
 export const APP_SHELL_PUBLIC_PATHS = [
   ...PUBLIC_ROUTE_PATHS,
   ...APP_SHELL_PUBLIC_UTILITY_PATHS,
@@ -203,6 +201,7 @@ export const AUTHENTICATED_ROUTE_PREFIXES = [
   "/setup/credentials",
   "/setup/status",
   "/setup/preview",
+  "/setup-lookup",
 ];
 
 export const ADMIN_ROUTE_PREFIXES = [
@@ -338,17 +337,4 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/delete-account",
   "/data-deletion",
   "/product-signup",
-  "/product-sign-up",
-  "/product_signup",
-  "/signup",
-  "/store",
-  "/AdminLeadDetail",
-  "/AdminSettings",
-  "/Dashboard",
-  "/ClientPortal",
-  "/LeadIntelligence",
-  "/Sam",
-  "/MedSpaDashboard",
-  "/WebsiteSpecPreview",
-  "/NotFound",
 ];
