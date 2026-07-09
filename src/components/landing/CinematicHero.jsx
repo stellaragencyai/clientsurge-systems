@@ -79,7 +79,7 @@ export default function CinematicHero() {
             initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.08 }}
-            style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.5rem, 3.6vw, 3rem)", fontWeight: 800, lineHeight: 1.05, letterSpacing: "-0.025em", margin: "0 0 32px 0", maxWidth: "900px" }}
+            style={{ fontFamily: "'Montserrat', 'Helvetica Neue', Arial, sans-serif", fontSize: "clamp(1.25rem, 2.35vw, 2rem)", fontWeight: 800, lineHeight: 1.08, letterSpacing: "-0.02em", margin: "0 0 24px 0", maxWidth: "760px" }}
           >
             Browse AI Systems. Add to Cart. Check Out.
           </motion.h1>
