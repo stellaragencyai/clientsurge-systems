@@ -120,11 +120,24 @@ export default function ThreeSystemsSection() {
         }
         .cs-pricing-card {
           min-height: 820px;
+          height: 100%;
+          position: relative;
           display: flex;
           flex-direction: column;
           border-radius: 28px;
           overflow: hidden;
           font-family: 'Montserrat', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+          transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
+        }
+        .cs-pricing-card-hover::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          z-index: 2;
+          border: 2px solid transparent;
+          border-radius: 28px;
+          pointer-events: none;
+          transition: border-color 0.2s ease, box-shadow 0.25s ease;
         }
         .cs-pricing-card-inner {
           min-height: 100%;
@@ -334,13 +347,18 @@ export default function ThreeSystemsSection() {
           }
           .cs-pricing-card {
             min-height: auto;
+            height: auto;
           }
         }
         @media (pointer: fine) {
-          .cs-pricing-card-hover:not([data-growth="true"]):hover {
-            border-color: var(--hover-border) !important;
+          .cs-pricing-card-hover:hover {
+            border-color: rgba(0,174,239,0.72) !important;
             transform: translateY(-4px);
-            box-shadow: 0 18px 46px rgba(0,174,239,0.14), 0 0 0 1px rgba(0,174,239,0.09), 0 6px 14px rgba(0,0,0,0.05) !important;
+            box-shadow: 0 18px 46px rgba(0,174,239,0.16), 0 0 0 1px rgba(0,174,239,0.10), 0 6px 14px rgba(0,0,0,0.05) !important;
+          }
+          .cs-pricing-card-hover:hover::after {
+            border-color: #00AEEF;
+            box-shadow: inset 0 0 0 1px rgba(0,174,239,0.18), 0 0 0 1px rgba(0,174,239,0.16);
           }
           .cs-pricing-cta[data-highlight="false"]:hover {
             box-shadow: 0 8px 22px rgba(0,174,239,0.18) !important;
@@ -354,7 +372,8 @@ export default function ThreeSystemsSection() {
         }
         @media (prefers-reduced-motion: reduce) {
           .cs-pricing-card-hover,
-          .cs-pricing-cta {
+          .cs-pricing-cta,
+          .cs-pricing-card-hover::after {
             transition: none !important;
           }
           .cs-pricing-card-hover:hover,
@@ -388,7 +407,7 @@ export default function ThreeSystemsSection() {
               {PACKAGES.map((pkg) => {
                 const isGrowth = pkg.highlight;
                 return (
-                  <div key={pkg.name} className="relative flex flex-col">
+                  <div key={pkg.name} className="relative flex h-full flex-col">
                     {isGrowth && (
                       <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
                         <span
@@ -413,7 +432,7 @@ export default function ThreeSystemsSection() {
                           ? "linear-gradient(155deg, #f0fbff 0%, #eaf8ff 46%, #f9fdff 100%)"
                           : "linear-gradient(155deg, #ffffff 0%, #f8fcff 100%)",
                         border: isGrowth
-                          ? "2px solid rgba(0,174,239,0.60)"
+                          ? "1.5px solid rgba(0,174,239,0.60)"
                           : `1.5px solid ${pkg.accentBorder}`,
                         boxShadow: isGrowth
                           ? "0 24px 72px rgba(0,174,239,0.20), 0 0 0 1px rgba(0,174,239,0.09), 0 8px 18px rgba(2,8,23,0.05)"
