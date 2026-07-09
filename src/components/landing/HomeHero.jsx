@@ -3,7 +3,6 @@ import {
   CalendarDays,
   CheckCircle2,
   MessageSquare,
-  PhoneCall,
   Settings,
   ShieldCheck,
   Zap,
@@ -115,7 +114,14 @@ function HeroDeviceMockup() {
             }}
             aria-hidden="true"
           />
-          <div className="absolute inset-0 opacity-35" style={{ backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 1px)', backgroundSize: '52px 52px' }} aria-hidden="true" />
+          <div
+            className="absolute inset-0 opacity-35"
+            style={{
+              backgroundImage: 'radial-gradient(circle, rgba(255,255,255,0.22) 1px, transparent 1px)',
+              backgroundSize: '52px 52px',
+            }}
+            aria-hidden="true"
+          />
 
           <div className="relative z-10 flex h-9 items-center justify-between px-5 text-[11px] font-bold text-white/90">
             <span>4:12 AM</span>
@@ -142,9 +148,9 @@ function HeroDeviceMockup() {
               </div>
 
               <div className="mt-4 flex flex-wrap gap-1.5 text-[9px] font-bold text-white/80">
-                <span className="rounded-full bg-white/9 px-2 py-1">Lead Capture</span>
-                <span className="rounded-full bg-white/9 px-2 py-1">AI Follow-Up</span>
-                <span className="rounded-full bg-white/9 px-2 py-1">Booking</span>
+                <span className="rounded-full bg-white/10 px-2 py-1">Lead Capture</span>
+                <span className="rounded-full bg-white/10 px-2 py-1">AI Follow-Up</span>
+                <span className="rounded-full bg-white/10 px-2 py-1">Booking</span>
               </div>
 
               <a
@@ -247,7 +253,7 @@ export default function HomeHero() {
       />
       <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-b from-transparent to-white" aria-hidden="true" />
 
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-5 pb-16 pt-[calc(var(--cs-nav-height,76px)+3.25rem)] sm:px-8 lg:min-h-[calc(100svh-var(--cs-nav-height,76px))] lg:grid-cols-[minmax(0,0.92fr)_minmax(470px,1fr)] lg:gap-16 lg:px-10 lg:pb-20 lg:pt-[calc(var(--cs-nav-height,76px)+2.5rem)]">
+      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-5 pb-16 pt-[calc(var(--cs-nav-height,76px)+3.25rem)] sm:px-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(470px,1fr)] lg:gap-16 lg:px-10 lg:pb-20 lg:pt-[calc(var(--cs-nav-height,76px)+2.5rem)]">
         <div className="mx-auto max-w-[650px] text-center lg:mx-0 lg:text-left">
           <p className="sr-only">AI Growth System for Service Businesses</p>
 
