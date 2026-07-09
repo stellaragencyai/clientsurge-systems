@@ -33,23 +33,112 @@ export const GENERATED_DIRECTORY_PATTERNS = [
   /\bPages\b/i,
 ];
 
-const SAFE_MARKETING_PATTERNS = [
-  /Turn your website into an AI-powered sales system/i,
-  /AI automation systems for service businesses/i,
-  /Compare Packages/i,
-  /Automate Your Lead Flow/i,
-  /Capture\. Follow Up\. Book\./i,
-];
+const PUBLIC_MARKETING_ROUTES = new Set([
+  "/",
+  "/pricing",
+  "/automations",
+  "/industries",
+  "/proof",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/blog",
+  "/testimonials",
+  "/roadmap",
+  "/contact",
+  "/privacy",
+  "/terms",
+  "/sms-terms",
+  "/refund-policy",
+]);
 
 const BASE44_EDITOR_BADGE_TEXT = /edit\s+with\s+base44/i;
+const PRIVATE_PATH_PATTERN = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44)(\/|$)/i;
+
+const ROUTE_COPY = {
+  "/": {
+    eyebrow: "AI Growth System for Service Businesses",
+    title: "Turn your website into an AI-powered sales system.",
+    body: "ClientSurge installs lead capture, instant response, booking, follow-up, review, and reactivation workflows for local service businesses.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/automations",
+    secondaryLabel: "See Automations",
+  },
+  "/pricing": {
+    eyebrow: "Packages",
+    title: "Choose the automation system your business needs next.",
+    body: "Compare Starter, Growth, and Pro packages with clear setup fees, monthly pricing, installation expectations, and support paths.",
+    primaryHref: "/product-signup?package=growth_system",
+    primaryLabel: "Start Growth System",
+    secondaryHref: "/automations",
+    secondaryLabel: "Review Automations",
+  },
+  "/automations": {
+    eyebrow: "Automations",
+    title: "Six core automations that stop leads from slipping away.",
+    body: "Lead capture, missed-call recovery, AI follow-up, booking, review requests, and lead reactivation work together as one conversion system.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/how-it-works",
+    secondaryLabel: "See How It Works",
+  },
+  "/proof": {
+    eyebrow: "Proof Standards",
+    title: "Truthful proof only. No fake testimonials. No fake live stats.",
+    body: "ClientSurge separates verified production proof, internal test evidence, demo screenshots, and claims that still need validation.",
+    primaryHref: "/how-it-works",
+    primaryLabel: "See The System",
+    secondaryHref: "/contact",
+    secondaryLabel: "Ask A Question",
+  },
+  "/contact": {
+    eyebrow: "Contact",
+    title: "Talk to ClientSurge about your automation setup.",
+    body: "Ask about packages, setup, AI voice agents, lead follow-up, booking automation, or the best starting point for your business.",
+    primaryHref: "mailto:support@clientsurgesystems.com",
+    primaryLabel: "Email Support",
+    secondaryHref: "/pricing",
+    secondaryLabel: "Compare Packages",
+  },
+};
+
+const DEFAULT_COPY = {
+  eyebrow: "ClientSurge Systems",
+  title: "AI automation systems for local service businesses.",
+  body: "ClientSurge helps local businesses respond faster, follow up consistently, book more qualified conversations, and recover leads that normally go cold.",
+  primaryHref: "/pricing",
+  primaryLabel: "Compare Packages",
+  secondaryHref: "/contact",
+  secondaryLabel: "Contact Support",
+};
 
 function textOf(node) {
   return (node?.textContent || "").replace(/\s+/g, " ").trim();
 }
 
+function normalizePathname(pathname = "/") {
+  const value = String(pathname || "/").split("?")[0].split("#")[0];
+  const normalized = value.length > 1 && value.endsWith("/") ? value.slice(0, -1) : value;
+  return normalized || "/";
+}
+
+function isPublicMarketingPath() {
+  const pathname = normalizePathname(window.location.pathname || "/");
+  return PUBLIC_MARKETING_ROUTES.has(pathname) || /^\/(med-spa|dental|hvac|plumbing|roofing|chiropractic|contractors|real-estate|personal-injury|property-services|veterinary|electrician|landscaping|tree-service|painting|pest-control|salon|auto-repair|accounting|fitness|law-firm)$/.test(pathname);
+}
+
+function isPrivatePath() {
+  return PRIVATE_PATH_PATTERN.test(normalizePathname(window.location.pathname || "/"));
+}
+
 function isInternalGeneratedLink(link) {
   const label = `${textOf(link)} ${link?.getAttribute?.("href") || ""}`;
-  return INTERNAL_PAGE_PATTERNS.some((pattern) => pattern.test(label));
+  let internalByPath = false;
+  try {
+    internalByPath = PRIVATE_PATH_PATTERN.test(new URL(link.getAttribute("href") || "", window.location.origin).pathname);
+  } catch {}
+  return internalByPath || INTERNAL_PAGE_PATTERNS.some((pattern) => pattern.test(label));
 }
 
 function hasGeneratedCopy(text) {
@@ -76,28 +165,41 @@ export function looksLikeGeneratedDirectory(root) {
 }
 
 function buildSafeFallback() {
+  const pathname = normalizePathname(window.location.pathname || "/");
+  const copy = ROUTE_COPY[pathname] || DEFAULT_COPY;
   const wrapper = document.createElement("main");
   wrapper.setAttribute("id", "main-content");
   wrapper.setAttribute("data-clientsurge-generated-directory-fallback", "true");
   wrapper.style.minHeight = "100svh";
-  wrapper.style.display = "flex";
-  wrapper.style.alignItems = "center";
-  wrapper.style.justifyContent = "center";
-  wrapper.style.padding = "32px";
-  wrapper.style.background =
-    "linear-gradient(135deg, #f8fafc 0%, #eff6ff 45%, #ffffff 100%)";
-  wrapper.style.fontFamily =
-    'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
+  wrapper.style.background = "linear-gradient(135deg, #f8fafc 0%, #eff6ff 45%, #ffffff 100%)";
+  wrapper.style.fontFamily = 'Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif';
 
   wrapper.innerHTML = `
-    <section style="max-width:760px;width:100%;border:1px solid rgba(15,23,42,.12);border-radius:28px;background:rgba(255,255,255,.94);box-shadow:0 24px 80px rgba(15,23,42,.12);padding:40px;text-align:left;">
-      <p style="margin:0 0 12px;color:#006bb0;font-size:13px;font-weight:800;text-transform:uppercase;letter-spacing:.12em;">ClientSurge Systems</p>
-      <h1 style="margin:0 0 16px;color:#0f172a;font-size:clamp(24px,3.2vw,36px);line-height:1.12;font-weight:900;">AI automation systems for service businesses.</h1>
-      <p style="margin:0 0 28px;color:#475569;font-size:18px;line-height:1.7;">The generated Base44 page directory was blocked because internal admin, setup, and client routes are not public marketing pages. Continue through the verified public paths below.</p>
-      <div style="display:flex;flex-wrap:wrap;gap:12px;">
-        <a href="/pricing" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:#003b8f;color:white;padding:13px 20px;font-weight:800;text-decoration:none;">Compare Packages</a>
-        <a href="/automations" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(15,23,42,.18);color:#0f172a;padding:13px 20px;font-weight:800;text-decoration:none;background:white;">View Automations</a>
-        <a href="/contact" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(15,23,42,.18);color:#0f172a;padding:13px 20px;font-weight:800;text-decoration:none;background:white;">Contact Support</a>
+    <section style="max-width:1120px;width:calc(100% - 32px);margin:0 auto;padding:32px 0 56px;">
+      <header style="display:flex;align-items:center;justify-content:space-between;gap:18px;flex-wrap:wrap;margin-bottom:clamp(40px,7vw,72px);">
+        <a href="/" style="color:#07111f;font-weight:950;letter-spacing:-.04em;text-decoration:none;font-size:21px;">ClientSurge Systems</a>
+        <nav aria-label="Public navigation" style="display:flex;gap:14px;flex-wrap:wrap;font-size:14px;">
+          <a href="/pricing" style="color:#075985;font-weight:800;text-decoration:none;">Pricing</a>
+          <a href="/automations" style="color:#075985;font-weight:800;text-decoration:none;">Automations</a>
+          <a href="/proof" style="color:#075985;font-weight:800;text-decoration:none;">Proof</a>
+          <a href="/contact" style="color:#075985;font-weight:800;text-decoration:none;">Contact</a>
+        </nav>
+      </header>
+      <div style="display:grid;grid-template-columns:1.05fr .95fr;gap:42px;align-items:center;">
+        <section>
+          <p style="margin:0 0 14px;color:#006bb0;font-size:13px;font-weight:900;text-transform:uppercase;letter-spacing:.15em;">${copy.eyebrow}</p>
+          <h1 style="margin:0 0 20px;color:#0f172a;font-size:clamp(34px,5vw,60px);line-height:1;letter-spacing:-.055em;font-weight:950;">${copy.title}</h1>
+          <p style="margin:0 0 28px;color:#475569;font-size:clamp(17px,1.7vw,20px);line-height:1.65;max-width:720px;">${copy.body}</p>
+          <div style="display:flex;flex-wrap:wrap;gap:12px;">
+            <a href="${copy.primaryHref}" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;background:linear-gradient(135deg,#003b8f,#00aeef);color:white;padding:13px 20px;font-weight:900;text-decoration:none;box-shadow:0 14px 32px rgba(0,107,176,.22);">${copy.primaryLabel}</a>
+            <a href="${copy.secondaryHref}" style="display:inline-flex;align-items:center;justify-content:center;border-radius:999px;border:1px solid rgba(15,23,42,.18);color:#0f172a;padding:13px 20px;font-weight:900;text-decoration:none;background:white;">${copy.secondaryLabel}</a>
+          </div>
+        </section>
+        <aside style="border:1px solid rgba(15,23,42,.12);border-radius:30px;background:rgba(255,255,255,.94);box-shadow:0 24px 80px rgba(15,23,42,.12);padding:32px;">
+          <p style="margin:0 0 12px;color:#006bb0;font-size:12px;font-weight:900;text-transform:uppercase;letter-spacing:.14em;">Public Shell Protected</p>
+          <h2 style="margin:0 0 14px;color:#0f172a;font-size:30px;letter-spacing:-.045em;">No internal app directory shown.</h2>
+          <p style="margin:0;color:#475569;line-height:1.65;">The generated Base44 page directory was blocked. Internal admin, setup, and client routes are not public marketing pages.</p>
+        </aside>
       </div>
     </section>
   `;
@@ -132,7 +234,6 @@ export function removeBase44EditorBadge() {
     const fixedAncestor = element.closest?.('[style*="fixed"], [class*="fixed"]');
     const target = fixedAncestor || element;
 
-    // Avoid hiding the whole app if a large ancestor happens to contain the words.
     if ((target.textContent || "").length > 300) {
       hidden += hideNode(element) ? 1 : 0;
     } else {
@@ -163,11 +264,7 @@ function removeGeneratedDirectoryHeadingBlock(root) {
       prev = prev.previousElementSibling;
       scanned += 1;
       const previousText = textOf(previous);
-      if (
-        hasGeneratedCopy(previousText) ||
-        /^ClientSurge Systems$/i.test(previousText) ||
-        /organize, track, and share your work/i.test(previousText)
-      ) {
+      if (hasGeneratedCopy(previousText) || /^ClientSurge Systems$/i.test(previousText)) {
         removed += removeNode(previous) ? 1 : 0;
       }
     }
@@ -218,14 +315,6 @@ export function sanitizeGeneratedDirectory(root) {
   return removed;
 }
 
-function hasUsefulPublicMarketing(root) {
-  const text = textOf(root);
-  if (SAFE_MARKETING_PATTERNS.some((pattern) => pattern.test(text))) return true;
-  return Boolean(
-    root.querySelector?.('a[href="/pricing"], a[href="/automations"], a[href="/contact"], nav[aria-label="Public navigation"]')
-  );
-}
-
 function setRobots(value) {
   let robotsMeta = document.head.querySelector('meta[name="robots"]');
   if (!robotsMeta) {
@@ -253,11 +342,21 @@ export function runPublicPageDirectoryGuard() {
   document.documentElement.setAttribute("data-clientsurge-route-exposure-guard", "blocked-generated-directory");
   document.title = "ClientSurge Systems | AI Automation for Service Businesses";
 
+  if (isPublicMarketingPath()) {
+    setRobots("index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
+    body.replaceChildren(buildSafeFallback());
+    return true;
+  }
+
+  if (isPrivatePath()) {
+    setRobots("noindex,nofollow");
+  }
+
   for (const scope of scopes) {
     sanitizeGeneratedDirectory(scope);
   }
 
-  if (!hasUsefulPublicMarketing(body)) {
+  if (looksLikeGeneratedDirectory(body)) {
     setRobots("noindex,nofollow");
     body.replaceChildren(buildSafeFallback());
   }
