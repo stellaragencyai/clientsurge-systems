@@ -4,6 +4,7 @@ import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
+import ConversionEnhancementSuite from "../components/landing/ConversionEnhancementSuite.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
 import WorkflowSection from "../components/landing/WorkflowSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
@@ -99,11 +100,11 @@ export default function Home() {
 
     try {
       cleanups.push(setPageMetadata({
-        title: "ClientSurge Systems | Turn Your Website Into an AI-Powered Sales System",
-        description: "ClientSurge turns your website into an AI-powered sales system for local service businesses. Compare packaged automation systems for lead capture, instant response, booking, follow-up, reviews, and reactivation.",
+        title: "ClientSurge Systems | Stop Losing Leads to Slow Follow-Up",
+        description: "ClientSurge turns local service websites into lead recovery systems with audit-driven lead capture, instant response, missed-call text-back, booking handoff, follow-up, and proof-based status tracking.",
         canonicalPath: "/",
-        ogTitle: "Turn Your Website Into an AI-Powered Sales System | ClientSurge Systems",
-        ogDescription: "AI automation for lead capture, instant response, booking, follow-up, reviews, and reactivation. Compare clear packages and choose the system that fits your business.",
+        ogTitle: "Stop Losing Local Service Leads | ClientSurge Systems",
+        ogDescription: "Diagnose lead leakage, compare packaged automation systems, and install a proof-first response and follow-up system for your business.",
       }));
     } catch (_e) {}
 
@@ -126,7 +127,7 @@ export default function Home() {
         <LoggedOutConfirmationBanner />
         <Navbar />
 
-        {/* 1. Hero — SaaS value prop + animated product demo */}
+        {/* 1. Hero — lead leakage positioning + animated product demo */}
         <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
           <HomeHero />
         </SectionErrorBoundary>
@@ -136,41 +137,46 @@ export default function Home() {
           <RevenueLeakSection />
         </SectionErrorBoundary>
 
-        {/* 3. Solution — the 5-step AI Growth System */}
+        {/* 3. Proof-first conversion enhancements — audit path, trust ledger, package fit, demo status */}
+        <SectionErrorBoundary sectionName="conversion-enhancement-suite">
+          <ConversionEnhancementSuite />
+        </SectionErrorBoundary>
+
+        {/* 4. Solution — the 5-step AI Growth System */}
         <SectionErrorBoundary sectionName="solution">
           <SolutionSection />
         </SectionErrorBoundary>
 
-        {/* 4. Six Core Automations — product-style showcase */}
+        {/* 5. Six Core Automations — product-style showcase */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
           <SixAutomationsSection />
         </SectionErrorBoundary>
 
-        {/* 5. Interactive Workflow — SaaS product demonstration */}
+        {/* 6. Interactive Workflow — SaaS product demonstration */}
         <SectionErrorBoundary sectionName="workflow">
           <WorkflowSection />
         </SectionErrorBoundary>
 
-        {/* 6. Industries — vertical-specific templates */}
+        {/* 7. Industries — vertical-specific templates */}
         <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
           <Industries />
         </LazyHomepageSection>
 
-        {/* 7. Trust — security, verification, architecture, transparency */}
+        {/* 8. Trust — security, verification, architecture, transparency */}
         <SectionErrorBoundary sectionName="trust">
           <TrustSection />
         </SectionErrorBoundary>
 
-        {/* 8. ROI Calculator — interactive lead recovery estimator */}
+        {/* 9. ROI Calculator — interactive lead recovery estimator */}
         <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
           <section className="py-16 md:py-24 px-4 bg-muted/30">
             <div className="max-w-4xl mx-auto">
               <CSSectionHeader
                 eyebrow="Revenue Recovery Calculator"
                 title="How Much Revenue Are You Losing?"
-                subtitle="Drag the sliders below to see how many leads you're losing to missed calls and slow follow-up — then browse our packages to recover them automatically."
+                subtitle="Drag the sliders below to estimate how many leads may be leaking through missed calls and slow follow-up — then browse our packages to recover them automatically."
                 align="center"
                 className="mb-8"
               />
@@ -179,19 +185,19 @@ export default function Home() {
           </section>
         </div>
 
-        {/* 9. Pricing / Core Offer */}
+        {/* 10. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="pricing">
           <ThreeSystemsSection />
         </SectionErrorBoundary>
 
-        {/* 10. FAQ — accordion section */}
+        {/* 11. FAQ — accordion section */}
         <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
           <FAQSection />
         </SectionErrorBoundary>
 
-        {/* 11. Final CTA — booking conversion */}
+        {/* 12. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>
