@@ -1,26 +1,9 @@
-/**
- * Centralized site configuration & constants.
- *
- * AREA 1 QA: CANONICAL PUBLIC NAVIGATION
- * Public header: Home -> / | AI Packages -> /pricing | Automations -> /automations |
- * Industries -> /industries | How It Works -> /how-it-works | Contact -> /contact |
- * Client Login -> /login | primary CTA -> /pricing
- *
- * AREA 1 QA: CANONICAL CTA DESTINATION MAP
- * "Compare Packages" / "Choose Your System" -> /pricing
- * "View Included Automations" -> /automations
- * "Get Help Choosing" / support CTAs -> /contact
- * "Client Login" -> /login
- * Phone CTAs -> tel:+16025843227
- * Email CTAs -> mailto:support@clientsurgesystems.com
- * Fallback buyer CTA -> /pricing
- *
- * AREA 1 QA: PUBLIC ROUTE CLASSIFICATION
- * Public marketing routes stay limited to buyer-facing pages. Internal/admin/setup
- * routes must not appear in header, footer, sitemap, or generated public route lists.
- */
+import { PACKAGE_OFFERS, getPackageStorePath } from "./salesCatalog.js";
 
-const productSignupUrl = (packageKey) => `/product-signup?package=${packageKey}`;
+/**
+ * Centralized site configuration and constants.
+ * Package pricing and Stripe references are derived from salesCatalog.js.
+ */
 
 export const SITE_CONFIG = {
   brand: {
@@ -75,26 +58,15 @@ export const COLORS = {
   foreground: "#001B44",
 };
 
-export const STRIPE_PRODUCTS = {
-  starter: {
-    name: "Starter System",
-    id: "prod_UReWMpnZsCnfcL",
-    setup: 797,
-    monthly: 497,
-    checkout_url: productSignupUrl("starter_system"),
-  },
-  growth: {
-    name: "Growth System",
-    id: "prod_UReWhZsWks1HuA",
-    setup: 1297,
-    monthly: 997,
-    checkout_url: productSignupUrl("growth_system"),
-  },
-  pro: {
-    name: "Pro System",
-    id: "prod_UReW1LmsVbn4BZ",
-    setup: 2497,
-    monthly: 1997,
-    checkout_url: productSignupUrl("pro_system"),
-  },
-};
+export const STRIPE_PRODUCTS = Object.fromEntries(
+  PACKAGE_OFFERS.map((offer) => [
+    offer.package_key.replace(/_system$/, ""),
+    {
+      name: offer.name,
+      id: offer.stripe_product_id,
+      setup: offer.setup_total,
+      monthly: offer.monthly_total,
+      checkout_url: getPackageStorePath(offer.package_key),
+    },
+  ])
+);
