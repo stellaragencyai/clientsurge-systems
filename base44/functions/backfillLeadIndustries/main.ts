@@ -4,7 +4,7 @@ import { secureJson } from "../_shared/response.ts";
 import {
   buildIndustryDataQualityFlags,
   classifyLeadIndustry,
-} from "../_shared/industryClassifier.ts";
+} from "../_shared/industryClassifierCanonical.ts";
 
 const MAX_RECORDS = 10_000;
 const MAX_BATCH_SIZE = 500;
@@ -79,7 +79,7 @@ Deno.serve(async (req) => {
     if (!dryRun && body?.confirm_phrase !== APPLY_CONFIRMATION) {
       return secureJson(
         {
-          error: `confirm_phrase must equal \"${APPLY_CONFIRMATION}\" when dry_run is false`,
+          error: `confirm_phrase must equal "${APPLY_CONFIRMATION}" when dry_run is false`,
           code: "INDUSTRY_BACKFILL_CONFIRMATION_REQUIRED",
         },
         { status: 400 },
