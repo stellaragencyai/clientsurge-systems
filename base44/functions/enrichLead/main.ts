@@ -4,7 +4,6 @@ import { withTimeout } from "../_shared/timeout.js";
 import {
   buildIndustryDataQualityFlags,
   classifyLeadIndustry,
-  serializeIndustryClassification,
 } from "../_shared/industryClassifier.ts";
 
 const ENRICH_LEAD_TIMEOUT_MS = 10_000;
@@ -32,9 +31,9 @@ function industryUpdate(lead, classification, now, enrichedTags = null) {
   return {
     industry,
     industry_tags: mergeTags(industry, enrichedTags, lead.industry_tags),
-    assigned_agent_name: classification.routing.agent_name,
-    ai_last_classification: serializeIndustryClassification(classification),
-    ai_confidence: classification.confidence,
+    assigned_agent_name: classification.status === "review_required"
+      ? (lead.assigned_agent_name || "sales_rep_general")
+      : classification.routing.agent_name,
     data_quality_flags: buildIndustryDataQualityFlags(lead.data_quality_flags, classification),
     data_quality_checked_at: now,
     audited_at: now,
@@ -58,8 +57,8 @@ Deno.serve(async (req) => {
 
     const now = new Date().toISOString();
 
-    // Even when enrichment is fresh, re-run the deterministic classifier so a
-    // legacy or corrected taxonomy cannot leave the canonical industry stale.
+    // Even when enrichment is fresh, refresh the deterministic classifier so
+    // taxonomy fixes cannot leave the canonical industry stale.
     if (lead.enriched_at) {
       const hoursSince = (Date.now() - new Date(lead.enriched_at).getTime()) / 3_600_000;
       if (hoursSince < 24) {
@@ -75,13 +74,15 @@ Deno.serve(async (req) => {
       }
     }
 
-    const websiteHint = lead.website ? `Their website is: ${lead.website}.` : "";
+    const website = lead.website || lead.website_url || lead.canonical_website_url;
+    const websiteHint = website ? `Their website is: ${website}.` : "";
     const prompt = `You are a business research assistant. Research the business and return factual structured metadata.
 
 Business name: ${lead.business_name}
 Business type supplied by import/form: ${lead.business_type || "unknown"}
+Current industry: ${lead.industry || "unknown"}
 ${websiteHint}
-Location/source context: ${lead.source || "unknown"}
+Location/source context: ${lead.city || ""} ${lead.state || ""} ${lead.source || "unknown"}
 
 Extract:
 1. industry_tags: 2-5 specific services or niche terms. Do not repeat a broad imported label unless verified.
@@ -91,10 +92,11 @@ Extract:
 5. enrichment_notes: 1-2 factual sentences describing actual services and positioning.
 
 Important distinctions:
-- Nail salons, barber shops, hair salons, tanning and massage businesses are Beauty & Personal Care, not medical spas.
+- Nail salons, barber shops, hair salons and tanning businesses are Beauty & Personal Care, not medical spas.
 - Medical spas require medical-aesthetic evidence such as injectables, Botox, fillers, medical lasers, cosmetic surgery or clinical skin treatments.
-- Physical therapy and chiropractic are not generic fitness businesses.
-Return only valid JSON.`;
+- Physical therapy is distinct from chiropractic and is not generic fitness.
+- HVAC, plumbing and electrical businesses must be categorized separately when the evidence identifies the trade.
+Return only valid JSON. Do not guess.`;
 
     let enriched = {};
     try {
@@ -122,6 +124,7 @@ Return only valid JSON.`;
       await base44.asServiceRole.entities.Leads.update(leadId, {
         ...industryUpdate(lead, fallbackClassification, now),
         enriched_at: now,
+        enrichment_status: "failed",
         enrichment_notes: `Enrichment attempted but failed: ${message}`,
       });
       console.error("[enrichLead] LLM error:", message);
@@ -148,7 +151,8 @@ Return only valid JSON.`;
 
     const update = {
       enriched_at: now,
-      enrichment_notes: enriched.enrichment_notes || null,
+      enrichment_status: "enriched",
+      enrichment_notes: enriched.enrichment_notes || lead.enrichment_notes || null,
       company_size: companySize,
       ...industryUpdate(lead, classification, now, enrichedTags),
     };
@@ -174,8 +178,10 @@ Return only valid JSON.`;
         lead_id: leadId,
         industry_key: classification.industry_key,
         industry: update.industry,
+        candidate_industry: classification.industry_label,
         classification_status: classification.status,
         confidence: classification.confidence,
+        conflict: classification.conflict,
         classifier_version: classification.classifier_version,
       }),
     });
