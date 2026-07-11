@@ -6,14 +6,14 @@ import {
   NOINDEX_ROUTE_PREFIXES,
   PUBLIC_ROUTE_PATHS,
 } from "./publicRouteMetadata.js";
-import { installPublicPageDirectoryGuard } from "./publicPageDirectoryGuard.js";
 
-// Production defense-in-depth: if Base44 ever renders its generated public
-// page directory before/around the React app shell, remove it and replace it
-// with a safe public fallback instead of exposing admin/client/setup route names.
-if (typeof window !== "undefined") {
-  installPublicPageDirectoryGuard();
-}
+// IMPORTANT: Route classification must remain side-effect free.
+// The previous implementation installed publicPageDirectoryGuard during module
+// evaluation. That guard repeatedly inspected the document and called
+// body.replaceChildren(...) on public routes when Base44 boilerplate was
+// detected, which deleted the mounted React application and replaced the live
+// website with a static emergency fallback. Raw HTML sanitization belongs at
+// the server/edge response layer, never inside this route metadata module.
 
 export const ROUTE_ACCESS = {
   PUBLIC: "public",
