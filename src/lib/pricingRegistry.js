@@ -40,7 +40,8 @@ export const PRICING_TIERS = Object.values(STRIPE_PRODUCTS);
 export function getPricingTier(slug) {
   const normalized = String(slug || "").trim().toLowerCase();
   if (!normalized) return null;
-  return STRIPE_PRODUCTS[normalized] || toLegacyTier(getPackageOffer(normalized)) || null;
+  const canonicalOffer = getPackageOffer(normalized);
+  return STRIPE_PRODUCTS[normalized] || (canonicalOffer ? toLegacyTier(canonicalOffer) : null);
 }
 
 export function getStripePriceId(slug, period = "monthly") {
