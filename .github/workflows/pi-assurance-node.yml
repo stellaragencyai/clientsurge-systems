@@ -1,0 +1,61 @@
+name: Raspberry Pi Assurance Node
+
+on:
+  pull_request:
+    paths:
+      - "infra/pi-assurance/**"
+      - ".github/workflows/pi-assurance-node.yml"
+  push:
+    branches:
+      - main
+    paths:
+      - "infra/pi-assurance/**"
+      - ".github/workflows/pi-assurance-node.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    name: Validate assurance package
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Compile assurance engine
+        run: python -m py_compile infra/pi-assurance/clientsurge_assurance.py
+
+      - name: Run unit tests
+        run: python -m unittest discover -s infra/pi-assurance/tests -v
+
+      - name: Validate installer shell syntax
+        run: bash -n infra/pi-assurance/install.sh
+
+      - name: Validate route profiles
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          payload = json.loads(Path("infra/pi-assurance/routes.json").read_text())
+          assert len(payload["light"]) >= 4
+          assert len(payload["full"]) >= 20
+          print(f"Validated {len(payload['light'])} light and {len(payload['full'])} full routes")
+          PY
+
+      - name: Summary
+        if: always()
+        run: |
+          echo "## Raspberry Pi Assurance Node" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Python engine compiled" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Unit tests executed" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Installer syntax validated" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Route profiles validated" >> "$GITHUB_STEP_SUMMARY"
