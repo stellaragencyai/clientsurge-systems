@@ -4,7 +4,7 @@ import { withTimeout } from "../_shared/timeout.js";
 import {
   buildIndustryDataQualityFlags,
   classifyLeadIndustry,
-} from "../_shared/industryClassifier.ts";
+} from "../_shared/industryClassifierCanonical.ts";
 
 const ENRICH_LEAD_TIMEOUT_MS = 10_000;
 
