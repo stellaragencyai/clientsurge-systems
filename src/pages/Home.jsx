@@ -138,11 +138,9 @@ export default function Home() {
         </div>
 
         {/* 3. How it works — the core ClientSurge operating sequence. */}
-        <div id="solution" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
-          <SectionErrorBoundary sectionName="how-it-works">
-            <SolutionSection />
-          </SectionErrorBoundary>
-        </div>
+        <SectionErrorBoundary sectionName="how-it-works">
+          <SolutionSection />
+        </SectionErrorBoundary>
 
         {/* 4. Product — the six automations customers actually receive. */}
         <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
@@ -152,26 +150,22 @@ export default function Home() {
         </div>
 
         {/* 5. Commercial decision — Starter, Growth, and Pro. */}
-        <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
-          <SectionErrorBoundary sectionName="pricing">
-            <ThreeSystemsSection />
-          </SectionErrorBoundary>
-        </div>
+        <SectionErrorBoundary sectionName="pricing">
+          <ThreeSystemsSection />
+        </SectionErrorBoundary>
 
         {/* 6. Objection handling — trust, essential FAQ, and one final action. */}
-        <div id="trust" className="bg-white" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+        <div className="bg-white">
           <SectionErrorBoundary sectionName="trust">
             <TrustSection />
           </SectionErrorBoundary>
 
-          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
-            <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
-              <FAQSection />
-            </SectionErrorBoundary>
-          </div>
+          <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
+            <FAQSection />
+          </SectionErrorBoundary>
 
           <section className="px-5 pb-20 pt-4 sm:px-8 lg:pb-24" aria-labelledby="homepage-final-cta-title">
-            <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 rounded-3xl bg-[#06162f] px-6 py-10 text-center shadow-[0_20px_55px_rgba(6,22,47,0.16)] sm:px-10 lg:flex-row lg:text-left">
+            <div className="cs-on-dark mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 rounded-3xl bg-[#06162f] px-6 py-10 text-center shadow-[0_20px_55px_rgba(6,22,47,0.16)] sm:px-10 lg:flex-row lg:text-left">
               <div>
                 <p className="text-xs font-black uppercase tracking-[0.18em] text-[#35BDF1]">Ready to stop losing leads?</p>
                 <h2 id="homepage-final-cta-title" className="mt-2 text-2xl font-black tracking-[-0.035em] text-white sm:text-3xl">
