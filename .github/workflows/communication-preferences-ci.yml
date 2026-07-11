@@ -1,0 +1,57 @@
+name: Communication Preferences CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/components/saas-portal/SaasCommunicationPreferences.jsx'
+      - 'src/pages/ClientSaasDashboard.jsx'
+      - 'base44/entities/CommunicationPreference.json'
+      - 'base44/entities/CommunicationPreferenceHistory.json'
+      - 'base44/functions/getCommunicationPreferences/**'
+      - 'base44/functions/updateCommunicationPreferences/**'
+      - 'base44/functions/_shared/communicationGuard/**'
+      - 'tests/communicationPreferences*.test.js'
+      - '.github/workflows/communication-preferences-ci.yml'
+  pull_request:
+    paths:
+      - 'src/components/saas-portal/SaasCommunicationPreferences.jsx'
+      - 'src/pages/ClientSaasDashboard.jsx'
+      - 'base44/entities/CommunicationPreference.json'
+      - 'base44/entities/CommunicationPreferenceHistory.json'
+      - 'base44/functions/getCommunicationPreferences/**'
+      - 'base44/functions/updateCommunicationPreferences/**'
+      - 'base44/functions/_shared/communicationGuard/**'
+      - 'tests/communicationPreferences*.test.js'
+      - '.github/workflows/communication-preferences-ci.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run communication-preference tests
+        run: node --test tests/communicationPreferences*.test.js
+
+      - name: Run lint
+        run: npm run lint
+
+      - name: Build production bundle
+        run: npm run build
