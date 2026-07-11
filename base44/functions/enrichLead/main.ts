@@ -1,74 +1,102 @@
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { secureJson } from "../_shared/response.ts";
-/**
- * enrichLead — auto-enrichment for the canonical Leads entity.
- *
- * Triggered by entity automation on Leads create, or called directly with { lead_id }.
- *
- * What it does:
- *  1. Loads the lead from the Leads entity
- *  2. Uses InvokeLLM with web search to scrape the business website + search for:
- *     - Industry tags (e.g. ["med spa", "aesthetics", "injectables"])
- *     - Company size estimate (solo / small / medium / large)
- *     - Social media profile URLs (Instagram, Facebook, LinkedIn, TikTok, Twitter)
- *     - A short enrichment summary
- *  3. Writes the results back to the Leads record
- *  4. Logs a CommunicationEvent
- */
-
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { withTimeout } from "../_shared/timeout.js";
+import {
+  buildIndustryDataQualityFlags,
+  classifyLeadIndustry,
+  serializeIndustryClassification,
+} from "../_shared/industryClassifier.ts";
 
 const ENRICH_LEAD_TIMEOUT_MS = 10_000;
+
+function mergeTags(canonicalLabel, enrichedTags, existingTags) {
+  const seen = new Set();
+  const output = [];
+  for (const value of [canonicalLabel, ...(enrichedTags || []), ...(existingTags || [])]) {
+    const text = String(value || "").trim();
+    const key = text.toLowerCase();
+    if (!key || seen.has(key)) continue;
+    seen.add(key);
+    output.push(text);
+  }
+  return output.slice(0, 8);
+}
+
+function industryUpdate(lead, classification, now, enrichedTags = null) {
+  const industry = classification.status === "classified"
+    ? classification.industry_label
+    : classification.status === "excluded_test"
+      ? "Internal Test / Excluded"
+      : "Needs Manual Review";
+
+  return {
+    industry,
+    industry_tags: mergeTags(industry, enrichedTags, lead.industry_tags),
+    assigned_agent_name: classification.routing.agent_name,
+    ai_last_classification: serializeIndustryClassification(classification),
+    ai_confidence: classification.confidence,
+    data_quality_flags: buildIndustryDataQualityFlags(lead.data_quality_flags, classification),
+    data_quality_checked_at: now,
+    audited_at: now,
+  };
+}
 
 Deno.serve(async (req) => {
   try {
     const base44 = createClientFromRequest(req);
     const body = await req.json().catch(() => ({}));
-
-    // Support automation payload shape AND direct { lead_id } call
     const leadId = body?.lead_id ?? body?.event?.entity_id ?? body?.data?.id ?? null;
     const leadData = body?.data ?? null;
 
-    if (!leadId) {
-      return secureJson({ error: "lead_id is required" }, { status: 400 });
-    }
+    if (!leadId) return secureJson({ error: "lead_id is required" }, { status: 400 });
 
-    // Load lead — use automation pre-loaded data if available
-    const lead = (leadData?.id === leadId)
+    const lead = leadData?.id === leadId
       ? leadData
       : await base44.asServiceRole.entities.Leads.get(leadId);
 
-    if (!lead) {
-      return secureJson({ error: "Lead not found" }, { status: 404 });
-    }
+    if (!lead) return secureJson({ error: "Lead not found" }, { status: 404 });
 
-    // Skip if already enriched recently (within 24h) to avoid redundant runs
+    const now = new Date().toISOString();
+
+    // Even when enrichment is fresh, re-run the deterministic classifier so a
+    // legacy or corrected taxonomy cannot leave the canonical industry stale.
     if (lead.enriched_at) {
-      const hoursSince = (Date.now() - new Date(lead.enriched_at).getTime()) / 3600000;
+      const hoursSince = (Date.now() - new Date(lead.enriched_at).getTime()) / 3_600_000;
       if (hoursSince < 24) {
-        return secureJson({ success: true, skipped: true, reason: "Already enriched within 24h" });
+        const classification = classifyLeadIndustry(lead);
+        const classificationUpdate = industryUpdate(lead, classification, now);
+        await base44.asServiceRole.entities.Leads.update(leadId, classificationUpdate);
+        return secureJson({
+          success: true,
+          skipped_enrichment: true,
+          reason: "Already enriched within 24h; canonical industry refreshed",
+          classification,
+        });
       }
     }
 
-    // Build the enrichment prompt
     const websiteHint = lead.website ? `Their website is: ${lead.website}.` : "";
-    const prompt = `You are a business research assistant. Research the following business and extract structured metadata.
+    const prompt = `You are a business research assistant. Research the business and return factual structured metadata.
 
 Business name: ${lead.business_name}
-Business type: ${lead.business_type || "unknown"}
+Business type supplied by import/form: ${lead.business_type || "unknown"}
 ${websiteHint}
-Location context: ${lead.source || "unknown source"}
+Location/source context: ${lead.source || "unknown"}
 
-Search the web for this business and extract:
-1. industry_tags: 2-5 specific industry/niche tags (e.g. ["med spa", "aesthetics", "botox", "filler"])
-2. company_size: one of "solo" (1 person), "small" (2-10), "medium" (11-50), "large" (50+), or "unknown"
-3. social_profiles: object with any found URLs for keys: instagram, facebook, linkedin, tiktok, twitter (only include ones you actually find, omit others)
-4. website: the business website URL if found (or confirm the one provided)
-5. enrichment_notes: 1-2 sentence summary of what you found about this business (services, positioning, online presence)
+Extract:
+1. industry_tags: 2-5 specific services or niche terms. Do not repeat a broad imported label unless verified.
+2. company_size: exactly one of solo, small, medium, large, unknown.
+3. social_profiles: found URLs only for instagram, facebook, linkedin, tiktok, twitter.
+4. website: verified official business website if found.
+5. enrichment_notes: 1-2 factual sentences describing actual services and positioning.
 
-Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
+Important distinctions:
+- Nail salons, barber shops, hair salons, tanning and massage businesses are Beauty & Personal Care, not medical spas.
+- Medical spas require medical-aesthetic evidence such as injectables, Botox, fillers, medical lasers, cosmetic surgery or clinical skin treatments.
+- Physical therapy and chiropractic are not generic fitness businesses.
+Return only valid JSON.`;
 
-    let enriched: any = {};
+    let enriched = {};
     try {
       enriched = await withTimeout(
         base44.asServiceRole.integrations.Core.InvokeLLM({
@@ -77,55 +105,61 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
           response_json_schema: {
             type: "object",
             properties: {
-              industry_tags:     { type: "array", items: { type: "string" } },
-              company_size:      { type: "string" },
-              social_profiles:   { type: "object" },
-              website:           { type: "string" },
-              enrichment_notes:  { type: "string" }
-            }
-          }
+              industry_tags: { type: "array", items: { type: "string" } },
+              company_size: { type: "string" },
+              social_profiles: { type: "object" },
+              website: { type: "string" },
+              enrichment_notes: { type: "string" },
+            },
+          },
         }),
         ENRICH_LEAD_TIMEOUT_MS,
-        "enrichLead InvokeLLM"
+        "enrichLead InvokeLLM",
       );
-    } catch (llmErr) {
-      const message = llmErr instanceof Error ? llmErr.message : String(llmErr);
-      console.error("[enrichLead] enrichLead LLM error:", message);
-      // Still write a partial enrichment record so we don't retry in a loop
+    } catch (llmError) {
+      const message = llmError instanceof Error ? llmError.message : String(llmError);
+      const fallbackClassification = classifyLeadIndustry(lead);
       await base44.asServiceRole.entities.Leads.update(leadId, {
-        enriched_at: new Date().toISOString(),
-        enrichment_notes: `Enrichment attempted but failed: ${message}`
+        ...industryUpdate(lead, fallbackClassification, now),
+        enriched_at: now,
+        enrichment_notes: `Enrichment attempted but failed: ${message}`,
       });
-      return secureJson({ success: false, error: message }, { status: 502 });
+      console.error("[enrichLead] LLM error:", message);
+      return secureJson({
+        success: false,
+        error: message,
+        classification: fallbackClassification,
+      }, { status: 502 });
     }
 
-    // Validate company_size against allowed enum values
     const validSizes = ["solo", "small", "medium", "large", "unknown"];
     const companySize = validSizes.includes(enriched.company_size) ? enriched.company_size : "unknown";
+    const enrichedTags = Array.isArray(enriched.industry_tags)
+      ? enriched.industry_tags.filter(Boolean).slice(0, 8)
+      : [];
 
-    // Build update payload — only write fields that came back with real values
-    const update: any = {
-      enriched_at: new Date().toISOString(),
+    const classificationInput = {
+      ...lead,
+      industry_tags: enrichedTags.length > 0 ? enrichedTags : lead.industry_tags,
+      enrichment_notes: enriched.enrichment_notes || lead.enrichment_notes,
+      website: lead.website || enriched.website,
+    };
+    const classification = classifyLeadIndustry(classificationInput);
+
+    const update = {
+      enriched_at: now,
       enrichment_notes: enriched.enrichment_notes || null,
       company_size: companySize,
+      ...industryUpdate(lead, classification, now, enrichedTags),
     };
-
-    if (Array.isArray(enriched.industry_tags) && enriched.industry_tags.length > 0) {
-      update.industry_tags = enriched.industry_tags.slice(0, 8); // cap at 8 tags
-    }
 
     if (enriched.social_profiles && typeof enriched.social_profiles === "object") {
       update.social_profiles = enriched.social_profiles;
     }
-
-    // Only update website if we don't already have one and the LLM found one
-    if (!lead.website && enriched.website) {
-      update.website = enriched.website;
-    }
+    if (!lead.website && enriched.website) update.website = enriched.website;
 
     await base44.asServiceRole.entities.Leads.update(leadId, update);
 
-    // Log event
     await base44.asServiceRole.entities.CommunicationEvent.create({
       lead_id: leadId,
       channel: "internal",
@@ -133,20 +167,23 @@ Return ONLY valid JSON matching this schema — no markdown, no explanation.`;
       event_type: "status_update",
       provider: "internal",
       status: "processed",
-      subject: "Lead auto-enriched",
-      message_body: `Enrichment complete. Tags: ${(update.industry_tags || []).join(", ") || "none"}. Size: ${companySize}. ${enriched.enrichment_notes || ""}`,
-      metadata_json: JSON.stringify({ source: "enrichLead", lead_id: leadId, tags: update.industry_tags, size: companySize }),
+      subject: "Lead auto-enriched and industry-classified",
+      message_body: `Industry: ${update.industry} (${classification.confidence}%, ${classification.status}). Tags: ${update.industry_tags.join(", ") || "none"}. Size: ${companySize}. ${enriched.enrichment_notes || ""}`,
+      metadata_json: JSON.stringify({
+        source: "enrichLead",
+        lead_id: leadId,
+        industry_key: classification.industry_key,
+        industry: update.industry,
+        classification_status: classification.status,
+        confidence: classification.confidence,
+        classifier_version: classification.classifier_version,
+      }),
     });
 
-    return secureJson({
-      success: true,
-      lead_id: leadId,
-      enriched: update,
-    });
-
+    return secureJson({ success: true, lead_id: leadId, enriched: update, classification });
   } catch (error) {
-    console.error("[enrichLead] enrichLead error:", error);
     const message = error instanceof Error ? error.message : "Enrichment failed";
+    console.error("[enrichLead]", error);
     return secureJson({ error: message }, { status: 500 });
   }
 });
