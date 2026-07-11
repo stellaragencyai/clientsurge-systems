@@ -2,7 +2,7 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import {
   buildIndustryDataQualityFlags,
   classifyLeadIndustry,
-} from "../_shared/industryClassifier.ts";
+} from "../_shared/industryClassifierCanonical.ts";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
