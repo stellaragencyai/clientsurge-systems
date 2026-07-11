@@ -1,39 +1,82 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
 import { Button } from "@/components/ui/button";
-import { AlertCircle, CheckCircle2 } from "lucide-react";
-import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone, hiddenHoneypotFilled, buildSourceAttribution } from "@/lib/formSanitizers";
+import {
+  AlertCircle,
+  ArrowRight,
+  Building2,
+  CheckCircle2,
+  Mail,
+  MessageSquareText,
+  Phone,
+  ShieldCheck,
+  Sparkles,
+  UserRound,
+} from "lucide-react";
+import {
+  isValidEmail,
+  isValidPhone,
+  normalizeEmail,
+  normalizePhone,
+  hiddenHoneypotFilled,
+  buildSourceAttribution,
+} from "@/lib/formSanitizers";
 
-const SMS_CONSENT_VERSION = "lead_capture_optional_sms_v2_2026-07-11";
+const SMS_CONSENT_VERSION = "lead_capture_optional_sms_v3_2026-07-11";
+
+const BUSINESS_TYPES = [
+  "Med Spas & Aesthetic Clinics",
+  "Dental & Orthodontics",
+  "Chiropractic & Physical Therapy",
+  "HVAC, Plumbing & Home Services",
+  "Roofing & Restoration",
+  "Contractors & Trades",
+  "Other",
+];
+
+const initialState = {
+  full_name: "",
+  business_name: "",
+  email: "",
+  phone: "",
+  business_type: "",
+  problem: "",
+  consent_given: false,
+  website_url: "",
+};
+
+function Field({ label, icon: Icon, children, hint }) {
+  return (
+    <div className="space-y-1.5">
+      <label className="flex items-center gap-2 text-sm font-semibold text-slate-800">
+        <Icon className="h-4 w-4 text-sky-600" aria-hidden="true" />
+        {label}
+      </label>
+      {children}
+      {hint ? <p className="text-[11px] leading-relaxed text-slate-500">{hint}</p> : null}
+    </div>
+  );
+}
+
+const inputClass =
+  "w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition placeholder:text-slate-400 hover:border-sky-200 focus:border-sky-500 focus:ring-4 focus:ring-sky-100";
 
 export default function LeadCaptureForm() {
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
-  const [formData, setFormData] = useState({
-    full_name: "",
-    business_name: "",
-    email: "",
-    phone: "",
-    business_type: "",
-    problem: "",
-    consent_given: false,
-    website_url: "",
-  });
+  const [formData, setFormData] = useState(initialState);
 
-  const businessTypes = [
-    "Med Spas & Aesthetic Clinics",
-    "Dental & Orthodontics",
-    "Chiropractic & Physical Therapy",
-    "HVAC, Plumbing & Home Services",
-    "Roofing & Restoration",
-    "Contractors & Trades",
-    "Other",
-  ];
+  const completedFields = useMemo(() => {
+    const keys = ["full_name", "business_name", "email", "phone", "business_type", "problem"];
+    return keys.filter((key) => String(formData[key] || "").trim()).length;
+  }, [formData]);
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
+  const completionPercent = Math.round((completedFields / 6) * 100);
+
+  const handleChange = (event) => {
+    const { name, value } = event.target;
+    setFormData((previous) => ({ ...previous, [name]: value }));
     setError("");
   };
 
@@ -41,15 +84,15 @@ export default function LeadCaptureForm() {
     if (hiddenHoneypotFilled(formData.website_url)) return "bot";
     if (!formData.full_name.trim()) return "Please enter your full name.";
     if (!formData.business_name.trim()) return "Please enter your business name.";
-    if (!isValidEmail(formData.email)) return "Please enter a valid email address.";
+    if (!isValidEmail(formData.email)) return "Please enter a valid business email address.";
     if (!isValidPhone(formData.phone)) return "Please enter a valid phone number.";
     if (!formData.business_type.trim()) return "Please select your business type.";
-    if (!formData.problem.trim()) return "Please describe the problem you want solved.";
+    if (!formData.problem.trim()) return "Please describe the main problem you want solved.";
     return "";
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
 
     const validationError = validate();
@@ -81,24 +124,18 @@ export default function LeadCaptureForm() {
         ...buildSourceAttribution("/leads/capture"),
       });
 
-      if (!result.data?.success) throw new Error(result.data?.error || "Lead submission failed");
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || "Lead submission failed");
+      }
 
       setSuccess(true);
-      setFormData({
-        full_name: "",
-        business_name: "",
-        email: "",
-        phone: "",
-        business_type: "",
-        problem: "",
-        consent_given: false,
-        website_url: "",
-      });
-
-      setTimeout(() => setSuccess(false), 5000);
-    } catch (err) {
-      setError(err.message || "Failed to submit form. Please try again or contact support@clientsurgesystems.com.");
-      console.error(err);
+      setFormData(initialState);
+    } catch (submissionError) {
+      setError(
+        submissionError.message ||
+          "We could not submit your request. Please email support@clientsurgesystems.com."
+      );
+      console.error(submissionError);
     } finally {
       setLoading(false);
     }
@@ -106,57 +143,207 @@ export default function LeadCaptureForm() {
 
   if (success) {
     return (
-      <div className="w-full max-w-md mx-auto p-6 bg-green-50 border border-green-200 rounded-lg text-center">
-        <CheckCircle2 className="w-12 h-12 text-green-600 mx-auto mb-3" />
-        <h3 className="text-lg font-semibold text-green-900 mb-2">Thank You!</h3>
-        <p className="text-sm text-green-700">We've received your information. We'll follow up by email, and by SMS only when you selected SMS consent.</p>
+      <div className="overflow-hidden rounded-3xl border border-emerald-200 bg-white shadow-[0_24px_80px_rgba(15,23,42,0.10)]">
+        <div className="bg-gradient-to-br from-emerald-50 via-white to-sky-50 px-7 py-10 text-center sm:px-10">
+          <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 shadow-inner">
+            <CheckCircle2 className="h-9 w-9 text-emerald-600" />
+          </div>
+          <h3 className="mt-5 text-2xl font-bold tracking-tight text-slate-950">Your request is in.</h3>
+          <p className="mx-auto mt-3 max-w-md text-sm leading-6 text-slate-600">
+            We received your information. We will follow up by email, and by SMS only when you selected SMS consent.
+          </p>
+          <Button
+            type="button"
+            onClick={() => setSuccess(false)}
+            className="mt-6 h-11 rounded-xl bg-sky-600 px-6 font-semibold hover:bg-sky-700"
+          >
+            Submit another request
+          </Button>
+        </div>
       </div>
     );
   }
 
   return (
-    <form onSubmit={handleSubmit} className="w-full max-w-md mx-auto space-y-4" noValidate>
-      <input type="text" name="website_url" value={formData.website_url} onChange={handleChange} tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
-      {error && (
-        <div className="flex items-center gap-2 p-4 bg-red-50 border border-red-200 rounded-lg" role="alert">
-          <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0" />
-          <p className="text-sm text-red-700">{error}</p>
+    <form onSubmit={handleSubmit} className="space-y-6" noValidate>
+      <input
+        type="text"
+        name="website_url"
+        value={formData.website_url}
+        onChange={handleChange}
+        tabIndex={-1}
+        autoComplete="off"
+        className="hidden"
+        aria-hidden="true"
+      />
+
+      <div className="rounded-2xl border border-sky-100 bg-gradient-to-r from-sky-50 to-white p-4">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="flex items-center gap-2 text-xs font-bold uppercase tracking-[0.16em] text-sky-700">
+              <Sparkles className="h-3.5 w-3.5" />
+              Free automation assessment
+            </p>
+            <p className="mt-1 text-sm text-slate-600">Usually takes less than two minutes.</p>
+          </div>
+          <div className="text-right">
+            <p className="text-xs font-semibold text-slate-500">Form progress</p>
+            <p className="text-sm font-bold text-sky-700">{completionPercent}%</p>
+          </div>
         </div>
-      )}
-
-      <div><label className="block text-sm font-medium text-foreground mb-1.5">Full Name</label><input type="text" name="full_name" value={formData.full_name} onChange={handleChange} required placeholder="John Doe" autoComplete="name" className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" /></div>
-      <div><label className="block text-sm font-medium text-foreground mb-1.5">Business Name</label><input type="text" name="business_name" value={formData.business_name} onChange={handleChange} required placeholder="Your Business" autoComplete="organization" className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" /></div>
-      <div><label className="block text-sm font-medium text-foreground mb-1.5">Email</label><input type="email" name="email" value={formData.email} onChange={handleChange} required placeholder="john@example.com" autoComplete="email" aria-invalid={Boolean(formData.email && !isValidEmail(formData.email))} className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" /></div>
-      <div><label className="block text-sm font-medium text-foreground mb-1.5">Phone Number</label><input type="tel" name="phone" value={formData.phone} onChange={handleChange} required placeholder="+1 (555) 123-4567" autoComplete="tel" aria-invalid={Boolean(formData.phone && !isValidPhone(formData.phone))} className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary" /></div>
-
-      <div>
-        <label className="block text-sm font-medium text-foreground mb-1.5">Business Type</label>
-        <select name="business_type" value={formData.business_type} onChange={handleChange} required className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground focus:outline-none focus:ring-2 focus:ring-primary">
-          <option value="">Select your business type</option>
-          {businessTypes.map((type) => <option key={type} value={type}>{type}</option>)}
-        </select>
+        <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-sky-100">
+          <div
+            className="h-full rounded-full bg-gradient-to-r from-sky-500 to-blue-600 transition-all duration-300"
+            style={{ width: `${completionPercent}%` }}
+          />
+        </div>
       </div>
 
-      <div><label className="block text-sm font-medium text-foreground mb-1.5">What's your biggest problem right now?</label><textarea name="problem" value={formData.problem} onChange={handleChange} required placeholder="Tell us what you're struggling with..." rows={3} className="w-full px-4 py-2.5 rounded-lg border border-border bg-white text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary resize-none" /></div>
+      {error ? (
+        <div className="flex items-start gap-3 rounded-xl border border-red-200 bg-red-50 p-4" role="alert">
+          <AlertCircle className="mt-0.5 h-5 w-5 flex-shrink-0 text-red-600" />
+          <p className="text-sm font-medium leading-6 text-red-700">{error}</p>
+        </div>
+      ) : null}
 
-      <div className="border border-border rounded-lg p-3 bg-muted/30">
-        <p className="text-xs font-semibold text-foreground mb-2">Optional SMS consent</p>
-        <label className="flex items-start gap-3 text-xs text-muted-foreground leading-relaxed">
+      <div className="grid gap-5 sm:grid-cols-2">
+        <Field label="Full name" icon={UserRound}>
+          <input
+            type="text"
+            name="full_name"
+            value={formData.full_name}
+            onChange={handleChange}
+            required
+            placeholder="Nolan Strommer"
+            autoComplete="name"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Business name" icon={Building2}>
+          <input
+            type="text"
+            name="business_name"
+            value={formData.business_name}
+            onChange={handleChange}
+            required
+            placeholder="Your company"
+            autoComplete="organization"
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Business email" icon={Mail}>
+          <input
+            type="email"
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            required
+            placeholder="you@company.com"
+            autoComplete="email"
+            aria-invalid={Boolean(formData.email && !isValidEmail(formData.email))}
+            className={inputClass}
+          />
+        </Field>
+
+        <Field label="Phone number" icon={Phone}>
+          <input
+            type="tel"
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            required
+            placeholder="+1 (555) 123-4567"
+            autoComplete="tel"
+            aria-invalid={Boolean(formData.phone && !isValidPhone(formData.phone))}
+            className={inputClass}
+          />
+        </Field>
+      </div>
+
+      <Field label="Business type" icon={Building2}>
+        <select
+          name="business_type"
+          value={formData.business_type}
+          onChange={handleChange}
+          required
+          className={`${inputClass} appearance-none`}
+        >
+          <option value="">Select your industry</option>
+          {BUSINESS_TYPES.map((type) => (
+            <option key={type} value={type}>
+              {type}
+            </option>
+          ))}
+        </select>
+      </Field>
+
+      <Field
+        label="What is the biggest lead or follow-up problem you want solved?"
+        icon={MessageSquareText}
+        hint="Be specific. A clear answer helps us recommend the right automation first."
+      >
+        <textarea
+          name="problem"
+          value={formData.problem}
+          onChange={handleChange}
+          required
+          placeholder="Example: We miss calls after hours and leads often wait until the next day for a response."
+          rows={4}
+          className={`${inputClass} resize-y`}
+        />
+      </Field>
+
+      <div className="rounded-2xl border border-sky-100 bg-sky-50/70 p-4 sm:p-5">
+        <div className="flex items-center gap-2 text-sm font-bold text-slate-900">
+          <ShieldCheck className="h-4 w-4 text-sky-600" />
+          Optional SMS consent
+        </div>
+        <label className="mt-3 flex cursor-pointer items-start gap-3 rounded-xl border border-white bg-white/80 p-4 text-xs leading-5 text-slate-600 shadow-sm transition hover:border-sky-200">
           <input
             type="checkbox"
             checked={formData.consent_given}
-            onChange={(e) => setFormData((prev) => ({ ...prev, consent_given: e.target.checked }))}
-            className="mt-0.5 h-4 w-4 rounded border-border accent-primary"
+            onChange={(event) =>
+              setFormData((previous) => ({ ...previous, consent_given: event.target.checked }))
+            }
+            className="mt-0.5 h-4 w-4 flex-shrink-0 rounded border-slate-300 accent-sky-600"
             aria-describedby="sms-consent-disclosure"
           />
           <span id="sms-consent-disclosure">
-            I agree to receive SMS messages from ClientSurge Systems regarding my inquiry, appointments, onboarding, and service updates. Message frequency varies. Message and data rates may apply. Reply <strong>STOP</strong> to opt out or <strong>HELP</strong> for help. Consent is not a condition of purchase. View <a href="/sms-terms" className="underline hover:text-foreground">SMS Terms</a> and <a href="/privacy" className="underline hover:text-foreground">Privacy Policy</a>.
+            I agree to receive SMS messages from ClientSurge Systems regarding my inquiry, appointments,
+            onboarding, and service updates. Message frequency varies. Message and data rates may apply.
+            Reply <strong>STOP</strong> to opt out or <strong>HELP</strong> for help. Consent is not a condition
+            of purchase. View{" "}
+            <a href="/sms-terms" className="font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-900">
+              SMS Terms
+            </a>{" "}
+            and{" "}
+            <a href="/privacy" className="font-semibold text-sky-700 underline underline-offset-2 hover:text-sky-900">
+              Privacy Policy
+            </a>
+            .
           </span>
         </label>
-        <p className="mt-2 text-[11px] text-muted-foreground">You may submit this form without selecting SMS consent. We can respond by email.</p>
+        <p className="mt-3 text-[11px] leading-5 text-slate-500">
+          You can submit this form without selecting SMS consent. We can respond by email instead.
+        </p>
       </div>
 
-      <Button type="submit" disabled={loading} className="w-full rounded-lg h-11 text-base font-semibold">{loading ? "Submitting..." : "Submit"}</Button>
+      <Button
+        type="submit"
+        disabled={loading}
+        className="group h-13 w-full rounded-xl bg-gradient-to-r from-sky-600 to-blue-700 text-base font-bold shadow-[0_12px_30px_rgba(2,132,199,0.28)] transition hover:from-sky-700 hover:to-blue-800 disabled:opacity-60"
+      >
+        {loading ? "Submitting securely..." : "Get my automation assessment"}
+        {!loading ? <ArrowRight className="ml-2 h-4 w-4 transition-transform group-hover:translate-x-1" /> : null}
+      </Button>
+
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 text-[11px] font-medium text-slate-500">
+        <span className="flex items-center gap-1.5"><ShieldCheck className="h-3.5 w-3.5 text-sky-600" />Secure submission</span>
+        <span>No spam</span>
+        <span>No obligation</span>
+      </div>
     </form>
   );
 }
