@@ -9,7 +9,7 @@ const SECTIONS = [
   {
     title: "SMS Consent",
     body:
-      "By submitting a form, booking a call, requesting information, or otherwise opting in, you agree that ClientSurge Systems may send text messages related to your inquiry, appointment, service request, onboarding, account, or requested follow-up.",
+      "By affirmatively selecting the optional SMS-consent checkbox on a ClientSurge Systems form, or by otherwise providing legally sufficient SMS consent, you agree that ClientSurge Systems may send text messages related to your inquiry, appointments, onboarding, account, service updates, or requested customer-support follow-up. Submitting a form without selecting SMS consent does not enroll you in SMS messaging.",
   },
   {
     title: "Message Frequency",
@@ -34,7 +34,12 @@ const SECTIONS = [
   {
     title: "Consent Not Required for Purchase",
     body:
-      "Where required by law, SMS consent is not a condition of purchasing goods or services from ClientSurge Systems.",
+      "SMS consent is not a condition of purchasing goods or services from ClientSurge Systems. You may submit an inquiry without selecting the SMS-consent checkbox and receive a response through another requested channel, such as email.",
+  },
+  {
+    title: "Mobile Data and Consent Protection",
+    body:
+      "No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text-messaging originator opt-in data and consent will not be sold, rented, transferred, or shared with third parties for their own marketing or promotional purposes. Service providers may process data only as needed to operate the messaging program, deliver requested messages, maintain security, and comply with law.",
   },
   {
     title: "Automated and AI-Assisted Communications",
@@ -44,7 +49,7 @@ const SECTIONS = [
   {
     title: "Privacy",
     body:
-      "SMS-related data is handled according to the ClientSurge Systems Privacy Policy. We do not sell your personal information.",
+      "SMS-related data is handled according to the ClientSurge Systems Privacy Policy. We do not sell personal information or use SMS consent for unrelated third-party marketing.",
   },
 ];
 
@@ -53,11 +58,11 @@ export default function SmsTermsPage() {
     return setPageMetadata({
       title: "SMS Terms and Consent | ClientSurge Systems",
       description:
-        "ClientSurge Systems SMS terms covering opt-in consent, message frequency, message and data rates, STOP opt-out instructions, HELP support, and automated communications.",
+        "ClientSurge Systems SMS terms covering optional opt-in consent, message frequency, message and data rates, STOP opt-out instructions, HELP support, and mobile data protections.",
       canonicalPath: "/sms-terms",
       ogTitle: "SMS Terms and Consent | ClientSurge Systems",
       ogDescription:
-        "Review ClientSurge Systems SMS consent, STOP opt-out, HELP support, message frequency, and automated communication terms.",
+        "Review ClientSurge Systems SMS consent, STOP opt-out, HELP support, message frequency, and mobile data protections.",
     });
   }, []);
 
@@ -74,7 +79,7 @@ export default function SmsTermsPage() {
             These SMS Terms explain how ClientSurge Systems uses text messaging for inquiries,
             appointment coordination, onboarding, support, and service-related follow-up.
           </p>
-          <p className="mt-2 text-xs text-muted-foreground">Last updated: June 29, 2026</p>
+          <p className="mt-2 text-xs text-muted-foreground">Last updated: July 11, 2026</p>
 
           <div className="mt-10 grid gap-5">
             {SECTIONS.map((section, index) => (
