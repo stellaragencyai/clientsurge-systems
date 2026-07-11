@@ -27,12 +27,17 @@ const PRIVACY_SECTIONS = [
   {
     id: "sms-email",
     title: "SMS and Email Communications",
-    body: "If you provide a phone number or email address and opt in where required, we may use it to send requested follow-ups, appointment reminders, booking confirmations, missed-call text-back messages, review requests, reactivation messages, service updates, and related business communications. Message frequency varies. Message and data rates may apply. Consent is not a condition of purchase.",
+    body: "If you provide a phone number and affirmatively select the optional SMS-consent checkbox, we may send requested SMS communications related to your inquiry, appointments, onboarding, service updates, and customer support. Email follow-up may still occur when you submit an inquiry without selecting SMS consent. Message frequency varies. Message and data rates may apply. SMS consent is not a condition of purchase. Reply STOP to opt out or HELP for help.",
   },
   {
     id: "consent-records",
     title: "Consent Records",
-    body: "When you submit a form or otherwise opt in to communications, we may store consent records such as consent text version, timestamp, IP address, source page, UTM/source details, and submitted contact details so we can maintain accurate compliance and audit records.",
+    body: "When you opt in to SMS communications, we may store consent records such as consent text version, timestamp, IP address, source page, UTM/source details, requested communication channels, and submitted contact details so we can maintain accurate compliance and audit records.",
+  },
+  {
+    id: "mobile-data",
+    title: "Mobile Messaging Data and Consent",
+    body: "No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text-messaging originator opt-in data and consent will not be sold, rented, transferred, or shared with third parties for their own marketing or promotional purposes. We may provide data to service providers only as necessary to operate our messaging program, deliver requested messages, maintain security, and comply with law.",
   },
   {
     id: "ai-processing",
@@ -47,7 +52,7 @@ const PRIVACY_SECTIONS = [
   {
     id: "data-sharing",
     title: "Data Sharing and Third-Party Services",
-    body: "We do not sell your personal information. We share data only with service providers needed to operate the website, forms, messaging, payments, email, analytics, automation, and AI workflows. These providers may include Base44, Twilio, Resend, Stripe, OpenAI, Google, Calendly, and similar infrastructure or business service vendors.",
+    body: "We do not sell your personal information. We share data only with service providers needed to operate the website, forms, messaging, payments, email, analytics, automation, and AI workflows. These providers may include Base44, Twilio, Resend, Stripe, OpenAI, Google, Calendly, and similar infrastructure or business service vendors. These operational disclosures do not permit any provider to use mobile information or SMS consent for its own marketing or promotional purposes.",
   },
   {
     id: "data-retention",
@@ -85,7 +90,7 @@ const TERMS_SECTIONS = [
   {
     id: "sms-compliance",
     title: "SMS Compliance",
-    body: "When you submit a form and check the communication consent box, book a requested appointment, or otherwise opt in, you consent to receive automated and non-automated text messages from ClientSurge Systems related to your inquiry, appointments, service updates, and follow-up. Message frequency varies. Message and data rates may apply. Consent is not a condition of purchase. Reply STOP to opt out or contact support to update communication preferences.",
+    body: "When you affirmatively select the optional SMS-consent checkbox or otherwise provide legally sufficient SMS consent, you agree to receive automated and non-automated text messages from ClientSurge Systems related to your inquiry, appointments, onboarding, service updates, and customer support. Message frequency varies. Message and data rates may apply. SMS consent is not a condition of purchase. Reply STOP to opt out or HELP for help. Additional program details are available in our SMS Terms.",
   },
   {
     id: "ai-outputs",
@@ -140,19 +145,19 @@ const REFUND_SECTIONS = [
 const LEGAL_META = {
   privacy: {
     title: "Privacy Policy",
-    updated: "July 8, 2026",
+    updated: "July 11, 2026",
     canonicalPath: "/privacy",
     sections: PRIVACY_SECTIONS,
     summary: [
       { icon: Lock, text: "We do not sell personal information" },
       { icon: PhoneCall, text: "SMS opt-out: reply STOP anytime" },
-      { icon: Shield, text: "Account/data deletion requests are available" },
+      { icon: Shield, text: "Mobile opt-in data is not shared for marketing" },
       { icon: ScrollText, text: "Consent records are maintained for auditability" },
     ],
   },
   terms: {
     title: "Terms of Service",
-    updated: "July 8, 2026",
+    updated: "July 11, 2026",
     canonicalPath: "/terms",
     sections: TERMS_SECTIONS,
     summary: [
@@ -164,7 +169,7 @@ const LEGAL_META = {
   },
   refund: {
     title: "Refund & Cancellation Policy",
-    updated: "July 8, 2026",
+    updated: "July 11, 2026",
     canonicalPath: "/refund-policy",
     sections: REFUND_SECTIONS,
     summary: [
