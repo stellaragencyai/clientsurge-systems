@@ -1,19 +1,42 @@
-// #94: Package tier/capability matrix for install runtime gates.
-// For pricing and Stripe product IDs, use PACKAGE_DEFINITIONS / PACKAGE_OFFERS from lib/salesCatalog.js.
-// These two files are complementary: salesCatalog = pricing; packageCapabilities = install runtime.
+import { getPackageOffer } from "./salesCatalog.js";
+
+// Runtime install requirements remain here; package names and service inclusions
+// are always read from the canonical sales catalog.
+
+const starterOffer = getPackageOffer("starter_system");
+const growthOffer = getPackageOffer("growth_system");
+const proOffer = getPackageOffer("pro_system");
+
+const BASIC_REQUIRED_INTAKE_FIELDS = [
+  "business_name",
+  "business_phone",
+  "business_hours",
+  "booking_link",
+  "brand_voice",
+  "services",
+];
+
+const GROWTH_REQUIRED_INTAKE_FIELDS = [
+  ...BASIC_REQUIRED_INTAKE_FIELDS,
+  "lead_sources",
+  "booking_process",
+  "common_customer_questions",
+];
+
+const PRO_REQUIRED_INTAKE_FIELDS = [
+  ...GROWTH_REQUIRED_INTAKE_FIELDS,
+  "reactivation_target_segment",
+  "review_link",
+  "review_trigger_event",
+];
+
 export const PACKAGE_CAPABILITY_MATRIX = {
+  // `basic` is retained as a runtime compatibility alias for Starter.
   basic: {
-    package_key: "basic_website_plus_two_automations",
-    package_name: "Website Redesign + Instant Lead Response + Missed Call Text-Back",
-    service_keys: ["instant_lead_response", "missed_call_text_back"],
-    required_intake_fields: [
-      "business_name",
-      "business_phone",
-      "business_hours",
-      "booking_link",
-      "brand_voice",
-      "services",
-    ],
+    package_key: starterOffer.package_key,
+    package_name: starterOffer.name,
+    service_keys: [...starterOffer.included_service_keys],
+    required_intake_fields: BASIC_REQUIRED_INTAKE_FIELDS,
     runtime_gates: [
       "website_lead_form_connected",
       "twilio_sms_webhook_verified",
@@ -26,25 +49,10 @@ export const PACKAGE_CAPABILITY_MATRIX = {
     ],
   },
   growth: {
-    package_key: "growth_website_plus_four_automations",
-    package_name: "Website Redesign + Instant Response + Missed Call + 14-Day Nurture + AI Booking Agent",
-    service_keys: [
-      "instant_lead_response",
-      "missed_call_text_back",
-      "nurture_sequence_14d",
-      "ai_booking_agent",
-    ],
-    required_intake_fields: [
-      "business_name",
-      "business_phone",
-      "business_hours",
-      "booking_link",
-      "brand_voice",
-      "services",
-      "lead_sources",
-      "booking_process",
-      "common_customer_questions",
-    ],
+    package_key: growthOffer.package_key,
+    package_name: growthOffer.name,
+    service_keys: [...growthOffer.included_service_keys],
+    required_intake_fields: GROWTH_REQUIRED_INTAKE_FIELDS,
     runtime_gates: [
       "basic_package_gates_passed",
       "nurture_sequence_templates_saved",
@@ -58,30 +66,10 @@ export const PACKAGE_CAPABILITY_MATRIX = {
     ],
   },
   pro: {
-    package_key: "pro_website_plus_six_automations",
-    package_name: "Website Redesign + Full Six-Automation Stack",
-    service_keys: [
-      "instant_lead_response",
-      "missed_call_text_back",
-      "nurture_sequence_14d",
-      "ai_booking_agent",
-      "lead_reactivation",
-      "review_request",
-    ],
-    required_intake_fields: [
-      "business_name",
-      "business_phone",
-      "business_hours",
-      "booking_link",
-      "brand_voice",
-      "services",
-      "lead_sources",
-      "booking_process",
-      "common_customer_questions",
-      "reactivation_target_segment",
-      "review_link",
-      "review_trigger_event",
-    ],
+    package_key: proOffer.package_key,
+    package_name: proOffer.name,
+    service_keys: [...proOffer.included_service_keys],
+    required_intake_fields: PRO_REQUIRED_INTAKE_FIELDS,
     runtime_gates: [
       "growth_package_gates_passed",
       "reactivation_target_segment_saved",
@@ -96,7 +84,17 @@ export const PACKAGE_CAPABILITY_MATRIX = {
 };
 
 export function getPackageCapabilities(packageTier = "basic") {
-  return PACKAGE_CAPABILITY_MATRIX[packageTier] || PACKAGE_CAPABILITY_MATRIX.basic;
+  const normalized = String(packageTier || "").trim().toLowerCase();
+  if (["starter", "starter_system", "basic_website_plus_two_automations"].includes(normalized)) {
+    return PACKAGE_CAPABILITY_MATRIX.basic;
+  }
+  if (["growth_system", "growth_website_plus_four_automations"].includes(normalized)) {
+    return PACKAGE_CAPABILITY_MATRIX.growth;
+  }
+  if (["pro_system", "elite_system", "pro_website_plus_six_automations"].includes(normalized)) {
+    return PACKAGE_CAPABILITY_MATRIX.pro;
+  }
+  return PACKAGE_CAPABILITY_MATRIX[normalized] || PACKAGE_CAPABILITY_MATRIX.basic;
 }
 
 export function getPackageTierForServiceKeys(serviceKeys = []) {
