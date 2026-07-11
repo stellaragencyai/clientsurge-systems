@@ -104,7 +104,7 @@ export default function TrustSection() {
         aria-hidden="true"
       />
 
-      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6">
+      <div className="relative z-10 max-w-[1320px] mx-auto px-4 sm:px-6">
         <motion.div
           initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
@@ -120,13 +120,13 @@ export default function TrustSection() {
           />
         </motion.div>
 
-        {/* Trust pillars — 2x2 grid */}
+        {/* Trust pillars — four equal cards on one desktop row */}
         <motion.div
           variants={shouldReduceMotion ? {} : containerVariants}
           initial={shouldReduceMotion ? {} : 'hidden'}
           whileInView={shouldReduceMotion ? {} : 'visible'}
           viewport={{ once: true, margin: '-80px' }}
-          className="grid grid-cols-1 md:grid-cols-2 gap-5 md:gap-6"
+          className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 items-stretch gap-5 xl:gap-4"
         >
           {TRUST_PILLARS.map((pillar) => {
             const Icon = pillar.icon;
@@ -134,7 +134,7 @@ export default function TrustSection() {
               <motion.div
                 key={pillar.title}
                 variants={shouldReduceMotion ? {} : itemVariants}
-                className="cs-glow-card p-6 md:p-7 relative overflow-hidden"
+                className="cs-glow-card h-full min-h-[340px] xl:min-h-[370px] p-6 xl:p-5 relative overflow-hidden"
               >
                 {/* Accent corner glow */}
                 <div
