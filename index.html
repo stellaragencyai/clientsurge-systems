@@ -121,6 +121,15 @@
       .static-pricing-list { margin:16px 0 0; padding:0; list-style:none; display:grid; gap:10px; color:#334155; font-size:14px; line-height:1.5; }
       .static-pricing-list strong { color:#0f172a; }
       @media (max-width: 820px) { .static-header, .static-footer, .static-hero { display:block; } .static-nav { margin-top:16px; } .static-hero { padding-top:40px; } .static-panel { margin-top:28px; } }
+
+      /* ── RAW HTML ROUTE EXPOSURE GUARD ──
+         Before React mounts (html lacks .clientsurge-app-mounted),
+         hide everything in #root except the .static-fallback. This
+         prevents any Base44-injected directory boilerplate from being
+         visible in the initial render, at the CSS layer — no JS needed. */
+      html:not(.clientsurge-app-mounted) #root > *:not(.static-fallback) {
+        display: none !important;
+      }
     </style>
 
     <title>ClientSurge Systems | AI-Powered Sales Systems for Local Businesses</title>
@@ -182,6 +191,63 @@
         </div>
       </main>
     </div>
+    <script>
+      // ── RAW HTML ROUTE EXPOSURE GUARD (synchronous, pre-React) ──
+      // Runs BEFORE the React module script loads. If Base44's serving
+      // layer injected a generated page directory into #root (route lists,
+      // entity-count boilerplate, "available pages", admin/client/setup
+      // links), strip it now and restore the safe static fallback so the
+      // visitor never sees internal route names in the initial paint.
+      (function () {
+        var root = document.getElementById("root");
+        if (!root) return;
+
+        var DIR_PATTERNS = /manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|available pages|app pages/i;
+        var text = (root.textContent || "").replace(/\s+/g, " ").trim();
+        var isGenerated = DIR_PATTERNS.test(text);
+
+        if (!isGenerated) {
+          var headings = root.querySelectorAll("h1,h2,h3,h4");
+          for (var i = 0; i < headings.length; i++) {
+            var h = (headings[i].textContent || "").replace(/\s+/g, " ").trim();
+            if (/^pages$/i.test(h) || /available pages/i.test(h)) {
+              isGenerated = true;
+              break;
+            }
+          }
+        }
+
+        if (!isGenerated) return;
+
+        document.documentElement.setAttribute("data-clientsurge-route-exposure-guard", "blocked-generated-directory");
+
+        var fallback = root.querySelector(".static-fallback");
+        if (fallback) {
+          root.innerHTML = "";
+          root.appendChild(fallback);
+        } else {
+          root.innerHTML =
+            '<main class="static-fallback" aria-label="ClientSurge Systems"><div class="static-shell">' +
+            '<header class="static-header"><a class="static-brand" href="/">ClientSurge Systems</a>' +
+            '<nav class="static-nav" aria-label="Public navigation">' +
+            '<a href="/pricing">AI Packages</a><a href="/automations">Automations</a>' +
+            '<a href="/industries">Industries</a><a href="/how-it-works">How It Works</a>' +
+            '<a href="/proof">Proof</a><a href="/contact">Contact</a><a href="/login">Client Login</a>' +
+            "</nav></header>" +
+            '<section class="static-hero"><div>' +
+            '<p class="static-eyebrow">AI Growth System for Service Businesses</p>' +
+            '<h1>Turn your website into an AI-powered sales system.</h1>' +
+            '<p class="static-lede">Compare packaged automation systems for lead capture, missed-call recovery, AI follow-up, booking, reviews, and reactivation. We configure, test, and install the system for you.</p>' +
+            '<div class="static-actions"><a class="static-button" href="/pricing">Compare Packages</a>' +
+            '<a class="static-button secondary" href="/contact">Contact ClientSurge</a></div></div></section>' +
+            '<footer class="static-footer"><p>ClientSurge Systems installs AI automation systems for local service businesses.</p>' +
+            '<nav class="static-nav" aria-label="Legal navigation">' +
+            '<a href="/privacy">Privacy</a><a href="/terms">Terms</a>' +
+            '<a href="/sms-terms">SMS Terms</a><a href="/refund-policy">Refund Policy</a>' +
+            "</nav></footer></div></main>";
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
