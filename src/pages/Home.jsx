@@ -1,31 +1,18 @@
-import { useEffect, useMemo, lazy, Suspense } from "react";
+import { useEffect, useMemo } from "react";
 import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
-import AutomationCommandPreview from "../components/landing/AutomationCommandPreview.jsx";
-import WorkflowSection from "../components/landing/WorkflowSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
-
-import LoggedOutConfirmationBanner from "../components/landing/LoggedOutConfirmationBanner";
-import ChatBubble from "../components/landing/ChatBubble";
 import Footer from "../components/landing/Footer";
-import ScrollProgressBar from "../components/landing/ScrollProgressBar";
-import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
-import ROICalculator from "../components/landing/ROICalculator.jsx";
 import FAQSection from "../components/landing/FAQSection.jsx";
 import SectionErrorBoundary from "../components/SectionErrorBoundary.jsx";
-import CSSectionHeader from "../components/design-system/CSSectionHeader.jsx";
-
-const Industries = lazy(() => import("../components/landing/Industries"));
-const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
-
 import {
   getFAQSchema,
   getLocalBusinessSchema,
@@ -38,27 +25,17 @@ import { setJsonLd, setPageMetadata } from "@/lib/seo";
 
 function isEditorSandbox() {
   try {
-    const h = window.location.hostname;
-    return h.includes("preview-sandbox") || h.includes("base44");
+    const hostname = window.location.hostname;
+    return hostname.includes("preview-sandbox") || hostname.includes("base44");
   } catch {
     return true;
   }
-}
-
-function LazyHomepageSection({ children, fallback }) {
-  return (
-    <SectionErrorBoundary sectionName="lazy-section">
-      <Suspense fallback={fallback}>{children}</Suspense>
-    </SectionErrorBoundary>
-  );
 }
 
 export default function Home() {
   const location = useLocation();
   useHashNavigation();
 
-  // Optimized hash-scroll: uses requestAnimationFrame with a max attempt count
-  // to avoid redundant setTimeout chains when multiple sections mount.
   useEffect(() => {
     if (!location.hash) return undefined;
 
@@ -72,6 +49,7 @@ export default function Home() {
         target.scrollIntoView({ behavior: "smooth", block: "start" });
         return;
       }
+
       if (attempts < 24) {
         attempts += 1;
         rafId = window.requestAnimationFrame(scrollToHashTarget);
@@ -82,15 +60,17 @@ export default function Home() {
     return () => window.cancelAnimationFrame(rafId);
   }, [location.hash]);
 
-  // Memoize SEO schemas so they only compute once per mount.
-  const schemas = useMemo(() => ({
-    organization: getOrganizationSchema(),
-    localBusiness: getLocalBusinessSchema(),
-    service: getServiceSchema(),
-    product: getProductSchema(),
-    website: getWebsiteSchema(),
-    faq: getFAQSchema(FAQ_ITEMS),
-  }), []);
+  const schemas = useMemo(
+    () => ({
+      organization: getOrganizationSchema(),
+      localBusiness: getLocalBusinessSchema(),
+      service: getServiceSchema(),
+      product: getProductSchema(),
+      website: getWebsiteSchema(),
+      faq: getFAQSchema(FAQ_ITEMS),
+    }),
+    [],
+  );
 
   useEffect(() => {
     if (isEditorSandbox()) return () => {};
@@ -99,111 +79,116 @@ export default function Home() {
     const cleanups = [];
 
     try {
-      cleanups.push(setPageMetadata({
-        title: "ClientSurge Systems | Stop Losing Leads to Slow Follow-Up",
-        description: "ClientSurge turns local service websites into lead recovery systems with audit-driven lead capture, instant response, missed-call text-back, booking handoff, follow-up, and proof-based status tracking.",
-        canonicalPath: "/",
-        ogTitle: "Stop Losing Local Service Leads | ClientSurge Systems",
-        ogDescription: "Diagnose lead leakage, compare packaged automation systems, and install a proof-first response and follow-up system for your business.",
-      }));
-    } catch (_e) {}
+      cleanups.push(
+        setPageMetadata({
+          title: "ClientSurge Systems | Stop Losing Leads to Slow Follow-Up",
+          description:
+            "ClientSurge turns local service websites into lead recovery systems with lead capture, instant response, missed-call text-back, booking, follow-up, reviews, and reactivation.",
+          canonicalPath: "/",
+          ogTitle: "Stop Losing Local Service Leads | ClientSurge Systems",
+          ogDescription:
+            "Compare packaged automation systems and install a focused response, follow-up, and booking system for your business.",
+        }),
+      );
+    } catch (_error) {}
 
-    try { cleanups.push(setJsonLd("organization", schemas.organization)); } catch (_e) {}
-    try { cleanups.push(setJsonLd("local-business", schemas.localBusiness)); } catch (_e) {}
-    try { cleanups.push(setJsonLd("service", schemas.service)); } catch (_e) {}
-    try { cleanups.push(setJsonLd("product", schemas.product)); } catch (_e) {}
-    try { cleanups.push(setJsonLd("website", schemas.website)); } catch (_e) {}
-    try { cleanups.push(setJsonLd("faq", schemas.faq)); } catch (_e) {}
+    try {
+      cleanups.push(setJsonLd("organization", schemas.organization));
+    } catch (_error) {}
+    try {
+      cleanups.push(setJsonLd("local-business", schemas.localBusiness));
+    } catch (_error) {}
+    try {
+      cleanups.push(setJsonLd("service", schemas.service));
+    } catch (_error) {}
+    try {
+      cleanups.push(setJsonLd("product", schemas.product));
+    } catch (_error) {}
+    try {
+      cleanups.push(setJsonLd("website", schemas.website));
+    } catch (_error) {}
+    try {
+      cleanups.push(setJsonLd("faq", schemas.faq));
+    } catch (_error) {}
 
     return () => {
-      cleanups.forEach((fn) => { try { fn(); } catch (_e) {} });
+      cleanups.forEach((cleanup) => {
+        try {
+          cleanup();
+        } catch (_error) {}
+      });
     };
   }, [schemas]);
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen">
-        <ScrollProgressBar />
-        <LoggedOutConfirmationBanner />
+      <div className="min-h-screen bg-white">
         <Navbar />
 
-        {/* 1. Hero — lead leakage positioning + animated product demo */}
+        {/* 1. Hero — one promise, two actions, one product visual. */}
         <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
           <HomeHero />
         </SectionErrorBoundary>
 
-        {/* 2. Problem — revenue leak framing */}
-        <SectionErrorBoundary sectionName="revenue-leak">
-          <RevenueLeakSection />
-        </SectionErrorBoundary>
+        {/* 2. Problem and outcome — concise revenue leakage framing. */}
+        <div id="problem" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+          <SectionErrorBoundary sectionName="problem-outcome">
+            <RevenueLeakSection />
+          </SectionErrorBoundary>
+        </div>
 
-        {/* 3. Solution — the 5-step AI Growth System */}
-        <SectionErrorBoundary sectionName="solution">
-          <SolutionSection />
-        </SectionErrorBoundary>
+        {/* 3. How it works — the core ClientSurge operating sequence. */}
+        <div id="solution" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+          <SectionErrorBoundary sectionName="how-it-works">
+            <SolutionSection />
+          </SectionErrorBoundary>
+        </div>
 
-        {/* 4. Product visual — IdentityIQ-style tabs, containers, and floating popups */}
-        <SectionErrorBoundary sectionName="automation-command-preview">
-          <AutomationCommandPreview />
-        </SectionErrorBoundary>
+        {/* 4. Product — the six automations customers actually receive. */}
+        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+          <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
+            <SixAutomationsSection />
+          </SectionErrorBoundary>
+        </div>
 
-        {/* 5. Six Core Automations — product-style showcase */}
-        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
-          <SixAutomationsSection />
-        </SectionErrorBoundary>
+        {/* 5. Commercial decision — Starter, Growth, and Pro. */}
+        <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+          <SectionErrorBoundary sectionName="pricing">
+            <ThreeSystemsSection />
+          </SectionErrorBoundary>
+        </div>
 
-        {/* 6. Interactive Workflow — SaaS product demonstration */}
-        <SectionErrorBoundary sectionName="workflow">
-          <WorkflowSection />
-        </SectionErrorBoundary>
+        {/* 6. Objection handling — trust, essential FAQ, and one final action. */}
+        <div id="trust" className="bg-white" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+          <SectionErrorBoundary sectionName="trust">
+            <TrustSection />
+          </SectionErrorBoundary>
 
-        {/* 7. Industries — vertical-specific templates */}
-        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
-          <Industries />
-        </LazyHomepageSection>
+          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
+            <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
+              <FAQSection />
+            </SectionErrorBoundary>
+          </div>
 
-        {/* 8. Trust — security, verification, architecture, transparency */}
-        <SectionErrorBoundary sectionName="trust">
-          <TrustSection />
-        </SectionErrorBoundary>
-
-        {/* 9. ROI Calculator — interactive lead recovery estimator */}
-        <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
-          <section className="py-16 md:py-24 px-4 bg-muted/30">
-            <div className="max-w-4xl mx-auto">
-              <CSSectionHeader
-                eyebrow="Revenue Recovery Calculator"
-                title="How Much Revenue Are You Losing?"
-                subtitle="Drag the sliders below to estimate how many leads may be leaking through missed calls and slow follow-up — then browse our packages to recover them automatically."
-                align="center"
-                className="mb-8"
-              />
-              <ROICalculator />
+          <section className="px-5 pb-20 pt-4 sm:px-8 lg:pb-24" aria-labelledby="homepage-final-cta-title">
+            <div className="mx-auto flex max-w-5xl flex-col items-center justify-between gap-6 rounded-3xl bg-[#06162f] px-6 py-10 text-center shadow-[0_20px_55px_rgba(6,22,47,0.16)] sm:px-10 lg:flex-row lg:text-left">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.18em] text-[#35BDF1]">Ready to stop losing leads?</p>
+                <h2 id="homepage-final-cta-title" className="mt-2 text-2xl font-black tracking-[-0.035em] text-white sm:text-3xl">
+                  Choose the system that fits your business.
+                </h2>
+              </div>
+              <a
+                href="/pricing"
+                className="inline-flex min-h-12 shrink-0 items-center justify-center rounded-full bg-[#00AEEF] px-7 text-sm font-black text-white transition-colors hover:bg-[#0099d5] focus:outline-none focus:ring-2 focus:ring-[#35BDF1] focus:ring-offset-2 focus:ring-offset-[#06162f]"
+              >
+                Compare Packages
+              </a>
             </div>
           </section>
         </div>
 
-        {/* 10. Pricing / Core Offer */}
-        <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SectionErrorBoundary sectionName="pricing">
-          <ThreeSystemsSection />
-        </SectionErrorBoundary>
-
-        {/* 11. FAQ — accordion section */}
-        <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
-          <FAQSection />
-        </SectionErrorBoundary>
-
-        {/* 12. Final CTA — booking conversion */}
-        <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
-          <FinalCTA />
-        </LazyHomepageSection>
-
         <Footer />
-        <ChatBubble />
       </div>
     </DemoBookingProvider>
   );
