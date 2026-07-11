@@ -1,20 +1,24 @@
 /**
  * Canonical deterministic lead-industry classifier.
  *
- * Specific business identity evidence (name, domain and enrichment tags) is
- * intentionally weighted above broad legacy import labels. Ambiguous or
- * contradictory records are flagged for review rather than silently guessed.
+ * Business identity evidence (name, domain and enrichment notes) is weighted
+ * above broad legacy import labels. Ambiguous or contradictory records are
+ * flagged for review rather than silently forced into a false category.
  */
 
-export const INDUSTRY_CLASSIFIER_VERSION = "2026-07-11.v1";
+export const INDUSTRY_CLASSIFIER_VERSION = "2026-07-11.v2";
 
 export const INDUSTRIES = {
   dental: { label: "Dental & Orthodontics", agent_name: "sales_rep_dental", rep_name: "Marcus" },
   med_spa: { label: "Med Spa & Aesthetics", agent_name: "sales_rep_med_spa", rep_name: "Sarah" },
   beauty: { label: "Beauty & Personal Care", agent_name: "sales_rep_general", rep_name: "Nolan" },
-  chiropractic_pt: { label: "Chiropractic & Physical Therapy", agent_name: "sales_rep_chiropractic", rep_name: "Jordan" },
+  chiropractic: { label: "Chiropractic", agent_name: "sales_rep_chiropractic", rep_name: "Jordan" },
+  physical_therapy: { label: "Physical Therapy & Rehabilitation", agent_name: "sales_rep_chiropractic", rep_name: "Jordan" },
+  rehabilitation_general: { label: "Chiropractic & Rehabilitation", agent_name: "sales_rep_chiropractic", rep_name: "Jordan" },
   fitness_wellness: { label: "Fitness & Wellness", agent_name: "sales_rep_general", rep_name: "Nolan" },
-  hvac_plumbing: { label: "HVAC & Plumbing", agent_name: "sales_rep_hvac", rep_name: "Tyler" },
+  hvac: { label: "HVAC", agent_name: "sales_rep_hvac", rep_name: "Tyler" },
+  plumbing: { label: "Plumbing", agent_name: "sales_rep_hvac", rep_name: "Tyler" },
+  electrical: { label: "Electrical", agent_name: "sales_rep_hvac", rep_name: "Tyler" },
   roofing_restoration: { label: "Roofing & Restoration", agent_name: "sales_rep_roofing", rep_name: "Derek" },
   contractors_trades: { label: "Contractors & Trades", agent_name: "sales_rep_contractors", rep_name: "Alex" },
   landscaping_outdoor: { label: "Landscaping & Outdoor Services", agent_name: "sales_rep_contractors", rep_name: "Alex" },
@@ -24,43 +28,60 @@ export const INDUSTRIES = {
   legal: { label: "Legal Services", agent_name: "sales_rep_general", rep_name: "Nolan" },
   accounting_finance: { label: "Accounting & Financial Services", agent_name: "sales_rep_general", rep_name: "Nolan" },
   real_estate: { label: "Real Estate", agent_name: "sales_rep_general", rep_name: "Nolan" },
+  property_management: { label: "Property Management", agent_name: "sales_rep_general", rep_name: "Nolan" },
   insurance: { label: "Insurance", agent_name: "sales_rep_general", rep_name: "Nolan" },
   food_hospitality: { label: "Restaurants & Food Service", agent_name: "sales_rep_general", rep_name: "Nolan" },
   retail_ecommerce: { label: "Retail & E-commerce", agent_name: "sales_rep_general", rep_name: "Nolan" },
   education_training: { label: "Education & Training", agent_name: "sales_rep_general", rep_name: "Nolan" },
   healthcare_medical: { label: "Healthcare & Medical", agent_name: "sales_rep_general", rep_name: "Nolan" },
   veterinary_pet: { label: "Veterinary & Pet Services", agent_name: "sales_rep_general", rep_name: "Nolan" },
+  home_care: { label: "Home Care & Senior Services", agent_name: "sales_rep_general", rep_name: "Nolan" },
   technology_marketing: { label: "Technology & Marketing", agent_name: "sales_rep_general", rep_name: "Nolan" },
   professional_services: { label: "Professional Services", agent_name: "sales_rep_general", rep_name: "Nolan" },
-  home_services: { label: "Home Services", agent_name: "sales_rep_general", rep_name: "Nolan" },
+  home_services: { label: "Home Services", agent_name: "sales_rep_hvac", rep_name: "Tyler" },
 };
 
 const RULES = [
   {
     key: "dental",
     decisive: ["dental", "dentist", "dentistry", "orthodont", "endodont", "periodont", "prosthodont", "oral surgery", "oral and maxillofacial", "dentures", "tooth doctor", "braces", "dds", "dmd"],
-    keywords: ["implant", "veneers", "teeth", "tooth", "gum care"],
+    keywords: ["implant", "veneers", "teeth", "tooth", "gum care", "root canal"],
   },
   {
-    key: "chiropractic_pt",
-    decisive: ["physical therapy", "physiotherapy", "chiropractic", "chiropractor", "sports rehabilitation", "rehabilitation clinic", "occupational therapy"],
-    keywords: ["chiro", "spine", "sports medicine", "pain clinic", "rehab", "pt clinic"],
+    key: "physical_therapy",
+    decisive: ["physical therapy", "physical therapist", "physiotherapy", "occupational therapy", "sports rehabilitation", "rehabilitation clinic", "rehab clinic"],
+    keywords: ["pt clinic", "sports therapy", "movement therapy", "rehabilitation"],
+  },
+  {
+    key: "chiropractic",
+    decisive: ["chiropractic", "chiropractor", "spinal adjustment", "chiropractic clinic"],
+    keywords: ["chiro", "spine adjustment", "spinal care"],
   },
   {
     key: "med_spa",
     decisive: ["med spa", "medspa", "medical spa", "aesthetic medicine", "aesthetics clinic", "injectables", "botox", "dermal filler", "cosmetic surgery", "plastic surgeon", "laser hair removal", "skin bar", "skin clinic", "body contouring"],
-    keywords: ["aesthetic", "microneedling", "coolsculpting", "hydrafacial", "chemical peel", "facial rejuvenation", "anti aging", "wellness clinic"],
+    keywords: ["aesthetic", "microneedling", "coolsculpting", "hydrafacial", "chemical peel", "facial rejuvenation", "anti aging"],
     excludes: ["nail salon", "nails and spa", "nail spa", "barber", "hair salon", "beauty salon", "tanning salon"],
   },
   {
     key: "beauty",
-    decisive: ["nail salon", "nails and spa", "nail spa", "nail studio", "nail bar", "barber shop", "barbershop", "hair salon", "beauty salon", "beauty bar", "lash studio", "eyelash", "eyebrow threading", "brow studio", "tanning salon", "spray tanning", "massage therapy", "massage studio", "day spa", "permanent makeup"],
+    decisive: ["nail salon", "nails and spa", "nail spa", "nail studio", "nail bar", "barber shop", "barbershop", "hair salon", "beauty salon", "beauty bar", "lash studio", "eyelash", "eyebrow threading", "brow studio", "tanning salon", "spray tanning", "massage studio", "day spa", "permanent makeup"],
     keywords: ["nails", "barber", "salon", "lashes", "lash", "brows", "brow", "tanning", "massage", "reflexology", "hair", "waxing", "makeup", "beauty supply"],
   },
   {
-    key: "hvac_plumbing",
-    decisive: ["hvac", "heating and air", "air conditioning", "plumbing", "plumber", "drain cleaning", "sewer service"],
-    keywords: ["heating", "cooling", "furnace", "ductless", "indoor air quality", "water heater", "boiler", "ventilation"],
+    key: "hvac",
+    decisive: ["hvac", "heating and air", "air conditioning", "ac repair", "furnace repair", "heat pump"],
+    keywords: ["heating", "cooling", "furnace", "ductless", "indoor air quality", "ventilation"],
+  },
+  {
+    key: "plumbing",
+    decisive: ["plumbing", "plumber", "drain cleaning", "sewer service", "water heater repair", "hydro jetting"],
+    keywords: ["water heater", "boiler", "drain", "sewer", "repiping"],
+  },
+  {
+    key: "electrical",
+    decisive: ["electrician", "electrical contractor", "electrical services", "panel upgrade", "electrical repair"],
+    keywords: ["rewiring", "generator installation", "electrical", "wiring"],
   },
   {
     key: "roofing_restoration",
@@ -84,8 +105,8 @@ const RULES = [
   },
   {
     key: "contractors_trades",
-    decisive: ["general contractor", "remodeling contractor", "construction company", "electrician", "electrical contractor", "painting contractor", "flooring contractor", "concrete contractor"],
-    keywords: ["contractor", "construction", "remodel", "builder", "painting", "flooring", "cabinet", "tile", "electric"],
+    decisive: ["general contractor", "remodeling contractor", "construction company", "painting contractor", "flooring contractor", "concrete contractor", "home builder"],
+    keywords: ["contractor", "construction", "remodel", "builder", "painting", "flooring", "cabinet", "tile"],
   },
   {
     key: "fitness_wellness",
@@ -109,9 +130,14 @@ const RULES = [
     keywords: ["accountant", "cpa", "payroll", "finance", "financial"],
   },
   {
+    key: "property_management",
+    decisive: ["property management", "property manager", "hoa management", "apartment management", "community management"],
+    keywords: ["rental management", "managed properties", "hoa"],
+  },
+  {
     key: "real_estate",
-    decisive: ["real estate", "realtor", "property management", "realty", "home inspector", "title company"],
-    keywords: ["brokerage", "realtors", "property manager"],
+    decisive: ["real estate", "realtor", "realty", "home inspector", "title company"],
+    keywords: ["brokerage", "realtors", "real estate agent"],
   },
   { key: "insurance", decisive: ["insurance agency", "insurance broker"], keywords: ["insurance", "coverage", "policy"] },
   {
@@ -125,9 +151,14 @@ const RULES = [
     keywords: ["veterinarian", "pet care", "groomer", "kennel"],
   },
   {
+    key: "home_care",
+    decisive: ["home care", "senior care", "assisted living", "memory care", "hospice", "caregiving"],
+    keywords: ["caregiver", "elder care", "in home care"],
+  },
+  {
     key: "healthcare_medical",
     decisive: ["medical clinic", "primary care", "urgent care", "pediatrics", "dermatology", "optometry", "ophthalmology", "mental health", "counseling center", "hearing center"],
-    keywords: ["doctor", "clinic", "physician", "therapy", "health center"],
+    keywords: ["doctor", "clinic", "physician", "health center"],
     excludes: ["dental", "dentist", "physical therapy", "chiropractic", "med spa", "medspa"],
   },
   {
@@ -164,13 +195,18 @@ const LEGACY_ALIASES = new Map([
   ["med spa and aesthetics", "med_spa"],
   ["beauty / personal care", "beauty"],
   ["beauty and personal care", "beauty"],
-  ["chiropractic / physical therapy", "chiropractic_pt"],
-  ["chiropractic and physical therapy", "chiropractic_pt"],
+  ["chiropractic", "chiropractic"],
+  ["physical therapy", "physical_therapy"],
+  ["physical therapy and rehabilitation", "physical_therapy"],
+  ["chiropractic / physical therapy", "rehabilitation_general"],
+  ["chiropractic and physical therapy", "rehabilitation_general"],
   ["fitness / wellness", "fitness_wellness"],
   ["fitness and wellness", "fitness_wellness"],
-  ["hvac", "hvac_plumbing"],
-  ["hvac / plumbing / home services", "hvac_plumbing"],
-  ["hvac and plumbing", "hvac_plumbing"],
+  ["hvac", "hvac"],
+  ["plumbing", "plumbing"],
+  ["electrical", "electrical"],
+  ["hvac / plumbing / home services", "home_services"],
+  ["hvac and plumbing", "home_services"],
   ["roofing", "roofing_restoration"],
   ["roofing and restoration", "roofing_restoration"],
   ["contractors and trades", "contractors_trades"],
@@ -179,10 +215,13 @@ const LEGACY_ALIASES = new Map([
   ["home services", "home_services"],
   ["legal services", "legal"],
   ["real estate", "real_estate"],
+  ["property management", "property_management"],
 ]);
 
 const TEST_SOURCES = new Set(["crm_live_smoke_test", "twilio_missed_call_test", "smoke_test", "qa_test"]);
 const GENERIC_NAMES = new Set(["", "doe", "personal", "business", "company", "test", "lead", "unknown", "hair salon", "barber shop", "contractor", "hvac"]);
+const OBSERVED_SOURCES = new Set(["business_name", "website", "enrichment_notes"]);
+const DECLARED_SOURCES = new Set(["industry_tags", "business_type", "business_type_alias", "current_industry_alias"]);
 
 function normalize(value) {
   return String(value || "")
@@ -244,6 +283,17 @@ function addAliasScore(value, weight, source, scores, evidence) {
   evidence.push({ key, source, points: weight, matches: [normalize(value)] });
 }
 
+function totalsBySource(evidence, sourceSet) {
+  const totals = {};
+  for (const item of evidence) {
+    if (!sourceSet.has(item.source)) continue;
+    totals[item.key] = (totals[item.key] || 0) + item.points;
+  }
+  return Object.entries(totals)
+    .map(([key, score]) => ({ key, score }))
+    .sort((a, b) => b.score - a.score || a.key.localeCompare(b.key));
+}
+
 export function buildIndustryDataQualityFlags(existingFlags, classification) {
   const flags = new Set(Array.isArray(existingFlags) ? existingFlags : []);
   flags.delete("missing_industry");
@@ -281,13 +331,12 @@ export function classifyLeadIndustry(lead) {
   const businessType = normalize(lead?.business_type);
   const currentIndustry = normalize(lead?.industry);
 
-  // Identity evidence outranks correlated legacy import fields.
   scoreRules(name, 14, "business_name", scores, evidence, decisiveHits);
-  scoreRules(domain, 9, "website", scores, evidence, decisiveHits);
-  scoreRules(tags, 6, "industry_tags", scores, evidence, decisiveHits);
+  scoreRules(domain, 10, "website", scores, evidence, decisiveHits);
+  scoreRules(tags, 7, "industry_tags", scores, evidence, decisiveHits);
   scoreRules(notes, 5, "enrichment_notes", scores, evidence, decisiveHits);
-  scoreRules(businessType, 3, "business_type", scores, evidence, decisiveHits);
-  addAliasScore(businessType, 4, "business_type_alias", scores, evidence);
+  scoreRules(businessType, 4, "business_type", scores, evidence, decisiveHits);
+  addAliasScore(businessType, 5, "business_type_alias", scores, evidence);
   addAliasScore(currentIndustry, 2, "current_industry_alias", scores, evidence);
 
   const ranked = Object.entries(scores)
@@ -298,7 +347,7 @@ export function classifyLeadIndustry(lead) {
     return {
       status: "review_required",
       industry_key: "unknown",
-      industry_label: lead?.industry || lead?.business_type || "Needs Manual Review",
+      industry_label: "Needs Manual Review",
       confidence: 0,
       conflict: false,
       reason: "No reliable industry evidence found",
@@ -315,29 +364,38 @@ export function classifyLeadIndustry(lead) {
   const competingDecisive = decisiveHits.filter((hit) => hit.key !== top.key);
   const decisiveNameHit = topDecisive.some((hit) => hit.source === "business_name");
   const genericName = GENERIC_NAMES.has(name);
+  const observedRanked = totalsBySource(evidence, OBSERVED_SOURCES);
+  const declaredRanked = totalsBySource(evidence, DECLARED_SOURCES);
+  const observedTop = observedRanked[0] || { key: null, score: 0 };
+  const declaredTop = declaredRanked[0] || { key: null, score: 0 };
 
-  const identityConflict = genericName &&
-    topDecisive.some((hit) => hit.source === "business_type") &&
-    competingDecisive.some((hit) => hit.source === "website");
-  const closeConflict = competingDecisive.length > 0 && margin < 5 && !decisiveNameHit;
-  const conflict = identityConflict || closeConflict;
+  const declaredObservedConflict = Boolean(
+    observedTop.key && declaredTop.key && observedTop.key !== declaredTop.key &&
+    observedTop.score >= 8 && declaredTop.score >= 6 && margin < 7
+  );
+  const genericIdentityConflict = Boolean(
+    genericName && observedTop.key && declaredTop.key && observedTop.key !== declaredTop.key && observedTop.score >= 8
+  );
+  const closeConflict = competingDecisive.length > 0 && margin < 4 && !decisiveNameHit;
+  const conflict = declaredObservedConflict || genericIdentityConflict || closeConflict;
 
   let confidence = 55;
   if (decisiveNameHit && margin >= 5) confidence = 96;
-  else if (top.score >= 24 && margin >= 9) confidence = 92;
-  else if (top.score >= 16 && margin >= 6) confidence = 86;
-  else if (top.score >= 10 && margin >= 4) confidence = 78;
+  else if (top.score >= 25 && margin >= 9) confidence = 92;
+  else if (top.score >= 17 && margin >= 6) confidence = 86;
+  else if (top.score >= 11 && margin >= 4) confidence = 78;
   else if (top.score >= 7 && margin >= 2) confidence = 68;
 
   if (conflict || confidence < 68) {
+    const candidate = INDUSTRIES[top.key];
     return {
       status: "review_required",
       industry_key: top.key,
-      industry_label: INDUSTRIES[top.key]?.label || "Needs Manual Review",
+      industry_label: candidate?.label || "Needs Manual Review",
       confidence: Math.min(confidence, 67),
       conflict,
       reason: conflict
-        ? `Conflicting evidence between ${top.key} and ${second.key || "another category"}`
+        ? `Conflicting observed and declared evidence (${observedTop.key || top.key} vs ${declaredTop.key || second.key || "another category"})`
         : "Industry evidence is too weak for automatic overwrite",
       evidence,
       classifier_version: INDUSTRY_CLASSIFIER_VERSION,
