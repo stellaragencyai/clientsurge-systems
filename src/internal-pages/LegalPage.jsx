@@ -1,6 +1,18 @@
 import { useEffect } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import { Shield, Lock, PhoneCall, BadgeCheck, ScrollText, RotateCcw, CalendarClock, Ban } from "lucide-react";
+import { useNavigate, useParams } from "react-router-dom";
+import {
+  BadgeCheck,
+  Ban,
+  CalendarClock,
+  CheckCircle2,
+  FileText,
+  Lock,
+  PhoneCall,
+  RotateCcw,
+  ScrollText,
+  Shield,
+  ShieldCheck,
+} from "lucide-react";
 
 import { setPageMetadata } from "@/lib/seo";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
@@ -145,6 +157,7 @@ const REFUND_SECTIONS = [
 const LEGAL_META = {
   privacy: {
     title: "Privacy Policy",
+    eyebrow: "Privacy and data protection",
     updated: "July 11, 2026",
     canonicalPath: "/privacy",
     sections: PRIVACY_SECTIONS,
@@ -157,18 +170,20 @@ const LEGAL_META = {
   },
   terms: {
     title: "Terms of Service",
+    eyebrow: "Service and account terms",
     updated: "July 11, 2026",
     canonicalPath: "/terms",
     sections: TERMS_SECTIONS,
     summary: [
       { icon: BadgeCheck, text: "Month-to-month service terms" },
-      { icon: Shield, text: "Setup fees and paid months are non-refundable unless required by law or agreed in writing" },
+      { icon: Shield, text: "Setup fees are generally non-refundable once work begins" },
       { icon: Lock, text: "Customers must honor consent and opt-outs" },
       { icon: ScrollText, text: "Governed by Arizona law" },
     ],
   },
   refund: {
     title: "Refund & Cancellation Policy",
+    eyebrow: "Billing and cancellation policy",
     updated: "July 11, 2026",
     canonicalPath: "/refund-policy",
     sections: REFUND_SECTIONS,
@@ -182,56 +197,77 @@ const LEGAL_META = {
 };
 
 const TRUST_LABELS = [
-  { label: "SMS Opt-Out Guardrails", desc: "STOP handling and compliance-block logging are part of the system design." },
-  { label: "Truthful Proof Labels", desc: "Previews, roadmap items, and verified results are labeled separately." },
-  { label: "Account/Data Deletion Path", desc: "Deletion requests can be submitted from the privacy page and support channels." },
-  { label: "Arizona Terms", desc: "Terms identify Arizona law without implying third-party certification." },
+  { label: "Consent-first messaging", desc: "STOP handling and communication preferences are built into our operating model." },
+  { label: "Clear data practices", desc: "Operational data sharing is separated from third-party marketing use." },
+  { label: "Deletion request path", desc: "Privacy requests can be submitted directly through the website." },
+  { label: "Plain-language policies", desc: "Policies are structured for readability, navigation, and practical use." },
 ];
 
 function SummaryCard({ items }) {
   return (
-    <div className="rounded-xl border border-primary/15 p-6 mb-10 bg-primary/5">
-      <p className="cs-section-eyebrow mb-4">At a Glance</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-        {items.map(({ icon: Icon, text }) => (
-          <div key={text} className="flex items-start gap-2.5">
-            <Icon className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" />
-            <span className="text-sm font-medium text-foreground leading-relaxed">{text}</span>
+    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+      {items.map(({ icon: Icon, text }) => (
+        <div key={text} className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+            <Icon className="h-4 w-4" />
           </div>
-        ))}
-      </div>
+          <p className="mt-4 text-sm font-bold leading-6 text-slate-900">{text}</p>
+        </div>
+      ))}
     </div>
   );
 }
 
 function SectionBlock({ section, index }) {
   return (
-    <section id={section.id} className="mb-10" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}>
-      <div className="flex items-baseline gap-3 mb-3">
-        <span className="text-xs font-bold text-primary font-titles min-w-[20px] flex-shrink-0">{index + 1}.</span>
-        <h2 className="cs-section-title" style={{ fontSize: "clamp(1rem, 2.5vw, 1.25rem)" }}>{section.title}</h2>
+    <section
+      id={section.id}
+      className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_16px_50px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_24px_60px_rgba(14,165,233,0.10)] sm:p-8"
+      style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}
+    >
+      <div className="flex items-start gap-4">
+        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 to-blue-100 text-sky-700">
+          <FileText className="h-5 w-5" />
+        </div>
+        <div>
+          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-600">Section {index + 1}</p>
+          <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">{section.title}</h2>
+        </div>
       </div>
-      <p className="text-[15px] text-foreground leading-relaxed pl-8 max-w-[72ch] font-inter">{section.body}</p>
-      {section.items && (
-        <ul className="pl-12 mt-3 space-y-1.5 max-w-[72ch]">
+      <p className="mt-5 max-w-3xl text-[15px] leading-7 text-slate-600">{section.body}</p>
+      {section.items ? (
+        <ul className="mt-5 space-y-3">
           {section.items.map((item) => (
-            <li key={item} className="list-disc text-[15px] text-foreground leading-relaxed font-inter">{item}</li>
+            <li key={item} className="flex items-start gap-3 text-sm leading-6 text-slate-600">
+              <CheckCircle2 className="mt-1 h-4 w-4 flex-shrink-0 text-sky-600" />
+              {item}
+            </li>
           ))}
         </ul>
-      )}
+      ) : null}
     </section>
   );
 }
 
 function ContactBlock() {
   return (
-    <section className="rounded-xl border border-border bg-muted/30 p-6 mt-10">
-      <h2 className="text-lg font-bold text-foreground mb-2">Contact</h2>
-      <p className="text-sm text-muted-foreground mb-3">Questions, requests, account deletion, data deletion, or communication preference changes can be sent to:</p>
-      <div className="flex flex-wrap items-center gap-2">
-        <a href={`mailto:${SUPPORT_EMAIL}`} className="text-sm font-bold text-primary border-b border-primary/30 hover:border-primary transition-colors pb-px">{SUPPORT_EMAIL}</a>
-        <span className="text-muted-foreground text-xs">or</span>
-        <a href={`tel:${SUPPORT_TEL}`} className="text-sm font-bold text-primary border-b border-primary/30 hover:border-primary transition-colors pb-px">{SUPPORT_PHONE}</a>
+    <section className="overflow-hidden rounded-3xl border border-sky-200 bg-gradient-to-r from-sky-600 to-blue-700 p-8 text-white shadow-[0_24px_70px_rgba(2,132,199,0.25)] sm:p-10">
+      <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
+        <div>
+          <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-100">Need clarification?</p>
+          <h2 className="mt-2 text-2xl font-black tracking-tight">Contact ClientSurge Systems</h2>
+          <p className="mt-3 max-w-2xl text-sm leading-7 text-sky-50">
+            Questions, data requests, communication preference changes, and account deletion requests can be sent directly to our support team.
+          </p>
+        </div>
+        <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
+          <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-bold text-sky-700 shadow-lg transition hover:bg-sky-50">
+            Email support
+          </a>
+          <a href={`tel:${SUPPORT_TEL}`} className="inline-flex h-11 items-center justify-center rounded-xl border border-white/40 px-5 text-sm font-bold text-white transition hover:bg-white/10">
+            {SUPPORT_PHONE}
+          </a>
+        </div>
       </div>
     </section>
   );
@@ -239,15 +275,17 @@ function ContactBlock() {
 
 function TrustLabelBar() {
   return (
-    <div className="bg-muted/50 border-t border-primary/10 py-12 px-6">
-      <div className="max-w-5xl mx-auto">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground text-center mb-5">Compliance &amp; Trust Labels</p>
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+    <div className="border-t border-sky-100 bg-white px-4 py-14 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-6xl">
+        <p className="text-center text-[11px] font-black uppercase tracking-[0.18em] text-sky-700">Compliance and trust principles</p>
+        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           {TRUST_LABELS.map(({ label, desc }) => (
-            <div key={label} className="rounded-xl border border-primary/12 p-4 text-center bg-white flex flex-col items-center gap-2">
-              <Shield className="w-5 h-5 text-primary" />
-              <span className="text-xs font-bold text-foreground leading-tight">{label}</span>
-              <span className="text-[11px] text-muted-foreground leading-relaxed">{desc}</span>
+            <div key={label} className="rounded-2xl border border-slate-200 bg-[#f8fbff] p-5 text-center">
+              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
+                <ShieldCheck className="h-5 w-5" />
+              </div>
+              <p className="mt-4 text-sm font-black text-slate-900">{label}</p>
+              <p className="mt-2 text-xs leading-5 text-slate-500">{desc}</p>
             </div>
           ))}
         </div>
@@ -261,37 +299,47 @@ export default function LegalPage({ fixedType, canonicalPath }) {
   const navigate = useNavigate();
   const type = fixedType || routeType;
   const meta = LEGAL_META[type] || LEGAL_META.privacy;
-  const { title, updated, sections, summary } = meta;
+  const { title, eyebrow, updated, sections, summary } = meta;
 
-  useEffect(() => setPageMetadata({
-    title: `${title} | ClientSurge Systems`,
-    description: `Read the ClientSurge Systems ${title.toLowerCase()} covering data, account deletion, messaging, billing, service terms, and support contacts.`,
-    canonicalPath: canonicalPath || meta.canonicalPath || `/legal/${type}`,
-    ogTitle: `${title} | ClientSurge Systems`,
-    ogDescription: `Review the latest ClientSurge Systems ${title.toLowerCase()} for lead capture, messaging, billing, account deletion, and service operations.`,
-  }), [canonicalPath, meta.canonicalPath, title, type]);
+  useEffect(
+    () =>
+      setPageMetadata({
+        title: `${title} | ClientSurge Systems`,
+        description: `Read the ClientSurge Systems ${title.toLowerCase()} covering data, messaging, billing, service terms, and support contacts.`,
+        canonicalPath: canonicalPath || meta.canonicalPath || `/legal/${type}`,
+        ogTitle: `${title} | ClientSurge Systems`,
+        ogDescription: `Review the latest ClientSurge Systems ${title.toLowerCase()}.`,
+      }),
+    [canonicalPath, meta.canonicalPath, title, type]
+  );
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-[#f7fbff] text-slate-900">
         <Navbar />
+
         <section
-          className="px-4 sm:px-6 lg:px-8"
-          style={{
-            background: "linear-gradient(180deg, rgba(0,174,239,0.06) 0%, hsl(var(--background)) 100%)",
-            paddingTop: "calc(var(--cs-nav-height) + 3rem)",
-            paddingBottom: "2.5rem",
-          }}
+          className="relative overflow-hidden border-b border-sky-100 px-4 sm:px-6 lg:px-8"
+          style={{ paddingTop: "calc(var(--cs-nav-height) + 4rem)", paddingBottom: "4rem" }}
         >
-          <div className="max-w-5xl mx-auto">
-            <p className="cs-section-eyebrow mb-3">Legal</p>
-            <div className="flex items-center gap-4 mb-4">
-              <span className="cs-section-bar" style={{ height: "52px" }} aria-hidden="true" />
-              <h1 className="cs-section-title" style={{ fontSize: "clamp(2rem, 5vw, 3rem)" }}>{title}</h1>
+          <div className="pointer-events-none absolute inset-0">
+            <div className="absolute -left-24 top-12 h-80 w-80 rounded-full bg-sky-200/35 blur-3xl" />
+            <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-blue-200/25 blur-3xl" />
+            <div className="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.035)_1px,transparent_1px)] bg-[size:48px_48px]" />
+          </div>
+
+          <div className="relative mx-auto max-w-6xl">
+            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-sky-700 shadow-sm backdrop-blur">
+              <ShieldCheck className="h-4 w-4" />
+              {eyebrow}
             </div>
-            <div className="flex flex-wrap items-center justify-between gap-3">
-              <p className="text-xs font-medium text-muted-foreground">Last updated: {updated}</p>
-              <div className="flex gap-1 rounded-lg border border-primary/20 p-0.5 bg-muted/50">
+            <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">{title}</h1>
+            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
+              Clear, accessible policies for how ClientSurge Systems handles data, services, billing, communications, and customer requests.
+            </p>
+            <div className="mt-7 flex flex-wrap items-center gap-3">
+              <span className="rounded-full border border-sky-100 bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">Last updated: {updated}</span>
+              <div className="flex rounded-xl border border-sky-100 bg-white p-1 shadow-sm">
                 {[
                   ["privacy", "Privacy", "/privacy"],
                   ["terms", "Terms", "/terms"],
@@ -301,7 +349,7 @@ export default function LegalPage({ fixedType, canonicalPath }) {
                     key={key}
                     type="button"
                     onClick={() => navigate(path)}
-                    className={`px-3.5 py-1.5 rounded-md text-xs font-bold border-none cursor-pointer transition-all ${type === key ? "bg-white text-primary shadow-sm" : "bg-transparent text-muted-foreground hover:text-foreground"}`}
+                    className={`rounded-lg px-4 py-2 text-xs font-bold transition ${type === key ? "bg-sky-600 text-white shadow" : "text-slate-500 hover:bg-sky-50 hover:text-sky-700"}`}
                   >
                     {label}
                   </button>
@@ -311,35 +359,44 @@ export default function LegalPage({ fixedType, canonicalPath }) {
           </div>
         </section>
 
-        <main className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 pb-16">
+        <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
           <SummaryCard items={summary} />
-          <div className="grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-10 items-start">
-            <div>
-              {sections.map((section, index) => <SectionBlock key={section.id} section={section} index={index} />)}
-              {type === "privacy" && (
-                <div id="data-deletion-request" className="mt-10" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}>
+
+          <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start">
+            <div className="space-y-5">
+              {sections.map((section, index) => (
+                <SectionBlock key={section.id} section={section} index={index} />
+              ))}
+
+              {type === "privacy" ? (
+                <div id="data-deletion-request" className="rounded-3xl border border-sky-100 bg-white p-5 shadow-[0_16px_50px_rgba(15,23,42,0.06)] sm:p-8" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}>
                   <DataDeletionRequestForm />
                 </div>
-              )}
+              ) : null}
+
               <ContactBlock />
             </div>
-            <aside className="hidden lg:block sticky" style={{ top: "calc(var(--cs-nav-height) + 32px)" }}>
-              <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-muted-foreground mb-3">On This Page</p>
-              <nav className="flex flex-col gap-1" aria-label="Page sections">
-                {sections.map((section, index) => (
-                  <a key={section.id} href={`#${section.id}`} className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                    {index + 1}. {section.title}
-                  </a>
-                ))}
-                {type === "privacy" && (
-                  <a href="#data-deletion-request" className="text-sm text-muted-foreground hover:text-primary transition-colors">
-                    Request deletion
-                  </a>
-                )}
-              </nav>
+
+            <aside className="hidden lg:block lg:sticky" style={{ top: "calc(var(--cs-nav-height) + 28px)" }}>
+              <div className="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm">
+                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-sky-700">On this page</p>
+                <nav className="mt-4 space-y-1.5" aria-label="Page sections">
+                  {sections.map((section, index) => (
+                    <a key={section.id} href={`#${section.id}`} className="block rounded-lg px-3 py-2 text-xs font-semibold leading-5 text-slate-600 transition hover:bg-sky-50 hover:text-sky-700">
+                      {index + 1}. {section.title}
+                    </a>
+                  ))}
+                  {type === "privacy" ? (
+                    <a href="#data-deletion-request" className="block rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-sky-50 hover:text-sky-700">
+                      Request deletion
+                    </a>
+                  ) : null}
+                </nav>
+              </div>
             </aside>
           </div>
         </main>
+
         <TrustLabelBar />
         <Footer />
         <MobileCallBar />
