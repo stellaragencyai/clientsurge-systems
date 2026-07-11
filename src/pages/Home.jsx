@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import Navbar from "../components/landing/Navbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
-import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
+import ProblemOutcomeSection from "../components/landing/ProblemOutcomeSection.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -133,7 +133,7 @@ export default function Home() {
         {/* 2. Problem and outcome — concise revenue leakage framing. */}
         <div id="problem" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
           <SectionErrorBoundary sectionName="problem-outcome">
-            <RevenueLeakSection />
+            <ProblemOutcomeSection />
           </SectionErrorBoundary>
         </div>
 
