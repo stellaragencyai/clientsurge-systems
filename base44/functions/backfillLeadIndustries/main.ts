@@ -4,12 +4,12 @@ import { secureJson } from "../_shared/response.ts";
 import {
   buildIndustryDataQualityFlags,
   classifyLeadIndustry,
-  serializeIndustryClassification,
 } from "../_shared/industryClassifier.ts";
 
 const MAX_RECORDS = 10_000;
 const MAX_BATCH_SIZE = 500;
 const CHANGE_SAMPLE_LIMIT = 100;
+const APPLY_CONFIRMATION = "CATEGORIZE LEADS";
 
 function positiveInteger(value, fallback, max) {
   const parsed = Number.parseInt(String(value ?? ""), 10);
@@ -47,10 +47,10 @@ function buildUpdate(lead, classification, now) {
   const update = {
     id: lead.id,
     industry: targetIndustry,
-    assigned_agent_name: classification.routing.agent_name,
+    assigned_agent_name: classification.status === "review_required"
+      ? (lead.assigned_agent_name || "sales_rep_general")
+      : classification.routing.agent_name,
     industry_tags: normalizedTags(lead.industry_tags, targetIndustry),
-    ai_last_classification: serializeIndustryClassification(classification),
-    ai_confidence: classification.confidence,
     data_quality_flags: flags,
     data_quality_checked_at: now,
     audited_at: now,
@@ -59,8 +59,6 @@ function buildUpdate(lead, classification, now) {
   const changed =
     lead.industry !== update.industry ||
     lead.assigned_agent_name !== update.assigned_agent_name ||
-    lead.ai_last_classification !== update.ai_last_classification ||
-    Number(lead.ai_confidence || 0) !== update.ai_confidence ||
     !arraysEqual(lead.industry_tags || [], update.industry_tags) ||
     !arraysEqual(lead.data_quality_flags || [], update.data_quality_flags);
 
@@ -78,6 +76,16 @@ Deno.serve(async (req) => {
 
     const body = await req.json().catch(() => ({}));
     const dryRun = body?.dry_run !== false;
+    if (!dryRun && body?.confirm_phrase !== APPLY_CONFIRMATION) {
+      return secureJson(
+        {
+          error: `confirm_phrase must equal \"${APPLY_CONFIRMATION}\" when dry_run is false`,
+          code: "INDUSTRY_BACKFILL_CONFIRMATION_REQUIRED",
+        },
+        { status: 400 },
+      );
+    }
+
     const startOffset = positiveInteger(body?.offset, 0, MAX_RECORDS);
     const requestedLimit = positiveInteger(body?.limit, MAX_RECORDS, MAX_RECORDS);
     const batchSize = Math.max(1, positiveInteger(body?.batch_size, MAX_BATCH_SIZE, MAX_BATCH_SIZE));
@@ -138,8 +146,11 @@ Deno.serve(async (req) => {
               business_name: lead.business_name,
               previous_industry: previousIndustry,
               new_industry: update.industry,
+              candidate_industry: classification.industry_label,
+              industry_key: classification.industry_key,
               status: classification.status,
               confidence: classification.confidence,
+              conflict: classification.conflict,
               reason: classification.reason,
             });
           }
@@ -174,6 +185,7 @@ Deno.serve(async (req) => {
       message: dryRun
         ? "Industry backfill audit completed; no records were changed"
         : "Industry backfill completed",
+      apply_confirmation_phrase: dryRun ? APPLY_CONFIRMATION : undefined,
       summary,
     });
   } catch (error) {
