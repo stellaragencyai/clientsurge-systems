@@ -1,14 +1,17 @@
 import edgeWorker, {
   repairPublicRouteMetadata,
 } from "./clientsurge-security-edge-worker.mjs";
+import {
+  APP_SHELL_PUBLIC_PATHS,
+} from "../src/lib/publicRouteMetadata.js";
 
 export const ROUTE_EXPOSURE_SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 export const ROUTE_EXPOSURE_GUARD_SCRIPT_ID = "clientsurge-edge-route-exposure-guard";
-export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-07-09T-phase1-public-shell";
+export const ROUTE_EXPOSURE_SANITIZER_VERSION = "2026-07-11T-phase2-full-public-shell";
 export const APP_SHELL_FALLBACK_HEADER = "x-clientsurge-app-shell-fallback";
-export const APP_SHELL_FALLBACK_VERSION = "2026-07-09T-phase1-public-shell";
+export const APP_SHELL_FALLBACK_VERSION = "2026-07-11T-phase2-full-public-shell";
 export const HOMEPAGE_REPAIR_HEADER = "x-clientsurge-homepage-repair";
-export const HOMEPAGE_REPAIR_VERSION = "2026-07-09T-phase1-public-shell";
+export const HOMEPAGE_REPAIR_VERSION = "2026-07-11T-phase2-full-public-shell";
 
 const INTERNAL_ROUTE_WORDS = [
   "Admin Dashboard",
@@ -16,6 +19,8 @@ const INTERNAL_ROUTE_WORDS = [
   "Admin / System Runbook",
   "Admin / Task Status Dashboard",
   "Admin / Conversion Insights",
+  "Admin / Automation Activity",
+  "Admin / Deployment Control",
   "Business Setup",
   "Client Portal",
   "Client Dashboard",
@@ -30,37 +35,44 @@ const INTERNAL_ROUTE_WORDS = [
   "Mission Control",
   "SaaS Admin",
   "AI Status Dashboard",
+  "AI Marketing Command Center",
   "Onboarding Pipeline",
   "Opportunity Review Queue",
   "Automation Health",
+  "Inbound Readiness",
+  "Sprint2 Blocker",
+  "SaaS Audit",
+  "Performance Wars",
+  "AI Sales Command Center",
+  "Admin Install Guide",
+  "Admin Onboarding",
+  "Admin Lead Detail",
+  "Admin Automation",
+  "Admin Reconciliation",
 ];
 
-const PUBLIC_MARKETING_ROUTES = new Set([
-  "/",
-  "/pricing",
-  "/automations",
-  "/industries",
-  "/proof",
-  "/faq",
-  "/how-it-works",
-  "/about",
+// Expanded set: ALL public shell routes (marketing + utility + industry slugs)
+// that should get full fallback replacement when route exposure is detected.
+const PUBLIC_SHELL_ROUTES = new Set([
+  ...APP_SHELL_PUBLIC_PATHS,
+  // Industry canonical slugs (legacy short routes)
+  "/med-spa", "/dental", "/hvac", "/plumbing", "/roofing",
+  "/chiropractic", "/contractors", "/real-estate", "/personal-injury",
+  "/property-services", "/veterinary", "/electrician", "/landscaping",
+  "/tree-service", "/painting", "/pest-control", "/salon",
+  "/auto-repair", "/accounting", "/fitness", "/law-firm",
+  // Blog dynamic routes
   "/blog",
-  "/testimonials",
-  "/roadmap",
-  "/contact",
-  "/privacy",
-  "/terms",
-  "/sms-terms",
-  "/refund-policy",
 ]);
 
 const APP_SHELL_BLOCKED_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44)(?:\/|$)/i;
 const APP_SHELL_ASSET_PATH_PATTERN = /\.(?:js|mjs|css|map|json|png|jpe?g|gif|svg|webp|ico|txt|xml|woff2?|ttf|otf|wasm|pdf|zip)(?:$|\?)/i;
 
-const GENERATED_BASE44_COPY = /ClientSurge Systems manages\s+\d+\s+data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates|available pages|app pages|\bPages\b/i;
-const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages\s+\d+\s+data types|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>|available pages|app pages)/i;
+// Expanded detection patterns — catches more Base44 boilerplate variations
+const GENERATED_BASE44_COPY = /ClientSurge Systems manages\s+\d+\s+data types|Premium AI-driven automation systems built to increase bookings|organize, track, and share your work in 1 place|including launch gates|available pages|app pages|manage\s+\d+\s+data types|data types including|Browse all pages|View all pages|All pages|App pages|Your pages/i;
+const GENERATED_DIRECTORY_PATTERN = /(?:ClientSurge Systems manages\s+\d+\s+data types|organize, track, and share your work in 1 place|including launch gates|<h[1-4][^>]*>\s*(?:Pages|Available Pages|App Pages|All Pages)\s*<\/h[1-4]>|available pages|app pages|browse all pages|view all pages)/i;
 const INTERNAL_TEXT_PATTERN = new RegExp(INTERNAL_ROUTE_WORDS.map((word) => word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i");
-const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions|function|mission-control|observability|reconciliation|saas|lead-intelligence|sam|medspa-dashboard|api|base44)[^"']*["'][^>]*>[\s\S]*?<\/a>/gi;
+const INTERNAL_HREF_PATTERN = /<a\b[^>]*href=["']\/(?:admin|dashboard|client-portal|client-dashboard|client-saas|dashboard-entry|setup|internal|functions?|function|mission-control|observability|reconciliation|saas|lead-intelligence|sam|medspa-dashboard|api|base44|onboarding|install|audit)[^"']*["'][^>]*>[\s\S]*?<\/a>/gi;
 
 const ROUTE_COPY = {
   "/": {
@@ -118,6 +130,116 @@ const ROUTE_COPY = {
     panelTitle: "Best first question",
     panelBody: "Tell us your business type, current website, monthly lead volume, and where leads are currently getting lost.",
   },
+  "/store": {
+    eyebrow: "Automation Store",
+    title: "Browse individual ClientSurge automation services.",
+    lede: "Explore lead capture, missed-call recovery, AI follow-up, booking, review, and reactivation automations available for your system.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/automations",
+    secondaryLabel: "See All Automations",
+    panelTitle: "Build your stack",
+    panelBody: "Start with a package or add individual automations to match your business needs.",
+  },
+  "/faq": {
+    eyebrow: "FAQ",
+    title: "Answers to common ClientSurge questions.",
+    lede: "Learn about packages, setup timelines, AI automation workflows, billing, support, and what to expect after go-live.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/contact",
+    secondaryLabel: "Ask A Question",
+    panelTitle: "Straight answers",
+    panelBody: "No hype. Just clear answers about what ClientSurge does, how it works, and what it costs.",
+  },
+  "/how-it-works": {
+    eyebrow: "How It Works",
+    title: "From website to AI-powered sales system.",
+    lede: "ClientSurge captures leads, responds instantly, follows up automatically, books appointments, requests reviews, and reactivates cold leads.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/automations",
+    secondaryLabel: "See Automations",
+    panelTitle: "Done-for-you setup",
+    panelBody: "We configure, test, and install the system. You focus on running your business.",
+  },
+  "/about": {
+    eyebrow: "About",
+    title: "ClientSurge Systems builds AI automation for local businesses.",
+    lede: "We install packaged AI systems that help local service businesses respond faster, recover missed opportunities, and move leads toward booked appointments.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/contact",
+    secondaryLabel: "Contact Us",
+    panelTitle: "Our mission",
+    panelBody: "Make enterprise-grade lead automation accessible and affordable for local service businesses.",
+  },
+  "/blog": {
+    eyebrow: "Blog",
+    title: "ClientSurge Systems articles and insights.",
+    lede: "Read about AI automation, lead capture, follow-up strategies, booking workflows, reviews, and local service business growth.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/contact",
+    secondaryLabel: "Contact Support",
+    panelTitle: "Practical insights",
+    panelBody: "Articles focused on real automation workflows and how they help local businesses grow.",
+  },
+  "/testimonials": {
+    eyebrow: "Workflow Scenarios",
+    title: "How ClientSurge workflows handle real lead situations.",
+    lede: "Review workflow scenarios and trust signals that show how the system responds to leads, missed calls, and follow-up opportunities.",
+    primaryHref: "/how-it-works",
+    primaryLabel: "See How It Works",
+    secondaryHref: "/proof",
+    secondaryLabel: "Proof Standards",
+    panelTitle: "Scenario previews",
+    panelBody: "These previews show how automations work. Verified customer testimonials are always labeled as such.",
+  },
+  "/roadmap": {
+    eyebrow: "Roadmap",
+    title: "ClientSurge automation roadmap and planned improvements.",
+    lede: "See what we are building next. Future items are not live proof until they are verified and deployed.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/contact",
+    secondaryLabel: "Ask About Roadmap",
+    panelTitle: "What's coming",
+    panelBody: "Planned improvements to lead capture, follow-up, booking, reviews, and reactivation automations.",
+  },
+  "/book": {
+    eyebrow: "Book a Demo",
+    title: "Book a ClientSurge demo and system walkthrough.",
+    lede: "See the AI automation system in action. We'll walk through lead capture, instant response, follow-up, booking, and reactivation workflows.",
+    primaryHref: "/contact",
+    primaryLabel: "Contact to Book",
+    secondaryHref: "/pricing",
+    secondaryLabel: "Compare Packages",
+    panelTitle: "See before you buy",
+    panelBody: "We'll show you exactly how the system works for your industry before you make a decision.",
+  },
+  "/login": {
+    eyebrow: "Client Login",
+    title: "Log in to your ClientSurge client portal.",
+    lede: "Access your dashboard, automation status, lead activity, billing, and support resources.",
+    primaryHref: "/login",
+    primaryLabel: "Client Login",
+    secondaryHref: "/contact",
+    secondaryLabel: "Need Help?",
+    panelTitle: "Client portal access",
+    panelBody: "If you have trouble logging in, contact support and we'll help you get access to your dashboard.",
+  },
+  "/industries": {
+    eyebrow: "Industries",
+    title: "AI automation systems adapted for your industry.",
+    lede: "ClientSurge adapts lead capture, follow-up, booking, and reactivation workflows for HVAC, plumbing, roofing, med spas, dental, legal intake, and more.",
+    primaryHref: "/pricing",
+    primaryLabel: "Compare Packages",
+    secondaryHref: "/contact",
+    secondaryLabel: "Ask About Your Industry",
+    panelTitle: "Industry-specific",
+    panelBody: "Each industry gets messaging, AI personality, and lead qualification tailored to its workflows.",
+  },
 };
 
 const DEFAULT_COPY = {
@@ -144,9 +266,16 @@ function acceptsHtmlNavigation(request) {
   return accept.includes("text/html") || mode === "navigate" || accept === "";
 }
 
-function isPublicMarketingPath(pathname = "/") {
+function isPublicShellPath(pathname = "/") {
   const normalized = normalizePathname(pathname);
-  return PUBLIC_MARKETING_ROUTES.has(normalized) || /^\/(?:med-spa|dental|hvac|plumbing|roofing|chiropractic|contractors|real-estate|personal-injury|property-services|veterinary|electrician|landscaping|tree-service|painting|pest-control|salon|auto-repair|accounting|fitness|law-firm)$/.test(normalized);
+  if (PUBLIC_SHELL_ROUTES.has(normalized)) return true;
+  // Industry dynamic routes: /industries/:slug
+  if (/^\/industries\/[^/]+$/.test(normalized)) return true;
+  // Blog dynamic routes: /blog/:slug
+  if (/^\/blog\/[^/]+$/.test(normalized)) return true;
+  // Legacy industry short routes not in the set
+  if (/^\/(?:med-spa|dental|hvac|plumbing|roofing|chiropractic|contractors|real-estate|personal-injury|property-services|veterinary|electrician|landscaping|tree-service|painting|pest-control|salon|auto-repair|accounting|fitness|law-firm)$/.test(normalized)) return true;
+  return false;
 }
 
 function isPrivateSurfacePath(pathname = "/") {
@@ -322,11 +451,18 @@ async function fetchAppShellFallback(request, env, ctx) {
 
 export function looksLikeRouteExposureHtml(html = "") {
   const text = String(html || "");
-  return (
-    (GENERATED_DIRECTORY_PATTERN.test(text) && (INTERNAL_TEXT_PATTERN.test(text) || GENERATED_BASE44_COPY.test(text))) ||
-    (GENERATED_BASE44_COPY.test(text) && INTERNAL_TEXT_PATTERN.test(text)) ||
-    (GENERATED_DIRECTORY_PATTERN.test(text) && /<a\b[^>]*href=["']\/(?:admin|dashboard|client|setup|store|book|login)[^"']*["']/i.test(text))
-  );
+  // Any single strong signal is enough to trigger full replacement
+  if (GENERATED_DIRECTORY_PATTERN.test(text) && (INTERNAL_TEXT_PATTERN.test(text) || GENERATED_BASE44_COPY.test(text))) return true;
+  if (GENERATED_BASE44_COPY.test(text) && INTERNAL_TEXT_PATTERN.test(text)) return true;
+  if (GENERATED_DIRECTORY_PATTERN.test(text) && /<a\b[^>]*href=["']\/(?:admin|dashboard|client|setup|store|book|login|onboarding|functions?|mission-control|saas|observability|reconciliation|internal|install|audit)[^"']*["']/i.test(text)) return true;
+  // Direct detection: "Pages" heading with a following list/nav containing internal links
+  if (/<h[1-4][^>]*>\s*(?:Pages|Available Pages|App Pages|All Pages)\s*<\/h[1-4]>/i.test(text) && INTERNAL_HREF_PATTERN.test(text)) return true;
+  // "manages N data types" anywhere in the HTML
+  if (/manages\s+\d+\s+data types/i.test(text)) return true;
+  // Multiple internal route links in a directory/list context
+  const internalLinkCount = (text.match(INTERNAL_HREF_PATTERN) || []).length;
+  if (internalLinkCount >= 3) return true;
+  return false;
 }
 
 function removePatterns(html, patterns) {
@@ -339,13 +475,25 @@ function removePatterns(html, patterns) {
 
 export function sanitizeGeneratedPagesDirectoryHtml(html = "") {
   let nextHtml = String(html || "");
-  nextHtml = nextHtml.replace(/<h[1-4][^>]*>\s*Pages\s*<\/h[1-4]>\s*<(ul|ol|nav|section|div)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  // Remove "Pages" heading + following list/nav/section
+  nextHtml = nextHtml.replace(/<h[1-4][^>]*>\s*(?:Pages|Available Pages|App Pages|All Pages)\s*<\/h[1-4]>\s*<(ul|ol|nav|section|div)\b[^>]*>[\s\S]*?<\/\1>/gi, "");
+  // Remove "manages N data types" blocks
   nextHtml = nextHtml.replace(/<[^>]+>\s*ClientSurge Systems manages\s+\d+\s+data types[\s\S]*?<\/[^>]+>/gi, "");
+  nextHtml = nextHtml.replace(/<[^>]+>\s*manages\s+\d+\s+data types[\s\S]*?<\/[^>]+>/gi, "");
   nextHtml = nextHtml.replace(/<[^>]+>\s*organize, track, and share your work in 1 place[\s\S]*?<\/[^>]+>/gi, "");
+  // Remove all internal route links
   nextHtml = nextHtml.replace(INTERNAL_HREF_PATTERN, "");
+  // Remove stray boilerplate text fragments
   return removePatterns(nextHtml, [
     /ClientSurge Systems manages\s+\d+\s+data types[^<]*/gi,
+    /manages\s+\d+\s+data types[^<]*/gi,
     /including launch gates[^<]*/gi,
+    /organize, track, and share your work in 1 place[^<]*/gi,
+    /Premium AI-driven automation systems built to increase bookings[^<]*/gi,
+    /available pages[^<]*/gi,
+    /app pages[^<]*/gi,
+    /browse all pages[^<]*/gi,
+    /view all pages[^<]*/gi,
   ]);
 }
 
@@ -358,7 +506,7 @@ export function shouldRepairHomepage(request, html = "") {
 export function shouldRepairPublicRoute(request, html = "") {
   if (request.method !== "GET" && request.method !== "HEAD") return false;
   const pathname = normalizePathname(new URL(request.url).pathname);
-  return isPublicMarketingPath(pathname) && looksLikeRouteExposureHtml(html);
+  return isPublicShellPath(pathname) && looksLikeRouteExposureHtml(html);
 }
 
 export function buildEmergencyHomepageHtml() {
@@ -373,12 +521,13 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
 (() => {
   if (window.__clientsurgeEdgeRouteExposureGuard) return;
   window.__clientsurgeEdgeRouteExposureGuard = true;
-  const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions|function|internal|private|onboarding|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44)(\/|$)/i;
-  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|available pages|app pages/i;
+  const INTERNAL_PATH = /^\/(admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|setup|functions?|function|internal|private|onboarding|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44)(\/|$)/i;
+  const GENERATED_COPY = /ClientSurge Systems manages \d+ data types|manages \d+ data types|organize, track, and share your work in 1 place|including launch gates|available pages|app pages|browse all pages|view all pages|all pages|data types including/i;
+  const PAGES_HEADING = /^(Pages|Available Pages|App Pages|All Pages)$/i;
   const text = (node) => (node && node.textContent || '').replace(/\s+/g, ' ').trim();
   const removeGeneratedDirectory = () => {
     for (const heading of Array.from(document.querySelectorAll('h1,h2,h3,h4'))) {
-      if (text(heading).toLowerCase() !== 'pages' && !/available pages/i.test(text(heading))) continue;
+      if (!PAGES_HEADING.test(text(heading)) && !/available pages|app pages|all pages/i.test(text(heading))) continue;
       const next = heading.nextElementSibling;
       let prev = heading.previousElementSibling;
       const previousNodes = [];
@@ -390,8 +539,12 @@ const EDGE_GUARD_SCRIPT = `<script id="${ROUTE_EXPOSURE_GUARD_SCRIPT_ID}">
       heading.remove();
       previousNodes.forEach((node) => node.remove());
     }
-    for (const node of Array.from(document.querySelectorAll('p,h1,h2,h3,h4'))) {
-      if (GENERATED_COPY.test(text(node))) node.remove();
+    for (const node of Array.from(document.querySelectorAll('p,h1,h2,h3,h4,span,div'))) {
+      const t = text(node);
+      if (GENERATED_COPY.test(t) || /manages \d+ data types/i.test(t)) {
+        // Only remove if the node's own text (not children) matches
+        if (node.children.length === 0 || GENERATED_COPY.test(t)) node.remove();
+      }
     }
     for (const a of Array.from(document.querySelectorAll('a[href]'))) {
       let url;
@@ -455,24 +608,28 @@ export default {
     const publicRouteRepaired = shouldRepairPublicRoute(request, originalHtml);
     const homepageRepaired = shouldRepairHomepage(request, originalHtml);
 
-    const repairedHtml = publicRouteRepaired
+    // If route exposure is detected on ANY non-private HTML route, replace
+    // the entire page with a clean fallback — never leak partial boilerplate.
+    const shouldFullReplace = publicRouteRepaired || (routeExposure && !isPrivateSurfacePath(pathname));
+
+    const repairedHtml = shouldFullReplace
       ? buildRouteFallbackHtml(pathname)
       : sanitizeGeneratedPagesDirectoryHtml(originalHtml);
     const guardedHtml = forceNoindexIfPrivate(pathname, injectEdgeRouteExposureGuard(repairedHtml));
 
     const headers = new Headers(response.headers);
-    headers.set(ROUTE_EXPOSURE_SANITIZED_HEADER, publicRouteRepaired ? "public-route-repaired" : routeExposure ? "removed" : "armed");
+    headers.set(ROUTE_EXPOSURE_SANITIZED_HEADER, shouldFullReplace ? "full-replaced" : routeExposure ? "removed" : "armed");
     headers.set("x-clientsurge-route-exposure-version", ROUTE_EXPOSURE_SANITIZER_VERSION);
     headers.set("Cache-Control", "no-store, max-age=0");
     headers.set("content-type", "text/html; charset=UTF-8");
 
-    if (homepageRepaired) {
+    if (homepageRepaired || (shouldFullReplace && pathname === "/")) {
       headers.set(HOMEPAGE_REPAIR_HEADER, HOMEPAGE_REPAIR_VERSION);
     }
 
     return new Response(guardedHtml, {
-      status: publicRouteRepaired ? 200 : response.status,
-      statusText: publicRouteRepaired ? "OK" : response.statusText,
+      status: shouldFullReplace ? 200 : response.status,
+      statusText: shouldFullReplace ? "OK" : response.statusText,
       headers,
     });
   },

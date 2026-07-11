@@ -1,3 +1,5 @@
+import { APP_SHELL_PUBLIC_PATHS } from "@/lib/publicRouteMetadata";
+
 export const INTERNAL_PAGE_PATTERNS = [
   /admin/i,
   /dashboard/i,
@@ -21,6 +23,11 @@ export const INTERNAL_PAGE_PATTERNS = [
   /credentials setup/i,
   /website preview/i,
   /performance wars/i,
+  /inbound readiness/i,
+  /sprint2 blocker/i,
+  /saas audit/i,
+  /ai sales command/i,
+  /ai marketing command/i,
 ];
 
 export const GENERATED_DIRECTORY_PATTERNS = [
@@ -30,26 +37,20 @@ export const GENERATED_DIRECTORY_PATTERNS = [
   /organize, track, and share your work/i,
   /available pages/i,
   /app pages/i,
+  /browse all pages/i,
+  /view all pages/i,
+  /all pages/i,
   /\bPages\b/i,
+  /data types including/i,
 ];
 
-const PUBLIC_MARKETING_ROUTES = new Set([
-  "/",
-  "/pricing",
-  "/automations",
-  "/industries",
-  "/proof",
-  "/faq",
-  "/how-it-works",
-  "/about",
-  "/blog",
-  "/testimonials",
-  "/roadmap",
-  "/contact",
-  "/privacy",
-  "/terms",
-  "/sms-terms",
-  "/refund-policy",
+const PUBLIC_SHELL_ROUTES = new Set([
+  ...APP_SHELL_PUBLIC_PATHS,
+  "/med-spa", "/dental", "/hvac", "/plumbing", "/roofing",
+  "/chiropractic", "/contractors", "/real-estate", "/personal-injury",
+  "/property-services", "/veterinary", "/electrician", "/landscaping",
+  "/tree-service", "/painting", "/pest-control", "/salon",
+  "/auto-repair", "/accounting", "/fitness", "/law-firm",
 ]);
 
 const BASE44_EDITOR_BADGE_TEXT = /edit\s+with\s+base44/i;
@@ -123,9 +124,13 @@ function normalizePathname(pathname = "/") {
   return normalized || "/";
 }
 
-function isPublicMarketingPath() {
+function isPublicShellPath() {
   const pathname = normalizePathname(window.location.pathname || "/");
-  return PUBLIC_MARKETING_ROUTES.has(pathname) || /^\/(med-spa|dental|hvac|plumbing|roofing|chiropractic|contractors|real-estate|personal-injury|property-services|veterinary|electrician|landscaping|tree-service|painting|pest-control|salon|auto-repair|accounting|fitness|law-firm)$/.test(pathname);
+  if (PUBLIC_SHELL_ROUTES.has(pathname)) return true;
+  if (/^\/industries\/[^/]+$/.test(pathname)) return true;
+  if (/^\/blog\/[^/]+$/.test(pathname)) return true;
+  if (/^\/(med-spa|dental|hvac|plumbing|roofing|chiropractic|contractors|real-estate|personal-injury|property-services|veterinary|electrician|landscaping|tree-service|painting|pest-control|salon|auto-repair|accounting|fitness|law-firm)$/.test(pathname)) return true;
+  return false;
 }
 
 function isPrivatePath() {
@@ -342,7 +347,10 @@ export function runPublicPageDirectoryGuard() {
   document.documentElement.setAttribute("data-clientsurge-route-exposure-guard", "blocked-generated-directory");
   document.title = "ClientSurge Systems | AI Automation for Service Businesses";
 
-  if (isPublicMarketingPath()) {
+  // For ANY public shell route, fully replace the body with a clean fallback.
+  // For private routes, set noindex and also replace.
+  // For unknown routes, sanitize then check again.
+  if (isPublicShellPath()) {
     setRobots("index,follow,max-image-preview:large,max-snippet:-1,max-video-preview:-1");
     body.replaceChildren(buildSafeFallback());
     return true;

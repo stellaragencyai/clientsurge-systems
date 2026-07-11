@@ -33,7 +33,7 @@ const ROOT_APP_SHELL_HTML = `<!doctype html>
   </body>
 </html>`;
 
-test("Cloudflare wrapper repairs generated Base44 homepage directory into clean homepage", async () => {
+test("Cloudflare wrapper fully replaces generated Base44 homepage directory with clean fallback", async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async (input) => {
     const target = new URL(typeof input === "string" ? input : input.url);
@@ -54,20 +54,22 @@ test("Cloudflare wrapper repairs generated Base44 homepage directory into clean 
     const body = await response.text();
 
     assert.equal(response.status, 200);
-    assert.equal(response.headers.get(HOMEPAGE_REPAIR_HEADER), "2026-06-30T23-58Z");
-    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "homepage-repaired");
-    assert.match(body, /ClientSurge Systems \| AI Automation for Local Businesses/);
-    assert.match(body, /Capture\. Follow Up\. Book\./);
+    assert.ok(response.headers.get(HOMEPAGE_REPAIR_HEADER), "homepage repair header should be set");
+    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "full-replaced");
+    // Fallback content is present
+    assert.match(body, /Turn your website into an AI-powered sales system/);
     assert.match(body, /Compare Packages/);
+    // No trace of directory/boilerplate
     assert.doesNotMatch(body, /<h2>Pages<\/h2>/);
     assert.doesNotMatch(body, /Admin Dashboard/);
     assert.doesNotMatch(body, /ClientSurge Systems manages 5 data types/);
+    assert.doesNotMatch(body, /manages \d+ data types/i);
   } finally {
     globalThis.fetch = previousFetch;
   }
 });
 
-test("Cloudflare wrapper falls back public route cache misses to the app shell", async () => {
+test("Cloudflare wrapper falls back public route cache misses to clean fallback", async () => {
   const previousFetch = globalThis.fetch;
   const originCalls = [];
 
@@ -107,14 +109,17 @@ test("Cloudflare wrapper falls back public route cache misses to the app shell",
 
     assert.equal(response.status, 200);
     assert.match(response.headers.get(APP_SHELL_FALLBACK_HEADER) || "", /from=\/store/);
-    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "removed");
+    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "full-replaced");
     assert.deepEqual(originCalls, ["/store", "/"]);
-    assert.match(body, /AI Automation Store \| ClientSurge Systems/);
+    // Fallback for /store route
+    assert.match(body, /Browse individual ClientSurge automation services/);
     assert.match(body, /<link rel="canonical" href="https:\/\/clientsurgesystems\.com\/store" \/>/);
-    assert.match(body, /Capture\. Follow Up\. Book\./);
+    assert.match(body, /Compare Packages/);
+    // No trace of cache miss or directory boilerplate
     assert.doesNotMatch(body, /Cache miss/);
     assert.doesNotMatch(body, /Admin Dashboard/);
     assert.doesNotMatch(body, /ClientSurge Systems manages 5 data types/);
+    assert.doesNotMatch(body, /manages \d+ data types/i);
   } finally {
     globalThis.fetch = previousFetch;
   }

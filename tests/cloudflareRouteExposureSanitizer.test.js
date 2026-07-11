@@ -81,7 +81,7 @@ test("edge route exposure guard injection is idempotent", () => {
   assert.equal(injectEdgeRouteExposureGuard(injected), injected);
 });
 
-test("Cloudflare wrapper sanitizes stale origin HTML and adds proof header", async () => {
+test("Cloudflare wrapper fully replaces stale origin HTML with clean fallback", async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(stalePagesDirectoryHtml, {
     status: 200,
@@ -94,16 +94,22 @@ test("Cloudflare wrapper sanitizes stale origin HTML and adds proof header", asy
     const publicBody = stripInjectedEdgeGuard(body);
 
     assert.equal(response.status, 200);
-    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "removed");
+    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "full-replaced");
     assert.match(body, new RegExp(ROUTE_EXPOSURE_GUARD_SCRIPT_ID));
+    // Full replacement: no trace of the directory/boilerplate
     assert.doesNotMatch(publicBody, />Pages</i);
     assert.doesNotMatch(publicBody, /Admin Dashboard|Business Setup|Client Portal|System Observability/i);
+    assert.doesNotMatch(publicBody, /manages \d+ data types/i);
+    assert.doesNotMatch(publicBody, /href="\/(admin|setup|client-portal)/i);
+    // Fallback content is present
+    assert.match(publicBody, /ClientSurge Systems/);
+    assert.match(publicBody, /Compare Packages/);
   } finally {
     globalThis.fetch = previousFetch;
   }
 });
 
-test("Cloudflare wrapper sanitizes current live directory fixture and keeps homepage body", async () => {
+test("Cloudflare wrapper fully replaces current live directory fixture with clean fallback", async () => {
   const previousFetch = globalThis.fetch;
   globalThis.fetch = async () => new Response(currentLivePagesDirectoryHtml, {
     status: 200,
@@ -116,10 +122,14 @@ test("Cloudflare wrapper sanitizes current live directory fixture and keeps home
     const publicBody = stripInjectedEdgeGuard(body);
 
     assert.equal(response.status, 200);
-    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "removed");
+    assert.equal(response.headers.get(ROUTE_EXPOSURE_SANITIZED_HEADER), "full-replaced");
     assert.doesNotMatch(publicBody, />Pages</i);
     assert.doesNotMatch(publicBody, /Admin \/ AI Status Dashboard|href="\/admin/i);
-    assert.match(publicBody, /Capture\. Follow Up\. Book\./);
+    assert.doesNotMatch(publicBody, /ClientSurge Systems manages 5 data types/i);
+    assert.doesNotMatch(publicBody, /manages \d+ data types/i);
+    // Fallback content is present
+    assert.match(publicBody, /ClientSurge Systems/);
+    assert.match(publicBody, /Compare Packages/);
   } finally {
     globalThis.fetch = previousFetch;
   }
