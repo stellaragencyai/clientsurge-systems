@@ -1,12 +1,22 @@
 import { useState, useEffect, useLayoutEffect } from 'react';
-import { Link } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
-import { Loader2, LogOut, LayoutDashboard, TrendingUp, Zap, Users, DollarSign, RefreshCw } from 'lucide-react';
+import {
+  Bell,
+  DollarSign,
+  LayoutDashboard,
+  Loader2,
+  LogOut,
+  RefreshCw,
+  TrendingUp,
+  Users,
+  Zap,
+} from 'lucide-react';
 import SaasKpiBar from '@/components/saas-portal/SaasKpiBar';
 import SaasOnboarding from '@/components/saas-portal/SaasOnboarding';
 import SaasAutomations from '@/components/saas-portal/SaasAutomations';
 import SaasLeadFeed from '@/components/saas-portal/SaasLeadFeed';
 import SaasRevenue from '@/components/saas-portal/SaasRevenue';
+import SaasCommunicationPreferences from '@/components/saas-portal/SaasCommunicationPreferences';
 
 const NAV = [
   { id: 'overview', label: 'Overview', Icon: LayoutDashboard },
@@ -14,6 +24,7 @@ const NAV = [
   { id: 'automations', label: 'Automations', Icon: Zap },
   { id: 'leads', label: 'Lead Activity', Icon: Users },
   { id: 'revenue', label: 'Revenue', Icon: DollarSign },
+  { id: 'preferences', label: 'Preferences', Icon: Bell },
 ];
 
 const STATUS_CONFIG = {
@@ -38,7 +49,6 @@ export default function ClientSaasDashboard() {
   const [branding, setBranding] = useState(null);
   const [loading, setLoading] = useState(true);
   const [activeSection, setActiveSection] = useState('overview');
-  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const [lastSynced, setLastSynced] = useState(null);
 
   useEffect(() => {
@@ -49,7 +59,6 @@ export default function ClientSaasDashboard() {
       const me = await base44.auth.me();
       setUser(me);
 
-      // Load portal context
       const ctx = await base44.functions.invoke('getClientPortalContext', {}).catch(() => ({ data: {} }));
       const ctxData = ctx?.data || {};
       setContext(ctxData);
@@ -58,16 +67,16 @@ export default function ClientSaasDashboard() {
       const clientProjectId = ctxData.project?.id;
       const orderId = ctxData.order?.id;
 
-      // Load ClientExperiencePortal record
       if (clientId || clientProjectId) {
         const filter = clientId ? { client_id: clientId } : { client_project_id: clientProjectId };
         const portals = await base44.entities.ClientExperiencePortal.filter(filter, '-created_date', 1).catch(() => []);
         let p = portals?.[0] ?? null;
 
-        // If stale or missing, trigger recompute
         if ((!p || !p.last_synced_at) && (clientId || orderId)) {
           await base44.functions.invoke('computeClientExperiencePortal', {
-            client_id: clientId, client_project_id: clientProjectId, order_id: orderId,
+            client_id: clientId,
+            client_project_id: clientProjectId,
+            order_id: orderId,
           }).catch(() => {});
           const refreshed = await base44.entities.ClientExperiencePortal.filter(filter, '-created_date', 1).catch(() => []);
           p = refreshed?.[0] ?? null;
@@ -76,13 +85,11 @@ export default function ClientSaasDashboard() {
         setLastSynced(p?.last_synced_at ? new Date(p.last_synced_at) : null);
       }
 
-      // Load ClientInstallationOS for onboarding details
       if (orderId) {
         const osRecords = await base44.entities.ClientInstallationOS.filter({ order_id: orderId }, '-created_date', 1).catch(() => []);
         setInstallOS(osRecords?.[0] ?? null);
       }
 
-      // Check for agency branding
       try {
         const brandingRecords = await base44.entities.AgencyBrandingConfig?.filter({}, '-created_date', 1).catch(() => []);
         setBranding(brandingRecords?.[0] ?? null);
@@ -99,7 +106,9 @@ export default function ClientSaasDashboard() {
     const orderId = context.order?.id;
     if (clientId || orderId) {
       await base44.functions.invoke('computeClientExperiencePortal', {
-        client_id: clientId, order_id: orderId, force_recompute: true,
+        client_id: clientId,
+        order_id: orderId,
+        force_recompute: true,
       }).catch(() => {});
       const filter = clientId ? { client_id: clientId } : { client_project_id: context.project?.id };
       const refreshed = await base44.entities.ClientExperiencePortal.filter(filter, '-created_date', 1).catch(() => []);
@@ -113,7 +122,6 @@ export default function ClientSaasDashboard() {
   const stage = portal?.onboarding_stage || 'intake_received';
   const sc = STATUS_CONFIG[stage] || STATUS_CONFIG.intake_received;
 
-  // Apply branding overrides
   const brandName = branding?.brand_name || 'ClientSurge Systems';
   const brandLogo = branding?.logo_url;
   const brandPrimary = branding?.primary_color || '#00AEEF';
@@ -158,13 +166,13 @@ export default function ClientSaasDashboard() {
       case 'automations': return <SaasAutomations portal={portal} clientId={clientId} />;
       case 'leads': return <SaasLeadFeed clientId={clientId} />;
       case 'revenue': return <SaasRevenue portal={portal} clientId={clientId} />;
+      case 'preferences': return <SaasCommunicationPreferences clientId={clientId} user={user} />;
       default: return null;
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Header */}
       <header className="sticky top-0 z-40 bg-white border-b border-gray-100 px-4 md:px-6 h-14 flex items-center justify-between">
         <div className="flex items-center gap-3">
           {brandLogo
@@ -179,7 +187,7 @@ export default function ClientSaasDashboard() {
           <span className="hidden sm:inline text-xs text-gray-400 border-l border-gray-200 pl-3">Client Portal</span>
         </div>
         <div className="flex items-center gap-4">
-          {lastSynced && (
+          {lastSynced && activeSection !== 'preferences' && (
             <button onClick={handleRefresh} className="hidden sm:flex items-center gap-1 text-xs text-gray-400 hover:text-blue-500 transition-colors">
               <RefreshCw className="w-3 h-3" />
               Updated {lastSynced.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -197,9 +205,7 @@ export default function ClientSaasDashboard() {
       </header>
 
       <div className="flex flex-1 max-w-7xl mx-auto w-full">
-        {/* Sidebar nav — desktop */}
         <aside className="hidden md:flex flex-col w-52 border-r border-gray-100 bg-white pt-6 pb-4 px-3">
-          {/* Business header */}
           <div className="px-3 mb-6">
             <p className="text-xs font-bold text-gray-900 truncate">{project?.business_name}</p>
             <div className={`flex items-center gap-1.5 mt-1 px-2 py-0.5 rounded-full text-[11px] font-medium w-fit ${sc.bg} ${sc.text}`}>
@@ -226,27 +232,23 @@ export default function ClientSaasDashboard() {
           </div>
         </aside>
 
-        {/* Mobile bottom nav */}
-        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-100 flex">
+        <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white border-t border-gray-100 grid grid-cols-6">
           {NAV.map(({ id, label, Icon }) => (
             <button key={id} onClick={() => setActiveSection(id)}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-medium transition-colors ${
+              className={`flex flex-col items-center gap-0.5 py-2 text-[9px] font-medium transition-colors ${
                 activeSection === id ? 'text-blue-600' : 'text-gray-400'
               }`}>
-              <Icon className="w-5 h-5" />{label}
+              <Icon className="w-4.5 h-4.5" />{label}
             </button>
           ))}
         </nav>
 
-        {/* Main content */}
         <main className="flex-1 p-4 md:p-8 pb-20 md:pb-8 min-w-0">
-          {/* Page title */}
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
               <h1 className="text-xl font-bold text-gray-900">{NAV.find(n => n.id === activeSection)?.label}</h1>
               <p className="text-sm text-gray-400 mt-0.5">{project?.business_name}</p>
             </div>
-            {/* AI summary pill */}
             {activeSection === 'overview' && portal?.ai_summary && (
               <div className="hidden lg:block max-w-xs text-xs text-gray-500 bg-white rounded-lg border border-gray-100 shadow-sm px-3 py-2">
                 {portal.ai_summary}
