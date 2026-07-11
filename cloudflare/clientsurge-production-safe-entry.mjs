@@ -1,7 +1,7 @@
 import baseSecurityEdge from "./clientsurge-security-edge-worker.mjs";
 import productSignupHotfix from "./clientsurge-product-signup-edge-hotfix.mjs";
 
-const SAFE_ENTRY_VERSION = "2026-07-11-preserve-react-v1";
+const SAFE_ENTRY_VERSION = "2026-07-11-preserve-react-v2";
 const SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 
 const GENERATED_DIRECTORY_SIGNAL = /(?:ClientSurge Systems manages\s+\d+\s+data types|manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|available pages|app pages)/i;
