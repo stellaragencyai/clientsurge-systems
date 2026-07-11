@@ -331,7 +331,7 @@ export function classifyLeadIndustry(lead) {
   const businessType = normalize(lead?.business_type);
   const currentIndustry = normalize(lead?.industry);
 
-  scoreRules(name, 14, "business_name", scores, evidence, decisiveHits);
+  scoreRules(name, 20, "business_name", scores, evidence, decisiveHits);
   scoreRules(domain, 10, "website", scores, evidence, decisiveHits);
   scoreRules(tags, 7, "industry_tags", scores, evidence, decisiveHits);
   scoreRules(notes, 5, "enrichment_notes", scores, evidence, decisiveHits);
@@ -363,24 +363,30 @@ export function classifyLeadIndustry(lead) {
   const topDecisive = decisiveHits.filter((hit) => hit.key === top.key);
   const competingDecisive = decisiveHits.filter((hit) => hit.key !== top.key);
   const decisiveNameHit = topDecisive.some((hit) => hit.source === "business_name");
+  const competingNameDecisive = competingDecisive.some((hit) => hit.source === "business_name");
   const genericName = GENERIC_NAMES.has(name);
   const observedRanked = totalsBySource(evidence, OBSERVED_SOURCES);
   const declaredRanked = totalsBySource(evidence, DECLARED_SOURCES);
   const observedTop = observedRanked[0] || { key: null, score: 0 };
   const declaredTop = declaredRanked[0] || { key: null, score: 0 };
+  const contradictoryWebsiteEvidence = Boolean(
+    decisiveNameHit && evidence.some((item) =>
+      item.source === "website" && item.key !== top.key && Number(item.points || 0) >= 8
+    )
+  );
 
   const declaredObservedConflict = Boolean(
-    observedTop.key && declaredTop.key && observedTop.key !== declaredTop.key &&
+    !decisiveNameHit && observedTop.key && declaredTop.key && observedTop.key !== declaredTop.key &&
     observedTop.score >= 8 && declaredTop.score >= 6 && margin < 7
   );
   const genericIdentityConflict = Boolean(
     genericName && observedTop.key && declaredTop.key && observedTop.key !== declaredTop.key && observedTop.score >= 8
   );
-  const closeConflict = competingDecisive.length > 0 && margin < 4 && !decisiveNameHit;
-  const conflict = declaredObservedConflict || genericIdentityConflict || closeConflict;
+  const closeConflict = competingNameDecisive || (competingDecisive.length > 0 && margin < 4 && !decisiveNameHit);
+  const conflict = declaredObservedConflict || genericIdentityConflict || closeConflict || contradictoryWebsiteEvidence;
 
   let confidence = 55;
-  if (decisiveNameHit && margin >= 5) confidence = 96;
+  if (decisiveNameHit && !competingNameDecisive && !contradictoryWebsiteEvidence) confidence = 97;
   else if (top.score >= 25 && margin >= 9) confidence = 92;
   else if (top.score >= 17 && margin >= 6) confidence = 86;
   else if (top.score >= 11 && margin >= 4) confidence = 78;
@@ -395,7 +401,7 @@ export function classifyLeadIndustry(lead) {
       confidence: Math.min(confidence, 67),
       conflict,
       reason: conflict
-        ? `Conflicting observed and declared evidence (${observedTop.key || top.key} vs ${declaredTop.key || second.key || "another category"})`
+        ? `Conflicting business identity evidence (${observedTop.key || top.key} vs ${declaredTop.key || second.key || "another category"})`
         : "Industry evidence is too weak for automatic overwrite",
       evidence,
       classifier_version: INDUSTRY_CLASSIFIER_VERSION,
