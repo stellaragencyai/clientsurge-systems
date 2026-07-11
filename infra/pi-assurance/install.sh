@@ -46,7 +46,9 @@ if ! command -v python3 >/dev/null 2>&1; then
   apt-get install -y python3 ca-certificates
 fi
 
+# Fail closed before modifying the machine.
 python3 -m py_compile "${SCRIPT_DIR}/clientsurge_assurance.py"
+python3 -m unittest discover -s "${SCRIPT_DIR}/tests" -v
 python3 - <<PY
 import json
 from pathlib import Path
