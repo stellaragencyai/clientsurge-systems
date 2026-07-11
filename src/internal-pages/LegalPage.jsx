@@ -4,14 +4,18 @@ import {
   BadgeCheck,
   Ban,
   CalendarClock,
-  CheckCircle2,
+  ChevronRight,
+  Cookie,
   FileText,
+  Fingerprint,
   Lock,
+  Mail,
   PhoneCall,
   RotateCcw,
   ScrollText,
   Shield,
   ShieldCheck,
+  Sparkles,
 } from "lucide-react";
 
 import { setPageMetadata } from "@/lib/seo";
@@ -26,272 +30,54 @@ const SUPPORT_PHONE = "(602) 584-3227";
 const SUPPORT_TEL = "+16025843227";
 
 const PRIVACY_SECTIONS = [
-  {
-    id: "info-collect",
-    title: "Information We Collect",
-    body: "We collect information you provide directly, including business name, contact name, phone number, email address, website URL, service interest, messages submitted through forms, booking details, and information needed to respond to your inquiry.",
-  },
-  {
-    id: "how-we-use",
-    title: "How We Use Your Information",
-    body: "We use your information to respond to inquiries, schedule automation audits, provide and improve AI automation services, support lead capture and booking workflows, send relevant follow-up communications, and maintain business records. You may opt out of SMS by replying STOP or by emailing support.",
-  },
-  {
-    id: "sms-email",
-    title: "SMS and Email Communications",
-    body: "If you provide a phone number and affirmatively select the optional SMS-consent checkbox, we may send requested SMS communications related to your inquiry, appointments, onboarding, service updates, and customer support. Email follow-up may still occur when you submit an inquiry without selecting SMS consent. Message frequency varies. Message and data rates may apply. SMS consent is not a condition of purchase. Reply STOP to opt out or HELP for help.",
-  },
-  {
-    id: "consent-records",
-    title: "Consent Records",
-    body: "When you opt in to SMS communications, we may store consent records such as consent text version, timestamp, IP address, source page, UTM/source details, requested communication channels, and submitted contact details so we can maintain accurate compliance and audit records.",
-  },
-  {
-    id: "mobile-data",
-    title: "Mobile Messaging Data and Consent",
-    body: "No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text-messaging originator opt-in data and consent will not be sold, rented, transferred, or shared with third parties for their own marketing or promotional purposes. We may provide data to service providers only as necessary to operate our messaging program, deliver requested messages, maintain security, and comply with law.",
-  },
-  {
-    id: "ai-processing",
-    title: "AI and Automation Processing",
-    body: "We may process inquiry details, message history, booking context, business information, and service preferences through automation and AI-assisted systems to classify leads, draft replies, summarize conversations, recommend next steps, route requests, and support customer service. AI-assisted outputs may be reviewed, edited, or overridden before use when appropriate.",
-  },
-  {
-    id: "cookies",
-    title: "Cookies and Tracking",
-    body: "We may use cookies, analytics, pixels, UTM parameters, and similar technologies to understand website traffic, measure marketing performance, improve forms and booking flows, and prevent abuse.",
-  },
-  {
-    id: "data-sharing",
-    title: "Data Sharing and Third-Party Services",
-    body: "We do not sell your personal information. We share data only with service providers needed to operate the website, forms, messaging, payments, email, analytics, automation, and AI workflows. These providers may include Base44, Twilio, Resend, Stripe, OpenAI, Google, Calendly, and similar infrastructure or business service vendors. These operational disclosures do not permit any provider to use mobile information or SMS consent for its own marketing or promotional purposes.",
-  },
-  {
-    id: "data-retention",
-    title: "Data Retention",
-    body: "We retain contact records and business inquiry data for as long as reasonably needed to provide services, maintain records, support legal obligations, and improve operations. We may delete or anonymize records that are no longer needed.",
-  },
-  {
-    id: "account-deletion",
-    title: "Account and Data Deletion",
-    body: "If you create or use an account, client portal, lead record, or communication record with ClientSurge Systems, you can request deletion of account-related data or personal information using the request form on this page or by contacting support. Some records may be retained when needed for billing, security, fraud prevention, legal compliance, dispute handling, or legitimate business records.",
-  },
+  { id: "info-collect", title: "Information We Collect", icon: Fingerprint, body: "We collect information you provide directly, including business name, contact name, phone number, email address, website URL, service interest, messages submitted through forms, booking details, and information needed to respond to your inquiry." },
+  { id: "how-we-use", title: "How We Use Your Information", icon: Sparkles, body: "We use your information to respond to inquiries, schedule automation assessments, provide and improve AI automation services, support lead capture and booking workflows, send relevant follow-up communications, and maintain business records. You may opt out of SMS by replying STOP or by contacting support." },
+  { id: "sms-email", title: "SMS and Email Communications", icon: PhoneCall, body: "If you provide a phone number and affirmatively select the optional SMS-consent checkbox, we may send requested SMS communications related to your inquiry, appointments, onboarding, service updates, and customer support. Email follow-up may still occur when you submit an inquiry without selecting SMS consent. Message frequency varies. Message and data rates may apply. SMS consent is not a condition of purchase. Reply STOP to opt out or HELP for help." },
+  { id: "consent-records", title: "Consent Records", icon: ScrollText, body: "When you opt in to SMS communications, we may store consent records such as consent text version, timestamp, IP address, source page, UTM or source details, requested communication channels, and submitted contact details so we can maintain accurate compliance and audit records." },
+  { id: "mobile-data", title: "Mobile Messaging Data and Consent", icon: ShieldCheck, body: "No mobile information will be shared with third parties or affiliates for marketing or promotional purposes. Text-messaging originator opt-in data and consent will not be sold, rented, transferred, or shared with third parties for their own marketing or promotional purposes. We may provide data to service providers only as necessary to operate our messaging program, deliver requested messages, maintain security, and comply with law." },
+  { id: "ai-processing", title: "AI and Automation Processing", icon: Sparkles, body: "We may process inquiry details, message history, booking context, business information, and service preferences through automation and AI-assisted systems to classify leads, draft replies, summarize conversations, recommend next steps, route requests, and support customer service. AI-assisted outputs may be reviewed, edited, or overridden before use when appropriate." },
+  { id: "cookies", title: "Cookies and Tracking", icon: Cookie, body: "We may use cookies, analytics, pixels, UTM parameters, and similar technologies to understand website traffic, measure marketing performance, improve forms and booking flows, and prevent abuse." },
+  { id: "data-sharing", title: "Data Sharing and Service Providers", icon: Lock, body: "We do not sell your personal information. We share data only with service providers needed to operate the website, forms, messaging, payments, email, analytics, automation, and AI workflows. These operational disclosures do not permit any provider to use mobile information or SMS consent for its own marketing or promotional purposes." },
+  { id: "data-retention", title: "Data Retention", icon: FileText, body: "We retain contact records and business inquiry data for as long as reasonably needed to provide services, maintain records, support legal obligations, and improve operations. We may delete or anonymize records that are no longer needed." },
+  { id: "account-deletion", title: "Account and Data Deletion", icon: Shield, body: "If you create or use an account, client portal, lead record, or communication record with ClientSurge Systems, you can request deletion of account-related data or personal information using the request form on this page or by contacting support. Some records may be retained when needed for billing, security, fraud prevention, legal compliance, dispute handling, or legitimate business records." },
 ];
 
 const TERMS_SECTIONS = [
-  {
-    id: "services",
-    title: "Services",
-    body: "ClientSurge Systems provides AI-powered lead automation services on a monthly subscription basis. Service tiers and pricing are listed at clientsurgesystems.com/pricing. By using our services, you agree to these terms.",
-  },
-  {
-    id: "billing",
-    title: "Subscription Billing and Auto-Renewal",
-    body: "Monthly subscriptions automatically renew each billing period until cancelled. By purchasing a subscription, you authorize ClientSurge Systems and its payment processor to charge the payment method on file for recurring monthly fees, applicable setup fees, add-ons, taxes, and other amounts disclosed at checkout. Subscriptions renew automatically unless you cancel before your next billing date.",
-  },
-  {
-    id: "cancellation",
-    title: "Cancellation and Changes",
-    body: "You may request cancellation, pause, resume, upgrade, or downgrade support by contacting support. Cancellation takes effect at the end of the then-current billing period unless otherwise stated in writing. Setup fees and already-paid monthly subscription fees are non-refundable except where required by law or expressly agreed in writing.",
-  },
-  {
-    id: "payment",
-    title: "Payment Processing",
-    body: "Payments are processed by Stripe or another third-party payment processor. You are responsible for keeping billing information current. Failed, disputed, or past-due payments may delay onboarding, pause service delivery, or limit access to active automations until billing is resolved.",
-  },
-  {
-    id: "sms-compliance",
-    title: "SMS Compliance",
-    body: "When you affirmatively select the optional SMS-consent checkbox or otherwise provide legally sufficient SMS consent, you agree to receive automated and non-automated text messages from ClientSurge Systems related to your inquiry, appointments, onboarding, service updates, and customer support. Message frequency varies. Message and data rates may apply. SMS consent is not a condition of purchase. Reply STOP to opt out or HELP for help. Additional program details are available in our SMS Terms.",
-  },
-  {
-    id: "ai-outputs",
-    title: "AI and Automation Outputs",
-    body: "AI-assisted messages, summaries, recommendations, and automations are provided to support business workflows. You are responsible for reviewing business-critical outputs, maintaining accurate business information, honoring customer opt-outs, collecting and maintaining legally sufficient consent for your own customer communications, and using the services in compliance with applicable laws and platform rules.",
-  },
-  {
-    id: "liability",
-    title: "Limitation of Liability",
-    body: "ClientSurge Systems is not liable for indirect or consequential damages. Our total liability shall not exceed the amount paid in the prior 30 days.",
-  },
-  {
-    id: "governing-law",
-    title: "Governing Law",
-    body: "These terms are governed by the laws of the State of Arizona.",
-  },
+  { id: "services", title: "Services", icon: Sparkles, body: "ClientSurge Systems provides AI-powered lead automation services on a monthly subscription basis. Service tiers and pricing are listed on our pricing page. By purchasing or using our services, you agree to these terms." },
+  { id: "billing", title: "Subscription Billing and Auto-Renewal", icon: CalendarClock, body: "Monthly subscriptions automatically renew each billing period until canceled. By purchasing a subscription, you authorize ClientSurge Systems and its payment processor to charge the payment method on file for recurring monthly fees, applicable setup fees, add-ons, taxes, and other amounts disclosed at checkout." },
+  { id: "cancellation", title: "Cancellation and Changes", icon: RotateCcw, body: "You may request cancellation, pause, resume, upgrade, or downgrade support by contacting support. Cancellation takes effect at the end of the then-current billing period unless otherwise stated in writing. Setup fees and already-paid monthly subscription fees are non-refundable except where required by law or expressly agreed in writing." },
+  { id: "payment", title: "Payment Processing", icon: Lock, body: "Payments are processed by Stripe or another third-party payment processor. You are responsible for keeping billing information current. Failed, disputed, or past-due payments may delay onboarding, pause service delivery, or limit access to active automations until billing is resolved." },
+  { id: "sms-compliance", title: "SMS Compliance", icon: PhoneCall, body: "When you affirmatively select the optional SMS-consent checkbox or otherwise provide legally sufficient SMS consent, you agree to receive automated and non-automated text messages from ClientSurge Systems related to your inquiry, appointments, onboarding, service updates, and customer support. Message frequency varies. Message and data rates may apply. SMS consent is not a condition of purchase. Reply STOP to opt out or HELP for help. Additional program details are available in our SMS Terms." },
+  { id: "ai-outputs", title: "AI and Automation Outputs", icon: Sparkles, body: "AI-assisted messages, summaries, recommendations, and automations are provided to support business workflows. You are responsible for reviewing business-critical outputs, maintaining accurate business information, honoring customer opt-outs, collecting legally sufficient consent for your own customer communications, and using the services in compliance with applicable laws and platform rules." },
+  { id: "liability", title: "Limitation of Liability", icon: Shield, body: "ClientSurge Systems is not liable for indirect or consequential damages. Our total liability shall not exceed the amount paid in the prior 30 days, except where a different limitation is required by law." },
+  { id: "governing-law", title: "Governing Law", icon: ScrollText, body: "These terms are governed by the laws of the State of Arizona, without regard to conflict-of-law principles." },
 ];
 
 const REFUND_SECTIONS = [
-  {
-    id: "services-overview",
-    title: "Services Overview",
-    body: "ClientSurge Systems provides custom AI automation setup, software configuration, workflow implementation, AI agent setup, and recurring monthly automation support services. Because our work involves custom setup, configuration, and digital service delivery, we do not accept physical returns or exchanges.",
-  },
-  {
-    id: "refund-eligibility",
-    title: "Refund Eligibility",
-    body: "Setup fees, installation fees, and onboarding fees are generally non-refundable once work has begun. This includes account configuration, workflow planning, AI setup, automation installation, software integration, client onboarding, or implementation work performed for the customer. Monthly subscription charges may be canceled before the next billing cycle. Cancellation stops future billing but does not automatically refund prior charges.",
-  },
-  {
-    id: "review-window",
-    title: "30-Day Review Window",
-    body: "Customers may contact ClientSurge Systems within 30 days of purchase if they believe there was a billing error, duplicate charge, service access issue, or failure to deliver the purchased service. Refund requests are reviewed case by case.",
-    items: [
-      "A refund may be approved for incorrect or duplicate charges.",
-      "A refund may be approved if ClientSurge Systems is unable to begin or deliver the purchased service.",
-      "A refund may be denied when custom setup work has already begun or required customer access was not provided.",
-    ],
-  },
-  {
-    id: "cancellations",
-    title: "Cancellations",
-    body: "Customers may request cancellation of their monthly subscription by contacting support. Cancellation requests should be submitted before the next billing date. Once canceled, the customer will not be billed for future monthly service periods.",
-  },
-  {
-    id: "no-returns",
-    title: "No Returns or Exchanges",
-    body: "ClientSurge Systems does not sell physical goods. Returns and exchanges do not apply.",
-  },
+  { id: "services-overview", title: "Services Overview", icon: Sparkles, body: "ClientSurge Systems provides custom AI automation setup, software configuration, workflow implementation, AI agent setup, and recurring monthly automation support services. Because our work involves custom setup, configuration, and digital service delivery, we do not accept physical returns or exchanges." },
+  { id: "refund-eligibility", title: "Refund Eligibility", icon: Shield, body: "Setup fees, installation fees, and onboarding fees are generally non-refundable once work has begun. This includes account configuration, workflow planning, AI setup, automation installation, software integration, client onboarding, or implementation work performed for the customer. Monthly subscription charges may be canceled before the next billing cycle. Cancellation stops future billing but does not automatically refund prior charges." },
+  { id: "review-window", title: "30-Day Review Window", icon: CalendarClock, body: "Customers may contact ClientSurge Systems within 30 days of purchase if they believe there was a billing error, duplicate charge, service access issue, or failure to deliver the purchased service. Refund requests are reviewed case by case.", items: ["A refund may be approved for incorrect or duplicate charges.", "A refund may be approved if ClientSurge Systems is unable to begin or deliver the purchased service.", "A refund may be denied when custom setup work has already begun or required customer access was not provided."] },
+  { id: "cancellations", title: "Cancellations", icon: RotateCcw, body: "Customers may request cancellation of their monthly subscription by contacting support. Cancellation requests should be submitted before the next billing date. Once canceled, the customer will not be billed for future monthly service periods." },
+  { id: "no-returns", title: "No Returns or Exchanges", icon: Ban, body: "ClientSurge Systems does not sell physical goods. Returns and exchanges do not apply." },
 ];
 
 const LEGAL_META = {
-  privacy: {
-    title: "Privacy Policy",
-    eyebrow: "Privacy and data protection",
-    updated: "July 11, 2026",
-    canonicalPath: "/privacy",
-    sections: PRIVACY_SECTIONS,
-    summary: [
-      { icon: Lock, text: "We do not sell personal information" },
-      { icon: PhoneCall, text: "SMS opt-out: reply STOP anytime" },
-      { icon: Shield, text: "Mobile opt-in data is not shared for marketing" },
-      { icon: ScrollText, text: "Consent records are maintained for auditability" },
-    ],
-  },
-  terms: {
-    title: "Terms of Service",
-    eyebrow: "Service and account terms",
-    updated: "July 11, 2026",
-    canonicalPath: "/terms",
-    sections: TERMS_SECTIONS,
-    summary: [
-      { icon: BadgeCheck, text: "Month-to-month service terms" },
-      { icon: Shield, text: "Setup fees are generally non-refundable once work begins" },
-      { icon: Lock, text: "Customers must honor consent and opt-outs" },
-      { icon: ScrollText, text: "Governed by Arizona law" },
-    ],
-  },
-  refund: {
-    title: "Refund & Cancellation Policy",
-    eyebrow: "Billing and cancellation policy",
-    updated: "July 11, 2026",
-    canonicalPath: "/refund-policy",
-    sections: REFUND_SECTIONS,
-    summary: [
-      { icon: RotateCcw, text: "Setup fees are generally non-refundable once work begins" },
-      { icon: CalendarClock, text: "Monthly billing can be canceled before the next cycle" },
-      { icon: Shield, text: "30-day review window for billing errors and access issues" },
-      { icon: Ban, text: "No physical returns or exchanges" },
-    ],
-  },
+  privacy: { title: "Privacy Policy", eyebrow: "Privacy and data protection", updated: "July 11, 2026", canonicalPath: "/privacy", description: "How ClientSurge Systems collects, uses, protects, and retains personal information, including SMS consent data.", sections: PRIVACY_SECTIONS, summary: [{ icon: Lock, text: "We do not sell personal information" }, { icon: PhoneCall, text: "Reply STOP to opt out of SMS" }, { icon: ShieldCheck, text: "Mobile opt-in data is not shared for marketing" }, { icon: ScrollText, text: "Consent records are maintained for auditability" }] },
+  terms: { title: "Terms of Service", eyebrow: "Service and billing terms", updated: "July 11, 2026", canonicalPath: "/terms", description: "The operating, billing, cancellation, SMS, and AI-use terms that govern ClientSurge Systems services.", sections: TERMS_SECTIONS, summary: [{ icon: BadgeCheck, text: "Month-to-month service terms" }, { icon: Shield, text: "Clear setup-fee and cancellation rules" }, { icon: Lock, text: "Consent and opt-outs must be honored" }, { icon: ScrollText, text: "Governed by Arizona law" }] },
+  refund: { title: "Refund & Cancellation Policy", eyebrow: "Refund and cancellation rules", updated: "July 11, 2026", canonicalPath: "/refund-policy", description: "How setup fees, recurring subscriptions, billing errors, cancellations, and refund reviews are handled.", sections: REFUND_SECTIONS, summary: [{ icon: RotateCcw, text: "Setup fees are generally non-refundable once work begins" }, { icon: CalendarClock, text: "Monthly billing can be canceled before the next cycle" }, { icon: Shield, text: "30-day review window for qualifying issues" }, { icon: Ban, text: "No physical returns or exchanges" }] },
 };
 
-const TRUST_LABELS = [
-  { label: "Consent-first messaging", desc: "STOP handling and communication preferences are built into our operating model." },
-  { label: "Clear data practices", desc: "Operational data sharing is separated from third-party marketing use." },
-  { label: "Deletion request path", desc: "Privacy requests can be submitted directly through the website." },
-  { label: "Plain-language policies", desc: "Policies are structured for readability, navigation, and practical use." },
-];
-
-function SummaryCard({ items }) {
-  return (
-    <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map(({ icon: Icon, text }) => (
-        <div key={text} className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.06)]">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-            <Icon className="h-4 w-4" />
-          </div>
-          <p className="mt-4 text-sm font-bold leading-6 text-slate-900">{text}</p>
-        </div>
-      ))}
-    </div>
-  );
+function SummaryGrid({ items }) {
+  return <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">{items.map(({ icon: Icon, text }) => <div key={text} className="rounded-2xl border border-sky-100 bg-white p-5 shadow-[0_12px_35px_rgba(15,23,42,0.06)]"><div className="flex h-10 w-10 items-center justify-center rounded-xl bg-gradient-to-br from-sky-100 to-blue-100 text-sky-700"><Icon className="h-4 w-4" /></div><p className="mt-4 text-sm font-bold leading-6 text-slate-900">{text}</p></div>)}</div>;
 }
 
 function SectionBlock({ section, index }) {
-  return (
-    <section
-      id={section.id}
-      className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_16px_50px_rgba(15,23,42,0.06)] transition hover:-translate-y-0.5 hover:border-sky-200 hover:shadow-[0_24px_60px_rgba(14,165,233,0.10)] sm:p-8"
-      style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}
-    >
-      <div className="flex items-start gap-4">
-        <div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 to-blue-100 text-sky-700">
-          <FileText className="h-5 w-5" />
-        </div>
-        <div>
-          <p className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-600">Section {index + 1}</p>
-          <h2 className="mt-1 text-xl font-black tracking-tight text-slate-950">{section.title}</h2>
-        </div>
-      </div>
-      <p className="mt-5 max-w-3xl text-[15px] leading-7 text-slate-600">{section.body}</p>
-      {section.items ? (
-        <ul className="mt-5 space-y-3">
-          {section.items.map((item) => (
-            <li key={item} className="flex items-start gap-3 text-sm leading-6 text-slate-600">
-              <CheckCircle2 className="mt-1 h-4 w-4 flex-shrink-0 text-sky-600" />
-              {item}
-            </li>
-          ))}
-        </ul>
-      ) : null}
-    </section>
-  );
+  const Icon = section.icon || Shield;
+  return <section id={section.id} className="rounded-3xl border border-slate-200/80 bg-white p-6 shadow-[0_16px_50px_rgba(15,23,42,0.055)] transition hover:border-sky-200 hover:shadow-[0_22px_55px_rgba(14,165,233,0.09)] sm:p-8" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 28px)" }}><div className="flex items-start gap-4"><div className="flex h-11 w-11 flex-shrink-0 items-center justify-center rounded-2xl bg-gradient-to-br from-sky-100 to-blue-100 text-sky-700"><Icon className="h-5 w-5" /></div><div><p className="text-[11px] font-black uppercase tracking-[0.18em] text-sky-600">Section {index + 1}</p><h2 className="mt-1 text-xl font-black tracking-[-0.02em] text-slate-950">{section.title}</h2></div></div><p className="mt-5 max-w-3xl text-[15px] leading-7 text-slate-600">{section.body}</p>{section.items ? <ul className="mt-4 space-y-2 pl-5 text-sm leading-7 text-slate-600">{section.items.map((item) => <li key={item} className="list-disc pl-1 marker:text-sky-500">{item}</li>)}</ul> : null}</section>;
 }
 
 function ContactBlock() {
-  return (
-    <section className="overflow-hidden rounded-3xl border border-sky-200 bg-gradient-to-r from-sky-600 to-blue-700 p-8 text-white shadow-[0_24px_70px_rgba(2,132,199,0.25)] sm:p-10">
-      <div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center">
-        <div>
-          <p className="text-xs font-black uppercase tracking-[0.18em] text-sky-100">Need clarification?</p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight">Contact ClientSurge Systems</h2>
-          <p className="mt-3 max-w-2xl text-sm leading-7 text-sky-50">
-            Questions, data requests, communication preference changes, and account deletion requests can be sent directly to our support team.
-          </p>
-        </div>
-        <div className="flex flex-col gap-3 sm:flex-row md:flex-col">
-          <a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex h-11 items-center justify-center rounded-xl bg-white px-5 text-sm font-bold text-sky-700 shadow-lg transition hover:bg-sky-50">
-            Email support
-          </a>
-          <a href={`tel:${SUPPORT_TEL}`} className="inline-flex h-11 items-center justify-center rounded-xl border border-white/40 px-5 text-sm font-bold text-white transition hover:bg-white/10">
-            {SUPPORT_PHONE}
-          </a>
-        </div>
-      </div>
-    </section>
-  );
-}
-
-function TrustLabelBar() {
-  return (
-    <div className="border-t border-sky-100 bg-white px-4 py-14 sm:px-6 lg:px-8">
-      <div className="mx-auto max-w-6xl">
-        <p className="text-center text-[11px] font-black uppercase tracking-[0.18em] text-sky-700">Compliance and trust principles</p>
-        <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {TRUST_LABELS.map(({ label, desc }) => (
-            <div key={label} className="rounded-2xl border border-slate-200 bg-[#f8fbff] p-5 text-center">
-              <div className="mx-auto flex h-10 w-10 items-center justify-center rounded-xl bg-sky-100 text-sky-700">
-                <ShieldCheck className="h-5 w-5" />
-              </div>
-              <p className="mt-4 text-sm font-black text-slate-900">{label}</p>
-              <p className="mt-2 text-xs leading-5 text-slate-500">{desc}</p>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
+  return <section className="mt-8 overflow-hidden rounded-3xl border border-sky-200 bg-gradient-to-r from-sky-600 to-blue-700 p-7 text-white shadow-[0_24px_70px_rgba(2,132,199,0.24)] sm:p-9"><div className="grid gap-6 md:grid-cols-[1fr_auto] md:items-center"><div><p className="text-xs font-black uppercase tracking-[0.18em] text-sky-100">Need clarification?</p><h2 className="mt-2 text-2xl font-black tracking-tight">Questions about privacy, consent, billing, or your account?</h2><p className="mt-3 max-w-2xl text-sm leading-7 text-sky-50">Contact us to update communication preferences, request data deletion, or get help understanding these terms.</p></div><div className="flex flex-col gap-3 sm:flex-row md:flex-col"><a href={`mailto:${SUPPORT_EMAIL}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-white px-5 text-sm font-bold text-sky-700 shadow-lg transition hover:bg-sky-50"><Mail className="h-4 w-4" />Email support</a><a href={`tel:${SUPPORT_TEL}`} className="inline-flex h-11 items-center justify-center gap-2 rounded-xl border border-white/35 bg-white/10 px-5 text-sm font-bold text-white transition hover:bg-white/20"><PhoneCall className="h-4 w-4" />{SUPPORT_PHONE}</a></div></div></section>;
 }
 
 export default function LegalPage({ fixedType, canonicalPath }) {
@@ -299,108 +85,8 @@ export default function LegalPage({ fixedType, canonicalPath }) {
   const navigate = useNavigate();
   const type = fixedType || routeType;
   const meta = LEGAL_META[type] || LEGAL_META.privacy;
-  const { title, eyebrow, updated, sections, summary } = meta;
 
-  useEffect(
-    () =>
-      setPageMetadata({
-        title: `${title} | ClientSurge Systems`,
-        description: `Read the ClientSurge Systems ${title.toLowerCase()} covering data, messaging, billing, service terms, and support contacts.`,
-        canonicalPath: canonicalPath || meta.canonicalPath || `/legal/${type}`,
-        ogTitle: `${title} | ClientSurge Systems`,
-        ogDescription: `Review the latest ClientSurge Systems ${title.toLowerCase()}.`,
-      }),
-    [canonicalPath, meta.canonicalPath, title, type]
-  );
+  useEffect(() => setPageMetadata({ title: `${meta.title} | ClientSurge Systems`, description: meta.description, canonicalPath: canonicalPath || meta.canonicalPath, ogTitle: `${meta.title} | ClientSurge Systems`, ogDescription: meta.description }), [canonicalPath, meta]);
 
-  return (
-    <DemoBookingProvider>
-      <div className="min-h-screen bg-[#f7fbff] text-slate-900">
-        <Navbar />
-
-        <section
-          className="relative overflow-hidden border-b border-sky-100 px-4 sm:px-6 lg:px-8"
-          style={{ paddingTop: "calc(var(--cs-nav-height) + 4rem)", paddingBottom: "4rem" }}
-        >
-          <div className="pointer-events-none absolute inset-0">
-            <div className="absolute -left-24 top-12 h-80 w-80 rounded-full bg-sky-200/35 blur-3xl" />
-            <div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-blue-200/25 blur-3xl" />
-            <div className="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.035)_1px,transparent_1px)] bg-[size:48px_48px]" />
-          </div>
-
-          <div className="relative mx-auto max-w-6xl">
-            <div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/85 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-sky-700 shadow-sm backdrop-blur">
-              <ShieldCheck className="h-4 w-4" />
-              {eyebrow}
-            </div>
-            <h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.04em] text-slate-950 sm:text-5xl">{title}</h1>
-            <p className="mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">
-              Clear, accessible policies for how ClientSurge Systems handles data, services, billing, communications, and customer requests.
-            </p>
-            <div className="mt-7 flex flex-wrap items-center gap-3">
-              <span className="rounded-full border border-sky-100 bg-white px-3 py-2 text-xs font-semibold text-slate-600 shadow-sm">Last updated: {updated}</span>
-              <div className="flex rounded-xl border border-sky-100 bg-white p-1 shadow-sm">
-                {[
-                  ["privacy", "Privacy", "/privacy"],
-                  ["terms", "Terms", "/terms"],
-                  ["refund", "Refunds", "/refund-policy"],
-                ].map(([key, label, path]) => (
-                  <button
-                    key={key}
-                    type="button"
-                    onClick={() => navigate(path)}
-                    className={`rounded-lg px-4 py-2 text-xs font-bold transition ${type === key ? "bg-sky-600 text-white shadow" : "text-slate-500 hover:bg-sky-50 hover:text-sky-700"}`}
-                  >
-                    {label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16">
-          <SummaryCard items={summary} />
-
-          <div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start">
-            <div className="space-y-5">
-              {sections.map((section, index) => (
-                <SectionBlock key={section.id} section={section} index={index} />
-              ))}
-
-              {type === "privacy" ? (
-                <div id="data-deletion-request" className="rounded-3xl border border-sky-100 bg-white p-5 shadow-[0_16px_50px_rgba(15,23,42,0.06)] sm:p-8" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 24px)" }}>
-                  <DataDeletionRequestForm />
-                </div>
-              ) : null}
-
-              <ContactBlock />
-            </div>
-
-            <aside className="hidden lg:block lg:sticky" style={{ top: "calc(var(--cs-nav-height) + 28px)" }}>
-              <div className="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm">
-                <p className="text-[11px] font-black uppercase tracking-[0.16em] text-sky-700">On this page</p>
-                <nav className="mt-4 space-y-1.5" aria-label="Page sections">
-                  {sections.map((section, index) => (
-                    <a key={section.id} href={`#${section.id}`} className="block rounded-lg px-3 py-2 text-xs font-semibold leading-5 text-slate-600 transition hover:bg-sky-50 hover:text-sky-700">
-                      {index + 1}. {section.title}
-                    </a>
-                  ))}
-                  {type === "privacy" ? (
-                    <a href="#data-deletion-request" className="block rounded-lg px-3 py-2 text-xs font-semibold text-slate-600 transition hover:bg-sky-50 hover:text-sky-700">
-                      Request deletion
-                    </a>
-                  ) : null}
-                </nav>
-              </div>
-            </aside>
-          </div>
-        </main>
-
-        <TrustLabelBar />
-        <Footer />
-        <MobileCallBar />
-      </div>
-    </DemoBookingProvider>
-  );
+  return <DemoBookingProvider><div className="min-h-screen bg-[#f7fbff] text-slate-900"><Navbar /><section className="relative overflow-hidden border-b border-sky-100 px-4 sm:px-6 lg:px-8" style={{ paddingTop: "calc(var(--cs-nav-height) + 4rem)", paddingBottom: "4rem" }}><div className="pointer-events-none absolute inset-0" aria-hidden="true"><div className="absolute -left-24 top-10 h-80 w-80 rounded-full bg-sky-200/35 blur-3xl" /><div className="absolute right-0 top-0 h-96 w-96 rounded-full bg-blue-200/25 blur-3xl" /><div className="absolute inset-0 bg-[linear-gradient(rgba(14,165,233,0.035)_1px,transparent_1px),linear-gradient(90deg,rgba(14,165,233,0.035)_1px,transparent_1px)] bg-[size:48px_48px]" /></div><div className="relative mx-auto max-w-6xl"><div className="inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/85 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-sky-700 shadow-sm backdrop-blur"><ShieldCheck className="h-4 w-4" />{meta.eyebrow}</div><h1 className="mt-6 max-w-4xl text-4xl font-black tracking-[-0.045em] text-slate-950 sm:text-5xl">{meta.title}</h1><p className="mt-5 max-w-3xl text-base leading-8 text-slate-600 sm:text-lg">{meta.description}</p><div className="mt-7 flex flex-wrap gap-3 text-xs font-semibold text-slate-600"><span className="rounded-full border border-sky-100 bg-white px-3 py-2 shadow-sm">Last updated: {meta.updated}</span><a href="/sms-terms" className="rounded-full border border-sky-100 bg-white px-3 py-2 text-sky-700 shadow-sm transition hover:border-sky-300 hover:text-sky-900">View SMS Terms</a></div></div></section><main className="mx-auto max-w-6xl px-4 py-12 sm:px-6 lg:px-8 lg:py-16"><SummaryGrid items={meta.summary} /><div className="mt-12 grid gap-8 lg:grid-cols-[minmax(0,1fr)_260px] lg:items-start"><div className="space-y-5">{meta.sections.map((section, index) => <SectionBlock key={section.id} section={section} index={index} />)}{type === "privacy" ? <div id="data-deletion-request" className="rounded-3xl border border-sky-100 bg-white p-5 shadow-[0_16px_50px_rgba(15,23,42,0.055)] sm:p-8" style={{ scrollMarginTop: "calc(var(--cs-nav-height) + 28px)" }}><DataDeletionRequestForm /></div> : null}<ContactBlock /></div><aside className="hidden lg:block lg:sticky" style={{ top: "calc(var(--cs-nav-height) + 28px)" }}><div className="rounded-2xl border border-sky-100 bg-white p-5 shadow-sm"><p className="text-[11px] font-black uppercase tracking-[0.16em] text-sky-700">On this page</p><nav className="mt-4 space-y-1.5" aria-label={`${meta.title} sections`}>{meta.sections.map((section, index) => <a key={section.id} href={`#${section.id}`} className="group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold leading-5 text-slate-600 transition hover:bg-sky-50 hover:text-sky-700"><span>{index + 1}. {section.title}</span><ChevronRight className="h-3.5 w-3.5 opacity-0 transition group-hover:opacity-100" /></a>)}{type === "privacy" ? <a href="#data-deletion-request" className="group flex items-center justify-between rounded-lg px-3 py-2 text-xs font-semibold leading-5 text-slate-600 transition hover:bg-sky-50 hover:text-sky-700"><span>Request deletion</span><ChevronRight className="h-3.5 w-3.5 opacity-0 transition group-hover:opacity-100" /></a> : null}</nav></div><div className="mt-4 rounded-2xl border border-slate-200 bg-white p-4 shadow-sm"><p className="text-[11px] font-black uppercase tracking-[0.16em] text-slate-500">Legal pages</p><div className="mt-3 space-y-1">{[["privacy", "Privacy Policy", "/privacy"], ["terms", "Terms of Service", "/terms"], ["refund", "Refund Policy", "/refund-policy"]].map(([key, label, path]) => <button key={key} type="button" onClick={() => navigate(path)} className={`w-full rounded-lg px-3 py-2 text-left text-xs font-bold transition ${type === key ? "bg-sky-50 text-sky-700" : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"}`}>{label}</button>)}</div></div></aside></div></main><Footer /><MobileCallBar /></div></DemoBookingProvider>;
 }
