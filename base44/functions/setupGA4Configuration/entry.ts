@@ -17,6 +17,7 @@ const TRACKED_EVENTS = [
   "audit_request_submitted",
   "begin_checkout",
   "purchase",
+  "purchase_client_confirmation",
   "demo_booked",
   "onboarding_complete",
 ] as const;
@@ -136,7 +137,8 @@ Successful outcomes:
 - contact_form_submit
 - audit_request_submitted
 - begin_checkout
-- purchase
+- purchase (server-verified Stripe webhook only)
+- purchase_client_confirmation (browser confirmation; not a key event)
 - demo_booked (only after the appointment is genuinely confirmed)
 
 5. GA4 KEY EVENTS
@@ -146,10 +148,10 @@ In GA4 Admin → Data display → Key events, mark these exact event names:
 - purchase
 - demo_booked
 
-Do not mark page_view, scroll, cta_click, pricing_view, form_submit_attempt, contact_form_submit, or audit_request_submitted as separate key events unless you intentionally want duplicate funnel counts.
+Do not mark page_view, scroll, cta_click, pricing_view, form_submit_attempt, contact_form_submit, audit_request_submitted, or purchase_client_confirmation as separate key events unless you intentionally want duplicate funnel counts.
 
 6. MEASUREMENT PROTOCOL SECRET
-If backend/server events are enabled, create a Measurement Protocol API secret in GA4 and store it only as Base44 Secret GA4_API_SECRET. Never store it in GA4Configuration, frontend code, logs, or entity records.
+Server-verified Stripe purchases use GA4 Measurement Protocol. Store the API secret only as Base44 Secret GA4_API_SECRET. Never store it in GA4Configuration, frontend code, logs, or entity records.
 
 7. VERIFICATION
 A database status is not proof. Confirm:
@@ -157,7 +159,8 @@ A database status is not proof. Confirm:
 - page_view on client-side route changes;
 - generate_lead only after a successful lead response;
 - begin_checkout only after a checkout session is created;
-- purchase only after a paid order is verified;
+- purchase only after a paid Stripe order is verified;
+- purchase_client_confirmation does not appear as a GA4 key event;
 - no duplicate events on one action.
 `;
 }
