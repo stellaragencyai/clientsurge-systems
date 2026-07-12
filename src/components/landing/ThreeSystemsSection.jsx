@@ -106,7 +106,7 @@ export default function ThreeSystemsSection() {
             radial-gradient(circle at 50% 15%, rgba(0,174,239,0.12), transparent 30%),
             linear-gradient(180deg, #f8fdff 0%, #f3fbff 54%, #ffffff 100%);
         }
-        .cs-pricing-card {
+        .csp-card {
           position: relative;
           display: flex;
           min-height: 890px;
@@ -117,17 +117,17 @@ export default function ThreeSystemsSection() {
           font-family: 'Montserrat', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
         }
-        .cs-pricing-card-inner {
+        .csp-card-inner {
           display: flex;
           min-height: 100%;
           flex: 1;
           flex-direction: column;
           padding: 44px 40px 30px;
         }
-        .cs-pricing-header {
+        .csp-header {
           min-height: 120px;
         }
-        .cs-pricing-title {
+        .csp-title {
           margin: 0;
           color: #06122b;
           font-family: Georgia, 'Times New Roman', serif;
@@ -136,14 +136,14 @@ export default function ThreeSystemsSection() {
           line-height: 1.18;
           letter-spacing: -0.018em;
         }
-        .cs-pricing-popular-line {
+        .csp-popular-line {
           margin-top: 10px;
           color: #0095d9;
           font-size: 0.84rem;
           font-weight: 900;
           line-height: 1.2;
         }
-        .cs-pricing-subtitle {
+        .csp-subtitle {
           margin: 10px 0 0;
           max-width: 330px;
           color: #53637c;
@@ -151,16 +151,16 @@ export default function ThreeSystemsSection() {
           font-weight: 500;
           line-height: 1.42;
         }
-        .cs-pricing-price-zone {
+        .csp-price-zone {
           margin-top: 22px;
         }
-        .cs-pricing-price-row {
+        .csp-price-row {
           display: flex;
           align-items: flex-end;
           gap: 8px;
           line-height: 1;
         }
-        .cs-pricing-price {
+        .csp-price {
           color: #06122b;
           font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
           font-size: clamp(2.75rem, 4.25vw, 3.35rem);
@@ -168,48 +168,48 @@ export default function ThreeSystemsSection() {
           line-height: 0.98;
           letter-spacing: -0.052em;
         }
-        .cs-pricing-period {
+        .csp-period {
           padding-bottom: 0.38rem;
           color: #60718f;
           font-size: 0.88rem;
           font-weight: 500;
           letter-spacing: -0.015em;
         }
-        .cs-pricing-setup {
+        .csp-setup {
           margin-top: 9px;
           color: #0079c1;
           font-size: 0.78rem;
           font-weight: 700;
           line-height: 1.3;
         }
-        .cs-pricing-contract {
+        .csp-contract {
           margin-top: 12px;
           color: #61718f;
           font-size: 0.78rem;
           font-weight: 500;
           line-height: 1.42;
         }
-        .cs-pricing-divider {
+        .csp-divider {
           width: 100%;
           height: 1px;
           margin: 28px 0;
           background: rgba(0,174,239,0.14);
         }
-        .cs-pricing-description {
+        .csp-description {
           margin: 0;
           color: #52627a;
           font-size: 0.95rem;
           font-weight: 500;
           line-height: 1.58;
         }
-        .cs-pricing-feature-intro {
+        .csp-feature-intro {
           margin-top: 18px;
           color: #52627a;
           font-size: 0.95rem;
           font-weight: 650;
           line-height: 1.58;
         }
-        .cs-pricing-feature-list {
+        .csp-feature-list {
           display: flex;
           flex-direction: column;
           gap: 15px;
@@ -217,7 +217,7 @@ export default function ThreeSystemsSection() {
           padding: 0;
           list-style: none;
         }
-        .cs-pricing-feature-row {
+        .csp-feature-row {
           display: flex;
           align-items: flex-start;
           gap: 12px;
@@ -226,13 +226,13 @@ export default function ThreeSystemsSection() {
           font-weight: 500;
           line-height: 1.42;
         }
-        .cs-pricing-feature-row svg {
+        .csp-feature-row svg {
           width: 16px;
           height: 16px;
           flex: 0 0 16px;
           margin-top: 2px;
         }
-        .cs-pricing-ops {
+        .csp-ops {
           display: flex;
           flex-direction: column;
           gap: 11px;
@@ -240,7 +240,7 @@ export default function ThreeSystemsSection() {
           padding-top: 22px;
           border-top: 1px solid rgba(0,174,239,0.12);
         }
-        .cs-pricing-ops-row {
+        .csp-ops-row {
           display: flex;
           align-items: flex-start;
           gap: 10px;
@@ -249,21 +249,28 @@ export default function ThreeSystemsSection() {
           font-weight: 500;
           line-height: 1.45;
         }
-        .cs-pricing-ops-row svg {
+        .csp-ops-row svg {
           width: 14px;
           height: 14px;
           flex: 0 0 14px;
           margin-top: 2px;
           color: #00AEEF;
         }
-        .cs-pricing-card-footer {
-          margin-top: auto;
+        .csp-cta-note {
+          margin: auto 0 0;
           padding-top: 30px;
+          color: #64748b;
+          font-size: 0.72rem;
+          font-weight: 500;
+          line-height: 1.35;
+          text-align: center;
         }
-        .cs-pricing-cta {
+        .csp-cta {
           display: inline-flex;
+          position: relative;
           width: 100%;
           height: 54px;
+          margin-top: 11px;
           align-items: center;
           justify-content: center;
           gap: 10px;
@@ -271,61 +278,69 @@ export default function ThreeSystemsSection() {
           font-size: 0.9rem;
           font-weight: 800;
           cursor: pointer;
-          transition: transform 0.15s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
+          isolation: isolate;
+          overflow: hidden;
+          transition: transform 0.18s ease, box-shadow 0.25s ease, background 0.25s ease, border-color 0.25s ease;
         }
-        .cs-pricing-cta:active {
-          transform: scale(0.97);
+        .csp-cta svg {
+          transition: transform 0.2s ease;
         }
-        .cs-pricing-footer-note {
-          margin-top: 14px;
-          color: #64748b;
-          font-size: 0.72rem;
-          font-weight: 500;
-          line-height: 1.35;
-          text-align: center;
+        .csp-cta:active {
+          transform: scale(0.98);
         }
         @media (max-width: 1023px) {
-          .cs-pricing-card {
+          .csp-card {
             min-height: 840px;
           }
-          .cs-pricing-card-inner {
+          .csp-card-inner {
             padding: 40px 30px 28px;
           }
-          .cs-pricing-header {
+          .csp-header {
             min-height: auto;
           }
         }
         @media (max-width: 767px) {
-          .cs-pricing-card {
+          .csp-card {
             min-height: auto;
           }
-          .cs-pricing-card-inner {
+          .csp-card-inner {
             padding: 38px 28px 26px;
+          }
+          .csp-cta-note {
+            margin-top: 28px;
+            padding-top: 0;
           }
         }
         @media (pointer: fine) {
-          .cs-pricing-card-hover:hover {
+          .csp-card:hover {
             border-color: rgba(0,174,239,0.72) !important;
             transform: translateY(-4px);
             box-shadow: 0 18px 46px rgba(0,174,239,0.16), 0 0 0 1px rgba(0,174,239,0.10), 0 6px 14px rgba(0,0,0,0.05) !important;
           }
-          .cs-pricing-cta[data-highlight="false"]:hover {
+          .csp-cta:hover {
+            transform: translateY(-2px);
+          }
+          .csp-cta:hover svg {
+            transform: translateX(4px);
+          }
+          .csp-cta[data-highlight="false"]:hover {
             border-color: rgba(0,174,239,0.55) !important;
             background: rgba(0,174,239,0.055) !important;
-            box-shadow: 0 8px 22px rgba(0,174,239,0.18) !important;
+            box-shadow: 0 10px 24px rgba(0,174,239,0.16) !important;
           }
-          .cs-pricing-cta[data-highlight="true"]:hover {
-            transform: translateY(-2px);
+          .csp-cta[data-highlight="true"]:hover {
             box-shadow: 0 16px 34px rgba(0,92,170,0.34), 0 0 0 1px rgba(0,174,239,0.10) !important;
           }
         }
         @media (prefers-reduced-motion: reduce) {
-          .cs-pricing-card-hover,
-          .cs-pricing-cta {
+          .csp-card,
+          .csp-cta,
+          .csp-cta svg {
             transition: none !important;
           }
-          .cs-pricing-card-hover:hover,
-          .cs-pricing-cta:hover {
+          .csp-card:hover,
+          .csp-cta:hover,
+          .csp-cta:hover svg {
             transform: none !important;
           }
         }
@@ -370,7 +385,7 @@ export default function ThreeSystemsSection() {
                   )}
 
                   <div
-                    className="cs-pricing-card cs-pricing-card-hover"
+                    className="csp-card"
                     data-growth={isGrowth ? "true" : "false"}
                     style={{
                       background: isGrowth
@@ -382,33 +397,32 @@ export default function ThreeSystemsSection() {
                       boxShadow: isGrowth
                         ? "0 24px 72px rgba(0,174,239,0.20), 0 0 0 1px rgba(0,174,239,0.09), 0 8px 18px rgba(2,8,23,0.05)"
                         : "0 14px 44px rgba(15,23,42,0.055), 0 2px 8px rgba(15,23,42,0.035)",
-                      ["--hover-border"]: pkg.accentBorderHover,
                     }}
                   >
-                    <div className="cs-pricing-card-inner">
-                      <div className="cs-pricing-header">
-                        <h3 className="cs-pricing-title">{pkg.title}</h3>
-                        {isGrowth && <p className="cs-pricing-popular-line">Most Popular</p>}
-                        <p className="cs-pricing-subtitle">{pkg.subtitle}</p>
+                    <div className="csp-card-inner">
+                      <div className="csp-header">
+                        <h3 className="csp-title">{pkg.title}</h3>
+                        {isGrowth && <p className="csp-popular-line">Most Popular</p>}
+                        <p className="csp-subtitle">{pkg.subtitle}</p>
                       </div>
 
-                      <div className="cs-pricing-price-zone">
-                        <div className="cs-pricing-price-row" aria-label={`${pkg.price} per month`}>
-                          <span className="cs-pricing-price">{pkg.price}</span>
-                          <span className="cs-pricing-period">/month</span>
+                      <div className="csp-price-zone">
+                        <div className="csp-price-row" aria-label={`${pkg.price} per month`}>
+                          <span className="csp-price">{pkg.price}</span>
+                          <span className="csp-period">/month</span>
                         </div>
-                        <p className="cs-pricing-setup">{pkg.setupPrice} one-time setup</p>
-                        <p className="cs-pricing-contract">No long-term contracts. Cancel anytime.</p>
+                        <p className="csp-setup">{pkg.setupPrice} one-time setup</p>
+                        <p className="csp-contract">No long-term contracts. Cancel anytime.</p>
                       </div>
 
-                      <div className="cs-pricing-divider" aria-hidden="true" />
+                      <div className="csp-divider" aria-hidden="true" />
 
-                      <p className="cs-pricing-description">{pkg.description}</p>
-                      <div className="cs-pricing-feature-intro">{pkg.featureIntro}</div>
+                      <p className="csp-description">{pkg.description}</p>
+                      <div className="csp-feature-intro">{pkg.featureIntro}</div>
 
-                      <ul className="cs-pricing-feature-list">
+                      <ul className="csp-feature-list">
                         {pkg.automations.map((item) => (
-                          <li key={item} className="cs-pricing-feature-row">
+                          <li key={item} className="csp-feature-row">
                             <CheckCircle2
                               aria-hidden="true"
                               style={{ color: "#22C55E", strokeWidth: 2.6 }}
@@ -418,55 +432,53 @@ export default function ThreeSystemsSection() {
                         ))}
                       </ul>
 
-                      <div className="cs-pricing-ops">
-                        <div className="cs-pricing-ops-row">
+                      <div className="csp-ops">
+                        <div className="csp-ops-row">
                           <Zap aria-hidden="true" />
                           <span><strong>{pkg.automationCount} automations</strong> included in this system.</span>
                         </div>
-                        <div className="cs-pricing-ops-row">
+                        <div className="csp-ops-row">
                           <Globe aria-hidden="true" />
                           <span><strong>Website:</strong> {pkg.websiteScope}</span>
                         </div>
-                        <div className="cs-pricing-ops-row">
+                        <div className="csp-ops-row">
                           <Server aria-hidden="true" />
                           <span><strong>Hosting:</strong> {pkg.hostingScope}</span>
                         </div>
-                        <div className="cs-pricing-ops-row">
+                        <div className="csp-ops-row">
                           <ShieldCheck aria-hidden="true" />
                           <span><strong>QA:</strong> {pkg.qaScope}</span>
                         </div>
                       </div>
 
-                      <div className="cs-pricing-card-footer">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.packageId });
-                            window.location.href = getPackageCheckoutPath(pkg.packageId);
-                          }}
-                          className="cs-pricing-cta"
-                          style={isGrowth
-                            ? {
-                                background: "linear-gradient(90deg, #0095d9 0%, #005bb8 100%)",
-                                color: "#fff",
-                                border: "1px solid rgba(0,91,184,0.15)",
-                                boxShadow: "0 14px 32px rgba(0,92,170,0.28)",
-                              }
-                            : {
-                                background: "rgba(255,255,255,0.72)",
-                                color: "#0079c1",
-                                border: "1.5px solid rgba(0,174,239,0.35)",
-                                boxShadow: "0 8px 22px rgba(15,23,42,0.035)",
-                              }
-                          }
-                          data-highlight={isGrowth ? "true" : "false"}
-                        >
-                          {pkg.cta} <ArrowRight className="w-4 h-4" />
-                        </button>
-                        <p className="cs-pricing-footer-note">
-                          {pkg.setupPrice} setup &middot; {pkg.price}/mo &middot; cancel anytime
-                        </p>
-                      </div>
+                      <p className="csp-cta-note">
+                        {pkg.setupPrice} setup &middot; {pkg.price}/mo &middot; cancel anytime
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          trackCTA(`package_${pkg.name.toLowerCase()}`, "three_systems_section", { package_id: pkg.packageId });
+                          window.location.href = getPackageCheckoutPath(pkg.packageId);
+                        }}
+                        className="csp-cta"
+                        style={isGrowth
+                          ? {
+                              background: "linear-gradient(90deg, #0095d9 0%, #005bb8 100%)",
+                              color: "#fff",
+                              border: "1px solid rgba(0,91,184,0.15)",
+                              boxShadow: "0 12px 28px rgba(0,92,170,0.25)",
+                            }
+                          : {
+                              background: "rgba(255,255,255,0.72)",
+                              color: "#0079c1",
+                              border: "1.5px solid rgba(0,174,239,0.35)",
+                              boxShadow: "0 6px 18px rgba(15,23,42,0.045)",
+                            }
+                        }
+                        data-highlight={isGrowth ? "true" : "false"}
+                      >
+                        {pkg.cta} <ArrowRight className="w-4 h-4" />
+                      </button>
                     </div>
                   </div>
                 </div>
