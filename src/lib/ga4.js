@@ -125,6 +125,51 @@ function eventSignature(eventName, params) {
   }
 }
 
+function shouldDispatchEvent(win, eventName, params) {
+  const state = getGa4State(win);
+  const signature = eventSignature(eventName, params);
+  const now = Date.now();
+  const lastSentAt = state.recentEvents.get(signature) || 0;
+  if (now - lastSentAt < EVENT_DEDUP_WINDOW_MS) return false;
+
+  state.recentEvents.set(signature, now);
+  if (state.recentEvents.size > 200) {
+    for (const [key, sentAt] of state.recentEvents) {
+      if (now - sentAt > 60_000) state.recentEvents.delete(key);
+    }
+  }
+  return true;
+}
+
+function ensureGtagDispatcher(win) {
+  win.dataLayer = win.dataLayer || [];
+  if (win.gtag?.__clientsurgeGa4Dispatcher === true) return win.gtag;
+
+  const existingGtag = typeof win.gtag === "function" ? win.gtag.bind(win) : null;
+  const dispatcher = (...command) => {
+    if (command[0] === "event") {
+      const params = command[2] && typeof command[2] === "object" ? command[2] : {};
+      const normalizedName = normalizeGa4EventName(command[1], params);
+      if (!normalizedName || !shouldDispatchEvent(win, normalizedName, params)) return false;
+      command[1] = normalizedName;
+    }
+
+    if (existingGtag) {
+      existingGtag(...command);
+    } else {
+      win.dataLayer.push(command);
+    }
+    return true;
+  };
+
+  Object.defineProperty(dispatcher, "__clientsurgeGa4Dispatcher", {
+    value: true,
+    enumerable: false,
+  });
+  win.gtag = dispatcher;
+  return dispatcher;
+}
+
 export function normalizeGa4EventName(eventName, params = {}) {
   const rawName = String(eventName || "").trim();
   if (!rawName) return "";
@@ -165,10 +210,11 @@ export function hasGrantedAnalyticsConsent(win = globalThis.window) {
 }
 
 export function updateGa4Consent(consent, win = globalThis.window) {
-  if (!win || typeof win.gtag !== "function") return false;
+  if (!win) return false;
 
   const { analyticsGranted, adsGranted } = normalizeConsentInput(consent);
-  win.gtag("consent", "update", {
+  const gtag = ensureGtagDispatcher(win);
+  gtag("consent", "update", {
     analytics_storage: analyticsGranted ? "granted" : "denied",
     ad_storage: adsGranted ? "granted" : "denied",
     ad_user_data: adsGranted ? "granted" : "denied",
@@ -193,27 +239,7 @@ export function trackGa4Event(eventName, params = {}, win = globalThis.window) {
     });
   }
 
-  win.dataLayer = win.dataLayer || [];
-  win.gtag =
-    win.gtag ||
-    function gtag() {
-      win.dataLayer.push(arguments);
-    };
-
-  const signature = eventSignature(normalizedName, params);
-  const now = Date.now();
-  const lastSentAt = state.recentEvents.get(signature) || 0;
-  if (now - lastSentAt < EVENT_DEDUP_WINDOW_MS) return false;
-
-  state.recentEvents.set(signature, now);
-  if (state.recentEvents.size > 200) {
-    for (const [key, sentAt] of state.recentEvents) {
-      if (now - sentAt > 60_000) state.recentEvents.delete(key);
-    }
-  }
-
-  win.gtag("event", normalizedName, params);
-  return true;
+  return ensureGtagDispatcher(win)("event", normalizedName, params) !== false;
 }
 
 export function trackGa4PageView(
@@ -274,15 +300,9 @@ export function installGa4({
     `script[data-ga4-measurement-id="${measurementId}"], script[src*="googletagmanager.com/gtag/js?id=${measurementId}"]`
   );
   const existingConfig = dataLayerConfig(windowRef, measurementId);
+  const gtag = ensureGtagDispatcher(windowRef);
 
-  windowRef.dataLayer = windowRef.dataLayer || [];
-  windowRef.gtag =
-    windowRef.gtag ||
-    function gtag() {
-      windowRef.dataLayer.push(arguments);
-    };
-
-  windowRef.gtag("consent", "default", {
+  gtag("consent", "default", {
     analytics_storage: normalizedConsent.analyticsGranted ? "granted" : "denied",
     ad_storage: normalizedConsent.adsGranted ? "granted" : "denied",
     ad_user_data: normalizedConsent.adsGranted ? "granted" : "denied",
@@ -291,8 +311,8 @@ export function installGa4({
 
   if (!state.installed) {
     if (!existingConfig) {
-      windowRef.gtag("js", new Date());
-      windowRef.gtag("config", measurementId, {
+      gtag("js", new Date());
+      gtag("config", measurementId, {
         send_page_view: false,
         linker: {
           domains: ["clientsurgesystems.com", "www.clientsurgesystems.com"],
