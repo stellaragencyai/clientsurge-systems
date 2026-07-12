@@ -6,10 +6,11 @@ const modalSource = readFileSync("src/components/forms/DemoBookingModal.jsx", "u
 
 test("DemoBookingModal stays reachable inside a mobile fixed overlay", () => {
   assert.match(modalSource, /import \{ createPortal \} from "react-dom";/);
-  assert.match(modalSource, /acquireBodyScrollLock\("demo-video-modal"\)/);
-  assert.match(modalSource, /className="fixed inset-0 z-\[9999\] flex items-center justify-center overflow-y-auto overscroll-contain p-4"/);
-  assert.match(modalSource, /minHeight: "100svh"/);
-  assert.match(modalSource, /WebkitOverflowScrolling: "touch"/);
+  assert.match(modalSource, /acquireBodyScrollLock\("audit-request-modal"\)/);
+  assert.match(modalSource, /fixed inset-0/);
+  assert.match(modalSource, /overflow-y-auto/);
+  assert.match(modalSource, /items-start/);
+  assert.match(modalSource, /md:items-center/);
   assert.match(modalSource, /role="dialog"/);
   assert.match(modalSource, /aria-modal="true"/);
   assert.match(modalSource, /document\.body/);
