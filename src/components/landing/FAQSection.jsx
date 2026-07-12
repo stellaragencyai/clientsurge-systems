@@ -1,109 +1,91 @@
-import { useState } from "react";
-import { ChevronDown, MessageCircle, Phone, Mail } from "lucide-react";
-import { FAQ_ITEMS } from "./FAQData";
+import { useId, useState } from "react";
+import { ChevronDown, MessageCircleQuestion } from "lucide-react";
+import { HOMEPAGE_FAQ_ITEMS } from "./FAQData";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 export default function FAQSection() {
-  const [openIndex, setOpenIndex] = useState(null);
-
-  const toggle = (index) => {
-    setOpenIndex(openIndex === index ? null : index);
-  };
+  const [openIndex, setOpenIndex] = useState(0);
+  const accordionId = useId();
 
   return (
-    <section id="faq" className="py-16 md:py-24 px-4" style={{ background: "#F7F8FA" }}>
-      <div className="max-w-6xl mx-auto">
-        <div className="grid grid-cols-1 lg:grid-cols-[0.85fr,1.15fr] gap-10 lg:gap-16 items-start">
-          {/* Left Column — Heading & Contact */}
-          <div className="lg:sticky lg:top-28">
-            <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl mb-5"
-              style={{
-                background: "rgba(0,174,239,0.08)",
-                border: "1px solid rgba(0,174,239,0.18)",
-                boxShadow: "0 0 20px rgba(0,174,239,0.12)",
-              }}
-            >
-              <MessageCircle className="w-5 h-5" style={{ color: "#00AEEF" }} />
-            </div>
-
-            <CSSectionHeader
-              eyebrow="FAQ"
-              title="Answers to Your Questions"
-              align="left"
-            />
-
-            <p className="text-sm leading-relaxed text-muted-foreground max-w-sm mt-4">
-              If you have any other questions, feel free to reach out to us at{" "}
-              <a
-                href="mailto:support@clientsurgesystems.com"
-                className="font-semibold transition-colors"
-                style={{ color: "#00AEEF" }}
-              >
-                support@clientsurgesystems.com
-              </a>
-              .
-            </p>
+    <section
+      id="faq"
+      className="bg-[#F7F8FA] px-5 py-16 sm:px-8 md:py-24 lg:px-10"
+      aria-label="Frequently asked questions"
+    >
+      <div className="mx-auto grid w-full max-w-[1180px] grid-cols-1 items-start gap-10 lg:grid-cols-[minmax(0,0.78fr)_minmax(0,1.22fr)] lg:gap-16">
+        <div className="lg:sticky lg:top-28">
+          <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-[#008fc9]">
+            <MessageCircleQuestion className="h-5 w-5" aria-hidden="true" />
           </div>
 
-          {/* Right Column — FAQ Accordion */}
-          <div className="space-y-3">
-            {FAQ_ITEMS.map((item, index) => {
-              const isOpen = openIndex === index;
-              return (
-                <div
-                  key={index}
-                  className="rounded-xl border transition-all duration-300 cursor-pointer overflow-hidden"
-                  onClick={() => toggle(index)}
-                  style={{
-                    background: "#ffffff",
-                    borderColor: isOpen ? "rgba(0,174,239,0.35)" : "#E5E7EB",
-                    boxShadow: isOpen
-                      ? "0 4px 24px rgba(0,174,239,0.12), 0 0 0 1px rgba(0,174,239,0.08)"
-                      : "0 1px 3px rgba(0,0,0,0.04)",
-                  }}
-                >
-                  <div className="flex items-center justify-between gap-4 px-5 py-4">
-                    <p className="text-sm font-semibold text-gray-900">{item.q}</p>
-                    <ChevronDown
-                      className={`w-4 h-4 flex-shrink-0 ${
-                        isOpen ? "rotate-180" : ""
-                      }`}
-                      style={{ color: isOpen ? "#00AEEF" : "#9CA3AF", transition: "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)" }}
-                    />
-                  </div>
-                  <div
-                    className="overflow-hidden transition-all"
-                    style={{
-                      maxHeight: isOpen ? "500px" : "0px",
-                      opacity: isOpen ? 1 : 0,
-                      transitionDuration: "400ms",
-                      transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
+          <CSSectionHeader
+            eyebrow="Essential Questions"
+            title="What buyers need to know before choosing a system."
+            subtitle="Five direct answers covering package scope, setup, integrations, expansion, and what happens after checkout."
+            align="left"
+            className="mt-5"
+          />
+
+          <p className="mt-6 max-w-sm text-sm font-medium leading-7 text-slate-600">
+            Need an answer specific to your business? Email{" "}
+            <a
+              href="mailto:support@clientsurgesystems.com"
+              className="font-black text-[#008fc9] underline decoration-sky-200 underline-offset-4 transition-colors hover:text-[#006f9d] focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
+            >
+              support@clientsurgesystems.com
+            </a>
+            .
+          </p>
+        </div>
+
+        <div className="overflow-hidden rounded-[1.5rem] border border-slate-200 bg-white shadow-[0_16px_44px_rgba(15,23,42,0.07)]">
+          {HOMEPAGE_FAQ_ITEMS.map((item, index) => {
+            const isOpen = openIndex === index;
+            const questionId = `${accordionId}-question-${index}`;
+            const answerId = `${accordionId}-answer-${index}`;
+
+            return (
+              <div
+                key={item.q}
+                className={index > 0 ? "border-t border-slate-100" : undefined}
+              >
+                <h3>
+                  <button
+                    id={questionId}
+                    type="button"
+                    aria-expanded={isOpen}
+                    aria-controls={answerId}
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="flex min-h-[68px] w-full items-center justify-between gap-5 bg-white px-5 py-5 text-left transition-colors hover:bg-sky-50/60 focus:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[#00AEEF] sm:px-6"
                   >
-                    <p className="px-5 pb-4 text-sm leading-relaxed text-gray-500">
+                    <span className="text-base font-black leading-6 tracking-[-0.015em] text-slate-950">
+                      {item.q}
+                    </span>
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-slate-200 bg-slate-50 text-slate-500">
+                      <ChevronDown
+                        className={`h-4 w-4 transition-transform duration-200 ${isOpen ? "rotate-180" : ""}`}
+                        aria-hidden="true"
+                      />
+                    </span>
+                  </button>
+                </h3>
+
+                {isOpen && (
+                  <div
+                    id={answerId}
+                    role="region"
+                    aria-labelledby={questionId}
+                    className="px-5 pb-6 pr-16 sm:px-6 sm:pr-20"
+                  >
+                    <p className="max-w-3xl text-sm font-medium leading-7 text-slate-600">
                       {item.a}
                     </p>
                   </div>
-                </div>
-              );
-            })}
-
-            {/* Still have questions CTA — clear next step after reading FAQ */}
-            <div className="rounded-xl p-5 mt-4 flex flex-col sm:flex-row items-center justify-between gap-4" style={{ background: "linear-gradient(135deg, rgba(0,174,239,0.06), rgba(0,59,143,0.04))", border: "1px solid rgba(0,174,239,0.2)" }}>
-              <div>
-                <p className="font-bold text-gray-900 text-sm mb-1">Still have questions?</p>
-                <p className="text-xs text-gray-500">We'll help you pick the right system — no sales pressure.</p>
+                )}
               </div>
-              <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
-                <a href="tel:+16025843227" className="inline-flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg border text-xs font-bold transition-colors" style={{ borderColor: "rgba(0,174,239,0.3)", color: "#006BB0", background: "#fff" }}>
-                  <Phone className="w-3.5 h-3.5" /> Call Us
-                </a>
-                <a href="mailto:support@clientsurgesystems.com" className="cs-btn-primary inline-flex items-center justify-center gap-1.5 text-xs" style={{ height: "40px", padding: "0 20px" }}>
-                  <Mail className="w-3.5 h-3.5" /> Email Support
-                </a>
-              </div>
-            </div>
-          </div>
+            );
+          })}
         </div>
       </div>
     </section>
