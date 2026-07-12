@@ -70,12 +70,18 @@ function commandParts(command) {
   }
 }
 
-function dataLayerContainsImplicitPageView(win, measurementId) {
-  if (!Array.isArray(win?.dataLayer)) return false;
-  return win.dataLayer.some((command) => {
+function dataLayerConfig(win, measurementId) {
+  if (!Array.isArray(win?.dataLayer)) return null;
+  for (const command of win.dataLayer) {
     const [type, id, config] = commandParts(command);
-    return type === "config" && id === measurementId && config?.send_page_view !== false;
-  });
+    if (type === "config" && id === measurementId) return config || {};
+  }
+  return null;
+}
+
+function dataLayerContainsImplicitPageView(win, measurementId) {
+  const config = dataLayerConfig(win, measurementId);
+  return Boolean(config && config.send_page_view !== false);
 }
 
 function stableParams(params = {}) {
@@ -145,6 +151,15 @@ export function trackGa4Event(eventName, params = {}, win = globalThis.window) {
   const normalizedName = normalizeGa4EventName(eventName, params);
   if (!normalizedName) return false;
 
+  const state = getGa4State(win);
+  if (!state.installed) {
+    installGa4({
+      documentRef: win.document || globalThis.document,
+      windowRef: win,
+      measurementId: getGa4MeasurementId(),
+    });
+  }
+
   win.dataLayer = win.dataLayer || [];
   win.gtag =
     win.gtag ||
@@ -152,7 +167,6 @@ export function trackGa4Event(eventName, params = {}, win = globalThis.window) {
       win.dataLayer.push(arguments);
     };
 
-  const state = getGa4State(win);
   const signature = eventSignature(normalizedName, params);
   const now = Date.now();
   const lastSentAt = state.recentEvents.get(signature) || 0;
@@ -225,6 +239,7 @@ export function installGa4({
   const existingScript = documentRef.querySelector(
     `script[data-ga4-measurement-id="${measurementId}"], script[src*="googletagmanager.com/gtag/js?id=${measurementId}"]`
   );
+  const existingConfig = dataLayerConfig(windowRef, measurementId);
 
   windowRef.dataLayer = windowRef.dataLayer || [];
   windowRef.gtag =
@@ -239,14 +254,16 @@ export function installGa4({
   });
 
   if (!state.installed) {
-    windowRef.gtag("js", new Date());
-    windowRef.gtag("config", measurementId, {
-      send_page_view: false,
-      linker: {
-        domains: ["clientsurgesystems.com", "www.clientsurgesystems.com"],
-        use_incoming: true,
-      },
-    });
+    if (!existingConfig) {
+      windowRef.gtag("js", new Date());
+      windowRef.gtag("config", measurementId, {
+        send_page_view: false,
+        linker: {
+          domains: ["clientsurgesystems.com", "www.clientsurgesystems.com"],
+          use_incoming: true,
+        },
+      });
+    }
     state.installed = true;
   }
 
@@ -261,7 +278,7 @@ export function installGa4({
   return {
     installed: true,
     measurementId,
-    alreadyInstalled: Boolean(existingScript),
+    alreadyInstalled: Boolean(existingScript || existingConfig),
     consentGranted,
   };
 }
