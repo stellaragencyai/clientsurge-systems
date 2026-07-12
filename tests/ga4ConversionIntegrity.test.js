@@ -4,6 +4,7 @@ import { readFileSync } from "node:fs";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
+const indexSource = read("index.html");
 const ga4Source = read("src/lib/ga4.js");
 const analyticsSource = read("src/lib/analytics.js");
 const checkoutObserverSource = read("src/lib/ga4CheckoutObserver.js");
@@ -43,6 +44,14 @@ test("canonical GA4 key-event catalog is consistent", () => {
   assert.match(eventHelpersSource, /GA4_EVENTS\.BEGIN_CHECKOUT/);
   assert.match(eventHelpersSource, /GA4_EVENTS\.PURCHASE/);
   assert.match(eventHelpersSource, /GA4_EVENTS\.DEMO_BOOKED/);
+});
+
+test("the static HTML cannot send analytics before consent is resolved", () => {
+  assert.doesNotMatch(indexSource, /googletagmanager\.com\/gtag\/js\?id=/);
+  assert.doesNotMatch(indexSource, /gtag\(['"]config['"]/);
+  assert.match(indexSource, /GA4 is installed once by src\/lib\/ga4\.js after analytics consent state is known/);
+  assert.match(ga4Source, /analytics_storage:\s*consentGranted \? "granted" : "denied"/);
+  assert.match(ga4Source, /send_page_view:\s*false/);
 });
 
 test("failed or merely attempted forms cannot masquerade as successful submissions", () => {
