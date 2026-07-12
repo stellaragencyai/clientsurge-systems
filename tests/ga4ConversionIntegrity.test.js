@@ -14,6 +14,8 @@ const base44ClientSource = read("src/api/base44Client.js");
 const orderSuccessSource = read("src/internal-pages/OrderSuccess.jsx");
 const configSchemaSource = read("base44/entities/GA4Configuration.jsonc");
 const setupFunctionSource = read("base44/functions/setupGA4Configuration/entry.ts");
+const measurementProtocolSource = read("base44/functions/_shared/ga4MeasurementProtocol.js");
+const stripeWebhookSource = read("base44/functions/stripeWebhookOrders/main.ts");
 
 test("GA4 private credentials cannot be persisted in GA4Configuration", () => {
   assert.doesNotMatch(configSchemaSource, /"api_secret"\s*:/);
@@ -21,6 +23,8 @@ test("GA4 private credentials cannot be persisted in GA4Configuration", () => {
   assert.match(setupFunctionSource, /GA4_SECRET_MUST_USE_SECRET_STORE/);
   assert.match(setupFunctionSource, /GA4_API_SECRET/);
   assert.doesNotMatch(setupFunctionSource, /api_secret:\s*api_secret/);
+  assert.match(measurementProtocolSource, /Deno\.env\.get\("GA4_API_SECRET"\)/);
+  assert.doesNotMatch(measurementProtocolSource, /console\.(log|warn|error)\([^\n]*apiSecret/);
 });
 
 test("GA4 setup remains configured until live delivery is independently verified", () => {
@@ -89,9 +93,23 @@ test("begin_checkout fires only after checkout session creation succeeds", () =>
   assert.match(checkoutObserverSource, /GA4_EVENTS\.BEGIN_CHECKOUT/);
 });
 
-test("purchase remains tied to a verified order and is idempotent in the success page", () => {
+test("purchase key events come from a verified, non-duplicate live Stripe webhook", () => {
+  assert.match(stripeWebhookSource, /handleCanonicalStripeWebhook/);
+  assert.match(stripeWebhookSource, /canonicalResult\?\.result\?\.success === true/);
+  assert.match(stripeWebhookSource, /canonicalResult\?\.result\?\.duplicate !== true/);
+  assert.match(stripeWebhookSource, /sendGa4PurchaseFromCheckoutSession/);
+  assert.match(measurementProtocolSource, /session\?\.livemode !== true/);
+  assert.match(measurementProtocolSource, /smoke_test/);
+  assert.match(measurementProtocolSource, /name:\s*"purchase"/);
+  assert.match(measurementProtocolSource, /transaction_id:/);
+  assert.match(measurementProtocolSource, /server_verified:\s*true/);
+});
+
+test("browser purchase confirmation cannot double-count the purchase key event", () => {
   assert.match(orderSuccessSource, /if \(!orderInfo\?\.id\) return/);
   assert.match(orderSuccessSource, /clientsurge:ga4-purchase-fired:/);
   assert.match(orderSuccessSource, /trackEvent\("purchase"/);
   assert.match(orderSuccessSource, /transaction_id:/);
+  assert.match(analyticsSource, /purchase_client_confirmation/);
+  assert.match(configSchemaSource, /"purchase_client_confirmation"/);
 });
