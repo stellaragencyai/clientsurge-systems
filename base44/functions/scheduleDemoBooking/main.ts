@@ -4,7 +4,7 @@ import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 const MAX_FIELD_LENGTH = 500;
 const MAX_NOTES_LENGTH = 4000;
 const MAX_REQUESTS_PER_DAY = 8;
-const ACTIVE_REQUEST_STATUSES = ["requested", "scheduled"];
+const ACTIVE_REQUEST_STATUSES = ["requested", "scheduled", "confirmed"];
 const TIME_ZONE = "America/Phoenix";
 const TIME_ZONE_LABEL = "Arizona time (MST)";
 const ALLOWED_TIMES = new Set([
@@ -97,7 +97,9 @@ function canonicalIndustryLabel(slug: string, fallback: string) {
 }
 
 function industryTags(slug: string, incoming: unknown) {
-  const tags = Array.isArray(incoming) ? incoming.map((item) => clean(item, 80)).filter(Boolean) : [];
+  const existingTags = Array.isArray(incoming)
+    ? incoming.map((item) => clean(item, 80)).filter(Boolean)
+    : [];
   const mapped = {
     roofing: ["roofing", "roofing_lead", "free_roofing_automation_audit"],
     hvac: ["hvac", "hvac_lead", "free_hvac_automation_audit"],
@@ -107,7 +109,7 @@ function industryTags(slug: string, incoming: unknown) {
     chiropractic: ["chiropractic", "chiropractic_lead"],
     contractors: ["contractors", "contractor_lead"],
   }[slug] || [slug, "automation_audit_lead"];
-  return [...new Set([...tags, ...mapped, `${slug}_landing_page`].filter(Boolean))].slice(0, 12);
+  return [...new Set([...existingTags, ...mapped, `${slug}_landing_page`].filter(Boolean))].slice(0, 12);
 }
 
 function crmTag(slug: string, fallback: unknown) {
@@ -137,11 +139,17 @@ function formatRequestedTime(date: string, time: string) {
   const [hourValue, minute] = time.split(":");
   const hour = Number(hourValue);
   const suffix = hour >= 12 ? "PM" : "AM";
-  const displayHour = hour % 12 || 12;
-  return `${date} at ${displayHour}:${minute} ${suffix} ${TIME_ZONE_LABEL}`;
+  return `${date} at ${hour % 12 || 12}:${minute} ${suffix} ${TIME_ZONE_LABEL}`;
 }
 
-function mergeSourceHistory(existing: Record<string, unknown> | null, payload: Record<string, string>) {
+function getRequestIp(req: Request) {
+  return req.headers.get("cf-connecting-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown";
+}
+
+function mergeSourceHistory(existing: Record<string, unknown> | null, payload: ReturnType<typeof normalizedPayload>) {
   const previous = Array.isArray(existing?.source_history)
     ? existing.source_history.map(String)
     : existing?.source_history
@@ -175,13 +183,15 @@ function isAdvancedLead(existing: Record<string, unknown> | null) {
 async function canonicalLeadId(email: string, phone: string, businessName: string) {
   const bytes = new TextEncoder().encode(`${email}|${phone}|${businessName}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  const hex = [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, "0")).join("");
+  const hex = [...new Uint8Array(digest)]
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
   return `lead_${hex.slice(0, 24)}`;
 }
 
 function normalizedPayload(raw: Record<string, unknown>) {
   const businessType = clean(raw.business_type || raw.industry, 160);
-  const slug = normalizeIndustrySlug(raw.industry_slug || businessType);
+  const industrySlug = normalizeIndustrySlug(raw.industry_slug || businessType);
   const email = normalizeEmail(raw.email);
   const phone = normalizePhone(raw.phone);
   const website = normalizeWebsite(raw.business_website_url || raw.website);
@@ -192,8 +202,8 @@ function normalizedPayload(raw: Record<string, unknown>) {
     email,
     phone,
     business_type: businessType,
-    industry_slug: slug,
-    industry: canonicalIndustryLabel(slug, businessType),
+    industry_slug: industrySlug,
+    industry: canonicalIndustryLabel(industrySlug, businessType),
     website,
     biggest_issue: clean(raw.biggest_issue || raw.message, 1500),
     scheduled_date: clean(raw.scheduled_date, 20),
@@ -201,8 +211,8 @@ function normalizedPayload(raw: Record<string, unknown>) {
     source: clean(raw.source, 120) || "landing_page",
     source_page: clean(raw.source_page, 240) || "/book",
     service_interest: clean(raw.service_interest, 120) || "automation_audit",
-    crm_tag: crmTag(slug, raw.crm_tag),
-    industry_tags: industryTags(slug, raw.industry_tags),
+    crm_tag: crmTag(industrySlug, raw.crm_tag),
+    industry_tags: industryTags(industrySlug, raw.industry_tags),
     utm_source: clean(raw.utm_source, 200),
     utm_medium: clean(raw.utm_medium, 200),
     utm_campaign: clean(raw.utm_campaign, 200),
@@ -231,40 +241,61 @@ function validate(payload: ReturnType<typeof normalizedPayload>) {
 }
 
 async function findExistingLead(base44: ReturnType<typeof createClientFromRequest>, payload: ReturnType<typeof normalizedPayload>) {
-  const matchesByEmail = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, "-created_date", 25).catch(() => []);
-  const byEmail = matchesByEmail.find((lead: Record<string, unknown>) =>
+  const emailMatches = await base44.asServiceRole.entities.Leads
+    .filter({ email: payload.email }, "-created_date", 25)
+    .catch(() => []);
+  const byEmail = emailMatches.find((lead: Record<string, unknown>) =>
     normalizeBusinessName(lead.business_name) === payload.normalized_business_name
   );
   if (byEmail) return byEmail;
 
-  const matchesByPhone = await base44.asServiceRole.entities.Leads.filter({ phone: payload.phone }, "-created_date", 25).catch(() => []);
-  return matchesByPhone.find((lead: Record<string, unknown>) =>
+  const phoneMatches = await base44.asServiceRole.entities.Leads
+    .filter({ phone: payload.phone }, "-created_date", 25)
+    .catch(() => []);
+  return phoneMatches.find((lead: Record<string, unknown>) =>
     normalizeBusinessName(lead.business_name) === payload.normalized_business_name
   ) || null;
 }
 
-async function reserveRequestedSlot(base44: ReturnType<typeof createClientFromRequest>, leadId: string, payload: ReturnType<typeof normalizedPayload>) {
-  const dayRequests = await base44.asServiceRole.entities.DemoRequest.filter(
-    { scheduled_date: payload.scheduled_date, status: { $in: ACTIVE_REQUEST_STATUSES } },
+async function queryActiveRequests(base44: ReturnType<typeof createClientFromRequest>, date: string) {
+  return base44.asServiceRole.entities.DemoRequest.filter(
+    { scheduled_date: date, status: { $in: ACTIVE_REQUEST_STATUSES } },
     "-created_date",
     50,
   );
+}
 
-  const sameSlot = (dayRequests || []).find((request: Record<string, unknown>) =>
+async function assertRequestedSlotAvailable(
+  base44: ReturnType<typeof createClientFromRequest>,
+  leadId: string | null,
+  payload: ReturnType<typeof normalizedPayload>,
+) {
+  const requests = await queryActiveRequests(base44, payload.scheduled_date);
+  const sameSlot = (requests || []).find((request: Record<string, unknown>) =>
     request.scheduled_time === payload.scheduled_time
   );
-  if (sameSlot && sameSlot.lead_id !== leadId) {
-    throw Object.assign(new Error("That preferred time is no longer available. Please choose another time."), { status: 409 });
+  if (sameSlot && (!leadId || sameSlot.lead_id !== leadId)) {
+    throw Object.assign(
+      new Error("That preferred time is no longer available. Please choose another time."),
+      { status: 409 },
+    );
   }
-
-  const existingForLead = (dayRequests || []).find((request: Record<string, unknown>) =>
-    request.lead_id === leadId && request.scheduled_time === payload.scheduled_time
-  );
-  if (existingForLead) return existingForLead;
-
-  if ((dayRequests || []).length >= MAX_REQUESTS_PER_DAY) {
-    throw Object.assign(new Error("No more audit requests are available on that date. Please choose another date."), { status: 409 });
+  if (!sameSlot && (requests || []).length >= MAX_REQUESTS_PER_DAY) {
+    throw Object.assign(
+      new Error("No more audit requests are available on that date. Please choose another date."),
+      { status: 409 },
+    );
   }
+  return sameSlot || null;
+}
+
+async function reserveRequestedSlot(
+  base44: ReturnType<typeof createClientFromRequest>,
+  leadId: string,
+  payload: ReturnType<typeof normalizedPayload>,
+) {
+  const existingRequest = await assertRequestedSlotAvailable(base44, leadId, payload);
+  if (existingRequest) return existingRequest;
 
   return base44.asServiceRole.entities.DemoRequest.create({
     lead_id: leadId,
@@ -314,32 +345,47 @@ async function safeLog(base44: ReturnType<typeof createClientFromRequest>, paylo
 Deno.serve(async (req) => {
   const requestId = `audit_request_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   try {
-    if (req.method !== "POST") return secureJson({ error: "Method not allowed", request_id: requestId }, { status: 405 });
+    if (req.method !== "POST") {
+      return secureJson({ error: "Method not allowed", request_id: requestId }, { status: 405 });
+    }
 
     const originGuard = validatePublicFormOrigin(req);
     if (!originGuard.ok) {
-      return secureJson({ error: originGuard.error, code: "invalid_origin", request_id: requestId }, { status: originGuard.status });
+      return secureJson(
+        { error: originGuard.error, code: "invalid_origin", request_id: requestId },
+        { status: originGuard.status },
+      );
     }
 
     const raw = await req.json().catch(() => null);
-    if (!raw || typeof raw !== "object") return secureJson({ error: "Invalid JSON body", request_id: requestId }, { status: 400 });
+    if (!raw || typeof raw !== "object") {
+      return secureJson({ error: "Invalid JSON body", request_id: requestId }, { status: 400 });
+    }
 
     const payload = normalizedPayload(raw as Record<string, unknown>);
     if (payload.honeypot) return secureJson({ success: true, ignored: true, request_id: requestId });
 
     const errors = validate(payload);
-    if (errors.length) return secureJson({ error: errors[0], errors, request_id: requestId }, { status: 400 });
+    if (errors.length) {
+      return secureJson({ error: errors[0], errors, request_id: requestId }, { status: 400 });
+    }
 
     const base44 = createClientFromRequest(req);
+    const existing = await findExistingLead(base44, payload);
+    await assertRequestedSlotAvailable(base44, existing?.id || null, payload);
+
     const now = new Date().toISOString();
     const requestedTime = formatRequestedTime(payload.scheduled_date, payload.scheduled_time);
-    const existing = await findExistingLead(base44, payload);
-    const advanced = isAdvancedLead(existing);
+    const canonicalId = existing?.canonical_lead_id || await canonicalLeadId(
+      payload.email,
+      payload.phone,
+      payload.normalized_business_name,
+    );
     const domain = normalizedDomain(payload.website, payload.email);
-    const canonicalId = existing?.canonical_lead_id || await canonicalLeadId(payload.email, payload.phone, payload.normalized_business_name);
-    const requestNote = `[${now}] Preferred automation-audit time requested: ${requestedTime}. Pending confirmation. Request ID: ${requestId}.`;
+    const advanced = isAdvancedLead(existing);
+    const requestIp = getRequestIp(req);
 
-    const leadData: Record<string, unknown> = {
+    const baseLeadData: Record<string, unknown> = {
       full_name: payload.full_name,
       owner_contact_name: payload.full_name,
       business_name: payload.business_name,
@@ -355,7 +401,6 @@ Deno.serve(async (req) => {
       website: payload.website,
       website_url: payload.website,
       package_interest: payload.service_interest,
-      service_interest: payload.service_interest,
       crm_tag: payload.crm_tag,
       industry_tags: payload.industry_tags,
       canonical_lead_id: canonicalId,
@@ -363,10 +408,15 @@ Deno.serve(async (req) => {
       normalized_phone: payload.phone.replace(/\D/g, ""),
       normalized_business_name: payload.normalized_business_name,
       normalized_domain: domain,
+      canonical_email: payload.email,
+      canonical_phone: payload.phone,
+      canonical_business_name: payload.normalized_business_name,
+      canonical_website_url: payload.website,
       dedupe_key: `${payload.email}|${payload.phone}|${payload.normalized_business_name}`,
       dedupe_status: existing ? (existing.dedupe_status || "keeper") : "unique",
       consent_given: true,
       consent_given_at: now,
+      consent_ip: requestIp,
       consent_source: payload.consent_source,
       consent_text_version: payload.consent_text_version,
       requested_channels: ["email", "phone", "sms"],
@@ -374,34 +424,50 @@ Deno.serve(async (req) => {
       utm_medium: payload.utm_medium || null,
       utm_campaign: payload.utm_campaign || null,
       utm_content: payload.utm_content || null,
-      referrer: payload.referrer || null,
       page_submitted_from: payload.source_page,
       last_activity_at: now,
+    };
+
+    const lead = existing || await base44.asServiceRole.entities.Leads.create({
+      ...baseLeadData,
+      status: "New",
+      crm_stage: "Not Contacted",
+      lead_state: "NEW",
+      outreach_status: "not_contacted",
+      lead_category: "High-Value",
+      lead_score: 70,
+      intent_score: 80,
+      activation_priority: "High",
+      ai_intent: "availability_interest",
+    });
+
+    const demoRequest = await reserveRequestedSlot(base44, lead.id, payload);
+    const requestNote = `[${now}] Preferred automation-audit time requested: ${requestedTime}. Pending confirmation. Request ID: ${requestId}.`;
+    const engagedLeadData: Record<string, unknown> = {
+      ...baseLeadData,
       next_follow_up_at: now,
-      lead_score: Math.max(Number(existing?.lead_score || 0), 80),
-      intent_score: Math.max(Number(existing?.intent_score || 0), 90),
+      lead_score: Math.max(Number(existing?.lead_score || lead.lead_score || 0), 80),
+      intent_score: Math.max(Number(existing?.intent_score || lead.intent_score || 0), 90),
       activation_priority: "Hot",
       lead_category: "High-Value",
       ai_intent: "booking_ready",
       reply_sentiment: "Positive",
-      notes: appendNotes(existing?.notes, requestNote),
+      notes: appendNotes(existing?.notes || lead.notes, requestNote),
     };
 
     if (!advanced) {
-      leadData.status = "Replied";
-      leadData.crm_stage = "Replied";
-      leadData.lead_state = "HOT";
-      leadData.outreach_status = existing?.do_not_contact ? "do_not_contact" : "replied";
+      Object.assign(engagedLeadData, {
+        status: "Replied",
+        crm_stage: "Replied",
+        lead_state: "HOT",
+        outreach_status: existing?.do_not_contact ? "do_not_contact" : "replied",
+      });
     }
 
-    const lead = existing
-      ? await base44.asServiceRole.entities.Leads.update(existing.id, leadData)
-      : await base44.asServiceRole.entities.Leads.create(leadData);
-
-    const demoRequest = await reserveRequestedSlot(base44, lead.id, payload);
+    const updatedLead = await base44.asServiceRole.entities.Leads.update(lead.id, engagedLeadData);
 
     await safeLog(base44, {
-      lead_id: lead.id,
+      lead_id: updatedLead.id,
       channel: "internal",
       direction: "system",
       event_type: "status_update",
@@ -429,18 +495,23 @@ Deno.serve(async (req) => {
       to: "nolan@clientsurgesystems.com",
       replyTo: payload.email,
       subject: `ACTION REQUIRED: Confirm audit request — ${payload.business_name}`,
-      html: `<div style="font-family:Arial,sans-serif;max-width:700px;margin:auto;padding:24px;color:#0f172a"><h2>New audit time request</h2><p><strong>Preferred time:</strong> ${escapeHtml(requestedTime)}</p><p><strong>Name:</strong> ${escapeHtml(payload.full_name)}<br><strong>Business:</strong> ${escapeHtml(payload.business_name)}<br><strong>Industry:</strong> ${escapeHtml(payload.industry)}<br><strong>Email:</strong> ${escapeHtml(payload.email)}<br><strong>Phone:</strong> ${escapeHtml(payload.phone)}<br><strong>Website:</strong> ${escapeHtml(payload.website || "Not provided")}</p><p><strong>Review request:</strong> ${escapeHtml(payload.biggest_issue)}</p><p>Confirm this request manually before changing the lead to Booked. Lead ID: ${escapeHtml(lead.id)}. DemoRequest ID: ${escapeHtml(demoRequest.id)}. Request ID: ${escapeHtml(requestId)}.</p></div>`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:700px;margin:auto;padding:24px;color:#0f172a"><h2>New audit time request</h2><p><strong>Preferred time:</strong> ${escapeHtml(requestedTime)}</p><p><strong>Name:</strong> ${escapeHtml(payload.full_name)}<br><strong>Business:</strong> ${escapeHtml(payload.business_name)}<br><strong>Industry:</strong> ${escapeHtml(payload.industry)}<br><strong>Email:</strong> ${escapeHtml(payload.email)}<br><strong>Phone:</strong> ${escapeHtml(payload.phone)}<br><strong>Website:</strong> ${escapeHtml(payload.website || "Not provided")}</p><p><strong>Review request:</strong> ${escapeHtml(payload.biggest_issue)}</p><p>Confirm this request manually before changing the lead to Booked. Lead ID: ${escapeHtml(updatedLead.id)}. DemoRequest ID: ${escapeHtml(demoRequest.id)}. Request ID: ${escapeHtml(requestId)}.</p></div>`,
     }).catch((error) => ({ sent: false, reason: error instanceof Error ? error.message : String(error) }));
 
-    for (const [target, result] of [["customer_receipt", customerEmail], ["admin_notification", adminEmail]] as const) {
+    for (const [target, result] of [
+      ["customer_receipt", customerEmail],
+      ["admin_notification", adminEmail],
+    ] as const) {
       await safeLog(base44, {
-        lead_id: lead.id,
+        lead_id: updatedLead.id,
         channel: "email",
         direction: "outbound",
         event_type: result.sent ? "email_sent" : "email_failed",
         provider: "resend",
         status: result.sent ? "sent" : "failed",
-        subject: target === "customer_receipt" ? "Audit time request received" : "Audit request admin notification",
+        subject: target === "customer_receipt"
+          ? "Audit time request received"
+          : "Audit request admin notification",
         message_body: requestedTime,
         error_message: result.sent ? undefined : result.reason,
         metadata_json: JSON.stringify({ target, request_id: requestId, request_status: "requested" }),
@@ -455,7 +526,7 @@ Deno.serve(async (req) => {
 
     return secureJson({
       success: true,
-      lead_id: lead.id,
+      lead_id: updatedLead.id,
       demo_request_id: demoRequest.id,
       action: existing ? "updated" : "created",
       request_status: "requested",
