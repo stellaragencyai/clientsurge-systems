@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
 import { useLocation } from "react-router-dom";
 import { trackEvent } from "@/lib/analytics";
+import { GA4_EVENTS, trackGa4PageView } from "@/lib/ga4";
 
-const CTA_KEYWORDS = /(book|demo|contact|audit|pricing|call|learn|explore|start|route|review|message|send|chat|industry|plan|quote)/i;
+const CTA_KEYWORDS = /(book|demo|contact|audit|pricing|call|learn|explore|start|route|review|message|send|chat|industry|plan|quote|checkout|buy)/i;
 const IGNORE_LABELS = /^(close|open navigation menu|close navigation menu|theme|back|next)$/i;
 
 function normalizeLabel(text = "") {
@@ -11,21 +12,26 @@ function normalizeLabel(text = "") {
 
 export default function AutoCTAAnalytics() {
   const location = useLocation();
-
-  // Fix #26: Use refs to persist dedup state across effect re-runs (React StrictMode double-fire)
   const lastSignatureRef = useRef("");
   const lastTimestampRef = useRef(0);
-  const firedForPathRef = useRef(false);
 
   useEffect(() => {
-    // Reset per-path dedup so CTA impressions fire once per page view
-    firedForPathRef.current = false;
-  }, [location.pathname]);
+    trackGa4PageView({
+      pathname: location.pathname,
+      search: location.search,
+      hash: location.hash,
+      title: document.title,
+      location: window.location.href,
+    });
+
+    if (location.pathname.toLowerCase() === "/pricing") {
+      trackEvent(GA4_EVENTS.PRICING_VIEW, {
+        page_path: `${location.pathname}${location.search}`,
+      });
+    }
+  }, [location.hash, location.pathname, location.search]);
 
   useEffect(() => {
-    let lastSignature = "";
-    let lastTimestamp = 0;
-
     const handleClick = (event) => {
       const target = event.target instanceof Element ? event.target.closest("a, button, [role='button']") : null;
       if (!target) return;
@@ -49,8 +55,6 @@ export default function AutoCTAAnalytics() {
 
       const signature = `${location.pathname}|${label}|${destination}`;
       const now = Date.now();
-
-      // Fix #26: Use refs to prevent double-fire across effect re-runs
       if (signature === lastSignatureRef.current && now - lastTimestampRef.current < 1000) {
         return;
       }
@@ -58,10 +62,11 @@ export default function AutoCTAAnalytics() {
       lastSignatureRef.current = signature;
       lastTimestampRef.current = now;
 
-      trackEvent("cta_click_auto", {
+      trackEvent(GA4_EVENTS.CTA_CLICK, {
         cta_label: label,
         cta_location: location.pathname,
         destination,
+        tracking_method: "automatic",
       });
     };
 
