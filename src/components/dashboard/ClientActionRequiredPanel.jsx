@@ -4,8 +4,15 @@ import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
 const SUPPORT_EMAIL = "support@clientsurgesystems.com";
 
-function setupUrl(order) {
-  return order?.id ? `/setup/credentials?order_id=${encodeURIComponent(order.id)}` : `mailto:${SUPPORT_EMAIL}?subject=ClientSurge%20Setup%20Help`;
+function supportUrl(subject = "ClientSurge Dashboard Support") {
+  return `mailto:${SUPPORT_EMAIL}?subject=${encodeURIComponent(subject)}`;
+}
+
+function setupUrl(order, section = "") {
+  if (!order?.id) return supportUrl("ClientSurge Setup Help");
+  const params = new URLSearchParams({ order_id: order.id });
+  if (section) params.set("section", section);
+  return `/setup/credentials?${params.toString()}`;
 }
 
 function actionHref(action, order) {
@@ -13,12 +20,15 @@ function actionHref(action, order) {
     case "payment":
       return "/pricing";
     case "onboarding":
+      return setupUrl(order, "business");
     case "booking_link":
+      return setupUrl(order, "booking");
     case "business_hours":
+      return setupUrl(order, "business-hours");
     case "templates":
-      return setupUrl(order);
+      return supportUrl("ClientSurge Message Template Approval");
     default:
-      return `mailto:${SUPPORT_EMAIL}?subject=ClientSurge%20Dashboard%20Support`;
+      return supportUrl("ClientSurge Dashboard Support");
   }
 }
 
@@ -30,23 +40,23 @@ export default function ClientActionRequiredPanel({ order, project, readiness, i
   }
 
   if (project && !project.onboarding_completed && !project.quick_start_completed) {
-    actions.push({ id: "onboarding", label: "Complete onboarding details", priority: "high", cta: "Open setup" });
+    actions.push({ id: "onboarding", label: "Complete onboarding details", priority: "high", cta: "Open business info" });
   }
 
   if (project && !project.booking_link) {
     const services = order?.services || [];
     const hasBooking = services.some((s) => (s.service_key || "").toLowerCase().includes("booking"));
     if (hasBooking) {
-      actions.push({ id: "booking_link", label: "Add or confirm booking link", priority: "medium", cta: "Open setup" });
+      actions.push({ id: "booking_link", label: "Add or confirm booking link", priority: "medium", cta: "Open booking setup" });
     }
   }
 
   if (project && (!project.business_hours || !project.business_hours_confirmed)) {
-    actions.push({ id: "business_hours", label: "Confirm business hours", priority: "medium", cta: "Open setup" });
+    actions.push({ id: "business_hours", label: "Confirm business hours", priority: "medium", cta: "Open business hours" });
   }
 
   if (project && project.templates_approved === false) {
-    actions.push({ id: "templates", label: "Approve message templates", priority: "medium", cta: "Open setup" });
+    actions.push({ id: "templates", label: "Approve message templates", priority: "medium", cta: "Request review" });
   }
 
   const services = order?.services || [];
