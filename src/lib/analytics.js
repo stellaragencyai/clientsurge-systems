@@ -1,5 +1,10 @@
 import { getUtmForAnalytics } from "@/lib/utmTracking";
 import { trackGa4Event } from "@/lib/ga4";
+import { installGa4CheckoutObserver } from "@/lib/ga4CheckoutObserver";
+
+if (typeof window !== "undefined") {
+  installGa4CheckoutObserver(window);
+}
 
 export function trackEvent(eventName, params = {}) {
   if (typeof window === "undefined") return false;
