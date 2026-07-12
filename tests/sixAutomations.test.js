@@ -7,32 +7,51 @@ const app = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
 const blog = readFileSync(new URL("../src/pages/Blog.jsx", import.meta.url), "utf8");
 const home = readFileSync(new URL("../src/pages/Home.jsx", import.meta.url), "utf8");
 const sitemap = readFileSync(new URL("../public/sitemap.xml", import.meta.url), "utf8");
+const automationSource = readFileSync(new URL("../src/lib/sixAutomations.js", import.meta.url), "utf8");
 const industryTemplate = readFileSync(
   new URL("../src/components/landing/IndustryTemplate.jsx", import.meta.url),
   "utf8"
 );
 
-test("the public offer is packaged around exactly six automation systems", () => {
+test("the public offer uses exactly the six locked package automations", () => {
   assert.equal(SIX_AUTOMATIONS.length, 6);
+  assert.deepEqual(
+    SIX_AUTOMATIONS.map((automation) => automation.serviceKey),
+    [
+      "instant_lead_response",
+      "missed_call_text_back",
+      "nurture_sequence_14d",
+      "ai_booking_agent",
+      "lead_reactivation",
+      "review_request",
+    ]
+  );
   assert.deepEqual(
     SIX_AUTOMATIONS.map((automation) => automation.title),
     [
+      "Instant Lead Response Automation",
       "Missed-Call Text-Back Automation",
-      "Lead Capture Automation",
-      "AI Lead Follow-Up Automation",
-      "Appointment Booking Automation",
-      "Review & Reputation Automation",
-      "Reactivation / Win-Back Automation",
+      "14-Day Lead Nurture Automation",
+      "AI Booking Handoff Automation",
+      "Old Lead Reactivation Automation",
+      "Review Request Automation",
     ]
   );
   assert.deepEqual(getAutomationRoutes(), [
-    "/missed-call-text-back",
     "/lead-capture-automation",
+    "/missed-call-text-back",
     "/ai-lead-follow-up",
     "/appointment-booking-automation",
-    "/review-automation",
     "/customer-reactivation",
+    "/review-automation",
   ]);
+});
+
+test("core package copy does not imply unapproved voice or guaranteed calendar sync", () => {
+  assert.doesNotMatch(automationSource, /Voice AI Receptionist|AI Voice Agent & Missed-Call Recovery/i);
+  assert.doesNotMatch(automationSource, /calendar syncs automatically|calendar syncs in real-time/i);
+  assert.match(automationSource, /Actual calendar confirmation depends on the client’s connected booking provider/);
+  assert.match(automationSource, /AI voice is not part of this core list/);
 });
 
 test("automation routes are public and no catch-all industry route advertises templates", () => {
