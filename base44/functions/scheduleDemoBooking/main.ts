@@ -1,6 +1,18 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.25';
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 
-function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}): Response {
+const MAX_FIELD_LENGTH = 500;
+const MAX_NOTES_LENGTH = 4000;
+const MAX_REQUESTS_PER_DAY = 8;
+const ACTIVE_REQUEST_STATUSES = ["requested", "scheduled"];
+const TIME_ZONE = "America/Phoenix";
+const TIME_ZONE_LABEL = "Arizona time (MST)";
+const ALLOWED_TIMES = new Set([
+  "09:00", "09:30", "10:00", "10:30", "11:00", "11:30",
+  "14:00", "14:30", "15:00", "15:30", "16:00", "16:30",
+]);
+
+function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {}) {
   return new Response(JSON.stringify(data), {
     ...init,
     headers: {
@@ -12,596 +24,454 @@ function secureJson(data: Record<string, unknown> = {}, init: ResponseInit = {})
   });
 }
 
-// Inline guard: verify a booking date has not exceeded the max daily slot count
-async function assertBookingDateAvailable(base44, scheduled_date) {
-  const MAX_PER_DAY = 8;
-  const existing = await base44.asServiceRole.entities.DemoRequest.filter({
-    scheduled_date,
-    status: { $in: ['requested', 'scheduled', 'confirmed'] },
-  });
-  if (existing && existing.length >= MAX_PER_DAY) {
-    throw Object.assign(
-      new Error(`No more slots available on ${scheduled_date}. Please choose another date.`),
-      { status: 409 }
-    );
-  }
+function clean(value: unknown, maxLength = MAX_FIELD_LENGTH) {
+  return String(value || "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/javascript:/gi, "")
+    .replace(/on\w+\s*=/gi, "")
+    .replace(/<[^>]*>/g, "")
+    .trim()
+    .slice(0, maxLength);
 }
 
-// #99: optimistic lock - re-fetch available slots right before confirming
-async function optimisticLockSlot(base44, scheduled_date, scheduled_time) {
-  const existing = await base44.asServiceRole.entities.DemoRequest.filter({
-    scheduled_date,
-    scheduled_time,
-    status: { $in: ['requested', 'scheduled', 'confirmed'] },
-  });
-  if (existing && existing.length > 0) {
-    throw Object.assign(
-      new Error(`Time slot ${scheduled_time} on ${scheduled_date} was just taken. Please choose another time.`),
-      { status: 409 }
-    );
-  }
-  return true;
+function normalizeEmail(value: unknown) {
+  return clean(value, 320).toLowerCase();
 }
 
-const MAX_FIELD_LENGTH = 500;
-const DUPLICATE_WINDOW_MS = 30 * 24 * 60 * 60 * 1000;
-const RATE_LIMIT_WINDOW_MS = 60 * 1000;
-const LEAD_SOURCE = 'landing_page';
-const INTAKE_TYPE = 'audit_booking';
-const DEFAULT_AUDIT_SUCCESS_MESSAGE = 'Free Automation Audit scheduled successfully';
+function normalizePhone(value: unknown) {
+  const digits = clean(value, 80).replace(/\D/g, "");
+  if (digits.length === 10) return `+1${digits}`;
+  if (digits.length === 11 && digits.startsWith("1")) return `+${digits}`;
+  return digits.length >= 10 ? `+${digits}` : "";
+}
 
-function sanitizeString(value: unknown, fallback = '') {
-  if (typeof value !== 'string') return fallback;
-  return value.replace(/[<>]/g, '').trim().slice(0, MAX_FIELD_LENGTH);
+function normalizeBusinessName(value: unknown) {
+  return clean(value, 240)
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, " ")
+    .trim();
+}
+
+function normalizeWebsite(value: unknown) {
+  const raw = clean(value, 500);
+  if (!raw) return "";
+  return /^https?:\/\//i.test(raw) ? raw : `https://${raw}`;
+}
+
+function normalizedDomain(website: string, email: string) {
+  try {
+    if (website) return new URL(website).hostname.replace(/^www\./i, "").toLowerCase();
+  } catch {
+    // Fall back to the email domain.
+  }
+  return email.includes("@") ? email.split("@").pop() || "" : "";
 }
 
 function normalizeIndustrySlug(value: unknown) {
-  return sanitizeString(value)
+  const slug = clean(value, 120)
     .toLowerCase()
-    .replace(/&/g, 'and')
-    .replace(/[^a-z0-9]+/g, '_')
-    .replace(/^_+|_+$/g, '');
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+
+  if (slug.includes("roof")) return "roofing";
+  if (slug.includes("hvac")) return "hvac";
+  if (slug.includes("plumb")) return "plumbing";
+  if (slug.includes("dental") || slug.includes("dentist") || slug.includes("orthodont")) return "dental";
+  if (slug.includes("med_spa") || slug.includes("aesthetic")) return "med_spa";
+  if (slug.includes("chiropr") || slug.includes("physical_therapy")) return "chiropractic";
+  if (slug.includes("contract")) return "contractors";
+  return slug || "general";
 }
 
-function canonicalIndustrySlug(value: unknown) {
-  const slug = normalizeIndustrySlug(value);
-  if (slug.includes('roof')) return 'roofing';
-  if (slug.includes('hvac')) return 'hvac';
-  if (slug.includes('plumb')) return 'plumbing';
-  if (slug.includes('dental') || slug.includes('dentist') || slug.includes('orthodont')) return 'dental';
-  if (slug.includes('med_spa') || slug.includes('aesthetic')) return 'med_spa';
-  return slug;
-}
-
-function inferIndustrySlug(payload: Record<string, unknown>) {
-  const explicit = canonicalIndustrySlug(payload.industry_slug);
-  if (explicit) return explicit;
-
-  const combined = canonicalIndustrySlug(`${payload.industry || ''} ${payload.business_type || ''}`);
-  if (combined.includes('roof')) return 'roofing';
-  if (combined.includes('hvac')) return 'hvac';
-  if (combined.includes('plumb')) return 'plumbing';
-  if (combined.includes('dental') || combined.includes('dentist') || combined.includes('orthodont')) return 'dental';
-  if (combined.includes('med_spa') || combined.includes('aesthetic')) return 'med_spa';
-  if (combined.includes('chiropractic') || combined.includes('physical_therapy')) return 'chiropractic';
-  if (combined.includes('contractor')) return 'contractors';
-  return combined;
-}
-
-function normalizeIndustryTags(value: unknown, industrySlug = '') {
-  const tags = Array.isArray(value)
-    ? value.map((entry) => normalizeIndustrySlug(entry)).filter(Boolean)
-    : [];
-  if (industrySlug) tags.push(industrySlug, `${industrySlug}_landing_page`);
-  if (industrySlug === 'roofing') tags.push('roofing_lead', 'free_roofing_automation_audit');
-  if (industrySlug === 'hvac') tags.push('hvac_lead', 'free_hvac_automation_audit', 'missed_call_text_back', 'after_hours_lead_capture');
-  if (industrySlug === 'dental') tags.push('dental_lead', 'free_dental_automation_audit');
-  if (industrySlug === 'med_spa') tags.push('med_spa_lead', 'free_med_spa_automation_audit');
-  if (industrySlug === 'plumbing') tags.push('plumbing_lead', 'free_plumbing_automation_audit', 'missed_call_text_back', 'emergency_service_request');
-  return [...new Set(tags)];
-}
-
-function leadScoreForIndustry(industrySlug: string) {
-  if (industrySlug === 'roofing') return 75;
-  if (industrySlug === 'hvac') return 72;
-  if (industrySlug === 'dental') return 70;
-  if (industrySlug === 'med_spa') return 73;
-  if (industrySlug === 'plumbing') return 72;
-  return 50;
-}
-
-function auditNameForIndustry(industrySlug = '') {
-  if (industrySlug === 'roofing') return 'Roofing Automation Audit';
-  if (industrySlug === 'dental') return 'Dental Automation Audit';
-  if (industrySlug === 'hvac') return 'HVAC Automation Audit';
-  if (industrySlug === 'med_spa') return 'Med Spa Automation Audit';
-  if (industrySlug === 'plumbing') return 'Plumbing Automation Audit';
-  return 'Automation Audit';
-}
-
-function crmTagForIndustry(industrySlug = '', fallback = '') {
-  const canonical = canonicalIndustrySlug(industrySlug || fallback);
-  const tags: Record<string, string> = {
-    roofing: 'roofing_lead',
-    hvac: 'hvac_lead',
-    dental: 'dental_lead',
-    med_spa: 'med_spa_lead',
-    plumbing: 'plumbing_lead',
-  };
-  return tags[canonical] || sanitizeString(fallback, 'automation_audit_lead') || 'automation_audit_lead';
-}
-
-function normalizePayload(payload: Record<string, unknown>) {
-  const industry = sanitizeString(payload.industry || payload.business_type, 'General') || 'General';
-  const industry_slug = inferIndustrySlug({ ...payload, industry });
+function canonicalIndustryLabel(slug: string, fallback: string) {
   return {
-    full_name: sanitizeString(payload.full_name),
-    business_name: sanitizeString(payload.business_name),
-    email: sanitizeString(payload.email).toLowerCase(),
-    phone: sanitizeString(payload.phone),
-    scheduled_date: sanitizeString(payload.scheduled_date),
-    scheduled_time: sanitizeString(payload.scheduled_time),
-    monthly_leads: sanitizeString(payload.monthly_leads),
-    biggest_issue: sanitizeString(payload.biggest_issue),
-    industry,
-    industry_slug,
-    industry_tags: normalizeIndustryTags(payload.industry_tags, industry_slug),
-    service_interest: sanitizeString(payload.service_interest, 'automation_audit') || 'automation_audit',
-    source: sanitizeString(payload.source, LEAD_SOURCE) || LEAD_SOURCE,
-    source_page: sanitizeString(payload.source_page, '/book') || '/book',
-    business_website_url: sanitizeString(payload.business_website_url || payload.website),
-    website: sanitizeString(payload.website || payload.business_website_url),
-    website_url: sanitizeString(payload.website_url),
-    utm_source: sanitizeString(payload.utm_source),
-    utm_medium: sanitizeString(payload.utm_medium),
-    utm_campaign: sanitizeString(payload.utm_campaign),
-    utm_content: sanitizeString(payload.utm_content),
-    referrer: sanitizeString(payload.referrer),
-    crm_tag: crmTagForIndustry(industry_slug, payload.crm_tag as string),
-    consent_given: payload.consent_given === true,
-    consent_source: sanitizeString(payload.consent_source),
-    consent_text_version: sanitizeString(payload.consent_text_version),
+    roofing: "Roofing & Restoration",
+    hvac: "HVAC",
+    plumbing: "Plumbing",
+    dental: "Dental & Orthodontics",
+    med_spa: "Med Spa & Aesthetics",
+    chiropractic: "Chiropractic & Rehabilitation",
+    contractors: "Contractors & Trades",
+  }[slug] || fallback || "Professional Services";
+}
+
+function industryTags(slug: string, incoming: unknown) {
+  const tags = Array.isArray(incoming) ? incoming.map((item) => clean(item, 80)).filter(Boolean) : [];
+  const mapped = {
+    roofing: ["roofing", "roofing_lead", "free_roofing_automation_audit"],
+    hvac: ["hvac", "hvac_lead", "free_hvac_automation_audit"],
+    plumbing: ["plumbing", "plumbing_lead", "free_plumbing_automation_audit"],
+    dental: ["dental", "dental_lead", "free_dental_automation_audit"],
+    med_spa: ["med_spa", "med_spa_lead", "free_med_spa_automation_audit"],
+    chiropractic: ["chiropractic", "chiropractic_lead"],
+    contractors: ["contractors", "contractor_lead"],
+  }[slug] || [slug, "automation_audit_lead"];
+  return [...new Set([...tags, ...mapped, `${slug}_landing_page`].filter(Boolean))].slice(0, 12);
+}
+
+function crmTag(slug: string, fallback: unknown) {
+  return {
+    roofing: "roofing_lead",
+    hvac: "hvac_lead",
+    plumbing: "plumbing_lead",
+    dental: "dental_lead",
+    med_spa: "med_spa_lead",
+    chiropractic: "chiropractic_lead",
+    contractors: "contractor_lead",
+  }[slug] || clean(fallback, 100) || "automation_audit_lead";
+}
+
+function getArizonaDate() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function formatRequestedTime(date: string, time: string) {
+  const [hourValue, minute] = time.split(":");
+  const hour = Number(hourValue);
+  const suffix = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour % 12 || 12;
+  return `${date} at ${displayHour}:${minute} ${suffix} ${TIME_ZONE_LABEL}`;
+}
+
+function mergeSourceHistory(existing: Record<string, unknown> | null, payload: Record<string, string>) {
+  const previous = Array.isArray(existing?.source_history)
+    ? existing.source_history.map(String)
+    : existing?.source_history
+      ? [String(existing.source_history)]
+      : [];
+  const current = [
+    payload.source,
+    payload.source_page ? `page:${payload.source_page}` : "",
+    payload.utm_source ? `utm_source:${payload.utm_source}` : "",
+    payload.utm_campaign ? `utm_campaign:${payload.utm_campaign}` : "",
+    payload.referrer ? `referrer:${payload.referrer}` : "",
+  ].filter(Boolean);
+  return [...new Set([...previous, ...current])].slice(-25);
+}
+
+function appendNotes(existing: unknown, line: string) {
+  const previous = clean(existing, MAX_NOTES_LENGTH);
+  return [previous, line].filter(Boolean).join("\n").slice(-MAX_NOTES_LENGTH);
+}
+
+function isAdvancedLead(existing: Record<string, unknown> | null) {
+  return Boolean(
+    existing && (
+      ["Booked", "Closed"].includes(String(existing.status || "")) ||
+      ["Audit Booked", "Audit Completed", "Proposal Sent", "Won Pending Payment", "Won"].includes(String(existing.crm_stage || "")) ||
+      ["BOOKED", "WON"].includes(String(existing.lead_state || ""))
+    )
+  );
+}
+
+async function canonicalLeadId(email: string, phone: string, businessName: string) {
+  const bytes = new TextEncoder().encode(`${email}|${phone}|${businessName}`);
+  const digest = await crypto.subtle.digest("SHA-256", bytes);
+  const hex = [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, "0")).join("");
+  return `lead_${hex.slice(0, 24)}`;
+}
+
+function normalizedPayload(raw: Record<string, unknown>) {
+  const businessType = clean(raw.business_type || raw.industry, 160);
+  const slug = normalizeIndustrySlug(raw.industry_slug || businessType);
+  const email = normalizeEmail(raw.email);
+  const phone = normalizePhone(raw.phone);
+  const website = normalizeWebsite(raw.business_website_url || raw.website);
+  return {
+    full_name: clean(raw.full_name, 200),
+    business_name: clean(raw.business_name, 240),
+    normalized_business_name: normalizeBusinessName(raw.business_name),
+    email,
+    phone,
+    business_type: businessType,
+    industry_slug: slug,
+    industry: canonicalIndustryLabel(slug, businessType),
+    website,
+    biggest_issue: clean(raw.biggest_issue || raw.message, 1500),
+    scheduled_date: clean(raw.scheduled_date, 20),
+    scheduled_time: clean(raw.scheduled_time, 10),
+    source: clean(raw.source, 120) || "landing_page",
+    source_page: clean(raw.source_page, 240) || "/book",
+    service_interest: clean(raw.service_interest, 120) || "automation_audit",
+    crm_tag: crmTag(slug, raw.crm_tag),
+    industry_tags: industryTags(slug, raw.industry_tags),
+    utm_source: clean(raw.utm_source, 200),
+    utm_medium: clean(raw.utm_medium, 200),
+    utm_campaign: clean(raw.utm_campaign, 200),
+    utm_content: clean(raw.utm_content, 200),
+    referrer: clean(raw.referrer, 1000),
+    honeypot: clean(raw.website_url, 300),
+    consent_given: raw.consent_given === true,
+    consent_source: clean(raw.consent_source, 160) || "audit_time_request",
+    consent_text_version: clean(raw.consent_text_version, 160) || "audit_time_request_explicit_v1",
   };
 }
 
-function validatePayload(payload: ReturnType<typeof normalizePayload>) {
+function validate(payload: ReturnType<typeof normalizedPayload>) {
   const errors: string[] = [];
-
-  if (!payload.full_name) errors.push('Full name is required');
-  if (!payload.business_name) errors.push('Business name is required');
-  if (!payload.industry || payload.industry === 'General') errors.push('Industry is required');
-  if (!payload.business_website_url && !payload.website) errors.push('Website is required');
-  if (!payload.biggest_issue) errors.push('What should we review is required');
-  if (payload.consent_given !== true) errors.push('Consent is required');
-
-  if (!payload.email) {
-    errors.push('Email is required');
-  } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) {
-    errors.push('Email must be valid');
-  }
-
-  if (!payload.phone) {
-    errors.push('Phone is required');
-  } else if (payload.phone.replace(/\D/g, '').length < 10) {
-    errors.push('Phone must be valid');
-  }
-
-  if (!payload.scheduled_date || !/^\d{4}-\d{2}-\d{2}$/.test(payload.scheduled_date)) {
-    errors.push('Scheduled date is required (YYYY-MM-DD)');
-  } else {
-    const bookedDate = new Date(payload.scheduled_date);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    if (bookedDate < today) {
-      errors.push('Scheduled date must be in the future');
-    }
-  }
-  if (!payload.scheduled_time || !/^\d{2}:\d{2}$/.test(payload.scheduled_time)) {
-    errors.push('Scheduled time is required');
-  }
-
+  if (!payload.full_name) errors.push("Full name is required");
+  if (!payload.business_name) errors.push("Business name is required");
+  if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(payload.email)) errors.push("A valid email is required");
+  if (!payload.phone) errors.push("A valid phone number is required");
+  if (!payload.business_type) errors.push("Industry is required");
+  if (!payload.biggest_issue) errors.push("What should we review is required");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(payload.scheduled_date)) errors.push("Preferred date is required");
+  else if (payload.scheduled_date < getArizonaDate()) errors.push("Preferred date cannot be in the past");
+  if (!ALLOWED_TIMES.has(payload.scheduled_time)) errors.push("Choose an available preferred time");
+  if (!payload.consent_given) errors.push("Consent is required");
   return errors;
 }
 
-async function isRateLimited(
-  base44: ReturnType<typeof createClientFromRequest>,
-  payload: ReturnType<typeof normalizePayload>
-) {
-  const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, '-created_date', 5);
-  const now = Date.now();
+async function findExistingLead(base44: ReturnType<typeof createClientFromRequest>, payload: ReturnType<typeof normalizedPayload>) {
+  const matchesByEmail = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, "-created_date", 25).catch(() => []);
+  const byEmail = matchesByEmail.find((lead: Record<string, unknown>) =>
+    normalizeBusinessName(lead.business_name) === payload.normalized_business_name
+  );
+  if (byEmail) return byEmail;
 
-  return emailMatches.some((existingLead: Record<string, unknown>) => {
-    const createdDate =
-      typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
-    const sameBusiness =
-      typeof existingLead.business_name === 'string' &&
-      existingLead.business_name.trim().toLowerCase() === payload.business_name.toLowerCase();
-
-    return createdDate > 0 && now - createdDate < RATE_LIMIT_WINDOW_MS && sameBusiness;
-  });
+  const matchesByPhone = await base44.asServiceRole.entities.Leads.filter({ phone: payload.phone }, "-created_date", 25).catch(() => []);
+  return matchesByPhone.find((lead: Record<string, unknown>) =>
+    normalizeBusinessName(lead.business_name) === payload.normalized_business_name
+  ) || null;
 }
 
-function parseBookingDateTime(date: string, time: string) {
-  const [year, month, day] = date.split('-').map(Number);
-  const [hour, minute] = time.split(':').map(Number);
+async function reserveRequestedSlot(base44: ReturnType<typeof createClientFromRequest>, leadId: string, payload: ReturnType<typeof normalizedPayload>) {
+  const dayRequests = await base44.asServiceRole.entities.DemoRequest.filter(
+    { scheduled_date: payload.scheduled_date, status: { $in: ACTIVE_REQUEST_STATUSES } },
+    "-created_date",
+    50,
+  );
 
-  const bookingDate = new Date(year, month - 1, day, hour, minute);
-
-  if (Number.isNaN(bookingDate.getTime())) {
-    throw new Error('Invalid booking date or time');
+  const sameSlot = (dayRequests || []).find((request: Record<string, unknown>) =>
+    request.scheduled_time === payload.scheduled_time
+  );
+  if (sameSlot && sameSlot.lead_id !== leadId) {
+    throw Object.assign(new Error("That preferred time is no longer available. Please choose another time."), { status: 409 });
   }
 
-  return bookingDate.toISOString();
-}
-
-function mergeSourceHistory(
-  payload: ReturnType<typeof normalizePayload>,
-  existingLead: Record<string, unknown> | null = null
-) {
-  const previous = Array.isArray(existingLead?.source_history)
-    ? existingLead.source_history
-    : typeof existingLead?.source_history === 'string'
-      ? [existingLead.source_history]
-      : [];
-  const current = [
-    payload.source || LEAD_SOURCE,
-    payload.source_page ? `page:${payload.source_page}` : '',
-    payload.utm_source ? `utm_source:${payload.utm_source}` : '',
-    payload.utm_campaign ? `utm_campaign:${payload.utm_campaign}` : '',
-    payload.referrer ? `referrer:${payload.referrer}` : '',
-  ].filter(Boolean);
-
-  return [...new Set([...previous, ...current])];
-}
-
-function isRecentDuplicate(existingLead: Record<string, unknown>, payload: ReturnType<typeof normalizePayload>) {
-  const createdDate = typeof existingLead.created_date === 'string' ? new Date(existingLead.created_date).getTime() : 0;
-  const isWithinWindow = createdDate > 0 && Date.now() - createdDate < DUPLICATE_WINDOW_MS;
-  const sameBusiness =
-    typeof existingLead.business_name === 'string' &&
-    existingLead.business_name.trim().toLowerCase() === payload.business_name.toLowerCase();
-
-  return isWithinWindow && sameBusiness;
-}
-
-function buildLeadPayload(
-  payload: ReturnType<typeof normalizePayload>,
-  existingLead: Record<string, unknown> | null = null
-) {
-  const now = new Date().toISOString();
-  const score = leadScoreForIndustry(payload.industry_slug);
-  return {
-    full_name: payload.full_name,
-    owner_contact_name: payload.full_name,
-    business_name: payload.business_name,
-    email: payload.email,
-    phone: payload.phone,
-    business_type: payload.industry,
-    industry: payload.industry_slug || payload.industry,
-    problem: payload.biggest_issue || payload.monthly_leads || 'Free Automation Audit booking',
-    source: payload.source || LEAD_SOURCE,
-    source_page: payload.source_page,
-    source_history: mergeSourceHistory(payload, existingLead),
-    intake_type: INTAKE_TYPE,
-    status: 'Booked',
-    crm_stage: 'Audit Booked',
-    outreach_status: 'booked',
-    booking_link_sent_at: now,
-    booked_at: now,
-    last_activity_at: now,
-    website: payload.business_website_url || payload.website,
-    website_url: payload.business_website_url || payload.website,
-    page_submitted_from: payload.source_page,
-    package_interest: payload.service_interest,
-    service_interest: payload.service_interest,
-    crm_tag: payload.crm_tag,
-    industry_tags: payload.industry_tags,
-    assigned_agent_name: payload.industry_slug ? `sales_rep_${payload.industry_slug}` : undefined,
-    assigned_at: now,
-    lead_score: score,
-    activation_priority: score >= 70 ? 'High' : 'Medium',
-    lead_category: score >= 70 ? 'High-Value' : 'Standard',
-    utm_source: payload.utm_source,
-    utm_medium: payload.utm_medium,
-    utm_campaign: payload.utm_campaign,
-    utm_content: payload.utm_content,
-    requested_channels: ['sms', 'email'],
-    consent_given: payload.consent_given,
-    consent_given_at: payload.consent_given ? now : undefined,
-    consent_source: payload.consent_source,
-    consent_text_version: payload.consent_text_version,
-  };
-}
-
-async function ensureDemoRequest(
-  base44: ReturnType<typeof createClientFromRequest>,
-  leadId: string,
-  payload: ReturnType<typeof normalizePayload>
-) {
-  const existingRequests = await base44.asServiceRole.entities.DemoRequest.filter(
-    {
-      lead_id: leadId,
-      scheduled_date: payload.scheduled_date,
-      scheduled_time: payload.scheduled_time,
-    },
-    '-created_date',
-    10
+  const existingForLead = (dayRequests || []).find((request: Record<string, unknown>) =>
+    request.lead_id === leadId && request.scheduled_time === payload.scheduled_time
   );
+  if (existingForLead) return existingForLead;
 
-  const existingScheduledRequest = existingRequests.find(
-    (request: Record<string, unknown>) => request.status === 'scheduled'
-  );
-
-  if (existingScheduledRequest) {
-    return existingScheduledRequest;
+  if ((dayRequests || []).length >= MAX_REQUESTS_PER_DAY) {
+    throw Object.assign(new Error("No more audit requests are available on that date. Please choose another date."), { status: 409 });
   }
 
   return base44.asServiceRole.entities.DemoRequest.create({
     lead_id: leadId,
     scheduled_date: payload.scheduled_date,
     scheduled_time: payload.scheduled_time,
-    status: 'scheduled',
-    notes: payload.biggest_issue || undefined,
+    status: "requested",
+    tenant_scope_status: "system_internal",
+    notes: `Preferred audit time requested (${TIME_ZONE_LABEL}). Pending manual confirmation. ${payload.biggest_issue}`.slice(0, 1000),
   });
 }
 
-async function logCommunicationEvent(
-  base44: ReturnType<typeof createClientFromRequest>,
-  payload: {
-    lead_id: string;
-    channel: 'sms' | 'email' | 'webhook' | 'internal';
-    direction: 'outbound' | 'inbound' | 'system';
-    event_type: 'lead_created' | 'sms_sent' | 'sms_failed' | 'sms_received' | 'sms_delivered' | 'email_sent' | 'email_failed' | 'webhook_sent' | 'workflow_triggered' | 'status_update';
-    provider: 'twilio' | 'resend' | 'gmail' | 'zapier' | 'n8n' | 'internal';
-    status: 'pending' | 'sent' | 'delivered' | 'failed' | 'received' | 'processed';
-    subject?: string;
-    message_body?: string;
-    error_message?: string;
-    metadata?: Record<string, unknown>;
-  }
-) {
-  await base44.asServiceRole.entities.CommunicationEvent.create({
-    lead_id: payload.lead_id,
-    channel: payload.channel,
-    direction: payload.direction,
-    event_type: payload.event_type,
-    provider: payload.provider,
-    status: payload.status,
-    subject: payload.subject,
-    message_body: payload.message_body,
-    error_message: payload.error_message,
-    metadata_json: payload.metadata ? JSON.stringify(payload.metadata) : undefined,
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+async function sendEmail({ to, subject, html, replyTo }: { to: string; subject: string; html: string; replyTo?: string }) {
+  const key = Deno.env.get("RESEND_API_KEY");
+  if (!key) return { sent: false, reason: "missing_resend_api_key" };
+  const response = await fetch("https://api.resend.com/emails", {
+    method: "POST",
+    headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
+    body: JSON.stringify({
+      from: "ClientSurge Systems <system@clientsurgesystems.com>",
+      to: [to],
+      reply_to: replyTo || "nolan@clientsurgesystems.com",
+      subject,
+      html,
+    }),
   });
+  if (!response.ok) return { sent: false, reason: (await response.text()) || "email_failed" };
+  return { sent: true, reason: "" };
+}
+
+async function safeLog(base44: ReturnType<typeof createClientFromRequest>, payload: Record<string, unknown>) {
+  try {
+    await base44.asServiceRole.entities.CommunicationEvent.create(payload);
+  } catch (error) {
+    console.warn("[scheduleDemoBooking] communication log skipped", error instanceof Error ? error.message : error);
+  }
 }
 
 Deno.serve(async (req) => {
+  const requestId = `audit_request_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   try {
-    if (req.method !== 'POST') {
-      return secureJson({ error: 'Method not allowed' }, { status: 405 });
+    if (req.method !== "POST") return secureJson({ error: "Method not allowed", request_id: requestId }, { status: 405 });
+
+    const originGuard = validatePublicFormOrigin(req);
+    if (!originGuard.ok) {
+      return secureJson({ error: originGuard.error, code: "invalid_origin", request_id: requestId }, { status: originGuard.status });
     }
+
+    const raw = await req.json().catch(() => null);
+    if (!raw || typeof raw !== "object") return secureJson({ error: "Invalid JSON body", request_id: requestId }, { status: 400 });
+
+    const payload = normalizedPayload(raw as Record<string, unknown>);
+    if (payload.honeypot) return secureJson({ success: true, ignored: true, request_id: requestId });
+
+    const errors = validate(payload);
+    if (errors.length) return secureJson({ error: errors[0], errors, request_id: requestId }, { status: 400 });
 
     const base44 = createClientFromRequest(req);
-    const rawPayload = await req.json();
-    const payload = normalizePayload(rawPayload);
+    const now = new Date().toISOString();
+    const requestedTime = formatRequestedTime(payload.scheduled_date, payload.scheduled_time);
+    const existing = await findExistingLead(base44, payload);
+    const advanced = isAdvancedLead(existing);
+    const domain = normalizedDomain(payload.website, payload.email);
+    const canonicalId = existing?.canonical_lead_id || await canonicalLeadId(payload.email, payload.phone, payload.normalized_business_name);
+    const requestNote = `[${now}] Preferred automation-audit time requested: ${requestedTime}. Pending confirmation. Request ID: ${requestId}.`;
 
-    if (payload.website_url) {
-      return secureJson({ success: true, ignored: true });
+    const leadData: Record<string, unknown> = {
+      full_name: payload.full_name,
+      owner_contact_name: payload.full_name,
+      business_name: payload.business_name,
+      email: payload.email,
+      phone: payload.phone,
+      business_type: payload.business_type,
+      industry: payload.industry,
+      problem: payload.biggest_issue,
+      source: payload.source,
+      source_page: payload.source_page,
+      source_history: mergeSourceHistory(existing, payload),
+      intake_type: "audit_time_request",
+      website: payload.website,
+      website_url: payload.website,
+      package_interest: payload.service_interest,
+      service_interest: payload.service_interest,
+      crm_tag: payload.crm_tag,
+      industry_tags: payload.industry_tags,
+      canonical_lead_id: canonicalId,
+      normalized_email: payload.email,
+      normalized_phone: payload.phone.replace(/\D/g, ""),
+      normalized_business_name: payload.normalized_business_name,
+      normalized_domain: domain,
+      dedupe_key: `${payload.email}|${payload.phone}|${payload.normalized_business_name}`,
+      dedupe_status: existing ? (existing.dedupe_status || "keeper") : "unique",
+      consent_given: true,
+      consent_given_at: now,
+      consent_source: payload.consent_source,
+      consent_text_version: payload.consent_text_version,
+      requested_channels: ["email", "phone", "sms"],
+      utm_source: payload.utm_source || null,
+      utm_medium: payload.utm_medium || null,
+      utm_campaign: payload.utm_campaign || null,
+      utm_content: payload.utm_content || null,
+      referrer: payload.referrer || null,
+      page_submitted_from: payload.source_page,
+      last_activity_at: now,
+      next_follow_up_at: now,
+      lead_score: Math.max(Number(existing?.lead_score || 0), 80),
+      intent_score: Math.max(Number(existing?.intent_score || 0), 90),
+      activation_priority: "Hot",
+      lead_category: "High-Value",
+      ai_intent: "booking_ready",
+      reply_sentiment: "Positive",
+      notes: appendNotes(existing?.notes, requestNote),
+    };
+
+    if (!advanced) {
+      leadData.status = "Replied";
+      leadData.crm_stage = "Replied";
+      leadData.lead_state = "HOT";
+      leadData.outreach_status = existing?.do_not_contact ? "do_not_contact" : "replied";
     }
 
-    const errors = validatePayload(payload);
+    const lead = existing
+      ? await base44.asServiceRole.entities.Leads.update(existing.id, leadData)
+      : await base44.asServiceRole.entities.Leads.create(leadData);
 
-    if (errors.length > 0) {
-      return secureJson({ error: errors[0], errors }, { status: 400 });
-    }
+    const demoRequest = await reserveRequestedSlot(base44, lead.id, payload);
 
-    if (await isRateLimited(base44, payload)) {
-      return secureJson({ error: 'Please wait a moment before submitting again.' }, { status: 429 });
-    }
-
-    await assertBookingDateAvailable(base44, payload.scheduled_date);
-    await optimisticLockSlot(base44, payload.scheduled_date, payload.scheduled_time);
-
-    const bookingDateTime = parseBookingDateTime(payload.scheduled_date, payload.scheduled_time);
-    let existingLead = null;
-
-    const emailMatches = await base44.asServiceRole.entities.Leads.filter({ email: payload.email }, '-created_date', 10);
-    existingLead = emailMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, payload)) || null;
-
-    if (!existingLead) {
-      const phoneMatches = await base44.asServiceRole.entities.Leads.filter({ phone: payload.phone }, '-created_date', 10);
-      existingLead = phoneMatches.find((item: Record<string, unknown>) => isRecentDuplicate(item, payload)) || null;
-    }
-
-    const leadPayload = buildLeadPayload(payload, existingLead);
-    const auditName = auditNameForIndustry(payload.industry_slug);
-    let lead;
-
-    if (existingLead) {
-      lead = await base44.asServiceRole.entities.Leads.update(existingLead.id, leadPayload);
-    } else {
-      lead = await base44.asServiceRole.entities.Leads.create(leadPayload);
-    }
-
-    await logCommunicationEvent(base44, {
+    await safeLog(base44, {
       lead_id: lead.id,
-      channel: 'internal',
-      direction: 'system',
-      event_type: 'lead_created',
-      provider: 'internal',
-      status: 'processed',
-      subject: existingLead ? `Free ${auditName} booking updated existing lead` : `Free ${auditName} booking created lead`,
-      message_body: `Free ${auditName} booking recorded for ${payload.full_name} from ${payload.business_name}`,
-      metadata: {
-        source: payload.source || LEAD_SOURCE,
+      channel: "internal",
+      direction: "system",
+      event_type: "status_update",
+      provider: "internal",
+      status: "processed",
+      subject: "Automation audit time requested",
+      message_body: `${payload.full_name} requested ${requestedTime}. Pending confirmation.`,
+      metadata_json: JSON.stringify({
+        request_id: requestId,
+        demo_request_id: demoRequest.id,
+        request_status: "requested",
+        calendar_created: false,
+        time_zone: TIME_ZONE,
         source_page: payload.source_page,
-        intake_type: INTAKE_TYPE,
-        action: existingLead ? 'updated' : 'created',
-        scheduled_date: payload.scheduled_date,
-        scheduled_time: payload.scheduled_time,
-      },
+      }),
     });
 
-    await ensureDemoRequest(base44, lead.id, payload);
+    const customerEmail = await sendEmail({
+      to: payload.email,
+      subject: `Audit time request received — ${requestedTime}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;padding:24px;color:#0f172a"><h2>We received your preferred audit time.</h2><p>Hi ${escapeHtml(payload.full_name)},</p><p>Your requested time is <strong>${escapeHtml(requestedTime)}</strong>.</p><p>This is a pending request, not a confirmed calendar appointment yet. Nolan will confirm the time or send the closest available option within one business day.</p><p><strong>Business:</strong> ${escapeHtml(payload.business_name)}<br><strong>What to review:</strong> ${escapeHtml(payload.biggest_issue)}</p><p>Reference: ${escapeHtml(requestId)}</p><p>Reply to this email if anything changes.</p><hr><p style="font-size:12px;color:#64748b">ClientSurge Systems · Phoenix, Arizona</p></div>`,
+    }).catch((error) => ({ sent: false, reason: error instanceof Error ? error.message : String(error) }));
 
-    const warnings: string[] = [];
+    const adminEmail = await sendEmail({
+      to: "nolan@clientsurgesystems.com",
+      replyTo: payload.email,
+      subject: `ACTION REQUIRED: Confirm audit request — ${payload.business_name}`,
+      html: `<div style="font-family:Arial,sans-serif;max-width:700px;margin:auto;padding:24px;color:#0f172a"><h2>New audit time request</h2><p><strong>Preferred time:</strong> ${escapeHtml(requestedTime)}</p><p><strong>Name:</strong> ${escapeHtml(payload.full_name)}<br><strong>Business:</strong> ${escapeHtml(payload.business_name)}<br><strong>Industry:</strong> ${escapeHtml(payload.industry)}<br><strong>Email:</strong> ${escapeHtml(payload.email)}<br><strong>Phone:</strong> ${escapeHtml(payload.phone)}<br><strong>Website:</strong> ${escapeHtml(payload.website || "Not provided")}</p><p><strong>Review request:</strong> ${escapeHtml(payload.biggest_issue)}</p><p>Confirm this request manually before changing the lead to Booked. Lead ID: ${escapeHtml(lead.id)}. DemoRequest ID: ${escapeHtml(demoRequest.id)}. Request ID: ${escapeHtml(requestId)}.</p></div>`,
+    }).catch((error) => ({ sent: false, reason: error instanceof Error ? error.message : String(error) }));
 
-    const sideEffects = [
-      {
-        name: 'confirmation_email',
-        channel: 'email' as const,
-        eventTypeSuccess: 'email_sent' as const,
-        eventTypeFailure: 'email_failed' as const,
-        provider: 'internal' as const,
-        subject: `Free ${auditName} confirmation for ${payload.full_name}`,
-        message: `Free ${auditName} confirmation email for ${payload.scheduled_date} ${payload.scheduled_time}`,
-        run: () =>
-          base44.functions.invoke('sendDemoConfirmationEmail', {
-            email: payload.email,
-            full_name: payload.full_name,
-            business_name: payload.business_name,
-            scheduled_date: payload.scheduled_date,
-            scheduled_time: payload.scheduled_time,
-            industry: payload.industry,
-            industry_slug: payload.industry_slug,
-          }),
-      },
-      {
-        name: 'prep_email',
-        channel: 'email' as const,
-        eventTypeSuccess: 'email_sent' as const,
-        eventTypeFailure: 'email_failed' as const,
-        provider: 'internal' as const,
-        subject: `Free ${auditName} prep email for ${payload.full_name}`,
-        message: `Free ${auditName} prep email for ${payload.scheduled_date} ${payload.scheduled_time}`,
-        run: () =>
-          base44.functions.invoke('sendDemoPrepEmail', {
-            email: payload.email,
-            full_name: payload.full_name,
-            business_name: payload.business_name,
-            scheduled_date: payload.scheduled_date,
-            scheduled_time: payload.scheduled_time,
-            industry: payload.industry,
-            industry_slug: payload.industry_slug,
-          }),
-      },
-      {
-        name: 'confirmation_sms',
-        channel: 'sms' as const,
-        eventTypeSuccess: 'sms_sent' as const,
-        eventTypeFailure: 'sms_failed' as const,
-        provider: 'twilio' as const,
-        subject: `Free ${auditName} SMS confirmation for ${payload.full_name}`,
-        message: `Free ${auditName} SMS confirmation for ${payload.scheduled_date} ${payload.scheduled_time}`,
-        run: () =>
-          base44.functions.invoke('sendDemoConfirmationSMS', {
-            phone: payload.phone,
-            full_name: payload.full_name,
-            scheduled_date: payload.scheduled_date,
-            scheduled_time: payload.scheduled_time,
-          }),
-      },
-      {
-        name: 'admin_notification',
-        channel: 'email' as const,
-        eventTypeSuccess: 'email_sent' as const,
-        eventTypeFailure: 'email_failed' as const,
-        provider: 'internal' as const,
-        subject: `Admin ${auditName} booking notification for ${payload.business_name}`,
-        message: `Admin ${auditName} booking notification for ${payload.full_name} (${payload.business_name})`,
-        run: () =>
-          base44.functions.invoke('sendAdminDemoNotification', {
-            full_name: payload.full_name,
-            business_name: payload.business_name,
-            email: payload.email,
-            phone: payload.phone,
-            scheduled_date: payload.scheduled_date,
-            scheduled_time: payload.scheduled_time,
-            monthly_leads: payload.monthly_leads,
-            biggest_issue: payload.biggest_issue,
-            industry: payload.industry,
-            industry_slug: payload.industry_slug,
-            crm_tag: payload.crm_tag,
-            industry_tags: payload.industry_tags,
-            source_page: payload.source_page,
-            utm_source: payload.utm_source,
-            utm_medium: payload.utm_medium,
-            utm_campaign: payload.utm_campaign,
-            utm_content: payload.utm_content,
-            referrer: payload.referrer,
-            business_website_url: payload.business_website_url || payload.website,
-          }),
-      },
-      {
-        name: 'calendar_event',
-        channel: 'internal' as const,
-        eventTypeSuccess: 'workflow_triggered' as const,
-        eventTypeFailure: 'workflow_triggered' as const,
-        provider: 'internal' as const,
-        subject: `Calendar event for ${payload.business_name}`,
-        message: `Calendar event scheduled for ${payload.scheduled_date} ${payload.scheduled_time}`,
-        run: () =>
-          base44.functions.invoke('createDemoCalendarEvent', {
-            lead_id: lead.id,
-            title: `Free ${auditName}: ${payload.business_name} - ${payload.full_name}`,
-            description: `Free ${auditName} Booking\n\nBusiness: ${payload.business_name}\nIndustry: ${payload.industry}\nIndustry Slug: ${payload.industry_slug || 'Not provided'}\nIndustry Tags: ${payload.industry_tags.join(', ') || 'Not provided'}\nWebsite: ${payload.business_website_url || payload.website || 'Not provided'}\nSource Page: ${payload.source_page}\nContact: ${payload.full_name}\nEmail: ${payload.email}\nPhone: ${payload.phone}\nMonthly Leads: ${payload.monthly_leads}\nChallenge: ${payload.biggest_issue}`,
-            start_time: bookingDateTime,
-            duration_minutes: 15,
-          }),
-      },
-    ];
-
-    for (const effect of sideEffects) {
-      try {
-        await effect.run();
-        await logCommunicationEvent(base44, {
-          lead_id: lead.id,
-          channel: effect.channel,
-          direction: effect.channel === 'internal' ? 'system' : 'outbound',
-          event_type: effect.eventTypeSuccess,
-          provider: effect.provider,
-          status: effect.channel === 'internal' ? 'processed' : 'sent',
-          subject: effect.subject,
-          message_body: effect.message,
-          metadata: {
-            effect: effect.name,
-            source: payload.source || LEAD_SOURCE,
-            source_page: payload.source_page,
-            intake_type: INTAKE_TYPE,
-          },
-        });
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'failed';
-        warnings.push(`${effect.name}:${message}`);
-        await logCommunicationEvent(base44, {
-          lead_id: lead.id,
-          channel: effect.channel,
-          direction: effect.channel === 'internal' ? 'system' : 'outbound',
-          event_type: effect.eventTypeFailure,
-          provider: effect.provider,
-          status: 'failed',
-          subject: effect.subject,
-          message_body: effect.message,
-          error_message: message,
-          metadata: {
-            effect: effect.name,
-            source: payload.source || LEAD_SOURCE,
-            source_page: payload.source_page,
-            intake_type: INTAKE_TYPE,
-          },
-        });
-      }
+    for (const [target, result] of [["customer_receipt", customerEmail], ["admin_notification", adminEmail]] as const) {
+      await safeLog(base44, {
+        lead_id: lead.id,
+        channel: "email",
+        direction: "outbound",
+        event_type: result.sent ? "email_sent" : "email_failed",
+        provider: "resend",
+        status: result.sent ? "sent" : "failed",
+        subject: target === "customer_receipt" ? "Audit time request received" : "Audit request admin notification",
+        message_body: requestedTime,
+        error_message: result.sent ? undefined : result.reason,
+        metadata_json: JSON.stringify({ target, request_id: requestId, request_status: "requested" }),
+      });
     }
+
+    const warnings = [
+      !customerEmail.sent ? `customer_receipt:${customerEmail.reason}` : "",
+      !adminEmail.sent ? `admin_notification:${adminEmail.reason}` : "",
+      "calendar_event:pending_manual_confirmation",
+    ].filter(Boolean);
 
     return secureJson({
       success: true,
       lead_id: lead.id,
-      message: payload.industry_slug ? `Free ${auditName} scheduled successfully` : DEFAULT_AUDIT_SUCCESS_MESSAGE,
-      industry_slug: payload.industry_slug,
-      industry_tags: payload.industry_tags,
+      demo_request_id: demoRequest.id,
+      action: existing ? "updated" : "created",
+      request_status: "requested",
+      calendar_created: false,
+      requested_date: payload.scheduled_date,
+      requested_time: payload.scheduled_time,
+      time_zone: TIME_ZONE,
+      time_zone_label: TIME_ZONE_LABEL,
+      message: "Preferred audit time received. ClientSurge will confirm it within one business day.",
+      request_id: requestId,
       warnings,
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to schedule Free Automation Audit';
-    return secureJson({ error: message }, { status: error.status || 500 });
+    const status = Number((error as { status?: number })?.status || 500);
+    const message = error instanceof Error ? error.message : "Failed to record audit time request";
+    console.error("[scheduleDemoBooking]", requestId, message);
+    return secureJson({ error: message, request_id: requestId }, { status });
   }
 });
