@@ -1,0 +1,3 @@
+Trigger Base44 production publish after GA4 conversion integrity merge.
+Requested: 2026-07-12
+Source merge: 37ff6cb19355d182bcfade4df9158001bd0d1284
