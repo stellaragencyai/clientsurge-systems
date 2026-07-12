@@ -116,7 +116,7 @@ function removeResidualDirectoryBlocks(html = "") {
   );
 
   next = next.replace(
-    /<(?:p|div|span)\b[^>]*>[^<]*(?:ClientSurge Systems manages\s+\d+\s+data types|manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|Premium AI-driven automation systems built to increase bookings)[\s\S]*?<\/(?:p|div|span)>/gi,
+    /<(p|div|span)\b[^>]*>[^<]*(?:ClientSurge Systems manages\s+\d+\s+data types|manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|Premium AI-driven automation systems built to increase bookings)[\s\S]*?<\/\1>/gi,
     "",
   );
 
@@ -161,6 +161,10 @@ export async function sanitizeHtmlResponse(request, response, options = {}) {
   const result = sanitizeHtmlString(originalHtml, pathname);
   const headers = new Headers(response.headers);
 
+  headers.delete("content-length");
+  headers.delete("content-encoding");
+  headers.delete("etag");
+  headers.delete("last-modified");
   headers.set(
     SANITIZED_HEADER,
     result.exposureRemaining
