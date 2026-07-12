@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { FAQ_ITEMS } from "./FAQData";
+import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
 export default function FAQSection() {
   const [openIndex, setOpenIndex] = useState(null);
@@ -15,9 +16,10 @@ export default function FAQSection() {
         <div className="grid grid-cols-1 lg:grid-cols-[0.85fr,1.15fr] gap-10 lg:gap-16 items-start">
           {/* Left Column — Heading & Contact */}
           <div className="lg:sticky lg:top-28">
-            <h2 className="font-titles text-4xl md:text-5xl font-black tracking-tight leading-[1.08] text-gray-950 max-w-md">
-              Answers to Your Questions
-            </h2>
+            <CSSectionHeader
+              title="Answers to Your Questions"
+              align="left"
+            />
 
             <p className="text-sm leading-relaxed text-muted-foreground max-w-sm mt-8">
               If you have any other questions, feel free to reach out to us at{" "}
