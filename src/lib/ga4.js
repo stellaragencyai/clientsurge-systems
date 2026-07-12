@@ -49,6 +49,28 @@ function readStorageValue(win, key) {
   }
 }
 
+function getStoredConsentValue(win) {
+  for (const key of CONSENT_STORAGE_KEYS) {
+    const value = readStorageValue(win, key);
+    if (value) return value;
+  }
+  return "";
+}
+
+function normalizeConsentInput(consent) {
+  if (typeof consent === "boolean") {
+    return {
+      analyticsGranted: consent,
+      adsGranted: consent,
+    };
+  }
+
+  return {
+    analyticsGranted: consent?.analyticsGranted === true || consent?.analytics === true,
+    adsGranted: consent?.adsGranted === true || consent?.ads === true,
+  };
+}
+
 function getGa4State(win) {
   if (!win.__clientsurgeGa4State) {
     win.__clientsurgeGa4State = {
@@ -130,16 +152,27 @@ export function getGa4MeasurementId(env = getDefaultEnv()) {
   return GA4_MEASUREMENT_ID_PATTERN.test(measurementId) ? measurementId : "";
 }
 
-export function hasGrantedAnalyticsConsent(win = globalThis.window) {
-  return CONSENT_STORAGE_KEYS.some((key) => readStorageValue(win, key) === "accepted");
+export function getGa4ConsentState(win = globalThis.window) {
+  const storedValue = getStoredConsentValue(win);
+  return {
+    analyticsGranted: storedValue === "accepted" || storedValue === "analytics_only",
+    adsGranted: storedValue === "accepted",
+  };
 }
 
-export function updateGa4Consent(granted, win = globalThis.window) {
+export function hasGrantedAnalyticsConsent(win = globalThis.window) {
+  return getGa4ConsentState(win).analyticsGranted;
+}
+
+export function updateGa4Consent(consent, win = globalThis.window) {
   if (!win || typeof win.gtag !== "function") return false;
 
+  const { analyticsGranted, adsGranted } = normalizeConsentInput(consent);
   win.gtag("consent", "update", {
-    analytics_storage: granted ? "granted" : "denied",
-    ad_storage: granted ? "granted" : "denied",
+    analytics_storage: analyticsGranted ? "granted" : "denied",
+    ad_storage: adsGranted ? "granted" : "denied",
+    ad_user_data: adsGranted ? "granted" : "denied",
+    ad_personalization: adsGranted ? "granted" : "denied",
   });
 
   return true;
@@ -225,7 +258,7 @@ export function installGa4({
   documentRef = globalThis.document,
   windowRef = globalThis.window,
   measurementId = getGa4MeasurementId(),
-  consentGranted = hasGrantedAnalyticsConsent(windowRef),
+  consentState = getGa4ConsentState(windowRef),
 } = {}) {
   if (!documentRef || !windowRef) {
     return { installed: false, reason: "missing_browser_context" };
@@ -235,6 +268,7 @@ export function installGa4({
     return { installed: false, reason: "missing_measurement_id" };
   }
 
+  const normalizedConsent = normalizeConsentInput(consentState);
   const state = getGa4State(windowRef);
   const existingScript = documentRef.querySelector(
     `script[data-ga4-measurement-id="${measurementId}"], script[src*="googletagmanager.com/gtag/js?id=${measurementId}"]`
@@ -249,8 +283,10 @@ export function installGa4({
     };
 
   windowRef.gtag("consent", "default", {
-    analytics_storage: consentGranted ? "granted" : "denied",
-    ad_storage: consentGranted ? "granted" : "denied",
+    analytics_storage: normalizedConsent.analyticsGranted ? "granted" : "denied",
+    ad_storage: normalizedConsent.adsGranted ? "granted" : "denied",
+    ad_user_data: normalizedConsent.adsGranted ? "granted" : "denied",
+    ad_personalization: normalizedConsent.adsGranted ? "granted" : "denied",
   });
 
   if (!state.installed) {
@@ -279,6 +315,6 @@ export function installGa4({
     installed: true,
     measurementId,
     alreadyInstalled: Boolean(existingScript || existingConfig),
-    consentGranted,
+    consentState: normalizedConsent,
   };
 }
