@@ -1,3 +1,4 @@
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -14,6 +15,15 @@ import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import CSButton from "@/components/design-system/CSButton";
 import IndustryContextBanner from "./IndustryContextBanner";
 
+const COVERAGE_STAGES = [
+  "Lead",
+  "Response",
+  "Follow-Up",
+  "Booking",
+  "Reactivation",
+  "Reviews",
+];
+
 const PACKAGES = [
   {
     name: "Starter",
@@ -25,6 +35,7 @@ const PACKAGES = [
     price: "$497",
     setupPrice: "$797",
     automationCount: 2,
+    coverageCount: 2,
     websiteScope: "Connects to your existing site",
     hostingScope: "Uses your current hosting",
     qaScope: "Launch-Proof QA: lead path + response flow tested",
@@ -49,6 +60,7 @@ const PACKAGES = [
     price: "$997",
     setupPrice: "$1,297",
     automationCount: 4,
+    coverageCount: 4,
     websiteScope: "Connects to your existing site",
     hostingScope: "Uses your current hosting",
     qaScope: "Launch-Proof QA: lead path, response flow, booking handoff + proof logs",
@@ -75,6 +87,7 @@ const PACKAGES = [
     price: "$1,997",
     setupPrice: "$2,497",
     automationCount: 6,
+    coverageCount: 6,
     websiteScope: "Full website build & design included",
     hostingScope: "Hosting included for your website",
     qaScope: "Launch-Proof QA + proof logs + priority setup",
@@ -95,16 +108,200 @@ const PACKAGES = [
   },
 ];
 
+const DEFAULT_PACKAGE_ID = "growth_system";
 const getPackageCheckoutPath = (packageId) => `/product-signup?package=${encodeURIComponent(packageId)}`;
 
 export default function ThreeSystemsSection() {
+  const sectionRef = useRef(null);
+  const [activePackageId, setActivePackageId] = useState(DEFAULT_PACKAGE_ID);
+  const [motionReady, setMotionReady] = useState(false);
+  const [hasEntered, setHasEntered] = useState(false);
+
+  const activePackage = PACKAGES.find((pkg) => pkg.packageId === activePackageId) || PACKAGES[1];
+
+  useEffect(() => {
+    setMotionReady(true);
+
+    const section = sectionRef.current;
+    if (!section || typeof IntersectionObserver === "undefined") {
+      setHasEntered(true);
+      return undefined;
+    }
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        setHasEntered(true);
+        observer.disconnect();
+      },
+      {
+        threshold: 0.16,
+        rootMargin: "0px 0px -8% 0px",
+      },
+    );
+
+    observer.observe(section);
+    return () => observer.disconnect();
+  }, []);
+
+  const resetCoverage = () => setActivePackageId(DEFAULT_PACKAGE_ID);
+
   return (
-    <section id="pricing" className="nebula-pricing pt-10 md:pt-14 pb-16 md:pb-24 px-5 sm:px-6 overflow-visible">
+    <section
+      ref={sectionRef}
+      id="pricing"
+      className="nebula-pricing pt-10 md:pt-14 pb-16 md:pb-24 px-5 sm:px-6 overflow-visible"
+    >
       <style>{`
         .nebula-pricing {
           background:
             radial-gradient(circle at 50% 15%, rgba(0,174,239,0.12), transparent 30%),
             linear-gradient(180deg, #f8fdff 0%, #f3fbff 54%, #ffffff 100%);
+        }
+        .csp-coverage-shell {
+          max-width: 1040px;
+          margin: 0 auto 40px;
+          padding: 20px 24px 18px;
+          border: 1px solid rgba(0,174,239,0.16);
+          border-radius: 18px;
+          background: rgba(255,255,255,0.76);
+          box-shadow: 0 14px 42px rgba(15,23,42,0.055), inset 0 1px 0 rgba(255,255,255,0.9);
+          backdrop-filter: blur(10px);
+          -webkit-backdrop-filter: blur(10px);
+        }
+        .csp-coverage-shell.is-motion-ready {
+          transition: opacity 0.58s cubic-bezier(0.16, 1, 0.3, 1), transform 0.58s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .csp-coverage-shell.is-motion-ready:not(.is-visible) {
+          opacity: 0;
+          transform: translateY(16px);
+        }
+        .csp-coverage-shell.is-motion-ready.is-visible {
+          opacity: 1;
+          transform: translateY(0);
+        }
+        .csp-coverage-meta {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          gap: 16px;
+          margin-bottom: 16px;
+        }
+        .csp-coverage-kicker {
+          color: #53637c;
+          font-size: 0.7rem;
+          font-weight: 800;
+          letter-spacing: 0.14em;
+          line-height: 1;
+          text-transform: uppercase;
+        }
+        .csp-coverage-plan {
+          color: #0079c1;
+          font-size: 0.78rem;
+          font-weight: 800;
+          line-height: 1.2;
+          transition: opacity 0.2s ease;
+        }
+        .csp-coverage-scroll {
+          overflow-x: auto;
+          scrollbar-width: none;
+        }
+        .csp-coverage-scroll::-webkit-scrollbar {
+          display: none;
+        }
+        .csp-coverage-track {
+          display: grid;
+          min-width: 650px;
+          grid-template-columns: repeat(6, minmax(96px, 1fr));
+          padding-top: 2px;
+        }
+        .csp-coverage-stage {
+          position: relative;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 8px;
+          color: #8a97aa;
+          font-size: 0.69rem;
+          font-weight: 700;
+          line-height: 1.2;
+          text-align: center;
+          transition: color 0.32s ease;
+        }
+        .csp-coverage-node {
+          position: relative;
+          z-index: 2;
+          width: 20px;
+          height: 20px;
+          border: 2px solid rgba(96,113,143,0.24);
+          border-radius: 999px;
+          background: #ffffff;
+          box-shadow: 0 3px 10px rgba(15,23,42,0.07);
+          transition: border-color 0.32s ease, box-shadow 0.32s ease, transform 0.32s ease;
+        }
+        .csp-coverage-node::after {
+          content: "";
+          position: absolute;
+          inset: 4px;
+          border-radius: inherit;
+          background: #00AEEF;
+          opacity: 0;
+          transform: scale(0.25);
+          transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .csp-coverage-segment {
+          position: absolute;
+          z-index: 1;
+          top: 9px;
+          left: calc(50% + 10px);
+          width: calc(100% - 20px);
+          height: 2px;
+          overflow: hidden;
+          background: rgba(96,113,143,0.17);
+        }
+        .csp-coverage-segment::after {
+          content: "";
+          position: absolute;
+          inset: 0;
+          background: linear-gradient(90deg, #00AEEF 0%, #0079c1 100%);
+          transform: scaleX(0);
+          transform-origin: left center;
+          transition: transform 0.44s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+        .csp-coverage-stage.is-active {
+          color: #263a58;
+        }
+        .csp-coverage-stage.is-active .csp-coverage-node {
+          border-color: rgba(0,174,239,0.72);
+          box-shadow: 0 0 0 4px rgba(0,174,239,0.09), 0 5px 14px rgba(0,121,193,0.15);
+          transform: translateY(-1px);
+        }
+        .csp-coverage-stage.is-active .csp-coverage-node::after {
+          opacity: 1;
+          transform: scale(1);
+        }
+        .csp-coverage-segment.is-active::after {
+          transform: scaleX(1);
+        }
+        .csp-card-stage {
+          position: relative;
+          display: flex;
+          height: 100%;
+          flex-direction: column;
+        }
+        .csp-card-stage.is-motion-ready {
+          transition:
+            opacity 0.68s cubic-bezier(0.16, 1, 0.3, 1),
+            transform 0.68s cubic-bezier(0.16, 1, 0.3, 1);
+          transition-delay: var(--csp-delay, 0ms);
+        }
+        .csp-card-stage.is-motion-ready:not(.is-visible) {
+          opacity: 0;
+          transform: translateY(26px) scale(0.992);
+        }
+        .csp-card-stage.is-motion-ready.is-visible {
+          opacity: 1;
+          transform: translateY(0) scale(1);
         }
         .csp-card {
           position: relative;
@@ -289,6 +486,9 @@ export default function ThreeSystemsSection() {
           transform: scale(0.98);
         }
         @media (max-width: 1023px) {
+          .csp-coverage-shell {
+            margin-bottom: 34px;
+          }
           .csp-card {
             min-height: 840px;
           }
@@ -300,6 +500,20 @@ export default function ThreeSystemsSection() {
           }
         }
         @media (max-width: 767px) {
+          .csp-coverage-shell {
+            margin-bottom: 28px;
+            padding: 18px 16px 16px;
+            border-radius: 16px;
+          }
+          .csp-coverage-meta {
+            align-items: flex-start;
+            flex-direction: column;
+            gap: 7px;
+            margin-bottom: 14px;
+          }
+          .csp-coverage-track {
+            min-width: 620px;
+          }
           .csp-card {
             min-height: auto;
           }
@@ -333,10 +547,21 @@ export default function ThreeSystemsSection() {
           }
         }
         @media (prefers-reduced-motion: reduce) {
+          .csp-coverage-shell,
+          .csp-coverage-stage,
+          .csp-coverage-node,
+          .csp-coverage-node::after,
+          .csp-coverage-segment::after,
+          .csp-card-stage,
           .csp-card,
           .csp-cta,
           .csp-cta svg {
             transition: none !important;
+          }
+          .csp-coverage-shell,
+          .csp-card-stage {
+            opacity: 1 !important;
+            transform: none !important;
           }
           .csp-card:hover,
           .csp-cta:hover,
@@ -362,12 +587,60 @@ export default function ThreeSystemsSection() {
           </p>
         </div>
 
-        <div className="relative pt-8">
+        <div
+          className={`csp-coverage-shell ${motionReady ? "is-motion-ready" : ""} ${hasEntered ? "is-visible" : ""}`}
+          aria-label={`${activePackage.title} system coverage`}
+        >
+          <div className="csp-coverage-meta">
+            <span className="csp-coverage-kicker">System coverage</span>
+            <span className="csp-coverage-plan">{activePackage.title}</span>
+          </div>
+          <div className="csp-coverage-scroll">
+            <div className="csp-coverage-track">
+              {COVERAGE_STAGES.map((stage, index) => {
+                const isActive = index < activePackage.coverageCount;
+                const segmentIsActive = index < activePackage.coverageCount - 1;
+
+                return (
+                  <div
+                    key={stage}
+                    className={`csp-coverage-stage ${isActive ? "is-active" : ""}`}
+                    aria-current={isActive ? "step" : undefined}
+                  >
+                    <span className="csp-coverage-node" aria-hidden="true" />
+                    <span>{stage}</span>
+                    {index < COVERAGE_STAGES.length - 1 && (
+                      <span
+                        className={`csp-coverage-segment ${segmentIsActive ? "is-active" : ""}`}
+                        aria-hidden="true"
+                      />
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+
+        <div className="relative pt-1">
           <div className="grid grid-cols-1 md:grid-cols-3 gap-7 lg:gap-8 items-stretch">
-            {PACKAGES.map((pkg) => {
+            {PACKAGES.map((pkg, index) => {
               const isGrowth = pkg.highlight;
+              const isVisible = hasEntered;
+
               return (
-                <div key={pkg.name} className="relative flex h-full flex-col">
+                <div
+                  key={pkg.name}
+                  className={`csp-card-stage ${motionReady ? "is-motion-ready" : ""} ${isVisible ? "is-visible" : ""}`}
+                  style={{ ["--csp-delay"]: `${index * 110}ms` }}
+                  onMouseEnter={() => setActivePackageId(pkg.packageId)}
+                  onMouseLeave={resetCoverage}
+                  onFocusCapture={() => setActivePackageId(pkg.packageId)}
+                  onBlurCapture={(event) => {
+                    if (!event.currentTarget.contains(event.relatedTarget)) resetCoverage();
+                  }}
+                  onTouchStart={() => setActivePackageId(pkg.packageId)}
+                >
                   {isGrowth && (
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
                       <span
