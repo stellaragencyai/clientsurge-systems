@@ -6,12 +6,19 @@ if (typeof window !== "undefined") {
   installGa4CheckoutObserver(window);
 }
 
+function frontendEventName(eventName) {
+  // Stripe webhooks are the source of truth for revenue. The browser success
+  // page remains useful operational proof, but it must not create a second GA4
+  // purchase key event for the same transaction.
+  return eventName === "purchase" ? "purchase_client_confirmation" : eventName;
+}
+
 export function trackEvent(eventName, params = {}) {
   if (typeof window === "undefined") return false;
 
   try {
     const enrichedParams = { ...getUtmForAnalytics(), ...params };
-    return trackGa4Event(eventName, enrichedParams, window);
+    return trackGa4Event(frontendEventName(eventName), enrichedParams, window);
   } catch (error) {
     console.warn("[analytics] trackEvent failed:", error?.message);
     return false;
