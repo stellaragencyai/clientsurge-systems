@@ -1,5 +1,10 @@
 import { createClient } from '@base44/sdk';
 import { appParams } from '@/lib/app-params';
+import {
+  trackAuditRequestSubmitted,
+  trackLeadSubmit,
+  trackSuccessfulFormSubmit,
+} from '@/utils/ga4Events';
 
 const { appId, token, functionsVersion, appBaseUrl } = appParams;
 
@@ -66,7 +71,52 @@ function createLocalPreviewClient() {
   };
 }
 
-//Create a client with authentication required
+function trackSuccessfulFunctionOutcome(functionName, payload, result) {
+  const data = result?.data && typeof result.data === "object" ? result.data : result;
+  if (functionName !== "scheduleDemoBooking" || data?.success === false) return;
+
+  const industry = payload?.industry || payload?.business_type || "unknown";
+  const source = payload?.source_page || "/book";
+
+  trackSuccessfulFormSubmit({
+    form_id: "audit_request_form",
+    page_path: source,
+    source: "audit_request",
+  });
+  trackAuditRequestSubmitted({
+    industry,
+    scheduled_date: payload?.scheduled_date,
+    source,
+  });
+  trackLeadSubmit({
+    industry,
+    has_website: Boolean(payload?.website || payload?.business_website_url),
+    lead_source: "audit_request",
+  });
+}
+
+function addFunctionOutcomeTracking(client) {
+  const functions = client?.functions;
+  if (!functions || typeof functions.invoke !== "function") return client;
+
+  const originalInvoke = functions.invoke.bind(functions);
+  try {
+    functions.invoke = async (functionName, payload = {}) => {
+      const result = await originalInvoke(functionName, payload);
+      try {
+        trackSuccessfulFunctionOutcome(functionName, payload, result);
+      } catch (error) {
+        console.warn("[base44Client] outcome tracking failed:", error?.message);
+      }
+      return result;
+    };
+  } catch (error) {
+    console.warn("[base44Client] unable to attach function outcome tracking:", error?.message);
+  }
+
+  return client;
+}
+
 const sdkClient = isLocalPreview() ? createLocalPreviewClient() : createClient({
   appId,
   token,
@@ -76,4 +126,4 @@ const sdkClient = isLocalPreview() ? createLocalPreviewClient() : createClient({
   appBaseUrl
 });
 
-export const base44 = sdkClient;
+export const base44 = addFunctionOutcomeTracking(sdkClient);
