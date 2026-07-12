@@ -1,504 +1,463 @@
-import { secureJson } from "../_shared/response.ts";
-/**
- * sendEmailCampaign — sends an email campaign to segmented leads.
- *
- * Payload:
- *  - campaign_id: the EmailCampaign to send
- *  - preview_only: if true, returns recipient count without sending
- *
- * Flow:
- *  1. Load campaign and validate status
- *  2. Apply segment filters to get matching leads
- *  3. Create EmailCampaignRecipient records
- *  4. Send emails via Resend with tracking
- *  5. Update campaign metrics
- */
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { createEmailUnsubscribeToken } from "../_shared/emailUnsubscribe.ts";
 
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
+const MAX_CAMPAIGN_RECIPIENTS = 50;
+const DEFAULT_TEST_BATCH_SIZE = 25;
+const RECENT_CONTACT_WINDOW_MS = 14 * 24 * 60 * 60 * 1000;
+const SEND_DELAY_MS = Math.max(0, Number(Deno.env.get("EMAIL_CAMPAIGN_SEND_DELAY_MS") || "125"));
+const ALLOWED_INDUSTRY_SEQUENCES = new Set(["roofing", "hvac", "dental", "med_spa", "plumbing"]);
+const ADVANCED_CRM_STAGES = new Set(["Audit Booked", "Audit Completed", "Proposal Sent", "Won Pending Payment", "Won"]);
+const TERMINAL_SUPPRESSION_STATUSES = new Set(["Booked", "Closed"]);
+const TERMINAL_SUPPRESSION_STAGES = new Set(["Lost", "Won", "Audit Completed"]);
+const TERMINAL_SUPPRESSION_STATES = new Set(["BOOKED", "WON"]);
+const TERMINAL_OUTREACH_STATUSES = new Set(["replied", "booked", "unsubscribed", "bounced", "do_not_contact"]);
+const DISALLOWED_QUALITY_STATUSES = new Set(["quarantine_candidate", "quarantined", "duplicate_candidate"]);
+const TEST_SIGNAL_PATTERN = /(?:^|\b)(test|testing|demo|sample|smoke|internal)(?:\b|$)/i;
 
-const BATCH_SIZE = 25;
-const MAX_LEADS = 5000;
-const MAX_SAFE_TEST_RECIPIENTS = 50;
-const DEFAULT_FOLLOW_UP_DAYS = 3;
-const RECENT_CONTACT_WINDOW_DAYS = 14;
-const TERMINAL_SUPPRESSION_STATUSES = new Set(["Closed", "Won", "Lost"]);
-const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
-
-function normalizeToken(value) {
-  return String(value || "").trim().toLowerCase();
+function secureJson(data: Record<string, unknown>, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      "Cache-Control": "no-store",
+      "X-Content-Type-Options": "nosniff",
+      "X-Frame-Options": "DENY",
+    },
+  });
 }
 
-function toArray(value) {
-  return Array.isArray(value) ? value : [];
+function clean(value: unknown, max = 1000) {
+  return String(value || "").trim().slice(0, max);
 }
 
-function hasIndustrySegmentation(filters = {}) {
-  return toArray(filters.industries).length > 0 || toArray(filters.tags).length > 0;
+function normalizeEmail(value: unknown) {
+  return clean(value, 320).toLowerCase();
 }
 
-function leadIndustryTokens(lead) {
-  return [
-    lead.industry,
-    lead.business_type,
-    lead.niche,
-    ...toArray(lead.industry_tags),
-  ].map(normalizeToken).filter(Boolean);
+function isValidEmail(value: unknown) {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizeEmail(value));
 }
 
-function matchesIndustry(lead, industries = []) {
-  if (!industries.length) return true;
-  const requested = industries.map(normalizeToken).filter(Boolean);
-  const leadTokens = leadIndustryTokens(lead);
-  return requested.some((industry) =>
-    leadTokens.some((token) => token === industry || token.includes(industry) || industry.includes(token))
+function escapeHtml(value: unknown) {
+  return String(value ?? "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+function replaceTokens(template: string, lead: Record<string, unknown>) {
+  const fullName = clean(lead.full_name || lead.owner_contact_name || lead.contact_name || "", 200);
+  const firstName = clean(lead.first_name || fullName.split(/\s+/)[0] || "there", 100);
+  const businessName = clean(lead.business_name || "your business", 240);
+  const industry = clean(lead.industry || lead.business_type || "local service", 160);
+  const replacements: Record<string, string> = {
+    "{name}": fullName || firstName,
+    "{{name}}": fullName || firstName,
+    "{first_name}": firstName,
+    "{{first_name}}": firstName,
+    "{business_name}": businessName,
+    "{{business_name}}": businessName,
+    "{industry}": industry,
+    "{{industry}}": industry,
+  };
+  return Object.entries(replacements).reduce(
+    (output, [token, value]) => output.split(token).join(value),
+    String(template || ""),
   );
 }
 
-function isSuppressed(lead) {
-  if (lead.do_not_contact || lead.dnc || lead.email_unsubscribed || lead.unsubscribed) return true;
-  if (lead.email_bounced || lead.bounced || lead.hard_bounced) return true;
-  if (TERMINAL_SUPPRESSION_STATUSES.has(lead.status) || TERMINAL_SUPPRESSION_STATUSES.has(lead.crm_stage)) return true;
-  if (lead.outreach_status === "do_not_contact") return true;
-  return false;
+function industryKey(value: unknown) {
+  const normalized = clean(value, 160)
+    .toLowerCase()
+    .replace(/&/g, "and")
+    .replace(/[^a-z0-9]+/g, "_")
+    .replace(/^_+|_+$/g, "");
+  if (normalized.includes("roof")) return "roofing";
+  if (normalized.includes("hvac")) return "hvac";
+  if (normalized.includes("plumb")) return "plumbing";
+  if (normalized.includes("dental") || normalized.includes("orthodont")) return "dental";
+  if (normalized.includes("med_spa") || normalized.includes("aesthetic")) return "med_spa";
+  return normalized;
 }
 
-function hasUsableWebsite(lead) {
-  return Boolean(lead.website || lead.business_website || lead.domain);
+function leadTags(lead: Record<string, unknown>) {
+  return [
+    ...(Array.isArray(lead.tags) ? lead.tags : []),
+    ...(Array.isArray(lead.industry_tags) ? lead.industry_tags : []),
+    lead.crm_tag,
+  ].map((value) => clean(value, 100).toLowerCase()).filter(Boolean);
 }
 
-function normalizeEmail(value) {
-  return String(value || "").trim().toLowerCase();
+function websiteModeMatches(lead: Record<string, unknown>, mode: string) {
+  const website = clean(lead.website || lead.website_url || lead.canonical_website_url || "", 500);
+  if (mode === "no_website") return !website;
+  if (mode === "any") return true;
+  return Boolean(website);
 }
 
-function maskEmail(value) {
-  const email = normalizeEmail(value);
-  if (!email || !email.includes("@")) return "";
-  const [local, domain] = email.split("@");
-  return `${local.slice(0, 1) || "*"}***@${domain}`;
+function isTestOrInternalLead(lead: Record<string, unknown>) {
+  const email = normalizeEmail(lead.email);
+  const signals = [
+    lead.business_name,
+    lead.full_name,
+    lead.source,
+    lead.intake_type,
+    lead.industry,
+    ...(Array.isArray(lead.data_quality_flags) ? lead.data_quality_flags : []),
+  ].map((value) => clean(value, 240)).join(" ");
+  return TEST_SIGNAL_PATTERN.test(signals) ||
+    /@(example|test|invalid|localhost)\./i.test(email) ||
+    String(lead.industry || "") === "Internal Test / Excluded";
 }
 
-function maskPhone(value) {
-  const digits = String(value || "").replace(/\D/g, "");
-  if (!digits) return "";
-  return `***-***-${digits.slice(-4).padStart(4, "*")}`;
-}
-
-function parseDate(value) {
-  const timestamp = Date.parse(value || "");
-  return Number.isFinite(timestamp) ? timestamp : null;
-}
-
-function wasRecentlyContacted(lead, windowDays = RECENT_CONTACT_WINDOW_DAYS) {
-  const timestamp = parseDate(lead.last_contacted_at) || parseDate(lead.last_contacted_date);
-  if (!timestamp) return false;
-  const cutoff = Date.now() - windowDays * 24 * 60 * 60 * 1000;
-  return timestamp >= cutoff;
-}
-
-function getSuppressionReason(lead) {
-  if (lead.do_not_contact || lead.dnc || lead.outreach_status === "do_not_contact") return "do_not_contact";
-  if (lead.email_unsubscribed || lead.unsubscribed) return "unsubscribed";
-  if (lead.email_bounced || lead.bounced || lead.hard_bounced) return "bounced";
-  if (TERMINAL_SUPPRESSION_STATUSES.has(lead.status) || TERMINAL_SUPPRESSION_STATUSES.has(lead.crm_stage)) return "closed_won_lost";
+function suppressionReason(lead: Record<string, unknown>, filters: Record<string, unknown>) {
+  const email = normalizeEmail(lead.email);
+  if (!isValidEmail(email)) return "missing_or_invalid_email";
+  if (isTestOrInternalLead(lead)) return "internal_or_test_record";
+  if (lead.do_not_contact) return "do_not_contact";
+  if (lead.email_unsubscribed) return "email_unsubscribed";
+  if (lead.email_bounced || lead.hard_bounced) return "email_bounced";
+  if (TERMINAL_SUPPRESSION_STATUSES.has(String(lead.status || ""))) return "terminal_status";
+  if (TERMINAL_SUPPRESSION_STAGES.has(String(lead.crm_stage || ""))) return "terminal_crm_stage";
+  if (TERMINAL_SUPPRESSION_STATES.has(String(lead.lead_state || ""))) return "terminal_lead_state";
+  if (TERMINAL_OUTREACH_STATUSES.has(String(lead.outreach_status || ""))) return "terminal_outreach_status";
+  if (DISALLOWED_QUALITY_STATUSES.has(String(lead.quality_review_status || ""))) return "quality_quarantine";
+  if (String(lead.industry || "") === "Needs Manual Review") return "industry_manual_review";
+  if (filters.outbound_ready_only !== false && String(lead.quality_review_status || "") !== "verified_outbound_ready") {
+    return "not_verified_outbound_ready";
+  }
+  const lastContactedAt = lead.last_contacted_at ? new Date(String(lead.last_contacted_at)).getTime() : 0;
+  if (lastContactedAt > 0 && Date.now() - lastContactedAt < RECENT_CONTACT_WINDOW_MS) {
+    return "recently_contacted";
+  }
+  const websiteMode = clean(filters.website_mode || "has_website", 40);
+  if (!websiteModeMatches(lead, websiteMode)) return websiteMode === "no_website" ? "has_website" : "missing_website";
   return "";
 }
 
-function getRecipientLimit(campaign) {
-  const requested = Number(campaign?.max_recipients ?? campaign?.segment_filters?.max_recipients ?? MAX_SAFE_TEST_RECIPIENTS);
-  if (!Number.isFinite(requested) || requested < 1) return MAX_SAFE_TEST_RECIPIENTS;
-  return Math.min(Math.floor(requested), MAX_SAFE_TEST_RECIPIENTS);
-}
-
-function getCampaignSendGate() {
-  const campaignEnabled = String(Deno.env.get("EMAIL_CAMPAIGN_ENABLED") || "").trim().toLowerCase() === "true";
-  const proofStatus = String(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "").trim().toLowerCase();
-  const proofReady = PROOF_READY_VALUES.has(proofStatus);
-
-  if (!campaignEnabled) {
-    return {
-      ok: false,
-      reason: "EMAIL_CAMPAIGN_ENABLED must be true before campaign sends.",
-      proof_status: proofStatus || "missing",
-    };
-  }
-  if (!proofReady) {
-    return {
-      ok: false,
-      reason: "EMAIL_DELIVERABILITY_PROOF_STATUS must be verified before campaign sends.",
-      proof_status: proofStatus || "missing",
-    };
-  }
-  return { ok: true, proof_status: proofStatus };
-}
-
-function followUpDateIso(campaign) {
-  const days = Number(campaign?.follow_up_days ?? DEFAULT_FOLLOW_UP_DAYS);
-  const safeDays = Number.isFinite(days) && days > 0 && days <= 14 ? days : DEFAULT_FOLLOW_UP_DAYS;
-  const date = new Date();
-  date.setUTCDate(date.getUTCDate() + safeDays);
-  return date.toISOString();
-}
-
-function appendEmailCompliance(html, text, unsubscribeEmail) {
-  const unsubscribeLine = `\n\nTo unsubscribe, reply "unsubscribe" or email ${unsubscribeEmail}.`;
-  const htmlFooter = `<p style="margin-top:24px;color:#667085;font-size:12px;line-height:1.5">To unsubscribe, reply "unsubscribe" or email <a href="mailto:${unsubscribeEmail}?subject=Unsubscribe">${unsubscribeEmail}</a>.</p>`;
-  return {
-    html: html ? `${html}${htmlFooter}` : undefined,
-    text: text ? `${text}${unsubscribeLine}` : unsubscribeLine.trim(),
-  };
-}
-
-function matchesFilters(lead, filters) {
-  if (!filters) return true;
-  
-  if (filters.statuses?.length > 0 && !filters.statuses.includes(lead.status)) {
-    return false;
-  }
-  if (filters.sources?.length > 0 && !filters.sources.includes(lead.source)) {
-    return false;
-  }
-  if (!matchesIndustry(lead, filters.industries || [])) {
-    return false;
-  }
-  if (filters.lead_score_min != null && (lead.lead_score || 0) < filters.lead_score_min) {
-    return false;
-  }
-  if (filters.lead_score_max != null && (lead.lead_score || 0) > filters.lead_score_max) {
-    return false;
-  }
-  // Tag matching (any tag matches)
-  if (filters.tags?.length > 0) {
-    const leadTags = lead.industry_tags || [];
-    if (!filters.tags.some(tag => leadTags.includes(tag))) {
-      return false;
-    }
-  }
+function matchesCampaignFilters(lead: Record<string, unknown>, filters: Record<string, unknown>, industrySequence: string) {
+  const statuses = Array.isArray(filters.statuses) ? filters.statuses.map(String) : [];
+  if (statuses.length && !statuses.includes(String(lead.status || ""))) return false;
+  const sources = Array.isArray(filters.sources) ? filters.sources.map(String) : [];
+  if (sources.length && !sources.includes(String(lead.source || ""))) return false;
+  const industries = Array.isArray(filters.industries) ? filters.industries.map(industryKey) : [];
+  const leadIndustry = industryKey(lead.industry || lead.business_type);
+  if (industries.length && !industries.includes(leadIndustry)) return false;
+  if (industrySequence && leadIndustry !== industrySequence && !leadTags(lead).includes(industrySequence)) return false;
+  const minimumScore = Number(filters.lead_score_min ?? 0);
+  const maximumScore = Number(filters.lead_score_max ?? 100);
+  const score = Number(lead.lead_score || 0);
+  if (score < minimumScore || score > maximumScore) return false;
+  const requiredTags = Array.isArray(filters.tags)
+    ? filters.tags.map((value) => clean(value, 100).toLowerCase()).filter(Boolean)
+    : [];
+  if (requiredTags.length && !requiredTags.some((tag) => leadTags(lead).includes(tag))) return false;
   return true;
 }
 
-function personalizeContent(content, lead) {
-  return (content || "")
-    .replace(/{name}/g, lead.full_name || "there")
-    .replace(/{first_name}/g, (lead.full_name || "").split(" ")[0] || "there")
-    .replace(/{business_name}/g, lead.business_name || "your business")
-    .replace(/{email}/g, lead.email || "");
+function buildHtml({ bodyHtml, bodyText, unsubscribeUrl, postalAddress }: {
+  bodyHtml: string;
+  bodyText: string;
+  unsubscribeUrl: string;
+  postalAddress: string;
+}) {
+  const content = bodyHtml || `<p>${escapeHtml(bodyText).replace(/\n/g, "<br>")}</p>`;
+  return `<!doctype html><html><body style="margin:0;background:#f8fafc;font-family:Arial,sans-serif;color:#0f172a"><div style="max-width:640px;margin:0 auto;padding:28px 20px"><div style="background:#fff;border:1px solid #e2e8f0;border-radius:16px;padding:28px">${content}<hr style="border:0;border-top:1px solid #e2e8f0;margin:28px 0"><p style="font-size:12px;line-height:1.55;color:#64748b">ClientSurge Systems · ${escapeHtml(postalAddress)}<br>This is a business outreach message. <a href="${escapeHtml(unsubscribeUrl)}" style="color:#0369a1">Unsubscribe from future outreach emails</a>.</p></div></div></body></html>`;
 }
 
-async function sendViaResend(to, subject, html, text, fromEmail, resendKey, campaignId, recipientId, unsubscribeEmail) {
-  // Add tracking pixel for opens
-  const trackingPixel = `<img src="https://clientsurge.base44.app/api/track/open/${campaignId}/${recipientId}" width="1" height="1" style="display:none" />`;
-  const htmlWithTracking = html ? `${html}${trackingPixel}` : undefined;
+function buildText(bodyText: string, unsubscribeUrl: string, postalAddress: string) {
+  return `${bodyText.trim()}\n\n---\nClientSurge Systems · ${postalAddress}\nUnsubscribe: ${unsubscribeUrl}`;
+}
 
-  const res = await resendFetch("https://api.resend.com/emails", {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${resendKey}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      from: fromEmail,
-      to,
-      subject,
-      html: htmlWithTracking,
-      text: text || undefined,
-      headers: {
-        "X-Campaign-ID": campaignId,
-        "X-Recipient-ID": recipientId,
-        "List-Unsubscribe": `<mailto:${unsubscribeEmail}?subject=Unsubscribe>`,
-        "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
-      },
-    }),
-  });
+function senderReadiness(campaign: Record<string, unknown>, settings: Record<string, unknown> | null) {
+  const fromEmail = normalizeEmail(
+    campaign.provider_from_email || settings?.resend_from_email || Deno.env.get("RESEND_FROM_EMAIL") || "",
+  );
+  const replyTo = normalizeEmail(Deno.env.get("OUTREACH_REPLY_TO_EMAIL") || "nolan@clientsurgesystems.com");
+  const postalAddress = clean(Deno.env.get("OUTREACH_POSTAL_ADDRESS") || "", 500);
+  const unsubscribeSecret = Deno.env.get("EMAIL_UNSUBSCRIBE_SECRET") || "";
+  const campaignEnabled = String(Deno.env.get("EMAIL_CAMPAIGN_ENABLED") || "").toLowerCase() === "true";
+  const proofStatus = clean(Deno.env.get("EMAIL_DELIVERABILITY_PROOF_STATUS") || "", 80).toLowerCase();
+  return {
+    resend_enabled: settings?.resend_enabled !== false,
+    api_key_present: Boolean(Deno.env.get("RESEND_API_KEY")),
+    campaign_enabled: campaignEnabled,
+    deliverability_verified: ["verified", "passed", "production_verified"].includes(proofStatus),
+    proof_status: proofStatus || "missing",
+    from_email: fromEmail,
+    from_email_valid: isValidEmail(fromEmail) && fromEmail.endsWith("@clientsurgesystems.com"),
+    reply_to: replyTo,
+    reply_to_valid: isValidEmail(replyTo),
+    postal_address_present: Boolean(postalAddress),
+    unsubscribe_secret_present: unsubscribeSecret.length >= 32,
+    postal_address: postalAddress,
+  };
+}
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    throw new Error(err?.message || "Resend API error");
+function readinessFailures(readiness: ReturnType<typeof senderReadiness>) {
+  const failures: string[] = [];
+  if (!readiness.resend_enabled) failures.push("Resend is disabled in AdminSettings");
+  if (!readiness.api_key_present) failures.push("RESEND_API_KEY is missing");
+  if (!readiness.campaign_enabled) failures.push("EMAIL_CAMPAIGN_ENABLED must be true");
+  if (!readiness.deliverability_verified) failures.push("EMAIL_DELIVERABILITY_PROOF_STATUS must be verified");
+  if (!readiness.from_email_valid) failures.push("A verified @clientsurgesystems.com sender is required");
+  if (!readiness.reply_to_valid) failures.push("OUTREACH_REPLY_TO_EMAIL is invalid");
+  if (!readiness.postal_address_present) failures.push("OUTREACH_POSTAL_ADDRESS is required");
+  if (!readiness.unsubscribe_secret_present) failures.push("EMAIL_UNSUBSCRIBE_SECRET must contain at least 32 characters");
+  return failures;
+}
+
+async function upsertRecipient(
+  base44: ReturnType<typeof createClientFromRequest>,
+  campaignId: string,
+  lead: Record<string, unknown>,
+  email: string,
+) {
+  const existing = await base44.asServiceRole.entities.EmailCampaignRecipient.filter(
+    { campaign_id: campaignId, lead_id: lead.id },
+    "-created_date",
+    5,
+  ).catch(() => []);
+  if (existing?.[0]) {
+    await base44.asServiceRole.entities.EmailCampaignRecipient.update(existing[0].id, {
+      email,
+      lead_name: clean(lead.full_name || lead.owner_contact_name || lead.business_name || "", 240),
+      status: "pending",
+      error_message: null,
+      suppression_reason: null,
+    });
+    return { ...existing[0], email, status: "pending" };
   }
-
-  const data = await res.json();
-  return data.id; // Resend message ID
+  return base44.asServiceRole.entities.EmailCampaignRecipient.create({
+    campaign_id: campaignId,
+    lead_id: lead.id,
+    tenant_scope_status: "system_internal",
+    email,
+    lead_name: clean(lead.full_name || lead.owner_contact_name || lead.business_name || "", 240),
+    status: "pending",
+  });
 }
 
 Deno.serve(async (req) => {
   try {
-    if (req.method !== "POST") {
-      return secureJson({ error: "Method not allowed" }, { status: 405 });
-    }
-
+    if (req.method !== "POST") return secureJson({ error: "Method not allowed" }, 405);
     const base44 = createClientFromRequest(req);
-
-    // Auth check
-    let user = null;
-    try { user = await base44.auth.me(); } catch (_) {}
-    if (!user || user.role !== "admin") {
-      return secureJson({ error: "Forbidden: Admin only" }, { status: 403 });
-    }
-
+    await requireAdminUser(base44);
     const body = await req.json().catch(() => ({}));
-    const { campaign_id, preview_only } = body;
+    const campaignId = clean(body?.campaign_id, 120);
+    const previewOnly = body?.preview_only !== false;
+    if (!campaignId) return secureJson({ error: "campaign_id is required" }, 400);
 
-    if (!campaign_id) {
-      return secureJson({ error: "campaign_id is required" }, { status: 400 });
+    const campaign = await base44.asServiceRole.entities.EmailCampaign.get(campaignId);
+    if (!campaign) return secureJson({ error: "Campaign not found" }, 404);
+    if (!["draft", "scheduled"].includes(String(campaign.status || "draft"))) {
+      return secureJson({ error: `Campaign status '${campaign.status}' cannot be sent` }, 409);
     }
 
-    // Load campaign
-    const campaign = await base44.asServiceRole.entities.EmailCampaign.get(campaign_id);
-    if (!campaign) {
-      return secureJson({ error: "Campaign not found" }, { status: 404 });
+    const industrySequence = industryKey(campaign.industry_sequence);
+    if (!ALLOWED_INDUSTRY_SEQUENCES.has(industrySequence)) {
+      return secureJson({ error: "Choose one approved launch-industry sequence before previewing or sending" }, 400);
     }
+    const filters = campaign.segment_filters && typeof campaign.segment_filters === "object"
+      ? { ...campaign.segment_filters }
+      : {};
+    filters.industries = Array.isArray(filters.industries) && filters.industries.length
+      ? filters.industries
+      : [industrySequence];
+    filters.outbound_ready_only = filters.outbound_ready_only !== false;
+    filters.website_mode = filters.website_mode || "has_website";
 
-    if (!preview_only && !["draft", "scheduled"].includes(campaign.status)) {
-      return secureJson({ error: `Cannot send campaign with status: ${campaign.status}` }, { status: 400 });
-    }
+    const configuredMax = Number(campaign.max_recipients || filters.max_recipients || DEFAULT_TEST_BATCH_SIZE);
+    const maxRecipients = Math.max(1, Math.min(MAX_CAMPAIGN_RECIPIENTS, configuredMax));
+    const allLeads = await base44.asServiceRole.entities.Leads.list("-lead_score", 10000, 0);
+    const matching = (allLeads || []).filter((lead: Record<string, unknown>) =>
+      matchesCampaignFilters(lead, filters, industrySequence)
+    );
 
-    // Load settings
-    const settingsRecords = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1);
-    const settings = settingsRecords?.[0] || {};
-    
-    const resendKey = Deno.env.get("RESEND_API_KEY");
-    const fromEmail =
-      settings.resend_from_email ||
-      Deno.env.get("RESEND_FROM_LEADS") ||
-      "support@clientsurgesystems.com";
-    const unsubscribeEmail = settings.unsubscribe_email || settings.support_email || "support@clientsurgesystems.com";
-
-    if (!preview_only && !resendKey) {
-      return secureJson({ error: "RESEND_API_KEY not configured" }, { status: 500 });
-    }
-
-    if (!preview_only) {
-      const sendGate = getCampaignSendGate();
-      if (!sendGate.ok) {
-        return secureJson({
-          error: "Campaign sending is blocked until deliverability proof is complete.",
-          email_sent: false,
-          safe_to_continue: false,
-          requires_owner_action: true,
-          reason: sendGate.reason,
-          proof_status: sendGate.proof_status,
-        }, { status: 403 });
-      }
-    }
-
-    if (!hasIndustrySegmentation(campaign.segment_filters || {})) {
-      return secureJson({
-        error: "Industry segmentation is required before previewing or sending. Choose Roofing, HVAC, Dental, or another explicit industry segment.",
-      }, { status: 400 });
-    }
-
-    const requestedLimit = Number(campaign?.max_recipients ?? campaign?.segment_filters?.max_recipients ?? MAX_SAFE_TEST_RECIPIENTS);
-    if (!preview_only && requestedLimit > MAX_SAFE_TEST_RECIPIENTS) {
-      return secureJson({
-        error: `Campaign test batches are capped at ${MAX_SAFE_TEST_RECIPIENTS} recipients. Lower max_recipients before sending.`,
-      }, { status: 400 });
-    }
-
-    // Get leads, segment them, and exclude unsafe recipients before capping the batch.
-    const allLeads = await base44.asServiceRole.entities.Leads.list("-created_date", MAX_LEADS);
-    const matchingLeads = (allLeads || []).filter(lead => matchesFilters(lead, campaign.segment_filters));
-    const missingEmailLeads = matchingLeads.filter((lead) => !lead.email);
-    const leadsWithEmail = matchingLeads.filter((lead) => lead.email);
-    const missingWebsiteLeads = leadsWithEmail.filter((lead) => !hasUsableWebsite(lead));
-    const leadsWithRequiredFields = leadsWithEmail.filter(hasUsableWebsite);
-    const suppressedLeads = leadsWithRequiredFields.filter(isSuppressed);
-    const unsuppressedLeads = leadsWithRequiredFields.filter((lead) => !isSuppressed(lead));
-    const recentlyContactedLeads = unsuppressedLeads.filter(wasRecentlyContacted);
-    const dedupeReadyLeads = unsuppressedLeads.filter((lead) => !wasRecentlyContacted(lead));
-    const duplicateEmails = new Set();
-    const seenEmails = new Set();
-    const dedupedLeads = [];
-
-    for (const lead of dedupeReadyLeads) {
+    const suppressedCounts: Record<string, number> = {};
+    const seenEmails = new Set<string>();
+    const eligible: Record<string, unknown>[] = [];
+    for (const lead of matching) {
       const email = normalizeEmail(lead.email);
-      if (!email) continue;
-      if (seenEmails.has(email)) {
-        duplicateEmails.add(email);
+      let reason = suppressionReason(lead, filters);
+      if (!reason && seenEmails.has(email)) reason = "duplicate_email";
+      if (reason) {
+        suppressedCounts[reason] = (suppressedCounts[reason] || 0) + 1;
         continue;
       }
       seenEmails.add(email);
-      dedupedLeads.push(lead);
+      eligible.push(lead);
+      if (eligible.length >= maxRecipients) break;
     }
 
-    const recipientLimit = getRecipientLimit(campaign);
-    const eligibleLeads = dedupedLeads.slice(0, recipientLimit);
+    const settingsRows = await base44.asServiceRole.entities.AdminSettings.list("-created_date", 1).catch(() => []);
+    const readiness = senderReadiness(campaign, settingsRows?.[0] || null);
+    const failures = readinessFailures(readiness);
+    const preview = {
+      success: true,
+      preview_only: true,
+      campaign_id: campaignId,
+      industry_sequence: industrySequence,
+      matching_count: matching.length,
+      recipient_count: eligible.length,
+      suppressed_count: Object.values(suppressedCounts).reduce((sum, value) => sum + value, 0),
+      suppression_counts: suppressedCounts,
+      outbound_ready_only: filters.outbound_ready_only,
+      website_mode: filters.website_mode,
+      max_recipients: maxRecipients,
+      sending_ready: failures.length === 0,
+      readiness_failures: failures,
+      proof_status: readiness.proof_status,
+      sender: readiness.from_email,
+      reply_to: readiness.reply_to,
+      sample_recipients: eligible.slice(0, 10).map((lead) => ({
+        id: lead.id,
+        name: clean(lead.full_name || lead.business_name || "", 200),
+        email: normalizeEmail(lead.email),
+        industry: clean(lead.industry || lead.business_type || "", 160),
+        website: clean(lead.website || lead.website_url || "", 300),
+        status: lead.quality_review_status,
+      })),
+    };
+    if (previewOnly) return secureJson(preview);
+    if (failures.length) return secureJson({ error: "Campaign sending is not ready", readiness_failures: failures }, 503);
+    if (!eligible.length) return secureJson({ error: "No verified recipients match this campaign" }, 409);
 
-    if (preview_only) {
-      const suppressionReasons = suppressedLeads.reduce((acc, lead) => {
-        const reason = getSuppressionReason(lead) || "other";
-        acc[reason] = (acc[reason] || 0) + 1;
-        return acc;
-      }, {});
-      return secureJson({
-        success: true,
-        preview: true,
-        matching_count: matchingLeads.length,
-        suppressed_count: suppressedLeads.length,
-        missing_email_count: missingEmailLeads.length,
-        missing_website_count: missingWebsiteLeads.length,
-        duplicate_excluded_count: duplicateEmails.size,
-        recently_contacted_count: recentlyContactedLeads.length,
-        suppression_reasons: suppressionReasons,
-        max_recipients: recipientLimit,
-        recipient_count: eligibleLeads.length,
-        sample_recipients: eligibleLeads.slice(0, 5).map(l => ({
-          label: l.business_name || "Masked lead",
-          email_masked: maskEmail(l.email),
-          phone_masked: maskPhone(l.phone),
-          status: l.status,
-          industry: l.business_type || l.industry || toArray(l.industry_tags)[0] || "",
-        })),
-      });
-    }
-
-    const existingRecipients = await base44.asServiceRole.entities.EmailCampaignRecipient.filter(
-      { campaign_id },
-      "-created_date",
-      MAX_LEADS
-    );
-    const existingRecipientByLeadId = new Map(
-      (existingRecipients || [])
-        .filter((recipient) => recipient?.lead_id)
-        .map((recipient) => [recipient.lead_id, recipient])
-    );
-
-    // Mark campaign as sending
-    await base44.asServiceRole.entities.EmailCampaign.update(campaign_id, {
+    await base44.asServiceRole.entities.EmailCampaign.update(campaignId, {
       status: "sending",
-      total_recipients: eligibleLeads.length,
-      suppressed_recipients: suppressedLeads.length,
+      total_recipients: eligible.length,
+      suppressed_recipients: preview.suppressed_count,
     });
 
+    const apiKey = Deno.env.get("RESEND_API_KEY")!;
+    const functionBase = clean(
+      Deno.env.get("PUBLIC_FUNCTION_BASE_URL") || "https://clientsurgesystems.com/functions",
+      500,
+    ).replace(/\/$/, "");
     let sent = 0;
     let failed = 0;
-    const errors = [];
 
-    // Process in batches
-    for (let i = 0; i < eligibleLeads.length; i += BATCH_SIZE) {
-      const batch = eligibleLeads.slice(i, i + BATCH_SIZE);
+    for (const lead of eligible) {
+      const email = normalizeEmail(lead.email);
+      const recipient = await upsertRecipient(base44, campaignId, lead, email);
+      try {
+        const token = await createEmailUnsubscribeToken({
+          recipient_id: recipient.id,
+          campaign_id: campaignId,
+          lead_id: String(lead.id),
+          email,
+        });
+        const unsubscribeUrl = `${functionBase}/unsubscribeEmail?token=${encodeURIComponent(token)}`;
+        const personalizedSubject = replaceTokens(String(campaign.subject || ""), lead);
+        const personalizedHtml = replaceTokens(String(campaign.body_html || ""), lead);
+        const personalizedText = replaceTokens(String(campaign.body_text || ""), lead);
+        const html = buildHtml({
+          bodyHtml: personalizedHtml,
+          bodyText: personalizedText,
+          unsubscribeUrl,
+          postalAddress: readiness.postal_address,
+        });
+        const text = buildText(
+          personalizedText || personalizedHtml.replace(/<[^>]+>/g, " "),
+          unsubscribeUrl,
+          readiness.postal_address,
+        );
 
-      for (const lead of batch) {
-        const existingRecipient = existingRecipientByLeadId.get(lead.id) || null;
-        let recipient = existingRecipient;
-        try {
-          if (existingRecipient && ["sent", "delivered", "opened", "clicked"].includes(existingRecipient.status)) {
-            continue;
-          }
-
-          recipient = existingRecipient
-            ? await base44.asServiceRole.entities.EmailCampaignRecipient.update(existingRecipient.id, {
-                email: lead.email,
-                lead_name: lead.full_name || "",
-                status: "pending",
-                error_message: undefined,
-              })
-            : await base44.asServiceRole.entities.EmailCampaignRecipient.create({
-                campaign_id,
-                lead_id: lead.id,
-                email: lead.email,
-                lead_name: lead.full_name || "",
-                status: "pending",
-              });
-
-          const personalizedSubject = personalizeContent(campaign.subject, lead);
-          const personalizedHtml = personalizeContent(campaign.body_html, lead);
-          const personalizedText = personalizeContent(campaign.body_text, lead);
-          const compliantContent = appendEmailCompliance(personalizedHtml, personalizedText, unsubscribeEmail);
-
-          // Send email
-          const messageId = await sendViaResend(
-            lead.email,
-            personalizedSubject,
-            compliantContent.html,
-            compliantContent.text,
-            fromEmail,
-            resendKey,
-            campaign_id,
-            recipient.id,
-            unsubscribeEmail
-          );
-
-          const nextFollowUpAt = followUpDateIso(campaign);
-
-          // Update recipient record
-          await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
-            status: "sent",
-            sent_at: new Date().toISOString(),
-            resend_message_id: messageId,
-            error_message: undefined,
-          });
-
-          await base44.asServiceRole.entities.Leads.update(lead.id, {
-            status: lead.status === "New" ? "Contacted" : lead.status,
-            crm_stage: lead.crm_stage === "Not Contacted" || !lead.crm_stage ? "Contacted" : lead.crm_stage,
-            outreach_status: "contacted",
-            last_contacted_at: new Date().toISOString(),
-            last_contacted_date: new Date().toISOString(),
-            next_follow_up_at: nextFollowUpAt,
-            follow_up_date: nextFollowUpAt,
-            last_outreach_campaign_id: campaign_id,
-            last_outreach_subject: personalizedSubject,
-            landing_page_url: campaign.landing_page_url || "",
-          });
-
-          // Log communication event
-          await base44.asServiceRole.entities.CommunicationEvent.create({
-            lead_id: lead.id,
-            channel: "email",
-            direction: "outbound",
-            event_type: "email_sent",
-            provider: "resend",
-            status: "sent",
+        const response = await fetch("https://api.resend.com/emails", {
+          method: "POST",
+          headers: { Authorization: `Bearer ${apiKey}`, "Content-Type": "application/json" },
+          body: JSON.stringify({
+            from: `ClientSurge Systems <${readiness.from_email}>`,
+            to: [email],
+            reply_to: readiness.reply_to,
             subject: personalizedSubject,
-            message_body: personalizedText || personalizedHtml?.substring(0, 500),
-            metadata_json: JSON.stringify({
-              campaign_id,
-              recipient_id: recipient.id,
-              outreach: true,
-              landing_page_url: campaign.landing_page_url || "",
-              next_follow_up_at: nextFollowUpAt,
-              industry_segment: campaign.segment_filters?.industries || campaign.segment_filters?.tags || [],
-            }),
-          });
-
-          sent++;
-        } catch (err) {
-          failed++;
-          errors.push({ lead_id: lead.id, error: err.message });
-          if (recipient?.id) {
-            await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
-              status: "failed",
-              error_message: err.message,
-            }).catch(() => null);
-          }
-          console.error(`[sendEmailCampaign] sendEmailCampaign error for lead ${lead.id}:`, err.message);
+            html,
+            text,
+            headers: {
+              "List-Unsubscribe": `<${unsubscribeUrl}>, <mailto:support@clientsurgesystems.com?subject=Unsubscribe>`,
+              "List-Unsubscribe-Post": "List-Unsubscribe=One-Click",
+              "X-ClientSurge-Campaign-ID": campaignId,
+              "X-ClientSurge-Recipient-ID": recipient.id,
+            },
+          }),
+        });
+        const result = await response.json().catch(() => ({}));
+        if (!response.ok || !result?.id) {
+          throw new Error(result?.message || `Resend returned HTTP ${response.status}`);
         }
-      }
 
-      // Small delay between batches to avoid rate limiting
-      if (i + BATCH_SIZE < eligibleLeads.length) {
-        await new Promise(resolve => setTimeout(resolve, 100));
+        const now = new Date().toISOString();
+        await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
+          status: "sent",
+          provider_from_email: readiness.from_email,
+          sent_at: now,
+          resend_message_id: result.id,
+          error_message: null,
+        });
+        const leadUpdate: Record<string, unknown> = {
+          last_contacted_at: now,
+          last_email_sent_at: now,
+          outreach_status: "contacted",
+          outreach_attempt_count: Number(lead.outreach_attempt_count || 0) + 1,
+          last_outreach_campaign_id: campaignId,
+          next_follow_up_at: new Date(Date.now() + Number(campaign.follow_up_days || 3) * 86400000).toISOString(),
+        };
+        if (!ADVANCED_CRM_STAGES.has(String(lead.crm_stage || ""))) {
+          leadUpdate.status = "Contacted";
+          leadUpdate.crm_stage = "Contacted";
+          leadUpdate.lead_state = "CONTACTED";
+        }
+        await base44.asServiceRole.entities.Leads.update(lead.id, leadUpdate);
+        await base44.asServiceRole.entities.CommunicationEvent.create({
+          lead_id: lead.id,
+          channel: "email",
+          direction: "outbound",
+          event_type: "email_sent",
+          provider: "resend",
+          provider_message_id: result.id,
+          status: "sent",
+          campaign_id: campaignId,
+          campaign_recipient_id: recipient.id,
+          subject: personalizedSubject,
+          message_body: personalizedText,
+          sent_at: now,
+          metadata_json: JSON.stringify({ industry_sequence: industrySequence }),
+        }).catch(() => null);
+        sent += 1;
+      } catch (error) {
+        failed += 1;
+        const message = error instanceof Error ? error.message : String(error);
+        await base44.asServiceRole.entities.EmailCampaignRecipient.update(recipient.id, {
+          status: "failed",
+          error_message: message.slice(0, 1000),
+        }).catch(() => null);
       }
+      if (SEND_DELAY_MS > 0) await new Promise((resolve) => setTimeout(resolve, SEND_DELAY_MS));
     }
 
-    // Update campaign final status
-    await base44.asServiceRole.entities.EmailCampaign.update(campaign_id, {
-      status: failed > 0 ? "paused" : "sent",
-      sent_at: sent > 0 ? new Date().toISOString() : undefined,
+    await base44.asServiceRole.entities.EmailCampaign.update(campaignId, {
+      status: "sent",
+      sent_at: new Date().toISOString(),
       total_sent: sent,
     });
 
     return secureJson({
       success: true,
-      campaign_id,
-      total_recipients: eligibleLeads.length,
+      campaign_id: campaignId,
       sent,
       failed,
-      errors: errors.slice(0, 10), // Return first 10 errors
+      suppressed: preview.suppressed_count,
+      total_recipients: eligible.length,
     });
-
   } catch (error) {
-    console.error("[sendEmailCampaign] sendEmailCampaign error:", error);
-    return secureJson({ error: error.message || "Failed to send campaign" }, { status: 500 });
+    if (error instanceof AuthGuardError) {
+      return secureJson({ error: error.message, code: error.code }, error.status);
+    }
+    const message = error instanceof Error ? error.message : "Campaign send failed";
+    console.error("[sendEmailCampaign]", message);
+    return secureJson({ error: message }, 500);
   }
 });
