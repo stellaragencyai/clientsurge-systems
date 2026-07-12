@@ -98,7 +98,9 @@ function normalizedPayload(raw: Record<string, unknown>) {
   const industrySlug = normalizeIndustrySlug(businessType);
   const email = normalizeEmail(raw.email);
   const phone = normalizePhone(raw.phone || raw.phone_number);
-  const website = normalizeWebsite(raw.business_website_url || raw.business_website || raw.website || raw.url);
+  const website = normalizeWebsite(
+    raw.business_website_url || raw.business_website || raw.website || raw.url,
+  );
   return {
     full_name: fullName,
     first_name: clean(raw.first_name, 100) || fullName.split(/\s+/)[0] || "",
@@ -111,7 +113,10 @@ function normalizedPayload(raw: Record<string, unknown>) {
     industry: canonicalIndustryLabel(industrySlug, businessType),
     message: clean(raw.message || raw.problem, MAX_MESSAGE_LENGTH),
     website,
-    honeypot: clean(raw.website_url || raw.website_hp || raw.website_honeypot || raw.company_website_hp, 300),
+    honeypot: clean(
+      raw.website_url || raw.website_hp || raw.website_honeypot || raw.company_website_hp,
+      300,
+    ),
     source_page: clean(raw.source_page, 240) || CONTACT_SOURCE_PAGE,
     utm_source: clean(raw.utm_source, 200),
     utm_medium: clean(raw.utm_medium, 200),
@@ -144,6 +149,10 @@ function getRequestIp(req: Request) {
     "unknown";
 }
 
+function getUserAgent(req: Request) {
+  return clean(req.headers.get("user-agent"), 500);
+}
+
 function escapeHtml(value: unknown) {
   return String(value ?? "")
     .replace(/&/g, "&amp;")
@@ -159,7 +168,7 @@ function appendNotes(existing: unknown, line: string) {
 }
 
 function mergeSourceHistory(existing: Record<string, unknown> | null, payload: ReturnType<typeof normalizedPayload>) {
-  const prior = Array.isArray(existing?.source_history)
+  const previous = Array.isArray(existing?.source_history)
     ? existing.source_history.map(String)
     : existing?.source_history
       ? [String(existing.source_history)]
@@ -171,7 +180,7 @@ function mergeSourceHistory(existing: Record<string, unknown> | null, payload: R
     payload.utm_campaign ? `utm_campaign:${payload.utm_campaign}` : "",
     payload.referrer ? `referrer:${payload.referrer}` : "",
   ].filter(Boolean);
-  return [...new Set([...prior, ...current])].slice(-25);
+  return [...new Set([...previous, ...current])].slice(-25);
 }
 
 function isAdvancedLead(existing: Record<string, unknown> | null) {
@@ -187,42 +196,81 @@ function isAdvancedLead(existing: Record<string, unknown> | null) {
 async function canonicalLeadId(email: string, phone: string, businessName: string) {
   const bytes = new TextEncoder().encode(`${email}|${phone}|${businessName}`);
   const digest = await crypto.subtle.digest("SHA-256", bytes);
-  const hex = [...new Uint8Array(digest)].map((value) => value.toString(16).padStart(2, "0")).join("");
+  const hex = [...new Uint8Array(digest)]
+    .map((value) => value.toString(16).padStart(2, "0"))
+    .join("");
   return `lead_${hex.slice(0, 24)}`;
 }
 
-async function safeFilter(entity: unknown, filter: Record<string, unknown>, sort = "-created_date", limit = 25) {
+async function safeFilter(
+  entity: unknown,
+  filter: Record<string, unknown>,
+  sort = "-created_date",
+  limit = 25,
+) {
   try {
-    const api = entity as { filter?: (query: Record<string, unknown>, sort?: string, limit?: number) => Promise<Record<string, unknown>[]> };
+    const api = entity as {
+      filter?: (
+        query: Record<string, unknown>,
+        sort?: string,
+        limit?: number,
+      ) => Promise<Record<string, unknown>[]>;
+    };
     return api?.filter ? await api.filter(filter, sort, limit) : [];
   } catch (error) {
-    console.warn("[submitContactInquiry] optional filter failed", error instanceof Error ? error.message : error);
+    console.warn(
+      "[submitContactInquiry] optional filter failed",
+      error instanceof Error ? error.message : error,
+    );
     return [];
   }
 }
 
-async function findRecentWebsiteLead(base44: ReturnType<typeof createClientFromRequest>, payload: ReturnType<typeof normalizedPayload>) {
-  const now = Date.now();
+async function findRecentWebsiteLead(
+  base44: ReturnType<typeof createClientFromRequest>,
+  payload: ReturnType<typeof normalizedPayload>,
+) {
   const candidates = [
-    ...await safeFilter(base44.asServiceRole.entities.WebsiteLead, { email: payload.email }, "-created_date", 10),
-    ...await safeFilter(base44.asServiceRole.entities.WebsiteLead, { phone_number: payload.phone }, "-created_date", 10),
+    ...await safeFilter(
+      base44.asServiceRole.entities.WebsiteLead,
+      { email: payload.email },
+      "-created_date",
+      10,
+    ),
+    ...await safeFilter(
+      base44.asServiceRole.entities.WebsiteLead,
+      { phone_number: payload.phone },
+      "-created_date",
+      10,
+    ),
   ];
   return candidates.find((row) => {
-    const createdAt = typeof row.created_date === "string" ? new Date(row.created_date).getTime() : 0;
-    const sameBusiness = normalizeBusinessName(row.business_name) === payload.normalized_business_name;
-    return sameBusiness && createdAt > 0 && now - createdAt < DUPLICATE_WINDOW_MS;
+    const createdAt = typeof row.created_date === "string"
+      ? new Date(row.created_date).getTime()
+      : 0;
+    return normalizeBusinessName(row.business_name) === payload.normalized_business_name &&
+      createdAt > 0 &&
+      Date.now() - createdAt < DUPLICATE_WINDOW_MS;
   }) || null;
 }
 
-async function isRateLimited(base44: ReturnType<typeof createClientFromRequest>, payload: ReturnType<typeof normalizedPayload>) {
-  const candidates = await safeFilter(base44.asServiceRole.entities.WebsiteLead, { email: payload.email }, "-created_date", 5);
+async function isRateLimited(
+  base44: ReturnType<typeof createClientFromRequest>,
+  payload: ReturnType<typeof normalizedPayload>,
+) {
+  const candidates = await safeFilter(
+    base44.asServiceRole.entities.WebsiteLead,
+    { email: payload.email },
+    "-created_date",
+    5,
+  );
   return candidates.some((row) => {
-    const createdAt = typeof row.updated_date === "string"
+    const activityAt = typeof row.updated_date === "string"
       ? new Date(row.updated_date).getTime()
       : typeof row.created_date === "string"
         ? new Date(row.created_date).getTime()
         : 0;
-    return createdAt > 0 && Date.now() - createdAt < RATE_LIMIT_WINDOW_MS;
+    return activityAt > 0 && Date.now() - activityAt < RATE_LIMIT_WINDOW_MS;
   });
 }
 
@@ -232,21 +280,47 @@ async function findExistingCanonicalLead(
   websiteLeadId: string,
 ) {
   if (websiteLeadId) {
-    const linked = await safeFilter(base44.asServiceRole.entities.Leads, { website_lead_id: websiteLeadId }, "-created_date", 5);
+    const linked = await safeFilter(
+      base44.asServiceRole.entities.Leads,
+      { website_lead_id: websiteLeadId },
+      "-created_date",
+      5,
+    );
     if (linked[0]) return linked[0];
   }
 
-  const emailMatches = await safeFilter(base44.asServiceRole.entities.Leads, { email: payload.email }, "-created_date", 25);
-  const byEmail = emailMatches.find((row) => normalizeBusinessName(row.business_name) === payload.normalized_business_name);
+  const emailMatches = await safeFilter(
+    base44.asServiceRole.entities.Leads,
+    { email: payload.email },
+    "-created_date",
+    25,
+  );
+  const byEmail = emailMatches.find((row) =>
+    normalizeBusinessName(row.business_name) === payload.normalized_business_name
+  );
   if (byEmail) return byEmail;
 
-  const phoneMatches = await safeFilter(base44.asServiceRole.entities.Leads, { phone: payload.phone }, "-created_date", 25);
-  return phoneMatches.find((row) => normalizeBusinessName(row.business_name) === payload.normalized_business_name) || null;
+  const phoneMatches = await safeFilter(
+    base44.asServiceRole.entities.Leads,
+    { phone: payload.phone },
+    "-created_date",
+    25,
+  );
+  return phoneMatches.find((row) =>
+    normalizeBusinessName(row.business_name) === payload.normalized_business_name
+  ) || null;
 }
 
-function buildWebsiteLeadData(payload: ReturnType<typeof normalizedPayload>, requestId: string, ip: string, existing: Record<string, unknown> | null) {
+function buildWebsiteLeadData(
+  payload: ReturnType<typeof normalizedPayload>,
+  requestId: string,
+  ip: string,
+  userAgent: string,
+  existing: Record<string, unknown> | null,
+) {
   const now = new Date().toISOString();
   return {
+    description: `Contact request ${requestId}${payload.referrer ? `; referrer ${payload.referrer}` : ""}`.slice(0, 1000),
     full_name: payload.full_name,
     first_name: payload.first_name,
     business_name: payload.business_name,
@@ -264,8 +338,8 @@ function buildWebsiteLeadData(payload: ReturnType<typeof normalizedPayload>, req
     utm_campaign: payload.utm_campaign || null,
     utm_content: payload.utm_content || null,
     utm_term: payload.utm_term || null,
-    referrer: payload.referrer || null,
     current_lead_source: CONTACT_SOURCE,
+    requested_channels: ["email", "phone", "sms"],
     lead_status: existing?.lead_status || "new",
     reply_status: existing?.reply_status || "none",
     booking_status: existing?.booking_status || "none",
@@ -273,15 +347,16 @@ function buildWebsiteLeadData(payload: ReturnType<typeof normalizedPayload>, req
     automation_enabled: existing?.automation_enabled !== false,
     cadence_mode: existing?.cadence_mode || "auto",
     cadence_paused: existing?.cadence_paused === true,
-    last_engagement_type: "contact_form",
+    last_engagement_type: existing?.last_engagement_type || "none",
     archived: false,
     consent_given: true,
     consent_given_at: now,
     consent_ip: ip,
     consent_source: payload.consent_source,
     consent_text_version: payload.consent_text_version,
+    ip_address: ip,
+    user_agent: userAgent,
     dedup_key: `${payload.email}|${payload.phone}|contact_page`,
-    request_id: requestId,
   };
 }
 
@@ -295,7 +370,11 @@ async function upsertCanonicalLead(
   const existing = await findExistingCanonicalLead(base44, payload, websiteLeadId);
   const now = new Date().toISOString();
   const domain = normalizedDomain(payload.website, payload.email);
-  const canonicalId = existing?.canonical_lead_id || await canonicalLeadId(payload.email, payload.phone, payload.normalized_business_name);
+  const canonicalId = existing?.canonical_lead_id || await canonicalLeadId(
+    payload.email,
+    payload.phone,
+    payload.normalized_business_name,
+  );
   const advanced = isAdvancedLead(existing);
   const note = `[${now}] Contact inquiry received. Request ID: ${requestId}. Message: ${payload.message}`;
 
@@ -337,7 +416,6 @@ async function upsertCanonicalLead(
     utm_campaign: payload.utm_campaign || null,
     utm_content: payload.utm_content || null,
     utm_term: payload.utm_term || null,
-    referrer: payload.referrer || null,
     page_submitted_from: payload.source_page,
     last_activity_at: now,
     next_follow_up_at: now,
@@ -368,19 +446,34 @@ async function upsertCanonicalLead(
   const lead = existing
     ? await base44.asServiceRole.entities.Leads.update(existing.id, data)
     : await base44.asServiceRole.entities.Leads.create(data);
-
   return { lead, action: existing ? "updated" : "created" };
 }
 
-async function safeLog(base44: ReturnType<typeof createClientFromRequest>, payload: Record<string, unknown>) {
+async function safeLog(
+  base44: ReturnType<typeof createClientFromRequest>,
+  payload: Record<string, unknown>,
+) {
   try {
     await base44.asServiceRole.entities.CommunicationEvent.create(payload);
   } catch (error) {
-    console.warn("[submitContactInquiry] communication log skipped", error instanceof Error ? error.message : error);
+    console.warn(
+      "[submitContactInquiry] communication log skipped",
+      error instanceof Error ? error.message : error,
+    );
   }
 }
 
-async function sendEmail({ to, subject, html, replyTo }: { to: string; subject: string; html: string; replyTo?: string }) {
+async function sendEmail({
+  to,
+  subject,
+  html,
+  replyTo,
+}: {
+  to: string;
+  subject: string;
+  html: string;
+  replyTo?: string;
+}) {
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) return { sent: false, reason: "missing_resend_api_key" };
   const response = await fetch("https://api.resend.com/emails", {
@@ -394,66 +487,116 @@ async function sendEmail({ to, subject, html, replyTo }: { to: string; subject: 
       html,
     }),
   });
-  if (!response.ok) return { sent: false, reason: (await response.text()) || "email_failed" };
+  if (!response.ok) {
+    return { sent: false, reason: (await response.text()) || "email_failed" };
+  }
   return { sent: true, reason: "" };
 }
 
 async function sendAdminSms(payload: ReturnType<typeof normalizedPayload>) {
   const accountSid = Deno.env.get("TWILIO_ACCOUNT_SID");
   const authToken = Deno.env.get("TWILIO_AUTH_TOKEN");
-  const fromRaw = Deno.env.get("TWILIO_FROM_NUMBER") || Deno.env.get("TWILIO_PHONE_NUMBER") || "";
+  const fromRaw = Deno.env.get("TWILIO_FROM_NUMBER") ||
+    Deno.env.get("TWILIO_PHONE_NUMBER") ||
+    "";
   const from = normalizePhone(fromRaw);
-  if (!accountSid || !authToken || !from) return { sent: false, reason: "twilio_not_configured" };
+  if (!accountSid || !authToken || !from) {
+    return { sent: false, reason: "twilio_not_configured" };
+  }
 
   const params = new URLSearchParams({
     To: "+16025874608",
     From: from,
     Body: `New ClientSurge contact inquiry\n${payload.full_name} — ${payload.business_name}\n${payload.phone}\n${payload.email}\n${payload.message.slice(0, 180)}`,
   });
-  const response = await fetch(`https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`, {
-    method: "POST",
-    headers: {
-      Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
-      "Content-Type": "application/x-www-form-urlencoded",
+  const response = await fetch(
+    `https://api.twilio.com/2010-04-01/Accounts/${accountSid}/Messages.json`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Basic ${btoa(`${accountSid}:${authToken}`)}`,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+      body: params.toString(),
     },
-    body: params.toString(),
-  });
-  if (!response.ok) return { sent: false, reason: (await response.text()) || "sms_failed" };
+  );
+  if (!response.ok) {
+    return { sent: false, reason: (await response.text()) || "sms_failed" };
+  }
   return { sent: true, reason: "" };
 }
 
 Deno.serve(async (req) => {
   const requestId = `contact_${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
   try {
-    if (req.method !== "POST") return secureJson({ error: "Method not allowed", request_id: requestId }, { status: 405 });
+    if (req.method !== "POST") {
+      return secureJson({ error: "Method not allowed", request_id: requestId }, { status: 405 });
+    }
 
     const originGuard = validatePublicFormOrigin(req);
     if (!originGuard.ok) {
-      return secureJson({ error: originGuard.error, code: "invalid_origin", request_id: requestId }, { status: originGuard.status });
+      return secureJson(
+        { error: originGuard.error, code: "invalid_origin", request_id: requestId },
+        { status: originGuard.status },
+      );
     }
 
     const raw = await req.json().catch(() => null);
-    if (!raw || typeof raw !== "object") return secureJson({ error: "Invalid JSON body", request_id: requestId }, { status: 400 });
+    if (!raw || typeof raw !== "object") {
+      return secureJson({ error: "Invalid JSON body", request_id: requestId }, { status: 400 });
+    }
 
     const payload = normalizedPayload(raw as Record<string, unknown>);
-    if (payload.honeypot) return secureJson({ success: true, ignored: true, request_id: requestId });
+    if (payload.honeypot) {
+      return secureJson({ success: true, ignored: true, request_id: requestId });
+    }
 
     const errors = validate(payload);
-    if (errors.length) return secureJson({ error: errors[0], errors, request_id: requestId }, { status: 400 });
+    if (errors.length) {
+      return secureJson({ error: errors[0], errors, request_id: requestId }, { status: 400 });
+    }
 
     const base44 = createClientFromRequest(req);
     if (await isRateLimited(base44, payload)) {
-      return secureJson({ error: "Please wait a moment before submitting again.", code: "rate_limited", request_id: requestId }, { status: 429 });
+      return secureJson(
+        {
+          error: "Please wait a moment before submitting again.",
+          code: "rate_limited",
+          request_id: requestId,
+        },
+        { status: 429 },
+      );
     }
 
     const ip = getRequestIp(req);
     const existingWebsiteLead = await findRecentWebsiteLead(base44, payload);
-    const websiteLeadData = buildWebsiteLeadData(payload, requestId, ip, existingWebsiteLead);
+    const websiteLeadData = buildWebsiteLeadData(
+      payload,
+      requestId,
+      ip,
+      getUserAgent(req),
+      existingWebsiteLead,
+    );
     const websiteLead = existingWebsiteLead
-      ? await base44.asServiceRole.entities.WebsiteLead.update(existingWebsiteLead.id, websiteLeadData)
+      ? await base44.asServiceRole.entities.WebsiteLead.update(
+          existingWebsiteLead.id,
+          websiteLeadData,
+        )
       : await base44.asServiceRole.entities.WebsiteLead.create(websiteLeadData);
 
-    const { lead, action } = await upsertCanonicalLead(base44, payload, websiteLead.id, requestId, ip);
+    const { lead, action } = await upsertCanonicalLead(
+      base44,
+      payload,
+      websiteLead.id,
+      requestId,
+      ip,
+    );
+
+    if (websiteLead.crm_lead_id !== lead.id) {
+      await base44.asServiceRole.entities.WebsiteLead.update(websiteLead.id, {
+        crm_lead_id: lead.id,
+      });
+    }
 
     await safeLog(base44, {
       lead_id: lead.id,
@@ -462,7 +605,9 @@ Deno.serve(async (req) => {
       event_type: "status_update",
       provider: "internal",
       status: "processed",
-      subject: action === "created" ? "Contact inquiry created canonical lead" : "Contact inquiry updated canonical lead",
+      subject: action === "created"
+        ? "Contact inquiry created canonical lead"
+        : "Contact inquiry updated canonical lead",
       message_body: payload.message,
       metadata_json: JSON.stringify({
         request_id: requestId,
@@ -478,18 +623,30 @@ Deno.serve(async (req) => {
       to: payload.email,
       subject: "Message received — ClientSurge Systems",
       html: `<div style="font-family:Arial,sans-serif;max-width:640px;margin:auto;padding:24px;color:#0f172a"><h2>Thanks for reaching out, ${escapeHtml(payload.first_name || payload.full_name)}.</h2><p>We received your message and will follow up with a clear next step within one business day.</p><p><strong>Your message:</strong> ${escapeHtml(payload.message)}</p><p>Reference: ${escapeHtml(requestId)}</p><p>Reply to this email if you need to add anything.</p><hr><p style="font-size:12px;color:#64748b">ClientSurge Systems · Phoenix, Arizona</p></div>`,
-    }).catch((error) => ({ sent: false, reason: error instanceof Error ? error.message : String(error) }));
+    }).catch((error) => ({
+      sent: false,
+      reason: error instanceof Error ? error.message : String(error),
+    }));
 
     const adminEmail = await sendEmail({
       to: "nolan@clientsurgesystems.com",
       replyTo: payload.email,
       subject: `New Contact: ${payload.full_name} — ${payload.business_type}`,
       html: `<div style="font-family:Arial,sans-serif;max-width:700px;margin:auto;padding:24px;color:#0f172a"><h2>New ClientSurge contact inquiry</h2><p><strong>Name:</strong> ${escapeHtml(payload.full_name)}<br><strong>Business:</strong> ${escapeHtml(payload.business_name)}<br><strong>Industry:</strong> ${escapeHtml(payload.industry)}<br><strong>Email:</strong> ${escapeHtml(payload.email)}<br><strong>Phone:</strong> ${escapeHtml(payload.phone)}<br><strong>Website:</strong> ${escapeHtml(payload.website || "Not provided")}</p><p><strong>Message:</strong> ${escapeHtml(payload.message)}</p><p>CRM action: ${escapeHtml(action)}. Lead ID: ${escapeHtml(lead.id)}. WebsiteLead ID: ${escapeHtml(websiteLead.id)}. Request ID: ${escapeHtml(requestId)}.</p></div>`,
-    }).catch((error) => ({ sent: false, reason: error instanceof Error ? error.message : String(error) }));
+    }).catch((error) => ({
+      sent: false,
+      reason: error instanceof Error ? error.message : String(error),
+    }));
 
-    const adminSms = await sendAdminSms(payload).catch((error) => ({ sent: false, reason: error instanceof Error ? error.message : String(error) }));
+    const adminSms = await sendAdminSms(payload).catch((error) => ({
+      sent: false,
+      reason: error instanceof Error ? error.message : String(error),
+    }));
 
-    for (const [target, result] of [["user_receipt", userEmail], ["admin_notification", adminEmail]] as const) {
+    for (const [target, result] of [
+      ["user_receipt", userEmail],
+      ["admin_notification", adminEmail],
+    ] as const) {
       await safeLog(base44, {
         lead_id: lead.id,
         channel: "email",
@@ -497,7 +654,9 @@ Deno.serve(async (req) => {
         event_type: result.sent ? "email_sent" : "email_failed",
         provider: "resend",
         status: result.sent ? "sent" : "failed",
-        subject: target === "user_receipt" ? "Message received — ClientSurge Systems" : `New Contact: ${payload.full_name}`,
+        subject: target === "user_receipt"
+          ? "Message received — ClientSurge Systems"
+          : `New Contact: ${payload.full_name}`,
         message_body: payload.message,
         error_message: result.sent ? undefined : result.reason,
         metadata_json: JSON.stringify({ target, request_id: requestId }),
@@ -521,7 +680,9 @@ Deno.serve(async (req) => {
       ].filter(Boolean),
     });
   } catch (error) {
-    const message = error instanceof Error ? error.message : "Contact form submission failed";
+    const message = error instanceof Error
+      ? error.message
+      : "Contact form submission failed";
     console.error("[submitContactInquiry]", requestId, message);
     return secureJson(
       {
