@@ -1,5 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
+import { assertBookingDateAvailable } from "../shared/demoBookingGuard.ts";
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_NOTES_LENGTH = 4000;
@@ -265,6 +266,18 @@ async function queryActiveRequests(base44: ReturnType<typeof createClientFromReq
   );
 }
 
+async function findActiveRequestForLead(
+  base44: ReturnType<typeof createClientFromRequest>,
+  leadId: string,
+) {
+  const requests = await base44.asServiceRole.entities.DemoRequest.filter(
+    { lead_id: leadId, status: { $in: ACTIVE_REQUEST_STATUSES } },
+    "-created_date",
+    10,
+  );
+  return requests?.[0] || null;
+}
+
 async function assertRequestedSlotAvailable(
   base44: ReturnType<typeof createClientFromRequest>,
   leadId: string | null,
@@ -274,19 +287,23 @@ async function assertRequestedSlotAvailable(
   const sameSlot = (requests || []).find((request: Record<string, unknown>) =>
     request.scheduled_time === payload.scheduled_time
   );
+  const sameLeadOnDate = leadId
+    ? (requests || []).find((request: Record<string, unknown>) => request.lead_id === leadId)
+    : null;
+
   if (sameSlot && (!leadId || sameSlot.lead_id !== leadId)) {
     throw Object.assign(
       new Error("That preferred time is no longer available. Please choose another time."),
       { status: 409 },
     );
   }
-  if (!sameSlot && (requests || []).length >= MAX_REQUESTS_PER_DAY) {
+  if (!sameSlot && !sameLeadOnDate && (requests || []).length >= MAX_REQUESTS_PER_DAY) {
     throw Object.assign(
       new Error("No more audit requests are available on that date. Please choose another date."),
       { status: 409 },
     );
   }
-  return sameSlot || null;
+  return sameSlot || sameLeadOnDate || null;
 }
 
 async function reserveRequestedSlot(
@@ -294,17 +311,22 @@ async function reserveRequestedSlot(
   leadId: string,
   payload: ReturnType<typeof normalizedPayload>,
 ) {
-  const existingRequest = await assertRequestedSlotAvailable(base44, leadId, payload);
-  if (existingRequest) return existingRequest;
-
-  return base44.asServiceRole.entities.DemoRequest.create({
+  const requestOnDate = await assertRequestedSlotAvailable(base44, leadId, payload);
+  const activeForLead = await findActiveRequestForLead(base44, leadId);
+  const requestToUpdate = activeForLead || requestOnDate;
+  const requestData = {
     lead_id: leadId,
     scheduled_date: payload.scheduled_date,
     scheduled_time: payload.scheduled_time,
     status: "requested",
     tenant_scope_status: "system_internal",
     notes: `Preferred audit time requested (${TIME_ZONE_LABEL}). Pending manual confirmation. ${payload.biggest_issue}`.slice(0, 1000),
-  });
+  };
+
+  if (requestToUpdate) {
+    return base44.asServiceRole.entities.DemoRequest.update(requestToUpdate.id, requestData);
+  }
+  return base44.asServiceRole.entities.DemoRequest.create(requestData);
 }
 
 function escapeHtml(value: unknown) {
@@ -371,6 +393,7 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
+    await assertBookingDateAvailable(base44, payload.scheduled_date);
     const existing = await findExistingLead(base44, payload);
     await assertRequestedSlotAvailable(base44, existing?.id || null, payload);
 
