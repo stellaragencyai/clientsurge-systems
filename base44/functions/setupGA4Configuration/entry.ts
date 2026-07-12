@@ -38,6 +38,10 @@ function isAdmin(user: Record<string, unknown> | null | undefined) {
   return user?.role === "admin" || user?.role === "super_admin";
 }
 
+function containsLegacySecret(record: Record<string, unknown> | null | undefined) {
+  return typeof record?.api_secret === "string" && record.api_secret.trim().length > 0;
+}
+
 Deno.serve(async (req) => {
   try {
     if (req.method !== "POST") {
@@ -75,7 +79,7 @@ Deno.serve(async (req) => {
     const existing = await base44.asServiceRole.entities.GA4Configuration.filter(
       { measurement_id: measurementId },
       "-created_date",
-      1,
+      100,
     ).catch(() => []);
 
     const payload = {
@@ -91,16 +95,52 @@ Deno.serve(async (req) => {
         "Configuration saved. Status remains configured until Realtime/DebugView and server-side delivery are independently verified.",
     };
 
-    const config = existing?.[0]?.id
-      ? await base44.asServiceRole.entities.GA4Configuration.update(existing[0].id, payload)
-      : await base44.asServiceRole.entities.GA4Configuration.create(payload);
+    const legacySecretDetected = existing.some(containsLegacySecret);
+    let legacySecretScrubbed = false;
+    let config;
+
+    if (legacySecretDetected) {
+      // Create a clean record first, then destroy every pre-existing copy so the
+      // secret bytes are removed rather than merely hidden by a schema change.
+      config = await base44.asServiceRole.entities.GA4Configuration.create(payload);
+      const deletionResults = await Promise.all(
+        existing.map(async (record) => {
+          try {
+            await base44.asServiceRole.entities.GA4Configuration.delete(record.id);
+            return true;
+          } catch {
+            return false;
+          }
+        }),
+      );
+      legacySecretScrubbed = deletionResults.every(Boolean);
+
+      if (!legacySecretScrubbed) {
+        return Response.json(
+          {
+            error: "A clean GA4 configuration was created, but at least one legacy secret-bearing record could not be deleted.",
+            code: "GA4_LEGACY_SECRET_SCRUB_INCOMPLETE",
+            config,
+          },
+          { status: 500 },
+        );
+      }
+    } else {
+      config = existing?.[0]?.id
+        ? await base44.asServiceRole.entities.GA4Configuration.update(existing[0].id, payload)
+        : await base44.asServiceRole.entities.GA4Configuration.create(payload);
+    }
 
     return Response.json({
       success: true,
       config,
+      legacy_secret_detected: legacySecretDetected,
+      legacy_secret_scrubbed: legacySecretScrubbed,
       secret_required_for_browser_tracking: false,
       secret_store_name: "GA4_API_SECRET",
-      message: "GA4 configuration saved without storing any private credential in the entity.",
+      message: legacySecretDetected
+        ? "GA4 configuration saved and the legacy secret-bearing record was destroyed. Rotate the old GA4 API secret before enabling server-side tracking."
+        : "GA4 configuration saved without storing any private credential in the entity.",
     });
   } catch (error) {
     console.error("[setupGA4Configuration]", error);
