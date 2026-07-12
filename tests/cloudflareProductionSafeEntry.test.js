@@ -73,13 +73,23 @@ test("sanitizes raw Base44 directory output while preserving React bootstrap", a
     }),
     new Response(RAW_BASE44_SHELL, {
       status: 200,
-      headers: { "content-type": "text/html; charset=utf-8" },
+      headers: {
+        "content-type": "text/html; charset=utf-8",
+        "content-length": String(RAW_BASE44_SHELL.length),
+        "content-encoding": "gzip",
+        etag: '"stale-origin-etag"',
+        "last-modified": "Sat, 11 Jul 2026 00:00:00 GMT",
+      },
     }),
   );
   const body = await response.text();
 
   assert.equal(response.status, 200);
   assert.equal(response.headers.get("x-clientsurge-route-exposure-sanitized"), "removed-preserved-react");
+  assert.equal(response.headers.get("content-length"), null);
+  assert.equal(response.headers.get("content-encoding"), null);
+  assert.equal(response.headers.get("etag"), null);
+  assert.equal(response.headers.get("last-modified"), null);
   assert.doesNotMatch(body, /manages 5 data types/i);
   assert.doesNotMatch(body, /Admin \/ Conversion Insights/);
   assert.doesNotMatch(body, /<h2>Pages<\/h2>/);
