@@ -147,18 +147,18 @@ export default function Footer() {
         .cs-footer-inner { width: min(100% - 48px, 1180px); margin: 0 auto; }
         .cs-footer-system { background: linear-gradient(135deg, #003B8F 0%, #006BB0 52%, #00AEEF 100%); padding: 34px 0; }
         .cs-footer-system, .cs-footer-system h3, .cs-footer-system p, .cs-footer-system a { color: #ffffff !important; -webkit-text-fill-color: #ffffff !important; }
-        .cs-footer-system-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 24px; }
+        .cs-footer-system-header { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 24px; }
         .cs-footer-eyebrow { margin: 0 0 7px; color: rgba(255,255,255,.78); font-size: 10px; font-weight: 800; letter-spacing: .18em; line-height: 1.4; text-transform: uppercase; }
         .cs-footer-system h3 { margin: 0; max-width: 760px; font-size: clamp(1.4rem, 3vw, 2.1rem); line-height: 1.1; letter-spacing: -0.04em; }
         .cs-footer-system-cta { display: inline-flex; align-items: center; justify-content: center; min-height: 44px; padding: 0 24px; border-radius: 999px; background: #ffffff; border: 1px solid #ffffff; color: #003B8F !important; -webkit-text-fill-color: #003B8F !important; font-size: 14px; font-weight: 800; white-space: nowrap; transition: transform 0.2s ease, box-shadow 0.2s ease; box-shadow: 0 4px 16px rgba(0,0,0,0.15); }
         .cs-footer-system-cta:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.25); }
-        .cs-footer-main { padding: 48px 0 26px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); gap: 40px; }
+        .cs-footer-main { padding: 48px 0 26px; display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(320px, .85fr); align-items: start; gap: 40px; }
         .cs-footer-brand p { max-width: 560px; color: #475569; line-height: 1.65; }
         .cs-footer-logo-row img { display: block; max-width: 240px; height: auto; }
         .cs-footer-contact-list { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 20px; }
         .cs-footer-contact-link { display: inline-flex; align-items: center; gap: 9px; padding: 10px 12px; border-radius: 999px; border: 1px solid rgba(0,174,239,.2); color: #075985 !important; font-size: 13px; font-weight: 800; }
         .cs-footer-contact-icon svg { width: 15px; height: 15px; }
-        .cs-footer-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 24px; }
+        .cs-footer-nav { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); align-items: start; gap: 24px; }
         .cs-footer-nav-column h4 { margin: 0 0 14px; color: #0f172a; font-size: 12px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
         .cs-footer-nav-column ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 10px; }
         .cs-footer-nav-column a, .cs-footer-nav-column button { color: #475569; font-size: 14px; font-weight: 700; }
