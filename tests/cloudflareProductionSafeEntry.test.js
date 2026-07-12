@@ -135,7 +135,7 @@ test("recovers a Base44 public-route cache miss from the root SPA shell", async 
     assert.doesNotMatch(body, /manages 5 data types/i);
     assert.doesNotMatch(body, /Admin \/ Conversion Insights/);
     assert.match(body, /<link rel="canonical" href="https:\/\/clientsurgesystems\.com\/how-it-works" \/>/);
-    assert.match(body, /How ClientSurge Works/);
+    assert.match(body, /How It Works \| ClientSurge Systems/);
     assert.match(body, /\/src\/main\.jsx/);
   } finally {
     globalThis.fetch = previousFetch;
