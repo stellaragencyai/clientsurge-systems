@@ -1,17 +1,17 @@
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
-import { SITE_CONFIG } from "@/lib/siteConfig";
-import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
-import { INDUSTRY_GROUPS } from "@/lib/industryNavConfig";
 
-const sectionLinks = SITE_CONFIG.navigation.sections;
-const menuItemClass = "w-full text-left flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-foreground border-l-2 border-transparent hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 hover:text-foreground transition-colors bg-transparent cursor-pointer whitespace-nowrap";
+const NAV_LINKS = [
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Automations", href: "/automations" },
+  { label: "Industries", href: "/industries" },
+  { label: "Pricing", href: "/pricing" },
+];
 
 function analyticsKey(label) {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
@@ -20,59 +20,35 @@ function analyticsKey(label) {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [industriesOpen, setIndustriesOpen] = useState(false);
-  const [industryDropdownPos, setIndustryDropdownPos] = useState(null);
-  const industriesTriggerRef = useRef(null);
-  const industriesCloseTimerRef = useRef(null);
-
   const navigate = useNavigate();
   const location = useLocation();
   const { user } = useAuth();
 
-  const mobileUserName = user?.full_name || user?.email?.split("@")[0] || null;
-  const mobileUserRole = user?.role ? user.role.replace(/_/g, " ") : null;
-
   usePageViewTracking();
 
-  const isActivePage = (href) => {
-    if (href === "/") return location.pathname === "/";
-    if (href.startsWith("/#")) return location.pathname === "/" && location.hash === href.replace("/", "");
-    return location.pathname === href || location.pathname.startsWith(`${href}/`);
-  };
+  const accountLabel = user ? "Client Portal" : "Client Login";
+  const accountHref = user ? "/client-portal" : "/login";
 
-  const closeAll = () => {
-    setIndustriesOpen(false);
-    setOpen(false);
-  };
+  const isActivePage = (href) =>
+    location.pathname === href || (href !== "/" && location.pathname.startsWith(`${href}/`));
 
-  const clearIndustriesTimer = () => {
-    if (industriesCloseTimerRef.current) {
-      clearTimeout(industriesCloseTimerRef.current);
-      industriesCloseTimerRef.current = null;
-    }
-  };
-
-  const openIndustries = () => {
-    clearIndustriesTimer();
-    const rect = industriesTriggerRef.current?.getBoundingClientRect();
-    setIndustryDropdownPos(rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null);
-    setIndustriesOpen(true);
-  };
-
-  const closeIndustriesSoon = () => {
-    clearIndustriesTimer();
-    industriesCloseTimerRef.current = setTimeout(() => setIndustriesOpen(false), 180);
-  };
+  const closeMenu = () => setOpen(false);
 
   const navigateTo = (href) => {
-    if (href.startsWith("/#") && location.pathname === "/") {
+    if (href.startsWith("/#")) {
       const id = href.slice(2);
-      const target = document.getElementById(id);
-      if (target) {
-        target.scrollIntoView({ behavior: "smooth", block: "start" });
-        window.history.replaceState(null, "", href);
-        return;
+
+      if (location.pathname === "/") {
+        const target = document.getElementById(id);
+        if (target) {
+          target.scrollIntoView({ behavior: "smooth", block: "start" });
+          window.history.replaceState(null, "", href);
+          return;
+        }
       }
+
+      navigate(href);
+      return;
     }
 
     if (href === location.pathname) {
@@ -83,48 +59,37 @@ export default function Navbar() {
     navigate(href);
   };
 
-  const handleNavClick = (event, item, source = "navbar") => {
+  const handleLink = (event, item, source = "navbar") => {
     event.preventDefault();
     trackCTA(`nav_${analyticsKey(item.label)}`, source);
-    closeAll();
+    closeMenu();
     navigateTo(item.href);
   };
 
-  const handleLogoClick = (event) => {
+  const handleLogo = (event) => {
     event.preventDefault();
     trackCTA("nav_logo", "navbar");
-    closeAll();
+    closeMenu();
+
     if (location.pathname === "/") {
       if (location.hash) window.history.replaceState(null, "", "/");
       window.scrollTo({ top: 0, left: 0, behavior: "smooth" });
       return;
     }
+
     navigate("/");
-    setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }), 50);
-  };
-
-  const handleIndustrySelect = (item, source) => {
-    try {
-      const slug = item.href.split("/").pop();
-      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
-      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
-    } catch (_error) {}
-
-    trackCTA(`industry_${analyticsKey(item.label)}`, source);
-    closeAll();
-    navigate(item.href);
   };
 
   useEffect(() => {
-    return () => clearIndustriesTimer();
-  }, []);
-
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
+    const onScroll = () => setScrolled(window.scrollY > 12);
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
+
+  useEffect(() => {
+    closeMenu();
+  }, [location.pathname, location.hash]);
 
   useEffect(() => {
     if (!open) return undefined;
@@ -132,100 +97,36 @@ export default function Navbar() {
   }, [open]);
 
   useEffect(() => {
-    const onKey = (event) => {
-      if (event.key === "Escape") closeAll();
+    const onKeyDown = (event) => {
+      if (event.key === "Escape") closeMenu();
     };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, []);
 
-  const IndustriesDropdown = industriesOpen && typeof document !== "undefined" ? createPortal(
-    <div
-      onMouseEnter={openIndustries}
-      onMouseLeave={closeIndustriesSoon}
-      className="fixed cs-dropdown-portal"
-      style={{
-        left: industryDropdownPos?.left ?? "50%",
-        transform: "translateX(-50%)",
-        top: industryDropdownPos?.top ?? "calc(var(--cs-nav-height) + 6px)",
-        zIndex: 60,
-      }}
-    >
-      <div
-        className="rounded-xl border border-border/60 p-5 shadow-xl"
-        role="menu"
-        aria-label="Industries"
-        style={{
-          background: "rgba(255,255,255,0.98)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,174,239,0.06)",
-        }}
-      >
-        <div className="grid grid-cols-2 gap-x-8 gap-y-1 min-w-[480px]">
-          {INDUSTRY_GROUPS.map((group) => (
-            <div key={group.label}>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-primary/60 mb-2 px-3">
-                {group.label}
-              </p>
-              <div className="flex flex-col gap-0.5">
-                {group.industries.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => handleIndustrySelect(item, "navbar_dropdown")}
-                    className={menuItemClass}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 pt-3 border-t border-border/50 text-center">
-          <a
-            href="/industries"
-            onClick={(event) => handleNavClick(event, { label: "View All Industries", href: "/industries" }, "navbar_dropdown")}
-            className="text-[12px] font-bold text-primary hover:underline"
-          >
-            View All Industries →
-          </a>
-        </div>
-      </div>
-    </div>,
-    document.body
-  ) : null;
+    window.addEventListener("keydown", onKeyDown);
+    return () => window.removeEventListener("keydown", onKeyDown);
+  }, []);
 
   return (
     <nav
       aria-label="Main navigation"
-      className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+      className="fixed inset-x-0 top-0 z-50 border-b transition-all duration-200"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: scrolled ? "rgba(6, 16, 37, 0.92)" : "rgba(6, 16, 37, 0.7)",
-        backdropFilter: "blur(12px) saturate(1.1)",
-        WebkitBackdropFilter: "blur(12px) saturate(1.1)",
-        borderBottom: scrolled ? "1px solid rgba(53, 189, 241, 0.18)" : "1px solid rgba(53, 189, 241, 0.08)",
-        boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.18)" : "none",
-        overflow: "visible",
+        background: scrolled ? "rgba(255,255,255,0.97)" : "rgba(255,255,255,0.92)",
+        borderColor: scrolled ? "rgba(148,163,184,0.24)" : "rgba(148,163,184,0.14)",
+        boxShadow: scrolled ? "0 8px 28px rgba(15,23,42,0.07)" : "none",
+        backdropFilter: "blur(14px)",
+        WebkitBackdropFilter: "blur(14px)",
       }}
     >
       <div
-        className="w-full flex items-center justify-between px-4 md:px-6"
-        style={{
-          height: "var(--cs-nav-height)",
-          paddingLeft: "max(1.25rem, env(safe-area-inset-left))",
-          paddingRight: "max(1.25rem, env(safe-area-inset-right))",
-        }}
+        className="mx-auto flex w-full max-w-[1280px] items-center justify-between px-5 sm:px-8 lg:px-10"
+        style={{ height: "var(--cs-nav-height, 76px)" }}
       >
         <a
           href="/"
-          onClick={handleLogoClick}
-          className="shrink-0 transition-transform duration-300 hover:-translate-y-0.5"
+          onClick={handleLogo}
+          className="inline-flex shrink-0 items-center"
           aria-label="ClientSurge Systems home"
-          style={{ display: "inline-flex", alignItems: "center", overflow: "visible" }}
         >
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
@@ -233,252 +134,107 @@ export default function Navbar() {
             width="480"
             height="224"
             decoding="async"
-            style={{ height: "clamp(84px, 10vw, 116px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+            className="block h-[44px] w-auto object-contain sm:h-[48px]"
           />
         </a>
 
-        <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.filter((link) => link.label !== "Industries").map((link) => (
+        <div className="hidden items-center gap-7 lg:flex">
+          {NAV_LINKS.map((item) => (
             <a
-              key={link.href}
-              href={link.href}
-              onClick={(event) => handleNavClick(event, link, "navbar")}
-              className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
-              style={{ color: isActivePage(link.href) ? "#35BDF1" : "#ffffff", textDecoration: "none" }}
+              key={item.href}
+              href={item.href}
+              onClick={(event) => handleLink(event, item)}
+              className="relative py-2 text-sm font-bold transition-colors hover:text-[#008fc9] focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
+              style={{ color: isActivePage(item.href) ? "#008fc9" : "#334155" }}
             >
-              {link.label}
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              {item.label}
+              {isActivePage(item.href) && (
+                <span className="absolute inset-x-0 -bottom-0.5 h-0.5 rounded-full bg-[#00AEEF]" aria-hidden="true" />
+              )}
             </a>
           ))}
-
-          <div className="relative" onMouseEnter={openIndustries} onMouseLeave={closeIndustriesSoon}>
-            <button
-              ref={industriesTriggerRef}
-              type="button"
-              onClick={() => (industriesOpen ? setIndustriesOpen(false) : openIndustries())}
-              aria-expanded={industriesOpen}
-              aria-haspopup="menu"
-              className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: industriesOpen || isActivePage("/industries") ? "#35BDF1" : "#ffffff" }}
-            >
-              Industries
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen || isActivePage("/industries") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
-            </button>
-            {IndustriesDropdown}
-          </div>
         </div>
 
-        <div className="hidden xl:flex items-center gap-2 shrink-0">
-          <button
-            type="button"
-            onClick={() => {
-              trackCTA("client_login", "navbar");
-              closeAll();
-              navigate("/login");
-            }}
-            className="hidden md:flex items-center gap-1.5 text-xs font-bold transition-all duration-300 px-4 py-1.5 rounded-lg"
-            style={{
-              minHeight: "unset",
-              minWidth: "unset",
-              color: "#ffffff",
-              background: "rgba(255,255,255,0.10)",
-              border: "1px solid rgba(255,255,255,0.22)",
-            }}
+        <div className="hidden items-center gap-3 lg:flex">
+          <a
+            href={accountHref}
+            onClick={(event) => handleLink(event, { label: accountLabel, href: accountHref })}
+            className="inline-flex min-h-10 items-center justify-center rounded-full px-4 text-sm font-bold text-slate-700 transition-colors hover:bg-slate-100 focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
           >
-            Client Login
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              trackCTA("compare_packages", "navbar");
-              closeAll();
-              navigateTo("/#pricing");
-            }}
-            className="cs-btn-primary cs-nav-cta"
-            style={{ minHeight: "unset", minWidth: "unset" }}
+            {accountLabel}
+          </a>
+          <a
+            href="/#pricing"
+            onClick={(event) => handleLink(event, { label: "Compare Packages", href: "/#pricing" })}
+            className="inline-flex min-h-11 items-center justify-center rounded-full bg-[#009bd8] px-5 text-sm font-black text-white transition-colors hover:bg-[#008cc3] focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
           >
             Compare Packages
-          </button>
+          </a>
         </div>
 
-        <div className="xl:hidden flex items-center gap-2">
-          <button
-            type="button"
-            onClick={() => {
-              trackCTA("compare_packages_mobile_bar", "navbar");
-              closeAll();
-              navigateTo("/#pricing");
-            }}
-            className="cs-btn-primary cs-nav-cta"
-            style={{ minHeight: "unset", height: "36px", padding: "0 16px", fontSize: "0.75rem" }}
+        <div className="flex items-center gap-2 lg:hidden">
+          <a
+            href="/#pricing"
+            onClick={(event) => handleLink(event, { label: "Compare Packages", href: "/#pricing" }, "mobile_nav_bar")}
+            className="inline-flex min-h-10 items-center justify-center rounded-full bg-[#009bd8] px-4 text-xs font-black text-white transition-colors hover:bg-[#008cc3] focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
           >
             Compare
-          </button>
+          </a>
           <button
             type="button"
-            className="w-10 h-10 rounded-full border backdrop-blur-[3px] flex items-center justify-center shadow-sm transition-colors"
-            onClick={() => setOpen(!open)}
-            style={{
-              borderColor: "rgba(53, 189, 241, 0.3)",
-              background: "rgba(53, 189, 241, 0.1)",
-              color: "#ffffff",
-            }}
+            onClick={() => setOpen((current) => !current)}
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-slate-200 bg-white text-slate-800 shadow-sm transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
             aria-controls="mobile-nav-drawer"
             aria-expanded={open}
           >
-            {open ? <X className="w-5 h-5" aria-hidden="true" /> : <Menu className="w-5 h-5" aria-hidden="true" />}
-            <span className="sr-only">{open ? "Close navigation menu" : "Open navigation menu"}</span>
+            {open ? <X className="h-5 w-5" aria-hidden="true" /> : <Menu className="h-5 w-5" aria-hidden="true" />}
           </button>
         </div>
       </div>
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40 xl:hidden bg-black/30" aria-hidden="true" onClick={() => setOpen(false)} />
+          <button
+            type="button"
+            className="fixed inset-0 top-[var(--cs-nav-height,76px)] z-40 bg-slate-950/25 lg:hidden"
+            aria-label="Close navigation menu"
+            onClick={closeMenu}
+          />
           <div
             id="mobile-nav-drawer"
-            className="xl:hidden px-5 pb-8 pt-2 relative z-50 mobile-nav-drawer"
-            style={{
-              maxWidth: "min(420px, 90vw)",
-              maxHeight: "calc(100vh - var(--cs-nav-height) - env(safe-area-inset-top))",
-              overflowY: "auto",
-              WebkitOverflowScrolling: "touch",
-              paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
-              background: "rgba(255,255,255,0.98)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
-              borderBottom: "1px solid rgba(0,174,239,0.12)",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
-            }}
+            className="relative z-50 border-t border-slate-100 bg-white px-5 pb-6 pt-3 shadow-[0_24px_50px_rgba(15,23,42,0.12)] sm:px-8 lg:hidden"
           >
-            <div className="pt-3 pb-2 space-y-0.5">
-              {sectionLinks.filter((link) => link.label !== "Industries").map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center text-[15px] font-semibold text-black hover:text-[#00AEEF] focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-[#00AEEF]/5"
-                  style={{ minHeight: "44px" }}
-                  onClick={(event) => handleNavClick(event, link, "mobile_nav")}
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-
-            <div className="mt-2 mb-3 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
-              {mobileUserName ? (
-                <>
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
-                  <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCTA("client_dashboard", "mobile_nav");
-                      closeAll();
-                      navigate("/client-portal");
-                    }}
-                    className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-white text-[13px] font-bold transition-all hover:-translate-y-0.5"
-                    style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)" }}
+            <div className="mx-auto max-w-[560px]">
+              <div className="grid gap-1">
+                {NAV_LINKS.map((item) => (
+                  <a
+                    key={item.href}
+                    href={item.href}
+                    onClick={(event) => handleLink(event, item, "mobile_nav")}
+                    className="flex min-h-12 items-center rounded-xl px-3 text-base font-bold text-slate-800 transition-colors hover:bg-sky-50 hover:text-[#008fc9] focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
                   >
-                    Go to Client Portal →
-                  </button>
-                </>
-              ) : (
-                <div className="grid grid-cols-1 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCTA("client_login", "mobile_nav");
-                      closeAll();
-                      navigate("/login");
-                    }}
-                    className="w-full inline-flex items-center justify-center rounded-xl border text-[14px] font-bold transition-all hover:-translate-y-0.5 focus:ring-2 focus:ring-primary focus:outline-none"
-                    style={{
-                      minHeight: "48px",
-                      color: "#ffffff",
-                      background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-                      borderColor: "rgba(53, 189, 241, 0.35)",
-                      boxShadow: "0 8px 22px rgba(0,174,239,0.22)",
-                    }}
-                  >
-                    Client Login
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCTA("contact", "mobile_nav");
-                      closeAll();
-                      navigate("/contact");
-                    }}
-                    className="w-full inline-flex items-center justify-center rounded-xl border border-border text-[14px] font-bold text-foreground hover:bg-muted transition-colors"
-                    style={{ minHeight: "48px" }}
-                  >
-                    Contact ClientSurge
-                  </button>
-                </div>
-              )}
-            </div>
-
-            <div className="pt-3 mt-1 border-t border-border">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-3" style={{ color: "#00AEEF" }}>Industries</p>
-              <div className="space-y-3">
-                {INDUSTRY_GROUPS.map((group) => (
-                  <div key={group.label}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] mb-1.5 px-3 text-muted-foreground/60">{group.label}</p>
-                    <div className="grid grid-cols-1 gap-0.5">
-                      {group.industries.map((item) => (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onClick={() => handleIndustrySelect(item, "mobile_nav")}
-                          className="w-full text-left flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
-                          style={{ minHeight: "44px" }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
+                    {item.label}
+                  </a>
                 ))}
               </div>
-              <a
-                href="/industries"
-                onClick={(event) => handleNavClick(event, { label: "View All Industries", href: "/industries" }, "mobile_nav")}
-                className="block text-center text-[12px] font-bold text-primary hover:underline mt-3 py-2"
-              >
-                View All Industries →
-              </a>
-            </div>
 
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  trackCTA("compare_packages", "mobile_nav");
-                  closeAll();
-                  navigateTo("/#pricing");
-                }}
-                className="cs-btn-primary cs-nav-cta flex-1"
-                style={{ minHeight: "unset" }}
-              >
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px" }}>
+              <div className="mt-4 grid gap-2 border-t border-slate-100 pt-4 sm:grid-cols-2">
+                <a
+                  href={accountHref}
+                  onClick={(event) => handleLink(event, { label: accountLabel, href: accountHref }, "mobile_nav")}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl border border-slate-200 bg-white px-5 text-sm font-black text-slate-800 transition-colors hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
+                >
+                  {accountLabel}
+                </a>
+                <a
+                  href="/#pricing"
+                  onClick={(event) => handleLink(event, { label: "Compare Packages", href: "/#pricing" }, "mobile_nav")}
+                  className="inline-flex min-h-12 items-center justify-center rounded-xl bg-[#009bd8] px-5 text-sm font-black text-white transition-colors hover:bg-[#008cc3] focus:outline-none focus:ring-2 focus:ring-[#00AEEF]"
+                >
                   Compare Packages
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  trackCTA("automations", "mobile_nav");
-                  closeAll();
-                  navigate("/automations");
-                }}
-                className="inline-flex items-center justify-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-                style={{ flex: "0 0 auto", minHeight: "unset", height: "48px", padding: "0 20px" }}
-              >
-                Automations
-              </button>
+                </a>
+              </div>
             </div>
           </div>
         </>

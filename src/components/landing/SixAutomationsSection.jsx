@@ -1,93 +1,158 @@
 import { motion, useReducedMotion } from "framer-motion";
-import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ShoppingCart } from "lucide-react";
+import {
+  Building2,
+  CalendarCheck2,
+  MessageSquareText,
+  PhoneCall,
+  RefreshCw,
+  Send,
+  Star,
+} from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 
-const AUTOMATION_CARDS = [
-  { id: "automation-lead-capture", label: "Lead Capture", description: "Turns forms, calls, ads, and website inquiries into one trackable pipeline — so no lead slips through the cracks.", icon: Zap, metric: "< 60 sec", metricLabel: "to first response" },
-  { id: "automation-missed-call", label: "Missed-Call Recovery", description: "Texts missed callers instantly so the conversation continues — before they call your competitor.", icon: Phone, metric: "78%", metricLabel: "recovery rate" },
-  { id: "automation-follow-up", label: "AI Follow-Up", description: "Keeps leads moving with automated multi-step sequences until they reply, book, opt out, or close.", icon: MessageSquare, metric: "14-day", metricLabel: "nurture sequence" },
-  { id: "automation-booking", label: "AI Booking", description: "Moves interested prospects toward a confirmed appointment — no manual back-and-forth needed.", icon: Calendar, metric: "24/7", metricLabel: "booking availability" },
-  { id: "automation-reviews", label: "Review Requests", description: "Automatically requests reviews when the customer experience is fresh and the timing is right.", icon: Star, metric: "3x", metricLabel: "more reviews" },
-  { id: "automation-reactivation", label: "Lead Reactivation", description: "Brings old leads, past customers, no-shows, and unclosed quotes back into motion automatically.", icon: RefreshCw, metric: "30-90 days", metricLabel: "dormant re-engaged" },
+const AUTOMATIONS = [
+  {
+    title: "Instant Lead Response",
+    description:
+      "Acknowledges new inquiries through the configured channels and gives each lead a clear next step.",
+    packageLabel: "Starter & up",
+    icon: Send,
+  },
+  {
+    title: "Missed-Call Text-Back",
+    description:
+      "Sends a configured text after a missed call so potential customers do not disappear without a response.",
+    packageLabel: "Starter & up",
+    icon: PhoneCall,
+  },
+  {
+    title: "14-Day Lead Nurture",
+    description:
+      "Keeps following up through a defined SMS and email sequence until the lead responds, books, or opts out.",
+    packageLabel: "Growth & up",
+    icon: MessageSquareText,
+  },
+  {
+    title: "AI Booking Handoff",
+    description:
+      "Moves interested leads toward your existing booking process and reduces manual back-and-forth.",
+    packageLabel: "Growth & up",
+    icon: CalendarCheck2,
+  },
+  {
+    title: "Review Requests",
+    description:
+      "Requests customer feedback at the configured point after service, with timing aligned to your workflow.",
+    packageLabel: "Pro",
+    icon: Star,
+  },
+  {
+    title: "Lead Reactivation",
+    description:
+      "Re-engages dormant inquiries, no-shows, and unclosed opportunities through a structured outreach campaign.",
+    packageLabel: "Pro",
+    icon: RefreshCw,
+  },
 ];
 
-const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.1 } } };
+const containerVariants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.07, delayChildren: 0.04 } },
+};
 
-const ICON_PULSE_KEYFRAMES = `
-@keyframes csIconPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); }
-  50% { box-shadow: 0 0 14px 1px rgba(53,189,241,0.25); }
-}
-@media (prefers-reduced-motion: reduce) {
-  @keyframes csIconPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); } }
-}
-`;
-const cardVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
+const cardVariants = {
+  hidden: { opacity: 0, y: 18 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.45, ease: [0.22, 1, 0.36, 1] },
+  },
+};
 
 export default function SixAutomationsSection() {
   const shouldReduceMotion = useReducedMotion();
 
   return (
-    <section className="relative py-20 md:py-32 bg-white" style={{ background: "#ffffff" }} aria-labelledby="six-automations-title">
-      <style>{ICON_PULSE_KEYFRAMES}</style>
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section
+      className="relative overflow-hidden bg-[#F7FBFE] py-16 md:py-24"
+      aria-label="Six ClientSurge automation modules"
+    >
+      <div
+        className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-sky-200 to-transparent"
+        aria-hidden="true"
+      />
+
+      <div className="relative z-10 mx-auto w-full max-w-[1240px] px-5 sm:px-8 lg:px-10">
         <motion.div
-          className="mb-16 md:mb-20"
-          initial={shouldReduceMotion ? {} : { opacity: 0, y: 20 }}
-          whileInView={shouldReduceMotion ? {} : { opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true, margin: "-100px" }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 18 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-70px" }}
+          transition={{ duration: 0.5 }}
+          className="mx-auto max-w-3xl"
         >
           <CSSectionHeader
-            eyebrow="The Automation Store"
-            title="Six Systems That Protect Every Lead"
-            subtitle="Browse the automation stack — capture, recover, follow up, book, request reviews, and reactivate. Add individual modules or pick a full system. No demos required."
+            eyebrow="What ClientSurge Installs"
+            title="Six focused automations. One connected system."
+            subtitle="Each module solves a specific gap in the lead journey. Your package determines which modules are configured, tested, and activated for your business."
             align="center"
-            theme="light"
           />
         </motion.div>
 
         <motion.div
-          className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 md:gap-8"
+          className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:mt-12 lg:grid-cols-3 lg:gap-5"
           variants={shouldReduceMotion ? {} : containerVariants}
           initial={shouldReduceMotion ? {} : "hidden"}
           whileInView={shouldReduceMotion ? {} : "visible"}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: "-70px" }}
         >
-          {AUTOMATION_CARDS.map(({ id, label, description, icon: Icon, metric, metricLabel }) => (
-            <motion.div
-              key={id}
-              id={id}
+          {AUTOMATIONS.map(({ title, description, packageLabel, icon: Icon }) => (
+            <motion.article
+              key={title}
               variants={shouldReduceMotion ? {} : cardVariants}
-              className="cs-feature-card p-6 md:p-8"
-              style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}
+              className="flex h-full min-h-[250px] flex-col rounded-[1.5rem] border border-slate-200 bg-white p-6 shadow-[0_14px_36px_rgba(15,23,42,0.065)] transition-colors duration-200 hover:border-sky-300"
             >
-              <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>
-                  <Icon className="w-6 h-6" style={{ color: "#35BDF1" }} aria-hidden="true" />
+              <div className="flex items-start justify-between gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl border border-sky-200 bg-sky-50 text-[#008fc9]">
+                  <Icon className="h-5 w-5" aria-hidden="true" />
                 </div>
-                <div className="text-right">
-                  <p className="font-titles font-black" style={{ fontSize: "1.1rem", color: "#006BB0", lineHeight: 1 }}>{metric}</p>
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">{metricLabel}</p>
-                </div>
+                <span className="rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-[#0079a8]">
+                  {packageLabel}
+                </span>
               </div>
-              <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>
-              <p style={{ color: "rgba(10,22,40,0.7)", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
-              <div className="mt-4 flex items-center justify-between">
-                <Link
-                  to={`/store?focus=${encodeURIComponent(id)}`}
-                  onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
-                >
-                  <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
-                </Link>
-                <span className="text-[10px] font-semibold text-gray-300">ID: {id.replace("automation-", "")}</span>
-              </div>
-            </motion.div>
+
+              <h3 className="mt-6 font-titles text-xl font-black leading-tight tracking-[-0.025em] text-slate-950">
+                {title}
+              </h3>
+              <p className="mt-3 text-sm font-medium leading-7 text-slate-600">
+                {description}
+              </p>
+            </motion.article>
           ))}
         </motion.div>
+
+        <div className="mt-8 flex flex-col items-start justify-between gap-4 rounded-2xl border border-sky-200 bg-white px-5 py-5 sm:flex-row sm:items-center sm:px-6">
+          <div className="flex items-start gap-3">
+            <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sky-50 text-[#008fc9]">
+              <Building2 className="h-5 w-5" aria-hidden="true" />
+            </div>
+            <div>
+              <p className="text-sm font-black text-slate-950">Configured around your service business.</p>
+              <p className="mt-1 text-sm font-medium leading-6 text-slate-600">
+                HVAC, dental, roofing, plumbing, med spas, legal services, and other appointment-driven businesses.
+              </p>
+            </div>
+          </div>
+
+          <Link
+            to="/industries"
+            onClick={() => trackCTA("six_automations_view_industries", "six_automations")}
+            className="inline-flex min-h-11 shrink-0 items-center justify-center rounded-full border border-sky-200 bg-sky-50 px-5 text-sm font-black text-[#0079a8] transition-colors hover:bg-sky-100 focus:outline-none focus:ring-2 focus:ring-[#00AEEF] focus:ring-offset-2"
+          >
+            View Industries
+          </Link>
+        </div>
       </div>
     </section>
   );

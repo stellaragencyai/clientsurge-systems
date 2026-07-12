@@ -60,3 +60,31 @@ export const FAQ_ITEMS = [
     category: "support",
   },
 ];
+
+export const HOMEPAGE_FAQ_ITEMS = [
+  {
+    q: "What is included in each package?",
+    a: "Starter includes Instant Lead Response and Missed-Call Text-Back. Growth adds the 14-Day Lead Nurture and AI Booking Handoff. Pro adds Review Requests and Lead Reactivation, plus the website and hosting scope shown in the pricing section.",
+    category: "pricing",
+  },
+  {
+    q: "How long does installation take?",
+    a: "After checkout, you complete a guided intake form. Straightforward setups can move quickly, while calendars, CRMs, phone routing, approvals, and custom website work can extend the timeline. We confirm the setup path before launch.",
+    category: "setup",
+  },
+  {
+    q: "Does ClientSurge replace my website or CRM?",
+    a: "Starter and Growth are designed to connect with your existing website and operating tools. Pro includes the website and hosting scope shown in pricing. We review your current systems during intake and confirm the cleanest implementation path.",
+    category: "integration",
+  },
+  {
+    q: "Can I expand or upgrade my system later?",
+    a: "Yes. Additional modules or a higher package can be reviewed with support before changes are activated. Any added setup work and recurring cost are confirmed first.",
+    category: "pricing",
+  },
+  {
+    q: "What happens after checkout?",
+    a: "You complete the guided intake, we confirm your integrations and requirements, configure the purchased workflows, test the lead path and handoffs, record proof where applicable, and then move the approved system toward launch.",
+    category: "setup",
+  },
+];
