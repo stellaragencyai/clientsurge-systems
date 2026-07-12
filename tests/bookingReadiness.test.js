@@ -49,22 +49,34 @@ test("inline audit form clearly describes preferred-time confirmation", () => {
   assert.match(bookingInline, /Arizona time \(MST\)/);
   assert.match(bookingInline, /pending until ClientSurge confirms it/i);
   assert.match(bookingInline, /Request This Time/);
-  assert.match(bookingInline, /calendar_created|appointment before it is marked booked/);
+  assert.match(bookingInline, /appointment before it is marked booked/);
   assert.match(bookingInline, /scheduleDemoBooking/);
   assert.match(bookingInline, /crm_tag:\s*crmTagForIndustry\(industrySlug\)/);
 });
 
-test("inline and modal booking surfaces capture the required audit context", () => {
-  for (const source of [bookingModal, bookingInline]) {
-    assert.match(source, /business_website_url|website/);
-    assert.match(source, /industry|business_type/);
-    assert.match(source, /biggest_issue|message/);
-    assert.match(source, /scheduled_date|preferred_date/);
-    assert.match(source, /scheduled_time|preferred_time/);
-    assert.match(source, /consent_given/);
-  }
+test("every modal uses the same canonical preferred-time request component", () => {
+  assert.match(bookingModal, /import\s+DemoBookingInline/);
+  assert.match(bookingModal, /<DemoBookingInline/);
+  assert.match(bookingModal, /preferred time, not receiving an instant calendar confirmation/i);
+  assert.match(bookingModal, /within one business day/i);
+  assert.doesNotMatch(bookingModal, /base44\.functions\.invoke\("scheduleDemoBooking"/);
+});
 
-  assert.match(bookingModal, /crm_tag:\s*auditCopy\.crmTag/);
+test("inline request surface captures complete CRM and audit context", () => {
+  for (const field of [
+    "business_website_url",
+    "industry_slug",
+    "crm_tag",
+    "biggest_issue",
+    "scheduled_date",
+    "scheduled_time",
+    "consent_given",
+    "utm_source",
+    "utm_campaign",
+    "referrer",
+  ]) {
+    assert.match(bookingInline, new RegExp(field));
+  }
 });
 
 test("canonical industry tags remain available for priority outreach verticals", () => {
@@ -78,5 +90,5 @@ test("plumbing keeps a real public route and industry-specific request context",
   assert.match(appSource, /"plumbing"/);
   assert.match(industryData, /"plumbing":\s*\{/);
   assert.match(industryData, /Free Plumbing Automation Audit/);
-  assert.match(bookingModal, /plumbing_lead/);
+  assert.match(bookingModal, /plumbing_automation_audit/);
 });
