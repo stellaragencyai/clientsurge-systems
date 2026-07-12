@@ -1,8 +1,9 @@
 import { useState } from "react";
-import { ArrowRight, Loader2, CheckCircle2 } from "lucide-react";
-import CSConfirmationCard from '@/components/design-system/CSConfirmationCard';
+import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import CSConfirmationCard from "@/components/design-system/CSConfirmationCard";
 import { base44 } from "@/api/base44Client";
 
+const TIME_ZONE_LABEL = "Arizona time (MST)";
 const TIME_SLOTS = [
   { value: "09:00", label: "9:00 AM" },
   { value: "09:30", label: "9:30 AM" },
@@ -19,31 +20,30 @@ const TIME_SLOTS = [
 ];
 
 const INDUSTRIES = [
-  "Med Spas & Aesthetic Clinics",
-  "Dental & Orthodontics",
-  "Chiropractic & Physical Therapy",
-  "HVAC, Plumbing & Home Services",
+  "HVAC",
   "Roofing & Restoration",
+  "Dental & Orthodontics",
+  "Med Spas & Aesthetic Clinics",
+  "Plumbing & Drain Services",
+  "Chiropractic & Physical Therapy",
   "Contractors & Trades",
   "Other",
 ];
 
 function normalizeIndustrySlug(value) {
-  return String(value || "")
+  const slug = String(value || "")
     .trim()
     .toLowerCase()
     .replace(/&/g, "and")
     .replace(/[^a-z0-9]+/g, "_")
     .replace(/^_+|_+$/g, "");
-}
-
-function canonicalIndustrySlug(value) {
-  const slug = normalizeIndustrySlug(value);
   if (slug.includes("roof")) return "roofing";
   if (slug.includes("hvac")) return "hvac";
   if (slug.includes("plumb")) return "plumbing";
   if (slug.includes("dental") || slug.includes("orthodont")) return "dental";
   if (slug.includes("med_spa") || slug.includes("aesthetic")) return "med_spa";
+  if (slug.includes("chiropr") || slug.includes("physical_therapy")) return "chiropractic";
+  if (slug.includes("contract")) return "contractors";
   return slug;
 }
 
@@ -54,7 +54,20 @@ function crmTagForIndustry(slug) {
     plumbing: "plumbing_lead",
     dental: "dental_lead",
     med_spa: "med_spa_lead",
+    chiropractic: "chiropractic_lead",
+    contractors: "contractor_lead",
   }[slug] || "automation_audit_lead";
+}
+
+function getArizonaDate() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "America/Phoenix",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
 }
 
 function getPageAttribution() {
@@ -68,7 +81,6 @@ function getPageAttribution() {
       referrer: "",
     };
   }
-
   const params = new URLSearchParams(window.location.search);
   return {
     source_page: window.location.pathname || "/book",
@@ -89,88 +101,87 @@ export default function DemoBookingInline({
   serviceLabel = "",
 }) {
   const isLight = theme === "light";
-  const flowLabel = mode === "system_match" ? "System Match" : "Audit";
-  const [step, setStep] = useState(1);
+  const flowLabel = mode === "system_match" ? "system match" : "automation audit";
   const [form, setForm] = useState({
-    first_name: "", last_name: "", business_name: "", email: "",
-    phone: "", website: "", industry: prefillIndustry, biggest_issue: "", website_url: "",
+    first_name: "",
+    last_name: "",
+    business_name: "",
+    email: "",
+    phone: "",
+    website: "",
+    industry: prefillIndustry,
+    biggest_issue: "",
+    preferred_date: "",
+    preferred_time: "",
+    website_url: "",
     consent_given: false,
   });
-  const [scheduling, setScheduling] = useState({ date: "", time: "" });
   const [saving, setSaving] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [responseMessage, setResponseMessage] = useState("");
   const [errors, setErrors] = useState({});
-  const [submitWarnings, setSubmitWarnings] = useState([]);
   const [bookedSlots, setBookedSlots] = useState([]);
   const [loadingSlots, setLoadingSlots] = useState(false);
 
-  const set = (e) => {
-    const { name, value } = e.target;
-    setForm((f) => ({ ...f, [name]: value }));
+  const labelClass = isLight
+    ? "block text-xs font-bold text-slate-700 mb-1.5"
+    : "block text-xs font-semibold text-white/70 mb-1.5";
+  const helperClass = isLight ? "text-xs text-slate-500" : "text-xs text-white/60";
+  const errorClass = isLight ? "text-xs font-semibold text-red-600" : "text-xs font-semibold text-red-300";
+  const inputClass = (key) => isLight
+    ? `w-full h-11 rounded-xl border px-3 text-sm bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 ${errors[key] ? "border-red-500" : "border-slate-200"}`
+    : `w-full h-11 rounded-xl border px-3 text-sm bg-white/5 text-white placeholder:text-white/35 focus:outline-none focus:ring-2 focus:ring-amber-500/40 ${errors[key] ? "border-red-400" : "border-white/15"}`;
+
+  const updateField = (name, value) => {
+    setForm((current) => ({ ...current, [name]: value }));
     setErrors((current) => ({ ...current, [name]: undefined, submit: undefined }));
   };
 
-  const validateEmail = (v) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.trim());
-  const validatePhone = (v) => /^[\d\s\-()]+$/.test(v) && v.replace(/\D/g, "").length >= 10;
-
-  const getStep1Errors = () => {
-    const errs = {};
-    if (!form.first_name.trim()) errs.first_name = "Required";
-    if (!form.last_name.trim()) errs.last_name = "Required";
-    if (!form.business_name.trim()) errs.business_name = "Required";
-    if (!form.email.trim()) errs.email = "Required";
-    else if (!validateEmail(form.email)) errs.email = "Invalid email";
-    if (!form.phone.trim()) errs.phone = "Required";
-    else if (!validatePhone(form.phone)) errs.phone = "Invalid phone";
-    if (!form.industry.trim()) errs.industry = "Required";
-    if (!form.website.trim()) errs.website = "Required";
-    if (!form.biggest_issue.trim()) errs.biggest_issue = "Required";
-    if (form.consent_given !== true) errs.consent_given = "Required";
-    return errs;
+  const validate = () => {
+    const next = {};
+    if (!form.first_name.trim()) next.first_name = "Required";
+    if (!form.last_name.trim()) next.last_name = "Required";
+    if (!form.business_name.trim()) next.business_name = "Required";
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) next.email = "Enter a valid email";
+    if (form.phone.replace(/\D/g, "").length < 10) next.phone = "Enter a valid phone";
+    if (!form.industry.trim()) next.industry = "Required";
+    if (!form.biggest_issue.trim()) next.biggest_issue = "Required";
+    if (!form.preferred_date) next.preferred_date = "Choose a date";
+    if (!form.preferred_time) next.preferred_time = "Choose a time";
+    if (!form.consent_given) next.consent_given = "Consent is required";
+    return next;
   };
 
-  const handleStep1 = (e) => {
-    e.preventDefault();
-    const errs = getStep1Errors();
-    setErrors(errs);
-    if (Object.keys(errs).length === 0) setStep(2);
-  };
-
-  const handleDateChange = async (e) => {
-    const value = e.target.value;
-    setScheduling({ date: value, time: "" });
-    setErrors((current) => ({ ...current, scheduling: undefined, submit: undefined }));
+  const handleDateChange = async (value) => {
+    updateField("preferred_date", value);
+    updateField("preferred_time", "");
+    setBookedSlots([]);
     if (!value) return;
     setLoadingSlots(true);
     try {
-      const res = await base44.functions.invoke("getBookedDemoSlots", { date: value });
-      setBookedSlots(res.data.booked_times || []);
-    } catch { setBookedSlots([]); }
-    finally { setLoadingSlots(false); }
+      const response = await base44.functions.invoke("getBookedDemoSlots", { date: value });
+      setBookedSlots(response?.data?.booked_times || []);
+    } catch {
+      setBookedSlots([]);
+    } finally {
+      setLoadingSlots(false);
+    }
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    const step1Errors = getStep1Errors();
-    if (Object.keys(step1Errors).length > 0) {
-      setErrors(step1Errors);
-      setStep(1);
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const nextErrors = validate();
+    setErrors(nextErrors);
+    if (Object.keys(nextErrors).length) return;
+    if (bookedSlots.includes(form.preferred_time)) {
+      setErrors({ preferred_time: "That preferred time is no longer available" });
       return;
     }
-    if (!scheduling.date || !scheduling.time) {
-      setErrors({ scheduling: "Please select both date and time" });
-      return;
-    }
-    if (bookedSlots.includes(scheduling.time)) {
-      setErrors({ scheduling: "That time is already reserved. Please choose another time." });
-      return;
-    }
+
     setSaving(true);
-    setSubmitWarnings([]);
-    setErrors({});
     try {
-      const industrySlug = canonicalIndustrySlug(form.industry);
-      const res = await base44.functions.invoke("scheduleDemoBooking", {
+      const industrySlug = normalizeIndustrySlug(form.industry);
+      const response = await base44.functions.invoke("scheduleDemoBooking", {
         ...getPageAttribution(),
         full_name: `${form.first_name.trim()} ${form.last_name.trim()}`,
         first_name: form.first_name.trim(),
@@ -187,184 +198,189 @@ export default function DemoBookingInline({
         service_interest: serviceInterest,
         service_label: serviceLabel,
         biggest_issue: form.biggest_issue,
-        consent_given: form.consent_given === true,
-        consent_source: mode === "system_match" ? "book_system_match_inline" : "book_inline_scheduler",
-        consent_text_version: mode === "system_match" ? "system_match_inline_explicit_checkbox_v1" : "audit_inline_explicit_checkbox_v1",
+        consent_given: true,
+        consent_source: mode === "system_match" ? "book_system_match_inline" : "audit_inline_request",
+        consent_text_version: "audit_preferred_time_request_v2",
         website_url: form.website_url,
-        scheduled_date: scheduling.date,
-        scheduled_time: scheduling.time,
+        scheduled_date: form.preferred_date,
+        scheduled_time: form.preferred_time,
       });
-      if (res.data?.success) {
-        setSubmitWarnings(res.data.warnings || []);
-        setSuccess(true);
-      } else {
-        throw new Error(res.data?.error || "Booking failed");
-      }
-    } catch {
-      setErrors({ submit: "Something went wrong. Please try again." });
-    } finally { setSaving(false); }
-  };
 
-  const labelCls = isLight ? "block text-xs font-bold text-slate-700 mb-1.5" : "block text-xs font-semibold text-white/60 mb-1";
-  const helperCls = isLight ? "text-center text-xs text-slate-500" : "text-center text-xs text-white/60";
-  const errorCls = isLight ? "text-xs font-semibold text-red-600" : "text-xs text-red-400";
-  const inputCls = (key) => isLight
-    ? `w-full h-11 rounded-xl border px-3 text-sm bg-white text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/50 transition ${errors[key] ? "border-red-500" : "border-slate-200"}`
-    : `w-full h-10 rounded-xl border px-3 text-sm bg-white/5 text-white placeholder-white/30 focus:outline-none focus:ring-2 focus:ring-amber-500/50 transition ${errors[key] ? "border-red-500" : "border-white/10"}`;
-  const primaryButtonCls = isLight
-    ? "w-full h-12 flex items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-50"
-    : "w-full h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50";
-  const primaryButtonStyle = isLight ? undefined : { background: "linear-gradient(135deg,#6b3f1f 0%,#9a5c2e 40%,#7a4825 100%)" };
+      if (!response?.data?.success) {
+        throw new Error(response?.data?.error || "Request failed");
+      }
+      setResponseMessage(
+        response.data.message || "Preferred time received. ClientSurge will confirm it within one business day."
+      );
+      setSuccess(true);
+    } catch (error) {
+      setErrors({
+        submit: error?.response?.data?.error || error?.message || "Something went wrong. Please try again.",
+      });
+    } finally {
+      setSaving(false);
+    }
+  };
 
   if (success) {
     return (
       <CSConfirmationCard
-        title="You're All Set"
-        message={`Nolan will confirm your ${flowLabel.toLowerCase()} within 24 hours. Need to reschedule? Reply to your confirmation email or contact support@clientsurgesystems.com.`}
-        responseTime="within 24 hours"
+        title="Preferred Time Received"
+        message={responseMessage}
+        responseTime="within one business day"
         nextSteps={[
-          `Your ${flowLabel.toLowerCase()} request has been received`,
-          'Our team confirms the scheduled time',
-          'You receive a confirmation email with details',
+          `Your preferred ${flowLabel} time is held as a request`,
+          "ClientSurge confirms the time or sends the closest option",
+          "You receive the confirmed appointment details by email",
         ]}
       />
     );
   }
 
-  if (step === 1) {
-    return (
-      <form onSubmit={handleStep1} className="space-y-4">
-        <input
-          type="text"
-          name="website_url"
-          value={form.website_url}
-          onChange={set}
-          tabIndex={-1}
-          autoComplete="off"
-          className="hidden"
-          aria-hidden="true"
-        />
-        {serviceLabel && isLight && (
-          <div className="rounded-xl border border-primary/15 bg-white p-3 text-sm text-slate-700">
-            <span className="font-bold text-primary">Selected focus:</span> {serviceLabel}
-          </div>
-        )}
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label className={labelCls}>First Name *</label>
-            <input name="first_name" value={form.first_name} onChange={set} placeholder="Jane" className={inputCls("first_name")} />
-          </div>
-          <div>
-            <label className={labelCls}>Last Name *</label>
-            <input name="last_name" value={form.last_name} onChange={set} placeholder="Smith" className={inputCls("last_name")} />
-          </div>
-        </div>
-        <div>
-          <label className={labelCls}>Business Name *</label>
-          <input name="business_name" value={form.business_name} onChange={set} placeholder="My Business" className={inputCls("business_name")} />
-        </div>
-        <div>
-          <label className={labelCls}>Industry *</label>
-          <select name="industry" value={form.industry} onChange={set} className={`${inputCls("industry")} cursor-pointer`}>
-            <option value="">Select...</option>
-            {INDUSTRIES.map((i) => <option key={i} value={i}>{i}</option>)}
-          </select>
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          <div>
-            <label className={labelCls}>Email *</label>
-            <input name="email" type="email" value={form.email} onChange={set} placeholder="jane@biz.com" className={inputCls("email")} />
-          </div>
-          <div>
-            <label className={labelCls}>Phone *</label>
-            <input name="phone" type="tel" value={form.phone} onChange={set} placeholder="(555) 000-0000" className={inputCls("phone")} />
-          </div>
-        </div>
-        <div>
-          <label className={labelCls}>Website *</label>
-          <input name="website" value={form.website} onChange={set} placeholder="https://mybusiness.com" className={inputCls("website")} />
-        </div>
-        <div>
-          <label className={labelCls}>Biggest challenge right now? *</label>
-          <select name="biggest_issue" value={form.biggest_issue} onChange={set} className={`${inputCls("biggest_issue")} cursor-pointer`}>
-            <option value="">Select one...</option>
-            {serviceLabel && <option value={`Need ${serviceLabel}`}>Need {serviceLabel}</option>}
-            <option value="Slow response time">Slow response time</option>
-            <option value="Missed calls not being followed up">Missed calls not followed up</option>
-            <option value="No follow-up system">No follow-up system</option>
-            <option value="Low booking conversions">Low booking conversions</option>
-          </select>
-        </div>
-        <label className={`flex items-start gap-2.5 rounded-xl border px-3 py-3 text-xs leading-relaxed ${isLight ? "bg-white text-slate-600" : "text-white/60"} ${errors.consent_given ? "border-red-500" : isLight ? "border-slate-200" : "border-white/10"}`}>
-          <input
-            type="checkbox"
-            checked={form.consent_given}
-            onChange={(e) => {
-              setForm((f) => ({ ...f, consent_given: e.target.checked }));
-              setErrors((current) => ({ ...current, consent_given: undefined, submit: undefined }));
-            }}
-            className={isLight ? "mt-0.5 h-4 w-4 rounded accent-primary" : "mt-0.5 h-4 w-4 rounded accent-amber-500"}
-          />
-          <span>I agree to receive automated SMS and email messages from ClientSurge Systems about my {flowLabel.toLowerCase()} request. Reply STOP to opt out.</span>
-        </label>
-        {Object.keys(errors).length > 0 && (
-          <p className={errorCls}>Please fill in all required fields.</p>
-        )}
-        <button type="submit" className={primaryButtonCls} style={primaryButtonStyle}>
-          Next: Choose {flowLabel} Time <ArrowRight className="w-4 h-4" />
-        </button>
-        <p className={helperCls}>No spam. No pressure. Just a practical recommendation for your business.</p>
-      </form>
-    );
-  }
-
   return (
     <form onSubmit={handleSubmit} className="space-y-4">
-      {errors.scheduling && <p className={errorCls}>{errors.scheduling}</p>}
-      {errors.submit && <p className={errorCls}>{errors.submit}</p>}
-      <div>
-        <label className={labelCls}>Select {flowLabel} Date *</label>
-        <input
-          type="date"
-          value={scheduling.date}
-          min={new Date().toISOString().split("T")[0]}
-          onChange={handleDateChange}
-          className={inputCls("scheduling")}
-        />
+      <input
+        type="text"
+        name="website_url"
+        value={form.website_url}
+        onChange={(event) => updateField("website_url", event.target.value)}
+        tabIndex={-1}
+        autoComplete="off"
+        className="hidden"
+        aria-hidden="true"
+      />
+
+      {serviceLabel && isLight && (
+        <div className="rounded-xl border border-primary/15 bg-white p-3 text-sm text-slate-700">
+          <span className="font-bold text-primary">Selected focus:</span> {serviceLabel}
+        </div>
+      )}
+
+      <div className="rounded-xl border border-primary/15 bg-primary/5 p-3">
+        <p className={`font-semibold ${isLight ? "text-slate-800" : "text-white"}`}>
+          Request a preferred time
+        </p>
+        <p className={`mt-1 ${helperClass}`}>
+          Times are shown in {TIME_ZONE_LABEL}. Your request is pending until ClientSurge confirms it by email.
+        </p>
       </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={labelClass}>First name *</label>
+          <input value={form.first_name} onChange={(event) => updateField("first_name", event.target.value)} className={inputClass("first_name")} placeholder="Jane" />
+          {errors.first_name && <p className={errorClass}>{errors.first_name}</p>}
+        </div>
+        <div>
+          <label className={labelClass}>Last name *</label>
+          <input value={form.last_name} onChange={(event) => updateField("last_name", event.target.value)} className={inputClass("last_name")} placeholder="Smith" />
+          {errors.last_name && <p className={errorClass}>{errors.last_name}</p>}
+        </div>
+      </div>
+
       <div>
-        <label className={labelCls}>
-          Select {flowLabel} Time * {loadingSlots && <span className={isLight ? "font-normal text-slate-400 ml-1" : "font-normal text-white/30 ml-1"}>Loading...</span>}
-        </label>
-        <select
-          value={scheduling.time}
-          onChange={(e) => {
-            setScheduling((s) => ({ ...s, time: e.target.value }));
-            setErrors((current) => ({ ...current, scheduling: undefined, submit: undefined }));
-          }}
-          disabled={!scheduling.date || loadingSlots}
-          className={`${inputCls("scheduling")} disabled:opacity-40 cursor-pointer`}
-        >
-          <option value="">{!scheduling.date ? "Select a date first..." : `Choose a ${flowLabel.toLowerCase()} time...`}</option>
-          {TIME_SLOTS.map(({ value, label }) => {
-            const booked = bookedSlots.includes(value);
-            return <option key={value} value={value} disabled={booked}>{label}{booked ? " - Reserved" : ""}</option>;
-          })}
+        <label className={labelClass}>Business name *</label>
+        <input value={form.business_name} onChange={(event) => updateField("business_name", event.target.value)} className={inputClass("business_name")} placeholder="My Business" />
+        {errors.business_name && <p className={errorClass}>{errors.business_name}</p>}
+      </div>
+
+      <div>
+        <label className={labelClass}>Industry *</label>
+        <select value={form.industry} onChange={(event) => updateField("industry", event.target.value)} className={`${inputClass("industry")} cursor-pointer`}>
+          <option value="">Select industry...</option>
+          {INDUSTRIES.map((industry) => <option key={industry} value={industry}>{industry}</option>)}
         </select>
+        {errors.industry && <p className={errorClass}>{errors.industry}</p>}
       </div>
-      <div className="flex flex-col gap-3 sm:flex-row">
-        <button
-          type="button"
-          onClick={() => { setStep(1); setErrors({}); }}
-          className={isLight ? "h-11 flex-1 rounded-full border border-slate-200 bg-white text-sm font-bold text-slate-700 transition hover:bg-slate-50" : "flex-1 h-11 rounded-full border border-white/10 text-white/60 font-semibold hover:bg-white/5 transition"}
-        >
-          Back
-        </button>
-        <button type="submit" disabled={saving} className={isLight ? primaryButtonCls.replace("w-full", "flex-1") : "flex-1 h-11 flex items-center justify-center gap-2 rounded-full text-sm font-bold text-amber-100 transition hover:opacity-90 disabled:opacity-50"} style={primaryButtonStyle}>
-          {saving ? <><Loader2 className="w-4 h-4 animate-spin" /> Scheduling...</> : <>Schedule {flowLabel} <ArrowRight className="w-4 h-4" /></>}
-        </button>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={labelClass}>Email *</label>
+          <input type="email" value={form.email} onChange={(event) => updateField("email", event.target.value)} className={inputClass("email")} placeholder="jane@business.com" />
+          {errors.email && <p className={errorClass}>{errors.email}</p>}
+        </div>
+        <div>
+          <label className={labelClass}>Phone *</label>
+          <input type="tel" value={form.phone} onChange={(event) => updateField("phone", event.target.value)} className={inputClass("phone")} placeholder="(555) 000-0000" />
+          {errors.phone && <p className={errorClass}>{errors.phone}</p>}
+        </div>
       </div>
-      <p className={helperCls}>No spam. No pressure. Just a practical recommendation for your business.</p>
+
+      <div>
+        <label className={labelClass}>Website <span className="font-normal opacity-70">(optional)</span></label>
+        <input value={form.website} onChange={(event) => updateField("website", event.target.value)} className={inputClass("website")} placeholder="https://mybusiness.com" />
+      </div>
+
+      <div>
+        <label className={labelClass}>What should we review first? *</label>
+        <select value={form.biggest_issue} onChange={(event) => updateField("biggest_issue", event.target.value)} className={`${inputClass("biggest_issue")} cursor-pointer`}>
+          <option value="">Select one...</option>
+          {serviceLabel && <option value={`Need ${serviceLabel}`}>Need {serviceLabel}</option>}
+          <option value="Slow response time">Slow response time</option>
+          <option value="Missed calls not being followed up">Missed calls not being followed up</option>
+          <option value="No follow-up system">No follow-up system</option>
+          <option value="Low booking conversions">Low booking conversions</option>
+          <option value="Website needs improvement">Website needs improvement</option>
+        </select>
+        {errors.biggest_issue && <p className={errorClass}>{errors.biggest_issue}</p>}
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2">
+        <div>
+          <label className={labelClass}>Preferred date *</label>
+          <input
+            type="date"
+            value={form.preferred_date}
+            min={getArizonaDate()}
+            onChange={(event) => handleDateChange(event.target.value)}
+            className={inputClass("preferred_date")}
+          />
+          {errors.preferred_date && <p className={errorClass}>{errors.preferred_date}</p>}
+        </div>
+        <div>
+          <label className={labelClass}>Preferred {TIME_ZONE_LABEL} *</label>
+          <select
+            value={form.preferred_time}
+            onChange={(event) => updateField("preferred_time", event.target.value)}
+            disabled={!form.preferred_date || loadingSlots}
+            className={`${inputClass("preferred_time")} cursor-pointer disabled:opacity-50`}
+          >
+            <option value="">{loadingSlots ? "Checking availability..." : "Choose a preferred time..."}</option>
+            {TIME_SLOTS.map(({ value, label }) => {
+              const unavailable = bookedSlots.includes(value);
+              return <option key={value} value={value} disabled={unavailable}>{label}{unavailable ? " — unavailable" : ""}</option>;
+            })}
+          </select>
+          {errors.preferred_time && <p className={errorClass}>{errors.preferred_time}</p>}
+        </div>
+      </div>
+
+      <label className={`flex items-start gap-2.5 rounded-xl border px-3 py-3 text-xs leading-relaxed ${isLight ? "bg-white text-slate-600" : "text-white/70"} ${errors.consent_given ? "border-red-500" : isLight ? "border-slate-200" : "border-white/15"}`}>
+        <input
+          type="checkbox"
+          checked={form.consent_given}
+          onChange={(event) => updateField("consent_given", event.target.checked)}
+          className={isLight ? "mt-0.5 h-4 w-4 rounded accent-primary" : "mt-0.5 h-4 w-4 rounded accent-amber-500"}
+        />
+        <span>I agree to receive SMS and email messages from ClientSurge Systems about this request. Reply STOP to opt out.</span>
+      </label>
+      {errors.consent_given && <p className={errorClass}>{errors.consent_given}</p>}
+      {errors.submit && <p className={errorClass}>{errors.submit}</p>}
+
+      <button
+        type="submit"
+        disabled={saving}
+        className={isLight
+          ? "w-full h-12 flex items-center justify-center gap-2 rounded-full bg-primary text-sm font-bold text-primary-foreground shadow-lg shadow-primary/20 transition hover:bg-primary/90 disabled:opacity-50"
+          : "w-full h-12 flex items-center justify-center gap-2 rounded-full bg-amber-700 text-sm font-bold text-amber-50 transition hover:bg-amber-600 disabled:opacity-50"}
+      >
+        {saving ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending request...</> : <>Request This Time <ArrowRight className="h-4 w-4" /></>}
+      </button>
+
+      <div className={`flex items-start gap-2 ${helperClass}`}>
+        <CheckCircle2 className="mt-0.5 h-4 w-4 flex-shrink-0 text-primary" />
+        <span>No payment is required. ClientSurge confirms the appointment before it is marked booked.</span>
+      </div>
     </form>
   );
 }
