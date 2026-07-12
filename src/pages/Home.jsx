@@ -8,7 +8,7 @@ import SolutionSection from "../components/landing/SolutionSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 import Footer from "../components/landing/Footer";
-import { FAQ_ITEMS } from "../components/landing/FAQData";
+import { HOMEPAGE_FAQ_ITEMS } from "../components/landing/FAQData";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
 import FAQSection from "../components/landing/FAQSection.jsx";
@@ -67,7 +67,7 @@ export default function Home() {
       service: getServiceSchema(),
       product: getProductSchema(),
       website: getWebsiteSchema(),
-      faq: getFAQSchema(FAQ_ITEMS),
+      faq: getFAQSchema(HOMEPAGE_FAQ_ITEMS),
     }),
     [],
   );
