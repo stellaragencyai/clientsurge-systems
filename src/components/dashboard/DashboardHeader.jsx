@@ -8,21 +8,36 @@ export default function DashboardHeader({ activeServices, portalState }) {
   const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   const rawLiveCount = activeServices.filter(s => s.installStatus === "Live").length;
-  const inProgressCount = activeServices.filter(s => ["Configuring", "Testing", "Ready for Install", "Pending Review", "Status Pending"].includes(s.installStatus)).length;
+  const buildInProgressCount = activeServices.filter(s => ["Configuring", "Testing", "Ready for Install", "Pending Review", "Status Pending"].includes(s.installStatus)).length;
+  const verificationInProgressCount = isProofLive ? 0 : rawLiveCount;
+  const inProgressCount = buildInProgressCount + verificationInProgressCount;
   const totalServices = activeServices.length;
 
   const liveLabel = isProofLive ? "Live & Verified" : "Live Status";
   const liveValue = isProofLive ? rawLiveCount : "Pending proof";
   const liveSub = isProofLive ? "backed by system evidence" : "not shown live until verified";
   const liveColor = isProofLive ? "#16a34a" : "#B8941F";
+  const progressLabel = verificationInProgressCount > 0 ? "Verification Running" : "Being Set Up";
+  const progressSub = verificationInProgressCount > 0
+    ? "systems awaiting verified launch proof"
+    : "configuration or verification in progress";
 
   if (totalServices === 0) return null;
 
   const cards = [
     { icon: MessageSquare, label: "Automation Systems", value: totalServices, sub: "linked to this account", color: "#0A1628", accent: "#00AEEF" },
     { icon: CheckCircle, label: liveLabel, value: liveValue, sub: liveSub, color: liveColor, accent: liveColor },
-    { icon: Clock, label: "Being Set Up", value: inProgressCount, sub: "configuration or verification in progress", color: "#0088CC", accent: "#0088CC" },
-    { icon: ShieldCheck, label: "Truth Gate", value: isProofLive ? "Passed" : "Active", sub: "prevents fake live status", color: isProofLive ? "#16a34a" : "#003B8F", accent: "#003B8F" },
+    { icon: Clock, label: progressLabel, value: inProgressCount, sub: progressSub, color: "#0088CC", accent: "#0088CC" },
+    {
+      icon: ShieldCheck,
+      label: "Verification Safeguard",
+      value: isProofLive ? "Verified" : "Active",
+      sub: isProofLive
+        ? "live status confirmed by verified checks"
+        : "marks systems live only after checks pass",
+      color: isProofLive ? "#16a34a" : "#003B8F",
+      accent: "#003B8F",
+    },
   ];
 
   return (
