@@ -100,21 +100,29 @@ function addFunctionOutcomeTracking(client) {
   if (!functions || typeof functions.invoke !== "function") return client;
 
   const originalInvoke = functions.invoke.bind(functions);
-  try {
-    functions.invoke = async (functionName, payload = {}) => {
-      const result = await originalInvoke(functionName, payload);
-      try {
-        trackSuccessfulFunctionOutcome(functionName, payload, result);
-      } catch (error) {
-        console.warn("[base44Client] outcome tracking failed:", error?.message);
-      }
-      return result;
-    };
-  } catch (error) {
-    console.warn("[base44Client] unable to attach function outcome tracking:", error?.message);
-  }
+  const trackedInvoke = async (functionName, payload = {}) => {
+    const result = await originalInvoke(functionName, payload);
+    try {
+      trackSuccessfulFunctionOutcome(functionName, payload, result);
+    } catch (error) {
+      console.warn("[base44Client] outcome tracking failed:", error?.message);
+    }
+    return result;
+  };
 
-  return client;
+  const trackedFunctions = new Proxy(functions, {
+    get(target, prop, receiver) {
+      if (prop === "invoke") return trackedInvoke;
+      return Reflect.get(target, prop, receiver);
+    },
+  });
+
+  return new Proxy(client, {
+    get(target, prop, receiver) {
+      if (prop === "functions") return trackedFunctions;
+      return Reflect.get(target, prop, receiver);
+    },
+  });
 }
 
 const sdkClient = isLocalPreview() ? createLocalPreviewClient() : createClient({
