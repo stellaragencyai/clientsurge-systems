@@ -1,32 +1,27 @@
-// Fix #20: Import UTM tracking to attach to all events
 import { getUtmForAnalytics } from "@/lib/utmTracking";
+import { trackGa4Event } from "@/lib/ga4";
 
 export function trackEvent(eventName, params = {}) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return false;
+
   try {
-    // Attach UTM parameters to every event for attribution
     const enrichedParams = { ...getUtmForAnalytics(), ...params };
-    if (typeof window.gtag === "function") {
-      window.gtag("event", eventName, enrichedParams);
-      return;
-    }
-    if (Array.isArray(window.dataLayer)) {
-      window.dataLayer.push({ event: eventName, ...enrichedParams });
-    }
-  } catch (e) {
-    // Analytics must never break user interactions
-    console.warn("[analytics] trackEvent failed:", e?.message);
+    return trackGa4Event(eventName, enrichedParams, window);
+  } catch (error) {
+    console.warn("[analytics] trackEvent failed:", error?.message);
+    return false;
   }
 }
 
 export function trackCTA(label, location, extra = {}) {
   try {
-    trackEvent("cta_click", {
+    return trackEvent("cta_click", {
       cta_label: label,
       cta_location: location,
       ...extra,
     });
-  } catch (e) {
-    console.warn("[analytics] trackCTA failed:", e?.message);
+  } catch (error) {
+    console.warn("[analytics] trackCTA failed:", error?.message);
+    return false;
   }
 }
