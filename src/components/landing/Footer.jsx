@@ -168,9 +168,8 @@ export default function Footer() {
         .cs-footer-secure svg { width: 14px; height: 14px; color: #075985; }
         .cs-footer-top-button { width: 34px; height: 34px; display: inline-flex; align-items: center; justify-content: center; border-radius: 999px; border: 1px solid rgba(0,174,239,.22) !important; color: #075985 !important; }
         .cs-footer-top-button svg { width: 15px; height: 15px; }
-        @media (max-width: 860px) { .cs-footer-system-header, .cs-footer-main { display: block; } .cs-footer-system-cta { margin-top: 18px; } .cs-footer-nav { margin-top: 32px; } .cs-footer-bottom { align-items: flex-start; flex-direction: column; } }
+        @media (max-width: 860px) { .cs-footer-system-header, .cs-footer-main { display: block; } .cs-footer-system-cta { margin-top: 18px; } .cs-footer-nav { margin-top: 32px; grid-template-columns: repeat(2, minmax(0, 1fr)); } .cs-footer-bottom { align-items: flex-start; flex-direction: column; } }
         @media (max-width: 560px) { .cs-footer-inner { width: min(100% - 32px, 1180px); } .cs-footer-nav { grid-template-columns: 1fr; } }
-        @media (max-width: 860px) { .cs-footer-nav { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
       `}</style>
     </footer>
   );
