@@ -16,6 +16,8 @@ test("audit booking records a pending request rather than a fake confirmed appoi
   assert.match(bookingSource, /calendar_created:\s*false/);
   assert.match(bookingSource, /America\/Phoenix/);
   assert.match(bookingSource, /pending manual confirmation/i);
+  assert.match(bookingSource, /assertBookingDateAvailable/);
+  assert.match(bookingSource, /ACTIVE_REQUEST_STATUSES = \["requested", "scheduled", "confirmed"\]/);
   assert.doesNotMatch(bookingSource, /entities\.Leads\.update\([^)]*,\s*\{[^}]*status:\s*["']Booked["']/s);
   assert.doesNotMatch(bookingSource, /crm_stage:\s*["']Audit Booked["']/);
   assert.doesNotMatch(bookingSource, /functions\.invoke\(["']createDemoCalendarEvent["']/);
@@ -34,7 +36,7 @@ test("calendar placeholder fails honestly instead of mutating CRM state", () => 
   assert.doesNotMatch(calendarSource, /Calendar event created/);
 });
 
-test("contact inquiries upsert the canonical CRM lead", () => {
+test("contact inquiries upsert and link the canonical CRM lead", () => {
   assert.match(contactSource, /findExistingCanonicalLead/);
   assert.match(contactSource, /website_lead_id:\s*websiteLeadId/);
   assert.match(contactSource, /existing\s*\?\s*await\s+base44\.asServiceRole\.entities\.Leads\.update/s);
@@ -42,6 +44,9 @@ test("contact inquiries upsert the canonical CRM lead", () => {
   assert.match(contactSource, /source_history:\s*mergeSourceHistory/);
   assert.match(contactSource, /dedupe_key:/);
   assert.match(contactSource, /canonical_lead_id:/);
+  assert.match(contactSource, /crm_lead_id:\s*lead\.id/);
+  assert.match(contactSource, /last_engagement_type:\s*existing\?\.last_engagement_type \|\| "none"/);
+  assert.doesNotMatch(contactSource, /last_engagement_type:\s*"contact_form"/);
   assert.doesNotMatch(
     contactSource,
     /const\s+canonicalLead\s*=\s*await\s+base44\.asServiceRole\.entities\.Leads\.create/,
