@@ -31,11 +31,22 @@ test("scheduleDemoBooking locks requested, scheduled, and confirmed preferred sl
   assert.ok(slotQuery < requestCreate, "expected slot query before request creation");
 });
 
+test("scheduleDemoBooking enforces weekdays and blocked dates", () => {
+  assert.match(scheduleDemoBooking, /import \{ assertBookingDateAvailable \} from "\.\.\/shared\/demoBookingGuard\.ts"/);
+  assert.match(scheduleDemoBooking, /await assertBookingDateAvailable\(base44, payload\.scheduled_date\)/);
+});
+
+test("repeat submissions update one active audit request instead of creating duplicates", () => {
+  assert.match(scheduleDemoBooking, /findActiveRequestForLead/);
+  assert.match(scheduleDemoBooking, /const requestToUpdate = activeForLead \|\| requestOnDate/);
+  assert.match(scheduleDemoBooking, /DemoRequest\.update\(requestToUpdate\.id, requestData\)/);
+});
+
 test("scheduleDemoBooking changes CRM state only after a request record exists", () => {
-  const requestCreate = scheduleDemoBooking.indexOf("entities.DemoRequest.create");
+  const reserveCall = scheduleDemoBooking.indexOf("const demoRequest = await reserveRequestedSlot");
   const engagedUpdate = scheduleDemoBooking.indexOf("const engagedLeadData");
-  assert.ok(requestCreate > -1);
-  assert.ok(engagedUpdate > requestCreate, "engaged CRM state must follow request creation");
+  assert.ok(reserveCall > -1);
+  assert.ok(engagedUpdate > reserveCall, "engaged CRM state must follow request reservation");
 
   assert.match(scheduleDemoBooking, /intake_type:\s*"audit_time_request"/);
   assert.match(scheduleDemoBooking, /crm_stage:\s*"Replied"/);
