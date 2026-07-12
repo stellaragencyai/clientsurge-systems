@@ -81,7 +81,9 @@
       "enum": [
         "roofing",
         "hvac",
-        "dental"
+        "dental",
+        "med_spa",
+        "plumbing"
       ]
     },
     "provider_from_email": {
@@ -129,6 +131,21 @@
         },
         "max_recipients": {
           "type": "number"
+        },
+        "outbound_ready_only": {
+          "type": "boolean",
+          "title": "Only Verified Outbound-Ready Leads",
+          "default": true
+        },
+        "website_mode": {
+          "type": "string",
+          "title": "Website Requirement",
+          "enum": [
+            "has_website",
+            "no_website",
+            "any"
+          ],
+          "default": "has_website"
         }
       }
     },
