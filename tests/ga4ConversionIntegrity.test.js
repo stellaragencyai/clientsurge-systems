@@ -10,7 +10,6 @@ const checkoutObserverSource = read("src/lib/ga4CheckoutObserver.js");
 const eventHelpersSource = read("src/utils/ga4Events.js");
 const autoCtaSource = read("src/components/analytics/AutoCTAAnalytics.jsx");
 const publicFunctionSource = read("src/lib/publicFunctionClient.js");
-const base44ClientSource = read("src/api/base44Client.js");
 const orderSuccessSource = read("src/internal-pages/OrderSuccess.jsx");
 const configSchemaSource = read("base44/entities/GA4Configuration.jsonc");
 const setupFunctionSource = read("base44/functions/setupGA4Configuration/entry.ts");
@@ -79,11 +78,11 @@ test("contact outcomes emit lead events only after a successful backend response
 });
 
 test("audit requests are tracked as requests, not confirmed demo bookings", () => {
-  assert.match(base44ClientSource, /functionName !== "scheduleDemoBooking"/);
-  assert.match(base44ClientSource, /trackAuditRequestSubmitted/);
-  assert.match(base44ClientSource, /trackLeadSubmit/);
-  assert.doesNotMatch(base44ClientSource, /trackDemoBooked/);
-  assert.doesNotMatch(base44ClientSource, /GA4_EVENTS\.DEMO_BOOKED/);
+  assert.match(checkoutObserverSource, /scheduleDemoBooking/);
+  assert.match(checkoutObserverSource, /data\?\.success === true/);
+  assert.match(checkoutObserverSource, /GA4_EVENTS\.AUDIT_REQUEST_SUBMITTED/);
+  assert.match(checkoutObserverSource, /GA4_EVENTS\.GENERATE_LEAD/);
+  assert.doesNotMatch(checkoutObserverSource, /GA4_EVENTS\.DEMO_BOOKED/);
 });
 
 test("begin_checkout fires only after checkout session creation succeeds", () => {
