@@ -1,59 +1,107 @@
-/**
- * utils/ga4Events.js — #76 dedup
- * GA4 event helpers live in lib/ga4.js (installGa4, etc.) and lib/analytics.js (trackCTA etc.).
- * Specific conversion events below remain here as they are checkout/form-specific.
- */
+import { trackEvent } from "@/lib/analytics";
+import { GA4_EVENTS } from "@/lib/ga4";
 
-function gtag(...args) {
-  if (typeof window !== "undefined" && window.gtag) {
-    window.gtag(...args);
-  }
+function normalizedNumber(value) {
+  const number = Number(value || 0);
+  return Number.isFinite(number) ? number : 0;
 }
 
-// Checkout button click → GA4 purchase-intent event
 export function trackCheckoutClick({ package_key, monthly_rate, setup_fee }) {
-  gtag("event", "begin_checkout", {
+  const monthlyRate = normalizedNumber(monthly_rate);
+  const setupFee = normalizedNumber(setup_fee);
+
+  return trackEvent(GA4_EVENTS.BEGIN_CHECKOUT, {
     currency: "USD",
-    value: setup_fee || 0,
-    items: [{ item_id: package_key, item_name: `ClientSurge ${package_key}`, price: monthly_rate || 0 }],
+    value: setupFee + monthlyRate,
+    checkout_source: "product_signup",
+    items: [
+      {
+        item_id: package_key,
+        item_name: `ClientSurge ${package_key}`,
+        price: setupFee + monthlyRate,
+        quantity: 1,
+      },
+    ],
   });
 }
 
-// Stripe checkout completed (called from order-success page)
-export function trackPurchase({ order_id, package_key, monthly_rate, setup_fee }) {
-  gtag("event", "purchase", {
+export function trackPurchase({ order_id, package_key, monthly_rate, setup_fee, items = [] }) {
+  const monthlyRate = normalizedNumber(monthly_rate);
+  const setupFee = normalizedNumber(setup_fee);
+
+  return trackEvent(GA4_EVENTS.PURCHASE, {
     transaction_id: order_id,
     currency: "USD",
-    value: setup_fee || 0,
-    items: [{ item_id: package_key, item_name: `ClientSurge ${package_key}`, price: monthly_rate || 0 }],
+    value: setupFee + monthlyRate,
+    items: items.length
+      ? items
+      : [
+          {
+            item_id: package_key,
+            item_name: `ClientSurge ${package_key}`,
+            price: setupFee + monthlyRate,
+            quantity: 1,
+          },
+        ],
   });
 }
 
-// Lead capture form submitted
-export function trackLeadSubmit({ industry, has_website }) {
-  gtag("event", "generate_lead", {
+export function trackLeadSubmit({ industry, has_website, lead_source = "website" }) {
+  return trackEvent(GA4_EVENTS.GENERATE_LEAD, {
     currency: "USD",
     value: 1,
     industry: industry || "unknown",
     has_website: has_website ? "yes" : "no",
+    lead_source,
+    submission_status: "success",
   });
 }
 
-// Demo booking form submitted
-export function trackDemoBooked({ industry, scheduled_date }) {
-  gtag("event", "demo_booked", {
-    category: "conversion",
+export function trackAuditRequestStarted({ source = "website" } = {}) {
+  return trackEvent(GA4_EVENTS.AUDIT_REQUEST_STARTED, {
+    source,
+  });
+}
+
+export function trackAuditRequestSubmitted({ industry, scheduled_date, source = "website" }) {
+  return trackEvent(GA4_EVENTS.AUDIT_REQUEST_SUBMITTED, {
     industry: industry || "unknown",
-    scheduled_date,
+    requested_date: scheduled_date || "",
+    source,
+    request_status: "requested",
+    submission_status: "success",
   });
 }
 
-// Contact form submitted
-export function trackContactSubmit({ source }) {
-  gtag("event", "contact_form_submit", { source: source || "homepage" });
+export function trackDemoBooked({ industry, scheduled_date, source = "admin_confirmation" }) {
+  return trackEvent(GA4_EVENTS.DEMO_BOOKED, {
+    industry: industry || "unknown",
+    scheduled_date: scheduled_date || "",
+    source,
+    booking_status: "confirmed",
+  });
 }
 
-// Onboarding form submitted
+export function trackContactSubmit({ source = "contact_page", industry = "unknown" } = {}) {
+  return trackEvent(GA4_EVENTS.CONTACT_FORM_SUBMIT, {
+    source,
+    industry,
+    submission_status: "success",
+  });
+}
+
+export function trackSuccessfulFormSubmit({ form_id, page_path, source }) {
+  return trackEvent(GA4_EVENTS.FORM_SUBMIT, {
+    form_id,
+    page_path,
+    source,
+    submission_status: "success",
+  });
+}
+
 export function trackOnboardingSubmit({ package_key }) {
-  gtag("event", "onboarding_complete", { package_key });
+  return trackEvent(GA4_EVENTS.ONBOARDING_COMPLETE, {
+    package_key,
+    submission_status: "success",
+  });
 }

@@ -5,12 +5,7 @@
     "measurement_id": {
       "type": "string",
       "title": "GA4 Measurement ID",
-      "description": "Google Analytics 4 property measurement ID (G-XXXXXXX)"
-    },
-    "api_secret": {
-      "type": "string",
-      "title": "GA4 API Secret",
-      "description": "Optional: API secret for server-side event tracking"
+      "description": "Public Google Analytics 4 web-stream measurement ID (G-XXXXXXXXXX)"
     },
     "enabled": {
       "type": "boolean",
@@ -21,25 +16,44 @@
     "tracked_events": {
       "type": "array",
       "title": "Tracked Events",
-      "description": "Which event types are sent to GA4",
+      "description": "Canonical event names the ClientSurge application can emit",
       "items": {
         "type": "string",
         "enum": [
           "page_view",
           "scroll",
+          "scroll_depth",
           "cta_click",
           "pricing_view",
-          "checkout_click",
+          "link_click",
+          "form_submit_attempt",
           "form_submit",
-          "demo_booking"
+          "generate_lead",
+          "contact_form_submit",
+          "audit_request_started",
+          "audit_request_submitted",
+          "begin_checkout",
+          "purchase",
+          "purchase_client_confirmation",
+          "demo_booked",
+          "onboarding_complete"
         ]
       },
       "default": [
         "page_view",
+        "scroll",
         "cta_click",
         "pricing_view",
-        "checkout_click",
-        "form_submit"
+        "form_submit_attempt",
+        "form_submit",
+        "generate_lead",
+        "contact_form_submit",
+        "audit_request_started",
+        "audit_request_submitted",
+        "begin_checkout",
+        "purchase",
+        "purchase_client_confirmation",
+        "demo_booked"
       ]
     },
     "setup_status": {
@@ -66,11 +80,29 @@
     },
     "conversion_events": {
       "type": "array",
-      "title": "Conversion Events",
+      "title": "GA4 Key Events",
       "items": {
-        "type": "string"
+        "type": "string",
+        "enum": [
+          "generate_lead",
+          "begin_checkout",
+          "purchase",
+          "demo_booked"
+        ]
       },
-      "description": "List of events marked as conversions in GA4"
+      "default": [
+        "generate_lead",
+        "begin_checkout",
+        "purchase",
+        "demo_booked"
+      ],
+      "description": "Intended GA4 key events. This documents the desired GA4 Admin configuration; it does not call the Google Analytics Admin API."
+    },
+    "server_side_tracking_enabled": {
+      "type": "boolean",
+      "title": "Server-Side Tracking Enabled",
+      "default": false,
+      "description": "True only after backend Measurement Protocol delivery has been verified. GA4_API_SECRET must live in Base44 Secrets, never in this entity."
     },
     "last_verified_at": {
       "type": "string",
@@ -88,7 +120,10 @@
   "rls": {
     "create": {
       "user_condition": {
-        "role": "admin"
+        "role": [
+          "admin",
+          "super_admin"
+        ]
       }
     },
     "read": {
@@ -101,12 +136,18 @@
     },
     "update": {
       "user_condition": {
-        "role": "admin"
+        "role": [
+          "admin",
+          "super_admin"
+        ]
       }
     },
     "delete": {
       "user_condition": {
-        "role": "admin"
+        "role": [
+          "admin",
+          "super_admin"
+        ]
       }
     }
   }

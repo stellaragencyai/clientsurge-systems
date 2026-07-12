@@ -46,30 +46,28 @@ export default function CookieConsent() {
     return () => window.removeEventListener('resize', updateOffset);
   }, []);
 
-  // Fix #28: Granular consent categories — Essential always on, Analytics & Marketing optional
   const handleAccept = () => {
     safeSetCookieConsent('accepted');
     setVisible(false);
-    updateGa4Consent(true);
+    updateGa4Consent({ analytics: true, ads: true });
   };
 
   const handleDecline = () => {
-    // Decline marketing/analytics but keep essential tracking (error monitoring, etc.)
     safeSetCookieConsent('essential_only');
     setVisible(false);
-    updateGa4Consent(false);
+    updateGa4Consent({ analytics: false, ads: false });
   };
 
   const handleDismiss = () => {
     safeSetCookieConsent('essential_only');
     setVisible(false);
-    updateGa4Consent(false);
+    updateGa4Consent({ analytics: false, ads: false });
   };
 
-  const handleAcceptEssentials = () => {
-    safeSetCookieConsent('essential_only');
+  const handleAcceptStats = () => {
+    safeSetCookieConsent('analytics_only');
     setVisible(false);
-    updateGa4Consent(false);
+    updateGa4Consent({ analytics: true, ads: false });
   };
 
   if (!visible) return null;
@@ -94,7 +92,6 @@ export default function CookieConsent() {
           boxShadow: '0 20px 60px rgba(0,0,0,0.12)'
         }}
       >
-        {/* Header with close */}
         <div className="flex items-start justify-end gap-3 sm:justify-between">
           <h3 className="sr-only sm:not-sr-only sm:font-semibold sm:text-[11px] sm:text-foreground md:text-xs">Cookie Preferences</h3>
           <button
@@ -106,9 +103,8 @@ export default function CookieConsent() {
           </button>
         </div>
 
-        {/* Message */}
         <p className="max-w-[25rem] text-[9px] text-muted-foreground leading-snug sm:text-[10px] md:text-[11px] md:leading-relaxed">
-          We use cookies to improve the site and measure traffic. By continuing, you agree to our{' '}
+          We use cookies to improve the site and measure traffic. Choose whether to allow analytics and marketing cookies. See our{' '}
           <a 
             href="/privacy-policy"
             className="font-medium text-primary hover:text-primary/80 transition-colors"
@@ -117,7 +113,7 @@ export default function CookieConsent() {
           </a>
           .
         </p>
-        {/* Fix #28: Three granular consent categories */}
+
         <div className="flex gap-1.5 pt-0.5">
           <button
             onClick={handleDecline}
@@ -127,9 +123,9 @@ export default function CookieConsent() {
             Essential Only
           </button>
           <button
-            onClick={handleAcceptEssentials}
+            onClick={handleAcceptStats}
             className="flex-1 rounded-md border border-border px-2 py-1 text-[9px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[10px]"
-            title="Essential + analytics (no marketing)"
+            title="Essential cookies and analytics, without advertising consent"
           >
             Essential + Stats
           </button>

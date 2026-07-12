@@ -1,32 +1,39 @@
-// Fix #20: Import UTM tracking to attach to all events
 import { getUtmForAnalytics } from "@/lib/utmTracking";
+import { trackGa4Event } from "@/lib/ga4";
+import { installGa4CheckoutObserver } from "@/lib/ga4CheckoutObserver";
+
+if (typeof window !== "undefined") {
+  installGa4CheckoutObserver(window);
+}
+
+function frontendEventName(eventName) {
+  // Stripe webhooks are the source of truth for revenue. The browser success
+  // page remains useful operational proof, but it must not create a second GA4
+  // purchase key event for the same transaction.
+  return eventName === "purchase" ? "purchase_client_confirmation" : eventName;
+}
 
 export function trackEvent(eventName, params = {}) {
-  if (typeof window === "undefined") return;
+  if (typeof window === "undefined") return false;
+
   try {
-    // Attach UTM parameters to every event for attribution
     const enrichedParams = { ...getUtmForAnalytics(), ...params };
-    if (typeof window.gtag === "function") {
-      window.gtag("event", eventName, enrichedParams);
-      return;
-    }
-    if (Array.isArray(window.dataLayer)) {
-      window.dataLayer.push({ event: eventName, ...enrichedParams });
-    }
-  } catch (e) {
-    // Analytics must never break user interactions
-    console.warn("[analytics] trackEvent failed:", e?.message);
+    return trackGa4Event(frontendEventName(eventName), enrichedParams, window);
+  } catch (error) {
+    console.warn("[analytics] trackEvent failed:", error?.message);
+    return false;
   }
 }
 
 export function trackCTA(label, location, extra = {}) {
   try {
-    trackEvent("cta_click", {
+    return trackEvent("cta_click", {
       cta_label: label,
       cta_location: location,
       ...extra,
     });
-  } catch (e) {
-    console.warn("[analytics] trackCTA failed:", e?.message);
+  } catch (error) {
+    console.warn("[analytics] trackCTA failed:", error?.message);
+    return false;
   }
 }

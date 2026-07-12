@@ -1,222 +1,206 @@
-import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 
-/**
- * SETUP GA4 CONFIGURATION — Admin-Only GA4 Integration Setup
- *
- * Creates/updates GA4 configuration with setup guide and validation.
- * Admin-only function to ensure only authorized users can configure GA4.
- */
+const MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{4,}$/i;
+
+const TRACKED_EVENTS = [
+  "page_view",
+  "scroll",
+  "scroll_depth",
+  "cta_click",
+  "pricing_view",
+  "link_click",
+  "form_submit_attempt",
+  "form_submit",
+  "generate_lead",
+  "contact_form_submit",
+  "audit_request_started",
+  "audit_request_submitted",
+  "begin_checkout",
+  "purchase",
+  "purchase_client_confirmation",
+  "demo_booked",
+  "onboarding_complete",
+] as const;
+
+const KEY_EVENTS = [
+  "generate_lead",
+  "begin_checkout",
+  "purchase",
+  "demo_booked",
+] as const;
+
+function uniqueAllowed(values: unknown, allowed: readonly string[], fallback: readonly string[]) {
+  if (!Array.isArray(values)) return [...fallback];
+  return [...new Set(values.map((value) => String(value || "").trim()).filter((value) => allowed.includes(value)))];
+}
+
+function isAdmin(user: Record<string, unknown> | null | undefined) {
+  return user?.role === "admin" || user?.role === "super_admin";
+}
+
+function containsLegacySecret(record: Record<string, unknown> | null | undefined) {
+  return typeof record?.api_secret === "string" && record.api_secret.trim().length > 0;
+}
+
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return Response.json({ error: "Method not allowed" }, { status: 405 });
+    }
+
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-
-    if (!user || user.role !== 'admin') {
-      return Response.json({ error: 'Unauthorized — admin only' }, { status: 403 });
+    if (!isAdmin(user)) {
+      return Response.json({ error: "Unauthorized — admin or super_admin required" }, { status: 403 });
     }
 
-    const { measurement_id, api_secret, enabled, tracked_events } = await req.json();
-
-    if (!measurement_id || !measurement_id.startsWith('G-')) {
+    const body = await req.json().catch(() => ({}));
+    if (Object.prototype.hasOwnProperty.call(body, "api_secret")) {
       return Response.json(
-        { error: 'Invalid measurement_id format. Must start with G-' },
-        { status: 400 }
+        {
+          error: "Do not send GA4 API secrets to this function. Store GA4_API_SECRET in Base44 Secrets and use it only from backend code.",
+          code: "GA4_SECRET_MUST_USE_SECRET_STORE",
+        },
+        { status: 400 },
       );
     }
 
-    const setupGuide = buildGA4SetupGuide();
+    const measurementId = String(body.measurement_id || "").trim().toUpperCase();
+    if (!MEASUREMENT_ID_PATTERN.test(measurementId)) {
+      return Response.json(
+        { error: "Invalid measurement_id format. Expected G-XXXXXXXXXX." },
+        { status: 400 },
+      );
+    }
 
-    // Check if config already exists
+    const trackedEvents = uniqueAllowed(body.tracked_events, TRACKED_EVENTS, TRACKED_EVENTS);
+    const conversionEvents = uniqueAllowed(body.conversion_events, KEY_EVENTS, KEY_EVENTS);
+
     const existing = await base44.asServiceRole.entities.GA4Configuration.filter(
-      { measurement_id },
-      '-created_date',
-      1
+      { measurement_id: measurementId },
+      "-created_date",
+      100,
     ).catch(() => []);
 
-    let config;
     const payload = {
-      measurement_id,
-      api_secret: api_secret || null,
-      enabled: enabled !== false,
-      tracked_events: tracked_events || [
-        'page_view',
-        'cta_click',
-        'pricing_view',
-        'checkout_click',
-        'form_submit',
-      ],
-      setup_status: 'configured',
-      setup_guide: setupGuide,
-      last_verified_at: new Date().toISOString(),
+      measurement_id: measurementId,
+      enabled: body.enabled !== false,
+      tracked_events: trackedEvents,
+      conversion_events: conversionEvents,
+      enhanced_measurement_enabled: body.enhanced_measurement_enabled !== false,
+      server_side_tracking_enabled: false,
+      setup_status: "configured",
+      setup_guide: buildGA4SetupGuide(measurementId),
+      notes:
+        "Configuration saved. Status remains configured until Realtime/DebugView and server-side delivery are independently verified.",
     };
 
-    if (existing?.[0]?.id) {
-      config = await base44.asServiceRole.entities.GA4Configuration.update(
-        existing[0].id,
-        payload
-      );
-    } else {
+    const legacySecretDetected = existing.some(containsLegacySecret);
+    let legacySecretScrubbed = false;
+    let config;
+
+    if (legacySecretDetected) {
+      // Create a clean record first, then destroy every pre-existing copy so the
+      // secret bytes are removed rather than merely hidden by a schema change.
       config = await base44.asServiceRole.entities.GA4Configuration.create(payload);
+      const deletionResults = await Promise.all(
+        existing.map(async (record) => {
+          try {
+            await base44.asServiceRole.entities.GA4Configuration.delete(record.id);
+            return true;
+          } catch {
+            return false;
+          }
+        }),
+      );
+      legacySecretScrubbed = deletionResults.every(Boolean);
+
+      if (!legacySecretScrubbed) {
+        return Response.json(
+          {
+            error: "A clean GA4 configuration was created, but at least one legacy secret-bearing record could not be deleted.",
+            code: "GA4_LEGACY_SECRET_SCRUB_INCOMPLETE",
+            config,
+          },
+          { status: 500 },
+        );
+      }
+    } else {
+      config = existing?.[0]?.id
+        ? await base44.asServiceRole.entities.GA4Configuration.update(existing[0].id, payload)
+        : await base44.asServiceRole.entities.GA4Configuration.create(payload);
     }
 
     return Response.json({
       success: true,
       config,
-      message: 'GA4 configuration saved. Begin implementing GA4 tag on frontend.',
+      legacy_secret_detected: legacySecretDetected,
+      legacy_secret_scrubbed: legacySecretScrubbed,
+      secret_required_for_browser_tracking: false,
+      secret_store_name: "GA4_API_SECRET",
+      message: legacySecretDetected
+        ? "GA4 configuration saved and the legacy secret-bearing record was destroyed. Rotate the old GA4 API secret before enabling server-side tracking."
+        : "GA4 configuration saved without storing any private credential in the entity.",
     });
   } catch (error) {
-    console.error('[setupGA4Configuration]', error);
-    return Response.json({ error: error.message }, { status: 500 });
+    console.error("[setupGA4Configuration]", error);
+    return Response.json({ error: error?.message || "Unknown setup error" }, { status: 500 });
   }
 });
 
-function buildGA4SetupGuide() {
+function buildGA4SetupGuide(measurementId: string) {
   return `
-GA4 SETUP GUIDE — ClientSurge Landing Pages
+GA4 SETUP GUIDE — ClientSurge Systems
 
-==================================================
-STEP 1: Create GA4 Property
-==================================================
-1. Go to Google Analytics 4 (analytics.google.com)
-2. Create new Property for ClientSurge landing pages
-3. Select "Web" as your platform
-4. Follow wizard to completion
+1. WEB STREAM
+Measurement ID: ${measurementId}
+The browser only needs the Measurement ID. It is public configuration, not a secret.
 
-==================================================
-STEP 2: Get Measurement ID
-==================================================
-1. In GA4 admin panel, navigate to "Data Streams"
-2. Select the web stream you just created
-3. Copy the Measurement ID (format: G-XXXXXXX)
-4. Paste into GA4Configuration.measurement_id field
+2. SINGLE TAG INITIALIZATION
+ClientSurge initializes GA4 through src/lib/ga4.js. Do not add a second gtag initialization in a page component, tag manager container, or layout.
 
-==================================================
-STEP 3: Install GA4 Tag on Frontend
-==================================================
-Add this to index.html <head>:
+3. SPA PAGE VIEWS
+The app emits explicit page_view events for React Router navigation. Verify at least the home page, pricing, contact, book, product-signup, and order-success routes in GA4 DebugView.
 
-<!-- Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=YOUR_MEASUREMENT_ID"></script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-  gtag('config', 'YOUR_MEASUREMENT_ID', {
-    'anonymize_ip': true,
-    'allow_google_signals': false,
-  });
-</script>
+4. CANONICAL EVENTS
+Engagement events:
+- page_view
+- scroll / scroll_depth
+- cta_click
+- pricing_view
+- link_click
+- form_submit_attempt
 
-Replace YOUR_MEASUREMENT_ID with your actual G-XXXXXXX from Step 2.
+Successful outcomes:
+- form_submit
+- generate_lead
+- contact_form_submit
+- audit_request_submitted
+- begin_checkout
+- purchase (server-verified Stripe webhook only)
+- purchase_client_confirmation (browser confirmation; not a key event)
+- demo_booked (only after the appointment is genuinely confirmed)
 
-==================================================
-STEP 4: Enable Enhanced Measurement
-==================================================
-1. In GA4 admin → Data Streams → Select your stream
-2. Scroll to "Enhanced measurement"
-3. Enable:
-   ✓ Page views
-   ✓ Scrolls
-   ✓ Outbound clicks
-   ✓ File downloads
-   ✓ Form interactions
+5. GA4 KEY EVENTS
+In GA4 Admin → Data display → Key events, mark these exact event names:
+- generate_lead
+- begin_checkout
+- purchase
+- demo_booked
 
-==================================================
-STEP 5: Configure Conversion Events
-==================================================
-1. In GA4 admin → Conversions
-2. Create new conversion events:
-   - cta_click
-   - checkout_click
-   - pricing_view
-   - demo_booking_click
-   - form_submit
+Do not mark page_view, scroll, cta_click, pricing_view, form_submit_attempt, contact_form_submit, audit_request_submitted, or purchase_client_confirmation as separate key events unless you intentionally want duplicate funnel counts.
 
-For each event:
-- Event name: exact match from list above
-- Mark as "Conversion"
-- Save
+6. MEASUREMENT PROTOCOL SECRET
+Server-verified Stripe purchases use GA4 Measurement Protocol. Store the API secret only as Base44 Secret GA4_API_SECRET. Never store it in GA4Configuration, frontend code, logs, or entity records.
 
-==================================================
-STEP 6: Frontend Integration
-==================================================
-ConversionTrackingEvent entity automatically:
-- Captures page views, clicks, form submissions
-- Tracks scroll depth, device type, UTM params
-- Syncs with GA4 via gtag('event', ...) calls
-
-Tracking functions available in lib/conversionTracking.js:
-- trackPageView(pageKey)
-- trackCTAClick(pageKey, label)
-- trackPricingView()
-- trackCheckoutClick(pageKey, planName)
-- trackDemoBooking(pageKey)
-- trackFormSubmit(pageKey, formName)
-
-==================================================
-STEP 7: Verify Setup
-==================================================
-1. In GA4 admin → Real-time report
-2. Load a landing page in new browser tab
-3. You should see your session appear within seconds
-4. Trigger a conversion event (click CTA button)
-5. Event should appear in Real-time report
-
-If events don't appear:
-- Check browser console for JS errors
-- Verify Measurement ID is correct (G-XXXXXXX)
-- Confirm GA4 tag is in <head> of HTML
-- Check GA4 filters aren't blocking your IP
-
-==================================================
-STEP 8: Setup Server-Side Tracking (Optional)
-==================================================
-For Stripe checkout events, use GA4 Measurement Protocol:
-- API Secret: Retrieve from GA4 admin → Data Streams → Measurement Protocol API secrets
-- Store in GA4Configuration.api_secret field
-- Backend function will use to send checkout events server-side
-
-==================================================
-STEP 9: Monitor Performance
-==================================================
-Dashboard locations:
-- GA4 Realtime: Real-time visitor activity
-- GA4 Acquisition: Where traffic comes from
-- GA4 Engagement: How users interact with pages
-- GA4 Conversions: Conversion tracking results
-
-LandingPageAnalytics entity aggregates daily metrics:
-- Page views, sessions, CTA clicks
-- Conversion rate, bounce rate, scroll depth
-- Traffic source breakdown (UTM params)
-- Device breakdown (mobile/tablet/desktop)
-
-Admin dashboard: Navigate to /admin → landing-page-analytics
-
-==================================================
-TROUBLESHOOTING
-==================================================
-Q: Measurement ID format?
-A: Must start with 'G-' followed by 10-12 characters. Example: G-1A2B3C4D5E
-
-Q: No events appearing in GA4?
-A: Check that gtag() is defined. Ensure GA4 tag is loaded before tracking calls.
-
-Q: ConversionTrackingEvent records appearing but not GA4?
-A: GA4 tag may not be installed. Re-run Step 3 and verify in browser console: window.gtag exists
-
-Q: Want to test without live traffic?
-A: Use GA4 Debug View mode (admin → Data Streams → Measurement Protocol) to see test events.
-
-==================================================
-NEXT STEPS
-==================================================
-1. Wait 24 hours for initial data to populate
-2. Create custom reports in GA4 for industry page comparison
-3. Set up GA4 goals for checkout completion rate
-4. Enable Google Ads integration for remarketing
-5. Connect Google Search Console for organic search insights
-
-Questions? Contact: support@clientsurge.com
+7. VERIFICATION
+A database status is not proof. Confirm:
+- one active user in GA4 Realtime while browsing the production domain;
+- page_view on client-side route changes;
+- generate_lead only after a successful lead response;
+- begin_checkout only after a checkout session is created;
+- purchase only after a paid Stripe order is verified;
+- purchase_client_confirmation does not appear as a GA4 key event;
+- no duplicate events on one action.
 `;
 }
