@@ -19,6 +19,7 @@ export default function CredentialsSetup() {
   const navigate = useNavigate();
   const params = new URLSearchParams(window.location.search);
   const setupToken = params.get("token") || params.get("setup_token") || "";
+  const requestedSection = params.get("section") || "";
   const [orderId, setOrderId] = useState(() => params.get("order_id") || null);
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -133,7 +134,13 @@ export default function CredentialsSetup() {
           Credentials are only used for setup and verification. Your portal will show status based on posted ClientSurge records, not assumptions.
         </div>
       </div>
-      <CredentialsWizard order={order} setupToken={setupToken} onComplete={handleComplete} />
+      <CredentialsWizard
+        order={order}
+        setupToken={setupToken}
+        initialSection={requestedSection}
+        exitHref="/client-portal/progress"
+        onComplete={handleComplete}
+      />
     </div>
   );
 }
