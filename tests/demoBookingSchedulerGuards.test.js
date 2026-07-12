@@ -15,8 +15,10 @@ const getBookedDemoSlots = readFileSync(
   "utf8"
 );
 
-test("scheduleDemoBooking protects preferred slots before creating a request", () => {
+test("scheduleDemoBooking locks requested, scheduled, and confirmed preferred slots", () => {
   assert.match(scheduleDemoBooking, /MAX_REQUESTS_PER_DAY = 8/);
+  assert.match(scheduleDemoBooking, /ACTIVE_REQUEST_STATUSES = \["requested", "scheduled", "confirmed"\]/);
+  assert.match(scheduleDemoBooking, /assertRequestedSlotAvailable/);
   assert.match(scheduleDemoBooking, /reserveRequestedSlot/);
   assert.match(scheduleDemoBooking, /That preferred time is no longer available/);
   assert.match(scheduleDemoBooking, /No more audit requests are available on that date/);
@@ -29,10 +31,15 @@ test("scheduleDemoBooking protects preferred slots before creating a request", (
   assert.ok(slotQuery < requestCreate, "expected slot query before request creation");
 });
 
-test("scheduleDemoBooking records engaged CRM state without claiming a confirmed booking", () => {
+test("scheduleDemoBooking changes CRM state only after a request record exists", () => {
+  const requestCreate = scheduleDemoBooking.indexOf("entities.DemoRequest.create");
+  const engagedUpdate = scheduleDemoBooking.indexOf("const engagedLeadData");
+  assert.ok(requestCreate > -1);
+  assert.ok(engagedUpdate > requestCreate, "engaged CRM state must follow request creation");
+
   assert.match(scheduleDemoBooking, /intake_type:\s*"audit_time_request"/);
-  assert.match(scheduleDemoBooking, /crm_stage = "Replied"|leadData\.crm_stage = "Replied"/);
-  assert.match(scheduleDemoBooking, /outreach_status = existing\?\.do_not_contact \? "do_not_contact" : "replied"/);
+  assert.match(scheduleDemoBooking, /crm_stage:\s*"Replied"/);
+  assert.match(scheduleDemoBooking, /outreach_status:\s*existing\?\.do_not_contact \? "do_not_contact" : "replied"/);
   assert.match(scheduleDemoBooking, /source_page: payload\.source_page/);
   assert.match(scheduleDemoBooking, /website_url: payload\.website/);
   assert.match(scheduleDemoBooking, /Preferred audit time received/);
@@ -45,7 +52,7 @@ test("demoBookingGuard entry reuses the shared booking-date guard", () => {
   assert.doesNotMatch(demoBookingGuard, /getUTCDay/);
 });
 
-test("getBookedDemoSlots treats pending and scheduled requests as unavailable", () => {
+test("getBookedDemoSlots treats pending and confirmed requests as unavailable", () => {
   assert.match(getBookedDemoSlots, /const \{ date \} = await req\.json\(\);/);
   assert.match(getBookedDemoSlots, /scheduled_date:\s*date/);
   assert.match(getBookedDemoSlots, /status:\s*\{\s*\$in:\s*\['requested', 'scheduled', 'confirmed'\]\s*\}/);
