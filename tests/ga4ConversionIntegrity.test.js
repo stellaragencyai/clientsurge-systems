@@ -10,6 +10,7 @@ const analyticsSource = read("src/lib/analytics.js");
 const checkoutObserverSource = read("src/lib/ga4CheckoutObserver.js");
 const eventHelpersSource = read("src/utils/ga4Events.js");
 const autoCtaSource = read("src/components/analytics/AutoCTAAnalytics.jsx");
+const cookieConsentSource = read("src/components/landing/CookieConsent.jsx");
 const publicFunctionSource = read("src/lib/publicFunctionClient.js");
 const orderSuccessSource = read("src/internal-pages/OrderSuccess.jsx");
 const configSchemaSource = read("base44/entities/GA4Configuration.jsonc");
@@ -50,8 +51,18 @@ test("the static HTML cannot send analytics before consent is resolved", () => {
   assert.doesNotMatch(indexSource, /googletagmanager\.com\/gtag\/js\?id=/);
   assert.doesNotMatch(indexSource, /gtag\(['"]config['"]/);
   assert.match(indexSource, /GA4 is installed once by src\/lib\/ga4\.js after analytics consent state is known/);
-  assert.match(ga4Source, /analytics_storage:\s*consentGranted \? "granted" : "denied"/);
+  assert.match(ga4Source, /analytics_storage:\s*normalizedConsent\.analyticsGranted/);
+  assert.match(ga4Source, /ad_storage:\s*normalizedConsent\.adsGranted/);
   assert.match(ga4Source, /send_page_view:\s*false/);
+});
+
+test("Essential + Stats grants analytics without granting advertising consent", () => {
+  assert.match(cookieConsentSource, /safeSetCookieConsent\('analytics_only'\)/);
+  assert.match(cookieConsentSource, /updateGa4Consent\(\{ analytics: true, ads: false \}\)/);
+  assert.match(ga4Source, /storedValue === "accepted" \|\| storedValue === "analytics_only"/);
+  assert.match(ga4Source, /adsGranted:\s*storedValue === "accepted"/);
+  assert.match(ga4Source, /ad_user_data:/);
+  assert.match(ga4Source, /ad_personalization:/);
 });
 
 test("failed or merely attempted forms cannot masquerade as successful submissions", () => {
