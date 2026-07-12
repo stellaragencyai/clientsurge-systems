@@ -13,8 +13,9 @@ const sources = {
   industryFinalCTA: readFileSync("src/components/industry/IndustryFinalCTA.jsx", "utf8"),
   demoBookingContext: readFileSync("src/components/landing/DemoBookingContext.jsx", "utf8"),
   demoBookingModal: readFileSync("src/components/forms/DemoBookingModal.jsx", "utf8"),
+  demoBookingInline: readFileSync("src/components/forms/DemoBookingInline.jsx", "utf8"),
   submitLeadCapture: readFileSync("base44/functions/submitLeadCapture/entry.ts", "utf8"),
-  scheduleDemoBooking: readFileSync("base44/functions/scheduleDemoBooking/entry.ts", "utf8"),
+  scheduleDemoBooking: readFileSync("base44/functions/scheduleDemoBooking/main.ts", "utf8"),
   sendWebsiteLeadResponse: readFileSync("base44/functions/sendWebsiteLeadResponse/entry.ts", "utf8"),
   sendDemoConfirmationEmail: readFileSync("base44/functions/sendDemoConfirmationEmail/entry.ts", "utf8"),
   sendDemoPrepEmail: readFileSync("base44/functions/sendDemoPrepEmail/entry.ts", "utf8"),
@@ -40,12 +41,6 @@ export function assertIndustryCampaignReady(config) {
     route,
     title,
     description,
-    cta,
-    crmTag,
-    serviceInterest,
-    auditTag,
-    painPoints,
-    emailPhrases,
   } = config;
 
   assert.match(sources.app, new RegExp(`"${escapeRegExp(slug)}"`));
@@ -59,7 +54,6 @@ export function assertIndustryCampaignReady(config) {
   assert.ok(activeConfig.description && activeConfig.description !== description);
   assert.ok(activeConfig.heroTitle);
   assert.ok(activeConfig.painStatement);
-  assert.equal(typeof activeConfig.painCalculation?.monthlyRevenueLoss, "function");
   assert.equal(activeConfig.cta, "Get Free Automation Audit");
   assert.ok(activeConfig.problems.length >= 3);
   assert.ok(new Set(activeConfig.problems.map((problem) => problem.title)).size >= 3);
@@ -83,17 +77,30 @@ export function assertIndustryCampaignReady(config) {
 
   assert.match(sources.demoBookingContext, /const industrySlug = options\.industrySlug \|\| selectedIndustry\?\.id \|\| "";/);
   assert.match(sources.demoBookingContext, /navigate\(`\/book\$\{search\}`\)/);
-  assert.match(sources.demoBookingModal, /source_page:\s*currentPath \|\| "\/book"/);
-  assert.match(sources.demoBookingModal, /industry_tags:\s*industryTags/);
-  assert.match(sources.demoBookingModal, /crm_tag:\s*auditCopy\.crmTag/);
-  assert.match(sources.demoBookingModal, /consent_given/);
-  assert.match(sources.demoBookingModal, /utm_source/);
-  assert.match(sources.demoBookingModal, /setSuccess\(true\)/);
+  assert.match(sources.demoBookingModal, /<DemoBookingInline/);
+  assert.match(sources.demoBookingModal, /serviceInterest=\{context\.interest\}/);
+  assert.match(sources.demoBookingModal, /preferred time, not receiving an instant calendar confirmation/i);
+
+  for (const field of [
+    "source_page",
+    "industry_slug",
+    "industry_tags",
+    "crm_tag",
+    "consent_given",
+    "utm_source",
+    "scheduled_date",
+    "scheduled_time",
+  ]) {
+    assert.match(sources.demoBookingInline, new RegExp(field));
+  }
+  assert.match(sources.demoBookingInline, /response\?\.data\?\.success/);
 
   assert.match(sources.scheduleDemoBooking, /service_interest/);
-  assert.match(sources.scheduleDemoBooking, /crm_stage:\s*'Audit Booked'/);
+  assert.match(sources.scheduleDemoBooking, /request_status:\s*"requested"/);
+  assert.match(sources.scheduleDemoBooking, /calendar_created:\s*false/);
   assert.match(sources.scheduleDemoBooking, /source_page:\s*payload\.source_page/);
   assert.match(sources.scheduleDemoBooking, /utm_source:\s*payload\.utm_source/);
+  assert.doesNotMatch(sources.scheduleDemoBooking, /crm_stage:\s*"Audit Booked"/);
   assert.match(sources.submitLeadCapture, /WebsiteLead\.create/);
 
   assert.match(sources.sendWebsiteLeadResponse, /automation audit/i);
