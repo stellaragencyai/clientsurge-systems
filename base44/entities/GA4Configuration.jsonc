@@ -34,6 +34,7 @@
           "audit_request_submitted",
           "begin_checkout",
           "purchase",
+          "purchase_client_confirmation",
           "demo_booked",
           "onboarding_complete"
         ]
@@ -51,6 +52,7 @@
         "audit_request_submitted",
         "begin_checkout",
         "purchase",
+        "purchase_client_confirmation",
         "demo_booked"
       ]
     },
