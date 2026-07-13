@@ -283,10 +283,10 @@ export default function Contact() {
       const payload = {
         ...form,
         full_name: form.full_name.trim(),
-        business_name: "Not provided",
+        business_name: "Website inquiry",
         email: form.email.trim().toLowerCase(),
         phone: form.phone.trim(),
-        business_type: form.business_type.trim() || "Not provided",
+        business_type: form.business_type.trim() || "General inquiry",
         message: form.message.trim(),
         business_website_url: form.business_website_url.trim(),
         source: "contact_page",
@@ -350,7 +350,7 @@ export default function Contact() {
                   width="480"
                   height="224"
                   decoding="async"
-                  className="h-auto w-[330px] max-w-full object-contain object-left"
+                  className="h-auto w-[420px] max-w-full object-contain object-left"
                 />
               </a>
 
