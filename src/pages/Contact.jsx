@@ -1,16 +1,12 @@
 import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  CalendarDays,
   CheckCircle2,
   Clock3,
-  Github,
-  Linkedin,
   Mail,
   MapPin,
   Phone,
   Sparkles,
-  Twitter,
 } from "lucide-react";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
@@ -18,7 +14,6 @@ import MobileCallBar from "../components/landing/MobileCallBar";
 import FloatingConfirmation from "@/components/ui/FloatingConfirmation";
 import { setPageMetadata } from "@/lib/seo";
 import { invokePublicBase44Function } from "@/lib/publicFunctionClient";
-import { SITE_CONFIG } from "@/lib/siteConfig";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
@@ -53,19 +48,19 @@ const contactMethods = [
 
 const socialLinks = [
   {
-    Icon: Linkedin,
-    label: "ClientSurge Systems on LinkedIn",
-    href: SITE_CONFIG.social.linkedin,
+    label: "LinkedIn",
+    shortLabel: "in",
+    href: "https://linkedin.com/company/clientsurge",
   },
   {
-    Icon: Twitter,
-    label: "ClientSurge Systems on X",
-    href: SITE_CONFIG.social.twitter,
+    label: "X",
+    shortLabel: "X",
+    href: "https://twitter.com/clientsurge",
   },
   {
-    Icon: Github,
-    label: "ClientSurge Systems on GitHub",
-    href: SITE_CONFIG.social.github,
+    label: "GitHub",
+    shortLabel: "GH",
+    href: "https://github.com/clientsurge",
   },
 ];
 
@@ -152,6 +147,7 @@ function UnderlineField({
           </span>
         )}
       </label>
+
       <input
         id={inputId}
         name={name}
@@ -164,10 +160,11 @@ function UnderlineField({
         inputMode={inputMode}
         aria-invalid={showError}
         aria-describedby={showError ? errorId : undefined}
-        className={`h-11 w-full border-0 border-b bg-transparent px-0 text-base text-[#001B44] outline-none transition-colors duration-200 placeholder:text-slate-300 focus:border-[#00AEEF] focus:ring-0 ${
+        className={`h-11 w-full border-0 border-b bg-transparent px-0 text-base text-[#001B44] outline-none transition-colors duration-200 focus:border-[#00AEEF] focus:ring-0 ${
           showError ? "border-red-500" : "border-slate-400"
         }`}
       />
+
       {showError && (
         <p id={errorId} className="mt-2 text-xs font-semibold text-red-600" role="alert">
           {error}
@@ -182,7 +179,7 @@ function ContactMethod({ Icon, label, value, href }) {
     <>
       <Icon aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-[#35BDF1]" />
       <span className="min-w-0">
-        <span className="block text-[0.67rem] font-semibold uppercase tracking-[0.16em] text-white/45">
+        <span className="block text-[0.67rem] font-semibold uppercase tracking-[0.16em] text-white/50">
           {label}
         </span>
         <span className="mt-1 block text-sm font-medium leading-relaxed text-white/90 sm:text-[0.94rem]">
@@ -192,16 +189,18 @@ function ContactMethod({ Icon, label, value, href }) {
     </>
   );
 
-  return href ? (
-    <a
-      href={href}
-      className="group flex items-start gap-4 py-1 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
-    >
-      {content}
-    </a>
-  ) : (
-    <div className="flex items-start gap-4 py-1">{content}</div>
-  );
+  if (href) {
+    return (
+      <a
+        href={href}
+        className="flex items-start gap-4 py-1 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <div className="flex items-start gap-4 py-1">{content}</div>;
 }
 
 export default function Contact() {
@@ -232,11 +231,16 @@ export default function Contact() {
     const nextErrors = {};
 
     if (!form.full_name.trim()) nextErrors.full_name = "Full name is required.";
-    if (!form.email.trim()) nextErrors.email = "Email address is required.";
-    else if (!EMAIL_REGEX.test(form.email)) nextErrors.email = "Enter a valid email address.";
 
-    if (!form.phone.trim()) nextErrors.phone = "Phone number is required.";
-    else {
+    if (!form.email.trim()) {
+      nextErrors.email = "Email address is required.";
+    } else if (!EMAIL_REGEX.test(form.email)) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!form.phone.trim()) {
+      nextErrors.phone = "Phone number is required.";
+    } else {
       const digits = form.phone.replace(/\D/g, "");
       if (!PHONE_REGEX.test(form.phone) || digits.length < 10) {
         nextErrors.phone = "Enter a valid phone number.";
@@ -244,6 +248,7 @@ export default function Contact() {
     }
 
     if (!form.message.trim()) nextErrors.message = "Please include a message.";
+
     if (!form.consent_given) {
       nextErrors.consent_given = "Consent is required so we can respond to your inquiry.";
     }
@@ -296,7 +301,9 @@ export default function Contact() {
       };
 
       const result = await invokePublicBase44Function("submitContactInquiry", payload);
-      if (!result.data?.success) throw new Error(result.data?.error || "Submission failed");
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || "Submission failed");
+      }
 
       setSubmittedLead({
         lead_id: result.data.lead_id || null,
@@ -322,7 +329,7 @@ export default function Contact() {
       <main className="pt-[var(--cs-nav-height)]">
         <section
           className="grid lg:grid-cols-2"
-          style={{ minHeight: "calc(100svh - var(--cs-nav-height))" }}
+          style={{ minHeight: "calc(100vh - var(--cs-nav-height))" }}
         >
           <aside className="relative overflow-hidden bg-[#061025] text-white">
             <div
@@ -330,12 +337,12 @@ export default function Contact() {
               className="absolute inset-0"
               style={{
                 background:
-                  "radial-gradient(circle at 12% 12%, rgba(53,189,241,0.18), transparent 32%), radial-gradient(circle at 88% 84%, rgba(0,121,193,0.20), transparent 34%), linear-gradient(145deg, #061025 0%, #001B44 100%)",
+                  "radial-gradient(circle at 12% 12%, rgba(53,189,241,0.16), transparent 32%), radial-gradient(circle at 88% 84%, rgba(0,121,193,0.18), transparent 34%), linear-gradient(145deg, #061025 0%, #001B44 100%)",
               }}
             />
             <div
               aria-hidden="true"
-              className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-[#35BDF1]/45 to-transparent lg:block"
+              className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-[#35BDF1]/40 to-transparent lg:block"
             />
 
             <div className="relative mx-auto flex h-full w-full max-w-[680px] flex-col justify-center px-7 py-14 sm:px-12 sm:py-16 lg:px-16 xl:px-20">
@@ -350,11 +357,12 @@ export default function Contact() {
                   width="480"
                   height="224"
                   decoding="async"
-                  className="h-auto w-[420px] max-w-full object-contain object-left"
+                  className="h-auto w-[390px] max-w-full object-contain object-left"
+                  style={{ filter: "brightness(0) invert(1)" }}
                 />
               </a>
 
-              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/35 to-transparent" />
+              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/30 to-transparent" />
 
               <div className="grid gap-4">
                 {contactMethods.map((method) => (
@@ -362,36 +370,37 @@ export default function Contact() {
                 ))}
               </div>
 
-              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/35 to-transparent" />
+              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/30 to-transparent" />
 
               <div className="grid gap-3 sm:grid-cols-2">
                 <a
                   href="/book#system-match-form"
-                  className="group inline-flex min-h-12 items-center justify-center gap-2 border border-[#35BDF1] px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#35BDF1] px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   <Sparkles aria-hidden="true" className="h-4 w-4" />
                   AI Readiness Check
                 </a>
+
                 <a
                   href="/book"
-                  className="group inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:border-white hover:bg-white hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:border-white hover:bg-white hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
                 >
-                  <CalendarDays aria-hidden="true" className="h-4 w-4" />
                   Book a Strategy Call
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </a>
               </div>
 
-              <div className="mt-8 flex items-center gap-5" aria-label="ClientSurge Systems social media">
-                {socialLinks.map(({ Icon, label, href }) => (
+              <div className="mt-8 flex items-center gap-4" aria-label="ClientSurge Systems social media">
+                {socialLinks.map(({ label, shortLabel, href }) => (
                   <a
                     key={label}
                     href={href}
                     target="_blank"
                     rel="noreferrer"
-                    aria-label={label}
-                    className="inline-flex h-9 w-9 items-center justify-center text-[#35BDF1] transition-colors hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                    aria-label={`ClientSurge Systems on ${label}`}
+                    className="inline-flex h-9 min-w-9 items-center justify-center border border-[#35BDF1]/50 px-2 text-[0.7rem] font-black uppercase tracking-wide text-[#35BDF1] transition-colors hover:border-white hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
                   >
-                    <Icon aria-hidden="true" className="h-5 w-5" />
+                    {shortLabel}
                   </a>
                 ))}
               </div>
@@ -413,16 +422,19 @@ export default function Contact() {
                     Your inquiry is in the ClientSurge system. We will review it and respond within one
                     business day with a clear next step.
                   </p>
+
                   {submittedLead?.request_id && (
                     <p className="mt-5 text-xs font-medium text-slate-400">
                       Reference: {submittedLead.request_id}
                     </p>
                   )}
+
                   <a
                     href="/"
                     className="mt-10 inline-flex min-h-14 min-w-[220px] items-center justify-center gap-2 border-2 border-[#001B44] px-8 text-sm font-bold uppercase tracking-[0.08em] text-[#001B44] transition-colors hover:bg-[#001B44] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]"
                   >
-                    Return Home <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                    Return Home
+                    <ArrowRight aria-hidden="true" className="h-4 w-4" />
                   </a>
                 </div>
               ) : (
@@ -431,6 +443,7 @@ export default function Contact() {
                     <p className="text-sm font-medium uppercase tracking-[0.13em] text-slate-500">
                       Get in touch
                     </p>
+
                     <div className="mt-3 flex items-center gap-5 sm:gap-7">
                       <span
                         aria-hidden="true"
@@ -484,6 +497,7 @@ export default function Contact() {
                         required
                         autoComplete="name"
                       />
+
                       <UnderlineField
                         label="Email Address"
                         name="email"
@@ -497,6 +511,7 @@ export default function Contact() {
                         autoComplete="email"
                         inputMode="email"
                       />
+
                       <UnderlineField
                         label="Phone Number"
                         name="phone"
@@ -510,6 +525,7 @@ export default function Contact() {
                         autoComplete="tel"
                         inputMode="tel"
                       />
+
                       <UnderlineField
                         label="Website"
                         name="business_website_url"
@@ -523,6 +539,7 @@ export default function Contact() {
                         autoComplete="url"
                         inputMode="url"
                       />
+
                       <div className="sm:col-span-2">
                         <UnderlineField
                           label="Industry"
@@ -533,7 +550,6 @@ export default function Contact() {
                           error={errors.business_type}
                           touched={touched.business_type}
                           optional
-                          autoComplete="organization-title"
                         />
                       </div>
 
@@ -548,6 +564,7 @@ export default function Contact() {
                           </span>
                           <span className="sr-only">required</span>
                         </label>
+
                         <textarea
                           id="contact-message"
                           name="message"
@@ -564,6 +581,7 @@ export default function Contact() {
                             errors.message && touched.message ? "border-red-500" : "border-slate-400"
                           }`}
                         />
+
                         {errors.message && touched.message && (
                           <p
                             id="contact-message-error"
@@ -590,6 +608,7 @@ export default function Contact() {
                           phone, or SMS. Message/data rates may apply. Reply STOP to opt out.
                         </span>
                       </label>
+
                       {errors.consent_given && touched.consent_given && (
                         <p className="mt-2 text-xs font-semibold text-red-600" role="alert">
                           {errors.consent_given}
@@ -606,6 +625,7 @@ export default function Contact() {
                         {loading ? "Sending..." : "Send Message"}
                         {!loading && <ArrowRight aria-hidden="true" className="h-4 w-4" />}
                       </button>
+
                       <p className="text-xs font-medium text-slate-400">
                         Required fields are marked with an asterisk.
                       </p>
