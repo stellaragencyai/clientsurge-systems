@@ -1,48 +1,71 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   ArrowRight,
-  Phone,
+  CheckCircle2,
+  Clock3,
   Mail,
   MapPin,
-  Clock3,
-  ShieldCheck,
+  Phone,
   Sparkles,
-  MessageSquareText,
-  CheckCircle2,
-  User,
-  Building2,
 } from "lucide-react";
-import CSButton from "@/components/design-system/CSButton";
-import CSFormContainer from "@/components/design-system/CSFormContainer";
-import CSFormField from "@/components/design-system/CSFormField";
-import CSConfirmationCard from "@/components/design-system/CSConfirmationCard";
 import Navbar from "../components/landing/Navbar";
 import Footer from "../components/landing/Footer";
 import MobileCallBar from "../components/landing/MobileCallBar";
 import FloatingConfirmation from "@/components/ui/FloatingConfirmation";
-import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import { setPageMetadata } from "@/lib/seo";
 import { invokePublicBase44Function } from "@/lib/publicFunctionClient";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
 const CONTACT_CONSENT_VERSION = "contact_form_explicit_consent_v1";
+const LOGO_URL =
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png";
 
 const contactMethods = [
-  { Icon: Phone, label: "Phone", value: "(602) 584-3227", href: "tel:+16025843227" },
-  { Icon: Mail, label: "Email", value: "support@clientsurgesystems.com", href: "mailto:support@clientsurgesystems.com" },
-  { Icon: MapPin, label: "Location", value: "Phoenix, Arizona" },
+  {
+    Icon: Phone,
+    label: "Phone",
+    value: "(602) 584-3227",
+    href: "tel:+16025843227",
+  },
+  {
+    Icon: Mail,
+    label: "Email",
+    value: "support@clientsurgesystems.com",
+    href: "mailto:support@clientsurgesystems.com",
+  },
+  {
+    Icon: MapPin,
+    label: "Location",
+    value: "Phoenix, Arizona · Serving businesses nationwide",
+  },
+  {
+    Icon: Clock3,
+    label: "Business Hours",
+    value: "Monday–Friday · Replies within one business day",
+  },
 ];
 
-const trustPoints = [
-  { Icon: Clock3, title: "Fast response", detail: "Replies within one business day." },
-  { Icon: ShieldCheck, title: "Clean tracking", detail: "Every inquiry creates a traceable lead record." },
-  { Icon: Sparkles, title: "Built for operators", detail: "Designed around local service-business lead flow." },
+const socialLinks = [
+  {
+    label: "LinkedIn",
+    shortLabel: "in",
+    href: "https://linkedin.com/company/clientsurge",
+  },
+  {
+    label: "X",
+    shortLabel: "X",
+    href: "https://twitter.com/clientsurge",
+  },
+  {
+    label: "GitHub",
+    shortLabel: "GH",
+    href: "https://github.com/clientsurge",
+  },
 ];
 
 const initialForm = {
   full_name: "",
-  business_name: "",
   email: "",
   phone: "",
   business_type: "",
@@ -85,6 +108,101 @@ function formatRequestSuffix(error) {
   return error?.request_id ? ` Request ID: ${error.request_id}.` : "";
 }
 
+function UnderlineField({
+  label,
+  name,
+  type = "text",
+  value,
+  onChange,
+  onBlur,
+  error,
+  touched,
+  required = false,
+  optional = false,
+  autoComplete,
+  inputMode,
+}) {
+  const inputId = `contact-${name}`;
+  const errorId = `${inputId}-error`;
+  const showError = Boolean(error && touched);
+
+  return (
+    <div className="min-w-0">
+      <label
+        htmlFor={inputId}
+        className="mb-3 flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500"
+      >
+        <span>{label}</span>
+        {required && (
+          <>
+            <span aria-hidden="true" className="text-[#0079C1]">
+              *
+            </span>
+            <span className="sr-only">required</span>
+          </>
+        )}
+        {optional && (
+          <span className="text-[0.64rem] font-medium normal-case tracking-normal text-slate-400">
+            optional
+          </span>
+        )}
+      </label>
+
+      <input
+        id={inputId}
+        name={name}
+        type={type}
+        value={value}
+        onChange={(event) => onChange(event.target.value)}
+        onBlur={onBlur}
+        required={required}
+        autoComplete={autoComplete}
+        inputMode={inputMode}
+        aria-invalid={showError}
+        aria-describedby={showError ? errorId : undefined}
+        className={`h-11 w-full border-0 border-b bg-transparent px-0 text-base text-[#001B44] outline-none transition-colors duration-200 focus:border-[#00AEEF] focus:ring-0 ${
+          showError ? "border-red-500" : "border-slate-400"
+        }`}
+      />
+
+      {showError && (
+        <p id={errorId} className="mt-2 text-xs font-semibold text-red-600" role="alert">
+          {error}
+        </p>
+      )}
+    </div>
+  );
+}
+
+function ContactMethod({ Icon, label, value, href }) {
+  const content = (
+    <>
+      <Icon aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-[#35BDF1]" />
+      <span className="min-w-0">
+        <span className="block text-[0.67rem] font-semibold uppercase tracking-[0.16em] text-white/50">
+          {label}
+        </span>
+        <span className="mt-1 block text-sm font-medium leading-relaxed text-white/90 sm:text-[0.94rem]">
+          {value}
+        </span>
+      </span>
+    </>
+  );
+
+  if (href) {
+    return (
+      <a
+        href={href}
+        className="flex items-start gap-4 py-1 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+      >
+        {content}
+      </a>
+    );
+  }
+
+  return <div className="flex items-start gap-4 py-1">{content}</div>;
+}
+
 export default function Contact() {
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
@@ -95,7 +213,7 @@ export default function Contact() {
   const [submittedLead, setSubmittedLead] = useState(null);
 
   useEffect(() => {
-    setForm((prev) => ({ ...prev, ...sourceMetadata() }));
+    setForm((previous) => ({ ...previous, ...sourceMetadata() }));
   }, []);
 
   useEffect(() => {
@@ -110,35 +228,33 @@ export default function Contact() {
   }, []);
 
   const validate = () => {
-    const e = {};
-    if (!form.full_name.trim()) e.full_name = "Required";
-    if (!form.business_name.trim()) e.business_name = "Required";
-    if (!form.email.trim()) e.email = "Required";
-    else if (!EMAIL_REGEX.test(form.email)) e.email = "Enter a valid email";
-    if (!form.phone.trim()) e.phone = "Required";
-    else {
-      const digits = form.phone.replace(/\D/g, "");
-      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) e.phone = "Enter a valid phone number";
-    }
-    if (!form.business_type.trim()) e.business_type = "Required";
-    if (!form.message.trim()) e.message = "Required";
-    if (!form.consent_given) e.consent_given = "Consent is required so we can respond to your inquiry";
-    return e;
-  };
+    const nextErrors = {};
 
-  const allValid = useMemo(() => {
-    const digits = form.phone.replace(/\D/g, "");
-    return Boolean(
-      form.full_name.trim() &&
-      form.business_name.trim() &&
-      EMAIL_REGEX.test(form.email) &&
-      form.phone.trim() &&
-      digits.length >= 10 &&
-      form.business_type.trim() &&
-      form.message.trim() &&
-      form.consent_given
-    );
-  }, [form]);
+    if (!form.full_name.trim()) nextErrors.full_name = "Full name is required.";
+
+    if (!form.email.trim()) {
+      nextErrors.email = "Email address is required.";
+    } else if (!EMAIL_REGEX.test(form.email)) {
+      nextErrors.email = "Enter a valid email address.";
+    }
+
+    if (!form.phone.trim()) {
+      nextErrors.phone = "Phone number is required.";
+    } else {
+      const digits = form.phone.replace(/\D/g, "");
+      if (!PHONE_REGEX.test(form.phone) || digits.length < 10) {
+        nextErrors.phone = "Enter a valid phone number.";
+      }
+    }
+
+    if (!form.message.trim()) nextErrors.message = "Please include a message.";
+
+    if (!form.consent_given) {
+      nextErrors.consent_given = "Consent is required so we can respond to your inquiry.";
+    }
+
+    return nextErrors;
+  };
 
   const updateField = (name, value) => {
     setForm((current) => ({ ...current, [name]: value }));
@@ -146,20 +262,19 @@ export default function Contact() {
   };
 
   const handleBlur = (name) => {
-    setTouched((prev) => ({ ...prev, [name]: true }));
+    setTouched((previous) => ({ ...previous, [name]: true }));
   };
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const nextErrors = validate();
+
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       setTouched({
         full_name: true,
-        business_name: true,
         email: true,
         phone: true,
-        business_type: true,
         message: true,
         consent_given: true,
       });
@@ -173,10 +288,10 @@ export default function Contact() {
       const payload = {
         ...form,
         full_name: form.full_name.trim(),
-        business_name: form.business_name.trim(),
+        business_name: "Website inquiry",
         email: form.email.trim().toLowerCase(),
         phone: form.phone.trim(),
-        business_type: form.business_type.trim(),
+        business_type: form.business_type.trim() || "General inquiry",
         message: form.message.trim(),
         business_website_url: form.business_website_url.trim(),
         source: "contact_page",
@@ -186,7 +301,9 @@ export default function Contact() {
       };
 
       const result = await invokePublicBase44Function("submitContactInquiry", payload);
-      if (!result.data?.success) throw new Error(result.data?.error || "Submission failed");
+      if (!result.data?.success) {
+        throw new Error(result.data?.error || "Submission failed");
+      }
 
       setSubmittedLead({
         lead_id: result.data.lead_id || null,
@@ -206,99 +323,153 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col overflow-x-hidden bg-white">
+    <div className="min-h-screen overflow-x-hidden bg-white">
       <Navbar />
-      <main className="relative flex-1 overflow-hidden pt-[calc(var(--cs-nav-height)+2.25rem)]">
-        <div className="absolute inset-0 -z-10 bg-[radial-gradient(circle_at_22%_12%,rgba(0,174,239,0.18),transparent_34%),radial-gradient(circle_at_78%_18%,rgba(0,59,143,0.12),transparent_30%),linear-gradient(180deg,#f8fcff_0%,#ffffff_42%,#f3faff_100%)]" />
-        <div className="absolute left-1/2 top-12 -z-10 h-72 w-72 -translate-x-1/2 rounded-full bg-[#00AEEF]/10 blur-3xl" />
 
-        <section className="px-6 pb-10 sm:px-10 md:px-12">
-          <div className="mx-auto mb-10 max-w-4xl">
-            <CSSectionHeader
-              eyebrow="Get in touch"
-              title="Let's map the fastest path to a cleaner lead system."
-              subtitle="Ask a question or tell us where leads are slipping through the cracks. We will help you identify the most practical next step."
-              align="center"
+      <main className="pt-[var(--cs-nav-height)]">
+        <section
+          className="grid lg:grid-cols-2"
+          style={{ minHeight: "calc(100vh - var(--cs-nav-height))" }}
+        >
+          <aside className="relative overflow-hidden bg-[#061025] text-white">
+            <div
+              aria-hidden="true"
+              className="absolute inset-0"
+              style={{
+                background:
+                  "radial-gradient(circle at 12% 12%, rgba(53,189,241,0.16), transparent 32%), radial-gradient(circle at 88% 84%, rgba(0,121,193,0.18), transparent 34%), linear-gradient(145deg, #061025 0%, #001B44 100%)",
+              }}
             />
-          </div>
+            <div
+              aria-hidden="true"
+              className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-[#35BDF1]/40 to-transparent lg:block"
+            />
 
-          <div className="mx-auto grid max-w-6xl gap-8 lg:grid-cols-[0.88fr_1.12fr] lg:items-start">
-            <aside className="relative overflow-hidden rounded-[2rem] cs-glow-card p-8 backdrop-blur-xl md:p-10">
-              <div className="absolute -right-16 -top-16 h-44 w-44 rounded-full bg-[#00AEEF]/15 blur-2xl" />
-              <div className="absolute -bottom-20 left-8 h-44 w-44 rounded-full bg-[#003B8F]/10 blur-2xl" />
+            <div className="relative mx-auto flex h-full w-full max-w-[680px] flex-col justify-center px-7 py-14 sm:px-12 sm:py-16 lg:px-16 xl:px-20">
+              <a
+                href="/"
+                aria-label="ClientSurge Systems home"
+                className="inline-flex w-fit focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+              >
+                <img
+                  src={LOGO_URL}
+                  alt="ClientSurge Systems"
+                  width="480"
+                  height="224"
+                  decoding="async"
+                  className="h-auto w-[390px] max-w-full object-contain object-left"
+                  style={{ filter: "brightness(0) invert(1)" }}
+                />
+              </a>
 
-              <div className="relative">
-                <span className="mb-5 inline-flex items-center gap-2 rounded-full border border-sky-200 bg-white/80 px-4 py-2 text-xs font-bold uppercase tracking-[0.16em] text-[#0079c1] shadow-sm">
-                  <MessageSquareText className="h-3.5 w-3.5" /> Contact command panel
-                </span>
-                <h2 className="font-titles text-3xl font-black leading-[1.02] tracking-[-0.04em] text-foreground md:text-4xl">
-                  Contact ClientSurge Systems
-                </h2>
-                <p className="mt-4 max-w-sm text-sm leading-relaxed text-slate-600 md:text-base">
-                  Talk through your website, missed calls, follow-up gaps, booking flow, or automation launch plan.
-                </p>
+              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/30 to-transparent" />
 
-                <div className="mt-6 inline-flex items-center gap-2 rounded-2xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-bold text-emerald-700">
-                  <CheckCircle2 className="h-4 w-4" /> Response within one business day
-                </div>
-
-                <div className="mt-8 space-y-3">
-                  {contactMethods.map(({ Icon, label, value, href }) => {
-                    const content = (
-                      <>
-                        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-sky-200 bg-white text-[#0079c1] shadow-sm">
-                          <Icon className="h-4 w-4" />
-                        </span>
-                        <span>
-                          <span className="block text-xs font-black uppercase tracking-[0.14em] text-slate-400">{label}</span>
-                          <span className="mt-1 block text-sm font-bold text-slate-900">{value}</span>
-                        </span>
-                      </>
-                    );
-
-                    return href ? (
-                      <a key={label} href={href} className="flex items-center gap-3 rounded-2xl border border-transparent p-2 transition hover:border-sky-200 hover:bg-white/70">
-                        {content}
-                      </a>
-                    ) : (
-                      <div key={label} className="flex items-center gap-3 rounded-2xl p-2">
-                        {content}
-                      </div>
-                    );
-                  })}
-                </div>
-
-                <div className="mt-8 rounded-3xl border border-sky-200/80 bg-gradient-to-br from-white to-sky-50 p-5">
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#00AEEF]">Best next step</p>
-                  <p className="mt-2 text-sm leading-relaxed text-slate-600">
-                    Not sure what you need yet? Start with the package comparison, then send us your current lead-flow problem.
-                  </p>
-                  <CSButton variant="primary" size="md" iconRight={ArrowRight} href="/pricing" className="mt-5">View Packages</CSButton>
-                </div>
+              <div className="grid gap-4">
+                {contactMethods.map((method) => (
+                  <ContactMethod key={method.label} {...method} />
+                ))}
               </div>
-            </aside>
 
-            <section className="rounded-[2rem] border border-slate-200/80 bg-white/90 p-6 shadow-[0_24px_90px_rgba(15,23,42,0.14)] backdrop-blur-xl md:p-9">
-              {success ? (
-                <CSConfirmationCard
-                  title="Message Received"
-                  message="Thanks for reaching out. Your inquiry has been captured in the ClientSurge lead system. We'll respond within one business day with a clear next step."
-                  responseTime="within one business day"
-                  nextSteps={[
-                    "Your inquiry is logged with source attribution",
-                    "Our team reviews your lead-flow problem",
-                    "You receive a tailored response — no pressure, no fake urgency",
-                  ]}
+              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/30 to-transparent" />
+
+              <div className="grid gap-3 sm:grid-cols-2">
+                <a
+                  href="/book#system-match-form"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#35BDF1] px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
+                  <Sparkles aria-hidden="true" className="h-4 w-4" />
+                  AI Readiness Check
+                </a>
+
+                <a
+                  href="/book"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:border-white hover:bg-white hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                >
+                  Book a Strategy Call
+                  <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                </a>
+              </div>
+
+              <div className="mt-8 flex items-center gap-4" aria-label="ClientSurge Systems social media">
+                {socialLinks.map(({ label, shortLabel, href }) => (
+                  <a
+                    key={label}
+                    href={href}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label={`ClientSurge Systems on ${label}`}
+                    className="inline-flex h-9 min-w-9 items-center justify-center border border-[#35BDF1]/50 px-2 text-[0.7rem] font-black uppercase tracking-wide text-[#35BDF1] transition-colors hover:border-white hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                  >
+                    {shortLabel}
+                  </a>
+                ))}
+              </div>
+            </div>
+          </aside>
+
+          <section className="bg-white text-[#001B44]">
+            <div className="mx-auto flex h-full w-full max-w-[760px] flex-col justify-center px-7 py-14 sm:px-12 sm:py-16 lg:px-16 xl:px-20">
+              {success ? (
+                <div className="max-w-xl" aria-live="polite">
+                  <CheckCircle2 aria-hidden="true" className="h-12 w-12 text-[#0079C1]" />
+                  <p className="mt-7 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">
+                    Message sent
+                  </p>
+                  <h1 className="mt-3 font-titles text-4xl font-black tracking-[-0.045em] text-[#001B44] sm:text-5xl">
+                    THANK YOU
+                  </h1>
+                  <p className="mt-6 max-w-lg text-base leading-7 text-slate-600">
+                    Your inquiry is in the ClientSurge system. We will review it and respond within one
+                    business day with a clear next step.
+                  </p>
+
                   {submittedLead?.request_id && (
-                    <p className="mt-4 text-xs text-slate-500">Reference: {submittedLead.request_id}</p>
+                    <p className="mt-5 text-xs font-medium text-slate-400">
+                      Reference: {submittedLead.request_id}
+                    </p>
                   )}
-                </CSConfirmationCard>
+
+                  <a
+                    href="/"
+                    className="mt-10 inline-flex min-h-14 min-w-[220px] items-center justify-center gap-2 border-2 border-[#001B44] px-8 text-sm font-bold uppercase tracking-[0.08em] text-[#001B44] transition-colors hover:bg-[#001B44] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]"
+                  >
+                    Return Home
+                    <ArrowRight aria-hidden="true" className="h-4 w-4" />
+                  </a>
+                </div>
               ) : (
-                <CSFormContainer title="Contact Us" subtitle="Share the basics and we will respond with a clear next step for your business." maxWidth="100%">
-                  <form onSubmit={handleSubmit} noValidate className="space-y-5">
+                <>
+                  <header>
+                    <p className="text-sm font-medium uppercase tracking-[0.13em] text-slate-500">
+                      Get in touch
+                    </p>
+
+                    <div className="mt-3 flex items-center gap-5 sm:gap-7">
+                      <span
+                        aria-hidden="true"
+                        className="h-16 w-1 shrink-0 bg-[#00AEEF] sm:h-[4.5rem]"
+                      />
+                      <h1 className="font-titles text-[clamp(3.2rem,6.2vw,5.4rem)] font-black leading-[0.88] tracking-[-0.055em] text-[#001B44]">
+                        CONTACT US
+                      </h1>
+                    </div>
+
+                    <div className="mt-10">
+                      <h2 className="text-xl font-black uppercase tracking-[-0.02em] text-[#001B44] sm:text-2xl">
+                        We would love to hear from you!
+                      </h2>
+                      <p className="mt-2 text-base leading-7 text-slate-600">
+                        Send us a message and we will get right back in touch.
+                      </p>
+                    </div>
+                  </header>
+
+                  <form id="contact-form" onSubmit={handleSubmit} noValidate className="mt-10">
                     {errors.submit && (
-                      <div className="rounded-2xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-700" role="alert">
+                      <div
+                        className="mb-7 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+                        role="alert"
+                      >
                         {errors.submit}
                       </div>
                     )}
@@ -307,15 +478,15 @@ export default function Contact() {
                       type="text"
                       name="website_url"
                       value={form.website_url}
-                      onChange={(e) => updateField("website_url", e.target.value)}
+                      onChange={(event) => updateField("website_url", event.target.value)}
                       className="hidden"
                       tabIndex={-1}
                       aria-hidden="true"
                       autoComplete="off"
                     />
 
-                    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                      <CSFormField
+                    <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
+                      <UnderlineField
                         label="Full Name"
                         name="full_name"
                         value={form.full_name}
@@ -325,28 +496,12 @@ export default function Contact() {
                         touched={touched.full_name}
                         required
                         autoComplete="name"
-                        allValid={allValid}
-                        icon={User}
-                        placeholder="John Doe"
                       />
-                      <CSFormField
-                        label="Business Name"
-                        name="business_name"
-                        value={form.business_name}
-                        onChange={(value) => updateField("business_name", value)}
-                        onBlur={() => handleBlur("business_name")}
-                        error={errors.business_name}
-                        touched={touched.business_name}
-                        required
-                        autoComplete="organization"
-                        allValid={allValid}
-                        icon={Building2}
-                        placeholder="ABC Roofing Co."
-                      />
-                      <CSFormField
+
+                      <UnderlineField
                         label="Email Address"
-                        type="email"
                         name="email"
+                        type="email"
                         value={form.email}
                         onChange={(value) => updateField("email", value)}
                         onBlur={() => handleBlur("email")}
@@ -354,156 +509,135 @@ export default function Contact() {
                         touched={touched.email}
                         required
                         autoComplete="email"
-                        allValid={allValid}
-                        icon={Mail}
-                        placeholder="john@example.com"
+                        inputMode="email"
                       />
-                      <CSFormField
+
+                      <UnderlineField
                         label="Phone Number"
-                        type="tel"
                         name="phone"
+                        type="tel"
                         value={form.phone}
                         onChange={(value) => updateField("phone", value)}
                         onBlur={() => handleBlur("phone")}
                         error={errors.phone}
                         touched={touched.phone}
                         required
-                        placeholder="(123) 456-7890"
                         autoComplete="tel"
-                        allValid={allValid}
-                        icon={Phone}
+                        inputMode="tel"
                       />
-                    </div>
 
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "#475569" }}>
-                        Business Type / Industry <span className="text-red-500">*</span>
-                      </label>
-                      <input
-                        type="text"
-                        name="business_type"
-                        value={form.business_type}
-                        onChange={(e) => updateField("business_type", e.target.value)}
-                        onBlur={() => handleBlur("business_type")}
-                        placeholder="e.g., HVAC, Dental, Roofing"
-                        aria-invalid={Boolean(errors.business_type)}
-                        className="w-full px-3 py-2.5 text-sm border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                        style={{ borderColor: errors.business_type && touched.business_type ? "#ef4444" : "hsl(var(--border))" }}
-                      />
-                      {errors.business_type && touched.business_type && (
-                        <p className="mt-1 text-xs text-red-500" role="alert">{errors.business_type}</p>
-                      )}
-                    </div>
-
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "#475569" }}>
-                        Business Website <span className="text-slate-400 normal-case tracking-normal">optional</span>
-                      </label>
-                      <input
-                        type="text"
+                      <UnderlineField
+                        label="Website"
                         name="business_website_url"
+                        type="url"
                         value={form.business_website_url}
-                        onChange={(e) => updateField("business_website_url", e.target.value)}
-                        placeholder="https://yourbusiness.com"
-                        className="w-full px-3 py-2.5 text-sm border rounded-lg bg-background text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary transition-all"
-                        style={{ borderColor: "hsl(var(--border))" }}
+                        onChange={(value) => updateField("business_website_url", value)}
+                        onBlur={() => handleBlur("business_website_url")}
+                        error={errors.business_website_url}
+                        touched={touched.business_website_url}
+                        optional
+                        autoComplete="url"
+                        inputMode="url"
                       />
-                    </div>
 
-                    <div>
-                      <label className="block text-xs font-bold uppercase tracking-wider mb-1.5" style={{ color: "#475569" }}>
-                        Message <span className="text-red-500">*</span>
-                      </label>
-                      <div className="relative">
+                      <div className="sm:col-span-2">
+                        <UnderlineField
+                          label="Industry"
+                          name="business_type"
+                          value={form.business_type}
+                          onChange={(value) => updateField("business_type", value)}
+                          onBlur={() => handleBlur("business_type")}
+                          error={errors.business_type}
+                          touched={touched.business_type}
+                          optional
+                        />
+                      </div>
+
+                      <div className="sm:col-span-2">
+                        <label
+                          htmlFor="contact-message"
+                          className="mb-3 flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500"
+                        >
+                          <span>Message</span>
+                          <span aria-hidden="true" className="text-[#0079C1]">
+                            *
+                          </span>
+                          <span className="sr-only">required</span>
+                        </label>
+
                         <textarea
+                          id="contact-message"
                           name="message"
                           value={form.message}
-                          onChange={(e) => updateField("message", e.target.value)}
+                          onChange={(event) => updateField("message", event.target.value)}
                           onBlur={() => handleBlur("message")}
-                          rows={5}
-                          aria-invalid={Boolean(errors.message)}
-                          className="w-full resize-none rounded-lg border bg-white px-4 py-3 text-base text-slate-900 outline-none transition-all duration-300 placeholder:text-slate-400 focus:border-[#00AEEF] focus:shadow-[0_0_0_4px_rgba(0,174,239,0.12)]"
-                          style={{ borderColor: errors.message && touched.message ? "#ef4444" : "hsl(var(--border))" }}
-                          placeholder="Tell us what is not working: missed calls, slow follow-up, poor booking, low website conversion, or something else."
+                          rows={3}
+                          required
+                          aria-invalid={Boolean(errors.message && touched.message)}
+                          aria-describedby={
+                            errors.message && touched.message ? "contact-message-error" : undefined
+                          }
+                          className={`w-full resize-none border-0 border-b bg-transparent px-0 py-2 text-base leading-7 text-[#001B44] outline-none transition-colors duration-200 focus:border-[#00AEEF] focus:ring-0 ${
+                            errors.message && touched.message ? "border-red-500" : "border-slate-400"
+                          }`}
                         />
-                        {allValid && !errors.message && form.message.trim() && (
-                          <CheckCircle2 className="absolute right-3 top-3 w-5 h-5 text-green-500 flex-shrink-0 pointer-events-none" />
+
+                        {errors.message && touched.message && (
+                          <p
+                            id="contact-message-error"
+                            className="mt-2 text-xs font-semibold text-red-600"
+                            role="alert"
+                          >
+                            {errors.message}
+                          </p>
                         )}
                       </div>
-                      {errors.message && touched.message && (
-                        <p className="mt-1 text-xs text-red-500" role="alert">{errors.message}</p>
+                    </div>
+
+                    <div className="mt-7">
+                      <label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-slate-500">
+                        <input
+                          type="checkbox"
+                          checked={form.consent_given}
+                          onChange={(event) => updateField("consent_given", event.target.checked)}
+                          onBlur={() => handleBlur("consent_given")}
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded-sm border-slate-400 text-[#0079C1] focus:ring-[#00AEEF]"
+                        />
+                        <span>
+                          I agree that ClientSurge Systems may contact me about this inquiry by email,
+                          phone, or SMS. Message/data rates may apply. Reply STOP to opt out.
+                        </span>
+                      </label>
+
+                      {errors.consent_given && touched.consent_given && (
+                        <p className="mt-2 text-xs font-semibold text-red-600" role="alert">
+                          {errors.consent_given}
+                        </p>
                       )}
                     </div>
 
-                    <label className="flex items-start gap-3 rounded-2xl border border-sky-100 bg-sky-50/70 p-4 text-sm text-slate-700">
-                      <input
-                        type="checkbox"
-                        checked={form.consent_given}
-                        onChange={(e) => updateField("consent_given", e.target.checked)}
-                        onBlur={() => handleBlur("consent_given")}
-                        className="mt-1 h-4 w-4 rounded border-slate-300 text-primary focus:ring-primary"
-                      />
-                      <span>
-                        I agree that ClientSurge Systems may contact me by email, phone, or SMS about this inquiry. Message/data rates may apply. Reply STOP to opt out.
-                        {errors.consent_given && touched.consent_given && (
-                          <span className="mt-1 block text-xs font-semibold text-red-500" role="alert">{errors.consent_given}</span>
-                        )}
-                      </span>
-                    </label>
-
-                    <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between pt-2">
-                      <CSButton
-                        variant="primary"
-                        size="lg"
-                        loading={loading}
-                        disabled={loading}
-                        iconRight={!loading ? ArrowRight : undefined}
+                    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                      <button
                         type="submit"
-                        className="disabled:opacity-60"
+                        disabled={loading}
+                        className="inline-flex min-h-14 min-w-[220px] items-center justify-center gap-2 border-2 border-[#001B44] bg-white px-8 text-sm font-bold uppercase tracking-[0.08em] text-[#001B44] transition-colors hover:bg-[#001B44] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {loading ? "Sending..." : "Send Message"}
-                      </CSButton>
-                      <p className="text-sm font-semibold text-slate-500">No spam. No pressure. Just a clear next step.</p>
+                        {!loading && <ArrowRight aria-hidden="true" className="h-4 w-4" />}
+                      </button>
+
+                      <p className="text-xs font-medium text-slate-400">
+                        Required fields are marked with an asterisk.
+                      </p>
                     </div>
                   </form>
-                </CSFormContainer>
+                </>
               )}
-            </section>
-          </div>
-
-          <div className="mx-auto mt-10 grid max-w-6xl gap-4 md:grid-cols-3">
-            {trustPoints.map(({ Icon, title, detail }) => (
-              <div key={title} className="rounded-3xl border border-sky-100 bg-white/80 p-5 shadow-[0_16px_50px_rgba(15,23,42,0.07)] backdrop-blur-xl">
-                <div className="flex items-start gap-4">
-                  <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-sky-50 text-[#0079c1]">
-                    <Icon className="h-5 w-5" />
-                  </span>
-                  <span>
-                    <span className="block text-base font-black text-slate-950">{title}</span>
-                    <span className="mt-1 block text-sm leading-relaxed text-slate-600">{detail}</span>
-                  </span>
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        <section className="relative overflow-hidden border-t border-sky-200/40 bg-[linear-gradient(135deg,#003B8F_0%,#0079c1_48%,#00AEEF_100%)] px-6 py-14 text-white sm:px-10 md:px-12">
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_30%,rgba(255,255,255,0.22),transparent_28%),radial-gradient(circle_at_82%_35%,rgba(255,255,255,0.16),transparent_24%)]" />
-          <div className="relative mx-auto flex max-w-6xl flex-col gap-6 md:flex-row md:items-center md:justify-between">
-            <div>
-              <p className="mb-3 text-xs font-black uppercase tracking-[0.22em] text-white/75">ClientSurge Systems</p>
-              <h2 className="font-titles max-w-2xl text-3xl font-black leading-tight tracking-[-0.04em] md:text-5xl">
-                AI automation systems for faster lead response, follow-up, booking, and customer reactivation.
-              </h2>
             </div>
-            <div className="flex flex-col gap-3 sm:flex-row md:flex-col lg:flex-row">
-              <CSButton variant="secondary" size="md" iconRight={ArrowRight} href="/pricing" className="!bg-white !text-[#006bb0]">Compare Packages</CSButton>
-              <CSButton variant="outline" size="md" href="/automations" className="!border-white/30 !bg-white/10 !text-white backdrop-blur">View Automation Stack</CSButton>
-            </div>
-          </div>
+          </section>
         </section>
       </main>
+
       <Footer />
       <MobileCallBar />
       <FloatingConfirmation
