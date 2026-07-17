@@ -74,11 +74,9 @@ Deno.serve(async (req) => {
 
     const dedupKey = await sha256([normalizedEmail, normalizedPhone, normalizedHost, clean(body.client_id), clean(body.client_project_id)].join('|'));
     const existing = await base44.asServiceRole.entities.WebsiteLead.filter({ dedup_key: dedupKey }, '-created_date', 1).catch(() => []);
-    const now = new Date().toISOString();
 
     if (existing?.[0]?.id) {
       const lead = existing[0];
-      const submissionCount = Number(lead.submission_count || 1) + 1;
       const updated = await base44.asServiceRole.entities.WebsiteLead.update(lead.id, {
         full_name: clean(body.full_name) || lead.full_name,
         first_name: clean(body.first_name) || lead.first_name,
@@ -90,10 +88,8 @@ Deno.serve(async (req) => {
         source: clean(body.source) || lead.source,
         source_page: clean(body.source_page) || lead.source_page,
         requested_channels: Array.from(new Set([...(lead.requested_channels || []), ...(body.requested_channels || [])])),
-        submission_count: submissionCount,
-        last_submission_at: now,
       });
-      return json({ success: true, duplicate: true, request_id: requestId, lead_id: updated.id, submission_count: submissionCount });
+      return json({ success: true, duplicate: true, request_id: requestId, lead_id: updated.id });
     }
 
     const created = await base44.asServiceRole.entities.WebsiteLead.create({
@@ -102,14 +98,8 @@ Deno.serve(async (req) => {
       phone_number: normalizedPhone,
       business_website_url: normalizedHost,
       dedup_key: dedupKey,
-      submission_count: 1,
-      first_submission_at: now,
-      last_submission_at: now,
       lead_quality: 'unreviewed',
       follow_up_priority: 'normal',
-      environment: clean(body.environment) || 'production',
-      dashboard_excluded: false,
-      dashboard_truth_status: 'unknown',
     });
 
     return json({ success: true, duplicate: false, request_id: requestId, lead_id: created.id }, 201);
