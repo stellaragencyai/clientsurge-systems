@@ -96,7 +96,7 @@ export default function ResetPassword() {
 
           <PasswordField label="Confirm password" value={confirmPassword} onChange={(value) => { setConfirmPassword(value); setError(""); }} show={showConfirm} onToggle={() => setShowConfirm((value) => !value)} />
 
-          <button type="submit" disabled={loading} className="group relative flex h-13 w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[linear-gradient(90deg,#16c7ff_0%,#0798ed_48%,#066ee8_100%)] px-5 text-sm font-black text-white shadow-[0_16px_35px_rgba(0,166,255,0.32)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(0,166,255,0.42)] disabled:cursor-not-allowed disabled:opacity-60">
+          <button type="submit" disabled={loading} className="group relative flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[linear-gradient(90deg,#16c7ff_0%,#0798ed_48%,#066ee8_100%)] px-5 text-sm font-black text-white shadow-[0_16px_35px_rgba(0,166,255,0.32)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(0,166,255,0.42)] disabled:cursor-not-allowed disabled:opacity-60">
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Updating password...</> : <><ShieldCheck className="h-4 w-4" /> Update password</>}
           </button>
         </form>
@@ -111,7 +111,7 @@ function PasswordField({ label, value, onChange, show, onToggle, autoFocus = fal
       <label className="mb-2 block text-xs font-black uppercase tracking-[0.14em] text-slate-700">{label}</label>
       <div className="relative">
         <Lock className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input type={show ? "text" : "password"} autoComplete="new-password" autoFocus={autoFocus} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Enter a secure password" className="h-13 w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-12 text-sm font-semibold text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" required />
+        <input type={show ? "text" : "password"} autoComplete="new-password" autoFocus={autoFocus} value={value} onChange={(e) => onChange(e.target.value)} placeholder="Enter a secure password" className="h-[52px] w-full rounded-2xl border border-slate-200 bg-white pl-11 pr-12 text-sm font-semibold text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100" required />
         <button type="button" onClick={onToggle} aria-label={show ? "Hide password" : "Show password"} className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 transition hover:text-cyan-600">{show ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}</button>
       </div>
     </div>
