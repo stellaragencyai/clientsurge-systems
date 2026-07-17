@@ -4,6 +4,23 @@
  * duplicated AdminDashboard sidebar is consolidated with AdminShell.
  */
 
+/* Admin dashboard brand: render at 150% of the previous 32px height and anchor it
+ * to the upper-left edge of the sidebar header. */
+img[src*="9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"] {
+  display: block !important;
+  width: auto !important;
+  height: 48px !important;
+  max-width: 100%;
+}
+
+div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"]
+  > div:has(img[src*="9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"]) {
+  display: flex !important;
+  align-items: flex-start !important;
+  justify-content: flex-start !important;
+  padding: 0.75rem 0.75rem 0.5rem !important;
+}
+
 @media (max-width: 1023px) {
   /* Main /admin duplicated sidebar: cap width and respect iPhone safe areas. */
   div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"][class*="bg-white"][class*="border-r"] {
