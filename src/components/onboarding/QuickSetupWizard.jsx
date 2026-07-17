@@ -1,15 +1,23 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  Check,
+  CheckCircle2,
+  Loader2,
+  Rocket,
+  Sparkles,
+} from "lucide-react";
 import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
 
 const INDUSTRIES = [
-  { id: "med_spa", name: "Med Spa & Aesthetic Clinics", icon: "✨" },
-  { id: "dental", name: "Dental & Orthodontics", icon: "🦷" },
-  { id: "hvac", name: "HVAC & Home Services", icon: "🔧" },
-  { id: "chiropractic", name: "Chiropractic & Physical Therapy", icon: "💆" },
-  { id: "roofing", name: "Roofing & Contractors", icon: "🏠" },
-  { id: "contractors", name: "General Contractors", icon: "🏗️" },
+  { id: "med_spa", name: "Med Spa & Aesthetic Clinics", description: "Consultations, treatments and follow-up", glyph: "MS" },
+  { id: "dental", name: "Dental & Orthodontics", description: "New-patient intake and appointment flow", glyph: "DE" },
+  { id: "hvac", name: "HVAC & Home Services", description: "Urgent calls, estimates and dispatch", glyph: "HV" },
+  { id: "chiropractic", name: "Chiropractic & Physical Therapy", description: "Patient qualification and booking", glyph: "CH" },
+  { id: "roofing", name: "Roofing & Contractors", description: "Inspection requests and estimate follow-up", glyph: "RO" },
+  { id: "contractors", name: "General Contractors", description: "Project inquiries and lead routing", glyph: "GC" },
 ];
 
 function formatMoney(amount) {
@@ -35,31 +43,82 @@ const MODES = PACKAGE_OFFERS.map((offer) => ({
   recommended: Boolean(offer.highlight),
 }));
 
+const STEPS = ["Industry", "System", "Review"];
+
+function Progress({ step }) {
+  return (
+    <div className="mb-8 rounded-2xl border border-white/10 bg-white/[0.05] p-4 backdrop-blur-sm">
+      <div className="grid grid-cols-3 gap-3">
+        {STEPS.map((label, index) => {
+          const number = index + 1;
+          const active = step === number;
+          const complete = step > number;
+          return (
+            <div key={label} className="relative">
+              <div className="flex items-center gap-3">
+                <span className={`flex h-8 w-8 items-center justify-center rounded-full border text-xs font-black transition-all ${
+                  complete
+                    ? "border-cyan-300 bg-cyan-300 text-[#06132c]"
+                    : active
+                      ? "border-cyan-300 bg-cyan-300/15 text-cyan-200 shadow-[0_0_24px_rgba(34,211,238,0.26)]"
+                      : "border-white/15 bg-white/5 text-white/45"
+                }`}>
+                  {complete ? <Check className="h-4 w-4" /> : number}
+                </span>
+                <div>
+                  <p className={`text-[10px] font-black uppercase tracking-[0.18em] ${active || complete ? "text-cyan-200" : "text-white/35"}`}>
+                    Step {number}
+                  </p>
+                  <p className={`text-sm font-bold ${active || complete ? "text-white" : "text-white/45"}`}>{label}</p>
+                </div>
+              </div>
+              {index < STEPS.length - 1 && (
+                <div className="absolute left-[calc(100%-10px)] top-4 hidden h-px w-[calc(100%-2.5rem)] bg-white/10 lg:block" />
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function ErrorBanner({ message }) {
+  if (!message) return null;
+  return (
+    <div className="mb-6 rounded-2xl border border-rose-300/25 bg-rose-400/10 px-4 py-3 text-sm font-semibold text-rose-100">
+      {message}
+    </div>
+  );
+}
+
 export default function QuickSetupWizard({ projectId, onComplete }) {
-  const [step, setStep] = useState(1); // 1: Industry, 2: Mode, 3: Review, 4: Complete
+  const [step, setStep] = useState(1);
   const [selectedIndustry, setSelectedIndustry] = useState(null);
   const [selectedMode, setSelectedMode] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
+  const industry = useMemo(() => INDUSTRIES.find((item) => item.id === selectedIndustry), [selectedIndustry]);
+  const mode = useMemo(() => MODES.find((item) => item.id === selectedMode), [selectedMode]);
+
   const handleNext = () => {
     if (step === 1 && !selectedIndustry) {
-      setError("Please select an industry");
+      setError("Select the industry that most closely matches your business.");
       return;
     }
     if (step === 2 && !selectedMode) {
-      setError("Please select a mode");
+      setError("Select the system configuration you want to activate.");
       return;
     }
     setError("");
-    setStep(step + 1);
+    setStep((current) => current + 1);
   };
 
   const handleComplete = async () => {
     setLoading(true);
     setError("");
     try {
-      // Initialize business config with selected options
       const result = await base44.functions.invoke("initializeBusinessConfig", {
         project_id: projectId,
         industry: selectedIndustry,
@@ -68,281 +127,188 @@ export default function QuickSetupWizard({ projectId, onComplete }) {
 
       if (result.data?.success) {
         setStep(4);
-        if (onComplete) {
-          setTimeout(() => onComplete(), 1500);
-        }
+        if (onComplete) setTimeout(() => onComplete(), 1500);
       } else {
-        setError(result.data?.error || "Setup failed");
+        setError(result.data?.error || "We could not initialize your setup.");
       }
     } catch (err) {
-      setError(err.message);
+      setError(err?.message || "We could not initialize your setup.");
     } finally {
       setLoading(false);
     }
   };
 
-  // STEP 1: Industry Selection
-  if (step === 1) {
-    return (
-      <div className="max-w-4xl mx-auto p-6">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            Select Your Industry
-          </h2>
-          <p className="text-muted-foreground">
-            We'll pre-configure everything for your business type
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-          {INDUSTRIES.map((industry) => (
-            <button
-              key={industry.id}
-              onClick={() => {
-                setSelectedIndustry(industry.id);
-                setError("");
-              }}
-              className={`p-4 rounded-lg border-2 transition-all text-left ${
-                selectedIndustry === industry.id
-                  ? "border-primary bg-primary/10"
-                  : "border-border hover:border-primary/50 bg-card"
-              }`}
-            >
-              <span className="text-3xl mb-2 block">{industry.icon}</span>
-              <h3 className="font-semibold text-foreground">{industry.name}</h3>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex justify-between">
-          <div></div>
-          <button
-            onClick={handleNext}
-            className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90"
-          >
-            Next: Choose Mode
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // STEP 2: Mode Selection
-  if (step === 2) {
-    return (
-      <div className="max-w-5xl mx-auto p-6">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            Choose Your Mode
-          </h2>
-          <p className="text-muted-foreground">
-            Start simple and upgrade anytime
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-            {error}
-          </div>
-        )}
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-          {MODES.map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => {
-                setSelectedMode(mode.id);
-                setError("");
-              }}
-              className={`p-6 rounded-lg border-2 transition-all text-left relative ${
-                selectedMode === mode.id
-                  ? "border-primary bg-primary/10 scale-105"
-                  : "border-border hover:border-primary/50 bg-card"
-              }`}
-            >
-              {mode.recommended && (
-                <div className="absolute top-3 right-3 bg-primary text-primary-foreground text-xs font-bold px-3 py-1 rounded-full">
-                  Recommended
-                </div>
-              )}
-
-              <h3 className="font-bold text-lg text-foreground mb-2">
-                {mode.name}
-              </h3>
-
-              <div className="mb-4">
-                <p className="text-2xl font-bold text-foreground">{mode.price}</p>
-                <p className="text-xs text-muted-foreground">
-                  Setup: {mode.setup}
-                </p>
-              </div>
-
-              <p className="text-sm text-muted-foreground mb-4">
-                {mode.description}
-              </p>
-
-              <ul className="space-y-2 mb-4">
-                {mode.features.slice(0, 3).map((feature) => (
-                  <li key={feature} className="text-xs flex items-start gap-2">
-                    <CheckCircle2 className="w-3 h-3 text-green-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-foreground">{feature}</span>
-                  </li>
-                ))}
-              </ul>
-
-              <p className="text-xs font-semibold text-primary">
-                {mode.best_for}
-              </p>
-            </button>
-          ))}
-        </div>
-
-        <div className="flex justify-between">
-          <button
-            onClick={() => setStep(1)}
-            className="px-6 py-2 border border-border rounded-lg font-semibold hover:bg-muted"
-          >
-            Back
-          </button>
-          <button
-            onClick={handleNext}
-            className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90"
-          >
-            Review Setup
-            <ArrowRight className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // STEP 3: Review
-  if (step === 3) {
-    const industry = INDUSTRIES.find((i) => i.id === selectedIndustry);
-    const mode = MODES.find((m) => m.id === selectedMode);
-
-    return (
-      <div className="max-w-2xl mx-auto p-6">
-        <div className="mb-8">
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            Review Your Setup
-          </h2>
-          <p className="text-muted-foreground">
-            Everything looks good? Let's go live!
-          </p>
-        </div>
-
-        {error && (
-          <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-red-800 text-sm">
-            {error}
-          </div>
-        )}
-
-        <div className="space-y-6 mb-8">
-          <div className="p-6 bg-card border border-border rounded-lg">
-            <h3 className="font-semibold text-foreground mb-3">Industry</h3>
-            <p className="text-lg">
-              {industry?.icon} {industry?.name}
-            </p>
-          </div>
-
-          <div className="p-6 bg-card border border-border rounded-lg">
-            <h3 className="font-semibold text-foreground mb-3">Mode</h3>
-            <p className="text-lg font-semibold text-foreground">{mode?.name}</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              {mode?.description}
-            </p>
-            <p className="text-lg font-bold text-primary mt-3">{mode?.price}</p>
-            <p className="text-xs text-muted-foreground">
-              Setup: {mode?.setup}
-            </p>
-          </div>
-
-          <div className="p-6 bg-green-50 border border-green-200 rounded-lg">
-            <h3 className="font-semibold text-green-900 mb-3">
-              ✅ What's Included
-            </h3>
-            <ul className="space-y-2">
-              {mode?.features.map((feature) => (
-                <li key={feature} className="text-sm text-green-800 flex gap-2">
-                  <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-                  {feature}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        <div className="flex justify-between gap-4">
-          <button
-            onClick={() => setStep(2)}
-            className="px-6 py-2 border border-border rounded-lg font-semibold hover:bg-muted"
-          >
-            Back
-          </button>
-          <button
-            onClick={handleComplete}
-            disabled={loading}
-            className="flex items-center gap-2 px-6 py-2 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90 disabled:opacity-50"
-          >
-            {loading && <Loader2 className="w-4 h-4 animate-spin" />}
-            {loading ? "Setting up..." : "Complete Setup"}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // STEP 4: Complete
   if (step === 4) {
     return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <div className="mb-8">
-          <CheckCircle2 className="w-16 h-16 text-green-600 mx-auto mb-4" />
-          <h2 className="text-3xl font-bold text-foreground mb-2">
-            You're All Set! 🎉
-          </h2>
-          <p className="text-muted-foreground">
-            Your automation system is live and ready to capture leads
-          </p>
+      <div className="mx-auto max-w-3xl px-5 pb-12">
+        <div className="overflow-hidden rounded-[2rem] border border-cyan-300/20 bg-[#07162f] shadow-[0_30px_90px_rgba(2,12,30,0.35)]">
+          <div className="relative px-6 py-12 text-center sm:px-10">
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(34,211,238,0.18),transparent_44%)]" />
+            <div className="relative">
+              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl border border-cyan-300/30 bg-cyan-300/10 text-cyan-200 shadow-[0_0_42px_rgba(34,211,238,0.24)]">
+                <Rocket className="h-8 w-8" />
+              </div>
+              <p className="mt-6 text-xs font-black uppercase tracking-[0.22em] text-cyan-200">Configuration submitted</p>
+              <h2 className="mt-3 text-3xl font-black tracking-[-0.04em] text-white sm:text-4xl">Your ClientSurge system is being prepared.</h2>
+              <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-slate-300">
+                Your configuration has been saved. We are returning you to the portal where you can track verification, installation and launch readiness.
+              </p>
+              <div className="mt-8 grid gap-3 text-left sm:grid-cols-2">
+                {["Business profile configured", "Automation mode selected", "Project records updated", "Portal status ready"].map((item) => (
+                  <div key={item} className="flex items-center gap-3 rounded-xl border border-white/10 bg-white/[0.05] px-4 py-3 text-sm font-semibold text-white/85">
+                    <CheckCircle2 className="h-4 w-4 text-cyan-200" />
+                    {item}
+                  </div>
+                ))}
+              </div>
+              <button
+                onClick={() => onComplete?.()}
+                className="mt-8 inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-xl bg-cyan-300 px-6 text-sm font-black text-[#06132c] shadow-[0_12px_34px_rgba(34,211,238,0.28)] transition hover:-translate-y-0.5 hover:bg-cyan-200 sm:w-auto"
+              >
+                Open setup progress <ArrowRight className="h-4 w-4" />
+              </button>
+            </div>
+          </div>
         </div>
-
-        <div className="bg-green-50 border border-green-200 rounded-lg p-6 mb-8 text-left">
-          <h3 className="font-semibold text-green-900 mb-4">What's Running</h3>
-          <ul className="space-y-2 text-sm text-green-800">
-            <li className="flex gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              Lead scoring & qualification
-            </li>
-            <li className="flex gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              Instant response automation
-            </li>
-            <li className="flex gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              Intelligent team routing
-            </li>
-            <li className="flex gap-2">
-              <CheckCircle2 className="w-4 h-4 flex-shrink-0" />
-              Real-time metrics & alerts
-            </li>
-          </ul>
-        </div>
-
-        <button
-          onClick={() => onComplete?.()}
-          className="w-full px-6 py-3 bg-primary text-primary-foreground rounded-lg font-semibold hover:bg-primary/90"
-        >
-          View Your Dashboard →
-        </button>
       </div>
     );
   }
+
+  return (
+    <div className="mx-auto max-w-6xl px-5 pb-12">
+      <div className="grid overflow-hidden rounded-[2rem] border border-slate-200 bg-white shadow-[0_30px_100px_rgba(15,23,42,0.14)] lg:grid-cols-[0.38fr_0.62fr]">
+        <aside className="relative overflow-hidden bg-[#07162f] p-6 text-white sm:p-8 lg:p-10">
+          <div className="absolute inset-0 bg-[radial-gradient(circle_at_15%_12%,rgba(34,211,238,0.18),transparent_35%),radial-gradient(circle_at_100%_90%,rgba(14,116,144,0.2),transparent_40%)]" />
+          <div className="relative flex h-full flex-col">
+            <div className="inline-flex w-fit items-center gap-2 rounded-full border border-cyan-300/20 bg-cyan-300/10 px-3 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-cyan-200">
+              <Sparkles className="h-3.5 w-3.5" /> Client activation
+            </div>
+            <h1 className="mt-6 text-3xl font-black leading-[1.05] tracking-[-0.045em] sm:text-4xl">
+              Configure the system around your business.
+            </h1>
+            <p className="mt-4 text-sm leading-7 text-slate-300">
+              We use these selections to determine the recommended automation routing, messaging patterns and operational setup for your project.
+            </p>
+            <div className="mt-8">
+              <Progress step={step} />
+            </div>
+            <div className="mt-auto rounded-2xl border border-white/10 bg-white/[0.05] p-4">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-cyan-200">Saved to your project</p>
+              <p className="mt-2 text-sm leading-6 text-slate-300">Selections are committed only after final review. Existing paid-order setup is never modified here.</p>
+            </div>
+          </div>
+        </aside>
+
+        <section className="p-6 sm:p-8 lg:p-10">
+          {step === 1 && (
+            <>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-700">Business profile</p>
+              <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-slate-950">What type of business are we configuring?</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">Choose the closest match. This controls the starting automation playbook and can be refined later.</p>
+              <ErrorBanner message={error} />
+              <div className="mt-7 grid gap-3 sm:grid-cols-2">
+                {INDUSTRIES.map((item) => {
+                  const selected = selectedIndustry === item.id;
+                  return (
+                    <button
+                      key={item.id}
+                      type="button"
+                      onClick={() => { setSelectedIndustry(item.id); setError(""); }}
+                      className={`group flex items-start gap-4 rounded-2xl border p-4 text-left transition-all ${selected ? "border-cyan-400 bg-cyan-50 shadow-[0_12px_30px_rgba(6,182,212,0.12)]" : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-lg"}`}
+                    >
+                      <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-xs font-black ${selected ? "bg-cyan-500 text-white" : "bg-slate-950 text-cyan-200"}`}>{item.glyph}</span>
+                      <span className="min-w-0">
+                        <span className="flex items-center gap-2 text-sm font-black text-slate-950">{item.name}{selected && <CheckCircle2 className="h-4 w-4 text-cyan-600" />}</span>
+                        <span className="mt-1 block text-xs leading-5 text-slate-500">{item.description}</span>
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {step === 2 && (
+            <>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-700">Automation system</p>
+              <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-slate-950">Choose the operating mode.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">Select the configuration that matches the package and operating depth you want for this project.</p>
+              <ErrorBanner message={error} />
+              <div className="mt-7 grid gap-4 xl:grid-cols-3">
+                {MODES.map((item) => {
+                  const selected = selectedMode === item.id;
+                  return (
+                    <button
+                      key={item.packageKey}
+                      type="button"
+                      onClick={() => { setSelectedMode(item.id); setError(""); }}
+                      className={`relative rounded-2xl border p-5 text-left transition-all ${selected ? "border-cyan-400 bg-cyan-50 shadow-[0_14px_34px_rgba(6,182,212,0.14)]" : "border-slate-200 bg-white hover:-translate-y-0.5 hover:border-cyan-300 hover:shadow-lg"}`}
+                    >
+                      {item.recommended && <span className="absolute right-4 top-4 rounded-full bg-slate-950 px-2.5 py-1 text-[9px] font-black uppercase tracking-[0.16em] text-cyan-200">Recommended</span>}
+                      <p className="pr-20 text-base font-black text-slate-950">{item.name}</p>
+                      <p className="mt-3 text-2xl font-black tracking-[-0.04em] text-slate-950">{item.price}</p>
+                      <p className="mt-1 text-xs font-semibold text-slate-400">{item.setup} setup</p>
+                      <p className="mt-4 text-xs leading-6 text-slate-500">{item.description}</p>
+                      <div className="mt-5 space-y-2.5">
+                        {item.features.slice(0, 4).map((feature) => (
+                          <div key={feature} className="flex gap-2 text-xs font-semibold leading-5 text-slate-700"><Check className="mt-0.5 h-3.5 w-3.5 shrink-0 text-cyan-600" />{feature}</div>
+                        ))}
+                      </div>
+                      <p className="mt-5 border-t border-slate-200 pt-4 text-[11px] font-bold leading-5 text-cyan-700">{item.best_for}</p>
+                    </button>
+                  );
+                })}
+              </div>
+            </>
+          )}
+
+          {step === 3 && (
+            <>
+              <p className="text-xs font-black uppercase tracking-[0.2em] text-cyan-700">Final verification</p>
+              <h2 className="mt-2 text-3xl font-black tracking-[-0.04em] text-slate-950">Review before activation.</h2>
+              <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-500">Confirm the configuration below. No changes are submitted until you activate the setup.</p>
+              <ErrorBanner message={error} />
+              <div className="mt-7 space-y-4">
+                <div className="rounded-2xl border border-slate-200 bg-slate-50 p-5">
+                  <p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Industry profile</p>
+                  <div className="mt-3 flex items-center gap-4">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-slate-950 text-xs font-black text-cyan-200">{industry?.glyph}</span>
+                    <div><p className="font-black text-slate-950">{industry?.name}</p><p className="mt-1 text-xs text-slate-500">{industry?.description}</p></div>
+                  </div>
+                </div>
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+                  <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                    <div><p className="text-[10px] font-black uppercase tracking-[0.18em] text-slate-400">Selected system</p><p className="mt-2 text-xl font-black text-slate-950">{mode?.name}</p><p className="mt-2 max-w-xl text-xs leading-6 text-slate-500">{mode?.description}</p></div>
+                    <div className="text-left sm:text-right"><p className="text-2xl font-black text-slate-950">{mode?.price}</p><p className="text-xs font-semibold text-slate-400">{mode?.setup} setup</p></div>
+                  </div>
+                  <div className="mt-5 grid gap-2 border-t border-slate-100 pt-5 sm:grid-cols-2">
+                    {mode?.features.map((feature) => <div key={feature} className="flex gap-2 text-xs font-semibold text-slate-700"><Check className="h-3.5 w-3.5 shrink-0 text-cyan-600" />{feature}</div>)}
+                  </div>
+                </div>
+              </div>
+            </>
+          )}
+
+          <div className="mt-8 flex items-center justify-between gap-4 border-t border-slate-100 pt-6">
+            <button
+              type="button"
+              onClick={() => { setError(""); setStep((current) => Math.max(1, current - 1)); }}
+              disabled={step === 1 || loading}
+              className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-slate-200 bg-white px-4 text-sm font-black text-slate-600 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-30"
+            >
+              <ArrowLeft className="h-4 w-4" /> Back
+            </button>
+            <button
+              type="button"
+              onClick={step === 3 ? handleComplete : handleNext}
+              disabled={loading}
+              className="inline-flex min-h-11 items-center justify-center gap-2 rounded-xl bg-cyan-400 px-5 text-sm font-black text-[#06132c] shadow-[0_10px_28px_rgba(34,211,238,0.3)] transition hover:-translate-y-0.5 hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Activating...</> : step === 3 ? <>Activate setup <Rocket className="h-4 w-4" /></> : <>Continue <ArrowRight className="h-4 w-4" /></>}
+            </button>
+          </div>
+        </section>
+      </div>
+    </div>
+  );
 }
