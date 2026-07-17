@@ -32,6 +32,22 @@ import {
   getWebsiteSchema,
 } from "../components/SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
+import "../styles/home-visual-polish.css";
+
+const HOMEPAGE_PROOF_ITEMS = [
+  {
+    title: "Package-first buyer path",
+    copy: "Visitors can compare the automation systems directly without being forced into a sales call first.",
+  },
+  {
+    title: "Truthful implementation scope",
+    copy: "The homepage sells configured lead response, booking, follow-up, review, and reactivation workflows.",
+  },
+  {
+    title: "Clean client handoff",
+    copy: "The visual path now carries buyers from homepage promise to pricing, checkout, and portal access.",
+  },
+];
 
 function isEditorSandbox() {
   try {
@@ -47,6 +63,54 @@ function LazyHomepageSection({ children, fallback }) {
     <SectionErrorBoundary sectionName="lazy-section">
       <Suspense fallback={fallback}>{children}</Suspense>
     </SectionErrorBoundary>
+  );
+}
+
+function HomepageVisualBackdrop() {
+  return (
+    <div className="cs-home-ambient" aria-hidden="true">
+      <div className="cs-home-ambient__grid" />
+    </div>
+  );
+}
+
+function HomepageProofStrip() {
+  return (
+    <section className="cs-home-proof-strip" aria-label="Homepage trust and buyer path cues">
+      <div className="cs-home-proof-grid">
+        {HOMEPAGE_PROOF_ITEMS.map((item, index) => (
+          <article className="cs-home-proof-card" key={item.title}>
+            <span className="cs-home-proof-index">{String(index + 1).padStart(2, "0")}</span>
+            <div>
+              <h2 className="cs-home-proof-title">{item.title}</h2>
+              <p className="cs-home-proof-copy">{item.copy}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </section>
+  );
+}
+
+function HomepageSectionDivider({ label }) {
+  return (
+    <div className="cs-home-section-divider" aria-hidden="true">
+      <span className="cs-home-section-divider__text">
+        <span className="cs-home-section-divider__dot" />
+        {label}
+      </span>
+    </div>
+  );
+}
+
+function HomepageSectionFrame({ children, name, accent = false }) {
+  return (
+    <div
+      className={`cs-home-section-frame ${accent ? "cs-home-section-frame--accent" : ""} ${name === "pricing" || name === "final-cta" ? `cs-home-section-frame--${name}` : ""}`}
+      data-home-section={name}
+    >
+      {children}
+    </div>
   );
 }
 
@@ -119,64 +183,97 @@ export default function Home() {
 
   return (
     <DemoBookingProvider>
-      <div className="min-h-screen">
+      <div className="cs-home-polish min-h-screen">
+        <HomepageVisualBackdrop />
         <ScrollProgressBar />
         <LoggedOutConfirmationBanner />
         <PremiumNavbar />
 
-        {/* 1. Hero — lead leakage positioning + animated product demo */}
-        <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
-          <HomeHero />
-        </SectionErrorBoundary>
+        <main className="cs-home-main" aria-label="ClientSurge Systems homepage">
+          {/* 1. Hero — lead leakage positioning + animated product demo */}
+          <HomepageSectionFrame name="hero">
+            <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
+              <HomeHero />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 2. Problem — revenue leak framing */}
-        <SectionErrorBoundary sectionName="revenue-leak">
-          <RevenueLeakSection />
-        </SectionErrorBoundary>
+          {/* Homepage visual proof strip — truthful buyer-path cues only */}
+          <HomepageProofStrip />
 
-        {/* 3. Solution — the 5-step AI Growth System */}
-        <SectionErrorBoundary sectionName="solution">
-          <SolutionSection />
-        </SectionErrorBoundary>
+          {/* 2. Problem — revenue leak framing */}
+          <HomepageSectionDivider label="Lead leakage audit" />
+          <HomepageSectionFrame name="revenue-leak" accent>
+            <SectionErrorBoundary sectionName="revenue-leak">
+              <RevenueLeakSection />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 4. Product visual — IdentityIQ-style tabs, containers, and floating popups */}
-        <SectionErrorBoundary sectionName="automation-command-preview">
-          <AutomationCommandPreview />
-        </SectionErrorBoundary>
+          {/* 3. Solution — the 5-step AI Growth System */}
+          <HomepageSectionDivider label="Installed response system" />
+          <HomepageSectionFrame name="solution">
+            <SectionErrorBoundary sectionName="solution">
+              <SolutionSection />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 5. Six Core Automations — product-style showcase */}
-        <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
-          <SixAutomationsSection />
-        </SectionErrorBoundary>
+          {/* 4. Product visual — IdentityIQ-style tabs, containers, and floating popups */}
+          <HomepageSectionFrame name="automation-command-preview" accent>
+            <SectionErrorBoundary sectionName="automation-command-preview">
+              <AutomationCommandPreview />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 6. Industries — vertical-specific templates */}
-        <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
-          <Industries />
-        </LazyHomepageSection>
+          {/* 5. Six Core Automations — product-style showcase */}
+          <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <HomepageSectionDivider label="Six core automations" />
+          <HomepageSectionFrame name="automations">
+            <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
+              <SixAutomationsSection />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 7. Trust — security, verification, architecture, transparency */}
-        <SectionErrorBoundary sectionName="trust">
-          <TrustSection />
-        </SectionErrorBoundary>
+          {/* 6. Industries — vertical-specific templates */}
+          <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <HomepageSectionDivider label="Built for local service businesses" />
+          <HomepageSectionFrame name="industries" accent>
+            <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
+              <Industries />
+            </LazyHomepageSection>
+          </HomepageSectionFrame>
 
-        {/* 8. Pricing / Core Offer */}
-        <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SectionErrorBoundary sectionName="pricing">
-          <ThreeSystemsSection />
-        </SectionErrorBoundary>
+          {/* 7. Trust — security, verification, architecture, transparency */}
+          <HomepageSectionDivider label="Trust and transparency" />
+          <HomepageSectionFrame name="trust">
+            <SectionErrorBoundary sectionName="trust">
+              <TrustSection />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 9. FAQ — accordion section */}
-        <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-        <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
-          <FAQSection />
-        </SectionErrorBoundary>
+          {/* 8. Pricing / Core Offer */}
+          <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <HomepageSectionDivider label="Choose your system" />
+          <HomepageSectionFrame name="pricing" accent>
+            <SectionErrorBoundary sectionName="pricing">
+              <ThreeSystemsSection />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
 
-        {/* 10. Final CTA — booking conversion */}
-        <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
-          <FinalCTA />
-        </LazyHomepageSection>
+          {/* 9. FAQ — accordion section */}
+          <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
+          <HomepageSectionDivider label="Questions before checkout" />
+          <HomepageSectionFrame name="faq">
+            <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
+              <FAQSection />
+            </SectionErrorBoundary>
+          </HomepageSectionFrame>
+
+          {/* 10. Final CTA — booking conversion */}
+          <HomepageSectionFrame name="final-cta" accent>
+            <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
+              <FinalCTA />
+            </LazyHomepageSection>
+          </HomepageSectionFrame>
+        </main>
 
         <Footer />
         <ChatBubble />
