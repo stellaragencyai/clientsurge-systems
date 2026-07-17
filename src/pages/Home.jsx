@@ -6,7 +6,6 @@ import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
 import AutomationCommandPreview from "../components/landing/AutomationCommandPreview.jsx";
-import WorkflowSection from "../components/landing/WorkflowSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
@@ -151,35 +150,30 @@ export default function Home() {
           <SixAutomationsSection />
         </SectionErrorBoundary>
 
-        {/* 6. Interactive Workflow — SaaS product demonstration */}
-        <SectionErrorBoundary sectionName="workflow">
-          <WorkflowSection />
-        </SectionErrorBoundary>
-
-        {/* 7. Industries — vertical-specific templates */}
+        {/* 6. Industries — vertical-specific templates */}
         <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <LazyHomepageSection fallback={<SectionSkeleton height="600px" />}>
           <Industries />
         </LazyHomepageSection>
 
-        {/* 8. Trust — security, verification, architecture, transparency */}
+        {/* 7. Trust — security, verification, architecture, transparency */}
         <SectionErrorBoundary sectionName="trust">
           <TrustSection />
         </SectionErrorBoundary>
 
-        {/* 9. Pricing / Core Offer */}
+        {/* 8. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="pricing">
           <ThreeSystemsSection />
         </SectionErrorBoundary>
 
-        {/* 10. FAQ — accordion section */}
+        {/* 9. FAQ — accordion section */}
         <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
           <FAQSection />
         </SectionErrorBoundary>
 
-        {/* 11. Final CTA — booking conversion */}
+        {/* 10. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>
