@@ -2,9 +2,9 @@ import DeploymentReleaseProofPanel from './DeploymentReleaseProofPanel';
 
 /**
  * Integration wrapper for launch proof surfaces.
- * Keeps deployment evidence separate from launch gates until the
- * parent dashboard imports this section.
+ * Accepts only evidence returned by the launch truth provider; missing fields
+ * stay visibly unverified inside DeploymentReleaseProofPanel.
  */
-export default function LaunchProofDeploymentReleaseSection() {
-  return <DeploymentReleaseProofPanel />;
+export default function LaunchProofDeploymentReleaseSection({ evidence }) {
+  return <DeploymentReleaseProofPanel evidence={evidence || {}} />;
 }
