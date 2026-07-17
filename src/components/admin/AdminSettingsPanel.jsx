@@ -1,29 +1,56 @@
-/**
- * AdminSettingsPanel — full settings including ALL message templates.
- * Fix #5
- */
-import { useState, useEffect } from 'react';
-import { Mail, MessageSquare, Key, Save, AlertCircle, CheckCircle, MessageCircle, Copy, Radio, Loader2 } from 'lucide-react';
-import { fetchAdminSettings, getAdminSettingsError, saveAdminSettings } from '@/lib/adminSettingsApi';
-import EmailTemplatePreviewModal from './EmailTemplatePreviewModal';
-import { base44 } from '@/api/base44Client';
-import WebhooksTab from './WebhooksTab';
+import { useEffect, useMemo, useState } from "react";
+import {
+  AlertCircle,
+  BarChart3,
+  CheckCircle2,
+  Key,
+  Loader2,
+  Mail,
+  MessageCircle,
+  MessageSquare,
+  RefreshCw,
+  Save,
+  ShieldCheck,
+  Sparkles,
+  XCircle,
+} from "lucide-react";
+import {
+  ensureGa4Configuration,
+  fetchAdminSettings,
+  fetchGa4ConfigurationStatus,
+  GA4_KEY_EVENTS,
+  GA4_MEASUREMENT_ID,
+  getAdminSettingsError,
+  saveAdminSettings,
+} from "@/lib/adminSettingsApi";
+import EmailTemplatePreviewModal from "./EmailTemplatePreviewModal";
+import WebhooksTab from "./WebhooksTab";
 
 const TABS = [
-  { id: "channels", label: "Channels" },
-  { id: "webhooks", label: "Webhooks" },
-  { id: "security", label: "Security" },
-  { id: "instant", label: "Instant Response" },
-  { id: "followup", label: "Follow-Up SMS" },
-  { id: "nurture", label: "Nurture Emails" },
+  { id: "channels", label: "Channels", icon: Mail },
+  { id: "analytics", label: "Analytics", icon: BarChart3 },
+  { id: "webhooks", label: "Webhooks", icon: Sparkles },
+  { id: "security", label: "Security", icon: ShieldCheck },
+  { id: "instant", label: "Instant Response", icon: MessageSquare },
+  { id: "followup", label: "Follow-Up SMS", icon: MessageCircle },
+  { id: "nurture", label: "Nurture Emails", icon: Mail },
 ];
+
+const VAR_HINT = "Variables: {name}, {business_name}, {booking_link}, {date}, {phone}";
+const SAMPLE_VALUES = {
+  "{name}": "Maria Rodriguez",
+  "{business_name}": "Sculpt Med Spa",
+  "{booking_link}": "https://calendly.com/example",
+  "{date}": "May 24, 2026",
+  "{phone}": "(602) 555-0184",
+};
 
 function Field({ label, helper, children }) {
   return (
-    <div>
-      <label className="block text-sm font-medium text-foreground mb-1.5">{label}</label>
+    <div className="space-y-1.5">
+      <label className="block text-xs font-bold uppercase tracking-[0.08em] text-slate-600">{label}</label>
       {children}
-      {helper && <p className="text-xs text-muted-foreground mt-1">{helper}</p>}
+      {helper ? <p className="text-xs leading-5 text-slate-500">{helper}</p> : null}
     </div>
   );
 }
@@ -33,9 +60,9 @@ function TextInput({ value, onChange, placeholder, type = "text" }) {
     <input
       type={type}
       value={value || ""}
-      onChange={e => onChange(e.target.value)}
+      onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+      className="w-full rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
     />
   );
 }
@@ -44,346 +71,254 @@ function TextArea({ value, onChange, placeholder, rows = 3 }) {
   return (
     <textarea
       value={value || ""}
-      onChange={e => onChange(e.target.value)}
-      rows={rows}
+      onChange={(event) => onChange(event.target.value)}
       placeholder={placeholder}
-      className="w-full px-4 py-2 rounded-lg border border-border bg-background text-foreground text-sm focus:outline-none focus:ring-2 focus:ring-primary"
+      rows={rows}
+      className="w-full resize-y rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm leading-6 text-slate-900 shadow-sm outline-none transition focus:border-sky-400 focus:ring-4 focus:ring-sky-100"
     />
   );
 }
 
-const VAR_HINT = "Variables: {name}, {business_name}, {booking_link}, {date}";
-const PREVIEW_SAMPLE_VALUES = {
-  "{name}": "Maria Rodriguez",
-  "{business_name}": "Sculpt Med Spa",
-  "{booking_link}": "https://vagaro.com/sculptmedspa",
-  "{date}": "May 24, 2026",
-  "{phone}": "(602) 555-0184",
-};
-
-function renderPreviewTemplate(template = "") {
-  return Object.entries(PREVIEW_SAMPLE_VALUES).reduce(
-    (output, [token, value]) => output.replaceAll(token, value),
-    template,
+function StatusPill({ ok, label }) {
+  return (
+    <span className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1 text-xs font-semibold ${ok ? "bg-emerald-50 text-emerald-700 ring-1 ring-emerald-200" : "bg-amber-50 text-amber-700 ring-1 ring-amber-200"}`}>
+      {ok ? <CheckCircle2 className="h-3.5 w-3.5" /> : <AlertCircle className="h-3.5 w-3.5" />}
+      {label}
+    </span>
   );
+}
+
+function SettingsCard({ icon: Icon, title, description, children }) {
+  return (
+    <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
+      <div className="flex items-start gap-3 border-b border-slate-100 bg-slate-50/70 px-6 py-5">
+        <div className="rounded-xl bg-sky-50 p-2.5 text-sky-600 ring-1 ring-sky-100"><Icon className="h-5 w-5" /></div>
+        <div>
+          <h3 className="text-base font-bold text-slate-950">{title}</h3>
+          {description ? <p className="mt-1 text-sm text-slate-500">{description}</p> : null}
+        </div>
+      </div>
+      <div className="space-y-5 p-6">{children}</div>
+    </section>
+  );
+}
+
+function renderPreview(template = "") {
+  return Object.entries(SAMPLE_VALUES).reduce((output, [token, value]) => output.replaceAll(token, value), template);
 }
 
 export default function AdminSettingsPanel() {
   const [settings, setSettings] = useState({});
   const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [activeTab, setActiveTab] = useState("channels");
   const [previewModal, setPreviewModal] = useState(null);
+  const [ga4Busy, setGa4Busy] = useState(false);
+
+  const ga4 = settings?._ga4 || {};
+  const dirty = useMemo(() => !loading && !saved, [loading, saved]);
 
   useEffect(() => {
-    fetchSettings();
+    loadSettings();
   }, []);
 
-  const fetchSettings = async () => {
+  async function loadSettings() {
+    setLoading(true);
     try {
       const data = await fetchAdminSettings();
-      setSettings(data);
-      setError('');
+      setSettings(data || {});
+      setError("");
     } catch (err) {
-      setError(getAdminSettingsError(err, 'Failed to load settings'));
+      setError(getAdminSettingsError(err, "Failed to load settings"));
     } finally {
       setLoading(false);
     }
-  };
+  }
 
-  const set = (field, value) => {
-    setSettings(prev => ({ ...prev, [field]: value }));
+  function set(field, value) {
+    setSettings((previous) => ({ ...previous, [field]: value }));
     setSaved(false);
-  };
+  }
 
-  const setAllowedAdminIps = (value) => {
-    set(
-      'allowed_admin_ips',
-      value
-        .split(/[\n,]/)
-        .map(ip => ip.trim())
-        .filter(Boolean)
-    );
-  };
+  function setAllowedAdminIps(value) {
+    set("allowed_admin_ips", value.split(/[\n,]/).map((ip) => ip.trim()).filter(Boolean));
+  }
 
-  const handleSave = async () => {
+  async function handleSave() {
+    setSaving(true);
     try {
-      setLoading(true);
-      const savedSettings = await saveAdminSettings(settings);
-      setSettings(savedSettings);
-      setError('');
+      const result = await saveAdminSettings(settings);
+      setSettings(result);
+      setError("");
       setSaved(true);
-      setTimeout(() => setSaved(false), 3000);
+      window.setTimeout(() => setSaved(false), 3500);
     } catch (err) {
-      setError(getAdminSettingsError(err, 'Failed to save settings'));
+      setError(getAdminSettingsError(err, "Failed to save settings"));
     } finally {
-      setLoading(false);
+      setSaving(false);
     }
-  };
+  }
 
-  const openPreview = (templateName, templateValue) => {
+  async function repairGa4() {
+    setGa4Busy(true);
+    setError("");
+    try {
+      const migration = await ensureGa4Configuration();
+      const status = await fetchGa4ConfigurationStatus();
+      setSettings((previous) => ({ ...previous, _ga4: { migration, ...status } }));
+    } catch (err) {
+      setError(err?.message || "GA4 repair failed");
+    } finally {
+      setGa4Busy(false);
+    }
+  }
+
+  function openPreview(name, value) {
     setPreviewModal({
-      template_name: templateName,
-      template_html: `<div style="font-family: Inter, Arial, sans-serif; line-height: 1.6; padding: 24px; color: #0f172a; white-space: pre-wrap;">${renderPreviewTemplate(templateValue || "")}</div>`,
+      template_name: name,
+      template_html: `<div style="font-family:Inter,Arial,sans-serif;line-height:1.65;padding:24px;color:#0f172a;white-space:pre-wrap">${renderPreview(value || "")}</div>`,
     });
-  };
+  }
+
+  if (loading) {
+    return <div className="flex min-h-[420px] items-center justify-center"><Loader2 className="h-7 w-7 animate-spin text-sky-500" /></div>;
+  }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-6">
-        <h2 className="text-2xl font-semibold text-foreground">Settings</h2>
-        <p className="text-sm text-muted-foreground mt-1">Manage integrations, notifications, and all message templates.</p>
+    <div className="mx-auto max-w-6xl space-y-6 pb-28">
+      <div className="rounded-3xl border border-sky-100 bg-gradient-to-br from-white via-sky-50/70 to-blue-50 px-7 py-7 shadow-sm">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.18em] text-sky-600">System configuration</p>
+            <h2 className="mt-2 text-3xl font-bold tracking-tight text-slate-950">Settings</h2>
+            <p className="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Manage customer communication channels, security, analytics integrity, webhooks, and automation templates from one control surface.</p>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <StatusPill ok={Boolean(settings.resend_enabled)} label={`Resend ${settings.resend_enabled ? "connected" : "needs attention"}`} />
+            <StatusPill ok={Boolean(settings.twilio_enabled)} label={`Twilio ${settings.twilio_enabled ? "connected" : "needs attention"}`} />
+            <StatusPill ok={Boolean(ga4.clean)} label={`GA4 ${ga4.clean ? "clean" : "repair needed"}`} />
+          </div>
+        </div>
       </div>
 
-      {error && (
-        <div className="flex items-center gap-3 p-4 bg-red-50 border border-red-200 rounded-lg">
-          <AlertCircle className="w-5 h-5 text-red-600" /><span className="text-sm text-red-700">{error}</span>
-        </div>
-      )}
-      {saved && (
-        <div className="flex items-center gap-3 p-4 bg-green-50 border border-green-200 rounded-lg">
-          <CheckCircle className="w-5 h-5 text-green-600" /><span className="text-sm text-green-700">Settings saved successfully</span>
-        </div>
-      )}
+      {error ? <div className="flex items-start gap-3 rounded-2xl border border-red-200 bg-red-50 p-4 text-sm text-red-800"><AlertCircle className="mt-0.5 h-5 w-5 shrink-0" /><span>{error}</span></div> : null}
+      {saved ? <div className="flex items-center gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><CheckCircle2 className="h-5 w-5" />Settings saved successfully.</div> : null}
 
-      {/* Tab nav */}
-      <div className="flex gap-1 border-b border-border">
-        {TABS.map(t => (
-          <button
-            key={t.id}
-            onClick={() => setActiveTab(t.id)}
-            className={`px-4 py-2.5 text-sm font-semibold border-b-2 transition-all ${
-              activeTab === t.id ? "border-primary text-primary" : "border-transparent text-muted-foreground hover:text-foreground"
-            }`}
-          >
-            {t.label}
-          </button>
-        ))}
+      <div className="overflow-x-auto rounded-2xl border border-slate-200 bg-white p-1.5 shadow-sm">
+        <div className="flex min-w-max gap-1">
+          {TABS.map(({ id, label, icon: Icon }) => (
+            <button key={id} onClick={() => setActiveTab(id)} className={`inline-flex items-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition ${activeTab === id ? "bg-slate-950 text-white shadow-sm" : "text-slate-600 hover:bg-slate-100 hover:text-slate-950"}`}>
+              <Icon className="h-4 w-4" />{label}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {activeTab === "channels" && (
-        <div className="space-y-6">
-          {/* Email */}
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Mail className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Email Configuration</h3>
-            </div>
-            <div className="space-y-4">
-              <Field label="Admin Notification Email" helper="Where lead alerts and admin emails are sent">
-                <TextInput value={settings.lead_notification_email} onChange={v => set('lead_notification_email', v)} placeholder="admin@example.com" type="email" />
-              </Field>
-              <Field label="Resend From Email" helper="Must be verified with Resend">
-                <TextInput value={settings.resend_from_email} onChange={v => set('resend_from_email', v)} placeholder="noreply@yourdomain.com" type="email" />
-              </Field>
-              <Field label="Resend Default Booking Link">
-                <TextInput value={settings.booking_link_default} onChange={v => set('booking_link_default', v)} placeholder="https://calendly.com/..." />
-              </Field>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <div className={`w-2 h-2 rounded-full ${settings.resend_enabled ? 'bg-green-500' : 'bg-gray-400'}`} />
-                <span className="text-sm text-foreground">Resend Status: {settings.resend_enabled ? 'Connected' : 'Not Connected'}</span>
-              </div>
-            </div>
-          </div>
+      {activeTab === "channels" ? (
+        <div className="grid gap-6 xl:grid-cols-2">
+          <SettingsCard icon={Mail} title="Email configuration" description="Control sender identity, notifications, and booking links.">
+            <Field label="Admin notification email" helper="Lead alerts and operational notifications are sent here."><TextInput type="email" value={settings.lead_notification_email} onChange={(value) => set("lead_notification_email", value)} placeholder="admin@example.com" /></Field>
+            <Field label="Resend from email" helper="This domain and sender must be verified in Resend."><TextInput type="email" value={settings.resend_from_email} onChange={(value) => set("resend_from_email", value)} placeholder="system@yourdomain.com" /></Field>
+            <Field label="Default booking link"><TextInput value={settings.booking_link_default} onChange={(value) => set("booking_link_default", value)} placeholder="https://calendly.com/..." /></Field>
+            <StatusPill ok={Boolean(settings.resend_enabled)} label={settings.resend_enabled ? "Resend connected" : "Resend not connected"} />
+          </SettingsCard>
 
-          {/* SMS */}
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">SMS Configuration</h3>
-            </div>
-            <div className="space-y-4">
-              <Field label="Twilio From Number">
-                <TextInput value={settings.twilio_from_number} onChange={v => set('twilio_from_number', v)} placeholder="+15550001234" type="tel" />
-              </Field>
-              <div className="flex items-center gap-3 p-3 bg-muted rounded-lg">
-                <div className={`w-2 h-2 rounded-full ${settings.twilio_enabled ? 'bg-green-500' : 'bg-gray-400'}`} />
-                <span className="text-sm text-foreground">Twilio Status: {settings.twilio_enabled ? 'Connected' : 'Not Connected'}</span>
-              </div>
-            </div>
-          </div>
+          <SettingsCard icon={MessageSquare} title="SMS configuration" description="Manage the Twilio number used for automated replies.">
+            <Field label="Twilio from number" helper="Use E.164 format, for example +16025551234."><TextInput type="tel" value={settings.twilio_from_number} onChange={(value) => set("twilio_from_number", value)} placeholder="+15550001234" /></Field>
+            <StatusPill ok={Boolean(settings.twilio_enabled)} label={settings.twilio_enabled ? "Twilio connected" : "Twilio not connected"} />
+          </SettingsCard>
 
-          {/* WhatsApp */}
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <MessageCircle className="w-5 h-5 text-green-600" />
-              <h3 className="text-lg font-semibold text-foreground">WhatsApp (via Twilio)</h3>
-            </div>
-            <div className="space-y-4">
-              <div className="flex items-center gap-3 p-3 rounded-lg border border-border">
-                <button
-                  onClick={() => set('whatsapp_enabled', !settings.whatsapp_enabled)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${settings.whatsapp_enabled ? 'bg-green-500' : 'bg-muted'}`}
-                >
-                  <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${settings.whatsapp_enabled ? 'translate-x-6' : 'translate-x-1'}`} />
-                </button>
-                <span className="text-sm font-medium text-foreground">{settings.whatsapp_enabled ? 'WhatsApp Enabled' : 'WhatsApp Disabled'}</span>
-              </div>
-              <Field label="WhatsApp From Number" helper={'Must include "whatsapp:" prefix'}>
-                <TextInput value={settings.whatsapp_from_number} onChange={v => set('whatsapp_from_number', v)} placeholder="whatsapp:+14155238886" />
-              </Field>
-            </div>
-          </div>
+          <SettingsCard icon={MessageCircle} title="WhatsApp via Twilio" description="Optional WhatsApp channel using a Twilio-approved sender.">
+            <button type="button" onClick={() => set("whatsapp_enabled", !settings.whatsapp_enabled)} className={`flex w-full items-center justify-between rounded-xl border px-4 py-3 text-sm font-semibold ${settings.whatsapp_enabled ? "border-emerald-200 bg-emerald-50 text-emerald-800" : "border-slate-200 bg-slate-50 text-slate-600"}`}>
+              <span>{settings.whatsapp_enabled ? "WhatsApp enabled" : "WhatsApp disabled"}</span><span className={`h-6 w-11 rounded-full p-1 transition ${settings.whatsapp_enabled ? "bg-emerald-500" : "bg-slate-300"}`}><span className={`block h-4 w-4 rounded-full bg-white shadow transition ${settings.whatsapp_enabled ? "translate-x-5" : "translate-x-0"}`} /></span>
+            </button>
+            <Field label="WhatsApp from number" helper='Include the "whatsapp:" prefix.'><TextInput value={settings.whatsapp_from_number} onChange={(value) => set("whatsapp_from_number", value)} placeholder="whatsapp:+14155238886" /></Field>
+          </SettingsCard>
         </div>
-      )}
-
-      {activeTab === "webhooks" && (
-        <WebhooksTab settings={settings} onSettingsUpdated={setSettings} />
-      )}
-
-      {activeTab === "security" && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Key className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Admin Access Controls</h3>
-            </div>
-            <div className="space-y-4">
-              <Field
-                label="Allowed Admin IPs"
-                helper="Optional allowlist for admin access controls. Enter one IP per line or comma-separated. Leave empty to keep IP allowlisting disabled."
-              >
-                <TextArea
-                  value={(settings.allowed_admin_ips || []).join('\n')}
-                  onChange={setAllowedAdminIps}
-                  placeholder={"203.0.113.10\n198.51.100.25"}
-                  rows={4}
-                />
-              </Field>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "instant" && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Key className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Instant Response Templates</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">{VAR_HINT}</p>
-            <div className="space-y-5">
-              <Field label="Instant Response SMS" helper="Sent immediately when a new lead submits a form or contacts you">
-                <TextArea value={settings.sms_template} onChange={v => set('sms_template', v)} placeholder="Hi {name}, thanks for reaching out to {business_name}! We'll follow up shortly. Book here: {booking_link}" rows={3} />
-              </Field>
-              <Field label="Email Confirmation Template" helper="Sent as the email confirmation to new leads">
-                <TextArea value={settings.email_confirmation_template} onChange={v => set('email_confirmation_template', v)} placeholder="Hi {name}, thanks for your interest. We'll be in touch soon..." rows={4} />
-                <button
-                  type="button"
-                  onClick={() => openPreview("Email Confirmation Template", settings.email_confirmation_template)}
-                  className="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
-                >
-                  Preview template
-                </button>
-              </Field>
-              <Field label="Missed Call SMS" helper="Sent automatically when a call is missed">
-                <TextArea value={settings.missed_call_sms_template} onChange={v => set('missed_call_sms_template', v)} placeholder="Hi! We missed your call. Reply here or book a time: {booking_link}" rows={3} />
-              </Field>
-              <Field label="Admin New Lead Notification Template">
-                <TextArea value={settings.admin_notification_template} onChange={v => set('admin_notification_template', v)} placeholder="New lead: {name} from {business_name} — {phone}" rows={3} />
-              </Field>
-              <Field label="Booking Prompt SMS (24h after Qualified)" helper="Sent when a lead is qualified and hasn't booked">
-                <TextArea value={settings.follow_up_booking_prompt_sms} onChange={v => set('follow_up_booking_prompt_sms', v)} placeholder="Hi {name}, just wanted to follow up — you can book your free call here: {booking_link}" rows={3} />
-              </Field>
-              <Field label="Booking Prompt Email Body (24h after Qualified)">
-                <TextArea value={settings.follow_up_booking_prompt_email} onChange={v => set('follow_up_booking_prompt_email', v)} placeholder="Hi {name}, we'd love to connect..." rows={4} />
-                <button
-                  type="button"
-                  onClick={() => openPreview("Booking Prompt Email", settings.follow_up_booking_prompt_email)}
-                  className="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
-                >
-                  Preview template
-                </button>
-              </Field>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "followup" && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <MessageSquare className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">Follow-Up SMS Sequence</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">{VAR_HINT}</p>
-            <div className="space-y-5">
-              <Field label="Day 1 Follow-Up SMS" helper="Sent 1 day after initial contact with no reply">
-                <TextArea value={settings.follow_up_day1_sms} onChange={v => set('follow_up_day1_sms', v)} placeholder="Hi {name}, just checking in — still interested? Reply here or grab a time: {booking_link}" rows={3} />
-              </Field>
-              <Field label="Day 3 Follow-Up SMS" helper="Sent 3 days after initial contact with no reply">
-                <TextArea value={settings.follow_up_day3_sms} onChange={v => set('follow_up_day3_sms', v)} placeholder="Hey {name}, we have a few open spots this week. Would love to help: {booking_link}" rows={3} />
-              </Field>
-              <Field label="Day 7 Follow-Up SMS" helper="Sent 7 days after initial contact with no reply">
-                <TextArea value={settings.follow_up_day7_sms} onChange={v => set('follow_up_day7_sms', v)} placeholder="Hi {name}, last check-in from us. No pressure — if timing is off, just let us know." rows={3} />
-              </Field>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {activeTab === "nurture" && (
-        <div className="space-y-6">
-          <div className="bg-white rounded-xl border border-border p-6">
-            <div className="flex items-center gap-3 mb-4">
-              <Mail className="w-5 h-5 text-primary" />
-              <h3 className="text-lg font-semibold text-foreground">30-Day Nurture Email Steps</h3>
-            </div>
-            <p className="text-xs text-muted-foreground mb-4">{VAR_HINT}</p>
-            <div className="space-y-8">
-              {[
-                { num: 1, label: "Day 0 — Welcome", subKey: "nurture_step1_subject", bodyKey: "nurture_step1_body" },
-                { num: 2, label: "Day 3 — Case Study", subKey: "nurture_step2_subject", bodyKey: "nurture_step2_body" },
-                { num: 3, label: "Day 7 — Testimonial", subKey: "nurture_step3_subject", bodyKey: "nurture_step3_body" },
-                { num: 4, label: "Day 10 — Tip", subKey: "nurture_step4_subject", bodyKey: "nurture_step4_body" },
-                { num: 5, label: "Day 14 — Case Study 2", subKey: "nurture_step5_subject", bodyKey: "nurture_step5_body" },
-                { num: 6, label: "Day 18 — Testimonial 2", subKey: "nurture_step6_subject", bodyKey: "nurture_step6_body" },
-                { num: 7, label: "Day 23 — Tip + Offer", subKey: "nurture_step7_subject", bodyKey: "nurture_step7_body" },
-                { num: 8, label: "Day 30 — Final CTA", subKey: "nurture_step8_subject", bodyKey: "nurture_step8_body" },
-              ].map(step => (
-                <div key={step.num} className="rounded-xl border border-border p-5 space-y-3">
-                  <p className="text-sm font-bold text-foreground">Step {step.num}: {step.label}</p>
-                  <Field label="Subject Line">
-                    <TextInput value={settings[step.subKey]} onChange={v => set(step.subKey, v)} placeholder={`Email subject for step ${step.num}...`} />
-                  </Field>
-                  <Field label="Email Body">
-                    <TextArea value={settings[step.bodyKey]} onChange={v => set(step.bodyKey, v)} placeholder={`Email body for step ${step.num}...`} rows={4} />
-                    <button
-                      type="button"
-                      onClick={() => openPreview(`Nurture Step ${step.num}`, settings[step.bodyKey])}
-                      className="mt-2 text-xs font-semibold text-primary hover:text-primary/80"
-                    >
-                      Preview template
-                    </button>
-                  </Field>
-                </div>
-              ))}
-            </div>
-          </div>
-        </div>
-      )}
-
-      <div className="flex gap-3 pt-2">
-        <button
-          onClick={handleSave}
-          disabled={loading}
-          className="flex items-center gap-2 px-6 py-2.5 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 disabled:opacity-50 transition-colors"
-        >
-          <Save className="w-4 h-4" />
-          {loading ? 'Saving...' : 'Save Settings'}
-        </button>
-      </div>
-
-      {previewModal ? (
-        <EmailTemplatePreviewModal
-          template_name={previewModal.template_name}
-          template_html={previewModal.template_html}
-          onClose={() => setPreviewModal(null)}
-        />
       ) : null}
+
+      {activeTab === "analytics" ? (
+        <div className="space-y-6">
+          <SettingsCard icon={BarChart3} title="Google Analytics 4 integrity" description="Security, event naming, and migration state for the production GA4 configuration.">
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Measurement ID</p><p className="mt-2 font-mono text-sm font-bold text-slate-950">{GA4_MEASUREMENT_ID}</p></div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Record count</p><p className="mt-2 text-2xl font-bold text-slate-950">{ga4.record_count ?? "—"}</p></div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Legacy secret</p><div className="mt-2">{ga4.has_legacy_secret === false ? <StatusPill ok label="Removed" /> : <StatusPill ok={false} label="Still present" />}</div></div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Configuration</p><div className="mt-2"><StatusPill ok={Boolean(ga4.clean)} label={ga4.clean ? "Clean" : "Needs repair"} /></div></div>
+            </div>
+
+            <div className="rounded-2xl border border-slate-200 p-5">
+              <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+                <div>
+                  <h4 className="font-bold text-slate-950">Canonical key events</h4>
+                  <p className="mt-1 text-sm text-slate-500">Only these events should be marked as key events in GA4 Admin.</p>
+                </div>
+                <div className="flex flex-wrap gap-2">{GA4_KEY_EVENTS.map((eventName) => <span key={eventName} className="rounded-lg bg-slate-950 px-3 py-1.5 font-mono text-xs text-white">{eventName}</span>)}</div>
+              </div>
+            </div>
+
+            {ga4.clean ? (
+              <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-bold">GA4 database configuration is clean.</p><p className="mt-1 text-sm">The legacy entity secret is absent, canonical key events are populated, and the configuration remains in “configured” state until live Realtime/DebugView verification is completed.</p></div></div>
+            ) : (
+              <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900"><XCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-bold">GA4 still requires repair.</p><p className="mt-1 text-sm">Use the repair control below. It invokes the secured Base44 setup function, deletes the legacy secret-bearing record, and restores canonical event names.</p></div></div>
+            )}
+
+            <button type="button" onClick={repairGa4} disabled={ga4Busy} className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50">
+              {ga4Busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}{ga4Busy ? "Repairing GA4…" : "Repair and recheck GA4"}
+            </button>
+          </SettingsCard>
+        </div>
+      ) : null}
+
+      {activeTab === "webhooks" ? <WebhooksTab settings={settings} onSettingsUpdated={setSettings} /> : null}
+
+      {activeTab === "security" ? (
+        <SettingsCard icon={Key} title="Admin access controls" description="Restrict administrative access to approved IP addresses when needed.">
+          <Field label="Allowed admin IPs" helper="Enter one IP per line or comma-separated. Leave empty to disable IP allowlisting."><TextArea value={(settings.allowed_admin_ips || []).join("\n")} onChange={setAllowedAdminIps} placeholder={"203.0.113.10\n198.51.100.25"} rows={5} /></Field>
+        </SettingsCard>
+      ) : null}
+
+      {activeTab === "instant" ? (
+        <SettingsCard icon={MessageSquare} title="Instant response templates" description={VAR_HINT}>
+          <Field label="Instant response SMS"><TextArea value={settings.sms_template} onChange={(value) => set("sms_template", value)} placeholder="Hi {name}, thanks for reaching out to {business_name}. Book here: {booking_link}" /></Field>
+          <Field label="Email confirmation template"><TextArea value={settings.email_confirmation_template} onChange={(value) => set("email_confirmation_template", value)} rows={5} /><button type="button" onClick={() => openPreview("Email Confirmation", settings.email_confirmation_template)} className="text-xs font-bold text-sky-600">Preview template</button></Field>
+          <Field label="Missed call SMS"><TextArea value={settings.missed_call_sms_template} onChange={(value) => set("missed_call_sms_template", value)} /></Field>
+          <Field label="Admin new lead notification"><TextArea value={settings.admin_notification_template} onChange={(value) => set("admin_notification_template", value)} /></Field>
+          <Field label="Booking prompt SMS"><TextArea value={settings.follow_up_booking_prompt_sms} onChange={(value) => set("follow_up_booking_prompt_sms", value)} /></Field>
+          <Field label="Booking prompt email"><TextArea value={settings.follow_up_booking_prompt_email} onChange={(value) => set("follow_up_booking_prompt_email", value)} rows={5} /><button type="button" onClick={() => openPreview("Booking Prompt Email", settings.follow_up_booking_prompt_email)} className="text-xs font-bold text-sky-600">Preview template</button></Field>
+        </SettingsCard>
+      ) : null}
+
+      {activeTab === "followup" ? (
+        <SettingsCard icon={MessageCircle} title="Follow-up SMS sequence" description={VAR_HINT}>
+          <Field label="Day 1 follow-up"><TextArea value={settings.follow_up_day1_sms} onChange={(value) => set("follow_up_day1_sms", value)} /></Field>
+          <Field label="Day 3 follow-up"><TextArea value={settings.follow_up_day3_sms} onChange={(value) => set("follow_up_day3_sms", value)} /></Field>
+          <Field label="Day 7 follow-up"><TextArea value={settings.follow_up_day7_sms} onChange={(value) => set("follow_up_day7_sms", value)} /></Field>
+        </SettingsCard>
+      ) : null}
+
+      {activeTab === "nurture" ? (
+        <SettingsCard icon={Mail} title="30-day nurture email sequence" description={VAR_HINT}>
+          {[1,2,3,4,5,6,7,8].map((number) => {
+            const subjectKey = `nurture_step${number}_subject`;
+            const bodyKey = `nurture_step${number}_body`;
+            return <div key={number} className="space-y-4 rounded-2xl border border-slate-200 bg-slate-50/60 p-5"><p className="font-bold text-slate-950">Step {number}</p><Field label="Subject"><TextInput value={settings[subjectKey]} onChange={(value) => set(subjectKey, value)} /></Field><Field label="Body"><TextArea value={settings[bodyKey]} onChange={(value) => set(bodyKey, value)} rows={5} /><button type="button" onClick={() => openPreview(`Nurture Step ${number}`, settings[bodyKey])} className="text-xs font-bold text-sky-600">Preview template</button></Field></div>;
+          })}
+        </SettingsCard>
+      ) : null}
+
+      <div className="fixed bottom-0 left-0 right-0 z-40 border-t border-slate-200 bg-white/95 px-6 py-4 shadow-[0_-8px_30px_rgba(15,23,42,0.08)] backdrop-blur lg:left-64">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4">
+          <p className="hidden text-sm text-slate-500 sm:block">{saved ? "All changes saved." : dirty ? "Review your changes before leaving this page." : "Settings are up to date."}</p>
+          <button onClick={handleSave} disabled={saving} className="ml-auto inline-flex items-center gap-2 rounded-xl bg-sky-500 px-6 py-3 text-sm font-bold text-white shadow-lg shadow-sky-200 transition hover:bg-sky-600 disabled:opacity-50">
+            {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />}{saving ? "Saving…" : "Save settings"}
+          </button>
+        </div>
+      </div>
+
+      {previewModal ? <EmailTemplatePreviewModal template_name={previewModal.template_name} template_html={previewModal.template_html} onClose={() => setPreviewModal(null)} /> : null}
     </div>
   );
 }
