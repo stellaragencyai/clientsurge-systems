@@ -18,10 +18,8 @@ import { SectionSkeleton } from "../components/landing/SkeletonLoader";
 import { FAQ_ITEMS } from "../components/landing/FAQData";
 import ThreeSystemsSection from "../components/landing/ThreeSystemsSection";
 import SixAutomationsSection from "../components/landing/SixAutomationsSection.jsx";
-import ROICalculator from "../components/landing/ROICalculator.jsx";
 import FAQSection from "../components/landing/FAQSection.jsx";
 import SectionErrorBoundary from "../components/SectionErrorBoundary.jsx";
-import CSSectionHeader from "../components/design-system/CSSectionHeader.jsx";
 
 const Industries = lazy(() => import("../components/landing/Industries"));
 const FinalCTA = lazy(() => import("../components/landing/FinalCTA"));
@@ -169,35 +167,19 @@ export default function Home() {
           <TrustSection />
         </SectionErrorBoundary>
 
-        {/* 9. ROI Calculator — interactive lead recovery estimator */}
-        <div id="roi-calculator" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}>
-          <section className="py-16 md:py-24 px-4 bg-muted/30">
-            <div className="max-w-4xl mx-auto">
-              <CSSectionHeader
-                eyebrow="Revenue Recovery Calculator"
-                title="How Much Revenue Are You Losing?"
-                subtitle="Drag the sliders below to estimate how many leads may be leaking through missed calls and slow follow-up — then browse our packages to recover them automatically."
-                align="center"
-                className="mb-8"
-              />
-              <ROICalculator />
-            </div>
-          </section>
-        </div>
-
-        {/* 10. Pricing / Core Offer */}
+        {/* 9. Pricing / Core Offer */}
         <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="pricing">
           <ThreeSystemsSection />
         </SectionErrorBoundary>
 
-        {/* 11. FAQ — accordion section */}
+        {/* 10. FAQ — accordion section */}
         <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
         <SectionErrorBoundary sectionName="faq" fallbackMessage="FAQ loading.">
           <FAQSection />
         </SectionErrorBoundary>
 
-        {/* 12. Final CTA — booking conversion */}
+        {/* 11. Final CTA — booking conversion */}
         <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
           <FinalCTA />
         </LazyHomepageSection>
