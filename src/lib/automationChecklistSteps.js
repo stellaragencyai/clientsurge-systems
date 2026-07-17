@@ -7,7 +7,22 @@
 //
 // Bump this version constant (and the copy in functions/initializeInstallOS)
 // whenever step content changes so any drift is immediately visible in backend logs.
-export const CHECKLIST_TEMPLATE_VERSION = "2026-04-29-v1";
+export const CHECKLIST_TEMPLATE_VERSION = "2026-07-16-v2";
+
+export const LEGACY_SERVICE_KEY_ALIASES = Object.freeze({
+  followup_sequences: "nurture_sequence_14d",
+  appointment_booking: "ai_booking_agent",
+  missed_call_textback: "missed_call_text_back",
+});
+
+export const normalizeAutomationServiceKey = (serviceKey) => {
+  const normalized = String(serviceKey || "")
+    .trim()
+    .toLowerCase()
+    .replace(/[\s-]+/g, "_");
+
+  return LEGACY_SERVICE_KEY_ALIASES[normalized] || normalized;
+};
 
 export const CHECKLIST_STEPS_BY_SERVICE = {
   instant_lead_response: [
@@ -74,7 +89,7 @@ export const CHECKLIST_STEPS_BY_SERVICE = {
 };
 
 export const getStepsForService = (serviceKey) => {
-  return CHECKLIST_STEPS_BY_SERVICE[serviceKey] || [];
+  return CHECKLIST_STEPS_BY_SERVICE[normalizeAutomationServiceKey(serviceKey)] || [];
 };
 
 export const getStepLabel = (serviceKey, stepId) => {
