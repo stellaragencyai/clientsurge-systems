@@ -19,12 +19,19 @@ for (const file of walk(path.join(root, 'src'))) {
   if (/ConversionTrackingEvent\.create\s*\(/.test(text)) {
     failures.push(`${path.relative(root, file)} directly creates ConversionTrackingEvent; use captureConversionEvent`);
   }
+  if (/WebsiteLead\.create\s*\(/.test(text)) {
+    failures.push(`${path.relative(root, file)} directly creates WebsiteLead; use captureValidatedWebsiteLead`);
+  }
   if (/asServiceRole/.test(text)) {
     failures.push(`${path.relative(root, file)} references asServiceRole in frontend code`);
   }
 }
 
 const requiredSchemaFields = {
+  'base44/entities/WebsiteLead.jsonc': [
+    'environment','dashboard_excluded','dashboard_truth_status','lead_quality','follow_up_priority',
+    'submission_count','first_submission_at','last_submission_at','duplicate_of_lead_id','capture_version'
+  ],
   'base44/entities/ConversionTrackingEvent.jsonc': [
     'environment','dashboard_excluded','dashboard_truth_status','release_version','tracking_version'
   ],
@@ -48,13 +55,21 @@ for (const [relative, fields] of Object.entries(requiredSchemaFields)) {
   }
 }
 
-const capturePath = path.join(root, 'base44/functions/captureConversionEvent/entry.ts');
-if (!fs.existsSync(capturePath)) {
-  failures.push('captureConversionEvent function is missing');
-} else {
-  const capture = fs.readFileSync(capturePath, 'utf8');
-  for (const marker of ['event_id', 'duplicate: true', 'dashboard_excluded', 'tracking_version']) {
-    if (!capture.includes(marker)) failures.push(`captureConversionEvent missing ${marker}`);
+const functionMarkers = {
+  'base44/functions/captureConversionEvent/entry.ts': ['event_id', 'duplicate: true', 'dashboard_excluded', 'tracking_version'],
+  'base44/functions/captureValidatedWebsiteLead/entry.ts': ['dedup_key', 'submission_count', 'environment', 'dashboard_truth_status'],
+  'base44/functions/backfillWebsiteLeadTruth/entry.ts': ['dry_run', 'submission_count', 'dashboard_excluded'],
+};
+
+for (const [relative, markers] of Object.entries(functionMarkers)) {
+  const full = path.join(root, relative);
+  if (!fs.existsSync(full)) {
+    failures.push(`${relative} is missing`);
+    continue;
+  }
+  const text = fs.readFileSync(full, 'utf8');
+  for (const marker of markers) {
+    if (!text.includes(marker)) failures.push(`${relative} missing ${marker}`);
   }
 }
 

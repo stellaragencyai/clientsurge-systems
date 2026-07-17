@@ -7,407 +7,96 @@
     "tenant_scoped": "client_id + client_project_id"
   },
   "properties": {
-    "description": {
-      "type": "string",
-      "title": "Description",
-      "maxLength": 1000
-    },
-    "full_name": {
-      "type": "string",
-      "title": "Full Name"
-    },
-    "first_name": {
-      "type": "string",
-      "title": "First Name"
-    },
-    "phone_number": {
-      "type": "string",
-      "title": "Phone Number"
-    },
-    "email": {
-      "type": "string",
-      "title": "Email Address",
-      "format": "email"
-    },
-    "business_name": {
-      "type": "string",
-      "title": "Business Name"
-    },
-    "business_type": {
-      "type": "string",
-      "title": "Business Type"
-    },
-    "business_website_url": {
-      "type": "string",
-      "title": "Business Website URL"
-    },
-    "industry_slug": {
-      "type": "string",
-      "title": "Industry Slug"
-    },
-    "industry_tags": {
-      "type": "array",
-      "title": "Industry Tags",
-      "items": {
-        "type": "string"
-      }
-    },
-    "service_interest": {
-      "type": "string",
-      "title": "Service Interest"
-    },
-    "message": {
-      "type": "string",
-      "title": "Message"
-    },
-    "problem": {
-      "type": "string",
-      "title": "Problem Summary"
-    },
+    "description": { "type": "string", "title": "Description", "maxLength": 1000 },
+    "full_name": { "type": "string", "title": "Full Name" },
+    "first_name": { "type": "string", "title": "First Name" },
+    "phone_number": { "type": "string", "title": "Phone Number" },
+    "email": { "type": "string", "title": "Email Address", "format": "email" },
+    "business_name": { "type": "string", "title": "Business Name" },
+    "business_type": { "type": "string", "title": "Business Type" },
+    "business_website_url": { "type": "string", "title": "Business Website URL" },
+    "industry_slug": { "type": "string", "title": "Industry Slug" },
+    "industry_tags": { "type": "array", "title": "Industry Tags", "items": { "type": "string" } },
+    "service_interest": { "type": "string", "title": "Service Interest" },
+    "message": { "type": "string", "title": "Message" },
+    "problem": { "type": "string", "title": "Problem Summary" },
     "source": {
       "type": "string",
       "title": "Lead Source",
-      "enum": [
-        "website_form",
-        "contact_page",
-        "pricing_page",
-        "landing_page",
-        "elevenlabs_sarah_ai_receptionist"
-      ],
+      "enum": ["website_form", "contact_page", "pricing_page", "landing_page", "elevenlabs_sarah_ai_receptionist"],
       "default": "website_form"
     },
-    "client_id": {
-      "type": "string",
-      "title": "Client ID (Tenant Isolation)",
-      "description": "Business/client tenant ID. Derived from routing_key, source_page, webhook registration, or explicit form metadata at capture time."
-    },
-    "client_project_id": {
-      "type": "string",
-      "title": "Linked Client Project ID"
-    },
-    "crm_lead_id": {
-      "type": "string",
-      "title": "Linked CRM Lead ID"
-    },
-    "source_page": {
-      "type": "string",
-      "title": "Source Page"
-    },
-    "utm_source": {
-      "type": "string",
-      "title": "UTM Source"
-    },
-    "utm_medium": {
-      "type": "string",
-      "title": "UTM Medium"
-    },
-    "utm_campaign": {
-      "type": "string",
-      "title": "UTM Campaign"
-    },
-    "utm_content": {
-      "type": "string",
-      "title": "UTM Content"
-    },
-    "utm_term": {
-      "type": "string",
-      "title": "UTM Term"
-    },
-    "routing_key": {
-      "type": "string",
-      "title": "Verified Routing Key"
-    },
-    "requested_channels": {
-      "type": "array",
-      "title": "Requested Contact Channels",
-      "items": {
-        "type": "string"
-      }
-    },
-    "consent_given": {
-      "type": "boolean",
-      "title": "Consent Given",
-      "default": false
-    },
-    "consent_given_at": {
-      "type": "string",
-      "title": "Consent Given At",
-      "format": "date-time"
-    },
-    "consent_ip": {
-      "type": "string",
-      "title": "Consent IP Address"
-    },
-    "consent_source": {
-      "type": "string",
-      "title": "Consent Source"
-    },
-    "consent_text_version": {
-      "type": "string",
-      "title": "Consent Text Version"
-    },
-    "user_agent": {
-      "type": "string",
-      "title": "User Agent"
-    },
-    "ip_address": {
-      "type": "string",
-      "title": "IP Address"
-    },
-    "lead_status": {
-      "type": "string",
-      "title": "Lead Status",
-      "enum": [
-        "new",
-        "contacted",
-        "responded",
-        "hot",
-        "booked",
-        "closed",
-        "ignored"
-      ],
-      "default": "new"
-    },
-    "reply_status": {
-      "type": "string",
-      "title": "Reply Status",
-      "enum": [
-        "none",
-        "responded"
-      ],
-      "default": "none"
-    },
-    "booking_status": {
-      "type": "string",
-      "title": "Booking Status",
-      "enum": [
-        "none",
-        "clicked",
-        "booked"
-      ],
-      "default": "none"
-    },
-    "follow_up_step": {
-      "type": "integer",
-      "title": "Follow-Up Step",
-      "default": 0,
-      "description": "0=new, 1=10min SMS sent, 2=1hr email sent, 3=24hr SMS sent"
-    },
-    "next_follow_up_at": {
-      "type": "string",
-      "title": "Next Follow-Up At",
-      "format": "date-time"
-    },
-    "last_message_sent": {
-      "type": "string",
-      "title": "Last Message Sent",
-      "format": "date-time"
-    },
-    "initial_response_sent_at": {
-      "type": "string",
-      "title": "Initial Response Sent At",
-      "format": "date-time"
-    },
-    "dedup_key": {
-      "type": "string",
-      "title": "Deduplication Key"
-    },
-    "automation_enabled": {
-      "type": "boolean",
-      "title": "Automation Enabled",
-      "default": true
-    },
-    "engagement_score": {
-      "type": "number",
-      "title": "Engagement Score (0-100)",
-      "default": 0,
-      "description": "Calculated from replies, opens, clicks"
-    },
-    "sms_attempt_count": {
-      "type": "integer",
-      "title": "SMS Attempt Count",
-      "default": 0
-    },
-    "email_attempt_count": {
-      "type": "integer",
-      "title": "Email Attempt Count",
-      "default": 0
-    },
-    "last_engagement_type": {
-      "type": "string",
-      "title": "Last Engagement Type",
-      "enum": [
-        "sms",
-        "email",
-        "call",
-        "none"
-      ],
-      "default": "none"
-    },
-    "last_engagement_at": {
-      "type": "string",
-      "title": "Last Engagement At",
-      "format": "date-time"
-    },
-    "cadence_mode": {
-      "type": "string",
-      "title": "Cadence Mode",
-      "enum": [
-        "auto",
-        "sms_first",
-        "email_first",
-        "custom"
-      ],
-      "default": "auto",
-      "description": "How to sequence follow-up channels"
-    },
-    "cadence_paused": {
-      "type": "boolean",
-      "title": "Cadence Paused",
-      "default": false,
-      "description": "Temporarily pause automation"
-    },
-    "cadence_paused_at": {
-      "type": "string",
-      "title": "Cadence Paused At",
-      "format": "date-time"
-    },
-    "archived": {
-      "type": "boolean",
-      "title": "Archived",
-      "default": false
-    },
-    "archived_at": {
-      "type": "string",
-      "title": "Archived At",
-      "format": "date-time"
-    },
-    "city_or_service_area": {
-      "type": "string",
-      "title": "City Or Service Area"
-    },
-    "website_url": {
-      "type": "string",
-      "title": "Website URL"
-    },
-    "interested_service": {
-      "type": "string",
-      "title": "Interested Service"
-    },
-    "current_lead_source": {
-      "type": "string",
-      "title": "Current Lead Source"
-    },
-    "desired_monthly_clients": {
-      "type": "string",
-      "title": "Desired Monthly Clients"
-    },
-    "current_marketing_spend_status": {
-      "type": "string",
-      "title": "Current Marketing Spend Status"
-    },
-    "capacity_to_handle_more_leads": {
-      "type": "string",
-      "title": "Capacity To Handle More Leads"
-    },
-    "timeline": {
-      "type": "string",
-      "title": "Timeline"
-    },
-    "sms_permission": {
-      "type": "boolean",
-      "title": "SMS Permission",
-      "default": false
-    },
-    "caller_type": {
-      "type": "string",
-      "title": "Caller Type"
-    },
-    "lead_quality": {
-      "type": "string",
-      "title": "Lead Quality"
-    },
-    "follow_up_priority": {
-      "type": "string",
-      "title": "Follow-Up Priority"
-    },
-    "call_summary": {
-      "type": "string",
-      "title": "Call Summary"
-    },
-    "transcript": {
-      "type": "string",
-      "title": "Transcript"
-    },
-    "call_sid": {
-      "type": "string",
-      "title": "Call SID"
-    },
-    "conversation_id": {
-      "type": "string",
-      "title": "Conversation ID"
-    }
+    "client_id": { "type": "string", "title": "Client ID (Tenant Isolation)", "description": "Business/client tenant ID. Derived from routing_key, source_page, webhook registration, or explicit form metadata at capture time." },
+    "client_project_id": { "type": "string", "title": "Linked Client Project ID" },
+    "crm_lead_id": { "type": "string", "title": "Linked CRM Lead ID" },
+    "source_page": { "type": "string", "title": "Source Page" },
+    "utm_source": { "type": "string", "title": "UTM Source" },
+    "utm_medium": { "type": "string", "title": "UTM Medium" },
+    "utm_campaign": { "type": "string", "title": "UTM Campaign" },
+    "utm_content": { "type": "string", "title": "UTM Content" },
+    "utm_term": { "type": "string", "title": "UTM Term" },
+    "routing_key": { "type": "string", "title": "Verified Routing Key" },
+    "requested_channels": { "type": "array", "title": "Requested Contact Channels", "items": { "type": "string" } },
+    "consent_given": { "type": "boolean", "title": "Consent Given", "default": false },
+    "consent_given_at": { "type": "string", "title": "Consent Given At", "format": "date-time" },
+    "consent_ip": { "type": "string", "title": "Consent IP Address" },
+    "consent_source": { "type": "string", "title": "Consent Source" },
+    "consent_text_version": { "type": "string", "title": "Consent Text Version" },
+    "user_agent": { "type": "string", "title": "User Agent" },
+    "ip_address": { "type": "string", "title": "IP Address" },
+    "lead_status": { "type": "string", "title": "Lead Status", "enum": ["new", "contacted", "responded", "hot", "booked", "closed", "ignored"], "default": "new" },
+    "reply_status": { "type": "string", "title": "Reply Status", "enum": ["none", "responded"], "default": "none" },
+    "booking_status": { "type": "string", "title": "Booking Status", "enum": ["none", "clicked", "booked"], "default": "none" },
+    "follow_up_step": { "type": "integer", "title": "Follow-Up Step", "default": 0, "description": "0=new, 1=10min SMS sent, 2=1hr email sent, 3=24hr SMS sent" },
+    "next_follow_up_at": { "type": "string", "title": "Next Follow-Up At", "format": "date-time" },
+    "last_message_sent": { "type": "string", "title": "Last Message Sent", "format": "date-time" },
+    "initial_response_sent_at": { "type": "string", "title": "Initial Response Sent At", "format": "date-time" },
+    "dedup_key": { "type": "string", "title": "Deduplication Key" },
+    "automation_enabled": { "type": "boolean", "title": "Automation Enabled", "default": true },
+    "engagement_score": { "type": "number", "title": "Engagement Score (0-100)", "default": 0, "description": "Calculated from replies, opens, clicks" },
+    "sms_attempt_count": { "type": "integer", "title": "SMS Attempt Count", "default": 0 },
+    "email_attempt_count": { "type": "integer", "title": "Email Attempt Count", "default": 0 },
+    "last_engagement_type": { "type": "string", "title": "Last Engagement Type", "enum": ["sms", "email", "call", "none"], "default": "none" },
+    "last_engagement_at": { "type": "string", "title": "Last Engagement At", "format": "date-time" },
+    "cadence_mode": { "type": "string", "title": "Cadence Mode", "enum": ["auto", "sms_first", "email_first", "custom"], "default": "auto", "description": "How to sequence follow-up channels" },
+    "cadence_paused": { "type": "boolean", "title": "Cadence Paused", "default": false, "description": "Temporarily pause automation" },
+    "cadence_paused_at": { "type": "string", "title": "Cadence Paused At", "format": "date-time" },
+    "archived": { "type": "boolean", "title": "Archived", "default": false },
+    "archived_at": { "type": "string", "title": "Archived At", "format": "date-time" },
+    "city_or_service_area": { "type": "string", "title": "City Or Service Area" },
+    "website_url": { "type": "string", "title": "Website URL" },
+    "interested_service": { "type": "string", "title": "Interested Service" },
+    "current_lead_source": { "type": "string", "title": "Current Lead Source" },
+    "desired_monthly_clients": { "type": "string", "title": "Desired Monthly Clients" },
+    "current_marketing_spend_status": { "type": "string", "title": "Current Marketing Spend Status" },
+    "capacity_to_handle_more_leads": { "type": "string", "title": "Capacity To Handle More Leads" },
+    "timeline": { "type": "string", "title": "Timeline" },
+    "sms_permission": { "type": "boolean", "title": "SMS Permission", "default": false },
+    "caller_type": { "type": "string", "title": "Caller Type" },
+    "lead_quality": { "type": "string", "title": "Lead Quality", "enum": ["unreviewed", "valid", "suspicious", "internal_test", "duplicate", "disqualified"], "default": "unreviewed" },
+    "follow_up_priority": { "type": "string", "title": "Follow-Up Priority", "enum": ["urgent", "high", "normal", "low", "none"], "default": "normal" },
+    "quality_reason_codes": { "type": "array", "title": "Lead Quality Reason Codes", "items": { "type": "string" } },
+    "quality_reviewed_at": { "type": "string", "title": "Quality Reviewed At", "format": "date-time" },
+    "quality_reviewed_by": { "type": "string", "title": "Quality Reviewed By" },
+    "duplicate_of_lead_id": { "type": "string", "title": "Canonical Lead ID" },
+    "submission_count": { "type": "integer", "title": "Submission Count", "default": 1, "minimum": 1 },
+    "first_submission_at": { "type": "string", "title": "First Submission At", "format": "date-time" },
+    "last_submission_at": { "type": "string", "title": "Last Submission At", "format": "date-time" },
+    "environment": { "type": "string", "title": "Environment", "enum": ["production", "qa", "smoke", "demo", "internal"], "default": "production" },
+    "dashboard_excluded": { "type": "boolean", "title": "Excluded From Production Dashboards", "default": false },
+    "dashboard_exclusion_reason": { "type": "string", "title": "Dashboard Exclusion Reason" },
+    "dashboard_truth_status": { "type": "string", "title": "Dashboard Truth Status", "enum": ["trusted", "excluded", "manual_review", "blocked"], "default": "trusted" },
+    "capture_version": { "type": "string", "title": "Capture Version", "default": "2.0.0" },
+    "call_summary": { "type": "string", "title": "Call Summary" },
+    "transcript": { "type": "string", "title": "Transcript" },
+    "call_sid": { "type": "string", "title": "Call SID" },
+    "conversation_id": { "type": "string", "title": "Conversation ID" }
   },
   "required": [],
   "rls": {
-    "create": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        }
-      ]
-    },
-    "read": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "data.client_id": "{{client_id}}"
-        },
-        {
-          "data.client_project_id": "{{client_project_id}}"
-        }
-      ]
-    },
-    "update": {
-      "$or": [
-        {
-          "user_condition": {
-            "role": "admin"
-          }
-        },
-        {
-          "user_condition": {
-            "role": "super_admin"
-          }
-        },
-        {
-          "data.client_id": "{{client_id}}"
-        },
-        {
-          "data.client_project_id": "{{client_project_id}}"
-        }
-      ]
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
+    "create": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "super_admin" } }] },
+    "read": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "super_admin" } }, { "data.client_id": "{{client_id}}" }, { "data.client_project_id": "{{client_project_id}}" }] },
+    "update": { "$or": [{ "user_condition": { "role": "admin" } }, { "user_condition": { "role": "super_admin" } }, { "data.client_id": "{{client_id}}" }, { "data.client_project_id": "{{client_project_id}}" }] },
+    "delete": { "user_condition": { "role": "admin" } }
   }
 }
