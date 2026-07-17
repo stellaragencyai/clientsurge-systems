@@ -1,7 +1,7 @@
 import { useEffect, useMemo, lazy, Suspense } from "react";
 import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
-import Navbar from "../components/landing/Navbar";
+import PremiumNavbar from "../components/landing/PremiumNavbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
@@ -122,7 +122,7 @@ export default function Home() {
       <div className="min-h-screen">
         <ScrollProgressBar />
         <LoggedOutConfirmationBanner />
-        <Navbar />
+        <PremiumNavbar />
 
         {/* 1. Hero — lead leakage positioning + animated product demo */}
         <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
