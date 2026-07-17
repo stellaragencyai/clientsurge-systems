@@ -1,0 +1,118 @@
+/* Homepage rollout for the approved ClientSurge electric-blue palette. */
+:root {
+  --cs-brand: #00A1EA;
+  --cs-brand-deep: #007ABF;
+  --cs-brand-highlight: #1DB6F0;
+  --cs-brand-pale: rgba(0, 161, 234, 0.08);
+  --cs-brand-border: rgba(0, 161, 234, 0.22);
+  --cs-gradient-primary: linear-gradient(135deg, #007ABF 0%, #00A1EA 55%, #1DB6F0 100%);
+  --cs-gradient-electric: linear-gradient(135deg, #007ABF 0%, #00A1EA 55%, #1DB6F0 100%);
+  --cs-glow-brand: 0 0 24px rgba(0, 161, 234, 0.35);
+  --cs-glow-cta: 0 12px 32px rgba(0, 161, 234, 0.32);
+  --cs-electric: #00A1EA;
+  --cs-electric-deep: #007ABF;
+  --cs-electric-highlight: #1DB6F0;
+}
+
+/* Primary conversion controls */
+.cs-btn-primary,
+.hero-primary-cta,
+.cs-footer-cta,
+nav[aria-label="Main navigation"] .cs-nav-cta {
+  background: var(--cs-gradient-electric) !important;
+  border: 1px solid rgba(29, 182, 240, 0.55) !important;
+  color: #fff !important;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.28),
+    0 12px 28px rgba(0, 161, 234, 0.28),
+    0 0 0 1px rgba(0, 122, 191, 0.12) !important;
+}
+
+.cs-btn-primary:hover,
+.hero-primary-cta:hover,
+.cs-footer-cta:hover,
+nav[aria-label="Main navigation"] .cs-nav-cta:hover {
+  transform: translateY(-2px);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.38),
+    0 16px 38px rgba(0, 161, 234, 0.38),
+    0 0 24px rgba(29, 182, 240, 0.22) !important;
+}
+
+/* Navigation active and hover states */
+nav[aria-label="Main navigation"] a:hover,
+nav[aria-label="Main navigation"] button:hover {
+  color: var(--cs-brand-deep) !important;
+}
+
+nav[aria-label="Main navigation"] a span,
+nav[aria-label="Main navigation"] button span {
+  background: var(--cs-gradient-electric) !important;
+  box-shadow: 0 0 10px rgba(0, 161, 234, 0.42) !important;
+}
+
+nav[aria-label="Main navigation"]::after {
+  background: linear-gradient(90deg, transparent, #007ABF 15%, #00A1EA 55%, #1DB6F0 85%, transparent) !important;
+}
+
+/* Homepage accents, pills, icons and focus states */
+main a:not([class*="text-white"]),
+section a:not([class*="text-white"]) {
+  text-decoration-color: rgba(0, 161, 234, 0.55);
+}
+
+.cs-eyebrow,
+.eyebrow,
+.text-primary,
+.text-\[\#00AEEF\],
+.text-\[\#0095D9\],
+.text-\[\#35BDF1\] {
+  color: var(--cs-brand) !important;
+  -webkit-text-fill-color: var(--cs-brand) !important;
+}
+
+.bg-primary,
+.bg-\[\#00AEEF\],
+.bg-\[\#0095D9\],
+.bg-\[\#35BDF1\] {
+  background-color: var(--cs-brand) !important;
+}
+
+.border-primary,
+.border-\[\#00AEEF\],
+.border-\[\#0095D9\],
+.border-\[\#35BDF1\] {
+  border-color: var(--cs-brand-border) !important;
+}
+
+:where(a, button, input, textarea, select):focus-visible {
+  outline: 3px solid rgba(29, 182, 240, 0.58) !important;
+  outline-offset: 3px;
+  box-shadow: 0 0 0 5px rgba(0, 161, 234, 0.14) !important;
+}
+
+/* Conversion and pricing surfaces */
+[id="pricing"] + section [class*="border-primary"],
+[id="pricing"] + div [class*="border-primary"],
+section [class*="shadow-"][class*="border-sky"] {
+  border-color: rgba(0, 161, 234, 0.24) !important;
+  box-shadow: 0 18px 46px rgba(0, 122, 191, 0.10) !important;
+}
+
+/* Preserve semantic colors and dark section text. */
+.text-emerald-300,
+.text-emerald-400,
+.text-red-500,
+.text-amber-500,
+.text-yellow-500 {
+  -webkit-text-fill-color: currentColor !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-btn-primary,
+  .hero-primary-cta,
+  .cs-footer-cta,
+  nav[aria-label="Main navigation"] .cs-nav-cta {
+    transition: none !important;
+  }
+}
