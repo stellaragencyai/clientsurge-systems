@@ -1,0 +1,41 @@
+{
+  "name": "CommunicationRetryQueue",
+  "type": "object",
+  "_metadata": {
+    "status": "CORE_PRODUCTION",
+    "reason": "Bounded retry and terminal dead-letter state for failed outbound communication events.",
+    "tenant_scoped": "client_id + client_project_id"
+  },
+  "properties": {
+    "communication_event_id": { "type": "string", "title": "Original Communication Event ID" },
+    "lead_id": { "type": "string", "title": "Lead ID" },
+    "order_id": { "type": "string", "title": "Order ID" },
+    "client_id": { "type": "string", "title": "Client ID" },
+    "client_project_id": { "type": "string", "title": "Client Project ID" },
+    "channel": { "type": "string", "enum": ["sms", "email", "webhook", "voice" ] },
+    "provider": { "type": "string" },
+    "environment": { "type": "string", "enum": ["production", "qa", "smoke", "demo", "internal", "unknown"], "default": "unknown" },
+    "failure_class": { "type": "string", "enum": ["transient", "permanent", "unknown"] },
+    "failure_reason": { "type": "string" },
+    "retry_function": { "type": "string", "title": "Allowlisted Base44 Retry Function" },
+    "retry_payload_json": { "type": "string", "title": "Sanitized Retry Payload JSON" },
+    "retry_count": { "type": "integer", "default": 0 },
+    "max_retry_count": { "type": "integer", "default": 5 },
+    "next_retry_at": { "type": "string", "format": "date-time" },
+    "last_retry_at": { "type": "string", "format": "date-time" },
+    "terminal_failure_at": { "type": "string", "format": "date-time" },
+    "status": { "type": "string", "enum": ["queued", "retrying", "succeeded", "non_retryable", "dead_letter", "manual_review"], "default": "queued" },
+    "last_error": { "type": "string" },
+    "resolved_event_id": { "type": "string" },
+    "dashboard_excluded": { "type": "boolean", "default": false },
+    "created_at": { "type": "string", "format": "date-time" },
+    "updated_at": { "type": "string", "format": "date-time" }
+  },
+  "required": ["communication_event_id", "channel", "status"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}
