@@ -156,10 +156,10 @@ export default function Navbar() {
         role="menu"
         aria-label="Industries"
         style={{
-          background: "rgba(255,255,255,0.98)",
-          backdropFilter: "blur(16px)",
-          WebkitBackdropFilter: "blur(16px)",
-          boxShadow: "0 12px 40px rgba(0,0,0,0.12), 0 0 0 1px rgba(0,174,239,0.06)",
+          background: "rgba(255,255,255,0.94)",
+          backdropFilter: "blur(20px) saturate(1.25)",
+          WebkitBackdropFilter: "blur(20px) saturate(1.25)",
+          boxShadow: "0 16px 48px rgba(15,23,42,0.14), 0 0 0 1px rgba(0,174,239,0.06)",
         }}
       >
         <div className="grid grid-cols-2 gap-x-8 gap-y-1 min-w-[480px]">
@@ -204,11 +204,11 @@ export default function Navbar() {
       className="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
       style={{
         paddingTop: "env(safe-area-inset-top)",
-        background: scrolled ? "rgba(6, 16, 37, 0.92)" : "rgba(6, 16, 37, 0.7)",
-        backdropFilter: "blur(12px) saturate(1.1)",
-        WebkitBackdropFilter: "blur(12px) saturate(1.1)",
-        borderBottom: scrolled ? "1px solid rgba(53, 189, 241, 0.18)" : "1px solid rgba(53, 189, 241, 0.08)",
-        boxShadow: scrolled ? "0 4px 24px rgba(0,0,0,0.18)" : "none",
+        background: scrolled ? "rgba(255, 255, 255, 0.78)" : "rgba(255, 255, 255, 0.94)",
+        backdropFilter: "blur(22px) saturate(1.35)",
+        WebkitBackdropFilter: "blur(22px) saturate(1.35)",
+        borderBottom: scrolled ? "1px solid rgba(15, 23, 42, 0.08)" : "1px solid rgba(0, 174, 239, 0.10)",
+        boxShadow: scrolled ? "0 12px 36px rgba(15, 23, 42, 0.10)" : "0 4px 18px rgba(15, 23, 42, 0.04)",
         overflow: "visible",
       }}
     >
@@ -243,11 +243,11 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={(event) => handleNavClick(event, link, "navbar")}
-              className="text-xs lg:text-sm font-medium transition-all duration-300 whitespace-nowrap relative pb-0.5"
-              style={{ color: isActivePage(link.href) ? "#35BDF1" : "#ffffff", textDecoration: "none" }}
+              className="text-xs lg:text-sm font-semibold transition-all duration-300 whitespace-nowrap relative pb-0.5"
+              style={{ color: isActivePage(link.href) ? "#0095D9" : "#0F172A", textDecoration: "none" }}
             >
               {link.label}
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.45)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </a>
           ))}
 
@@ -258,11 +258,11 @@ export default function Navbar() {
               onClick={() => (industriesOpen ? setIndustriesOpen(false) : openIndustries())}
               aria-expanded={industriesOpen}
               aria-haspopup="menu"
-              className="text-xs lg:text-sm font-medium transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: industriesOpen || isActivePage("/industries") ? "#35BDF1" : "#ffffff" }}
+              className="text-xs lg:text-sm font-semibold transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
+              style={{ color: industriesOpen || isActivePage("/industries") ? "#0095D9" : "#0F172A" }}
             >
               Industries
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen || isActivePage("/industries") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#35BDF1", boxShadow: "0 0 6px rgba(53,189,241,0.6)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
+              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen || isActivePage("/industries") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.45)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </button>
             {IndustriesDropdown}
           </div>
@@ -280,9 +280,10 @@ export default function Navbar() {
             style={{
               minHeight: "unset",
               minWidth: "unset",
-              color: "#ffffff",
-              background: "rgba(255,255,255,0.10)",
-              border: "1px solid rgba(255,255,255,0.22)",
+              color: "#0F172A",
+              background: "rgba(255,255,255,0.64)",
+              border: "1px solid rgba(15,23,42,0.12)",
+              boxShadow: "0 6px 18px rgba(15,23,42,0.05)",
             }}
           >
             Client Login
@@ -319,9 +320,9 @@ export default function Navbar() {
             className="w-10 h-10 rounded-full border backdrop-blur-[3px] flex items-center justify-center shadow-sm transition-colors"
             onClick={() => setOpen(!open)}
             style={{
-              borderColor: "rgba(53, 189, 241, 0.3)",
-              background: "rgba(53, 189, 241, 0.1)",
-              color: "#ffffff",
+              borderColor: "rgba(15, 23, 42, 0.12)",
+              background: "rgba(255, 255, 255, 0.62)",
+              color: "#0F172A",
             }}
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
             aria-controls="mobile-nav-drawer"
@@ -345,9 +346,9 @@ export default function Navbar() {
               overflowY: "auto",
               WebkitOverflowScrolling: "touch",
               paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
-              background: "rgba(255,255,255,0.98)",
-              backdropFilter: "blur(16px)",
-              WebkitBackdropFilter: "blur(16px)",
+              background: "rgba(255,255,255,0.96)",
+              backdropFilter: "blur(20px) saturate(1.2)",
+              WebkitBackdropFilter: "blur(20px) saturate(1.2)",
               borderBottom: "1px solid rgba(0,174,239,0.12)",
               boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
             }}
