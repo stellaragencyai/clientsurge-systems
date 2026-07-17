@@ -58,6 +58,58 @@ div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"]
   cursor: pointer;
 }
 
+/* Visual improvement 1: stronger navigation hierarchy and a clearer active state. */
+div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"] nav button {
+  position: relative;
+  border: 1px solid transparent;
+  transition: transform 160ms ease, background-color 160ms ease, border-color 160ms ease, box-shadow 160ms ease;
+}
+
+div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"] nav button:hover {
+  transform: translateX(2px);
+  border-color: rgba(14, 165, 233, 0.14);
+  background: linear-gradient(90deg, rgba(240, 249, 255, 0.96), rgba(248, 250, 252, 0.96)) !important;
+}
+
+div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"] nav button[style*="background"] {
+  border-color: rgba(14, 165, 233, 0.34) !important;
+  background: linear-gradient(135deg, #0f172a 0%, #1e3a5f 100%) !important;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.16);
+}
+
+div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"] nav button[style*="background"]::before {
+  content: "";
+  position: absolute;
+  left: -0.35rem;
+  top: 50%;
+  width: 3px;
+  height: 62%;
+  border-radius: 999px;
+  background: #38bdf8;
+  transform: translateY(-50%);
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.12);
+}
+
+/* Visual improvement 2: add depth to the shell and separate content from chrome. */
+div[class*="bg-white"][class*="border-b"][class*="sticky"][class*="top-0"][class*="z-10"] {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-bottom-color: rgba(148, 163, 184, 0.24) !important;
+  backdrop-filter: blur(16px) saturate(140%);
+  -webkit-backdrop-filter: blur(16px) saturate(140%);
+  box-shadow: 0 8px 24px rgba(15, 23, 42, 0.05) !important;
+}
+
+div[class*="flex-1"][class*="overflow-auto"][class*="p-6"] {
+  background:
+    radial-gradient(circle at 12% 0%, rgba(14, 165, 233, 0.08), transparent 26rem),
+    radial-gradient(circle at 88% 8%, rgba(59, 130, 246, 0.06), transparent 24rem),
+    #f8fafc;
+}
+
+div[class*="flex-1"][class*="overflow-auto"][class*="p-6"] > div[class*="max-w-7xl"] {
+  padding-bottom: 2rem;
+}
+
 @media (max-width: 1023px) {
   /* Main /admin duplicated sidebar: cap width and respect iPhone safe areas. */
   div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"][class*="bg-white"][class*="border-r"] {
@@ -78,8 +130,6 @@ div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"]
     padding-left: 0.75rem !important;
     padding-right: 0.75rem !important;
     padding-top: max(0.625rem, env(safe-area-inset-top, 0px)) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
   }
 
   div[class*="bg-white"][class*="border-b"][class*="sticky"][class*="top-0"][class*="z-10"] span[class*="font-semibold"] {
