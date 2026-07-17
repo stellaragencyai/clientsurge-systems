@@ -13,7 +13,6 @@ export const SITE_CONFIG = {
   navigation: {
     sections: [
       { label: "Home", href: "/", isPage: true },
-      { label: "AI Packages", href: "/pricing", isPage: true },
       { label: "Automations", href: "/automations", isPage: true },
       { label: "Industries", href: "/industries", isPage: true },
       { label: "How It Works", href: "/how-it-works", isPage: true },
