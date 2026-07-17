@@ -2,6 +2,17 @@ name: Base44 Auto Publish
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "base44/entities/**"
+      - "base44/functions/**"
+      - "base44/automations/**"
+      - "src/lib/conversionTracking.js"
+      - "scripts/ci/check-production-data-truth.mjs"
+      - "package.json"
+      - ".github/workflows/base44-auto-publish.yml"
   workflow_run:
     workflows:
       - ClientSurge Release Gate
@@ -22,7 +33,7 @@ jobs:
     name: Publish ClientSurge app and prove checkout
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    if: ${{ github.event_name == 'workflow_dispatch' || github.event_name == 'push' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
 
     env:
       CLIENTSURGE_APP_ID: 69dc4a79656fdba136d413d3
@@ -59,6 +70,12 @@ jobs:
             echo "Add a fresh Base44 auth JSON secret in GitHub repository settings, then rerun this workflow." >&2
             exit 1
           fi
+
+      - name: Run production data truth guards
+        run: |
+          npm run ci:website-lead-ingestion
+          npm run ci:production-data-truth
+          npm run ci:no-service-role-frontend
 
       - name: Write release chain proof preflight
         run: |
@@ -123,7 +140,7 @@ jobs:
         run: |
           echo "## Base44 Auto Publish" >> "$GITHUB_STEP_SUMMARY"
           echo "- App ID: $CLIENTSURGE_APP_ID" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Trigger: release-gate success on main, or manual workflow dispatch" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Trigger: hardened production change on main, release-gate success, or manual workflow dispatch" >> "$GITHUB_STEP_SUMMARY"
           echo "- Workflow run: $GITHUB_RUN_ID attempt $GITHUB_RUN_ATTEMPT" >> "$GITHUB_STEP_SUMMARY"
           echo "- Checked out SHA: $GITHUB_SHA" >> "$GITHUB_STEP_SUMMARY"
           echo "- Verified route: $CLIENTSURGE_VERIFY_URL" >> "$GITHUB_STEP_SUMMARY"
