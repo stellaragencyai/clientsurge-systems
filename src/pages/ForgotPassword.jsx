@@ -74,7 +74,7 @@ export default function ForgotPassword() {
                 placeholder="you@business.com"
                 value={email}
                 onChange={(e) => { setEmail(e.target.value); setError(""); }}
-                className={`h-13 w-full rounded-2xl border bg-white pl-11 pr-4 text-sm font-semibold text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100 ${error ? "border-red-300 bg-red-50/40" : "border-slate-200"}`}
+                className={`h-[52px] w-full rounded-2xl border bg-white pl-11 pr-4 text-sm font-semibold text-slate-950 shadow-sm outline-none transition placeholder:text-slate-400 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-100 ${error ? "border-red-300 bg-red-50/40" : "border-slate-200"}`}
                 required
                 aria-invalid={Boolean(error)}
               />
@@ -85,7 +85,7 @@ export default function ForgotPassword() {
           <button
             type="submit"
             disabled={loading}
-            className="group relative flex h-13 w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[linear-gradient(90deg,#16c7ff_0%,#0798ed_48%,#066ee8_100%)] px-5 text-sm font-black text-white shadow-[0_16px_35px_rgba(0,166,255,0.32)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(0,166,255,0.42)] disabled:cursor-not-allowed disabled:opacity-60"
+            className="group relative flex h-[52px] w-full items-center justify-center gap-2 overflow-hidden rounded-2xl bg-[linear-gradient(90deg,#16c7ff_0%,#0798ed_48%,#066ee8_100%)] px-5 text-sm font-black text-white shadow-[0_16px_35px_rgba(0,166,255,0.32)] transition hover:-translate-y-0.5 hover:shadow-[0_20px_42px_rgba(0,166,255,0.42)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <span className="absolute inset-y-0 -left-1/3 w-1/3 skew-x-[-20deg] bg-white/20 transition-transform duration-700 group-hover:translate-x-[500%]" />
             {loading ? <><Loader2 className="h-4 w-4 animate-spin" /> Sending secure link...</> : <>Send reset link <ArrowRight className="h-4 w-4" /></>}
