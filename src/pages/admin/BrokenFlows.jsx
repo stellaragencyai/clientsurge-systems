@@ -1,7 +1,9 @@
 import { useEffect, useMemo, useState } from "react";
 import { base44 } from "@/api/base44Client";
-import { AlertTriangle, CheckCircle2, ExternalLink, RefreshCw, ShieldAlert, Wrench } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ExternalLink, RefreshCw, ShieldAlert, ShieldCheck, Wrench } from "lucide-react";
 import BuildVersionBeacon from "@/components/system/BuildVersionBeacon";
+
+const REPAIR_CONFIRMATION = "REPAIR BROKEN FLOW";
 
 function severityClasses(severity) {
   if (severity === "critical") return "border-red-200 bg-red-50 text-red-800";
@@ -9,8 +11,14 @@ function severityClasses(severity) {
   return "border-emerald-200 bg-emerald-50 text-emerald-800";
 }
 
+function coverageClasses(status) {
+  if (status === "verified") return "border-emerald-200 bg-emerald-50 text-emerald-800";
+  if (status === "partial") return "border-amber-200 bg-amber-50 text-amber-800";
+  return "border-red-200 bg-red-50 text-red-800";
+}
+
 function repairOptions(flow) {
-  if (!flow?.record_id || flow.entity_name !== "Order") return [];
+  if (!flow?.repairable || !flow?.record_id || flow.entity_name !== "Order") return [];
   const id = String(flow.id || "");
   if (id.includes("missing-install-os")) return [{ action: "create_install_os", label: "Create Install OS" }];
   if (id.includes("missing-credentials")) return [
@@ -18,7 +26,7 @@ function repairOptions(flow) {
     { action: "recheck_authorization", label: "Check Auth" },
     { action: "mark_draft_abandoned", label: "Abandon Draft" },
   ];
-  return [{ action: "rerun_setup_handoff", label: "Repair Order" }];
+  return [];
 }
 
 function FlowCard({ flow, onRepair, repairing }) {
@@ -32,6 +40,11 @@ function FlowCard({ flow, onRepair, repairing }) {
           <div className="flex flex-wrap items-center gap-2">
             <h3 className="font-semibold">{flow.title}</h3>
             <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">{flow.severity}</span>
+            {flow.proof_state && (
+              <span className="rounded-full bg-white/70 px-2 py-0.5 text-[10px] font-bold uppercase tracking-wide">
+                {String(flow.proof_state).replaceAll("_", " ")}
+              </span>
+            )}
           </div>
           <p className="mt-1 text-sm opacity-90">{flow.message}</p>
           <div className="mt-3 flex flex-wrap items-center gap-2 text-xs opacity-80">
@@ -45,7 +58,7 @@ function FlowCard({ flow, onRepair, repairing }) {
                 <button
                   key={repair.action}
                   disabled={repairing === `${flow.record_id}:${repair.action}`}
-                  onClick={() => onRepair(flow, repair.action)}
+                  onClick={() => onRepair(flow, repair.action, repair.label)}
                   className="inline-flex items-center gap-1 rounded-lg bg-white/85 px-2.5 py-1.5 text-xs font-semibold hover:bg-white disabled:opacity-50"
                 >
                   <Wrench className="h-3.5 w-3.5" />
@@ -79,14 +92,20 @@ export default function BrokenFlows() {
       const response = await base44.functions.invoke("getBrokenFlows", {});
       setData(response?.data || response || {});
     } catch (err) {
-      setError(err?.data?.error || err?.message || "Unable to load broken flow diagnostics.");
+      const requestId = err?.data?.request_id;
+      setError(`${err?.data?.error || err?.message || "Unable to load broken flow diagnostics."}${requestId ? ` Reference ${requestId}.` : ""}`);
     } finally {
       setLoading(false);
     }
   };
 
-  const repair = async (flow, action) => {
+  const repair = async (flow, action, label) => {
     if (!flow?.record_id) return;
+    const approved = window.confirm(
+      `${label} for order ${flow.record_id}?\n\nThis changes production records. The same action will be blocked for five minutes after it runs.`
+    );
+    if (!approved) return;
+
     const key = `${flow.record_id}:${action}`;
     setRepairing(key);
     setError("");
@@ -95,13 +114,19 @@ export default function BrokenFlows() {
       const response = await base44.functions.invoke("repairBrokenFlow", {
         order_id: flow.record_id,
         action,
+        confirmation: REPAIR_CONFIRMATION,
       });
       const payload = response?.data || response || {};
       if (payload.error) throw payload;
-      setNotice(`Repair complete: ${action}. Reference ${payload.request_id || "n/a"}.`);
+      setNotice(`Repair complete: ${label}. Reference ${payload.request_id || "n/a"}.`);
       await load();
     } catch (err) {
-      setError(err?.data?.error || err?.message || `Repair failed for ${action}.`);
+      const payload = err?.data || err || {};
+      const retryMessage = payload?.duplicate?.retry_after_seconds
+        ? ` Retry after ${payload.duplicate.retry_after_seconds} seconds.`
+        : "";
+      const requestMessage = payload?.request_id ? ` Reference ${payload.request_id}.` : "";
+      setError(`${payload?.error || payload?.message || `Repair failed for ${label}.`}${retryMessage}${requestMessage}`);
     } finally {
       setRepairing("");
     }
@@ -112,6 +137,7 @@ export default function BrokenFlows() {
   }, []);
 
   const flows = data?.flows || [];
+  const coverage = data?.coverage || {};
   const criticalCount = useMemo(() => flows.filter((flow) => flow.severity === "critical").length, [flows]);
   const warningCount = useMemo(() => flows.filter((flow) => flow.severity === "warning").length, [flows]);
 
@@ -123,13 +149,28 @@ export default function BrokenFlows() {
             <p className="text-xs font-bold uppercase tracking-[0.2em] text-slate-400">Operations Truth</p>
             <h1 className="mt-2 text-3xl font-semibold text-slate-950">Broken Flows</h1>
             <p className="mt-2 max-w-2xl text-sm text-slate-600">
-              Paid-order, credentials, install OS, dead-letter, and system execution issues that need attention. This panel is intentionally blunt and repairable.
+              Paid-order, credentials, install OS, dead-letter, and system execution issues that need attention. Repairs require confirmation and are protected against accidental immediate repeats.
             </p>
           </div>
           <button onClick={load} disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-2.5 text-sm font-semibold text-white disabled:opacity-60">
             <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} /> Refresh
           </button>
         </div>
+
+        {!loading && coverage.status && (
+          <div className={`rounded-2xl border p-4 ${coverageClasses(coverage.status)}`}>
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="h-5 w-5" />
+                <div>
+                  <p className="text-sm font-semibold">Diagnostic coverage: {coverage.status} ({coverage.score}%)</p>
+                  <p className="text-xs opacity-80">{coverage.label}</p>
+                </div>
+              </div>
+              <span className="text-xs font-semibold">{coverage.sources_available}/{coverage.sources_expected} sources available</span>
+            </div>
+          </div>
+        )}
 
         <div className="grid gap-4 md:grid-cols-4">
           <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm">
