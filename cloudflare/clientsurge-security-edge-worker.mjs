@@ -17,6 +17,7 @@ export const TRUST_SECURITY_SCRIPT_PATH = "/.well-known/clientsurge-trust-securi
 export const EDGE_ROUTE_METADATA_HEADER = "x-clientsurge-route-metadata";
 export const PRIVATE_ROUTE_BLOCK_HEADER = "x-clientsurge-private-route-block";
 export const ANONYMOUS_USER_ME_HEADER = "x-clientsurge-anonymous-user-me";
+export const ANONYMOUS_SESSION_RECORDING_HEADER = "x-clientsurge-anonymous-session-recording";
 export const PUBLIC_NAV_POLISH_HEADER = "x-clientsurge-public-nav-polish";
 export const PUBLIC_NAV_POLISH_STYLE_ID = "clientsurge-public-nav-polish-style";
 export const PUBLIC_NAV_POLISH_SCRIPT_ID = "clientsurge-public-nav-polish-script";
@@ -1436,6 +1437,12 @@ export function isAnonymousUserMeRequest(request, url = new URL(request.url)) {
   return !request.headers.get("authorization") && !request.headers.get("cookie");
 }
 
+export function isAnonymousSessionRecordingRequest(request, url = new URL(request.url)) {
+  if (request.method !== "POST" && request.method !== "OPTIONS") return false;
+  if (!/\/api\/(?:apps\/[^/]+\/)?runtime\/session-recordings\/ingest\/?$/.test(url.pathname)) return false;
+  return !request.headers.get("authorization") && !request.headers.get("cookie");
+}
+
 function anonymousUserMeResponse() {
   const headers = applySecurityHeaders(new Headers({
     "Content-Type": "application/json; charset=utf-8",
@@ -1443,6 +1450,19 @@ function anonymousUserMeResponse() {
     [ANONYMOUS_USER_ME_HEADER]: "edge-v1",
   }), "/login");
   return new Response("null", { status: 200, headers });
+}
+
+function anonymousSessionRecordingResponse() {
+  const headers = applySecurityHeaders(new Headers({
+    "Cache-Control": "no-store",
+    "Access-Control-Allow-Origin": CANONICAL_ORIGIN,
+    "Access-Control-Allow-Methods": "POST, OPTIONS",
+    "Access-Control-Allow-Headers": "Content-Type, X-Base44-Recording-Token",
+    "Access-Control-Max-Age": "600",
+    "X-Base44-Recording-Skip": "sampled",
+    [ANONYMOUS_SESSION_RECORDING_HEADER]: "edge-v1",
+  }), "/");
+  return new Response(null, { status: 204, headers });
 }
 
 export default {
@@ -1459,6 +1479,10 @@ export default {
 
     if (isAnonymousUserMeRequest(request, url)) {
       return anonymousUserMeResponse();
+    }
+
+    if (isAnonymousSessionRecordingRequest(request, url)) {
+      return anonymousSessionRecordingResponse();
     }
 
     if (url.pathname === "/.well-known/security.txt") {

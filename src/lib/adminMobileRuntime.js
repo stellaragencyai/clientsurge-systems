@@ -91,11 +91,21 @@ function buildActionBar() {
   return bar;
 }
 
+function removeActionBar() {
+  if (typeof document === 'undefined') return;
+  document.querySelector('.cs-admin-mobile-action-bar')?.remove();
+}
+
 function syncActionBar() {
   if (typeof document === 'undefined') return;
+  if (!isAdminRoute() || !isMobile()) {
+    removeActionBar();
+    return;
+  }
+
   const bar = buildActionBar();
   if (!bar) return;
-  bar.hidden = !(isAdminRoute() && isMobile());
+  bar.hidden = false;
 }
 
 export function installAdminMobileRuntime() {

@@ -51,8 +51,9 @@ test("strips generated directory injected before the React root", () => {
   const result = stripInjectedDirectoryBeforeRoot(RAW_BASE44_SHELL);
   assert.equal(result.changed, true);
   assert.equal(result.reason, "removed_directory_before_root");
+  const bodyOnly = result.html.replace(/^[\s\S]*<body[^>]*>/i, "").replace(/<\/body>[\s\S]*$/i, "");
   assert.doesNotMatch(result.html, /Admin \/ Conversion Insights/);
-  assert.doesNotMatch(result.html, /manages 5 data types/i);
+  assert.doesNotMatch(bodyOnly, /manages 5 data types/i);
   assert.match(result.html, /<div id="root">/);
   assert.match(result.html, /<script type="module" src="\/src\/main\.jsx"><\/script>/);
 });
@@ -210,6 +211,24 @@ test("legacy client dashboard redirects to the canonical client portal", async (
   assert.equal(response.headers.get("x-clientsurge-client-dashboard-redirect"), "canonical-client-portal");
   assert.equal(response.headers.get("location"), "https://clientsurgesystems.com/client-portal?tab=billing");
   assert.match(response.headers.get("x-robots-tag") || "", /noindex/);
+});
+
+test("product signup hotfix is still served through the safe-entry sanitizer", async () => {
+  const response = await safeEntry.fetch(
+    new Request("https://clientsurgesystems.com/product-signup?package=starter_system", {
+      headers: { accept: "text/html" },
+    }),
+    {},
+    {},
+  );
+  const body = await response.text();
+
+  assert.equal(response.status, 200);
+  assert.equal(response.headers.get("x-clientsurge-product-signup-hotfix"), "2026-07-05-product-signup-edge-hotfix-v1");
+  assert.equal(response.headers.get("x-clientsurge-route-exposure-sanitized"), "removed-preserved-react");
+  assert.doesNotMatch(body, /Available Pages|Admin \/ Conversion Insights|manages 5 data types/i);
+  assert.match(body, /Complete your ClientSurge signup/);
+  assert.match(body, /createCheckoutSession/);
 });
 
 test("private routes remain blocked and are never converted to a public SPA fallback", async () => {

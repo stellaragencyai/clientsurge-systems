@@ -18,6 +18,13 @@ test("mobile admin action bar exposes core destinations", () => {
   assert.ok(runtime.includes("/admin?tab=settings"));
 });
 
+test("mobile admin action bar is not injected into public page DOM", () => {
+  assert.match(runtime, /if \(!isAdminRoute\(\) \|\| !isMobile\(\)\) \{/);
+  assert.match(runtime, /removeActionBar\(\)/);
+  assert.match(runtime, /bar\.hidden = false/);
+  assert.doesNotMatch(runtime, /bar\.hidden = !/);
+});
+
 test("admin mobile CSS covers settings tabs, lead cards, overview compression, and overflow containment", () => {
   assert.ok(css.includes("Admin settings tabs"));
   assert.ok(css.includes("Lead table card mode"));

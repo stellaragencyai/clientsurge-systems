@@ -268,7 +268,8 @@ export default {
     }
 
     if (isProductSignupRequest(request)) {
-      return productSignupHotfix.fetch(request, env, ctx);
+      const response = await productSignupHotfix.fetch(request, env, ctx);
+      return sanitizeHtmlResponse(request, response, { pathname });
     }
 
     let response;
