@@ -1,0 +1,62 @@
+name: GA4 Configuration Migration
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/workflows/ga4-configuration-migration.yml"
+      - "scripts/base44/migrate-ga4-configuration.mjs"
+      - "base44/functions/setupGA4Configuration/**"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: clientsurge-ga4-configuration-migration
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Scrub legacy GA4 record and apply canonical configuration
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      BASE44_APP_ID: "69dc4a79656fdba136d413d3"
+      GA4_MEASUREMENT_ID: "G-H6QT342ZN9"
+      BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON }}
+      BASE_44_AUTH_JSON: ${{ secrets.BASE_44_AUTH_JSON }}
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Verify Base44 credential is configured
+        shell: bash
+        run: |
+          if [[ -z "${BASE44_AUTH_JSON}" && -z "${BASE_44_AUTH_JSON}" ]]; then
+            echo "::error::Missing repository secret BASE44_AUTH_JSON or BASE_44_AUTH_JSON."
+            exit 1
+          fi
+
+      - name: Run GA4 configuration migration
+        run: node scripts/base44/migrate-ga4-configuration.mjs
+
+      - name: Record migration summary
+        if: always()
+        run: |
+          {
+            echo "## GA4 Configuration Migration"
+            echo
+            echo "- App: ClientSurge Systems"
+            echo "- App ID: 69dc4a79656fdba136d413d3"
+            echo "- Measurement ID: G-H6QT342ZN9"
+            echo "- Expected status after migration: configured"
+            echo "- Expected key events: generate_lead, begin_checkout, purchase, demo_booked"
+          } >> "$GITHUB_STEP_SUMMARY"
