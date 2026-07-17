@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -18,6 +18,7 @@ import { invokePublicBase44Function } from "@/lib/publicFunctionClient";
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const PHONE_REGEX = /^[\d\s()+.-]+$/;
 const CONTACT_CONSENT_VERSION = "contact_form_explicit_consent_v1";
+const MAX_MESSAGE_LENGTH = 1500;
 const LOGO_URL =
   "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png";
 
@@ -49,18 +50,15 @@ const contactMethods = [
 const socialLinks = [
   {
     label: "LinkedIn",
-    shortLabel: "in",
     href: "https://linkedin.com/company/clientsurge",
   },
   {
     label: "X",
-    shortLabel: "X",
     href: "https://twitter.com/clientsurge",
   },
   {
     label: "GitHub",
-    shortLabel: "GH",
-    href: "https://github.com/clientsurge",
+    href: "https://github.com/stellaragencyai",
   },
 ];
 
@@ -108,6 +106,23 @@ function formatRequestSuffix(error) {
   return error?.request_id ? ` Request ID: ${error.request_id}.` : "";
 }
 
+function normalizeWebsite(value) {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  return /^https?:\/\//i.test(trimmed) ? trimmed : `https://${trimmed}`;
+}
+
+function isValidWebsite(value) {
+  if (!value.trim()) return true;
+
+  try {
+    const url = new URL(normalizeWebsite(value));
+    return Boolean(url.hostname && url.hostname.includes("."));
+  } catch {
+    return false;
+  }
+}
+
 function UnderlineField({
   label,
   name,
@@ -121,6 +136,8 @@ function UnderlineField({
   optional = false,
   autoComplete,
   inputMode,
+  placeholder,
+  maxLength,
 }) {
   const inputId = `contact-${name}`;
   const errorId = `${inputId}-error`;
@@ -130,7 +147,7 @@ function UnderlineField({
     <div className="min-w-0">
       <label
         htmlFor={inputId}
-        className="mb-3 flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500"
+        className="mb-2.5 flex items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
       >
         <span>{label}</span>
         {required && (
@@ -142,7 +159,7 @@ function UnderlineField({
           </>
         )}
         {optional && (
-          <span className="text-[0.64rem] font-medium normal-case tracking-normal text-slate-400">
+          <span className="text-[0.7rem] font-medium normal-case tracking-normal text-slate-500">
             optional
           </span>
         )}
@@ -158,11 +175,11 @@ function UnderlineField({
         required={required}
         autoComplete={autoComplete}
         inputMode={inputMode}
+        placeholder={placeholder}
+        maxLength={maxLength}
         aria-invalid={showError}
         aria-describedby={showError ? errorId : undefined}
-        className={`h-11 w-full border-0 border-b bg-transparent px-0 text-base text-[#001B44] outline-none transition-colors duration-200 focus:border-[#00AEEF] focus:ring-0 ${
-          showError ? "border-red-500" : "border-slate-400"
-        }`}
+        className="contact-control h-[3.15rem] w-full text-base text-[#001B44] placeholder:text-slate-400"
       />
 
       {showError && (
@@ -179,10 +196,10 @@ function ContactMethod({ Icon, label, value, href }) {
     <>
       <Icon aria-hidden="true" className="mt-0.5 h-5 w-5 shrink-0 text-[#35BDF1]" />
       <span className="min-w-0">
-        <span className="block text-[0.67rem] font-semibold uppercase tracking-[0.16em] text-white/50">
+        <span className="block text-[0.72rem] font-semibold uppercase tracking-[0.14em] text-white/65">
           {label}
         </span>
-        <span className="mt-1 block text-sm font-medium leading-relaxed text-white/90 sm:text-[0.94rem]">
+        <span className="mt-1 block text-[0.98rem] font-medium leading-relaxed text-white/95">
           {value}
         </span>
       </span>
@@ -193,17 +210,18 @@ function ContactMethod({ Icon, label, value, href }) {
     return (
       <a
         href={href}
-        className="flex items-start gap-4 py-1 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+        className="flex items-start gap-4 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
       >
         {content}
       </a>
     );
   }
 
-  return <div className="flex items-start gap-4 py-1">{content}</div>;
+  return <div className="flex items-start gap-4 py-1.5">{content}</div>;
 }
 
 export default function Contact() {
+  const formRef = useRef(null);
   const [form, setForm] = useState(initialForm);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
@@ -247,6 +265,10 @@ export default function Contact() {
       }
     }
 
+    if (!isValidWebsite(form.business_website_url)) {
+      nextErrors.business_website_url = "Enter a valid website address.";
+    }
+
     if (!form.message.trim()) nextErrors.message = "Please include a message.";
 
     if (!form.consent_given) {
@@ -265,8 +287,30 @@ export default function Contact() {
     setTouched((previous) => ({ ...previous, [name]: true }));
   };
 
+  const focusFirstError = (nextErrors) => {
+    const fieldOrder = [
+      "full_name",
+      "email",
+      "phone",
+      "business_website_url",
+      "message",
+      "consent_given",
+    ];
+    const firstInvalidName = fieldOrder.find((field) => nextErrors[field]);
+
+    if (!firstInvalidName) return;
+
+    window.requestAnimationFrame(() => {
+      const field = formRef.current?.querySelector(`[name="${firstInvalidName}"]`);
+      field?.focus();
+      field?.scrollIntoView({ behavior: "smooth", block: "center" });
+    });
+  };
+
   const handleSubmit = async (event) => {
     event.preventDefault();
+    if (loading) return;
+
     const nextErrors = validate();
 
     if (Object.keys(nextErrors).length > 0) {
@@ -275,9 +319,11 @@ export default function Contact() {
         full_name: true,
         email: true,
         phone: true,
+        business_website_url: true,
         message: true,
         consent_given: true,
       });
+      focusFirstError(nextErrors);
       return;
     }
 
@@ -293,7 +339,7 @@ export default function Contact() {
         phone: form.phone.trim(),
         business_type: form.business_type.trim() || "General inquiry",
         message: form.message.trim(),
-        business_website_url: form.business_website_url.trim(),
+        business_website_url: normalizeWebsite(form.business_website_url),
         source: "contact_page",
         source_page: "/contact",
         consent_source: "contact_page_form",
@@ -323,7 +369,7 @@ export default function Contact() {
   };
 
   return (
-    <div className="min-h-screen overflow-x-hidden bg-white">
+    <div className="contact-page min-h-screen overflow-x-hidden bg-white">
       <Navbar />
 
       <main className="pt-[var(--cs-nav-height)]">
@@ -345,7 +391,7 @@ export default function Contact() {
               className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-[#35BDF1]/40 to-transparent lg:block"
             />
 
-            <div className="relative mx-auto flex h-full w-full max-w-[680px] flex-col justify-center px-7 py-14 sm:px-12 sm:py-16 lg:px-16 xl:px-20">
+            <div className="relative mx-auto flex h-full w-full max-w-[720px] flex-col justify-center px-8 py-12 sm:px-12 sm:py-14 lg:px-16 xl:px-20">
               <a
                 href="/"
                 aria-label="ClientSurge Systems home"
@@ -362,20 +408,20 @@ export default function Contact() {
                 />
               </a>
 
-              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/30 to-transparent" />
+              <div className="my-6 h-px w-full bg-gradient-to-r from-[#35BDF1]/80 via-[#35BDF1]/35 to-transparent" />
 
-              <div className="grid gap-4">
+              <div className="grid gap-3.5">
                 {contactMethods.map((method) => (
                   <ContactMethod key={method.label} {...method} />
                 ))}
               </div>
 
-              <div className="my-8 h-px w-full bg-gradient-to-r from-[#35BDF1]/75 via-[#35BDF1]/30 to-transparent" />
+              <div className="my-6 h-px w-full bg-gradient-to-r from-[#35BDF1]/80 via-[#35BDF1]/35 to-transparent" />
 
-              <div className="grid gap-3 sm:grid-cols-2">
+              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
                 <a
                   href="/book#system-match-form"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#35BDF1] px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#35BDF1] px-5 text-center text-xs font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   <Sparkles aria-hidden="true" className="h-4 w-4" />
                   AI Readiness Check
@@ -383,36 +429,36 @@ export default function Contact() {
 
                 <a
                   href="/book"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-white/30 px-4 text-center text-xs font-bold uppercase tracking-[0.11em] text-white transition-colors hover:border-white hover:bg-white hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-white/85 underline decoration-[#35BDF1]/60 underline-offset-4 transition-colors hover:text-[#35BDF1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
                 >
-                  Book a Strategy Call
+                  Prefer to talk? Book a call
                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </a>
               </div>
 
-              <div className="mt-8 flex items-center gap-4" aria-label="ClientSurge Systems social media">
-                {socialLinks.map(({ label, shortLabel, href }) => (
+              <nav className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2" aria-label="ClientSurge Systems social media">
+                {socialLinks.map(({ label, href }) => (
                   <a
                     key={label}
                     href={href}
                     target="_blank"
-                    rel="noreferrer"
+                    rel="noopener noreferrer"
                     aria-label={`ClientSurge Systems on ${label}`}
-                    className="inline-flex h-9 min-w-9 items-center justify-center border border-[#35BDF1]/50 px-2 text-[0.7rem] font-black uppercase tracking-wide text-[#35BDF1] transition-colors hover:border-white hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                    className="text-sm font-semibold text-[#35BDF1] underline decoration-transparent underline-offset-4 transition-colors hover:text-white hover:decoration-[#35BDF1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
                   >
-                    {shortLabel}
+                    {label}
                   </a>
                 ))}
-              </div>
+              </nav>
             </div>
           </aside>
 
           <section className="bg-white text-[#001B44]">
-            <div className="mx-auto flex h-full w-full max-w-[760px] flex-col justify-center px-7 py-14 sm:px-12 sm:py-16 lg:px-16 xl:px-20">
+            <div className="mx-auto flex h-full w-full max-w-[820px] flex-col justify-center px-8 py-10 sm:px-12 sm:py-12 lg:px-14 xl:px-16">
               {success ? (
                 <div className="max-w-xl" aria-live="polite">
                   <CheckCircle2 aria-hidden="true" className="h-12 w-12 text-[#0079C1]" />
-                  <p className="mt-7 text-sm font-semibold uppercase tracking-[0.16em] text-slate-500">
+                  <p className="mt-7 text-sm font-semibold uppercase tracking-[0.16em] text-slate-600">
                     Message sent
                   </p>
                   <h1 className="mt-3 font-titles text-4xl font-black tracking-[-0.045em] text-[#001B44] sm:text-5xl">
@@ -424,14 +470,14 @@ export default function Contact() {
                   </p>
 
                   {submittedLead?.request_id && (
-                    <p className="mt-5 text-xs font-medium text-slate-400">
+                    <p className="mt-5 text-xs font-medium text-slate-500">
                       Reference: {submittedLead.request_id}
                     </p>
                   )}
 
                   <a
                     href="/"
-                    className="mt-10 inline-flex min-h-14 min-w-[220px] items-center justify-center gap-2 border-2 border-[#001B44] px-8 text-sm font-bold uppercase tracking-[0.08em] text-[#001B44] transition-colors hover:bg-[#001B44] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]"
+                    className="mt-10 inline-flex min-h-14 min-w-[220px] items-center justify-center gap-2 border-2 border-[#001B44] bg-[#001B44] px-8 text-sm font-bold uppercase tracking-[0.08em] text-white transition-colors hover:border-[#00AEEF] hover:bg-[#00AEEF] hover:text-[#001B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF]"
                   >
                     Return Home
                     <ArrowRight aria-hidden="true" className="h-4 w-4" />
@@ -440,21 +486,21 @@ export default function Contact() {
               ) : (
                 <>
                   <header>
-                    <p className="text-sm font-medium uppercase tracking-[0.13em] text-slate-500">
+                    <p className="text-sm font-semibold uppercase tracking-[0.13em] text-slate-600">
                       Get in touch
                     </p>
 
                     <div className="mt-3 flex items-center gap-5 sm:gap-7">
                       <span
                         aria-hidden="true"
-                        className="h-16 w-1 shrink-0 bg-[#00AEEF] sm:h-[4.5rem]"
+                        className="h-16 w-1 shrink-0 bg-[#00AEEF] sm:h-[4.25rem]"
                       />
-                      <h1 className="font-titles text-[clamp(3.2rem,6.2vw,5.4rem)] font-black leading-[0.88] tracking-[-0.055em] text-[#001B44]">
+                      <h1 className="contact-heading whitespace-nowrap font-titles text-[clamp(3.4rem,4.1vw,5rem)] font-black leading-[0.9] tracking-[-0.055em] text-[#001B44]">
                         CONTACT US
                       </h1>
                     </div>
 
-                    <div className="mt-10">
+                    <div className="mt-7">
                       <h2 className="text-xl font-black uppercase tracking-[-0.02em] text-[#001B44] sm:text-2xl">
                         We would love to hear from you!
                       </h2>
@@ -464,11 +510,19 @@ export default function Contact() {
                     </div>
                   </header>
 
-                  <form id="contact-form" onSubmit={handleSubmit} noValidate className="mt-10">
+                  <form
+                    ref={formRef}
+                    id="contact-form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                    aria-busy={loading}
+                    className="mt-8"
+                  >
                     {errors.submit && (
                       <div
-                        className="mb-7 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+                        className="mb-6 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
                         role="alert"
+                        aria-live="assertive"
                       >
                         {errors.submit}
                       </div>
@@ -485,7 +539,7 @@ export default function Contact() {
                       autoComplete="off"
                     />
 
-                    <div className="grid grid-cols-1 gap-x-10 gap-y-8 sm:grid-cols-2">
+                    <div className="grid grid-cols-1 gap-x-10 gap-y-6 sm:grid-cols-2">
                       <UnderlineField
                         label="Full Name"
                         name="full_name"
@@ -538,6 +592,7 @@ export default function Contact() {
                         optional
                         autoComplete="url"
                         inputMode="url"
+                        placeholder="yourbusiness.com"
                       />
 
                       <div className="sm:col-span-2">
@@ -550,20 +605,26 @@ export default function Contact() {
                           error={errors.business_type}
                           touched={touched.business_type}
                           optional
+                          placeholder="e.g., HVAC, dental, roofing"
                         />
                       </div>
 
                       <div className="sm:col-span-2">
-                        <label
-                          htmlFor="contact-message"
-                          className="mb-3 flex items-center gap-2 text-[0.72rem] font-semibold uppercase tracking-[0.12em] text-slate-500"
-                        >
-                          <span>Message</span>
-                          <span aria-hidden="true" className="text-[#0079C1]">
-                            *
+                        <div className="mb-2.5 flex items-center justify-between gap-4">
+                          <label
+                            htmlFor="contact-message"
+                            className="flex items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
+                          >
+                            <span>Message</span>
+                            <span aria-hidden="true" className="text-[#0079C1]">
+                              *
+                            </span>
+                            <span className="sr-only">required</span>
+                          </label>
+                          <span className="text-xs font-medium text-slate-500" aria-live="polite">
+                            {form.message.length}/{MAX_MESSAGE_LENGTH}
                           </span>
-                          <span className="sr-only">required</span>
-                        </label>
+                        </div>
 
                         <textarea
                           id="contact-message"
@@ -571,15 +632,15 @@ export default function Contact() {
                           value={form.message}
                           onChange={(event) => updateField("message", event.target.value)}
                           onBlur={() => handleBlur("message")}
-                          rows={3}
+                          rows={4}
+                          maxLength={MAX_MESSAGE_LENGTH}
                           required
+                          placeholder="Tell us what you would like to improve in your lead response, follow-up, booking, or customer reactivation process."
                           aria-invalid={Boolean(errors.message && touched.message)}
                           aria-describedby={
                             errors.message && touched.message ? "contact-message-error" : undefined
                           }
-                          className={`w-full resize-none border-0 border-b bg-transparent px-0 py-2 text-base leading-7 text-[#001B44] outline-none transition-colors duration-200 focus:border-[#00AEEF] focus:ring-0 ${
-                            errors.message && touched.message ? "border-red-500" : "border-slate-400"
-                          }`}
+                          className="contact-control contact-textarea min-h-[7rem] w-full resize-y text-base leading-7 text-[#001B44] placeholder:text-slate-400"
                         />
 
                         {errors.message && touched.message && (
@@ -594,18 +655,27 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    <div className="mt-7">
-                      <label className="flex cursor-pointer items-start gap-3 text-xs leading-5 text-slate-500">
+                    <div className="mt-6">
+                      <label className="flex cursor-pointer items-start gap-3 text-[0.82rem] leading-6 text-slate-600">
                         <input
                           type="checkbox"
+                          name="consent_given"
                           checked={form.consent_given}
                           onChange={(event) => updateField("consent_given", event.target.checked)}
                           onBlur={() => handleBlur("consent_given")}
-                          className="mt-0.5 h-4 w-4 shrink-0 rounded-sm border-slate-400 text-[#0079C1] focus:ring-[#00AEEF]"
+                          aria-invalid={Boolean(errors.consent_given && touched.consent_given)}
+                          className="mt-1 h-4 w-4 shrink-0 rounded-sm border-slate-400 text-[#0079C1] focus:ring-[#00AEEF]"
                         />
                         <span>
                           I agree that ClientSurge Systems may contact me about this inquiry by email,
-                          phone, or SMS. Message/data rates may apply. Reply STOP to opt out.
+                          phone, or SMS. Message/data rates may apply. Reply STOP to opt out. See our{" "}
+                          <a
+                            href="/privacy"
+                            className="font-semibold text-[#0079C1] underline underline-offset-2 hover:text-[#001B44]"
+                          >
+                            Privacy Policy
+                          </a>
+                          .
                         </span>
                       </label>
 
@@ -616,18 +686,18 @@ export default function Contact() {
                       )}
                     </div>
 
-                    <div className="mt-8 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
                       <button
                         type="submit"
                         disabled={loading}
-                        className="inline-flex min-h-14 min-w-[220px] items-center justify-center gap-2 border-2 border-[#001B44] bg-white px-8 text-sm font-bold uppercase tracking-[0.08em] text-[#001B44] transition-colors hover:bg-[#001B44] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF] disabled:cursor-not-allowed disabled:opacity-60"
+                        className="inline-flex min-h-[3.6rem] min-w-[230px] items-center justify-center gap-2 border-2 border-[#001B44] bg-[#001B44] px-8 text-sm font-bold uppercase tracking-[0.08em] text-white transition-colors hover:border-[#00AEEF] hover:bg-[#00AEEF] hover:text-[#001B44] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00AEEF] disabled:cursor-not-allowed disabled:opacity-60"
                       >
                         {loading ? "Sending..." : "Send Message"}
                         {!loading && <ArrowRight aria-hidden="true" className="h-4 w-4" />}
                       </button>
 
-                      <p className="text-xs font-medium text-slate-400">
-                        Required fields are marked with an asterisk.
+                      <p className="text-sm font-medium text-slate-500">
+                        We typically reply within one business day.
                       </p>
                     </div>
                   </form>
@@ -646,6 +716,55 @@ export default function Contact() {
         title="Message Received"
         message="Thanks for reaching out. Your inquiry has been logged."
       />
+
+      <style>{`
+        .contact-page #contact-form .contact-control {
+          display: block;
+          border: 0 !important;
+          border-bottom: 1px solid #94a3b8 !important;
+          border-radius: 0 !important;
+          background: transparent !important;
+          box-shadow: none !important;
+          padding-left: 0 !important;
+          padding-right: 0 !important;
+          outline: none;
+          transition: border-color 180ms ease, box-shadow 180ms ease;
+        }
+
+        .contact-page #contact-form .contact-control:hover {
+          border-bottom-color: #64748b !important;
+        }
+
+        .contact-page #contact-form .contact-control:focus {
+          border-bottom-color: #00AEEF !important;
+          box-shadow: 0 2px 0 -1px #00AEEF !important;
+        }
+
+        .contact-page #contact-form .contact-control[aria-invalid="true"] {
+          border-bottom-color: #dc2626 !important;
+          box-shadow: 0 2px 0 -1px #dc2626 !important;
+        }
+
+        .contact-page #contact-form .contact-textarea {
+          padding-top: 0.5rem !important;
+          padding-bottom: 0.75rem !important;
+        }
+
+        .contact-page #contact-form input:-webkit-autofill,
+        .contact-page #contact-form input:-webkit-autofill:hover,
+        .contact-page #contact-form input:-webkit-autofill:focus {
+          -webkit-text-fill-color: #001B44 !important;
+          box-shadow: 0 0 0 1000px #ffffff inset !important;
+          transition: background-color 9999s ease-out 0s;
+        }
+
+        @media (max-width: 639px) {
+          .contact-page .contact-heading {
+            white-space: normal;
+            font-size: clamp(3rem, 16vw, 4rem);
+          }
+        }
+      `}</style>
     </div>
   );
 }
