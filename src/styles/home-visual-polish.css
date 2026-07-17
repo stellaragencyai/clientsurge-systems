@@ -1,0 +1,360 @@
+/*
+  ClientSurge homepage-only visual polish.
+  Scope is intentionally limited to .cs-home-polish so dashboard, auth, checkout,
+  portal, legal, and internal pages are not touched by this design pass.
+*/
+
+.cs-home-polish {
+  --cs-home-ink: #06122b;
+  --cs-home-muted: #526175;
+  --cs-home-blue: #00aeef;
+  --cs-home-blue-deep: #006bb0;
+  --cs-home-border: rgba(0, 174, 239, 0.16);
+  --cs-home-border-strong: rgba(0, 174, 239, 0.28);
+  --cs-home-card: rgba(255, 255, 255, 0.86);
+  --cs-home-shadow: 0 18px 55px rgba(15, 73, 111, 0.08);
+  --cs-home-shadow-hover: 0 24px 72px rgba(0, 107, 176, 0.14);
+  position: relative;
+  isolation: isolate;
+  overflow-x: clip;
+  background:
+    radial-gradient(circle at 12% 12%, rgba(0, 174, 239, 0.10), transparent 30%),
+    radial-gradient(circle at 84% 28%, rgba(0, 107, 176, 0.09), transparent 34%),
+    linear-gradient(180deg, #fbfdff 0%, #ffffff 42%, #f7fbff 100%);
+  color: var(--cs-home-ink);
+}
+
+.cs-home-polish nav,
+.cs-home-polish footer,
+.cs-home-main {
+  position: relative;
+  z-index: 2;
+}
+
+.cs-home-ambient {
+  pointer-events: none;
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.cs-home-ambient::before,
+.cs-home-ambient::after {
+  content: "";
+  position: absolute;
+  border-radius: 999px;
+  filter: blur(8px);
+  opacity: 0.82;
+}
+
+.cs-home-ambient::before {
+  width: min(44vw, 620px);
+  height: min(44vw, 620px);
+  top: 9rem;
+  right: -16rem;
+  background: radial-gradient(circle, rgba(0, 174, 239, 0.13), transparent 68%);
+}
+
+.cs-home-ambient::after {
+  width: min(40vw, 560px);
+  height: min(40vw, 560px);
+  top: 42rem;
+  left: -18rem;
+  background: radial-gradient(circle, rgba(0, 107, 176, 0.10), transparent 66%);
+}
+
+.cs-home-ambient__grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(0, 174, 239, 0.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 174, 239, 0.045) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.50), transparent 68%);
+}
+
+.cs-home-main {
+  background: linear-gradient(180deg, rgba(255,255,255,0) 0%, rgba(248,252,255,0.70) 54%, rgba(255,255,255,0) 100%);
+}
+
+.cs-home-section-frame {
+  position: relative;
+  isolation: isolate;
+}
+
+.cs-home-section-frame > * {
+  position: relative;
+  z-index: 1;
+}
+
+.cs-home-section-frame::before {
+  content: "";
+  position: absolute;
+  inset: clamp(1.5rem, 4vw, 3rem) max(1rem, calc((100vw - 1240px) / 2));
+  z-index: 0;
+  pointer-events: none;
+  border-radius: clamp(1.75rem, 3vw, 3rem);
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.64), rgba(236,248,255,0.36)),
+    radial-gradient(circle at 18% 18%, rgba(0,174,239,0.08), transparent 34%),
+    radial-gradient(circle at 84% 74%, rgba(0,107,176,0.07), transparent 32%);
+  border: 1px solid rgba(0,174,239,0.08);
+  box-shadow: 0 28px 90px rgba(0, 66, 120, 0.045);
+  opacity: 0;
+}
+
+.cs-home-section-frame--accent::before {
+  opacity: 1;
+}
+
+.cs-home-section-frame--pricing::before,
+.cs-home-section-frame--final-cta::before {
+  opacity: 0.72;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.88), rgba(226,246,255,0.52)),
+    radial-gradient(circle at 72% 12%, rgba(0,174,239,0.12), transparent 38%);
+}
+
+.cs-home-proof-strip {
+  width: min(1120px, calc(100% - 2rem));
+  margin: clamp(-2rem, -2.4vw, -1rem) auto clamp(2.5rem, 5vw, 4.5rem);
+  padding: 0.85rem;
+  border: 1px solid var(--cs-home-border);
+  border-radius: 1.65rem;
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: 0 18px 60px rgba(0, 74, 125, 0.10);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+}
+
+.cs-home-proof-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.85rem;
+}
+
+.cs-home-proof-card {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 0.9rem;
+  align-items: center;
+  min-height: 92px;
+  padding: 1rem;
+  border: 1px solid rgba(0, 174, 239, 0.12);
+  border-radius: 1.2rem;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.92), rgba(240,250,255,0.72));
+  box-shadow: 0 10px 28px rgba(0, 107, 176, 0.055);
+  transition: transform 220ms ease, border-color 220ms ease, box-shadow 220ms ease;
+}
+
+.cs-home-proof-index {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.4rem;
+  height: 2.4rem;
+  border-radius: 999px;
+  color: #0079c1;
+  background: linear-gradient(135deg, rgba(0,174,239,0.13), rgba(0,107,176,0.06));
+  border: 1px solid rgba(0,174,239,0.20);
+  font-size: 0.72rem;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+}
+
+.cs-home-proof-title {
+  margin: 0;
+  color: var(--cs-home-ink);
+  font-size: 0.9rem;
+  font-weight: 900;
+  letter-spacing: -0.03em;
+}
+
+.cs-home-proof-copy {
+  margin: 0.25rem 0 0;
+  color: var(--cs-home-muted);
+  font-size: 0.78rem;
+  font-weight: 500;
+  line-height: 1.55;
+}
+
+.cs-home-section-divider {
+  display: flex;
+  align-items: center;
+  gap: clamp(0.75rem, 2vw, 1.25rem);
+  width: min(1120px, calc(100% - 2rem));
+  margin: clamp(1rem, 3vw, 2rem) auto clamp(0.25rem, 2vw, 1rem);
+  color: #0079c1;
+}
+
+.cs-home-section-divider::before,
+.cs-home-section-divider::after {
+  content: "";
+  height: 1px;
+  flex: 1;
+  background: linear-gradient(90deg, transparent, rgba(0,174,239,0.34), transparent);
+}
+
+.cs-home-section-divider__text {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-height: 2rem;
+  padding: 0.35rem 0.8rem;
+  border-radius: 999px;
+  border: 1px solid rgba(0,174,239,0.18);
+  background: rgba(255,255,255,0.78);
+  box-shadow: 0 8px 24px rgba(0,107,176,0.07);
+  font-size: 0.68rem;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.cs-home-section-divider__dot {
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--cs-home-blue);
+  box-shadow: 0 0 0 4px rgba(0,174,239,0.12);
+}
+
+.cs-home-main h1,
+.cs-home-main h2,
+.cs-home-main h3 {
+  color: var(--cs-home-ink);
+  text-wrap: balance;
+}
+
+.cs-home-main h2 {
+  letter-spacing: -0.052em;
+}
+
+.cs-home-main p {
+  color: inherit;
+}
+
+.cs-home-main .uppercase[class*="tracking"],
+.cs-home-main [class*="eyebrow"],
+.cs-home-main .cs-eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  letter-spacing: 0.14em !important;
+}
+
+.cs-home-main .uppercase[class*="tracking"]::before,
+.cs-home-main [class*="eyebrow"]::before,
+.cs-home-main .cs-eyebrow::before {
+  content: "";
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 999px;
+  background: var(--cs-home-blue);
+  box-shadow: 0 0 0 4px rgba(0,174,239,0.12);
+}
+
+.cs-home-main .rounded-xl,
+.cs-home-main .rounded-2xl,
+.cs-home-main .rounded-3xl {
+  border-color: var(--cs-home-border) !important;
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+.cs-home-main .rounded-2xl,
+.cs-home-main .rounded-3xl {
+  border-radius: clamp(1rem, 1.45vw, 1.55rem) !important;
+}
+
+.cs-home-main a[href*="pricing"],
+.cs-home-main a[href*="product-signup"],
+.cs-home-main a[href*="book"],
+.cs-home-main a[href*="how-it-works"] {
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease,
+    border-color 220ms ease,
+    background-color 220ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cs-home-proof-card:hover,
+  .cs-home-main .rounded-xl:hover,
+  .cs-home-main .rounded-2xl:hover,
+  .cs-home-main .rounded-3xl:hover {
+    transform: translateY(-3px);
+    border-color: var(--cs-home-border-strong) !important;
+    box-shadow: var(--cs-home-shadow-hover);
+  }
+
+  .cs-home-main a[href*="pricing"]:hover,
+  .cs-home-main a[href*="product-signup"]:hover,
+  .cs-home-main a[href*="book"]:hover,
+  .cs-home-main a[href*="how-it-works"]:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.cs-home-main a:focus-visible,
+.cs-home-main button:focus-visible,
+.cs-home-proof-card:focus-within {
+  outline: 2px solid var(--cs-home-blue);
+  outline-offset: 4px;
+  box-shadow: 0 0 0 6px rgba(0,174,239,0.14), var(--cs-home-shadow);
+}
+
+.cs-home-section-frame[data-home-section="hero"] + .cs-home-proof-strip {
+  position: relative;
+  z-index: 3;
+}
+
+@media (max-width: 900px) {
+  .cs-home-proof-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-home-proof-strip {
+    margin-top: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .cs-home-polish {
+    background:
+      radial-gradient(circle at 78% 8%, rgba(0,174,239,0.12), transparent 34%),
+      linear-gradient(180deg, #fbfdff 0%, #ffffff 50%, #f7fbff 100%);
+  }
+
+  .cs-home-ambient__grid {
+    background-size: 52px 52px;
+    opacity: 0.55;
+  }
+
+  .cs-home-section-frame::before {
+    inset: 1rem 0.75rem;
+    border-radius: 1.4rem;
+  }
+
+  .cs-home-proof-strip,
+  .cs-home-section-divider {
+    width: min(100% - 1.25rem, 1120px);
+  }
+
+  .cs-home-proof-card {
+    min-height: 84px;
+    padding: 0.9rem;
+  }
+
+  .cs-home-section-divider__text {
+    max-width: 82vw;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
