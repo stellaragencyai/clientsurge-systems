@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import Navbar from "./Navbar";
 import "./premium-navbar.css";
 import "./premium-navbar-polish.css";
+import "./electric-blue-homepage-rollout.css";
 
 const SCROLLED_CLASS = "cs-premium-nav-scrolled";
 
