@@ -11,7 +11,34 @@ export const LaunchApproval = base44.entities.LaunchApproval;
 export const LaunchGate = base44.entities.LaunchGate;
 export const SpaLead = base44.entities.Leads;
 export const SupportMessage = base44.entities.SupportMessage;
-export const WebsiteLead = base44.entities.WebsiteLead;
+
+// WebsiteLead writes must pass through the hardened server-side intake function.
+// Reads and updates remain available through the generated entity client, while
+// direct create calls are intercepted so fake/test rejection and deduplication
+// cannot be bypassed by legacy form components.
+const websiteLeadEntity = base44.entities.WebsiteLead;
+export const WebsiteLead = {
+  ...websiteLeadEntity,
+  async create(payload) {
+    const response = await base44.functions.invoke('captureValidatedWebsiteLead', payload);
+    const data = response?.data ?? response;
+    if (data?.rejected) {
+      const error = new Error('Lead submission was rejected by validation.');
+      error.code = 'lead_rejected';
+      error.reason_codes = data.reason_codes || [];
+      throw error;
+    }
+    if (!data?.success) {
+      throw new Error(data?.error || 'Unable to capture website lead.');
+    }
+    return {
+      id: data.lead_id,
+      duplicate: Boolean(data.duplicate),
+      submission_count: data.submission_count || 1,
+      request_id: data.request_id,
+    };
+  },
+};
 
 export default {
   AutomationJob,
