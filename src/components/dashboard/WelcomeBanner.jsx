@@ -117,10 +117,20 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             <p style={{ fontSize: "11px", fontWeight: "900", color: "#38C8FF", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 8px" }}>
               ClientSurge Systems
             </p>
-            <h1 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: "900", color: "#ffffff", margin: "0 0 10px", lineHeight: 1.05, letterSpacing: "-0.04em", textShadow: "0 2px 18px rgba(0,0,0,0.16)" }}>
+            <h1 style={{
+              fontSize: "clamp(28px,4vw,42px)",
+              fontWeight: "900",
+              color: "#ffffff",
+              WebkitTextFillColor: "#ffffff",
+              backgroundImage: "none",
+              margin: "0 0 10px",
+              lineHeight: 1.05,
+              letterSpacing: "-0.04em",
+              textShadow: "0 2px 18px rgba(0,0,0,0.28)",
+            }}>
               {isLive ? `System live, ${displayName}` : `Welcome, ${displayName}`}
             </h1>
-            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.72)", margin: 0, maxWidth: "640px", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.82)", margin: 0, maxWidth: "640px", lineHeight: 1.6 }}>
               {businessName ? `${businessName} · ` : ""}
               {isLive
                 ? "Your automation system is active and verified by system evidence."
@@ -146,7 +156,7 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
                 <p style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", margin: "2px 0 0" }}>{heroStatus.title}</p>
               </div>
             </div>
-            <p style={{ fontSize: "12px", lineHeight: 1.55, color: "rgba(255,255,255,0.68)", margin: 0 }}>{heroStatus.body}</p>
+            <p style={{ fontSize: "12px", lineHeight: 1.55, color: "rgba(255,255,255,0.78)", margin: 0 }}>{heroStatus.body}</p>
           </div>
         </div>
 

@@ -1,6 +1,6 @@
-import { useEffect, useState } from "react";
-import { CheckCircle2, ArrowRight, Rocket } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useEffect, useMemo, useState } from "react";
+import { ArrowRight, CheckCircle2, ClipboardCheck, Loader2, ShieldCheck } from "lucide-react";
+import { Link } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
 import Navbar from "@/components/landing/Navbar";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
@@ -8,17 +8,27 @@ import PostPurchaseWhatNext from "@/components/portal/PostPurchaseWhatNext";
 import GuaranteeCard from "@/components/portal/GuaranteeCard";
 import { trackEvent } from "@/lib/analytics";
 
-// Prevent search engines from indexing the order success page
-const noIndexMeta = document.querySelector('meta[name="robots"]');
-if (noIndexMeta) noIndexMeta.setAttribute("content", "noindex,nofollow");
+function readPayload(result) {
+  return result?.data || result || {};
+}
 
 export default function OrderSuccess() {
-  const navigate = useNavigate();
+  const sessionId = useMemo(() => new URLSearchParams(window.location.search).get("session_id") || "", []);
   const [orderSummary, setOrderSummary] = useState(null);
   const [orderInfo, setOrderInfo] = useState(null);
+  const [resolvingOrder, setResolvingOrder] = useState(Boolean(sessionId));
+  const [resolveError, setResolveError] = useState("");
 
   useEffect(() => {
-    // Read pre-checkout summary saved to sessionStorage before Stripe redirect
+    const robots = document.querySelector('meta[name="robots"]');
+    const previous = robots?.getAttribute("content") || "index,follow";
+    if (robots) robots.setAttribute("content", "noindex,nofollow");
+    return () => {
+      if (robots) robots.setAttribute("content", previous);
+    };
+  }, []);
+
+  useEffect(() => {
     try {
       const raw = sessionStorage.getItem("clientsurge:last-order");
       if (raw) {
@@ -28,46 +38,54 @@ export default function OrderSuccess() {
       sessionStorage.removeItem("clientsurge:cart");
     } catch {}
 
-    // Resolve order from Stripe session_id so we can link to the setup wizard
-    const params = new URLSearchParams(window.location.search);
-    const sessionId = params.get("session_id");
-    if (!sessionId) return;
+    if (!sessionId) {
+      setResolvingOrder(false);
+      return;
+    }
 
     base44.functions.invoke("getOrderStatus", { session_id: sessionId })
       .then((result) => {
-        if (result?.eligible && result?.order?.id) {
-          setOrderInfo(result.order);
+        const payload = readPayload(result);
+        if (payload?.eligible && payload?.order?.id) {
+          setOrderInfo(payload.order);
+          return;
         }
+        setResolveError("Your payment is confirmed, but the setup record is still syncing. The secure setup link below can finish resolving it.");
       })
-      .catch(() => {});
-  }, []);
+      .catch(() => {
+        setResolveError("Your payment is confirmed, but we could not display the order details yet. Continue with the secure setup link below.");
+      })
+      .finally(() => setResolvingOrder(false));
+  }, [sessionId]);
 
-  // GA4 purchase tracking — fires once when order is confirmed, idempotent
   useEffect(() => {
     if (!orderInfo?.id) return;
 
-    // Skip test orders
     const email = (orderInfo.customer_email || "").toLowerCase();
     const testPatterns = [
-      /@example\.com/i, /@clientsurge\.test/i, /@clientsurge-install\.internal/i,
-      /runtime\.checkout/i, /test-/i, /stripe-.*-proof/i,
-      /pricing-live-checkout/i, /postfix-live-checkout/i, /proof@/i,
+      /@example\.com/i,
+      /@clientsurge\.test/i,
+      /@clientsurge-install\.internal/i,
+      /runtime\.checkout/i,
+      /test-/i,
+      /stripe-.*-proof/i,
+      /pricing-live-checkout/i,
+      /postfix-live-checkout/i,
+      /proof@/i,
     ];
-    if (!email || testPatterns.some(p => p.test(email))) return;
+    if (!email || testPatterns.some((pattern) => pattern.test(email))) return;
 
-    // Idempotency — prevent double-counting on page refresh
     const fireKey = `clientsurge:ga4-purchase-fired:${orderInfo.id}`;
     if (sessionStorage.getItem(fireKey)) return;
     sessionStorage.setItem(fireKey, "1");
 
     const totalValue = Number(orderInfo.total_setup || 0) + Number(orderInfo.total_monthly || 0);
-
     trackEvent("purchase", {
       transaction_id: orderInfo.stripe_session_id || orderInfo.id,
       value: totalValue,
       currency: "USD",
-      items: (orderInfo.items || []).map((item, idx) => ({
-        item_id: item.product_id || item.service_key || `item-${idx}`,
+      items: (orderInfo.items || []).map((item, index) => ({
+        item_id: item.product_id || item.service_key || `item-${index}`,
         item_name: item.product_name || item.service_key || "Service",
         price: Number(item.setup_fee || 0) + Number(item.monthly_fee || 0),
         quantity: 1,
@@ -75,264 +93,103 @@ export default function OrderSuccess() {
     });
   }, [orderInfo]);
 
+  const setupHref = orderInfo?.id
+    ? `/setup/credentials?order_id=${encodeURIComponent(orderInfo.id)}&section=business`
+    : sessionId
+      ? `/setup/credentials?session_id=${encodeURIComponent(sessionId)}&section=business`
+      : "/client-portal";
+
   return (
     <DemoBookingProvider>
-      <div
-        style={{
-          minHeight: "100vh",
-          background: "linear-gradient(135deg, #fdfcfa 0%, #f8f4ee 100%)",
-          fontFamily: "'Inter', sans-serif",
-        }}
-      >
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-sky-50 font-sans">
         <Navbar />
-        <div
-          style={{
-            maxWidth: "600px",
-            margin: "0 auto",
-            padding: "80px 24px",
-            textAlign: "center",
-          }}
-        >
-          <div
-            style={{
-              width: "80px",
-              height: "80px",
-              borderRadius: "50%",
-              background: "rgba(34,197,94,0.12)",
-              border: "2px solid rgba(34,197,94,0.3)",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              margin: "0 auto 24px",
-            }}
-          >
-            <CheckCircle2 style={{ width: "40px", height: "40px", color: "#22c55e" }} />
-          </div>
-
-          <h1
-            className="font-display"
-            style={{ fontSize: "2.2rem", fontWeight: "800", color: "#1a1209", marginBottom: "12px" }}
-          >
-            Your AI Brain is Deploying
-          </h1>
-          <p
-            style={{
-              fontSize: "1.05rem",
-              color: "rgba(26,18,9,0.6)",
-              lineHeight: 1.7,
-              marginBottom: "32px",
-            }}
-          >
-            Payment confirmed. Your automations are now being provisioned remotely. Track real-time deployment progress in your client portal—setup complete in 4–6 hours.
-          </p>
-
-          <div
-            style={{
-              background: "rgba(255,255,255,0.8)",
-              border: "1.5px solid rgba(154,92,46,0.15)",
-              borderRadius: "20px",
-              padding: "24px 28px",
-              marginBottom: "32px",
-              textAlign: "left",
-            }}
-          >
-            <p
-              style={{
-                fontSize: "11px",
-                fontWeight: "700",
-                color: "#9a5c2e",
-                textTransform: "uppercase",
-                letterSpacing: "0.12em",
-                marginBottom: "16px",
-              }}
-            >
-              What Happens Next
+        <main className="mx-auto max-w-3xl px-5 pb-16 pt-28 sm:px-8">
+          <section className="text-center">
+            <div className="mx-auto mb-5 flex h-20 w-20 items-center justify-center rounded-full border-2 border-green-200 bg-green-50">
+              <CheckCircle2 className="h-10 w-10 text-green-600" aria-hidden="true" />
+            </div>
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-green-700">Payment confirmed</p>
+            <h1 className="mt-2 text-3xl font-black tracking-tight text-slate-950 sm:text-4xl">
+              Complete Your Secure Setup
+            </h1>
+            <p className="mx-auto mt-4 max-w-2xl text-base leading-7 text-slate-600">
+              Your purchase is complete. Configuration begins after you submit the business details, booking information, and integration preferences needed for your system.
             </p>
-            {[
-              { step: "1", text: "Deployment briefing email arrives (credentials, timeline, next steps)." },
-              { step: "2", text: "AI Brain auto-generates your business config (SMS templates, email sequences, booking logic)." },
-              { step: "3", text: "Services deploy in parallel: Twilio SMS, email routing, lead capture webhooks, voice AI." },
-              { step: "4", text: "Watch real-time status in your dashboard—go-live confirmation within 4–6 hours." },
-            ].map((entry) => (
-              <div
-                key={entry.step}
-                style={{
-                  display: "flex",
-                  alignItems: "flex-start",
-                  gap: "12px",
-                  marginBottom: "12px",
-                }}
-              >
-                <div
-                  style={{
-                    width: "24px",
-                    height: "24px",
-                    borderRadius: "50%",
-                    background: "linear-gradient(135deg,#9a5c2e,#c8965c)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    flexShrink: 0,
-                    marginTop: "1px",
-                  }}
-                >
-                  <span style={{ fontSize: "11px", fontWeight: "800", color: "#fff" }}>{entry.step}</span>
-                </div>
-                <p style={{ fontSize: "14px", color: "rgba(26,18,9,0.7)", lineHeight: 1.5, margin: 0 }}>
-                  {entry.text}
-                </p>
-              </div>
-            ))}
-          </div>
+          </section>
 
-          {/* Order summary */}
-          {orderSummary && (
-            <div style={{
-              background: "rgba(255,255,255,0.8)", border: "1.5px solid rgba(154,92,46,0.15)",
-              borderRadius: "20px", padding: "20px 24px", marginBottom: "24px", textAlign: "left",
-            }}>
-              <p style={{ fontSize: "11px", fontWeight: "700", color: "#9a5c2e", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "12px" }}>
-                Your Order
-              </p>
-              {orderSummary.items?.map((item, i) => (
-                <div key={i} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "8px 0", borderBottom: i < orderSummary.items.length - 1 ? "1px solid rgba(154,92,46,0.08)" : "none" }}>
-                  <span style={{ fontSize: "13px", color: "#1a1209", fontWeight: "600" }}>{item.icon} {item.name}</span>
-                  <span style={{ fontSize: "12px", color: "rgba(26,18,9,0.6)" }}>${item.setup_fee} + ${item.monthly_fee}/mo</span>
+          <section className="mt-8 rounded-3xl border border-sky-200 bg-white p-6 shadow-[0_18px_50px_rgba(0,59,143,0.10)] sm:p-8">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex items-start gap-4 text-left">
+                <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-2xl border border-sky-200 bg-sky-50">
+                  <ClipboardCheck className="h-6 w-6 text-sky-700" aria-hidden="true" />
                 </div>
-              ))}
+                <div>
+                  <p className="text-sm font-extrabold text-slate-950">Next required step</p>
+                  <p className="mt-1 text-sm leading-6 text-slate-600">
+                    Complete the setup form now, or save your progress and return through the client portal.
+                  </p>
+                  <div className="mt-2 flex items-center gap-2 text-xs font-semibold text-slate-500">
+                    <ShieldCheck className="h-4 w-4 text-green-600" aria-hidden="true" />
+                    Secure, order-verified setup
+                  </div>
+                </div>
+              </div>
+
+              <Link
+                to={setupHref}
+                className="inline-flex min-h-12 flex-shrink-0 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-sky-600 to-blue-900 px-6 py-3 text-sm font-extrabold text-white no-underline shadow-lg shadow-sky-900/15 transition-transform hover:-translate-y-0.5"
+              >
+                Start Setup <ArrowRight className="h-4 w-4" aria-hidden="true" />
+              </Link>
+            </div>
+
+            {resolvingOrder && (
+              <p className="mt-4 flex items-center justify-center gap-2 rounded-xl bg-slate-50 px-3 py-2 text-xs font-semibold text-slate-500">
+                <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" /> Verifying your order details…
+              </p>
+            )}
+
+            {resolveError && (
+              <p className="mt-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-left text-xs font-semibold leading-5 text-amber-800">
+                {resolveError}
+              </p>
+            )}
+          </section>
+
+          {orderSummary && (
+            <section className="mt-6 rounded-2xl border border-slate-200 bg-white p-5 text-left shadow-sm">
+              <p className="text-[11px] font-black uppercase tracking-[0.14em] text-sky-700">Your order</p>
+              <div className="mt-3 divide-y divide-slate-100">
+                {orderSummary.items?.map((item, index) => (
+                  <div key={`${item.name || "service"}-${index}`} className="flex items-center justify-between gap-4 py-3">
+                    <span className="text-sm font-semibold text-slate-900">{item.icon} {item.name}</span>
+                    <span className="text-xs font-semibold text-slate-500">${item.setup_fee} + ${item.monthly_fee}/mo</span>
+                  </div>
+                ))}
+              </div>
               {orderSummary.totalSetup != null && (
-                <div style={{ marginTop: "12px", paddingTop: "10px", borderTop: "1.5px solid rgba(154,92,46,0.12)", display: "flex", justifyContent: "space-between" }}>
-                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#1a1209" }}>Total</span>
-                  <span style={{ fontSize: "13px", fontWeight: "700", color: "#9a5c2e" }}>${orderSummary.totalSetup} setup · ${orderSummary.totalMonthly}/mo</span>
+                <div className="mt-2 flex items-center justify-between border-t border-slate-200 pt-4 text-sm font-extrabold">
+                  <span className="text-slate-950">Total</span>
+                  <span className="text-sky-800">${orderSummary.totalSetup} setup · ${orderSummary.totalMonthly}/mo</span>
                 </div>
               )}
-            </div>
+            </section>
           )}
 
-          {/* Post-purchase roadmap */}
-          <div style={{ marginBottom: "24px" }}>
+          <div className="mt-6">
             <PostPurchaseWhatNext />
           </div>
 
-          {/* 30-day guarantee */}
-          <div style={{ marginBottom: "24px" }}>
+          <div className="mt-6">
             <GuaranteeCard />
           </div>
 
-          {/* Finding #105: Post-purchase upsell — one-time upgrade offer */}
-          {orderInfo && (
-            <div style={{
-              background: "linear-gradient(135deg, rgba(0,174,239,0.06) 0%, rgba(0,107,176,0.03) 100%)",
-              border: "1.5px solid rgba(0,174,239,0.2)",
-              borderRadius: "20px",
-              padding: "24px 28px",
-              marginBottom: "32px",
-              textAlign: "left",
-            }}>
-              <p style={{
-                fontSize: "11px", fontWeight: "700", color: "#00AEEF",
-                textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: "8px",
-              }}>
-                Limited-Time Upgrade Offer
-              </p>
-              <p style={{ fontSize: "15px", fontWeight: "700", color: "#1a1209", marginBottom: "8px" }}>
-                Upgrade within 48 hours and save $500
-              </p>
-              <p style={{ fontSize: "13px", color: "rgba(26,18,9,0.6)", lineHeight: 1.5, marginBottom: "16px" }}>
-                Lock in a higher tier now while your account is being provisioned. We'll apply the upgrade instantly — no re-onboarding needed.
-              </p>
-              <Link
-                to="/pricing"
-                style={{
-                  display: "inline-flex", alignItems: "center", gap: "6px",
-                  fontSize: "13px", fontWeight: "700", color: "#00AEEF",
-                  textDecoration: "none",
-                }}
-              >
-                View upgrade options <ArrowRight style={{ width: "14px", height: "14px" }} />
-              </Link>
-            </div>
-          )}
-
-          <div style={{ display: "flex", flexDirection: "column", gap: "12px", alignItems: "center" }}>
-            {orderInfo ? (
-              <button
-                onClick={() => navigate(`/setup/credentials?order_id=${orderInfo.id}`)}
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  borderRadius: "9999px",
-                  padding: "2px",
-                  border: "none",
-                  cursor: "pointer",
-                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%)",
-                  textDecoration: "none",
-                  boxShadow: "0 4px 18px rgba(0,174,239,0.3)",
-                }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    height: "48px",
-                    padding: "0 28px",
-                    borderRadius: "9999px",
-                    background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
-                    color: "#ffffff",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                  }}
-                >
-                  <Rocket style={{ width: "16px", height: "16px" }} /> Complete Your Setup <ArrowRight style={{ width: "14px", height: "14px" }} />
-                </span>
-              </button>
-            ) : (
-              <Link
-                to="/client-portal"
-                style={{
-                  display: "inline-flex",
-                  alignItems: "center",
-                  gap: "8px",
-                  borderRadius: "9999px",
-                  padding: "2px",
-                  background: "linear-gradient(135deg, #00AEEF 0%, #009DFF 45%, #003B8F 100%)",
-                  textDecoration: "none",
-                  boxShadow: "0 4px 18px rgba(0,174,239,0.3)",
-                }}
-              >
-                <span
-                  style={{
-                    display: "flex",
-                    alignItems: "center",
-                    gap: "8px",
-                    height: "48px",
-                    padding: "0 28px",
-                    borderRadius: "9999px",
-                    background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)",
-                    color: "#ffffff",
-                    fontWeight: "700",
-                    fontSize: "14px",
-                  }}
-                >
-                  Get Instant Access <ArrowRight style={{ width: "14px", height: "14px" }} />
-                </span>
-              </Link>
-            )}
-            <Link
-              to="/store"
-              style={{
-                fontSize: "13px",
-                color: "rgba(154,92,46,0.7)",
-                fontWeight: "600",
-                textDecoration: "none",
-              }}
-            >
-              Add more AI services
+          <div className="mt-8 text-center">
+            <Link to="/client-portal" className="text-sm font-bold text-sky-800 no-underline hover:text-blue-950">
+              Open client portal
             </Link>
           </div>
-        </div>
+        </main>
       </div>
     </DemoBookingProvider>
   );
