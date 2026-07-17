@@ -19,19 +19,16 @@ import { trackCTA } from '@/lib/analytics';
  */
 
 const AUTOMATION_PILLS = [
-  'Lead Capture',
+  'Instant Lead Response',
   'Missed-Call Recovery',
-  'AI Follow-Up',
   'AI Booking',
-  'Reviews',
-  'Reactivation',
-  'Optional AI Phone Receptionist',
+  'Automated Follow-Up',
 ];
 
-const TRUST_BADGES = [
-  'Clear packages',
-  'Secure checkout path',
-  'Setup handled for you',
+const TRUST_ITEMS = [
+  'Transparent pricing',
+  'Secure checkout',
+  'Done-for-you setup',
 ];
 
 const MINI_FEATURES = ['No demo gate', 'Package-first buyer path', 'Done-for-you setup'];
@@ -55,19 +52,26 @@ function scrollToSection(event, sectionId, fallbackPath, analyticsName) {
 
 function AutomationPill({ label }) {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-200/90 bg-sky-50/95 px-3 py-1.5 text-[11px] font-extrabold text-[#006BB0] shadow-[0_1px_0_rgba(255,255,255,0.9)]">
+    <span className="inline-flex items-center gap-2 rounded-full border border-sky-200/70 bg-white/72 px-3.5 py-1.5 text-[11px] font-bold tracking-[-0.01em] text-[#075985] shadow-[0_8px_24px_rgba(15,23,42,0.04)] backdrop-blur-sm">
       <span className="h-1.5 w-1.5 rounded-full bg-[#00AEEF]" aria-hidden="true" />
       {label}
     </span>
   );
 }
 
-function TrustBadge({ label }) {
+function TrustLine() {
   return (
-    <span className="inline-flex items-center gap-1.5 rounded-full border border-sky-200/70 bg-white/65 px-3 py-1.5 text-[11px] font-bold text-slate-500 shadow-[0_8px_24px_rgba(0,107,176,0.06)] backdrop-blur-sm">
-      <CheckCircle2 className="h-3.5 w-3.5 text-[#00AEEF]" aria-hidden="true" />
-      {label}
-    </span>
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] font-semibold tracking-[-0.01em] text-slate-500 lg:justify-start">
+      {TRUST_ITEMS.map((item, index) => (
+        <div key={item} className="flex items-center gap-3">
+          {index > 0 && <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" aria-hidden="true" />}
+          <span className="inline-flex items-center gap-1.5">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#00AEEF]" aria-hidden="true" />
+            {item}
+          </span>
+        </div>
+      ))}
+    </div>
   );
 }
 
@@ -86,21 +90,22 @@ function HeroDeviceMockup() {
   return (
     <div className="relative mx-auto w-full max-w-[540px] lg:max-w-[560px]" aria-label="ClientSurge automation dashboard preview">
       <div
-        className="absolute -inset-10 rounded-[4rem] opacity-70 blur-3xl"
+        className="absolute -inset-12 rounded-[4.5rem] opacity-80 blur-3xl"
         style={{
           background:
-            'radial-gradient(circle at 55% 18%, rgba(0,174,239,0.20), transparent 34%), radial-gradient(circle at 65% 75%, rgba(3,105,161,0.20), transparent 42%)',
+            'radial-gradient(circle at 52% 24%, rgba(0,174,239,0.20), transparent 32%), radial-gradient(circle at 62% 76%, rgba(3,105,161,0.14), transparent 42%)',
         }}
         aria-hidden="true"
       />
 
       <div
-        className="relative aspect-[7/8] rounded-[2.35rem] bg-[#1c2532] p-3 shadow-2xl"
+        className="relative aspect-[7/8] rounded-[2.35rem] bg-[#1c2532] p-3"
         style={{
           boxShadow:
-            '0 34px 70px rgba(2, 8, 23, 0.34), 0 14px 28px rgba(2, 8, 23, 0.22), inset 0 0 0 1px rgba(255,255,255,0.12)',
+            '0 44px 90px rgba(2,8,23,0.22), 0 18px 38px rgba(2,8,23,0.14), 0 2px 8px rgba(2,8,23,0.12), inset 1px 1px 0 rgba(255,255,255,0.16), inset 0 0 0 1px rgba(255,255,255,0.08)',
         }}
       >
+        <div className="pointer-events-none absolute inset-x-10 top-0 h-px bg-gradient-to-r from-transparent via-white/55 to-transparent" aria-hidden="true" />
         <div className="absolute -left-1 top-[76px] h-9 w-1 rounded-l-md bg-[#111827]" aria-hidden="true" />
         <div className="absolute -left-1 top-[128px] h-9 w-1 rounded-l-md bg-[#111827]" aria-hidden="true" />
         <div className="absolute -right-1 top-[98px] h-16 w-1 rounded-r-md bg-[#111827]" aria-hidden="true" />
@@ -244,35 +249,35 @@ export default function HomeHero() {
       <div
         className="absolute inset-0 -z-20"
         style={{
-          backgroundColor: '#f8fdff',
+          backgroundColor: '#fbfdff',
           backgroundImage:
-            'linear-gradient(rgba(0,174,239,0.075) 1px, transparent 1px), linear-gradient(90deg, rgba(0,174,239,0.075) 1px, transparent 1px), radial-gradient(circle at 88% -8%, rgba(0,174,239,0.24), transparent 28%), radial-gradient(circle at 52% 42%, rgba(255,255,255,0.98), rgba(248,253,255,0.86) 58%, rgba(239,248,253,0.72) 100%)',
-          backgroundSize: '40px 40px, 40px 40px, auto, auto',
+            'radial-gradient(circle at 82% 22%, rgba(0,174,239,0.14), transparent 27%), radial-gradient(circle at 18% 8%, rgba(219,239,249,0.34), transparent 29%), linear-gradient(180deg, #fbfdff 0%, #f8fbfd 62%, #ffffff 100%)',
         }}
         aria-hidden="true"
       />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-44 bg-gradient-to-b from-transparent to-white" aria-hidden="true" />
+      <div className="absolute inset-x-0 bottom-0 -z-10 h-52 bg-gradient-to-b from-transparent via-white/65 to-white" aria-hidden="true" />
 
-      <div className="mx-auto grid w-full max-w-[1280px] grid-cols-1 items-center gap-12 px-5 pb-16 pt-[calc(var(--cs-nav-height,76px)+3.25rem)] sm:px-8 lg:grid-cols-[minmax(0,0.92fr)_minmax(470px,1fr)] lg:gap-16 lg:px-10 lg:pb-20 lg:pt-[calc(var(--cs-nav-height,76px)+2.5rem)]">
-        <div className="mx-auto max-w-[650px] text-center lg:mx-0 lg:text-left">
+      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-14 px-5 pb-20 pt-[calc(var(--cs-nav-height,76px)+4.5rem)] sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(470px,1fr)] lg:gap-20 lg:px-10 lg:pb-24 lg:pt-[calc(var(--cs-nav-height,76px)+4rem)]">
+        <div className="mx-auto max-w-[620px] text-center lg:mx-0 lg:text-left">
           <p className="sr-only">AI Growth System for Service Businesses</p>
 
-          <h1 className="font-black leading-[0.98] tracking-[-0.065em] text-[#06122b]" style={{ fontSize: 'clamp(3.05rem, 5vw, 5.15rem)' }}>
-            Turn your website into an{' '}
-            <span className="text-[#00AEEF]">AI-powered sales system.</span>
+          <h1 className="font-black leading-[0.97] tracking-[-0.06em] text-[#06122b]" style={{ fontSize: 'clamp(2.85rem, 4.35vw, 4.55rem)' }}>
+            <span className="block">Turn your website</span>
+            <span className="block">into an <span className="text-[#00AEEF]">AI-powered</span></span>
+            <span className="block">sales system.</span>
           </h1>
 
-          <p className="mt-7 max-w-[610px] text-[1rem] font-medium leading-8 text-slate-500 sm:text-lg lg:mx-0 lg:max-w-[590px]">
+          <p className="mt-8 max-w-[560px] text-[1rem] font-normal leading-[1.8] tracking-[-0.01em] text-slate-500 sm:text-[1.06rem] lg:mx-0">
             ClientSurge installs the lead capture, instant response, booking, follow-up, review, and reactivation workflows your website needs to turn more visitors into real opportunities — without forcing a mandatory demo call first.
           </p>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-2 lg:justify-start">
+          <div className="mt-7 flex flex-wrap justify-center gap-2.5 lg:justify-start">
             {AUTOMATION_PILLS.map((pill) => (
               <AutomationPill key={pill} label={pill} />
             ))}
           </div>
 
-          <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
             <a
               href="/#pricing"
               onClick={scrollToPricing}
@@ -294,19 +299,17 @@ export default function HomeHero() {
             </a>
           </div>
 
-          <div className="mt-5 flex flex-wrap justify-center gap-2 lg:justify-start">
-            {TRUST_BADGES.map((badge) => (
-              <TrustBadge key={badge} label={badge} />
-            ))}
+          <div className="mt-6">
+            <TrustLine />
           </div>
 
-          <div className="mt-8 hidden items-center gap-3 text-[10px] font-black uppercase tracking-[0.28em] text-slate-400 lg:flex">
-            <span className="h-7 w-px bg-[#00AEEF]/45" aria-hidden="true" />
+          <div className="mt-10 hidden items-center gap-3 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 lg:flex">
+            <span className="h-7 w-px bg-[#00AEEF]/35" aria-hidden="true" />
             Scroll
           </div>
         </div>
 
-        <div className="relative lg:pl-2">
+        <div className="relative lg:pl-3">
           <HeroDeviceMockup />
 
           <div className="pointer-events-none absolute -bottom-4 left-1/2 hidden -translate-x-1/2 flex-wrap justify-center gap-2 lg:flex">
