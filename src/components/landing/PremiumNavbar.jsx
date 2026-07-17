@@ -3,6 +3,7 @@ import Navbar from "./Navbar";
 import "./premium-navbar.css";
 import "./premium-navbar-polish.css";
 import "./electric-blue-homepage-rollout.css";
+import "./electric-blue-conversion-polish.css";
 
 const SCROLLED_CLASS = "cs-premium-nav-scrolled";
 
