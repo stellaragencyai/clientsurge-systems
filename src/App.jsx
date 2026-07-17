@@ -233,6 +233,14 @@ function SignupForward() {
   return <Navigate to={`/product-signup${location.search}`} replace />;
 }
 
+function ProductSignupRoute() {
+  const location = useLocation();
+  if (location.pathname.toLowerCase() !== "/product-signup") {
+    return <Navigate to={`/product-signup${location.search}${location.hash}`} replace />;
+  }
+  return <ProductSignup />;
+}
+
 function AdminLoadingSkeleton() {
   return (
     <div className="min-h-screen bg-background flex">
@@ -344,8 +352,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/automations" element={<LazyRoute Component={Automations} />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
       <Route path="/signup" element={<SignupForward />} />
-      <Route path="/product-signup" element={<ProductSignup />} />
-      <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
+      <Route path="/product-signup/*" element={<ProductSignupRoute />} />
       <Route path="/product-sign-up" element={<SignupForward />} />
       <Route path="/product_signup" element={<SignupForward />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />

@@ -8,7 +8,7 @@ import {
   normalizeEmail,
   normalizePhone,
 } from './leadCapture.shared.js';
-import { validatePublicFormOrigin } from '../_shared/publicFormOriginGuard.js';
+import { validatePublicFormOrigin } from './publicFormOriginGuard.js';
 
 const MAX_MESSAGE_LENGTH = 1000;
 const rateLimiter = createLeadCaptureRateLimiter();
