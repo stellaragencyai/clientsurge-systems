@@ -1,0 +1,129 @@
+name: ClientSurge Production Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_sha:
+        description: "Exact main commit to release; defaults to current main"
+        required: false
+        type: string
+      allow_ui_fallback:
+        description: "Allow Playwright to click Publish if CLI and endpoint deployment fail"
+        required: true
+        default: false
+        type: boolean
+  workflow_run:
+    workflows:
+      - ClientSurge Release Gate
+    types:
+      - completed
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+environment: production
+
+concurrency:
+  group: clientsurge-production-release
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Deploy exact main commit and prove it live
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+
+    env:
+      BASE44_APP_ID: 69dc4a79656fdba136d413d3
+      RELEASE_BASE_URL: https://clientsurgesystems.com
+      RELEASE_PROOF_PATH: tmp/production-release-proof.json
+      BASE44_AUTH_JSON: ${{ secrets.BASE44_AUTH_JSON || secrets.BASE_44_AUTH_JSON }}
+      BASE44_STORAGE_STATE_JSON: ${{ secrets.BASE44_STORAGE_STATE_JSON }}
+      ALLOW_BASE44_ENDPOINT_FALLBACK: "true"
+      ALLOW_BASE44_UI_FALLBACK: ${{ github.event_name == 'workflow_dispatch' && inputs.allow_ui_fallback && 'true' || 'false' }}
+      SKIP_NPM_INSTALL: "false"
+      SKIP_RELEASE_TESTS: "false"
+
+    steps:
+      - name: Resolve exact source commit
+        id: source
+        shell: bash
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "sha=${{ github.event.workflow_run.head_sha }}" >> "$GITHUB_OUTPUT"
+          elif [ -n "${{ inputs.source_sha }}" ]; then
+            echo "sha=${{ inputs.source_sha }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "sha=main" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Checkout exact source
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ steps.source.outputs.sha }}
+          fetch-depth: 0
+
+      - name: Confirm commit belongs to main
+        shell: bash
+        run: |
+          git fetch origin main --depth=1
+          SOURCE_SHA="$(git rev-parse HEAD)"
+          git merge-base --is-ancestor "$SOURCE_SHA" origin/main
+          echo "RELEASE_SHA=$SOURCE_SHA" >> "$GITHUB_ENV"
+          echo "RELEASE_BRANCH=main" >> "$GITHUB_ENV"
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+
+      - name: Install Base44 authentication
+        shell: bash
+        run: |
+          if [ -z "$BASE44_AUTH_JSON" ]; then
+            echo "BASE44_AUTH_JSON / BASE_44_AUTH_JSON is missing." >&2
+            exit 1
+          fi
+          mkdir -p "$HOME/.base44/auth"
+          printf '%s' "$BASE44_AUTH_JSON" > "$HOME/.base44/auth/auth.json"
+          chmod 600 "$HOME/.base44/auth/auth.json"
+
+      - name: Install browser fallback dependencies
+        if: ${{ env.ALLOW_BASE44_UI_FALLBACK == 'true' }}
+        shell: bash
+        run: |
+          npm ci --prefix tools/browser-audit
+          npm run --prefix tools/browser-audit install:browsers
+
+      - name: Deploy exact artifact and verify production
+        run: node scripts/release/deploy-production-site.mjs
+
+      - name: Verify live checkout path
+        run: npm run smoke:product-signup-checkout -- --package growth_system
+
+      - name: Upload immutable release proof
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clientsurge-production-release-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            tmp/production-release-proof.json
+            tmp/live-release-sha-proof.json
+            tmp/base44-endpoint-publish-proof.json
+            tmp/base44-ui-publish-proof.json
+          if-no-files-found: warn
+          retention-days: 90
+
+      - name: Release summary
+        if: always()
+        shell: bash
+        run: |
+          echo "## ClientSurge Production Release" >> "$GITHUB_STEP_SUMMARY"
+          echo "- App: $BASE44_APP_ID" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Domain: $RELEASE_BASE_URL" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Exact source SHA: ${RELEASE_SHA:-unknown}" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Success requires /release.json to report the same SHA." >> "$GITHUB_STEP_SUMMARY"

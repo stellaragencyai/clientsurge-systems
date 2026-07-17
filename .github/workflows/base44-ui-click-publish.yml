@@ -1,37 +1,30 @@
-name: Base44 UI Click Publish
+name: Base44 UI Click Publish (Manual Emergency Fallback)
 
 on:
   workflow_dispatch:
     inputs:
       dry_run:
-        description: "Only verify the Publish button is visible/clickable"
+        description: "Only verify that the Publish control is reachable"
         required: true
         type: choice
-        default: "false"
+        default: "true"
         options:
-          - "false"
           - "true"
-  workflow_run:
-    workflows:
-      - ClientSurge Release Gate
-    types:
-      - completed
-    branches:
-      - main
+          - "false"
 
 permissions:
   contents: read
 
 concurrency:
-  group: base44-ui-click-publish-production
+  group: clientsurge-production-release
   cancel-in-progress: false
 
 jobs:
   click-publish:
-    name: Click Base44 Publish button
+    name: Manually invoke Base44 Publish button fallback
     runs-on: ubuntu-latest
     timeout-minutes: 25
-    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
+    environment: production
 
     env:
       BASE44_STORAGE_STATE_JSON: ${{ secrets.BASE44_STORAGE_STATE_JSON }}
@@ -40,10 +33,10 @@ jobs:
       BASE44_UI_PUBLISH_PROOF_PATH: tmp/base44-ui-click-publish-proof.json
 
     steps:
-      - name: Checkout source
+      - name: Checkout current main
         uses: actions/checkout@v4
         with:
-          ref: ${{ github.event.workflow_run.head_sha || github.sha }}
+          ref: main
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -57,34 +50,32 @@ jobs:
           npm ci --prefix tools/browser-audit
           npm run --prefix tools/browser-audit install:browsers
 
-      - name: Verify Base44 UI session secret
+      - name: Verify Base44 UI session
         shell: bash
         run: |
           if [ -z "$BASE44_STORAGE_STATE_JSON" ] && [ -z "$BASE44_AUTH_JSON" ]; then
-            echo "BASE44_STORAGE_STATE_JSON is missing and BASE44_AUTH_JSON/BASE_44_AUTH_JSON is also missing." >&2
-            echo "For literal UI click publishing, add BASE44_STORAGE_STATE_JSON from a logged-in Base44 Playwright storageState JSON." >&2
-            echo "BASE44_AUTH_JSON can be used as an Authorization header helper, but storageState is the most reliable way to render the editor UI." >&2
+            echo "Base44 UI authentication is missing." >&2
             exit 1
           fi
 
-      - name: Build before UI publish
+      - name: Build before fallback publish
         run: npm run build
 
-      - name: Click Base44 Publish button
+      - name: Invoke Publish control
         shell: bash
         run: |
           mkdir -p tmp
-          if [ "${{ github.event_name }}" = "workflow_dispatch" ] && [ "${{ inputs.dry_run }}" = "true" ]; then
+          if [ "${{ inputs.dry_run }}" = "true" ]; then
             npm run base44:publish-ui -- --dry-run --headless --timeout-ms 180000 --output "$BASE44_UI_PUBLISH_PROOF_PATH"
           else
             npm run base44:publish-ui -- --yes --headless --timeout-ms 180000 --output "$BASE44_UI_PUBLISH_PROOF_PATH"
           fi
 
-      - name: Upload UI publish proof
+      - name: Upload fallback proof
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: base44-ui-click-publish-proof-${{ github.run_id }}-${{ github.run_attempt }}
+          name: manual-base44-ui-fallback-${{ github.run_id }}-${{ github.run_attempt }}
           path: tmp/base44-ui-click-publish-proof.json
           if-no-files-found: warn
           retention-days: 30
@@ -92,9 +83,6 @@ jobs:
       - name: Summary
         if: always()
         run: |
-          echo "## Base44 UI Click Publish" >> "$GITHUB_STEP_SUMMARY"
-          echo "- App ID: 69dc4a79656fdba136d413d3" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Trigger: ClientSurge Release Gate success on main, or manual dispatch" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Dashboard URL: $BASE44_DASHBOARD_URL" >> "$GITHUB_STEP_SUMMARY"
-          echo "- Proof artifact: base44-ui-click-publish-proof-$GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" >> "$GITHUB_STEP_SUMMARY"
-          echo "- If this fails at login, refresh the BASE44_STORAGE_STATE_JSON repository secret." >> "$GITHUB_STEP_SUMMARY"
+          echo "## Manual Base44 UI Fallback" >> "$GITHUB_STEP_SUMMARY"
+          echo "- This workflow no longer auto-triggers after every main release." >> "$GITHUB_STEP_SUMMARY"
+          echo "- Canonical deployment: ClientSurge Production Release." >> "$GITHUB_STEP_SUMMARY"
