@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { RefreshCw, ShieldCheck } from 'lucide-react';
 import AdminActionResult from './AdminActionResult';
+import DashboardTrustScorePanel from './DashboardTrustScorePanel';
 import { errorToAdminActionResult, normalizeAdminActionResult } from '@/lib/adminActionResult';
 
 export default function AdminReconciliationButton({ onComplete }) {
@@ -71,29 +72,33 @@ export default function AdminReconciliationButton({ onComplete }) {
   };
 
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        <button
-          onClick={handleRun}
-          disabled={running}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-muted text-foreground font-semibold text-sm hover:bg-muted/80 transition-opacity disabled:opacity-60"
-          style={{ minHeight: 'unset', minWidth: 'unset' }}
-        >
-          <RefreshCw className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
-          {running ? 'Working...' : 'Admin Reconciliation'}
-        </button>
-        <button
-          onClick={handleTrackC}
-          disabled={running}
-          className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 font-semibold text-sm hover:bg-blue-100 transition-opacity disabled:opacity-60"
-          style={{ minHeight: 'unset', minWidth: 'unset' }}
-        >
-          <ShieldCheck className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
-          Track C Cleanup
-        </button>
+    <div className="space-y-4">
+      <div className="space-y-3">
+        <div className="flex flex-wrap gap-2">
+          <button
+            onClick={handleRun}
+            disabled={running}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-border bg-muted text-foreground font-semibold text-sm hover:bg-muted/80 transition-opacity disabled:opacity-60"
+            style={{ minHeight: 'unset', minWidth: 'unset' }}
+          >
+            <RefreshCw className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
+            {running ? 'Working...' : 'Admin Reconciliation'}
+          </button>
+          <button
+            onClick={handleTrackC}
+            disabled={running}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-lg border border-blue-200 bg-blue-50 text-blue-800 font-semibold text-sm hover:bg-blue-100 transition-opacity disabled:opacity-60"
+            style={{ minHeight: 'unset', minWidth: 'unset' }}
+          >
+            <ShieldCheck className={`w-4 h-4 ${running ? 'animate-spin' : ''}`} />
+            Track C Cleanup
+          </button>
+        </div>
+
+        <AdminActionResult result={result} onRetry={!running && lastAction ? lastAction : null} onDismiss={() => setResult(null)} />
       </div>
 
-      <AdminActionResult result={result} onRetry={!running && lastAction ? lastAction : null} onDismiss={() => setResult(null)} />
+      <DashboardTrustScorePanel />
     </div>
   );
 }
