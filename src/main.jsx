@@ -4,6 +4,7 @@ import App from '@/App.jsx'
 import '@/index.css'
 import '@/design-tokens.css'
 import '@/design-system.css'
+import '@/styles/public-electric-blue-audit.css'
 import '@/admin-mobile-hotfix.css'
 import '@/area10-mobile-a11y.css'
 import { installAdminMobileRuntime } from '@/lib/adminMobileRuntime'
@@ -52,7 +53,7 @@ function showFatalError(message) {
     width: '64px',
     height: '64px',
     borderRadius: '16px',
-    background: 'linear-gradient(135deg,#003B8F,#00AEEF)',
+    background: 'linear-gradient(135deg,#007ABF,#00A1EA 55%,#1DB6F0)',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
@@ -83,7 +84,7 @@ function showFatalError(message) {
     minWidth: '44px',
     padding: '10px 24px',
     borderRadius: '999px',
-    background: 'linear-gradient(90deg,#0079c1,#005691)',
+    background: 'linear-gradient(135deg,#007ABF,#00A1EA 55%,#1DB6F0)',
     color: '#fff',
     fontWeight: '700',
     border: 'none',
