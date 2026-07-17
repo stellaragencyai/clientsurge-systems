@@ -1,12 +1,20 @@
 import { useState } from 'react';
 import { base44 } from '@/api/base44Client';
 import { AlertTriangle, CheckCircle2, Loader2, RefreshCw, ShieldCheck } from 'lucide-react';
+import { classifyDashboardTruth } from '@/lib/dashboardTruthMatrix';
 
 const BAND_STYLE = {
   trusted: 'border-green-200 bg-green-50 text-green-800',
   warning: 'border-amber-200 bg-amber-50 text-amber-800',
   blocked: 'border-red-200 bg-red-50 text-red-800',
   no_evidence: 'border-slate-200 bg-slate-50 text-slate-700',
+};
+
+const CLASSIFICATION_STYLE = {
+  Trusted: 'border-green-200 bg-green-50 text-green-800',
+  Unverified: 'border-amber-200 bg-amber-50 text-amber-800',
+  Broken: 'border-red-200 bg-red-50 text-red-800',
+  'Needs Instrumentation': 'border-blue-200 bg-blue-50 text-blue-800',
 };
 
 export default function DashboardTrustScorePanel() {
@@ -27,7 +35,20 @@ export default function DashboardTrustScorePanel() {
     }
   };
 
-  const rows = report?.results || [];
+  const rows = (report?.results || []).map((row) => ({
+    ...row,
+    truth_matrix: classifyDashboardTruth({
+      ...row,
+      source_records: row.source_records || row.dashboard_truth_score?.source_records || {},
+    }),
+  }));
+
+  const classificationCounts = rows.reduce((counts, row) => {
+    const key = row.truth_matrix.classification;
+    counts[key] = (counts[key] || 0) + 1;
+    return counts;
+  }, {});
+
   return (
     <div className="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex flex-wrap items-start justify-between gap-3">
@@ -36,7 +57,7 @@ export default function DashboardTrustScorePanel() {
             <ShieldCheck className="h-4 w-4 text-slate-700" />
             <h3 className="text-sm font-semibold text-slate-900">Dashboard Trust Scoring</h3>
           </div>
-          <p className="mt-1 text-xs text-slate-500">Evidence-backed score only. Blockers always prevent a Trusted result.</p>
+          <p className="mt-1 text-xs text-slate-500">Every status is classified as Trusted, Unverified, Broken, or Needs Instrumentation. Unsupported confidence is never shown as trusted.</p>
         </div>
         <div className="flex gap-2">
           <button onClick={() => run(true)} disabled={running} className="inline-flex items-center gap-1.5 rounded-lg border border-blue-200 bg-blue-50 px-3 py-2 text-xs font-semibold text-blue-700 disabled:opacity-50">
@@ -60,17 +81,36 @@ export default function DashboardTrustScorePanel() {
               </div>
             ))}
           </div>
+
+          <div className="grid gap-2 sm:grid-cols-4">
+            {['Trusted', 'Unverified', 'Broken', 'Needs Instrumentation'].map((classification) => (
+              <div key={classification} className={`rounded-lg border p-3 ${CLASSIFICATION_STYLE[classification]}`}>
+                <p className="text-[10px] font-bold uppercase tracking-wide opacity-70">{classification}</p>
+                <p className="text-lg font-bold">{classificationCounts[classification] || 0}</p>
+              </div>
+            ))}
+          </div>
+
           <p className="text-[11px] text-slate-500">Mode: {report.dry_run ? 'Dry run — no records changed' : 'Persisted to DashboardTruthCheck'} · Request ID: {report.request_id}</p>
           {rows.length > 0 && (
-            <div className="max-h-72 overflow-auto rounded-lg border border-slate-200">
+            <div className="max-h-96 overflow-auto rounded-lg border border-slate-200">
               {rows.slice(0, 25).map((row) => (
                 <div key={row.id} className="border-b border-slate-100 p-3 last:border-0">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <span className="text-xs font-semibold text-slate-800">{row.business_name || row.id}</span>
-                    <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${BAND_STYLE[row.trust_band] || BAND_STYLE.no_evidence}`}>{row.trust_score}/100 · {row.trust_band}</span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${CLASSIFICATION_STYLE[row.truth_matrix.classification]}`}>
+                        {row.truth_matrix.classification}
+                      </span>
+                      <span className={`rounded-full border px-2 py-0.5 text-[10px] font-bold ${BAND_STYLE[row.trust_band] || BAND_STYLE.no_evidence}`}>{row.trust_score}/100 · {row.trust_band}</span>
+                    </div>
                   </div>
+                  <p className="mt-1 text-[11px] font-medium text-slate-600">{row.truth_matrix.reason}</p>
                   <p className="mt-1 text-[11px] text-slate-500">Blockers {row.blocker_count} · Warnings {row.warning_count} · Stale {row.stale_source_count} · Missing {row.missing_source_count} · Evidence {row.evidence_count}</p>
                   <p className="mt-1 text-[10px] text-slate-400">Penalties: blockers {row.trust_penalties?.blockers || 0}, warnings {row.trust_penalties?.warnings || 0}, stale {row.trust_penalties?.stale_sources || 0}, missing {row.trust_penalties?.missing_sources || 0}</p>
+                  {row.truth_matrix.legacy_dependencies.length > 0 && (
+                    <p className="mt-1 text-[10px] font-semibold text-amber-700">Legacy dependencies: {row.truth_matrix.legacy_dependencies.join(', ')}</p>
+                  )}
                 </div>
               ))}
             </div>
