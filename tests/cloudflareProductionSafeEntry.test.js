@@ -152,6 +152,66 @@ test("recovers a Base44 public-route cache miss from the root SPA shell", async 
   }
 });
 
+test("client portal gets the sanitized SPA shell instead of a private-route 403", async () => {
+  const previousFetch = globalThis.fetch;
+  const calls = [];
+
+  globalThis.fetch = async (input) => {
+    const target = new URL(typeof input === "string" ? input : input.url);
+    calls.push(`${target.hostname}${target.pathname}`);
+    assert.equal(target.hostname, "grinning-apex-flow-growth.base44.app");
+
+    if (target.pathname === "/") {
+      return new Response(RAW_BASE44_SHELL, {
+        status: 200,
+        headers: { "content-type": "text/html; charset=utf-8" },
+      });
+    }
+
+    return new Response("Cache miss", {
+      status: 500,
+      statusText: "Cache miss",
+      headers: { "content-type": "text/plain; charset=utf-8" },
+    });
+  };
+
+  try {
+    const response = await safeEntry.fetch(
+      new Request("https://clientsurgesystems.com/client-portal", {
+        headers: { accept: "text/html", "sec-fetch-mode": "navigate" },
+      }),
+      {},
+      {},
+    );
+    const body = await response.text();
+
+    assert.equal(response.status, 200);
+    assert.equal(response.headers.get("x-clientsurge-client-portal-edge"), "app-shell");
+    assert.match(response.headers.get("x-clientsurge-app-shell-fallback") || "", /from=\/client-portal/);
+    assert.match(response.headers.get("x-robots-tag") || "", /noindex/);
+    assert.ok(calls.includes("grinning-apex-flow-growth.base44.app/"));
+    assert.doesNotMatch(body, /Cache miss|Login Required|manages 5 data types/i);
+    assert.match(body, /<script type="module" src="\/src\/main\.jsx"><\/script>/);
+  } finally {
+    globalThis.fetch = previousFetch;
+  }
+});
+
+test("legacy client dashboard redirects to the canonical client portal", async () => {
+  const response = await safeEntry.fetch(
+    new Request("https://clientsurgesystems.com/client-dashboard?tab=billing", {
+      headers: { accept: "text/html" },
+    }),
+    {},
+    {},
+  );
+
+  assert.equal(response.status, 308);
+  assert.equal(response.headers.get("x-clientsurge-client-dashboard-redirect"), "canonical-client-portal");
+  assert.equal(response.headers.get("location"), "https://clientsurgesystems.com/client-portal?tab=billing");
+  assert.match(response.headers.get("x-robots-tag") || "", /noindex/);
+});
+
 test("private routes remain blocked and are never converted to a public SPA fallback", async () => {
   const response = await safeEntry.fetch(
     new Request("https://clientsurgesystems.com/admin", {
