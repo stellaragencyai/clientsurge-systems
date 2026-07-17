@@ -4,21 +4,58 @@
  * duplicated AdminDashboard sidebar is consolidated with AdminShell.
  */
 
-/* Admin dashboard brand: render at 150% of the previous 32px height and anchor it
- * to the upper-left edge of the sidebar header. */
+/* Admin dashboard brand: increase the original 32px logo by 200% to 96px. */
 img[src*="9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"] {
   display: block !important;
   width: auto !important;
-  height: 48px !important;
+  height: 96px !important;
   max-width: 100%;
+  object-fit: contain;
 }
 
 div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"]
   > div:has(img[src*="9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"]) {
   display: flex !important;
-  align-items: flex-start !important;
+  align-items: center !important;
   justify-content: flex-start !important;
+  min-height: 118px;
   padding: 0.75rem 0.75rem 0.5rem !important;
+}
+
+/* Keep Need help? and Logout on one baseline with identical sizing. */
+.cs-admin-header-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 0 0 auto;
+}
+
+.cs-admin-header-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 36px;
+  padding: 0.5rem 0.9rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  background: #fff;
+  color: #475569;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color 160ms ease, border-color 160ms ease, color 160ms ease;
+}
+
+.cs-admin-header-action:hover {
+  border-color: #cbd5e1;
+  background: #f8fafc;
+  color: #0f172a;
+}
+
+.cs-admin-header-logout {
+  cursor: pointer;
 }
 
 @media (max-width: 1023px) {
@@ -50,6 +87,16 @@ div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"]
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .cs-admin-header-actions {
+    gap: 0.35rem;
+  }
+
+  .cs-admin-header-action {
+    min-height: 34px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.7rem;
   }
 
   /* Admin page content: reclaim width on small screens. */
@@ -196,6 +243,14 @@ div[class*="fixed"][class*="inset-y-0"][class*="left-0"][class*="z-40"]
 }
 
 @media (max-width: 640px) {
+  .cs-admin-header-actions {
+    display: none;
+  }
+
+  img[src*="9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"] {
+    height: 72px !important;
+  }
+
   div[class*="grid"][class*="grid-cols-2"] {
     gap: 0.65rem !important;
   }
