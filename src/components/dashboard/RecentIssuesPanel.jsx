@@ -1,6 +1,6 @@
 import { AlertTriangle, ChevronDown, ChevronUp } from "lucide-react";
 import { groupFailedEventsByCategory, getFriendlyEventLabel } from "@/lib/dashboardHelpers";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { getCardState } from "@/lib/portalStateEngine";
 import PortalAdminDiagnostics from "@/components/portal/PortalAdminDiagnostics";
 
@@ -10,9 +10,12 @@ function eventKey(event, index) {
 
 export default function RecentIssuesPanel({ events = [], isAdmin = false, portalState }) {
   const [expanded, setExpanded] = useState({});
-  const groups = groupFailedEventsByCategory(events);
+  const groups = useMemo(() => groupFailedEventsByCategory(events), [events]);
   const cardState = getCardState(portalState, "automation_health");
-  const totalIssues = groups.reduce((sum, group) => sum + group.count, 0);
+  const totalIssues = useMemo(
+    () => groups.reduce((sum, group) => sum + group.count, 0),
+    [groups]
+  );
 
   if (groups.length === 0) {
     return null;
