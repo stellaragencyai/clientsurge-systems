@@ -62,6 +62,8 @@ const NAV_GROUPS = [
   {
     group: "System",
     items: [
+      { id: "broken-flows", label: "Broken Flows", icon: Ban, path: "/admin/broken-flows" },
+      { id: "publish-drift", label: "Publish Drift", icon: Server, path: "/admin/publish-drift" },
       { id: "ops-verification", label: "Ops Verification Center", icon: ShieldCheck, path: "/admin/ops-verification" },
       { id: "inbound-readiness", label: "Inbound Readiness", icon: ShieldCheck, path: "/admin/inbound-readiness" },
       { id: "sprint2-blockers", label: "Sprint 2 Blockers", icon: Ban, path: "/admin/sprint2-blockers" },
@@ -122,7 +124,6 @@ export default function AdminShell({ children, title, activeId }) {
 
   const handleNavClick = (item) => {
     if (item.tab) {
-      // Navigate to /admin with a ?tab= param so AdminDashboard can pick it up
       navigate(`/admin?tab=${item.tab}`);
     } else {
       navigate(item.path);
@@ -149,13 +150,11 @@ export default function AdminShell({ children, title, activeId }) {
   return (
     <AdminSessionGuard isAdmin={isAdmin}>
     <div className="min-h-screen bg-background flex overflow-x-hidden">
-      {/* Sidebar */}
       <div
         className={`fixed lg:static inset-y-0 left-0 z-40 w-[min(20rem,86vw)] lg:w-64 bg-background border-r border-border transition-transform duration-300 lg:translate-x-0 shadow-2xl lg:shadow-none pt-[env(safe-area-inset-top)] lg:pt-0 ${
           sidebarOpen ? "translate-x-0" : "-translate-x-full"
         } flex flex-col`}
       >
-        {/* Logo */}
         <div className="p-4 border-b border-border">
           <button
             onClick={() => navigate("/admin")}
@@ -165,7 +164,6 @@ export default function AdminShell({ children, title, activeId }) {
           </button>
         </div>
 
-        {/* Search */}
         <div className="px-3 py-2 border-b border-border">
           <AdminGlobalSearch
             onNavigate={(tab) => {
@@ -175,7 +173,6 @@ export default function AdminShell({ children, title, activeId }) {
           />
         </div>
 
-        {/* Nav */}
         <nav className="flex-1 p-3 overflow-y-auto space-y-4 overscroll-contain">
           {NAV_GROUPS.map(({ group, items }) => (
             <div key={group}>
@@ -216,7 +213,6 @@ export default function AdminShell({ children, title, activeId }) {
           ))}
         </nav>
 
-        {/* User */}
         <div className="p-4 border-t border-border space-y-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="px-4 py-2">
             <p className="text-xs text-muted-foreground">Signed in as</p>
@@ -233,9 +229,7 @@ export default function AdminShell({ children, title, activeId }) {
         </div>
       </div>
 
-      {/* Main */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Bar */}
         <div className="bg-background/95 backdrop-blur border-b border-border px-3 sm:px-6 py-2.5 sm:py-3 flex items-center justify-between sticky top-0 z-10 pt-[max(0.625rem,env(safe-area-inset-top))] lg:pt-3">
           <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <button
@@ -289,13 +283,11 @@ export default function AdminShell({ children, title, activeId }) {
           </div>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-auto p-3 sm:p-6 pb-[max(1rem,env(safe-area-inset-bottom))]">
           <div className="max-w-7xl mx-auto min-w-0">{children}</div>
         </div>
       </div>
 
-      {/* Mobile Overlay */}
       {sidebarOpen && (
         <div
           onClick={() => setSidebarOpen(false)}
