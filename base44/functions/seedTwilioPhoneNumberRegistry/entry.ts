@@ -1,6 +1,7 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.39";
 
 const SHARED_MESSAGING_SERVICE_SID = "MG01671b8a8ce56066b9f36e9f50463cee";
+const CANONICAL_INBOUND_SMS_WEBHOOK = "https://clientsurgesystems.com/functions/receiveTwilioInboundSms";
 
 const REGISTRY = [
   {
@@ -17,7 +18,7 @@ const REGISTRY = [
     voice_enabled: true,
     automated_sending_allowed: true,
     approval_status: "approved",
-    inbound_sms_webhook_url: "https://clientsurgesystems.com/api/functions/receiveTwilioInboundSms",
+    inbound_sms_webhook_url: CANONICAL_INBOUND_SMS_WEBHOOK,
     voice_webhook_url: "https://clientsurgesystems.com/functions/receiveInboundVoiceCall",
     status_callback_url: "https://clientsurgesystems.com/functions/receiveTwilioSmsStatusCallback",
     is_public: true,
@@ -41,7 +42,7 @@ const REGISTRY = [
     voice_enabled: true,
     automated_sending_allowed: true,
     approval_status: "approved",
-    inbound_sms_webhook_url: "https://clientsurgesystems.com/api/functions/receiveTwilioInboundSms",
+    inbound_sms_webhook_url: CANONICAL_INBOUND_SMS_WEBHOOK,
     voice_webhook_url: "https://clientsurgesystems.com/functions/receiveInboundVoiceCall",
     status_callback_url: "https://clientsurgesystems.com/functions/receiveTwilioSmsStatusCallback",
     is_public: false,
