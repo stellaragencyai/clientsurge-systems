@@ -6,11 +6,11 @@
  */
 import { lazy, Suspense } from "react";
 import {
-  Bell, TrendingUp, Zap, Target, Rocket,
-  ArrowRight, ShieldCheck, AlertCircle, CheckCircle2, Info, Clock,
+  Zap, Target, Rocket,
+  ArrowRight, ShieldCheck, AlertCircle, Info, Clock,
 } from "lucide-react";
 import { getCardState, CARD_STATUS } from "@/lib/portalStateEngine";
-import { translateCard, getClientStatusConfig } from "@/lib/clientStatusLanguage";
+import { translateCard } from "@/lib/clientStatusLanguage";
 import CSCard from "@/components/design-system/CSCard";
 import CSButton from "@/components/design-system/CSButton";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
@@ -20,6 +20,7 @@ import ClientActionCenter from "./ClientActionCenter";
 import ClientNotificationCenter from "./ClientNotificationCenter";
 import PortalTrustStrip from "./PortalTrustStrip";
 import PortalStatusTimeline from "./PortalStatusTimeline";
+import PremiumCommandCenter from "@/components/dashboard/PremiumCommandCenter";
 
 const PortalLazy = ({ children }) => (
   <Suspense fallback={<div className="h-32 rounded-xl bg-muted/30 animate-pulse" />}>{children}</Suspense>
@@ -54,26 +55,16 @@ export default function PortalDashboardOverview({
   const activeCount = services.filter((s) => s.install_status === "Live").length;
   const totalCount = services.length;
 
-  // Phase A.1: Use normalized portal state for truth-validated display values
   const systemReadinessCard = getCardState(portalState, "system_readiness");
   const automationHealthCard = getCardState(portalState, "automation_health");
-  const leadCaptureCard = getCardState(portalState, "lead_capture");
-  const billingCard = getCardState(portalState, "billing");
-
-  // Phase 4.1: Use centralized client status language for all status labels
   const systemReadinessTranslated = translateCard(systemReadinessCard);
   const readinessStatus = systemReadinessTranslated.friendlyStatus;
-  const automationHealthTranslated = translateCard(automationHealthCard);
 
-  // Quick Start is complete only when BOTH flags are true
   const quickStartDone = project?.quick_start_completed === true && project?.onboarding_wizard_completed === true;
-
-  // Services value from normalized state — never fake 0/0
   const servicesValue = portalStateLoading
     ? "Syncing"
     : (totalCount > 0 ? `${activeCount}/${totalCount}` : "Pending");
 
-  // Derive deployment from portalState meta for action center
   const deployment = portalState?.meta?.deployment_id
     ? {
         id: portalState.meta.deployment_id,
@@ -84,14 +75,12 @@ export default function PortalDashboardOverview({
       }
     : null;
 
-  // Issues count comes from normalized state, not raw events
   const issuesValue = portalStateLoading
     ? "—"
     : (automationHealthCard?.status === CARD_STATUS.LIVE ? "0" : "Review");
 
   return (
     <div className="space-y-6">
-      {/* Client Action Center — Phase 4.4 Phase 2 */}
       <ClientActionCenter
         project={project}
         deployment={deployment}
@@ -103,7 +92,6 @@ export default function PortalDashboardOverview({
         onNavigate={navigateTab}
       />
 
-      {/* Client-data scoping notice */}
       <CSCard className="!p-3 !bg-blue-50/50" hover={false}>
         <div className="flex items-center gap-2.5">
           <Info className="w-4 h-4 text-[#0088CC] flex-shrink-0" />
@@ -115,7 +103,6 @@ export default function PortalDashboardOverview({
         </div>
       </CSCard>
 
-      {/* Welcome header — premium gradient banner */}
       <div
         className="rounded-2xl p-6 flex items-center justify-between flex-wrap gap-4"
         style={{
@@ -136,11 +123,11 @@ export default function PortalDashboardOverview({
               Welcome back, {project?.business_name || user?.full_name || "Client"}
             </h2>
             <p className="text-xs text-gray-500 mt-0.5">
-                Your system status:{" "}
-                <span className="font-semibold text-gray-700">
-                  {portalStateLoading ? "Syncing Data" : readinessStatus}
-                </span>
-              </p>
+              Your system status:{" "}
+              <span className="font-semibold text-gray-700">
+                {portalStateLoading ? "Syncing Data" : readinessStatus}
+              </span>
+            </p>
           </div>
         </div>
         <CSButton
@@ -153,17 +140,21 @@ export default function PortalDashboardOverview({
         </CSButton>
       </div>
 
-      {/* Trust strip — Phase 4.4 Phase 6 */}
       <PortalTrustStrip
         portalState={portalState}
         portalStateLoading={portalStateLoading}
         deployment={deployment}
       />
 
-      {/* System status timeline — visual progress from Payment → Monitoring */}
+      <PremiumCommandCenter
+        services={services}
+        healthData={healthData}
+        portalState={portalState}
+        navigateTab={navigateTab}
+      />
+
       <PortalStatusTimeline project={project} portalOrder={portalOrder} />
 
-      {/* Payment failed / missing assets banners */}
       <PortalLazy>
         <PaymentFailedBanner subscription={subscription} order={portalOrder} />
       </PortalLazy>
@@ -171,11 +162,8 @@ export default function PortalDashboardOverview({
         <OnboardingMissingAssetsBanner project={project} onNavigate={navigateTab} />
       </PortalLazy>
 
-      {/* Main grid: 70/30 split */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Main column (2/3) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* System Status section — primary, visually dominant */}
           <div className="rounded-2xl bg-white border border-gray-100 p-5 shadow-sm">
             <div className="flex items-center justify-between mb-4">
               <CSSectionHeader
@@ -184,7 +172,6 @@ export default function PortalDashboardOverview({
                 align="left"
                 className="mb-0"
               />
-              {/* Last updated indicator — Enhancement #14 */}
               <div className="flex items-center gap-2">
                 {project?.updated_date ? (
                   <span className="text-[10px] text-gray-400 flex items-center gap-1">
@@ -200,31 +187,30 @@ export default function PortalDashboardOverview({
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-               <PortalMetricCard
-                 icon={Rocket}
-                 label="Services Active"
-                 value={servicesValue}
-                 accent="#0088CC"
-                 onClick={() => navigateTab("performance")}
-               />
-               <PortalMetricCard
-                 icon={Zap}
-                 label="Quick Start"
-                 value={quickStartDone ? "Done" : "Pending"}
-                 accent={quickStartDone ? "#10B981" : "#D4AF37"}
-                 onClick={() => navigateTab("quickstart")}
-               />
-               <PortalMetricCard
-                 icon={AlertCircle}
-                 label="Recent Issues"
-                 value={issuesValue}
-                 accent={issuesValue === "0" ? "#10B981" : "#D4AF37"}
-                 onClick={() => navigateTab("performance")}
-               />
-             </div>
+              <PortalMetricCard
+                icon={Rocket}
+                label="Services Active"
+                value={servicesValue}
+                accent="#0088CC"
+                onClick={() => navigateTab("performance")}
+              />
+              <PortalMetricCard
+                icon={Zap}
+                label="Quick Start"
+                value={quickStartDone ? "Done" : "Pending"}
+                accent={quickStartDone ? "#10B981" : "#D4AF37"}
+                onClick={() => navigateTab("quickstart")}
+              />
+              <PortalMetricCard
+                icon={AlertCircle}
+                label="Recent Issues"
+                value={issuesValue}
+                accent={issuesValue === "0" ? "#10B981" : "#D4AF37"}
+                onClick={() => navigateTab("performance")}
+              />
+            </div>
           </div>
 
-          {/* Launch Readiness — secondary, smaller */}
           <PortalLazy>
             <LaunchReadinessPanel
               order={portalOrder}
@@ -233,7 +219,6 @@ export default function PortalDashboardOverview({
             />
           </PortalLazy>
 
-          {/* Active Automations */}
           <PortalLazy>
             <ActiveAutomationsPanel
               packageKey={portalOrder?.package_type || portalOrder?.selected_package_type}
@@ -245,9 +230,7 @@ export default function PortalDashboardOverview({
           </PortalLazy>
         </div>
 
-        {/* Side column (1/3) */}
         <div className="space-y-6">
-          {/* Notification Center — Phase 4.5: powered by useClientNotifications hook */}
           <ClientNotificationCenter
             notifications={notifications}
             unreadCount={unreadCount}
@@ -255,12 +238,10 @@ export default function PortalDashboardOverview({
             onMarkAllAsRead={onMarkAllAsRead}
           />
 
-          {/* Getting Started / Action Required */}
           <PortalLazy>
             <GettingStartedBanner project={project} order={portalOrder} />
           </PortalLazy>
 
-          {/* Quick Start upsell — secondary, compact */}
           {!quickStartDone && (
             <PortalActionCard
               icon={Zap}
@@ -272,7 +253,6 @@ export default function PortalDashboardOverview({
             />
           )}
 
-          {/* Billing — secondary, compact */}
           <PortalActionCard
             icon={ShieldCheck}
             title="Manage Your Plan"
@@ -282,7 +262,6 @@ export default function PortalDashboardOverview({
             onClick={() => navigateTab("billing")}
           />
 
-          {/* Support — secondary, compact */}
           <PortalActionCard
             icon={Target}
             title="Need Help?"
