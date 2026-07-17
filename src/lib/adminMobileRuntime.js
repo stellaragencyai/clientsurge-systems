@@ -21,6 +21,54 @@ function findAdminMenuButton() {
   });
 }
 
+function findAdminLogoutButton() {
+  return Array.from(document.querySelectorAll('button')).find((button) => {
+    const label = `${button.getAttribute('aria-label') || ''} ${button.textContent || ''}`.trim().toLowerCase();
+    return label === 'logout' || label === 'sign out' || label === 'signout';
+  });
+}
+
+function ensureAdminHeaderActions() {
+  if (typeof document === 'undefined' || !isAdminRoute()) return;
+
+  const topBar = Array.from(document.querySelectorAll('div')).find((element) => {
+    const className = String(element.className || '');
+    return className.includes('sticky') && className.includes('top-0') && className.includes('z-10') && className.includes('justify-between');
+  });
+
+  if (!topBar || topBar.querySelector('.cs-admin-header-actions')) return;
+
+  const rightSide = topBar.lastElementChild;
+  if (!rightSide) return;
+
+  const actions = document.createElement('div');
+  actions.className = 'cs-admin-header-actions';
+  actions.setAttribute('aria-label', 'Admin account actions');
+
+  const helpLink = document.createElement('a');
+  helpLink.href = '/contact';
+  helpLink.className = 'cs-admin-header-action cs-admin-header-help';
+  helpLink.textContent = 'Need help?';
+  helpLink.setAttribute('aria-label', 'Open ClientSurge support');
+
+  const logoutButton = document.createElement('button');
+  logoutButton.type = 'button';
+  logoutButton.className = 'cs-admin-header-action cs-admin-header-logout';
+  logoutButton.textContent = 'Logout';
+  logoutButton.setAttribute('aria-label', 'Logout');
+  logoutButton.addEventListener('click', () => {
+    const existingLogout = findAdminLogoutButton();
+    if (existingLogout && existingLogout !== logoutButton) {
+      existingLogout.click();
+      return;
+    }
+    window.location.assign('/logout');
+  });
+
+  actions.append(helpLink, logoutButton);
+  rightSide.prepend(actions);
+}
+
 function buildActionBar() {
   if (typeof document === 'undefined') return null;
   let bar = document.querySelector('.cs-admin-mobile-action-bar');
@@ -55,6 +103,7 @@ export function installAdminMobileRuntime() {
 
   const sync = () => {
     ensureRouteClass();
+    ensureAdminHeaderActions();
     syncActionBar();
   };
 
