@@ -2,145 +2,74 @@
   "name": "ConversionTrackingEvent",
   "type": "object",
   "properties": {
-    "event_id": {
+    "event_id": { "type": "string", "title": "Event ID", "description": "Stable idempotency identifier for this event" },
+    "session_id": { "type": "string", "title": "Session ID", "description": "Browser session identifier" },
+    "client_id": { "type": "string", "title": "Client ID", "description": "Owning tenant for attribution and isolation" },
+    "client_project_id": { "type": "string", "title": "Client Project ID", "description": "Linked client project" },
+    "environment": {
       "type": "string",
-      "title": "Event ID",
-      "description": "Unique identifier for this event"
-    },
-    "session_id": {
-      "type": "string",
-      "title": "Session ID",
-      "description": "Browser session identifier"
-    },
-    "client_project_id": {
-      "type": "string",
-      "title": "Client Project ID",
-      "description": "Optional link to client project for later attribution"
+      "title": "Environment",
+      "enum": ["production", "qa", "smoke", "demo", "internal", "unknown"],
+      "default": "unknown"
     },
     "page_key": {
       "type": "string",
       "title": "Page Key",
-      "enum": [
-        "homepage",
-        "med_spa",
-        "dental",
-        "hvac",
-        "roofing",
-        "contractors",
-        "real_estate",
-        "personal_injury",
-        "plumbing",
-        "chiropractic",
-        "pricing"
-      ],
+      "enum": ["homepage", "med_spa", "dental", "hvac", "roofing", "contractors", "real_estate", "personal_injury", "plumbing", "chiropractic", "pricing"],
       "description": "Which landing page triggered the event"
     },
+    "page_url": { "type": "string", "title": "Page URL" },
+    "route": { "type": "string", "title": "Application Route" },
     "event_type": {
       "type": "string",
       "title": "Event Type",
-      "enum": [
-        "page_view",
-        "scroll_depth",
-        "cta_click",
-        "pricing_view",
-        "checkout_click",
-        "form_submit",
-        "demo_booking_click"
-      ],
+      "enum": ["page_view", "scroll_depth", "cta_click", "pricing_view", "checkout_click", "form_submit", "demo_booking_click"],
       "description": "Type of conversion event"
     },
-    "event_label": {
+    "event_label": { "type": "string", "title": "Event Label" },
+    "timestamp": { "type": "string", "title": "Timestamp", "format": "date-time" },
+    "consent_state": {
       "type": "string",
-      "title": "Event Label",
-      "description": "Human-readable label (e.g., 'Get Started Button', 'See Pricing')"
+      "title": "Consent State",
+      "enum": ["granted", "denied", "not_required", "unknown"],
+      "default": "unknown"
     },
-    "timestamp": {
+    "release_version": { "type": "string", "title": "Release Version" },
+    "tracking_version": { "type": "string", "title": "Tracking Version", "default": "v1" },
+    "dashboard_excluded": { "type": "boolean", "title": "Excluded From Dashboards", "default": false },
+    "dashboard_exclusion_reason": { "type": "string", "title": "Dashboard Exclusion Reason" },
+    "dashboard_truth_status": {
       "type": "string",
-      "title": "Timestamp",
-      "format": "date-time",
-      "description": "When the event occurred"
+      "title": "Dashboard Truth Status",
+      "enum": ["unreviewed", "trusted", "blocked", "manual_review"],
+      "default": "unreviewed"
     },
     "metadata": {
       "type": "object",
       "title": "Metadata",
-      "description": "Additional context about the event",
       "properties": {
-        "device_type": {
-          "type": "string",
-          "enum": [
-            "mobile",
-            "tablet",
-            "desktop"
-          ]
-        },
-        "browser": {
-          "type": "string"
-        },
-        "utm_source": {
-          "type": "string"
-        },
-        "utm_medium": {
-          "type": "string"
-        },
-        "utm_campaign": {
-          "type": "string"
-        },
-        "utm_content": {
-          "type": "string"
-        },
-        "referrer": {
-          "type": "string"
-        },
-        "scroll_depth": {
-          "type": "integer",
-          "description": "Scroll depth percentage (0-100)"
-        }
+        "device_type": { "type": "string", "enum": ["mobile", "tablet", "desktop"] },
+        "browser": { "type": "string" },
+        "utm_source": { "type": "string" },
+        "utm_medium": { "type": "string" },
+        "utm_campaign": { "type": "string" },
+        "utm_content": { "type": "string" },
+        "referrer": { "type": "string" },
+        "scroll_depth": { "type": "integer", "description": "Scroll depth percentage (0-100)" }
       }
     }
   },
-  "required": [
-    "event_id",
-    "session_id",
-    "page_key",
-    "event_type",
-    "timestamp"
-  ],
+  "required": ["event_id", "session_id", "page_key", "event_type", "timestamp"],
   "rls": {
-    "create": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
-    },
+    "create": { "user_condition": { "role": ["admin", "super_admin"] } },
     "read": {
       "$or": [
-        {
-          "user_condition": {
-            "role": [
-              "admin",
-              "super_admin"
-            ]
-          }
-        },
-        {
-          "data.client_project_id": "{{client_project_id}}"
-        }
+        { "user_condition": { "role": ["admin", "super_admin"] } },
+        { "data.client_id": "{{client_id}}" },
+        { "data.client_project_id": "{{client_project_id}}" }
       ]
     },
-    "update": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
+    "update": { "user_condition": { "role": ["admin", "super_admin"] } },
+    "delete": { "user_condition": { "role": "admin" } }
   }
 }
