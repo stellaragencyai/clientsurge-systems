@@ -3,9 +3,11 @@ import baseSecurityEdge, {
 } from "./clientsurge-security-edge-worker.mjs";
 import productSignupHotfix from "./clientsurge-product-signup-edge-hotfix.mjs";
 
-const SAFE_ENTRY_VERSION = "2026-07-11-public-route-repair-v3";
+const SAFE_ENTRY_VERSION = "2026-07-17-client-portal-edge-v1";
 const SANITIZED_HEADER = "x-clientsurge-route-exposure-sanitized";
 const APP_SHELL_FALLBACK_HEADER = "x-clientsurge-app-shell-fallback";
+const CLIENT_PORTAL_EDGE_HEADER = "x-clientsurge-client-portal-edge";
+const CLIENT_DASHBOARD_REDIRECT_HEADER = "x-clientsurge-client-dashboard-redirect";
 
 const GENERATED_DIRECTORY_SIGNAL = /(?:ClientSurge Systems manages\s+\d+\s+data types|manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|available pages|app pages|Premium AI-driven automation systems built to increase bookings)/i;
 const PAGES_HEADING_PATTERN = /<h[1-4][^>]*>\s*(?:Pages|Available Pages|App Pages|All Pages)\s*<\/h[1-4]>/i;
@@ -13,7 +15,12 @@ const STATIC_FALLBACK_PATTERN = /<main\b[^>]*class=["'][^"']*\bstatic-fallback\b
 const ROOT_OPEN_PATTERN = /<div\b[^>]*\bid=["']root["'][^>]*>/i;
 const BODY_OPEN_PATTERN = /<body\b[^>]*>/i;
 const REACT_BOOTSTRAP_PATTERN = /<script\b[^>]*\btype=["']module["'][^>]*\bsrc=["'][^"']+["'][^>]*><\/script>/i;
-const PRIVATE_PATH_PATTERN = /^\/(?:admin|dashboard|client|client-portal|client-dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44)(?:\/|$)/i;
+
+// Private/internal routes still fail closed. The canonical client portal is
+// intentionally excluded so the SPA shell can render and Base44 auth can gate it.
+const PRIVATE_PATH_PATTERN = /^\/(?:admin|dashboard|client-saas|dashboard-entry|onboarding|setup|functions?|function|internal|private|install|audit|observability|reconciliation|mission-control|saas|lead-intelligence|sam|medspa-dashboard|api|base44)(?:\/|$)/i;
+const CLIENT_PORTAL_PATH_PATTERN = /^\/(?:client-portal|ClientPortal)\/?$/;
+const CLIENT_DASHBOARD_PATH_PATTERN = /^\/(?:client-dashboard|ClientDashboard)\/?$/;
 const ASSET_PATH_PATTERN = /\.(?:js|mjs|css|map|json|png|jpe?g|gif|svg|webp|ico|txt|xml|woff2?|ttf|otf|wasm|pdf|zip)(?:$|\?)/i;
 
 function normalizePathname(pathname = "/") {
@@ -25,6 +32,14 @@ function isProductSignupRequest(request) {
   if (request.method !== "GET" && request.method !== "HEAD") return false;
   const pathname = normalizePathname(new URL(request.url).pathname);
   return pathname === "/product-signup" || pathname === "/product-sign-up";
+}
+
+function isClientPortalPath(pathname = "/") {
+  return CLIENT_PORTAL_PATH_PATTERN.test(normalizePathname(pathname));
+}
+
+function isLegacyClientDashboardPath(pathname = "/") {
+  return CLIENT_DASHBOARD_PATH_PATTERN.test(normalizePathname(pathname));
 }
 
 function isHtmlResponse(response) {
@@ -47,31 +62,19 @@ function containsVisibleGeneratedDirectory(html = "") {
   return containsGeneratedDirectory(visibleHtmlOnly(html));
 }
 
-/**
- * Base44 has emitted the generated page directory in two locations across
- * production variants: before #root, and as a sibling immediately before the
- * app's static fallback inside #root. Strip either injected segment while
- * preserving the actual React root, fallback, and module bootstrap.
- */
 export function stripInjectedDirectoryBeforeRoot(html = "") {
   const source = String(html || "");
   const bodyMatch = BODY_OPEN_PATTERN.exec(source);
   const rootMatch = ROOT_OPEN_PATTERN.exec(source);
 
-  if (!bodyMatch || !rootMatch) {
-    return { html: source, changed: false, reason: "markers_missing" };
-  }
+  if (!bodyMatch || !rootMatch) return { html: source, changed: false, reason: "markers_missing" };
 
   const bodyContentStart = bodyMatch.index + bodyMatch[0].length;
   const rootStart = rootMatch.index;
-  if (rootStart <= bodyContentStart) {
-    return { html: source, changed: false, reason: "invalid_marker_order" };
-  }
+  if (rootStart <= bodyContentStart) return { html: source, changed: false, reason: "invalid_marker_order" };
 
   const injectedSegment = source.slice(bodyContentStart, rootStart);
-  if (!containsGeneratedDirectory(injectedSegment)) {
-    return { html: source, changed: false, reason: "no_directory_before_root" };
-  }
+  if (!containsGeneratedDirectory(injectedSegment)) return { html: source, changed: false, reason: "no_directory_before_root" };
 
   return {
     html: source.slice(0, bodyContentStart) + "\n" + source.slice(rootStart),
@@ -85,20 +88,14 @@ export function stripInjectedDirectoryBeforeFallback(html = "") {
   const rootMatch = ROOT_OPEN_PATTERN.exec(source);
   const fallbackMatch = STATIC_FALLBACK_PATTERN.exec(source);
 
-  if (!rootMatch || !fallbackMatch) {
-    return { html: source, changed: false, reason: "markers_missing" };
-  }
+  if (!rootMatch || !fallbackMatch) return { html: source, changed: false, reason: "markers_missing" };
 
   const rootContentStart = rootMatch.index + rootMatch[0].length;
   const fallbackStart = fallbackMatch.index;
-  if (fallbackStart <= rootContentStart) {
-    return { html: source, changed: false, reason: "invalid_marker_order" };
-  }
+  if (fallbackStart <= rootContentStart) return { html: source, changed: false, reason: "invalid_marker_order" };
 
   const injectedSegment = source.slice(rootContentStart, fallbackStart);
-  if (!containsGeneratedDirectory(injectedSegment)) {
-    return { html: source, changed: false, reason: "no_directory_before_fallback" };
-  }
+  if (!containsGeneratedDirectory(injectedSegment)) return { html: source, changed: false, reason: "no_directory_before_fallback" };
 
   return {
     html: source.slice(0, rootContentStart) + "\n" + source.slice(fallbackStart),
@@ -160,6 +157,7 @@ export async function sanitizeHtmlResponse(request, response, options = {}) {
   const originalHtml = await response.text();
   const result = sanitizeHtmlString(originalHtml, pathname);
   const headers = new Headers(response.headers);
+  const clientPortal = options.clientPortal === true || isClientPortalPath(pathname);
 
   headers.delete("content-length");
   headers.delete("content-encoding");
@@ -182,6 +180,14 @@ export async function sanitizeHtmlResponse(request, response, options = {}) {
     headers.set(APP_SHELL_FALLBACK_HEADER, `${SAFE_ENTRY_VERSION}; from=${pathname}`);
   }
 
+  if (clientPortal || options.noindex) {
+    headers.set("x-robots-tag", "noindex, nofollow");
+  }
+
+  if (clientPortal) {
+    headers.set(CLIENT_PORTAL_EDGE_HEADER, "app-shell");
+  }
+
   return new Response(request.method === "HEAD" ? null : result.html, {
     status: options.status || response.status,
     statusText: options.status ? "OK" : response.statusText,
@@ -200,6 +206,7 @@ function isRecoverablePublicNavigation(request) {
   if (!acceptsHtmlNavigation(request)) return false;
 
   const pathname = normalizePathname(new URL(request.url).pathname);
+  if (isClientPortalPath(pathname)) return true;
   if (pathname === "/") return false;
   if (PRIVATE_PATH_PATTERN.test(pathname)) return false;
   if (ASSET_PATH_PATTERN.test(pathname)) return false;
@@ -235,11 +242,31 @@ async function fetchRootAppShell(request, env, ctx) {
     pathname: originalPathname,
     status: 200,
     appShellFallback: true,
+    clientPortal: isClientPortalPath(originalPathname),
+    noindex: isClientPortalPath(originalPathname),
   });
+}
+
+function buildClientDashboardRedirect(request) {
+  const url = new URL(request.url);
+  url.pathname = "/client-portal";
+  const headers = new Headers({
+    Location: url.toString(),
+    "Cache-Control": "no-store, max-age=0",
+    "x-robots-tag": "noindex, nofollow",
+  });
+  headers.set(CLIENT_DASHBOARD_REDIRECT_HEADER, "canonical-client-portal");
+  return new Response(null, { status: 308, statusText: "Permanent Redirect", headers });
 }
 
 export default {
   async fetch(request, env, ctx) {
+    const pathname = normalizePathname(new URL(request.url).pathname);
+
+    if (isLegacyClientDashboardPath(pathname)) {
+      return buildClientDashboardRedirect(request);
+    }
+
     if (isProductSignupRequest(request)) {
       return productSignupHotfix.fetch(request, env, ctx);
     }
@@ -258,6 +285,10 @@ export default {
       if (fallback) return fallback;
     }
 
-    return sanitizeHtmlResponse(request, response);
+    return sanitizeHtmlResponse(request, response, {
+      pathname,
+      clientPortal: isClientPortalPath(pathname),
+      noindex: isClientPortalPath(pathname),
+    });
   },
 };
