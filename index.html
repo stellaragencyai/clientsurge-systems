@@ -57,8 +57,13 @@
     <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://js.stripe.com https://checkout.stripe.com https://assets.calendly.com https://calendly.com https://unpkg.com; script-src-elem 'self' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://www.googleadservices.com https://googleads.g.doubleclick.net https://js.stripe.com https://checkout.stripe.com https://assets.calendly.com https://calendly.com https://unpkg.com; connect-src 'self' https: wss: ws:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https:; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; frame-src 'self' https://js.stripe.com https://checkout.stripe.com https://hooks.stripe.com https://calendly.com https://assets.calendly.com; object-src 'none'; base-uri 'self'; form-action 'self' https://api.stripe.com https://checkout.stripe.com; upgrade-insecure-requests" />
 
     <!-- GA4 is installed once by src/lib/ga4.js after analytics consent state is known. -->
-    <!-- Global click tracker. The Cloudflare route serves this same-origin script on every page. -->
-    <script src="/clientsurge-telegram-click-tracker.js" defer data-clientsurge-telegram-tracker="true"></script>
+    <!-- Global ClientSurge visit and click tracker. Version query prevents stale browser/CDN copies. -->
+    <script
+      src="https://clientsurge-telegram-tracker.nolanfstrommer.workers.dev/clientsurge-telegram-click-tracker.js?v=2026-07-16-visit-v3"
+      defer
+      crossorigin="anonymous"
+      data-clientsurge-telegram-tracker="true"
+    ></script>
 
     <script type="application/ld+json" data-schema-id="static-homepage">
       {
