@@ -5,6 +5,7 @@ const REGISTRY = [
     phone_number: "+18778123630",
     display_name: "ClientSurge Customer Service",
     purpose: "customer_service",
+    phone_number_sid: "PN7a5a6f2f97d22f4043b9c32087088368",
     sms_enabled: true,
     voice_enabled: true,
     automated_sending_allowed: true,
@@ -15,7 +16,7 @@ const REGISTRY = [
     is_public: true,
     is_default_for_purpose: true,
     active: true,
-    notes: "Primary ClientSurge customer-service, support, website-lead, onboarding and transactional number. Phone Number SID and Messaging Service SID may be added later; they are non-secret identifiers.",
+    notes: "Primary ClientSurge customer-service, support, website-lead, onboarding and transactional number. Toll-free SMS registration confirmed approved. Registration SID HHcc53b133b3a2e6ca0e2ef92bebba40c7. No MG Messaging Service SID was visible in the supplied Twilio screenshots.",
   },
   {
     phone_number: "+16025843227",
@@ -31,7 +32,7 @@ const REGISTRY = [
     is_public: false,
     is_default_for_purpose: true,
     active: true,
-    notes: "Primary Nolan sales, Arizona/local outreach and direct sales follow-up number.",
+    notes: "Primary Nolan sales, Arizona/local outreach and direct sales follow-up number. Phone Number SID and any Messaging Service SID still need to be confirmed.",
   },
   {
     phone_number: "+16025874608",
