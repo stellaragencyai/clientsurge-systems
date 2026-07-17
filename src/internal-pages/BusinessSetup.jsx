@@ -1,5 +1,5 @@
 import { useMemo, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import Navbar from "@/components/landing/Navbar";
 import QuickSetupWizard from "@/components/onboarding/QuickSetupWizard";
 import { DemoBookingProvider } from "@/components/landing/DemoBookingContext";
@@ -28,6 +28,7 @@ export default function BusinessSetup() {
     return {
       projectId: params.get("project_id") || null,
       orderId: params.get("order_id") || null,
+      section: params.get("section") || "",
       source: params.get("source") || "client_setup",
     };
   }, []);
@@ -36,12 +37,19 @@ export default function BusinessSetup() {
   const handleSetupComplete = () => {
     const next = new URLSearchParams();
     if (projectId) next.set("project_id", projectId);
-    if (setupContext.orderId) next.set("order_id", setupContext.orderId);
     next.set("setup_submitted", "1");
     navigate(`/client-portal/progress?${next.toString()}`);
   };
 
-  if (!projectId && !setupContext.orderId) return <MissingSetupContext />;
+  // Paid orders use the verified credentials wizard. The legacy project-only
+  // quick setup must never ask a post-purchase client to choose a package again.
+  if (setupContext.orderId) {
+    const next = new URLSearchParams({ order_id: setupContext.orderId });
+    if (setupContext.section) next.set("section", setupContext.section);
+    return <Navigate to={`/setup/credentials?${next.toString()}`} replace />;
+  }
+
+  if (!projectId) return <MissingSetupContext />;
 
   return (
     <DemoBookingProvider>
@@ -53,7 +61,7 @@ export default function BusinessSetup() {
           </div>
         </div>
         <div className="pb-12">
-          <QuickSetupWizard projectId={projectId || setupContext.orderId} onComplete={handleSetupComplete} />
+          <QuickSetupWizard projectId={projectId} onComplete={handleSetupComplete} />
         </div>
       </div>
     </DemoBookingProvider>

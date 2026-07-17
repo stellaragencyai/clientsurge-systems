@@ -1,43 +1,39 @@
-/**
- * PostPurchaseWhatNext — detailed, empathetic roadmap shown after payment.
- * Covers the critical 72-hour window where buyer anxiety is highest.
- */
 const TIMELINE_STEPS = [
   {
-    time: "Within 10 minutes",
-    icon: "📧",
-    title: "Check Your Inbox",
+    time: "Right now",
+    icon: "📋",
+    title: "Complete Secure Setup",
     detail:
-      "You'll receive an order confirmation email with your receipt and a secure link to your Client Portal. Check your spam folder if it doesn't appear.",
+      "Submit your business details, hours, booking link, notification email, and integration preferences. You can save and finish later from the client portal.",
     highlight: true,
   },
   {
-    time: "Within 2 hours",
-    icon: "💬",
-    title: "Welcome SMS from Our Team",
+    time: "After submission",
+    icon: "🔎",
+    title: "Installation Review",
     detail:
-      "We'll send a personal SMS to the number you provided with your portal link and a direct line to your onboarding specialist.",
+      "Our implementation team reviews the information for missing fields, access issues, or configuration conflicts before any automation is activated.",
   },
   {
-    time: "Within 24 hours",
-    icon: "📋",
-    title: "Onboarding Form Sent",
-    detail:
-      "Our team will send you a short intake form collecting your business hours, booking link, review page, and any existing phone numbers. This takes about 5 minutes.",
-  },
-  {
-    time: "Within 48 hours",
+    time: "During configuration",
     icon: "⚙️",
-    title: "Configuration Begins",
+    title: "Systems Are Configured",
     detail:
-      "Our implementation team begins building and testing your custom automation sequences — SMS templates, lead routing, missed-call text-back, and AI follow-up.",
+      "Your purchased services are configured using the approved business information, routing rules, messaging preferences, and connected tools.",
   },
   {
-    time: "Within 5–7 business days",
-    icon: "🚀",
-    title: "Your System Goes Live",
+    time: "Before launch",
+    icon: "🧪",
+    title: "Verification Tests Run",
     detail:
-      "Once testing passes, we flip the switch and your automations go fully live. You'll get a 'System Active' email with a live dashboard link.",
+      "We test the required workflows and supporting evidence. The client dashboard will continue to show verification in progress until those checks pass.",
+  },
+  {
+    time: "After verification",
+    icon: "🚀",
+    title: "Live Status Is Confirmed",
+    detail:
+      "Once launch checks pass, your client portal will show the system as live and verified. You will also receive a launch confirmation update.",
   },
 ];
 
@@ -48,19 +44,18 @@ export default function PostPurchaseWhatNext() {
         className="px-6 py-5"
         style={{ background: "linear-gradient(135deg,#003B8F 0%,#006BB0 60%,#00AEEF 100%)" }}
       >
-        <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Your Launch Roadmap</p>
-        <h3 className="text-xl font-bold text-white">What Happens After Payment</h3>
-        <p className="text-blue-100/70 text-sm mt-1">
-          Here's exactly what our team does next — and when you can expect each milestone.
+        <p className="text-xs font-bold text-blue-200/70 uppercase tracking-widest mb-1">Your setup roadmap</p>
+        <h3 className="text-xl font-bold text-white">What Happens Next</h3>
+        <p className="text-blue-100/80 text-sm mt-1">
+          Setup information comes first. Configuration and launch verification follow after submission.
         </p>
       </div>
 
       <div className="p-6 space-y-0">
-        {TIMELINE_STEPS.map((step, idx) => {
-          const isLast = idx === TIMELINE_STEPS.length - 1;
+        {TIMELINE_STEPS.map((step, index) => {
+          const isLast = index === TIMELINE_STEPS.length - 1;
           return (
-            <div key={idx} className="flex items-start gap-4 relative">
-              {/* Connector */}
+            <div key={step.title} className="flex items-start gap-4 relative">
               {!isLast && (
                 <div
                   className="absolute left-5 top-10 bottom-0 w-0.5"
@@ -68,7 +63,6 @@ export default function PostPurchaseWhatNext() {
                 />
               )}
 
-              {/* Icon */}
               <div
                 className="w-10 h-10 rounded-xl flex items-center justify-center text-lg flex-shrink-0 z-10"
                 style={{
@@ -79,7 +73,6 @@ export default function PostPurchaseWhatNext() {
                 {step.icon}
               </div>
 
-              {/* Content */}
               <div className={`flex-1 ${!isLast ? "pb-6" : ""}`}>
                 <p
                   className="text-[10px] font-bold uppercase tracking-widest mb-0.5"

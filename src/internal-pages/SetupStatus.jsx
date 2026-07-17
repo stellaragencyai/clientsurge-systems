@@ -149,7 +149,7 @@ export default function SetupStatus() {
 
       <div style={{ marginBottom: 24, background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.22)", borderRadius: 16, padding: 16 }}>
         <p style={{ color: "#FDE68A", fontSize: 12, fontWeight: 800, margin: "0 0 4px", textTransform: "uppercase", letterSpacing: "0.08em" }}>Status evidence</p>
-        <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, margin: 0 }}>This page uses posted ClientSurge order/progress records. It does not claim live provider proof unless a verified live/proof event exists in your portal.</p>
+        <p style={{ color: "rgba(255,255,255,0.72)", fontSize: 13, margin: 0 }}>This page uses posted ClientSurge order/progress records. This is setup-record status, not live provider proof. Live status appears only after a verified live/proof event exists in your portal.</p>
       </div>
 
       {hasActivationError && (

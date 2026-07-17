@@ -8,13 +8,19 @@ export default function DashboardHeader({ activeServices, portalState }) {
   const isAdmin = portalState?.meta?.is_admin_preview || false;
 
   const rawLiveCount = activeServices.filter(s => s.installStatus === "Live").length;
-  const inProgressCount = activeServices.filter(s => ["Configuring", "Testing", "Ready for Install", "Pending Review", "Status Pending"].includes(s.installStatus)).length;
+  const buildInProgressCount = activeServices.filter(s => ["Configuring", "Testing", "Ready for Install", "Pending Review", "Status Pending"].includes(s.installStatus)).length;
+  const verificationInProgressCount = isProofLive ? 0 : rawLiveCount;
+  const inProgressCount = buildInProgressCount + verificationInProgressCount;
   const totalServices = activeServices.length;
 
   const liveLabel = isProofLive ? "Live & Verified" : "Live Status";
   const liveValue = isProofLive ? rawLiveCount : "Pending proof";
   const liveSub = isProofLive ? "backed by system evidence" : "not shown live until verified";
   const liveColor = isProofLive ? "#16a34a" : "#B8941F";
+  const progressLabel = verificationInProgressCount > 0 ? "Verification Running" : "Being Set Up";
+  const progressSub = verificationInProgressCount > 0
+    ? "systems awaiting verified launch proof"
+    : "configuration or verification in progress";
 
   if (totalServices === 0) return null;
 
@@ -41,19 +47,21 @@ export default function DashboardHeader({ activeServices, portalState }) {
     },
     {
       icon: Clock,
-      label: "Being Set Up",
+      label: progressLabel,
       value: inProgressCount,
-      sub: "configuration or verification in progress",
+      sub: progressSub,
       color: "#0088CC",
       accent: "#0088CC",
-      badge: inProgressCount > 0 ? "In progress" : "Clear",
-      progress: inProgressCount > 0 ? 52 : 100,
+      badge: verificationInProgressCount > 0 ? "Verification" : inProgressCount > 0 ? "In progress" : "Clear",
+      progress: verificationInProgressCount > 0 ? 68 : inProgressCount > 0 ? 52 : 100,
     },
     {
       icon: ShieldCheck,
-      label: "Truth Gate",
-      value: isProofLive ? "Passed" : "Active",
-      sub: "prevents fake live status",
+      label: "Verification Safeguard",
+      value: isProofLive ? "Verified" : "Active",
+      sub: isProofLive
+        ? "live status confirmed by verified checks"
+        : "marks systems live only after checks pass",
       color: isProofLive ? "#16a34a" : "#003B8F",
       accent: isProofLive ? "#16a34a" : "#003B8F",
       badge: "Protected",

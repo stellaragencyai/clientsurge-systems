@@ -71,6 +71,7 @@ function getHeroStatus({ stageIndex, rawStageIndex, isProofLive }) {
 const whiteText = {
   color: "#ffffff",
   WebkitTextFillColor: "#ffffff",
+  backgroundImage: "none",
 };
 
 export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }) {
@@ -127,7 +128,7 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             <h1 style={{ ...whiteText, fontSize: "clamp(28px,4vw,42px)", fontWeight: "900", margin: "0 0 10px", lineHeight: 1.05, letterSpacing: "-0.04em", textShadow: "0 2px 18px rgba(0,0,0,0.3)" }}>
               {isLive ? `System live, ${displayName}` : `Welcome, ${displayName}`}
             </h1>
-            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.78)", WebkitTextFillColor: "rgba(255,255,255,0.78)", margin: 0, maxWidth: "640px", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.82)", WebkitTextFillColor: "rgba(255,255,255,0.82)", margin: 0, maxWidth: "640px", lineHeight: 1.6 }}>
               {businessName ? `${businessName} · ` : ""}
               {isLive
                 ? "Your automation system is active and verified by system evidence."
@@ -153,7 +154,7 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
                 <p style={{ ...whiteText, fontSize: "14px", fontWeight: "800", margin: "2px 0 0" }}>{heroStatus.title}</p>
               </div>
             </div>
-            <p style={{ fontSize: "12px", lineHeight: 1.55, color: "rgba(255,255,255,0.74)", WebkitTextFillColor: "rgba(255,255,255,0.74)", margin: 0 }}>{heroStatus.body}</p>
+            <p style={{ fontSize: "12px", lineHeight: 1.55, color: "rgba(255,255,255,0.78)", WebkitTextFillColor: "rgba(255,255,255,0.78)", margin: 0 }}>{heroStatus.body}</p>
           </div>
         </div>
 
