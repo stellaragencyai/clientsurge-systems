@@ -5,141 +5,67 @@
     "page_key": {
       "type": "string",
       "title": "Page Key",
-      "enum": [
-        "homepage",
-        "med_spa",
-        "dental",
-        "hvac",
-        "roofing",
-        "contractors",
-        "real_estate",
-        "personal_injury",
-        "plumbing",
-        "chiropractic",
-        "pricing"
-      ]
+      "enum": ["homepage", "med_spa", "dental", "hvac", "roofing", "contractors", "real_estate", "personal_injury", "plumbing", "chiropractic", "pricing"]
     },
-    "date": {
+    "date": { "type": "string", "title": "Date", "format": "date" },
+    "client_id": { "type": "string", "title": "Client ID" },
+    "client_project_id": { "type": "string", "title": "Client Project ID" },
+    "environment": {
       "type": "string",
-      "title": "Date",
-      "format": "date",
-      "description": "Analytics date (YYYY-MM-DD)"
+      "title": "Environment",
+      "enum": ["production", "qa", "smoke", "demo", "internal", "unknown"],
+      "default": "unknown"
     },
-    "impressions": {
-      "type": "integer",
-      "title": "Page Views",
-      "default": 0
-    },
-    "sessions": {
-      "type": "integer",
-      "title": "Unique Sessions",
-      "default": 0
-    },
-    "cta_clicks": {
-      "type": "integer",
-      "title": "CTA Clicks",
-      "default": 0
-    },
-    "demo_bookings": {
-      "type": "integer",
-      "title": "Demo Bookings",
-      "default": 0
-    },
-    "checkout_clicks": {
-      "type": "integer",
-      "title": "Checkout Clicks",
-      "default": 0
-    },
-    "form_submissions": {
-      "type": "integer",
-      "title": "Form Submissions",
-      "default": 0
-    },
-    "conversion_rate": {
-      "type": "number",
-      "title": "Conversion Rate (%)",
-      "default": 0,
-      "description": "CTA clicks / sessions"
-    },
-    "avg_time_on_page_seconds": {
-      "type": "number",
-      "title": "Avg Time on Page (s)",
-      "default": 0
-    },
-    "bounce_rate": {
-      "type": "number",
-      "title": "Bounce Rate (%)",
-      "default": 0
-    },
-    "scroll_completion_rate": {
-      "type": "number",
-      "title": "Scroll Completion Rate (%)",
-      "default": 0
-    },
-    "top_utm_source": {
+    "impressions": { "type": "integer", "title": "Page Views", "default": 0 },
+    "sessions": { "type": "integer", "title": "Unique Sessions", "default": 0 },
+    "cta_clicks": { "type": "integer", "title": "CTA Clicks", "default": 0 },
+    "demo_bookings": { "type": "integer", "title": "Demo Bookings", "default": 0 },
+    "checkout_clicks": { "type": "integer", "title": "Checkout Clicks", "default": 0 },
+    "form_submissions": { "type": "integer", "title": "Form Submissions", "default": 0 },
+    "conversion_rate": { "type": "number", "title": "Conversion Rate (%)", "default": 0 },
+    "avg_time_on_page_seconds": { "type": "number", "title": "Avg Time on Page (s)", "default": 0 },
+    "bounce_rate": { "type": "number", "title": "Bounce Rate (%)", "default": 0 },
+    "scroll_completion_rate": { "type": "number", "title": "Scroll Completion Rate (%)", "default": 0 },
+    "top_utm_source": { "type": "string", "title": "Top Traffic Source (UTM)" },
+    "top_utm_campaign": { "type": "string", "title": "Top Campaign (UTM)" },
+    "source_event_count": { "type": "integer", "title": "Trusted Source Event Count", "default": 0 },
+    "source_event_first_at": { "type": "string", "title": "First Source Event At", "format": "date-time" },
+    "source_event_last_at": { "type": "string", "title": "Last Source Event At", "format": "date-time" },
+    "source_event_ids_hash": { "type": "string", "title": "Source Event Set Hash" },
+    "calculation_version": { "type": "string", "title": "Calculation Version", "default": "v1" },
+    "calculated_at": { "type": "string", "title": "Calculated At", "format": "date-time" },
+    "calculated_by": { "type": "string", "title": "Calculated By" },
+    "release_version": { "type": "string", "title": "Release Version" },
+    "proof_status": {
       "type": "string",
-      "title": "Top Traffic Source (UTM)"
+      "title": "Proof Status",
+      "enum": ["unverified", "verified", "mismatch", "blocked", "manual_review"],
+      "default": "unverified"
     },
-    "top_utm_campaign": {
+    "dashboard_excluded": { "type": "boolean", "title": "Excluded From Dashboards", "default": false },
+    "dashboard_exclusion_reason": { "type": "string", "title": "Dashboard Exclusion Reason" },
+    "dashboard_truth_status": {
       "type": "string",
-      "title": "Top Campaign (UTM)"
+      "title": "Dashboard Truth Status",
+      "enum": ["unreviewed", "trusted", "blocked", "manual_review"],
+      "default": "unreviewed"
     },
     "device_breakdown": {
       "type": "object",
       "title": "Device Breakdown",
       "properties": {
-        "mobile": {
-          "type": "integer",
-          "default": 0
-        },
-        "tablet": {
-          "type": "integer",
-          "default": 0
-        },
-        "desktop": {
-          "type": "integer",
-          "default": 0
-        }
+        "mobile": { "type": "integer", "default": 0 },
+        "tablet": { "type": "integer", "default": 0 },
+        "desktop": { "type": "integer", "default": 0 }
       }
     },
-    "notes": {
-      "type": "string",
-      "title": "Notes"
-    }
+    "notes": { "type": "string", "title": "Notes" }
   },
-  "required": [
-    "page_key",
-    "date"
-  ],
+  "required": ["page_key", "date"],
   "rls": {
-    "create": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
-    },
-    "read": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
-    },
-    "update": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
-    },
-    "delete": {
-      "user_condition": {
-        "role": "admin"
-      }
-    }
+    "create": { "user_condition": { "role": ["admin", "super_admin"] } },
+    "read": { "user_condition": { "role": ["admin", "super_admin"] } },
+    "update": { "user_condition": { "role": ["admin", "super_admin"] } },
+    "delete": { "user_condition": { "role": "admin" } }
   }
 }
