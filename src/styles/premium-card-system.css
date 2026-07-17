@@ -1,0 +1,40 @@
+/* ClientSurge Premium Card Surface System */
+
+:root {
+  --cs-card-radius-premium: 24px;
+  --cs-card-border-premium: rgba(0, 161, 234, 0.16);
+  --cs-card-shadow-premium: 0 18px 50px rgba(15, 23, 42, 0.08);
+  --cs-card-shadow-hover: 0 28px 70px rgba(0, 122, 191, 0.16);
+  --cs-card-glow: rgba(0, 161, 234, 0.18);
+}
+
+.cs-premium-card,
+.cs-card-premium {
+  border-radius: var(--cs-card-radius-premium);
+  border: 1px solid var(--cs-card-border-premium);
+  background: rgba(255, 255, 255, 0.82);
+  box-shadow: var(--cs-card-shadow-premium);
+  backdrop-filter: blur(18px) saturate(1.15);
+  -webkit-backdrop-filter: blur(18px) saturate(1.15);
+  transition: transform .28s ease, box-shadow .28s ease, border-color .28s ease;
+}
+
+.cs-premium-card:hover,
+.cs-card-premium:hover {
+  transform: translateY(-4px);
+  border-color: rgba(0, 161, 234, 0.36);
+  box-shadow: var(--cs-card-shadow-hover);
+}
+
+.cs-premium-card:focus-visible,
+.cs-card-premium:focus-visible {
+  outline: 3px solid rgba(0, 161, 234, .35);
+  outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-premium-card,
+  .cs-card-premium {
+    transition: none;
+  }
+}
