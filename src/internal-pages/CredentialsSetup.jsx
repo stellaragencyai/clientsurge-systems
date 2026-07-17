@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import CredentialsWizard from "@/components/onboarding/CredentialsWizardHardened";
+import CredentialsWizard from "@/components/onboarding/CredentialsWizard";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 
 const SUPPORT_EMAIL = "support@clientsurgesystems.com";
@@ -127,20 +127,5 @@ export default function CredentialsSetup() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-slate-50 to-white">
-      <div className="mx-auto max-w-3xl px-6 pt-8">
-        <div className="mb-4 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          Credentials are only used for setup and verification. Your portal will show status based on posted ClientSurge records, not assumptions.
-        </div>
-      </div>
-      <CredentialsWizard
-        order={order}
-        setupToken={setupToken}
-        initialSection={requestedSection}
-        exitHref="/client-portal/progress"
-        onComplete={handleComplete}
-      />
-    </div>
-  );
+  return <CredentialsWizard order={order} onComplete={handleComplete} />;
 }
