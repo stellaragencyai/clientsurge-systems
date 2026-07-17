@@ -50,14 +50,17 @@ const contactMethods = [
 const socialLinks = [
   {
     label: "LinkedIn",
+    icon: "linkedin",
     href: "https://linkedin.com/company/clientsurge",
   },
   {
     label: "X",
+    icon: "x",
     href: "https://twitter.com/clientsurge",
   },
   {
     label: "GitHub",
+    icon: "github",
     href: "https://github.com/stellaragencyai",
   },
 ];
@@ -78,6 +81,30 @@ const initialForm = {
   referrer: "",
   consent_given: false,
 };
+
+function SocialIcon({ name }) {
+  if (name === "linkedin") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+        <path d="M5.36 3.5A2.36 2.36 0 1 1 .64 3.5a2.36 2.36 0 0 1 4.72 0ZM1.04 8.08h4.64V23H1.04V8.08ZM8.48 8.08h4.45v2.04h.06c.62-1.17 2.13-2.4 4.39-2.4 4.69 0 5.56 3.09 5.56 7.1V23H18.3v-7.25c0-1.73-.03-3.95-2.41-3.95-2.41 0-2.78 1.88-2.78 3.82V23H8.48V8.08Z" />
+      </svg>
+    );
+  }
+
+  if (name === "x") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+        <path d="M18.9 2H22l-6.77 7.73L23.2 22h-6.24l-4.89-6.39L6.48 22H3.36l7.25-8.29L2.96 2h6.4l4.42 5.84L18.9 2Zm-1.1 17.84h1.72L8.42 4.05H6.58L17.8 19.84Z" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true" className="h-5 w-5" fill="currentColor">
+      <path fillRule="evenodd" d="M12 .75a11.25 11.25 0 0 0-3.56 21.92c.56.1.77-.24.77-.54v-2.1c-3.13.68-3.79-1.33-3.79-1.33-.51-1.3-1.25-1.65-1.25-1.65-1.02-.7.08-.69.08-.69 1.13.08 1.72 1.16 1.72 1.16 1 1.72 2.63 1.22 3.27.93.1-.73.39-1.22.71-1.5-2.5-.29-5.13-1.25-5.13-5.56 0-1.23.44-2.23 1.16-3.02-.12-.29-.5-1.43.11-2.98 0 0 .95-.3 3.09 1.15A10.74 10.74 0 0 1 12 6.1c.96 0 1.92.13 2.82.38 2.14-1.45 3.08-1.15 3.08-1.15.62 1.55.23 2.69.11 2.98.72.79 1.16 1.79 1.16 3.02 0 4.32-2.64 5.27-5.15 5.55.4.35.76 1.04.76 2.1v3.12c0 .3.2.65.78.54A11.25 11.25 0 0 0 12 .75Z" clipRule="evenodd" />
+    </svg>
+  );
+}
 
 function getStoredUtm() {
   try {
@@ -147,7 +174,7 @@ function UnderlineField({
     <div className="min-w-0">
       <label
         htmlFor={inputId}
-        className="mb-2.5 flex items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
+        className="mb-2 flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
       >
         <span>{label}</span>
         {required && (
@@ -159,7 +186,7 @@ function UnderlineField({
           </>
         )}
         {optional && (
-          <span className="text-[0.7rem] font-medium normal-case tracking-normal text-slate-500">
+          <span className="text-[0.69rem] font-medium normal-case tracking-normal text-slate-500">
             optional
           </span>
         )}
@@ -179,11 +206,11 @@ function UnderlineField({
         maxLength={maxLength}
         aria-invalid={showError}
         aria-describedby={showError ? errorId : undefined}
-        className="contact-control h-[3.15rem] w-full text-base text-[#001B44] placeholder:text-slate-400"
+        className="contact-control h-12 w-full text-base text-[#001B44] placeholder:text-slate-400"
       />
 
       {showError && (
-        <p id={errorId} className="mt-2 text-xs font-semibold text-red-600" role="alert">
+        <p id={errorId} className="mt-1.5 text-xs font-semibold text-red-600" role="alert">
           {error}
         </p>
       )}
@@ -210,14 +237,14 @@ function ContactMethod({ Icon, label, value, href }) {
     return (
       <a
         href={href}
-        className="flex items-start gap-4 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+        className="flex min-h-11 items-start gap-4 py-1.5 transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
       >
         {content}
       </a>
     );
   }
 
-  return <div className="flex items-start gap-4 py-1.5">{content}</div>;
+  return <div className="flex min-h-11 items-start gap-4 py-1.5">{content}</div>;
 }
 
 export default function Contact() {
@@ -374,7 +401,7 @@ export default function Contact() {
 
       <main className="pt-[var(--cs-nav-height)]">
         <section
-          className="grid lg:grid-cols-2"
+          className="contact-shell grid lg:grid-cols-[0.46fr_0.54fr]"
           style={{ minHeight: "calc(100vh - var(--cs-nav-height))" }}
         >
           <aside className="relative overflow-hidden bg-[#061025] text-white">
@@ -391,7 +418,7 @@ export default function Contact() {
               className="absolute inset-y-0 right-0 hidden w-px bg-gradient-to-b from-transparent via-[#35BDF1]/40 to-transparent lg:block"
             />
 
-            <div className="relative mx-auto flex h-full w-full max-w-[720px] flex-col justify-center px-8 py-12 sm:px-12 sm:py-14 lg:px-16 xl:px-20">
+            <div className="contact-panel-inner contact-left-inner relative mx-auto flex h-full w-full max-w-[680px] flex-col px-8 py-12 sm:px-12 lg:px-14 xl:px-16">
               <a
                 href="/"
                 aria-label="ClientSurge Systems home"
@@ -403,25 +430,25 @@ export default function Contact() {
                   width="480"
                   height="224"
                   decoding="async"
-                  className="h-auto w-[390px] max-w-full object-contain object-left"
+                  className="contact-logo h-auto w-[360px] max-w-full object-contain object-left"
                   style={{ filter: "brightness(0) invert(1)" }}
                 />
               </a>
 
-              <div className="my-6 h-px w-full bg-gradient-to-r from-[#35BDF1]/80 via-[#35BDF1]/35 to-transparent" />
+              <div className="contact-left-divider my-5 h-px w-full bg-gradient-to-r from-[#35BDF1]/80 via-[#35BDF1]/35 to-transparent" />
 
-              <div className="grid gap-3.5">
+              <div className="contact-left-list grid gap-2.5">
                 {contactMethods.map((method) => (
                   <ContactMethod key={method.label} {...method} />
                 ))}
               </div>
 
-              <div className="my-6 h-px w-full bg-gradient-to-r from-[#35BDF1]/80 via-[#35BDF1]/35 to-transparent" />
+              <div className="contact-left-divider my-5 h-px w-full bg-gradient-to-r from-[#35BDF1]/80 via-[#35BDF1]/35 to-transparent" />
 
-              <div className="flex flex-col items-start gap-4 sm:flex-row sm:items-center">
+              <div className="flex flex-col items-start gap-3.5 sm:flex-row sm:items-center">
                 <a
                   href="/book#system-match-form"
-                  className="inline-flex min-h-12 items-center justify-center gap-2 border border-[#35BDF1] px-5 text-center text-xs font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
+                  className="inline-flex min-h-11 items-center justify-center gap-2 border border-[#35BDF1] px-5 text-center text-[0.72rem] font-bold uppercase tracking-[0.1em] text-white transition-colors hover:bg-[#35BDF1] hover:text-[#061025] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white"
                 >
                   <Sparkles aria-hidden="true" className="h-4 w-4" />
                   AI Readiness Check
@@ -429,24 +456,28 @@ export default function Contact() {
 
                 <a
                   href="/book"
-                  className="inline-flex items-center gap-2 text-sm font-semibold text-white/85 underline decoration-[#35BDF1]/60 underline-offset-4 transition-colors hover:text-[#35BDF1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                  className="inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-white/85 underline decoration-[#35BDF1]/60 underline-offset-4 transition-colors hover:text-[#35BDF1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
                 >
                   Prefer to talk? Book a call
                   <ArrowRight aria-hidden="true" className="h-4 w-4" />
                 </a>
               </div>
 
-              <nav className="mt-6 flex flex-wrap items-center gap-x-5 gap-y-2" aria-label="ClientSurge Systems social media">
-                {socialLinks.map(({ label, href }) => (
+              <nav
+                className="contact-socials mt-5 flex items-center gap-2.5"
+                aria-label="ClientSurge Systems social media"
+              >
+                {socialLinks.map(({ label, icon, href }) => (
                   <a
                     key={label}
                     href={href}
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`ClientSurge Systems on ${label}`}
-                    className="text-sm font-semibold text-[#35BDF1] underline decoration-transparent underline-offset-4 transition-colors hover:text-white hover:decoration-[#35BDF1] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
+                    title={label}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.06] text-[#35BDF1] transition-colors hover:bg-white/[0.12] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#35BDF1]"
                   >
-                    {label}
+                    <SocialIcon name={icon} />
                   </a>
                 ))}
               </nav>
@@ -454,7 +485,7 @@ export default function Contact() {
           </aside>
 
           <section className="bg-white text-[#001B44]">
-            <div className="mx-auto flex h-full w-full max-w-[820px] flex-col justify-center px-8 py-10 sm:px-12 sm:py-12 lg:px-14 xl:px-16">
+            <div className="contact-panel-inner contact-form-inner mx-auto flex h-full w-full max-w-[900px] flex-col px-8 py-10 sm:px-12 lg:px-14 xl:px-16">
               {success ? (
                 <div className="max-w-xl" aria-live="polite">
                   <CheckCircle2 aria-hidden="true" className="h-12 w-12 text-[#0079C1]" />
@@ -485,26 +516,26 @@ export default function Contact() {
                 </div>
               ) : (
                 <>
-                  <header>
+                  <header className="contact-title-block">
                     <p className="text-sm font-semibold uppercase tracking-[0.13em] text-slate-600">
                       Get in touch
                     </p>
 
-                    <div className="mt-3 flex items-center gap-5 sm:gap-7">
+                    <div className="mt-2.5 flex items-center gap-5 sm:gap-7">
                       <span
                         aria-hidden="true"
                         className="h-16 w-1 shrink-0 bg-[#00AEEF] sm:h-[4.25rem]"
                       />
-                      <h1 className="contact-heading whitespace-nowrap font-titles text-[clamp(3.4rem,4.1vw,5rem)] font-black leading-[0.9] tracking-[-0.055em] text-[#001B44]">
+                      <h1 className="contact-heading font-titles font-black leading-[0.9] tracking-[-0.055em] text-[#001B44]">
                         CONTACT US
                       </h1>
                     </div>
 
-                    <div className="mt-7">
+                    <div className="contact-intro mt-5">
                       <h2 className="text-xl font-black uppercase tracking-[-0.02em] text-[#001B44] sm:text-2xl">
                         We would love to hear from you!
                       </h2>
-                      <p className="mt-2 text-base leading-7 text-slate-600">
+                      <p className="mt-1.5 text-base leading-7 text-slate-600">
                         Send us a message and we will get right back in touch.
                       </p>
                     </div>
@@ -516,11 +547,11 @@ export default function Contact() {
                     onSubmit={handleSubmit}
                     noValidate
                     aria-busy={loading}
-                    className="mt-8"
+                    className="contact-form mt-6"
                   >
                     {errors.submit && (
                       <div
-                        className="mb-6 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
+                        className="mb-5 border-l-4 border-red-500 bg-red-50 px-4 py-3 text-sm font-semibold text-red-700"
                         role="alert"
                         aria-live="assertive"
                       >
@@ -539,7 +570,7 @@ export default function Contact() {
                       autoComplete="off"
                     />
 
-                    <div className="grid grid-cols-1 gap-x-10 gap-y-6 sm:grid-cols-2">
+                    <div className="contact-fields grid grid-cols-1 gap-x-10 gap-y-5 sm:grid-cols-2">
                       <UnderlineField
                         label="Full Name"
                         name="full_name"
@@ -610,10 +641,10 @@ export default function Contact() {
                       </div>
 
                       <div className="sm:col-span-2">
-                        <div className="mb-2.5 flex items-center justify-between gap-4">
+                        <div className="mb-2 flex items-center justify-between gap-4">
                           <label
                             htmlFor="contact-message"
-                            className="flex items-center gap-2 text-[0.78rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
+                            className="flex items-center gap-2 text-[0.76rem] font-semibold uppercase tracking-[0.1em] text-slate-600"
                           >
                             <span>Message</span>
                             <span aria-hidden="true" className="text-[#0079C1]">
@@ -632,7 +663,7 @@ export default function Contact() {
                           value={form.message}
                           onChange={(event) => updateField("message", event.target.value)}
                           onBlur={() => handleBlur("message")}
-                          rows={4}
+                          rows={3}
                           maxLength={MAX_MESSAGE_LENGTH}
                           required
                           placeholder="Tell us what you would like to improve in your lead response, follow-up, booking, or customer reactivation process."
@@ -640,13 +671,13 @@ export default function Contact() {
                           aria-describedby={
                             errors.message && touched.message ? "contact-message-error" : undefined
                           }
-                          className="contact-control contact-textarea min-h-[7rem] w-full resize-y text-base leading-7 text-[#001B44] placeholder:text-slate-400"
+                          className="contact-control contact-textarea min-h-[5.75rem] w-full resize-y text-base leading-7 text-[#001B44] placeholder:text-slate-400"
                         />
 
                         {errors.message && touched.message && (
                           <p
                             id="contact-message-error"
-                            className="mt-2 text-xs font-semibold text-red-600"
+                            className="mt-1.5 text-xs font-semibold text-red-600"
                             role="alert"
                           >
                             {errors.message}
@@ -655,8 +686,8 @@ export default function Contact() {
                       </div>
                     </div>
 
-                    <div className="mt-6">
-                      <label className="flex cursor-pointer items-start gap-3 text-[0.82rem] leading-6 text-slate-600">
+                    <div className="contact-consent mt-4">
+                      <label className="flex cursor-pointer items-start gap-3 text-[0.8rem] leading-5 text-slate-600">
                         <input
                           type="checkbox"
                           name="consent_given"
@@ -664,7 +695,7 @@ export default function Contact() {
                           onChange={(event) => updateField("consent_given", event.target.checked)}
                           onBlur={() => handleBlur("consent_given")}
                           aria-invalid={Boolean(errors.consent_given && touched.consent_given)}
-                          className="mt-1 h-4 w-4 shrink-0 rounded-sm border-slate-400 text-[#0079C1] focus:ring-[#00AEEF]"
+                          className="mt-0.5 h-4 w-4 shrink-0 rounded-sm border-slate-400 text-[#0079C1] focus:ring-[#00AEEF]"
                         />
                         <span>
                           I agree that ClientSurge Systems may contact me about this inquiry by email,
@@ -680,13 +711,13 @@ export default function Contact() {
                       </label>
 
                       {errors.consent_given && touched.consent_given && (
-                        <p className="mt-2 text-xs font-semibold text-red-600" role="alert">
+                        <p className="mt-1.5 text-xs font-semibold text-red-600" role="alert">
                           {errors.consent_given}
                         </p>
                       )}
                     </div>
 
-                    <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center">
+                    <div className="contact-submit-row mt-4 flex flex-col gap-3 sm:flex-row sm:items-center">
                       <button
                         type="submit"
                         disabled={loading}
@@ -746,8 +777,8 @@ export default function Contact() {
         }
 
         .contact-page #contact-form .contact-textarea {
-          padding-top: 0.5rem !important;
-          padding-bottom: 0.75rem !important;
+          padding-top: 0.35rem !important;
+          padding-bottom: 0.55rem !important;
         }
 
         .contact-page #contact-form input:-webkit-autofill,
@@ -758,10 +789,82 @@ export default function Contact() {
           transition: background-color 9999s ease-out 0s;
         }
 
+        .contact-page .contact-panel-inner {
+          justify-content: flex-start;
+          padding-top: clamp(2.75rem, 6vh, 5rem);
+          padding-bottom: 2.5rem;
+        }
+
+        .contact-page .contact-heading {
+          white-space: nowrap !important;
+          font-size: clamp(3.4rem, 4.2vw, 5.2rem) !important;
+          max-width: none;
+        }
+
+        @media (min-width: 1024px) and (max-height: 850px) {
+          .contact-page .contact-panel-inner {
+            padding-top: 1.75rem !important;
+            padding-bottom: 1.5rem !important;
+          }
+
+          .contact-page .contact-logo {
+            width: 320px !important;
+          }
+
+          .contact-page .contact-left-divider {
+            margin-top: 1rem !important;
+            margin-bottom: 1rem !important;
+          }
+
+          .contact-page .contact-left-list {
+            gap: 0.45rem !important;
+          }
+
+          .contact-page .contact-socials {
+            margin-top: 1rem !important;
+          }
+
+          .contact-page .contact-intro {
+            margin-top: 1rem !important;
+          }
+
+          .contact-page .contact-form {
+            margin-top: 1rem !important;
+          }
+
+          .contact-page .contact-fields {
+            row-gap: 0.85rem !important;
+          }
+
+          .contact-page #contact-form .contact-control {
+            height: 2.65rem !important;
+          }
+
+          .contact-page #contact-form .contact-textarea {
+            min-height: 4.7rem !important;
+          }
+
+          .contact-page .contact-consent,
+          .contact-page .contact-submit-row {
+            margin-top: 0.85rem !important;
+          }
+        }
+
+        @media (max-width: 1023px) {
+          .contact-page .contact-panel-inner {
+            padding-top: 3.5rem;
+            padding-bottom: 3.5rem;
+          }
+
+          .contact-page .contact-left-inner {
+            min-height: auto;
+          }
+        }
+
         @media (max-width: 639px) {
           .contact-page .contact-heading {
-            white-space: normal;
-            font-size: clamp(3rem, 16vw, 4rem);
+            white-space: normal !important;
+            font-size: clamp(3rem, 16vw, 4rem) !important;
           }
         }
       `}</style>
