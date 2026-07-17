@@ -1,0 +1,21 @@
+/* ClientSurge Premium Electric Blue System Refresh */
+:root {
+  --cs-brand-premium: #00A1EA;
+  --cs-brand-highlight: #1DB6F0;
+  --cs-brand-deep-premium: #007ABF;
+  --cs-brand-glow-premium: rgba(0, 161, 234, 0.35);
+  --cs-gradient-premium: linear-gradient(135deg, #007ABF 0%, #00A1EA 55%, #1DB6F0 100%);
+  --cs-glow-premium-sm: 0 0 12px rgba(0,161,234,0.30);
+  --cs-glow-premium-md: 0 0 24px rgba(0,161,234,0.35);
+  --cs-glow-premium-lg: 0 0 48px rgba(0,161,234,0.45);
+}
+
+.cs-premium-electric {
+  color: var(--cs-brand-premium);
+}
+
+.cs-premium-gradient,
+.cs-btn-primary,
+.hero-primary-cta {
+  background: var(--cs-gradient-premium);
+}
