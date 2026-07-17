@@ -24,7 +24,7 @@ function getHeroStatus({ stageIndex, rawStageIndex, isProofLive }) {
       eyebrow: "Proof-gated launch",
       title: "Verification checks are running",
       body: "Your setup may be complete, but this dashboard will not label the system live until verified proof is available.",
-      color: "#00AEEF",
+      color: "#38C8FF",
       icon: ShieldCheck,
     };
   }
@@ -34,7 +34,7 @@ function getHeroStatus({ stageIndex, rawStageIndex, isProofLive }) {
       eyebrow: "Action required",
       title: "Setup information needed",
       body: "Submit your business details so the installation team can configure your automation system.",
-      color: "#00AEEF",
+      color: "#38C8FF",
       icon: Clock,
     };
   }
@@ -44,7 +44,7 @@ function getHeroStatus({ stageIndex, rawStageIndex, isProofLive }) {
       eyebrow: "Received",
       title: "Setup information received",
       body: "Your details are in review. The dashboard updates as the build progresses through verified stages.",
-      color: "#22c55e",
+      color: "#4ade80",
       icon: CheckCircle2,
     };
   }
@@ -54,7 +54,7 @@ function getHeroStatus({ stageIndex, rawStageIndex, isProofLive }) {
       eyebrow: "In progress",
       title: "We are configuring your system",
       body: "Testing and verification come next. No action is needed from you unless the dashboard asks for it.",
-      color: "#fbbf24",
+      color: "#fcd34d",
       icon: Zap,
     };
   }
@@ -63,10 +63,15 @@ function getHeroStatus({ stageIndex, rawStageIndex, isProofLive }) {
     eyebrow: "Live & verified",
     title: "Your automation is live and verified",
     body: "The system is marked live only because the portal has verified supporting proof.",
-    color: "#22c55e",
+    color: "#4ade80",
     icon: CheckCircle2,
   };
 }
+
+const whiteText = {
+  color: "#ffffff",
+  WebkitTextFillColor: "#ffffff",
+};
 
 export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }) {
   const businessName = order?.business_name || order?.customer_name || null;
@@ -90,6 +95,8 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
       boxShadow: "0 28px 80px rgba(0,59,143,0.22)",
       position: "relative", overflow: "hidden",
       border: "1px solid rgba(255,255,255,0.12)",
+      color: "#ffffff",
+      WebkitTextFillColor: "#ffffff",
     }}>
       <div style={{
         position: "absolute", top: "-40%", right: "-8%",
@@ -114,13 +121,13 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
           marginBottom: "24px",
         }}>
           <div style={{ minWidth: "min(100%, 420px)", flex: "1 1 420px" }}>
-            <p style={{ fontSize: "11px", fontWeight: "900", color: "#38C8FF", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 8px" }}>
+            <p style={{ fontSize: "11px", fontWeight: "900", color: "#38C8FF", WebkitTextFillColor: "#38C8FF", textTransform: "uppercase", letterSpacing: "0.2em", margin: "0 0 8px" }}>
               ClientSurge Systems
             </p>
-            <h1 style={{ fontSize: "clamp(28px,4vw,42px)", fontWeight: "900", color: "#ffffff", margin: "0 0 10px", lineHeight: 1.05, letterSpacing: "-0.04em", textShadow: "0 2px 18px rgba(0,0,0,0.16)" }}>
+            <h1 style={{ ...whiteText, fontSize: "clamp(28px,4vw,42px)", fontWeight: "900", margin: "0 0 10px", lineHeight: 1.05, letterSpacing: "-0.04em", textShadow: "0 2px 18px rgba(0,0,0,0.3)" }}>
               {isLive ? `System live, ${displayName}` : `Welcome, ${displayName}`}
             </h1>
-            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.72)", margin: 0, maxWidth: "640px", lineHeight: 1.6 }}>
+            <p style={{ fontSize: "15px", color: "rgba(255,255,255,0.78)", WebkitTextFillColor: "rgba(255,255,255,0.78)", margin: 0, maxWidth: "640px", lineHeight: 1.6 }}>
               {businessName ? `${businessName} · ` : ""}
               {isLive
                 ? "Your automation system is active and verified by system evidence."
@@ -142,11 +149,11 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
                 <StatusIcon style={{ width: "17px", height: "17px", color: heroStatus.color }} />
               </div>
               <div>
-                <p style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.14em", textTransform: "uppercase", color: heroStatus.color, margin: 0 }}>{heroStatus.eyebrow}</p>
-                <p style={{ fontSize: "14px", fontWeight: "800", color: "#ffffff", margin: "2px 0 0" }}>{heroStatus.title}</p>
+                <p style={{ fontSize: "10px", fontWeight: "900", letterSpacing: "0.14em", textTransform: "uppercase", color: heroStatus.color, WebkitTextFillColor: heroStatus.color, margin: 0 }}>{heroStatus.eyebrow}</p>
+                <p style={{ ...whiteText, fontSize: "14px", fontWeight: "800", margin: "2px 0 0" }}>{heroStatus.title}</p>
               </div>
             </div>
-            <p style={{ fontSize: "12px", lineHeight: 1.55, color: "rgba(255,255,255,0.68)", margin: 0 }}>{heroStatus.body}</p>
+            <p style={{ fontSize: "12px", lineHeight: 1.55, color: "rgba(255,255,255,0.74)", WebkitTextFillColor: "rgba(255,255,255,0.74)", margin: 0 }}>{heroStatus.body}</p>
           </div>
         </div>
 
@@ -185,12 +192,12 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
                   ) : active ? (
                     <Clock style={{ width: "15px", height: "15px", color: "#38C8FF" }} />
                   ) : (
-                    <span style={{ fontSize: "11px", fontWeight: "900", color: "rgba(255,255,255,0.42)" }}>{i + 1}</span>
+                    <span style={{ fontSize: "11px", fontWeight: "900", color: "rgba(255,255,255,0.5)", WebkitTextFillColor: "rgba(255,255,255,0.5)" }}>{i + 1}</span>
                   )}
                 </div>
                 <div style={{ minWidth: 0 }}>
-                  <p style={{ fontSize: "12px", fontWeight: "850", color: waiting ? "rgba(255,255,255,0.45)" : "#ffffff", margin: 0, lineHeight: 1.2 }}>{stage.label}</p>
-                  <p style={{ fontSize: "10px", fontWeight: "750", color: done ? "#4ade80" : active ? "#38C8FF" : "rgba(255,255,255,0.34)", margin: "3px 0 0", lineHeight: 1.2 }}>{stage.detail}</p>
+                  <p style={{ fontSize: "12px", fontWeight: "850", color: waiting ? "rgba(255,255,255,0.55)" : "#ffffff", WebkitTextFillColor: waiting ? "rgba(255,255,255,0.55)" : "#ffffff", margin: 0, lineHeight: 1.2 }}>{stage.label}</p>
+                  <p style={{ fontSize: "10px", fontWeight: "750", color: done ? "#4ade80" : active ? "#38C8FF" : "rgba(255,255,255,0.42)", WebkitTextFillColor: done ? "#4ade80" : active ? "#38C8FF" : "rgba(255,255,255,0.42)", margin: "3px 0 0", lineHeight: 1.2 }}>{stage.detail}</p>
                 </div>
               </div>
             );
@@ -204,7 +211,7 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
             borderRadius: "18px", padding: "14px 16px",
             display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: "12px",
           }}>
-            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.76)", margin: 0, lineHeight: 1.5 }}>
+            <p style={{ fontSize: "13px", color: "rgba(255,255,255,0.82)", WebkitTextFillColor: "rgba(255,255,255,0.82)", margin: 0, lineHeight: 1.5 }}>
               Finish the setup form so we can configure routing, messaging, and verification correctly.
             </p>
             <a
@@ -213,7 +220,7 @@ export default function WelcomeBanner({ user, order, hasSetupInfo, portalState }
                 display: "inline-flex", alignItems: "center", gap: "7px",
                 padding: "10px 18px", borderRadius: "9999px",
                 background: "#ffffff",
-                color: "#003B8F", fontWeight: "850", fontSize: "12px",
+                color: "#003B8F", WebkitTextFillColor: "#003B8F", fontWeight: "850", fontSize: "12px",
                 textDecoration: "none", whiteSpace: "nowrap",
                 boxShadow: "0 8px 20px rgba(0,0,0,0.16)",
                 flexShrink: 0,
