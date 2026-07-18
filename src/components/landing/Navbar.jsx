@@ -1,5 +1,4 @@
-import { useEffect, useRef, useState } from "react";
-import { createPortal } from "react-dom";
+import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
@@ -7,11 +6,8 @@ import { usePageViewTracking } from "../../hooks/usePageViewTracking";
 import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { useAuth } from "@/lib/AuthContext";
 import { SITE_CONFIG } from "@/lib/siteConfig";
-import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
-import { INDUSTRY_GROUPS } from "@/lib/industryNavConfig";
 
-const sectionLinks = SITE_CONFIG.navigation.sections;
-const menuItemClass = "w-full text-left flex items-center rounded-lg px-3 py-2.5 text-sm font-medium text-foreground border-l-2 border-transparent hover:border-[#00AEEF] hover:bg-[#00AEEF]/5 hover:text-foreground transition-colors bg-transparent cursor-pointer whitespace-nowrap";
+const sectionLinks = SITE_CONFIG.navigation.sections.filter((link) => link.label !== "Industries");
 
 function analyticsKey(label) {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
@@ -20,10 +16,6 @@ function analyticsKey(label) {
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [industriesOpen, setIndustriesOpen] = useState(false);
-  const [industryDropdownPos, setIndustryDropdownPos] = useState(null);
-  const industriesTriggerRef = useRef(null);
-  const industriesCloseTimerRef = useRef(null);
 
   const navigate = useNavigate();
   const location = useLocation();
@@ -41,27 +33,7 @@ export default function Navbar() {
   };
 
   const closeAll = () => {
-    setIndustriesOpen(false);
     setOpen(false);
-  };
-
-  const clearIndustriesTimer = () => {
-    if (industriesCloseTimerRef.current) {
-      clearTimeout(industriesCloseTimerRef.current);
-      industriesCloseTimerRef.current = null;
-    }
-  };
-
-  const openIndustries = () => {
-    clearIndustriesTimer();
-    const rect = industriesTriggerRef.current?.getBoundingClientRect();
-    setIndustryDropdownPos(rect ? { left: rect.left + rect.width / 2, top: rect.bottom + 6 } : null);
-    setIndustriesOpen(true);
-  };
-
-  const closeIndustriesSoon = () => {
-    clearIndustriesTimer();
-    industriesCloseTimerRef.current = setTimeout(() => setIndustriesOpen(false), 180);
   };
 
   const navigateTo = (href) => {
@@ -103,22 +75,6 @@ export default function Navbar() {
     setTimeout(() => window.scrollTo({ top: 0, left: 0, behavior: "smooth" }), 50);
   };
 
-  const handleIndustrySelect = (item, source) => {
-    try {
-      const slug = item.href.split("/").pop();
-      window.sessionStorage.setItem(INDUSTRY_SELECTION_STORAGE_KEY, slug);
-      window.dispatchEvent(new CustomEvent("clientsurge:industry-selected", { detail: { id: slug } }));
-    } catch (_error) {}
-
-    trackCTA(`industry_${analyticsKey(item.label)}`, source);
-    closeAll();
-    navigate(item.href);
-  };
-
-  useEffect(() => {
-    return () => clearIndustriesTimer();
-  }, []);
-
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 20);
     onScroll();
@@ -138,65 +94,6 @@ export default function Navbar() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, []);
-
-  const IndustriesDropdown = industriesOpen && typeof document !== "undefined" ? createPortal(
-    <div
-      onMouseEnter={openIndustries}
-      onMouseLeave={closeIndustriesSoon}
-      className="fixed cs-dropdown-portal"
-      style={{
-        left: industryDropdownPos?.left ?? "50%",
-        transform: "translateX(-50%)",
-        top: industryDropdownPos?.top ?? "calc(var(--cs-nav-height) + 6px)",
-        zIndex: 60,
-      }}
-    >
-      <div
-        className="rounded-xl border border-border/60 p-5 shadow-xl"
-        role="menu"
-        aria-label="Industries"
-        style={{
-          background: "rgba(255,255,255,0.94)",
-          backdropFilter: "blur(20px) saturate(1.25)",
-          WebkitBackdropFilter: "blur(20px) saturate(1.25)",
-          boxShadow: "0 16px 48px rgba(15,23,42,0.14), 0 0 0 1px rgba(0,174,239,0.06)",
-        }}
-      >
-        <div className="grid grid-cols-2 gap-x-8 gap-y-1 min-w-[480px]">
-          {INDUSTRY_GROUPS.map((group) => (
-            <div key={group.label}>
-              <p className="text-[10px] font-black uppercase tracking-[0.18em] text-primary/60 mb-2 px-3">
-                {group.label}
-              </p>
-              <div className="flex flex-col gap-0.5">
-                {group.industries.map((item) => (
-                  <button
-                    key={item.label}
-                    type="button"
-                    role="menuitem"
-                    onClick={() => handleIndustrySelect(item, "navbar_dropdown")}
-                    className={menuItemClass}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="mt-3 pt-3 border-t border-border/50 text-center">
-          <a
-            href="/industries"
-            onClick={(event) => handleNavClick(event, { label: "View All Industries", href: "/industries" }, "navbar_dropdown")}
-            className="text-[12px] font-bold text-primary hover:underline"
-          >
-            View All Industries →
-          </a>
-        </div>
-      </div>
-    </div>,
-    document.body
-  ) : null;
 
   return (
     <nav
@@ -238,7 +135,7 @@ export default function Navbar() {
         </a>
 
         <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.filter((link) => link.label !== "Industries").map((link) => (
+          {sectionLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -250,22 +147,6 @@ export default function Navbar() {
               <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.45)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
             </a>
           ))}
-
-          <div className="relative" onMouseEnter={openIndustries} onMouseLeave={closeIndustriesSoon}>
-            <button
-              ref={industriesTriggerRef}
-              type="button"
-              onClick={() => (industriesOpen ? setIndustriesOpen(false) : openIndustries())}
-              aria-expanded={industriesOpen}
-              aria-haspopup="menu"
-              className="text-xs lg:text-sm font-semibold transition-colors whitespace-nowrap relative pb-0.5 bg-transparent border-none cursor-pointer"
-              style={{ color: industriesOpen || isActivePage("/industries") ? "#0095D9" : "#0F172A" }}
-            >
-              Industries
-              <span style={{ position: "absolute", bottom: "-6px", left: 0, right: industriesOpen || isActivePage("/industries") ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.45)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
-            </button>
-            {IndustriesDropdown}
-          </div>
         </div>
 
         <div className="hidden xl:flex items-center gap-2 shrink-0">
@@ -354,7 +235,7 @@ export default function Navbar() {
             }}
           >
             <div className="pt-3 pb-2 space-y-0.5">
-              {sectionLinks.filter((link) => link.label !== "Industries").map((link) => (
+              {sectionLinks.map((link) => (
                 <a
                   key={link.href}
                   href={link.href}
@@ -420,37 +301,6 @@ export default function Navbar() {
                   </button>
                 </div>
               )}
-            </div>
-
-            <div className="pt-3 mt-1 border-t border-border">
-              <p className="text-[11px] font-bold uppercase tracking-[0.2em] mb-3 px-3" style={{ color: "#00AEEF" }}>Industries</p>
-              <div className="space-y-3">
-                {INDUSTRY_GROUPS.map((group) => (
-                  <div key={group.label}>
-                    <p className="text-[10px] font-bold uppercase tracking-[0.14em] mb-1.5 px-3 text-muted-foreground/60">{group.label}</p>
-                    <div className="grid grid-cols-1 gap-0.5">
-                      {group.industries.map((item) => (
-                        <button
-                          key={item.label}
-                          type="button"
-                          onClick={() => handleIndustrySelect(item, "mobile_nav")}
-                          className="w-full text-left flex items-center rounded-xl px-3 py-2.5 text-[13px] font-medium text-muted-foreground hover:text-foreground hover:bg-muted/50 focus:ring-2 focus:ring-primary focus:outline-none border-none bg-transparent cursor-pointer transition-colors"
-                          style={{ minHeight: "44px" }}
-                        >
-                          {item.label}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <a
-                href="/industries"
-                onClick={(event) => handleNavClick(event, { label: "View All Industries", href: "/industries" }, "mobile_nav")}
-                className="block text-center text-[12px] font-bold text-primary hover:underline mt-3 py-2"
-              >
-                View All Industries →
-              </a>
             </div>
 
             <div className="mt-5 flex gap-2">
