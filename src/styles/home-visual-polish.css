@@ -14,6 +14,7 @@
   --cs-home-card: rgba(255, 255, 255, 0.86);
   --cs-home-shadow: 0 18px 55px rgba(15, 73, 111, 0.08);
   --cs-home-shadow-hover: 0 24px 72px rgba(0, 107, 176, 0.14);
+  --cs-home-mobile-gutter: clamp(1rem, 5vw, 1.5rem);
   position: relative;
   isolation: isolate;
   overflow-x: clip;
@@ -315,6 +316,17 @@
   z-index: 3;
 }
 
+@media (max-width: 1100px) {
+  .cs-home-section-frame::before {
+    inset: 1.25rem 0.9rem;
+  }
+
+  .cs-home-section-frame[data-home-section="pricing"]::before,
+  .cs-home-section-frame[data-home-section="final-cta"]::before {
+    inset: 0.9rem;
+  }
+}
+
 @media (max-width: 900px) {
   .cs-home-proof-grid {
     grid-template-columns: 1fr;
@@ -325,6 +337,10 @@
   }
 }
 
+/*
+  Mobile polish run: fix homepage breathing room, hero height, CTA ergonomics,
+  pricing readability, final CTA clearance, and floating chat overlap.
+*/
 @media (max-width: 768px) {
   .cs-home-polish {
     background:
@@ -332,29 +348,233 @@
       linear-gradient(180deg, #fbfdff 0%, #ffffff 50%, #f7fbff 100%);
   }
 
-  .cs-home-ambient__grid {
-    background-size: 52px 52px;
+  .cs-home-ambient::before,
+  .cs-home-ambient::after {
+    filter: blur(14px);
     opacity: 0.55;
   }
 
+  .cs-home-ambient__grid {
+    background-size: 52px 52px;
+    opacity: 0.45;
+    mask-image: linear-gradient(180deg, rgba(0,0,0,0.34), transparent 55%);
+  }
+
+  .cs-home-section-frame {
+    overflow-x: clip;
+  }
+
   .cs-home-section-frame::before {
-    inset: 1rem 0.75rem;
-    border-radius: 1.4rem;
+    inset: 0.75rem 0.5rem;
+    border-radius: 1.25rem;
+    box-shadow: 0 16px 48px rgba(0, 66, 120, 0.04);
+  }
+
+  .cs-home-section-frame[data-home-section="hero"]::before {
+    opacity: 0;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] section {
+    min-height: auto !important;
+    padding-top: 0 !important;
+    padding-bottom: 0 !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] section > div:last-child {
+    gap: 1.35rem !important;
+    padding-top: calc(var(--cs-nav-height, 68px) + 1.6rem) !important;
+    padding-right: var(--cs-home-mobile-gutter) !important;
+    padding-bottom: 2.25rem !important;
+    padding-left: var(--cs-home-mobile-gutter) !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] h1 {
+    max-width: 11ch;
+    margin-inline: auto;
+    font-size: clamp(2.35rem, 12vw, 3.35rem) !important;
+    line-height: 0.98 !important;
+    letter-spacing: -0.065em !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] p:not(.sr-only) {
+    max-width: 34rem;
+    margin-right: auto;
+    margin-left: auto;
+    font-size: clamp(0.95rem, 4vw, 1.03rem) !important;
+    line-height: 1.68 !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] a[href*="pricing"],
+  .cs-home-section-frame[data-home-section="hero"] a[href*="how-it-works"] {
+    width: min(100%, 22rem) !important;
+    min-height: 3.15rem !important;
+    padding-right: 1rem !important;
+    padding-left: 1rem !important;
+    font-size: 0.96rem !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] [aria-label="ClientSurge automation dashboard preview"] {
+    max-width: min(92vw, 390px) !important;
+    margin-top: 0.35rem;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] [aria-label="ClientSurge automation dashboard preview"] > div[style] {
+    filter: none !important;
   }
 
   .cs-home-proof-strip,
   .cs-home-section-divider {
-    width: min(100% - 1.25rem, 1120px);
+    width: min(calc(100% - 1.25rem), 1120px);
+  }
+
+  .cs-home-proof-strip {
+    margin-bottom: 2rem;
+    padding: 0.7rem;
+    border-radius: 1.2rem;
   }
 
   .cs-home-proof-card {
-    min-height: 84px;
-    padding: 0.9rem;
+    min-height: 82px;
+    padding: 0.85rem;
+    border-radius: 1rem;
+  }
+
+  .cs-home-proof-index {
+    width: 2.1rem;
+    height: 2.1rem;
+    font-size: 0.66rem;
+  }
+
+  .cs-home-proof-title {
+    font-size: 0.86rem;
+    line-height: 1.16;
+  }
+
+  .cs-home-proof-copy {
+    font-size: 0.76rem;
+    line-height: 1.5;
+  }
+
+  .cs-home-section-divider {
+    margin-top: 1rem;
+    margin-bottom: 0.15rem;
+  }
+
+  .cs-home-section-divider::before,
+  .cs-home-section-divider::after {
+    min-width: 1.25rem;
   }
 
   .cs-home-section-divider__text {
     max-width: 82vw;
+    min-height: 1.85rem;
     overflow: hidden;
+    padding: 0.35rem 0.65rem;
     text-overflow: ellipsis;
+    font-size: 0.6rem;
+    letter-spacing: 0.12em;
+  }
+
+  .cs-home-main [data-home-section]:not([data-home-section="hero"]) section {
+    padding-top: clamp(2.75rem, 10vw, 4rem) !important;
+    padding-bottom: clamp(2.75rem, 10vw, 4rem) !important;
+  }
+
+  .cs-home-main [data-home-section="pricing"] section,
+  .cs-home-main [data-home-section="final-cta"] section {
+    padding-right: var(--cs-home-mobile-gutter) !important;
+    padding-left: var(--cs-home-mobile-gutter) !important;
+  }
+
+  .cs-home-main [data-home-section="pricing"] [class*="grid"],
+  .cs-home-main [data-home-section="automations"] [class*="grid"],
+  .cs-home-main [data-home-section="industries"] [class*="grid"] {
+    gap: 1rem !important;
+  }
+
+  .cs-home-main [data-home-section="pricing"] .rounded-xl,
+  .cs-home-main [data-home-section="pricing"] .rounded-2xl,
+  .cs-home-main [data-home-section="pricing"] .rounded-3xl {
+    padding: clamp(1rem, 4vw, 1.25rem) !important;
+  }
+
+  .cs-home-main [data-home-section="pricing"] a,
+  .cs-home-main [data-home-section="final-cta"] a,
+  .cs-home-main [data-home-section="pricing"] button,
+  .cs-home-main [data-home-section="final-cta"] button {
+    width: 100%;
+    min-height: 3rem;
+  }
+
+  .cs-home-section-frame--final-cta {
+    padding-bottom: max(5.5rem, calc(5.5rem + env(safe-area-inset-bottom, 0px)));
+  }
+
+  .cs-home-polish .cs-chat-button {
+    right: 12px !important;
+    bottom: max(18px, calc(18px + env(safe-area-inset-bottom, 0px))) !important;
+    height: 48px !important;
+    min-width: 48px !important;
+    padding-right: 13px !important;
+    padding-left: 13px !important;
+    border: 1px solid rgba(255,255,255,0.52) !important;
+  }
+
+  .cs-home-polish .cs-chat-window {
+    right: 10px !important;
+    bottom: max(78px, calc(78px + env(safe-area-inset-bottom, 0px))) !important;
+    width: calc(100vw - 20px) !important;
+    max-height: min(520px, calc(100dvh - 104px)) !important;
+    border-radius: 1.25rem !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .cs-home-section-frame[data-home-section="hero"] h1 {
+    max-width: 10.5ch;
+    font-size: clamp(2.2rem, 13vw, 3.05rem) !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] section > div:last-child {
+    padding-top: calc(var(--cs-nav-height, 68px) + 1.25rem) !important;
+  }
+
+  .cs-home-proof-card {
+    grid-template-columns: 2rem minmax(0, 1fr);
+    gap: 0.72rem;
+  }
+
+  .cs-home-section-divider__text {
+    max-width: 76vw;
+  }
+
+  .cs-home-main [data-home-section="pricing"] .rounded-xl,
+  .cs-home-main [data-home-section="pricing"] .rounded-2xl,
+  .cs-home-main [data-home-section="pricing"] .rounded-3xl {
+    border-radius: 1rem !important;
+  }
+}
+
+@media (max-height: 720px) and (max-width: 768px) {
+  .cs-home-section-frame[data-home-section="hero"] section > div:last-child {
+    padding-top: calc(var(--cs-nav-height, 68px) + 1rem) !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] [aria-label="ClientSurge automation dashboard preview"] {
+    max-width: min(86vw, 340px) !important;
+  }
+}
+
+@media (pointer: coarse) {
+  .cs-home-proof-card:hover,
+  .cs-home-main .rounded-xl:hover,
+  .cs-home-main .rounded-2xl:hover,
+  .cs-home-main .rounded-3xl:hover,
+  .cs-home-main a[href*="pricing"]:hover,
+  .cs-home-main a[href*="product-signup"]:hover,
+  .cs-home-main a[href*="book"]:hover,
+  .cs-home-main a[href*="how-it-works"]:hover {
+    transform: none !important;
   }
 }
