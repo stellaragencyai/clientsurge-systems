@@ -1,0 +1,77 @@
+/*
+  Homepage spacing pass.
+  Scoped to the homepage shell only so dashboard, portal, checkout, auth,
+  legal, and internal routes are not affected.
+*/
+
+.cs-home-main {
+  --cs-home-section-space: clamp(3rem, 6vw, 5.5rem);
+  --cs-home-divider-space: clamp(2.25rem, 4.5vw, 4rem);
+}
+
+.cs-home-section-frame {
+  margin-block: var(--cs-home-section-space);
+}
+
+.cs-home-section-frame[data-home-section="hero"] {
+  margin-top: 0;
+  margin-bottom: clamp(1.25rem, 3vw, 2.75rem);
+}
+
+.cs-home-proof-strip {
+  margin-top: clamp(0.5rem, 1.5vw, 1.25rem);
+  margin-bottom: clamp(3rem, 6vw, 5rem);
+}
+
+.cs-home-section-divider {
+  margin-top: var(--cs-home-divider-space);
+  margin-bottom: clamp(1rem, 2.4vw, 1.85rem);
+}
+
+.cs-home-section-divider + .cs-home-section-frame {
+  margin-top: 0;
+}
+
+.cs-home-section-frame + .cs-home-section-divider {
+  margin-top: clamp(2.75rem, 5vw, 4.5rem);
+}
+
+.cs-home-section-frame--final-cta {
+  margin-bottom: 0;
+}
+
+/*
+  Homepage-only industry trim.
+  These three cards are hidden from the homepage grid so the remaining
+  industries collapse into a shorter, cleaner grid. The full industries
+  component/page remains untouched.
+*/
+.cs-home-main [data-home-section="industries"] button[aria-label*="Accounting & Tax Firms"],
+.cs-home-main [data-home-section="industries"] button[aria-label*="Gyms & Fitness Studios"],
+.cs-home-main [data-home-section="industries"] button[aria-label*="Veterinary Clinics"] {
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .cs-home-main {
+    --cs-home-section-space: clamp(2.15rem, 9vw, 3.35rem);
+    --cs-home-divider-space: clamp(1.75rem, 8vw, 2.75rem);
+  }
+
+  .cs-home-section-frame {
+    margin-block: var(--cs-home-section-space);
+  }
+
+  .cs-home-section-frame[data-home-section="hero"] {
+    margin-bottom: clamp(1rem, 5vw, 1.75rem);
+  }
+
+  .cs-home-proof-strip {
+    margin-bottom: clamp(2.25rem, 8vw, 3.25rem);
+  }
+
+  .cs-home-section-divider {
+    margin-top: var(--cs-home-divider-space);
+    margin-bottom: clamp(0.8rem, 4vw, 1.25rem);
+  }
+}
