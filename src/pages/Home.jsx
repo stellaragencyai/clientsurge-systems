@@ -82,7 +82,7 @@ function HomepageProofStrip() {
           <article className="cs-home-proof-card" key={item.title}>
             <span className="cs-home-proof-index">{String(index + 1).padStart(2, "0")}</span>
             <div>
-              <h2 className="cs-home-proof-title">{item.title}</h2>
+              <p className="cs-home-proof-title">{item.title}</p>
               <p className="cs-home-proof-copy">{item.copy}</p>
             </div>
           </article>
