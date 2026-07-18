@@ -1,0 +1,197 @@
+:root {
+  /* ClientSurge Design System v2 — brand north star */
+  --cs-navy-1000: #020813;
+  --cs-navy-950: #061225;
+  --cs-navy-900: #08172c;
+  --cs-navy-850: #0b1d35;
+  --cs-navy-800: #102642;
+  --cs-navy-700: #173354;
+
+  --cs-blue-700: #005bd8;
+  --cs-blue-600: #0077ee;
+  --cs-blue-500: #0798f2;
+  --cs-cyan-400: #18baf4;
+  --cs-cyan-300: #42d7f5;
+
+  --cs-white: #f8fbff;
+  --cs-ink: #071426;
+  --cs-text-on-dark: #f7fbff;
+  --cs-text-muted-dark: #a9b7ca;
+  --cs-text-subtle-dark: #70819a;
+  --cs-text-on-light: #0b1728;
+  --cs-text-muted-light: #64748b;
+
+  --cs-success: #20c997;
+  --cs-warning: #f4b740;
+  --cs-danger: #ef5b67;
+
+  --cs-radius-sm: 10px;
+  --cs-radius-md: 14px;
+  --cs-radius-lg: 20px;
+  --cs-radius-xl: 28px;
+  --cs-radius-pill: 999px;
+
+  --cs-shadow-sm: 0 8px 24px rgba(2, 12, 30, 0.08);
+  --cs-shadow-md: 0 18px 48px rgba(2, 12, 30, 0.14);
+  --cs-shadow-lg: 0 30px 80px rgba(2, 12, 30, 0.24);
+  --cs-shadow-blue: 0 16px 42px rgba(0, 119, 238, 0.32);
+  --cs-glow-blue: 0 0 0 1px rgba(66, 215, 245, 0.34), 0 0 28px rgba(7, 152, 242, 0.22);
+
+  --cs-gradient-blue: linear-gradient(92deg, #0077ee 0%, #0798f2 52%, #42d7f5 100%);
+  --cs-gradient-button: linear-gradient(135deg, #0077ee 0%, #0798f2 58%, #18baf4 100%);
+  --cs-gradient-panel: linear-gradient(145deg, #061225 0%, #08172c 52%, #0b1d35 100%);
+
+  --cs-duration-fast: 140ms;
+  --cs-duration-base: 220ms;
+  --cs-duration-slow: 420ms;
+  --cs-ease: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cs-brand-shell {
+  position: relative;
+  overflow: hidden;
+  color: var(--cs-text-on-dark);
+  background:
+    radial-gradient(circle at 50% 42%, rgba(7, 152, 242, 0.13), transparent 34%),
+    radial-gradient(circle at 50% 50%, transparent 0 31%, rgba(66, 215, 245, 0.045) 31.2% 31.5%, transparent 31.8% 44%, rgba(66, 215, 245, 0.03) 44.2% 44.5%, transparent 44.8%),
+    var(--cs-gradient-panel);
+}
+
+.cs-brand-shell::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  background-image:
+    radial-gradient(circle, rgba(255, 255, 255, 0.5) 0 1px, transparent 1.25px),
+    radial-gradient(circle, rgba(24, 186, 244, 0.42) 0 1px, transparent 1.4px);
+  background-position: 0 0, 38px 54px;
+  background-size: 180px 180px, 260px 260px;
+  mask-image: linear-gradient(to bottom, black, transparent 92%);
+}
+
+.cs-gradient-text {
+  color: transparent;
+  background: var(--cs-gradient-blue);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+.cs-primary-button {
+  display: inline-flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border: 1px solid rgba(66, 215, 245, 0.72);
+  border-radius: var(--cs-radius-pill);
+  padding: 0.75rem 1.5rem;
+  color: #fff;
+  background: var(--cs-gradient-button);
+  box-shadow: var(--cs-shadow-blue), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  font-weight: 750;
+  letter-spacing: -0.01em;
+  transition:
+    transform var(--cs-duration-base) var(--cs-ease),
+    box-shadow var(--cs-duration-base) var(--cs-ease),
+    filter var(--cs-duration-base) var(--cs-ease);
+}
+
+.cs-primary-button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  filter: saturate(1.08) brightness(1.04);
+  box-shadow: 0 20px 48px rgba(0, 119, 238, 0.42), 0 0 0 5px rgba(24, 186, 244, 0.09);
+}
+
+.cs-primary-button:active:not(:disabled) {
+  transform: translateY(0);
+}
+
+.cs-primary-button:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-shadow-blue), 0 0 0 4px rgba(66, 215, 245, 0.23);
+}
+
+.cs-primary-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+.cs-secondary-button {
+  display: inline-flex;
+  min-height: 46px;
+  align-items: center;
+  justify-content: center;
+  gap: 0.625rem;
+  border: 1px solid rgba(169, 183, 202, 0.35);
+  border-radius: var(--cs-radius-pill);
+  padding: 0.7rem 1.35rem;
+  color: var(--cs-text-on-dark);
+  background: rgba(255, 255, 255, 0.055);
+  backdrop-filter: blur(16px);
+  font-weight: 700;
+  transition: all var(--cs-duration-base) var(--cs-ease);
+}
+
+.cs-secondary-button:hover:not(:disabled) {
+  border-color: rgba(66, 215, 245, 0.54);
+  background: rgba(7, 152, 242, 0.11);
+  transform: translateY(-1px);
+}
+
+.cs-dark-card {
+  border: 1px solid rgba(169, 183, 202, 0.12);
+  border-radius: var(--cs-radius-lg);
+  background: linear-gradient(145deg, rgba(16, 38, 66, 0.82), rgba(6, 18, 37, 0.9));
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.035), var(--cs-shadow-md);
+  backdrop-filter: blur(20px);
+}
+
+.cs-light-card {
+  border: 1px solid rgba(15, 35, 62, 0.09);
+  border-radius: var(--cs-radius-lg);
+  color: var(--cs-text-on-light);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: var(--cs-shadow-sm);
+}
+
+.cs-input {
+  min-height: 48px;
+  width: 100%;
+  border: 1px solid rgba(100, 116, 139, 0.28);
+  border-radius: var(--cs-radius-md);
+  padding: 0.75rem 0.95rem;
+  color: var(--cs-text-on-light);
+  background: #fff;
+  transition: border-color var(--cs-duration-fast), box-shadow var(--cs-duration-fast);
+}
+
+.cs-input:focus {
+  outline: none;
+  border-color: var(--cs-blue-500);
+  box-shadow: 0 0 0 4px rgba(7, 152, 242, 0.12);
+}
+
+.cs-eyebrow {
+  color: var(--cs-cyan-400);
+  font-size: 0.75rem;
+  font-weight: 800;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+}
+
+.cs-display {
+  color: var(--cs-text-on-dark);
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  line-height: 0.98;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-primary-button,
+  .cs-secondary-button {
+    transition: none;
+  }
+}
