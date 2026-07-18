@@ -40,18 +40,6 @@
   margin-bottom: 0;
 }
 
-/*
-  Homepage-only industry trim.
-  These three cards are hidden from the homepage grid so the remaining
-  industries collapse into a shorter, cleaner grid. The full industries
-  component/page remains untouched.
-*/
-.cs-home-main [data-home-section="industries"] button[aria-label*="Accounting & Tax Firms"],
-.cs-home-main [data-home-section="industries"] button[aria-label*="Gyms & Fitness Studios"],
-.cs-home-main [data-home-section="industries"] button[aria-label*="Veterinary Clinics"] {
-  display: none !important;
-}
-
 @media (max-width: 768px) {
   .cs-home-main {
     --cs-home-section-space: clamp(2.15rem, 9vw, 3.35rem);
