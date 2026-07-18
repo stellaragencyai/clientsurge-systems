@@ -32,6 +32,7 @@ import {
 } from "../components/SEO/SchemaMarkup";
 import { setJsonLd, setPageMetadata } from "@/lib/seo";
 import "../styles/home-visual-polish.css";
+import "../styles/home-section-spacing.css";
 
 const HOMEPAGE_PROOF_ITEMS = [
   {
