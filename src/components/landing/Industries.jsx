@@ -17,10 +17,7 @@ import {
   Bug,
   Scissors,
   Car,
-  Calculator,
-  Dumbbell,
   Gavel,
-  PawPrint,
 } from "lucide-react";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
@@ -253,34 +250,6 @@ const industries = [
   "https://images.unsplash.com/photo-1632823469850-2f77dd9c7f93?w=1200&q=95"
 },
 {
-  id: "accounting",
-  routePath: "/accounting",
-  icon: Calculator,
-  name: "Accounting & Tax Firms",
-  accent: {
-    color: "#0891b2",
-    soft: "rgba(8,145,178,0.18)",
-    glow: "rgba(8,145,178,0.28)",
-    iconBg: "rgba(8,145,178,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1554224155-6726b3ff858f?w=1200&q=95"
-},
-{
-  id: "fitness",
-  routePath: "/fitness",
-  icon: Dumbbell,
-  name: "Gyms & Fitness Studios",
-  accent: {
-    color: "#ea580c",
-    soft: "rgba(234,88,12,0.18)",
-    glow: "rgba(234,88,12,0.28)",
-    iconBg: "rgba(234,88,12,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1534438327276-14e030dce1a0?w=1200&q=95"
-},
-{
   id: "law-firm",
   routePath: "/law-firm",
   icon: Gavel,
@@ -293,20 +262,6 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1589216532372-1c2a367900d9?w=1200&q=95"
-},
-{
-  id: "veterinary",
-  routePath: "/veterinary",
-  icon: PawPrint,
-  name: "Veterinary Clinics",
-  accent: {
-    color: "#14b8a6",
-    soft: "rgba(20,184,166,0.18)",
-    glow: "rgba(20,184,166,0.28)",
-    iconBg: "rgba(20,184,166,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1450778869180-41d0601e046e?w=1200&q=95"
 },
 {
   id: "property-services",
