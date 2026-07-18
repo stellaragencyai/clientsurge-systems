@@ -202,7 +202,7 @@ export default function Navbar() {
             onClick={() => setOpen(!open)}
             style={{
               borderColor: "rgba(15, 23, 42, 0.12)",
-              background: "rgba(255, 255, 255, 0.62)",
+              background: open ? "rgba(0, 174, 239, 0.10)" : "rgba(255, 255, 255, 0.62)",
               color: "#0F172A",
             }}
             aria-label={open ? "Close navigation menu" : "Open navigation menu"}
@@ -217,120 +217,163 @@ export default function Navbar() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40 xl:hidden bg-black/30" aria-hidden="true" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40 xl:hidden bg-slate-950/35 backdrop-blur-[2px]" aria-hidden="true" onClick={() => setOpen(false)} />
           <div
             id="mobile-nav-drawer"
-            className="xl:hidden px-5 pb-8 pt-2 relative z-50 mobile-nav-drawer"
+            className="xl:hidden fixed z-50 overflow-hidden rounded-[1.75rem] border mobile-nav-drawer"
             style={{
-              maxWidth: "min(420px, 90vw)",
-              maxHeight: "calc(100vh - var(--cs-nav-height) - env(safe-area-inset-top))",
+              top: "calc(var(--cs-nav-height) + env(safe-area-inset-top) + 12px)",
+              left: "max(12px, env(safe-area-inset-left))",
+              right: "max(12px, env(safe-area-inset-right))",
+              maxHeight: "calc(100dvh - var(--cs-nav-height) - env(safe-area-inset-top) - 28px)",
               overflowY: "auto",
               WebkitOverflowScrolling: "touch",
-              paddingBottom: "max(2rem, env(safe-area-inset-bottom))",
-              background: "rgba(255,255,255,0.96)",
-              backdropFilter: "blur(20px) saturate(1.2)",
-              WebkitBackdropFilter: "blur(20px) saturate(1.2)",
-              borderBottom: "1px solid rgba(0,174,239,0.12)",
-              boxShadow: "0 20px 60px rgba(0,0,0,0.12)",
+              padding: "14px",
+              paddingBottom: "max(14px, calc(14px + env(safe-area-inset-bottom)))",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.98) 0%, rgba(247,252,255,0.98) 100%)",
+              borderColor: "rgba(0,174,239,0.16)",
+              backdropFilter: "blur(24px) saturate(1.25)",
+              WebkitBackdropFilter: "blur(24px) saturate(1.25)",
+              boxShadow: "0 28px 80px rgba(15,23,42,0.22), 0 0 0 1px rgba(255,255,255,0.7)",
             }}
           >
-            <div className="pt-3 pb-2 space-y-0.5">
-              {sectionLinks.map((link) => (
-                <a
-                  key={link.href}
-                  href={link.href}
-                  className="flex items-center text-[15px] font-semibold text-black hover:text-[#00AEEF] focus:ring-2 focus:ring-primary focus:outline-none rounded-xl px-3 py-3 transition-colors hover:bg-[#00AEEF]/5"
-                  style={{ minHeight: "44px" }}
-                  onClick={(event) => handleNavClick(event, link, "mobile_nav")}
-                >
-                  {link.label}
-                </a>
-              ))}
+            <div className="flex items-start justify-between gap-4 rounded-2xl border px-4 py-3"
+              style={{ background: "rgba(255,255,255,0.78)", borderColor: "rgba(0,174,239,0.14)" }}>
+              <div>
+                <p className="text-[11px] font-black uppercase tracking-[0.22em]" style={{ color: "#0088CC" }}>
+                  Menu
+                </p>
+                <p className="mt-1 text-sm font-semibold text-slate-600">
+                  Choose where you want to go next.
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full border transition-colors hover:bg-sky-50"
+                style={{ borderColor: "rgba(15,23,42,0.12)", color: "#0F172A" }}
+                aria-label="Close navigation menu"
+              >
+                <X className="h-4 w-4" aria-hidden="true" />
+              </button>
             </div>
 
-            <div className="mt-2 mb-3 rounded-2xl border border-primary/15 bg-primary/5 px-4 py-3">
+            <div className="mt-3 grid gap-2">
+              {sectionLinks.map((link) => {
+                const active = isActivePage(link.href);
+                return (
+                  <a
+                    key={link.href}
+                    href={link.href}
+                    className="flex items-center justify-between rounded-2xl border px-4 py-3.5 text-[15px] font-bold transition-all focus:outline-none focus:ring-2 focus:ring-primary"
+                    style={{
+                      minHeight: "52px",
+                      color: active ? "#0079C1" : "#0F172A",
+                      background: active ? "rgba(0,174,239,0.09)" : "rgba(255,255,255,0.72)",
+                      borderColor: active ? "rgba(0,174,239,0.28)" : "rgba(15,23,42,0.08)",
+                      boxShadow: active ? "0 10px 26px rgba(0,174,239,0.10)" : "none",
+                    }}
+                    onClick={(event) => handleNavClick(event, link, "mobile_nav")}
+                  >
+                    <span>{link.label}</span>
+                    <span
+                      aria-hidden="true"
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-xs"
+                      style={{
+                        background: active ? "#00AEEF" : "rgba(15,23,42,0.05)",
+                        color: active ? "#fff" : "#64748B",
+                      }}
+                    >
+                      →
+                    </span>
+                  </a>
+                );
+              })}
+            </div>
+
+            <div className="mt-4 rounded-2xl border px-4 py-4" style={{ background: "rgba(0,174,239,0.06)", borderColor: "rgba(0,174,239,0.16)" }}>
               {mobileUserName ? (
                 <>
-                  <p className="text-[11px] font-semibold uppercase tracking-widest text-primary/70 mb-1">Signed in</p>
-                  <p className="text-sm font-semibold text-foreground truncate">{mobileUserName}</p>
-                  <p className="text-xs text-muted-foreground capitalize">{mobileUserRole || "client"}</p>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCTA("client_dashboard", "mobile_nav");
-                      closeAll();
-                      navigate("/client-portal");
-                    }}
-                    className="mt-3 w-full flex items-center justify-center gap-1.5 px-4 py-2.5 rounded-lg text-white text-[13px] font-bold transition-all hover:-translate-y-0.5"
-                    style={{ background: "linear-gradient(135deg, #0088CC, #00AEEF)" }}
-                  >
-                    Go to Client Portal →
-                  </button>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/70">Signed in</p>
+                  <p className="mt-1 truncate text-sm font-bold text-slate-950">{mobileUserName}</p>
+                  <p className="text-xs capitalize text-slate-500">{mobileUserRole || "client"}</p>
+                  <div className="mt-3 grid grid-cols-1 gap-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackCTA("client_dashboard", "mobile_nav");
+                        closeAll();
+                        navigate("/client-portal");
+                      }}
+                      className="w-full rounded-xl text-[14px] font-black text-white transition-all hover:-translate-y-0.5"
+                      style={{ minHeight: "48px", background: "linear-gradient(135deg, #0088CC, #00AEEF)", boxShadow: "0 12px 26px rgba(0,174,239,0.24)" }}
+                    >
+                      Go to Client Portal
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackCTA("compare_packages", "mobile_nav");
+                        closeAll();
+                        navigateTo("/#pricing");
+                      }}
+                      className="w-full rounded-xl border bg-white text-[14px] font-black text-slate-950 transition-colors hover:bg-sky-50"
+                      style={{ minHeight: "48px", borderColor: "rgba(0,174,239,0.20)" }}
+                    >
+                      Compare Packages
+                    </button>
+                  </div>
                 </>
               ) : (
-                <div className="grid grid-cols-1 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCTA("client_login", "mobile_nav");
-                      closeAll();
-                      navigate("/login");
-                    }}
-                    className="w-full inline-flex items-center justify-center rounded-xl border text-[14px] font-bold transition-all hover:-translate-y-0.5 focus:ring-2 focus:ring-primary focus:outline-none"
-                    style={{
-                      minHeight: "48px",
-                      color: "#ffffff",
-                      background: "linear-gradient(135deg, #0088CC, #00AEEF)",
-                      borderColor: "rgba(53, 189, 241, 0.35)",
-                      boxShadow: "0 8px 22px rgba(0,174,239,0.22)",
-                    }}
-                  >
-                    Client Login
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      trackCTA("contact", "mobile_nav");
-                      closeAll();
-                      navigate("/contact");
-                    }}
-                    className="w-full inline-flex items-center justify-center rounded-xl border border-border text-[14px] font-bold text-foreground hover:bg-muted transition-colors"
-                    style={{ minHeight: "48px" }}
-                  >
-                    Contact ClientSurge
-                  </button>
-                </div>
+                <>
+                  <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/70">Client access</p>
+                  <p className="mt-1 text-sm font-semibold text-slate-600">Log in to your portal or compare packages.</p>
+                  <div className="mt-3 grid grid-cols-1 gap-2 sm:grid-cols-2">
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackCTA("client_login", "mobile_nav");
+                        closeAll();
+                        navigate("/login");
+                      }}
+                      className="w-full rounded-xl text-[14px] font-black text-white transition-all hover:-translate-y-0.5"
+                      style={{ minHeight: "48px", background: "linear-gradient(135deg, #0088CC, #00AEEF)", boxShadow: "0 12px 26px rgba(0,174,239,0.24)" }}
+                    >
+                      Client Login
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        trackCTA("contact", "mobile_nav");
+                        closeAll();
+                        navigate("/contact");
+                      }}
+                      className="w-full rounded-xl border bg-white text-[14px] font-black text-slate-950 transition-colors hover:bg-sky-50"
+                      style={{ minHeight: "48px", borderColor: "rgba(0,174,239,0.20)" }}
+                    >
+                      Contact
+                    </button>
+                  </div>
+                </>
               )}
             </div>
 
-            <div className="mt-5 flex gap-2">
-              <button
-                type="button"
-                onClick={() => {
-                  trackCTA("compare_packages", "mobile_nav");
-                  closeAll();
-                  navigateTo("/#pricing");
-                }}
-                className="cs-btn-primary cs-nav-cta flex-1"
-                style={{ minHeight: "unset" }}
-              >
-                <span style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: "6px", height: "40px" }}>
-                  Compare Packages
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  trackCTA("automations", "mobile_nav");
-                  closeAll();
-                  navigate("/automations");
-                }}
-                className="inline-flex items-center justify-center rounded-lg border border-border text-sm font-semibold text-foreground hover:bg-muted transition-colors"
-                style={{ flex: "0 0 auto", minHeight: "unset", height: "48px", padding: "0 20px" }}
-              >
-                Automations
-              </button>
-            </div>
+            <button
+              type="button"
+              onClick={() => {
+                trackCTA("compare_packages", "mobile_nav_footer");
+                closeAll();
+                navigateTo("/#pricing");
+              }}
+              className="mt-3 flex w-full items-center justify-center rounded-2xl text-[15px] font-black text-white transition-all hover:-translate-y-0.5"
+              style={{
+                minHeight: "52px",
+                background: "linear-gradient(135deg,#006BB0 0%,#00AEEF 100%)",
+                boxShadow: "0 16px 34px rgba(0,174,239,0.28)",
+              }}
+            >
+              Compare Packages
+            </button>
           </div>
         </>
       )}
