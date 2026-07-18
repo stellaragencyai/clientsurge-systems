@@ -5,7 +5,6 @@ import PremiumNavbar from "../components/landing/PremiumNavbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
 import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
-import AutomationCommandPreview from "../components/landing/AutomationCommandPreview.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
 
@@ -216,14 +215,7 @@ export default function Home() {
             </SectionErrorBoundary>
           </HomepageSectionFrame>
 
-          {/* 4. Product visual — IdentityIQ-style tabs, containers, and floating popups */}
-          <HomepageSectionFrame name="automation-command-preview" accent>
-            <SectionErrorBoundary sectionName="automation-command-preview">
-              <AutomationCommandPreview />
-            </SectionErrorBoundary>
-          </HomepageSectionFrame>
-
-          {/* 5. Six Core Automations — product-style showcase */}
+          {/* 4. Six Core Automations — product-style showcase */}
           <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <HomepageSectionDivider label="Six core automations" />
           <HomepageSectionFrame name="automations">
@@ -232,7 +224,7 @@ export default function Home() {
             </SectionErrorBoundary>
           </HomepageSectionFrame>
 
-          {/* 6. Industries — vertical-specific templates */}
+          {/* 5. Industries — vertical-specific templates */}
           <div id="industries" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <HomepageSectionDivider label="Built for local service businesses" />
           <HomepageSectionFrame name="industries" accent>
@@ -241,7 +233,7 @@ export default function Home() {
             </LazyHomepageSection>
           </HomepageSectionFrame>
 
-          {/* 7. Trust — security, verification, architecture, transparency */}
+          {/* 6. Trust — security, verification, architecture, transparency */}
           <HomepageSectionDivider label="Trust and transparency" />
           <HomepageSectionFrame name="trust">
             <SectionErrorBoundary sectionName="trust">
@@ -249,7 +241,7 @@ export default function Home() {
             </SectionErrorBoundary>
           </HomepageSectionFrame>
 
-          {/* 8. Pricing / Core Offer */}
+          {/* 7. Pricing / Core Offer */}
           <div id="pricing" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <HomepageSectionDivider label="Choose your system" />
           <HomepageSectionFrame name="pricing" accent>
@@ -258,7 +250,7 @@ export default function Home() {
             </SectionErrorBoundary>
           </HomepageSectionFrame>
 
-          {/* 9. FAQ — accordion section */}
+          {/* 8. FAQ — accordion section */}
           <div id="faq" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
           <HomepageSectionDivider label="Questions before checkout" />
           <HomepageSectionFrame name="faq">
@@ -267,7 +259,7 @@ export default function Home() {
             </SectionErrorBoundary>
           </HomepageSectionFrame>
 
-          {/* 10. Final CTA — booking conversion */}
+          {/* 9. Final CTA — booking conversion */}
           <HomepageSectionFrame name="final-cta" accent>
             <LazyHomepageSection fallback={<SectionSkeleton height="400px" />}>
               <FinalCTA />
