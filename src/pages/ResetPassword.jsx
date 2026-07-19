@@ -1,11 +1,9 @@
 import React, { useState } from "react";
 import { Link, useSearchParams } from "react-router-dom";
+import { AlertTriangle, Lock } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Lock, Loader2, AlertTriangle } from "lucide-react";
 import AuthLayout from "@/components/AuthLayout";
+import { CSAlert, CSButton, CSField } from "@/components/design-system";
 
 function validatePassword(password) {
   if (password.length < 8) return "Password must be at least 8 characters.";
@@ -18,14 +16,13 @@ function validatePassword(password) {
 export default function ResetPassword() {
   const [searchParams] = useSearchParams();
   const resetToken = searchParams.get("token");
-
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
 
     const passwordError = validatePassword(newPassword);
@@ -35,7 +32,7 @@ export default function ResetPassword() {
     }
 
     if (newPassword !== confirmPassword) {
-      setError("Passwords do not match");
+      setError("Passwords do not match.");
       return;
     }
 
@@ -43,8 +40,8 @@ export default function ResetPassword() {
     try {
       await base44.auth.resetPassword({ resetToken, newPassword });
       window.location.href = "/login";
-    } catch (err) {
-      setError(err.message || "Failed to reset password");
+    } catch (requestError) {
+      setError(requestError.message || "The password could not be reset. Request a new link and try again.");
     } finally {
       setLoading(false);
     }
@@ -54,17 +51,13 @@ export default function ResetPassword() {
     return (
       <AuthLayout
         icon={AlertTriangle}
-        title="Invalid reset link"
-        subtitle="This password reset link is missing or invalid"
-        footer={
-          <Link to="/forgot-password" className="text-primary font-medium hover:underline">
-            Request a new link
-          </Link>
-        }
+        title="Reset link unavailable"
+        subtitle="This link is incomplete, invalid, or has expired."
+        footer={<Link to="/forgot-password">Request a new secure link</Link>}
       >
-        <p className="text-sm text-foreground text-center">
-          The link you used appears to be incomplete. Please request a new password reset email.
-        </p>
+        <CSAlert tone="warning" title="A new link is required">
+          Request another password-reset email to continue safely.
+        </CSAlert>
       </AuthLayout>
     );
   }
@@ -72,61 +65,56 @@ export default function ResetPassword() {
   return (
     <AuthLayout
       icon={Lock}
-      title="New password"
-      subtitle="Enter your new password below"
+      title="Create a new password"
+      subtitle="Choose a strong password for your ClientSurge account."
+      footer={<Link to="/login">Return to secure sign in</Link>}
     >
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
+      {error ? (
+        <CSAlert tone="danger" title="Password could not be updated">
           {error}
-        </div>
-      )}
-      <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-        <div className="space-y-2">
-          <Label htmlFor="password">New Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              autoFocus
-              placeholder="••••••••"
-              value={newPassword}
-              onChange={(e) => { setNewPassword(e.target.value); setError(""); }}
-              className="pl-10 h-12"
-              required
-              aria-invalid={Boolean(error)}
-            />
-          </div>
-          <p className="text-xs text-muted-foreground">Use at least 8 characters with uppercase, lowercase, and a number.</p>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm">Confirm Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="confirm"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => { setConfirmPassword(e.target.value); setError(""); }}
-              className="pl-10 h-12"
-              required
-              aria-invalid={Boolean(error)}
-            />
-          </div>
-        </div>
-        <Button type="submit" className="w-full h-12 font-medium" disabled={loading}>
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Resetting...
-            </>
-          ) : (
-            "Reset password"
-          )}
-        </Button>
+        </CSAlert>
+      ) : null}
+
+      <form onSubmit={handleSubmit} noValidate>
+        <CSField
+          id="new-password"
+          label="New password"
+          hint="Use at least 8 characters with uppercase, lowercase, and a number."
+          required
+        >
+          <input
+            className="cs-auth-input"
+            type="password"
+            autoComplete="new-password"
+            autoFocus
+            placeholder="Enter a strong password"
+            value={newPassword}
+            onChange={(event) => {
+              setNewPassword(event.target.value);
+              setError("");
+            }}
+            required
+          />
+        </CSField>
+
+        <CSField id="confirm-password" label="Confirm password" required>
+          <input
+            className="cs-auth-input"
+            type="password"
+            autoComplete="new-password"
+            placeholder="Repeat your new password"
+            value={confirmPassword}
+            onChange={(event) => {
+              setConfirmPassword(event.target.value);
+              setError("");
+            }}
+            required
+          />
+        </CSField>
+
+        <CSButton className="cs-auth-submit" type="submit" size="lg" loading={loading}>
+          Update password securely
+        </CSButton>
       </form>
     </AuthLayout>
   );
