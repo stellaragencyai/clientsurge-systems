@@ -1,0 +1,172 @@
+.cs-auth-layout {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(280px, 0.8fr) minmax(0, 1.2fr);
+  background: var(--cs-bg-app);
+}
+
+.cs-auth-layout__brand {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(2rem, 5vw, 4.5rem);
+  background: linear-gradient(155deg, var(--cs-navy-950), var(--cs-navy-800));
+  color: var(--cs-text-inverse);
+}
+
+.cs-auth-layout__brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 750;
+  letter-spacing: -0.02em;
+}
+
+.cs-auth-layout__brand-mark {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-blue-500);
+  color: white;
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.cs-auth-layout__brand-copy {
+  max-width: 34rem;
+}
+
+.cs-auth-layout__brand-copy h2 {
+  margin: 0;
+  font-size: clamp(2rem, 4vw, 3.5rem);
+  line-height: 1.03;
+  letter-spacing: -0.045em;
+}
+
+.cs-auth-layout__brand-copy p {
+  margin: 1.25rem 0 0;
+  max-width: 42ch;
+  color: rgba(255, 255, 255, 0.74);
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+.cs-auth-layout__assurance {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.875rem;
+}
+
+.cs-auth-layout__workspace {
+  display: grid;
+  place-items: center;
+  padding: clamp(1.5rem, 5vw, 5rem);
+}
+
+.cs-auth-layout__panel {
+  width: min(100%, 31rem);
+}
+
+.cs-auth-layout__heading {
+  margin-bottom: 1.75rem;
+}
+
+.cs-auth-layout__icon {
+  display: grid;
+  place-items: center;
+  width: 3rem;
+  height: 3rem;
+  margin-bottom: 1rem;
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-blue-50);
+  color: var(--cs-blue-700);
+}
+
+.cs-auth-layout__heading h1 {
+  margin: 0;
+  color: var(--cs-text-primary);
+  font-size: clamp(1.8rem, 3vw, 2.35rem);
+  line-height: 1.15;
+  letter-spacing: -0.035em;
+}
+
+.cs-auth-layout__heading p {
+  margin: 0.65rem 0 0;
+  color: var(--cs-text-secondary);
+  line-height: 1.65;
+}
+
+.cs-auth-layout__card {
+  padding: clamp(1.25rem, 3vw, 2rem);
+  border: 1px solid var(--cs-border);
+  border-radius: var(--cs-radius-xl);
+  background: var(--cs-bg-surface);
+  box-shadow: var(--cs-shadow-sm);
+}
+
+.cs-auth-layout__footer {
+  margin: 1.25rem 0 0;
+  text-align: center;
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+}
+
+.cs-auth-layout__footer a {
+  color: var(--cs-blue-700);
+  font-weight: 650;
+  text-decoration: none;
+}
+
+.cs-auth-layout__footer a:hover {
+  text-decoration: underline;
+}
+
+.cs-auth-layout .cs-auth-input {
+  width: 100%;
+  min-height: 3rem;
+  border: 1px solid var(--cs-border-strong);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-bg-surface);
+  color: var(--cs-text-primary);
+}
+
+.cs-auth-layout .cs-auth-input:focus-visible {
+  outline: none;
+  border-color: var(--cs-blue-500);
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-auth-layout .cs-auth-submit {
+  width: 100%;
+}
+
+@media (max-width: 860px) {
+  .cs-auth-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-auth-layout__brand {
+    min-height: 14rem;
+    padding: 1.5rem;
+  }
+
+  .cs-auth-layout__brand-copy {
+    margin-top: 2rem;
+  }
+
+  .cs-auth-layout__brand-copy h2 {
+    font-size: clamp(1.75rem, 8vw, 2.5rem);
+  }
+
+  .cs-auth-layout__assurance {
+    margin-top: 1.5rem;
+  }
+
+  .cs-auth-layout__workspace {
+    padding: 2rem 1rem 3rem;
+  }
+}
