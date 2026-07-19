@@ -58,18 +58,20 @@
   text-align: left;
   cursor: pointer;
 }
-.cs-activation-nav__item:hover:not(:disabled) { background: rgb(255 255 255 / 0.07); color: white; }
+.cs-activation-nav__item:hover:not([aria-disabled="true"]) { background: rgb(255 255 255 / 0.07); color: white; }
 .cs-activation-nav__item:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(22 131 255 / 0.38); }
 .cs-activation-nav__item--current { border-color: rgb(22 131 255 / 0.38); background: rgb(22 131 255 / 0.16); color: white; }
 .cs-activation-nav__item--complete { color: rgb(255 255 255 / 0.9); }
-.cs-activation-nav__item--blocked { opacity: 0.55; cursor: not-allowed; }
+.cs-activation-nav__item[aria-disabled="true"] { opacity: 0.72; cursor: not-allowed; }
+.cs-activation-nav__item--blocked[aria-disabled="true"] { opacity: 0.86; }
 .cs-activation-nav__marker { display: grid; width: 28px; height: 28px; place-items: center; border: 1px solid rgb(255 255 255 / 0.22); border-radius: 999px; }
 .cs-activation-nav__item--complete .cs-activation-nav__marker { border-color: var(--cs-success-100); background: var(--cs-success-700); }
 .cs-activation-nav__item--current .cs-activation-nav__marker { border-color: var(--cs-blue-500); background: var(--cs-blue-500); }
 .cs-activation-nav__copy { display: grid; gap: 2px; min-width: 0; }
 .cs-activation-nav__index { color: rgb(255 255 255 / 0.48); font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; }
 .cs-activation-nav__label { font-size: 0.92rem; font-weight: 680; }
-.cs-activation-nav__optional, .cs-activation-nav__reason { color: rgb(255 255 255 / 0.5); font-size: 0.74rem; line-height: 1.4; }
+.cs-activation-nav__optional,
+.cs-activation-nav__reason { color: rgb(255 255 255 / 0.5); font-size: 0.74rem; line-height: 1.4; }
 .cs-activation-shell__support { margin-top: auto; }
 
 .cs-activation-shell__workspace { min-width: 0; display: flex; min-height: 100svh; flex-direction: column; }
