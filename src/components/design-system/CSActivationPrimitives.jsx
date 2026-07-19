@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { AlertTriangle, Check, Circle, Cloud, CloudOff, LockKeyhole } from "lucide-react";
 import { CSAlert, CSButton, CSPageHeader, CSStatusBadge } from "./CSProductPrimitives";
 import "@/styles/clientsurge-os-activation.css";
@@ -30,6 +31,8 @@ export function CSAutosaveStatus({ status = "saved", label, className }) {
 }
 
 export function CSActivationStepNav({ steps = [], currentStepId, onStepSelect, className }) {
+  const navigationId = useId();
+
   return (
     <nav className={cx("cs-activation-nav", className)} aria-label="Activation steps">
       <ol>
@@ -37,22 +40,36 @@ export function CSActivationStepNav({ steps = [], currentStepId, onStepSelect, c
           const status = step.id === currentStepId ? "current" : (step.status || "available");
           const Icon = STEP_ICONS[status] || Circle;
           const disabled = status === "blocked" || step.disabled;
+          const disabledReason =
+            step.blockedReason ||
+            step.blockedMessage ||
+            step.unavailableReason ||
+            step.disabledReason ||
+            (disabled ? "Complete the required activation item before opening this step." : "");
+          const disabledReasonId = disabledReason ? `${navigationId}-${step.id || index}-reason` : undefined;
           return (
             <li key={step.id}>
               <button
                 type="button"
                 className={cx("cs-activation-nav__item", `cs-activation-nav__item--${status}`)}
                 aria-current={status === "current" ? "step" : undefined}
-                aria-disabled={disabled || undefined}
-                disabled={disabled}
-                onClick={() => onStepSelect?.(step)}
+                aria-disabled={disabled ? "true" : undefined}
+                aria-describedby={disabledReasonId}
+                onClick={(event) => {
+                  if (disabled) {
+                    event.preventDefault();
+                    return;
+                  }
+
+                  onStepSelect?.(step);
+                }}
               >
                 <span className="cs-activation-nav__marker" aria-hidden="true"><Icon size={16} /></span>
                 <span className="cs-activation-nav__copy">
                   <span className="cs-activation-nav__index">Step {index + 1}</span>
                   <span className="cs-activation-nav__label">{step.label}</span>
                   {step.optional ? <span className="cs-activation-nav__optional">Optional</span> : null}
-                  {step.blockedReason ? <span className="cs-activation-nav__reason">{step.blockedReason}</span> : null}
+                  {disabledReason ? <span id={disabledReasonId} className="cs-activation-nav__reason">{disabledReason}</span> : null}
                 </span>
               </button>
             </li>

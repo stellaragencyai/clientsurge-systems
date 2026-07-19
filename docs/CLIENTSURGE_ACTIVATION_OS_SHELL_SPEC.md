@@ -59,7 +59,7 @@ The UI must never display a saved state before persistence succeeds.
 - Completed steps are selectable.
 - Current step is selectable and marked with `aria-current="step"`.
 - Upcoming steps remain unavailable unless a step explicitly declares `available: true`.
-- Blocked steps display a visible blocked status.
+- Blocked and unavailable steps display a visible reason and keep the disabled control focusable with `aria-disabled` plus descriptive helper text.
 - Step selection does not bypass container-level validation or persistence guards.
 
 ## Accessibility contract
@@ -69,6 +69,7 @@ The UI must never display a saved state before persistence succeeds.
 - The current step uses `aria-current="step"`.
 - Save status uses polite live announcements, except save failure uses assertive alert semantics.
 - Progress uses native `progress` semantics on mobile.
+- Blocked or unavailable step controls expose their disabled reason through visible text referenced by `aria-describedby`.
 - Buttons retain visible focus and minimum practical touch targets.
 - Icons are decorative unless they communicate unique information.
 - Motion respects reduced-motion settings.
@@ -101,10 +102,10 @@ Tablet and mobile:
 
 ## Integration boundary
 
-This branch intentionally adds an isolated shell. It should be integrated only after PR #1353 completes its Codex validation checkpoint. The follow-on integration must:
+After rebasing onto PR #1353, the shared activation primitives live in the Design System boundary. This branch keeps an activation-specific compatibility adapter and contract layer so downstream setup flows can adopt those primitives without introducing a competing shell. The follow-on integration must:
 
 1. Rebase on the validated Design System 2.1 branch.
-2. Export the shell through the central component boundary or an activation-specific index.
+2. Use the shared Design System activation primitives as the rendering source of truth.
 3. Import the activation stylesheet through the approved application style entry point.
 4. Connect the shell to the current Business Setup and credentials/onboarding architecture through an adapter.
 5. Preserve existing backend behavior until a separately reviewed migration changes it.
