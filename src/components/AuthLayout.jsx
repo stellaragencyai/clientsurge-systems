@@ -1,5 +1,6 @@
 import React from "react";
 import { ShieldCheck } from "lucide-react";
+import "@/styles/clientsurge-os-auth-layout.css";
 
 export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
   return (
