@@ -1,0 +1,161 @@
+.cs-auth-surface {
+  min-height: 100svh;
+  background: var(--cs-bg-app);
+  color: var(--cs-text-primary);
+}
+
+.cs-auth-surface__hero {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: minmax(0, 0.95fr) minmax(420px, 1.05fr);
+}
+
+.cs-auth-surface__brand-panel {
+  display: flex;
+  min-height: 100%;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: var(--cs-space-12);
+  padding: clamp(28px, 5vw, 72px);
+  background:
+    radial-gradient(circle at 12% 10%, rgb(22 131 255 / 0.18), transparent 30%),
+    linear-gradient(155deg, var(--cs-navy-950), var(--cs-navy-800));
+  color: var(--cs-text-inverse);
+}
+
+.cs-auth-surface__brand-lockup {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.cs-auth-surface__brand-mark {
+  display: grid;
+  width: 38px;
+  height: 38px;
+  place-items: center;
+  border: 1px solid rgb(255 255 255 / 0.22);
+  border-radius: var(--cs-radius-md);
+  background: rgb(255 255 255 / 0.09);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+}
+
+.cs-auth-surface__brand-content {
+  max-width: 640px;
+}
+
+.cs-auth-surface__brand-content h1 {
+  margin: var(--cs-space-5) 0 0;
+  max-width: 12ch;
+  font-size: clamp(2.5rem, 5vw, 5rem);
+  line-height: 0.98;
+  letter-spacing: -0.055em;
+}
+
+.cs-auth-surface__brand-content > p {
+  max-width: 58ch;
+  margin: var(--cs-space-6) 0 0;
+  color: rgb(255 255 255 / 0.74);
+  font-size: clamp(1rem, 1.5vw, 1.2rem);
+  line-height: 1.7;
+}
+
+.cs-auth-surface__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-3);
+  margin-top: var(--cs-space-8);
+}
+
+.cs-auth-surface__assurance {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  max-width: 520px;
+  color: rgb(255 255 255 / 0.68);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cs-auth-surface__assurance svg {
+  flex: 0 0 auto;
+  color: var(--cs-blue-500);
+}
+
+.cs-auth-surface__workspace {
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 5vw, 72px);
+  background:
+    linear-gradient(rgb(255 255 255 / 0.82), rgb(255 255 255 / 0.92)),
+    radial-gradient(circle at 80% 10%, var(--cs-blue-50), transparent 36%);
+}
+
+.cs-auth-surface__access-card {
+  width: min(100%, 620px);
+  box-shadow: var(--cs-shadow-md);
+}
+
+.cs-auth-surface__benefits {
+  display: grid;
+  gap: var(--cs-space-4);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-auth-surface__benefits li {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--cs-space-3);
+  color: var(--cs-text-secondary);
+  line-height: 1.55;
+}
+
+.cs-auth-surface__benefits svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: var(--cs-blue-600);
+}
+
+@media (max-width: 900px) {
+  .cs-auth-surface__hero {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-auth-surface__brand-panel {
+    min-height: auto;
+    padding-bottom: 48px;
+  }
+
+  .cs-auth-surface__brand-content h1 {
+    max-width: 14ch;
+  }
+
+  .cs-auth-surface__workspace {
+    min-height: 460px;
+  }
+}
+
+@media (max-width: 540px) {
+  .cs-auth-surface__brand-panel,
+  .cs-auth-surface__workspace {
+    padding: 24px 18px;
+  }
+
+  .cs-auth-surface__brand-panel {
+    gap: 40px;
+  }
+
+  .cs-auth-surface__actions {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .cs-auth-surface__actions > * {
+    width: 100%;
+  }
+}
