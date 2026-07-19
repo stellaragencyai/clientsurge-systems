@@ -121,6 +121,162 @@
   color: var(--cs-blue-600);
 }
 
+.cs-portal-login {
+  display: grid;
+  gap: var(--cs-space-5);
+}
+
+.cs-portal-login .cs-status-badge {
+  width: fit-content;
+  gap: var(--cs-space-2);
+  text-transform: uppercase;
+}
+
+.cs-portal-login__status-dot {
+  width: 0.4rem;
+  height: 0.4rem;
+  border-radius: 999px;
+  background: currentColor;
+}
+
+.cs-portal-login__form,
+.cs-portal-login__success-actions {
+  display: grid;
+  gap: var(--cs-space-4);
+}
+
+.cs-portal-login__submit {
+  width: 100%;
+}
+
+.cs-portal-login__submit svg {
+  width: 1rem;
+  height: 1rem;
+}
+
+.cs-portal-login__secondary-actions {
+  display: grid;
+  justify-items: center;
+  gap: var(--cs-space-3);
+  padding-top: var(--cs-space-1);
+}
+
+.cs-portal-login__text-button,
+.cs-portal-login__inline-button {
+  border: 0;
+  background: transparent;
+  color: var(--cs-color-text-muted);
+  font: inherit;
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+
+.cs-portal-login__text-button {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: var(--cs-space-2);
+  padding: 0 var(--cs-space-3);
+}
+
+.cs-portal-login__inline-button {
+  min-height: 44px;
+  padding: 0;
+  color: var(--cs-color-action);
+  font-weight: 700;
+}
+
+.cs-portal-login__text-button:hover,
+.cs-portal-login__inline-button:hover {
+  color: var(--cs-color-action);
+  text-decoration: underline;
+}
+
+.cs-portal-login__text-button:focus-visible,
+.cs-portal-login__inline-button:focus-visible,
+.cs-portal-login__role-option:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-portal-login__footer-note {
+  margin: 0;
+  color: var(--cs-color-text-muted);
+  font-size: 0.875rem;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.cs-portal-login__role-list {
+  display: grid;
+  gap: var(--cs-space-3);
+}
+
+.cs-portal-login__role-option {
+  display: grid;
+  min-height: 104px;
+  grid-template-columns: 44px minmax(0, 1fr) 20px;
+  align-items: center;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-color-surface);
+  color: var(--cs-color-text-strong);
+  text-align: left;
+  cursor: pointer;
+  transition: border-color var(--cs-transition-fast), background-color var(--cs-transition-fast), box-shadow var(--cs-transition-fast);
+}
+
+.cs-portal-login__role-option:hover {
+  border-color: var(--cs-color-action-border);
+  background: var(--cs-color-action-soft);
+  box-shadow: var(--cs-shadow-sm);
+}
+
+.cs-portal-login__role-option > svg {
+  width: 1rem;
+  height: 1rem;
+  color: var(--cs-color-text-muted);
+}
+
+.cs-portal-login__role-icon {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  place-items: center;
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-action-soft);
+  color: var(--cs-color-action);
+}
+
+.cs-portal-login__role-icon--client {
+  background: var(--cs-color-surface-muted);
+  color: var(--cs-color-navy);
+}
+
+.cs-portal-login__role-icon svg {
+  width: 1.25rem;
+  height: 1.25rem;
+}
+
+.cs-portal-login__role-title,
+.cs-portal-login__role-description {
+  display: block;
+}
+
+.cs-portal-login__role-title {
+  margin-bottom: var(--cs-space-1);
+  font-weight: 800;
+}
+
+.cs-portal-login__role-description {
+  color: var(--cs-color-text-muted);
+  font-size: 0.8125rem;
+  line-height: 1.5;
+}
+
 @media (max-width: 900px) {
   .cs-auth-surface__hero {
     grid-template-columns: 1fr;
@@ -157,5 +313,13 @@
 
   .cs-auth-surface__actions > * {
     width: 100%;
+  }
+
+  .cs-portal-login__role-option {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .cs-portal-login__role-option > svg {
+    display: none;
   }
 }

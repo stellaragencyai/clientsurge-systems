@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useId, useMemo, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import { Check, ChevronDown, Info, X } from "lucide-react";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
 import { CSButton } from "./CSProductPrimitives";
 
 const cx = (...values) => values.filter(Boolean).join(" ");
@@ -19,9 +20,7 @@ function useEscape(handler, enabled = true) {
 function useBodyScrollLock(enabled) {
   useEffect(() => {
     if (!enabled) return undefined;
-    const previous = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = previous; };
+    return acquireBodyScrollLock("cs-overlay");
   }, [enabled]);
 }
 
@@ -30,13 +29,19 @@ function useFocusReturn(open) {
   useEffect(() => {
     if (open) {
       previousFocus.current = document.activeElement;
-      return;
+      return () => {
+        if (previousFocus.current instanceof HTMLElement && document.contains(previousFocus.current)) {
+          previousFocus.current.focus();
+        }
+        previousFocus.current = null;
+      };
     }
 
-    if (previousFocus.current instanceof HTMLElement) {
+    if (previousFocus.current instanceof HTMLElement && document.contains(previousFocus.current)) {
       previousFocus.current.focus();
       previousFocus.current = null;
     }
+    return undefined;
   }, [open]);
 }
 
