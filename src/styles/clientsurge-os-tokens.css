@@ -1,0 +1,102 @@
+:root {
+  color-scheme: light;
+
+  --cs-bg-app: #f5f7fb;
+  --cs-bg-surface: #ffffff;
+  --cs-bg-subtle: #f8fafc;
+  --cs-bg-muted: #eef2f7;
+
+  --cs-border: #dfe5ee;
+  --cs-border-strong: #c8d1df;
+
+  --cs-text-primary: #102033;
+  --cs-text-secondary: #475569;
+  --cs-text-muted: #718096;
+  --cs-text-inverse: #ffffff;
+
+  --cs-navy-950: #071525;
+  --cs-navy-900: #0a1c30;
+  --cs-navy-800: #102a46;
+  --cs-navy-700: #173a5f;
+
+  --cs-blue-700: #0757c8;
+  --cs-blue-600: #0969e8;
+  --cs-blue-500: #1683ff;
+  --cs-blue-100: #dcebff;
+  --cs-blue-50: #eef6ff;
+
+  --cs-success-700: #087443;
+  --cs-success-100: #d9f7e8;
+  --cs-warning-700: #9a5b00;
+  --cs-warning-100: #fff0c2;
+  --cs-danger-700: #b42318;
+  --cs-danger-100: #fee4e2;
+  --cs-info-700: #175cd3;
+  --cs-info-100: #dbeafe;
+
+  --cs-radius-sm: 8px;
+  --cs-radius-md: 12px;
+  --cs-radius-lg: 16px;
+  --cs-radius-xl: 22px;
+
+  --cs-shadow-xs: 0 1px 2px rgb(16 32 51 / 0.05);
+  --cs-shadow-sm: 0 2px 8px rgb(16 32 51 / 0.08);
+  --cs-shadow-md: 0 12px 30px rgb(16 32 51 / 0.10);
+
+  --cs-space-1: 4px;
+  --cs-space-2: 8px;
+  --cs-space-3: 12px;
+  --cs-space-4: 16px;
+  --cs-space-5: 20px;
+  --cs-space-6: 24px;
+  --cs-space-8: 32px;
+  --cs-space-10: 40px;
+  --cs-space-12: 48px;
+
+  --cs-sidebar-width: 272px;
+  --cs-topbar-height: 64px;
+  --cs-content-max: 1480px;
+
+  --cs-focus-ring: 0 0 0 3px rgb(22 131 255 / 0.28);
+  --cs-transition-fast: 140ms ease;
+  --cs-transition-base: 200ms ease;
+}
+
+.cs-focusable:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-surface {
+  background: var(--cs-bg-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: var(--cs-radius-lg);
+  box-shadow: var(--cs-shadow-xs);
+}
+
+.cs-page-title {
+  margin: 0;
+  color: var(--cs-text-primary);
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.cs-page-description {
+  margin: var(--cs-space-2) 0 0;
+  max-width: 72ch;
+  color: var(--cs-text-secondary);
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
