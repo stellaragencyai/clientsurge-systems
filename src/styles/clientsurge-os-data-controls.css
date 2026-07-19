@@ -1,0 +1,26 @@
+.cs-visually-hidden { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+.cs-search-field { display: grid; min-height: 44px; grid-template-columns: 20px 1fr 36px; align-items: center; gap: var(--cs-space-2); padding: 0 var(--cs-space-3); border: 1px solid var(--cs-color-border); border-radius: var(--cs-radius-md); background: var(--cs-color-surface); color: var(--cs-color-text-muted); }
+.cs-search-field:focus-within { border-color: var(--cs-color-action); box-shadow: var(--cs-focus-ring); }
+.cs-search-field > svg { width: 18px; height: 18px; }
+.cs-search-field input { min-width: 0; border: 0; outline: 0; background: transparent; color: var(--cs-color-text-strong); }
+.cs-search-field button { display: grid; width: 32px; height: 32px; place-items: center; border: 0; border-radius: var(--cs-radius-sm); background: transparent; color: var(--cs-color-text-muted); cursor: pointer; }
+.cs-search-field button:hover { background: var(--cs-color-surface-muted); color: var(--cs-color-text-strong); }
+.cs-search-field button svg { width: 16px; height: 16px; }
+.cs-filter-bar { display: flex; align-items: end; gap: var(--cs-space-4); padding: var(--cs-space-4); border: 1px solid var(--cs-color-border); border-radius: var(--cs-radius-lg); background: var(--cs-color-surface-subtle); }
+.cs-filter-bar__label { display: inline-flex; min-height: 40px; align-items: center; gap: var(--cs-space-2); color: var(--cs-color-text-strong); font-weight: 700; }
+.cs-filter-bar__label svg { width: 18px; height: 18px; color: var(--cs-color-action); }
+.cs-filter-bar__count { display: inline-grid; min-width: 22px; height: 22px; place-items: center; border-radius: 999px; background: var(--cs-color-action); color: white; font-size: .75rem; }
+.cs-filter-bar__controls { display: flex; flex: 1; flex-wrap: wrap; gap: var(--cs-space-3); }
+.cs-filter-bar__actions { display: flex; align-items: center; gap: var(--cs-space-3); }
+.cs-filter-bar__actions > button:not(.cs-button) { border: 0; background: transparent; color: var(--cs-color-action); font-weight: 700; cursor: pointer; }
+.cs-select-filter { display: grid; gap: var(--cs-space-1); color: var(--cs-color-text); font-size: .78rem; font-weight: 650; }
+.cs-select-filter select { min-height: 40px; padding: 0 36px 0 12px; border: 1px solid var(--cs-color-border); border-radius: var(--cs-radius-md); background: var(--cs-color-surface); color: var(--cs-color-text-strong); }
+.cs-select-filter select:focus-visible { outline: none; border-color: var(--cs-color-action); box-shadow: var(--cs-focus-ring); }
+.cs-pagination { display: flex; align-items: center; justify-content: space-between; gap: var(--cs-space-4); padding-top: var(--cs-space-4); }
+.cs-pagination p { margin: 0; color: var(--cs-color-text-muted); font-size: .875rem; }
+.cs-pagination__controls, .cs-pagination__pages { display: flex; align-items: center; gap: var(--cs-space-2); }
+.cs-pagination__pages button { display: grid; min-width: 36px; height: 36px; place-items: center; border: 1px solid transparent; border-radius: var(--cs-radius-md); background: transparent; color: var(--cs-color-text); cursor: pointer; }
+.cs-pagination__pages button:hover { background: var(--cs-color-surface-muted); }
+.cs-pagination__pages button[aria-current="page"] { border-color: var(--cs-color-action); background: var(--cs-color-action-soft); color: var(--cs-color-action); font-weight: 700; }
+.cs-pagination__pages button:focus-visible { outline: none; box-shadow: var(--cs-focus-ring); }
+@media (max-width: 760px) { .cs-filter-bar, .cs-pagination { align-items: stretch; flex-direction: column; } .cs-filter-bar__controls, .cs-filter-bar__actions { width: 100%; } .cs-select-filter { flex: 1 1 160px; } .cs-pagination__controls { justify-content: space-between; } .cs-pagination__pages { display: none; } }
