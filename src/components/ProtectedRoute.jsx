@@ -3,12 +3,11 @@ import { Outlet } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
 import { useSessionValidation } from "@/hooks/useSessionValidation";
-
-const DefaultFallback = () => (
-  <div className="fixed inset-0 flex items-center justify-center">
-    <div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" />
-  </div>
-);
+import {
+  CSAuthLoadingState,
+  CSSessionExpiredState,
+  CSUnauthorizedState,
+} from "@/components/design-system";
 
 function LoginRedirect({ navigateToLogin, fallback }) {
   useEffect(() => {
@@ -20,7 +19,7 @@ function LoginRedirect({ navigateToLogin, fallback }) {
 
 export default function ProtectedRoute({
   allowedRoles,
-  fallback = <DefaultFallback />,
+  fallback = <CSAuthLoadingState />,
   unauthenticatedElement,
   unauthorizedElement,
 }) {
@@ -41,6 +40,10 @@ export default function ProtectedRoute({
     return <UserNotRegisteredError />;
   }
 
+  if (["session_expired", "token_revoked", "invalid_session"].includes(authError?.type)) {
+    return <CSSessionExpiredState onSignIn={navigateToLogin} />;
+  }
+
   if (!isAuthenticated) {
     return (
       unauthenticatedElement || (
@@ -50,10 +53,11 @@ export default function ProtectedRoute({
   }
 
   if (allowedRoles?.length && !allowedRoles.includes(user?.role)) {
-    return unauthorizedElement || null;
+    const role = String(user?.role || "").toLowerCase();
+    const returnPath = role === "admin" || role === "super_admin" ? "/admin" : "/client-portal";
+    return unauthorizedElement || <CSUnauthorizedState onReturn={() => { window.location.href = returnPath; }} />;
   }
 
-  // Validate session on protected routes — catches revoked tokens
   return <ProtectedOutlet />;
 }
 
