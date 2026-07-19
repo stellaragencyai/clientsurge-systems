@@ -1,5 +1,24 @@
-import { useEffect, useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { Menu, X } from "lucide-react";
+import { acquireBodyScrollLock } from "@/lib/bodyScrollLock";
+
+const FOCUSABLE_SELECTOR = [
+  "a[href]",
+  "button:not([disabled])",
+  "input:not([disabled])",
+  "select:not([disabled])",
+  "textarea:not([disabled])",
+  "[tabindex]:not([tabindex='-1'])",
+].join(",");
+
+function getFocusableElements(container) {
+  if (!container) return [];
+
+  return Array.from(container.querySelectorAll(FOCUSABLE_SELECTOR)).filter((element) => {
+    const isHidden = element.getAttribute("aria-hidden") === "true";
+    return !isHidden && element.getClientRects().length > 0;
+  });
+}
 
 /**
  * Shared white-dominant ClientSurge OS application shell.
@@ -17,23 +36,94 @@ export default function CSAppShell({
   footer,
 }) {
   const [mobileOpen, setMobileOpen] = useState(false);
-  const navigationId = useId();
+  const shellId = useId();
+  const desktopNavigationId = `${shellId}-desktop-navigation`;
+  const mobileDrawerId = `${shellId}-mobile-navigation-drawer`;
+  const mobileNavigationId = `${shellId}-mobile-navigation`;
+  const menuButtonRef = useRef(null);
+  const mobilePanelRef = useRef(null);
+  const lastFocusedElementRef = useRef(null);
+  const shouldRestoreFocusRef = useRef(false);
 
   useEffect(() => {
     if (!mobileOpen) return undefined;
+
+    const releaseScrollLock = acquireBodyScrollLock("cs-app-shell-mobile-navigation");
+    const panel = mobilePanelRef.current;
+    const [firstFocusable] = getFocusableElements(panel);
+
+    window.requestAnimationFrame(() => {
+      (firstFocusable ?? panel)?.focus({ preventScroll: true });
+    });
+
     const onKeyDown = (event) => {
-      if (event.key === "Escape") setMobileOpen(false);
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMobileNavigation();
+        return;
+      }
+
+      if (event.key !== "Tab" || !panel) return;
+
+      const focusableElements = getFocusableElements(panel);
+      if (focusableElements.length === 0) {
+        event.preventDefault();
+        panel.focus({ preventScroll: true });
+        return;
+      }
+
+      const firstElement = focusableElements[0];
+      const lastElement = focusableElements[focusableElements.length - 1];
+      const activeElement = document.activeElement;
+
+      if (event.shiftKey && (!panel.contains(activeElement) || activeElement === firstElement)) {
+        event.preventDefault();
+        lastElement.focus({ preventScroll: true });
+        return;
+      }
+
+      if (!event.shiftKey && activeElement === lastElement) {
+        event.preventDefault();
+        firstElement.focus({ preventScroll: true });
+      }
     };
+
     document.addEventListener("keydown", onKeyDown);
-    return () => document.removeEventListener("keydown", onKeyDown);
+    return () => {
+      document.removeEventListener("keydown", onKeyDown);
+      releaseScrollLock();
+    };
   }, [mobileOpen]);
 
-  const handleNavigate = (item) => {
+  useEffect(() => {
+    if (mobileOpen || !shouldRestoreFocusRef.current) return;
+
+    shouldRestoreFocusRef.current = false;
+    const focusTarget = lastFocusedElementRef.current ?? menuButtonRef.current;
+    window.requestAnimationFrame(() => {
+      if (focusTarget?.isConnected) {
+        focusTarget.focus({ preventScroll: true });
+      }
+    });
+  }, [mobileOpen]);
+
+  const openMobileNavigation = () => {
+    lastFocusedElementRef.current = document.activeElement;
+    shouldRestoreFocusRef.current = true;
+    setMobileOpen(true);
+  };
+
+  const closeMobileNavigation = () => {
+    shouldRestoreFocusRef.current = true;
     setMobileOpen(false);
+  };
+
+  const handleNavigate = (item) => {
+    closeMobileNavigation();
     onNavigate?.(item);
   };
 
-  const sidebar = (
+  const renderSidebar = (navigationId) => (
     <aside className="cs-app-shell__sidebar" aria-label="Primary navigation">
       <div className="cs-app-shell__brand">{brand}</div>
       <nav id={navigationId} className="cs-app-shell__nav">
@@ -59,9 +149,13 @@ export default function CSAppShell({
     </aside>
   );
 
+  const inertBackgroundProps = mobileOpen ? { inert: "", "aria-hidden": "true" } : {};
+
   return (
     <div className="cs-app-shell">
-      <div className="cs-app-shell__desktop-sidebar">{sidebar}</div>
+      <div className="cs-app-shell__desktop-sidebar" {...inertBackgroundProps}>
+        {renderSidebar(desktopNavigationId)}
+      </div>
 
       {mobileOpen ? (
         <div className="cs-app-shell__mobile-layer" role="presentation">
@@ -69,31 +163,40 @@ export default function CSAppShell({
             className="cs-app-shell__backdrop"
             type="button"
             aria-label="Close navigation"
-            onClick={() => setMobileOpen(false)}
+            onClick={closeMobileNavigation}
           />
-          <div className="cs-app-shell__mobile-panel">
+          <div
+            id={mobileDrawerId}
+            ref={mobilePanelRef}
+            className="cs-app-shell__mobile-panel"
+            role="dialog"
+            aria-label="Primary navigation"
+            aria-modal="true"
+            tabIndex={-1}
+          >
             <button
               type="button"
               className="cs-app-shell__mobile-close cs-focusable"
               aria-label="Close navigation"
-              onClick={() => setMobileOpen(false)}
+              onClick={closeMobileNavigation}
             >
               <X aria-hidden="true" size={22} />
             </button>
-            {sidebar}
+            {renderSidebar(mobileNavigationId)}
           </div>
         </div>
       ) : null}
 
-      <section className="cs-app-shell__workspace">
+      <section className="cs-app-shell__workspace" {...inertBackgroundProps}>
         <header className="cs-app-shell__topbar">
           <button
+            ref={menuButtonRef}
             type="button"
             className="cs-app-shell__menu-button cs-focusable"
             aria-label="Open navigation"
-            aria-controls={navigationId}
+            aria-controls={mobileDrawerId}
             aria-expanded={mobileOpen}
-            onClick={() => setMobileOpen(true)}
+            onClick={openMobileNavigation}
           >
             <Menu aria-hidden="true" size={22} />
           </button>
