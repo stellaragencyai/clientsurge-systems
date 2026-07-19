@@ -1,6 +1,7 @@
 import React from "react";
 import { ChevronLeft, ChevronRight, Search, SlidersHorizontal, X } from "lucide-react";
 import { CSButton } from "./CSProductPrimitives";
+import "@/styles/clientsurge-os-data-controls.css";
 
 const cx = (...values) => values.filter(Boolean).join(" ");
 
