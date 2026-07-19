@@ -22,6 +22,55 @@ import {
 
 const cx = (...values) => values.filter(Boolean).join(" ");
 
+const actionQueueStates = {
+  verified_zero: {
+    title: "No human action is currently required",
+    description: "The action query completed successfully with required sources and permissions available.",
+    detail: "The queue is clear based on verified source data.",
+  },
+  not_loaded: {
+    title: "Action queue not loaded",
+    description: "The action query has not completed yet.",
+    detail: "Do not treat this as caught up until the query finishes.",
+  },
+  failed: {
+    title: "Action queue failed to load",
+    description: "The action query did not complete successfully.",
+    detail: "Retry before deciding whether human action is required.",
+  },
+  not_connected: {
+    title: "Action source not connected",
+    description: "Required sources are not connected yet.",
+    detail: "Connect the source before treating this queue as clear.",
+  },
+  restricted: {
+    title: "Action queue restricted",
+    description: "Your role cannot verify whether actions exist.",
+    detail: "Counts are withheld to avoid leaking restricted work.",
+  },
+  unsupported: {
+    title: "Action queue unsupported",
+    description: "This package or configuration does not support the requested action queue.",
+    detail: "Use an eligible module for this workflow.",
+  },
+  unknown: {
+    title: "Action queue not verified",
+    description: "There is not enough evidence to know whether actions exist.",
+    detail: "No action-clear state has been fabricated.",
+  },
+};
+
+const freshnessStates = {
+  live: "Live",
+  current: "Current",
+  delayed: "Delayed",
+  stale: "Stale",
+  partial: "Partial",
+  not_connected: "Not connected",
+  unavailable: "Unavailable",
+  unknown: "Freshness unknown",
+};
+
 export const COMMAND_CENTER_MODULES = [
   { id: "business-pulse", label: "Business Pulse", icon: HeartPulse },
   { id: "growth-snapshot", label: "Growth Snapshot", icon: CircleDollarSign },
@@ -69,7 +118,19 @@ function WorkforceRow({ name, role, status, activity, metric }) {
   );
 }
 
-function ActionItem({ title, description, priority = "Normal", icon: Icon = Sparkles, action }) {
+function ActionItem({
+  title,
+  description,
+  priority = "Normal",
+  owner = "Unassigned",
+  urgency = priority,
+  consequence,
+  evidence,
+  destination,
+  lifecycle = "New",
+  icon: Icon = Sparkles,
+  action,
+}) {
   const tone = priority === "Urgent" ? "danger" : priority === "High" ? "warning" : "info";
   return (
     <article className="cs-action-item">
@@ -80,6 +141,14 @@ function ActionItem({ title, description, priority = "Normal", icon: Icon = Spar
           <CSStatusBadge tone={tone}>{priority}</CSStatusBadge>
         </div>
         <p>{description}</p>
+        <dl className="cs-action-item__meta">
+          <div><dt>Owner</dt><dd>{owner}</dd></div>
+          <div><dt>Urgency</dt><dd>{urgency}</dd></div>
+          <div><dt>Consequence</dt><dd>{consequence || "Business impact not verified"}</dd></div>
+          <div><dt>Evidence</dt><dd>{evidence || "Evidence not verified"}</dd></div>
+          <div><dt>Destination</dt><dd>{destination || "No exact destination provided"}</dd></div>
+          <div><dt>Lifecycle</dt><dd>{lifecycle}</dd></div>
+        </dl>
       </div>
       {action ? <div className="cs-action-item__action">{action}</div> : null}
     </article>
@@ -98,6 +167,10 @@ export default function CSCommandCenterShell({
   workforce = [],
   actions = [],
   actionQueueVerified = false,
+  actionQueueState,
+  freshnessState = "unknown",
+  sourceConnected = false,
+  coverageState = "unknown",
   alerts = [],
   activity,
   opportunities,
@@ -106,6 +179,9 @@ export default function CSCommandCenterShell({
   headerActions,
 }) {
   const hasVerifiedOperationalData = dataReadiness === "verified";
+  const canDisplayLive = hasVerifiedOperationalData && sourceConnected && freshnessState === "live" && coverageState === "current";
+  const displayedFreshnessState = canDisplayLive ? "live" : freshnessState === "live" ? "current" : freshnessState;
+  const displayedFreshnessLabel = freshnessStates[displayedFreshnessState] || freshnessStates.unknown;
   const displayedStatus = hasVerifiedOperationalData ? status : "Data not verified";
   const displayedStatusTone =
     statusTone ||
@@ -117,10 +193,8 @@ export default function CSCommandCenterShell({
   const displayedStatusMessage =
     readinessMessage || (hasVerifiedOperationalData ? "Verified operational view" : "Awaiting verified data readiness");
   const pageTitle = title || (businessName === "Your business" ? "Your Command Center" : `${businessName} Command Center`);
-  const emptyActionTitle = actionQueueVerified ? "No human action is currently required" : "Action queue not verified";
-  const emptyActionDescription = actionQueueVerified
-    ? "ClientSurge will surface the next action when one becomes available."
-    : "Connect and verify the required sources before treating the human-action queue as clear.";
+  const resolvedActionQueueState = actionQueueState || (actionQueueVerified ? "verified_zero" : "unknown");
+  const actionQueueCopy = actionQueueStates[resolvedActionQueueState] || actionQueueStates.unknown;
 
   return (
     <main className="cs-command-center">
@@ -132,6 +206,7 @@ export default function CSCommandCenterShell({
       >
         <div className="cs-command-center__status-line">
           <CSStatusBadge tone={displayedStatusTone}>{displayedStatus}</CSStatusBadge>
+          <CSStatusBadge tone={displayedFreshnessState === "live" || displayedFreshnessState === "current" ? "info" : displayedFreshnessState === "stale" || displayedFreshnessState === "delayed" || displayedFreshnessState === "partial" ? "warning" : "neutral"}>{displayedFreshnessLabel}</CSStatusBadge>
           <span>{displayedStatusMessage}</span>
         </div>
       </CSPageHeader>
@@ -146,6 +221,23 @@ export default function CSCommandCenterShell({
         </div>
       ) : null}
 
+      <div className="cs-command-center__priority-grid" aria-label="First viewport priority">
+        <CommandCenterSection
+          id="daily-actions"
+          title="Daily Action Center"
+          description="The highest-value actions requiring a person today."
+          icon={Inbox}
+        >
+          <div className="cs-action-list">
+            {actions.length ? actions.map((item) => <ActionItem key={item.id || item.title} {...item} />) : (
+              <CSCard tone="subtle" title={actionQueueCopy.title} description={actionQueueCopy.description}>
+                <p className="cs-command-center__muted">{actionQueueCopy.detail}</p>
+              </CSCard>
+            )}
+          </div>
+        </CommandCenterSection>
+      </div>
+
       <section className="cs-command-center__metrics" aria-label="Business pulse">
         {metrics.length ? metrics.map((metric) => <CSMetricCard key={metric.id || metric.label} {...metric} />) : (
           <CSCard tone="subtle" title="Business pulse not verified" description="Metrics appear only after a connected source reports verified values.">
@@ -158,7 +250,7 @@ export default function CSCommandCenterShell({
         <CommandCenterSection
           id="ai-workforce"
           title="AI Workforce"
-          description="Live operating status for the AI systems working across your business."
+          description="Current operating status for the AI systems working across your business."
           icon={Bot}
           className="cs-command-section--wide"
         >
@@ -166,23 +258,6 @@ export default function CSCommandCenterShell({
             {workforce.length ? workforce.map((agent) => <WorkforceRow key={agent.id || agent.name} {...agent} />) : (
               <CSCard tone="subtle" title="No AI workers are reporting yet" description="AI workforce activity will appear after connected services are activated.">
                 <p className="cs-command-center__muted">No status has been fabricated. Connect or activate a service to begin reporting.</p>
-              </CSCard>
-            )}
-          </div>
-        </CommandCenterSection>
-
-        <CommandCenterSection
-          id="daily-actions"
-          title="Daily Action Center"
-          description="The highest-value actions requiring a person today."
-          icon={Inbox}
-        >
-          <div className="cs-action-list">
-            {actions.length ? actions.map((item) => <ActionItem key={item.id || item.title} {...item} />) : (
-              <CSCard tone="subtle" title={emptyActionTitle} description={emptyActionDescription}>
-                <p className="cs-command-center__muted">
-                  {actionQueueVerified ? "The queue is clear based on verified source data." : "No action-clear state has been fabricated."}
-                </p>
               </CSCard>
             )}
           </div>
