@@ -89,9 +89,15 @@ function ActionItem({ title, description, priority = "Normal", icon: Icon = Spar
 export default function CSCommandCenterShell({
   businessName = "Your business",
   status = "Operational",
+  statusTone,
+  dataReadiness = "unverified",
+  readinessMessage,
+  title,
+  description = "Verified activity, revenue opportunities, and human actions appear here as connected sources report in.",
   metrics = [],
   workforce = [],
   actions = [],
+  actionQueueVerified = false,
   alerts = [],
   activity,
   opportunities,
@@ -99,17 +105,34 @@ export default function CSCommandCenterShell({
   systemHealth,
   headerActions,
 }) {
+  const hasVerifiedOperationalData = dataReadiness === "verified";
+  const displayedStatus = hasVerifiedOperationalData ? status : "Data not verified";
+  const displayedStatusTone =
+    statusTone ||
+    (hasVerifiedOperationalData && status === "Operational"
+      ? "success"
+      : hasVerifiedOperationalData && status === "Needs attention"
+        ? "warning"
+        : "neutral");
+  const displayedStatusMessage =
+    readinessMessage || (hasVerifiedOperationalData ? "Verified operational view" : "Awaiting verified data readiness");
+  const pageTitle = title || (businessName === "Your business" ? "Your Command Center" : `${businessName} Command Center`);
+  const emptyActionTitle = actionQueueVerified ? "No human action is currently required" : "Action queue not verified";
+  const emptyActionDescription = actionQueueVerified
+    ? "ClientSurge will surface the next action when one becomes available."
+    : "Connect and verify the required sources before treating the human-action queue as clear.";
+
   return (
     <main className="cs-command-center">
       <CSPageHeader
         eyebrow="ClientSurge Command Center"
-        title={`${businessName} is ${status.toLowerCase()}`}
-        description="See what your AI workforce is doing, where revenue opportunities are forming, and what needs your attention next."
+        title={pageTitle}
+        description={description}
         actions={headerActions}
       >
         <div className="cs-command-center__status-line">
-          <CSStatusBadge tone={status === "Operational" ? "success" : "warning"}>{status}</CSStatusBadge>
-          <span>Live operational view</span>
+          <CSStatusBadge tone={displayedStatusTone}>{displayedStatus}</CSStatusBadge>
+          <span>{displayedStatusMessage}</span>
         </div>
       </CSPageHeader>
 
@@ -124,7 +147,11 @@ export default function CSCommandCenterShell({
       ) : null}
 
       <section className="cs-command-center__metrics" aria-label="Business pulse">
-        {metrics.map((metric) => <CSMetricCard key={metric.id || metric.label} {...metric} />)}
+        {metrics.length ? metrics.map((metric) => <CSMetricCard key={metric.id || metric.label} {...metric} />) : (
+          <CSCard tone="subtle" title="Business pulse not verified" description="Metrics appear only after a connected source reports verified values.">
+            <p className="cs-command-center__muted">Unknown data is not represented as zero.</p>
+          </CSCard>
+        )}
       </section>
 
       <div className="cs-command-center__grid">
@@ -152,8 +179,10 @@ export default function CSCommandCenterShell({
         >
           <div className="cs-action-list">
             {actions.length ? actions.map((item) => <ActionItem key={item.id || item.title} {...item} />) : (
-              <CSCard tone="subtle" title="You are caught up" description="No human action is currently required.">
-                <p className="cs-command-center__muted">ClientSurge will surface the next action when one becomes available.</p>
+              <CSCard tone="subtle" title={emptyActionTitle} description={emptyActionDescription}>
+                <p className="cs-command-center__muted">
+                  {actionQueueVerified ? "The queue is clear based on verified source data." : "No action-clear state has been fabricated."}
+                </p>
               </CSCard>
             )}
           </div>

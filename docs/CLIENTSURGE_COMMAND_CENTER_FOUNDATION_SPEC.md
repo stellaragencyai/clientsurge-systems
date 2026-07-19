@@ -45,6 +45,8 @@ The Command Center must distinguish between:
 
 Unknown data must never be represented as zero. Placeholder production metrics are prohibited.
 
+The shell defaults to an unverified operational state. A container must pass explicit verified readiness before the header may communicate an operational view, clear action queue, or trustworthy metric band.
+
 ## AI Workforce contract
 
 Every AI service should be represented as an accountable worker with:
@@ -68,6 +70,8 @@ This module contains only actions that require a person. Each item must include:
 - priority,
 - direct action,
 - no vague “review this” language when a specific action is known.
+
+An empty action list is not the same as an all-clear. The shell may communicate “no action required” only when the action queue is explicitly verified.
 
 ## Accessibility contract
 
