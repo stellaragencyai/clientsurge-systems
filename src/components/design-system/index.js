@@ -7,6 +7,12 @@ export {
   CSPricingGrid,
 } from "./CSPricingPrimitives";
 export {
+  CSFilterBar,
+  CSPagination,
+  CSSearchField,
+  CSSelectFilter,
+} from "./CSDataControls";
+export {
   CSConfirmDialog,
   CSDrawer,
   CSDropdown,
