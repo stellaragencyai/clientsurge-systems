@@ -60,6 +60,32 @@
   --cs-focus-ring: 0 0 0 3px rgb(22 131 255 / 0.28);
   --cs-transition-fast: 140ms ease;
   --cs-transition-base: 200ms ease;
+
+  /* Semantic aliases: components consume intent, not raw palette values. */
+  --cs-color-app: var(--cs-bg-app);
+  --cs-color-surface: var(--cs-bg-surface);
+  --cs-color-surface-subtle: var(--cs-bg-subtle);
+  --cs-color-surface-muted: var(--cs-bg-muted);
+  --cs-color-border: var(--cs-border);
+  --cs-color-border-strong: var(--cs-border-strong);
+  --cs-color-text-strong: var(--cs-text-primary);
+  --cs-color-text: var(--cs-text-secondary);
+  --cs-color-text-muted: var(--cs-text-muted);
+  --cs-color-navy: var(--cs-navy-900);
+  --cs-color-action: var(--cs-blue-600);
+  --cs-color-action-hover: var(--cs-blue-700);
+  --cs-color-action-soft: var(--cs-blue-50);
+  --cs-color-action-border: var(--cs-blue-100);
+  --cs-color-success: var(--cs-success-700);
+  --cs-color-success-soft: var(--cs-success-100);
+  --cs-color-success-border: #a7e7c8;
+  --cs-color-warning: var(--cs-warning-700);
+  --cs-color-warning-strong: #754400;
+  --cs-color-warning-soft: var(--cs-warning-100);
+  --cs-color-warning-border: #f3d27b;
+  --cs-color-danger: var(--cs-danger-700);
+  --cs-color-danger-soft: var(--cs-danger-100);
+  --cs-color-danger-border: #f5b7b1;
 }
 
 .cs-focusable:focus-visible {
