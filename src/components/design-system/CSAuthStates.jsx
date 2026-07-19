@@ -1,5 +1,6 @@
 import { AlertTriangle, LockKeyhole, ShieldX } from "lucide-react";
 import { CSButton, CSCard, CSSkeleton } from "./CSProductPrimitives";
+import "@/styles/clientsurge-os-auth-states.css";
 
 export function CSAuthLoadingState({ title = "Securing your workspace", description = "Validating your session and loading your ClientSurge system." }) {
   return (
