@@ -50,7 +50,7 @@ export function isAdminSettingsFunctionNotFound(error) {
 
 export function getAdminSettingsError(error, fallback) {
   if (isAdminSettingsFunctionNotFound(error)) {
-    return "The GA4 repair backend is not deployed yet. Publish the latest Base44 backend functions, then retry.";
+    return "The GA4 verification backend is not deployed yet. Publish the latest Base44 backend functions, then retry.";
   }
   return error?.data?.error || error?.response?.data?.error || error?.message || fallback;
 }
@@ -87,6 +87,17 @@ async function saveAdminSettingsToEntity(settings) {
   return existing?.id ? entity.update(existing.id, patch) : entity.create(patch);
 }
 
+export async function runGa4FinalVerification() {
+  const response = await base44.functions.invoke("verifyGA4Configuration", {});
+  const data = unwrapFunctionPayload(response);
+  if (data?.success === false || data?.verified === false || data?.error) {
+    const error = new Error(data?.error || data?.message || "GA4 final verification failed");
+    error.data = data;
+    throw error;
+  }
+  return data;
+}
+
 export async function fetchGa4ConfigurationStatus() {
   try {
     const response = await base44.functions.invoke("getAdminSettings", {});
@@ -109,12 +120,25 @@ export async function fetchGa4ConfigurationStatus() {
     const hasLegacySecret = Boolean(config && typeof config.api_secret === "string" && config.api_secret.trim());
     const keyEvents = new Set(config?.conversion_events || []);
     const canonicalKeyEvents = GA4_KEY_EVENTS.every((eventName) => keyEvents.has(eventName));
+    const operationallyVerified = Boolean(
+      config &&
+      config.setup_status === "active" &&
+      config.server_side_tracking_enabled === true &&
+      config.last_verified_at
+    );
     return {
       config,
       record_count: records?.length || 0,
       has_legacy_secret: hasLegacySecret,
       canonical_key_events: canonicalKeyEvents,
-      clean: Boolean(config && records.length === 1 && !hasLegacySecret && canonicalKeyEvents && config.setup_status === "configured"),
+      operationally_verified: operationallyVerified,
+      clean: Boolean(
+        config &&
+        records.length === 1 &&
+        !hasLegacySecret &&
+        canonicalKeyEvents &&
+        (config.setup_status === "configured" || config.setup_status === "active")
+      ),
     };
   } catch (error) {
     return {
@@ -122,6 +146,7 @@ export async function fetchGa4ConfigurationStatus() {
       record_count: 0,
       has_legacy_secret: null,
       canonical_key_events: false,
+      operationally_verified: false,
       clean: false,
       error: error?.message || "Unable to read GA4 status",
     };
@@ -137,32 +162,40 @@ export async function ensureGa4Configuration() {
     conversion_events: GA4_KEY_EVENTS,
   };
 
+  let repairResult = null;
   let primaryError = null;
   try {
     const response = await base44.functions.invoke("setupGA4Configuration", payload);
     const data = unwrapFunctionPayload(response);
     if (data?.success === false || data?.error) throw new Error(data?.error || "GA4 configuration migration failed");
-    return data;
+    repairResult = data;
   } catch (error) {
     primaryError = error;
   }
 
-  try {
-    const response = await base44.functions.invoke("getAdminSettings", {});
-    const data = unwrapFunctionPayload(response);
-    if (data?.ga4_migration?.success === false) {
-      throw new Error(data.ga4_migration.error || "GA4 fallback repair failed");
+  if (!repairResult) {
+    try {
+      const response = await base44.functions.invoke("getAdminSettings", {});
+      const data = unwrapFunctionPayload(response);
+      if (data?.ga4_migration?.success === false) {
+        throw new Error(data.ga4_migration.error || "GA4 fallback repair failed");
+      }
+      if (data?.ga4_status?.clean || data?.ga4_migration?.clean) {
+        repairResult = data.ga4_status || data.ga4_migration;
+      }
+    } catch (fallbackError) {
+      const primaryMessage = getAdminSettingsError(primaryError, "Primary GA4 repair failed");
+      const fallbackMessage = getAdminSettingsError(fallbackError, "Fallback GA4 repair failed");
+      throw new Error(`${primaryMessage} ${fallbackMessage}`.trim());
     }
-    if (data?.ga4_status?.clean || data?.ga4_migration?.clean) {
-      return data.ga4_status || data.ga4_migration;
-    }
-  } catch (fallbackError) {
-    const primaryMessage = getAdminSettingsError(primaryError, "Primary GA4 repair failed");
-    const fallbackMessage = getAdminSettingsError(fallbackError, "Fallback GA4 repair failed");
-    throw new Error(`${primaryMessage} ${fallbackMessage}`.trim());
   }
 
-  throw new Error(getAdminSettingsError(primaryError, "GA4 repair did not complete"));
+  if (!repairResult) {
+    throw new Error(getAdminSettingsError(primaryError, "GA4 repair did not complete"));
+  }
+
+  const verification = await runGa4FinalVerification();
+  return { ...repairResult, verification };
 }
 
 export async function fetchAdminSettings() {
