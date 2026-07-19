@@ -19,14 +19,23 @@ export function CSAuthLoadingState({ title = "Securing your workspace", descript
   );
 }
 
-export function CSUnauthorizedState({ onReturn, title = "You do not have access to this area", description = "Your account is active, but your current role does not include permission for this workspace." }) {
+export function CSUnauthorizedState({
+  onReturn,
+  title = "You do not have access to this area",
+  description = "Your account is active, but your current role does not include permission for this workspace.",
+  actionLabel = "Return to your workspace",
+  secondaryAction,
+}) {
   return (
     <main className="cs-auth-state">
       <CSCard className="cs-auth-state__card">
         <div className="cs-auth-state__icon cs-auth-state__icon--danger"><ShieldX aria-hidden="true" /></div>
         <h1>{title}</h1>
         <p>{description}</p>
-        <CSButton onClick={onReturn}>Return to your workspace</CSButton>
+        <div className="cs-auth-state__actions">
+          <CSButton onClick={onReturn}>{actionLabel}</CSButton>
+          {secondaryAction}
+        </div>
       </CSCard>
     </main>
   );

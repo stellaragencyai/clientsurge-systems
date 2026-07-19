@@ -68,3 +68,34 @@
   justify-items: center;
   margin-top: var(--cs-space-2);
 }
+
+.cs-auth-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--cs-space-3);
+}
+
+.cs-auth-state__actions .cs-button {
+  min-width: 11rem;
+}
+
+.cs-auth-state__list {
+  margin: var(--cs-space-2) 0 0;
+  padding-left: 1.1rem;
+  color: var(--cs-color-text);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+@media (max-width: 540px) {
+  .cs-auth-state__actions {
+    width: 100%;
+    flex-direction: column;
+  }
+
+  .cs-auth-state__actions .cs-button {
+    width: 100%;
+  }
+}
