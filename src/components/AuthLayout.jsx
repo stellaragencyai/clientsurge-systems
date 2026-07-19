@@ -1,27 +1,41 @@
 import React from "react";
+import { ShieldCheck } from "lucide-react";
 
 export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
   return (
-    <div className="min-h-screen flex items-center justify-center bg-background px-4">
-      <div className="w-full max-w-md">
-        <div className="text-center mb-10">
-          <div className="flex justify-center mb-6">
-            <img
-              src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png"
-              alt="ClientSurge Systems"
-              className="h-28 w-auto object-contain"
-            />
-          </div>
-          <h1 className="text-3xl font-bold tracking-tight text-foreground">{title}</h1>
-          {subtitle && <p className="text-muted-foreground mt-2">{subtitle}</p>}
+    <main className="cs-auth-layout">
+      <section className="cs-auth-layout__brand" aria-label="ClientSurge secure access">
+        <div className="cs-auth-layout__brand-lockup" aria-label="ClientSurge Systems">
+          <span className="cs-auth-layout__brand-mark" aria-hidden="true">CS</span>
+          <span>ClientSurge Systems</span>
         </div>
-        <div className="bg-card rounded-2xl shadow-sm border border-border p-8">
-          {children}
+
+        <div className="cs-auth-layout__brand-copy">
+          <h2>Secure access to the system running your growth.</h2>
+          <p>
+            Recover your account without leaving the protected ClientSurge experience. Your activation,
+            services, reporting, billing, and support remain connected to one identity.
+          </p>
         </div>
-        {footer && (
-          <p className="text-center text-sm text-muted-foreground mt-6">{footer}</p>
-        )}
-      </div>
-    </div>
+
+        <div className="cs-auth-layout__assurance">
+          <ShieldCheck size={18} aria-hidden="true" />
+          <span>Protected account recovery and identity verification.</span>
+        </div>
+      </section>
+
+      <section className="cs-auth-layout__workspace">
+        <div className="cs-auth-layout__panel">
+          <header className="cs-auth-layout__heading">
+            {Icon ? <span className="cs-auth-layout__icon"><Icon size={22} aria-hidden="true" /></span> : null}
+            <h1>{title}</h1>
+            {subtitle ? <p>{subtitle}</p> : null}
+          </header>
+
+          <div className="cs-auth-layout__card">{children}</div>
+          {footer ? <p className="cs-auth-layout__footer">{footer}</p> : null}
+        </div>
+      </section>
+    </main>
   );
 }
