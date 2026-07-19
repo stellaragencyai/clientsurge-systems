@@ -1,4 +1,5 @@
 export { default as CSAppShell } from "./CSAppShell";
+export { default as CSAuthSurface } from "./CSAuthSurface";
 export {
   CSAlert,
   CSButton,
