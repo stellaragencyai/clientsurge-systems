@@ -39,6 +39,9 @@ export default function ResetPassword() {
     setLoading(true);
     try {
       await base44.auth.resetPassword({ resetToken, newPassword });
+      try {
+        sessionStorage.setItem("clientsurge_password_reset_complete", "true");
+      } catch {}
       window.location.href = "/login";
     } catch (requestError) {
       setError(requestError.message || "The password could not be reset. Request a new link and try again.");

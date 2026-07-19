@@ -7,6 +7,7 @@ import { setPageMetadata } from "@/lib/seo";
 
 export default function Login() {
   const [showLogin, setShowLogin] = useState(false);
+  const [recoveryNotice, setRecoveryNotice] = useState("");
 
   useEffect(() => {
     return setPageMetadata({
@@ -26,6 +27,14 @@ export default function Login() {
     if (params.get("from_url")) setShowLogin(true);
   }, []);
 
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem("clientsurge_password_reset_complete") !== "true") return;
+      sessionStorage.removeItem("clientsurge_password_reset_complete");
+      setRecoveryNotice("Your password has been updated. Sign in with your new password to continue.");
+    } catch {}
+  }, []);
+
   return (
     <>
       <CSAuthSurface
@@ -39,9 +48,15 @@ export default function Login() {
           </Link>
         }
       >
-        <CSAlert tone="info" title="First time signing in?">
-          Use the email connected to your order. Your activation and account access remain linked to the same customer record.
-        </CSAlert>
+        {recoveryNotice ? (
+          <CSAlert tone="success" title="Password updated">
+            {recoveryNotice}
+          </CSAlert>
+        ) : (
+          <CSAlert tone="info" title="First time signing in?">
+            Use the email connected to your order. Your activation and account access remain linked to the same customer record.
+          </CSAlert>
+        )}
       </CSAuthSurface>
 
       {showLogin ? <PortalLoginModal onClose={() => setShowLogin(false)} /> : null}
