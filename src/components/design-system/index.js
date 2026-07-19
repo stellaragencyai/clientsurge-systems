@@ -7,6 +7,16 @@ export {
   CSPricingGrid,
 } from "./CSPricingPrimitives";
 export {
+  CSConfirmDialog,
+  CSDrawer,
+  CSDropdown,
+  CSModal,
+  CSTabs,
+  CSToastProvider,
+  CSTooltip,
+  useCSToast,
+} from "./CSInteractionPrimitives";
+export {
   CSAlert,
   CSButton,
   CSCard,
