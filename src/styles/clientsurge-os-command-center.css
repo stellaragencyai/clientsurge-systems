@@ -1,0 +1,310 @@
+.cs-command-center {
+  width: min(100%, var(--cs-content-max));
+  margin: 0 auto;
+  padding: clamp(24px, 4vw, 48px);
+  color: var(--cs-color-text-strong);
+}
+
+.cs-command-center__status-line {
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  margin-top: var(--cs-space-4);
+  color: var(--cs-color-text-muted);
+  font-size: 0.875rem;
+}
+
+.cs-command-center__alerts {
+  display: grid;
+  gap: var(--cs-space-3);
+  margin-top: var(--cs-space-6);
+}
+
+.cs-command-center__metrics {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cs-space-4);
+  margin-top: var(--cs-space-8);
+}
+
+.cs-command-center__grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--cs-space-5);
+  margin-top: var(--cs-space-5);
+}
+
+.cs-command-section {
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-xl);
+  background: var(--cs-color-surface);
+  box-shadow: var(--cs-shadow-xs);
+}
+
+.cs-command-section--wide {
+  grid-column: 1 / -1;
+}
+
+.cs-command-section__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-5) var(--cs-space-6);
+  border-bottom: 1px solid var(--cs-color-border);
+}
+
+.cs-command-section__heading {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: var(--cs-space-3);
+}
+
+.cs-command-section__icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--cs-color-action-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-action-soft);
+  color: var(--cs-color-action);
+}
+
+.cs-command-section__icon svg {
+  width: 19px;
+  height: 19px;
+}
+
+.cs-command-section h2,
+.cs-action-item h3 {
+  margin: 0;
+  color: var(--cs-color-text-strong);
+  letter-spacing: -0.02em;
+}
+
+.cs-command-section h2 {
+  font-size: 1.05rem;
+}
+
+.cs-command-section__header p,
+.cs-action-item p {
+  margin: var(--cs-space-1) 0 0;
+  color: var(--cs-color-text);
+  line-height: 1.55;
+}
+
+.cs-command-section__body {
+  padding: var(--cs-space-6);
+}
+
+.cs-workforce-list,
+.cs-action-list {
+  display: grid;
+  gap: var(--cs-space-3);
+}
+
+.cs-workforce-row {
+  display: grid;
+  grid-template-columns: minmax(220px, 1.1fr) auto minmax(240px, 1fr) minmax(90px, auto);
+  align-items: center;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-color-surface-subtle);
+}
+
+.cs-workforce-row__identity {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: var(--cs-space-3);
+}
+
+.cs-workforce-row__avatar {
+  display: grid;
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 999px;
+  background: var(--cs-color-navy);
+  color: var(--cs-text-inverse);
+}
+
+.cs-workforce-row__avatar svg {
+  width: 20px;
+  height: 20px;
+}
+
+.cs-workforce-row__identity div {
+  display: grid;
+  gap: 2px;
+  min-width: 0;
+}
+
+.cs-workforce-row__identity strong,
+.cs-workforce-row__identity span,
+.cs-workforce-row p {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cs-workforce-row__identity span,
+.cs-workforce-row p {
+  color: var(--cs-color-text);
+  font-size: 0.875rem;
+}
+
+.cs-workforce-row__metric {
+  justify-self: end;
+  color: var(--cs-color-text-strong);
+}
+
+.cs-action-item {
+  display: grid;
+  grid-template-columns: 40px minmax(0, 1fr) auto;
+  align-items: start;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-lg);
+}
+
+.cs-action-item__icon {
+  display: grid;
+  width: 40px;
+  height: 40px;
+  place-items: center;
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-action-soft);
+  color: var(--cs-color-action);
+}
+
+.cs-action-item__icon svg {
+  width: 18px;
+  height: 18px;
+}
+
+.cs-action-item__title-row {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: var(--cs-space-2);
+}
+
+.cs-action-item h3 {
+  font-size: 0.95rem;
+}
+
+.cs-command-center__muted {
+  margin: 0;
+  color: var(--cs-color-text-muted);
+  line-height: 1.6;
+}
+
+.cs-system-health-summary {
+  display: grid;
+  gap: var(--cs-space-3);
+}
+
+.cs-system-health-summary > div {
+  display: grid;
+  grid-template-columns: 24px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--cs-space-3);
+  min-height: 48px;
+  padding: 0 var(--cs-space-3);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-md);
+}
+
+.cs-system-health-summary svg {
+  width: 18px;
+  height: 18px;
+  color: var(--cs-color-text-muted);
+}
+
+@media (max-width: 1120px) {
+  .cs-command-center__metrics {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cs-workforce-row {
+    grid-template-columns: minmax(220px, 1fr) auto;
+  }
+
+  .cs-workforce-row p,
+  .cs-workforce-row__metric {
+    grid-column: 1 / -1;
+    justify-self: start;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 760px) {
+  .cs-command-center {
+    padding: 20px 16px 32px;
+  }
+
+  .cs-command-center__metrics,
+  .cs-command-center__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-command-section--wide {
+    grid-column: auto;
+  }
+
+  .cs-command-section__header,
+  .cs-command-section__body {
+    padding-left: var(--cs-space-4);
+    padding-right: var(--cs-space-4);
+  }
+
+  .cs-command-section__header {
+    flex-direction: column;
+  }
+
+  .cs-command-section__actions {
+    width: 100%;
+  }
+
+  .cs-workforce-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-workforce-row__metric,
+  .cs-workforce-row p {
+    grid-column: auto;
+  }
+
+  .cs-action-item {
+    grid-template-columns: 40px minmax(0, 1fr);
+  }
+
+  .cs-action-item__action {
+    grid-column: 1 / -1;
+  }
+}
+
+@media (max-width: 480px) {
+  .cs-command-center__metrics {
+    gap: var(--cs-space-3);
+  }
+
+  .cs-command-section__heading {
+    align-items: center;
+  }
+
+  .cs-command-section__icon {
+    width: 36px;
+    height: 36px;
+  }
+}
