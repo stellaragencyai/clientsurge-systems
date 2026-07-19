@@ -1,5 +1,6 @@
 import { AlertTriangle, Check, Circle, Cloud, CloudOff, LockKeyhole } from "lucide-react";
 import { CSAlert, CSButton, CSPageHeader, CSStatusBadge } from "./CSProductPrimitives";
+import "@/styles/clientsurge-os-activation.css";
 
 const cx = (...values) => values.filter(Boolean).join(" ");
 
