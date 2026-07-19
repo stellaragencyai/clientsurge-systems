@@ -2,7 +2,16 @@ import React from "react";
 import { ShieldCheck } from "lucide-react";
 import "@/styles/clientsurge-os-auth-layout.css";
 
-export default function AuthLayout({ icon: Icon, title, subtitle, footer, children }) {
+export default function AuthLayout({
+  icon: Icon,
+  title,
+  subtitle,
+  footer,
+  children,
+  brandTitle = "Secure access to the system running your growth.",
+  brandDescription = "Recover your account without leaving the protected ClientSurge experience. Your activation, services, reporting, billing, and support remain connected to one identity.",
+  assurance = "Protected account recovery and identity verification.",
+}) {
   return (
     <main className="cs-auth-layout">
       <section className="cs-auth-layout__brand" aria-label="ClientSurge secure access">
@@ -12,16 +21,13 @@ export default function AuthLayout({ icon: Icon, title, subtitle, footer, childr
         </div>
 
         <div className="cs-auth-layout__brand-copy">
-          <h2>Secure access to the system running your growth.</h2>
-          <p>
-            Recover your account without leaving the protected ClientSurge experience. Your activation,
-            services, reporting, billing, and support remain connected to one identity.
-          </p>
+          <h2>{brandTitle}</h2>
+          <p>{brandDescription}</p>
         </div>
 
         <div className="cs-auth-layout__assurance">
           <ShieldCheck size={18} aria-hidden="true" />
-          <span>Protected account recovery and identity verification.</span>
+          <span>{assurance}</span>
         </div>
       </section>
 
