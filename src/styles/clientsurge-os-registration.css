@@ -1,0 +1,79 @@
+.cs-registration-form {
+  display: grid;
+  gap: var(--cs-space-4);
+}
+
+.cs-registration-divider {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: var(--cs-space-3);
+  margin: var(--cs-space-5) 0;
+  color: var(--cs-color-text-muted);
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cs-registration-divider::before,
+.cs-registration-divider::after {
+  height: 1px;
+  background: var(--cs-color-border);
+  content: "";
+}
+
+.cs-registration-provider {
+  width: 100%;
+}
+
+.cs-registration-provider svg {
+  width: 19px;
+  height: 19px;
+}
+
+.cs-registration-otp {
+  display: grid;
+  justify-items: center;
+  gap: var(--cs-space-5);
+}
+
+.cs-registration-otp [data-input-otp-container] {
+  gap: var(--cs-space-2);
+}
+
+.cs-registration-otp [data-input-otp-slot] {
+  width: clamp(40px, 10vw, 52px);
+  height: clamp(46px, 11vw, 56px);
+  border-color: var(--cs-color-border-strong);
+  border-radius: var(--cs-radius-md);
+  font-size: 1.15rem;
+  font-weight: 750;
+}
+
+.cs-registration-otp__resend {
+  margin: 0;
+  color: var(--cs-color-text);
+  font-size: 0.875rem;
+  text-align: center;
+}
+
+.cs-registration-link-button {
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--cs-color-action);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.cs-registration-link-button:hover {
+  text-decoration: underline;
+}
+
+.cs-registration-link-button:focus-visible {
+  outline: none;
+  border-radius: 4px;
+  box-shadow: var(--cs-focus-ring);
+}
