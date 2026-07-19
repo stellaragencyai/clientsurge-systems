@@ -1,5 +1,5 @@
 import { useId } from "react";
-import { AlertTriangle, Check, Circle, Cloud, CloudOff, LockKeyhole } from "lucide-react";
+import { AlertTriangle, Check, Circle, Cloud, CloudOff, LockKeyhole, RotateCcw } from "lucide-react";
 import { CSAlert, CSButton, CSPageHeader, CSStatusBadge } from "./CSProductPrimitives";
 import "@/styles/clientsurge-os-activation.css";
 
@@ -13,19 +13,34 @@ const STEP_ICONS = {
   optional: Circle,
 };
 
-export function CSAutosaveStatus({ status = "saved", label, className }) {
+function getBlockedReasonText(step, fallback) {
+  if (!step) return fallback;
+  const parts = [
+    step.blockedReason || step.blockedMessage || step.unavailableReason || step.disabledReason || fallback,
+    step.missingRequirement ? `Missing requirement: ${step.missingRequirement}.` : null,
+    step.unlockAction ? `Unlock action: ${step.unlockAction}.` : null,
+    step.unlockLocation ? `Where: ${step.unlockLocation}.` : null,
+  ].filter(Boolean);
+  return parts.join(" ");
+}
+
+export function CSAutosaveStatus({ status = "saved_local", label, className, lastSavedAt }) {
   const config = {
-    saving: { icon: Cloud, text: label || "Saving changes…", tone: "info" },
-    saved: { icon: Cloud, text: label || "All changes saved", tone: "success" },
-    offline: { icon: CloudOff, text: label || "Offline — changes are not saved", tone: "warning" },
-    error: { icon: AlertTriangle, text: label || "Changes could not be saved", tone: "danger" },
+    dirty: { icon: RotateCcw, text: label || "Unsaved changes", tone: "warning", announce: false },
+    saving: { icon: Cloud, text: label || "Saving changes", tone: "info", announce: false },
+    saved_local: { icon: Cloud, text: label || "Saved locally", tone: "info", announce: false },
+    saved_remote: { icon: Cloud, text: label || "Saved to service", tone: "success", announce: true },
+    saved: { icon: Cloud, text: label || "Saved to service", tone: "success", announce: true },
+    offline: { icon: CloudOff, text: label || "Offline - changes are local only", tone: "warning", announce: true },
+    error: { icon: AlertTriangle, text: label || "Save failed - retry available", tone: "danger", announce: true },
   }[status] || { icon: Cloud, text: label || "Save status unavailable", tone: "neutral" };
   const Icon = config.icon;
+  const statusText = lastSavedAt ? `${config.text} (${lastSavedAt})` : config.text;
 
   return (
     <CSStatusBadge tone={config.tone} className={cx("cs-autosave-status", className)}>
       <Icon size={14} aria-hidden="true" />
-      <span aria-live="polite">{config.text}</span>
+      <span aria-live={config.announce ? "polite" : undefined}>{statusText}</span>
     </CSStatusBadge>
   );
 }
@@ -40,12 +55,9 @@ export function CSActivationStepNav({ steps = [], currentStepId, onStepSelect, c
           const status = step.id === currentStepId ? "current" : (step.status || "available");
           const Icon = STEP_ICONS[status] || Circle;
           const disabled = status === "blocked" || step.disabled;
-          const disabledReason =
-            step.blockedReason ||
-            step.blockedMessage ||
-            step.unavailableReason ||
-            step.disabledReason ||
-            (disabled ? "Complete the required activation item before opening this step." : "");
+          const disabledReason = disabled
+            ? getBlockedReasonText(step, "Complete the required activation item before opening this step.")
+            : "";
           const disabledReasonId = disabledReason ? `${navigationId}-${step.id || index}-reason` : undefined;
           return (
             <li key={step.id}>
@@ -103,6 +115,21 @@ export function CSActivationFooter({ onBack, onSaveExit, onContinue, continueLab
   );
 }
 
+export function CSSafeResumeNotice({
+  preservation = "Progress is saved locally in this review fixture.",
+  resume = "You will resume on the current activation step.",
+  risk = "Leaving before a service save may require retrying the latest change.",
+}) {
+  return (
+    <section className="cs-activation-resume" aria-label="Leave and resume safety">
+      <strong>Leave and resume</strong>
+      <p>{preservation}</p>
+      <p>{resume}</p>
+      <p>{risk}</p>
+    </section>
+  );
+}
+
 export function CSActivationShell({
   steps = [],
   currentStepId,
@@ -117,6 +144,7 @@ export function CSActivationShell({
   children,
   footer,
   supportAction,
+  resumeNotice,
   className,
 }) {
   const boundedProgress = Math.min(100, Math.max(0, Number(progress) || 0));
@@ -140,6 +168,7 @@ export function CSActivationShell({
           <CSPageHeader eyebrow={eyebrow} title={title} description={description} />
           {blocker ? <CSAlert tone="warning" title={blocker.title || "This step is blocked"}>{blocker.description}</CSAlert> : null}
           <CSValidationSummary errors={validationErrors} />
+          {resumeNotice ? <CSSafeResumeNotice {...resumeNotice} /> : null}
           <div className="cs-activation-shell__content">{children}</div>
         </main>
         {footer}

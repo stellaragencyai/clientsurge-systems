@@ -6,19 +6,23 @@ import {
 } from "@/components/design-system";
 
 const saveStateLabels = {
-  idle: "All changes saved",
+  idle: "Saved locally",
   dirty: "Unsaved changes",
   saving: "Saving changes",
-  saved: "Changes saved",
-  error: "Save failed",
-  offline: "Connection unavailable",
+  saved_local: "Saved locally",
+  saved_remote: "Saved to service",
+  saved: "Saved to service",
+  error: "Save failed - retry available",
+  offline: "Offline - changes are local only",
 };
 
 const saveStateMap = {
-  idle: "saved",
+  idle: "saved_local",
   dirty: "dirty",
   saving: "saving",
-  saved: "saved",
+  saved_local: "saved_local",
+  saved_remote: "saved_remote",
+  saved: "saved_remote",
   error: "error",
   offline: "offline",
 };
@@ -90,6 +94,8 @@ export default function CSActivationShell({
   onStepSelect,
   validationMessage,
   blockedMessage,
+  lastSavedAt,
+  resumeNotice,
   headerActions,
 }) {
   const normalizedSteps = normalizeActivationSteps(steps, currentStep);
@@ -107,6 +113,7 @@ export default function CSActivationShell({
       autosaveStatus={saveStateMap[saveState] || saveState}
       blocker={blockedMessage ? { title: "This step is blocked", description: blockedMessage } : undefined}
       validationErrors={validationMessage ? [{ id: "validation", message: validationMessage }] : []}
+      resumeNotice={resumeNotice}
       footer={
         <CSActivationFooter
           onBack={currentStep <= 1 || continueLoading ? undefined : onPrevious}
@@ -119,7 +126,7 @@ export default function CSActivationShell({
       }
       supportAction={headerActions}
     >
-      {saveMessage ? <CSActivationSaveStatus state={saveState} message={saveMessage} /> : null}
+      {saveMessage ? <CSAutosaveStatus status={saveStateMap[saveState] || saveState} label={saveMessage} lastSavedAt={lastSavedAt} /> : null}
       {children}
     </CSActivationShellPrimitive>
   );
