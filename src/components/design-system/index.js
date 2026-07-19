@@ -1,6 +1,13 @@
 export { default as CSAppShell } from "./CSAppShell";
 export { default as CSAuthSurface } from "./CSAuthSurface";
 export {
+  CSActivationFooter,
+  CSActivationShell,
+  CSActivationStepNav,
+  CSAutosaveStatus,
+  CSValidationSummary,
+} from "./CSActivationPrimitives";
+export {
   CSAuthLoadingState,
   CSSessionExpiredState,
   CSUnauthorizedState,
