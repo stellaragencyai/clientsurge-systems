@@ -123,8 +123,8 @@ export default function CSAppShell({
     onNavigate?.(item);
   };
 
-  const renderSidebar = (navigationId) => (
-    <aside className="cs-app-shell__sidebar" aria-label="Primary navigation">
+  const renderSidebar = (navigationId, ariaLabel) => (
+    <aside className="cs-app-shell__sidebar" aria-label={ariaLabel}>
       <div className="cs-app-shell__brand">{brand}</div>
       <nav id={navigationId} className="cs-app-shell__nav">
         {navigation.map((item) => {
@@ -154,7 +154,7 @@ export default function CSAppShell({
   return (
     <div className="cs-app-shell">
       <div className="cs-app-shell__desktop-sidebar" {...inertBackgroundProps}>
-        {renderSidebar(desktopNavigationId)}
+        {renderSidebar(desktopNavigationId, "Desktop primary navigation")}
       </div>
 
       {mobileOpen ? (
@@ -163,6 +163,7 @@ export default function CSAppShell({
             className="cs-app-shell__backdrop"
             type="button"
             aria-label="Close navigation"
+            tabIndex={-1}
             onClick={closeMobileNavigation}
           />
           <div
@@ -182,7 +183,7 @@ export default function CSAppShell({
             >
               <X aria-hidden="true" size={22} />
             </button>
-            {renderSidebar(mobileNavigationId)}
+            {renderSidebar(mobileNavigationId, "Mobile primary navigation")}
           </div>
         </div>
       ) : null}
@@ -194,7 +195,7 @@ export default function CSAppShell({
             type="button"
             className="cs-app-shell__menu-button cs-focusable"
             aria-label="Open navigation"
-            aria-controls={mobileDrawerId}
+            aria-controls={mobileOpen ? mobileDrawerId : undefined}
             aria-expanded={mobileOpen}
             onClick={openMobileNavigation}
           >
