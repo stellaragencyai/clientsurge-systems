@@ -28,10 +28,15 @@ function useBodyScrollLock(enabled) {
 function useFocusReturn(open) {
   const previousFocus = useRef(null);
   useEffect(() => {
-    if (open) previousFocus.current = document.activeElement;
-    return () => {
-      if (!open && previousFocus.current instanceof HTMLElement) previousFocus.current.focus();
-    };
+    if (open) {
+      previousFocus.current = document.activeElement;
+      return;
+    }
+
+    if (previousFocus.current instanceof HTMLElement) {
+      previousFocus.current.focus();
+      previousFocus.current = null;
+    }
   }, [open]);
 }
 
@@ -184,24 +189,93 @@ export function CSTabs({ tabs, value, onChange, ariaLabel = "Sections", classNam
 export function CSDropdown({ label, items, align = "left", disabled = false, className }) {
   const [open, setOpen] = useState(false);
   const rootRef = useRef(null);
+  const triggerRef = useRef(null);
+  const menuRef = useRef(null);
+  const pendingMenuFocus = useRef(null);
   const menuId = useId();
-  useEscape(() => setOpen(false), open);
+  const focusMenuItem = useCallback((direction = "first") => {
+    const menuItems = Array.from(menuRef.current?.querySelectorAll('[role="menuitem"]:not(:disabled)') || []);
+    if (!menuItems.length) return;
+
+    if (direction === "last") {
+      menuItems[menuItems.length - 1].focus();
+      return;
+    }
+
+    menuItems[0].focus();
+  }, []);
+  const closeMenu = useCallback((restoreFocus = false) => {
+    setOpen(false);
+    pendingMenuFocus.current = null;
+    if (restoreFocus) window.requestAnimationFrame(() => triggerRef.current?.focus());
+  }, []);
+  useEscape(() => closeMenu(true), open);
+  useEffect(() => {
+    if (!open || !pendingMenuFocus.current) return undefined;
+    const direction = pendingMenuFocus.current;
+    const frame = window.requestAnimationFrame(() => {
+      focusMenuItem(direction);
+      pendingMenuFocus.current = null;
+    });
+    return () => window.cancelAnimationFrame(frame);
+  }, [focusMenuItem, open]);
   useEffect(() => {
     if (!open) return undefined;
     const onPointerDown = (event) => {
-      if (!rootRef.current?.contains(event.target)) setOpen(false);
+      if (!rootRef.current?.contains(event.target)) closeMenu(false);
     };
     document.addEventListener("pointerdown", onPointerDown);
     return () => document.removeEventListener("pointerdown", onPointerDown);
-  }, [open]);
+  }, [closeMenu, open]);
   return (
     <div className={cx("cs-dropdown", className)} ref={rootRef}>
-      <button type="button" className="cs-dropdown__trigger" disabled={disabled} aria-haspopup="menu" aria-expanded={open} aria-controls={menuId} onClick={() => setOpen((current) => !current)}>
+      <button
+        ref={triggerRef}
+        type="button"
+        className="cs-dropdown__trigger"
+        disabled={disabled}
+        aria-haspopup="menu"
+        aria-expanded={open}
+        aria-controls={menuId}
+        onClick={() => setOpen((current) => !current)}
+        onKeyDown={(event) => {
+          if (event.key !== "ArrowDown" && event.key !== "ArrowUp") return;
+          event.preventDefault();
+          pendingMenuFocus.current = event.key === "ArrowUp" ? "last" : "first";
+          setOpen(true);
+        }}
+      >
         {label}<ChevronDown aria-hidden="true" />
       </button>
-      {open ? <div id={menuId} className={cx("cs-dropdown__menu", `cs-dropdown__menu--${align}`)} role="menu">
+      {open ? <div
+        id={menuId}
+        ref={menuRef}
+        className={cx("cs-dropdown__menu", `cs-dropdown__menu--${align}`)}
+        role="menu"
+        onKeyDown={(event) => {
+          const menuItems = Array.from(menuRef.current?.querySelectorAll('[role="menuitem"]:not(:disabled)') || []);
+          if (!menuItems.length) return;
+
+          const currentIndex = Math.max(0, menuItems.indexOf(document.activeElement));
+          let nextIndex = currentIndex;
+          if (event.key === "ArrowDown") nextIndex = (currentIndex + 1) % menuItems.length;
+          else if (event.key === "ArrowUp") nextIndex = (currentIndex - 1 + menuItems.length) % menuItems.length;
+          else if (event.key === "Home") nextIndex = 0;
+          else if (event.key === "End") nextIndex = menuItems.length - 1;
+          else if (event.key === "Escape") {
+            event.preventDefault();
+            closeMenu(true);
+            return;
+          } else {
+            return;
+          }
+
+          event.preventDefault();
+          menuItems[nextIndex].focus();
+        }}
+      >
         {items.map((item) => item.separator ? <div key={item.id} className="cs-dropdown__separator" role="separator" /> : (
-          <button key={item.id} type="button" role="menuitem" className={cx("cs-dropdown__item", item.tone === "danger" && "cs-dropdown__item--danger")} disabled={item.disabled} onClick={() => { item.onSelect?.(); setOpen(false); }}>
+          <button key={item.id} type="button" role="menuitem" className={cx("cs-dropdown__item", item.tone === "danger" && "cs-dropdown__item--danger")} disabled={item.disabled} onClick={() => { item.onSelect?.(); closeMenu(false); }}>
             {item.icon ? <span aria-hidden="true">{item.icon}</span> : null}<span>{item.label}</span>{item.selected ? <Check aria-hidden="true" /> : null}
           </button>
         ))}
