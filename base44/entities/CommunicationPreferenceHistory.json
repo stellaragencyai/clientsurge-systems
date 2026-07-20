@@ -2,16 +2,16 @@
   "name": "CommunicationPreferenceHistory",
   "type": "object",
   "properties": {
-    "client_id": { "type": ["string", "null"] },
-    "user_email": { "type": ["string", "null"] },
+    "client_id": { "type": "string" },
+    "user_email": { "type": "string" },
     "source": { "type": "string" },
-    "consent_version": { "type": ["string", "null"] },
-    "previous_preferences_json": { "type": ["string", "null"] },
+    "consent_version": { "type": "string" },
+    "previous_preferences_json": { "type": "string" },
     "current_preferences_json": { "type": "string" },
     "changed_fields": { "type": "array", "items": { "type": "string" } },
     "changed_at": { "type": "string", "format": "date-time" },
-    "changed_by_user_id": { "type": ["string", "null"] },
-    "request_id": { "type": ["string", "null"] }
+    "changed_by_user_id": { "type": "string" },
+    "request_id": { "type": "string" }
   },
   "required": ["source", "current_preferences_json", "changed_at"],
   "indexes": [

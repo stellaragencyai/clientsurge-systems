@@ -1,14 +1,26 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { readFileSync, readdirSync } from "node:fs";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
 
 const verifierSource = read("base44/functions/verifyGA4Configuration/main.ts");
 const compatibilityVerifierSource = read("base44/functions/configureGA4Analytics/entry.ts");
+const setupFunctionSource = read("base44/functions/setupGA4Configuration/main.ts");
+const getAdminSettingsSource = read("base44/functions/getAdminSettings/main.ts");
 const adminApiSource = read("src/lib/adminSettingsApi.js");
 const adminPanelSource = read("src/components/admin/AdminSettingsPanel.jsx");
 const publishWorkflowSource = read(".github/workflows/base44-auto-publish.yml");
+const deployAdjacentEntitySources = [
+  "base44/entities/AutoOptimizationRule.jsonc",
+  "base44/entities/ConversionTrackingEvent.jsonc",
+  "base44/entities/GrowthOptimizationSignal.jsonc",
+  "base44/entities/LandingPageAnalytics.jsonc",
+  "base44/entities/OptimizationAction.jsonc",
+].map((path) => [path, read(path)]);
+const entitySources = readdirSync(new URL("../base44/entities", import.meta.url))
+  .filter((fileName) => /\.(json|jsonc)$/i.test(fileName))
+  .map((fileName) => [`base44/entities/${fileName}`, read(`base44/entities/${fileName}`)]);
 
 test("GA4 verifier gates active status behind every required live check", () => {
   for (const checkName of [
@@ -95,4 +107,29 @@ test("Base44 auto-publish includes frontend and backend GA4 surfaces", () => {
   assert.match(publishWorkflowSource, /index\.html/);
   assert.match(publishWorkflowSource, /BASE44_AUTH_JSON/);
   assert.match(publishWorkflowSource, /BASE_44_AUTH_JSON/);
+});
+
+test("existing deployed GA4 admin slots are self-contained for Base44 individual deploys", () => {
+  for (const [path, source] of [
+    ["base44/functions/setupGA4Configuration/main.ts", setupFunctionSource],
+    ["base44/functions/getAdminSettings/main.ts", getAdminSettingsSource],
+  ]) {
+    assert.doesNotMatch(source, /from\s+["']\.\.\/_shared\//, `${path} must not depend on parent shared imports`);
+  }
+
+  assert.match(setupFunctionSource, /repairCanonicalGa4Configuration/);
+  assert.match(getAdminSettingsSource, /summarizeGa4Records/);
+});
+
+test("GA4 deploy-adjacent entity RLS uses Base44-compatible role checks", () => {
+  for (const [path, source] of deployAdjacentEntitySources) {
+    assert.doesNotMatch(source, /"role"\s*:\s*\[/, `${path} must not use role arrays`);
+    assert.doesNotThrow(() => JSON.parse(source), `${path} must remain valid JSON`);
+  }
+});
+
+test("entity schemas avoid Base44-incompatible JSON Schema union types", () => {
+  for (const [path, source] of entitySources) {
+    assert.doesNotMatch(source, /"type"\s*:\s*\[/, `${path} must not use type arrays`);
+  }
 });
