@@ -56,7 +56,7 @@ export function getAdminSettingsError(error, fallback) {
 }
 
 function getAdminSettingsEntity() {
-  const entity = base44?.entities?.AdminSettings || base44?.asServiceRole?.entities?.AdminSettings;
+  const entity = base44?.entities?.AdminSettings;
   if (!entity) throw new Error("AdminSettings entity API is unavailable");
   return entity;
 }

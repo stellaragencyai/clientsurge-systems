@@ -85,6 +85,7 @@ test("Analytics tab exposes the full repair and verification workflow", () => {
   assert.match(adminApiSource, /mode:\s*"verify"/);
   assert.match(adminApiSource, /canonical_tracked_events/);
   assert.match(adminApiSource, /measurement_protocol_delivery_status/);
+  assert.doesNotMatch(adminApiSource, /asServiceRole/);
 });
 
 test("Base44 auto-publish includes frontend and backend GA4 surfaces", () => {
