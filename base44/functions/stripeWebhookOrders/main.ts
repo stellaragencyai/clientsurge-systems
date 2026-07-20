@@ -1,5 +1,5 @@
-import { handleCanonicalStripeWebhook } from "../_shared/stripeOrderWebhook.js";
-import { sendGa4PurchaseFromCheckoutSession } from "../_shared/ga4MeasurementProtocol.js";
+import { handleCanonicalStripeWebhook } from "../shared/stripeOrderWebhook.js";
+import { sendGa4PurchaseFromCheckoutSession } from "../shared/ga4MeasurementProtocol.js";
 
 function createRequestId(req: Request) {
   const incoming = req.headers.get("x-request-id")?.trim();

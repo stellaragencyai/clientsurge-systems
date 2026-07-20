@@ -1,6 +1,6 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-import { isGa4Admin } from "../_shared/ga4Configuration.ts";
-import { runGa4Verification } from "../_shared/ga4Verification.ts";
+import { isGa4Admin } from "../shared/ga4Configuration.ts";
+import { runGa4Verification } from "../shared/ga4Verification.ts";
 
 function jsonResponse(body: unknown, status = 200) {
   return Response.json(body, {

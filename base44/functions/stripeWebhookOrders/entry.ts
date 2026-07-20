@@ -1,4 +1,4 @@
-import { handleCanonicalStripeWebhook } from "../_shared/stripeOrderWebhook.js";
+import { handleCanonicalStripeWebhook } from "../shared/stripeOrderWebhook.js";
 
 /**
  * Legacy Stripe order webhook entrypoint.
