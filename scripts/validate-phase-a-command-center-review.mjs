@@ -99,7 +99,7 @@ async function assertNoDuplicateIds(page) {
 
 async function assertNeutralDefaults(page) {
   const text = await page.locator("body").innerText();
-  for (const forbidden of ["Operational", "Live operational view", "You are caught up", "All clear"]) {
+  for (const forbidden of ["Operational", "Healthy", "Live", "Live operational view", "You are caught up", "All clear", "Everything is working"]) {
     if (text.includes(forbidden)) fail(`neutral default leaked ${forbidden}`, { text });
   }
   for (const required of ["Data not verified", "Status being verified", "Action queue not verified", "Business pulse not verified"]) {
@@ -128,22 +128,171 @@ async function assertLiveGating(page, shouldBeLive) {
   if (!shouldBeLive && statusLine.includes("Live")) fail("unverified/non-current state displayed Live", { statusLine });
 }
 
-async function assertFirstViewportPriority(page) {
+async function assertNoTruthContradictions(page, label) {
+  const result = await page.evaluate(() => {
+    const normalize = (value) => (value || "").replace(/\s+/g, " ").trim();
+    const text = document.body.innerText;
+    const statusLine = normalize(document.querySelector(".cs-command-center__status-line")?.textContent);
+    const prohibited = [
+      ["Operational", "Status being verified"],
+      ["Operational", "Limited data available"],
+      ["Live", "Stale"],
+      ["Live", "Partial"],
+      ["Live", "Not connected"],
+      ["Live", "Unknown"],
+      ["Healthy", "Unverified"],
+      ["All clear", "Permission restricted"],
+    ].filter(([a, b]) => text.includes(a) && text.includes(b));
+    return { text, statusLine, prohibited };
+  });
+  if (result.prohibited.length) fail(`truth contradiction at ${label}`, result);
+}
+
+async function assertFirstViewportPriority(page, label) {
   const positions = await page.evaluate(() => {
-    const daily = document.querySelector("#daily-actions")?.getBoundingClientRect();
-    const metrics = document.querySelector(".cs-command-center__metrics")?.getBoundingClientRect();
-    const workforce = document.querySelector("#ai-workforce")?.getBoundingClientRect();
+    const read = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        top: Math.round(rect.top),
+        bottom: Math.round(rect.bottom),
+        inFirstViewport: rect.top < window.innerHeight && rect.bottom > 0,
+        text: (element.textContent || "").replace(/\s+/g, " ").trim().slice(0, 240),
+      };
+    };
+    const business = document.querySelector("#business-condition");
+    const attention = document.querySelector("#attention-required");
+    const actions = document.querySelector("#daily-actions");
+    const outcomes = document.querySelector("#verified-outcome-summary");
+    const compare = (a, b) => {
+      if (!a || !b) return null;
+      return Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
+    };
     return {
-      dailyTop: daily?.top ?? null,
-      metricsTop: metrics?.top ?? null,
-      workforceTop: workforce?.top ?? null,
+      business: read("#business-condition"),
+      attention: read("#attention-required"),
+      actions: read("#daily-actions"),
+      outcomes: read("#verified-outcome-summary"),
+      aiWorkforce: read("#ai-workforce"),
+      activity: read("#activity"),
+      systemHealth: read("#system-health"),
+      domOrder: {
+        businessBeforeAttention: compare(business, attention),
+        businessBeforeActions: compare(business, actions),
+        attentionBeforeActions: attention ? compare(attention, actions) : true,
+        actionsBeforeOutcomes: outcomes ? compare(actions, outcomes) : true,
+      },
+      headings: Array.from(document.querySelectorAll("h2")).map((heading) => (heading.textContent || "").replace(/\s+/g, " ").trim()).slice(0, 8),
+      viewportHeight: window.innerHeight,
     };
   });
-  if (positions.dailyTop === null || positions.metricsTop === null || positions.workforceTop === null) {
-    fail("priority sections missing", positions);
+
+  if (!positions.business || !positions.actions) fail(`priority sections missing at ${label}`, positions);
+  if (!positions.business.inFirstViewport) fail(`Business Condition is not visible in first viewport at ${label}`, positions);
+  if (positions.attention && positions.business.top > positions.attention.top) fail(`Business Condition does not visually precede Attention Required at ${label}`, positions);
+  if (positions.business.top > positions.actions.top) fail(`Business Condition does not visually precede Next Best Actions at ${label}`, positions);
+  if (positions.attention && positions.attention.top > positions.actions.top) fail(`Attention Required does not visually precede Next Best Actions at ${label}`, positions);
+  if (positions.outcomes && positions.actions.top > positions.outcomes.top) fail(`Verified Outcome Summary does not follow actions at ${label}`, positions);
+  if (positions.domOrder.businessBeforeAttention === false || positions.domOrder.businessBeforeActions === false || positions.domOrder.attentionBeforeActions === false || positions.domOrder.actionsBeforeOutcomes === false) {
+    fail(`DOM order does not match required priority order at ${label}`, positions);
   }
-  if (positions.dailyTop > positions.metricsTop || positions.dailyTop > positions.workforceTop) {
-    fail("Daily Action Center is not first-viewport priority", positions);
+  const headingOrder = positions.headings.join(" > ");
+  if (!headingOrder.includes("Business Condition") || !headingOrder.includes("Next Best Actions")) fail(`heading order missing priority headings at ${label}`, positions);
+  if (headingOrder.indexOf("Business Condition") > headingOrder.indexOf("Next Best Actions")) fail(`heading order is not condition-first at ${label}`, positions);
+  if (positions.aiWorkforce?.top < positions.actions.top) fail(`AI Workforce displaces core priority hierarchy at ${label}`, positions);
+  if (positions.activity && positions.activity.top < positions.actions.top) fail(`Activity Timeline is not secondary at ${label}`, positions);
+}
+
+async function assertModuleSubordination(page, label) {
+  const result = await page.evaluate(() => {
+    const read = (selector) => {
+      const element = document.querySelector(selector);
+      if (!element) return null;
+      const rect = element.getBoundingClientRect();
+      return {
+        top: Math.round(rect.top),
+        role: element.getAttribute("data-command-role"),
+        prominence: element.getAttribute("data-prominence"),
+        text: (element.textContent || "").replace(/\s+/g, " ").trim().slice(0, 220),
+      };
+    };
+    return {
+      business: read("#business-condition"),
+      growthSnapshot: read("#growth-snapshot"),
+      daily: read("#daily-actions"),
+      opportunities: read("#opportunities"),
+      activity: read("#activity"),
+      systemHealth: read("#system-health"),
+      aiWorkforce: read("#ai-workforce"),
+    };
+  });
+  if (result.growthSnapshot && result.growthSnapshot.prominence === "primary") fail(`Growth Snapshot is equal-weight primary at ${label}`, result);
+  if (result.activity && result.activity.prominence !== "secondary") fail(`Activity Timeline is not secondary at ${label}`, result);
+  if (result.aiWorkforce && result.aiWorkforce.top < result.daily.top) fail(`AI Workforce displaces actions at ${label}`, result);
+  if (result.opportunities && result.opportunities.top < result.daily.top) fail(`Opportunities displace immediate actions at ${label}`, result);
+}
+
+async function assertRenderedSecondaryContent(page, label) {
+  const result = await page.evaluate(() => {
+    const selectors = ["#ai-workforce", "#opportunities", "#website-intelligence", "#activity", "#system-health"];
+    return selectors.map((selector) => {
+      const element = document.querySelector(selector);
+      const style = element ? window.getComputedStyle(element) : null;
+      return {
+        selector,
+        renderedText: (element?.innerText || "").replace(/\s+/g, " ").trim(),
+        htmlText: (element?.textContent || "").replace(/\s+/g, " ").trim().slice(0, 180),
+        contentVisibility: style?.contentVisibility,
+      };
+    });
+  });
+  const emptyRenderedSections = result.filter((section) => section.htmlText && !section.renderedText);
+  if (emptyRenderedSections.length) fail(`secondary module content is present in HTML but not rendered at ${label}`, { result });
+}
+
+async function assertSystemHealthProminence(page, expectedProminence, label) {
+  const result = await page.evaluate(() => {
+    const element = document.querySelector("#system-health");
+    return {
+      prominence: element?.getAttribute("data-prominence"),
+      text: (element?.textContent || "").replace(/\s+/g, " ").trim(),
+    };
+  });
+  if (result.prominence !== expectedProminence) {
+    fail(`System Health prominence mismatch at ${label}`, { expectedProminence, result });
+  }
+}
+
+async function assertTouchTargets(page, label) {
+  const failures = await page.evaluate(() => {
+    return Array.from(document.querySelectorAll("a[href], button, [role='button']"))
+      .filter((element) => {
+        const rect = element.getBoundingClientRect();
+        const style = window.getComputedStyle(element);
+        return rect.width > 0 && rect.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+      })
+      .map((element) => {
+        const rect = element.getBoundingClientRect();
+        return {
+          tag: element.tagName.toLowerCase(),
+          text: (element.textContent || "").replace(/\s+/g, " ").trim().slice(0, 100),
+          width: Math.round(rect.width),
+          height: Math.round(rect.height),
+        };
+      })
+      .filter((item) => item.width < 44 || item.height < 44);
+  });
+  if (failures.length) fail(`small touch targets at ${label}`, { failures });
+}
+
+async function assertCleanLiveFixture(page) {
+  const text = await page.locator("body").innerText();
+  await assertLiveGating(page, true);
+  await assertSystemHealthProminence(page, "secondary", "clean-live");
+  if (!text.includes("Operational")) fail("clean live fixture missing Operational", { text });
+  if (text.includes("Attention required") || text.includes("Needs attention") || text.includes("not verified") || text.includes("may not send") || text.includes("No delivery proof")) {
+    fail("clean live fixture contains contradictory warning copy", { text });
   }
 }
 
@@ -200,8 +349,13 @@ async function run() {
       await assertNoHorizontalOverflow(page, label);
       await assertNeutralDefaults(page);
       await assertLiveGating(page, false);
-      await assertFirstViewportPriority(page);
-      if (viewport.width === 1440 || viewport.width === 390) {
+      await assertNoTruthContradictions(page, label);
+      await assertFirstViewportPriority(page, label);
+      await assertModuleSubordination(page, label);
+      await assertRenderedSecondaryContent(page, label);
+      await assertSystemHealthProminence(page, "contextual", label);
+      await assertTouchTargets(page, label);
+      if (viewport.width === 1440 || viewport.width === 1280 || viewport.width === 1024 || viewport.width === 768 || viewport.width === 390 || viewport.width === 375) {
         await assertAxeCritical(page);
         await page.screenshot({ path: path.join(resultsDir, `command-default-${viewport.width}x${viewport.height}.png`), fullPage: true });
       }
@@ -214,6 +368,8 @@ async function run() {
       const page = await context.newPage();
       await page.goto(`${reviewUrl}?actionState=${state}`, { waitUntil: "networkidle" });
       await assertActionQueueState(page, state);
+      await assertFirstViewportPriority(page, `actionState/${state}`);
+      await assertNoTruthContradictions(page, `actionState/${state}`);
       await assertNoHorizontalOverflow(page, `actionState/${state}`);
       await context.close();
       checked++;
@@ -224,6 +380,7 @@ async function run() {
       const page = await context.newPage();
       await page.goto(`${reviewUrl}?freshness=${freshness}`, { waitUntil: "networkidle" });
       await assertLiveGating(page, false);
+      await assertNoTruthContradictions(page, `freshness/${freshness}`);
       await context.close();
       checked++;
     }
@@ -232,11 +389,29 @@ async function run() {
       const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
       const page = await context.newPage();
       await page.goto(`${reviewUrl}?verified=1&freshness=live&withAction=1`, { waitUntil: "networkidle" });
-      await assertLiveGating(page, true);
+      await assertLiveGating(page, false);
+      await assertNoTruthContradictions(page, "verified/actionable");
+      await assertFirstViewportPriority(page, "verified/actionable");
+      await assertRenderedSecondaryContent(page, "verified/actionable");
       await assertActionAccountability(page);
       await assertNoHorizontalOverflow(page, "verified/actionable");
       await assertAxeCritical(page);
       await page.screenshot({ path: path.join(resultsDir, "command-verified-actionable-1440x900.png"), fullPage: true });
+      await context.close();
+      checked++;
+    }
+
+    {
+      const context = await browser.newContext({ viewport: { width: 1440, height: 900 }, reducedMotion: "reduce" });
+      const page = await context.newPage();
+      await page.goto(`${reviewUrl}?verified=1&freshness=live&actionState=verified_zero&alert=0`, { waitUntil: "networkidle" });
+      await assertCleanLiveFixture(page);
+      await assertFirstViewportPriority(page, "verified/clean-live");
+      await assertModuleSubordination(page, "verified/clean-live");
+      await assertRenderedSecondaryContent(page, "verified/clean-live");
+      await assertNoHorizontalOverflow(page, "verified/clean-live");
+      await assertAxeCritical(page);
+      await page.screenshot({ path: path.join(resultsDir, "command-verified-clean-live-1440x900.png"), fullPage: true });
       await context.close();
       checked++;
     }

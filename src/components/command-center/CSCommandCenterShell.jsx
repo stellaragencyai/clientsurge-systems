@@ -71,6 +71,79 @@ const freshnessStates = {
   unknown: "Freshness unknown",
 };
 
+const conditionStates = {
+  verified_operational: {
+    label: "Operational",
+    tone: "success",
+    title: "Business Condition",
+    summary: "Verified sources are current and no action-required condition is present.",
+    message: "Verified source coverage is current for this review fixture.",
+  },
+  attention_required: {
+    label: "Attention required",
+    tone: "warning",
+    title: "Business Condition",
+    summary: "A verified or material business condition needs attention.",
+    message: "Review the attention item and complete the next best action before treating the workspace as operational.",
+  },
+  setup_incomplete: {
+    label: "Setup incomplete",
+    tone: "warning",
+    title: "Business Condition",
+    summary: "Required setup is incomplete.",
+    message: "Finish setup before making operational claims.",
+  },
+  not_connected: {
+    label: "Not connected",
+    tone: "neutral",
+    title: "Business Condition",
+    summary: "Required sources are not connected.",
+    message: "Connect sources before interpreting business condition.",
+  },
+  partial: {
+    label: "Partial data",
+    tone: "warning",
+    title: "Business Condition",
+    summary: "Some source coverage is missing.",
+    message: "Do not treat partial data as complete or operational.",
+  },
+  stale: {
+    label: "Stale data",
+    tone: "warning",
+    title: "Business Condition",
+    summary: "Source data has not updated recently.",
+    message: "Refresh source evidence before making operational decisions.",
+  },
+  delayed: {
+    label: "Delayed",
+    tone: "warning",
+    title: "Business Condition",
+    summary: "A connected source is delayed.",
+    message: "Review delayed source coverage before acting on totals.",
+  },
+  permission_restricted: {
+    label: "Permission restricted",
+    tone: "neutral",
+    title: "Business Condition",
+    summary: "This role cannot verify the full business condition.",
+    message: "Request access before treating hidden work as clear.",
+  },
+  unavailable: {
+    label: "Unavailable",
+    tone: "danger",
+    title: "Business Condition",
+    summary: "A required source is unavailable.",
+    message: "Restore the source before interpreting the business condition.",
+  },
+  unknown: {
+    label: "Data not verified",
+    tone: "neutral",
+    title: "Business Condition",
+    summary: "Business pulse not verified",
+    message: "Status being verified from static review fixtures. Unknown data is not represented as zero.",
+  },
+};
+
 export const COMMAND_CENTER_MODULES = [
   { id: "business-pulse", label: "Business Pulse", icon: HeartPulse },
   { id: "growth-snapshot", label: "Growth Snapshot", icon: CircleDollarSign },
@@ -82,9 +155,15 @@ export const COMMAND_CENTER_MODULES = [
   { id: "system-health", label: "System Health", icon: HeartPulse },
 ];
 
-function CommandCenterSection({ id, title, description, icon: Icon, actions, children, className }) {
+function CommandCenterSection({ id, title, description, icon: Icon, actions, children, className, moduleRole, prominence }) {
   return (
-    <section id={id} className={cx("cs-command-section", className)} aria-labelledby={`${id}-title`}>
+    <section
+      id={id}
+      className={cx("cs-command-section", className)}
+      aria-labelledby={`${id}-title`}
+      data-command-role={moduleRole}
+      data-prominence={prominence}
+    >
       <div className="cs-command-section__header">
         <div className="cs-command-section__heading">
           <span className="cs-command-section__icon" aria-hidden="true"><Icon /></span>
@@ -98,6 +177,27 @@ function CommandCenterSection({ id, title, description, icon: Icon, actions, chi
       <div className="cs-command-section__body">{children}</div>
     </section>
   );
+}
+
+function deriveConditionState({
+  dataReadiness,
+  sourceConnected,
+  coverageState,
+  freshnessState,
+  alerts,
+  actions,
+}) {
+  if (dataReadiness !== "verified") return "unknown";
+  if (!sourceConnected) return "not_connected";
+  if (coverageState === "partial" || freshnessState === "partial") return "partial";
+  if (freshnessState === "stale") return "stale";
+  if (freshnessState === "delayed") return "delayed";
+  if (freshnessState === "not_connected") return "not_connected";
+  if (freshnessState === "unavailable") return "unavailable";
+  if (freshnessState === "unknown") return "unknown";
+  if (alerts.length || actions.length) return "attention_required";
+  if ((freshnessState === "live" || freshnessState === "current") && coverageState === "current") return "verified_operational";
+  return "unknown";
 }
 
 function WorkforceRow({ name, role, status, activity, metric }) {
@@ -157,7 +257,6 @@ function ActionItem({
 
 export default function CSCommandCenterShell({
   businessName = "Your business",
-  status = "Operational",
   statusTone,
   dataReadiness = "unverified",
   readinessMessage,
@@ -179,22 +278,27 @@ export default function CSCommandCenterShell({
   headerActions,
 }) {
   const hasVerifiedOperationalData = dataReadiness === "verified";
-  const canDisplayLive = hasVerifiedOperationalData && sourceConnected && freshnessState === "live" && coverageState === "current";
+  const conditionState = deriveConditionState({
+    dataReadiness,
+    sourceConnected,
+    coverageState,
+    freshnessState,
+    alerts,
+    actions,
+  });
+  const condition = conditionStates[conditionState] || conditionStates.unknown;
+  const canDisplayLive = conditionState === "verified_operational" && sourceConnected && freshnessState === "live" && coverageState === "current";
   const displayedFreshnessState = canDisplayLive ? "live" : freshnessState === "live" ? "current" : freshnessState;
   const displayedFreshnessLabel = freshnessStates[displayedFreshnessState] || freshnessStates.unknown;
-  const displayedStatus = hasVerifiedOperationalData ? status : "Data not verified";
-  const displayedStatusTone =
-    statusTone ||
-    (hasVerifiedOperationalData && status === "Operational"
-      ? "success"
-      : hasVerifiedOperationalData && status === "Needs attention"
-        ? "warning"
-        : "neutral");
-  const displayedStatusMessage =
-    readinessMessage || (hasVerifiedOperationalData ? "Verified operational view" : "Awaiting verified data readiness");
+  const displayedStatus = condition.label;
+  const displayedStatusTone = statusTone || condition.tone;
+  const displayedStatusMessage = readinessMessage || condition.message;
   const pageTitle = title || (businessName === "Your business" ? "Your Command Center" : `${businessName} Command Center`);
   const resolvedActionQueueState = actionQueueState || (actionQueueVerified ? "verified_zero" : "unknown");
   const actionQueueCopy = actionQueueStates[resolvedActionQueueState] || actionQueueStates.unknown;
+  const showAttention = alerts.length > 0 || conditionState === "attention_required";
+  const showVerifiedOutcomeSummary = hasVerifiedOperationalData && metrics.length > 0;
+  const systemHealthProminence = conditionState === "verified_operational" ? "secondary" : "contextual";
 
   return (
     <main className="cs-command-center">
@@ -211,22 +315,60 @@ export default function CSCommandCenterShell({
         </div>
       </CSPageHeader>
 
-      {alerts.length ? (
-        <div className="cs-command-center__alerts" aria-label="Priority alerts">
-          {alerts.map((alert) => (
-            <CSAlert key={alert.id || alert.title} tone={alert.tone || "warning"} title={alert.title} actions={alert.actions}>
-              {alert.message}
-            </CSAlert>
-          ))}
-        </div>
-      ) : null}
-
       <div className="cs-command-center__priority-grid" aria-label="First viewport priority">
         <CommandCenterSection
+          id="business-condition"
+          title="Business Condition"
+          description="The current business condition, source coverage, and freshness before actions or analytics."
+          icon={HeartPulse}
+          moduleRole="business-condition"
+          prominence="primary"
+        >
+          <div className="cs-business-condition">
+            <CSCard tone={conditionState === "verified_operational" ? "default" : "subtle"} title={condition.summary} description={condition.message}>
+              <dl className="cs-command-center__source-row">
+                <div><dt>Source</dt><dd>{sourceConnected ? "Connected review source" : "Static review fixture"}</dd></div>
+                <div><dt>Truth</dt><dd><CSStatusBadge tone={displayedStatusTone}>{displayedStatus}</CSStatusBadge></dd></div>
+                <div><dt>Freshness</dt><dd><CSStatusBadge tone={displayedFreshnessState === "live" || displayedFreshnessState === "current" ? "info" : "neutral"}>{displayedFreshnessLabel}</CSStatusBadge></dd></div>
+                <div><dt>Coverage</dt><dd>{coverageState === "current" ? "Current period" : "Coverage not verified"}</dd></div>
+              </dl>
+              {!hasVerifiedOperationalData ? (
+                <p className="cs-command-center__muted">Business pulse not verified. Metrics appear only after a connected source reports verified values.</p>
+              ) : null}
+            </CSCard>
+          </div>
+        </CommandCenterSection>
+
+        {showAttention ? (
+          <CommandCenterSection
+            id="attention-required"
+            title="Attention Required"
+            description="Business-impacting warnings and blockers that should be reviewed before routine work."
+            icon={AlertTriangle}
+            moduleRole="attention-required"
+            prominence="primary"
+          >
+            <div className="cs-command-center__alerts" aria-label="Priority alerts">
+              {alerts.length ? alerts.map((alert) => (
+                <CSAlert key={alert.id || alert.title} tone={alert.tone || "warning"} title={alert.title} actions={alert.actions}>
+                  {alert.message}
+                </CSAlert>
+              )) : (
+                <CSAlert tone="warning" title="Attention required">
+                  Review the current condition before treating the workspace as operational.
+                </CSAlert>
+              )}
+            </div>
+          </CommandCenterSection>
+        ) : null}
+
+        <CommandCenterSection
           id="daily-actions"
-          title="Daily Action Center"
+          title="Next Best Actions"
           description="The highest-value actions requiring a person today."
           icon={Inbox}
+          moduleRole="next-best-actions"
+          prominence="primary"
         >
           <div className="cs-action-list">
             {actions.length ? actions.map((item) => <ActionItem key={item.id || item.title} {...item} />) : (
@@ -236,23 +378,32 @@ export default function CSCommandCenterShell({
             )}
           </div>
         </CommandCenterSection>
+
+        {showVerifiedOutcomeSummary ? (
+          <CommandCenterSection
+            id="verified-outcome-summary"
+            title="Verified Outcome Summary"
+            description="Current verified outcomes after condition, attention, and next actions."
+            icon={CircleDollarSign}
+            moduleRole="verified-outcome-summary"
+            prominence="primary"
+          >
+            <div className="cs-command-center__metrics" aria-label="Verified outcome summary">
+              {metrics.map((metric) => <CSMetricCard key={metric.id || metric.label} {...metric} />)}
+            </div>
+          </CommandCenterSection>
+        ) : null}
       </div>
 
-      <section className="cs-command-center__metrics" aria-label="Business pulse">
-        {metrics.length ? metrics.map((metric) => <CSMetricCard key={metric.id || metric.label} {...metric} />) : (
-          <CSCard tone="subtle" title="Business pulse not verified" description="Metrics appear only after a connected source reports verified values.">
-            <p className="cs-command-center__muted">Unknown data is not represented as zero.</p>
-          </CSCard>
-        )}
-      </section>
-
-      <div className="cs-command-center__grid">
+      <div className="cs-command-center__grid cs-command-center__secondary-grid">
         <CommandCenterSection
           id="ai-workforce"
           title="AI Workforce"
           description="Current operating status for the AI systems working across your business."
           icon={Bot}
           className="cs-command-section--wide"
+          moduleRole="ai-workforce"
+          prominence="secondary"
         >
           <div className="cs-workforce-list">
             {workforce.length ? workforce.map((agent) => <WorkforceRow key={agent.id || agent.name} {...agent} />) : (
@@ -263,24 +414,34 @@ export default function CSCommandCenterShell({
           </div>
         </CommandCenterSection>
 
-        <CommandCenterSection id="opportunities" title="Opportunities" description="Qualified leads and revenue opportunities that are moving now." icon={Target}>
+        <CommandCenterSection id="opportunities" title="Opportunities" description="Qualified leads and revenue opportunities that are moving now." icon={Target} moduleRole="opportunities" prominence="secondary">
           {opportunities || <CSCard tone="subtle"><p className="cs-command-center__muted">Opportunity data is unavailable until lead sources are connected.</p></CSCard>}
         </CommandCenterSection>
 
-        <CommandCenterSection id="website-intelligence" title="Website Intelligence" description="How your website is converting attention into measurable business activity." icon={Globe2}>
+        <CommandCenterSection id="website-intelligence" title="Website Intelligence" description="How your website is converting attention into measurable business activity." icon={Globe2} moduleRole="website-intelligence" prominence="secondary">
           {websiteIntelligence || <CSCard tone="subtle"><p className="cs-command-center__muted">Website intelligence will appear after tracking is verified.</p></CSCard>}
         </CommandCenterSection>
 
-        <CommandCenterSection id="activity" title="Activity Timeline" description="A trustworthy chronological record of meaningful system activity." icon={Activity} className="cs-command-section--wide">
+        <CommandCenterSection id="activity" title="Activity Timeline" description="A trustworthy chronological record of meaningful system activity." icon={Activity} className="cs-command-section--wide cs-command-section--secondary" moduleRole="activity-timeline" prominence="secondary">
           {activity || <CSCard tone="subtle"><p className="cs-command-center__muted">No meaningful activity has been recorded yet.</p></CSCard>}
         </CommandCenterSection>
 
-        <CommandCenterSection id="system-health" title="System Health" description="Connection, delivery, and automation health across the ClientSurge system." icon={HeartPulse}>
+        <CommandCenterSection id="system-health" title="System Health" description="Connection, delivery, and automation health across the ClientSurge system." icon={HeartPulse} className={cx(systemHealthProminence === "secondary" && "cs-command-section--secondary")} moduleRole="system-health" prominence={systemHealthProminence}>
           {systemHealth || (
             <div className="cs-system-health-summary">
-              <div><PhoneCall aria-hidden="true" /><span>Communications</span><CSStatusBadge tone="neutral">Not connected</CSStatusBadge></div>
-              <div><CalendarCheck aria-hidden="true" /><span>Booking</span><CSStatusBadge tone="neutral">Not connected</CSStatusBadge></div>
-              <div><Globe2 aria-hidden="true" /><span>Website</span><CSStatusBadge tone="neutral">Not verified</CSStatusBadge></div>
+              {systemHealthProminence === "secondary" ? (
+                <>
+                  <div><PhoneCall aria-hidden="true" /><span>Communications</span><CSStatusBadge tone="success">Verified</CSStatusBadge></div>
+                  <div><CalendarCheck aria-hidden="true" /><span>Booking</span><CSStatusBadge tone="success">Verified</CSStatusBadge></div>
+                  <div><Globe2 aria-hidden="true" /><span>Website</span><CSStatusBadge tone="success">Verified</CSStatusBadge></div>
+                </>
+              ) : (
+                <>
+                  <div><PhoneCall aria-hidden="true" /><span>Communications</span><CSStatusBadge tone="neutral">Not connected</CSStatusBadge></div>
+                  <div><CalendarCheck aria-hidden="true" /><span>Booking</span><CSStatusBadge tone="neutral">Not connected</CSStatusBadge></div>
+                  <div><Globe2 aria-hidden="true" /><span>Website</span><CSStatusBadge tone="neutral">Not verified</CSStatusBadge></div>
+                </>
+              )}
             </div>
           )}
         </CommandCenterSection>
