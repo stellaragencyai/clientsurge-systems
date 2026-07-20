@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, Navigate } from "react-router-dom";
 import {
   Activity,
@@ -39,6 +40,19 @@ import {
   getEnterpriseSection,
   getStateLabelsForSection,
 } from "@/lib/enterpriseAdminFoundation";
+import { fetchEnterpriseOrganizationSection } from "@/lib/enterpriseOrganizationSettingsSource";
+import { fetchEnterpriseTeamSection } from "@/lib/enterpriseTeamManagementSource";
+
+const SECTION_SOURCE_LOADERS = {
+  organization: {
+    label: "Organization",
+    load: fetchEnterpriseOrganizationSection,
+  },
+  team: {
+    label: "Team",
+    load: fetchEnterpriseTeamSection,
+  },
+};
 
 const ROUTE_ICON = {
   organization: Building2,
@@ -115,6 +129,8 @@ const STATUS_STYLE = {
   Alert: "border-rose-200 bg-rose-50 text-rose-800",
   "SLA At Risk": "border-rose-200 bg-rose-50 text-rose-800",
   Open: "border-sky-200 bg-sky-50 text-sky-800",
+  Loading: "border-sky-200 bg-sky-50 text-sky-800",
+  Empty: "border-slate-200 bg-slate-100 text-slate-700",
 };
 
 function statusClass(status) {
@@ -187,6 +203,48 @@ function SourceSemantics({ semantics }) {
           </div>
         ))}
       </dl>
+    </section>
+  );
+}
+
+function SourceBindingNotice({ binding }) {
+  if (!binding) return null;
+
+  const bindingRows = Object.entries(binding).filter(([key]) => !["errors"].includes(key));
+
+  return (
+    <section aria-labelledby="source-binding-title" className="rounded-lg border border-violet-200 bg-violet-50 p-4 shadow-sm">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+        <div>
+          <div className="mb-2 flex items-center gap-2">
+            <FileClock className="h-5 w-5 text-violet-800" aria-hidden="true" />
+            <h2 id="source-binding-title" className="text-base font-semibold text-violet-950">
+              Read-only Source Binding
+            </h2>
+          </div>
+          <p className="text-sm leading-6 text-violet-950">
+            Values may include read-only source snapshots. They remain unverified until canonical records, RBAC enforcement, and audit proof are bound.
+          </p>
+        </div>
+        <StatusPill status={binding.status} />
+      </div>
+      <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
+        {bindingRows.map(([key, value]) => (
+          <div key={key} className="rounded-lg border border-violet-200 bg-white/70 p-3">
+            <dt className="font-semibold text-violet-800">
+              {key.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase())}
+            </dt>
+            <dd className="mt-1 break-words text-violet-950">{value}</dd>
+          </div>
+        ))}
+      </dl>
+      {binding.errors?.length ? (
+        <ul className="mt-3 space-y-1 text-sm text-violet-950" aria-label="Source binding read issues">
+          {binding.errors.map((error) => (
+            <li key={error}>{error}</li>
+          ))}
+        </ul>
+      ) : null}
     </section>
   );
 }
@@ -379,8 +437,49 @@ function ValidationMatrix() {
 
 export default function EnterpriseSettingsPage({ sectionId = "organization" }) {
   const route = getEnterpriseRoute(sectionId);
-  const section = getEnterpriseSection(sectionId);
+  const baseSection = getEnterpriseSection(sectionId);
+  const sourceLoader = SECTION_SOURCE_LOADERS[sectionId];
+  const [boundSection, setBoundSection] = useState(null);
+  const [bindingStatus, setBindingStatus] = useState("Loading");
+  const section = sourceLoader && boundSection ? boundSection : baseSection;
   const Icon = ROUTE_ICON[route.id] || Settings;
+
+  useEffect(() => {
+    let active = true;
+
+    if (!sourceLoader) {
+      setBoundSection(null);
+      setBindingStatus("Empty");
+      return () => {
+        active = false;
+      };
+    }
+
+    setBindingStatus("Loading");
+    sourceLoader.load()
+      .then((nextSection) => {
+        if (!active) return;
+        setBoundSection(nextSection);
+        setBindingStatus(nextSection.sourceBinding?.status || "Current");
+      })
+      .catch((error) => {
+        if (!active) return;
+        setBindingStatus("Partial");
+        setBoundSection({
+          ...baseSection,
+          sourceBinding: {
+            mode: "read-only",
+            status: "Partial",
+            sources: "fixture fallback only",
+            errors: [error?.message || `${sourceLoader.label} source binding failed`],
+          },
+        });
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [baseSection, sourceLoader]);
 
   if (!ENTERPRISE_SETTINGS_ROUTES.some((item) => item.id === sectionId)) {
     return <Navigate to="/settings/organization" replace />;
@@ -416,6 +515,15 @@ export default function EnterpriseSettingsPage({ sectionId = "organization" }) {
                   >
                     Review fixture from #{PHASE_D_SOURCE.issue}
                   </span>
+                  {sourceLoader ? (
+                    <span
+                      role="status"
+                      aria-live="polite"
+                      className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800"
+                    >
+                      {sourceLoader.label} binding {bindingStatus}
+                    </span>
+                  ) : null}
                 </div>
                 <h1 id="enterprise-settings-title" className="text-3xl font-semibold text-slate-950 sm:text-4xl">
                   {section.title}
@@ -438,6 +546,7 @@ export default function EnterpriseSettingsPage({ sectionId = "organization" }) {
           </header>
 
           <SourceSemantics semantics={section.sourceSemantics} />
+          <SourceBindingNotice binding={section.sourceBinding} />
 
           <section aria-labelledby="panels-title" className="space-y-4">
             <div className="flex flex-wrap items-end justify-between gap-3">
