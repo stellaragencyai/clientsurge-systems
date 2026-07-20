@@ -20,65 +20,94 @@ import AdminSessionGuard from "./AdminSessionGuard";
 
 const NAV_GROUPS = [
   {
-    group: "Main",
+    group: "Command Center",
     items: [
       { id: "overview",         label: "Overview",          icon: LayoutDashboard, path: "/admin" },
-      { id: "leads",            label: "Leads",             icon: Users,           path: "/admin", tab: "leads" },
-      { id: "crm-health",       label: "CRM Health",        icon: ShieldCheck,     path: "/admin", tab: "crm-health" },
-      { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
-      { id: "deployment-manager", label: "Deployment Manager", icon: ShieldCheck, path: "/admin", tab: "deployment-manager" },
-      { id: "marketing",          label: "AI Marketing",        icon: Sparkles,        path: "/admin/marketing" },
-      { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
-      { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
-      { id: "onboarding-pipeline", label: "Onboarding Pipeline", icon: LayoutDashboard, path: "/admin/onboarding-pipeline" },
+      { id: "platform-integration", label: "Platform Integration", icon: Layers, path: "/admin/platform" },
+      { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
+      { id: "launch-proof", label: "Launch Proof", icon: ShieldCheck, path: "/admin", tab: "launch-proof" },
     ],
   },
   {
-    group: "Automation",
+    group: "Intelligence",
     items: [
-      { id: "website-leads",    label: "Website Leads",     icon: Target,          path: "/admin", tab: "website-leads" },
-      { id: "install-queue",    label: "Install Queue",     icon: Server,          path: "/admin", tab: "install-queue" },
-      { id: "install-checklists", label: "Install Checklists", icon: ClipboardList, path: "/admin", tab: "install-checklists" },
-      { id: "automations",      label: "Automation Status", icon: Zap,             path: "/admin/automations" },
-      { id: "drip",             label: "Drip Campaigns",    icon: Send,            path: "/admin", tab: "drip" },
-      { id: "nurture",          label: "Nurture Campaigns", icon: Flame,           path: "/admin", tab: "nurture" },
-      { id: "cadence",          label: "Dynamic Cadence",   icon: Settings,        path: "/admin", tab: "cadence" },
-      { id: "email-campaigns",  label: "Email Campaigns",   icon: Mail,            path: "/admin", tab: "email-campaigns" },
-      { id: "campaign-builder", label: "Campaign Builder",  icon: Layers,          path: "/admin", tab: "campaign-builder" },
-      { id: "reactivation",     label: "Lead Reactivation", icon: RotateCcw,       path: "/admin", tab: "reactivation" },
-      { id: "routing",          label: "Lead Routing",      icon: Target,          path: "/admin", tab: "routing" },
-    ],
-  },
-  {
-    group: "Insights",
-    items: [
+      { id: "lead-intelligence", label: "Lead Intelligence", icon: Flame, path: "/admin", tab: "lead-intelligence" },
       { id: "analytics",        label: "Analytics",         icon: BarChart3,       path: "/admin", tab: "analytics" },
       { id: "revenue",          label: "Revenue & MRR",     icon: DollarSign,      path: "/admin", tab: "revenue" },
-      { id: "priority",         label: "Priority Queue",    icon: Star,            path: "/admin", tab: "priority" },
       { id: "attribution",      label: "Source Attribution",icon: PieChart,        path: "/admin", tab: "attribution" },
+      { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
+    ],
+  },
+  {
+    group: "Operations",
+    items: [
+      { id: "guided-onboarding", label: "Launch Guide", icon: Zap, path: "/admin", tab: "guided-onboarding" },
+      { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
+      { id: "deployment-manager", label: "Deployment Manager", icon: ShieldCheck, path: "/admin", tab: "deployment-manager" },
+      { id: "install-queue",    label: "Install Queue",     icon: Server,          path: "/admin", tab: "install-queue" },
+      { id: "launch-gates",     label: "Launch Gates",      icon: ClipboardList,   path: "/admin", tab: "launch-gates" },
+      { id: "ops-verification", label: "Ops Verification", icon: ShieldCheck, path: "/admin/ops-verification" },
+      { id: "inbound-readiness", label: "Inbound Readiness", icon: ShieldCheck, path: "/admin/inbound-readiness" },
+      { id: "broken-flows", label: "Broken Flows", icon: Ban, path: "/admin/broken-flows" },
+      { id: "publish-drift", label: "Publish Drift", icon: Server, path: "/admin/publish-drift" },
+    ],
+  },
+  {
+    group: "Customers",
+    items: [
+      { id: "leads",            label: "Leads",             icon: Users,           path: "/admin", tab: "leads" },
+      { id: "priority",         label: "Priority Queue",    icon: Star,            path: "/admin", tab: "priority" },
+      { id: "website-leads",    label: "Website Leads",     icon: Target,          path: "/admin", tab: "website-leads" },
+      { id: "demo-bookings",    label: "Demo Bookings",     icon: ClipboardList,   path: "/admin", tab: "demo-bookings" },
+      { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
+      { id: "onboarding-pipeline", label: "Onboarding Pipeline", icon: LayoutDashboard, path: "/admin/onboarding-pipeline" },
       { id: "opportunity-review", label: "Opportunity Review", icon: ListChecks,    path: "/admin/opportunity-review" },
     ],
   },
   {
-    group: "System",
+    group: "Communications",
     items: [
-      { id: "broken-flows", label: "Broken Flows", icon: Ban, path: "/admin/broken-flows" },
-      { id: "publish-drift", label: "Publish Drift", icon: Server, path: "/admin/publish-drift" },
-      { id: "ops-verification", label: "Ops Verification Center", icon: ShieldCheck, path: "/admin/ops-verification" },
-      { id: "inbound-readiness", label: "Inbound Readiness", icon: ShieldCheck, path: "/admin/inbound-readiness" },
-      { id: "sprint2-blockers", label: "Sprint 2 Blockers", icon: Ban, path: "/admin/sprint2-blockers" },
-      { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
-      { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
-      { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
-      { id: "automation-activity", label: "Automation Activity", icon: Activity,    path: "/admin/automation-activity" },
-      { id: "audit-log",        label: "Audit Log",         icon: ShieldCheck,     path: "/admin", tab: "audit-log" },
+      { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
       { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs", badge: "webhook-errors" },
       { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },
       { id: "review-request",   label: "Review Requests",   icon: Star,            path: "/admin", tab: "review-request" },
+      { id: "email-campaigns",  label: "Email Campaigns",   icon: Mail,            path: "/admin", tab: "email-campaigns" },
+      { id: "routing",          label: "Lead Routing",      icon: Target,          path: "/admin", tab: "routing" },
+      { id: "marketing",        label: "AI Marketing",      icon: Sparkles,        path: "/admin/marketing" },
+    ],
+  },
+  {
+    group: "AI Workforce",
+    items: [
+      { id: "automations",      label: "Automation Status", icon: Zap,             path: "/admin/automations" },
+      { id: "ai-sales",         label: "AI Sales Command",  icon: Zap,             path: "/admin/ai-sales" },
+      { id: "automation-activity", label: "Automation Activity", icon: Activity,    path: "/admin/automation-activity" },
+      { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
+      { id: "campaign-builder", label: "Campaign Builder",  icon: Layers,          path: "/admin", tab: "campaign-builder" },
+      { id: "drip",             label: "Drip Campaigns",    icon: Send,            path: "/admin", tab: "drip" },
+      { id: "nurture",          label: "Nurture Campaigns", icon: Flame,           path: "/admin", tab: "nurture" },
+      { id: "cadence",          label: "Dynamic Cadence",   icon: Settings,        path: "/admin", tab: "cadence" },
+      { id: "reactivation",     label: "Lead Reactivation", icon: RotateCcw,       path: "/admin", tab: "reactivation" },
+    ],
+  },
+  {
+    group: "Administration",
+    items: [
       { id: "enterprise-settings", label: "Enterprise Settings", icon: Settings,    path: "/settings/organization" },
       { id: "settings",         label: "Settings",          icon: Settings,        path: "/admin", tab: "settings" },
+      { id: "crm-health",       label: "CRM Health",        icon: ShieldCheck,     path: "/admin", tab: "crm-health" },
+      { id: "sprint2-blockers", label: "Sprint 2 Blockers", icon: Ban, path: "/admin/sprint2-blockers" },
+      { id: "audit-log",        label: "Audit Log",         icon: ShieldCheck,     path: "/admin", tab: "audit-log" },
       { id: "qa",               label: "QA Tools",          icon: RefreshCw,       path: "/admin", tab: "qa" },
       { id: "install-guide",    label: "Install Guide",     icon: BookOpen,        path: "/admin/install-guide" },
+    ],
+  },
+  {
+    group: "Account",
+    items: [
+      { id: "billing", label: "Billing", icon: DollarSign, path: "/settings/billing" },
+      { id: "usage", label: "Usage", icon: Activity, path: "/settings/usage" },
+      { id: "support", label: "Support", icon: MessageSquare, path: "/settings/support" },
     ],
   },
 ];
@@ -86,6 +115,7 @@ const NAV_GROUPS = [
 const isDesktopViewport = () => typeof window === "undefined" || window.innerWidth >= 1024;
 const MOBILE_QUICK_NAV = [
   { id: "overview", label: "Overview", path: "/admin" },
+  { id: "platform-integration", label: "Platform", path: "/admin/platform" },
   { id: "leads", label: "Leads", path: "/admin", tab: "leads" },
   { id: "inbox", label: "Inbox", path: "/admin", tab: "inbox" },
   { id: "settings", label: "Settings", path: "/admin", tab: "settings" },
@@ -240,7 +270,7 @@ export default function AdminShell({ children, title, activeId }) {
               aria-expanded={sidebarOpen}
             >
               {sidebarOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-              <span>Menu</span>
+              <span className="hidden sm:inline">Menu</span>
             </button>
             <button
               onClick={() => navigate("/admin")}
