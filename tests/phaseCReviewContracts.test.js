@@ -6,10 +6,16 @@ import {
   AI_WORKER_STATES,
   COMMUNICATION_CHANNELS,
   COMMUNICATION_STATES,
+  PHASE_C_ADAPTER_BOUNDARIES,
   PHASE_C_ACCESSIBILITY_CONTRACTS,
+  PHASE_C_RECOMMENDATION_LIFECYCLE_ACTIONS,
+  PHASE_C_REQUIRED_UI_STATES,
   PHASE_C_ROUTES,
+  PHASE_C_ROLE_SCENARIOS,
   PHASE_C_SOURCE_ISSUES,
+  PHASE_C_STATE_GALLERY,
   PHASE_C_VALIDATION_TARGETS,
+  PHASE_C_WORKER3_UX_CHECKLIST,
   TIMELINE_EVENT_TYPES,
   WORKER_REQUIRED_FIELDS,
   phaseCCommunications,
@@ -17,9 +23,16 @@ import {
   phaseCTimeline,
   phaseCWorkforce,
 } from "../src/data/phaseCReviewFixtures.js";
+import {
+  assertPhaseCAdapterIsFixtureOnly,
+  listPhaseCAdapterBoundaries,
+  validatePhaseCAdapterRecord,
+} from "../src/lib/phaseCAdapterContracts.js";
 
 const appSource = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
 const routeMetadataSource = readFileSync(new URL("../src/lib/publicRouteMetadata.js", import.meta.url), "utf8");
+const workforcePageSource = readFileSync(new URL("../src/pages/review/PhaseCWorkforceReview.jsx", import.meta.url), "utf8");
+const componentSource = readFileSync(new URL("../src/components/review/phase-c/PhaseCReviewComponents.jsx", import.meta.url), "utf8");
 
 function assertNoKeyMatching(value, matcher, path = "root") {
   if (!value || typeof value !== "object") return;
@@ -36,6 +49,7 @@ function assertNoKeyMatching(value, matcher, path = "root") {
 
 test("Phase C review route map is mounted and review routes are internal noindex surfaces", () => {
   const expectedRoutes = [
+    "/review/phase-c",
     "/review/phase-c/workforce",
     "/review/phase-c/timeline",
     "/review/phase-c/communications",
@@ -46,7 +60,8 @@ test("Phase C review route map is mounted and review routes are internal noindex
   for (const route of expectedRoutes) {
     assert.match(appSource, new RegExp(`path="${route.replace(/\//g, "\\/")}"`));
   }
-  assert.match(appSource, /\/review\/phase-c" element={<Navigate to="\/review\/phase-c\/workforce"/);
+  assert.match(appSource, /PhaseCReviewHub/);
+  assert.doesNotMatch(appSource, /\/review\/phase-c" element={<Navigate to="\/review\/phase-c\/workforce"/);
   assert.match(routeMetadataSource, /"\/review"/);
 });
 
@@ -178,10 +193,74 @@ test("Validation contract includes required viewports and accessibility categori
   }
 });
 
+test("State gallery covers every required UI state for every Phase C module", () => {
+  assert.equal(PHASE_C_STATE_GALLERY.length, PHASE_C_ROUTES.length - 1);
+  for (const module of PHASE_C_STATE_GALLERY) {
+    assert.deepEqual(new Set(module.states.map((state) => state.state)), new Set(PHASE_C_REQUIRED_UI_STATES));
+    for (const state of module.states) {
+      assert.ok(state.summary);
+      assert.ok(state.recovery);
+    }
+  }
+});
+
+test("Role scenarios cover permission boundaries without leaking live capabilities", () => {
+  assert.deepEqual(
+    new Set(PHASE_C_ROLE_SCENARIOS.map((scenario) => scenario.id)),
+    new Set(["super-admin", "customer-success-owner", "installation-owner", "billing-owner", "restricted-viewer"])
+  );
+  for (const scenario of PHASE_C_ROLE_SCENARIOS) {
+    assert.ok(scenario.routes.length > 0);
+    assert.ok(scenario.allowedActions.length > 0);
+    assert.ok(scenario.restrictions.length > 0);
+    assert.ok(scenario.recovery);
+    assert.doesNotMatch(scenario.allowedActions.join(" "), /live_send|production_write|health_score_override/);
+  }
+});
+
+test("Adapter boundary contracts are fixture-only and validate required return fields", () => {
+  assert.deepEqual(listPhaseCAdapterBoundaries().map((boundary) => boundary.id), PHASE_C_ADAPTER_BOUNDARIES.map((boundary) => boundary.id));
+
+  for (const boundary of PHASE_C_ADAPTER_BOUNDARIES) {
+    assert.equal(boundary.status, "fixture_contract_only");
+    assert.ok(boundary.allowedMethods.length > 0);
+    assert.ok(boundary.prohibited.length > 0);
+    assert.ok(boundary.requiredReturnFields.length > 0);
+    assert.equal(assertPhaseCAdapterIsFixtureOnly(boundary.contract), true);
+
+    const validRecord = Object.fromEntries(boundary.requiredReturnFields.map((field) => [field, `${field}-fixture`]));
+    assert.equal(validatePhaseCAdapterRecord(boundary.contract, validRecord).ok, true);
+    assert.equal(validatePhaseCAdapterRecord(boundary.contract, {}).ok, false);
+  }
+});
+
+test("Workforce review includes scan controls and fixture-only lifecycle interactions", () => {
+  assert.match(workforcePageSource, /worker-search/);
+  assert.match(workforcePageSource, /Filter AI workers by state/);
+  assert.match(workforcePageSource, /<details open=/);
+  assert.match(workforcePageSource, /interactive/);
+  assert.equal(PHASE_C_RECOMMENDATION_LIFECYCLE_ACTIONS.length, 7);
+  assert.match(componentSource, /data-phase-c-lifecycle-controls/);
+  for (const action of PHASE_C_RECOMMENDATION_LIFECYCLE_ACTIONS) {
+    assert.ok(action.resultingState);
+    assert.ok(action.auditMeaning);
+  }
+});
+
+test("Worker #3 checklist is explicit and durable", () => {
+  assert.ok(PHASE_C_WORKER3_UX_CHECKLIST.length >= 8);
+  const checklistDoc = readFileSync(new URL("../docs/PHASE_C_WORKER3_UX_CHECKLIST.md", import.meta.url), "utf8");
+  for (const item of PHASE_C_WORKER3_UX_CHECKLIST) {
+    assert.match(checklistDoc, new RegExp(item.label.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")));
+    assert.ok(item.acceptance);
+  }
+});
+
 test("Phase C review implementation does not import live adapters", () => {
   const reviewFiles = [
     ...readdirSync(new URL("../src/pages/review", import.meta.url)).map((file) => new URL(`../src/pages/review/${file}`, import.meta.url)),
     ...readdirSync(new URL("../src/components/review/phase-c", import.meta.url)).map((file) => new URL(`../src/components/review/phase-c/${file}`, import.meta.url)),
+    new URL("../src/lib/phaseCAdapterContracts.js", import.meta.url),
   ];
 
   for (const file of reviewFiles) {

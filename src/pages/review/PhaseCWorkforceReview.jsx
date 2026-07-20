@@ -1,3 +1,4 @@
+import { useMemo, useState } from "react";
 import { Activity, Bot, Settings, ShieldAlert } from "lucide-react";
 import {
   AI_WORKER_STATES,
@@ -32,7 +33,7 @@ function TextList({ items, emptyText = "None recorded" }) {
   );
 }
 
-function WorkerProfileCard({ worker }) {
+function WorkerProfileCard({ worker, defaultOpen = false }) {
   return (
     <ReviewCard
       id={`worker-${worker.id}`}
@@ -41,7 +42,13 @@ function WorkerProfileCard({ worker }) {
       icon={Bot}
       badge={<StateBadge state={worker.currentState} />}
     >
-      <div className="grid gap-4">
+      <details open={defaultOpen} className="group">
+        <summary className="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 rounded-md border border-slate-200 bg-slate-50 px-3 py-2 text-sm font-semibold text-[#0f2d52] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2">
+          <span>Worker profile detail</span>
+          <span className="text-xs text-slate-500 group-open:hidden">Closed</span>
+          <span className="hidden text-xs text-slate-500 group-open:inline">Open</span>
+        </summary>
+        <div className="mt-4 grid gap-4">
         <DefinitionList
           columns="sm:grid-cols-3"
           items={[
@@ -111,17 +118,39 @@ function WorkerProfileCard({ worker }) {
             <HandoffBlock handoff={worker.humanEscalation} />
           </div>
         </div>
-      </div>
+        </div>
+      </details>
     </ReviewCard>
   );
 }
 
 export default function PhaseCWorkforceReview() {
   const { workers, activity, stateReference } = phaseCWorkforce;
-  const recommendations = workers.map((worker) => ({
+  const [stateFilter, setStateFilter] = useState("all");
+  const [search, setSearch] = useState("");
+  const filteredWorkers = useMemo(() => {
+    const term = search.trim().toLowerCase();
+    return workers.filter((worker) => {
+      const matchesState = stateFilter === "all" || worker.currentState === stateFilter;
+      const searchableText = [
+        worker.identity.name,
+        worker.identity.workerId,
+        worker.role,
+        worker.currentState,
+        worker.recommendation.title,
+        worker.recommendation.owner,
+      ].join(" ").toLowerCase();
+      return matchesState && (!term || searchableText.includes(term));
+    });
+  }, [search, stateFilter, workers]);
+  const recommendations = filteredWorkers.map((worker) => ({
     worker,
     recommendation: worker.recommendation,
   }));
+  const stateCounts = workers.reduce((acc, worker) => {
+    acc[worker.currentState] = (acc[worker.currentState] || 0) + 1;
+    return acc;
+  }, {});
 
   return (
     <PhaseCReviewShell
@@ -176,10 +205,56 @@ export default function PhaseCWorkforceReview() {
           title="Directory and profile cards"
           description="Each AI worker card includes the complete required field set from the Phase C prompt."
         />
+        <div className="mt-4 rounded-lg border border-slate-200 bg-white p-4">
+          <div className="grid gap-4 lg:grid-cols-[280px_minmax(0,1fr)]">
+            <div>
+              <label htmlFor="worker-search" className="text-sm font-bold text-slate-950">Search workers</label>
+              <input
+                id="worker-search"
+                type="search"
+                value={search}
+                onChange={(event) => setSearch(event.target.value)}
+                className="mt-2 min-h-11 w-full rounded-md border border-slate-300 bg-white px-3 py-2 text-sm text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2"
+                placeholder="Name, role, state, owner"
+              />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-slate-950">State filter</p>
+              <div className="mt-2 flex flex-wrap gap-2" role="group" aria-label="Filter AI workers by state">
+                <button
+                  type="button"
+                  onClick={() => setStateFilter("all")}
+                  className={`inline-flex min-h-11 items-center rounded-md border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 ${stateFilter === "all" ? "border-[#0f2d52] bg-[#0f2d52] text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+                  aria-pressed={stateFilter === "all"}
+                >
+                  All ({workers.length})
+                </button>
+                {AI_WORKER_STATES.map((state) => (
+                  <button
+                    key={state}
+                    type="button"
+                    onClick={() => setStateFilter(state)}
+                    className={`inline-flex min-h-11 items-center rounded-md border px-3 py-2 text-sm font-semibold focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-sky-700 focus-visible:ring-offset-2 ${stateFilter === state ? "border-[#0f2d52] bg-[#0f2d52] text-white" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+                    aria-pressed={stateFilter === state}
+                  >
+                    {state} ({stateCounts[state] || 0})
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          <p className="mt-3 text-sm font-semibold text-slate-600">{filteredWorkers.length} workers shown</p>
+        </div>
         <div className="mt-4 grid gap-4 xl:grid-cols-2">
-          {workers.map((worker) => (
-            <WorkerProfileCard key={worker.id} worker={worker} />
-          ))}
+          {filteredWorkers.length > 0 ? (
+            filteredWorkers.map((worker) => (
+              <WorkerProfileCard key={worker.id} worker={worker} defaultOpen={worker.currentState !== "healthy"} />
+            ))
+          ) : (
+            <ReviewCard title="No workers match the current filter" subtitle="Filtered zero" icon={ShieldAlert}>
+              <p className="text-sm leading-6 text-slate-700">This is a valid filtered-zero state. Clear search or choose another state to continue review.</p>
+            </ReviewCard>
+          )}
         </div>
       </section>
 
@@ -232,7 +307,7 @@ export default function PhaseCWorkforceReview() {
               icon={ShieldAlert}
               badge={<ContractPill label="Priority" value={recommendation.priority} tone={recommendation.priority === "critical" ? "unknown" : "reported"} />}
             >
-              <RecommendationBlock recommendation={recommendation} />
+              <RecommendationBlock recommendation={recommendation} interactive />
             </ReviewCard>
           ))}
         </div>
@@ -246,7 +321,7 @@ export default function PhaseCWorkforceReview() {
           description="Configuration fixtures state scope, permissions, integrations, freshness windows, and safeguards without enabling live work."
         />
         <div className="mt-4 grid gap-4 lg:grid-cols-2">
-          {workers.map((worker) => (
+          {filteredWorkers.map((worker) => (
             <ReviewCard
               key={`${worker.id}-configuration`}
               title={`${worker.identity.name} configuration`}

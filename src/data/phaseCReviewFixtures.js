@@ -26,6 +26,7 @@ export const PHASE_C_SOURCE_ISSUES = [
 ];
 
 export const PHASE_C_ROUTES = [
+  { path: "/review/phase-c", label: "Review Hub", key: "hub" },
   { path: "/review/phase-c/workforce", label: "AI Workforce OS", key: "workforce" },
   { path: "/review/phase-c/timeline", label: "Client Timeline", key: "timeline" },
   { path: "/review/phase-c/communications", label: "Communication Center", key: "communications" },
@@ -169,6 +170,237 @@ export const PHASE_C_ACCESSIBILITY_CONTRACTS = [
   "Touch targets for links and action buttons stay at least 44px high.",
   "Reduced motion is respected because the review routes do not depend on animated state.",
 ];
+
+export const PHASE_C_REQUIRED_UI_STATES = [
+  "loading",
+  "refreshing",
+  "current",
+  "empty",
+  "partial",
+  "stale",
+  "delayed",
+  "unavailable",
+  "not_connected",
+  "permission_restricted",
+  "unknown",
+  "error",
+];
+
+export const PHASE_C_UI_STATE_LABELS = {
+  loading: "Loading",
+  refreshing: "Refreshing",
+  current: "Current",
+  empty: "Empty valid",
+  partial: "Partial",
+  stale: "Stale",
+  delayed: "Delayed",
+  unavailable: "Unavailable",
+  not_connected: "Not connected",
+  permission_restricted: "Permission restricted",
+  unknown: "Unknown",
+  error: "Error with recovery",
+};
+
+export const PHASE_C_RECOMMENDATION_LIFECYCLE_ACTIONS = [
+  {
+    id: "acknowledge",
+    label: "Acknowledge",
+    resultingState: "acknowledged",
+    auditMeaning: "Reviewer accepts visibility without marking the recommendation resolved.",
+  },
+  {
+    id: "snooze",
+    label: "Snooze",
+    resultingState: "snoozed",
+    auditMeaning: "Reviewer defers action while keeping history and return reason visible.",
+  },
+  {
+    id: "assign",
+    label: "Assign",
+    resultingState: "in_progress",
+    auditMeaning: "Reviewer assigns a human owner and starts work.",
+  },
+  {
+    id: "escalate",
+    label: "Escalate",
+    resultingState: "waiting_on_dependency",
+    auditMeaning: "Reviewer records that another owner or provider is required.",
+  },
+  {
+    id: "complete",
+    label: "Complete",
+    resultingState: "completed",
+    auditMeaning: "Reviewer marks the fixture recommendation resolved with history retained.",
+  },
+  {
+    id: "dismiss",
+    label: "Dismiss",
+    resultingState: "dismissed",
+    auditMeaning: "Reviewer closes the recommendation without deleting audit history.",
+  },
+  {
+    id: "supersede",
+    label: "Supersede",
+    resultingState: "superseded",
+    auditMeaning: "Reviewer points to a newer recommendation that replaces this one.",
+  },
+];
+
+export const PHASE_C_ROLE_SCENARIOS = [
+  {
+    id: "super-admin",
+    label: "Super Admin",
+    ownerClass: "ClientSurge staff",
+    routes: PHASE_C_ROUTES.map((route) => route.path),
+    allowedActions: ["view_all", "assign_owner", "acknowledge", "snooze", "complete", "supersede"],
+    restrictions: ["No live sends", "No production adapter writes", "No health score override"],
+    recovery: "Can route reviewers to the exact module and fixture object.",
+  },
+  {
+    id: "customer-success-owner",
+    label: "Customer Success Owner",
+    ownerClass: "ClientSurge staff",
+    routes: ["/review/phase-c/communications", "/review/phase-c/customer-success", "/review/phase-c/timeline"],
+    allowedActions: ["view_customer_context", "assign_owner", "acknowledge", "escalate"],
+    restrictions: ["Billing provider details restricted", "No SMS retry without consent proof"],
+    recovery: "Can escalate risks and customer communications with source context attached.",
+  },
+  {
+    id: "installation-owner",
+    label: "Installation Owner",
+    ownerClass: "ClientSurge staff",
+    routes: ["/review/phase-c/workforce", "/review/phase-c/timeline", "/review/phase-c/customer-success"],
+    allowedActions: ["view_installation_context", "acknowledge", "assign_owner", "complete"],
+    restrictions: ["Cannot mark DNS, review-link, or website states verified without evidence"],
+    recovery: "Can resolve configuration tasks only after a superseding evidence event exists.",
+  },
+  {
+    id: "billing-owner",
+    label: "Billing Owner",
+    ownerClass: "ClientSurge staff",
+    routes: ["/review/phase-c/timeline", "/review/phase-c/customer-success"],
+    allowedActions: ["view_billing_summary", "acknowledge", "escalate"],
+    restrictions: ["Payment provider identifiers stay permission scoped", "No renewal-ready language without current payment proof"],
+    recovery: "Can request current payment source verification before renewal messaging.",
+  },
+  {
+    id: "restricted-viewer",
+    label: "Restricted Viewer",
+    ownerClass: "external provider",
+    routes: ["/review/phase-c/workforce", "/review/phase-c/timeline"],
+    allowedActions: ["view_non_sensitive_status"],
+    restrictions: ["Communication content restricted", "Payment details restricted", "Customer PII restricted"],
+    recovery: "Sees permission-restricted states without leaked protected detail.",
+  },
+];
+
+export const PHASE_C_ADAPTER_BOUNDARIES = [
+  {
+    id: "workforce-adapter",
+    module: "AI Workforce OS",
+    contract: "PhaseCWorkforceAdapter",
+    status: "fixture_contract_only",
+    allowedMethods: ["listWorkers", "getWorkerProfile", "listWorkerActivity", "listWorkerRecommendations", "getWorkerConfiguration"],
+    prohibited: ["live worker mutation", "provider runtime write", "production send"],
+    requiredReturnFields: WORKER_REQUIRED_FIELDS,
+  },
+  {
+    id: "timeline-adapter",
+    module: "Client Timeline",
+    contract: "PhaseCTimelineAdapter",
+    status: "fixture_contract_only",
+    allowedMethods: ["listEvents", "getEventProvenance", "resolveDeepLink"],
+    prohibited: ["provenance flattening", "history rewrite", "generic dashboard deep link"],
+    requiredReturnFields: ["actor", "timestamp", "source", "verification", "summary", "relatedObject", "deepLink", "provenance"],
+  },
+  {
+    id: "communications-adapter",
+    module: "Communication Center",
+    contract: "PhaseCCommunicationAdapter",
+    status: "fixture_contract_only",
+    allowedMethods: ["listConversations", "getConversation", "listConversationMessages", "getDeliveryState"],
+    prohibited: ["live send", "delivery inference", "read inference", "consent bypass"],
+    requiredReturnFields: ["participants", "owner", "assignment", "unread", "priority", "aiInvolvement", "humanEscalation", "state"],
+  },
+  {
+    id: "customer-success-adapter",
+    module: "Customer Success Workspace",
+    contract: "PhaseCCustomerSuccessAdapter",
+    status: "fixture_contract_only",
+    allowedMethods: ["listAccounts", "getAccountWorkspace", "listRisks", "listSuccessPlanItems"],
+    prohibited: ["health score generation", "renewal certainty without proof", "risk without evidence"],
+    requiredReturnFields: ["installation", "adoption", "aiUsage", "automationCoverage", "risk", "successPlan", "owner", "renewal"],
+  },
+];
+
+export const PHASE_C_WORKER3_UX_CHECKLIST = [
+  {
+    id: "hierarchy",
+    label: "Information hierarchy",
+    acceptance: "Each page answers what is happening, what needs attention, and what to do next in the first visible sections.",
+  },
+  {
+    id: "state-clarity",
+    label: "State clarity",
+    acceptance: "Loading, empty, partial, stale, restricted, unavailable, unknown, and error states are visually and verbally distinct.",
+  },
+  {
+    id: "mobile-order",
+    label: "Mobile priority order",
+    acceptance: "Critical state and action-required content appears before passive reporting at 390px and 375px.",
+  },
+  {
+    id: "focus-keyboard",
+    label: "Keyboard and focus",
+    acceptance: "Navigation, filters, lifecycle controls, deep links, and cards are reachable with visible focus.",
+  },
+  {
+    id: "touch-targets",
+    label: "Touch targets",
+    acceptance: "Interactive controls remain at least 44px high on tablet and mobile.",
+  },
+  {
+    id: "truth-copy",
+    label: "Truthful copy",
+    acceptance: "Unknown, unavailable, reported, estimated, delivered, read, and verified claims are never blurred together.",
+  },
+  {
+    id: "provenance",
+    label: "Provenance visibility",
+    acceptance: "Sources, timestamps, verification, freshness, related objects, and deep links remain visible without flattening.",
+  },
+  {
+    id: "reduced-motion",
+    label: "Reduced motion",
+    acceptance: "State comprehension does not depend on animation, and reduced-motion mode has no running ornamental motion.",
+  },
+];
+
+const STATE_SCENARIO_SUMMARIES = {
+  loading: "Initial layout-preserving skeleton while fixture data is requested.",
+  refreshing: "Existing fixture data remains visible while freshness is being checked.",
+  current: "All required fixture sources are inside their expected freshness window.",
+  empty: "A valid zero-result state with a reason class and no implied failure.",
+  partial: "One or more required fixture sources are missing while the view remains usable.",
+  stale: "Source data is outside the expected freshness window and cannot be treated as current.",
+  delayed: "The source reports processing delay and should not be treated as failed.",
+  unavailable: "The source cannot currently be reached or queried.",
+  not_connected: "A required integration is absent from the fixture configuration.",
+  permission_restricted: "Content may exist, but this role cannot view the protected detail.",
+  unknown: "The system cannot determine the state from available fixture evidence.",
+  error: "A recoverable error state with consequence, retry path, and escalation path.",
+};
+
+export const PHASE_C_STATE_GALLERY = PHASE_C_ROUTES.filter((route) => route.key !== "hub").map((route) => ({
+  module: route.label,
+  route: route.path,
+  states: PHASE_C_REQUIRED_UI_STATES.map((state) => ({
+    state,
+    label: PHASE_C_UI_STATE_LABELS[state],
+    summary: STATE_SCENARIO_SUMMARIES[state],
+    recovery: state === "error" ? "Retry fixture load or escalate to Worker #1 with the source ID." : "Keep source, freshness, and truth labels visible.",
+  })),
+}));
 
 const baseSource = ({
   id,
@@ -1606,6 +1838,13 @@ export const phaseCReviewPacket = {
   sourceIssues: PHASE_C_SOURCE_ISSUES,
   routes: PHASE_C_ROUTES,
   fixtures: {
+    reviewHub: {
+      stateGalleryModules: PHASE_C_STATE_GALLERY.length,
+      roleScenarios: PHASE_C_ROLE_SCENARIOS.length,
+      adapterBoundaries: PHASE_C_ADAPTER_BOUNDARIES.length,
+      lifecycleActions: PHASE_C_RECOMMENDATION_LIFECYCLE_ACTIONS.length,
+      worker3ChecklistItems: PHASE_C_WORKER3_UX_CHECKLIST.length,
+    },
     workforce: {
       workers: phaseCWorkforce.workers.length,
       activity: phaseCWorkforce.activity.length,

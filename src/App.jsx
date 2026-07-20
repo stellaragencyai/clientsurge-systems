@@ -98,6 +98,7 @@ const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboar
 const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
+const PhaseCReviewHub = lazy(() => import("./pages/review/PhaseCReviewHub"));
 const PhaseCWorkforceReview = lazy(() => import("./pages/review/PhaseCWorkforceReview"));
 const PhaseCTimelineReview = lazy(() => import("./pages/review/PhaseCTimelineReview"));
 const PhaseCCommunicationsReview = lazy(() => import("./pages/review/PhaseCCommunicationsReview"));
@@ -389,7 +390,7 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
       {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<LazyRoute Component={IndustryPageTemplate} />} />)}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => <Route key={route} path={route} element={<LazyRoute Component={Component} />} />)}
-      <Route path="/review/phase-c" element={<Navigate to="/review/phase-c/workforce" replace />} />
+      <Route path="/review/phase-c" element={<LazyRoute Component={PhaseCReviewHub} />} />
       <Route path="/review/phase-c/workforce" element={<LazyRoute Component={PhaseCWorkforceReview} />} />
       <Route path="/review/phase-c/timeline" element={<LazyRoute Component={PhaseCTimelineReview} />} />
       <Route path="/review/phase-c/communications" element={<LazyRoute Component={PhaseCCommunicationsReview} />} />
