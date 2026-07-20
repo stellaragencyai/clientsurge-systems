@@ -26,6 +26,8 @@ This is a static review foundation only. It defines routeable enterprise adminis
 ## Components
 
 - `src/lib/enterpriseAdminFoundation.js`: route map, RBAC matrix, state contracts, panel fixtures, safeguards, acceptance, accessibility, and responsive validation.
+- `src/lib/enterpriseOrganizationSettingsReadModel.js`: pure read-only Organization Settings adapter for AdminSettings, ClientProject, and runtime host snapshots.
+- `src/lib/enterpriseOrganizationSettingsSource.js`: Base44 read-only source loader. It lists records only and does not create, update, delete, invoke functions, or save settings.
 - `src/pages/settings/EnterpriseSettingsPage.jsx`: reusable route component for every Phase D system.
 - `src/App.jsx`: protected admin route wiring.
 - `src/components/admin/AdminShell.jsx`: navigation entry for Enterprise Settings.
@@ -68,9 +70,10 @@ Required checks:
 
 ## Worker #3 Packet
 
-1. Bind each route panel to canonical records without removing fixture/source semantics.
+1. Organization Settings now has a read-only source binding. Worker #3 should promote approved AdminSettings, ClientProject, runtime host, and future Organization fields into canonical Organization records without removing fixture/source semantics.
 2. Enforce RBAC by role, permission, and scope across route guards, data access, and backend mutations.
 3. Preserve actor, action, target, timestamp, source, and outcome on security and audit records.
 4. Keep Commerce Blue reserved for purchase and commercial commitment actions.
 5. Treat billing, integration, usage, and security values as unverified until live source checks pass.
 6. Add mutation flows only after destructive-action safeguards and audit writes exist.
+7. Keep Organization Settings writes disabled until audited mutation paths exist.

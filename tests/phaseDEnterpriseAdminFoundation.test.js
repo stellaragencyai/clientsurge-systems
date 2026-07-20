@@ -16,10 +16,12 @@ import {
   ENTERPRISE_STATE_CONTRACTS,
   ROLE_PERMISSION_MATRIX,
 } from "../src/lib/enterpriseAdminFoundation.js";
+import { buildEnterpriseOrganizationSectionReadModel } from "../src/lib/enterpriseOrganizationSettingsReadModel.js";
 
 const appSource = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
 const adminShellSource = readFileSync(new URL("../src/components/admin/AdminShell.jsx", import.meta.url), "utf8");
 const pageSource = readFileSync(new URL("../src/pages/settings/EnterpriseSettingsPage.jsx", import.meta.url), "utf8");
+const organizationSource = readFileSync(new URL("../src/lib/enterpriseOrganizationSettingsSource.js", import.meta.url), "utf8");
 
 test("Phase D settings routes are mounted behind the admin guard and out of public routing", () => {
   assert.match(appSource, /allowedRoles=\{\["admin", "super_admin"\]\}/);
@@ -133,7 +135,59 @@ test("Phase D UI includes accessibility, screen-reader, and reduced-motion hooks
     "aria-labelledby",
     "<caption className=\"sr-only\">Enterprise RBAC matrix by role and scope</caption>",
     "motion-reduce:transition-none",
+    "Read-only Source Binding",
   ]) {
     assert.ok(pageSource.includes(required), `${required} missing from Phase D settings page`);
   }
+});
+
+test("organization settings read model binds read-only sources without claiming production verification", () => {
+  const section = buildEnterpriseOrganizationSectionReadModel({
+    adminSettings: {
+      company_name: "ClientSurge Operations",
+      legal_name: "ClientSurge LLC",
+      primary_industry: "AI automation",
+      primary_domain: "clientsurgesystems.com",
+      timezone: "America/Phoenix",
+      resend_from_email: "support@clientsurgesystems.com",
+      default_approval_policy: "Owner approval required",
+    },
+    clientProjects: [
+      {
+        business_name: "Signal Med Spa",
+        business_type: "Med Spa",
+        location_name: "Phoenix",
+        timezone: "America/Phoenix",
+      },
+    ],
+    hostname: "clientsurgesystems.com",
+  });
+
+  assert.equal(section.sourceBinding.mode, "read-only");
+  assert.equal(section.sourceBinding.status, "Current");
+  assert.match(section.sourceSemantics.source, /Read-only AdminSettings, ClientProject/);
+  assert.match(section.sourceSemantics.verification, /remain unverified/);
+
+  const company = section.panels.find((panel) => panel.id === "company");
+  const locations = section.panels.find((panel) => panel.id === "locations");
+  const domains = section.panels.find((panel) => panel.id === "domains");
+  const brand = section.panels.find((panel) => panel.id === "brand");
+  const preferences = section.panels.find((panel) => panel.id === "preferences");
+
+  assert.deepEqual(company.fields[0], ["Display name", "ClientSurge Operations (read-only source)"]);
+  assert.deepEqual(company.fields[1], ["Legal name", "ClientSurge LLC (read-only source)"]);
+  assert.deepEqual(locations.fields[2], ["Location count", "1"]);
+  assert.deepEqual(domains.fields[0], ["Primary domain", "clientsurgesystems.com (read-only source)"]);
+  assert.deepEqual(brand.fields[2], ["Email sender brand", "clientsurgesystems.com (read-only source)"]);
+  assert.deepEqual(preferences.fields[0], ["Timezone", "America/Phoenix (read-only source)"]);
+});
+
+test("organization source binding remains read-only and does not introduce mutations", () => {
+  for (const forbidden of [".create(", ".update(", ".delete(", "saveAdminSettings", "functions.invoke"]) {
+    assert.equal(organizationSource.includes(forbidden), false, `${forbidden} must not appear in read-only source binding`);
+  }
+
+  assert.match(organizationSource, /AdminSettings/);
+  assert.match(organizationSource, /ClientProject/);
+  assert.match(organizationSource, /\.list\(/);
 });
