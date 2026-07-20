@@ -75,6 +75,7 @@ const NAV_GROUPS = [
       { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs", badge: "webhook-errors" },
       { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },
       { id: "review-request",   label: "Review Requests",   icon: Star,            path: "/admin", tab: "review-request" },
+      { id: "enterprise-settings", label: "Enterprise Settings", icon: Settings,    path: "/settings/organization" },
       { id: "settings",         label: "Settings",          icon: Settings,        path: "/admin", tab: "settings" },
       { id: "qa",               label: "QA Tools",          icon: RefreshCw,       path: "/admin", tab: "qa" },
       { id: "install-guide",    label: "Install Guide",     icon: BookOpen,        path: "/admin/install-guide" },

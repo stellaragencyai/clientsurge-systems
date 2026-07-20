@@ -98,6 +98,7 @@ const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboar
 const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
+const EnterpriseSettingsPage = lazy(() => import("./pages/settings/EnterpriseSettingsPage"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -440,6 +441,17 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "deployment-control"), Component: lazy(() => import("./pages/admin/DeploymentControlCenter")) },
           { route: routePath("admin", "broken-flows"), Component: BrokenFlows },
           { route: routePath("admin", "publish-drift"), Component: PublishDrift },
+          { route: routePath("settings"), element: <Navigate to={routePath("settings", "organization")} replace /> },
+          { route: routePath("settings", "organization"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="organization" /></Suspense> },
+          { route: routePath("settings", "team"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="team" /></Suspense> },
+          { route: routePath("settings", "roles"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="roles" /></Suspense> },
+          { route: routePath("settings", "integrations"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="integrations" /></Suspense> },
+          { route: routePath("settings", "billing"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="billing" /></Suspense> },
+          { route: routePath("settings", "usage"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="usage" /></Suspense> },
+          { route: routePath("settings", "notifications"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="notifications" /></Suspense> },
+          { route: routePath("settings", "security"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="security" /></Suspense> },
+          { route: routePath("settings", "audit"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="audit" /></Suspense> },
+          { route: routePath("settings", "support"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="support" /></Suspense> },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route key={route} caseSensitive={caseSensitive} path={route} element={element || <Suspense fallback={<AdminLoadingSkeleton />}><Component /></Suspense>} />
         ))}
