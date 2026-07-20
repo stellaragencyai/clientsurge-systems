@@ -32,13 +32,12 @@ export const GA4_TRACKED_EVENTS = [
 ];
 export const GA4_KEY_EVENTS = ["generate_lead", "begin_checkout", "purchase", "demo_booked"];
 export const GA4_REPAIR_STAGES = [
-  { id: "repairing_configuration", label: "Repairing configuration..." },
-  { id: "validating_secret_availability", label: "Validating secret availability..." },
-  { id: "validating_with_google", label: "Validating with Google..." },
-  { id: "sending_verification_event", label: "Sending verification event..." },
-  { id: "checking_production_site", label: "Checking production site..." },
-  { id: "finalizing", label: "Finalizing..." },
-  { id: "ga4_fully_verified", label: "GA4 fully verified" },
+  { id: "entity_cleanup", label: "Repairing configuration..." },
+  { id: "secret_validation", label: "Checking secrets..." },
+  { id: "google_validation", label: "Validating Google Analytics..." },
+  { id: "production_security", label: "Checking production..." },
+  { id: "final_activation", label: "Finalizing..." },
+  { id: "ga4_fully_verified", label: "GA4 Fully Verified" },
 ];
 
 function extractStatus(error) {
@@ -99,24 +98,10 @@ async function saveAdminSettingsToEntity(settings) {
 function buildGa4FunctionError(data, fallback) {
   const error = new Error(data?.error || data?.message || fallback);
   error.data = data;
-  error.failed_stage = data?.failed_stage || null;
+  error.stage = data?.stage || data?.failed_stage || null;
+  error.failed_stage = data?.failed_stage || data?.stage || null;
   error.failed_checks = data?.failed_checks || [];
   return error;
-}
-
-export async function runGa4FinalVerification({ onStage } = {}) {
-  onStage?.("validating_secret_availability");
-  onStage?.("validating_with_google");
-  const response = await base44.functions.invoke("verifyGA4Configuration", {
-    measurement_id: GA4_MEASUREMENT_ID,
-  });
-  onStage?.("finalizing");
-  const data = unwrapFunctionPayload(response);
-  if (data?.success === false || data?.verified === false || data?.error) {
-    throw buildGa4FunctionError(data, "GA4 final verification failed");
-  }
-  onStage?.("ga4_fully_verified");
-  return data;
 }
 
 export async function fetchGa4ConfigurationStatus() {
@@ -183,37 +168,26 @@ export async function ensureGa4Configuration({ onStage } = {}) {
     conversion_events: GA4_KEY_EVENTS,
   };
 
-  let repairResult = null;
-  let primaryError = null;
   try {
-    onStage?.("repairing_configuration");
+    onStage?.("entity_cleanup");
     const response = await base44.functions.invoke("setupGA4Configuration", payload);
+    onStage?.("final_activation");
     const data = unwrapFunctionPayload(response);
-    if (data?.success === false || data?.error) throw buildGa4FunctionError(data, "GA4 configuration migration failed");
-    repairResult = data;
-  } catch (error) {
-    primaryError = error;
-  }
-
-  if (!repairResult) {
-    try {
-      const status = await fetchGa4ConfigurationStatus();
-      if (status?.clean) {
-        repairResult = { already_clean: true, ...status };
-      }
-    } catch (fallbackError) {
-      const primaryMessage = getAdminSettingsError(primaryError, "Primary GA4 repair failed");
-      const fallbackMessage = getAdminSettingsError(fallbackError, "Unable to read current GA4 status");
-      throw new Error(`${primaryMessage} ${fallbackMessage}`.trim());
+    if (data?.success === false || data?.verified === false || data?.error) {
+      throw buildGa4FunctionError(data, "GA4 verification failed");
     }
+    onStage?.("ga4_fully_verified");
+    return { repair: data?.repair || null, verification: data };
+  } catch (error) {
+    if (error?.data || error?.stage || error?.failed_stage) {
+      throw error;
+    }
+    const wrapped = new Error(getAdminSettingsError(error, "GA4 verification failed"));
+    wrapped.data = error?.data || null;
+    wrapped.stage = error?.stage || error?.data?.stage || error?.data?.failed_stage || null;
+    wrapped.failed_stage = wrapped.stage;
+    throw wrapped;
   }
-
-  if (!repairResult) {
-    throw new Error(getAdminSettingsError(primaryError, "GA4 repair did not complete"));
-  }
-
-  const verification = await runGa4FinalVerification({ onStage });
-  return { repair: repairResult, verification };
 }
 
 export async function fetchAdminSettings() {

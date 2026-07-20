@@ -1,8 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 
 const read = (path) => readFileSync(new URL(`../${path}`, import.meta.url), "utf8");
+const exists = (path) => existsSync(new URL(`../${path}`, import.meta.url));
 
 const indexSource = read("index.html");
 const appSource = read("src/App.jsx");
@@ -16,39 +17,51 @@ const publicFunctionSource = read("src/lib/publicFunctionClient.js");
 const orderSuccessSource = read("src/internal-pages/OrderSuccess.jsx");
 const configSchemaSource = read("base44/entities/GA4Configuration.jsonc");
 const setupFunctionSource = read("base44/functions/setupGA4Configuration/main.ts");
-const setupHelperSource = read("base44/functions/_shared/ga4Configuration.ts");
-const verifyFunctionSource = read("base44/functions/verifyGA4Configuration/main.ts");
-const verifyFunctionConfigSource = read("base44/functions/verifyGA4Configuration/function.jsonc");
-const verificationSource = read("base44/functions/_shared/ga4Verification.ts");
 const measurementProtocolSource = read("base44/functions/_shared/ga4MeasurementProtocol.js");
 const stripeWebhookSource = read("base44/functions/stripeWebhookOrders/main.ts");
 const adminSettingsPanelSource = read("src/components/admin/AdminSettingsPanel.jsx");
 const adminSettingsApiSource = read("src/lib/adminSettingsApi.js");
-const setupBundleSource = `${setupFunctionSource}\n${setupHelperSource}`;
-const verificationBundleSource = `${verifyFunctionSource}\n${verificationSource}`;
+
+function functionBody(source, name) {
+  const start = source.indexOf(`function ${name}`);
+  assert.notEqual(start, -1, `${name} not found`);
+  const next = source.indexOf("\nfunction ", start + 1);
+  return source.slice(start, next === -1 ? source.length : next);
+}
 
 test("GA4 private credentials cannot be persisted in GA4Configuration", () => {
   assert.doesNotMatch(configSchemaSource, /"api_secret"\s*:/);
   assert.match(configSchemaSource, /"server_side_tracking_enabled"\s*:/);
   assert.match(setupFunctionSource, /GA4_SECRET_MUST_USE_SECRET_STORE/);
-  assert.match(verificationBundleSource, /GA4_API_SECRET/);
-  assert.doesNotMatch(setupBundleSource, /api_secret:\s*api_secret/);
-  assert.doesNotMatch(verificationBundleSource, /api_secret:\s*api_secret/);
+  assert.match(setupFunctionSource, /Deno\.env\.get\("GA4_API_SECRET"\)/);
+  assert.doesNotMatch(setupFunctionSource, /api_secret:\s*api_secret/);
   assert.match(measurementProtocolSource, /Deno\.env\.get\("GA4_API_SECRET"\)/);
   assert.doesNotMatch(measurementProtocolSource, /console\.(log|warn|error)\([^\n]*apiSecret/);
 });
 
-test("GA4 setup remains configured until live delivery is independently verified", () => {
-  assert.match(setupBundleSource, /setup_status:\s*"configured"/);
-  assert.match(setupBundleSource, /server_side_tracking_enabled:\s*false/);
-  assert.match(setupBundleSource, /last_verified_at:\s*null/);
+test("setupGA4Configuration is self-contained and verifyGA4Configuration is not required", () => {
+  assert.doesNotMatch(setupFunctionSource, /from\s+["']\.\/shared\//);
+  assert.doesNotMatch(setupFunctionSource, /from\s+["']\.\.\/_shared\//);
+  assert.equal(exists("base44/functions/verifyGA4Configuration/function.jsonc"), false);
+  assert.equal(exists("base44/functions/verifyGA4Configuration/main.ts"), false);
+  assert.doesNotMatch(adminSettingsApiSource, /verifyGA4Configuration/);
+});
+
+test("GA4 setup repairs to configured state before final verification can activate", () => {
+  assert.match(setupFunctionSource, /setup_status:\s*"configured"/);
+  assert.match(setupFunctionSource, /server_side_tracking_enabled:\s*false/);
+  assert.match(setupFunctionSource, /last_verified_at:\s*null/);
+  assert.match(setupFunctionSource, /stage:\s*"entity_cleanup"/);
+  assert.match(setupFunctionSource, /stage:\s*"final_activation"/);
+  assert.match(setupFunctionSource, /setup_status:\s*"active"/);
+  assert.match(setupFunctionSource, /server_side_tracking_enabled:\s*true/);
 });
 
 test("canonical GA4 key-event catalog is consistent", () => {
   for (const eventName of ["generate_lead", "begin_checkout", "purchase", "demo_booked"]) {
     assert.match(ga4Source, new RegExp(`\\b${eventName}\\b`));
     assert.match(configSchemaSource, new RegExp(`"${eventName}"`));
-    assert.match(setupBundleSource, new RegExp(`"${eventName}"`));
+    assert.match(setupFunctionSource, new RegExp(`"${eventName}"`));
   }
 
   assert.match(eventHelpersSource, /GA4_EVENTS\.GENERATE_LEAD/);
@@ -148,29 +161,58 @@ test("browser purchase confirmation cannot double-count the purchase key event",
   assert.match(configSchemaSource, /"purchase_client_confirmation"/);
 });
 
-test("final verification is the only path that can activate server-side GA4", () => {
-  assert.match(verifyFunctionConfigSource, /"name":\s*"verifyGA4Configuration"/);
-  assert.match(verifyFunctionSource, /runGa4Verification/);
-  assert.doesNotMatch(setupFunctionSource, /action === "verify"/);
-  assert.match(verificationSource, /setup_status:\s*verified \? "active" : "configured"/);
-  assert.match(verificationSource, /server_side_tracking_enabled:\s*verified/);
-  assert.match(verificationSource, /last_verified_at:\s*verified \? now/);
-  assert.match(verificationSource, /measurement_protocol_debug/);
-  assert.match(verificationSource, /measurement_protocol_delivery/);
-  assert.match(verificationSource, /production_site/);
-  assert.match(verificationSource, /static_code_assertions/);
-  assert.match(verificationSource, /static_gtag_script_tags/);
-  assert.match(verificationSource, /gtag_loader_literal_occurrences/);
-  assert.match(verificationSource, /failed_stage/);
+test("setupGA4Configuration performs final backend verification before activation", () => {
+  assert.match(setupFunctionSource, /DEBUG_ENDPOINT/);
+  assert.match(setupFunctionSource, /COLLECT_ENDPOINT/);
+  assert.match(setupFunctionSource, /fetchProductionHealth/);
+  assert.match(setupFunctionSource, /markConfigurationFailed/);
+  assert.match(setupFunctionSource, /Verified through GA4 Measurement Protocol, production health check, and configuration integrity validation\./);
+  assert.match(setupFunctionSource, /last_verified_at:\s*verifiedAt/);
 });
 
-test("Analytics settings UI runs repair and verification with explicit progress and retry", () => {
+test("GA4 cannot become active when the backend secret is missing", () => {
+  assert.match(setupFunctionSource, /Deno\.env\.get\("GA4_API_SECRET"\)/);
+  assert.match(setupFunctionSource, /failureBody\("secret_validation",\s*"GA4_API_SECRET missing"/);
+  assert.match(setupFunctionSource, /markConfigurationFailed\(base44,\s*config,\s*"secret_validation"/);
+  assert.match(setupFunctionSource, /setup_status:\s*"configured"/);
+  assert.match(setupFunctionSource, /server_side_tracking_enabled:\s*false/);
+});
+
+test("failed production health check prevents activation", () => {
+  assert.match(setupFunctionSource, /PRODUCTION_URL\s*=\s*"https:\/\/clientsurgesystems\.com"/);
+  for (const term of ["available pages", "manages data types", "admin pages", "Base44 directory"]) {
+    assert.ok(setupFunctionSource.includes(`label: "${term}"`), `${term} guard missing`);
+  }
+  assert.match(setupFunctionSource, /failureBody\("production_security",\s*"Production domain health check failed"/);
+  assert.match(setupFunctionSource, /markConfigurationFailed\(base44,\s*config,\s*"production_security"/);
+});
+
+test("verification event cannot be confused with purchase conversion tracking", () => {
+  const payloadBuilderSource = functionBody(setupFunctionSource, "buildVerificationPayload");
+  assert.match(payloadBuilderSource, /client_id:\s*"clientsurge-verification"/);
+  assert.match(payloadBuilderSource, /name:\s*"ga4_verification"/);
+  assert.match(payloadBuilderSource, /source:\s*"clientsurge_admin_verification"/);
+  assert.match(payloadBuilderSource, /environment:\s*"production"/);
+  assert.doesNotMatch(payloadBuilderSource, /purchase/);
+  assert.doesNotMatch(payloadBuilderSource, /email|phone|customer/i);
+});
+
+test("Analytics settings UI calls setup once with explicit progress and failure details", () => {
   assert.match(adminSettingsApiSource, /GA4_REPAIR_STAGES/);
   assert.match(adminSettingsApiSource, /setupGA4Configuration/);
-  assert.match(adminSettingsApiSource, /verifyGA4Configuration/);
-  assert.match(adminSettingsPanelSource, /Repair and verify GA4/);
-  assert.match(adminSettingsPanelSource, /ga4Stage/);
-  assert.match(adminSettingsPanelSource, /failed_checks/);
-  assert.match(adminSettingsPanelSource, /Retry/);
-  assert.match(adminSettingsPanelSource, /Verification ID/);
+  assert.doesNotMatch(adminSettingsApiSource, /runGa4FinalVerification/);
+  for (const label of [
+    "Repairing configuration...",
+    "Checking secrets...",
+    "Validating Google Analytics...",
+    "Checking production...",
+    "Finalizing...",
+  ]) {
+    assert.match(adminSettingsApiSource, new RegExp(label.replace(/[.]/g, "\\.")));
+  }
+  assert.match(adminSettingsPanelSource, /Repair and Verify GA4/);
+  assert.match(adminSettingsPanelSource, /GA4 Fully Verified/);
+  assert.match(adminSettingsPanelSource, /Failed Stage:/);
+  assert.match(adminSettingsPanelSource, /Error:/);
+  assert.match(adminSettingsPanelSource, /fetchGa4ConfigurationStatus/);
 });

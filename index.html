@@ -196,14 +196,14 @@
       // ── RAW HTML ROUTE EXPOSURE GUARD (synchronous, pre-React) ──
       // Runs BEFORE the React module script loads. If Base44's serving
       // layer injected a generated page directory into #root (route lists,
-      // entity-count boilerplate, "available pages", admin/client/setup
+      // entity-count boilerplate, public directory headings, admin/client/setup
       // links), strip it now and restore the safe static fallback so the
       // visitor never sees internal route names in the initial paint.
       (function () {
         var root = document.getElementById("root");
         if (!root) return;
 
-        var DIR_PATTERNS = /manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|available pages|app pages/i;
+        var DIR_PATTERNS = /manages\s+\d+\s+data types|including launch gates|organize, track, and share your work|available\s+pages|app\s+pages/i;
         var text = (root.textContent || "").replace(/\s+/g, " ").trim();
         var isGenerated = DIR_PATTERNS.test(text);
 
@@ -211,7 +211,7 @@
           var headings = root.querySelectorAll("h1,h2,h3,h4");
           for (var i = 0; i < headings.length; i++) {
             var h = (headings[i].textContent || "").replace(/\s+/g, " ").trim();
-            if (/^pages$/i.test(h) || /available pages/i.test(h)) {
+            if (/^pages$/i.test(h) || /available\s+pages/i.test(h)) {
               isGenerated = true;
               break;
             }

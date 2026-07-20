@@ -7,9 +7,9 @@ ClientSurge production GA4 uses Measurement ID `G-H6QT342ZN9`.
 1. Store `GA4_API_SECRET` in Base44 backend secrets only.
 2. Optionally store `GA4_MEASUREMENT_ID=G-H6QT342ZN9` in backend secrets or environment.
 3. Open Admin Settings -> Analytics.
-4. Click **Repair and verify GA4**.
-5. The UI calls `setupGA4Configuration`, then `verifyGA4Configuration`.
-6. `setup_status` becomes `active` only after entity integrity, backend secret availability, Measurement Protocol debug validation, real `ga4_verification` delivery, production-site health, and static deployed-code assertions pass.
+4. Click **Repair and Verify GA4**.
+5. The UI calls `setupGA4Configuration`.
+6. `setup_status` becomes `active` only after entity integrity, backend secret availability, Measurement Protocol debug validation, real `ga4_verification` delivery, and production-site health pass.
 
 ## Browser Tag
 
