@@ -55,11 +55,11 @@ export default function ActivationReviewHarness() {
       onContinue={() => {}}
       headerActions={<CSButton variant="secondary">Open blocker summary</CSButton>}
     >
-      <CSCard title="Stage summary" headingLevel={2}>
+      <CSCard title="Current stage summary" headingLevel={2}>
         <div className="cs-design-gallery__row">
-          <strong>Basics complete</strong>
-          <span>Offer in progress</span>
-          <span>Launch blocked by checkout proof</span>
+          <strong>Foundation complete</strong>
+          <span>Offer current: Services</span>
+          <span>Launch blocked: checkout proof</span>
           <span>Review not started</span>
         </div>
       </CSCard>

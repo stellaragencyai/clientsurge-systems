@@ -43,7 +43,54 @@
 .cs-activation-shell__track { height: 7px; overflow: hidden; border-radius: 999px; background: rgb(255 255 255 / 0.12); }
 .cs-activation-shell__track span { display: block; height: 100%; border-radius: inherit; background: var(--cs-blue-500); transition: width var(--cs-transition-base); }
 
-.cs-activation-nav ol { display: grid; gap: var(--cs-space-2); margin: 0; padding: 0; list-style: none; }
+.cs-activation-nav { display: grid; gap: var(--cs-space-3); }
+.cs-activation-stage-overview {
+  display: grid;
+  gap: 4px;
+  padding: var(--cs-space-3);
+  border: 1px solid rgb(255 255 255 / 0.24);
+  border-radius: var(--cs-radius-md);
+  background: #0b1220;
+  color: #f8fafc;
+  font-size: 0.78rem;
+  line-height: 1.4;
+}
+.cs-activation-stage-overview strong { color: #ffffff; font-size: 1rem; }
+.cs-activation-stage-overview__eyebrow,
+.cs-activation-nav__stage-index {
+  color: #dbeafe;
+  font-size: 0.68rem;
+  font-weight: 720;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.cs-activation-stage-overview__blocker {
+  margin-top: var(--cs-space-1);
+  color: #fef3c7;
+}
+.cs-activation-nav__stages,
+.cs-activation-nav__steps { display: grid; gap: var(--cs-space-2); margin: 0; padding: 0; list-style: none; }
+.cs-activation-nav__stage details {
+  overflow: hidden;
+  border: 1px solid rgb(255 255 255 / 0.12);
+  border-radius: var(--cs-radius-md);
+  background: #0b1220;
+}
+.cs-activation-nav__stage-summary {
+  display: grid;
+  min-height: 44px;
+  gap: 2px;
+  padding: var(--cs-space-3);
+  background: #101b33;
+  color: #f8fafc;
+  cursor: pointer;
+}
+.cs-activation-nav__stage-summary strong { color: white; }
+.cs-activation-nav__stage-summary:focus-visible { outline: none; box-shadow: 0 0 0 3px rgb(22 131 255 / 0.38); }
+.cs-activation-nav__stage--current details { border-color: rgb(255 255 255 / 0.28); background: #0f1e38; }
+.cs-activation-nav__stage--blocked details { border-color: rgb(255 214 102 / 0.32); }
+.cs-activation-nav__stage--complete:not(.cs-activation-nav__stage--current) details:not([open]) .cs-activation-nav__stage-summary { background: #0b1220; }
+.cs-activation-nav__steps { padding: 0 var(--cs-space-2) var(--cs-space-2); }
 .cs-activation-nav__item {
   display: grid;
   width: 100%;
@@ -117,12 +164,17 @@
 @media (max-width: 900px) {
   .cs-activation-shell { grid-template-columns: 1fr; }
   .cs-activation-shell__sidebar { position: static; height: auto; max-height: none; }
-  .cs-activation-nav ol { grid-auto-flow: column; grid-auto-columns: minmax(190px, 1fr); overflow-x: auto; padding-bottom: var(--cs-space-2); }
+  .cs-activation-nav__stages,
+  .cs-activation-nav__steps { grid-auto-flow: row; overflow: visible; padding-bottom: 0; }
   .cs-activation-shell__support { margin-top: 0; }
 }
 
 @media (max-width: 560px) {
-  .cs-activation-shell__sidebar { padding: var(--cs-space-4); }
+  .cs-activation-shell__sidebar { gap: var(--cs-space-4); padding: var(--cs-space-4); }
+  .cs-activation-stage-overview,
+  .cs-activation-nav__stage-summary,
+  .cs-activation-nav__item { padding: var(--cs-space-2); }
+  .cs-activation-nav__item { grid-template-columns: 28px minmax(0, 1fr); }
   .cs-activation-shell__main { padding: 28px 18px calc(96px + env(safe-area-inset-bottom)); }
   .cs-activation-shell__topbar { padding: 0 18px; }
   .cs-activation-footer {

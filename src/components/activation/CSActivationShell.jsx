@@ -2,7 +2,6 @@ import {
   CSActivationFooter,
   CSActivationShell as CSActivationShellPrimitive,
   CSActivationStepNav as CSActivationStepNavPrimitive,
-  CSAutosaveStatus,
 } from "@/components/design-system";
 
 const saveStateLabels = {
@@ -27,6 +26,16 @@ const saveStateMap = {
   offline: "offline",
 };
 
+function normalizeActivationStage(stage, position) {
+  if (stage === "Basics") return "Foundation";
+  if (stage === "Experience") return "Launch";
+  if (stage) return stage;
+  if (position <= 2) return "Foundation";
+  if (position <= 3) return "Offer";
+  if (position <= 8) return "Launch";
+  return "Review";
+}
+
 function normalizeActivationSteps(steps = [], currentStep = 1) {
   return steps.map((step, index) => {
     const position = index + 1;
@@ -42,6 +51,7 @@ function normalizeActivationSteps(steps = [], currentStep = 1) {
       ...step,
       id: step.id || `activation-step-${position}`,
       position,
+      stage: normalizeActivationStage(step.stage, position),
       sourceStep: step,
       status: status === "upcoming" ? "available" : status,
       disabled: status === "blocked" || !isSelectable,
@@ -111,6 +121,8 @@ export default function CSActivationShell({
       description={description}
       progress={progress}
       autosaveStatus={saveStateMap[saveState] || saveState}
+      autosaveLabel={saveMessage}
+      autosaveLastSavedAt={lastSavedAt}
       blocker={blockedMessage ? { title: "This step is blocked", description: blockedMessage } : undefined}
       validationErrors={validationMessage ? [{ id: "validation", message: validationMessage }] : []}
       resumeNotice={resumeNotice}
@@ -126,7 +138,6 @@ export default function CSActivationShell({
       }
       supportAction={headerActions}
     >
-      {saveMessage ? <CSAutosaveStatus status={saveStateMap[saveState] || saveState} label={saveMessage} lastSavedAt={lastSavedAt} /> : null}
       {children}
     </CSActivationShellPrimitive>
   );
