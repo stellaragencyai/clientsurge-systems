@@ -157,7 +157,9 @@ async function assertFirstViewportPriority(page, label) {
       return {
         top: Math.round(rect.top),
         bottom: Math.round(rect.bottom),
+        height: Math.round(rect.height),
         inFirstViewport: rect.top < window.innerHeight && rect.bottom > 0,
+        fullyInFirstViewport: rect.top >= 0 && rect.bottom <= window.innerHeight + 1,
         text: (element.textContent || "").replace(/\s+/g, " ").trim().slice(0, 240),
       };
     };
@@ -183,25 +185,71 @@ async function assertFirstViewportPriority(page, label) {
         attentionBeforeActions: attention ? compare(attention, actions) : true,
         actionsBeforeOutcomes: outcomes ? compare(actions, outcomes) : true,
       },
-      headings: Array.from(document.querySelectorAll("h2")).map((heading) => (heading.textContent || "").replace(/\s+/g, " ").trim()).slice(0, 8),
+      headings: Array.from(document.querySelectorAll("h2")).map((heading) => (heading.textContent || "").replace(/\s+/g, " ").trim()).slice(0, 12),
+      priorityHeadings: Array.from(document.querySelectorAll("#business-condition h2, #attention-required h2, #daily-actions h2, #verified-outcome-summary h2"))
+        .map((heading) => (heading.textContent || "").replace(/\s+/g, " ").trim()),
       viewportHeight: window.innerHeight,
     };
   });
 
-  if (!positions.business || !positions.actions) fail(`priority sections missing at ${label}`, positions);
-  if (!positions.business.inFirstViewport) fail(`Business Condition is not visible in first viewport at ${label}`, positions);
+  if (!positions.business || !positions.attention || !positions.actions) fail(`core priority sections missing at ${label}`, positions);
+  for (const [name, section] of [["Business Condition", positions.business], ["Attention Required", positions.attention], ["Next Best Actions", positions.actions]]) {
+    if (!section.fullyInFirstViewport) fail(`${name} is not fully contained in first viewport at ${label}`, positions);
+  }
+  if (positions.outcomes && !positions.outcomes.inFirstViewport) fail(`Verified Outcome Summary is not visible in first viewport at ${label}`, positions);
   if (positions.attention && positions.business.top > positions.attention.top) fail(`Business Condition does not visually precede Attention Required at ${label}`, positions);
   if (positions.business.top > positions.actions.top) fail(`Business Condition does not visually precede Next Best Actions at ${label}`, positions);
   if (positions.attention && positions.attention.top > positions.actions.top) fail(`Attention Required does not visually precede Next Best Actions at ${label}`, positions);
   if (positions.outcomes && positions.actions.top > positions.outcomes.top) fail(`Verified Outcome Summary does not follow actions at ${label}`, positions);
+  if (positions.business.bottom > positions.attention.top + 1 || positions.attention.bottom > positions.actions.top + 1) {
+    fail(`priority sections visually overlap at ${label}`, positions);
+  }
   if (positions.domOrder.businessBeforeAttention === false || positions.domOrder.businessBeforeActions === false || positions.domOrder.attentionBeforeActions === false || positions.domOrder.actionsBeforeOutcomes === false) {
     fail(`DOM order does not match required priority order at ${label}`, positions);
   }
-  const headingOrder = positions.headings.join(" > ");
-  if (!headingOrder.includes("Business Condition") || !headingOrder.includes("Next Best Actions")) fail(`heading order missing priority headings at ${label}`, positions);
-  if (headingOrder.indexOf("Business Condition") > headingOrder.indexOf("Next Best Actions")) fail(`heading order is not condition-first at ${label}`, positions);
+  const expectedPriorityHeadings = ["Business Condition", "Attention Required", "Next Best Actions"];
+  if (positions.outcomes) expectedPriorityHeadings.push("Verified Outcome Summary");
+  const actualPriorityHeadings = positions.priorityHeadings.slice(0, expectedPriorityHeadings.length);
+  if (actualPriorityHeadings.join(" > ") !== expectedPriorityHeadings.join(" > ")) {
+    fail(`heading order does not match required priority hierarchy at ${label}`, { ...positions, expectedPriorityHeadings, actualPriorityHeadings });
+  }
   if (positions.aiWorkforce?.top < positions.actions.top) fail(`AI Workforce displaces core priority hierarchy at ${label}`, positions);
   if (positions.activity && positions.activity.top < positions.actions.top) fail(`Activity Timeline is not secondary at ${label}`, positions);
+}
+
+async function assertKeyboardOrderMatchesVisualFlow(page, label) {
+  const result = await page.evaluate(() => {
+    const focusables = Array.from(document.querySelectorAll([
+      "a[href]",
+      "button:not([disabled])",
+      "input:not([disabled])",
+      "select:not([disabled])",
+      "textarea:not([disabled])",
+      "[tabindex]:not([tabindex='-1'])",
+    ].join(","))).filter((element) => {
+      const rect = element.getBoundingClientRect();
+      const style = window.getComputedStyle(element);
+      return rect.width > 0 && rect.height > 0 && style.visibility !== "hidden" && style.display !== "none";
+    }).map((element, index) => {
+      const rect = element.getBoundingClientRect();
+      const section = element.closest("section")?.id || element.closest("header")?.className || "unknown";
+      return {
+        index,
+        section,
+        top: Math.round(rect.top),
+        left: Math.round(rect.left),
+        text: (element.textContent || element.getAttribute("aria-label") || "").replace(/\s+/g, " ").trim().slice(0, 120),
+      };
+    });
+    const backwards = [];
+    for (let index = 1; index < focusables.length; index += 1) {
+      const previous = focusables[index - 1];
+      const current = focusables[index];
+      if (current.top + 8 < previous.top) backwards.push({ previous, current });
+    }
+    return { focusables, backwards };
+  });
+  if (result.backwards.length) fail(`keyboard order moves upward against visual flow at ${label}`, result);
 }
 
 async function assertModuleSubordination(page, label) {
@@ -351,6 +399,7 @@ async function run() {
       await assertLiveGating(page, false);
       await assertNoTruthContradictions(page, label);
       await assertFirstViewportPriority(page, label);
+      await assertKeyboardOrderMatchesVisualFlow(page, label);
       await assertModuleSubordination(page, label);
       await assertRenderedSecondaryContent(page, label);
       await assertSystemHealthProminence(page, "contextual", label);
@@ -369,6 +418,7 @@ async function run() {
       await page.goto(`${reviewUrl}?actionState=${state}`, { waitUntil: "networkidle" });
       await assertActionQueueState(page, state);
       await assertFirstViewportPriority(page, `actionState/${state}`);
+      await assertKeyboardOrderMatchesVisualFlow(page, `actionState/${state}`);
       await assertNoTruthContradictions(page, `actionState/${state}`);
       await assertNoHorizontalOverflow(page, `actionState/${state}`);
       await context.close();
@@ -392,6 +442,7 @@ async function run() {
       await assertLiveGating(page, false);
       await assertNoTruthContradictions(page, "verified/actionable");
       await assertFirstViewportPriority(page, "verified/actionable");
+      await assertKeyboardOrderMatchesVisualFlow(page, "verified/actionable");
       await assertRenderedSecondaryContent(page, "verified/actionable");
       await assertActionAccountability(page);
       await assertNoHorizontalOverflow(page, "verified/actionable");
@@ -407,6 +458,7 @@ async function run() {
       await page.goto(`${reviewUrl}?verified=1&freshness=live&actionState=verified_zero&alert=0`, { waitUntil: "networkidle" });
       await assertCleanLiveFixture(page);
       await assertFirstViewportPriority(page, "verified/clean-live");
+      await assertKeyboardOrderMatchesVisualFlow(page, "verified/clean-live");
       await assertModuleSubordination(page, "verified/clean-live");
       await assertRenderedSecondaryContent(page, "verified/clean-live");
       await assertNoHorizontalOverflow(page, "verified/clean-live");
