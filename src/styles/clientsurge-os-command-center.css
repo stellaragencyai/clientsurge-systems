@@ -871,13 +871,6 @@
     line-height: 1.22;
   }
 
-  .cs-command-summary__item-body p {
-    display: -webkit-box;
-    overflow: hidden;
-    -webkit-line-clamp: 2;
-    -webkit-box-orient: vertical;
-  }
-
   .cs-command-summary .cs-command-center__source-row--compact {
     display: none;
   }
