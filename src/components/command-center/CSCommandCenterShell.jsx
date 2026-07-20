@@ -13,9 +13,7 @@ import {
   Target,
 } from "lucide-react";
 import {
-  CSAlert,
   CSCard,
-  CSMetricCard,
   CSPageHeader,
   CSStatusBadge,
 } from "@/components/design-system";
@@ -179,6 +177,27 @@ function CommandCenterSection({ id, title, description, icon: Icon, actions, chi
   );
 }
 
+function ExecutiveSummaryItem({ id, title, icon: Icon, tone = "neutral", badge, children, moduleRole }) {
+  return (
+    <article
+      id={id}
+      className="cs-command-summary__item"
+      data-command-role={moduleRole}
+      data-prominence="primary"
+      aria-labelledby={`${id}-title`}
+    >
+      <div className="cs-command-summary__item-header">
+        <span className="cs-command-summary__icon" aria-hidden="true"><Icon /></span>
+        <div>
+          <h3 id={`${id}-title`}>{title}</h3>
+          {badge ? <CSStatusBadge tone={tone}>{badge}</CSStatusBadge> : null}
+        </div>
+      </div>
+      <div className="cs-command-summary__item-body">{children}</div>
+    </article>
+  );
+}
+
 function deriveConditionState({
   dataReadiness,
   sourceConnected,
@@ -323,6 +342,27 @@ export default function CSCommandCenterShell({
   const conditionPriorityMessage = hasVerifiedOperationalData
     ? condition.message
     : "Unknown data is not represented as zero. Metrics appear after a connected source reports verified values.";
+  const primaryAttention = alerts[0] || attentionFallback;
+  const primaryAction = actions[0];
+  const nextActionTitle = primaryAction
+    ? primaryAction.title
+    : resolvedActionQueueState === "verified_zero"
+      ? actionQueueCopy.title
+      : "Verify action queue";
+  const nextActionDetail = primaryAction
+    ? primaryAction.description
+    : `${actionQueueCopy.title}. ${actionQueueCopy.description} ${actionQueueCopy.detail}`;
+  const outcomeSummaryItems = metrics.length
+    ? metrics.slice(0, 4).map((metric) => ({
+        id: metric.id || metric.label,
+        label: metric.label,
+        value: metric.value,
+      }))
+    : [
+        { id: "leads", label: "Leads", value: "Not verified" },
+        { id: "calls", label: "Calls", value: "Not verified" },
+        { id: "reviews", label: "Reviews", value: "Not verified" },
+      ];
 
   return (
     <main className="cs-command-center">
@@ -338,20 +378,27 @@ export default function CSCommandCenterShell({
         </div>
       </CSPageHeader>
 
-      <div className="cs-command-center__priority-grid" aria-label="First viewport priority">
-        <CommandCenterSection
+      <section
+        id="command-center-summary"
+        className="cs-command-summary"
+        aria-labelledby="command-center-summary-title"
+      >
+        <div className="cs-command-summary__header">
+          <p className="cs-eyebrow">Command Center Summary</p>
+          <h2 id="command-center-summary-title">What matters now</h2>
+        </div>
+
+        <div className="cs-command-summary__grid" aria-label="First viewport priority">
+          <ExecutiveSummaryItem
           id="business-condition"
           title="Business Condition"
-          description="Condition, coverage, and freshness before action."
           icon={HeartPulse}
-          className="cs-command-section--priority"
+            tone={displayedStatusTone}
+            badge={displayedStatus}
           moduleRole="business-condition"
-          prominence="primary"
         >
-          <article className={cx("cs-priority-card", conditionState === "verified_operational" && "cs-priority-card--verified")}>
-            <div className="cs-priority-card__headline">
+            <div className="cs-command-summary__headline">
               <strong>{condition.summary}</strong>
-              <CSStatusBadge tone={displayedStatusTone}>{displayedStatus}</CSStatusBadge>
             </div>
             <p>{conditionPriorityMessage}</p>
             <dl className="cs-command-center__source-row cs-command-center__source-row--compact">
@@ -360,73 +407,61 @@ export default function CSCommandCenterShell({
               <div><dt>Freshness</dt><dd><CSStatusBadge tone={displayedFreshnessState === "live" || displayedFreshnessState === "current" ? "info" : "neutral"}>{displayedFreshnessLabel}</CSStatusBadge></dd></div>
               <div><dt>Coverage</dt><dd>{coverageState === "current" ? "Current period" : "Coverage not verified"}</dd></div>
             </dl>
-          </article>
-        </CommandCenterSection>
+          </ExecutiveSummaryItem>
 
-        <CommandCenterSection
+          <ExecutiveSummaryItem
           id="attention-required"
           title="Attention Required"
-          description="Warnings to review before routine work."
           icon={AlertTriangle}
-          className="cs-command-section--priority"
+            tone={primaryAttention.tone || "warning"}
+            badge={alerts.length || hasAttention ? "Review" : attentionFallback.badge}
           moduleRole="attention-required"
-          prominence="primary"
         >
-          <div className="cs-command-center__alerts" aria-label="Priority alerts">
-            {alerts.length ? alerts.map((alert) => (
-              <CSAlert key={alert.id || alert.title} className="cs-alert--priority" tone={alert.tone || "warning"} title={alert.title} actions={alert.actions}>
-                {alert.message}
-              </CSAlert>
-            )) : (
-              <article className={cx("cs-priority-card", `cs-priority-card--${attentionFallback.tone}`)}>
-                <div className="cs-priority-card__headline">
-                  <strong>{attentionFallback.title}</strong>
-                  <CSStatusBadge tone={attentionFallback.tone}>{attentionFallback.badge}</CSStatusBadge>
-                </div>
-                <p>{attentionFallback.message}</p>
-              </article>
-            )}
-          </div>
-        </CommandCenterSection>
+            <div className="cs-command-summary__headline">
+              <strong>{primaryAttention.title}</strong>
+            </div>
+            <p>{primaryAttention.message}</p>
+          </ExecutiveSummaryItem>
 
-        <CommandCenterSection
+          <ExecutiveSummaryItem
           id="daily-actions"
-          title="Next Best Actions"
-          description="Highest-value human action today."
+            title="Next Best Action"
           icon={Inbox}
-          className="cs-command-section--priority"
+            tone={primaryAction ? "warning" : resolvedActionQueueState === "verified_zero" ? "success" : "neutral"}
+            badge={primaryAction ? primaryAction.priority || "Action" : resolvedActionQueueState === "verified_zero" ? "Verified zero" : actionQueueCopy.title}
           moduleRole="next-best-actions"
-          prominence="primary"
         >
-          <div className="cs-action-list">
-            {actions.length ? actions.map((item) => <ActionItem key={item.id || item.title} compact {...item} />) : (
-              <article className="cs-priority-card cs-priority-card--action-state">
-                <div className="cs-priority-card__headline">
-                  <strong>{actionQueueCopy.title}</strong>
-                  <CSStatusBadge tone={resolvedActionQueueState === "verified_zero" ? "success" : "neutral"}>Action queue</CSStatusBadge>
+            {primaryAction ? (
+              <ActionItem compact {...primaryAction} />
+            ) : (
+              <>
+                <div className="cs-command-summary__headline">
+                  <strong>{nextActionTitle}</strong>
                 </div>
-                <p>{actionQueueCopy.description} {actionQueueCopy.detail}</p>
-              </article>
+                <p>{nextActionDetail}</p>
+              </>
             )}
-          </div>
-        </CommandCenterSection>
+          </ExecutiveSummaryItem>
 
-        {showVerifiedOutcomeSummary ? (
-          <CommandCenterSection
+          <ExecutiveSummaryItem
             id="verified-outcome-summary"
             title="Verified Outcome Summary"
-            description="Verified outcomes after condition and actions."
             icon={CircleDollarSign}
-            className="cs-command-section--priority"
+            tone={showVerifiedOutcomeSummary ? "info" : "neutral"}
+            badge={showVerifiedOutcomeSummary ? "Verified" : "Not verified"}
             moduleRole="verified-outcome-summary"
-            prominence="primary"
           >
-            <div className="cs-command-center__metrics" aria-label="Verified outcome summary">
-              {metrics.map((metric) => <CSMetricCard key={metric.id || metric.label} {...metric} />)}
+            <div className="cs-command-summary__outcomes" aria-label="Verified outcome summary">
+              {outcomeSummaryItems.map((metric) => (
+                <div key={metric.id}>
+                  <span>{metric.label}</span>
+                  <strong>{metric.value}</strong>
+                </div>
+              ))}
             </div>
-          </CommandCenterSection>
-        ) : null}
-      </div>
+          </ExecutiveSummaryItem>
+        </div>
+      </section>
 
       {headerActions ? <div className="cs-command-center__source-actions">{headerActions}</div> : null}
 

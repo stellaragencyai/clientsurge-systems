@@ -156,8 +156,11 @@ async function assertFirstViewportPriority(page, label) {
       const rect = element.getBoundingClientRect();
       return {
         top: Math.round(rect.top),
+        left: Math.round(rect.left),
+        right: Math.round(rect.right),
         bottom: Math.round(rect.bottom),
         height: Math.round(rect.height),
+        width: Math.round(rect.width),
         inFirstViewport: rect.top < window.innerHeight && rect.bottom > 0,
         fullyInFirstViewport: rect.top >= 0 && rect.bottom <= window.innerHeight + 1,
         text: (element.textContent || "").replace(/\s+/g, " ").trim().slice(0, 240),
@@ -172,6 +175,7 @@ async function assertFirstViewportPriority(page, label) {
       return Boolean(a.compareDocumentPosition(b) & Node.DOCUMENT_POSITION_FOLLOWING);
     };
     return {
+      summary: read("#command-center-summary"),
       business: read("#business-condition"),
       attention: read("#attention-required"),
       actions: read("#daily-actions"),
@@ -186,29 +190,34 @@ async function assertFirstViewportPriority(page, label) {
         actionsBeforeOutcomes: outcomes ? compare(actions, outcomes) : true,
       },
       headings: Array.from(document.querySelectorAll("h2")).map((heading) => (heading.textContent || "").replace(/\s+/g, " ").trim()).slice(0, 12),
-      priorityHeadings: Array.from(document.querySelectorAll("#business-condition h2, #attention-required h2, #daily-actions h2, #verified-outcome-summary h2"))
+      priorityHeadings: Array.from(document.querySelectorAll("#business-condition > .cs-command-summary__item-header h3, #attention-required > .cs-command-summary__item-header h3, #daily-actions > .cs-command-summary__item-header h3, #verified-outcome-summary > .cs-command-summary__item-header h3"))
         .map((heading) => (heading.textContent || "").replace(/\s+/g, " ").trim()),
       viewportHeight: window.innerHeight,
     };
   });
 
-  if (!positions.business || !positions.attention || !positions.actions) fail(`core priority sections missing at ${label}`, positions);
-  for (const [name, section] of [["Business Condition", positions.business], ["Attention Required", positions.attention], ["Next Best Actions", positions.actions]]) {
+  if (!positions.summary || !positions.business || !positions.attention || !positions.actions || !positions.outcomes) fail(`executive summary priority sections missing at ${label}`, positions);
+  if (!positions.summary.inFirstViewport) fail(`Command Center Summary is not visible in first viewport at ${label}`, positions);
+  for (const [name, section] of [["Business Condition", positions.business], ["Attention Required", positions.attention], ["Next Best Action", positions.actions], ["Verified Outcome Summary", positions.outcomes]]) {
     if (!section.fullyInFirstViewport) fail(`${name} is not fully contained in first viewport at ${label}`, positions);
   }
-  if (positions.outcomes && !positions.outcomes.inFirstViewport) fail(`Verified Outcome Summary is not visible in first viewport at ${label}`, positions);
-  if (positions.attention && positions.business.top > positions.attention.top) fail(`Business Condition does not visually precede Attention Required at ${label}`, positions);
-  if (positions.business.top > positions.actions.top) fail(`Business Condition does not visually precede Next Best Actions at ${label}`, positions);
-  if (positions.attention && positions.attention.top > positions.actions.top) fail(`Attention Required does not visually precede Next Best Actions at ${label}`, positions);
-  if (positions.outcomes && positions.actions.top > positions.outcomes.top) fail(`Verified Outcome Summary does not follow actions at ${label}`, positions);
-  if (positions.business.bottom > positions.attention.top + 1 || positions.attention.bottom > positions.actions.top + 1) {
+  const visuallyBefore = (a, b) => a.top < b.top - 1 || (Math.abs(a.top - b.top) <= 1 && a.left <= b.left);
+  if (!visuallyBefore(positions.business, positions.attention)) fail(`Business Condition does not visually precede Attention Required at ${label}`, positions);
+  if (!visuallyBefore(positions.attention, positions.actions)) fail(`Attention Required does not visually precede Next Best Action at ${label}`, positions);
+  if (!visuallyBefore(positions.actions, positions.outcomes)) fail(`Verified Outcome Summary does not follow actions at ${label}`, positions);
+  const pairs = [
+    ["business/attention", positions.business, positions.attention],
+    ["attention/actions", positions.attention, positions.actions],
+    ["actions/outcomes", positions.actions, positions.outcomes],
+  ];
+  const overlappedPair = pairs.find(([, a, b]) => a.left < b.right - 1 && a.right > b.left + 1 && a.top < b.bottom - 1 && a.bottom > b.top + 1);
+  if (overlappedPair) {
     fail(`priority sections visually overlap at ${label}`, positions);
   }
   if (positions.domOrder.businessBeforeAttention === false || positions.domOrder.businessBeforeActions === false || positions.domOrder.attentionBeforeActions === false || positions.domOrder.actionsBeforeOutcomes === false) {
     fail(`DOM order does not match required priority order at ${label}`, positions);
   }
-  const expectedPriorityHeadings = ["Business Condition", "Attention Required", "Next Best Actions"];
-  if (positions.outcomes) expectedPriorityHeadings.push("Verified Outcome Summary");
+  const expectedPriorityHeadings = ["Business Condition", "Attention Required", "Next Best Action", "Verified Outcome Summary"];
   const actualPriorityHeadings = positions.priorityHeadings.slice(0, expectedPriorityHeadings.length);
   if (actualPriorityHeadings.join(" > ") !== expectedPriorityHeadings.join(" > ")) {
     fail(`heading order does not match required priority hierarchy at ${label}`, { ...positions, expectedPriorityHeadings, actualPriorityHeadings });
