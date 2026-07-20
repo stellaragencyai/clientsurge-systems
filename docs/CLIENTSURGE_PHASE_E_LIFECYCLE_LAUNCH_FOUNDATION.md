@@ -149,6 +149,15 @@ Worker #3 should review:
 - color-independent state meaning
 - enterprise polish against issues #1371, #1372, #1373, #1359, and #1383
 
+Detailed checklist:
+
+`docs/CLIENTSURGE_PHASE_E_WORKER3_CHECKLIST.md`
+
+## Local Worktree Notes
+
+- `work/phase-e-browser-screens/` is local validation evidence and is intentionally not committed.
+- The isolated Windows worktree has the known tracked-file case collision between `src/components/ui/Pagination.jsx` and `src/components/ui/pagination.jsx`. The lowercase path is marked `skip-worktree` locally so the Phase E branch status is not polluted by the Windows checkout artifact.
+
 ## GitHub Updates
 
 No merge, undraft, or production rollout was performed.
