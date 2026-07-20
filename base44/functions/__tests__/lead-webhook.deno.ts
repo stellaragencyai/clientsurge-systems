@@ -22,6 +22,14 @@ class InMemoryCollection {
     return { ...record };
   }
 
+  async filter(query = {}) {
+    return this.records
+      .filter((record) =>
+        Object.entries(query).every(([key, value]) => record[key] === value)
+      )
+      .map((record) => ({ ...record }));
+  }
+
   async create(data) {
     const record = {
       id: data.id || `rec_${this.sequence++}`,
@@ -80,6 +88,11 @@ function createFakeBase44() {
     base44: {
       asServiceRole: {
         entities,
+        functions: {
+          async invoke() {
+            return { success: true };
+          },
+        },
       },
     },
   };

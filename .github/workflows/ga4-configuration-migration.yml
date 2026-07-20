@@ -9,6 +9,13 @@ on:
       - ".github/workflows/ga4-configuration-migration.yml"
       - "scripts/base44/migrate-ga4-configuration.mjs"
       - "base44/functions/setupGA4Configuration/**"
+      - "base44/functions/verifyGA4Configuration/**"
+      - "base44/functions/getAdminSettings/**"
+      - "base44/functions/_shared/ga4Configuration.ts"
+      - "base44/functions/_shared/ga4MeasurementProtocol.js"
+      - "src/lib/ga4.js"
+      - "src/lib/adminSettingsApi.js"
+      - "src/components/admin/AdminSettingsPanel.jsx"
 
 permissions:
   contents: read
@@ -44,6 +51,12 @@ jobs:
             echo "::error::Missing repository secret BASE44_AUTH_JSON or BASE_44_AUTH_JSON."
             exit 1
           fi
+          echo "Base44 auth secret is configured."
+
+      - name: Document GA4 runtime secret requirement
+        shell: bash
+        run: |
+          echo "::notice::Live GA4 activation requires Base44 backend secret GA4_API_SECRET and optional GA4_MEASUREMENT_ID=G-H6QT342ZN9. Values are checked by verifyGA4Configuration without printing them."
 
       - name: Run GA4 configuration migration
         run: node scripts/base44/migrate-ga4-configuration.mjs
@@ -58,5 +71,6 @@ jobs:
             echo "- App ID: 69dc4a79656fdba136d413d3"
             echo "- Measurement ID: G-H6QT342ZN9"
             echo "- Expected status after migration: configured"
+            echo "- Final active status requires verifyGA4Configuration to pass live Measurement Protocol and production-domain checks"
             echo "- Expected key events: generate_lead, begin_checkout, purchase, demo_booked"
           } >> "$GITHUB_STEP_SUMMARY"

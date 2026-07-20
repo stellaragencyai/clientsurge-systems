@@ -31,6 +31,20 @@ async function validateWebhookSignature(body, signature, secret, algorithm = 'sh
   return match;
 }
 
+export async function computeWebhookSignature(secret, timestamp, body, algorithm = 'sha256') {
+  void timestamp;
+  const encoder = new TextEncoder();
+  const key = await crypto.subtle.importKey(
+    'raw', encoder.encode(secret),
+    { name: 'HMAC', hash: algorithm === 'sha256' ? 'SHA-256' : 'SHA-1' },
+    false, ['sign']
+  );
+  const bodyBytes = typeof body === 'string' ? encoder.encode(body) : body;
+  const signatureBytes = await crypto.subtle.sign('HMAC', key, bodyBytes);
+  return Array.from(new Uint8Array(signatureBytes))
+    .map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
 function normalizePhoneNumber(phone) {
   if (!phone) return null;
   const cleaned = phone.replace(/\D/g, '');
@@ -39,7 +53,7 @@ function normalizePhoneNumber(phone) {
   if (cleaned.length >= 11) return `+${cleaned}`;
   return null;
 }
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
+import { createClientFromRequest } from "npm:@base44/sdk@0.8.39";
 
 /**
  * CANONICAL LEAD INGESTION FUNCTION

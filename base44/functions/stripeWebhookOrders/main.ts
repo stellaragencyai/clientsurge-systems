@@ -76,6 +76,14 @@ Deno.serve(async (req) => {
         { eventId: stripeEvent.id },
       );
 
+      console.log("[stripeWebhookOrders] GA4 purchase delivery outcome", {
+        request_id: requestId,
+        sent: ga4Result.sent,
+        reason: ga4Result.reason || "sent",
+        event_id: stripeEvent.id || "",
+        session_id: stripeEvent.data.object.id || "",
+      });
+
       if (!ga4Result.sent && ga4Result.reason !== "not_live_purchase") {
         console.warn("[stripeWebhookOrders] GA4 purchase not delivered", {
           request_id: requestId,

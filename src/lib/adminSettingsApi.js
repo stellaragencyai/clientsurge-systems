@@ -31,6 +31,15 @@ export const GA4_TRACKED_EVENTS = [
   "onboarding_complete",
 ];
 export const GA4_KEY_EVENTS = ["generate_lead", "begin_checkout", "purchase", "demo_booked"];
+export const GA4_REPAIR_STAGES = [
+  { id: "repairing_configuration", label: "Repairing configuration..." },
+  { id: "validating_secret_availability", label: "Validating secret availability..." },
+  { id: "validating_with_google", label: "Validating with Google..." },
+  { id: "sending_verification_event", label: "Sending verification event..." },
+  { id: "checking_production_site", label: "Checking production site..." },
+  { id: "finalizing", label: "Finalizing..." },
+  { id: "ga4_fully_verified", label: "GA4 fully verified" },
+];
 
 function extractStatus(error) {
   return error?.status || error?.response?.status || error?.data?.status || error?.data?.statusCode || error?.data?.code;
@@ -87,14 +96,23 @@ async function saveAdminSettingsToEntity(settings) {
   return existing?.id ? entity.update(existing.id, patch) : entity.create(patch);
 }
 
-export async function runGa4FinalVerification() {
+function buildGa4FunctionError(data, fallback) {
+  const error = new Error(data?.error || data?.message || fallback);
+  error.data = data;
+  error.failed_stage = data?.failed_stage || null;
+  error.failed_checks = data?.failed_checks || [];
+  return error;
+}
+
+export async function runGa4FinalVerification({ onStage } = {}) {
+  onStage?.("validating_secret_availability");
+  onStage?.("validating_with_google");
   const response = await base44.functions.invoke("verifyGA4Configuration", {});
   const data = unwrapFunctionPayload(response);
   if (data?.success === false || data?.verified === false || data?.error) {
-    const error = new Error(data?.error || data?.message || "GA4 final verification failed");
-    error.data = data;
-    throw error;
+    throw buildGa4FunctionError(data, "GA4 final verification failed");
   }
+  onStage?.("ga4_fully_verified");
   return data;
 }
 
@@ -120,6 +138,8 @@ export async function fetchGa4ConfigurationStatus() {
     const hasLegacySecret = Boolean(config && typeof config.api_secret === "string" && config.api_secret.trim());
     const keyEvents = new Set(config?.conversion_events || []);
     const canonicalKeyEvents = GA4_KEY_EVENTS.every((eventName) => keyEvents.has(eventName));
+    const trackedEvents = new Set(config?.tracked_events || []);
+    const canonicalTrackedEvents = GA4_TRACKED_EVENTS.every((eventName) => trackedEvents.has(eventName));
     const operationallyVerified = Boolean(
       config &&
       config.setup_status === "active" &&
@@ -130,12 +150,14 @@ export async function fetchGa4ConfigurationStatus() {
       config,
       record_count: records?.length || 0,
       has_legacy_secret: hasLegacySecret,
+      canonical_tracked_events: canonicalTrackedEvents,
       canonical_key_events: canonicalKeyEvents,
       operationally_verified: operationallyVerified,
       clean: Boolean(
         config &&
         records.length === 1 &&
         !hasLegacySecret &&
+        canonicalTrackedEvents &&
         canonicalKeyEvents &&
         (config.setup_status === "configured" || config.setup_status === "active")
       ),
@@ -153,7 +175,7 @@ export async function fetchGa4ConfigurationStatus() {
   }
 }
 
-export async function ensureGa4Configuration() {
+export async function ensureGa4Configuration({ onStage } = {}) {
   const payload = {
     measurement_id: GA4_MEASUREMENT_ID,
     enabled: true,
@@ -165,9 +187,10 @@ export async function ensureGa4Configuration() {
   let repairResult = null;
   let primaryError = null;
   try {
+    onStage?.("repairing_configuration");
     const response = await base44.functions.invoke("setupGA4Configuration", payload);
     const data = unwrapFunctionPayload(response);
-    if (data?.success === false || data?.error) throw new Error(data?.error || "GA4 configuration migration failed");
+    if (data?.success === false || data?.error) throw buildGa4FunctionError(data, "GA4 configuration migration failed");
     repairResult = data;
   } catch (error) {
     primaryError = error;
@@ -175,17 +198,13 @@ export async function ensureGa4Configuration() {
 
   if (!repairResult) {
     try {
-      const response = await base44.functions.invoke("getAdminSettings", {});
-      const data = unwrapFunctionPayload(response);
-      if (data?.ga4_migration?.success === false) {
-        throw new Error(data.ga4_migration.error || "GA4 fallback repair failed");
-      }
-      if (data?.ga4_status?.clean || data?.ga4_migration?.clean) {
-        repairResult = data.ga4_status || data.ga4_migration;
+      const status = await fetchGa4ConfigurationStatus();
+      if (status?.clean) {
+        repairResult = { already_clean: true, ...status };
       }
     } catch (fallbackError) {
       const primaryMessage = getAdminSettingsError(primaryError, "Primary GA4 repair failed");
-      const fallbackMessage = getAdminSettingsError(fallbackError, "Fallback GA4 repair failed");
+      const fallbackMessage = getAdminSettingsError(fallbackError, "Unable to read current GA4 status");
       throw new Error(`${primaryMessage} ${fallbackMessage}`.trim());
     }
   }
@@ -194,8 +213,11 @@ export async function ensureGa4Configuration() {
     throw new Error(getAdminSettingsError(primaryError, "GA4 repair did not complete"));
   }
 
-  const verification = await runGa4FinalVerification();
-  return { ...repairResult, verification };
+  onStage?.("sending_verification_event");
+  onStage?.("checking_production_site");
+  const verification = await runGa4FinalVerification({ onStage });
+  onStage?.("finalizing");
+  return { repair: repairResult, verification };
 }
 
 export async function fetchAdminSettings() {
@@ -216,14 +238,15 @@ export async function fetchAdminSettings() {
 }
 
 export async function saveAdminSettings(settings) {
-  const sanitized = sanitizeSettingsForEntity(settings);
+  const preservedGa4Status = settings?._ga4;
+  settings = sanitizeSettingsForEntity(settings);
   try {
-    const response = await base44.functions.invoke("updateAdminSettings", { settings: sanitized });
-    return { ...unwrapSettingsPayload(response, sanitized), _ga4: settings?._ga4 };
+    const response = await base44.functions.invoke("updateAdminSettings", { settings });
+    return { ...unwrapSettingsPayload(response, settings), _ga4: preservedGa4Status };
   } catch (error) {
     if (isAdminSettingsFunctionNotFound(error)) {
-      const saved = await saveAdminSettingsToEntity(sanitized);
-      return { ...saved, _ga4: settings?._ga4 };
+      const saved = await saveAdminSettingsToEntity(settings);
+      return { ...saved, _ga4: preservedGa4Status };
     }
     throw error;
   }

@@ -1,19 +1,17 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import {
+  DEFAULT_GA4_MEASUREMENT_ID,
+  GA4_MEASUREMENT_ID_PATTERN,
+  containsLegacySecret,
+  isGa4Admin,
+  summarizeGa4Records,
+} from "../_shared/ga4Configuration.ts";
 
-const DEFAULT_MEASUREMENT_ID = "G-H6QT342ZN9";
-const MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{4,}$/i;
-const KEY_EVENTS = ["generate_lead", "begin_checkout", "purchase", "demo_booked"];
 const DEBUG_ENDPOINT = "https://www.google-analytics.com/debug/mp/collect";
 const COLLECT_ENDPOINT = "https://www.google-analytics.com/mp/collect";
 const PRODUCTION_URL = "https://clientsurgesystems.com/";
 
-function isAdmin(user: Record<string, unknown> | null | undefined) {
-  return user?.role === "admin" || user?.role === "super_admin";
-}
-
-function containsLegacySecret(record: Record<string, unknown> | null | undefined) {
-  return typeof record?.api_secret === "string" && record.api_secret.trim().length > 0;
-}
+type CheckResult = Record<string, any> & { passed: boolean };
 
 function jsonResponse(body: unknown, status = 200) {
   return Response.json(body, { status, headers: { "Cache-Control": "no-store" } });
@@ -23,6 +21,7 @@ async function postMeasurementProtocol(endpoint: string, measurementId: string, 
   const url = new URL(endpoint);
   url.searchParams.set("measurement_id", measurementId);
   url.searchParams.set("api_secret", apiSecret);
+
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 6000);
   try {
@@ -34,11 +33,136 @@ async function postMeasurementProtocol(endpoint: string, measurementId: string, 
     });
     const text = await response.text();
     let payload: unknown = text;
-    try { payload = text ? JSON.parse(text) : {}; } catch {}
+    try {
+      payload = text ? JSON.parse(text) : {};
+    } catch {
+      payload = text.slice(0, 500);
+    }
     return { ok: response.ok, status: response.status, payload };
+  } catch (error) {
+    return {
+      ok: false,
+      status: 0,
+      payload: {},
+      error: error instanceof Error && error.name === "AbortError" ? "ga4_timeout" : "ga4_request_failed",
+    };
   } finally {
     clearTimeout(timeout);
   }
+}
+
+function validationMessages(payload: unknown) {
+  return Array.isArray((payload as any)?.validationMessages)
+    ? (payload as any).validationMessages
+    : [];
+}
+
+function validationErrors(messages: any[]) {
+  return messages.filter((message) => String(message?.severity || "").toUpperCase() === "ERROR");
+}
+
+function firstAssetUrl(html: string, baseUrl: string) {
+  const scriptMatch = html.match(/<script[^>]+src=["']([^"']*\/assets\/[^"']+\.js)["']/i);
+  const bareMatch = html.match(/\/assets\/[^"']+\.js/i);
+  const src = scriptMatch?.[1] || bareMatch?.[0] || "";
+  if (!src) return "";
+  try {
+    return new URL(src, baseUrl).href;
+  } catch {
+    return "";
+  }
+}
+
+async function fetchProductionSite() {
+  const response = await fetch(PRODUCTION_URL, {
+    redirect: "follow",
+    headers: { "User-Agent": "ClientSurge-GA4-Verification/2.0" },
+  });
+  const html = await response.text();
+  const normalized = html.replace(/\s+/g, " ");
+  const brandContentPresent = /ClientSurge Systems|Turn your website into an AI-powered sales system|AI automation systems/i.test(normalized);
+  const directoryExposureDetected = /manages\s+\d+\s+data types|available pages|generated page directory|app pages/i.test(normalized);
+  const rawErrorDetected = /Application error|Internal Server Error|Unhandled Runtime Error|Cannot GET|stack trace/i.test(normalized);
+
+  return {
+    html,
+    check: {
+      passed: Boolean(response.ok && brandContentPresent && !directoryExposureDetected && !rawErrorDetected),
+      status: response.status,
+      final_url: response.url,
+      brand_content_present: brandContentPresent,
+      directory_exposure_detected: directoryExposureDetected,
+      raw_error_detected: rawErrorDetected,
+    },
+  };
+}
+
+async function inspectDeployedStaticCode(html: string, baseUrl: string) {
+  const assetUrl = firstAssetUrl(html, baseUrl);
+  let assetText = "";
+  let assetStatus = 0;
+
+  if (assetUrl) {
+    try {
+      const response = await fetch(assetUrl, {
+        headers: { "User-Agent": "ClientSurge-GA4-Verification/2.0" },
+      });
+      assetStatus = response.status;
+      assetText = await response.text();
+    } catch {
+      assetText = "";
+    }
+  }
+
+  const source = `${html}\n${assetText}`;
+  const gtagScriptOccurrences = (source.match(/googletagmanager\.com\/gtag\/js/g) || []).length;
+  const measurementIdPresent = source.includes(DEFAULT_GA4_MEASUREMENT_ID);
+  const sendPageViewDisabled = /send_page_view["']?\s*:\s*(false|!1)/.test(source);
+  const linkerDomainPresent =
+    source.includes("clientsurgesystems.com") &&
+    source.includes("www.clientsurgesystems.com");
+  const browserPurchaseIsConfirmation = source.includes("purchase_client_confirmation");
+
+  return {
+    passed: Boolean(
+      assetUrl &&
+        measurementIdPresent &&
+        gtagScriptOccurrences <= 1 &&
+        sendPageViewDisabled &&
+        linkerDomainPresent &&
+        browserPurchaseIsConfirmation,
+    ),
+    asset_url: assetUrl || null,
+    asset_status: assetStatus,
+    measurement_id_present: measurementIdPresent,
+    ga4_installed_once: gtagScriptOccurrences <= 1,
+    send_page_view_disabled: sendPageViewDisabled,
+    linker_domain_present: linkerDomainPresent,
+    browser_purchase_uses_confirmation_event: browserPurchaseIsConfirmation,
+    server_purchase_helper_expected: true,
+  };
+}
+
+function allPassed(checks: Record<string, CheckResult>) {
+  return Object.values(checks).every((check) => check.passed === true);
+}
+
+function failedCheckNames(checks: Record<string, CheckResult>) {
+  return Object.entries(checks)
+    .filter(([, check]) => check.passed !== true)
+    .map(([name]) => name);
+}
+
+function firstFailedStage(checks: Record<string, CheckResult>) {
+  const ordered = [
+    "entity_integrity",
+    "secret_available",
+    "measurement_protocol_debug",
+    "measurement_protocol_delivery",
+    "production_site",
+    "static_code_assertions",
+  ];
+  return ordered.find((name) => checks[name]?.passed !== true) || null;
 }
 
 Deno.serve(async (req) => {
@@ -47,129 +171,200 @@ Deno.serve(async (req) => {
 
     const base44 = createClientFromRequest(req);
     const user = await base44.auth.me();
-    if (!isAdmin(user)) return jsonResponse({ error: "Admin access required", code: "FORBIDDEN" }, 403);
+    if (!isGa4Admin(user)) return jsonResponse({ error: "Admin access required", code: "FORBIDDEN" }, 403);
 
-    const measurementId = String(Deno.env.get("GA4_MEASUREMENT_ID") || DEFAULT_MEASUREMENT_ID).trim().toUpperCase();
+    const now = new Date().toISOString();
+    const envMeasurementId = String(Deno.env.get("GA4_MEASUREMENT_ID") || "").trim().toUpperCase();
+    const measurementId = envMeasurementId || DEFAULT_GA4_MEASUREMENT_ID;
+    const measurementIdMatchesExpected =
+      (!envMeasurementId || envMeasurementId === DEFAULT_GA4_MEASUREMENT_ID) &&
+      GA4_MEASUREMENT_ID_PATTERN.test(measurementId);
     const apiSecret = String(Deno.env.get("GA4_API_SECRET") || "").trim();
     const secretPresent = apiSecret.length > 0;
 
     const records = await base44.asServiceRole.entities.GA4Configuration.filter(
-      { measurement_id: measurementId },
+      { measurement_id: DEFAULT_GA4_MEASUREMENT_ID },
       "-created_date",
-      20,
+      100,
     ).catch(() => []);
-    const config = records?.[0] || null;
-    const keyEvents = new Set(config?.conversion_events || []);
-    const configClean = Boolean(
-      config &&
-      records.length === 1 &&
-      !containsLegacySecret(config) &&
-      KEY_EVENTS.every((eventName) => keyEvents.has(eventName)) &&
-      config.enabled === true
-    );
+    const summary = summarizeGa4Records(records);
+    const config = summary.config;
 
-    let productionCheck = { ok: false, status: 0, final_url: PRODUCTION_URL, directory_exposure_detected: false };
+    const checks: Record<string, CheckResult> = {
+      entity_integrity: {
+        passed: Boolean(
+          summary.record_count === 1 &&
+            config?.measurement_id === DEFAULT_GA4_MEASUREMENT_ID &&
+            config?.enabled === true &&
+            config?.enhanced_measurement_enabled === true &&
+            records.every((record: Record<string, unknown>) => !containsLegacySecret(record)) &&
+            summary.canonical_tracked_events &&
+            summary.canonical_key_events,
+        ),
+        record_count: summary.record_count,
+        measurement_id: config?.measurement_id || null,
+        enabled: config?.enabled === true,
+        enhanced_measurement_enabled: config?.enhanced_measurement_enabled === true,
+        no_api_secret_in_entity: records.every((record: Record<string, unknown>) => !containsLegacySecret(record)),
+        canonical_tracked_events: summary.canonical_tracked_events,
+        canonical_key_events: summary.canonical_key_events,
+        missing_tracked_events: summary.missing_tracked_events,
+        missing_key_events: summary.missing_key_events,
+      },
+      secret_available: {
+        passed: Boolean(secretPresent && measurementIdMatchesExpected),
+        api_secret_present: secretPresent,
+        measurement_id_source: envMeasurementId ? "GA4_MEASUREMENT_ID" : "default",
+        measurement_id_matches_expected: measurementIdMatchesExpected,
+      },
+      measurement_protocol_debug: {
+        passed: false,
+        skipped: true,
+        status: 0,
+        validation_message_count: 0,
+        error_message_count: 0,
+      },
+      measurement_protocol_delivery: {
+        passed: false,
+        skipped: true,
+        status: 0,
+      },
+      production_site: {
+        passed: false,
+        status: 0,
+        final_url: PRODUCTION_URL,
+        brand_content_present: false,
+        directory_exposure_detected: false,
+        raw_error_detected: false,
+      },
+      static_code_assertions: {
+        passed: false,
+        asset_url: null,
+        asset_status: 0,
+      },
+    };
+
+    let productionHtml = "";
     try {
-      const response = await fetch(PRODUCTION_URL, { redirect: "follow", headers: { "User-Agent": "ClientSurge-GA4-Verification/1.0" } });
-      const html = await response.text();
-      productionCheck = {
-        ok: response.ok,
-        status: response.status,
-        final_url: response.url,
-        directory_exposure_detected: /manages\s+\d+\s+data types|available pages|generated page directory/i.test(html),
+      const production = await fetchProductionSite();
+      productionHtml = production.html;
+      checks.production_site = production.check;
+    } catch (error) {
+      checks.production_site = {
+        passed: false,
+        status: 0,
+        final_url: PRODUCTION_URL,
+        brand_content_present: false,
+        directory_exposure_detected: false,
+        raw_error_detected: true,
+        error: error instanceof Error ? error.message : "Production site check failed",
       };
-    } catch {}
+    }
 
-    if (!MEASUREMENT_ID_PATTERN.test(measurementId) || !secretPresent || !configClean) {
-      return jsonResponse({
-        success: false,
-        verified: false,
-        measurement_id: measurementId,
-        checks: {
-          measurement_id_valid: MEASUREMENT_ID_PATTERN.test(measurementId),
-          api_secret_present: secretPresent,
-          configuration_clean: configClean,
-          production_reachable: productionCheck.ok,
-          public_directory_clean: !productionCheck.directory_exposure_detected,
-        },
-        error: !secretPresent
-          ? "GA4_API_SECRET is missing from Base44 Secrets."
-          : !configClean
-            ? "GA4Configuration is not clean and canonical."
-            : "GA4 measurement ID is invalid.",
-      }, 409);
+    if (productionHtml) {
+      checks.static_code_assertions = await inspectDeployedStaticCode(productionHtml, PRODUCTION_URL);
     }
 
     const verificationId = crypto.randomUUID();
-    const payload = {
+    const mpPayload = {
       client_id: `server.verification.${verificationId}`,
+      timestamp_micros: String(Date.now() * 1000),
       non_personalized_ads: true,
       validation_behavior: "ENFORCE_RECOMMENDATIONS",
-      events: [{
-        name: "ga4_verification",
-        params: {
-          event_id: verificationId,
-          engagement_time_msec: 1,
-          verification_source: "clientsurge_admin",
-          debug_mode: 1,
+      events: [
+        {
+          name: "ga4_verification",
+          params: {
+            verification_id: verificationId,
+            timestamp: now,
+            environment: "production",
+            source: "clientsurge_admin_verifier",
+            engagement_time_msec: 1,
+            debug_mode: 1,
+          },
         },
-      }],
+      ],
     };
 
-    const debugResult = await postMeasurementProtocol(DEBUG_ENDPOINT, measurementId, apiSecret, payload);
-    const validationMessages = Array.isArray((debugResult.payload as any)?.validationMessages)
-      ? (debugResult.payload as any).validationMessages
-      : [];
-    const debugAccepted = debugResult.ok && validationMessages.length === 0;
+    if (checks.entity_integrity.passed && checks.secret_available.passed) {
+      const debugResult = await postMeasurementProtocol(DEBUG_ENDPOINT, DEFAULT_GA4_MEASUREMENT_ID, apiSecret, mpPayload);
+      const messages = validationMessages(debugResult.payload);
+      const errors = validationErrors(messages);
+      checks.measurement_protocol_debug = {
+        passed: Boolean(debugResult.ok && errors.length === 0),
+        skipped: false,
+        status: debugResult.status,
+        validation_message_count: messages.length,
+        error_message_count: errors.length,
+        error_messages: errors.map((message) => ({
+          fieldPath: message?.fieldPath || "",
+          description: message?.description || "",
+          validationCode: message?.validationCode || "",
+        })),
+        transport_error: (debugResult as any).error || null,
+      };
 
-    let collectResult = { ok: false, status: 0, payload: {} as unknown };
-    if (debugAccepted) collectResult = await postMeasurementProtocol(COLLECT_ENDPOINT, measurementId, apiSecret, payload);
-
-    const verified = Boolean(
-      debugAccepted &&
-      collectResult.ok &&
-      productionCheck.ok &&
-      !productionCheck.directory_exposure_detected
-    );
-
-    if (config?.id) {
-      await base44.asServiceRole.entities.GA4Configuration.update(config.id, {
-        server_side_tracking_enabled: Boolean(debugAccepted && collectResult.ok),
-        setup_status: verified ? "active" : "configured",
-        last_verified_at: verified ? new Date().toISOString() : config.last_verified_at || null,
-        notes: verified
-          ? `Operational verification passed at ${new Date().toISOString()}: canonical configuration clean, production reachable, public directory exposure absent, Measurement Protocol debug validation accepted, and verification event accepted for collection. Verification ID: ${verificationId}.`
-          : `Verification incomplete at ${new Date().toISOString()}. Debug accepted: ${debugAccepted}; collect accepted: ${collectResult.ok}; production reachable: ${productionCheck.ok}; directory exposure: ${productionCheck.directory_exposure_detected}.`,
-      });
+      if (checks.measurement_protocol_debug.passed) {
+        const collectResult = await postMeasurementProtocol(COLLECT_ENDPOINT, DEFAULT_GA4_MEASUREMENT_ID, apiSecret, mpPayload);
+        checks.measurement_protocol_delivery = {
+          passed: collectResult.ok,
+          skipped: false,
+          status: collectResult.status,
+          transport_error: (collectResult as any).error || null,
+        };
+      }
     }
 
-    return jsonResponse({
-      success: verified,
-      verified,
-      verification_id: verificationId,
-      measurement_id: measurementId,
-      verified_at: verified ? new Date().toISOString() : null,
-      checks: {
-        measurement_id_valid: true,
-        api_secret_present: true,
-        configuration_clean: configClean,
-        production_reachable: productionCheck.ok,
-        public_directory_clean: !productionCheck.directory_exposure_detected,
-        measurement_protocol_debug_accepted: debugAccepted,
-        measurement_protocol_collect_accepted: collectResult.ok,
+    const verified = allPassed(checks);
+    const failed_checks = failedCheckNames(checks);
+    const failed_stage = firstFailedStage(checks);
+    const configurationPatch = {
+      server_side_tracking_enabled: verified,
+      setup_status: verified ? "active" : "configured",
+      last_verified_at: verified ? now : config?.last_verified_at || null,
+      notes: verified
+        ? `GA4 verification passed at ${now}. Verification ID: ${verificationId}. Production site healthy, public directory exposure absent, Measurement Protocol debug validation passed, and ga4_verification delivery was accepted.`
+        : `GA4 verification failed at ${now}. Verification ID: ${verificationId}. Failed checks: ${failed_checks.join(", ")}.`,
+    };
+
+    let updatedConfig = null;
+    if (config?.id) {
+      updatedConfig = await base44.asServiceRole.entities.GA4Configuration.update(config.id, configurationPatch);
+    }
+
+    return jsonResponse(
+      {
+        success: verified,
+        verified,
+        verification_id: verificationId,
+        verified_at: verified ? now : null,
+        failed_stage,
+        failed_checks,
+        checks,
+        configuration: updatedConfig
+          ? {
+              id: updatedConfig.id,
+              setup_status: updatedConfig.setup_status,
+              server_side_tracking_enabled: updatedConfig.server_side_tracking_enabled,
+              last_verified_at: updatedConfig.last_verified_at || null,
+            }
+          : null,
+        message: verified
+          ? "GA4 operational verification passed and the configuration is active."
+          : "GA4 verification did not pass every required check.",
       },
-      validation_messages: validationMessages,
-      production: productionCheck,
-      message: verified
-        ? "GA4 operational verification passed. The verification event was validated and accepted by Google Analytics Measurement Protocol."
-        : "GA4 verification did not pass every required check.",
-    }, verified ? 200 : 409);
+      verified ? 200 : 409,
+    );
   } catch (error) {
     console.error("[verifyGA4Configuration]", error);
-    return jsonResponse({
-      success: false,
-      verified: false,
-      error: error instanceof Error ? error.message : "GA4 verification failed",
-    }, 500);
+    return jsonResponse(
+      {
+        success: false,
+        verified: false,
+        failed_stage: "unexpected_error",
+        error: error instanceof Error ? error.message : "GA4 verification failed",
+      },
+      500,
+    );
   }
 });
