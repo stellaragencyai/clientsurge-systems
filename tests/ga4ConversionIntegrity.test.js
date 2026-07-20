@@ -14,11 +14,10 @@ const cookieConsentSource = read("src/components/landing/CookieConsent.jsx");
 const publicFunctionSource = read("src/lib/publicFunctionClient.js");
 const orderSuccessSource = read("src/internal-pages/OrderSuccess.jsx");
 const configSchemaSource = read("base44/entities/GA4Configuration.jsonc");
-const setupFunctionSource = read("base44/functions/setupGA4Configuration/entry.ts");
-const setupHelperSource = read("base44/functions/_shared/ga4Configuration.ts");
+const setupFunctionSource = read("base44/functions/setupGA4Configuration/main.ts");
+const setupHelperSource = read("base44/functions/setupGA4Configuration/ga4Configuration.ts");
 const measurementProtocolSource = read("base44/functions/_shared/ga4MeasurementProtocol.js");
 const stripeWebhookSource = read("base44/functions/stripeWebhookOrders/main.ts");
-const verifyFunctionSource = read("base44/functions/verifyGA4Configuration/main.ts");
 const adminSettingsPanelSource = read("src/components/admin/AdminSettingsPanel.jsx");
 const adminSettingsApiSource = read("src/lib/adminSettingsApi.js");
 const setupBundleSource = `${setupFunctionSource}\n${setupHelperSource}`;
@@ -142,20 +141,23 @@ test("browser purchase confirmation cannot double-count the purchase key event",
 });
 
 test("final verification is the only path that can activate server-side GA4", () => {
-  assert.match(verifyFunctionSource, /setup_status:\s*verified \? "active" : "configured"/);
-  assert.match(verifyFunctionSource, /server_side_tracking_enabled:\s*verified/);
-  assert.match(verifyFunctionSource, /last_verified_at:\s*verified \? now/);
-  assert.match(verifyFunctionSource, /measurement_protocol_debug/);
-  assert.match(verifyFunctionSource, /measurement_protocol_delivery/);
-  assert.match(verifyFunctionSource, /production_site/);
-  assert.match(verifyFunctionSource, /static_code_assertions/);
-  assert.match(verifyFunctionSource, /failed_stage/);
+  assert.match(setupFunctionSource, /action === "verify"/);
+  assert.match(setupFunctionSource, /setup_status:\s*verified \? "active" : "configured"/);
+  assert.match(setupFunctionSource, /server_side_tracking_enabled:\s*verified/);
+  assert.match(setupFunctionSource, /last_verified_at:\s*verified \? now/);
+  assert.match(setupFunctionSource, /measurement_protocol_debug/);
+  assert.match(setupFunctionSource, /measurement_protocol_delivery/);
+  assert.match(setupFunctionSource, /production_site/);
+  assert.match(setupFunctionSource, /static_code_assertions/);
+  assert.match(setupFunctionSource, /static_gtag_script_tags/);
+  assert.match(setupFunctionSource, /gtag_loader_literal_occurrences/);
+  assert.match(setupFunctionSource, /failed_stage/);
 });
 
 test("Analytics settings UI runs repair and verification with explicit progress and retry", () => {
   assert.match(adminSettingsApiSource, /GA4_REPAIR_STAGES/);
   assert.match(adminSettingsApiSource, /setupGA4Configuration/);
-  assert.match(adminSettingsApiSource, /verifyGA4Configuration/);
+  assert.match(adminSettingsApiSource, /action:\s*"verify"/);
   assert.match(adminSettingsPanelSource, /Repair and verify GA4/);
   assert.match(adminSettingsPanelSource, /ga4Stage/);
   assert.match(adminSettingsPanelSource, /failed_checks/);

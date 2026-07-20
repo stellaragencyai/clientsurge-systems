@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,follow">
+    <title>Complete your ClientSurge signup | ClientSurge Systems</title>
+    <style>
+      :root { color-scheme: light; font-family: Montserrat, Inter, system-ui, sans-serif; }
+      body { margin: 0; background: #f8fbff; color: #0f172a; }
+      .shell { width: min(920px, calc(100% - 32px)); margin: 0 auto; padding: 28px 0 44px; }
+      header, footer { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      a { color: #006da8; font-weight: 800; }
+      h1 { margin: 24px 0 8px; font-size: clamp(2rem, 6vw, 3.25rem); line-height: 1; letter-spacing: 0; }
+      .lead { color: #475569; font-size: 1.05rem; line-height: 1.6; }
+      .plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px; margin: 28px 0; }
+      .plan, form { border: 1px solid #d9e7f2; background: #fff; border-radius: 8px; box-shadow: 0 16px 44px rgba(15, 23, 42, .08); }
+      .plan { padding: 18px; }
+      .plan strong { display: block; font-size: 1.05rem; margin-bottom: 6px; }
+      form { padding: 22px; }
+      h2 { margin: 0 0 16px; font-size: 1.2rem; }
+      label { display: block; margin: 12px 0 6px; font-size: .88rem; font-weight: 800; color: #334155; }
+      input, select { box-sizing: border-box; width: 100%; min-height: 44px; border: 1px solid #cbd5e1; border-radius: 8px; padding: 10px 12px; font: inherit; }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+      .full { grid-column: 1 / -1; }
+      .consent { display: flex; align-items: flex-start; gap: 10px; margin: 16px 0; color: #475569; font-size: .92rem; line-height: 1.5; }
+      .consent input { width: 18px; min-height: 18px; margin-top: 2px; }
+      button { width: 100%; min-height: 52px; border: 0; border-radius: 8px; background: linear-gradient(135deg, #003b8f, #0088cc 60%, #00aeef); color: #fff; font: inherit; font-weight: 900; cursor: pointer; }
+      .status { min-height: 22px; margin-top: 12px; color: #7f1d1d; font-weight: 700; }
+      @media (max-width: 760px) { header, footer, .plans, .grid { display: block; } .plan { margin-bottom: 12px; } }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header>
+        <a href="/">ClientSurge Systems</a>
+        <a href="/pricing">Compare packages</a>
+      </header>
+
+      <h1>Complete your ClientSurge signup</h1>
+      <p class="lead">Choose Starter System, Growth System, or Pro System, then enter Your Information to continue through the secure checkout flow.</p>
+
+      <section class="plans" aria-label="ClientSurge packages">
+        <div class="plan"><strong>Starter System</strong><span>$797 setup + $497/month</span></div>
+        <div class="plan"><strong>Growth System</strong><span>$1,297 setup + $997/month</span></div>
+        <div class="plan"><strong>Pro System</strong><span>$2,497 setup + $1,997/month</span></div>
+      </section>
+
+      <form id="checkout-form">
+        <h2>Your Information</h2>
+        <div class="grid">
+          <div class="full">
+            <label for="package">Selected package</label>
+            <select id="package" name="package_key">
+              <option value="starter_system">Starter System</option>
+              <option value="growth_system" selected>Growth System</option>
+              <option value="pro_system">Pro System</option>
+            </select>
+          </div>
+          <div>
+            <label for="name">Full name</label>
+            <input id="name" name="customer_name" autocomplete="name" required>
+          </div>
+          <div>
+            <label for="business">Business name</label>
+            <input id="business" name="business_name" autocomplete="organization" required>
+          </div>
+          <div>
+            <label for="email">Email</label>
+            <input id="email" name="customer_email" type="email" autocomplete="email" required>
+          </div>
+          <div>
+            <label for="phone">Phone</label>
+            <input id="phone" name="customer_phone" type="tel" autocomplete="tel" required>
+          </div>
+          <div class="full">
+            <label for="industry">Industry</label>
+            <input id="industry" name="industry" required>
+          </div>
+        </div>
+        <label class="consent">
+          <input id="consent" type="checkbox" required>
+          <span>I agree that ClientSurge Systems may contact me by email, phone, or SMS about this purchase and setup.</span>
+        </label>
+        <button type="submit">Continue to Secure Checkout</button>
+        <p id="status" class="status" role="status"></p>
+      </form>
+
+      <footer>
+        <p>Secure checkout is created by the ClientSurge backend.</p>
+        <a href="/contact">Need help?</a>
+      </footer>
+    </main>
+    <script>
+      (function () {
+        var appId = "69dc4a79656fdba136d413d3";
+        var endpoint = "/api/apps/" + appId + "/functions/createCheckoutSession";
+        var params = new URLSearchParams(location.search);
+        var requestedPackage = params.get("package") || params.get("plan");
+        var packageSelect = document.getElementById("package");
+        var allowed = { starter: "starter_system", starter_system: "starter_system", growth: "growth_system", growth_system: "growth_system", pro: "pro_system", pro_system: "pro_system" };
+        if (requestedPackage && allowed[requestedPackage]) packageSelect.value = allowed[requestedPackage];
+
+        document.getElementById("checkout-form").addEventListener("submit", async function (event) {
+          event.preventDefault();
+          var status = document.getElementById("status");
+          status.textContent = "Preparing secure checkout...";
+          var data = Object.fromEntries(new FormData(event.currentTarget).entries());
+          data.success_url = location.origin + "/order-success?session_id={CHECKOUT_SESSION_ID}";
+          data.cancel_url = location.origin + "/product-signup?package=" + encodeURIComponent(data.package_key);
+          data.source = "product_signup_static_fallback";
+          data.consent_given = true;
+          data.consent_source = "product_signup_checkout_form";
+          data.consent_text_version = "checkout_contact_consent_v1";
+          data.requested_channels = ["email", "sms", "call"];
+          try {
+            var response = await fetch(endpoint, {
+              method: "POST",
+              headers: { Accept: "application/json", "Content-Type": "application/json" },
+              credentials: "same-origin",
+              body: JSON.stringify(data)
+            });
+            var payload = await response.json().catch(function () { return {}; });
+            var checkoutUrl = payload.url || (payload.data && payload.data.url);
+            if (!response.ok || !checkoutUrl) throw new Error(payload.error || "Checkout could not be started.");
+            location.assign(checkoutUrl);
+          } catch (error) {
+            status.textContent = (error && error.message) || "Checkout could not be started. Please contact support.";
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>

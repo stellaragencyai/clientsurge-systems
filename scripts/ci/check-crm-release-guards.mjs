@@ -12,6 +12,8 @@ const ALLOWED_DELETE_PATHS = new Set([
   'src/components/admin/WebsiteLeadsDashboard.jsx',
   'base44/functions/backfillLeadQualityGuards/main.ts',
   'base44/functions/bulkLeadAction/main.ts',
+  'base44/functions/purgeFakeWebsiteLeads/entry.ts',
+  'base44/functions/quarantineFakeLeads/entry.ts',
 ]);
 
 const APPROVED_OUTBOUND_GUARD_FILES = new Set([

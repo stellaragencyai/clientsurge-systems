@@ -107,7 +107,10 @@ function buildGa4FunctionError(data, fallback) {
 export async function runGa4FinalVerification({ onStage } = {}) {
   onStage?.("validating_secret_availability");
   onStage?.("validating_with_google");
-  const response = await base44.functions.invoke("verifyGA4Configuration", {});
+  const response = await base44.functions.invoke("setupGA4Configuration", {
+    action: "verify",
+    measurement_id: GA4_MEASUREMENT_ID,
+  });
   const data = unwrapFunctionPayload(response);
   if (data?.success === false || data?.verified === false || data?.error) {
     throw buildGa4FunctionError(data, "GA4 final verification failed");

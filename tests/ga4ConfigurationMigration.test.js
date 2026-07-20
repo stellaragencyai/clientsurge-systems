@@ -7,11 +7,11 @@ const schemaSource = readFileSync(
   "utf8",
 );
 const setupSource = readFileSync(
-  new URL("../base44/functions/setupGA4Configuration/entry.ts", import.meta.url),
+  new URL("../base44/functions/setupGA4Configuration/main.ts", import.meta.url),
   "utf8",
 );
 const helperSource = readFileSync(
-  new URL("../base44/functions/_shared/ga4Configuration.ts", import.meta.url),
+  new URL("../base44/functions/setupGA4Configuration/ga4Configuration.ts", import.meta.url),
   "utf8",
 );
 
