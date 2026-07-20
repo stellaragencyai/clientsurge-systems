@@ -1,11 +1,28 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { lazy, Suspense, useState } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { ArrowLeft, CalendarCheck } from 'lucide-react';
 import DemoBookingModal from '@/components/forms/DemoBookingModal';
+import { useAuth } from '@/lib/AuthContext';
+
+const BrokenFlows = lazy(() => import('@/pages/admin/BrokenFlows'));
+const PublishDrift = lazy(() => import('@/pages/admin/PublishDrift'));
+
+function AdminRouteFallback({ Component }) {
+  const { user, isLoadingAuth } = useAuth();
+  if (isLoadingAuth) {
+    return <div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>;
+  }
+  if (user?.role !== 'admin' && user?.role !== 'super_admin') return null;
+  return <Suspense fallback={<div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>}><Component /></Suspense>;
+}
 
 export default function PageNotFound() {
   const navigate = useNavigate();
+  const location = useLocation();
   const [showModal, setShowModal] = useState(false);
+
+  if (location.pathname === '/admin/broken-flows') return <AdminRouteFallback Component={BrokenFlows} />;
+  if (location.pathname === '/admin/publish-drift') return <AdminRouteFallback Component={PublishDrift} />;
 
   return (
     <>
