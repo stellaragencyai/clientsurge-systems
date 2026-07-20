@@ -34,19 +34,12 @@ function valuesArray(values: unknown) {
   return Array.isArray(values) ? values.map((value) => String(value || "").trim()).filter(Boolean) : [];
 }
 
-function uniqueAllowed(values: unknown, allowed: readonly string[], fallback: readonly string[]) {
-  if (!Array.isArray(values)) return [...fallback];
-  const allowedSet = new Set(allowed);
-  const normalized = valuesArray(values).filter((value) => allowedSet.has(value));
-  return [...new Set(normalized)];
-}
-
 export function isGa4Admin(user: Record<string, unknown> | null | undefined) {
   return user?.role === "admin" || user?.role === "super_admin";
 }
 
 export function containsLegacySecret(record: Ga4Record | null | undefined) {
-  return typeof record?.api_secret === "string" && record.api_secret.trim().length > 0;
+  return Boolean(record && Object.prototype.hasOwnProperty.call(record, "api_secret"));
 }
 
 export function missingValues(values: unknown, requiredValues: readonly string[]) {
@@ -122,8 +115,8 @@ export function canonicalGa4Payload({
   return {
     measurement_id: measurementId,
     enabled: body.enabled !== false,
-    tracked_events: uniqueAllowed(body.tracked_events, GA4_TRACKED_EVENTS, GA4_TRACKED_EVENTS),
-    conversion_events: uniqueAllowed(body.conversion_events, GA4_KEY_EVENTS, GA4_KEY_EVENTS),
+    tracked_events: [...GA4_TRACKED_EVENTS],
+    conversion_events: [...GA4_KEY_EVENTS],
     enhanced_measurement_enabled: body.enhanced_measurement_enabled !== false,
     server_side_tracking_enabled: false,
     setup_status: "configured",
@@ -170,9 +163,8 @@ export function summarizeGa4Records(records: Ga4Record[] = []) {
   };
 }
 
-async function queryGa4Records(base44: any, measurementId: string) {
-  return await base44.asServiceRole.entities.GA4Configuration.filter(
-    { measurement_id: measurementId },
+export async function queryAllGa4Records(base44: any) {
+  return await base44.asServiceRole.entities.GA4Configuration.list(
     "-created_date",
     100,
   ).catch(() => []);
@@ -205,22 +197,23 @@ export async function repairGa4Configuration(base44: any, {
   measurementId?: string;
   notes?: string;
 } = {}) {
-  const existing = await queryGa4Records(base44, measurementId);
+  const existing = await queryAllGa4Records(base44);
   const payload = canonicalGa4Payload({ body, measurementId, notes });
   const legacySecretDetected = existing.some(containsLegacySecret);
   const duplicateRecordsDetected = existing.length > 1;
+  const reusableCanonical = existing.find(
+    (record) => record?.id && record.measurement_id === measurementId && !containsLegacySecret(record),
+  );
 
   let config: Ga4Record | null = null;
   let deletionResults: Array<{ id: string; deleted: boolean; error?: string }> = [];
 
-  if (legacySecretDetected) {
-    config = await base44.asServiceRole.entities.GA4Configuration.create(payload);
-    deletionResults = await deleteRecords(base44, existing);
-  } else if (existing[0]?.id) {
-    config = await base44.asServiceRole.entities.GA4Configuration.update(existing[0].id, payload);
-    deletionResults = await deleteRecords(base44, existing.slice(1));
+  if (reusableCanonical) {
+    config = await base44.asServiceRole.entities.GA4Configuration.update(reusableCanonical.id, payload);
+    deletionResults = await deleteRecords(base44, existing.filter((record) => record.id !== reusableCanonical.id));
   } else {
     config = await base44.asServiceRole.entities.GA4Configuration.create(payload);
+    deletionResults = await deleteRecords(base44, existing);
   }
 
   const failedDeletes = deletionResults.filter((result) => !result.deleted);
@@ -232,7 +225,7 @@ export async function repairGa4Configuration(base44: any, {
     throw error;
   }
 
-  const verifiedRecords = await queryGa4Records(base44, measurementId);
+  const verifiedRecords = await queryAllGa4Records(base44);
   const summary = summarizeGa4Records(verifiedRecords);
 
   if (summary.record_count !== 1) {

@@ -23,7 +23,25 @@
     "event_type": {
       "type": "string",
       "title": "Event Type",
-      "enum": ["page_view", "scroll_depth", "cta_click", "pricing_view", "checkout_click", "form_submit", "demo_booking_click"],
+      "enum": [
+        "page_view",
+        "scroll",
+        "scroll_depth",
+        "cta_click",
+        "pricing_view",
+        "link_click",
+        "form_submit_attempt",
+        "form_submit",
+        "generate_lead",
+        "contact_form_submit",
+        "audit_request_started",
+        "audit_request_submitted",
+        "begin_checkout",
+        "purchase",
+        "purchase_client_confirmation",
+        "demo_booked",
+        "onboarding_complete"
+      ],
       "description": "Type of conversion event"
     },
     "event_label": { "type": "string", "title": "Event Label" },

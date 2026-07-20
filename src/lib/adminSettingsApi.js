@@ -107,10 +107,10 @@ function buildGa4FunctionError(data, fallback) {
 export async function runGa4FinalVerification({ onStage } = {}) {
   onStage?.("validating_secret_availability");
   onStage?.("validating_with_google");
-  const response = await base44.functions.invoke("setupGA4Configuration", {
-    action: "verify",
+  const response = await base44.functions.invoke("verifyGA4Configuration", {
     measurement_id: GA4_MEASUREMENT_ID,
   });
+  onStage?.("finalizing");
   const data = unwrapFunctionPayload(response);
   if (data?.success === false || data?.verified === false || data?.error) {
     throw buildGa4FunctionError(data, "GA4 final verification failed");
@@ -132,11 +132,7 @@ export async function fetchGa4ConfigurationStatus() {
   }
 
   try {
-    const records = await base44.entities.GA4Configuration.filter(
-      { measurement_id: GA4_MEASUREMENT_ID },
-      "-created_date",
-      10,
-    );
+    const records = await base44.entities.GA4Configuration.list("-created_date", 10);
     const config = records?.[0] || null;
     const hasLegacySecret = Boolean(config && typeof config.api_secret === "string" && config.api_secret.trim());
     const keyEvents = new Set(config?.conversion_events || []);
@@ -216,10 +212,7 @@ export async function ensureGa4Configuration({ onStage } = {}) {
     throw new Error(getAdminSettingsError(primaryError, "GA4 repair did not complete"));
   }
 
-  onStage?.("sending_verification_event");
-  onStage?.("checking_production_site");
   const verification = await runGa4FinalVerification({ onStage });
-  onStage?.("finalizing");
   return { repair: repairResult, verification };
 }
 

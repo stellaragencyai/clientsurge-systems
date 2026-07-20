@@ -11,7 +11,7 @@ const setupSource = readFileSync(
   "utf8",
 );
 const helperSource = readFileSync(
-  new URL("../base44/functions/setupGA4Configuration/ga4Configuration.ts", import.meta.url),
+  new URL("../base44/functions/_shared/ga4Configuration.ts", import.meta.url),
   "utf8",
 );
 
@@ -24,6 +24,7 @@ test("setup rejects secrets and destroys legacy secret-bearing records", () => {
   assert.match(setupSource, /GA4_SECRET_MUST_USE_SECRET_STORE/);
   assert.match(helperSource, /legacySecretDetected = existing\.some\(containsLegacySecret\)/);
   assert.match(helperSource, /duplicateRecordsDetected = existing\.length > 1/);
+  assert.match(helperSource, /queryAllGa4Records/);
   assert.match(helperSource, /GA4Configuration\.create\(payload\)/);
   assert.match(helperSource, /GA4Configuration\.delete\(record\.id\)/);
   assert.match(helperSource, /GA4_RECORD_DELETE_INCOMPLETE/);

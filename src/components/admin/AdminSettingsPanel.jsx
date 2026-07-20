@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   BarChart3,
@@ -135,6 +135,7 @@ export default function AdminSettingsPanel() {
   const [ga4Stage, setGa4Stage] = useState("");
   const [ga4Result, setGa4Result] = useState(null);
   const [ga4Error, setGa4Error] = useState(null);
+  const ga4RunRef = useRef(false);
 
   const ga4 = settings?._ga4 || {};
   const ga4Verification = ga4Result || ga4.verification || {};
@@ -197,6 +198,8 @@ export default function AdminSettingsPanel() {
   }
 
   async function repairGa4() {
+    if (ga4RunRef.current) return;
+    ga4RunRef.current = true;
     setGa4Busy(true);
     setError("");
     setGa4Error(null);
@@ -221,6 +224,7 @@ export default function AdminSettingsPanel() {
       setGa4Error(failure);
       setError(failure.message);
     } finally {
+      ga4RunRef.current = false;
       setGa4Busy(false);
     }
   }

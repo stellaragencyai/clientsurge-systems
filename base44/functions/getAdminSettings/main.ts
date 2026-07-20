@@ -2,17 +2,13 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { secureJson } from "../_shared/response.ts";
 import { loadAdminSettings } from "../_shared/adminSettings.js";
 import {
-  DEFAULT_GA4_MEASUREMENT_ID,
   isGa4Admin,
+  queryAllGa4Records,
   summarizeGa4Records,
 } from "../_shared/ga4Configuration.ts";
 
 async function readGa4Status(base44: any) {
-  const records = await base44.asServiceRole.entities.GA4Configuration.filter(
-    { measurement_id: DEFAULT_GA4_MEASUREMENT_ID },
-    "-created_date",
-    100,
-  ).catch(() => []);
+  const records = await queryAllGa4Records(base44);
 
   return summarizeGa4Records(records);
 }

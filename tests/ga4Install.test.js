@@ -135,7 +135,7 @@ test("GA4 consent follows stored preference and supports analytics without ads",
 });
 
 test("React app owns GA4 bootstrap and environment docs expose the launch variable", () => {
-  assert.match(appSource, /import \{ installGa4 \} from "@\/lib\/ga4";/);
+  assert.match(appSource, /import \{ GA4_EVENTS, installGa4, trackGa4Event \} from "@\/lib\/ga4";/);
   assert.match(appSource, /<AppInner \/>/);
   assert.match(appSource, /installGa4\(\)/);
   assert.doesNotMatch(indexHtml, /googletagmanager\.com\/gtag\/js\?id=/);

@@ -20,9 +20,9 @@ import { queryClientInstance } from "@/lib/query-client";
 import AutoCTAAnalytics from "./components/analytics/AutoCTAAnalytics";
 import ErrorBoundary from "./components/ErrorBoundary";
 import PageNotFound from "./lib/PageNotFound";
-import { installGa4 } from "@/lib/ga4";
+import { GA4_EVENTS, installGa4, trackGa4Event } from "@/lib/ga4";
 import { initializeAnalyticsObserver } from "@/lib/analyticsObserver";
-import { captureUtmParameters } from "@/lib/utmTracking";
+import { captureUtmParameters, getUtmForAnalytics } from "@/lib/utmTracking";
 import { initScrollDepthTracking, resetScrollTracking } from "@/lib/scrollDepth";
 import { initPerformanceMonitoring } from "@/lib/performanceMonitoring";
 import {
@@ -98,6 +98,7 @@ const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboar
 const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
+const PlatformIntegrationFoundation = lazy(() => import("./internal-pages/PlatformIntegrationFoundation"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -175,55 +176,34 @@ function AppInner() {
     initScrollDepthTracking();
     initPerformanceMonitoring();
 
-    const trackFormSubmits = () => {
-      document.querySelectorAll("form").forEach((form) => {
-        form.addEventListener("submit", () => {
-          if (!window.gtag) return;
-          const utmParams = new URLSearchParams(window.location.search);
-          const utmData = {};
-          ["utm_source", "utm_medium", "utm_campaign", "utm_content", "utm_term"].forEach((key) => {
-            const val = utmParams.get(key);
-            if (val) utmData[key] = val;
-          });
-          try {
-            const stored = JSON.parse(sessionStorage.getItem("cs_utm_session") || "{}");
-            Object.keys(stored).forEach((key) => {
-              if (!utmData[key]) utmData[key] = stored[key];
-            });
-          } catch {}
-          window.gtag("event", "form_submit", {
-            form_id: form.id || form.name,
-            page_path: window.location.pathname,
-            ...utmData,
-          });
-        });
+    const handleFormSubmitAttempt = (event) => {
+      const form = event.target instanceof HTMLFormElement ? event.target : null;
+      if (!form) return;
+      trackGa4Event(GA4_EVENTS.FORM_SUBMIT_ATTEMPT, {
+        form_id: form.id || form.name || "unknown_form",
+        page_path: window.location.pathname,
+        submission_status: "attempted",
+        ...getUtmForAnalytics(),
       });
     };
 
-    const trackLinks = () => {
-      document.querySelectorAll("a[href]").forEach((link) => {
-        if (link.href.includes("http") && !link.href.includes(window.location.hostname)) {
-          link.addEventListener("click", () => {
-            if (window.gtag) {
-              window.gtag("event", "link_click", {
-                link_url: link.href,
-                link_text: link.textContent,
-                link_type: "external",
-              });
-            }
-          });
-        }
+    const handleExternalLinkClick = (event) => {
+      const link = event.target instanceof Element ? event.target.closest("a[href]") : null;
+      if (!(link instanceof HTMLAnchorElement)) return;
+      if (!link.href.includes("http") || link.href.includes(window.location.hostname)) return;
+      trackGa4Event(GA4_EVENTS.LINK_CLICK, {
+        link_url: link.href,
+        link_text: link.textContent,
+        link_type: "external",
       });
     };
 
-    trackFormSubmits();
-    trackLinks();
-    const observer = new MutationObserver(() => {
-      trackFormSubmits();
-      trackLinks();
-    });
-    observer.observe(document.body, { childList: true, subtree: true });
-    return () => observer.disconnect();
+    document.addEventListener("submit", handleFormSubmitAttempt, true);
+    document.addEventListener("click", handleExternalLinkClick, true);
+    return () => {
+      document.removeEventListener("submit", handleFormSubmitAttempt, true);
+      document.removeEventListener("click", handleExternalLinkClick, true);
+    };
   }, []);
   return null;
 }
@@ -440,6 +420,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "deployment-control"), Component: lazy(() => import("./pages/admin/DeploymentControlCenter")) },
           { route: routePath("admin", "broken-flows"), Component: BrokenFlows },
           { route: routePath("admin", "publish-drift"), Component: PublishDrift },
+          { route: routePath("admin", "platform-integration"), Component: PlatformIntegrationFoundation },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route key={route} caseSensitive={caseSensitive} path={route} element={element || <Suspense fallback={<AdminLoadingSkeleton />}><Component /></Suspense>} />
         ))}

@@ -49,6 +49,21 @@ const getEnvironment = () => {
   return 'production';
 };
 
+const normalizeEventType = (eventType, metadata = {}) => {
+  const raw = String(eventType || '').trim();
+  const aliases = {
+    checkout_click: 'begin_checkout',
+    demo_booking: 'audit_request_started',
+    demo_booking_click: 'audit_request_started',
+    cta_click_auto: 'cta_click',
+  };
+  const normalized = aliases[raw] || raw;
+  if (normalized === 'form_submit' && metadata.submission_status !== 'success') {
+    return 'form_submit_attempt';
+  }
+  return normalized;
+};
+
 export const trackConversionEvent = async (
   pageKey,
   eventType,
@@ -56,6 +71,7 @@ export const trackConversionEvent = async (
   metadata = {}
 ) => {
   const eventId = newId();
+  const canonicalEventType = normalizeEventType(eventType, metadata);
   try {
     const base44 = await import('@/api/base44Client').then((m) => m.base44);
     if (!base44) return { success: false, error: 'base44_unavailable', event_id: eventId };
@@ -66,8 +82,8 @@ export const trackConversionEvent = async (
       page_key: pageKey,
       page_url: typeof window !== 'undefined' ? window.location.href : '',
       route: typeof window !== 'undefined' ? window.location.pathname : '',
-      event_type: eventType,
-      event_label: eventLabel || eventType,
+      event_type: canonicalEventType,
+      event_label: eventLabel || canonicalEventType,
       timestamp: new Date().toISOString(),
       environment: getEnvironment(),
       consent_state: metadata.consent_state || 'unknown',
@@ -87,7 +103,7 @@ export const trackConversionEvent = async (
     const result = await base44.functions.invoke('captureConversionEvent', payload);
 
     if (typeof window !== 'undefined' && typeof window.gtag !== 'undefined') {
-      window.gtag('event', eventType, {
+      window.gtag('event', canonicalEventType, {
         event_id: eventId,
         page_key: pageKey,
         event_label: eventLabel,
@@ -125,7 +141,7 @@ export const setupScrollTracking = (pageKey) => {
 
 export const trackCTAClick = (pageKey, label) => trackConversionEvent(pageKey, 'cta_click', label);
 export const trackPricingView = (pageKey = 'pricing') => trackConversionEvent(pageKey, 'pricing_view', 'Pricing Page Viewed');
-export const trackCheckoutClick = (pageKey, planName) => trackConversionEvent(pageKey, 'checkout_click', `Checkout - ${planName}`);
-export const trackDemoBooking = (pageKey) => trackConversionEvent(pageKey, 'demo_booking_click', 'Demo Booking Initiated');
+export const trackCheckoutClick = (pageKey, planName) => trackConversionEvent(pageKey, 'cta_click', `Checkout - ${planName}`, { cta_label: 'checkout', plan_name: planName });
+export const trackDemoBooking = (pageKey) => trackConversionEvent(pageKey, 'audit_request_started', 'Demo Booking Initiated');
 export const trackPageView = (pageKey) => trackConversionEvent(pageKey, 'page_view', `${pageKey} page viewed`);
-export const trackFormSubmit = (pageKey, formName) => trackConversionEvent(pageKey, 'form_submit', `Form Submitted - ${formName}`);
+export const trackFormSubmit = (pageKey, formName) => trackConversionEvent(pageKey, 'form_submit_attempt', `Form Submit Attempted - ${formName}`, { submission_status: 'attempted' });

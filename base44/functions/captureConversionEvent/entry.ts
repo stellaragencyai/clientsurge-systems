@@ -5,8 +5,17 @@ const ALLOWED_PAGE_KEYS = new Set([
   'personal_injury','plumbing','chiropractic','pricing'
 ]);
 const ALLOWED_EVENT_TYPES = new Set([
-  'page_view','scroll_depth','cta_click','pricing_view','checkout_click','form_submit','demo_booking_click'
+  'page_view','scroll','scroll_depth','cta_click','pricing_view','link_click','form_submit_attempt',
+  'form_submit','generate_lead','contact_form_submit','audit_request_started',
+  'audit_request_submitted','begin_checkout','purchase','purchase_client_confirmation',
+  'demo_booked','onboarding_complete'
 ]);
+const LEGACY_EVENT_ALIASES: Record<string, string> = {
+  checkout_click: 'begin_checkout',
+  demo_booking: 'audit_request_started',
+  demo_booking_click: 'audit_request_started',
+  cta_click_auto: 'cta_click',
+};
 
 function json(data: unknown, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -33,7 +42,12 @@ Deno.serve(async (req) => {
     const eventId = String(body.event_id || '').trim();
     const sessionId = String(body.session_id || '').trim();
     const pageKey = String(body.page_key || '').trim();
-    const eventType = String(body.event_type || '').trim();
+    const rawEventType = String(body.event_type || '').trim();
+    const metadata = body.metadata && typeof body.metadata === 'object' ? body.metadata : {};
+    let eventType = LEGACY_EVENT_ALIASES[rawEventType] || rawEventType;
+    if (eventType === 'form_submit' && metadata.submission_status !== 'success') {
+      eventType = 'form_submit_attempt';
+    }
     const timestamp = String(body.timestamp || '').trim();
 
     if (!eventId || !sessionId || !pageKey || !eventType || !timestamp) {
@@ -56,7 +70,6 @@ Deno.serve(async (req) => {
 
     const environment = resolveEnvironment(req, body.environment);
     const dashboardExcluded = environment !== 'production';
-    const metadata = body.metadata && typeof body.metadata === 'object' ? body.metadata : {};
     const releaseVersion = String(body.release_version || Deno.env.get('RELEASE_VERSION') || Deno.env.get('GIT_COMMIT_SHA') || 'unversioned');
 
     const created = await base44.asServiceRole.entities.ConversionTrackingEvent.create({

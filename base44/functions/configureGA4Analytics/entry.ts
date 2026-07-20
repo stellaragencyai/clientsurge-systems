@@ -1,60 +1,54 @@
 /**
- * Configure GA4 Analytics for ClientSurge
- * Sets measurement ID and enables event tracking for:
- * - Page views
- * - Form submissions
- * - Link clicks
- * - Conversion events
+ * Legacy compatibility helper.
+ *
+ * GA4 is configured through setupGA4Configuration and verified through
+ * verifyGA4Configuration. Do not generate a second browser tag snippet here.
  */
+
+const CANONICAL_EVENTS = [
+  "page_view",
+  "scroll",
+  "scroll_depth",
+  "cta_click",
+  "pricing_view",
+  "link_click",
+  "form_submit_attempt",
+  "form_submit",
+  "generate_lead",
+  "contact_form_submit",
+  "audit_request_started",
+  "audit_request_submitted",
+  "begin_checkout",
+  "purchase",
+  "purchase_client_confirmation",
+  "demo_booked",
+  "onboarding_complete",
+];
 
 Deno.serve(async (req) => {
   try {
-    const { measurement_id } = await req.json();
+    const { measurement_id } = await req.json().catch(() => ({}));
 
-    if (!measurement_id || !measurement_id.match(/^G-[A-Z0-9]{10,}$/i)) {
+    if (measurement_id && !String(measurement_id).match(/^G-[A-Z0-9]{4,}$/i)) {
       return new Response(
         JSON.stringify({ error: "Invalid GA4 measurement ID (format: G-XXXXXXXXXX)" }),
-        { status: 400, headers: { "Content-Type": "application/json" } }
+        { status: 400, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } },
       );
     }
 
-    // Store in environment or return configuration
-    const config = {
-      measurement_id,
-      status: "configured",
-      events_enabled: [
-        "page_view",
-        "form_submit",
-        "link_click",
-        "conversion",
-        "scroll_depth",
-        "sign_up",
-        "purchase",
-      ],
-      installation: {
-        script_url: `https://www.googletagmanager.com/gtag/js?id=${measurement_id}`,
-        init_script: `
-window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${measurement_id}', { send_page_view: true });
-        `,
-      },
-      tracking_setup: {
-        forms: "Add data-ga-form='form-name' to track form submissions",
-        links: "Add onclick=\"trackLinkClick(this.href, this.textContent)\" to track link clicks",
-        conversions: "Call window.gtag('event', 'conversion', { event_name: '...' })",
-      },
-    };
-
-    return new Response(JSON.stringify(config), {
-      status: 200,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({
+        status: "deprecated",
+        replacement_functions: ["setupGA4Configuration", "verifyGA4Configuration"],
+        browser_installation: "src/lib/ga4.js installs the single GA4 tag with Consent Mode v2 and send_page_view disabled.",
+        events_enabled: CANONICAL_EVENTS,
+      }),
+      { status: 200, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } },
+    );
   } catch (error) {
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { "Content-Type": "application/json" },
-    });
+    return new Response(
+      JSON.stringify({ error: error instanceof Error ? error.message : "GA4 compatibility helper failed" }),
+      { status: 500, headers: { "Content-Type": "application/json", "Cache-Control": "no-store" } },
+    );
   }
 });
