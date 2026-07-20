@@ -4,8 +4,9 @@
 
 - Branch: `feature/phase-b-business-intelligence-production-foundation`
 - Base: `feature/clientsurge-design-system-2-1-shell`
-- Base SHA: `99bc81dc1c2be7f5eb8d24ab8d54e7ef604b5cf7`
-- Base handling: intentionally not rebased during this remediation pass.
+- Construction base SHA: `99bc81dc1c2be7f5eb8d24ab8d54e7ef604b5cf7`
+- Review PR target SHA at creation: `0bcd0b4b5ec5945b4ef8436978a5ec247a72d781`
+- Base handling: intentionally not rebased during this remediation pass; the branch remains mergeable against the current Phase A shell target.
 - Architecture sources: #1357, #1359, #1360, #1361, #1363, #1366, #1367, #1369, #1371, #1372
 - Production integration: none
 - Route integration: review-only routes under `/review/phase-b/*`
