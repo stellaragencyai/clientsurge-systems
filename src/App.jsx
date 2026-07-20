@@ -98,7 +98,6 @@ const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboar
 const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
-const PlatformIntegrationFoundation = lazy(() => import("./internal-pages/PlatformIntegrationFoundation"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -420,7 +419,6 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "deployment-control"), Component: lazy(() => import("./pages/admin/DeploymentControlCenter")) },
           { route: routePath("admin", "broken-flows"), Component: BrokenFlows },
           { route: routePath("admin", "publish-drift"), Component: PublishDrift },
-          { route: routePath("admin", "platform-integration"), Component: PlatformIntegrationFoundation },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route key={route} caseSensitive={caseSensitive} path={route} element={element || <Suspense fallback={<AdminLoadingSkeleton />}><Component /></Suspense>} />
         ))}
