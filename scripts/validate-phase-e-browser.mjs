@@ -211,6 +211,28 @@ async function dispatchTab(cdp, sessionId) {
   );
 }
 
+async function warmPaintForFullPageScreenshot(cdp, sessionId) {
+  await evaluate(
+    cdp,
+    sessionId,
+    `new Promise((resolve) => {
+      const height = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+      const steps = [0, Math.floor(height * 0.33), Math.floor(height * 0.66), height, 0];
+      let index = 0;
+      const tick = () => {
+        window.scrollTo(0, steps[index]);
+        index += 1;
+        if (index >= steps.length) {
+          requestAnimationFrame(() => requestAnimationFrame(resolve));
+          return;
+        }
+        setTimeout(tick, 80);
+      };
+      tick();
+    })`,
+  );
+}
+
 async function validateRouteViewport(cdp, route, viewport) {
   const section = PHASE_E_SECTIONS[route.id];
   const label = `${route.id}-${viewport.width}`;
@@ -318,6 +340,8 @@ async function validateRouteViewport(cdp, route, viewport) {
     );
     assert.notEqual(focusState.tagName, "BODY", `${label} should move keyboard focus`);
     assert.ok(focusState.width > 0 && focusState.height > 0, `${label} focused element should be visible`);
+    await evaluate(cdp, sessionId, `document.activeElement?.blur?.(); window.scrollTo(0, 0); true`);
+    await delay(100);
 
     let zoom200 = "not-run";
     if (viewport.width === 1280) {
@@ -337,12 +361,31 @@ async function validateRouteViewport(cdp, route, viewport) {
         zoomState.scrollWidth <= zoomState.clientWidth + 1,
         `${label} has horizontal overflow at 200% zoom: ${JSON.stringify(zoomState)}`,
       );
+      await evaluate(cdp, sessionId, `document.documentElement.style.fontSize = ""; true`);
+      await delay(200);
       zoom200 = "pass";
     }
 
+    await warmPaintForFullPageScreenshot(cdp, sessionId);
+    const layoutMetrics = await cdp.send("Page.getLayoutMetrics", {}, sessionId);
+    const contentHeight = Math.max(
+      viewport.height,
+      Math.ceil(layoutMetrics.contentSize?.height || viewport.height),
+    );
+    await cdp.send(
+      "Emulation.setDeviceMetricsOverride",
+      {
+        width: viewport.width,
+        height: Math.min(contentHeight, 12000),
+        deviceScaleFactor: 1,
+        mobile: viewport.width < 768,
+      },
+      sessionId,
+    );
+    await delay(250);
     const screenshot = await cdp.send(
       "Page.captureScreenshot",
-      { format: "png", captureBeyondViewport: true },
+      { format: "png", fromSurface: true },
       sessionId,
     );
     const screenshotPath = join(screenshotDir, `${label}.png`);
