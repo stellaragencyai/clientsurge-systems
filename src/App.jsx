@@ -98,6 +98,10 @@ const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboar
 const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
+const PhaseCWorkforceReview = lazy(() => import("./pages/review/PhaseCWorkforceReview"));
+const PhaseCTimelineReview = lazy(() => import("./pages/review/PhaseCTimelineReview"));
+const PhaseCCommunicationsReview = lazy(() => import("./pages/review/PhaseCCommunicationsReview"));
+const PhaseCCustomerSuccessReview = lazy(() => import("./pages/review/PhaseCCustomerSuccessReview"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -135,6 +139,11 @@ const isPublicPath = (pathname) =>
     const normalizedPath = path.toLowerCase();
     return normalizedPathname === normalizedPath || normalizedPathname.startsWith(`${normalizedPath}/`);
   });
+
+const isReviewPath = (pathname) => {
+  const normalizedPathname = pathname.toLowerCase();
+  return normalizedPathname === "/review" || normalizedPathname.startsWith("/review/");
+};
 
 const PATH_EXPLICIT_MAP = {
   "/Dashboard": "/admin",
@@ -318,7 +327,7 @@ function AccessDeniedPage() {
 const AuthenticatedAppWithTenant = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
   const location = useLocation();
-  const publicRoute = isPublicPath(location.pathname);
+  const publicRoute = isPublicPath(location.pathname) || isReviewPath(location.pathname);
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
     return <div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>;
@@ -380,6 +389,11 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
       {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<LazyRoute Component={IndustryPageTemplate} />} />)}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => <Route key={route} path={route} element={<LazyRoute Component={Component} />} />)}
+      <Route path="/review/phase-c" element={<Navigate to="/review/phase-c/workforce" replace />} />
+      <Route path="/review/phase-c/workforce" element={<LazyRoute Component={PhaseCWorkforceReview} />} />
+      <Route path="/review/phase-c/timeline" element={<LazyRoute Component={PhaseCTimelineReview} />} />
+      <Route path="/review/phase-c/communications" element={<LazyRoute Component={PhaseCCommunicationsReview} />} />
+      <Route path="/review/phase-c/customer-success" element={<LazyRoute Component={PhaseCCustomerSuccessReview} />} />
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
       <Route path="/_generated/*" element={<Navigate to="/" replace />} />
       <Route path="/pages" element={<Navigate to="/" replace />} />
