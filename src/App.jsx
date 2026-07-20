@@ -104,6 +104,7 @@ const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketing
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
 const PhaseEReviewPage = lazy(() => import("./pages/review/PhaseEReviewPage"));
+const PlatformIntegrationFoundation = lazy(() => import("./pages/admin/PlatformIntegrationFoundation"));
 const EnterpriseSettingsPage = lazy(() => import("./pages/settings/EnterpriseSettingsPage"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
@@ -430,6 +431,7 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin-settings"), Component: AdminDashboard },
           { route: routePath("mission-control"), element: <Navigate to="/admin" replace /> },
           { route: routePath("admin"), Component: AdminDashboard },
+          { route: routePath("admin", "platform"), Component: PlatformIntegrationFoundation },
           { route: routePath("admin", "leads"), element: <Navigate to={`${routePath("admin")}?tab=leads`} replace /> },
           { route: routePath("admin", "leads", dynamicParam("leadId")), Component: AdminLeadDetail },
           { route: routePath("admin", "automations"), Component: AdminAutomation },

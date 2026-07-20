@@ -1,6 +1,7 @@
 /**
- * AdminGlobalSearch.jsx — #46 / #271
- * Searches canonical Leads, ClientProject, Order, and SupportMessage entities.
+ * AdminGlobalSearch.jsx - Phase F universal search surface.
+ * Searches customers, leads, conversations, AI workers, timeline events,
+ * settings, billing, and documents through one result contract.
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
@@ -9,85 +10,70 @@ import { Search, X } from "lucide-react";
 import {
   buildAdminGlobalSearchResults,
   getAdminGlobalSearchPlaceholder,
+  loadAdminGlobalSearchRecords,
 } from "@/lib/adminGlobalSearch";
 
 const ENTITY_COLORS = {
+  customer: "#00FFB3",
   lead: "#00D4FF",
-  client: "#00FFB3",
-  order: "#A78BFA",
-  support: "#F59E0B",
+  conversation: "#F59E0B",
+  ai_worker: "#A78BFA",
+  timeline_event: "#38BDF8",
+  setting: "#64748B",
+  billing: "#10B981",
+  document: "#FB7185",
+};
+
+const RESULT_STATE_COPY = {
+  loading: "Searching...",
+  "no-results": "No results found",
+  error: "Search is unavailable",
 };
 
 export default function AdminGlobalSearch({ onSelect, onNavigate }) {
   const navigate = useNavigate();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
+  const [status, setStatus] = useState("idle");
   const debounce = useRef(null);
 
   const handleSelect = (result) => {
     onSelect?.(result);
-
-    if (result.type === "lead") {
-      onNavigate?.("leads", result);
-      navigate(`/admin/leads/${result.id}`);
-      return;
-    }
-
-    if (result.type === "order") {
-      onNavigate?.("client-projects", result);
-      navigate(`/admin?tab=client-projects&order=${result.id}`);
-      return;
-    }
-
-    if (result.type === "support") {
-      onNavigate?.("inbox", result);
-      navigate(`/admin?tab=inbox&message=${result.id}`);
-      return;
-    }
-
-    onNavigate?.("client-projects", result);
-    navigate(`/admin?tab=client-projects&client=${result.id}`);
+    if (result.tab) onNavigate?.(result.tab, result);
+    navigate(result.destination || "/admin");
   };
 
   useEffect(() => {
     if (!query || query.length < 2) {
       setResults([]);
-      return;
+      setStatus("idle");
+      return undefined;
     }
 
     clearTimeout(debounce.current);
     debounce.current = setTimeout(async () => {
-      setLoading(true);
+      setStatus("loading");
       try {
-        const [leads, clients, legacyClients, orders, supportMessages] = await Promise.all([
-          base44.entities.Leads.list("-created_date", 200),
-          base44.entities.ClientProject.list("-created_date", 200).catch(() => []),
-          base44.entities.Client.list("-created_date", 200).catch(() => []),
-          base44.entities.Order.list("-created_date", 200),
-          base44.entities.SupportMessage.list("-created_date", 200),
-        ]);
-
-        setResults(
-          buildAdminGlobalSearchResults(
-            {
-              lead: leads,
-              client: [...(clients || []), ...(legacyClients || [])],
-              order: orders,
-              support: supportMessages,
-            },
-            query,
-          ).slice(0, 10),
+        const searchRecords = await loadAdminGlobalSearchRecords(base44);
+        const nextResults = buildAdminGlobalSearchResults(
+          searchRecords.recordsBySource,
+          query,
+          10,
+          { sourceStatuses: searchRecords.sourceStatuses },
         );
+
+        setResults(nextResults);
+        setStatus(nextResults.length > 0 ? "results" : "no-results");
       } catch {
         setResults([]);
-      } finally {
-        setLoading(false);
+        setStatus("error");
       }
     }, 280);
 
     return () => clearTimeout(debounce.current);
   }, [query]);
+
+  const showMenu = status === "loading" || status === "results" || status === "no-results" || status === "error";
 
   return (
     <div style={{ position: "relative", width: "100%", maxWidth: 400 }}>
@@ -97,13 +83,18 @@ export default function AdminGlobalSearch({ onSelect, onNavigate }) {
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder={getAdminGlobalSearchPlaceholder()}
+          aria-label="Universal admin search"
+          aria-expanded={showMenu}
           style={{ background: "none", border: "none", outline: "none", color: "#fff", fontSize: 13, flex: 1 }}
         />
         {query && (
           <button
+            type="button"
+            aria-label="Clear search"
             onClick={() => {
               setQuery("");
               setResults([]);
+              setStatus("idle");
             }}
             style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.3)", padding: 0 }}
           >
@@ -112,30 +103,47 @@ export default function AdminGlobalSearch({ onSelect, onNavigate }) {
         )}
       </div>
 
-      {(results.length > 0 || loading) && (
-        <div style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "#0D1B2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", zIndex: 100, overflow: "hidden" }}>
-          {loading && <div style={{ padding: "10px 14px", color: "rgba(255,255,255,0.35)", fontSize: 12 }}>Searching...</div>}
-          {results.map((result) => (
-            <div
-              key={`${result.type}-${result.id}`}
-              onClick={() => {
-                handleSelect(result);
-                setQuery("");
-                setResults([]);
-              }}
-              style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", borderBottom: "1px solid rgba(255,255,255,0.04)" }}
-              onMouseEnter={(event) => (event.currentTarget.style.background = "rgba(255,255,255,0.04)")}
-              onMouseLeave={(event) => (event.currentTarget.style.background = "none")}
-            >
-              <span style={{ background: `${ENTITY_COLORS[result.type]}15`, color: ENTITY_COLORS[result.type], border: `1px solid ${ENTITY_COLORS[result.type]}30`, borderRadius: 9999, padding: "1px 7px", fontSize: 9, fontWeight: 800, textTransform: "uppercase" }}>
-                {result.type}
-              </span>
-              <div>
-                <p style={{ color: "#fff", fontSize: 12, fontWeight: 500, margin: 0 }}>{result.label}</p>
-                <p style={{ color: "rgba(255,255,255,0.35)", fontSize: 10, margin: 0 }}>{result.sub}</p>
-              </div>
+      {showMenu && (
+        <div
+          role="listbox"
+          aria-label="Universal search results"
+          style={{ position: "absolute", top: "calc(100% + 6px)", left: 0, right: 0, background: "#0D1B2E", border: "1px solid rgba(255,255,255,0.1)", borderRadius: 10, boxShadow: "0 8px 32px rgba(0,0,0,0.5)", zIndex: 100, overflow: "hidden" }}
+        >
+          {status !== "results" && (
+            <div role="status" aria-live="polite" style={{ padding: "10px 14px", color: "rgba(255,255,255,0.55)", fontSize: 12 }}>
+              {RESULT_STATE_COPY[status]}
             </div>
-          ))}
+          )}
+          {results.map((result) => {
+            const color = ENTITY_COLORS[result.type] || "#94A3B8";
+            return (
+              <button
+                key={`${result.type}-${result.id || result.destination}`}
+                type="button"
+                role="option"
+                aria-selected="false"
+                onClick={() => {
+                  handleSelect(result);
+                  setQuery("");
+                  setResults([]);
+                  setStatus("idle");
+                }}
+                style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 14px", cursor: "pointer", border: "none", borderBottom: "1px solid rgba(255,255,255,0.04)", background: "transparent", textAlign: "left" }}
+                onMouseEnter={(event) => (event.currentTarget.style.background = "rgba(255,255,255,0.04)")}
+                onMouseLeave={(event) => (event.currentTarget.style.background = "transparent")}
+              >
+                <span style={{ background: `${color}15`, color, border: `1px solid ${color}30`, borderRadius: 9999, padding: "1px 7px", fontSize: 9, fontWeight: 800, textTransform: "uppercase", whiteSpace: "nowrap" }}>
+                  {result.type.replace("_", " ")}
+                </span>
+                <div style={{ minWidth: 0 }}>
+                  <p style={{ color: "#fff", fontSize: 12, fontWeight: 500, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{result.title}</p>
+                  <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 10, margin: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {result.owner} - {result.timestamp}
+                  </p>
+                </div>
+              </button>
+            );
+          })}
         </div>
       )}
     </div>
