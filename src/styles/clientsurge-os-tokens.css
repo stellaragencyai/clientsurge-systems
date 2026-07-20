@@ -26,6 +26,15 @@
   --cs-blue-100: #c9ecfb;
   --cs-blue-50: #eefaff;
 
+  /* Non-commerce interface blues. These are not purchase/checkout tokens. */
+  --cs-interface-accent: #2251d1;
+  --cs-interface-accent-hover: #1b3faf;
+  --cs-interface-accent-soft: #edf4ff;
+  --cs-interface-accent-border: #bfd4ff;
+  --cs-focus-blue: #2563eb;
+  --cs-info-blue: #175cd3;
+  --cs-info-blue-soft: #dbeafe;
+
   /* Pricing/storefront blue sampled from the approved current pricing design. */
   --cs-commerce-blue-start: #0094d8;
   --cs-commerce-blue-end: #005cb9;
@@ -66,7 +75,7 @@
   --cs-topbar-height: 64px;
   --cs-content-max: 1480px;
 
-  --cs-focus-ring: 0 0 0 3px rgb(0 148 216 / 0.30);
+  --cs-focus-ring: 0 0 0 3px rgb(37 99 235 / 0.28);
   --cs-transition-fast: 140ms ease;
   --cs-transition-base: 200ms ease;
 
@@ -81,10 +90,16 @@
   --cs-color-text: var(--cs-text-secondary);
   --cs-color-text-muted: var(--cs-text-muted);
   --cs-color-navy: var(--cs-navy-900);
-  --cs-color-action: var(--cs-commerce-blue-solid);
-  --cs-color-action-hover: var(--cs-commerce-blue-end);
-  --cs-color-action-soft: var(--cs-blue-50);
-  --cs-color-action-border: var(--cs-blue-100);
+  --cs-color-action: var(--cs-interface-accent);
+  --cs-color-action-hover: var(--cs-interface-accent-hover);
+  --cs-color-action-soft: var(--cs-interface-accent-soft);
+  --cs-color-action-border: var(--cs-interface-accent-border);
+  --cs-color-commerce: var(--cs-commerce-blue-solid);
+  --cs-color-commerce-hover: var(--cs-commerce-blue-end);
+  --cs-color-commerce-soft: var(--cs-blue-50);
+  --cs-color-commerce-border: var(--cs-blue-100);
+  --cs-color-info: var(--cs-info-blue);
+  --cs-color-info-soft: var(--cs-info-blue-soft);
   --cs-color-success: var(--cs-success-700);
   --cs-color-success-soft: var(--cs-success-100);
   --cs-color-success-border: #a7e7c8;
