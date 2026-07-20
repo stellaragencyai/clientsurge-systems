@@ -11,6 +11,11 @@ import {
 import { Toaster } from "@/components/ui/toaster";
 import ProtectedRoute from "@/components/ProtectedRoute";
 import UserNotRegisteredError from "@/components/UserNotRegisteredError";
+import {
+  CSAuthLoadingState,
+  CSButton,
+  CSUnauthorizedState,
+} from "@/components/design-system";
 const CookieConsent = lazy(() =>
   import("@/components/landing/CookieConsent").catch(() => ({ default: () => null }))
 );
@@ -294,24 +299,23 @@ function PublicCookieConsent() {
 function AuthRedirectFallback() {
   const { navigateToLogin } = useAuth();
   useEffect(() => { navigateToLogin(); }, [navigateToLogin]);
-  return <div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>;
+  return (
+    <CSAuthLoadingState
+      title="Redirecting to secure sign in"
+      description="Your session needs authentication before this workspace can open."
+    />
+  );
 }
 
 function AccessDeniedPage() {
   return (
-    <div className="min-h-screen flex items-center justify-center px-6 bg-background">
-      <div className="max-w-md text-center">
-        <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4" style={{ background: "linear-gradient(135deg, #003B8F, #00AEEF)" }}>
-          <span className="text-white text-xl font-bold">!</span>
-        </div>
-        <h1 className="mb-3 text-2xl font-semibold text-foreground">Access Restricted</h1>
-        <p className="text-muted-foreground text-sm mb-8 leading-relaxed">You do not have permission to view this page. If you believe this is an error, please contact support.</p>
-        <div className="flex flex-wrap gap-3 justify-center">
-          <a href="/" className="inline-flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold border border-border text-foreground hover:bg-muted transition-colors">Back to Home</a>
-          <a href="/contact" className="cs-btn-primary" style={{ fontSize: "0.8125rem", minHeight: "unset", minWidth: "unset" }}>Contact Support</a>
-        </div>
-      </div>
-    </div>
+    <CSUnauthorizedState
+      title="Access restricted"
+      description="You do not have permission to view this page. If you believe this is an error, contact support."
+      actionLabel="Back to home"
+      onReturn={() => { window.location.href = "/"; }}
+      secondaryAction={<CSButton variant="secondary" onClick={() => { window.location.href = "/contact"; }}>Contact support</CSButton>}
+    />
   );
 }
 
@@ -321,7 +325,7 @@ const AuthenticatedAppWithTenant = () => {
   const publicRoute = isPublicPath(location.pathname);
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
-    return <div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>;
+    return <CSAuthLoadingState />;
   }
   if (authError?.type === "user_not_registered" && !publicRoute) return <UserNotRegisteredError />;
 

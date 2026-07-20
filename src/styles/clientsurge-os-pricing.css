@@ -1,0 +1,246 @@
+.cs-pricing-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 28px;
+  align-items: stretch;
+}
+
+.cs-pricing-card {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  padding: 38px 34px 26px;
+  border: 1px solid #cfe0eb;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 18px 46px rgb(15 38 65 / 0.08);
+  color: #0b1d3a;
+}
+
+.cs-pricing-card--popular {
+  border-color: var(--cs-commerce-blue-start);
+  background: linear-gradient(180deg, #f0fbff 0%, #ffffff 58%);
+  box-shadow: 0 20px 54px rgb(0 121 201 / 0.17);
+}
+
+.cs-popular-badge {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  display: inline-flex;
+  min-height: 34px;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  padding: 7px 22px;
+  border-radius: 999px;
+  background: var(--cs-commerce-blue-gradient);
+  box-shadow: var(--cs-commerce-blue-glow);
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 800;
+  line-height: 1;
+  transform: translate(-50%, -50%);
+  white-space: nowrap;
+}
+
+.cs-pricing-card__header h2 {
+  margin: 0;
+  color: #0a1b38;
+  font-size: clamp(1.45rem, 2vw, 2rem);
+  font-weight: 800;
+  letter-spacing: -0.035em;
+  line-height: 1.1;
+}
+
+.cs-pricing-card__popular-copy,
+.cs-pricing-card__setup {
+  margin: 7px 0 0;
+  color: var(--cs-commerce-blue-solid);
+  font-size: 0.82rem;
+  font-weight: 800;
+}
+
+.cs-pricing-card__description,
+.cs-pricing-card__contract,
+.cs-pricing-card__section,
+.cs-pricing-card__operations,
+.cs-pricing-card__footer {
+  color: #52647d;
+}
+
+.cs-pricing-card__description {
+  min-height: 3.2em;
+  margin: 10px 0 0;
+  font-size: 0.92rem;
+  line-height: 1.55;
+}
+
+.cs-pricing-card__price-block {
+  padding: 30px 0 25px;
+  border-bottom: 1px solid #dbe8f0;
+}
+
+.cs-pricing-card__price-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.cs-pricing-card__price-row strong {
+  color: #071a38;
+  font-size: clamp(2.75rem, 4vw, 4rem);
+  font-weight: 800;
+  letter-spacing: -0.06em;
+  line-height: 0.95;
+}
+
+.cs-pricing-card__price-row span,
+.cs-pricing-card__contract {
+  font-size: 0.82rem;
+}
+
+.cs-pricing-card__contract {
+  margin: 9px 0 0;
+}
+
+.cs-pricing-card__section {
+  padding: 25px 0;
+  border-bottom: 1px solid #dbe8f0;
+  font-size: 0.94rem;
+  line-height: 1.55;
+}
+
+.cs-pricing-card__section > p {
+  margin: 0 0 18px;
+}
+
+.cs-pricing-card__emphasis {
+  color: #263b59;
+  font-weight: 750;
+}
+
+.cs-pricing-card__features,
+.cs-pricing-card__operations {
+  display: grid;
+  gap: 11px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-pricing-card__features li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+.cs-pricing-card__features svg {
+  flex: 0 0 auto;
+  margin-top: 2px;
+  color: #00ad62;
+  stroke-width: 2.5;
+}
+
+.cs-pricing-card__operations {
+  padding: 22px 0;
+  font-size: 0.78rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.cs-pricing-card__operations li::before {
+  content: "✦";
+  margin-right: 8px;
+  color: var(--cs-commerce-blue-start);
+}
+
+.cs-pricing-card__footer {
+  display: grid;
+  gap: 13px;
+  margin-top: auto;
+  padding-top: 20px;
+}
+
+.cs-pricing-card__footer p {
+  margin: 0;
+  text-align: center;
+  font-size: 0.75rem;
+}
+
+.cs-commerce-button {
+  display: inline-flex;
+  width: 100%;
+  min-height: 48px;
+  align-items: center;
+  justify-content: center;
+  gap: 13px;
+  padding: 12px 22px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: transform var(--cs-transition-fast), box-shadow var(--cs-transition-fast), background var(--cs-transition-fast);
+}
+
+.cs-commerce-button--primary {
+  background: var(--cs-commerce-blue-gradient);
+  box-shadow: var(--cs-commerce-blue-glow);
+  color: #ffffff;
+}
+
+.cs-commerce-button--primary:hover {
+  background: var(--cs-commerce-blue-gradient-hover);
+  box-shadow: 0 12px 28px rgb(0 121 201 / 0.31);
+  transform: translateY(-1px);
+}
+
+.cs-commerce-button--outline {
+  border-color: var(--cs-commerce-blue-start);
+  background: #ffffff;
+  color: var(--cs-commerce-blue-solid);
+}
+
+.cs-commerce-button--outline:hover {
+  background: var(--cs-blue-50);
+  transform: translateY(-1px);
+}
+
+.cs-commerce-button:focus-visible,
+.cs-popular-badge:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-commerce-button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+}
+
+@media (max-width: 980px) {
+  .cs-pricing-grid {
+    grid-template-columns: 1fr;
+    max-width: 680px;
+    margin-inline: auto;
+  }
+
+  .cs-pricing-card__description {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 540px) {
+  .cs-pricing-card {
+    padding: 34px 22px 22px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-commerce-button {
+    transition: none;
+  }
+}

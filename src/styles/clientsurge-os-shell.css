@@ -1,0 +1,196 @@
+.cs-app-shell {
+  min-height: 100svh;
+  display: grid;
+  grid-template-columns: var(--cs-sidebar-width) minmax(0, 1fr);
+  background: var(--cs-bg-app);
+  color: var(--cs-text-primary);
+}
+
+.cs-app-shell__desktop-sidebar {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+}
+
+.cs-app-shell__sidebar {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  background: var(--cs-navy-950);
+  color: var(--cs-text-inverse);
+  border-right: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.cs-app-shell__brand {
+  min-height: var(--cs-topbar-height);
+  display: flex;
+  align-items: center;
+  padding: 0 var(--cs-space-6);
+  border-bottom: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.cs-app-shell__nav {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: var(--cs-space-1);
+  padding: var(--cs-space-5) var(--cs-space-3);
+  overflow-y: auto;
+}
+
+.cs-app-shell__nav-item {
+  width: 100%;
+  min-height: 44px;
+  display: grid;
+  grid-template-columns: 20px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: 10px 12px;
+  color: rgb(255 255 255 / 0.72);
+  background: var(--cs-navy-950);
+  border: 1px solid transparent;
+  border-radius: var(--cs-radius-md);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: color var(--cs-transition-fast), background var(--cs-transition-fast), border-color var(--cs-transition-fast);
+}
+
+.cs-app-shell__nav-item:hover {
+  color: var(--cs-text-inverse);
+  background: var(--cs-navy-800);
+}
+
+.cs-app-shell__nav-item.is-active {
+  color: var(--cs-text-inverse);
+  background: var(--cs-navy-700);
+  border-color: rgb(255 255 255 / 0.24);
+}
+
+.cs-app-shell__badge {
+  min-width: 22px;
+  padding: 2px 7px;
+  border-radius: 999px;
+  color: var(--cs-text-inverse);
+  background: var(--cs-interface-accent);
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.cs-app-shell__sidebar-footer {
+  padding: var(--cs-space-4);
+  border-top: 1px solid rgb(255 255 255 / 0.08);
+}
+
+.cs-app-shell__workspace {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.cs-app-shell__topbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  min-height: var(--cs-topbar-height);
+  display: flex;
+  align-items: center;
+  gap: var(--cs-space-3);
+  padding: 0 var(--cs-space-6);
+  background: rgb(255 255 255 / 0.94);
+  border-bottom: 1px solid var(--cs-border);
+  backdrop-filter: blur(14px);
+}
+
+.cs-app-shell__topbar-content {
+  min-width: 0;
+  flex: 1;
+}
+
+.cs-app-shell__menu-button,
+.cs-app-shell__mobile-close {
+  width: 44px;
+  height: 44px;
+  display: inline-grid;
+  place-items: center;
+  color: var(--cs-text-primary);
+  background: var(--cs-bg-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: var(--cs-radius-md);
+  cursor: pointer;
+}
+
+.cs-app-shell__menu-button {
+  display: none;
+}
+
+.cs-app-shell__main {
+  width: 100%;
+  max-width: var(--cs-content-max);
+  margin: 0 auto;
+  padding: var(--cs-space-8);
+}
+
+.cs-app-shell__mobile-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: none;
+}
+
+.cs-app-shell__backdrop {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  background: rgb(7 21 37 / 0.62);
+  border: 0;
+}
+
+.cs-app-shell__mobile-panel {
+  position: relative;
+  width: min(88vw, 320px);
+  height: 100%;
+  box-shadow: 20px 0 50px rgb(7 21 37 / 0.28);
+}
+
+.cs-app-shell__mobile-close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  z-index: 2;
+  color: var(--cs-text-inverse);
+  background: rgb(255 255 255 / 0.08);
+  border-color: rgb(255 255 255 / 0.12);
+}
+
+@media (max-width: 1023px) {
+  .cs-app-shell {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .cs-app-shell__desktop-sidebar {
+    display: none;
+  }
+
+  .cs-app-shell__menu-button,
+  .cs-app-shell__mobile-layer {
+    display: grid;
+  }
+
+  .cs-app-shell__main {
+    padding: var(--cs-space-6);
+  }
+}
+
+@media (max-width: 640px) {
+  .cs-app-shell__topbar {
+    padding: 0 var(--cs-space-4);
+  }
+
+  .cs-app-shell__main {
+    padding: var(--cs-space-4);
+  }
+}

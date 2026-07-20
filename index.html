@@ -58,12 +58,21 @@
 
     <!-- GA4 is installed once by src/lib/ga4.js after analytics consent state is known. -->
     <!-- Global ClientSurge visit and click tracker. Version query prevents stale browser/CDN copies. -->
-    <script
-      src="https://clientsurge-telegram-tracker.nolanfstrommer.workers.dev/clientsurge-telegram-click-tracker.js?v=2026-07-16-visit-v3"
-      defer
-      crossorigin="anonymous"
-      data-clientsurge-telegram-tracker="true"
-    ></script>
+    <script>
+      window.__loadClientSurgeTelegramTracker = function () {
+        var host = window.location.hostname;
+        if (host !== "clientsurgesystems.com" && host !== "www.clientsurgesystems.com") return;
+
+        var script = document.createElement("script");
+        script.src = "https://clientsurge-telegram-tracker.nolanfstrommer.workers.dev/clientsurge-telegram-click-tracker.js?v=2026-07-16-visit-v3";
+        script.defer = true;
+        script.crossOrigin = "anonymous";
+        script.setAttribute("data-clientsurge-telegram-tracker", "true");
+        document.head.appendChild(script);
+      };
+      window.__loadClientSurgeTelegramTracker();
+      delete window.__loadClientSurgeTelegramTracker;
+    </script>
 
     <script type="application/ld+json" data-schema-id="static-homepage">
       {

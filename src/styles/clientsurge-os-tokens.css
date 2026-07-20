@@ -1,0 +1,152 @@
+:root {
+  color-scheme: light;
+
+  --cs-bg-app: #f5f7fb;
+  --cs-bg-surface: #ffffff;
+  --cs-bg-subtle: #f8fafc;
+  --cs-bg-muted: #eef2f7;
+
+  --cs-border: #dfe5ee;
+  --cs-border-strong: #c8d1df;
+
+  --cs-text-primary: #102033;
+  --cs-text-secondary: #475569;
+  --cs-text-muted: #718096;
+  --cs-text-inverse: #ffffff;
+
+  --cs-navy-950: #071525;
+  --cs-navy-900: #0a1c30;
+  --cs-navy-800: #102a46;
+  --cs-navy-700: #173a5f;
+
+  /* Canonical product blues. */
+  --cs-blue-700: #005cb9;
+  --cs-blue-600: #0079c9;
+  --cs-blue-500: #0094d8;
+  --cs-blue-100: #c9ecfb;
+  --cs-blue-50: #eefaff;
+
+  /* Non-commerce interface blues. These are not purchase/checkout tokens. */
+  --cs-interface-accent: #2251d1;
+  --cs-interface-accent-hover: #1b3faf;
+  --cs-interface-accent-soft: #edf4ff;
+  --cs-interface-accent-border: #bfd4ff;
+  --cs-focus-blue: #2563eb;
+  --cs-info-blue: #175cd3;
+  --cs-info-blue-soft: #dbeafe;
+
+  /* Pricing/storefront blue sampled from the approved current pricing design. */
+  --cs-commerce-blue-start: #0094d8;
+  --cs-commerce-blue-end: #005cb9;
+  --cs-commerce-blue-solid: #0079c9;
+  --cs-commerce-blue-gradient: linear-gradient(90deg, var(--cs-commerce-blue-start) 0%, var(--cs-commerce-blue-end) 100%);
+  --cs-commerce-blue-gradient-hover: linear-gradient(90deg, #0087ce 0%, #0053aa 100%);
+  --cs-commerce-blue-glow: 0 10px 24px rgb(0 121 201 / 0.24);
+
+  --cs-success-700: #087443;
+  --cs-success-100: #d9f7e8;
+  --cs-warning-700: #9a5b00;
+  --cs-warning-100: #fff0c2;
+  --cs-danger-700: #b42318;
+  --cs-danger-100: #fee4e2;
+  --cs-info-700: #175cd3;
+  --cs-info-100: #dbeafe;
+
+  --cs-radius-sm: 8px;
+  --cs-radius-md: 12px;
+  --cs-radius-lg: 16px;
+  --cs-radius-xl: 22px;
+
+  --cs-shadow-xs: 0 1px 2px rgb(16 32 51 / 0.05);
+  --cs-shadow-sm: 0 2px 8px rgb(16 32 51 / 0.08);
+  --cs-shadow-md: 0 12px 30px rgb(16 32 51 / 0.10);
+
+  --cs-space-1: 4px;
+  --cs-space-2: 8px;
+  --cs-space-3: 12px;
+  --cs-space-4: 16px;
+  --cs-space-5: 20px;
+  --cs-space-6: 24px;
+  --cs-space-8: 32px;
+  --cs-space-10: 40px;
+  --cs-space-12: 48px;
+
+  --cs-sidebar-width: 272px;
+  --cs-topbar-height: 64px;
+  --cs-content-max: 1480px;
+
+  --cs-focus-ring: 0 0 0 3px rgb(37 99 235 / 0.28);
+  --cs-transition-fast: 140ms ease;
+  --cs-transition-base: 200ms ease;
+
+  /* Semantic aliases: components consume intent, not raw palette values. */
+  --cs-color-app: var(--cs-bg-app);
+  --cs-color-surface: var(--cs-bg-surface);
+  --cs-color-surface-subtle: var(--cs-bg-subtle);
+  --cs-color-surface-muted: var(--cs-bg-muted);
+  --cs-color-border: var(--cs-border);
+  --cs-color-border-strong: var(--cs-border-strong);
+  --cs-color-text-strong: var(--cs-text-primary);
+  --cs-color-text: var(--cs-text-secondary);
+  --cs-color-text-muted: var(--cs-text-muted);
+  --cs-color-navy: var(--cs-navy-900);
+  --cs-color-action: var(--cs-interface-accent);
+  --cs-color-action-hover: var(--cs-interface-accent-hover);
+  --cs-color-action-soft: var(--cs-interface-accent-soft);
+  --cs-color-action-border: var(--cs-interface-accent-border);
+  --cs-color-commerce: var(--cs-commerce-blue-solid);
+  --cs-color-commerce-hover: var(--cs-commerce-blue-end);
+  --cs-color-commerce-soft: var(--cs-blue-50);
+  --cs-color-commerce-border: var(--cs-blue-100);
+  --cs-color-info: var(--cs-info-blue);
+  --cs-color-info-soft: var(--cs-info-blue-soft);
+  --cs-color-success: var(--cs-success-700);
+  --cs-color-success-soft: var(--cs-success-100);
+  --cs-color-success-border: #a7e7c8;
+  --cs-color-warning: var(--cs-warning-700);
+  --cs-color-warning-strong: #754400;
+  --cs-color-warning-soft: var(--cs-warning-100);
+  --cs-color-warning-border: #f3d27b;
+  --cs-color-danger: var(--cs-danger-700);
+  --cs-color-danger-soft: var(--cs-danger-100);
+  --cs-color-danger-border: #f5b7b1;
+}
+
+.cs-focusable:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-surface {
+  background: var(--cs-bg-surface);
+  border: 1px solid var(--cs-border);
+  border-radius: var(--cs-radius-lg);
+  box-shadow: var(--cs-shadow-xs);
+}
+
+.cs-page-title {
+  margin: 0;
+  color: var(--cs-text-primary);
+  font-size: clamp(1.5rem, 2vw, 2rem);
+  line-height: 1.2;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+.cs-page-description {
+  margin: var(--cs-space-2) 0 0;
+  max-width: 72ch;
+  color: var(--cs-text-secondary);
+  line-height: 1.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -1,14 +1,23 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import { Mail, UserPlus } from "lucide-react";
 import { base44 } from "@/api/base44Client";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { UserPlus, Mail, Lock, Loader2 } from "lucide-react";
-import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import AuthLayout from "@/components/AuthLayout";
 import GoogleIcon from "@/components/GoogleIcon";
+import { InputOTP, InputOTPGroup, InputOTPSlot } from "@/components/ui/input-otp";
 import { toast } from "@/components/ui/use-toast";
+import { CSAlert, CSButton, CSField } from "@/components/design-system";
+import "@/styles/clientsurge-os-registration.css";
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+function validatePassword(password) {
+  if (password.length < 8) return "Password must be at least 8 characters.";
+  if (!/[A-Z]/.test(password)) return "Password must include at least one uppercase letter.";
+  if (!/[a-z]/.test(password)) return "Password must include at least one lowercase letter.";
+  if (!/\d/.test(password)) return "Password must include at least one number.";
+  return "";
+}
 
 export default function Register() {
   const [email, setEmail] = useState("");
@@ -19,19 +28,34 @@ export default function Register() {
   const [showOtp, setShowOtp] = useState(false);
   const [otpCode, setOtpCode] = useState("");
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
     setError("");
-    if (password !== confirmPassword) {
-      setError("Passwords do not match");
+
+    const normalizedEmail = email.trim().toLowerCase();
+    if (!EMAIL_REGEX.test(normalizedEmail)) {
+      setError("Enter a valid email address.");
       return;
     }
+
+    const passwordError = validatePassword(password);
+    if (passwordError) {
+      setError(passwordError);
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
     setLoading(true);
     try {
-      await base44.auth.register({ email, password });
+      await base44.auth.register({ email: normalizedEmail, password });
+      setEmail(normalizedEmail);
       setShowOtp(true);
     } catch (err) {
-      setError(err.message || "Registration failed");
+      setError(err?.data?.message || err?.message || "Registration failed. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -42,12 +66,10 @@ export default function Register() {
     setLoading(true);
     try {
       const result = await base44.auth.verifyOtp({ email, otpCode });
-      if (result?.access_token) {
-        base44.auth.setToken(result.access_token);
-      }
+      if (result?.access_token) base44.auth.setToken(result.access_token);
       window.location.href = "/";
     } catch (err) {
-      setError(err.message || "Invalid verification code");
+      setError(err?.data?.message || err?.message || "The verification code is invalid or has expired.");
     } finally {
       setLoading(false);
     }
@@ -57,70 +79,39 @@ export default function Register() {
     setError("");
     try {
       await base44.auth.resendOtp(email);
-      toast({
-        title: "Code sent",
-        description: "Check your email for the new code.",
-      });
+      toast({ title: "Code sent", description: "Check your email for the new verification code." });
     } catch (err) {
-      setError(err.message || "Failed to resend code");
+      setError(err?.data?.message || err?.message || "We could not resend the code. Please try again.");
     }
   };
 
-  const handleGoogle = () => {
-    base44.auth.loginWithProvider("google", "/");
-  };
+  const handleGoogle = () => base44.auth.loginWithProvider("google", "/");
 
   if (showOtp) {
     return (
       <AuthLayout
         icon={Mail}
         title="Verify your email"
-        subtitle={`We sent a code to ${email}`}
+        subtitle={`Enter the six-digit code sent to ${email}.`}
+        brandTitle="One final security step before your system opens."
+        brandDescription="Email verification protects your ClientSurge identity and ensures activation, reporting, billing, and service access stay connected to the correct account."
+        assurance="Secure one-time verification for your ClientSurge account."
       >
-        {error && (
-          <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-            {error}
-          </div>
-        )}
-        <div className="flex justify-center mb-6">
-          <InputOTP
-            maxLength={6}
-            value={otpCode}
-            onChange={setOtpCode}
-            autoFocus
-            autoComplete="one-time-code"
-          >
+        <div className="cs-registration-otp">
+          {error ? <CSAlert tone="danger" title="Verification unsuccessful">{error}</CSAlert> : null}
+          <InputOTP maxLength={6} value={otpCode} onChange={setOtpCode} autoFocus autoComplete="one-time-code" aria-label="Six-digit verification code">
             <InputOTPGroup>
-              <InputOTPSlot index={0} />
-              <InputOTPSlot index={1} />
-              <InputOTPSlot index={2} />
-              <InputOTPSlot index={3} />
-              <InputOTPSlot index={4} />
-              <InputOTPSlot index={5} />
+              {Array.from({ length: 6 }, (_, index) => <InputOTPSlot index={index} key={index} />)}
             </InputOTPGroup>
           </InputOTP>
+          <CSButton className="cs-auth-submit" onClick={handleVerify} loading={loading} disabled={otpCode.length < 6}>
+            Verify and continue
+          </CSButton>
+          <p className="cs-registration-otp__resend">
+            Did not receive the code?{" "}
+            <button type="button" className="cs-registration-link-button" onClick={handleResend}>Resend code</button>
+          </p>
         </div>
-        <Button
-          className="w-full h-12 font-bold text-white border-none"
-          onClick={handleVerify}
-          disabled={loading || otpCode.length < 6}
-          style={{ background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)", boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4)" }}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Verifying...
-            </>
-          ) : (
-            "Verify"
-          )}
-        </Button>
-        <p className="text-center text-sm text-muted-foreground mt-4">
-          Didn't receive the code?{" "}
-          <button onClick={handleResend} className="text-primary font-medium hover:underline">
-            Resend
-          </button>
-        </p>
       </AuthLayout>
     );
   }
@@ -128,106 +119,62 @@ export default function Register() {
   return (
     <AuthLayout
       icon={UserPlus}
-      title="Create your account"
-      subtitle="Sign up to get started"
-      footer={
-        <>
-          Already have an account?{" "}
-          <Link to="/login" className="text-primary font-medium hover:underline">
-            Log in
-          </Link>
-        </>
-      }
+      title="Create your ClientSurge account"
+      subtitle="Create the secure identity that will own your activation, services, reporting, and billing."
+      brandTitle="Your AI-powered business system starts with one secure account."
+      brandDescription="Create your ClientSurge identity once, then use it through activation, installation, launch, reporting, billing, and ongoing growth."
+      assurance="Protected account creation and email verification."
+      footer={<><span>Already have an account? </span><Link to="/login">Sign in</Link></>}
     >
-      <Button
-        variant="outline"
-        className="w-full h-12 text-sm font-medium mb-6"
-        onClick={handleGoogle}
-      >
-        <GoogleIcon className="w-5 h-5 mr-2" />
-        Continue with Google
-      </Button>
+      <CSButton variant="secondary" className="cs-registration-provider" onClick={handleGoogle}>
+        <GoogleIcon aria-hidden="true" /> Continue with Google
+      </CSButton>
 
-      <div className="relative mb-6">
-        <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-border" />
-        </div>
-        <div className="relative flex justify-center text-xs uppercase">
-          <span className="bg-card px-3 text-muted-foreground">or</span>
-        </div>
-      </div>
+      <div className="cs-registration-divider"><span>or use email</span></div>
 
-      {error && (
-        <div className="mb-4 p-3 rounded-lg bg-destructive/10 text-destructive text-sm">
-          {error}
-        </div>
-      )}
+      {error ? <CSAlert tone="danger" title="Account could not be created">{error}</CSAlert> : null}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="email">Email</Label>
-          <div className="relative">
-            <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="email"
-              type="email"
-              autoComplete="email"
-              autoFocus
-              placeholder="you@example.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="password">Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="password"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <div className="space-y-2">
-          <Label htmlFor="confirm">Confirm Password</Label>
-          <div className="relative">
-            <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" aria-hidden="true" />
-            <Input
-              id="confirm"
-              type="password"
-              autoComplete="new-password"
-              placeholder="••••••••"
-              value={confirmPassword}
-              onChange={(e) => setConfirmPassword(e.target.value)}
-              className="pl-10 h-12"
-              required
-            />
-          </div>
-        </div>
-        <Button
-          type="submit"
-          className="w-full h-12 font-bold text-white border-none"
-          disabled={loading}
-          style={{ background: "linear-gradient(135deg, #0088CC 0%, #006BB0 40%, #003B8F 100%)", boxShadow: "0 0 0 1px rgba(0,174,239,0.5), 0 0 14px rgba(0,174,239,0.4)" }}
-        >
-          {loading ? (
-            <>
-              <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-              Creating account...
-            </>
-          ) : (
-            "Create account"
-          )}
-        </Button>
+      <form onSubmit={handleSubmit} className="cs-registration-form" noValidate>
+        <CSField id="register-email" label="Email address" required>
+          <input
+            className="cs-auth-input"
+            type="email"
+            autoComplete="email"
+            autoFocus
+            placeholder="you@business.com"
+            value={email}
+            onChange={(event) => { setEmail(event.target.value); setError(""); }}
+            required
+          />
+        </CSField>
+
+        <CSField id="register-password" label="Password" hint="Use at least 8 characters with uppercase, lowercase, and a number." required>
+          <input
+            className="cs-auth-input"
+            type="password"
+            autoComplete="new-password"
+            placeholder="Create a secure password"
+            value={password}
+            onChange={(event) => { setPassword(event.target.value); setError(""); }}
+            required
+          />
+        </CSField>
+
+        <CSField id="register-confirm-password" label="Confirm password" required>
+          <input
+            className="cs-auth-input"
+            type="password"
+            autoComplete="new-password"
+            placeholder="Re-enter your password"
+            value={confirmPassword}
+            onChange={(event) => { setConfirmPassword(event.target.value); setError(""); }}
+            required
+          />
+        </CSField>
+
+        <CSButton type="submit" className="cs-auth-submit" loading={loading}>
+          Create secure account
+        </CSButton>
       </form>
     </AuthLayout>
   );
