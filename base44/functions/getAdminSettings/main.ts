@@ -1,11 +1,11 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-import { secureJson } from "../shared/response.ts";
-import { loadAdminSettings } from "../shared/adminSettings.js";
+import { secureJson } from "./shared/response.ts";
+import { loadAdminSettings } from "./shared/adminSettings.js";
 import {
   isGa4Admin,
   queryAllGa4Records,
   summarizeGa4Records,
-} from "../shared/ga4Configuration.ts";
+} from "./shared/ga4Configuration.ts";
 
 async function readGa4Status(base44: any) {
   const records = await queryAllGa4Records(base44);

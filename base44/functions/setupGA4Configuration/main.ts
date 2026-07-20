@@ -4,7 +4,7 @@ import {
   GA4_MEASUREMENT_ID_PATTERN,
   isGa4Admin,
   repairGa4Configuration,
-} from "../shared/ga4Configuration.ts";
+} from "./shared/ga4Configuration.ts";
 
 function jsonResponse(body: unknown, status = 200) {
   return Response.json(body, {
