@@ -98,6 +98,12 @@ const SaaSAuditDashboard = lazy(() => import("./internal-pages/SaaSAuditDashboar
 const AIMarketingCommandCenter = lazy(() => import("./internal-pages/AIMarketingCommandCenter"));
 const BrokenFlows = lazy(() => import("./pages/admin/BrokenFlows"));
 const PublishDrift = lazy(() => import("./pages/admin/PublishDrift"));
+const PhaseCWorkforceReview = lazy(() => import("./pages/review/PhaseCWorkforceReview"));
+const PhaseCTimelineReview = lazy(() => import("./pages/review/PhaseCTimelineReview"));
+const PhaseCCommunicationsReview = lazy(() => import("./pages/review/PhaseCCommunicationsReview"));
+const PhaseCCustomerSuccessReview = lazy(() => import("./pages/review/PhaseCCustomerSuccessReview"));
+const PhaseEReviewPage = lazy(() => import("./pages/review/PhaseEReviewPage"));
+const EnterpriseSettingsPage = lazy(() => import("./pages/settings/EnterpriseSettingsPage"));
 
 const PUBLIC_PATHS = APP_SHELL_PUBLIC_PATHS;
 const routePath = (...segments) => `/${segments.join("/")}`;
@@ -135,6 +141,11 @@ const isPublicPath = (pathname) =>
     const normalizedPath = path.toLowerCase();
     return normalizedPathname === normalizedPath || normalizedPathname.startsWith(`${normalizedPath}/`);
   });
+
+const isReviewPath = (pathname) => {
+  const normalizedPathname = pathname.toLowerCase();
+  return normalizedPathname === "/review" || normalizedPathname.startsWith("/review/");
+};
 
 const PATH_EXPLICIT_MAP = {
   "/Dashboard": "/admin",
@@ -318,7 +329,7 @@ function AccessDeniedPage() {
 const AuthenticatedAppWithTenant = () => {
   const { isLoadingAuth, isLoadingPublicSettings, authError } = useAuth();
   const location = useLocation();
-  const publicRoute = isPublicPath(location.pathname);
+  const publicRoute = isPublicPath(location.pathname) || isReviewPath(location.pathname);
 
   if ((isLoadingPublicSettings || isLoadingAuth) && !publicRoute) {
     return <div className="fixed inset-0 flex items-center justify-center"><div className="w-8 h-8 animate-spin rounded-full border-4 border-slate-200 border-t-slate-800" /></div>;
@@ -380,6 +391,22 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
       {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<LazyRoute Component={IndustryPageTemplate} />} />)}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => <Route key={route} path={route} element={<LazyRoute Component={Component} />} />)}
+      <Route path="/review/phase-c" element={<Navigate to="/review/phase-c/workforce" replace />} />
+      <Route path="/review/phase-c/workforce" element={<LazyRoute Component={PhaseCWorkforceReview} />} />
+      <Route path="/review/phase-c/timeline" element={<LazyRoute Component={PhaseCTimelineReview} />} />
+      <Route path="/review/phase-c/communications" element={<LazyRoute Component={PhaseCCommunicationsReview} />} />
+      <Route path="/review/phase-c/customer-success" element={<LazyRoute Component={PhaseCCustomerSuccessReview} />} />
+      <Route path="/review/phase-e" element={<Navigate to="/review/phase-e/onboarding" replace />} />
+      <Route path="/review/phase-e/onboarding" element={<LazyRoute Component={PhaseEReviewPage} sectionId="onboarding" />} />
+      <Route path="/review/phase-e/home-entry" element={<LazyRoute Component={PhaseEReviewPage} sectionId="home-entry" />} />
+      <Route path="/review/phase-e/trial" element={<LazyRoute Component={PhaseEReviewPage} sectionId="trial" />} />
+      <Route path="/review/phase-e/subscription" element={<LazyRoute Component={PhaseEReviewPage} sectionId="subscription" />} />
+      <Route path="/review/phase-e/search" element={<LazyRoute Component={PhaseEReviewPage} sectionId="search" />} />
+      <Route path="/review/phase-e/command-menu" element={<LazyRoute Component={PhaseEReviewPage} sectionId="command-menu" />} />
+      <Route path="/review/phase-e/notifications" element={<LazyRoute Component={PhaseEReviewPage} sectionId="notifications" />} />
+      <Route path="/review/phase-e/help" element={<LazyRoute Component={PhaseEReviewPage} sectionId="help" />} />
+      <Route path="/review/phase-e/incidents" element={<LazyRoute Component={PhaseEReviewPage} sectionId="incidents" />} />
+      <Route path="/review/phase-e/launch-readiness" element={<LazyRoute Component={PhaseEReviewPage} sectionId="launch-readiness" />} />
       <Route path={routePath("services", dynamicParam("serviceSlug"))} element={<Navigate to="/store" replace />} />
       <Route path="/_generated/*" element={<Navigate to="/" replace />} />
       <Route path="/pages" element={<Navigate to="/" replace />} />
@@ -440,6 +467,17 @@ const AuthenticatedAppWithTenant = () => {
           { route: routePath("admin", "deployment-control"), Component: lazy(() => import("./pages/admin/DeploymentControlCenter")) },
           { route: routePath("admin", "broken-flows"), Component: BrokenFlows },
           { route: routePath("admin", "publish-drift"), Component: PublishDrift },
+          { route: routePath("settings"), element: <Navigate to={routePath("settings", "organization")} replace /> },
+          { route: routePath("settings", "organization"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="organization" /></Suspense> },
+          { route: routePath("settings", "team"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="team" /></Suspense> },
+          { route: routePath("settings", "roles"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="roles" /></Suspense> },
+          { route: routePath("settings", "integrations"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="integrations" /></Suspense> },
+          { route: routePath("settings", "billing"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="billing" /></Suspense> },
+          { route: routePath("settings", "usage"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="usage" /></Suspense> },
+          { route: routePath("settings", "notifications"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="notifications" /></Suspense> },
+          { route: routePath("settings", "security"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="security" /></Suspense> },
+          { route: routePath("settings", "audit"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="audit" /></Suspense> },
+          { route: routePath("settings", "support"), element: <Suspense fallback={<AdminLoadingSkeleton />}><EnterpriseSettingsPage sectionId="support" /></Suspense> },
         ].map(({ route, Component, element, caseSensitive }) => (
           <Route key={route} caseSensitive={caseSensitive} path={route} element={element || <Suspense fallback={<AdminLoadingSkeleton />}><Component /></Suspense>} />
         ))}
