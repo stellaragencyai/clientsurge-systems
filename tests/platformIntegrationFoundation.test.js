@@ -83,12 +83,18 @@ test("Phase F search contract spans the required source families", () => {
     "documents",
   ]);
   assert.deepEqual(PLATFORM_SEARCH_RESULT_FIELDS, [
+    "id",
     "title",
+    "description",
+    "source",
     "type",
+    "route",
+    "status",
     "owner",
     "timestamp",
     "permission",
     "destination",
+    "metadata",
   ]);
   assert.deepEqual(PLATFORM_SEARCH_STATES, [
     "Loading",
@@ -115,6 +121,10 @@ test("Phase F search contract spans the required source families", () => {
     for (const field of PLATFORM_SEARCH_RESULT_FIELDS) {
       assert.ok(result[field], `${field} should be present for ${result.type}`);
     }
+    assert.equal(result.status, "Results");
+    assert.equal(result.metadata.sourceId, result.source);
+    assert.equal(result.metadata.routeId, result.route);
+    assert.ok(result.metadata.permissionScope);
   }
 });
 

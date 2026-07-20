@@ -554,12 +554,18 @@ export const PLATFORM_SEARCH_STATES = [
 ];
 
 export const PLATFORM_SEARCH_RESULT_FIELDS = [
+  "id",
   "title",
+  "description",
+  "source",
   "type",
+  "route",
+  "status",
   "owner",
   "timestamp",
   "permission",
   "destination",
+  "metadata",
 ];
 
 export const PLATFORM_SEARCH_SOURCES = [
@@ -851,6 +857,24 @@ function buildDestination(template, record) {
   return String(template).replace(/:([a-zA-Z0-9_]+)/g, (_, key) => encodeURIComponent(record?.[key] || record?.id || ""));
 }
 
+function buildSearchDescription(record, source, title, owner) {
+  const description = pickFirst(record, ["description", "message", "subject", "status", "payment_status", "order_status", "scope"]);
+  return String(description || `${source.id} result for ${title} owned by ${owner}`);
+}
+
+function buildSearchMetadata(record, source, routeId, timestamp) {
+  return {
+    recordId: record.id,
+    sourceId: source.id,
+    sourceEntities: source.entities,
+    routeId,
+    tab: source.tab,
+    permissionScope: source.permission.scope,
+    truthState: timestamp === "static-contract" ? "Derived" : "Reported",
+    freshness: timestamp === "Unknown" ? "Unavailable" : "Current",
+  };
+}
+
 function normalizeDestination(destination) {
   const value = String(destination || "/admin");
   return value.endsWith("/") && value !== "/" ? value.slice(0, -1) : value;
@@ -895,15 +919,23 @@ export function buildPlatformSearchResults(entityRecords, query, maxResults = 12
         const owner = String(pickFirst(record, source.ownerFields) || "Unassigned");
         const timestamp = String(pickFirst(record, source.timestampFields) || "Unknown");
         const destination = buildDestination(source.destination, record);
+        const route = getPlatformRouteByDestination(destination)?.id || source.tab || source.id;
+        const description = buildSearchDescription(record, source, title, owner);
+        const metadata = buildSearchMetadata(record, source, route, timestamp);
 
         return {
           id: record.id,
           title,
+          description,
+          source: source.id,
           type: source.type,
+          route,
+          status: "Results",
           owner,
           timestamp,
           permission: source.permission,
           destination,
+          metadata,
           tab: source.tab,
           label: title,
           sub: `${source.id} - ${owner}`,
