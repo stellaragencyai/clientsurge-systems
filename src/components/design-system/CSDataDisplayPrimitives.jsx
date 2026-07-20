@@ -1,16 +1,42 @@
 import React from "react";
 import { ArrowDown, ArrowUp, Clock3, Minus, MoreHorizontal } from "lucide-react";
-import { CSStatusBadge } from "./CSProductPrimitives";
+import {
+  CSEmptyState,
+  CSLoadingState,
+  CSStatusBadge,
+  EMPTY_STATE_COPY,
+} from "./CSProductPrimitives";
 
 const cx = (...values) => values.filter(Boolean).join(" ");
 
+function normalizeHeadingLevel(level = 2) {
+  const numericLevel = Number(level);
+  if (!Number.isInteger(numericLevel)) return 2;
+  return Math.min(Math.max(numericLevel, 1), 6);
+}
+
+function Heading({ level = 2, className, children }) {
+  const Tag = `h${normalizeHeadingLevel(level)}`;
+  return <Tag className={className}>{children}</Tag>;
+}
+
 export function CSDataTable({ columns, rows, rowKey = "id", caption, emptyState, loading = false, className }) {
   if (loading) {
-    return <CSTableSkeleton columns={columns.length} rows={5} className={className} />;
+    return (
+      <CSLoadingState label={caption ? `Loading ${caption}` : "Loading table rows"} className={className}>
+        <CSTableSkeleton columns={columns.length} rows={5} />
+      </CSLoadingState>
+    );
   }
 
   if (!rows?.length) {
-    return emptyState || <div className="cs-data-empty">No records are available.</div>;
+    return emptyState || (
+      <CSEmptyState
+        reason="verified_zero"
+        title="No verified rows for this view"
+        description="The table query completed successfully and returned zero rows for the active scope."
+      />
+    );
   }
 
   return (
@@ -54,7 +80,15 @@ export function CSStatusRow({ icon, title, description, status, tone = "neutral"
 }
 
 export function CSActivityTimeline({ items, className, emptyState }) {
-  if (!items?.length) return emptyState || <div className="cs-data-empty">No recent activity.</div>;
+  if (!items?.length) {
+    return emptyState || (
+      <CSEmptyState
+        reason="verified_zero"
+        title="No verified activity in this period"
+        description="Activity may exist outside the selected period or source scope."
+      />
+    );
+  }
 
   return (
     <ol className={cx("cs-activity-timeline", className)}>
@@ -107,25 +141,44 @@ export function CSProgressTracker({ value, max = 100, label, helper, tone = "act
   );
 }
 
-export function CSChartFrame({ title, description, actions, legend, children, empty = false, emptyState, className }) {
+export function CSChartFrame({ title, description, actions, legend, children, empty = false, emptyState, className, headingLevel = 2 }) {
   return (
     <section className={cx("cs-chart-frame", className)}>
       <div className="cs-chart-frame__header">
-        <div><h2>{title}</h2>{description ? <p>{description}</p> : null}</div>
+        <div><Heading level={headingLevel}>{title}</Heading>{description ? <p>{description}</p> : null}</div>
         {actions ? <div>{actions}</div> : null}
       </div>
       {legend ? <div className="cs-chart-frame__legend">{legend}</div> : null}
-      <div className="cs-chart-frame__body">{empty ? (emptyState || <div className="cs-data-empty">No chart data is available.</div>) : children}</div>
+      <div className="cs-chart-frame__body">
+        {empty ? (emptyState || (
+          <CSEmptyState
+            reason="unknown"
+            title="Chart data not verified"
+            description="The chart cannot display until source coverage and query status are known."
+          />
+        )) : children}
+      </div>
     </section>
   );
 }
 
-export function CSDataState({ state = "empty", title, description, action, className }) {
+export function CSDataState({ state = "unknown", title, description, consequence, action, className, announce = false }) {
+  const copy = EMPTY_STATE_COPY[state] || EMPTY_STATE_COPY.unknown;
+  const finalTitle = title || copy.title;
+  const finalDescription = description || copy.description;
+  const finalConsequence = consequence || copy.consequence;
+  const liveProps = announce
+    ? {
+        role: state === "query_error" ? "alert" : "status",
+        "aria-live": state === "query_error" ? "assertive" : "polite",
+      }
+    : {};
   return (
-    <div className={cx("cs-data-state", `cs-data-state--${state}`, className)} role={state === "error" ? "alert" : "status"}>
+    <div className={cx("cs-data-state", `cs-data-state--${state}`, className)} data-state-reason={state} {...liveProps}>
       <MoreHorizontal aria-hidden="true" />
-      <strong>{title}</strong>
-      {description ? <p>{description}</p> : null}
+      <strong>{finalTitle}</strong>
+      {finalDescription ? <p>{finalDescription}</p> : null}
+      {finalConsequence ? <p className="cs-data-state__consequence">{finalConsequence}</p> : null}
       {action ? <div>{action}</div> : null}
     </div>
   );
