@@ -6,6 +6,7 @@ import {
   BIStateFrame,
   ConfidenceBadge,
   DeepLinkAction,
+  EvidenceSummary,
   FreshnessIndicator,
   LoadingState,
   PartialCoverageBanner,
@@ -46,12 +47,14 @@ function HealthDomainCard({ domain }) {
         <TruthLabel value={domain.verification} />
         <FreshnessIndicator state={domain.freshness} />
       </div>
+      <EvidenceSummary title={`${domain.name} evidence`} items={domain.evidence} />
       <SourceDisclosure
         source={domain.source}
         verification={domain.verification}
         freshness={domain.freshness}
         explanation="Domain classification is qualitative until an approved score contract exists."
       />
+      <p><strong>Recommendation:</strong> {domain.recommendation || domain.nextAction}</p>
       <DeepLinkAction label={domain.nextAction} href={`#${domain.id}`} />
     </article>
   );

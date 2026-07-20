@@ -73,6 +73,10 @@ export function TruthLabel({ value = "unknown", className }) {
   return <CSStatusBadge tone={item.tone} className={className}>{item.label}</CSStatusBadge>;
 }
 
+export function TruthIndicator(props) {
+  return <TruthLabel {...props} />;
+}
+
 export function FreshnessIndicator({ state = "unknown", timestamp, className }) {
   const item = lookupLabel(FRESHNESS_LABELS, state, "Freshness unknown");
   return (
@@ -87,6 +91,10 @@ export function FreshnessIndicator({ state = "unknown", timestamp, className }) 
 export function ConfidenceBadge({ value = "insufficient", className }) {
   const item = lookupLabel(CONFIDENCE_LABELS, value, "Insufficient confidence");
   return <CSStatusBadge tone={item.tone} className={className}>{item.label}</CSStatusBadge>;
+}
+
+export function ConfidenceIndicator(props) {
+  return <ConfidenceBadge {...props} />;
 }
 
 export function ActionPriority({ priority = "medium", className }) {
@@ -171,6 +179,10 @@ export function EvidenceSummary({ title = "Evidence", items = [], className }) {
   );
 }
 
+export function EvidenceCard(props) {
+  return <EvidenceSummary {...props} />;
+}
+
 export function PartialCoverageBanner({ coverage, missing = [], className }) {
   return (
     <CSAlert tone="warning" title="Partial data coverage" className={cx("cs-bi-banner", className)}>
@@ -178,6 +190,10 @@ export function PartialCoverageBanner({ coverage, missing = [], className }) {
       {missing.length ? <p>Missing: {missing.join(", ")}.</p> : null}
     </CSAlert>
   );
+}
+
+export function PartialCoverageState(props) {
+  return <PartialCoverageBanner {...props} />;
 }
 
 export function RecommendationCard({
@@ -213,6 +229,10 @@ export function RecommendationCard({
       <DeepLinkAction label={actionLabel} href={actionHref} />
     </article>
   );
+}
+
+export function ActionCard(props) {
+  return <RecommendationCard {...props} />;
 }
 
 export function LoadingState({ title = "Loading verified intelligence", description = "Connected sources are being checked before any values are shown.", className }) {
@@ -265,6 +285,10 @@ export function PermissionRestrictedState({ title = "Permission restricted", des
       action={action}
     />
   );
+}
+
+export function PermissionState(props) {
+  return <PermissionRestrictedState {...props} />;
 }
 
 export function ErrorRecoveryPanel({ title = "Unable to verify this view", description, recoveryLabel = "Retry verification", onRetry, className }) {

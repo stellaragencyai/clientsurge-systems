@@ -2,13 +2,13 @@
 
 ## Scope
 
-- Branch: `feature/phase-b-business-intelligence-foundations`
+- Branch: `feature/phase-b-business-intelligence-production-foundation`
 - Base: `feature/clientsurge-design-system-2-1-shell`
 - Base SHA: `99bc81dc1c2be7f5eb8d24ab8d54e7ef604b5cf7`
 - Base handling: intentionally not rebased during this remediation pass.
-- Architecture sources: #1357, #1359, #1360, #1361, #1363, #1366, #1367, #1369
+- Architecture sources: #1357, #1359, #1360, #1361, #1363, #1366, #1367, #1369, #1371, #1372
 - Production integration: none
-- Route integration: none
+- Route integration: review-only routes under `/review/phase-b/*`
 - Production data connection: none
 
 ## Implemented Foundations
@@ -16,13 +16,19 @@
 Shared primitives and contracts:
 
 - `TruthLabel`
+- `TruthIndicator`
 - `FreshnessIndicator`
 - `ConfidenceBadge`
+- `ConfidenceIndicator`
 - `EvidenceSummary`
+- `EvidenceCard`
 - `SourceDisclosure`
 - `RecommendationCard`
+- `ActionCard`
 - `ActionPriority`
 - `PartialCoverageBanner`
+- `PartialCoverageState`
+- `PermissionState`
 - `PermissionRestrictedState`
 - `UnavailableState`
 - `LoadingState`
@@ -33,11 +39,11 @@ Shared primitives and contracts:
 
 Phase B module shells:
 
-- Morning Brief
-- Business Health Engine
-- Opportunity Center
-- Revenue Intelligence
-- Website Intelligence
+- Morning Brief: Business Condition, Attention Required, Next Actions, Verified Outcomes, AI Summary, Recommendations
+- Business Health Engine: Website, Lead Capture, AI Workforce, Communication, Bookings, Reviews, Integrations, Revenue Visibility
+- Opportunity Center: title, evidence, confidence, impact, priority, owner, action, status, and lifecycle states
+- Revenue Intelligence: Collected, Invoiced, Pipeline, Attributed, Projected, Estimated, Outstanding, and Unknown revenue
+- Website Intelligence: technical signals plus business outcomes, with causation claims withheld without evidence
 
 ## Files Changed
 
@@ -52,19 +58,33 @@ Phase B module shells:
 - `src/components/business-intelligence/index.js`
 - `src/styles/clientsurge-os-business-intelligence.css`
 - `review/phase-b/index.html`
+- `review/phase-b/morning-brief/index.html`
+- `review/phase-b/business-health/index.html`
+- `review/phase-b/opportunities/index.html`
+- `review/phase-b/revenue/index.html`
+- `review/phase-b/website/index.html`
 - `src/review/phase-b/PhaseBReviewHarness.jsx`
 - `src/review/phase-b/phase-b-entry.jsx`
+- `scripts/validate-phase-b-browser.mjs`
 - `scripts/validate-phase-b-business-intelligence-browser.mjs`
 - `docs/CLIENTSURGE_PHASE_B_BUSINESS_INTELLIGENCE_FOUNDATION_VALIDATION.md`
 
 Committed review harness:
 
 - `/review/phase-b/`
-- `/review/phase-b/?module=morningBrief&state=current`
-- `/review/phase-b/?module=businessHealth&state=unknown`
-- `/review/phase-b/?module=opportunityCenter&state=partial`
-- `/review/phase-b/?module=revenueIntelligence&state=stale`
-- `/review/phase-b/?module=websiteIntelligence&state=delayed`
+- `/review/phase-b/morning-brief/`
+- `/review/phase-b/business-health/`
+- `/review/phase-b/opportunities/`
+- `/review/phase-b/revenue/`
+- `/review/phase-b/website/`
+
+Query controls remain available for fixtures, for example:
+
+- `/review/phase-b/morning-brief/?state=current`
+- `/review/phase-b/business-health/?state=unknown`
+- `/review/phase-b/opportunities/?state=partial`
+- `/review/phase-b/revenue/?state=stale`
+- `/review/phase-b/website/?state=delayed`
 
 Screenshots remain local validation artifacts under `work/phase-b-browser/results`.
 
@@ -100,12 +120,12 @@ Fixtures are explicitly labeled as static review fixtures and are not production
 | Command | Result | Notes |
 | --- | --- | --- |
 | `npm ci` | Passed | npm reported 7 audit advisories and allow-scripts warnings for `core-js` and `esbuild`. |
-| `npx eslint src/components/business-intelligence/CSBusinessIntelligencePrimitives.jsx src/components/business-intelligence/CSMorningBrief.jsx src/components/business-intelligence/CSBusinessHealthEngine.jsx src/components/business-intelligence/CSOpportunityCenter.jsx src/components/business-intelligence/CSRevenueIntelligence.jsx src/components/business-intelligence/CSWebsiteIntelligence.jsx src/components/business-intelligence/CSBusinessIntelligenceGallery.jsx src/components/business-intelligence/phaseBFixtures.js src/components/business-intelligence/index.js scripts/validate-phase-b-business-intelligence-browser.mjs --quiet` | Passed | Focused lint for all changed source and script files. |
-| `git diff --check -- src/components/business-intelligence src/styles/clientsurge-os-business-intelligence.css review/phase-b src/review/phase-b scripts/validate-phase-b-business-intelligence-browser.mjs docs/CLIENTSURGE_PHASE_B_BUSINESS_INTELLIGENCE_FOUNDATION_VALIDATION.md` | Passed | No whitespace errors. |
+| `npx eslint src/components/business-intelligence/CSBusinessIntelligencePrimitives.jsx src/components/business-intelligence/CSMorningBrief.jsx src/components/business-intelligence/CSBusinessHealthEngine.jsx src/components/business-intelligence/CSOpportunityCenter.jsx src/components/business-intelligence/CSRevenueIntelligence.jsx src/components/business-intelligence/CSWebsiteIntelligence.jsx src/components/business-intelligence/CSBusinessIntelligenceGallery.jsx src/components/business-intelligence/phaseBFixtures.js src/components/business-intelligence/index.js src/review/phase-b/PhaseBReviewHarness.jsx scripts/validate-phase-b-browser.mjs scripts/validate-phase-b-business-intelligence-browser.mjs --quiet` | Passed | Focused lint for all changed source and script files. |
+| `git diff --check -- src/components/business-intelligence src/styles/clientsurge-os-business-intelligence.css review/phase-b src/review/phase-b scripts/validate-phase-b-browser.mjs scripts/validate-phase-b-business-intelligence-browser.mjs docs/CLIENTSURGE_PHASE_B_BUSINESS_INTELLIGENCE_FOUNDATION_VALIDATION.md` | Passed | No whitespace errors. |
 | `npm run lint` | Failed, pre-existing baseline | 167 repository-wide errors outside the changed Phase B files. |
 | `npm run typecheck` | Passed | `tsc -p ./jsconfig.json`. |
 | `npm run build` | Passed | Vite build completed with the existing large-chunk warning. |
-| `node scripts/validate-phase-b-business-intelligence-browser.mjs` | Passed | 270 module/state/viewport checks against `/review/phase-b/`, plus default controls touch-target coverage and 10 axe serious/critical checks. |
+| `node scripts/validate-phase-b-browser.mjs` | Passed | 270 module/state/viewport checks against the five `/review/phase-b/<module>/` routes, plus default controls touch-target coverage and 10 axe serious/critical checks. |
 
 ## Browser Matrix
 
@@ -197,7 +217,7 @@ Local screenshots were saved for each current-state module at desktop and mobile
 ### Phase B limitations
 
 - Static foundations only.
-- No production route is mounted.
+- No production navigation or live app route is mounted; `/review/phase-b/*` remains a review harness only.
 - No production data adapter is connected.
 - No numeric Business Health score exists.
 - No revenue attribution method is implemented.

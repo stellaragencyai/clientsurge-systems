@@ -60,6 +60,8 @@ function WebsiteEmptyState({ scenario }) {
 export default function CSWebsiteIntelligence({ scenario = websiteFixtures.current }) {
   const state = scenario.state || "current";
   const signals = scenario.signals || [];
+  const technicalSignals = signals.filter((signal) => signal.group === "technical");
+  const businessSignals = signals.filter((signal) => signal.group === "business");
 
   return (
     <BIReviewSurface
@@ -84,17 +86,27 @@ export default function CSWebsiteIntelligence({ scenario = websiteFixtures.curre
             {state === "stale" ? <PartialCoverageBanner coverage="Website evidence is stale. The view stays honest about freshness before recommending changes." /> : null}
             {state === "delayed" ? <PartialCoverageBanner coverage="Analytics processing is delayed. Business outcomes remain separated from technical checks." /> : null}
 
-            <BISection id="website-critical-journey" title={scenario.headline} description="Landing to lead form to booking to confirmation is represented as a critical journey with evidence per step.">
+            <BISection id="website-technical" title="Technical" description="Speed, availability, errors, forms, and mobile stay separate from business outcomes.">
               <div className="cs-bi-methodology-note">
                 <Route aria-hidden="true" />
                 <p>Technical metrics include availability, form health, and route behavior. Business outcomes include verified leads, bookings, and conversion events only when connected sources support them.</p>
               </div>
-              {signals.length ? (
+              {technicalSignals.length ? (
                 <div className="cs-bi-website-path">
-                  {signals.map((signal) => <JourneyStep key={signal.id} signal={signal} />)}
+                  {technicalSignals.map((signal) => <JourneyStep key={signal.id} signal={signal} />)}
                 </div>
               ) : (
                 <WebsiteEmptyState scenario={scenario} />
+              )}
+            </BISection>
+
+            <BISection id="website-business-outcomes" title="Business outcomes" description="Visitors, leads, bookings, conversions, and high-value pages are displayed only with source disclosure.">
+              {businessSignals.length ? (
+                <div className="cs-bi-website-path">
+                  {businessSignals.map((signal) => <JourneyStep key={signal.id} signal={signal} />)}
+                </div>
+              ) : (
+                <UnknownState title="No website business outcomes verified" description="The foundation does not fabricate visitors, leads, bookings, conversions, or page value." />
               )}
             </BISection>
 

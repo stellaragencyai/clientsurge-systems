@@ -18,7 +18,7 @@ import {
   UnavailableState,
   UnknownState,
 } from "./CSBusinessIntelligencePrimitives";
-import { opportunityFixtures } from "./phaseBFixtures";
+import { opportunityFixtures, opportunityLifecycleStates } from "./phaseBFixtures";
 import { CSEmptyState, CSStatusBadge } from "@/components/design-system";
 
 function OpportunityCard({ opportunity }) {
@@ -36,7 +36,7 @@ function OpportunityCard({ opportunity }) {
         <ConfidenceBadge value={opportunity.confidence} />
         <TruthLabel value={opportunity.verification} />
         <FreshnessIndicator state={opportunity.freshness} />
-        <CSStatusBadge tone="neutral">{opportunity.lifecycle}</CSStatusBadge>
+        <CSStatusBadge tone="neutral">{opportunity.status || opportunity.lifecycle}</CSStatusBadge>
       </div>
       <EvidenceSummary title={`${opportunity.title} evidence`} items={opportunity.evidence} />
       <SourceDisclosure
@@ -92,6 +92,9 @@ export default function CSOpportunityCenter({ scenario = opportunityFixtures.cur
               description="Critical and high-priority items appear before estimated growth or coverage opportunities."
               actions={<DeepLinkAction label="Filter opportunities" href="#opportunity-filters" />}
             >
+              <div className="cs-bi-chip-row" aria-label="Opportunity lifecycle states">
+                {opportunityLifecycleStates.map((lifecycleState) => <CSStatusBadge key={lifecycleState} tone="neutral">{lifecycleState}</CSStatusBadge>)}
+              </div>
               {state === "partial" ? <PartialCoverageBanner coverage={scenario.coverage} /> : null}
               {state === "stale" ? <PartialCoverageBanner coverage="Opportunity evidence is stale and must be reviewed before action priority is trusted." /> : null}
               {state === "delayed" ? <PartialCoverageBanner coverage="Detector processing is delayed; delayed opportunities remain labeled." /> : null}

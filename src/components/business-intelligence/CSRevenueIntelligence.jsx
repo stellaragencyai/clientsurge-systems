@@ -19,13 +19,13 @@ import { revenueFixtures } from "./phaseBFixtures";
 import { CSEmptyState, CSStatusBadge } from "@/components/design-system";
 
 const REVENUE_CLASS_LABELS = [
-  "Collected",
-  "Invoiced",
-  "Projected",
-  "Attributed",
-  "Estimated",
-  "Refunded",
-  "Outstanding",
+  "Collected Revenue",
+  "Invoiced Revenue",
+  "Pipeline Revenue",
+  "Attributed Revenue",
+  "Projected Revenue",
+  "Estimated Revenue",
+  "Outstanding Revenue",
   "Unknown",
 ];
 
@@ -73,7 +73,7 @@ export default function CSRevenueIntelligence({ scenario = revenueFixtures.curre
     <BIReviewSurface
       eyebrow="Revenue Intelligence"
       title="Revenue classes stay separate"
-      description="Collected, invoiced, projected, attributed, estimated, refunded, outstanding, and unknown revenue are never silently combined."
+      description="Collected, invoiced, pipeline, attributed, projected, estimated, outstanding, and unknown revenue are never silently combined."
       actions={<CSStatusBadge tone="warning">No unsupported attribution</CSStatusBadge>}
       className={`cs-bi-revenue-intelligence cs-bi-state-${state}`}
     >

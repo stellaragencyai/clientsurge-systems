@@ -18,6 +18,14 @@ const modules = [
   "websiteIntelligence",
 ];
 
+const moduleRoutePaths = {
+  morningBrief: "morning-brief",
+  businessHealth: "business-health",
+  opportunityCenter: "opportunities",
+  revenueIntelligence: "revenue",
+  websiteIntelligence: "website",
+};
+
 const states = [
   "loading",
   "empty",
@@ -106,8 +114,10 @@ function fail(message, details = {}) {
   throw error;
 }
 
-function reviewUrlWithParams(baseUrl, params = {}) {
-  const url = new URL(baseUrl);
+function reviewModuleUrl(baseUrl, moduleKey, params = {}) {
+  const normalizedBaseUrl = baseUrl.endsWith("/") ? baseUrl : `${baseUrl}/`;
+  const routePath = moduleRoutePaths[moduleKey];
+  const url = new URL(routePath ? `${routePath}/` : "", normalizedBaseUrl);
   for (const [key, value] of Object.entries(params)) {
     url.searchParams.set(key, value);
   }
@@ -283,8 +293,7 @@ async function main() {
           page.on("pageerror", (error) => consoleErrors.push(error.message));
 
           try {
-            const response = await page.goto(reviewUrlWithParams(reviewUrl, {
-              module: moduleKey,
+            const response = await page.goto(reviewModuleUrl(reviewUrl, moduleKey, {
               state: stateKey,
               controls: "0",
             }), { waitUntil: "networkidle" });
@@ -322,6 +331,7 @@ async function main() {
       states,
       viewports,
       reviewUrl: "/review/phase-b/",
+      reviewRoutes: Object.values(moduleRoutePaths).map((routePath) => `/review/phase-b/${routePath}/`),
       screenshots: resultsDir,
     }, null, 2));
   } catch (error) {

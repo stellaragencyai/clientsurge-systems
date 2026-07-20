@@ -56,22 +56,45 @@ export default function CSMorningBrief({ scenario = morningBriefFixtures.current
             {state === "stale" ? <PartialCoverageBanner coverage="The brief is visible with stale source disclosure. It is not promoted to current." /> : null}
             {state === "delayed" ? <PartialCoverageBanner coverage="A connected source has confirmed processing delay. Delayed items remain labeled." /> : null}
 
-            <section className="cs-bi-brief-summary" aria-labelledby="morning-brief-summary-title">
+            <BISection id="morning-brief-condition" title="Business Condition" description="The opening condition is qualitative and source-backed; unsupported success is never shown.">
               <div className="cs-bi-brief-callout">
                 <ListChecks aria-hidden="true" />
                 <div>
-                  <h2 id="morning-brief-summary-title">{scenario.summary}</h2>
-                  <p>Priority actions stay above supporting reporting. Missing domains are disclosed instead of filled with zero.</p>
+                  <h3>{scenario.summary}</h3>
+                  <p>Supported condition states: Healthy, Attention, Degraded, Blocked, Unknown, and Unavailable. Missing domains are disclosed instead of filled with zero.</p>
                 </div>
                 <SourceDisclosure {...(scenario.disclosure || sharedFixtureDisclosure)} />
               </div>
+            </BISection>
 
-              <BISection id="morning-brief-actions" title="Highest-priority actions" description="Only precise, evidence-backed actions appear here.">
-                {actions.length ? actions.map((action) => <RecommendationCard key={action.id} {...action} />) : <BriefEmptyState scenario={scenario} />}
-              </BISection>
-            </section>
+            <BISection id="morning-brief-attention" title="Attention Required" description="Human attention appears only when evidence supports a specific review path.">
+              {actions.length ? (
+                <div className="cs-bi-methodology-note">
+                  <ListChecks aria-hidden="true" />
+                  <p>{actions.length} evidence-backed item requires review. No fake revenue, fake growth, or fake ROI is inferred.</p>
+                </div>
+              ) : (
+                <UnknownState title="No attention item verified" description="The brief does not invent urgent work when evidence is absent." />
+              )}
+            </BISection>
 
-            <BISection id="morning-brief-highlights" title="Verified business highlights" description="Each highlight carries source, freshness, confidence, and explanation.">
+            <BISection id="morning-brief-next-actions" title="Next Actions" description="Actions include owner, confidence, truth, evidence, and a narrow destination.">
+              {actions.length ? (
+                <div className="cs-bi-layout cs-bi-layout--two">
+                  {actions.map((action) => (
+                    <div key={`${action.id}-next`} className="cs-bi-methodology-note">
+                      <ListChecks aria-hidden="true" />
+                      <p><strong>{action.title}:</strong> {action.reason}</p>
+                      <DeepLinkAction label={action.actionLabel} href={action.actionHref} />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <BriefEmptyState scenario={scenario} />
+              )}
+            </BISection>
+
+            <BISection id="morning-brief-outcomes" title="Verified Outcomes" description="Each outcome carries source, freshness, confidence, and explanation.">
               {highlights.length ? (
                 <div className="cs-bi-layout cs-bi-layout--two">
                   {highlights.map((highlight) => <BIInsightCard key={highlight.id} {...highlight} />)}
@@ -79,6 +102,18 @@ export default function CSMorningBrief({ scenario = morningBriefFixtures.current
               ) : (
                 <UnknownState title="No verified highlights to show" description="The brief does not invent calls, bookings, reviews, revenue, or website activity." />
               )}
+            </BISection>
+
+            <BISection id="morning-brief-ai-summary" title="AI Summary" description="The summary restates visible evidence and uncertainty; it does not create metrics.">
+              <div className="cs-bi-methodology-note">
+                <CalendarDays aria-hidden="true" />
+                <p>{scenario.summary} This fixture is isolated from production data, so the summary remains limited to rendered evidence and disclosed gaps.</p>
+              </div>
+              <SourceDisclosure {...(scenario.disclosure || sharedFixtureDisclosure)} />
+            </BISection>
+
+            <BISection id="morning-brief-recommendations" title="Recommendations" description="Recommendations remain evidence-backed and do not claim fake growth, ROI, or revenue impact.">
+              {actions.length ? actions.map((action) => <RecommendationCard key={`${action.id}-recommendation`} {...action} />) : <UnknownState title="No recommendation verified" description="No recommendation is shown without evidence, owner, impact class, and destination." />}
             </BISection>
           </div>
         )}
