@@ -169,11 +169,12 @@ export function CSStatusBadge({ tone = "neutral", children, className }) {
 }
 
 export function CSAlert({ tone = "info", title, children, actions, className, announce = false }) {
-  const liveProps = tone === "danger"
-    ? { role: "alert" }
-    : announce
-      ? { role: "status", "aria-live": "polite" }
-      : {};
+  const liveProps = announce
+    ? {
+        role: tone === "danger" ? "alert" : "status",
+        "aria-live": tone === "danger" ? "assertive" : "polite",
+      }
+    : {};
   return (
     <div className={cx("cs-alert", `cs-alert--${tone}`, className)} {...liveProps}>
       <div className="cs-alert__content">

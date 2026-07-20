@@ -13,6 +13,13 @@ Scope: Activation OS remediation for issue #1375 rows A-ACT-01 through A-ACT-06.
 - A-ACT-05: Mobile footer actions use fixed safe-area-aware positioning at narrow widths. Validator covers 390 x 520 and 375 x 500 virtual-keyboard-like reduced heights.
 - A-ACT-06: Added review fixture support for nine-step comprehension with stage summary, completed-step context, and mobile blocker summary without changing the underlying step architecture.
 
+## Prompt #16D Contract Repair
+
+- Restored the approved `CSAlert` announcement contract in `src/components/design-system/CSProductPrimitives.jsx`.
+- `announce=false` now renders a static alert presentation without `role="alert"`, `role="status"`, or `aria-live`.
+- `announce=true` is the only path that creates live announcement behavior: danger alerts use `role="alert"` with assertive live behavior, and non-danger alerts use `role="status"` with polite live behavior.
+- Activation autosave announcements remain owned by the autosave live region; static Activation guidance is not announced.
+
 ## Repeatable Commands
 
 ```powershell
@@ -42,7 +49,8 @@ This harness is committed under `review/phase-a-activation/` and `src/review/pha
 
 - Focused ESLint: passed.
 - `git diff --check`: passed.
-- `node scripts/validate-phase-a-activation-review.mjs`: passed, 38 checks.
+- `node scripts/validate-phase-a-foundation-review.mjs`: passed on 2026-07-20, 6 viewport checks. The first run timed out during initial Vite/browser warm-up before assertions; rerun passed.
+- `node scripts/validate-phase-a-activation-review.mjs`: passed on 2026-07-20, 38 checks.
 
 The validator covers 1440 x 900, 1280 x 820, 1024 x 768, 768 x 900, 390 x 844, 375 x 667, plus 390 x 520 and 375 x 500 reduced-height mobile cases.
 

@@ -30,6 +30,13 @@ The activation branch was resolved by making `src/components/activation/CSActiva
 - Native `disabled` was removed from blocked step buttons so keyboard users can discover the blocked reason.
 - Click handling prevents blocked-step navigation without bypassing container-level validation or persistence guards.
 
+## Prompt #16D Accessibility Contract Repair
+
+- Restored the approved `CSAlert` announcement contract from the Design System baseline.
+- Static alerts now remain static unless the caller passes `announce=true`.
+- Explicit announcements preserve the original tone-specific behavior: danger uses `role="alert"` with assertive live behavior, and non-danger uses `role="status"` with polite live behavior.
+- Activation guidance remains static while autosave transition announcements continue to use the dedicated autosave owner.
+
 ## Commands Run
 
 | Command | Result | Notes |
@@ -41,6 +48,8 @@ The activation branch was resolved by making `src/components/activation/CSActiva
 | `npm run typecheck` | Passed | Ran after the final rebase. |
 | `npm run build` | Passed | Vite build completed with the existing large-chunk warning. |
 | `node work/prompt2-browser/browser-validate.mjs --surface=activation --url=http://127.0.0.1:5174/work/prompt2-browser/activation.html` | Passed | Local scratch harness; not committed. |
+| `node scripts/validate-phase-a-foundation-review.mjs` | Passed | Prompt #16D rerun on 2026-07-20; 6 viewport checks. Initial run timed out during Vite/browser warm-up before assertions. |
+| `node scripts/validate-phase-a-activation-review.mjs` | Passed | Prompt #16D rerun on 2026-07-20; 38 checks across persistence states, viewport matrix, keyboard viewports, and transition evidence. |
 
 ## Browser Matrix
 
