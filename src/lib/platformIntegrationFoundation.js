@@ -862,7 +862,7 @@ function buildSearchDescription(record, source, title, owner) {
   return String(description || `${source.id} result for ${title} owned by ${owner}`);
 }
 
-function buildSearchMetadata(record, source, routeId, timestamp) {
+function buildSearchMetadata(record, source, routeId, timestamp, sourceStatus) {
   return {
     recordId: record.id,
     sourceId: source.id,
@@ -872,6 +872,8 @@ function buildSearchMetadata(record, source, routeId, timestamp) {
     permissionScope: source.permission.scope,
     truthState: timestamp === "static-contract" ? "Derived" : "Reported",
     freshness: timestamp === "Unknown" ? "Unavailable" : "Current",
+    adapterStatus: sourceStatus?.status || "Unverified",
+    adapterUnavailableEntities: sourceStatus?.unavailableEntities || [],
   };
 }
 
@@ -909,7 +911,7 @@ function toEnterpriseRole(role) {
   return String(role).charAt(0).toUpperCase() + String(role).slice(1);
 }
 
-export function buildPlatformSearchResults(entityRecords, query, maxResults = 12) {
+export function buildPlatformSearchResults(entityRecords, query, maxResults = 12, options = {}) {
   const results = PLATFORM_SEARCH_SOURCES.flatMap((source) =>
     getRecordsForSource(entityRecords, source)
       .filter((record) => matchesQuery(record, source.fields, query))
@@ -921,7 +923,7 @@ export function buildPlatformSearchResults(entityRecords, query, maxResults = 12
         const destination = buildDestination(source.destination, record);
         const route = getPlatformRouteByDestination(destination)?.id || source.tab || source.id;
         const description = buildSearchDescription(record, source, title, owner);
-        const metadata = buildSearchMetadata(record, source, route, timestamp);
+        const metadata = buildSearchMetadata(record, source, route, timestamp, options.sourceStatuses?.[source.id]);
 
         return {
           id: record.id,

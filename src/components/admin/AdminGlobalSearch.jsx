@@ -10,6 +10,7 @@ import { Search, X } from "lucide-react";
 import {
   buildAdminGlobalSearchResults,
   getAdminGlobalSearchPlaceholder,
+  loadAdminGlobalSearchRecords,
 } from "@/lib/adminGlobalSearch";
 
 const ENTITY_COLORS = {
@@ -28,16 +29,6 @@ const RESULT_STATE_COPY = {
   "no-results": "No results found",
   error: "Search is unavailable",
 };
-
-async function listEntity(name, limit = 200) {
-  const entity = base44.entities?.[name];
-  if (!entity?.list) return [];
-  try {
-    return await entity.list("-created_date", limit);
-  } catch {
-    return [];
-  }
-}
 
 export default function AdminGlobalSearch({ onSelect, onNavigate }) {
   const navigate = useNavigate();
@@ -63,65 +54,12 @@ export default function AdminGlobalSearch({ onSelect, onNavigate }) {
     debounce.current = setTimeout(async () => {
       setStatus("loading");
       try {
-        const [
-          clientProjects,
-          legacyClients,
-          leads,
-          legacyLeads,
-          websiteLeads,
-          supportMessages,
-          communicationEvents,
-          communicationLogs,
-          aiWorkers,
-          automationAgents,
-          automationJobs,
-          timelineEvents,
-          auditLogs,
-          automationProofLogs,
-          adminSettings,
-          orders,
-          subscriptions,
-          invoices,
-          documents,
-          resources,
-          knowledgeBaseArticles,
-        ] = await Promise.all([
-          listEntity("ClientProject"),
-          listEntity("Client"),
-          listEntity("Leads"),
-          listEntity("Lead"),
-          listEntity("WebsiteLead"),
-          listEntity("SupportMessage"),
-          listEntity("CommunicationEvent"),
-          listEntity("CommunicationLog"),
-          listEntity("AIWorker"),
-          listEntity("AutomationAgent"),
-          listEntity("AutomationJob"),
-          listEntity("ClientTimelineEvent"),
-          listEntity("AuditLog"),
-          listEntity("AutomationProofLog"),
-          listEntity("AdminSettings", 50),
-          listEntity("Order"),
-          listEntity("Subscription"),
-          listEntity("Invoice"),
-          listEntity("Document"),
-          listEntity("Resource"),
-          listEntity("KnowledgeBaseArticle"),
-        ]);
-
+        const searchRecords = await loadAdminGlobalSearchRecords(base44);
         const nextResults = buildAdminGlobalSearchResults(
-          {
-            customers: [...clientProjects, ...legacyClients],
-            leads: [...leads, ...legacyLeads, ...websiteLeads],
-            conversations: [...supportMessages, ...communicationEvents, ...communicationLogs],
-            ai_workers: [...aiWorkers, ...automationAgents, ...automationJobs],
-            timeline_events: [...timelineEvents, ...auditLogs, ...communicationEvents, ...automationProofLogs],
-            settings: adminSettings,
-            billing: [...orders, ...subscriptions, ...invoices],
-            documents: [...documents, ...resources, ...knowledgeBaseArticles],
-          },
+          searchRecords.recordsBySource,
           query,
           10,
+          { sourceStatuses: searchRecords.sourceStatuses },
         );
 
         setResults(nextResults);
