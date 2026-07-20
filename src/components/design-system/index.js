@@ -5,6 +5,7 @@ export {
   CSActivationShell,
   CSActivationStepNav,
   CSAutosaveStatus,
+  CSSafeResumeNotice,
   CSValidationSummary,
 } from "./CSActivationPrimitives";
 export {
