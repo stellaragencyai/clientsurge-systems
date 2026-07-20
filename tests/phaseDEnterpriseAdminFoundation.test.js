@@ -17,11 +17,19 @@ import {
   ROLE_PERMISSION_MATRIX,
 } from "../src/lib/enterpriseAdminFoundation.js";
 import { buildEnterpriseOrganizationSectionReadModel } from "../src/lib/enterpriseOrganizationSettingsReadModel.js";
+import { buildEnterpriseTeamSectionReadModel } from "../src/lib/enterpriseTeamManagementReadModel.js";
+import {
+  ENTERPRISE_RBAC_AUDIT_FIELDS,
+  buildPermissionChangeAuditContract,
+  can,
+  evaluateEnterprisePermission,
+} from "../src/lib/enterpriseRbac.js";
 
 const appSource = readFileSync(new URL("../src/App.jsx", import.meta.url), "utf8");
 const adminShellSource = readFileSync(new URL("../src/components/admin/AdminShell.jsx", import.meta.url), "utf8");
 const pageSource = readFileSync(new URL("../src/pages/settings/EnterpriseSettingsPage.jsx", import.meta.url), "utf8");
 const organizationSource = readFileSync(new URL("../src/lib/enterpriseOrganizationSettingsSource.js", import.meta.url), "utf8");
+const teamSource = readFileSync(new URL("../src/lib/enterpriseTeamManagementSource.js", import.meta.url), "utf8");
 
 test("Phase D settings routes are mounted behind the admin guard and out of public routing", () => {
   assert.match(appSource, /allowedRoles=\{\["admin", "super_admin"\]\}/);
@@ -126,6 +134,34 @@ test("RBAC contract is explicit by role, permission, and scope", () => {
   );
 });
 
+test("RBAC evaluator returns allow decisions, deny reasons, and audit semantics", () => {
+  assert.equal(can("Owner", "Delete", "Organization"), true);
+  assert.equal(can("super_admin", "manage", "org"), true);
+  assert.equal(can("Sales", "Delete", "Organization"), false);
+
+  const denied = evaluateEnterprisePermission({ role: "Sales", permission: "Delete", scope: "Organization" });
+  assert.equal(denied.allowed, false);
+  assert.equal(denied.reason, "permission_not_granted");
+  assert.equal(denied.auditEvent.outcome, "denied");
+
+  const unknown = evaluateEnterprisePermission({ role: "Contractor", permission: "View", scope: "Client" });
+  assert.equal(unknown.allowed, false);
+  assert.equal(unknown.reason, "unknown_role");
+
+  const auditContract = buildPermissionChangeAuditContract({
+    actor: "owner@clientsurgesystems.com",
+    target: "analyst@clientsurgesystems.com",
+    role: "Analyst",
+    permission: "Export",
+    scope: "Client",
+  });
+  assert.equal(auditContract.action, "rbac.permission.changed");
+  assert.equal(auditContract.outcome, "pending");
+  for (const field of ["actor", "action", "target", "timestamp", "source", "outcome", "reason"]) {
+    assert.ok(ENTERPRISE_RBAC_AUDIT_FIELDS.includes(field), `${field} should be required for RBAC audit`);
+  }
+});
+
 test("Phase D UI includes accessibility, screen-reader, and reduced-motion hooks", () => {
   for (const required of [
     "aria-current",
@@ -190,4 +226,63 @@ test("organization source binding remains read-only and does not introduce mutat
   assert.match(organizationSource, /AdminSettings/);
   assert.match(organizationSource, /ClientProject/);
   assert.match(organizationSource, /\.list\(/);
+});
+
+test("team management read model binds available sources and keeps canonical team records unverified", () => {
+  const section = buildEnterpriseTeamSectionReadModel({
+    users: [
+      {
+        full_name: "Ops Admin",
+        email: "ops@clientsurgesystems.com",
+        role: "admin",
+        routing_active: true,
+        routing_categories: ["High-Value"],
+      },
+      {
+        full_name: "Read Only",
+        email: "viewer@clientsurgesystems.com",
+        role: "user",
+        routing_active: false,
+      },
+    ],
+    clientProjects: [
+      {
+        business_name: "Signal Med Spa",
+        client_email: "owner@signal.example",
+        support_priority: "Urgent",
+      },
+    ],
+    auditLogs: [
+      { action: "rbac.permission.granted", notes: "permission scope changed" },
+      { action: "team.assignment.changed", notes: "backup owner assigned" },
+    ],
+  });
+
+  assert.equal(section.sourceBinding.mode, "read-only");
+  assert.equal(section.sourceBinding.status, "Current");
+  assert.equal(section.sourceBinding.users, "2 read");
+  assert.equal(section.sourceBinding.canonicalTeams, "unavailable");
+  assert.match(section.sourceSemantics.verification, /canonical Team, Invite, Assignment/);
+
+  const users = section.panels.find((panel) => panel.id === "users");
+  const invites = section.panels.find((panel) => panel.id === "invites");
+  const assignments = section.panels.find((panel) => panel.id === "assignments");
+  const activity = section.panels.find((panel) => panel.id === "activity");
+
+  assert.deepEqual(users.fields[0], ["Active users", "2 (read-only source)"]);
+  assert.deepEqual(users.fields[1], ["Enterprise roles", "Admin, Viewer (derived read-only source)"]);
+  assert.deepEqual(invites.fields[0], ["Pending invites", "1 inferred (derived read-only source)"]);
+  assert.deepEqual(assignments.fields[2], ["Organization Manage", "Manager denied until Admin or Owner"]);
+  assert.deepEqual(activity.fields[1], ["Permission changes", "1 (derived read-only source)"]);
+});
+
+test("team management source binding remains read-only and does not introduce mutations", () => {
+  for (const forbidden of [".create(", ".update(", ".delete(", "inviteUser", "functions.invoke"]) {
+    assert.equal(teamSource.includes(forbidden), false, `${forbidden} must not appear in read-only team source binding`);
+  }
+
+  assert.match(teamSource, /User/);
+  assert.match(teamSource, /ClientProject/);
+  assert.match(teamSource, /AuditLog/);
+  assert.match(teamSource, /\.list\(/);
 });

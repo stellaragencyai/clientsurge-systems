@@ -41,6 +41,18 @@ import {
   getStateLabelsForSection,
 } from "@/lib/enterpriseAdminFoundation";
 import { fetchEnterpriseOrganizationSection } from "@/lib/enterpriseOrganizationSettingsSource";
+import { fetchEnterpriseTeamSection } from "@/lib/enterpriseTeamManagementSource";
+
+const SECTION_SOURCE_LOADERS = {
+  organization: {
+    label: "Organization",
+    load: fetchEnterpriseOrganizationSection,
+  },
+  team: {
+    label: "Team",
+    load: fetchEnterpriseTeamSection,
+  },
+};
 
 const ROUTE_ICON = {
   organization: Building2,
@@ -198,6 +210,8 @@ function SourceSemantics({ semantics }) {
 function SourceBindingNotice({ binding }) {
   if (!binding) return null;
 
+  const bindingRows = Object.entries(binding).filter(([key]) => !["errors"].includes(key));
+
   return (
     <section aria-labelledby="source-binding-title" className="rounded-lg border border-violet-200 bg-violet-50 p-4 shadow-sm">
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -209,28 +223,20 @@ function SourceBindingNotice({ binding }) {
             </h2>
           </div>
           <p className="text-sm leading-6 text-violet-950">
-            Organization values may include AdminSettings, ClientProject, and runtime host snapshots. They remain unverified until canonical Organization proof is bound.
+            Values may include read-only source snapshots. They remain unverified until canonical records, RBAC enforcement, and audit proof are bound.
           </p>
         </div>
         <StatusPill status={binding.status} />
       </div>
       <dl className="mt-4 grid gap-2 text-sm sm:grid-cols-2 lg:grid-cols-4">
-        <div className="rounded-lg border border-violet-200 bg-white/70 p-3">
-          <dt className="font-semibold text-violet-800">Mode</dt>
-          <dd className="mt-1 text-violet-950">{binding.mode}</dd>
-        </div>
-        <div className="rounded-lg border border-violet-200 bg-white/70 p-3">
-          <dt className="font-semibold text-violet-800">Sources</dt>
-          <dd className="mt-1 text-violet-950">{binding.sources}</dd>
-        </div>
-        <div className="rounded-lg border border-violet-200 bg-white/70 p-3">
-          <dt className="font-semibold text-violet-800">Client Projects</dt>
-          <dd className="mt-1 text-violet-950">{binding.clientProjects}</dd>
-        </div>
-        <div className="rounded-lg border border-violet-200 bg-white/70 p-3">
-          <dt className="font-semibold text-violet-800">Host</dt>
-          <dd className="mt-1 break-all text-violet-950">{binding.hostname}</dd>
-        </div>
+        {bindingRows.map(([key, value]) => (
+          <div key={key} className="rounded-lg border border-violet-200 bg-white/70 p-3">
+            <dt className="font-semibold text-violet-800">
+              {key.replace(/([A-Z])/g, " $1").replace(/^./, (letter) => letter.toUpperCase())}
+            </dt>
+            <dd className="mt-1 break-words text-violet-950">{value}</dd>
+          </div>
+        ))}
       </dl>
       {binding.errors?.length ? (
         <ul className="mt-3 space-y-1 text-sm text-violet-950" aria-label="Source binding read issues">
@@ -432,41 +438,40 @@ function ValidationMatrix() {
 export default function EnterpriseSettingsPage({ sectionId = "organization" }) {
   const route = getEnterpriseRoute(sectionId);
   const baseSection = getEnterpriseSection(sectionId);
-  const [organizationSection, setOrganizationSection] = useState(null);
-  const [organizationBindingStatus, setOrganizationBindingStatus] = useState("Loading");
-  const section = sectionId === "organization" && organizationSection ? organizationSection : baseSection;
+  const sourceLoader = SECTION_SOURCE_LOADERS[sectionId];
+  const [boundSection, setBoundSection] = useState(null);
+  const [bindingStatus, setBindingStatus] = useState("Loading");
+  const section = sourceLoader && boundSection ? boundSection : baseSection;
   const Icon = ROUTE_ICON[route.id] || Settings;
 
   useEffect(() => {
     let active = true;
-    if (sectionId !== "organization") {
-      setOrganizationSection(null);
-      setOrganizationBindingStatus("Empty");
+
+    if (!sourceLoader) {
+      setBoundSection(null);
+      setBindingStatus("Empty");
       return () => {
         active = false;
       };
     }
 
-    setOrganizationBindingStatus("Loading");
-    fetchEnterpriseOrganizationSection()
+    setBindingStatus("Loading");
+    sourceLoader.load()
       .then((nextSection) => {
         if (!active) return;
-        setOrganizationSection(nextSection);
-        setOrganizationBindingStatus(nextSection.sourceBinding?.status || "Current");
+        setBoundSection(nextSection);
+        setBindingStatus(nextSection.sourceBinding?.status || "Current");
       })
       .catch((error) => {
         if (!active) return;
-        setOrganizationBindingStatus("Partial");
-        setOrganizationSection({
+        setBindingStatus("Partial");
+        setBoundSection({
           ...baseSection,
           sourceBinding: {
             mode: "read-only",
             status: "Partial",
             sources: "fixture fallback only",
-            adminSettings: "read failed",
-            clientProjects: "read failed",
-            hostname: typeof window === "undefined" ? "clientsurgesystems.com" : window.location.hostname,
-            errors: [error?.message || "Organization source binding failed"],
+            errors: [error?.message || `${sourceLoader.label} source binding failed`],
           },
         });
       });
@@ -474,7 +479,7 @@ export default function EnterpriseSettingsPage({ sectionId = "organization" }) {
     return () => {
       active = false;
     };
-  }, [baseSection, sectionId]);
+  }, [baseSection, sourceLoader]);
 
   if (!ENTERPRISE_SETTINGS_ROUTES.some((item) => item.id === sectionId)) {
     return <Navigate to="/settings/organization" replace />;
@@ -510,13 +515,13 @@ export default function EnterpriseSettingsPage({ sectionId = "organization" }) {
                   >
                     Review fixture from #{PHASE_D_SOURCE.issue}
                   </span>
-                  {sectionId === "organization" ? (
+                  {sourceLoader ? (
                     <span
                       role="status"
                       aria-live="polite"
                       className="inline-flex rounded-full border border-sky-200 bg-sky-50 px-3 py-1 text-xs font-semibold text-sky-800"
                     >
-                      Organization binding {organizationBindingStatus}
+                      {sourceLoader.label} binding {bindingStatus}
                     </span>
                   ) : null}
                 </div>
