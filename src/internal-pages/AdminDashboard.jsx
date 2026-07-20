@@ -105,15 +105,16 @@ function LazyAdminPanel({ children }) {
 // but no longer clog the left sidebar.
 const NAV_GROUPS = [
   {
-    group: 'Command',
+    group: 'Command Center',
     items: [
       { id: 'overview', label: 'Overview', icon: LayoutDashboard },
+      { id: 'platform-integration', label: 'Platform Integration', icon: Database, external: true, externalPath: '/admin/platform' },
       { id: 'lead-intelligence', label: 'Lead Intelligence', icon: Flame },
       { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
     ],
   },
   {
-    group: 'Leads & Sales',
+    group: 'Customers',
     items: [
       { id: 'leads', label: 'Leads', icon: Users },
       { id: 'priority', label: 'Priority Queue', icon: Star },
@@ -123,7 +124,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    group: 'Client Launch',
+    group: 'Operations',
     items: [
       { id: 'guided-onboarding', label: 'Launch Guide', icon: Zap },
       { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
@@ -134,7 +135,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    group: 'Automation & Messaging',
+    group: 'Communications',
     items: [
       { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
       { id: 'instant-response', label: 'Instant Response', icon: Send },
@@ -146,7 +147,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    group: 'Revenue & Analytics',
+    group: 'Intelligence',
     items: [
       { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
       { id: 'analytics', label: 'Analytics', icon: BarChart3 },
@@ -155,7 +156,7 @@ const NAV_GROUPS = [
     ],
   },
   {
-    group: 'System',
+    group: 'Administration',
     items: [
       { id: 'audit-command-center', label: 'Audit Command Center', icon: ShieldCheck },
       { id: 'launch-proof', label: 'Launch Proof', icon: ShieldCheck },
