@@ -6,6 +6,7 @@ This packet publishes the rendered screenshots required for Worker #3's A-CMD-04
 
 - PR: #1356
 - Branch: `feature/clientsurge-command-center-foundation`
+- Review target before this evidence refresh: `e943f47524712831eb82da6046b9845775d43903`
 - Review route: `/review/phase-a-command-center/`
 - Validator: `node scripts\validate-phase-a-command-center-review.mjs`
 - Screenshot source: `work\phase-a-command-center-review\results`
@@ -34,8 +35,12 @@ The default screenshots show the first-viewport order Worker #3 requested:
 
 1. Business Condition
 2. Attention Required
-3. Next Best Actions
-4. Secondary/contextual modules below the decision stack
+3. Next Best Action
+4. Verified Outcome Summary
+
+Five-second no-scroll test: **PASS**. At each required viewport, the validator confirms Business Condition, Attention Required, Next Best Action, and Verified Outcome Summary are fully contained in the first viewport with matching DOM, heading, and keyboard order.
+
+Secondary/contextual modules remain below the decision stack.
 
 Screenshots:
 
