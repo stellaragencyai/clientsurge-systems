@@ -40,11 +40,16 @@ function resolveClientId(session) {
 function isEligibleLivePurchase(session) {
   if (!session?.id) return false;
   if (session?.livemode !== true) return false;
+  if (cleanString(session?.payment_status, 32).toLowerCase() !== "paid") return false;
   if (cleanString(session?.metadata?.smoke_test).toLowerCase() === "true") return false;
   return true;
 }
 
-export async function sendGa4PurchaseFromCheckoutSession(session, { eventId = "" } = {}) {
+export async function sendGa4PurchaseFromCheckoutSession(session, { eventId = "", duplicateTransaction = false } = {}) {
+  if (duplicateTransaction) {
+    return { sent: false, reason: "duplicate_transaction" };
+  }
+
   if (!isEligibleLivePurchase(session)) {
     return { sent: false, reason: "not_live_purchase" };
   }

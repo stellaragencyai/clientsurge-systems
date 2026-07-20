@@ -69,17 +69,29 @@ Deno.serve(async (req) => {
       canonicalResult?.event_type === "checkout.session.completed" &&
       canonicalResult?.result?.success === true &&
       canonicalResult?.result?.duplicate !== true;
+    const canonicalPurchaseDuplicate =
+      canonicalResult?.event_type === "checkout.session.completed" &&
+      canonicalResult?.result?.success === true &&
+      canonicalResult?.result?.duplicate === true;
 
-    if (canonicalPurchaseSucceeded && stripeEvent?.data?.object) {
+    if ((canonicalPurchaseSucceeded || canonicalPurchaseDuplicate) && stripeEvent?.data?.object) {
       const ga4Result = await sendGa4PurchaseFromCheckoutSession(
         stripeEvent.data.object,
-        { eventId: stripeEvent.id },
+        { eventId: stripeEvent.id, duplicateTransaction: canonicalPurchaseDuplicate },
       );
 
-      if (!ga4Result.sent && ga4Result.reason !== "not_live_purchase") {
+      if (!ga4Result.sent && !["not_live_purchase", "duplicate_transaction"].includes(ga4Result.reason)) {
         console.warn("[stripeWebhookOrders] GA4 purchase not delivered", {
           request_id: requestId,
           reason: ga4Result.reason,
+          event_id: stripeEvent.id || "",
+          session_id: stripeEvent.data.object.id || "",
+        });
+      } else {
+        console.log("[stripeWebhookOrders] GA4 purchase delivery status", {
+          request_id: requestId,
+          sent: ga4Result.sent === true,
+          reason: ga4Result.reason || "sent",
           event_id: stripeEvent.id || "",
           session_id: stripeEvent.data.object.id || "",
         });

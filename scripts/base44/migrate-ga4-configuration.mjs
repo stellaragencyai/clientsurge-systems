@@ -108,9 +108,23 @@ async function main() {
   }
 
   const config = data.config || {};
-  const expected = CONVERSION_EVENTS.join(",");
-  const actual = Array.isArray(config.conversion_events) ? config.conversion_events.join(",") : "";
-  if (config.measurement_id !== MEASUREMENT_ID || config.setup_status !== "configured" || actual !== expected) {
+  const expectedConversions = CONVERSION_EVENTS.join(",");
+  const actualConversions = Array.isArray(config.conversion_events) ? config.conversion_events.join(",") : "";
+  const expectedTracked = TRACKED_EVENTS.join(",");
+  const actualTracked = Array.isArray(config.tracked_events) ? config.tracked_events.join(",") : "";
+  if (
+    config.measurement_id !== MEASUREMENT_ID ||
+    config.setup_status !== "configured" ||
+    config.enabled !== true ||
+    config.enhanced_measurement_enabled !== true ||
+    config.server_side_tracking_enabled === true ||
+    config.last_verified_at ||
+    actualConversions !== expectedConversions ||
+    actualTracked !== expectedTracked ||
+    data.record_count !== 1 ||
+    data.legacy_secret_scrubbed !== true ||
+    data.clean !== true
+  ) {
     throw new Error(`GA4 migration returned an unexpected configuration: ${JSON.stringify(config)}`);
   }
 
@@ -118,10 +132,13 @@ async function main() {
     success: true,
     measurement_id: config.measurement_id,
     setup_status: config.setup_status,
+    record_count: data.record_count,
     legacy_secret_detected: data.legacy_secret_detected,
     legacy_secret_scrubbed: data.legacy_secret_scrubbed,
+    tracked_events: config.tracked_events,
     conversion_events: config.conversion_events,
     server_side_tracking_enabled: config.server_side_tracking_enabled,
+    last_verified_at: config.last_verified_at || null,
   }, null, 2));
 }
 

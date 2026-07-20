@@ -19,6 +19,7 @@ export const GA4_EVENTS = Object.freeze({
   AUDIT_REQUEST_SUBMITTED: "audit_request_submitted",
   BEGIN_CHECKOUT: "begin_checkout",
   PURCHASE: "purchase",
+  PURCHASE_CLIENT_CONFIRMATION: "purchase_client_confirmation",
   DEMO_BOOKED: "demo_booked",
   ONBOARDING_COMPLETE: "onboarding_complete",
 });
