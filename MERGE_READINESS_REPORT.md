@@ -1,50 +1,104 @@
-# Phase A Merge Readiness Report
+# PR #1412 Merge Readiness Report
 
 Date: 2026-07-20
+Branch: `feature/unified-platform-integration-repair`
+Base repair target: PR #1412, `feature/unified-clientsurge-os-integration`
+Starting head: `3024429a486c9d69a21a4acbc99e95ab9f937255`
 
-Scope: final Phase A stack repair for PR #1353, PR #1355, and PR #1356. This report does not authorize merge; Worker #2 owns merge authorization and Worker #3 owns final UX/accessibility approval.
+## Executive Result
 
-## Final Stack SHAs
+PR #1412 is locally repair-complete for the known Worker #1 blockers. The branch resolves route registry ownership, universal search completeness, search permission enforcement, notification contract completeness, and the confirmed CI/build guard failures without merging, deploying, force-pushing, or live-integrating.
 
-| PR | Branch | SHA | Status |
-| --- | --- | --- | --- |
-| #1353 | `feature/clientsurge-design-system-2-1-shell` | `0bcd0b4b5ec5945b4ef8436978a5ec247a72d781` | Design System base. |
-| #1355 | `feature/clientsurge-activation-os-shell` | `d3e94c16a937fa120ca892a3a2920c1740c555cc` | CSAlert contract repair and validation evidence. |
-| #1356 | `feature/clientsurge-command-center-foundation` | `7cd6969bc0a3b0a9cd879ff0089ca9b529a58ef7` | Stack-alignment merge commit before this documentation update; the final PR head is the commit containing this report. |
+Worker #2 should still sequence the final GitHub check/PR strategy. Worker #3 should review the UI/accessibility packet below before merge acceptance.
 
-## CSAlert Contract
+## Resolved Blockers
 
-Approved behavior is restored in `src/components/design-system/CSProductPrimitives.jsx`.
+1. Route registry ownership
+   - `PLATFORM_ROUTES` now covers the valid legacy admin tabs and standalone admin destinations used by `AdminShell` and `AdminDashboard`.
+   - `AdminShell` and `AdminDashboard` now render navigation from registry-derived route groups and items.
+   - `scripts/validate-route-registry-authority.mjs` verifies registry exports, shell/dashboard consumption, and route-id coverage.
 
-- `announce=false`: static alert presentation with no automatic live announcement semantics.
-- `announce=true`: dynamic accessibility announcement behavior.
-- Danger announcements use `role="alert"` and assertive live behavior.
-- Non-danger announcements use `role="status"` and polite live behavior.
-- Static Activation guidance remains quiet; autosave transition announcements remain owned by the autosave live region.
+2. Universal search completeness
+   - Search now covers 10 source families: customers, leads, opportunities, appointments, conversations, AI workers, timeline events, settings, billing, and documents.
+   - Search placeholder, tests, adapter plan, and validation summaries were updated to the expanded source contract.
 
-## Validation Status
+3. Search permission enforcement
+   - Search construction now accepts user context and filters unauthorized results before returning UI results.
+   - Restricted matches now produce `Permission Restricted` instead of being flattened into `No Results`.
+   - `buildPlatformSearchResponse` preserves counts for total, permitted, restricted, and truncated results.
 
-| Workstream | Command | Result | Evidence |
-| --- | --- | --- | --- |
-| Foundation | `node scripts/validate-phase-a-foundation-review.mjs` | PASS | 6 viewport checks. One first-run drawer focus restoration miss at 375 x 667 did not reproduce; rerun passed. |
-| Activation | `node scripts/validate-phase-a-activation-review.mjs` | PASS | 38 checks across six persistence states, six viewports, two keyboard viewports, and transition evidence. |
-| Command Center | `node scripts/validate-phase-a-command-center-review.mjs` | PASS | 23 checks across action states, freshness states, and six viewports. |
+4. Notification contract completeness
+   - Notification required fields now include `id`, `severity`, `whatHappened`, `whyItMatters`, `createdAt`, and the existing business/action/owner/destination/status fields.
+   - Fixtures now validate AI, Business Intelligence, Billing, Security, and Integration notifications.
 
-## Stack Status
+5. CI/build guard failures
+   - CRM release guard no longer finds unapproved direct CRM deletes in the two failing functions.
+   - Fake/test lead cleanup now quarantines and audits instead of permanently deleting.
+   - Product signup build now writes static fallback HTML at `dist/product-signup/index.html` and alias paths.
+   - Vite preview serves the product-signup fallback before the SPA fallback for strict local/CI route proof.
 
-- Required merge order is PR #1353, then PR #1355, then PR #1356.
-- `git merge-base origin/feature/clientsurge-design-system-2-1-shell origin/feature/clientsurge-activation-os-shell` returned `0bcd0b4b5ec5945b4ef8436978a5ec247a72d781`.
-- `git merge-base origin/feature/clientsurge-activation-os-shell HEAD` returned `d3e94c16a937fa120ca892a3a2920c1740c555cc`.
-- `git merge-base --is-ancestor origin/feature/clientsurge-activation-os-shell HEAD` passed.
-- `git merge-tree --write-tree HEAD origin/feature/clientsurge-activation-os-shell` completed without conflict.
+## Validation Results
 
-## Remaining Blockers
+- `npm ci` - passed
+- `npm ci` in `tools/browser-audit` - passed
+- `npm run typecheck` - passed
+- Focused ESLint on touched JS/JSX/MJS and Vite config - passed
+- `git diff --check` - passed
+- `npm run ci:crm-release-guards` - passed; advisory legacy provider findings remain, but the blocking unapproved CRM delete gate passed
+- `npm run build` - passed; existing chunk-size warnings remain
+- `node scripts/product-signup-route-smoke.mjs` - passed CI fallback mode
+- `PRODUCT_SIGNUP_SMOKE_STRICT_HTTP=1 node scripts/product-signup-route-smoke.mjs` against Vite preview - passed 9/9 routes
+- `node --test tests/platformIntegrationFoundation.test.js tests/adminGlobalSearch.test.js tests/unifiedPlatformIntegration.test.js` - passed 11/11
+- `node scripts/validate-platform-integration.mjs --json` - passed
+- `node validate-unified-platform-integration.mjs --json` - passed
+- `node scripts/validate-route-registry-authority.mjs --json` - passed
+- `node scripts/validate-platform-contracts.mjs --json` - passed
+- `node scripts/validate-phase-a-foundation-review.mjs` - passed 6 viewports
+- `node scripts/validate-phase-a-activation-review.mjs` - passed 38 checks
+- `node scripts/validate-phase-a-command-center-review.mjs` - passed 23 checks
+- `node scripts/validate-phase-b-business-intelligence-browser.mjs` - passed 270 checks and 10 axe checks
+- `node scripts/validate-phase-c-customer-operations-browser.mjs` - passed 138 checks, 8 axe checks, and 8 text-zoom checks
+- `node scripts/validate-phase-e-browser.mjs --url http://127.0.0.1:5173` - passed 60 checks
 
-- Worker #2 merge authorization remains required.
-- Worker #3 final UX/accessibility approval remains required.
-- GitHub Actions status must be reviewed after the final #1356 documentation commit is pushed.
-- Existing non-Phase-A limitations remain out of scope: no production Activation route, no production Command Center data adapter, no Base44 persistence/data contract changes, and no Phase B-F system changes.
+## Remaining Notes
 
-## Merge Recommendation
+- No production deploy, Base44 publish, live integration, merge, force-push, or history rewrite was performed.
+- The worktree still contains pre-existing unrelated Windows case/artifact noise: deleted `src/components/ui/Pagination.jsx`, untracked SEO files, and generated `work/` browser evidence. These should not be staged with the repair commit.
+- Root `npm ci` reported 7 audit vulnerabilities from the existing dependency tree. This was not expanded because it is outside the PR #1412 blocker scope.
 
-Merge-ready after Worker #2 confirms GitHub checks and Worker #3 confirms final UX/accessibility acceptance. Use the stack order exactly: #1353 -> #1355 -> #1356. Do not squash or reorder the stack during final merge review unless Worker #2 explicitly chooses that strategy.
+## Worker #3 Review Packet
+
+Focus review on:
+
+1. AdminShell and AdminDashboard navigation still feel consistent across desktop, tablet, and mobile after switching to registry-derived items.
+2. Universal search states are clear for `Partial Results`, `Permission Restricted`, `No Results`, loading, and error cases.
+3. Search result destinations remain intuitive for opportunities, appointments, billing, documents, and settings.
+4. Notification language does not imply live proof when data is configured, connected, partial, unknown, or estimated.
+5. Product signup fallback is acceptable as a static checkout safety path and does not overclaim successful checkout before `createCheckoutSession` returns a URL.
+
+## GitHub Draft
+
+Title: Make PR #1412 merge-ready: route registry, search permissions, notification contract, CI blockers
+
+Body:
+
+This repair branch resolves the remaining Worker #1 blockers for PR #1412.
+
+- Moved AdminShell/AdminDashboard navigation ownership to platform route registry helpers.
+- Added missing platform routes for valid legacy admin tabs and standalone admin destinations.
+- Expanded universal search to opportunities and appointments.
+- Added permission-aware search response state and `Permission Restricted` handling.
+- Completed the notification contract and fixture validation for AI, BI, Billing, Security, and Integration.
+- Replaced fake/test lead hard deletes with quarantine/audit behavior.
+- Added product-signup fallback build output and strict Vite preview route proof.
+- Added route-registry and platform-contract validators.
+
+Validation: typecheck, focused ESLint, build, CRM guard, product-signup smoke including strict preview, platform/unified validators, node tests, and Phase A/B/C/E browser validators all pass locally.
+
+## Asana Draft
+
+Task: PR #1412 unified platform integration blocker repair is ready for Worker #2 sequencing.
+
+Update:
+
+Worker #1 blockers are resolved on `feature/unified-platform-integration-repair`. Route registry ownership, search source completeness, permission enforcement, notification contract completeness, CRM delete guard, and product-signup fallback proof all pass local validation. No merge/deploy/live integration was performed. Worker #2 should sequence final GitHub checks/PR handling, and Worker #3 should review the navigation/search/accessibility packet before merge acceptance.

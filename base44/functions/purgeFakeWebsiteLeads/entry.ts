@@ -109,7 +109,7 @@ Deno.serve(async (req) => {
       .map((lead) => ({ lead, classification: classifyFakeLead(lead) }))
       .filter((entry) => entry.classification.is_fake);
 
-    const deleted: Array<{ id: string; reasons: string[] }> = [];
+    const quarantined: Array<{ id: string; reasons: string[] }> = [];
     const failed: Array<{ id: string; reasons: string[]; error: string }> = [];
 
     if (!dryRun) {
@@ -118,8 +118,15 @@ Deno.serve(async (req) => {
         if (!id) continue;
 
         try {
-          await base44.asServiceRole.entities.WebsiteLead.delete(id);
-          deleted.push({ id, reasons: entry.classification.reasons });
+          await base44.asServiceRole.entities.WebsiteLead.update(id, {
+            do_not_contact: true,
+            quality_review_status: 'quarantined',
+            quality_reason: 'Deterministic fake/test data quarantined by admin cleanup',
+            quality_reason_codes: entry.classification.reasons,
+            archived_at: new Date().toISOString(),
+            archived_reason: 'fake_website_lead_quarantine',
+          });
+          quarantined.push({ id, reasons: entry.classification.reasons });
         } catch (error) {
           failed.push({
             id,
@@ -139,13 +146,13 @@ Deno.serve(async (req) => {
 
     await base44.asServiceRole.entities.AuditLog.create({
       admin_email: user.email || 'admin',
-      action: dryRun ? 'fake_website_lead_audit' : 'fake_website_lead_purge',
+      action: dryRun ? 'fake_website_lead_audit' : 'fake_website_lead_quarantine',
       entity_name: 'WebsiteLead',
       record_id: requestId,
       before: JSON.stringify({ scanned: records.length }),
       after: JSON.stringify({
         matched: matches.length,
-        deleted: deleted.length,
+        quarantined: quarantined.length,
         failed: failed.length,
         dry_run: dryRun,
         reason_counts: reasonCounts,
@@ -160,7 +167,8 @@ Deno.serve(async (req) => {
       dry_run: dryRun,
       scanned: records.length,
       matched_fake_leads: matches.length,
-      deleted: deleted.length,
+      quarantined: quarantined.length,
+      deleted: 0,
       failed: failed.length,
       reason_counts: reasonCounts,
       matched_records: matches.map(({ lead, classification }) => ({

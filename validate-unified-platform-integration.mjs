@@ -24,6 +24,10 @@ import {
   PHASE_E_VIEWPORTS,
 } from "./src/lib/phaseELifecycleFoundation.js";
 import {
+  ADMIN_DASHBOARD_NAVIGATION_GROUPS,
+  ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS,
+  ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS,
+  ADMIN_SHELL_NAVIGATION_GROUPS,
   CUSTOMER_CONTEXT_CONTRACT,
   DATA_FRESHNESS_STATES,
   DATA_TRUTH_STATES,
@@ -186,8 +190,13 @@ function assertPhaseF(checks) {
   const navIds = PLATFORM_NAVIGATION_SECTIONS.map((section) => section.id);
   recordCheck(checks, "phase-f.platform-validation", phaseFValidation.ok, phaseFValidation);
   recordCheck(checks, "phase-f.navigation-sections", navIds.join(",") === PLATFORM_NAVIGATION_SECTION_IDS.join(","), { navIds });
-  recordCheck(checks, "phase-f.search-sources", PLATFORM_SEARCH_SOURCES.length === 8);
-  recordCheck(checks, "phase-f.notifications", PLATFORM_NOTIFICATION_CONTRACT.requiredFields.includes("businessImpact"));
+  recordCheck(checks, "phase-f.search-sources", PLATFORM_SEARCH_SOURCES.length === 10);
+  recordCheck(
+    checks,
+    "phase-f.notifications",
+    ["severity", "whatHappened", "whyItMatters", "businessImpact", "createdAt"]
+      .every((field) => PLATFORM_NOTIFICATION_CONTRACT.requiredFields.includes(field)),
+  );
   recordCheck(checks, "phase-f.activity", PLATFORM_ACTIVITY_EVENT_CONTRACT.requiredFields.includes("deepLink"));
   recordCheck(checks, "phase-f.customer-context", CUSTOMER_CONTEXT_CONTRACT.requiredFields.includes("recentActivity"));
   recordCheck(
@@ -203,9 +212,17 @@ function assertPhaseF(checks) {
 function assertUnifiedWiring(checks) {
   const appSource = sourceFile("src/App.jsx");
   const adminShellSource = sourceFile("src/components/admin/AdminShell.jsx");
+  const adminDashboardSource = sourceFile("src/internal-pages/AdminDashboard.jsx");
   const adminSearchSource = sourceFile("src/lib/adminGlobalSearch.js");
   const routeIds = new Set(PLATFORM_ROUTES.map((route) => route.id));
   const routeDestinationIds = new Set(PLATFORM_ROUTES.map((route) => getPlatformRouteByDestination(route.destination)?.id));
+  const routeIdForNavEntry = (entry) => (typeof entry === "string" ? entry : entry.routeId);
+  const shellRouteIds = new Set(ADMIN_SHELL_NAVIGATION_GROUPS.flatMap((group) => group.items.map(routeIdForNavEntry)));
+  const dashboardRouteIds = new Set([
+    ...ADMIN_DASHBOARD_NAVIGATION_GROUPS.flatMap((group) => group.items.map(routeIdForNavEntry)),
+    ...ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS.map(routeIdForNavEntry),
+    ...ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS.map(routeIdForNavEntry),
+  ]);
 
   for (const [phaseId, routeRequirements] of Object.entries(phaseRouteRequirements)) {
     recordCheck(
@@ -228,15 +245,14 @@ function assertUnifiedWiring(checks) {
   recordCheck(
     checks,
     "unified.admin-shell",
-    adminShellSource.includes('group: "Command Center"') &&
-      adminShellSource.includes('group: "Intelligence"') &&
-      adminShellSource.includes('group: "Operations"') &&
-      adminShellSource.includes('group: "Customers"') &&
-      adminShellSource.includes('group: "Communications"') &&
-      adminShellSource.includes('group: "AI Workforce"') &&
-      adminShellSource.includes('group: "Administration"') &&
-      adminShellSource.includes('group: "Account"') &&
-      adminShellSource.includes('path: "/admin/platform"'),
+    adminShellSource.includes("getPlatformNavigationGroups") &&
+      adminShellSource.includes("ADMIN_SHELL_NAVIGATION_GROUPS") &&
+      adminDashboardSource.includes("getPlatformNavigationGroups") &&
+      adminDashboardSource.includes("ADMIN_DASHBOARD_NAVIGATION_GROUPS") &&
+      ["admin-overview", "platform-integration", "inbox", "leads", "automation-activity", "settings-billing"]
+        .every((routeId) => shellRouteIds.has(routeId)) &&
+      ["admin-overview", "platform-integration", "customer-onboarding", "ai-sales", "install-guide"]
+        .every((routeId) => dashboardRouteIds.has(routeId)),
   );
   recordCheck(
     checks,

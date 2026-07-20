@@ -1,14 +1,15 @@
 /**
  * AdminGlobalSearch.jsx - Phase F universal search surface.
- * Searches customers, leads, conversations, AI workers, timeline events,
- * settings, billing, and documents through one result contract.
+ * Searches customers, leads, opportunities, appointments, conversations,
+ * AI workers, timeline events, settings, billing, and documents through one result contract.
  */
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
+import { useAuth } from "@/lib/AuthContext";
 import { Search, X } from "lucide-react";
 import {
-  buildAdminGlobalSearchResults,
+  buildAdminGlobalSearchResponse,
   getAdminGlobalSearchPlaceholder,
   loadAdminGlobalSearchRecords,
 } from "@/lib/adminGlobalSearch";
@@ -16,6 +17,8 @@ import {
 const ENTITY_COLORS = {
   customer: "#00FFB3",
   lead: "#00D4FF",
+  opportunity: "#F97316",
+  appointment: "#22C55E",
   conversation: "#F59E0B",
   ai_worker: "#A78BFA",
   timeline_event: "#38BDF8",
@@ -26,12 +29,22 @@ const ENTITY_COLORS = {
 
 const RESULT_STATE_COPY = {
   loading: "Searching...",
+  "partial-results": "Partial results available",
+  "permission-restricted": "Permission restricted",
   "no-results": "No results found",
   error: "Search is unavailable",
 };
 
+function toSearchUiStatus(platformStatus) {
+  if (platformStatus === "Partial Results") return "partial-results";
+  if (platformStatus === "Permission Restricted") return "permission-restricted";
+  if (platformStatus === "No Results") return "no-results";
+  return "results";
+}
+
 export default function AdminGlobalSearch({ onSelect, onNavigate }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [query, setQuery] = useState("");
   const [results, setResults] = useState([]);
   const [status, setStatus] = useState("idle");
@@ -55,15 +68,15 @@ export default function AdminGlobalSearch({ onSelect, onNavigate }) {
       setStatus("loading");
       try {
         const searchRecords = await loadAdminGlobalSearchRecords(base44);
-        const nextResults = buildAdminGlobalSearchResults(
+        const searchResponse = buildAdminGlobalSearchResponse(
           searchRecords.recordsBySource,
           query,
           10,
-          { sourceStatuses: searchRecords.sourceStatuses },
+          { sourceStatuses: searchRecords.sourceStatuses, user },
         );
 
-        setResults(nextResults);
-        setStatus(nextResults.length > 0 ? "results" : "no-results");
+        setResults(searchResponse.results);
+        setStatus(toSearchUiStatus(searchResponse.status));
       } catch {
         setResults([]);
         setStatus("error");
@@ -71,9 +84,9 @@ export default function AdminGlobalSearch({ onSelect, onNavigate }) {
     }, 280);
 
     return () => clearTimeout(debounce.current);
-  }, [query]);
+  }, [query, user]);
 
-  const showMenu = status === "loading" || status === "results" || status === "no-results" || status === "error";
+  const showMenu = status !== "idle";
 
   return (
     <div style={{ position: "relative", width: "100%", maxWidth: 400 }}>

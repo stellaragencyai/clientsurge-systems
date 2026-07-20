@@ -8,6 +8,12 @@ import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
 import { countWebhookErrorEvents } from "@/lib/adminUnreadCounts";
 import {
+  ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS,
+  ADMIN_SHELL_NAVIGATION_GROUPS,
+  getPlatformNavigationGroups,
+  getPlatformNavigationItems,
+} from "@/lib/platformIntegrationFoundation";
+import {
   LogOut, Menu, X, LayoutDashboard, Settings, BarChart3, MessageSquare,
   Activity, Users, FolderKanban, Zap, ClipboardList, Loader2, Send, Flame,
   Mail, Target, PieChart, Layers, DollarSign, Inbox, RefreshCw,
@@ -18,108 +24,75 @@ import AdminGlobalSearch from "./AdminGlobalSearch";
 import DarkModeToggle from "./DarkModeToggle";
 import AdminSessionGuard from "./AdminSessionGuard";
 
-const NAV_GROUPS = [
-  {
-    group: "Command Center",
-    items: [
-      { id: "overview",         label: "Overview",          icon: LayoutDashboard, path: "/admin" },
-      { id: "platform-integration", label: "Platform Integration", icon: Layers, path: "/admin/platform" },
-      { id: "audit-command-center", label: "Audit Command Center", icon: ShieldCheck, path: "/admin", tab: "audit-command-center" },
-      { id: "launch-proof", label: "Launch Proof", icon: ShieldCheck, path: "/admin", tab: "launch-proof" },
-    ],
-  },
-  {
-    group: "Intelligence",
-    items: [
-      { id: "lead-intelligence", label: "Lead Intelligence", icon: Flame, path: "/admin", tab: "lead-intelligence" },
-      { id: "analytics",        label: "Analytics",         icon: BarChart3,       path: "/admin", tab: "analytics" },
-      { id: "revenue",          label: "Revenue & MRR",     icon: DollarSign,      path: "/admin", tab: "revenue" },
-      { id: "attribution",      label: "Source Attribution",icon: PieChart,        path: "/admin", tab: "attribution" },
-      { id: "health",           label: "Integration Health",icon: Activity,        path: "/admin", tab: "health" },
-    ],
-  },
-  {
-    group: "Operations",
-    items: [
-      { id: "guided-onboarding", label: "Launch Guide", icon: Zap, path: "/admin", tab: "guided-onboarding" },
-      { id: "client-projects",  label: "Client Projects",   icon: FolderKanban,    path: "/admin", tab: "client-projects" },
-      { id: "deployment-manager", label: "Deployment Manager", icon: ShieldCheck, path: "/admin", tab: "deployment-manager" },
-      { id: "install-queue",    label: "Install Queue",     icon: Server,          path: "/admin", tab: "install-queue" },
-      { id: "launch-gates",     label: "Launch Gates",      icon: ClipboardList,   path: "/admin", tab: "launch-gates" },
-      { id: "ops-verification", label: "Ops Verification", icon: ShieldCheck, path: "/admin/ops-verification" },
-      { id: "inbound-readiness", label: "Inbound Readiness", icon: ShieldCheck, path: "/admin/inbound-readiness" },
-      { id: "broken-flows", label: "Broken Flows", icon: Ban, path: "/admin/broken-flows" },
-      { id: "publish-drift", label: "Publish Drift", icon: Server, path: "/admin/publish-drift" },
-    ],
-  },
-  {
-    group: "Customers",
-    items: [
-      { id: "leads",            label: "Leads",             icon: Users,           path: "/admin", tab: "leads" },
-      { id: "priority",         label: "Priority Queue",    icon: Star,            path: "/admin", tab: "priority" },
-      { id: "website-leads",    label: "Website Leads",     icon: Target,          path: "/admin", tab: "website-leads" },
-      { id: "demo-bookings",    label: "Demo Bookings",     icon: ClipboardList,   path: "/admin", tab: "demo-bookings" },
-      { id: "onboarding",       label: "Client Onboarding", icon: ClipboardList,   path: "/admin/onboarding" },
-      { id: "onboarding-pipeline", label: "Onboarding Pipeline", icon: LayoutDashboard, path: "/admin/onboarding-pipeline" },
-      { id: "opportunity-review", label: "Opportunity Review", icon: ListChecks,    path: "/admin/opportunity-review" },
-    ],
-  },
-  {
-    group: "Communications",
-    items: [
-      { id: "inbox",            label: "Inbox",             icon: Inbox,           path: "/admin", tab: "inbox", badge: "inbox" },
-      { id: "logs",             label: "Communication Logs",icon: MessageSquare,   path: "/admin", tab: "logs", badge: "webhook-errors" },
-      { id: "templates",        label: "Templates",         icon: MessageSquare,   path: "/admin", tab: "templates" },
-      { id: "review-request",   label: "Review Requests",   icon: Star,            path: "/admin", tab: "review-request" },
-      { id: "email-campaigns",  label: "Email Campaigns",   icon: Mail,            path: "/admin", tab: "email-campaigns" },
-      { id: "routing",          label: "Lead Routing",      icon: Target,          path: "/admin", tab: "routing" },
-      { id: "marketing",        label: "AI Marketing",      icon: Sparkles,        path: "/admin/marketing" },
-    ],
-  },
-  {
-    group: "AI Workforce",
-    items: [
-      { id: "automations",      label: "Automation Status", icon: Zap,             path: "/admin/automations" },
-      { id: "ai-sales",         label: "AI Sales Command",  icon: Zap,             path: "/admin/ai-sales" },
-      { id: "automation-activity", label: "Automation Activity", icon: Activity,    path: "/admin/automation-activity" },
-      { id: "task-board",       label: "Task Board",        icon: ClipboardList,   path: "/admin", tab: "task-board" },
-      { id: "campaign-builder", label: "Campaign Builder",  icon: Layers,          path: "/admin", tab: "campaign-builder" },
-      { id: "drip",             label: "Drip Campaigns",    icon: Send,            path: "/admin", tab: "drip" },
-      { id: "nurture",          label: "Nurture Campaigns", icon: Flame,           path: "/admin", tab: "nurture" },
-      { id: "cadence",          label: "Dynamic Cadence",   icon: Settings,        path: "/admin", tab: "cadence" },
-      { id: "reactivation",     label: "Lead Reactivation", icon: RotateCcw,       path: "/admin", tab: "reactivation" },
-    ],
-  },
-  {
-    group: "Administration",
-    items: [
-      { id: "enterprise-settings", label: "Enterprise Settings", icon: Settings,    path: "/settings/organization" },
-      { id: "settings",         label: "Settings",          icon: Settings,        path: "/admin", tab: "settings" },
-      { id: "crm-health",       label: "CRM Health",        icon: ShieldCheck,     path: "/admin", tab: "crm-health" },
-      { id: "sprint2-blockers", label: "Sprint 2 Blockers", icon: Ban, path: "/admin/sprint2-blockers" },
-      { id: "audit-log",        label: "Audit Log",         icon: ShieldCheck,     path: "/admin", tab: "audit-log" },
-      { id: "qa",               label: "QA Tools",          icon: RefreshCw,       path: "/admin", tab: "qa" },
-      { id: "install-guide",    label: "Install Guide",     icon: BookOpen,        path: "/admin/install-guide" },
-    ],
-  },
-  {
-    group: "Account",
-    items: [
-      { id: "billing", label: "Billing", icon: DollarSign, path: "/settings/billing" },
-      { id: "usage", label: "Usage", icon: Activity, path: "/settings/usage" },
-      { id: "support", label: "Support", icon: MessageSquare, path: "/settings/support" },
-    ],
-  },
-];
+const NAV_ICON_BY_ROUTE_ID = {
+  "admin-overview": LayoutDashboard,
+  "platform-integration": Layers,
+  "audit-command-center": ShieldCheck,
+  "launch-proof": ShieldCheck,
+  "lead-intelligence": Flame,
+  analytics: BarChart3,
+  revenue: DollarSign,
+  attribution: PieChart,
+  health: Activity,
+  "guided-onboarding": Zap,
+  "client-projects": FolderKanban,
+  "deployment-manager": ShieldCheck,
+  "install-queue": Server,
+  "launch-gates": ClipboardList,
+  "ops-verification": ShieldCheck,
+  "inbound-readiness": ShieldCheck,
+  "broken-flows": Ban,
+  "publish-drift": Server,
+  leads: Users,
+  priority: Star,
+  "website-leads": Target,
+  "demo-bookings": ClipboardList,
+  "client-onboarding": ClipboardList,
+  "onboarding-pipeline": LayoutDashboard,
+  "opportunity-review": ListChecks,
+  inbox: Inbox,
+  "communication-logs": MessageSquare,
+  templates: MessageSquare,
+  "review-request": Star,
+  "email-campaigns": Mail,
+  routing: Target,
+  "ai-marketing": Sparkles,
+  automations: Zap,
+  "ai-sales": Zap,
+  "automation-activity": Activity,
+  "task-board": ClipboardList,
+  "campaign-builder": Layers,
+  drip: Send,
+  nurture: Flame,
+  cadence: Settings,
+  reactivation: RotateCcw,
+  "settings-organization": Settings,
+  settings: Settings,
+  "crm-health": ShieldCheck,
+  "sprint2-blockers": Ban,
+  "audit-log": ShieldCheck,
+  qa: RefreshCw,
+  "install-guide": BookOpen,
+  "settings-billing": DollarSign,
+  "settings-usage": Activity,
+  "settings-support": MessageSquare,
+};
+
+function addPresentation(items) {
+  return items.map((item) => ({
+    ...item,
+    icon: NAV_ICON_BY_ROUTE_ID[item.routeId] || LayoutDashboard,
+  }));
+}
+
+function addGroupPresentation(groups) {
+  return groups.map((group) => ({
+    ...group,
+    items: addPresentation(group.items),
+  }));
+}
 
 const isDesktopViewport = () => typeof window === "undefined" || window.innerWidth >= 1024;
-const MOBILE_QUICK_NAV = [
-  { id: "overview", label: "Overview", path: "/admin" },
-  { id: "platform-integration", label: "Platform", path: "/admin/platform" },
-  { id: "leads", label: "Leads", path: "/admin", tab: "leads" },
-  { id: "inbox", label: "Inbox", path: "/admin", tab: "inbox" },
-  { id: "settings", label: "Settings", path: "/admin", tab: "settings" },
-];
 
 export default function AdminShell({ children, title, activeId }) {
   const { user } = useAuth();
@@ -130,6 +103,8 @@ export default function AdminShell({ children, title, activeId }) {
   const [loggingOut, setLoggingOut] = useState(false);
   const [inboxUnread, setInboxUnread] = useState(0);
   const [webhookErrorCount, setWebhookErrorCount] = useState(0);
+  const navGroups = addGroupPresentation(getPlatformNavigationGroups(user, ADMIN_SHELL_NAVIGATION_GROUPS));
+  const mobileQuickNav = addPresentation(getPlatformNavigationItems(user, ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS));
 
   useEffect(() => {
     const handleResize = () => setSidebarOpen(isDesktopViewport());
@@ -154,12 +129,8 @@ export default function AdminShell({ children, title, activeId }) {
   }, []);
 
   const handleNavClick = (item) => {
-    if (item.tab) {
-      navigate(`/admin?tab=${item.tab}`);
-    } else {
-      navigate(item.path);
-    }
-    if (window.innerWidth < 1024) setSidebarOpen(false);
+    navigate(item.destination || item.path || "/admin");
+    if (typeof window !== "undefined" && window.innerWidth < 1024) setSidebarOpen(false);
   };
 
   const handleLogout = () => {
@@ -169,13 +140,14 @@ export default function AdminShell({ children, title, activeId }) {
 
   const isActive = (item) => {
     const currentTab = new URLSearchParams(location.search).get("tab");
+    if (activeId === item.id || activeId === item.routeId) return true;
     if (item.tab) {
-      return activeId === item.id || (location.pathname === item.path && currentTab === item.tab);
+      return location.pathname === item.path && currentTab === item.tab;
     }
-    if (item.path !== "/admin" && !item.tab) {
+    if (item.path !== "/admin") {
       return location.pathname === item.path;
     }
-    return activeId === item.id;
+    return location.pathname === "/admin" && !currentTab && item.routeId === "admin-overview";
   };
 
   return (
@@ -197,15 +169,14 @@ export default function AdminShell({ children, title, activeId }) {
 
         <div className="px-3 py-2 border-b border-border">
           <AdminGlobalSearch
-            onNavigate={(tab) => {
-              navigate(`/admin?tab=${tab}`);
-              if (window.innerWidth < 1024) setSidebarOpen(false);
+            onNavigate={() => {
+              if (typeof window !== "undefined" && window.innerWidth < 1024) setSidebarOpen(false);
             }}
           />
         </div>
 
         <nav className="flex-1 p-3 overflow-y-auto space-y-4 overscroll-contain">
-          {NAV_GROUPS.map(({ group, items }) => (
+          {navGroups.map(({ group, items }) => (
             <div key={group}>
               <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
                 {group}
@@ -298,7 +269,7 @@ export default function AdminShell({ children, title, activeId }) {
 
         <div className="lg:hidden border-b border-border bg-background/95 px-3 py-2 overflow-x-auto">
           <div className="flex gap-2 min-w-max">
-            {MOBILE_QUICK_NAV.map((item) => (
+            {mobileQuickNav.map((item) => (
               <button
                 key={item.id}
                 onClick={() => handleNavClick(item)}

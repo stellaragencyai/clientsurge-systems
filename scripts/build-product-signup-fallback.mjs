@@ -1,0 +1,144 @@
+#!/usr/bin/env node
+
+import { existsSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
+import path from "node:path";
+
+const outDir = path.resolve("dist");
+const appId = "69dc4a79656fdba136d413d3";
+const checkoutFunction = "createCheckoutSession";
+const checkoutEndpoint = `/api/apps/${appId}/functions/${checkoutFunction}`;
+const fallbackPaths = ["product-signup", "product_signup", "product-sign-up"];
+
+if (!existsSync(outDir)) {
+  throw new Error("dist directory not found. Run this script after vite build.");
+}
+
+mkdirSync(outDir, { recursive: true });
+
+const html = `<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="robots" content="noindex,follow">
+    <title>Complete your ClientSurge signup</title>
+    <style>
+      :root { color-scheme: light; font-family: Montserrat, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      body { margin: 0; background: #f7f9fc; color: #0f172a; }
+      main { max-width: 880px; margin: 0 auto; padding: 40px 18px 56px; }
+      header { background: #fff; border-bottom: 1px solid #e5edf5; }
+      header div { max-width: 880px; margin: 0 auto; padding: 18px; font-weight: 900; font-size: 20px; }
+      h1 { margin: 0 0 10px; font-size: clamp(28px, 4vw, 40px); line-height: 1.05; }
+      h2 { font-size: 19px; margin: 28px 0 12px; }
+      p { color: #475569; line-height: 1.55; }
+      .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 18px; }
+      label.plan { display: block; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; padding: 16px; cursor: pointer; }
+      label.plan strong { display: block; color: #0f172a; margin-bottom: 6px; }
+      form { margin-top: 24px; background: #fff; border: 1px solid #dbe5ef; border-radius: 8px; padding: 22px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07); }
+      .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+      .full { grid-column: 1 / -1; }
+      label span { display: block; margin-bottom: 6px; font-size: 13px; font-weight: 800; color: #334155; }
+      input, select { width: 100%; box-sizing: border-box; border: 1px solid #cbd5e1; border-radius: 8px; padding: 12px; font: inherit; font-size: 16px; }
+      button { width: 100%; min-height: 54px; margin-top: 18px; border: 0; border-radius: 8px; background: #0077b6; color: #fff; font-weight: 900; font-size: 16px; cursor: pointer; }
+      button:disabled { cursor: wait; opacity: 0.7; }
+      .note { font-size: 13px; }
+      .error { display: none; margin-top: 14px; color: #991b1b; background: #fee2e2; border: 1px solid #fecaca; border-radius: 8px; padding: 12px; }
+      @media (max-width: 640px) { .grid { grid-template-columns: 1fr; } main { padding-top: 28px; } }
+    </style>
+  </head>
+  <body data-route-verify="product-signup" data-base44-app-id="${appId}">
+    <header><div>ClientSurge Systems</div></header>
+    <main>
+      <p class="note">Secure Checkout</p>
+      <h1>Complete your ClientSurge signup</h1>
+      <p>Select Starter System, Growth System, or Pro System, then enter Your Information to Continue to Secure Checkout.</p>
+      <section class="plans" aria-label="Choose Your System">
+        <label class="plan"><input type="radio" name="package_key" value="starter_system" form="checkout-form"> <strong>Starter System</strong><span>Instant lead response and missed-call text-back.</span></label>
+        <label class="plan"><input type="radio" name="package_key" value="growth_system" form="checkout-form" checked> <strong>Growth System</strong><span>Starter plus nurture and AI booking handoff.</span></label>
+        <label class="plan"><input type="radio" name="package_key" value="pro_system" form="checkout-form"> <strong>Pro System</strong><span>Growth plus reactivation and review requests.</span></label>
+      </section>
+      <form id="checkout-form" data-checkout-function="${checkoutFunction}" data-checkout-endpoint="${checkoutEndpoint}">
+        <h2>Your Information</h2>
+        <div class="grid">
+          <label class="full"><span>Full Name</span><input name="customer_name" autocomplete="name" required></label>
+          <label class="full"><span>Business Name</span><input name="business_name" autocomplete="organization" required></label>
+          <label><span>Email Address</span><input name="customer_email" type="email" autocomplete="email" required></label>
+          <label><span>Phone Number</span><input name="customer_phone" type="tel" autocomplete="tel" required></label>
+          <label class="full"><span>Industry / Business Type</span><input name="industry" required></label>
+        </div>
+        <label class="full" style="display:flex;gap:10px;margin-top:14px;align-items:flex-start;">
+          <input name="consent_given" type="checkbox" required style="width:auto;margin-top:4px;">
+          <span>I agree that ClientSurge Systems may contact me about this purchase and setup.</span>
+        </label>
+        <button type="submit">Continue to Secure Checkout</button>
+        <div class="error" role="alert"></div>
+        <p class="note">Checkout endpoint: ${checkoutEndpoint}</p>
+      </form>
+    </main>
+    <script>
+      const form = document.getElementById("checkout-form");
+      const errorBox = form.querySelector(".error");
+      const params = new URLSearchParams(window.location.search);
+      const requestedPackage = params.get("package") || params.get("plan");
+      const normalized = { starter: "starter_system", growth: "growth_system", pro: "pro_system" }[requestedPackage] || requestedPackage;
+      if (normalized) {
+        const selected = form.querySelector('input[name="package_key"][value="' + normalized + '"]');
+        if (selected) selected.checked = true;
+      }
+
+      form.addEventListener("submit", async (event) => {
+        event.preventDefault();
+        errorBox.style.display = "none";
+        const submit = form.querySelector("button");
+        submit.disabled = true;
+        submit.textContent = "Preparing secure checkout...";
+        const data = new FormData(form);
+        const packageKey = data.get("package_key") || "growth_system";
+        const payload = {
+          package_key: packageKey,
+          customer_name: String(data.get("customer_name") || "").trim(),
+          customer_email: String(data.get("customer_email") || "").trim(),
+          customer_phone: String(data.get("customer_phone") || "").trim(),
+          business_name: String(data.get("business_name") || "").trim(),
+          industry: String(data.get("industry") || "").trim(),
+          success_url: window.location.origin + "/order-success?session_id={CHECKOUT_SESSION_ID}",
+          cancel_url: window.location.origin + "/product-signup?package=" + encodeURIComponent(packageKey),
+          source: "product_signup_static_fallback",
+          consent_given: true,
+          consent_source: "product_signup_checkout_form",
+          consent_text_version: "checkout_contact_consent_v1",
+          requested_channels: ["email", "sms", "call"]
+        };
+        try {
+          const response = await fetch("${checkoutEndpoint}", {
+            method: "POST",
+            headers: { Accept: "application/json", "Content-Type": "application/json" },
+            credentials: "same-origin",
+            body: JSON.stringify(payload)
+          });
+          const result = await response.json().catch(() => ({}));
+          const checkoutUrl = result.url || result.data?.url;
+          if (!response.ok || !checkoutUrl) throw new Error(result.error || result.data?.error || "Checkout could not be started.");
+          window.location.assign(checkoutUrl);
+        } catch (error) {
+          errorBox.textContent = (error && error.message) || "Checkout could not be started.";
+          errorBox.style.display = "block";
+          submit.disabled = false;
+          submit.textContent = "Continue to Secure Checkout";
+        }
+      });
+    </script>
+  </body>
+</html>
+`;
+
+for (const fallbackPath of fallbackPaths) {
+  const fallbackDir = path.join(outDir, fallbackPath);
+  if (existsSync(fallbackDir) && !statSync(fallbackDir).isDirectory()) {
+    rmSync(fallbackDir, { force: true });
+  }
+  mkdirSync(fallbackDir, { recursive: true });
+  writeFileSync(path.join(fallbackDir, "index.html"), html, "utf8");
+}
+
+console.log(`Wrote product-signup fallback files: ${fallbackPaths.map((item) => `dist/${item}/index.html`).join(", ")}`);

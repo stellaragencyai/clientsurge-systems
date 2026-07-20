@@ -9,6 +9,7 @@ import {
   PLATFORM_NAVIGATION_SECTION_IDS,
   PLATFORM_NAVIGATION_SECTIONS,
   PLATFORM_NOTIFICATION_CONTRACT,
+  PLATFORM_NOTIFICATION_FIXTURES,
   PLATFORM_PERMISSION_SCOPES,
   PLATFORM_READINESS_CHECKS,
   PLATFORM_ROUTES,
@@ -19,6 +20,7 @@ import {
   PLATFORM_VALIDATION_VIEWPORTS,
   WORKER_3_PACKET,
   buildCustomerContext,
+  buildPlatformSearchResponse,
   buildPlatformSearchResults,
   canPromoteTruthState,
   evaluatePlatformPermission,
@@ -75,6 +77,8 @@ test("Phase F search contract spans the required source families", () => {
   assert.deepEqual(PLATFORM_SEARCH_SOURCES.map((source) => source.id), [
     "customers",
     "leads",
+    "opportunities",
+    "appointments",
     "conversations",
     "ai-workers",
     "timeline-events",
@@ -100,7 +104,7 @@ test("Phase F search contract spans the required source families", () => {
     "Loading",
     "Results",
     "No Results",
-    "Partial",
+    "Partial Results",
     "Permission Restricted",
     "Error",
   ]);
@@ -108,6 +112,8 @@ test("Phase F search contract spans the required source families", () => {
   const results = buildPlatformSearchResults({
     customers: [{ id: "client_1", business_name: "Mesa Dental", owner: "Ops" }],
     leads: [{ id: "lead_1", business_name: "Mesa Plumbing", assigned_to: "Sales" }],
+    opportunities: [{ id: "opp_1", business_name: "Mesa Restoration", activation_priority: "High" }],
+    appointments: [{ id: "booking_1", business_name: "Mesa Roofing", scheduled_date: "2026-07-21" }],
     conversations: [{ id: "message_1", subject: "Mesa support", sender_email: "client@example.com" }],
     ai_workers: [{ id: "worker_1", name: "Mesa responder", owner: "AI Ops" }],
     timeline_events: [{ id: "event_1", type: "Mesa launch", actor: "Nolan" }],
@@ -116,7 +122,7 @@ test("Phase F search contract spans the required source families", () => {
     documents: [{ id: "doc_1", title: "Mesa launch packet", owner: "Ops" }],
   }, "mesa");
 
-  assert.equal(results.length, 8);
+  assert.equal(results.length, 10);
   for (const result of results) {
     for (const field of PLATFORM_SEARCH_RESULT_FIELDS) {
       assert.ok(result[field], `${field} should be present for ${result.type}`);
@@ -126,20 +132,35 @@ test("Phase F search contract spans the required source families", () => {
     assert.equal(result.metadata.routeId, result.route);
     assert.ok(result.metadata.permissionScope);
   }
+
+  const restrictedResponse = buildPlatformSearchResponse({
+    settings: [{ id: "roles", title: "Mesa role settings", scope: "Organization" }],
+  }, "mesa", 10, { user: { role: "client" } });
+  assert.equal(restrictedResponse.status, "Permission Restricted");
+  assert.equal(restrictedResponse.results.length, 0);
+  assert.equal(restrictedResponse.restrictedCount, 1);
 });
 
 test("notification, activity, customer context, and truth contracts are explicit", () => {
   assert.deepEqual(PLATFORM_NOTIFICATION_CONTRACT.requiredFields, [
+    "id",
     "title",
     "category",
-    "priority",
+    "severity",
     "source",
+    "whatHappened",
+    "whyItMatters",
     "businessImpact",
     "recommendedAction",
     "owner",
     "destination",
     "status",
+    "createdAt",
   ]);
+  assert.ok(PLATFORM_NOTIFICATION_FIXTURES.length >= 5);
+  for (const source of ["AI", "Business Intelligence", "Billing", "Security", "Integration"]) {
+    assert.ok(PLATFORM_NOTIFICATION_FIXTURES.some((fixture) => fixture.source === source), `${source} fixture missing`);
+  }
   assert.deepEqual(PLATFORM_NOTIFICATION_CONTRACT.states, [
     "Unread",
     "Read",
@@ -198,12 +219,13 @@ test("protected route, admin navigation, accessibility, and readiness harness ar
   assert.match(appSource, /lazy\(\(\) => import\("\.\/pages\/admin\/PlatformIntegrationFoundation"\)\)/);
   assert.match(appSource, /routePath\("admin", "platform"\), Component: PlatformIntegrationFoundation/);
   assert.match(appSource, /allowedRoles=\{\["admin", "super_admin"\]\}/);
-  assert.match(adminShellSource, /group: "Command Center"/);
-  assert.match(adminShellSource, /group: "AI Workforce"/);
-  assert.match(adminShellSource, /group: "Account"/);
-  assert.match(adminShellSource, /label: "Platform Integration", icon: Layers, path: "\/admin\/platform"/);
-  assert.match(adminDashboardSource, /group: 'Command Center'/);
-  assert.match(adminDashboardSource, /externalPath: '\/admin\/platform'/);
+  assert.match(adminShellSource, /getPlatformNavigationGroups/);
+  assert.match(adminShellSource, /ADMIN_SHELL_NAVIGATION_GROUPS/);
+  assert.match(adminShellSource, /ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS/);
+  assert.doesNotMatch(adminShellSource, /const NAV_GROUPS = \[/);
+  assert.match(adminDashboardSource, /getPlatformNavigationGroups/);
+  assert.match(adminDashboardSource, /ADMIN_DASHBOARD_NAVIGATION_GROUPS/);
+  assert.match(adminDashboardSource, /ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS/);
 
   for (const required of [
     "aria-current",

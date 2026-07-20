@@ -122,6 +122,7 @@ const route = ({
   id,
   path,
   tab,
+  navigationId,
   title,
   description,
   navSection,
@@ -139,6 +140,7 @@ const route = ({
   description,
   permissionRequirement,
   navigationLocation: {
+    id: navigationId || tab || id,
     section: navSection,
     label: navLabel || title,
     order,
@@ -170,6 +172,7 @@ export const PLATFORM_ROUTES = [
   route({
     id: "admin-overview",
     path: "/admin",
+    navigationId: "overview",
     title: "Command Center Overview",
     description: "Unified admin overview for leads, client launch, automation, revenue, and system proof.",
     navSection: "command-center",
@@ -241,6 +244,16 @@ export const PLATFORM_ROUTES = [
     system: "Revenue Intelligence",
   }),
   route({
+    id: "revenue-tracking",
+    path: "/admin",
+    tab: "revenue-tracking",
+    title: "Revenue Tracking",
+    description: "Detailed revenue tracking with order, subscription, and payment-state context.",
+    navSection: "intelligence",
+    order: 12.5,
+    system: "Revenue Intelligence",
+  }),
+  route({
     id: "attribution",
     path: "/admin",
     tab: "attribution",
@@ -248,6 +261,16 @@ export const PLATFORM_ROUTES = [
     description: "Campaign, channel, and landing-source attribution with data freshness labels.",
     navSection: "intelligence",
     order: 13,
+    system: "Website Intelligence",
+  }),
+  route({
+    id: "landing-traffic",
+    path: "/admin",
+    tab: "landing-traffic",
+    title: "Landing Traffic",
+    description: "Landing-page traffic and conversion review with source and freshness context.",
+    navSection: "intelligence",
+    order: 13.5,
     system: "Website Intelligence",
   }),
   route({
@@ -314,6 +337,28 @@ export const PLATFORM_ROUTES = [
     system: "Production Readiness",
   }),
   route({
+    id: "onboarding-orchestration",
+    path: "/admin",
+    tab: "onboarding-orchestration",
+    title: "Onboarding Progress",
+    description: "Unified onboarding progress review with task, client, and launch-state context.",
+    navSection: "operations",
+    order: 24.2,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Onboarding",
+  }),
+  route({
+    id: "install-checklists",
+    path: "/admin",
+    tab: "install-checklists",
+    title: "Install Checklists",
+    description: "Installation checklist validation with service, proof, and blocker state.",
+    navSection: "operations",
+    order: 24.4,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Activation",
+  }),
+  route({
     id: "ops-verification",
     path: "/admin/ops-verification",
     title: "Ops Verification Center",
@@ -373,13 +418,25 @@ export const PLATFORM_ROUTES = [
     system: "Opportunity Center",
   }),
   route({
+    id: "priority",
+    path: "/admin",
+    tab: "priority",
+    title: "Priority Queue",
+    description: "Prioritized outreach queue with activation, booking, and follow-up signals.",
+    navSection: "customers",
+    order: 32,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    deepLinkParams: ["lead"],
+    system: "Opportunity Center",
+  }),
+  route({
     id: "website-leads",
     path: "/admin",
     tab: "website-leads",
     title: "Website Leads",
     description: "Website lead intake with verified-junk guardrails and source context.",
     navSection: "customers",
-    order: 32,
+    order: 33,
     permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
     system: "Website Intelligence",
   }),
@@ -390,17 +447,51 @@ export const PLATFORM_ROUTES = [
     title: "Demo Bookings",
     description: "Booked demos, source context, follow-up ownership, and status.",
     navSection: "customers",
-    order: 33,
+    order: 34,
     permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Opportunity Center",
+  }),
+  route({
+    id: "sales-funnel",
+    path: "/admin",
+    tab: "sales-funnel",
+    title: "Sales Funnel",
+    description: "Lead-to-close funnel review with conversion state and blocker context.",
+    navSection: "customers",
+    order: 35,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Opportunity Center",
+  }),
+  route({
+    id: "opportunity-review",
+    path: "/admin/opportunity-review",
+    title: "Opportunity Review",
+    description: "Review qualified opportunities, recommended actions, and close-risk context.",
+    navSection: "customers",
+    order: 36,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    deepLinkParams: ["opportunity", "lead"],
     system: "Opportunity Center",
   }),
   route({
     id: "client-onboarding",
     path: "/admin/onboarding",
+    navigationId: "onboarding",
     title: "Client Onboarding",
     description: "Onboarding workflow, owner assignment, and customer launch state.",
     navSection: "customers",
-    order: 34,
+    order: 37,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Onboarding",
+  }),
+  route({
+    id: "customer-onboarding",
+    path: "/admin",
+    tab: "customer-onboarding",
+    title: "Customer Onboarding",
+    description: "Dashboard onboarding panel for customer setup, requirements, and launch handoff.",
+    navSection: "customers",
+    order: 38,
     permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
     system: "Onboarding",
   }),
@@ -410,9 +501,31 @@ export const PLATFORM_ROUTES = [
     title: "Onboarding Pipeline",
     description: "Client onboarding pipeline with progress, blockers, and ownership.",
     navSection: "customers",
-    order: 35,
+    order: 39,
     permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
     system: "Onboarding",
+  }),
+  route({
+    id: "platform-clients",
+    path: "/admin",
+    tab: "platform-clients",
+    title: "Platform Clients",
+    description: "Client platform records with account, launch, and ownership context.",
+    navSection: "customers",
+    order: 40,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Customer Success",
+  }),
+  route({
+    id: "sniper",
+    path: "/admin",
+    tab: "sniper",
+    title: "Lead Sniper",
+    description: "Lead Sniper prospecting surface with source, owner, and outreach readiness context.",
+    navSection: "customers",
+    order: 40.5,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Opportunity Center",
   }),
   route({
     id: "client-portal",
@@ -420,7 +533,7 @@ export const PLATFORM_ROUTES = [
     title: "Client Portal",
     description: "Client-facing account, launch, support, and performance context.",
     navSection: "customers",
-    order: 36,
+    order: 41,
     permissionRequirement: CLIENT_VIEW_PERMISSION,
     deepLinkParams: ["section"],
     system: "Customer Success",
@@ -441,11 +554,23 @@ export const PLATFORM_ROUTES = [
     id: "communication-logs",
     path: "/admin",
     tab: "logs",
+    navigationId: "logs",
     title: "Communication Logs",
     description: "Inbound and outbound communication events, provider proof, and failures.",
     navSection: "communications",
     navLabel: "Communication Logs",
     order: 41,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Communication Center",
+  }),
+  route({
+    id: "instant-response",
+    path: "/admin",
+    tab: "instant-response",
+    title: "Instant Response",
+    description: "Instant lead response diagnostics with provider, timing, and delivery truth states.",
+    navSection: "communications",
+    order: 41.5,
     permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
     system: "Communication Center",
   }),
@@ -470,6 +595,17 @@ export const PLATFORM_ROUTES = [
     system: "Communication Center",
   }),
   route({
+    id: "routing",
+    path: "/admin",
+    tab: "routing",
+    title: "Lead Routing",
+    description: "Lead routing rules, owner assignment, and delivery/failure safeguards.",
+    navSection: "communications",
+    order: 43.5,
+    permissionRequirement: { ...ADMIN_PERMISSION, scope: "Client" },
+    system: "Communication Center",
+  }),
+  route({
     id: "review-request",
     path: "/admin",
     tab: "review-request",
@@ -480,8 +616,59 @@ export const PLATFORM_ROUTES = [
     system: "Communication Center",
   }),
   route({
+    id: "failed-jobs",
+    path: "/admin",
+    tab: "failed-jobs",
+    title: "Failed Jobs",
+    description: "Failed communication and automation jobs with retry readiness and provider context.",
+    navSection: "communications",
+    order: 44.3,
+    system: "Communication Center",
+  }),
+  route({
+    id: "resend-diagnostics",
+    path: "/admin",
+    tab: "resend-diagnostics",
+    title: "Resend Sender Diagnostics",
+    description: "Sender identity and email provider diagnostics with setup and verification state.",
+    navSection: "communications",
+    order: 44.5,
+    system: "Communication Center",
+  }),
+  route({
+    id: "messaging-regression",
+    path: "/admin",
+    tab: "messaging-regression",
+    title: "Messaging Provider Test",
+    description: "Messaging provider regression checks with proof-limited pass/fail context.",
+    navSection: "communications",
+    order: 44.7,
+    system: "Communication Center",
+  }),
+  route({
+    id: "social-engine",
+    path: "/admin",
+    tab: "social-engine",
+    title: "Social Media Engine",
+    description: "Social content and channel automation surface with provenance and owner context.",
+    navSection: "communications",
+    order: 44.8,
+    system: "Communication Center",
+  }),
+  route({
+    id: "website-copy",
+    path: "/admin",
+    tab: "website-copy",
+    title: "Website Copy AI",
+    description: "Website copy generation and review surface with source and approval state.",
+    navSection: "communications",
+    order: 44.9,
+    system: "Communication Center",
+  }),
+  route({
     id: "ai-marketing",
     path: "/admin/marketing",
+    navigationId: "marketing",
     title: "AI Marketing",
     description: "Marketing agent activity and campaign operating context.",
     navSection: "communications",
@@ -498,12 +685,81 @@ export const PLATFORM_ROUTES = [
     system: "AI Workforce",
   }),
   route({
+    id: "automation-activity",
+    path: "/admin/automation-activity",
+    title: "Automation Activity",
+    description: "Automation activity stream with deployment, run, and proof state.",
+    navSection: "ai-workforce",
+    order: 50.5,
+    system: "AI Workforce",
+  }),
+  route({
     id: "ai-sales",
     path: "/admin/ai-sales",
     title: "AI Sales Command",
     description: "AI sales worker control surface and sales workflow state.",
     navSection: "ai-workforce",
     order: 51,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "task-board",
+    path: "/admin",
+    tab: "task-board",
+    title: "Task Board",
+    description: "Operator task board for AI and launch work with owner and status context.",
+    navSection: "ai-workforce",
+    order: 51.3,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "campaign-builder",
+    path: "/admin",
+    tab: "campaign-builder",
+    title: "Campaign Builder",
+    description: "Campaign builder for AI-assisted outreach with source and approval context.",
+    navSection: "ai-workforce",
+    order: 51.4,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "drip",
+    path: "/admin",
+    tab: "drip",
+    title: "Drip Campaigns",
+    description: "Drip campaign automation with sequence, consent, and delivery state.",
+    navSection: "ai-workforce",
+    order: 51.5,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "nurture",
+    path: "/admin",
+    tab: "nurture",
+    title: "Nurture Campaigns",
+    description: "Nurture automation with customer stage, cadence, and proof context.",
+    navSection: "ai-workforce",
+    order: 51.6,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "cadence",
+    path: "/admin",
+    tab: "cadence",
+    title: "Dynamic Cadence",
+    description: "Dynamic follow-up cadence controls with source and permission state.",
+    navSection: "ai-workforce",
+    order: 51.7,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "reactivation",
+    path: "/admin",
+    tab: "reactivation",
+    title: "Lead Reactivation",
+    description: "Reactivation automation for dormant leads with suppression and consent controls.",
+    navSection: "ai-workforce",
+    order: 51.8,
     system: "AI Workforce",
   }),
   route({
@@ -517,6 +773,16 @@ export const PLATFORM_ROUTES = [
     system: "AI Workforce",
   }),
   route({
+    id: "twilio-health",
+    path: "/admin",
+    tab: "twilio-health",
+    title: "Twilio Health",
+    description: "Twilio runtime health with provider, message, and delivery proof state.",
+    navSection: "ai-workforce",
+    order: 52.5,
+    system: "AI Workforce",
+  }),
+  route({
     id: "twilio-growth-engine",
     path: "/admin",
     tab: "twilio-growth-engine",
@@ -525,6 +791,132 @@ export const PLATFORM_ROUTES = [
     navSection: "ai-workforce",
     order: 53,
     system: "AI Workforce",
+  }),
+  route({
+    id: "performance-wars",
+    path: "/admin/performance-wars",
+    title: "Performance Wars",
+    description: "Performance comparison and campaign competition surface with bounded proof.",
+    navSection: "ai-workforce",
+    order: 54,
+    system: "AI Workforce",
+  }),
+  route({
+    id: "settings",
+    path: "/admin",
+    tab: "settings",
+    title: "Settings",
+    description: "Legacy admin settings panel with organization controls and runtime configuration.",
+    navSection: "administration",
+    order: 70,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Administration",
+  }),
+  route({
+    id: "lead-quality",
+    path: "/admin",
+    tab: "lead-quality",
+    title: "Lead Quality Control",
+    description: "Lead quality control and quarantine review with explicit data-truth guardrails.",
+    navSection: "administration",
+    order: 71,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Data Quality",
+  }),
+  route({
+    id: "crm-health",
+    path: "/admin",
+    tab: "crm-health",
+    title: "CRM Health",
+    description: "CRM health diagnostics for ingestion, data quality, and operational readiness.",
+    navSection: "administration",
+    order: 72,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Data Quality",
+  }),
+  route({
+    id: "data-quality",
+    path: "/admin",
+    tab: "data-quality",
+    title: "Data Quality",
+    description: "Data quality dashboard combining cleanup, validation, and source-freshness context.",
+    navSection: "administration",
+    order: 73,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Data Quality",
+  }),
+  route({
+    id: "sprint2-blockers",
+    path: "/admin/sprint2-blockers",
+    title: "Sprint 2 Blockers",
+    description: "Sprint 2 blocker verification with proof state and approval boundaries.",
+    navSection: "administration",
+    order: 74,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Production Readiness",
+  }),
+  route({
+    id: "audit-log",
+    path: "/admin",
+    tab: "audit-log",
+    title: "Audit Log",
+    description: "Audit log events with actor, source, timestamp, and verification state.",
+    navSection: "administration",
+    order: 75,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Audit",
+  }),
+  route({
+    id: "launch-truth-sprint",
+    path: "/admin",
+    tab: "launch-truth-sprint",
+    title: "Launch Truth Sprint",
+    description: "Launch truth sprint review with verified, estimated, and unknown states kept separate.",
+    navSection: "administration",
+    order: 76,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Production Readiness",
+  }),
+  route({
+    id: "canonical-map",
+    path: "/admin",
+    tab: "canonical-map",
+    title: "System Map",
+    description: "Canonical system map with ownership, dependency, and integration context.",
+    navSection: "administration",
+    order: 77,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Administration",
+  }),
+  route({
+    id: "resource-library",
+    path: "/admin",
+    tab: "resource-library",
+    title: "Resource Library",
+    description: "Resource and document library with source, owner, and publication state.",
+    navSection: "administration",
+    order: 78,
+    system: "Administration",
+  }),
+  route({
+    id: "qa",
+    path: "/admin",
+    tab: "qa",
+    title: "QA Tools",
+    description: "Internal QA tools with admin-only access and explicit testing context.",
+    navSection: "administration",
+    order: 79,
+    permissionRequirement: MANAGE_ORG_PERMISSION,
+    system: "Administration",
+  }),
+  route({
+    id: "install-guide",
+    path: "/admin/install-guide",
+    title: "Install Guide",
+    description: "Installation guide and operator reference for client launch work.",
+    navSection: "administration",
+    order: 79.5,
+    system: "Administration",
   }),
   ...SETTINGS_ROUTES,
   route({
@@ -544,11 +936,159 @@ export const PLATFORM_ROUTES = [
   }),
 ];
 
+export const ADMIN_SHELL_NAVIGATION_GROUPS = [
+  {
+    group: "Command Center",
+    items: ["admin-overview", "platform-integration", "audit-command-center", "launch-proof"],
+  },
+  {
+    group: "Intelligence",
+    items: ["lead-intelligence", "analytics", "revenue", "attribution", "health"],
+  },
+  {
+    group: "Operations",
+    items: [
+      "guided-onboarding",
+      "client-projects",
+      "deployment-manager",
+      "install-queue",
+      "launch-gates",
+      "ops-verification",
+      "inbound-readiness",
+      "broken-flows",
+      "publish-drift",
+    ],
+  },
+  {
+    group: "Customers",
+    items: ["leads", "priority", "website-leads", "demo-bookings", "client-onboarding", "onboarding-pipeline", "opportunity-review"],
+  },
+  {
+    group: "Communications",
+    items: [
+      { routeId: "inbox", badge: "inbox" },
+      { routeId: "communication-logs", badge: "webhook-errors" },
+      "templates",
+      "review-request",
+      "email-campaigns",
+      "routing",
+      "ai-marketing",
+    ],
+  },
+  {
+    group: "AI Workforce",
+    items: ["automations", "ai-sales", "automation-activity", "task-board", "campaign-builder", "drip", "nurture", "cadence", "reactivation"],
+  },
+  {
+    group: "Administration",
+    items: [
+      { routeId: "settings-organization", id: "enterprise-settings", label: "Enterprise Settings" },
+      "settings",
+      "crm-health",
+      "sprint2-blockers",
+      "audit-log",
+      "qa",
+      "install-guide",
+    ],
+  },
+  {
+    group: "Account",
+    items: [
+      { routeId: "settings-billing", id: "billing" },
+      { routeId: "settings-usage", id: "usage" },
+      { routeId: "settings-support", id: "support" },
+    ],
+  },
+];
+
+export const ADMIN_DASHBOARD_NAVIGATION_GROUPS = [
+  {
+    group: "Command Center",
+    items: [
+      "admin-overview",
+      { routeId: "platform-integration", external: true },
+      "lead-intelligence",
+      { routeId: "inbox", badge: "inbox" },
+    ],
+  },
+  {
+    group: "Customers",
+    items: ["leads", "priority", "website-leads", "demo-bookings", "sales-funnel"],
+  },
+  {
+    group: "Operations",
+    items: ["guided-onboarding", "customer-onboarding", "client-projects", "deployment-manager", "install-queue", "launch-gates"],
+  },
+  {
+    group: "Communications",
+    items: [
+      { routeId: "automations", external: true },
+      "instant-response",
+      "email-campaigns",
+      "routing",
+      { routeId: "communication-logs", badge: "webhook-errors" },
+      "failed-jobs",
+      { routeId: "ai-marketing", external: true },
+    ],
+  },
+  {
+    group: "Intelligence",
+    items: ["revenue", "analytics", "attribution", "landing-traffic"],
+  },
+  {
+    group: "Administration",
+    items: ["audit-command-center", "launch-proof", "health", "settings"],
+  },
+];
+
+export const ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS = [
+  "lead-quality",
+  "crm-health",
+  { routeId: "client-onboarding", external: true },
+  "onboarding-orchestration",
+  "install-checklists",
+  "cadence",
+  "reactivation",
+  "drip",
+  "nurture",
+  "revenue-tracking",
+  "campaign-builder",
+  "launch-truth-sprint",
+  "data-quality",
+  "platform-clients",
+  "twilio-growth-engine",
+  "twilio-health",
+  "resend-diagnostics",
+  "audit-log",
+  "canonical-map",
+  "resource-library",
+  "messaging-regression",
+  "ai-sales-reps",
+  "sniper",
+  { routeId: "ai-sales", id: "ai-sales-cmd", external: true },
+  { routeId: "performance-wars", external: true },
+  "social-engine",
+  "website-copy",
+  "task-board",
+  "templates",
+  "review-request",
+  "qa",
+  { routeId: "install-guide", external: true },
+];
+
+export const ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS = [
+  "admin-overview",
+  { routeId: "platform-integration", label: "Platform" },
+  "leads",
+  "inbox",
+  "settings",
+];
+
 export const PLATFORM_SEARCH_STATES = [
   "Loading",
   "Results",
   "No Results",
-  "Partial",
+  "Partial Results",
   "Permission Restricted",
   "Error",
 ];
@@ -593,6 +1133,32 @@ export const PLATFORM_SEARCH_SOURCES = [
     ownerFields: ["owner", "assigned_to", "email", "phone", "phone_number"],
     timestampFields: ["updated_date", "created_date", "last_contacted_at"],
     destination: "/admin/leads/:id",
+    permission: { ...ADMIN_PERMISSION, scope: "Client" },
+  },
+  {
+    id: "opportunities",
+    type: "opportunity",
+    tab: "priority",
+    recordKeys: ["opportunities", "opportunity", "priority", "priority_queue"],
+    entities: ["Opportunity", "LeadOpportunity", "LeadPriorityQueue", "Leads", "Lead"],
+    fields: ["business_name", "full_name", "name", "email", "opportunity_stage", "activation_priority", "next_action", "recommended_offer"],
+    titleFields: ["business_name", "full_name", "name", "email", "id"],
+    ownerFields: ["owner", "assigned_to", "email", "activation_priority"],
+    timestampFields: ["updated_date", "created_date", "last_activity_at", "last_contacted_at"],
+    destination: "/admin/opportunity-review?opportunity=:id",
+    permission: { ...ADMIN_PERMISSION, scope: "Client" },
+  },
+  {
+    id: "appointments",
+    type: "appointment",
+    tab: "demo-bookings",
+    recordKeys: ["appointments", "appointment", "bookings", "demo_bookings", "demoBookings"],
+    entities: ["Appointment", "DemoBooking", "Booking", "CalendarEvent"],
+    fields: ["business_name", "customer_name", "full_name", "name", "email", "scheduled_date", "scheduled_time", "status", "intent", "source"],
+    titleFields: ["business_name", "customer_name", "full_name", "name", "email", "id"],
+    ownerFields: ["owner", "assigned_to", "email", "calendar_owner"],
+    timestampFields: ["scheduled_at", "scheduled_date", "updated_date", "created_date"],
+    destination: "/admin?tab=demo-bookings&appointment=:id",
     permission: { ...ADMIN_PERMISSION, scope: "Client" },
   },
   {
@@ -687,12 +1253,12 @@ export const PLATFORM_SEARCH_STATIC_RECORDS = {
 };
 
 export const PLATFORM_NOTIFICATION_SOURCES = [
-  "AI Workforce",
+  "AI",
   "Business Intelligence",
   "Communications",
   "Billing",
   "Security",
-  "Integrations",
+  "Integration",
 ];
 
 export const PLATFORM_NOTIFICATION_CATEGORIES = [
@@ -704,7 +1270,8 @@ export const PLATFORM_NOTIFICATION_CATEGORIES = [
   "integration",
 ];
 
-export const PLATFORM_NOTIFICATION_PRIORITIES = ["Critical", "High", "Normal", "Low"];
+export const PLATFORM_NOTIFICATION_SEVERITIES = ["Critical", "High", "Normal", "Low"];
+export const PLATFORM_NOTIFICATION_PRIORITIES = PLATFORM_NOTIFICATION_SEVERITIES;
 
 export const PLATFORM_NOTIFICATION_STATES = [
   "Unread",
@@ -716,21 +1283,104 @@ export const PLATFORM_NOTIFICATION_STATES = [
 
 export const PLATFORM_NOTIFICATION_CONTRACT = {
   requiredFields: [
+    "id",
     "title",
     "category",
-    "priority",
+    "severity",
     "source",
+    "whatHappened",
+    "whyItMatters",
     "businessImpact",
     "recommendedAction",
     "owner",
     "destination",
     "status",
+    "createdAt",
   ],
   sources: PLATFORM_NOTIFICATION_SOURCES,
   categories: PLATFORM_NOTIFICATION_CATEGORIES,
+  severities: PLATFORM_NOTIFICATION_SEVERITIES,
   priorities: PLATFORM_NOTIFICATION_PRIORITIES,
   states: PLATFORM_NOTIFICATION_STATES,
 };
+
+export const PLATFORM_NOTIFICATION_FIXTURES = [
+  {
+    id: "ai-worker-attention",
+    title: "AI worker needs review",
+    category: "automation",
+    severity: "High",
+    source: "AI",
+    whatHappened: "An AI worker returned an incomplete proof payload.",
+    whyItMatters: "Connected does not prove the worker completed the business task.",
+    businessImpact: "Follow-up automation may need manual review before launch proof is trusted.",
+    recommendedAction: "Open Automation Activity and verify the latest run evidence.",
+    owner: "AI Ops",
+    destination: "/admin/automation-activity",
+    status: "Unread",
+    createdAt: "fixture-contract",
+  },
+  {
+    id: "business-intelligence-partial",
+    title: "Business intelligence source is partial",
+    category: "intelligence",
+    severity: "Normal",
+    source: "Business Intelligence",
+    whatHappened: "One analytics source is unavailable while other sources are current.",
+    whyItMatters: "Partial data must not be summarized as verified performance.",
+    businessImpact: "Revenue and attribution decisions may need source-level qualification.",
+    recommendedAction: "Review Analytics and Source Attribution freshness labels.",
+    owner: "Revenue Ops",
+    destination: "/admin?tab=analytics",
+    status: "Unread",
+    createdAt: "fixture-contract",
+  },
+  {
+    id: "billing-payment-attention",
+    title: "Billing record requires attention",
+    category: "billing",
+    severity: "Critical",
+    source: "Billing",
+    whatHappened: "A billing record has an unresolved payment or subscription state.",
+    whyItMatters: "Sent or created checkout events do not prove payment completion.",
+    businessImpact: "Client activation should wait for verified order status.",
+    recommendedAction: "Open Revenue Intelligence and reconcile the order proof.",
+    owner: "Finance Ops",
+    destination: "/admin?tab=revenue",
+    status: "Unread",
+    createdAt: "fixture-contract",
+  },
+  {
+    id: "security-rbac-change",
+    title: "Security review is required",
+    category: "security",
+    severity: "High",
+    source: "Security",
+    whatHappened: "A role or permission change needs admin review.",
+    whyItMatters: "Access must stay scoped by organization, client, and location.",
+    businessImpact: "Incorrect access could expose restricted customer or billing data.",
+    recommendedAction: "Review Roles & Permissions before approving the change.",
+    owner: "Platform Admin",
+    destination: "/settings/roles",
+    status: "Unread",
+    createdAt: "fixture-contract",
+  },
+  {
+    id: "integration-proof-missing",
+    title: "Integration proof is missing",
+    category: "integration",
+    severity: "High",
+    source: "Integration",
+    whatHappened: "A provider is configured but lacks current workflow proof.",
+    whyItMatters: "Configured and connected states do not prove operational health.",
+    businessImpact: "Launch readiness should stay blocked until proof is refreshed.",
+    recommendedAction: "Open Integration Health and validate provider evidence.",
+    owner: "Platform Ops",
+    destination: "/admin?tab=health",
+    status: "Unread",
+    createdAt: "fixture-contract",
+  },
+];
 
 export const PLATFORM_ACTIVITY_EVENT_SOURCES = [
   "AI",
@@ -862,7 +1512,7 @@ function buildSearchDescription(record, source, title, owner) {
   return String(description || `${source.id} result for ${title} owned by ${owner}`);
 }
 
-function buildSearchMetadata(record, source, routeId, timestamp, sourceStatus) {
+function buildSearchMetadata(record, source, routeId, timestamp, sourceStatus, permissionState) {
   return {
     recordId: record.id,
     sourceId: source.id,
@@ -874,6 +1524,8 @@ function buildSearchMetadata(record, source, routeId, timestamp, sourceStatus) {
     freshness: timestamp === "Unknown" ? "Unavailable" : "Current",
     adapterStatus: sourceStatus?.status || "Unverified",
     adapterUnavailableEntities: sourceStatus?.unavailableEntities || [],
+    permissionState: permissionState?.state || "Allowed",
+    permissionRole: permissionState?.role || "admin",
   };
 }
 
@@ -911,8 +1563,69 @@ function toEnterpriseRole(role) {
   return String(role).charAt(0).toUpperCase() + String(role).slice(1);
 }
 
-export function buildPlatformSearchResults(entityRecords, query, maxResults = 12, options = {}) {
-  const results = PLATFORM_SEARCH_SOURCES.flatMap((source) =>
+function normalizeNavigationEntry(entry) {
+  return typeof entry === "string" ? { routeId: entry } : entry;
+}
+
+function buildPlatformNavigationItem(entry, user, options = {}) {
+  const normalizedEntry = normalizeNavigationEntry(entry);
+  const routeItem = getPlatformRouteById(normalizedEntry.routeId);
+  if (!routeItem) return null;
+
+  const permissionUser = user || options.defaultUser || { role: "admin" };
+  if (options.filterPermissions !== false && !evaluatePlatformPermission(permissionUser, routeItem.permissionRequirement).allowed) {
+    return null;
+  }
+
+  const destination = normalizedEntry.destination || routeItem.destination;
+  const isExternal = Boolean(normalizedEntry.external);
+
+  return {
+    id: normalizedEntry.id || routeItem.navigationLocation.id,
+    routeId: routeItem.id,
+    label: normalizedEntry.label || routeItem.navigationLocation.label || routeItem.title,
+    title: routeItem.title,
+    description: routeItem.description,
+    path: routeItem.path,
+    tab: routeItem.tab,
+    destination,
+    external: isExternal,
+    externalPath: normalizedEntry.externalPath || (isExternal ? destination : undefined),
+    badge: normalizedEntry.badge,
+    section: routeItem.navigationLocation.section,
+    order: routeItem.navigationLocation.order,
+    permissionRequirement: routeItem.permissionRequirement,
+    system: routeItem.system,
+  };
+}
+
+export function getPlatformRouteById(routeId) {
+  return PLATFORM_ROUTES.find((routeItem) => routeItem.id === routeId);
+}
+
+export function getPlatformNavigationItems(user, entries, options = {}) {
+  return entries
+    .map((entry) => buildPlatformNavigationItem(entry, user, options))
+    .filter(Boolean);
+}
+
+export function getPlatformNavigationGroups(user, groups = ADMIN_SHELL_NAVIGATION_GROUPS, options = {}) {
+  return groups
+    .map((group) => ({
+      group: group.group,
+      items: getPlatformNavigationItems(user, group.items, options),
+    }))
+    .filter((group) => group.items.length > 0);
+}
+
+function collectPlatformSearchResults(entityRecords, query, options = {}) {
+  const permissionUser = options.user || options.currentUser || { role: "admin" };
+
+  return PLATFORM_SEARCH_SOURCES.flatMap((source) => {
+    const permissionState = evaluatePlatformPermission(permissionUser, source.permission);
+    const sourceStatus = options.sourceStatuses?.[source.id];
+
+    return (
     getRecordsForSource(entityRecords, source)
       .filter((record) => matchesQuery(record, source.fields, query))
       .slice(0, 5)
@@ -923,7 +1636,7 @@ export function buildPlatformSearchResults(entityRecords, query, maxResults = 12
         const destination = buildDestination(source.destination, record);
         const route = getPlatformRouteByDestination(destination)?.id || source.tab || source.id;
         const description = buildSearchDescription(record, source, title, owner);
-        const metadata = buildSearchMetadata(record, source, route, timestamp, options.sourceStatuses?.[source.id]);
+        const metadata = buildSearchMetadata(record, source, route, timestamp, sourceStatus, permissionState);
 
         return {
           id: record.id,
@@ -944,14 +1657,45 @@ export function buildPlatformSearchResults(entityRecords, query, maxResults = 12
           data: record,
           state: "Results",
         };
-      }),
-  );
+      })
+    );
+  });
+}
 
-  return results.slice(0, maxResults);
+export function buildPlatformSearchResponse(entityRecords, query, maxResults = 12, options = {}) {
+  const allMatches = collectPlatformSearchResults(entityRecords, query, options);
+  const permittedMatches = allMatches.filter((result) => result.metadata.permissionState === "Allowed");
+  const adapterStates = Object.values(options.sourceStatuses || {}).map((status) => status?.status);
+  const hasPartialSource = adapterStates.some((status) => status === "Partial" || status === "Unavailable");
+  const restrictedCount = allMatches.length - permittedMatches.length;
+  const results = permittedMatches.slice(0, maxResults);
+  const totalPermitted = permittedMatches.length;
+  const truncated = totalPermitted > maxResults;
+
+  let status = "No Results";
+  if (results.length > 0) {
+    status = hasPartialSource || truncated ? "Partial Results" : "Results";
+  } else if (allMatches.length > 0 && restrictedCount > 0) {
+    status = "Permission Restricted";
+  }
+
+  return {
+    results,
+    status,
+    totalMatches: allMatches.length,
+    permittedCount: totalPermitted,
+    restrictedCount,
+    truncated,
+    sourceStatuses: options.sourceStatuses || {},
+  };
+}
+
+export function buildPlatformSearchResults(entityRecords, query, maxResults = 12, options = {}) {
+  return buildPlatformSearchResponse(entityRecords, query, maxResults, options).results;
 }
 
 export function getPlatformSearchPlaceholder() {
-  return "Search customers, leads, conversations, AI workers, settings, billing...";
+  return "Search customers, leads, appointments, opportunities, AI workers, settings...";
 }
 
 export function getPlatformRouteByDestination(destination) {
@@ -1036,6 +1780,19 @@ export function validatePlatformIntegrationFoundation() {
     assertCheck(Boolean(routeItem.destination), `route-destination:${routeItem.id}`, failures);
   }
 
+  const routeIds = new Set(PLATFORM_ROUTES.map((routeItem) => routeItem.id));
+  const navigationRouteIds = [
+    ...ADMIN_SHELL_NAVIGATION_GROUPS.flatMap((group) => group.items),
+    ...ADMIN_DASHBOARD_NAVIGATION_GROUPS.flatMap((group) => group.items),
+    ...ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS,
+    ...ADMIN_MOBILE_QUICK_NAVIGATION_ITEMS,
+  ].map((entry) => normalizeNavigationEntry(entry).routeId);
+  assertCheck(
+    navigationRouteIds.every((routeId) => routeIds.has(routeId)),
+    "navigation-route-registry",
+    failures,
+  );
+
   for (const source of PLATFORM_SEARCH_SOURCES) {
     assertCheck(
       PLATFORM_SEARCH_RESULT_FIELDS.every((field) => field === "permission" ? Boolean(source.permission) : true),
@@ -1047,14 +1804,26 @@ export function validatePlatformIntegrationFoundation() {
   }
 
   assertCheck(
-    ["Loading", "Results", "No Results", "Partial", "Permission Restricted", "Error"].every((state) => PLATFORM_SEARCH_STATES.includes(state)),
+    ["Loading", "Results", "No Results", "Partial Results", "Permission Restricted", "Error"].every((state) => PLATFORM_SEARCH_STATES.includes(state)) &&
+      PLATFORM_SEARCH_SOURCES.length >= 10,
     "search-states",
     failures,
   );
   assertCheck(
-    PLATFORM_NOTIFICATION_CONTRACT.requiredFields.length === 9 &&
-      PLATFORM_NOTIFICATION_SOURCES.length === 6 &&
-      PLATFORM_NOTIFICATION_STATES.length === 5,
+    ["appointments", "opportunities"].every((sourceId) => PLATFORM_SEARCH_SOURCES.some((source) => source.id === sourceId)),
+    "search-source-completeness",
+    failures,
+  );
+  assertCheck(
+    PLATFORM_NOTIFICATION_CONTRACT.requiredFields.length === 13 &&
+      PLATFORM_NOTIFICATION_SOURCES.length >= 5 &&
+      PLATFORM_NOTIFICATION_STATES.length === 5 &&
+      PLATFORM_NOTIFICATION_FIXTURES.every((fixture) =>
+        PLATFORM_NOTIFICATION_CONTRACT.requiredFields.every((field) => Boolean(fixture[field])),
+      ) &&
+      ["AI", "Business Intelligence", "Billing", "Security", "Integration"].every((source) =>
+        PLATFORM_NOTIFICATION_FIXTURES.some((fixture) => fixture.source === source),
+      ),
     "notification-contract",
     failures,
   );

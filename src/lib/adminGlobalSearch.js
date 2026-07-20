@@ -1,5 +1,6 @@
 import {
   PLATFORM_SEARCH_SOURCES,
+  buildPlatformSearchResponse,
   buildPlatformSearchResults,
   getPlatformSearchPlaceholder,
 } from "./platformIntegrationFoundation.js";
@@ -94,6 +95,14 @@ export async function loadAdminGlobalSearchRecords(base44Client, options = {}) {
 export function buildAdminGlobalSearchResults(entityRecords, query, maxResults = 12, options = {}) {
   return buildPlatformSearchResults(entityRecords, query, maxResults, {
     sourceStatuses: options.sourceStatuses,
+    user: options.user,
+  });
+}
+
+export function buildAdminGlobalSearchResponse(entityRecords, query, maxResults = 12, options = {}) {
+  return buildPlatformSearchResponse(entityRecords, query, maxResults, {
+    sourceStatuses: options.sourceStatuses,
+    user: options.user,
   });
 }
 

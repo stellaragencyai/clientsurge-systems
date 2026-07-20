@@ -2,6 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 
 import {
+  buildAdminGlobalSearchResponse,
   buildAdminGlobalSearchResults,
   getAdminGlobalSearchAdapterPlan,
   getAdminGlobalSearchPlaceholder,
@@ -13,6 +14,8 @@ test("admin global search includes all Phase F platform source types", () => {
   const results = buildAdminGlobalSearchResults({
     customers: [{ id: "client_1", business_name: "Phoenix Roofing", client_email: "owner@example.com" }],
     leads: [{ id: "lead_1", business_name: "Phoenix Med Spa", email: "lead@example.com" }],
+    opportunities: [{ id: "opp_1", business_name: "Phoenix Restoration", activation_priority: "High" }],
+    appointments: [{ id: "booking_1", business_name: "Phoenix Dental", scheduled_date: "2026-07-21" }],
     conversations: [{ id: "support_1", subject: "Phoenix portal question", sender_email: "client@example.com" }],
     ai_workers: [{ id: "worker_1", name: "Phoenix responder", owner: "AI Ops" }],
     timeline_events: [{ id: "event_1", type: "Phoenix handoff", actor: "Nolan" }],
@@ -24,6 +27,8 @@ test("admin global search includes all Phase F platform source types", () => {
   assert.deepEqual(results.map((result) => result.type), [
     "customer",
     "lead",
+    "opportunity",
+    "appointment",
     "conversation",
     "ai_worker",
     "timeline_event",
@@ -34,6 +39,8 @@ test("admin global search includes all Phase F platform source types", () => {
   assert.deepEqual(results.map((result) => result.tab), [
     "client-projects",
     "leads",
+    "priority",
+    "demo-bookings",
     "inbox",
     "automations",
     "audit-log",
@@ -51,7 +58,7 @@ test("admin global search includes all Phase F platform source types", () => {
 
 test("admin global search ignores short queries and exposes all-entity placeholder", () => {
   assert.deepEqual(buildAdminGlobalSearchResults({ lead: [{ id: "1", business_name: "AI" }] }, "a"), []);
-  assert.equal(getAdminGlobalSearchPlaceholder(), "Search customers, leads, conversations, AI workers, settings, billing...");
+  assert.equal(getAdminGlobalSearchPlaceholder(), "Search customers, leads, appointments, opportunities, AI workers, settings...");
 });
 
 test("admin global search adapter plan binds Worker 2 source families to Base44 entities", () => {
@@ -59,6 +66,8 @@ test("admin global search adapter plan binds Worker 2 source families to Base44 
   const bySource = Object.fromEntries(plan.map((item) => [item.sourceId, item]));
 
   assert.deepEqual(bySource["ai-workers"].entities, ["AIWorker", "AutomationAgent", "AutomationJob", "Agent"]);
+  assert.deepEqual(bySource.appointments.entities, ["Appointment", "DemoBooking", "Booking", "CalendarEvent"]);
+  assert.deepEqual(bySource.opportunities.entities, ["Opportunity", "LeadOpportunity", "LeadPriorityQueue", "Leads", "Lead"]);
   assert.deepEqual(bySource["timeline-events"].entities, ["ClientTimelineEvent", "AuditLog", "CommunicationEvent", "AutomationProofLog"]);
   assert.deepEqual(bySource.settings.entities, ["AdminSettings"]);
   assert.deepEqual(bySource.documents.entities, ["Document", "Resource", "KnowledgeBaseArticle"]);
@@ -95,4 +104,14 @@ test("admin global search adapter loader degrades missing sources without hiding
   const aiResult = results.find((result) => result.type === "ai_worker");
   assert.equal(aiResult.metadata.adapterStatus, "Partial");
   assert.deepEqual(aiResult.metadata.adapterUnavailableEntities, ["AutomationAgent", "AutomationJob", "Agent"]);
+});
+
+test("admin global search response enforces platform permissions", () => {
+  const response = buildAdminGlobalSearchResponse({
+    settings: [{ id: "roles", title: "Phoenix role settings", scope: "Organization" }],
+  }, "phoenix", 10, { user: { role: "client" } });
+
+  assert.equal(response.status, "Permission Restricted");
+  assert.equal(response.results.length, 0);
+  assert.equal(response.restrictedCount, 1);
 });

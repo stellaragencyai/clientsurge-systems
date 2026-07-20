@@ -86,7 +86,7 @@ Deno.serve(async (req) => {
       });
     }
 
-    // STEP 3: Permanently delete quarantined leads
+    // STEP 3: Report quarantined leads. Permanent CRM deletion is intentionally disabled.
     if (action === 'purge') {
       const quarantined = await svc.entities.Leads.filter(
         { quality_review_status: 'quarantined' },
@@ -94,24 +94,15 @@ Deno.serve(async (req) => {
         5000
       );
 
-      if (dry_run) {
-        return Response.json({
-          would_delete: quarantined.length,
-          ids: quarantined.map((l) => l.id),
-        });
-      }
-
-      let deleted = 0;
-      for (const lead of quarantined) {
-        try {
-          await svc.entities.Leads.delete(lead.id);
-          deleted++;
-        } catch (err) {
-          console.error('[quarantineFakeLeads] delete error:', err.message);
-        }
-      }
-
-      return Response.json({ success: true, deleted });
+      return Response.json({
+        success: true,
+        dry_run: dry_run === true,
+        purge_disabled: true,
+        quarantined_count: quarantined.length,
+        deleted: 0,
+        ids: quarantined.map((l) => l.id),
+        message: 'Permanent delete is disabled. Quarantined leads remain hidden from sales views for auditability.',
+      });
     }
 
     return Response.json({ error: 'Unknown action' }, { status: 400 });
