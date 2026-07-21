@@ -124,6 +124,50 @@ Known non-blocking notes:
 - Existing npm audit vulnerabilities remain from the dependency tree and were not expanded.
 - Existing unrelated worktree noise was not staged or repaired.
 
+## Final Worker #3 UX/Accessibility/Mobile Addendum
+
+Starting review target:
+
+- Branch: `feature/unified-platform-integration-repair`
+- Reviewed SHA: `c64bb3334f7d017886800076a2393b3c72d317d4`
+- Worker #3 score: 68/100
+- Worker #3 decision: NO-GO
+
+Final repair target:
+
+- Branch: `feature/unified-platform-integration-repair`
+- Exact final SHA: confirmed after commit/push in the active PR head proof and PR update
+- Scope: true Worker #3 blockers only; no merge, deploy, Base44 publish, feature expansion, force-push, or history rewrite
+
+Resolved final blockers:
+
+1. AdminGlobalSearch ARIA failures
+   - Root cause: the popup behavior mixed interactive result controls and incomplete combobox/listbox relationships, and it could render expanded states without a complete controlled result region.
+   - Resolution: `AdminGlobalSearch` now uses a single combobox/listbox pattern with stable generated IDs, valid `aria-controls`, `aria-activedescendant`, named options, live status announcements, and keyboard open/navigate/activate/close behavior.
+
+2. `/admin/platform` contrast failures
+   - Root cause: muted slate labels, active navigation states, and brand/meta text were below serious/critical axe thresholds in the rendered admin shell/platform combination.
+   - Resolution: contrast was raised with navy/slate tokens while preserving the locked ClientSurge shell: white workspace, navy-led navigation, thin borders, and restrained hierarchy.
+
+3. `/admin/platform` keyboard-accessible scroll-region failures
+   - Root cause: the universal search source contract table could overflow horizontally without a named keyboard-operable region.
+   - Resolution: only the meaningful table overflow wrapper now receives `role="region"`, `aria-label="Universal search source contract table"`, `tabIndex={0}`, and visible focus styling.
+
+4. Static `/product-signup` mobile overflow
+   - Root cause: the fallback page had shrink-resistant children, a long checkout endpoint, fixed-ish button copy, and insufficient wrapping/padding behavior at 390px and 375px.
+   - Resolution: the fallback now uses border-box sizing, shrinkable plan/form children, responsive padding, wrapping endpoint text, wrapping retry button text, and explicit payment-incomplete fallback messaging.
+
+5. PR #1412 head mismatch
+   - Root cause: PR #1412 still pointed at `feature/unified-clientsurge-os-integration` / `3024429...` while Worker #3 reviewed `feature/unified-platform-integration-repair` / `c64bb333...`.
+   - Resolution path: after the final commit, confirm ancestry and either fast-forward the PR #1412 head branch without force-push or create a replacement PR if safe fast-forward is impossible.
+
+Final repair proof:
+
+- Focused final validator passed `/admin/platform` and `/product-signup` at 1440x900, 1280x820, 1024x768, 768x900, 390x844, and 375x667.
+- Final validator checks covered serious/critical axe, search combobox/listbox semantics, keyboard search behavior, status announcements, permission-restricted search contract, platform contrast, keyboard table scroll region, horizontal overflow, fallback messaging, and 200% text zoom.
+- Product-signup strict preview smoke passed 9/9 served fallback routes after rebuild.
+- Phase A foundation, Phase A activation, Phase A command-center, Phase B, Phase C, and Phase E browser validators all passed.
+
 ## Handoff
 
 Worker #2:

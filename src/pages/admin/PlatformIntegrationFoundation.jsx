@@ -72,7 +72,7 @@ function SummaryTile({ label, value, description, tone }) {
   return (
     <article className="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
       <div className="flex flex-col items-start gap-2">
-        <p className="whitespace-nowrap text-xs font-semibold text-slate-500">{label}</p>
+        <p className="whitespace-nowrap text-xs font-semibold text-slate-600">{label}</p>
         <StatusBadge tone={tone}>{value}</StatusBadge>
       </div>
       <p className="mt-3 text-sm leading-6 text-slate-700">{description}</p>
@@ -127,7 +127,7 @@ function NavigationArchitecture() {
                 ))}
               </ul>
               {group.routes.length > 7 ? (
-                <p className="mt-3 text-xs font-semibold text-slate-500">
+                <p className="mt-3 text-xs font-semibold text-slate-600">
                   {group.routes.length - 7} additional protected routes registered in the contract.
                 </p>
               ) : null}
@@ -149,7 +149,12 @@ function SearchArchitecture() {
         description="Search sources share one result contract and explicit states for loading, empty, partial, restricted, and error outcomes."
       />
       <div className="grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
-        <div className="overflow-x-auto rounded-lg border border-slate-200">
+        <div
+          className="overflow-x-auto rounded-lg border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-600 focus:ring-offset-2"
+          role="region"
+          aria-label="Universal search source contract table"
+          tabIndex={0}
+        >
           <table className="min-w-[720px] w-full border-collapse text-sm">
             <caption className="sr-only">Universal search source contract</caption>
             <thead className="bg-slate-50 text-left text-slate-600">
@@ -343,9 +348,9 @@ export default function PlatformIntegrationFoundation() {
   return (
     <AdminShell title="Platform Integration" activeId="platform-integration">
       <main className="space-y-6 text-slate-950" aria-labelledby="platform-integration-title">
-        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-slate-500">
+        <nav aria-label="Breadcrumb" className="flex flex-wrap items-center gap-2 text-sm text-slate-600">
           {breadcrumbs.map((item, index) => (
-            <span key={item.destination} className="flex items-center gap-2">
+            <span key={`${item.destination}-${index}`} className="flex items-center gap-2">
               <span aria-current={index === breadcrumbs.length - 1 ? "page" : undefined}>{item.label}</span>
               {index < breadcrumbs.length - 1 ? <span aria-hidden="true">/</span> : null}
             </span>

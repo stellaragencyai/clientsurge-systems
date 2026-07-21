@@ -163,7 +163,7 @@ export default function AdminShell({ children, title, activeId }) {
             onClick={() => navigate("/admin")}
             className="font-display text-lg font-semibold text-foreground hover:text-primary transition-colors"
           >
-            ClientSurge <span className="text-primary">Admin</span>
+            ClientSurge <span className="text-sky-800">Admin</span>
           </button>
         </div>
 
@@ -178,7 +178,7 @@ export default function AdminShell({ children, title, activeId }) {
         <nav className="flex-1 p-3 overflow-y-auto space-y-4 overscroll-contain">
           {navGroups.map(({ group, items }) => (
             <div key={group}>
-              <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-muted-foreground/60">
+              <p className="px-3 pb-1 text-[10px] font-bold uppercase tracking-widest text-slate-600">
                 {group}
               </p>
               <div className="space-y-0.5">
@@ -196,7 +196,7 @@ export default function AdminShell({ children, title, activeId }) {
                       onClick={() => handleNavClick(item)}
                       className={`w-full flex items-center gap-3 px-4 py-3 lg:py-2.5 rounded-lg transition-colors font-medium text-sm ${
                         active
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-slate-900 text-white shadow-sm"
                           : "text-foreground hover:bg-muted"
                       }`}
                     >
@@ -249,7 +249,7 @@ export default function AdminShell({ children, title, activeId }) {
             >
               <ArrowLeft className="w-3.5 h-3.5" /> Main Menu
             </button>
-            <span className="hidden lg:block text-muted-foreground/40">|</span>
+            <span className="hidden lg:block text-slate-400" aria-hidden="true">|</span>
             <h2 className="truncate text-sm sm:text-base font-semibold text-foreground">{title}</h2>
           </div>
           <div className="flex items-center gap-2 flex-shrink-0">
@@ -275,7 +275,7 @@ export default function AdminShell({ children, title, activeId }) {
                 onClick={() => handleNavClick(item)}
                 className={`rounded-full border px-3 py-1.5 text-xs font-semibold transition-colors ${
                   isActive(item)
-                    ? "border-primary bg-primary text-primary-foreground"
+                    ? "border-slate-900 bg-slate-900 text-white"
                     : "border-border bg-card text-foreground"
                 }`}
               >

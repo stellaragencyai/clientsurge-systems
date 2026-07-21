@@ -5,6 +5,44 @@ Branch: `feature/unified-platform-integration-repair`
 Base repair target: PR #1412, `feature/unified-clientsurge-os-integration`
 Starting head: `3024429a486c9d69a21a4acbc99e95ab9f937255`
 
+## 2026-07-20 Final UX, Accessibility, Mobile Repair Addendum
+
+Worker #3 final integrated review of `feature/unified-platform-integration-repair` at `c64bb3334f7d017886800076a2393b3c72d317d4` returned 68/100 and NO-GO because AdminGlobalSearch ARIA, `/admin/platform` contrast, `/admin/platform` keyboard scroll regions, static `/product-signup` mobile overflow, and PR #1412 head alignment were still blocking.
+
+This addendum resolves the true UX/accessibility/mobile blockers in the same narrow repair scope. The final branch remains `feature/unified-platform-integration-repair`; the exact final PR head SHA is confirmed after commit/push in the GitHub PR head proof and PR update because a committed report cannot embed its own final commit hash without changing that hash.
+
+Repair summary:
+
+- `src/components/admin/AdminGlobalSearch.jsx`: implemented one coherent combobox/listbox pattern with generated IDs, valid `aria-controls`/`aria-activedescendant`, named status live region, keyboard navigation, no nested interactive rows, decorative icons hidden from assistive technology, restricted/no-results/loading/error announcements, and permission-filtered result activation.
+- `src/components/admin/AdminShell.jsx`: raised contrast for the Admin brand, active desktop/mobile navigation states, group labels, and decorative divider while preserving the white workspace/navy-led shell.
+- `src/pages/admin/PlatformIntegrationFoundation.jsx`: raised muted slate copy/breadcrumb contrast, added a named keyboard-focusable scroll region only around the universal search source contract table, and fixed duplicate breadcrumb keys.
+- `scripts/build-product-signup-fallback.mjs`: removed mobile overflow sources with global border-box sizing, shrinkable plan/form children, wrapped long endpoint text, responsive padding, wrapping button text, and explicit "Payment has not completed" retry guidance.
+- `scripts/product-signup-route-smoke.mjs`: updated the static fallback smoke contract to require the repaired payment-incomplete warning and retry CTA.
+- `scripts/validate-final-ux-accessibility-blockers.mjs`: added the final focused browser validator for AdminGlobalSearch, `/admin/platform`, and static `/product-signup`.
+
+Additional final repair validation:
+
+- `npx eslint --quiet src/components/admin/AdminGlobalSearch.jsx src/components/admin/AdminShell.jsx src/pages/admin/PlatformIntegrationFoundation.jsx scripts/build-product-signup-fallback.mjs scripts/product-signup-route-smoke.mjs scripts/validate-final-ux-accessibility-blockers.mjs` - passed
+- `git diff --check` - passed
+- `npm run typecheck` - passed
+- `npm run build` - passed; existing large chunk warning remains
+- `node --test tests/adminGlobalSearch.test.js tests/platformIntegrationFoundation.test.js` - passed 10/10
+- `npm run ci:crm-release-guards` - passed; advisory legacy provider findings remain non-blocking
+- `npm run verify:platform-integration` - passed
+- `npm run verify:unified-platform-integration` - passed
+- `node scripts/validate-route-registry-authority.mjs` - passed
+- `node scripts/validate-platform-contracts.mjs` - passed
+- `PRODUCT_SIGNUP_SMOKE_STRICT_HTTP=1 node scripts/product-signup-route-smoke.mjs --base-url=http://127.0.0.1:4173` against Vite preview - passed 9/9 routes after rebuild
+- `node scripts/validate-final-ux-accessibility-blockers.mjs --skip-build=true` - passed `/admin/platform` and `/product-signup` across 1440x900, 1280x820, 1024x768, 768x900, 390x844, and 375x667
+- `node scripts/validate-phase-a-foundation-review.mjs` - passed 6 viewports
+- `node scripts/validate-phase-a-activation-review.mjs` - passed 38 checks
+- `node scripts/validate-phase-a-command-center-review.mjs` - passed 23 checks
+- `node scripts/validate-phase-b-browser.mjs` - passed 270 checks and 10 axe checks
+- `node scripts/validate-phase-c-customer-operations-browser.mjs` - passed 138 checks, 8 axe checks, and 8 text-zoom checks
+- `node scripts/validate-phase-e-browser.mjs` against local Vite dev at `http://127.0.0.1:5173` - passed 60 checks
+
+Worker #3 re-review should focus only on AdminGlobalSearch ARIA/keyboard behavior, `/admin/platform` contrast, `/admin/platform` keyboard scroll region behavior, static `/product-signup` at 390px and 375px including 200% text zoom, and navigation/notification regression spot checks.
+
 ## Executive Result
 
 PR #1412 is locally repair-complete for the known Worker #1 blockers. The branch resolves route registry ownership, universal search completeness, search permission enforcement, notification contract completeness, and the confirmed CI/build guard failures without merging, deploying, force-pushing, or live-integrating.
