@@ -1,0 +1,482 @@
+.cs-bi-surface {
+  box-sizing: border-box;
+  width: min(100%, var(--cs-content-max));
+  margin: 0 auto;
+  padding: var(--cs-space-8);
+  color: var(--cs-color-text-strong);
+}
+
+.cs-bi-surface__header {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: var(--cs-space-6);
+  align-items: start;
+  padding-bottom: var(--cs-space-6);
+}
+
+.cs-bi-surface__header h1 {
+  margin: 0;
+  font-size: 2.25rem;
+  line-height: 1.08;
+  letter-spacing: 0;
+}
+
+.cs-bi-surface__header p {
+  max-width: 68ch;
+  margin: var(--cs-space-3) 0 0;
+  color: var(--cs-color-text);
+  line-height: 1.6;
+}
+
+.cs-bi-surface .cs-status-badge--info,
+.cs-bi-surface .cs-status-badge--neutral {
+  color: var(--cs-color-text-strong);
+}
+
+.cs-bi-surface .cs-card__description {
+  color: var(--cs-color-text);
+}
+
+.cs-bi-surface__actions,
+.cs-bi-section__actions,
+.cs-bi-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-2);
+  align-items: center;
+}
+
+.cs-bi-layout {
+  display: grid;
+  gap: var(--cs-space-5);
+}
+
+.cs-bi-layout--two {
+  grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+}
+
+.cs-bi-layout--three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.cs-bi-section {
+  box-sizing: border-box;
+  min-width: 0;
+  overflow: hidden;
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-color-surface);
+  box-shadow: var(--cs-shadow-xs);
+}
+
+.cs-bi-section__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-5);
+  border-bottom: 1px solid var(--cs-color-border);
+}
+
+.cs-bi-section__header h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.3;
+  letter-spacing: 0;
+}
+
+.cs-bi-section__header p {
+  margin: var(--cs-space-2) 0 0;
+  color: var(--cs-color-text);
+  line-height: 1.55;
+}
+
+.cs-bi-section__body {
+  display: grid;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-5);
+}
+
+.cs-bi-freshness,
+.cs-bi-owner,
+.cs-bi-deep-link,
+.cs-bi-external-source {
+  display: inline-flex;
+  gap: var(--cs-space-2);
+  align-items: center;
+  color: var(--cs-color-text);
+  font-size: 0.8125rem;
+  font-weight: 700;
+}
+
+.cs-bi-freshness time {
+  color: var(--cs-color-text);
+  font-weight: 600;
+}
+
+.cs-bi-owner {
+  min-height: 1.625rem;
+  padding: 0 0.625rem;
+  border: 1px solid var(--cs-color-border);
+  border-radius: 999px;
+  background: var(--cs-color-surface-subtle);
+}
+
+.cs-bi-deep-link,
+.cs-bi-external-source {
+  justify-content: center;
+  width: fit-content;
+  min-height: 2.5rem;
+  padding: 0 var(--cs-space-3);
+  border: 1px solid var(--cs-color-action-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-action-soft);
+  color: var(--cs-color-text-strong);
+  text-decoration: none;
+}
+
+.cs-bi-deep-link:focus-visible,
+.cs-bi-external-source:focus-visible {
+  outline: none;
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-bi-deep-link--disabled {
+  color: var(--cs-color-text-muted);
+  background: var(--cs-color-surface-subtle);
+  border-color: var(--cs-color-border);
+}
+
+.cs-bi-source-disclosure {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cs-space-3);
+  margin: 0;
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-surface-subtle);
+}
+
+.cs-bi-source-disclosure div {
+  min-width: 0;
+}
+
+.cs-bi-source-disclosure dt {
+  color: var(--cs-color-text);
+  font-size: 0.72rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0;
+}
+
+.cs-bi-source-disclosure dd {
+  margin: var(--cs-space-1) 0 0;
+  color: var(--cs-color-text-strong);
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.cs-bi-source-disclosure__wide {
+  grid-column: 1 / -1;
+}
+
+.cs-bi-evidence {
+  display: grid;
+  gap: var(--cs-space-2);
+}
+
+.cs-bi-evidence h3 {
+  margin: 0;
+  font-size: 0.875rem;
+  letter-spacing: 0;
+}
+
+.cs-bi-evidence ul {
+  display: grid;
+  gap: var(--cs-space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cs-bi-evidence li {
+  display: flex;
+  gap: var(--cs-space-2);
+  align-items: flex-start;
+  color: var(--cs-color-text);
+  line-height: 1.5;
+}
+
+.cs-bi-banner p {
+  margin: 0;
+}
+
+.cs-bi-recommendation,
+.cs-bi-opportunity-card,
+.cs-bi-health-domain,
+.cs-bi-journey-step,
+.cs-bi-revenue-row {
+  display: grid;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-surface);
+  box-shadow: var(--cs-shadow-xs);
+}
+
+.cs-bi-recommendation__header,
+.cs-bi-opportunity-card__header,
+.cs-bi-health-domain__header,
+.cs-bi-revenue-row__header {
+  display: flex;
+  justify-content: space-between;
+  gap: var(--cs-space-3);
+  align-items: flex-start;
+}
+
+.cs-bi-recommendation h3,
+.cs-bi-opportunity-card h3,
+.cs-bi-health-domain h3,
+.cs-bi-revenue-row h3 {
+  margin: 0;
+  font-size: 1rem;
+  letter-spacing: 0;
+}
+
+.cs-bi-recommendation p,
+.cs-bi-opportunity-card p,
+.cs-bi-health-domain p,
+.cs-bi-revenue-row p {
+  margin: var(--cs-space-1) 0 0;
+  color: var(--cs-color-text);
+  line-height: 1.55;
+}
+
+.cs-bi-state,
+.cs-bi-error-recovery {
+  display: grid;
+  grid-template-columns: 2.75rem minmax(0, 1fr) auto;
+  gap: var(--cs-space-4);
+  align-items: center;
+  padding: var(--cs-space-5);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-color-surface);
+}
+
+.cs-bi-state > svg,
+.cs-bi-error-recovery > svg {
+  width: 2.25rem;
+  height: 2.25rem;
+  color: var(--cs-color-action);
+}
+
+.cs-bi-state strong,
+.cs-bi-error-recovery strong {
+  display: block;
+  color: var(--cs-color-text-strong);
+}
+
+.cs-bi-state p,
+.cs-bi-error-recovery p {
+  margin: var(--cs-space-1) 0 0;
+  color: var(--cs-color-text);
+  line-height: 1.55;
+}
+
+.cs-bi-state__skeletons {
+  display: grid;
+  width: 14rem;
+  gap: var(--cs-space-2);
+}
+
+.cs-bi-empty-state svg {
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+.cs-bi-insight .cs-card__body {
+  display: grid;
+  gap: var(--cs-space-4);
+}
+
+.cs-bi-insight__value {
+  color: var(--cs-color-text-strong);
+  font-size: 1.7rem;
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.cs-bi-brief-summary {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(280px, 0.65fr);
+  gap: var(--cs-space-5);
+}
+
+.cs-bi-brief-callout {
+  display: grid;
+  gap: var(--cs-space-4);
+  padding: var(--cs-space-5);
+  border: 1px solid var(--cs-color-action-border);
+  border-radius: var(--cs-radius-lg);
+  background: var(--cs-color-action-soft);
+}
+
+.cs-bi-brief-callout h2 {
+  margin: 0;
+  font-size: 1.45rem;
+  letter-spacing: 0;
+}
+
+.cs-bi-brief-callout p {
+  margin: 0;
+  color: var(--cs-color-text);
+  line-height: 1.6;
+}
+
+.cs-bi-health-list,
+.cs-bi-opportunity-list,
+.cs-bi-revenue-list,
+.cs-bi-journey-list {
+  display: grid;
+  gap: var(--cs-space-3);
+}
+
+.cs-bi-health-domain__meta,
+.cs-bi-opportunity-card__meta,
+.cs-bi-revenue-row__meta,
+.cs-bi-journey-step__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-2);
+  align-items: center;
+}
+
+.cs-bi-opportunity-detail,
+.cs-bi-methodology-note {
+  display: grid;
+  gap: var(--cs-space-3);
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-surface-subtle);
+}
+
+.cs-bi-methodology-note p {
+  margin: 0;
+  color: var(--cs-color-text);
+  line-height: 1.6;
+}
+
+.cs-bi-revenue-class {
+  display: grid;
+  gap: var(--cs-space-2);
+  padding: var(--cs-space-4);
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-surface-subtle);
+}
+
+.cs-bi-revenue-class strong {
+  font-size: 1.2rem;
+  letter-spacing: 0;
+}
+
+.cs-bi-website-path {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cs-space-3);
+}
+
+.cs-bi-journey-step {
+  position: relative;
+}
+
+.cs-bi-gallery {
+  display: grid;
+  gap: var(--cs-space-8);
+  background: var(--cs-color-app);
+}
+
+.cs-bi-gallery__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--cs-space-2);
+}
+
+.cs-bi-gallery__tabs button {
+  min-height: 2.5rem;
+  border: 1px solid var(--cs-color-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-color-surface);
+  color: var(--cs-color-text);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.cs-bi-gallery__tabs button[aria-pressed="true"] {
+  color: var(--cs-color-action);
+  border-color: var(--cs-color-action-border);
+  background: var(--cs-color-action-soft);
+}
+
+@media (max-width: 1080px) {
+  .cs-bi-layout--two,
+  .cs-bi-layout--three,
+  .cs-bi-brief-summary,
+  .cs-bi-website-path {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .cs-bi-source-disclosure {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 760px) {
+  .cs-bi-surface {
+    padding: var(--cs-space-5) var(--cs-space-4) max(var(--cs-space-8), env(safe-area-inset-bottom, 0px));
+  }
+
+  .cs-bi-surface__header,
+  .cs-bi-layout--two,
+  .cs-bi-layout--three,
+  .cs-bi-brief-summary,
+  .cs-bi-website-path,
+  .cs-bi-source-disclosure {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-bi-surface__header h1 {
+    font-size: 1.85rem;
+  }
+
+  .cs-bi-section__header,
+  .cs-bi-recommendation__header,
+  .cs-bi-opportunity-card__header,
+  .cs-bi-health-domain__header,
+  .cs-bi-revenue-row__header,
+  .cs-bi-state,
+  .cs-bi-error-recovery {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+
+  .cs-bi-state__skeletons {
+    width: 100%;
+  }
+
+  .cs-bi-deep-link,
+  .cs-bi-external-source {
+    width: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-bi-gallery__tabs button,
+  .cs-bi-deep-link,
+  .cs-bi-external-source {
+    transition: none;
+  }
+}

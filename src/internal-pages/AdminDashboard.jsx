@@ -11,6 +11,12 @@ import {
 import { base44 } from '@/api/base44Client';
 import { fetchLeadPipelineSummary, getLeadPipelineError } from '@/lib/leadPipelineApi';
 import { countWebhookErrorEvents } from '@/lib/adminUnreadCounts';
+import {
+  ADMIN_DASHBOARD_NAVIGATION_GROUPS,
+  ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS,
+  getPlatformNavigationGroups,
+  getPlatformNavigationItems,
+} from '@/lib/platformIntegrationFoundation';
 import AdminSettingsPanel from '../components/admin/AdminSettingsPanel';
 import LeadsTable from '../components/admin/LeadsTable';
 import LeadsRecentChanges from '../components/admin/LeadsRecentChanges';
@@ -101,104 +107,92 @@ function LazyAdminPanel({ children }) {
   return <Suspense fallback={<AdminPanelSkeleton />}>{children}</Suspense>;
 }
 
-// Keep the rendered admin menu focused. Secondary/legacy tools stay reachable by URL/search,
-// but no longer clog the left sidebar.
-const NAV_GROUPS = [
-  {
-    group: 'Command',
-    items: [
-      { id: 'overview', label: 'Overview', icon: LayoutDashboard },
-      { id: 'lead-intelligence', label: 'Lead Intelligence', icon: Flame },
-      { id: 'inbox', label: 'Inbox', icon: Inbox, badge: 'inbox' },
-    ],
-  },
-  {
-    group: 'Leads & Sales',
-    items: [
-      { id: 'leads', label: 'Leads', icon: Users },
-      { id: 'priority', label: 'Priority Queue', icon: Star },
-      { id: 'website-leads', label: 'Website Leads', icon: Target },
-      { id: 'demo-bookings', label: 'Demo Bookings', icon: CalendarCheck2 },
-      { id: 'sales-funnel', label: 'Sales Funnel', icon: TrendingDown },
-    ],
-  },
-  {
-    group: 'Client Launch',
-    items: [
-      { id: 'guided-onboarding', label: 'Launch Guide', icon: Zap },
-      { id: 'customer-onboarding', label: 'Customer Onboarding', icon: ClipboardList },
-      { id: 'client-projects', label: 'Client Projects', icon: FolderKanban },
-      { id: 'deployment-manager', label: 'Deployment Manager', icon: ShieldCheck },
-      { id: 'install-queue', label: 'Install Queue', icon: Server },
-      { id: 'launch-gates', label: 'Launch Gates', icon: ClipboardList },
-    ],
-  },
-  {
-    group: 'Automation & Messaging',
-    items: [
-      { id: 'automations', label: 'Automation Status', icon: Zap, external: true, externalPath: '/admin/automations' },
-      { id: 'instant-response', label: 'Instant Response', icon: Send },
-      { id: 'email-campaigns', label: 'Email Campaigns', icon: Mail },
-      { id: 'routing', label: 'Lead Routing', icon: Target },
-      { id: 'logs', label: 'Communication Logs', icon: MessageSquare, badge: 'webhook-errors' },
-      { id: 'failed-jobs', label: 'Failed Jobs', icon: Loader2 },
-      { id: 'marketing', label: 'AI Marketing', icon: Sparkles, external: true, externalPath: '/admin/marketing' },
-    ],
-  },
-  {
-    group: 'Revenue & Analytics',
-    items: [
-      { id: 'revenue', label: 'Revenue & MRR', icon: DollarSign },
-      { id: 'analytics', label: 'Analytics', icon: BarChart3 },
-      { id: 'attribution', label: 'Source Attribution', icon: PieChart },
-      { id: 'landing-traffic', label: 'Landing Traffic', icon: BarChart3 },
-    ],
-  },
-  {
-    group: 'System',
-    items: [
-      { id: 'audit-command-center', label: 'Audit Command Center', icon: ShieldCheck },
-      { id: 'launch-proof', label: 'Launch Proof', icon: ShieldCheck },
-      { id: 'health', label: 'Integration Health', icon: Activity },
-      { id: 'settings', label: 'Settings', icon: Settings },
-    ],
-  },
-];
+const NAV_ICON_BY_ROUTE_ID = {
+  "admin-overview": LayoutDashboard,
+  "platform-integration": Database,
+  "lead-intelligence": Flame,
+  inbox: Inbox,
+  leads: Users,
+  priority: Star,
+  "website-leads": Target,
+  "demo-bookings": CalendarCheck2,
+  "sales-funnel": TrendingDown,
+  "guided-onboarding": Zap,
+  "customer-onboarding": ClipboardList,
+  "client-projects": FolderKanban,
+  "deployment-manager": ShieldCheck,
+  "install-queue": Server,
+  "launch-gates": ClipboardList,
+  automations: Zap,
+  "instant-response": Send,
+  "email-campaigns": Mail,
+  routing: Target,
+  "communication-logs": MessageSquare,
+  "failed-jobs": Loader2,
+  "ai-marketing": Sparkles,
+  revenue: DollarSign,
+  analytics: BarChart3,
+  attribution: PieChart,
+  "landing-traffic": BarChart3,
+  "audit-command-center": ShieldCheck,
+  "launch-proof": ShieldCheck,
+  health: Activity,
+  settings: Settings,
+  "lead-quality": ShieldCheck,
+  "crm-health": Activity,
+  "client-onboarding": ClipboardList,
+  "onboarding-orchestration": ClipboardList,
+  "install-checklists": ClipboardList,
+  cadence: Settings,
+  reactivation: RotateCcw,
+  drip: Mail,
+  nurture: Mail,
+  "revenue-tracking": DollarSign,
+  "campaign-builder": Layers,
+  "launch-truth-sprint": ShieldCheck,
+  "data-quality": Activity,
+  "platform-clients": Users,
+  "twilio-growth-engine": Zap,
+  "twilio-health": Activity,
+  "resend-diagnostics": Mail,
+  "audit-log": ShieldCheck,
+  "canonical-map": Database,
+  "resource-library": BookOpen,
+  "messaging-regression": Send,
+  "ai-sales-reps": Users,
+  sniper: Crosshair,
+  "ai-sales": Zap,
+  "performance-wars": Trophy,
+  "social-engine": Sparkles,
+  "website-copy": Wand2,
+  "task-board": ClipboardList,
+  templates: MessageSquare,
+  "review-request": Star,
+  qa: RefreshCw,
+  "install-guide": BookOpen,
+};
 
-const SECONDARY_NAV_ITEMS = [
-  { id: 'lead-quality', label: 'Lead Quality Control', icon: ShieldCheck },
-  { id: 'crm-health', label: 'CRM Health', icon: Activity },
-  { id: 'onboarding', label: 'Onboarding', icon: ClipboardList, external: true, externalPath: '/admin/onboarding' },
-  { id: 'onboarding-orchestration', label: 'Onboarding Progress', icon: ClipboardList },
-  { id: 'install-checklists', label: 'Install Checklists', icon: ClipboardList },
-  { id: 'cadence', label: 'Dynamic Cadence', icon: Settings },
-  { id: 'reactivation', label: 'Lead Reactivation', icon: RotateCcw },
-  { id: 'drip', label: 'Drip Campaigns', icon: Mail },
-  { id: 'nurture', label: 'Nurture Campaigns', icon: Mail },
-  { id: 'revenue-tracking', label: 'Revenue Tracking', icon: DollarSign },
-  { id: 'campaign-builder', label: 'Campaign Builder', icon: Layers },
-  { id: 'launch-truth-sprint', label: 'Launch Truth Sprint', icon: ShieldCheck },
-  { id: 'data-quality', label: 'Data Quality', icon: Activity },
-  { id: 'platform-clients', label: 'Platform Clients', icon: Users },
-  { id: 'twilio-growth-engine', label: 'Twilio Growth Engine', icon: Zap },
-  { id: 'twilio-health', label: 'Twilio Health', icon: Activity },
-  { id: 'resend-diagnostics', label: 'Resend Sender Diagnostics', icon: Mail },
-  { id: 'audit-log', label: 'Audit Log', icon: ShieldCheck },
-  { id: 'canonical-map', label: 'System Map', icon: Database },
-  { id: 'resource-library', label: 'Resource Library', icon: BookOpen },
-  { id: 'messaging-regression', label: 'Messaging Provider Test', icon: Send },
-  { id: 'ai-sales-reps', label: 'AI Sales Reps', icon: Users },
-  { id: 'sniper', label: 'Lead Sniper', icon: Crosshair },
-  { id: 'ai-sales-cmd', label: 'AI Sales Command', icon: Zap, external: true, externalPath: '/admin/ai-sales' },
-  { id: 'performance-wars', label: 'Performance Wars', icon: Trophy, external: true, externalPath: '/admin/performance-wars' },
-  { id: 'social-engine', label: 'Social Media Engine', icon: Sparkles },
-  { id: 'website-copy', label: 'Website Copy AI', icon: Wand2 },
-  { id: 'task-board', label: 'Task Board', icon: ClipboardList },
-  { id: 'templates', label: 'Templates', icon: MessageSquare },
-  { id: 'review-request', label: 'Review Requests', icon: Star },
-  { id: 'qa', label: 'QA Tools', icon: RefreshCw },
-  { id: 'install-guide', label: 'Install Guide', icon: BookOpen, external: true, externalPath: '/admin/install-guide' },
-];
+function addPresentation(items) {
+  return items.map((item) => ({
+    ...item,
+    icon: NAV_ICON_BY_ROUTE_ID[item.routeId] || LayoutDashboard,
+  }));
+}
+
+function addGroupPresentation(groups) {
+  return groups.map((group) => ({
+    ...group,
+    items: addPresentation(group.items),
+  }));
+}
+
+const NAV_REGISTRY_USER = { role: 'super_admin' };
+const NAV_GROUPS = addGroupPresentation(
+  getPlatformNavigationGroups(NAV_REGISTRY_USER, ADMIN_DASHBOARD_NAVIGATION_GROUPS, { filterPermissions: false }),
+);
+const SECONDARY_NAV_ITEMS = addPresentation(
+  getPlatformNavigationItems(NAV_REGISTRY_USER, ADMIN_DASHBOARD_SECONDARY_NAVIGATION_ITEMS, { filterPermissions: false }),
+);
 
 const ALL_NAV = [...NAV_GROUPS.flatMap(g => g.items), ...SECONDARY_NAV_ITEMS];
 const VALID_TAB_IDS = new Set(ALL_NAV.filter(item => !item.external).map(item => item.id));

@@ -1,10 +1,48 @@
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
+import fs from "fs";
 import path from "path";
+
+const productSignupFallbackPaths = new Set([
+  "/product-signup",
+  "/product_signup",
+  "/product-sign-up",
+]);
+
+function productSignupPreviewFallback() {
+  return {
+    name: "clientsurge-product-signup-preview-fallback",
+    configurePreviewServer(server) {
+      server.middlewares.use((req, res, next) => {
+        const requestPath = new URL(req.url || "/", "http://localhost").pathname;
+        if (!productSignupFallbackPaths.has(requestPath)) {
+          next();
+          return;
+        }
+
+        const fallbackPath = path.resolve(
+          __dirname,
+          "dist",
+          requestPath.replace(/^\//, ""),
+          "index.html",
+        );
+
+        if (!fs.existsSync(fallbackPath)) {
+          next();
+          return;
+        }
+
+        res.statusCode = 200;
+        res.setHeader("Content-Type", "text/html; charset=utf-8");
+        res.end(fs.readFileSync(fallbackPath, "utf8"));
+      });
+    },
+  };
+}
 
 // #8: split recharts + framer-motion into separate chunks
 export default defineConfig({
-  plugins: [react()],
+  plugins: [react(), productSignupPreviewFallback()],
   server: {
     allowedHosts: true,
   },

@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "vite build && node scripts/build-product-signup-fallback.mjs",
     "lint": "eslint . --quiet",
     "lint:fix": "eslint . --fix",
     "test": "node scripts/run-tests.mjs",
@@ -54,6 +54,8 @@
     "smoke:public-exposure-live": "node scripts/public-exposure-live-smoke.mjs",
     "audit:raw-route-html": "node scripts/audit-raw-route-html.mjs",
     "verify:production-security": "node scripts/verify-production-security.mjs",
+    "verify:platform-integration": "node scripts/validate-platform-integration.mjs",
+    "verify:unified-platform-integration": "node validate-unified-platform-integration.mjs",
     "openclaw:validate-install": "node scripts/openclaw/run-install-validation.mjs",
     "openclaw:basic-package-check": "node scripts/openclaw/basic-package-activation-check.mjs",
     "openclaw:purchase-onboarding-smoke": "node scripts/openclaw/purchase-onboarding-smoke.mjs",

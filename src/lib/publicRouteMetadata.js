@@ -227,6 +227,7 @@ export const ADMIN_ROUTE_PREFIXES = [
   "/mission-control",
   "/saas/admin",
   "/saas",
+  "/settings",
 ];
 
 export const INTERNAL_ROUTE_PREFIXES = [
@@ -240,6 +241,7 @@ export const INTERNAL_ROUTE_PREFIXES = [
   "/audit",
   "/observability",
   "/reconciliation",
+  "/review",
   "/base44",
   "/api",
   "/api/apps",
@@ -277,6 +279,7 @@ export const NOINDEX_ROUTE_PREFIXES = [
   "/thank-you",
   "/setup-lookup",
   "/launch-control",
+  "/review",
   "/leads/capture",
   "/faq",
   "/how-it-works",
@@ -336,10 +339,14 @@ export const ROBOTS_DISALLOW_PATHS = [
   "/observability/",
   "/reconciliation",
   "/reconciliation/",
+  "/review",
+  "/review/",
   "/api/",
   "/base44/",
   "/saas",
   "/saas/",
+  "/settings",
+  "/settings/",
   "/mission-control",
   "/lead-intelligence",
   "/leadintelligence",

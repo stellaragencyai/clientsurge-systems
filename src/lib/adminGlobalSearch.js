@@ -1,66 +1,111 @@
-const SEARCH_LIMIT_PER_ENTITY = 5;
+import {
+  PLATFORM_SEARCH_SOURCES,
+  buildPlatformSearchResponse,
+  buildPlatformSearchResults,
+  getPlatformSearchPlaceholder,
+} from "./platformIntegrationFoundation.js";
 
-const ENTITY_CONFIG = {
-  lead: {
-    label: "Lead",
-    tab: "leads",
-    fields: ["business_name", "full_name", "name", "email", "phone", "phone_number", "industry"],
-    labelFields: ["business_name", "full_name", "name", "email"],
-    subFields: ["industry", "email", "phone", "phone_number"],
-  },
-  client: {
-    label: "Client",
-    tab: "client-projects",
-    fields: ["business_name", "client_name", "full_name", "email", "client_email", "contact_email", "phone"],
-    labelFields: ["business_name", "client_name", "full_name", "email", "client_email"],
-    subFields: ["client_email", "contact_email", "email", "plan", "phone"],
-  },
-  order: {
-    label: "Order",
-    tab: "install-queue",
-    fields: ["business_name", "customer_name", "customer_email", "customer_phone", "stripe_session_id", "id"],
-    labelFields: ["business_name", "customer_name", "customer_email", "id"],
-    subFields: ["customer_email", "payment_status", "order_status", "pipeline_status"],
-  },
-  support: {
-    label: "Support",
-    tab: "inbox",
-    fields: ["sender_name", "sender_email", "message", "description", "project_id"],
-    labelFields: ["sender_name", "sender_email", "project_id"],
-    subFields: ["message", "description", "sender_email"],
-  },
+const DEFAULT_SEARCH_ENTITY_LIMIT = 200;
+const SOURCE_ENTITY_LIMITS = {
+  settings: 50,
 };
 
-function pickFirst(record, fields) {
-  return fields.map((field) => record?.[field]).find((value) => value !== undefined && value !== null && String(value).trim());
+function getEntityLimit(source, options = {}) {
+  return options.sourceLimits?.[source.id] ?? SOURCE_ENTITY_LIMITS[source.id] ?? options.entityLimit ?? DEFAULT_SEARCH_ENTITY_LIMIT;
 }
 
-function matchesQuery(record, fields, query) {
-  const normalizedQuery = String(query || "").trim().toLowerCase();
-  if (normalizedQuery.length < 2) return false;
+async function listSearchEntity(base44Client, entityName, limit) {
+  const entity = base44Client?.entities?.[entityName];
 
-  return fields.some((field) => String(record?.[field] || "").toLowerCase().includes(normalizedQuery));
+  if (!entity?.list) {
+    return {
+      entity: entityName,
+      status: "Unavailable",
+      records: [],
+      reason: "missing_entity",
+    };
+  }
+
+  try {
+    const records = await entity.list("-created_date", limit);
+    return {
+      entity: entityName,
+      status: "Current",
+      records: Array.isArray(records) ? records : [],
+      reason: null,
+    };
+  } catch (error) {
+    return {
+      entity: entityName,
+      status: "Unavailable",
+      records: [],
+      reason: error?.message || "entity_list_failed",
+    };
+  }
 }
 
-export function buildAdminGlobalSearchResults(entityRecords, query, maxResults = 8) {
-  const results = Object.entries(ENTITY_CONFIG).flatMap(([type, config]) => {
-    const records = entityRecords?.[type] || [];
-    return records
-      .filter((record) => matchesQuery(record, config.fields, query))
-      .slice(0, SEARCH_LIMIT_PER_ENTITY)
-      .map((record) => ({
-        type,
-        tab: config.tab,
-        id: record.id,
-        label: String(pickFirst(record, config.labelFields) || config.label),
-        sub: String(pickFirst(record, config.subFields) || config.label),
-        data: record,
-      }));
+function summarizeSourceStatus(source, entityResults) {
+  const currentEntities = entityResults.filter((result) => result.status === "Current").map((result) => result.entity);
+  const unavailableEntities = entityResults.filter((result) => result.status !== "Current").map((result) => result.entity);
+  const recordCount = entityResults.reduce((count, result) => count + result.records.length, 0);
+  const status = currentEntities.length === 0 ? "Unavailable" : unavailableEntities.length > 0 ? "Partial" : "Current";
+
+  return {
+    sourceId: source.id,
+    status,
+    entities: source.entities,
+    currentEntities,
+    unavailableEntities,
+    recordCount,
+  };
+}
+
+export function getAdminGlobalSearchAdapterPlan(options = {}) {
+  const sourceIds = options.sourceIds ? new Set(options.sourceIds) : null;
+
+  return PLATFORM_SEARCH_SOURCES
+    .filter((source) => !sourceIds || sourceIds.has(source.id))
+    .map((source) => ({
+      sourceId: source.id,
+      recordKey: source.id,
+      entities: source.entities,
+      limit: getEntityLimit(source, options),
+    }));
+}
+
+export async function loadAdminGlobalSearchRecords(base44Client, options = {}) {
+  const sourcesById = new Map(PLATFORM_SEARCH_SOURCES.map((source) => [source.id, source]));
+  const entries = await Promise.all(
+    getAdminGlobalSearchAdapterPlan(options).map(async (planItem) => {
+      const source = sourcesById.get(planItem.sourceId);
+      const entityResults = await Promise.all(
+        planItem.entities.map((entityName) => listSearchEntity(base44Client, entityName, planItem.limit)),
+      );
+      const records = entityResults.flatMap((result) => result.records);
+      return [planItem.sourceId, records, summarizeSourceStatus(source, entityResults)];
+    }),
+  );
+
+  return {
+    recordsBySource: Object.fromEntries(entries.map(([sourceId, records]) => [sourceId, records])),
+    sourceStatuses: Object.fromEntries(entries.map(([sourceId, _records, status]) => [sourceId, status])),
+  };
+}
+
+export function buildAdminGlobalSearchResults(entityRecords, query, maxResults = 12, options = {}) {
+  return buildPlatformSearchResults(entityRecords, query, maxResults, {
+    sourceStatuses: options.sourceStatuses,
+    user: options.user,
   });
-
-  return results.slice(0, maxResults);
 }
 
-export function getAdminGlobalSearchPlaceholder() {
-  return "Search leads, clients, orders, support...";
+export function buildAdminGlobalSearchResponse(entityRecords, query, maxResults = 12, options = {}) {
+  return buildPlatformSearchResponse(entityRecords, query, maxResults, {
+    sourceStatuses: options.sourceStatuses,
+    user: options.user,
+  });
 }
+
+export {
+  getPlatformSearchPlaceholder as getAdminGlobalSearchPlaceholder,
+};

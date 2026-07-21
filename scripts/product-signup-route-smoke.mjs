@@ -17,7 +17,8 @@ const requiredMarkers = [
   "Growth System",
   "Pro System",
   "Your Information",
-  "Continue to Secure Checkout",
+  "Payment has not completed.",
+  "Retry Secure Checkout",
   "createCheckoutSession",
   "69dc4a79656fdba136d413d3",
   "/api/apps/",
@@ -94,10 +95,22 @@ function checkBuiltFallback() {
     };
   }
 
-  const html = fs.readFileSync(builtFallbackPath, "utf8");
+  const stats = fs.statSync(builtFallbackPath);
+  const fallbackHtmlPath = stats.isDirectory() ? `${builtFallbackPath}/index.html` : builtFallbackPath;
+
+  if (!fs.existsSync(fallbackHtmlPath)) {
+    return {
+      status: "fail",
+      bytes: 0,
+      failures: [`built fallback html not found: ${fallbackHtmlPath}`],
+    };
+  }
+
+  const html = fs.readFileSync(fallbackHtmlPath, "utf8");
   const failures = validateHtml(html);
   return {
     status: failures.length ? "fail" : "pass",
+    path: fallbackHtmlPath,
     bytes: Buffer.byteLength(html, "utf8"),
     failures,
   };
