@@ -37,8 +37,8 @@ Open [Base44.com](http://Base44.com) and click on Publish.
 This repo uses the **Base44 app-code / GitHub sync** release path.
 
 - Pushes to `main` sync code into Base44.
-- The live site still requires clicking **Publish** in the Base44 UI.
-- `base44 deploy` is only for Base44 **Backend Platform** apps and will fail for this repo.
+- The live site can be published from the CLI with `npm run base44:publish-site-cli`.
+- Direct `base44 site deploy` from the full repo can fail if Base44 validates unrelated entity files first; the site CLI helper builds the app, packages only `dist/` plus the minimal Base44 site config, deploys that package, then verifies the custom domain and Base44 origin.
 - Pre-launch QA belongs in the Base44 test database / test workspace; see `docs/STAGING_ENVIRONMENT.md` before running checkout, SMS, email, or activation smoke tests.
 
 Helper command:

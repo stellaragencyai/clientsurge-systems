@@ -22,6 +22,8 @@
     "release:base44": "pwsh -File scripts/release-base44.ps1",
     "base44:publish-backend": "pwsh -File scripts/base44/publish-backend-changes.ps1",
     "base44:publish-api": "node scripts/base44/publish-deploy-endpoint.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com",
+    "base44:publish-site-cli": "node scripts/base44/publish-site-only-cli.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com --base44-origin-url https://grinning-apex-flow-growth.base44.app",
+    "base44:publish-function-cli": "node scripts/base44/publish-function-only-cli.mjs --app-id 69dc4a79656fdba136d413d3",
     "base44:check-app": "node scripts/base44/check-app-access.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https://clientsurgesystems.com",
     "base44:publish-all": "node scripts/base44/publish-all-apps.mjs",
     "base44:sync-metadata": "node scripts/base44/sync-function-metadata.mjs",

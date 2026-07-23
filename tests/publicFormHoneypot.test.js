@@ -17,8 +17,8 @@ const sources = {
 test("public backend form endpoints treat website_url as the honeypot field", () => {
   assert.match(sources.submitLeadCapture, /cleanString\(body\.website_url\)/);
   assert.match(sources.submitLeadCapture, /reason: 'bot_detected'|reason: "bot_detected"/);
-  assert.match(sources.submitContactInquiry, /payload\.website_url \|\| payload\.website_hp/);
-  assert.match(sources.submitContactInquiry, /if \(contact\.honeypot\)/);
+  assert.match(sources.submitContactInquiry, /raw\.website_url\s*\|\|\s*raw\.website_hp/);
+  assert.match(sources.submitContactInquiry, /if \(payload\.honeypot\)/);
 });
 
 test("submitContactInquiry entry delegates to the canonical main handler", () => {
@@ -26,8 +26,8 @@ test("submitContactInquiry entry delegates to the canonical main handler", () =>
 });
 
 test("submitContactInquiry preserves real business website separately from honeypot website_url", () => {
-  assert.match(sources.submitContactInquiry, /payload\.business_website_url \|\| payload\.website/);
-  assert.doesNotMatch(sources.submitContactInquiry, /payload\.website_url \|\| payload\.website\)/);
+  assert.match(sources.submitContactInquiry, /raw\.business_website_url\s*\|\|\s*raw\.business_website\s*\|\|\s*raw\.website\s*\|\|\s*raw\.url/);
+  assert.doesNotMatch(sources.submitContactInquiry, /raw\.website_url\s*\|\|\s*raw\.website\)/);
   assert.match(sources.samChat, /business_website_url: leadForm\.business_website_url/);
 });
 

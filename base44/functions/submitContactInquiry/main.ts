@@ -1,5 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
-import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
+import { validatePublicFormOrigin } from "./publicFormOriginGuard.local.js";
 
 const MAX_FIELD_LENGTH = 500;
 const MAX_MESSAGE_LENGTH = 1500;
