@@ -8,7 +8,15 @@ on:
     paths:
       - ".github/workflows/ga4-configuration-migration.yml"
       - "scripts/base44/migrate-ga4-configuration.mjs"
+      - "base44/entities/GA4Configuration.jsonc"
+      - "base44/functions/_shared/ga4Configuration.js"
+      - "base44/functions/_shared/ga4MeasurementProtocol.js"
+      - "base44/functions/getAdminSettings/**"
       - "base44/functions/setupGA4Configuration/**"
+      - "base44/functions/verifyGA4Configuration/**"
+      - "base44/functions/stripeWebhookOrders/**"
+      - "src/lib/adminSettingsApi.js"
+      - "src/components/admin/AdminSettingsPanel.jsx"
 
 permissions:
   contents: read

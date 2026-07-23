@@ -1,9 +1,6 @@
-import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+export const GA4_MEASUREMENT_ID = "G-H6QT342ZN9";
 
-const GA4_MEASUREMENT_ID = "G-H6QT342ZN9";
-const MEASUREMENT_ID_PATTERN = /^G-[A-Z0-9]{4,}$/i;
-
-const GA4_TRACKED_EVENTS = Object.freeze([
+export const GA4_TRACKED_EVENTS = Object.freeze([
   "page_view",
   "scroll",
   "scroll_depth",
@@ -23,63 +20,55 @@ const GA4_TRACKED_EVENTS = Object.freeze([
   "onboarding_complete",
 ]);
 
-const GA4_KEY_EVENTS = Object.freeze([
+export const GA4_KEY_EVENTS = Object.freeze([
   "generate_lead",
   "begin_checkout",
   "purchase",
   "demo_booked",
 ]);
 
-function jsonResponse(body: Record<string, unknown>, status = 200) {
-  return Response.json(body, {
-    status,
-    headers: {
-      "Cache-Control": "no-store",
-      "X-Frame-Options": "DENY",
-    },
-  });
+export function isAdmin(user) {
+  return user?.role === "admin" || user?.role === "super_admin";
 }
 
-function isAdmin(user: any) {
-  const roles = [
-    user?.role,
-    user?.user_role,
-    ...(Array.isArray(user?.roles) ? user.roles : []),
-    ...(Array.isArray(user?.app_roles) ? user.app_roles : []),
-  ]
-    .filter(Boolean)
-    .map((role) => String(role).toLowerCase());
-  return roles.includes("admin") || roles.includes("super_admin");
-}
-
-function cleanString(value: unknown, maxLength = 200) {
+export function cleanString(value, maxLength = 200) {
   return String(value || "").trim().slice(0, maxLength);
 }
 
-function containsLegacySecret(record: any) {
+export function containsLegacySecret(record) {
   return typeof record?.api_secret === "string" && record.api_secret.trim().length > 0;
 }
 
-function payloadContainsApiSecret(value: unknown, seen = new Set<unknown>()) {
+export function payloadContainsApiSecret(value, seen = new Set()) {
   if (!value || typeof value !== "object") return false;
   if (seen.has(value)) return false;
   seen.add(value);
 
-  for (const [key, child] of Object.entries(value as Record<string, unknown>)) {
+  for (const [key, child] of Object.entries(value)) {
     if (String(key).toLowerCase() === "api_secret") return true;
     if (payloadContainsApiSecret(child, seen)) return true;
   }
   return false;
 }
 
-function missingEvents(actual: unknown, expected: readonly string[]) {
-  const actualSet = new Set(
-    Array.isArray(actual) ? actual.map((eventName) => String(eventName || "").trim()) : [],
-  );
+export function missingEvents(actual, expected) {
+  const actualSet = new Set(Array.isArray(actual) ? actual.map((eventName) => String(eventName || "").trim()) : []);
   return expected.filter((eventName) => !actualSet.has(eventName));
 }
 
-function verifyGa4RecordIntegrity(records: any[], measurementId = GA4_MEASUREMENT_ID) {
+export function parseGa4Evidence(notes) {
+  const text = cleanString(notes, 4000);
+  if (!text) return null;
+  try {
+    const parsed = JSON.parse(text);
+    return parsed && typeof parsed === "object" ? parsed : null;
+  } catch {
+    const verificationId = text.match(/Verification ID:\s*([a-f0-9-]+)/i)?.[1] || "";
+    return verificationId ? { verification_id: verificationId } : null;
+  }
+}
+
+export function verifyGa4RecordIntegrity(records, measurementId = GA4_MEASUREMENT_ID) {
   const list = Array.isArray(records) ? records : [];
   const config = list[0] || null;
   const missingTrackedEvents = missingEvents(config?.tracked_events, GA4_TRACKED_EVENTS);
@@ -121,7 +110,44 @@ function verifyGa4RecordIntegrity(records: any[], measurementId = GA4_MEASUREMEN
   };
 }
 
-async function listGa4ConfigurationRecords(base44: any, limit = 5000) {
+export function summarizeGa4Records(records, measurementId = GA4_MEASUREMENT_ID) {
+  const list = Array.isArray(records) ? records : [];
+  const config = list[0] || null;
+  const integrity = verifyGa4RecordIntegrity(list, measurementId);
+  const evidence = parseGa4Evidence(config?.notes);
+  const operationallyVerified = Boolean(
+    integrity.passed &&
+      config?.setup_status === "active" &&
+      config?.server_side_tracking_enabled === true &&
+      config?.last_verified_at
+  );
+
+  return {
+    config,
+    record_count: list.length,
+    has_legacy_secret: !integrity.no_legacy_secret,
+    canonical_tracked_events: integrity.canonical_tracked_events,
+    canonical_key_events: integrity.canonical_key_events,
+    missing_tracked_events: integrity.missing_tracked_events,
+    missing_key_events: integrity.missing_key_events,
+    enabled: config?.enabled === true,
+    enhanced_measurement_enabled: config?.enhanced_measurement_enabled === true,
+    setup_status: config?.setup_status || "not_configured",
+    server_side_tracking_enabled: config?.server_side_tracking_enabled === true,
+    last_verified_at: config?.last_verified_at || null,
+    operationally_verified: operationallyVerified,
+    verification_id: evidence?.verification_id || null,
+    production_site_health: evidence?.production_site?.passed ?? null,
+    measurement_protocol_validation_status: evidence?.measurement_protocol_debug?.passed ?? null,
+    measurement_protocol_delivery_status: evidence?.measurement_protocol_delivery?.passed ?? null,
+    clean: Boolean(
+      integrity.passed &&
+        (config?.setup_status === "configured" || config?.setup_status === "active")
+    ),
+  };
+}
+
+export async function listGa4ConfigurationRecords(base44, limit = 5000) {
   const entity = base44?.asServiceRole?.entities?.GA4Configuration;
   if (!entity) throw new Error("GA4Configuration entity API is unavailable.");
   if (typeof entity.list === "function") return entity.list("-created_date", limit);
@@ -129,7 +155,7 @@ async function listGa4ConfigurationRecords(base44: any, limit = 5000) {
   throw new Error("GA4Configuration entity does not expose list or filter.");
 }
 
-function buildGa4SetupGuide(measurementId = GA4_MEASUREMENT_ID) {
+export function buildGa4SetupGuide(measurementId = GA4_MEASUREMENT_ID) {
   return `
 GA4 SETUP GUIDE - ClientSurge Systems
 
@@ -180,7 +206,7 @@ A database status is not proof. The admin verifier must pass entity integrity, s
 `;
 }
 
-function buildCanonicalGa4Payload({ notes = "", setupStatus = "configured" } = {}) {
+export function buildCanonicalGa4Payload({ notes = "", setupStatus = "configured" } = {}) {
   return {
     measurement_id: GA4_MEASUREMENT_ID,
     enabled: true,
@@ -197,7 +223,7 @@ function buildCanonicalGa4Payload({ notes = "", setupStatus = "configured" } = {
   };
 }
 
-async function repairCanonicalGa4Configuration(base44: any) {
+export async function repairCanonicalGa4Configuration(base44) {
   const entity = base44?.asServiceRole?.entities?.GA4Configuration;
   if (!entity) throw new Error("GA4Configuration entity API is unavailable.");
 
@@ -240,22 +266,16 @@ async function repairCanonicalGa4Configuration(base44: any) {
   const failedDeletions = deletionResults.filter((result) => !result.deleted);
   if (failedDeletions.length > 0) {
     const error = new Error("GA4_LEGACY_SECRET_SCRUB_INCOMPLETE");
-    (error as any).details = { failed_deletions: failedDeletions };
+    error.details = { failed_deletions: failedDeletions };
     throw error;
   }
 
   const remainingRecords = await listGa4ConfigurationRecords(base44);
   const remaining = Array.isArray(remainingRecords) ? remainingRecords : [];
   const integrity = verifyGa4RecordIntegrity(remaining);
-  if (
-    remaining.length !== 1 ||
-    !integrity.passed ||
-    remaining[0]?.setup_status !== "configured" ||
-    remaining[0]?.server_side_tracking_enabled === true ||
-    remaining[0]?.last_verified_at
-  ) {
+  if (remaining.length !== 1 || !integrity.passed || remaining[0]?.setup_status !== "configured" || remaining[0]?.server_side_tracking_enabled === true || remaining[0]?.last_verified_at) {
     const error = new Error("GA4_CANONICAL_CONFIGURATION_INCOMPLETE");
-    (error as any).details = { integrity };
+    error.details = { integrity };
     throw error;
   }
 
@@ -280,65 +300,3 @@ async function repairCanonicalGa4Configuration(base44: any) {
     integrity,
   };
 }
-
-Deno.serve(async (req) => {
-  try {
-    if (req.method !== "POST") {
-      return jsonResponse({ error: "Method not allowed" }, 405);
-    }
-
-    const base44 = createClientFromRequest(req);
-    const user = await base44.auth.me();
-    if (!isAdmin(user)) {
-      return jsonResponse({ error: "Unauthorized: admin or super_admin required" }, 403);
-    }
-
-    const body = await req.json().catch(() => ({}));
-    if (payloadContainsApiSecret(body)) {
-      return jsonResponse(
-        {
-          error: "Do not send GA4 API secrets to this function. Store GA4_API_SECRET in Base44 Secrets and use it only from backend code.",
-          code: "GA4_SECRET_MUST_USE_SECRET_STORE",
-        },
-        400,
-      );
-    }
-
-    const requestedMeasurementId = String(body.measurement_id || GA4_MEASUREMENT_ID).trim().toUpperCase();
-    if (!MEASUREMENT_ID_PATTERN.test(requestedMeasurementId)) {
-      return jsonResponse({ error: "Invalid measurement_id format. Expected G-XXXXXXXXXX." }, 400);
-    }
-    if (requestedMeasurementId !== GA4_MEASUREMENT_ID) {
-      return jsonResponse(
-        {
-          error: `ClientSurge GA4 must use the canonical Measurement ID ${GA4_MEASUREMENT_ID}.`,
-          code: "GA4_MEASUREMENT_ID_MISMATCH",
-        },
-        400,
-      );
-    }
-
-    const result = await repairCanonicalGa4Configuration(base44);
-
-    return jsonResponse({
-      ...result,
-      secret_required_for_browser_tracking: false,
-      secret_store_name: "GA4_API_SECRET",
-      message: result.legacy_secret_detected
-        ? "GA4 configuration saved and every duplicate or legacy secret-bearing record was deleted. Rotate any previously exposed GA4 API secret before relying on server-side tracking."
-        : "GA4 configuration saved as one clean canonical record without storing any private credential in the entity.",
-    });
-  } catch (error) {
-    console.error("[setupGA4Configuration]", error);
-    const message = error instanceof Error ? error.message : "Unknown setup error";
-    return jsonResponse(
-      {
-        success: false,
-        error: message,
-        code: message,
-        details: error instanceof Error ? (error as any).details || null : null,
-      },
-      500,
-    );
-  }
-});

@@ -13,7 +13,7 @@ test("AdminSettings schema exposes allowed_admin_ips", () => {
 });
 
 test("admin settings endpoints use the shared normalized settings save path", () => {
-  const getEntry = read("base44/functions/getAdminSettings/entry.ts");
+  const getEntry = read("base44/functions/getAdminSettings/main.ts");
   const updateEntry = read("base44/functions/updateAdminSettings/entry.ts");
 
   assert.match(getEntry, /loadAdminSettings/);
@@ -44,7 +44,7 @@ test("frontend settings API unwraps function settings payloads and falls back to
   const api = read("src/lib/adminSettingsApi.js");
 
   assert.match(api, /response\?\.data\?\.settings \|\| response\?\.data/);
-  assert.match(api, /invoke\("updateAdminSettings", \{ settings \}\)/);
+  assert.match(api, /invoke\("updateAdminSettings", \{ settings: sanitized \}\)/);
   assert.match(api, /isAdminSettingsFunctionNotFound/);
   assert.match(api, /base44\?\.entities\?\.AdminSettings/);
   assert.match(api, /entity\.list\("-created_date", 1\)/);
