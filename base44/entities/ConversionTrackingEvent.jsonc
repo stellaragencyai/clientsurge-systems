@@ -23,7 +23,25 @@
     "event_type": {
       "type": "string",
       "title": "Event Type",
-      "enum": ["page_view", "scroll_depth", "cta_click", "pricing_view", "checkout_click", "form_submit", "demo_booking_click"],
+      "enum": [
+        "page_view",
+        "scroll",
+        "scroll_depth",
+        "cta_click",
+        "pricing_view",
+        "link_click",
+        "form_submit_attempt",
+        "form_submit",
+        "generate_lead",
+        "contact_form_submit",
+        "audit_request_started",
+        "audit_request_submitted",
+        "begin_checkout",
+        "purchase",
+        "purchase_client_confirmation",
+        "demo_booked",
+        "onboarding_complete"
+      ],
       "description": "Type of conversion event"
     },
     "event_label": { "type": "string", "title": "Event Label" },
@@ -61,15 +79,26 @@
   },
   "required": ["event_id", "session_id", "page_key", "event_type", "timestamp"],
   "rls": {
-    "create": { "user_condition": { "role": ["admin", "super_admin"] } },
+    "create": {
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } }
+      ]
+    },
     "read": {
       "$or": [
-        { "user_condition": { "role": ["admin", "super_admin"] } },
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } },
         { "data.client_id": "{{client_id}}" },
         { "data.client_project_id": "{{client_project_id}}" }
       ]
     },
-    "update": { "user_condition": { "role": ["admin", "super_admin"] } },
+    "update": {
+      "$or": [
+        { "user_condition": { "role": "admin" } },
+        { "user_condition": { "role": "super_admin" } }
+      ]
+    },
     "delete": { "user_condition": { "role": "admin" } }
   }
 }

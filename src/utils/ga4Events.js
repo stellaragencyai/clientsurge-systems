@@ -10,7 +10,10 @@ export function trackCheckoutClick({ package_key, monthly_rate, setup_fee }) {
   const monthlyRate = normalizedNumber(monthly_rate);
   const setupFee = normalizedNumber(setup_fee);
 
-  return trackEvent(GA4_EVENTS.BEGIN_CHECKOUT, {
+  return trackEvent(GA4_EVENTS.CTA_CLICK, {
+    cta_label: "checkout",
+    cta_location: "product_signup",
+    package_key,
     currency: "USD",
     value: setupFee + monthlyRate,
     checkout_source: "product_signup",

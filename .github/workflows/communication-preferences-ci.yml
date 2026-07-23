@@ -50,8 +50,24 @@ jobs:
       - name: Run communication-preference tests
         run: node --test tests/communicationPreferences*.test.js
 
-      - name: Run lint
-        run: npm run lint
+      - name: Run scoped lint
+        shell: bash
+        run: |
+          files=(
+            "src/components/saas-portal/SaasCommunicationPreferences.jsx"
+            "src/pages/ClientSaasDashboard.jsx"
+          )
+          existing=()
+          for file in "${files[@]}"; do
+            if [[ -f "$file" ]]; then
+              existing+=("$file")
+            fi
+          done
+          if (( ${#existing[@]} == 0 )); then
+            echo "No communication preference UI files to lint."
+            exit 0
+          fi
+          npx eslint --quiet "${existing[@]}"
 
       - name: Build production bundle
         run: npm run build

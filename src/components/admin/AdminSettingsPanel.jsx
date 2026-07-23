@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   AlertCircle,
   BarChart3,
@@ -20,6 +20,7 @@ import {
   fetchGa4ConfigurationStatus,
   GA4_KEY_EVENTS,
   GA4_MEASUREMENT_ID,
+  GA4_REPAIR_STAGES,
   getAdminSettingsError,
   saveAdminSettings,
 } from "@/lib/adminSettingsApi";
@@ -88,6 +89,21 @@ function StatusPill({ ok, label }) {
   );
 }
 
+function StatusValue({ value, trueLabel = "Passed", falseLabel = "Failed", unknownLabel = "Unknown" }) {
+  if (value === true) return <StatusPill ok label={trueLabel} />;
+  if (value === false) return <StatusPill ok={false} label={falseLabel} />;
+  return <StatusPill ok={false} label={unknownLabel} />;
+}
+
+function MetricTile({ label, children }) {
+  return (
+    <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+      <p className="text-xs font-bold uppercase tracking-wide text-slate-500">{label}</p>
+      <div className="mt-2">{children}</div>
+    </div>
+  );
+}
+
 function SettingsCard({ icon: Icon, title, description, children }) {
   return (
     <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-sm">
@@ -116,13 +132,33 @@ export default function AdminSettingsPanel() {
   const [activeTab, setActiveTab] = useState("channels");
   const [previewModal, setPreviewModal] = useState(null);
   const [ga4Busy, setGa4Busy] = useState(false);
+  const [ga4Stage, setGa4Stage] = useState("");
+  const [ga4Result, setGa4Result] = useState(null);
+  const [ga4Error, setGa4Error] = useState(null);
+  const ga4RunRef = useRef(false);
 
   const ga4 = settings?._ga4 || {};
+  const ga4Verification = ga4Result || ga4.verification || {};
+  const ga4Checks = ga4Verification.checks || {};
+  const ga4StageLabel = GA4_REPAIR_STAGES.find((stage) => stage.id === ga4Stage)?.label || "";
   const dirty = useMemo(() => !loading && !saved, [loading, saved]);
 
   useEffect(() => {
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (!ga4Busy) return undefined;
+
+    let stageIndex = Math.max(0, GA4_REPAIR_STAGES.findIndex((stage) => stage.id === ga4Stage));
+    const finalizingIndex = GA4_REPAIR_STAGES.findIndex((stage) => stage.id === "final_activation");
+    const timer = window.setInterval(() => {
+      stageIndex = Math.min(stageIndex + 1, finalizingIndex);
+      setGa4Stage(GA4_REPAIR_STAGES[stageIndex]?.id || "final_activation");
+    }, 1400);
+
+    return () => window.clearInterval(timer);
+  }, [ga4Busy, ga4Stage]);
 
   async function loadSettings() {
     setLoading(true);
@@ -153,7 +189,7 @@ export default function AdminSettingsPanel() {
       setSettings(result);
       setError("");
       setSaved(true);
-      window.setTimeout(() => setSaved(false), 3500);
+      window.setTimeout(() => setSaved(false), 3000);
     } catch (err) {
       setError(getAdminSettingsError(err, "Failed to save settings"));
     } finally {
@@ -162,15 +198,37 @@ export default function AdminSettingsPanel() {
   }
 
   async function repairGa4() {
+    if (ga4RunRef.current) return;
+    ga4RunRef.current = true;
     setGa4Busy(true);
     setError("");
+    setGa4Error(null);
+    setGa4Result(null);
+    setGa4Stage("entity_cleanup");
     try {
-      const migration = await ensureGa4Configuration();
+      const migration = await ensureGa4Configuration({ onStage: setGa4Stage });
       const status = await fetchGa4ConfigurationStatus();
-      setSettings((previous) => ({ ...previous, _ga4: { migration, ...status } }));
+      const verification = migration?.verification || null;
+      const nextConfig = status?.config || verification?.configuration || null;
+      setGa4Result(verification);
+      setGa4Stage("ga4_fully_verified");
+      setSettings((previous) => ({
+        ...previous,
+        _ga4: { ...status, config: nextConfig, repair: migration?.repair, verification },
+      }));
     } catch (err) {
-      setError(err?.message || "GA4 repair failed");
+      const failedStage = err?.stage || err?.failed_stage || err?.data?.stage || err?.data?.failed_stage || ga4Stage || "entity_cleanup";
+      const failure = {
+        message: err?.data?.error || err?.message || "GA4 repair failed",
+        failed_stage: failedStage,
+        failed_checks: err?.failed_checks || err?.data?.failed_checks || [],
+        data: err?.data || null,
+      };
+      setGa4Stage(failedStage);
+      setGa4Error(failure);
+      setError(failure.message);
     } finally {
+      ga4RunRef.current = false;
       setGa4Busy(false);
     }
   }
@@ -243,10 +301,14 @@ export default function AdminSettingsPanel() {
         <div className="space-y-6">
           <SettingsCard icon={BarChart3} title="Google Analytics 4 integrity" description="Security, event naming, and migration state for the production GA4 configuration.">
             <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Measurement ID</p><p className="mt-2 font-mono text-sm font-bold text-slate-950">{GA4_MEASUREMENT_ID}</p></div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Record count</p><p className="mt-2 text-2xl font-bold text-slate-950">{ga4.record_count ?? "—"}</p></div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Legacy secret</p><div className="mt-2">{ga4.has_legacy_secret === false ? <StatusPill ok label="Removed" /> : <StatusPill ok={false} label="Still present" />}</div></div>
-              <div className="rounded-xl border border-slate-200 bg-slate-50 p-4"><p className="text-xs font-bold uppercase tracking-wide text-slate-500">Configuration</p><div className="mt-2"><StatusPill ok={Boolean(ga4.clean)} label={ga4.clean ? "Clean" : "Needs repair"} /></div></div>
+              <MetricTile label="Measurement ID"><p className="font-mono text-sm font-bold text-slate-950">{GA4_MEASUREMENT_ID}</p></MetricTile>
+              <MetricTile label="Record count"><p className="text-2xl font-bold text-slate-950">{ga4.record_count ?? "-"}</p></MetricTile>
+              <MetricTile label="Legacy secret"><StatusValue value={ga4.has_legacy_secret == null ? null : ga4.has_legacy_secret === false} trueLabel="Removed" falseLabel="Still present" unknownLabel="Unknown" /></MetricTile>
+              <MetricTile label="Canonical events"><StatusValue value={ga4.canonical_tracked_events == null || ga4.canonical_key_events == null ? null : Boolean(ga4.canonical_tracked_events && ga4.canonical_key_events)} trueLabel="Complete" falseLabel="Incomplete" unknownLabel="Unknown" /></MetricTile>
+              <MetricTile label="Setup status"><p className="font-mono text-sm font-bold text-slate-950">{ga4.config?.setup_status || "-"}</p></MetricTile>
+              <MetricTile label="Server-side tracking"><StatusValue value={ga4.config?.server_side_tracking_enabled == null ? null : ga4.config.server_side_tracking_enabled === true} trueLabel="Enabled" falseLabel="Disabled" unknownLabel="Unknown" /></MetricTile>
+              <MetricTile label="Last verified"><p className="text-sm font-semibold text-slate-950">{ga4.config?.last_verified_at || "-"}</p></MetricTile>
+              <MetricTile label="Verification ID"><p className="break-all font-mono text-xs font-semibold text-slate-950">{ga4Verification.verification_id || "-"}</p></MetricTile>
             </div>
 
             <div className="rounded-2xl border border-slate-200 p-5">
@@ -259,14 +321,72 @@ export default function AdminSettingsPanel() {
               </div>
             </div>
 
-            {ga4.clean ? (
-              <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-bold">GA4 database configuration is clean.</p><p className="mt-1 text-sm">The legacy entity secret is absent, canonical key events are populated, and the configuration remains in “configured” state until live Realtime/DebugView verification is completed.</p></div></div>
+            <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+              <MetricTile label="Production"><StatusValue value={ga4Checks.production_security?.passed} trueLabel="Healthy" falseLabel="Failed" unknownLabel="Not checked" /></MetricTile>
+              <MetricTile label="GA debug"><StatusValue value={ga4Checks.google_validation?.measurement_protocol_debug?.passed} trueLabel="Passed" falseLabel="Failed" unknownLabel="Not checked" /></MetricTile>
+              <MetricTile label="GA delivery"><StatusValue value={ga4Checks.google_validation?.measurement_protocol_delivery?.passed} trueLabel="Delivered" falseLabel="Failed" unknownLabel="Not checked" /></MetricTile>
+              <MetricTile label="Activation"><StatusValue value={ga4Checks.final_activation?.passed} trueLabel="Active" falseLabel="Blocked" unknownLabel="Not checked" /></MetricTile>
+            </div>
+
+            {ga4Busy ? (
+              <div className="rounded-2xl border border-sky-200 bg-sky-50 p-5">
+                <div className="flex items-center gap-3 text-sky-900">
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                  <p className="font-bold">{ga4StageLabel || "Repairing configuration..."}</p>
+                </div>
+                <div className="mt-4 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+                  {GA4_REPAIR_STAGES.map((stage) => {
+                    const currentIndex = GA4_REPAIR_STAGES.findIndex((item) => item.id === ga4Stage);
+                    const stageIndex = GA4_REPAIR_STAGES.findIndex((item) => item.id === stage.id);
+                    const done = currentIndex > stageIndex || ga4Stage === "ga4_fully_verified";
+                    const current = ga4Stage === stage.id && !done;
+                    return (
+                      <div key={stage.id} className={`rounded-xl border px-3 py-2 text-xs font-semibold ${done ? "border-emerald-200 bg-white text-emerald-700" : current ? "border-sky-300 bg-white text-sky-800" : "border-slate-200 bg-white/70 text-slate-500"}`}>
+                        {stage.label}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            ) : null}
+
+            {ga4Error ? (
+              <div className="rounded-2xl border border-red-200 bg-red-50 p-5 text-red-900">
+                <div className="flex items-start gap-3">
+                  <XCircle className="mt-0.5 h-5 w-5 shrink-0" />
+                  <div>
+                    <p className="font-bold">GA4 verification failed.</p>
+                    <div className="mt-2 grid gap-2 text-sm">
+                      <p><span className="font-bold">Failed Stage:</span> <span className="font-mono">{ga4Error.failed_stage || "unknown"}</span></p>
+                      <p><span className="font-bold">Error:</span> {ga4Error.message}</p>
+                    </div>
+                    {ga4Error.failed_checks?.length ? <p className="mt-2 font-mono text-xs">Failed checks: {ga4Error.failed_checks.join(", ")}</p> : null}
+                  </div>
+                </div>
+                <button type="button" onClick={repairGa4} disabled={ga4Busy} className="mt-4 inline-flex items-center gap-2 rounded-xl bg-red-700 px-4 py-2 text-sm font-bold text-white shadow-sm transition hover:bg-red-800 disabled:opacity-50">
+                  <RefreshCw className="h-4 w-4" />Retry
+                </button>
+              </div>
+            ) : ga4Verification.verified ? (
+              <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900">
+                <CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" />
+                <div>
+                  <p className="font-bold">GA4 Fully Verified</p>
+                  <div className="mt-3 grid gap-1 text-sm">
+                    <p><span className="font-bold">Measurement ID:</span> <span className="font-mono">{GA4_MEASUREMENT_ID}</span></p>
+                    <p><span className="font-bold">Status:</span> <span className="font-mono">ACTIVE</span></p>
+                    <p><span className="font-bold">Verified:</span> {ga4Verification.verified_at || ga4Verification.last_verified_at || ga4Verification.configuration?.last_verified_at || "-"}</p>
+                  </div>
+                </div>
+              </div>
+            ) : ga4.clean ? (
+              <div className="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-5 text-emerald-900"><CheckCircle2 className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-bold">GA4 database configuration is clean.</p><p className="mt-1 text-sm">Run verification to prove the backend secret, Google delivery, and production domain before marking active.</p></div></div>
             ) : (
-              <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900"><XCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-bold">GA4 still requires repair.</p><p className="mt-1 text-sm">Use the repair control below. It invokes the secured Base44 setup function, deletes the legacy secret-bearing record, and restores canonical event names.</p></div></div>
+              <div className="flex items-start gap-3 rounded-2xl border border-amber-200 bg-amber-50 p-5 text-amber-900"><XCircle className="mt-0.5 h-5 w-5 shrink-0" /><div><p className="font-bold">GA4 still requires repair.</p><p className="mt-1 text-sm">The repair action invokes the secured Base44 setup function, removes duplicate or legacy secret-bearing records, and then runs final backend verification.</p></div></div>
             )}
 
             <button type="button" onClick={repairGa4} disabled={ga4Busy} className="inline-flex items-center gap-2 rounded-xl bg-slate-950 px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-slate-800 disabled:opacity-50">
-              {ga4Busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}{ga4Busy ? "Repairing GA4…" : "Repair and recheck GA4"}
+              {ga4Busy ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}{ga4Busy ? (ga4StageLabel || "Repairing configuration...") : "Repair and Verify GA4"}
             </button>
           </SettingsCard>
         </div>
@@ -276,7 +396,7 @@ export default function AdminSettingsPanel() {
 
       {activeTab === "security" ? (
         <SettingsCard icon={Key} title="Admin access controls" description="Restrict administrative access to approved IP addresses when needed.">
-          <Field label="Allowed admin IPs" helper="Enter one IP per line or comma-separated. Leave empty to disable IP allowlisting."><TextArea value={(settings.allowed_admin_ips || []).join("\n")} onChange={setAllowedAdminIps} placeholder={"203.0.113.10\n198.51.100.25"} rows={5} /></Field>
+          <Field label="Allowed Admin IPs" helper="Enter one IP per line or comma-separated. Leave empty to disable IP allowlisting."><TextArea value={(settings.allowed_admin_ips || []).join("\n")} onChange={setAllowedAdminIps} placeholder={"203.0.113.10\n198.51.100.25"} rows={5} /></Field>
         </SettingsCard>
       ) : null}
 

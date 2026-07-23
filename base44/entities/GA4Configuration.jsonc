@@ -42,8 +42,10 @@
       "default": [
         "page_view",
         "scroll",
+        "scroll_depth",
         "cta_click",
         "pricing_view",
+        "link_click",
         "form_submit_attempt",
         "form_submit",
         "generate_lead",
@@ -53,7 +55,8 @@
         "begin_checkout",
         "purchase",
         "purchase_client_confirmation",
-        "demo_booked"
+        "demo_booked",
+        "onboarding_complete"
       ]
     },
     "setup_status": {
@@ -119,36 +122,60 @@
   ],
   "rls": {
     "create": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "read": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "update": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     },
     "delete": {
-      "user_condition": {
-        "role": [
-          "admin",
-          "super_admin"
-        ]
-      }
+      "$or": [
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "user_condition": {
+            "role": "super_admin"
+          }
+        }
+      ]
     }
   }
 }

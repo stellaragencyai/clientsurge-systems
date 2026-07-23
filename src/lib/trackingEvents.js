@@ -5,7 +5,7 @@
 
 export function trackFormSubmit(formName) {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'form_submit', { form_name: formName });
+    window.gtag('event', 'form_submit_attempt', { form_name: formName, submission_status: 'attempted' });
   }
 }
 
@@ -17,12 +17,18 @@ export function trackLinkClick(url, text) {
 
 export function trackConversion(name, value = 0) {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('event', 'conversion', { event_name: name, value });
+    const canonicalName = {
+      checkout_click: 'begin_checkout',
+      demo_booking: 'audit_request_started',
+      demo_booking_click: 'audit_request_started',
+      cta_click_auto: 'cta_click',
+    }[name] || name;
+    window.gtag('event', canonicalName, { value });
   }
 }
 
 export function trackPageView() {
   if (typeof window !== 'undefined' && window.gtag) {
-    window.gtag('config', 'GA_MEASUREMENT_ID', { page_path: window.location.pathname });
+    window.gtag('event', 'page_view', { page_path: window.location.pathname });
   }
 }

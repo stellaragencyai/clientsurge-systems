@@ -5,9 +5,10 @@
 
 export function trackFormSubmission(formName, formData = {}) {
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', 'form_submit', {
+    window.gtag('event', 'form_submit_attempt', {
       form_name: formName,
       form_id: formData.id || '',
+      submission_status: 'attempted',
       ...Object.keys(formData).reduce((acc, key) => {
         if (!['password', 'token'].includes(key)) {
           acc[`form_${key}`] = String(formData[key]).substring(0, 100);
@@ -40,8 +41,13 @@ export function trackPageEngagement(engagementType, details = {}) {
 
 export function trackConversion(conversionName, value = 0) {
   if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
-    window.gtag('event', 'conversion', {
-      conversion_name: conversionName,
+    const canonicalName = {
+      checkout_click: 'begin_checkout',
+      demo_booking: 'audit_request_started',
+      demo_booking_click: 'audit_request_started',
+      cta_click_auto: 'cta_click',
+    }[conversionName] || conversionName;
+    window.gtag('event', canonicalName, {
       value: value,
       page_path: window.location.pathname,
     });
