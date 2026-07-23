@@ -1,0 +1,77 @@
+{
+  "name": "TwilioPhoneNumber",
+  "type": "object",
+  "title": "Twilio Phone Number Registry",
+  "description": "Canonical registry for every Twilio or internal phone number used by ClientSurge. Credentials and auth tokens must never be stored here.",
+  "properties": {
+    "phone_number": { "type": "string", "title": "Phone Number (E.164)" },
+    "display_name": { "type": "string", "title": "Display Name" },
+    "purpose": {
+      "type": "string",
+      "title": "Number Purpose",
+      "enum": ["customer_service", "sales", "client_assigned", "personal_verification", "internal_test", "fallback"]
+    },
+    "phone_number_sid": {
+      "type": "string",
+      "title": "Twilio Phone Number SID",
+      "description": "Non-secret Twilio PN SID. Do not store auth credentials."
+    },
+    "messaging_service_sid": {
+      "type": "string",
+      "title": "Messaging Service SID",
+      "description": "Optional non-secret Twilio MG SID."
+    },
+    "registration_type": {
+      "type": "string",
+      "title": "Registration Type",
+      "enum": ["toll_free", "a2p_10dlc", "none", "unknown"],
+      "default": "unknown"
+    },
+    "registration_status": {
+      "type": "string",
+      "title": "Registration Status",
+      "enum": ["approved", "verified", "pending", "rejected", "not_required", "unknown"],
+      "default": "unknown"
+    },
+    "registration_sid": {
+      "type": "string",
+      "title": "Primary Registration SID",
+      "description": "Non-secret Twilio registration identifier such as HH, BN, or CM SID."
+    },
+    "brand_sid": {
+      "type": "string",
+      "title": "A2P Brand SID",
+      "description": "Non-secret Twilio BN SID for A2P 10DLC."
+    },
+    "campaign_sid": {
+      "type": "string",
+      "title": "A2P Campaign SID",
+      "description": "Non-secret Twilio CM SID for A2P 10DLC."
+    },
+    "sms_enabled": { "type": "boolean", "title": "SMS Enabled", "default": false },
+    "mms_enabled": { "type": "boolean", "title": "MMS Enabled", "default": false },
+    "voice_enabled": { "type": "boolean", "title": "Voice Enabled", "default": false },
+    "automated_sending_allowed": { "type": "boolean", "title": "Automated Sending Allowed", "default": false },
+    "approval_status": {
+      "type": "string",
+      "title": "SMS Approval Status",
+      "enum": ["pending", "approved", "rejected", "not_required", "unknown"],
+      "default": "unknown"
+    },
+    "inbound_sms_webhook_url": { "type": "string", "title": "Inbound SMS Webhook URL" },
+    "voice_webhook_url": { "type": "string", "title": "Voice Webhook URL" },
+    "status_callback_url": { "type": "string", "title": "SMS Status Callback URL" },
+    "fallback_forwarding_number": { "type": "string", "title": "Fallback Forwarding Number" },
+    "is_public": { "type": "boolean", "title": "Publicly Displayed Number", "default": false },
+    "is_default_for_purpose": { "type": "boolean", "title": "Default for Purpose", "default": false },
+    "active": { "type": "boolean", "title": "Active", "default": true },
+    "notes": { "type": "string", "title": "Administrative Notes" }
+  },
+  "required": ["phone_number", "display_name", "purpose", "automated_sending_allowed"],
+  "rls": {
+    "create": { "user_condition": { "role": "admin" } },
+    "read": { "user_condition": { "role": "admin" } },
+    "update": { "user_condition": { "role": "admin" } },
+    "delete": { "user_condition": { "role": "admin" } }
+  }
+}
