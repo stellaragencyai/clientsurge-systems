@@ -1,0 +1,46 @@
+[Unit]
+Description=ClientSurge Assurance Node (%i)
+Documentation=https://github.com/stellaragencyai/clientsurge-systems/tree/main/infra/pi-assurance
+Wants=network-online.target
+After=network-online.target
+
+[Service]
+Type=oneshot
+DynamicUser=yes
+EnvironmentFile=-/etc/clientsurge-assurance/assurance.env
+ExecStart=/usr/bin/python3 /opt/clientsurge-assurance/clientsurge_assurance.py --mode %i --routes-file /opt/clientsurge-assurance/routes.json
+StateDirectory=clientsurge-assurance
+RuntimeDirectory=clientsurge-assurance
+UMask=0077
+TimeoutStartSec=5min
+
+# Keep business monitoring isolated and subordinate to the Pi's trading workload.
+Nice=10
+IOSchedulingClass=best-effort
+IOSchedulingPriority=7
+CPUQuota=50%
+MemoryMax=256M
+TasksMax=32
+OOMScoreAdjust=500
+
+# Service hardening.
+NoNewPrivileges=yes
+PrivateTmp=yes
+PrivateDevices=yes
+ProtectSystem=strict
+ProtectHome=yes
+ProtectControlGroups=yes
+ProtectKernelModules=yes
+ProtectKernelTunables=yes
+ProtectKernelLogs=yes
+ProtectClock=yes
+ProtectHostname=yes
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+CapabilityBoundingSet=
+AmbientCapabilities=
+RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6
+
+[Install]
+WantedBy=multi-user.target
