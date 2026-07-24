@@ -40,7 +40,11 @@ Never commit real secret values to source control.
 | `TWILIO_SMS_STATUS_CALLBACK_URL` | Twilio message delivery callback URL. | Points to `receiveTwilioSmsStatusCallback`. |
 | `TWILIO_WEBHOOK_KEY` | Shared key for Twilio webhook callback URLs where configured. | Do not expose publicly beyond provider configuration. |
 | `TELEGRAM_BOT_TOKEN` | Telegram bot token for internal alerts. | External send behavior still requires operator approval when live. |
+| `TELEGRAM_CHAT_ID` | Cloudflare Worker Telegram recipient/chat ID. | Used by the website click-tracking Worker. Store as a Worker secret; redact in reports. |
 | `TELEGRAM_NOLAN_ID` | Telegram recipient/chat ID for internal alerts. | Store as config, not in source. |
+| `ALLOWED_ORIGINS` | Comma-separated origins allowed to post website click events to the Cloudflare Worker. | Defaults should include only `https://clientsurgesystems.com` and `https://www.clientsurgesystems.com`. |
+| `TRACKING_SHARED_SECRET` | Optional shared secret for the Worker diagnostic Telegram test endpoint. | Required only for `/__cs_telegram_click/diagnostic`; do not expose to browser JavaScript. |
+| `VISITOR_ALERT_ENABLED` | Enables or disables production website click Telegram alerts. | Use `false` only for an intentional alert pause. |
 | `ELEVENLABS_API_KEY` | ElevenLabs API key for voice features. | Optional unless voice workflows are enabled. |
 | `ELEVENLABS_WEBHOOK_SECRET` | ElevenLabs post-call webhook secret. | Optional unless ElevenLabs webhooks are enabled. |
 

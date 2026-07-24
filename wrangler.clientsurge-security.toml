@@ -1,5 +1,5 @@
 name = "clientsurge-security-edge"
-main = "cloudflare/clientsurge-production-safe-entry.mjs"
+main = "cloudflare/clientsurge-security-telegram-wrapper.mjs"
 compatibility_date = "2026-04-23"
 workers_dev = false
 

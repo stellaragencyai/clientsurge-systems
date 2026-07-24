@@ -38,7 +38,11 @@ For pre-launch QA, use `docs/STAGING_ENVIRONMENT.md` and the Base44 test databas
 | `TWILIO_SMS_STATUS_CALLBACK_URL` | Twilio delivery tracking | Callback URL for `receiveTwilioSmsStatusCallback`. |
 | `TWILIO_WEBHOOK_KEY` | Twilio webhook URLs | Optional shared callback key. |
 | `TELEGRAM_BOT_TOKEN` | Internal Telegram alerts | Bot token for internal alerting functions. |
+| `TELEGRAM_CHAT_ID` | Website click-tracking Worker | Telegram recipient/chat ID for the Cloudflare click alert Worker. Store as a Worker secret and redact in reports. |
 | `TELEGRAM_NOLAN_ID` | Internal Telegram alerts | Recipient/chat ID for internal alerting. |
+| `ALLOWED_ORIGINS` | Website click-tracking Worker | Comma-separated origins allowed to post click events; production should be limited to `https://clientsurgesystems.com` and `https://www.clientsurgesystems.com`. |
+| `TRACKING_SHARED_SECRET` | Website click-tracking Worker | Optional secret required by the diagnostic Telegram test endpoint. Do not expose to browser code. |
+| `VISITOR_ALERT_ENABLED` | Website click-tracking Worker | Set to `false` only for an intentional pause of production click alerts. |
 | `ELEVENLABS_API_KEY` | Voice workflows | ElevenLabs API key. |
 | `ELEVENLABS_WEBHOOK_SECRET` | ElevenLabs post-call webhook | Webhook validation secret. |
 
