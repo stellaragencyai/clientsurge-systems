@@ -49,33 +49,28 @@ export default function CookieConsent() {
   const handleAccept = () => {
     safeSetCookieConsent('accepted');
     setVisible(false);
-    updateGa4Consent({ analytics: true, ads: true });
+    updateGa4Consent(true);
   };
 
   const handleDecline = () => {
-    safeSetCookieConsent('essential_only');
+    safeSetCookieConsent('declined');
     setVisible(false);
-    updateGa4Consent({ analytics: false, ads: false });
+    updateGa4Consent(false);
   };
 
   const handleDismiss = () => {
-    safeSetCookieConsent('essential_only');
+    safeSetCookieConsent('dismissed');
     setVisible(false);
-    updateGa4Consent({ analytics: false, ads: false });
-  };
-
-  const handleAcceptStats = () => {
-    safeSetCookieConsent('analytics_only');
-    setVisible(false);
-    updateGa4Consent({ analytics: true, ads: false });
+    updateGa4Consent(false);
   };
 
   if (!visible) return null;
 
   return (
     <div
-      className="fixed left-3 right-3 z-50 sm:right-auto sm:max-w-[300px] md:left-5 md:max-w-[280px]"
+      className="fixed right-3 z-50 sm:right-5 md:w-[320px]"
       style={{
+        width: "min(320px, calc(100vw - 24px))",
         bottom: offsetForMobileCallBar
           ? "max(72px, calc(72px + env(safe-area-inset-bottom, 0px)))"
           : "max(12px, calc(12px + env(safe-area-inset-bottom, 0px)))",
@@ -92,6 +87,7 @@ export default function CookieConsent() {
           boxShadow: '0 20px 60px rgba(0,0,0,0.12)'
         }}
       >
+        {/* Header with close */}
         <div className="flex items-start justify-end gap-3 sm:justify-between">
           <h3 className="sr-only sm:not-sr-only sm:font-semibold sm:text-[11px] sm:text-foreground md:text-xs">Cookie Preferences</h3>
           <button
@@ -103,8 +99,9 @@ export default function CookieConsent() {
           </button>
         </div>
 
+        {/* Message */}
         <p className="max-w-[25rem] text-[9px] text-muted-foreground leading-snug sm:text-[10px] md:text-[11px] md:leading-relaxed">
-          We use cookies to improve the site and measure traffic. Choose whether to allow analytics and marketing cookies. See our{' '}
+          We use cookies to improve the site and measure traffic. By continuing, you agree to our{' '}
           <a 
             href="/privacy-policy"
             className="font-medium text-primary hover:text-primary/80 transition-colors"
@@ -113,25 +110,17 @@ export default function CookieConsent() {
           </a>
           .
         </p>
-
-        <div className="flex gap-1.5 pt-0.5">
+        {/* Actions */}
+        <div className="flex gap-2 pt-0.5">
           <button
             onClick={handleDecline}
-            className="flex-1 rounded-md border border-border px-2 py-1 text-[9px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[10px]"
-            title="Essential cookies only — no analytics or marketing tracking"
+            className="flex-1 rounded-md border border-border px-3 py-1 text-[10px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[11px]"
           >
-            Essential Only
-          </button>
-          <button
-            onClick={handleAcceptStats}
-            className="flex-1 rounded-md border border-border px-2 py-1 text-[9px] font-medium text-muted-foreground transition-colors hover:bg-muted hover:text-foreground sm:py-1.5 md:py-2 md:text-[10px]"
-            title="Essential cookies and analytics, without advertising consent"
-          >
-            Essential + Stats
+            Decline
           </button>
           <button
             onClick={handleAccept}
-            className="flex-1 rounded-md px-2 py-1 text-[9px] font-medium text-white transition-all sm:py-1.5 md:py-2 md:text-[10px]"
+            className="flex-1 rounded-md px-3 py-1 text-[10px] font-medium text-white transition-all sm:py-1.5 md:py-2 md:text-[11px]"
             style={{
               background: 'linear-gradient(135deg,#0088cc 0%,#00aaff 100%)',
               boxShadow: '0 4px 12px rgba(0,170,255,0.25)'
@@ -143,7 +132,7 @@ export default function CookieConsent() {
               e.currentTarget.style.boxShadow = '0 4px 12px rgba(0,170,255,0.25)';
             }}
           >
-            Accept All
+            Accept
           </button>
         </div>
       </div>

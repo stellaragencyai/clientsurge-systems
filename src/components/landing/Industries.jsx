@@ -2,242 +2,170 @@ import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import {
   Building2,
-  Droplets,
   Heart,
   Home,
   MapPin,
   Sparkles,
   Wrench,
-  Scale,
-  KeyRound,
-  Zap,
-  Leaf,
-  TreePine,
-  Paintbrush,
-  Bug,
-  Scissors,
-  Car,
-  Gavel,
 } from "lucide-react";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
 import { buildResponsiveImageProps } from "@/lib/imageOptimization";
-import { industryPatterns, FILTER_TAGS, INDUSTRY_TAGS } from "@/lib/industryAssets.jsx";
-import CSSectionHeader from "@/components/design-system/CSSectionHeader";
+import medSpaIndustryImage from "@/assets/industry-medspa.webp";
+import roofingIndustryImage from "@/assets/industry-roofing.webp";
+
+const industryPatterns = {
+  "med-spa": (
+    <svg className="absolute inset-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pat-medspa" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+          <circle cx="16" cy="16" r="10" fill="none" stroke="white" strokeWidth="1" />
+          <circle cx="16" cy="16" r="4" fill="white" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pat-medspa)" />
+    </svg>
+  ),
+  dental: (
+    <svg className="absolute inset-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pat-dental" x="0" y="0" width="28" height="28" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="14" x2="28" y2="14" stroke="white" strokeWidth="1" />
+          <line x1="14" y1="0" x2="14" y2="28" stroke="white" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pat-dental)" />
+    </svg>
+  ),
+  "chiro-pt": (
+    <svg className="absolute inset-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pat-chiro" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
+          <polygon points="20,4 36,36 4,36" fill="none" stroke="white" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pat-chiro)" />
+    </svg>
+  ),
+  hvac: (
+    <svg className="absolute inset-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pat-hvac" x="0" y="0" width="24" height="24" patternUnits="userSpaceOnUse">
+          <rect x="4" y="4" width="16" height="16" fill="none" stroke="white" strokeWidth="1" />
+          <rect x="9" y="9" width="6" height="6" fill="white" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pat-hvac)" />
+    </svg>
+  ),
+  roofing: (
+    <svg className="absolute inset-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pat-roofing" x="0" y="0" width="36" height="20" patternUnits="userSpaceOnUse">
+          <path d="M0,20 L18,0 L36,20" fill="none" stroke="white" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pat-roofing)" />
+    </svg>
+  ),
+  contractors: (
+    <svg className="absolute inset-0 h-full w-full opacity-[0.07]" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <pattern id="pat-contractors" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+          <line x1="0" y1="0" x2="30" y2="30" stroke="white" strokeWidth="1" />
+          <line x1="30" y1="0" x2="0" y2="30" stroke="white" strokeWidth="1" />
+        </pattern>
+      </defs>
+      <rect width="100%" height="100%" fill="url(#pat-contractors)" />
+    </svg>
+  ),
+};
 
 const industries = [
-{
-  id: "roofing",
-  routePath: "/roofing",
-  icon: Home,
-  name: "Roofing & Restoration",
-  accent: {
-    color: "#075985",
-    soft: "rgba(7,89,133,0.18)",
-    glow: "rgba(7,89,133,0.28)",
-    iconBg: "rgba(7,89,133,0.18)"
+  {
+    id: "med-spa",
+    routePath: "/med-spa",
+    icon: Sparkles,
+    name: "Med Spas & Aesthetic Clinics",
+    summary: "Automate consultation booking, lead nurture, no-show reduction, and membership follow-up.",
+    accent: {
+      color: "#38bdf8",
+      soft: "rgba(56,189,248,0.18)",
+      glow: "rgba(56,189,248,0.28)",
+      iconBg: "rgba(56,189,248,0.18)",
+    },
+    image: medSpaIndustryImage,
   },
-  image:
-  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/3fcc65c06_Screenshot2026-04-21185605.png"
-},
-{
-  id: "hvac",
-  routePath: "/hvac",
-  icon: Wrench,
-  name: "HVAC & Heating/Cooling",
-  accent: {
-    color: "#0284c7",
-    soft: "rgba(2,132,199,0.18)",
-    glow: "rgba(2,132,199,0.28)",
-    iconBg: "rgba(2,132,199,0.18)"
+  {
+    id: "dental",
+    routePath: "/dental",
+    icon: Heart,
+    name: "Dental & Orthodontics",
+    summary: "Handle new patient leads, emergency inquiries, reminders, and unfinished treatment follow-up.",
+    accent: {
+      color: "#0ea5e9",
+      soft: "rgba(14,165,233,0.18)",
+      glow: "rgba(14,165,233,0.28)",
+      iconBg: "rgba(14,165,233,0.18)",
+    },
+    image: "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95",
   },
-  image:
-  "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95"
-},
-{
-  id: "plumbing",
-  routePath: "/plumbing",
-  icon: Droplets,
-  name: "Plumbing & Drain Services",
-  accent: {
-    color: "#0891b2",
-    soft: "rgba(8,145,178,0.18)",
-    glow: "rgba(8,145,178,0.28)",
-    iconBg: "rgba(8,145,178,0.18)"
+  {
+    id: "chiro-pt",
+    routePath: "/chiropractic",
+    icon: Building2,
+    name: "Chiropractic & Physical Therapy",
+    summary: "Capture new patient demand, reduce drop-off, and reactivate unfinished care plans.",
+    accent: {
+      color: "#2563eb",
+      soft: "rgba(37,99,235,0.16)",
+      glow: "rgba(37,99,235,0.24)",
+      iconBg: "rgba(37,99,235,0.16)",
+    },
+    image: "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95",
   },
-  image:
-  "https://images.unsplash.com/photo-1607472586893-edb57bdc0e39?w=1200&q=95"
-},
-{
-  id: "dental",
-  routePath: "/dental",
-  icon: Heart,
-  name: "Dental & Orthodontics",
-  accent: {
-    color: "#0ea5e9",
-    soft: "rgba(14,165,233,0.18)",
-    glow: "rgba(14,165,233,0.28)",
-    iconBg: "rgba(14,165,233,0.18)"
+  {
+    id: "hvac",
+    routePath: "/hvac",
+    icon: Wrench,
+    name: "HVAC, Plumbing & Home Services",
+    summary: "Recover urgent missed calls, route service requests fast, and follow up on estimates automatically.",
+    accent: {
+      color: "#0284c7",
+      soft: "rgba(2,132,199,0.18)",
+      glow: "rgba(2,132,199,0.28)",
+      iconBg: "rgba(2,132,199,0.18)",
+    },
+    image: "https://images.unsplash.com/photo-1504328345606-18bbc8c9d7d1?w=1200&q=95",
   },
-  image:
-  "https://images.unsplash.com/photo-1644353740797-b85ffb378b3a?w=1200&q=95"
-},
-{
-  id: "med-spa",
-  routePath: "/med-spa",
-  icon: Sparkles,
-  name: "Med Spas & Aesthetic Clinics",
-  accent: {
-    color: "#38bdf8",
-    soft: "rgba(56,189,248,0.18)",
-    glow: "rgba(56,189,248,0.28)",
-    iconBg: "rgba(56,189,248,0.18)"
+  {
+    id: "roofing",
+    routePath: "/roofing",
+    icon: Home,
+    name: "Roofing & Restoration",
+    summary: "Handle storm-season spikes, inspection booking, estimate follow-up, and dormant lead recovery.",
+    accent: {
+      color: "#075985",
+      soft: "rgba(7,89,133,0.18)",
+      glow: "rgba(7,89,133,0.28)",
+      iconBg: "rgba(7,89,133,0.18)",
+    },
+    image: roofingIndustryImage,
   },
-  image:
-  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/741357982_Gemini_Generated_Image_hdkpn1hdkpn1hdkp.png"
-},
-{
-  id: "chiro-pt",
-  routePath: "/chiropractic",
-  icon: Building2,
-  name: "Chiropractic & Physical Therapy",
-  accent: {
-    color: "#2563eb",
-    soft: "rgba(37,99,235,0.16)",
-    glow: "rgba(37,99,235,0.24)",
-    iconBg: "rgba(37,99,235,0.16)"
+  {
+    id: "contractors",
+    routePath: "/contractors",
+    icon: MapPin,
+    name: "Contractors & Trades",
+    summary: "Move quote requests faster, revive stale opportunities, and keep project inquiries organized.",
+    accent: {
+      color: "#1d4ed8",
+      soft: "rgba(29,78,216,0.16)",
+      glow: "rgba(29,78,216,0.24)",
+      iconBg: "rgba(29,78,216,0.16)",
+    },
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95",
   },
-  image:
-  "https://images.unsplash.com/photo-1657470179447-0f5aa16daa91?w=1200&q=95"
-},
-{
-  id: "contractors",
-  routePath: "/contractors",
-  icon: MapPin,
-  name: "Contractors & Trades",
-  accent: {
-    color: "#1d4ed8",
-    soft: "rgba(29,78,216,0.16)",
-    glow: "rgba(29,78,216,0.24)",
-    iconBg: "rgba(29,78,216,0.16)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=1200&q=95"
-},
-{
-  id: "real-estate",
-  routePath: "/real-estate",
-  icon: KeyRound,
-  name: "Real Estate Agents",
-  accent: {
-    color: "#10b981",
-    soft: "rgba(16,185,129,0.18)",
-    glow: "rgba(16,185,129,0.28)",
-    iconBg: "rgba(16,185,129,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=1200&q=95"
-},
-{
-  id: "personal-injury",
-  routePath: "/personal-injury",
-  icon: Scale,
-  name: "Personal-Injury",
-  accent: {
-    color: "#8b5cf6",
-    soft: "rgba(139,92,246,0.18)",
-    glow: "rgba(139,92,246,0.28)",
-    iconBg: "rgba(139,92,246,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
-},
-{
-  id: "landscaping",
-  routePath: "/landscaping",
-  icon: Leaf,
-  name: "Landscaping",
-  accent: {
-    color: "#16a34a",
-    soft: "rgba(22,163,74,0.18)",
-    glow: "rgba(22,163,74,0.28)",
-    iconBg: "rgba(22,163,74,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1558904541-efa843a96f01?w=1200&q=95"
-},
-{
-  id: "painting",
-  routePath: "/painting",
-  icon: Paintbrush,
-  name: "Painting Contractors",
-  accent: {
-    color: "#db2777",
-    soft: "rgba(219,39,119,0.18)",
-    glow: "rgba(219,39,119,0.28)",
-    iconBg: "rgba(219,39,119,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=1200&q=95"
-},
-{
-  id: "salon",
-  routePath: "/salon",
-  icon: Scissors,
-  name: "Salons & Hair Studios",
-  accent: {
-    color: "#d946ef",
-    soft: "rgba(217,70,239,0.18)",
-    glow: "rgba(217,70,239,0.28)",
-    iconBg: "rgba(217,70,239,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1560066984-138dadb4c035?w=1200&q=95"
-},
-{
-  id: "auto-repair",
-  routePath: "/auto-repair",
-  icon: Car,
-  name: "Auto Repair Shops",
-  accent: {
-    color: "#dc2626",
-    soft: "rgba(220,38,38,0.18)",
-    glow: "rgba(220,38,38,0.28)",
-    iconBg: "rgba(220,38,38,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1632823469850-2f77dd9c7f93?w=1200&q=95"
-},
-{
-  id: "law-firm",
-  routePath: "/law-firm",
-  icon: Gavel,
-  name: "Law Firms & Attorneys",
-  accent: {
-    color: "#7c3aed",
-    soft: "rgba(124,58,237,0.18)",
-    glow: "rgba(124,58,237,0.28)",
-    iconBg: "rgba(124,58,237,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1589216532372-1c2a367900d9?w=1200&q=95"
-},
-{
-  id: "property-services",
-  routePath: "/property-services",
-  icon: Building2,
-  name: "Property Services",
-  accent: {
-    color: "#6366f1",
-    soft: "rgba(99,102,241,0.18)",
-    glow: "rgba(99,102,241,0.28)",
-    iconBg: "rgba(99,102,241,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1560518883-ce09059eeffa?w=1200&q=95"
-}];
-
-
-
+];
 
 export default function Industries() {
   const sectionRef = useRef(null);
@@ -245,7 +173,6 @@ export default function Industries() {
   const [sectionVisible, setSectionVisible] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [hoveredIndustryId, setHoveredIndustryId] = useState("");
-  const [activeFilter, setActiveFilter] = useState("all");
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -290,46 +217,31 @@ export default function Industries() {
     navigate(industry.routePath);
   };
 
-  const filteredIndustries = activeFilter === "all"
-    ? industries
-    : industries.filter(i => INDUSTRY_TAGS[i.id] === activeFilter);
-
   return (
     <section
+      id="industries"
       ref={sectionRef}
-      className="pt-16 md:pt-24 pb-16 md:pb-24 px-0 bg-white">
-      
-      <div className="max-w-6xl mx-auto px-6 pt-10 pb-10">
-         <CSSectionHeader
-            eyebrow="Choose Your Industry"
-            title="AI Systems Built for Your Industry"
-            subtitle="Pick your industry to see exactly how much revenue you're losing — and which AI system from our store fixes it."
-            align="center"
-          />
-
-        {/* Filter pills */}
-        <div className="flex flex-wrap justify-center gap-2 mt-6 pb-4">
-          {FILTER_TAGS.map(f => (
-            <button
-              key={f.id}
-              onClick={() => setActiveFilter(f.id)}
-              className={`px-4 py-2 rounded-full text-sm font-semibold border transition-all duration-200 ${
-                activeFilter === f.id
-                  ? "text-white border-transparent shadow-sm bg-[#00AEEF]"
-                  : "bg-white text-foreground border-border hover:text-foreground hover:border-[#00AEEF] hover:bg-[rgba(0,174,239,0.08)]"
-              }`}
-            style={activeFilter === f.id ? { background: "linear-gradient(90deg, #0079c1, #005691)", boxShadow: "0 2px 12px rgba(0,121,193,0.35)" } : { borderColor: "rgba(0,174,239,0.22)" }}
-            >
-              {f.label}
-            </button>
-          ))}
-        </div>
+      className="bg-gradient-to-b from-card via-background via-70% to-slate-50/40 px-0 pb-24 pt-16 md:pb-32 md:pt-24"
+    >
+      <div className="mx-auto max-w-6xl px-6 pb-14 pt-10 text-center">
+        <p className="mb-3 text-xs font-bold uppercase tracking-[0.3em] text-primary">Choose Your Industry</p>
+        <h2
+          className="text-4xl font-bold leading-tight tracking-tight text-foreground md:text-5xl lg:text-6xl"
+          style={{ fontFamily: "Montserrat, sans-serif" }}
+        >
+          Built for Businesses That Win on <span className="text-primary">Fast Response</span>
+        </h2>
+        <p className="mx-auto mt-4 max-w-3xl text-lg leading-relaxed text-muted-foreground">
+          Pick your niche to see the ClientSurge system we would lead with first, why it fits, and how the
+          stack maps to the way that business actually closes jobs.
+        </p>
       </div>
 
       <div
-        className="w-full max-w-none mx-auto grid grid-cols-1 gap-0 sm:grid-cols-2 lg:grid-cols-3 relative z-10 px-4 md:px-6"
-        style={{ overflowX: "hidden" }}>
-        {filteredIndustries.map((industry, index) => {
+        className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 px-6 md:grid-cols-2 lg:grid-cols-3"
+        style={{ overflowX: "hidden" }}
+      >
+        {industries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
           const isSelected = selectedIndustryId === industry.id;
@@ -342,121 +254,193 @@ export default function Industries() {
 
           return (
             <button
-            key={industry.id}
-            type="button"
-            aria-label={`View ${industry.name} automation system`}
-            aria-pressed={isSelected}
-            className="group relative block overflow-hidden min-h-[320px] sm:min-h-[360px] md:min-h-[400px] text-left"
-            onClick={() => handleIndustrySelect(industry)}
-            onMouseEnter={() => setHoveredIndustryId(industry.id)}
-            onMouseLeave={() => setHoveredIndustryId("")}
-            onFocus={() => setHoveredIndustryId(industry.id)}
-            onBlur={() => setHoveredIndustryId("")}
+              key={industry.id}
+              type="button"
+              aria-label={industry.name}
+              aria-pressed={isSelected}
+              className="group relative block min-h-[300px] overflow-hidden rounded-[28px] text-left md:min-h-[340px]"
+              onClick={() => handleIndustrySelect(industry)}
+              onMouseEnter={() => setHoveredIndustryId(industry.id)}
+              onMouseLeave={() => setHoveredIndustryId("")}
+              onFocus={() => setHoveredIndustryId(industry.id)}
+              onBlur={() => setHoveredIndustryId("")}
               style={{
                 opacity: sectionVisible ? 1 : 0,
                 transform: sectionVisible ? "translateY(0)" : "translateY(32px)",
-                transition: `opacity 600ms ease ${index * 100}ms, transform 600ms ease ${
-                index * 100}ms`,
+                transition: `opacity 600ms ease ${index * 100}ms, transform 600ms ease ${index * 100}ms`,
                 border: "none",
                 padding: 0,
                 background: "transparent",
                 cursor: "pointer",
                 position: "relative",
                 zIndex: isSelected ? 2 : 1,
-              }}>
-              
+                scale: highlighted ? "1.015" : isSelected ? "1.02" : "1",
+                contentVisibility: "auto",
+                containIntrinsicSize: "380px 340px",
+              }}
+            >
+              <div
+                className="absolute inset-0"
+                style={{
+                  background: `linear-gradient(145deg, ${accent.color} 0%, #0a2240 52%, #061120 100%)`,
+                }}
+              />
+
               <img
                 {...imageProps}
-                alt={`${industry.name} — AI lead response, missed-call recovery, and booking automation | ClientSurge Systems`}
+                alt={industry.name}
                 loading="lazy"
                 decoding="async"
                 width="600"
                 height="442"
-                className="absolute inset-0 h-full w-full object-cover"
-                style={{ filter: "saturate(1) contrast(1.03) brightness(0.98)" }} />
+                className="absolute inset-0 h-full w-full object-cover mix-blend-luminosity opacity-[0.22]"
+                style={{ filter: "saturate(0.8) contrast(1.02) brightness(0.8)" }}
+              />
 
-              {/* Unique per-industry SVG texture pattern */}
               {industryPatterns[industry.id]}
-
 
               <div
                 className="absolute inset-0"
                 style={{
-                  background: highlighted ?
-                  "linear-gradient(to bottom, rgba(3,7,18,0) 0%, rgba(3,7,18,0) 30%, rgba(3,7,18,0.48) 100%)" :
-                  "linear-gradient(to bottom, rgba(3,7,18,0) 0%, rgba(3,7,18,0) 30%, rgba(3,7,18,0.44) 100%)"
-                }} />
-              
+                  background: highlighted
+                    ? "linear-gradient(180deg, rgba(255,255,255,0.06) 0%, rgba(5,16,34,0.12) 28%, rgba(5,16,34,0.88) 100%)"
+                    : "linear-gradient(180deg, rgba(255,255,255,0.04) 0%, rgba(5,16,34,0.1) 28%, rgba(5,16,34,0.9) 100%)",
+                }}
+              />
 
               <div
-               className="absolute inset-0 border-2 transition-all duration-300"
-               style={{
-                 borderColor: isSelected ? accent.color : highlighted ? accent.color : "rgba(255,255,255,0.12)",
-                 boxShadow: isSelected ?
-                 `inset 0 0 0 1px ${accent.soft}, 0 0 32px ${accent.glow}, 0 0 0 2px ${accent.glow}` :
-                 highlighted ?
-                 `inset 0 0 0 1px ${accent.soft}, 0 0 24px ${accent.glow}, 0 0 0 1.5px ${accent.glow}` :
-                 "0 0 0 1px rgba(255,255,255,0.08)"
-               }} />
+                className="absolute inset-0 border-2 transition-all duration-300"
+                style={{
+                  borderColor: isSelected ? accent.color : highlighted ? accent.color : "rgba(255,255,255,0.08)",
+                  boxShadow:
+                    isSelected || highlighted
+                      ? `inset 0 0 0 1px ${accent.soft}, 0 0 0 2px ${accent.glow}`
+                      : "none",
+                }}
+              />
+
               {isSelected && (
-                <div className="absolute top-3 right-3 w-7 h-7 rounded-full bg-primary flex items-center justify-center shadow-lg z-20">
-                  <svg viewBox="0 0 24 24" fill="none" className="w-4 h-4"><path d="M5 12l4 4 10-10" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                <div className="absolute right-4 top-4 z-20 flex h-8 w-8 items-center justify-center rounded-full bg-primary shadow-lg">
+                  <svg viewBox="0 0 24 24" fill="none" className="h-4 w-4">
+                    <path
+                      d="M5 12l4 4 10-10"
+                      stroke="#fff"
+                      strokeWidth="2.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    />
+                  </svg>
                 </div>
               )}
-              
 
+              <div className="absolute left-5 right-5 top-5 flex items-center justify-between gap-3">
+                <span
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    borderRadius: "999px",
+                    padding: "8px 12px",
+                    background: "rgba(255,255,255,0.12)",
+                    border: "1px solid rgba(255,255,255,0.14)",
+                    color: "#ffffff",
+                    fontSize: "11px",
+                    fontWeight: 700,
+                    letterSpacing: "0.08em",
+                    textTransform: "uppercase",
+                    backdropFilter: "blur(10px)",
+                  }}
+                >
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      width: "8px",
+                      height: "8px",
+                      borderRadius: "999px",
+                      background: accent.color,
+                      boxShadow: `0 0 0 5px ${accent.soft}`,
+                    }}
+                  />
+                  Industry System
+                </span>
+              </div>
 
-
-              <div className="absolute bottom-0 inset-x-0 px-5 pb-5 pt-12">
+              <div className="absolute inset-x-0 bottom-0 px-5 pb-5 pt-12">
                 <div
                   className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border backdrop-blur-sm transition-transform duration-300"
                   style={{
                     background: highlighted || isSelected ? accent.iconBg : "rgba(255,255,255,0.12)",
                     borderColor: highlighted || isSelected ? accent.soft : "rgba(255,255,255,0.14)",
                     boxShadow: highlighted || isSelected ? `0 10px 30px ${accent.glow}` : "none",
-                    transform: highlighted ? "translateY(-2px) scale(1.02)" : "none"
+                    transform: highlighted ? "translateY(-2px) scale(1.02)" : "none",
                   }}
                 >
-                  <Icon className="w-5 h-5" style={{ color: highlighted || isSelected ? accent.color : "#ffffff" }} />
+                  <Icon className="h-5 w-5" style={{ color: highlighted || isSelected ? accent.color : "#ffffff" }} />
                 </div>
+
                 <p
                   style={{
-                    fontSize: "18px",
-                    fontWeight: "700",
-                    lineHeight: 1.3,
+                    fontSize: "24px",
+                    fontWeight: "800",
+                    lineHeight: 1.16,
                     color: "#ffffff",
                     textShadow: "0 1px 12px rgba(0,0,0,0.76)",
-                    margin: 0
-                  }}>
-                  
+                    margin: 0,
+                  }}
+                >
                   {industry.name}
                 </p>
+
                 <p
                   style={{
-                    fontSize: "12px",
+                    fontSize: "13px",
                     lineHeight: 1.6,
-                    color: "rgba(255,255,255,0.74)",
-                    margin: "8px 0 0",
-                    opacity: highlighted ? 1 : 0,
-                    transition: "opacity 0.3s ease",
-                  }}>
-                  
-                  Browse AI systems tailored to this industry.
+                    color: "rgba(255,255,255,0.78)",
+                    margin: "10px 0 0",
+                    maxWidth: "92%",
+                    opacity: 1,
+                  }}
+                >
+                  {industry.summary}
                 </p>
+
+                <div
+                  style={{
+                    marginTop: "16px",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: "8px",
+                    color: "#ffffff",
+                    fontSize: "12px",
+                    fontWeight: 700,
+                    letterSpacing: "0.03em",
+                    opacity: highlighted || isSelected ? 1 : 0.82,
+                  }}
+                >
+                  View system
+                  <span
+                    aria-hidden="true"
+                    style={{
+                      transform: highlighted ? "translateX(4px)" : "translateX(0)",
+                      transition: "transform 0.25s ease",
+                    }}
+                  >
+                    →
+                  </span>
+                </div>
               </div>
 
               <div
                 className="absolute bottom-0 left-0 h-[2px] transition-all duration-500 ease-out"
                 style={{
                   width: highlighted ? "100%" : "0%",
-                  background: `linear-gradient(to right, ${accent.color}, #ffffff, ${accent.color})`
-                }} />
-              
-            </button>);
-
+                  background: `linear-gradient(to right, ${accent.color}, #ffffff, ${accent.color})`,
+                }}
+              />
+            </button>
+          );
         })}
       </div>
-
-    </section>);
-
+    </section>
+  );
 }
