@@ -31,8 +31,6 @@ const TRUST_ITEMS = [
   'Done-for-you setup',
 ];
 
-const MINI_FEATURES = ['No demo gate', 'Package-first buyer path', 'Done-for-you setup'];
-
 function scrollToSection(event, sectionId, fallbackPath, analyticsName) {
   trackCTA(analyticsName, 'hero');
 
@@ -61,7 +59,7 @@ function AutomationPill({ label }) {
 
 function TrustLine() {
   return (
-    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] font-semibold tracking-[-0.01em] text-slate-500 lg:justify-start">
+    <div className="flex flex-wrap items-center justify-center gap-x-3 gap-y-2 text-[11px] font-semibold tracking-[-0.01em] text-slate-500">
       {TRUST_ITEMS.map((item, index) => (
         <div key={item} className="flex items-center gap-3">
           {index > 0 && <span className="hidden h-1 w-1 rounded-full bg-slate-300 sm:block" aria-hidden="true" />}
@@ -243,31 +241,40 @@ export default function HomeHero() {
   return (
     <section
       className="relative isolate overflow-hidden bg-white"
-      style={{ minHeight: 'calc(100svh - var(--cs-nav-height, 76px))' }}
       aria-label="ClientSurge Systems AI growth system hero"
     >
+      <div className="mx-auto w-full max-w-[1180px] px-5 pb-24 pt-[calc(var(--cs-nav-height,76px)+3.5rem)] sm:px-8 lg:px-10">
+        <p className="sr-only">AI Growth System for Service Businesses</p>
 
-      <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-14 px-5 pb-20 pt-[calc(var(--cs-nav-height,76px)+4.5rem)] sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(470px,1fr)] lg:gap-20 lg:px-10 lg:pb-24 lg:pt-[calc(var(--cs-nav-height,76px)+4rem)]">
-        <div className="mx-auto max-w-[620px] text-center lg:mx-0 lg:text-left">
-          <p className="sr-only">AI Growth System for Service Businesses</p>
-
-          <h1 className="font-black leading-[0.97] tracking-[-0.06em] text-[#06122b]" style={{ fontSize: 'clamp(2.85rem, 4.35vw, 4.55rem)' }}>
-            <span className="block">Turn your website</span>
-            <span className="block">into an <span className="text-[#00AEEF]">AI-powered</span></span>
-            <span className="block">sales system.</span>
+        {/* Headline block — centered, two lines, gradient highlight on one word */}
+        <div className="mx-auto max-w-[920px] text-center">
+          <h1
+            className="font-display font-black leading-[1.02] tracking-[-0.035em] text-black"
+            style={{ fontSize: 'clamp(2.6rem, 5.6vw, 4.75rem)' }}
+          >
+            <span className="block">Turn your website into an</span>
+            <span className="block">
+              <span
+                className="bg-clip-text text-transparent"
+                style={{ backgroundImage: 'linear-gradient(135deg, #00AEEF 0%, #006BB0 55%, #003B8F 100%)' }}
+              >
+                AI-powered
+              </span>{' '}
+              sales system.
+            </span>
           </h1>
 
-          <p className="mt-8 max-w-[560px] text-[1rem] font-normal leading-[1.8] tracking-[-0.01em] text-slate-500 sm:text-[1.06rem] lg:mx-0">
+          <p className="mx-auto mt-8 max-w-[640px] text-[1rem] font-normal leading-[1.7] tracking-[-0.01em] text-slate-500 sm:text-[1.06rem]">
             ClientSurge installs the lead capture, instant response, booking, follow-up, review, and reactivation workflows your website needs to turn more visitors into real opportunities — without forcing a mandatory demo call first.
           </p>
 
-          <div className="mt-7 flex flex-wrap justify-center gap-2.5 lg:justify-start">
+          <div className="mt-7 flex flex-wrap justify-center gap-2.5">
             {AUTOMATION_PILLS.map((pill) => (
               <AutomationPill key={pill} label={pill} />
             ))}
           </div>
 
-          <div className="mt-9 flex flex-col items-center gap-3 sm:flex-row sm:justify-center lg:justify-start">
+          <div className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
               href="/#pricing"
               onClick={scrollToPricing}
@@ -289,26 +296,14 @@ export default function HomeHero() {
             </a>
           </div>
 
-          <div className="mt-6">
+          <div className="mt-6 flex justify-center">
             <TrustLine />
-          </div>
-
-          <div className="mt-10 hidden items-center gap-3 text-[10px] font-bold uppercase tracking-[0.24em] text-slate-400 lg:flex">
-            <span className="h-7 w-px bg-[#00AEEF]/35" aria-hidden="true" />
-            Scroll
           </div>
         </div>
 
-        <div className="relative lg:pl-3">
+        {/* Visual — centered below the headline */}
+        <div className="relative mt-16 flex justify-center">
           <HeroDeviceMockup />
-
-          <div className="pointer-events-none absolute -bottom-4 left-1/2 hidden -translate-x-1/2 flex-wrap justify-center gap-2 lg:flex">
-            {MINI_FEATURES.map((feature) => (
-              <span key={feature} className="rounded-full bg-slate-950/80 px-3 py-1 text-[9px] font-bold text-white/70 shadow-lg backdrop-blur-sm">
-                {feature}
-              </span>
-            ))}
-          </div>
         </div>
       </div>
     </section>
