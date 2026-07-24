@@ -23,12 +23,17 @@ function isBase44EditorPreview() {
   return hostname.startsWith('preview-sandbox--') || hostname.endsWith('.modal.host');
 }
 
+function isLaunchWaitlistPage() {
+  return window.location.pathname === '/' && Boolean(document.querySelector('.cs-launch-page'));
+}
+
 export default function CookieConsent() {
   const [visible, setVisible] = useState(false);
   const [offsetForMobileCallBar, setOffsetForMobileCallBar] = useState(false);
 
   useEffect(() => {
     if (isBase44EditorPreview()) return;
+    if (isLaunchWaitlistPage()) return;
 
     const consent = safeGetCookieConsent();
     if (!consent) setVisible(true);
