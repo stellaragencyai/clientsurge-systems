@@ -35,7 +35,9 @@ test("launch waitlist captures email-only leads through the hardened Base44 inta
   assert.match(launchPage, /base44\.functions\.invoke\("captureValidatedWebsiteLead"/);
   assert.match(launchPage, /requested_channels:\s*\["email"\]/);
   assert.match(launchPage, /consent_source:\s*"launch_waitlist_email_form"/);
-  assert.match(launchPage, /First \{FOUNDING_LIMIT\.toLocaleString\(\)\} signups lock 50% off for life and no setup fee/);
+  assert.match(launchPage, /Founding \{FOUNDING_LIMIT\.toLocaleString\(\)\}/);
+  assert.match(launchPage, /50% off for life/);
+  assert.match(launchPage, /No setup fee/);
 });
 
 test("launch waitlist styles support reduced motion and responsive countdown tiles", () => {

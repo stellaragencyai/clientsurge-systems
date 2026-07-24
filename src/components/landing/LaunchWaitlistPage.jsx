@@ -1,11 +1,11 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   ArrowRight,
+  BadgeCheck,
   CalendarDays,
   CheckCircle2,
   Clock3,
   Mail,
-  ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
@@ -17,6 +17,12 @@ const FOUNDING_LIMIT = 1000;
 
 const LOGO_URL =
   "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png";
+
+const TRUST_POINTS = [
+  "No setup fee",
+  "50% off for life",
+  "First 1,000 signups",
+];
 
 function clamp(value, min, max) {
   return Math.min(Math.max(value, min), max);
@@ -142,56 +148,64 @@ function LaunchWaitlistForm() {
   };
 
   return (
-    <form className="cs-launch-form" onSubmit={handleSubmit}>
-      <label className="sr-only" htmlFor="launch-waitlist-email">Email address</label>
-      <div className="cs-launch-input-shell">
-        <Mail aria-hidden="true" />
-        <input
-          id="launch-waitlist-email"
-          type="email"
-          value={email}
-          onChange={(event) => setEmail(event.target.value)}
-          placeholder="you@company.com"
-          autoComplete="email"
-          required
-        />
-        <input
-          type="text"
-          value={websiteUrl}
-          onChange={(event) => setWebsiteUrl(event.target.value)}
-          tabIndex={-1}
-          autoComplete="off"
-          className="cs-launch-honeypot"
-          aria-hidden="true"
-        />
+    <div className="cs-launch-reserve">
+      <div className="cs-launch-reserve-head">
+        <span>Reserve founding access</span>
+        <strong className="cs-launch-offer-line">
+          <span>Founding {FOUNDING_LIMIT.toLocaleString()}</span>
+          <span>50% off for life</span>
+          <span>No setup fee</span>
+        </strong>
       </div>
-      <button type="submit" disabled={!canSubmit} className="cs-launch-submit">
-        <span>{status === "submitting" ? "Joining..." : "Join The Waitlist"}</span>
-        {status === "submitting" ? <Clock3 aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
-      </button>
-      <p className="cs-launch-consent">
-        By joining, you agree to receive email launch updates from ClientSurge Systems. Unsubscribe anytime.
-      </p>
-      {message && (
-        <p className={`cs-launch-form-status cs-launch-form-status--${status}`} role={status === "error" ? "alert" : "status"}>
-          {status === "error" ? null : <CheckCircle2 aria-hidden="true" />}
-          <span>{message}</span>
+
+      <form className="cs-launch-form" onSubmit={handleSubmit}>
+        <label className="sr-only" htmlFor="launch-waitlist-email">Email address</label>
+        <div className="cs-launch-input-shell">
+          <Mail aria-hidden="true" />
+          <input
+            id="launch-waitlist-email"
+            type="email"
+            value={email}
+            onChange={(event) => setEmail(event.target.value)}
+            placeholder="you@company.com"
+            autoComplete="email"
+            required
+          />
+          <input
+            type="text"
+            value={websiteUrl}
+            onChange={(event) => setWebsiteUrl(event.target.value)}
+            tabIndex={-1}
+            autoComplete="off"
+            className="cs-launch-honeypot"
+            aria-hidden="true"
+          />
+        </div>
+        <button type="submit" disabled={!canSubmit} className="cs-launch-submit">
+          <span>{status === "submitting" ? "Joining..." : "Join The Waitlist"}</span>
+          {status === "submitting" ? <Clock3 aria-hidden="true" /> : <ArrowRight aria-hidden="true" />}
+        </button>
+        <p className="cs-launch-consent">
+          By joining, you agree to receive email launch updates from ClientSurge Systems. Unsubscribe anytime.
         </p>
-      )}
-    </form>
+        {message && (
+          <p className={`cs-launch-form-status cs-launch-form-status--${status}`} role={status === "error" ? "alert" : "status"}>
+            {status === "error" ? null : <CheckCircle2 aria-hidden="true" />}
+            <span>{message}</span>
+          </p>
+        )}
+      </form>
+    </div>
   );
 }
 
 function LaunchInstrument({ progress }) {
   return (
-    <div className="cs-launch-instrument" style={{ "--launch-progress": `${progress}%` }}>
-      <div className="cs-launch-instrument-face">
-        <div className="cs-launch-instrument-track" aria-hidden="true" />
-        <div className="cs-launch-instrument-core">
-          <span>Live Countdown</span>
-          <strong>Sept 1</strong>
-          <small>2026</small>
-        </div>
+    <div className="cs-launch-instrument" style={{ "--launch-progress": `${progress}%` }} aria-hidden="true">
+      <div className="cs-launch-instrument-core">
+        <span>Sept</span>
+        <strong>01</strong>
+        <small>2026</small>
       </div>
     </div>
   );
@@ -243,21 +257,31 @@ export default function LaunchWaitlistPage() {
               <span>Launching September 1, 2026</span>
             </div>
             <h1>
-              <span>ClientSurge</span>
-              <span>Systems</span>
+              <span>Launch access</span>
+              <span>opens Sept. 1</span>
             </h1>
             <p className="cs-launch-lede">
-              The founding waitlist is open for local service businesses that want faster lead response, cleaner follow-up, and proof-first automation before the public launch.
+              Join the private launch list for ClientSurge Systems and lock the founding offer before public onboarding opens.
             </p>
-            <div className="cs-launch-offer" aria-label="Founding launch offer">
-              <Sparkles aria-hidden="true" />
-              <span>First {FOUNDING_LIMIT.toLocaleString()} signups lock 50% off for life and no setup fee.</span>
-            </div>
             <LaunchWaitlistForm />
+            <div className="cs-launch-trust-row" aria-label="Founding offer details">
+              {TRUST_POINTS.map((point) => (
+                <span key={point}>
+                  <BadgeCheck aria-hidden="true" />
+                  {point}
+                </span>
+              ))}
+            </div>
           </div>
 
-          <div className="cs-launch-countdown" aria-label="Countdown to September 1, 2026">
-            <LaunchInstrument progress={progress} />
+          <aside className="cs-launch-countdown" aria-label="Countdown to September 1, 2026">
+            <div className="cs-launch-countdown-head">
+              <div>
+                <span>Live countdown</span>
+                <strong>September 1, 2026</strong>
+              </div>
+              <LaunchInstrument progress={progress} />
+            </div>
             <div className="cs-launch-count-grid" aria-live="polite">
               <CountdownTile label="Days" value={formattedCountdown.days} />
               <CountdownTile label="Hours" value={formattedCountdown.hours} />
@@ -268,22 +292,14 @@ export default function LaunchWaitlistPage() {
               <span>Campaign window</span>
               <strong>{Math.round(progress)}%</strong>
             </div>
-          </div>
-        </section>
-
-        <section className="cs-launch-proof-row" aria-label="Launch offer details">
-          <div>
-            <ShieldCheck aria-hidden="true" />
-            <span>No setup fee for founding accounts</span>
-          </div>
-          <div>
-            <Clock3 aria-hidden="true" />
-            <span>Priority onboarding opens at launch</span>
-          </div>
-          <div>
-            <Sparkles aria-hidden="true" />
-            <span>Founding 1,000 discount window</span>
-          </div>
+            <div className="cs-launch-progress-bar" aria-hidden="true">
+              <span style={{ width: `${progress}%` }} />
+            </div>
+            <div className="cs-launch-offer" aria-label="Founding launch offer">
+              <Sparkles aria-hidden="true" />
+              <span>Priority onboarding opens for the founding list first.</span>
+            </div>
+          </aside>
         </section>
       </main>
 
