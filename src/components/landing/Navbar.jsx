@@ -140,8 +140,8 @@ export default function Navbar() {
               key={link.href}
               href={link.href}
               onClick={(event) => handleNavClick(event, link, "navbar")}
-              className="text-xs lg:text-sm font-semibold transition-all duration-300 whitespace-nowrap relative pb-0.5"
-              style={{ color: isActivePage(link.href) ? "#0095D9" : "#0F172A", textDecoration: "none" }}
+              className="text-sm transition-all duration-300 whitespace-nowrap relative pb-0.5"
+              style={{ color: isActivePage(link.href) ? "#00AEEF" : "#4a4a4a", fontWeight: 500, textDecoration: "none" }}
             >
               {link.label}
               <span style={{ position: "absolute", bottom: "-6px", left: 0, right: isActivePage(link.href) ? 0 : "100%", height: "2px", borderRadius: "999px", background: "#00AEEF", boxShadow: "0 0 6px rgba(0,174,239,0.45)", transition: "right 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)" }} />
@@ -157,14 +157,17 @@ export default function Navbar() {
               closeAll();
               navigate("/login");
             }}
-            className="hidden md:flex items-center gap-1.5 text-xs font-bold transition-all duration-300 px-4 py-1.5 rounded-lg"
+            className="hidden md:flex items-center gap-1.5 transition-all duration-300 hover:-translate-y-0.5"
             style={{
               minHeight: "unset",
               minWidth: "unset",
-              color: "#0F172A",
-              background: "rgba(255,255,255,0.64)",
-              border: "1px solid rgba(15,23,42,0.12)",
-              boxShadow: "0 6px 18px rgba(15,23,42,0.05)",
+              padding: "0.55rem 1.1rem",
+              fontSize: "0.8125rem",
+              fontWeight: 700,
+              color: "#ffffff",
+              background: "#000000",
+              borderRadius: "0.625rem",
+              boxShadow: "0 6px 18px rgba(15,23,42,0.18)",
             }}
           >
             Client Login
@@ -176,8 +179,18 @@ export default function Navbar() {
               closeAll();
               navigateTo("/#pricing");
             }}
-            className="cs-btn-primary cs-nav-cta"
-            style={{ minHeight: "unset", minWidth: "unset" }}
+            className="transition-all duration-300 hover:-translate-y-0.5"
+            style={{
+              minHeight: "unset",
+              minWidth: "unset",
+              padding: "0.55rem 1.1rem",
+              fontSize: "0.8125rem",
+              fontWeight: 700,
+              color: "#ffffff",
+              background: "linear-gradient(90deg, #0079c1 0%, #00AEEF 100%)",
+              borderRadius: "0.625rem",
+              boxShadow: "0 6px 18px rgba(0,174,239,0.28)",
+            }}
           >
             Compare Packages
           </button>
