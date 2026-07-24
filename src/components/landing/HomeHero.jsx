@@ -242,20 +242,10 @@ export default function HomeHero() {
 
   return (
     <section
-      className="relative isolate overflow-hidden"
+      className="relative isolate overflow-hidden bg-white"
       style={{ minHeight: 'calc(100svh - var(--cs-nav-height, 76px))' }}
       aria-label="ClientSurge Systems AI growth system hero"
     >
-      <div
-        className="absolute inset-0 -z-20"
-        style={{
-          backgroundColor: '#fbfdff',
-          backgroundImage:
-            'radial-gradient(circle at 82% 22%, rgba(0,174,239,0.14), transparent 27%), radial-gradient(circle at 18% 8%, rgba(219,239,249,0.34), transparent 29%), linear-gradient(180deg, #fbfdff 0%, #f8fbfd 62%, #ffffff 100%)',
-        }}
-        aria-hidden="true"
-      />
-      <div className="absolute inset-x-0 bottom-0 -z-10 h-52 bg-gradient-to-b from-transparent via-white/65 to-white" aria-hidden="true" />
 
       <div className="mx-auto grid w-full max-w-[1240px] grid-cols-1 items-center gap-14 px-5 pb-20 pt-[calc(var(--cs-nav-height,76px)+4.5rem)] sm:px-8 lg:grid-cols-[minmax(0,0.9fr)_minmax(470px,1fr)] lg:gap-20 lg:px-10 lg:pb-24 lg:pt-[calc(var(--cs-nav-height,76px)+4rem)]">
         <div className="mx-auto max-w-[620px] text-center lg:mx-0 lg:text-left">

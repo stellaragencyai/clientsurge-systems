@@ -1,0 +1,88 @@
+{
+  "type": "object",
+  "name": "CommunicationPreference",
+  "properties": {
+    "client_id": {
+      "type": "string"
+    },
+    "user_email": {
+      "type": "string"
+    },
+    "sms_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "email_enabled": {
+      "type": "boolean",
+      "default": true
+    },
+    "marketing_enabled": {
+      "type": "boolean",
+      "default": false
+    },
+    "appointment_updates": {
+      "type": "boolean",
+      "default": true
+    },
+    "service_updates": {
+      "type": "boolean",
+      "default": true
+    },
+    "support_updates": {
+      "type": "boolean",
+      "default": true
+    },
+    "consent_source": {
+      "type": "string"
+    },
+    "consent_version": {
+      "type": "string"
+    },
+    "preference_updated_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "sms_opt_out_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "email_opt_out_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "marketing_opt_in_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "updated_by_user_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "sms_enabled",
+    "email_enabled",
+    "marketing_enabled",
+    "appointment_updates",
+    "service_updates",
+    "support_updates"
+  ],
+  "indexes": [
+    {
+      "fields": [
+        "client_id"
+      ]
+    },
+    {
+      "fields": [
+        "user_email"
+      ]
+    },
+    {
+      "fields": [
+        "client_id",
+        "user_email"
+      ],
+      "unique": true
+    }
+  ]
+}

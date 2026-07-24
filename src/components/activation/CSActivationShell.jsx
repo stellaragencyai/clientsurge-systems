@@ -1,4 +1,5 @@
 import {
+  CSAutosaveStatus,
   CSActivationFooter,
   CSActivationShell as CSActivationShellPrimitive,
   CSActivationStepNav as CSActivationStepNavPrimitive,
