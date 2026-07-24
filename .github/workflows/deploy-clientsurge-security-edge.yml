@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "ACTIVE ClientSurge Cloudflare Security Edge deploy workflow"
           echo "Commit: $GITHUB_SHA"
-          echo "Production Worker routes are dashboard-managed; this workflow deploys code without mutating zone routes."
+          echo "Production Worker routes are dashboard-managed; this workflow deploys a tagged Worker version without mutating zone routes."
 
       - name: Require Cloudflare credentials
         shell: bash
@@ -56,20 +56,23 @@ jobs:
         run: node scripts/cloudflare/ensure-proxied-dns.mjs
 
       - name: Dry-run active Cloudflare Worker
-        run: npx wrangler deploy --config wrangler.clientsurge-security.toml --dry-run
+        run: npx wrangler versions upload --config wrangler.clientsurge-security.toml --dry-run
 
-      - name: Deploy active Cloudflare Worker
-        run: npx wrangler deploy --config wrangler.clientsurge-security.toml
+      - name: Upload active Cloudflare Worker version
+        run: npx wrangler versions upload --config wrangler.clientsurge-security.toml --tag "$GITHUB_SHA" --message "GitHub Actions $GITHUB_SHA"
 
-      - name: Verify product signup edge hotfix
+      - name: Deploy uploaded Worker version to 100 percent
+        run: npx wrangler versions deploy --config wrangler.clientsurge-security.toml --version-tag "$GITHUB_SHA" --percentage 100 --yes --message "GitHub Actions $GITHUB_SHA"
+
+      - name: Verify current product signup route
         shell: bash
         run: |
           set -euo pipefail
           URL="$VERIFY_PRODUCT_SIGNUP_URL&edge_verify=$(date +%s)"
           echo "Verifying $URL"
           HTML="$(curl -fsSL -H 'Cache-Control: no-cache' "$URL")"
-          echo "$HTML" | grep -F "Complete your ClientSurge signup."
-          echo "$HTML" | grep -F "Edge hotfix: 2026-07-05-product-signup-edge-hotfix-v1"
+          echo "$HTML" | grep -F "<title>Product Signup | ClientSurge Systems</title>"
+          echo "$HTML" | grep -F "clientsurge-telegram-click-tracker.js"
 
       - name: Verify live public route exposure
         run: npm run smoke:public-exposure-live -- --url "$VERIFY_URL"
