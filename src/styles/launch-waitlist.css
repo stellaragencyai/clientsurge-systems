@@ -1,0 +1,554 @@
+.cs-launch-body,
+.cs-launch-body #root {
+  background: #07111f !important;
+}
+
+.cs-launch-page {
+  --launch-ink: #07111f;
+  --launch-text: #dbeafe;
+  --launch-muted: #93a4b8;
+  --launch-line: rgba(148, 163, 184, 0.22);
+  --launch-blue: #00aeef;
+  --launch-cobalt: #155eef;
+  --launch-lime: #b8f35d;
+  --launch-amber: #f8c14a;
+  min-height: 100svh;
+  position: relative;
+  overflow: hidden;
+  color: var(--launch-text);
+  background:
+    linear-gradient(135deg, rgba(0, 174, 239, 0.18) 0%, transparent 34%),
+    linear-gradient(215deg, rgba(184, 243, 93, 0.10) 0%, transparent 24%),
+    linear-gradient(180deg, #07111f 0%, #0b1728 58%, #0d1b2b 100%);
+}
+
+.cs-launch-page,
+.cs-launch-page * {
+  box-sizing: border-box;
+}
+
+.cs-launch-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(255,255,255,0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,0.055) 1px, transparent 1px);
+  background-size: 44px 44px;
+  mask-image: linear-gradient(180deg, rgba(0,0,0,0.85), transparent 72%);
+}
+
+.cs-launch-header,
+.cs-launch-main,
+.cs-launch-footer {
+  position: relative;
+  z-index: 1;
+  width: min(100% - 40px, 1180px);
+  margin: 0 auto;
+}
+
+.cs-launch-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  min-height: 96px;
+  padding-top: env(safe-area-inset-top);
+}
+
+.cs-launch-logo {
+  display: inline-flex;
+  align-items: center;
+  width: min(244px, 54vw);
+}
+
+.cs-launch-logo img {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 18px 28px rgba(0,0,0,0.26));
+}
+
+.cs-launch-login {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 42px;
+  padding: 0 18px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 800;
+  text-decoration: none;
+  background: rgba(255,255,255,0.08);
+}
+
+.cs-launch-main {
+  padding: 18px 0 34px;
+}
+
+.cs-launch-hero {
+  min-height: min(720px, calc(100svh - 164px));
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(360px, 0.82fr);
+  align-items: center;
+  gap: clamp(34px, 6vw, 76px);
+}
+
+.cs-launch-copy {
+  max-width: 680px;
+}
+
+.cs-launch-kicker,
+.cs-launch-offer,
+.cs-launch-proof-row div {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.cs-launch-kicker {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid rgba(184, 243, 93, 0.26);
+  border-radius: 8px;
+  color: #eaffc7;
+  background: rgba(184, 243, 93, 0.08);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+.cs-launch-kicker svg,
+.cs-launch-offer svg,
+.cs-launch-proof-row svg,
+.cs-launch-input-shell svg,
+.cs-launch-submit svg,
+.cs-launch-form-status svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.cs-launch-page .cs-launch-copy h1 {
+  margin: 22px 0 18px;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  filter: none !important;
+  font-size: clamp(3.15rem, 6vw, 5.8rem);
+  line-height: 0.9;
+  letter-spacing: 0;
+  font-weight: 950;
+  mix-blend-mode: normal !important;
+  opacity: 1 !important;
+  text-shadow: 0 16px 44px rgba(0, 0, 0, 0.28);
+}
+
+.cs-launch-page .cs-launch-copy h1 span {
+  display: block;
+  max-width: 100%;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: none !important;
+  filter: none !important;
+  opacity: 1 !important;
+  overflow-wrap: normal;
+  word-break: keep-all;
+  white-space: nowrap;
+}
+
+.cs-launch-lede {
+  max-width: 630px;
+  margin: 0;
+  color: rgba(219, 234, 254, 0.88);
+  font-size: clamp(1.05rem, 2vw, 1.32rem);
+  line-height: 1.65;
+}
+
+.cs-launch-offer {
+  width: fit-content;
+  max-width: 100%;
+  margin: 26px 0 24px;
+  padding: 14px 16px;
+  border: 1px solid rgba(0, 174, 239, 0.32);
+  border-radius: 8px;
+  color: #ffffff;
+  background: linear-gradient(90deg, rgba(0, 174, 239, 0.20), rgba(21, 94, 239, 0.12));
+  box-shadow: 0 18px 44px rgba(0, 0, 0, 0.16);
+  font-size: 15px;
+  font-weight: 850;
+}
+
+.cs-launch-offer svg {
+  color: var(--launch-amber);
+}
+
+.cs-launch-form {
+  width: min(100%, 640px);
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.cs-launch-input-shell {
+  min-height: 58px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border: 1px solid rgba(255,255,255,0.18);
+  border-radius: 8px;
+  padding: 0 16px;
+  color: rgba(255,255,255,0.72);
+  background: rgba(255,255,255,0.11);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.11);
+}
+
+.cs-launch-input-shell:focus-within {
+  border-color: rgba(0, 174, 239, 0.72);
+  box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.16);
+}
+
+.cs-launch-page .cs-launch-input-shell input {
+  width: 100%;
+  min-width: 0;
+  border: 0 !important;
+  outline: 0 !important;
+  color: #ffffff !important;
+  -webkit-text-fill-color: #ffffff !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.cs-launch-page .cs-launch-input-shell input::placeholder {
+  color: rgba(219, 234, 254, 0.78) !important;
+  -webkit-text-fill-color: rgba(219, 234, 254, 0.78) !important;
+}
+
+.cs-launch-honeypot {
+  display: none;
+}
+
+.cs-launch-submit {
+  min-height: 58px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  border: 0;
+  border-radius: 8px;
+  padding: 0 24px;
+  color: #04111f;
+  background: linear-gradient(135deg, var(--launch-lime), #ffffff 62%);
+  box-shadow: 0 20px 46px rgba(184, 243, 93, 0.18);
+  font-size: 14px;
+  font-weight: 950;
+  white-space: nowrap;
+  cursor: pointer;
+  transition: transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
+}
+
+.cs-launch-submit:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 28px 64px rgba(184, 243, 93, 0.24);
+}
+
+.cs-launch-submit:disabled {
+  cursor: not-allowed;
+  opacity: 0.56;
+}
+
+.cs-launch-consent {
+  grid-column: 1 / -1;
+  margin: -2px 0 0;
+  color: rgba(219, 234, 254, 0.62);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.cs-launch-form-status {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.cs-launch-form-status--success,
+.cs-launch-form-status--duplicate {
+  color: #d9ff9d;
+}
+
+.cs-launch-form-status--error {
+  color: #fecaca;
+}
+
+.cs-launch-countdown {
+  align-self: center;
+}
+
+.cs-launch-instrument {
+  width: min(100%, 430px);
+  aspect-ratio: 1;
+  margin: 0 auto 24px;
+  position: relative;
+  border-radius: 50%;
+  background:
+    conic-gradient(from -90deg, rgba(184, 243, 93, 0.95) 0 var(--launch-progress), rgba(255,255,255,0.13) var(--launch-progress) 100%);
+  padding: 3px;
+  box-shadow:
+    0 32px 84px rgba(0,0,0,0.35),
+    0 0 0 1px rgba(255,255,255,0.12);
+}
+
+.cs-launch-instrument::before {
+  content: "";
+  position: absolute;
+  inset: 14px;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.14);
+  animation: cs-launch-spin 16s linear infinite;
+}
+
+.cs-launch-instrument-face {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background:
+    linear-gradient(135deg, rgba(255,255,255,0.16), rgba(255,255,255,0.04)),
+    #0a1728;
+  position: relative;
+  overflow: hidden;
+}
+
+.cs-launch-instrument-track {
+  position: absolute;
+  inset: 34px;
+  border-radius: 50%;
+  border: 1px dashed rgba(0, 174, 239, 0.42);
+}
+
+.cs-launch-instrument-core {
+  width: 58%;
+  aspect-ratio: 1;
+  display: grid;
+  place-content: center;
+  text-align: center;
+  border-radius: 50%;
+  border: 1px solid rgba(255,255,255,0.18);
+  background: linear-gradient(180deg, rgba(255,255,255,0.14), rgba(255,255,255,0.05));
+}
+
+.cs-launch-instrument-core span,
+.cs-launch-instrument-core small {
+  color: rgba(219, 234, 254, 0.68);
+  font-size: 11px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cs-launch-instrument-core strong {
+  display: block;
+  margin: 7px 0 2px;
+  color: #ffffff;
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 0.95;
+  font-weight: 950;
+}
+
+.cs-launch-count-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.cs-launch-count-tile {
+  min-height: 104px;
+  display: grid;
+  align-content: center;
+  justify-items: center;
+  border: 1px solid rgba(255,255,255,0.16);
+  border-radius: 8px;
+  background: rgba(255,255,255,0.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10);
+}
+
+.cs-launch-count-value {
+  color: #ffffff;
+  font-size: clamp(1.9rem, 4vw, 3.2rem);
+  line-height: 1;
+  font-weight: 950;
+  font-variant-numeric: tabular-nums;
+}
+
+.cs-launch-count-label {
+  margin-top: 10px;
+  color: rgba(219, 234, 254, 0.66);
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+}
+
+.cs-launch-progress {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-top: 12px;
+  color: rgba(219, 234, 254, 0.66);
+  font-size: 12px;
+  font-weight: 850;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.cs-launch-progress strong {
+  color: #ffffff;
+}
+
+.cs-launch-proof-row {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-top: 20px;
+  color: #ffffff;
+}
+
+.cs-launch-proof-row div {
+  min-height: 74px;
+  border: 1px solid rgba(15, 23, 42, 0.10);
+  border-radius: 8px;
+  padding: 0 18px;
+  background: rgba(255,255,255,0.10);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.10), 0 12px 34px rgba(0,0,0,0.16);
+  font-size: 14px;
+  font-weight: 900;
+}
+
+.cs-launch-proof-row svg {
+  color: var(--launch-lime);
+}
+
+.cs-launch-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 26px 0 max(24px, env(safe-area-inset-bottom));
+  color: #64748b;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.cs-launch-footer nav {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.cs-launch-footer a {
+  color: #cbd5e1;
+  text-decoration: none;
+}
+
+.cs-launch-login:focus-visible,
+.cs-launch-footer a:focus-visible,
+.cs-launch-submit:focus-visible,
+.cs-launch-input-shell:focus-within {
+  outline: 2px solid rgba(184, 243, 93, 0.82);
+  outline-offset: 3px;
+}
+
+@keyframes cs-launch-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 980px) {
+  .cs-launch-page {
+    background:
+      linear-gradient(135deg, rgba(0, 174, 239, 0.18) 0%, transparent 34%),
+      linear-gradient(180deg, #07111f 0%, #0b1728 62%, #0d1b2b 100%);
+  }
+
+  .cs-launch-hero {
+    min-height: auto;
+    grid-template-columns: 1fr;
+    padding: 24px 0 18px;
+  }
+
+  .cs-launch-countdown {
+    width: min(100%, 560px);
+    margin: 0 auto;
+  }
+}
+
+@media (max-width: 680px) {
+  .cs-launch-header,
+  .cs-launch-main,
+  .cs-launch-footer {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .cs-launch-header {
+    min-height: 82px;
+  }
+
+  .cs-launch-login {
+    min-height: 38px;
+    padding: 0 13px;
+    font-size: 12px;
+  }
+
+  .cs-launch-page .cs-launch-copy h1 {
+    font-size: clamp(2.45rem, 11.8vw, 3.6rem);
+  }
+
+  .cs-launch-offer {
+    align-items: flex-start;
+    font-size: 14px;
+  }
+
+  .cs-launch-form {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-launch-submit {
+    width: 100%;
+  }
+
+  .cs-launch-count-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cs-launch-count-tile {
+    min-height: 92px;
+  }
+
+  .cs-launch-proof-row {
+    grid-template-columns: 1fr;
+  }
+
+  .cs-launch-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cs-launch-page *,
+  .cs-launch-page *::before,
+  .cs-launch-page *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: 0.01ms !important;
+  }
+}
