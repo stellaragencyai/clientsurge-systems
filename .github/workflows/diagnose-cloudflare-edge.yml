@@ -62,6 +62,9 @@ jobs:
             echo "Fetched $path"
           }
           fetch_file wrangler.clientsurge-security.toml
+          fetch_file cloudflare/clientsurge-security-telegram-wrapper.mjs
+          fetch_file cloudflare/clientsurge-production-safe-entry.mjs
+          fetch_file cloudflare/clientsurge-product-signup-edge-hotfix.mjs
           fetch_file cloudflare/clientsurge-homepage-repair-wrapper.mjs
           fetch_file cloudflare/clientsurge-security-edge-wrapper.mjs
           fetch_file cloudflare/clientsurge-security-edge-worker.mjs
