@@ -1581,6 +1581,18 @@ table tbody tr:nth-child(even) {
   height: 40px;
 }
 
+/* Align eyebrow + subtitle with the title text (offset by bar width + gap = 22px) */
+.cs-section-header--left .cs-section-eyebrow,
+.cs-section-header--left .cs-section-subtitle {
+  padding-left: 22px;
+}
+
+/* Hero title size override — sits on two lines on desktop */
+.cs-section-title--hero {
+  font-size: clamp(1.5rem, 2.6vw, 2.05rem) !important;
+  line-height: 1.15 !important;
+}
+
 /* The canonical section title — black, Montserrat, bold, one size everywhere */
 .cs-section-title {
   font-family: 'Montserrat', sans-serif !important;

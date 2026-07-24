@@ -128,7 +128,7 @@ export default function HowItWorks() {
               <p className="cs-section-eyebrow">Business AI Automation Store</p>
               <div className="cs-section-title-row">
                 <span className="cs-section-bar" />
-                <h1 className="cs-section-title">
+                <h1 className="cs-section-title cs-section-title--hero">
                   How the ClientSurge AI Brain Turns a Business Signup Into a Remote Setup Plan
                 </h1>
               </div>
