@@ -44,7 +44,7 @@ jobs:
         run: |
           echo "ACTIVE ClientSurge Cloudflare Security Edge deploy workflow"
           echo "Commit: $GITHUB_SHA"
-          echo "This deploy only runs for Cloudflare edge, route metadata, live exposure smoke, or workflow changes."
+          echo "Production Worker routes are dashboard-managed; this workflow deploys code without mutating zone routes."
 
       - name: Require Cloudflare credentials
         shell: bash
@@ -60,9 +60,6 @@ jobs:
 
       - name: Deploy active Cloudflare Worker
         run: npx wrangler deploy --config wrangler.clientsurge-security.toml
-
-      - name: Upsert Cloudflare Worker routes
-        run: node scripts/cloudflare/upsert-worker-routes.mjs
 
       - name: Verify product signup edge hotfix
         shell: bash
