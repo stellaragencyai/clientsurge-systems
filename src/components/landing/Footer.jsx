@@ -45,8 +45,6 @@ export default function Footer() {
 
   return (
     <footer className="cs-footer">
-      <div className="cs-footer-accent" />
-
       <div className="cs-footer-inner cs-footer-main">
         <div className="cs-footer-brand">
           <div className="cs-footer-brand-glow" aria-hidden="true" />

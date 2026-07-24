@@ -33,21 +33,6 @@ import { setJsonLd, setPageMetadata } from "@/lib/seo";
 import "../styles/home-visual-polish.css";
 import "../styles/home-section-spacing.css";
 
-const HOMEPAGE_PROOF_ITEMS = [
-  {
-    title: "Package-first buyer path",
-    copy: "Visitors can compare the automation systems directly without being forced into a sales call first.",
-  },
-  {
-    title: "Truthful implementation scope",
-    copy: "The homepage sells configured lead response, booking, follow-up, review, and reactivation workflows.",
-  },
-  {
-    title: "Clean client handoff",
-    copy: "The visual path now carries buyers from homepage promise to pricing, checkout, and portal access.",
-  },
-];
-
 function isEditorSandbox() {
   try {
     const h = window.location.hostname;
@@ -70,24 +55,6 @@ function HomepageVisualBackdrop() {
     <div className="cs-home-ambient" aria-hidden="true">
       <div className="cs-home-ambient__grid" />
     </div>
-  );
-}
-
-function HomepageProofStrip() {
-  return (
-    <section className="cs-home-proof-strip" aria-label="Homepage trust and buyer path cues">
-      <div className="cs-home-proof-grid">
-        {HOMEPAGE_PROOF_ITEMS.map((item, index) => (
-          <article className="cs-home-proof-card" key={item.title}>
-            <span className="cs-home-proof-index">{String(index + 1).padStart(2, "0")}</span>
-            <div>
-              <p className="cs-home-proof-title">{item.title}</p>
-              <p className="cs-home-proof-copy">{item.copy}</p>
-            </div>
-          </article>
-        ))}
-      </div>
-    </section>
   );
 }
 
@@ -193,17 +160,6 @@ export default function Home() {
           <HomepageSectionFrame name="hero">
             <SectionErrorBoundary sectionName="hero" fallbackMessage="Welcome to ClientSurge Systems.">
               <HomeHero />
-            </SectionErrorBoundary>
-          </HomepageSectionFrame>
-
-          {/* Homepage visual proof strip — truthful buyer-path cues only */}
-          <HomepageProofStrip />
-
-          {/* 3. Solution — the 5-step AI Growth System */}
-          <HomepageSectionDivider label="Installed response system" />
-          <HomepageSectionFrame name="solution">
-            <SectionErrorBoundary sectionName="solution">
-              <SolutionSection />
             </SectionErrorBoundary>
           </HomepageSectionFrame>
 

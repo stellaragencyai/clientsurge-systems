@@ -152,20 +152,6 @@ const industries = [
   "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=1200&q=95"
 },
 {
-  id: "electrician",
-  routePath: "/electrician",
-  icon: Zap,
-  name: "Electrical Contractors",
-  accent: {
-    color: "#eab308",
-    soft: "rgba(234,179,8,0.18)",
-    glow: "rgba(234,179,8,0.28)",
-    iconBg: "rgba(234,179,8,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1621905251918-48416cbd6309?w=1200&q=95"
-},
-{
   id: "landscaping",
   routePath: "/landscaping",
   icon: Leaf,
@@ -180,20 +166,6 @@ const industries = [
   "https://images.unsplash.com/photo-1558904541-efa843a96f01?w=1200&q=95"
 },
 {
-  id: "tree-service",
-  routePath: "/tree-service",
-  icon: TreePine,
-  name: "Tree Service",
-  accent: {
-    color: "#15803d",
-    soft: "rgba(21,128,61,0.18)",
-    glow: "rgba(21,128,61,0.28)",
-    iconBg: "rgba(21,128,61,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1599598275926-5e0a4b906475?w=1200&q=95"
-},
-{
   id: "painting",
   routePath: "/painting",
   icon: Paintbrush,
@@ -206,20 +178,6 @@ const industries = [
   },
   image:
   "https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=1200&q=95"
-},
-{
-  id: "pest-control",
-  routePath: "/pest-control",
-  icon: Bug,
-  name: "Pest Control",
-  accent: {
-    color: "#ca8a04",
-    soft: "rgba(202,138,4,0.18)",
-    glow: "rgba(202,138,4,0.28)",
-    iconBg: "rgba(202,138,4,0.18)"
-  },
-  image:
-  "https://images.unsplash.com/photo-1584468764996-15ad89a5b0b5?w=1200&q=95"
 },
 {
   id: "salon",
