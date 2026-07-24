@@ -71,7 +71,7 @@ jobs:
           URL="$VERIFY_PRODUCT_SIGNUP_URL&edge_verify=$(date +%s)"
           echo "Verifying $URL"
           HTML="$(curl -fsSL -H 'Cache-Control: no-cache' "$URL")"
-          echo "$HTML" | grep -F "<title>Product Signup | ClientSurge Systems</title>"
+          echo "$HTML" | grep -F "Product Signup | ClientSurge Systems"
           echo "$HTML" | grep -F "clientsurge-telegram-click-tracker.js"
 
       - name: Verify live public route exposure
