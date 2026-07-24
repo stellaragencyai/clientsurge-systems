@@ -47,16 +47,6 @@ export default function Footer() {
     <footer className="cs-footer">
       <div className="cs-footer-accent" />
 
-      <section className="cs-footer-system" aria-labelledby="footer-system-heading">
-        <div className="cs-footer-inner cs-footer-system-header">
-          <div>
-            <p className="cs-footer-eyebrow">ClientSurge Systems</p>
-            <h3 id="footer-system-heading">AI-powered lead capture, follow-up, booking, reviews, and reactivation for local service businesses.</h3>
-          </div>
-          <Link className="cs-footer-system-cta" to="/pricing" onClick={() => handleClick("Compare Packages")}>Compare Packages</Link>
-        </div>
-      </section>
-
       <div className="cs-footer-inner cs-footer-main">
         <div className="cs-footer-brand">
           <div className="cs-footer-brand-glow" aria-hidden="true" />

@@ -3,7 +3,6 @@ import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import PremiumNavbar from "../components/landing/PremiumNavbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
-import RevenueLeakSection from "../components/landing/RevenueLeakSection.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -200,14 +199,6 @@ export default function Home() {
           {/* Homepage visual proof strip — truthful buyer-path cues only */}
           <HomepageProofStrip />
 
-          {/* 2. Problem — revenue leak framing */}
-          <HomepageSectionDivider label="Lead leakage audit" />
-          <HomepageSectionFrame name="revenue-leak" accent>
-            <SectionErrorBoundary sectionName="revenue-leak">
-              <RevenueLeakSection />
-            </SectionErrorBoundary>
-          </HomepageSectionFrame>
-
           {/* 3. Solution — the 5-step AI Growth System */}
           <HomepageSectionDivider label="Installed response system" />
           <HomepageSectionFrame name="solution">
@@ -218,7 +209,6 @@ export default function Home() {
 
           {/* 4. Six Core Automations — product-style showcase */}
           <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
-          <HomepageSectionDivider label="Six core automations" />
           <HomepageSectionFrame name="automations">
             <SectionErrorBoundary sectionName="automations" fallbackMessage="Automation details loading.">
               <SixAutomationsSection />
