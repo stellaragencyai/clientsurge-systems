@@ -1,6 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title">
-  <title>ClientSurge Systems</title>
-  <rect width="512" height="512" rx="112" fill="#0A1628"/>
-  <path d="M112 328c34 42 82 64 144 64 68 0 118-28 150-82l-70-38c-18 28-44 42-80 42-35 0-62-13-82-40-18-25-24-55-16-90 8-34 28-60 60-78 35-20 75-19 120 3l28-72c-64-31-125-30-181 3-55 32-89 79-101 142-12 59-3 108 28 146Z" fill="#00AEEF"/>
-  <path d="M176 258h160v54H176z" fill="#FFFFFF"/>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-labelledby="title desc">
+  <title id="title">ClientSurge Systems lightning icon</title>
+  <desc id="desc">A blue lightning bolt on a dark rounded-square background.</desc>
+  <defs>
+    <linearGradient id="bg" x1="64" y1="48" x2="448" y2="464" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#0F2A57"/>
+      <stop offset="1" stop-color="#07111F"/>
+    </linearGradient>
+    <linearGradient id="boltMain" x1="170" y1="86" x2="338" y2="398" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#61E8FF"/>
+      <stop offset="0.45" stop-color="#18C5FF"/>
+      <stop offset="1" stop-color="#005BFF"/>
+    </linearGradient>
+    <linearGradient id="boltAccent" x1="128" y1="118" x2="276" y2="344" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#F8FDFF"/>
+      <stop offset="1" stop-color="#8AE8FF"/>
+    </linearGradient>
+  </defs>
+  <rect width="512" height="512" rx="112" fill="url(#bg)"/>
+  <path d="M276 64L144 292H234L184 448L368 204H274L332 64H276Z" fill="url(#boltMain)"/>
+  <path d="M254 96L168 250H242L214 372L320 218H252L292 96H254Z" fill="url(#boltAccent)" opacity="0.95"/>
+  <path d="M276 64L144 292H234L184 448L368 204H274L332 64H276Z" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="12" stroke-linejoin="round"/>
 </svg>
