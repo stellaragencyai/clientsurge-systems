@@ -104,8 +104,8 @@ export default function Navbar() {
         background: scrolled ? "rgba(255, 255, 255, 0.78)" : "rgba(255, 255, 255, 0.94)",
         backdropFilter: "blur(22px) saturate(1.35)",
         WebkitBackdropFilter: "blur(22px) saturate(1.35)",
-        borderBottom: scrolled ? "1px solid rgba(15, 23, 42, 0.08)" : "1px solid rgba(0, 174, 239, 0.10)",
-        boxShadow: scrolled ? "0 12px 36px rgba(15, 23, 42, 0.10)" : "0 4px 18px rgba(15, 23, 42, 0.04)",
+        borderBottom: scrolled ? "1px solid rgba(0, 174, 239, 0.12)" : "1px solid rgba(0, 174, 239, 0.10)",
+        boxShadow: scrolled ? "0 12px 36px rgba(0, 174, 239, 0.10)" : "0 4px 18px rgba(0, 174, 239, 0.04)",
         overflow: "visible",
       }}
     >
@@ -130,7 +130,7 @@ export default function Navbar() {
             width="480"
             height="224"
             decoding="async"
-            style={{ height: "clamp(84px, 10vw, 116px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+            style={{ height: "clamp(40px, 4.5vw, 56px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
           />
         </a>
 

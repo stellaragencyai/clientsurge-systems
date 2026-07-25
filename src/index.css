@@ -153,11 +153,11 @@ select:focus-visible,
 /* Unified primary button system — matches style guide: blue gradient pill, white text */
 .cs-btn-primary {
   @apply inline-flex items-center justify-center rounded-full border-none cursor-pointer text-white font-semibold px-6 py-3 transition-all duration-300;
-  background: linear-gradient(90deg, #0079c1 0%, #005691 100%);
-  box-shadow: 0 2px 12px rgba(0,121,193,0.35);
+  background: linear-gradient(90deg, #0088CC 0%, #006BB0 100%);
+  box-shadow: 0 2px 12px rgba(0,136,204,0.35);
 }
 .cs-btn-primary:hover {
-  box-shadow: 0 4px 24px rgba(0,121,193,0.5);
+  box-shadow: 0 4px 24px rgba(0,136,204,0.5);
   transform: translateY(-1px);
 }
 .cs-btn-primary:active {
@@ -1143,7 +1143,7 @@ select:focus-visible,
 .cs-btn-primary:focus-visible,
 .hero-primary-cta:focus-visible,
 .cs-footer-cta:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid #003B8F;
   outline-offset: 3px;
   box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.5);
 }
@@ -1249,7 +1249,7 @@ img[style*="object-fit"] {
 }
 .saas-card:hover {
   box-shadow: 0 2px 4px rgba(0,0,0,0.06), 0 4px 12px rgba(0,0,0,0.08);
-  border-color: hsl(var(--primary), 0.3);
+  border-color: hsla(var(--primary), 0.3);
 }
 
 /* Data Table Enhancements */
@@ -1308,7 +1308,7 @@ input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="
 select:focus,
 textarea:focus {
   border-color: hsl(var(--primary));
-  box-shadow: 0 0 0 3px hsl(var(--primary), 0.1);
+  box-shadow: 0 0 0 3px hsla(var(--primary), 0.1);
 }
 
 /* ============================================
@@ -1374,15 +1374,15 @@ textarea:focus {
 
 /* Premium CTA with enhanced glow */
 .cs-cta-glow {
-  background: linear-gradient(90deg, #0079c1 0%, #005691 100%);
+  background: linear-gradient(90deg, #0088CC 0%, #006BB0 100%);
   box-shadow:
-    0 2px 12px rgba(0,121,193,0.35),
+    0 2px 12px rgba(0,136,204,0.35),
     0 0 0 0 rgba(0,174,239,0);
   transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 .cs-cta-glow:hover {
   box-shadow:
-    0 4px 24px rgba(0,121,193,0.5),
+    0 4px 24px rgba(0,136,204,0.5),
     0 0 32px rgba(0,174,239,0.3);
   transform: translateY(-2px);
 }
@@ -1456,7 +1456,7 @@ table tbody tr:nth-child(even) {
   box-shadow: 0 1px 2px rgba(0,0,0,0.05);
 }
 .btn-primary:hover {
-  box-shadow: 0 4px 12px hsl(var(--primary), 0.3);
+  box-shadow: 0 4px 12px hsla(var(--primary), 0.3);
   transform: translateY(-1px);
 }
 .btn-primary:active {
@@ -1471,7 +1471,7 @@ table tbody tr:nth-child(even) {
 }
 .btn-secondary:hover {
   background: hsl(var(--muted));
-  border-color: hsl(var(--primary), 0.3);
+  border-color: hsla(var(--primary), 0.3);
 }
 
 /* Empty State Styling */
@@ -1889,8 +1889,8 @@ table td,
    FLAW #60: Enhance hover state visibility on list items
    ============================================ */
 .list-item:hover {
-  background: hsl(var(--primary), 0.06);
-  border-color: hsl(var(--primary), 0.2);
+  background: hsla(var(--primary), 0.06);
+  border-color: hsla(var(--primary), 0.2);
   transform: translateX(2px);
 }
 @media (pointer: coarse) {
@@ -2023,7 +2023,7 @@ nav [role="menu"] {
 .cs-btn-primary:focus-visible,
 .cs-cta-glow:focus-visible,
 .btn-primary:focus-visible {
-  outline: 2px solid #ffffff;
+  outline: 2px solid #003B8F;
   outline-offset: 3px;
   box-shadow: 0 0 0 4px rgba(0, 174, 239, 0.35) !important;
 }
@@ -2119,7 +2119,7 @@ button.icon-only,
 .hero-primary-cta:hover,
 .cs-cta-glow:hover {
   box-shadow:
-    0 4px 24px rgba(0,121,193,0.5),
+    0 4px 24px rgba(0,136,204,0.5),
     0 0 32px rgba(0,174,239,0.3) !important;
   transform: translateY(-2px);
 }
@@ -2189,8 +2189,8 @@ a[aria-disabled="true"] {
 .cs-btn-primary,
 .btn-primary,
 .hero-primary-cta {
-  background: linear-gradient(90deg, #0079c1 0%, #005691 100%) !important;
-  box-shadow: 0 2px 12px rgba(0,121,193,0.35) !important;
+  background: linear-gradient(90deg, #0088CC 0%, #006BB0 100%) !important;
+  box-shadow: 0 2px 12px rgba(0,136,204,0.35) !important;
   transition: box-shadow 0.3s ease, transform 0.3s ease !important;
   white-space: nowrap;
   gap: 8px;
@@ -2198,7 +2198,7 @@ a[aria-disabled="true"] {
 .cs-btn-primary:hover,
 .btn-primary:hover,
 .hero-primary-cta:hover {
-  box-shadow: 0 4px 24px rgba(0,121,193,0.5), 0 0 32px rgba(0,174,239,0.3) !important;
+  box-shadow: 0 4px 24px rgba(0,136,204,0.5), 0 0 32px rgba(0,174,239,0.3) !important;
 }
 .cs-btn-primary:active,
 .btn-primary:active {

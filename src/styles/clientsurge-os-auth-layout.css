@@ -331,7 +331,7 @@
 
 .cs-auth-layout .cs-auth-submit.cs-btn-primary {
   width: 100%;
-  background: linear-gradient(90deg, var(--cs-blue-600) 0%, var(--cs-blue-700) 100%) !important;
+  background: linear-gradient(90deg, #0088CC 0%, #006BB0 100%) !important;
   color: #ffffff !important;
   border: none;
   border-radius: var(--cs-radius-md);
@@ -340,7 +340,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  box-shadow: 0 1px 2px rgb(16 32 51 / 0.08), 0 6px 16px rgb(0 121 201 / 0.18);
+  box-shadow: 0 1px 2px rgb(16 32 51 / 0.08), 0 6px 16px rgb(0 136 204 / 0.18);
   transition: box-shadow var(--cs-transition-base), transform var(--cs-transition-base), filter var(--cs-transition-base);
   display: inline-flex;
   align-items: center;
@@ -350,7 +350,7 @@
 
 .cs-auth-layout .cs-auth-submit.cs-btn-primary:hover {
   filter: brightness(1.05);
-  box-shadow: 0 2px 4px rgb(16 32 51 / 0.10), 0 10px 22px rgb(0 121 201 / 0.26);
+  box-shadow: 0 2px 4px rgb(16 32 51 / 0.10), 0 10px 22px rgb(0 136 204 / 0.26);
   transform: translateY(-1px);
 }
 
