@@ -135,20 +135,22 @@ export default function Login() {
         </div>
 
         <div className="cs-auth-layout__brand-copy">
-          <CSStatusBadge tone="info" style={{ marginBottom: "1.25rem" }}>
+          <span className="cs-auth-brand-pill">
             <LockKeyhole size={14} aria-hidden="true" /> Secure client access
-          </CSStatusBadge>
-          <h2 style={{ margin: 0, fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.03, letterSpacing: "-0.045em", fontWeight: 800 }}>
+          </span>
+          <h2 style={{ margin: 0, color: "#ffffff", fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.03, letterSpacing: "-0.045em", fontWeight: 800 }}>
             Your ClientSurge system, in one place.
           </h2>
-          <p style={{ margin: "1.25rem 0 0", maxWidth: "42ch", color: "rgba(255,255,255,0.74)", fontSize: "1rem", lineHeight: 1.7 }}>
+          <p style={{ margin: "1.25rem 0 0", maxWidth: "42ch", color: "rgba(255,255,255,0.78)", fontSize: "1rem", lineHeight: 1.7 }}>
             Sign in to see what is active, what ClientSurge handled, what results were created, and what needs your attention — without navigating technical tools.
           </p>
 
-          <ul style={{ listStyle: "none", padding: 0, margin: "2rem 0 0", display: "grid", gap: "0.85rem" }}>
+          <ul style={{ listStyle: "none", padding: 0, margin: "2rem 0 0", display: "grid", gap: "0.95rem" }}>
             {BRAND_BENEFITS.map((item) => (
-              <li key={item} style={{ display: "flex", alignItems: "center", gap: "0.7rem", color: "rgba(255,255,255,0.82)", fontSize: "0.95rem", fontWeight: 500 }}>
-                <Sparkles size={16} aria-hidden="true" style={{ color: "var(--cs-blue-500)", flexShrink: 0 }} />
+              <li key={item} style={{ display: "flex", alignItems: "center", gap: "0.85rem", color: "rgba(255,255,255,0.86)", fontSize: "0.95rem", fontWeight: 500, lineHeight: 1.4 }}>
+                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1.5rem", height: "1.5rem", borderRadius: "0.5rem", background: "rgba(0,174,239,0.16)", border: "1px solid rgba(0,174,239,0.28)", flexShrink: 0 }}>
+                  <Sparkles size={14} aria-hidden="true" style={{ color: "var(--cs-blue-500)" }} />
+                </span>
                 {item}
               </li>
             ))}
@@ -343,11 +345,11 @@ export default function Login() {
                 </form>
               </div>
 
-              <div className="cs-auth-layout__footer" style={{ marginTop: "1.5rem", display: "flex", alignItems: "center", justifyContent: "center", gap: "0.5rem", flexWrap: "wrap" }}>
+              <div className="cs-auth-layout__footer">
                 <CheckCircle2 size={14} aria-hidden="true" style={{ color: "var(--cs-success-700)" }} />
                 <span>Protected by ClientSurge secure access.</span>
-                <span style={{ color: "var(--cs-text-muted)" }}>·</span>
-                <Link to="/contact" style={{ color: "var(--cs-blue-700)", fontWeight: 600, textDecoration: "none" }}>Get account help</Link>
+                <span className="cs-auth-footer-divider" aria-hidden="true">·</span>
+                <Link to="/contact" className="cs-auth-footer-link">Get account help</Link>
               </div>
             </>
           )}

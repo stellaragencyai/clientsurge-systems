@@ -40,6 +40,7 @@
 
 .cs-auth-layout__brand-copy h2 {
   margin: 0;
+  color: #ffffff;
   font-size: clamp(2rem, 4vw, 3.5rem);
   line-height: 1.03;
   letter-spacing: -0.045em;
@@ -48,17 +49,40 @@
 .cs-auth-layout__brand-copy p {
   margin: 1.25rem 0 0;
   max-width: 42ch;
-  color: rgba(255, 255, 255, 0.74);
+  color: rgba(255, 255, 255, 0.78);
   font-size: 1rem;
   line-height: 1.7;
+}
+
+.cs-auth-brand-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  margin-bottom: 1.25rem;
+  padding: 0.45rem 0.85rem;
+  border-radius: 999px;
+  background: rgba(0, 174, 239, 0.14);
+  border: 1px solid rgba(0, 174, 239, 0.38);
+  color: #c9ecfb;
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
 }
 
 .cs-auth-layout__assurance {
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  color: rgba(255, 255, 255, 0.72);
-  font-size: 0.875rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.78);
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.cs-auth-layout__assurance svg {
+  color: var(--cs-blue-500);
+  flex-shrink: 0;
 }
 
 .cs-auth-layout__workspace {
@@ -95,34 +119,53 @@
 }
 
 .cs-auth-layout__heading p {
-  margin: 0.65rem 0 0;
+  margin: 0.7rem 0 0;
   color: var(--cs-text-secondary);
-  line-height: 1.65;
+  font-size: 0.95rem;
+  line-height: 1.72;
 }
 
 .cs-auth-layout__card {
-  padding: clamp(1.25rem, 3vw, 2rem);
-  border: 1px solid var(--cs-border);
+  padding: clamp(1.5rem, 3vw, 2.25rem);
+  border: 1px solid var(--cs-border-strong);
   border-radius: var(--cs-radius-xl);
   background: var(--cs-bg-surface);
-  box-shadow: var(--cs-shadow-sm);
+  box-shadow: 0 1px 2px rgb(16 32 51 / 0.04), 0 12px 32px rgb(16 32 51 / 0.08);
 }
 
 .cs-auth-layout__footer {
-  margin: 1.25rem 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+  margin: 1.5rem 0 0;
+  padding-top: 1.25rem;
+  border-top: 1px solid var(--cs-border);
   text-align: center;
   color: var(--cs-text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
 }
 
-.cs-auth-layout__footer a {
+.cs-auth-layout__footer svg {
+  flex-shrink: 0;
+}
+
+.cs-auth-footer-divider {
+  color: var(--cs-text-muted);
+}
+
+.cs-auth-footer-link {
   color: var(--cs-blue-700);
-  font-weight: 650;
+  font-weight: 600;
   text-decoration: none;
+  transition: color var(--cs-transition-base);
 }
 
-.cs-auth-layout__footer a:hover {
+.cs-auth-footer-link:hover {
+  color: var(--cs-blue-600);
   text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .cs-auth-layout .cs-auth-input {
@@ -186,10 +229,14 @@
   padding: 0 1rem 0 2.85rem;
   border: 1.5px solid var(--cs-border-strong);
   border-radius: var(--cs-radius-md);
-  background: var(--cs-bg-surface);
+  background: var(--cs-bg-subtle);
   color: var(--cs-text-primary);
   font-size: 1rem;
-  transition: border-color var(--cs-transition-base), box-shadow var(--cs-transition-base);
+  transition: border-color var(--cs-transition-base), box-shadow var(--cs-transition-base), background var(--cs-transition-base);
+}
+
+.cs-auth-layout .cs-auth-input:focus-visible {
+  background: var(--cs-bg-surface);
 }
 
 .cs-auth-layout .cs-auth-input::placeholder {
@@ -284,15 +331,16 @@
 
 .cs-auth-layout .cs-auth-submit.cs-btn-primary {
   width: 100%;
-  background: linear-gradient(90deg, var(--cs-commerce-blue-start) 0%, var(--cs-commerce-blue-end) 100%) !important;
+  background: linear-gradient(90deg, var(--cs-blue-600) 0%, var(--cs-blue-700) 100%) !important;
   color: #ffffff !important;
   border: none;
   border-radius: var(--cs-radius-md);
-  min-height: 3.25rem;
-  font-size: 0.98rem;
+  min-height: 3rem;
+  margin-bottom: 1.25rem;
+  font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  box-shadow: var(--cs-commerce-blue-glow);
+  box-shadow: 0 1px 2px rgb(16 32 51 / 0.08), 0 6px 16px rgb(0 121 201 / 0.18);
   transition: box-shadow var(--cs-transition-base), transform var(--cs-transition-base), filter var(--cs-transition-base);
   display: inline-flex;
   align-items: center;
@@ -301,8 +349,8 @@
 }
 
 .cs-auth-layout .cs-auth-submit.cs-btn-primary:hover {
-  filter: brightness(1.06);
-  box-shadow: 0 14px 32px rgb(0 121 201 / 0.4);
+  filter: brightness(1.05);
+  box-shadow: 0 2px 4px rgb(16 32 51 / 0.10), 0 10px 22px rgb(0 121 201 / 0.26);
   transform: translateY(-1px);
 }
 
