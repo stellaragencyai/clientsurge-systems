@@ -144,6 +144,172 @@
   width: 100%;
 }
 
+/* ── Inline login form fields ── */
+.cs-auth-field {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.cs-auth-field__label {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--cs-text-secondary);
+}
+
+.cs-auth-field__control {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.cs-auth-field__icon {
+  position: absolute;
+  left: 0.95rem;
+  color: var(--cs-text-muted);
+  pointer-events: none;
+  transition: color var(--cs-transition-base);
+  width: 17px;
+  height: 17px;
+  flex-shrink: 0;
+}
+
+.cs-auth-field__control:focus-within .cs-auth-field__icon {
+  color: var(--cs-blue-600);
+}
+
+.cs-auth-layout .cs-auth-input {
+  width: 100%;
+  min-height: 3.25rem;
+  padding: 0 1rem 0 2.85rem;
+  border: 1.5px solid var(--cs-border-strong);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-bg-surface);
+  color: var(--cs-text-primary);
+  font-size: 1rem;
+  transition: border-color var(--cs-transition-base), box-shadow var(--cs-transition-base);
+}
+
+.cs-auth-layout .cs-auth-input::placeholder {
+  color: var(--cs-text-muted);
+}
+
+.cs-auth-layout .cs-auth-input:focus-visible {
+  outline: none;
+  border-color: var(--cs-blue-500);
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-auth-field__hint {
+  margin: 0;
+  font-size: 0.8rem;
+  color: var(--cs-text-muted);
+  line-height: 1.5;
+}
+
+.cs-auth-field__footer-note {
+  margin: 0;
+  text-align: center;
+  color: var(--cs-text-secondary);
+  font-size: 0.875rem;
+}
+
+.cs-auth-text-link,
+.cs-auth-inline-link {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  color: var(--cs-blue-700);
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-decoration: none;
+  transition: color var(--cs-transition-base);
+  font-family: inherit;
+  padding: 0;
+}
+
+.cs-auth-text-link:hover,
+.cs-auth-inline-link:hover {
+  color: var(--cs-blue-600);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.cs-auth-layout__role-option {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+  width: 100%;
+  text-align: left;
+  padding: 1rem 1.1rem;
+  border: 1.5px solid var(--cs-border);
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-bg-surface);
+  cursor: pointer;
+  transition: border-color var(--cs-transition-base), box-shadow var(--cs-transition-base), transform var(--cs-transition-base);
+}
+
+.cs-auth-layout__role-option:hover {
+  border-color: var(--cs-blue-500);
+  box-shadow: var(--cs-shadow-sm);
+  transform: translateY(-1px);
+}
+
+.cs-auth-layout__role-option:focus-visible {
+  outline: none;
+  border-color: var(--cs-blue-500);
+  box-shadow: var(--cs-focus-ring);
+}
+
+.cs-auth-layout__role-icon {
+  display: grid;
+  place-items: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  border-radius: var(--cs-radius-md);
+  background: var(--cs-blue-50);
+  color: var(--cs-blue-700);
+  flex-shrink: 0;
+}
+
+.cs-auth-layout__role-icon--client {
+  background: var(--cs-info-blue-soft);
+  color: var(--cs-info-blue);
+}
+
+.cs-auth-layout .cs-auth-submit.cs-btn-primary {
+  width: 100%;
+  background: linear-gradient(90deg, var(--cs-commerce-blue-start) 0%, var(--cs-commerce-blue-end) 100%) !important;
+  color: #ffffff !important;
+  border: none;
+  border-radius: var(--cs-radius-md);
+  min-height: 3.25rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  box-shadow: var(--cs-commerce-blue-glow);
+  transition: box-shadow var(--cs-transition-base), transform var(--cs-transition-base), filter var(--cs-transition-base);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.cs-auth-layout .cs-auth-submit.cs-btn-primary:hover {
+  filter: brightness(1.06);
+  box-shadow: 0 14px 32px rgb(0 121 201 / 0.4);
+  transform: translateY(-1px);
+}
+
+.cs-auth-layout .cs-auth-submit.cs-btn-primary:active {
+  transform: translateY(0) scale(0.99);
+}
+
 @media (max-width: 860px) {
   .cs-auth-layout {
     grid-template-columns: 1fr;
