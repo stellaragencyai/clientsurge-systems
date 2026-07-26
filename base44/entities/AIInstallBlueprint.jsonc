@@ -4,6 +4,11 @@
   "title": "AI Install Blueprint",
   "description": "Client-specific installation blueprint generated from website scan + onboarding details.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

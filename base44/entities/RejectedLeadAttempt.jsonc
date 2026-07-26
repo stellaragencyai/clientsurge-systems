@@ -7,29 +7,99 @@
     "tenant_scoped": "client_id + client_project_id"
   },
   "properties": {
-    "request_id": { "type": "string", "title": "Request ID" },
-    "client_id": { "type": "string", "title": "Client ID" },
-    "client_project_id": { "type": "string", "title": "Client Project ID" },
-    "source": { "type": "string", "title": "Submission Source" },
-    "source_page": { "type": "string", "title": "Source Page" },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "request_id": {
+      "type": "string",
+      "title": "Request ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "source": {
+      "type": "string",
+      "title": "Submission Source"
+    },
+    "source_page": {
+      "type": "string",
+      "title": "Source Page"
+    },
     "environment": {
       "type": "string",
-      "enum": ["production", "qa", "smoke", "demo", "internal", "unknown"],
+      "enum": [
+        "production",
+        "qa",
+        "smoke",
+        "demo",
+        "internal",
+        "unknown"
+      ],
       "default": "unknown"
     },
-    "reason_codes": { "type": "array", "items": { "type": "string" } },
-    "email_domain": { "type": "string", "title": "Email Domain Only" },
-    "phone_suffix": { "type": "string", "title": "Last Four Digits Only" },
-    "ip_hash": { "type": "string", "title": "Hashed IP" },
-    "user_agent_family": { "type": "string", "title": "User Agent Family" },
-    "rejected_at": { "type": "string", "format": "date-time" },
-    "retention_delete_after": { "type": "string", "format": "date-time" }
+    "reason_codes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "email_domain": {
+      "type": "string",
+      "title": "Email Domain Only"
+    },
+    "phone_suffix": {
+      "type": "string",
+      "title": "Last Four Digits Only"
+    },
+    "ip_hash": {
+      "type": "string",
+      "title": "Hashed IP"
+    },
+    "user_agent_family": {
+      "type": "string",
+      "title": "User Agent Family"
+    },
+    "rejected_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "retention_delete_after": {
+      "type": "string",
+      "format": "date-time"
+    }
   },
-  "required": ["request_id", "reason_codes", "rejected_at"],
+  "required": [
+    "request_id",
+    "reason_codes",
+    "rejected_at"
+  ],
   "rls": {
-    "create": { "user_condition": { "role": "admin" } },
-    "read": { "user_condition": { "role": "admin" } },
-    "update": { "user_condition": { "role": "admin" } },
-    "delete": { "user_condition": { "role": "admin" } }
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

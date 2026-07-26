@@ -6,6 +6,11 @@
     "reason": "Captures cancellation survey responses to feed predictChurnRisk model"
   },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "cancellation_reason": {
       "type": "string",
       "title": "Cancellation Reason",

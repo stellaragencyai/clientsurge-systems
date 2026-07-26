@@ -7,32 +7,88 @@
     "tenant_scoped": "client_id"
   },
   "properties": {
-    "order_id": { "type": "string", "title": "Order ID" },
-    "client_id": { "type": "string", "title": "Client ID" },
-    "client_project_id": { "type": "string", "title": "Client Project ID" },
-    "onboarding_client_id": { "type": "string", "title": "Linked OnboardingClient ID" },
-    "installation_os_id": { "type": "string", "title": "Linked ClientInstallationOS ID" },
-    "automation_checklist_id": { "type": "string", "title": "Linked AutomationChecklist ID" },
-    "business_name": { "type": "string", "title": "Business Name" },
-    "client_email": { "type": "string", "title": "Client Email" },
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
+    "order_id": {
+      "type": "string",
+      "title": "Order ID"
+    },
+    "client_id": {
+      "type": "string",
+      "title": "Client ID"
+    },
+    "client_project_id": {
+      "type": "string",
+      "title": "Client Project ID"
+    },
+    "onboarding_client_id": {
+      "type": "string",
+      "title": "Linked OnboardingClient ID"
+    },
+    "installation_os_id": {
+      "type": "string",
+      "title": "Linked ClientInstallationOS ID"
+    },
+    "automation_checklist_id": {
+      "type": "string",
+      "title": "Linked AutomationChecklist ID"
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name"
+    },
+    "client_email": {
+      "type": "string",
+      "title": "Client Email"
+    },
     "environment": {
       "type": "string",
       "title": "Environment",
-      "enum": ["production", "qa", "smoke", "demo", "internal", "unknown"],
+      "enum": [
+        "production",
+        "qa",
+        "smoke",
+        "demo",
+        "internal",
+        "unknown"
+      ],
       "default": "unknown"
     },
-    "dashboard_excluded": { "type": "boolean", "title": "Excluded From Dashboards", "default": false },
-    "dashboard_exclusion_reason": { "type": "string", "title": "Dashboard Exclusion Reason" },
+    "dashboard_excluded": {
+      "type": "boolean",
+      "title": "Excluded From Dashboards",
+      "default": false
+    },
+    "dashboard_exclusion_reason": {
+      "type": "string",
+      "title": "Dashboard Exclusion Reason"
+    },
     "dashboard_truth_status": {
       "type": "string",
       "title": "Dashboard Truth Status",
-      "enum": ["unreviewed", "trusted", "blocked", "manual_review", "override_active"],
+      "enum": [
+        "unreviewed",
+        "trusted",
+        "blocked",
+        "manual_review",
+        "override_active"
+      ],
       "default": "unreviewed"
     },
     "unified_stage": {
       "type": "string",
       "title": "Canonical Onboarding Stage",
-      "enum": ["intake_received", "setup_in_progress", "testing", "awaiting_client_approval", "live", "blocked"],
+      "enum": [
+        "intake_received",
+        "setup_in_progress",
+        "testing",
+        "awaiting_client_approval",
+        "live",
+        "blocked"
+      ],
       "default": "intake_received",
       "description": "Only canonical onboarding stage. Other status fields are projections."
     },
@@ -42,25 +98,79 @@
       "items": {
         "type": "object",
         "properties": {
-          "stage": { "type": "string" },
-          "entered_at": { "type": "string", "format": "date-time" },
-          "exited_at": { "type": "string", "format": "date-time" },
-          "changed_by": { "type": "string" },
-          "change_reason": { "type": "string" }
+          "stage": {
+            "type": "string"
+          },
+          "entered_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "exited_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changed_by": {
+            "type": "string"
+          },
+          "change_reason": {
+            "type": "string"
+          }
         }
       }
     },
-    "order_status": { "type": "string", "title": "Derived Order Status", "enum": ["pending_payment", "paid_setup_in_progress", "partially_live", "fully_live"] },
-    "installation_status": { "type": "string", "title": "Derived Installation Status", "enum": ["Paid", "Ready for Install", "Configuring", "Testing", "Live", "Error"] },
-    "checklist_status": { "type": "string", "title": "Derived Checklist Status", "enum": ["not_started", "in_progress", "active", "failed", "paused"] },
+    "order_status": {
+      "type": "string",
+      "title": "Derived Order Status",
+      "enum": [
+        "pending_payment",
+        "paid_setup_in_progress",
+        "partially_live",
+        "fully_live"
+      ]
+    },
+    "installation_status": {
+      "type": "string",
+      "title": "Derived Installation Status",
+      "enum": [
+        "Paid",
+        "Ready for Install",
+        "Configuring",
+        "Testing",
+        "Live",
+        "Error"
+      ]
+    },
+    "checklist_status": {
+      "type": "string",
+      "title": "Derived Checklist Status",
+      "enum": [
+        "not_started",
+        "in_progress",
+        "active",
+        "failed",
+        "paused"
+      ]
+    },
     "completion_metrics": {
       "type": "object",
       "title": "Onboarding Completion Metrics",
       "properties": {
-        "total_checklist_steps": { "type": "integer", "default": 0 },
-        "completed_steps": { "type": "integer", "default": 0 },
-        "completion_percentage": { "type": "number", "default": 0 },
-        "last_updated_at": { "type": "string", "format": "date-time" }
+        "total_checklist_steps": {
+          "type": "integer",
+          "default": 0
+        },
+        "completed_steps": {
+          "type": "integer",
+          "default": 0
+        },
+        "completion_percentage": {
+          "type": "number",
+          "default": 0
+        },
+        "last_updated_at": {
+          "type": "string",
+          "format": "date-time"
+        }
       }
     },
     "blockers": {
@@ -69,48 +179,165 @@
       "items": {
         "type": "object",
         "properties": {
-          "blocker_id": { "type": "string" },
-          "entity_type": { "type": "string" },
-          "description": { "type": "string" },
-          "severity": { "type": "string", "enum": ["info", "warning", "critical"] },
-          "identified_at": { "type": "string", "format": "date-time" },
-          "resolved_at": { "type": "string", "format": "date-time" }
+          "blocker_id": {
+            "type": "string"
+          },
+          "entity_type": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "info",
+              "warning",
+              "critical"
+            ]
+          },
+          "identified_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolved_at": {
+            "type": "string",
+            "format": "date-time"
+          }
         }
       }
     },
-    "missing_setup_items": { "type": "array", "title": "Missing Setup Items", "items": { "type": "string" } },
-    "ready_to_go_live": { "type": "boolean", "title": "Ready to Go Live", "default": false },
-    "go_live_requirements_version": { "type": "string", "title": "Go-Live Requirements Version", "default": "v1" },
-    "go_live_evidence_checked_at": { "type": "string", "title": "Go-Live Evidence Checked At", "format": "date-time" },
-    "go_live_date": { "type": "string", "title": "Go-Live Date", "format": "date-time" },
-    "override_status": { "type": "string", "title": "Override Status", "enum": ["none", "requested", "approved", "expired", "revoked"], "default": "none" },
-    "override_requested_by": { "type": "string", "title": "Override Requested By" },
-    "override_requested_at": { "type": "string", "title": "Override Requested At", "format": "date-time" },
-    "override_reason": { "type": "string", "title": "Override Reason" },
-    "override_expires_at": { "type": "string", "title": "Override Expires At", "format": "date-time" },
-    "bypassed_blocker_ids": { "type": "array", "title": "Bypassed Blocker IDs", "items": { "type": "string" } },
-    "second_approval_by": { "type": "string", "title": "Second Approval By" },
-    "second_approval_at": { "type": "string", "title": "Second Approval At", "format": "date-time" },
-    "last_sync_at": { "type": "string", "title": "Last Orchestration Sync", "format": "date-time" },
-    "sync_errors": { "type": "array", "title": "Recent Sync Errors", "items": { "type": "string" } },
-    "admin_notes": { "type": "string", "title": "Admin Notes" }
+    "missing_setup_items": {
+      "type": "array",
+      "title": "Missing Setup Items",
+      "items": {
+        "type": "string"
+      }
+    },
+    "ready_to_go_live": {
+      "type": "boolean",
+      "title": "Ready to Go Live",
+      "default": false
+    },
+    "go_live_requirements_version": {
+      "type": "string",
+      "title": "Go-Live Requirements Version",
+      "default": "v1"
+    },
+    "go_live_evidence_checked_at": {
+      "type": "string",
+      "title": "Go-Live Evidence Checked At",
+      "format": "date-time"
+    },
+    "go_live_date": {
+      "type": "string",
+      "title": "Go-Live Date",
+      "format": "date-time"
+    },
+    "override_status": {
+      "type": "string",
+      "title": "Override Status",
+      "enum": [
+        "none",
+        "requested",
+        "approved",
+        "expired",
+        "revoked"
+      ],
+      "default": "none"
+    },
+    "override_requested_by": {
+      "type": "string",
+      "title": "Override Requested By"
+    },
+    "override_requested_at": {
+      "type": "string",
+      "title": "Override Requested At",
+      "format": "date-time"
+    },
+    "override_reason": {
+      "type": "string",
+      "title": "Override Reason"
+    },
+    "override_expires_at": {
+      "type": "string",
+      "title": "Override Expires At",
+      "format": "date-time"
+    },
+    "bypassed_blocker_ids": {
+      "type": "array",
+      "title": "Bypassed Blocker IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "second_approval_by": {
+      "type": "string",
+      "title": "Second Approval By"
+    },
+    "second_approval_at": {
+      "type": "string",
+      "title": "Second Approval At",
+      "format": "date-time"
+    },
+    "last_sync_at": {
+      "type": "string",
+      "title": "Last Orchestration Sync",
+      "format": "date-time"
+    },
+    "sync_errors": {
+      "type": "array",
+      "title": "Recent Sync Errors",
+      "items": {
+        "type": "string"
+      }
+    },
+    "admin_notes": {
+      "type": "string",
+      "title": "Admin Notes"
+    }
   },
-  "required": ["order_id", "client_id"],
+  "required": [
+    "order_id",
+    "client_id"
+  ],
   "rls": {
-    "create": { "user_condition": { "role": "admin" } },
+    "create": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
     "read": {
       "$or": [
-        { "user_condition": { "role": "admin" } },
-        { "data.client_id": "{{client_id}}" },
-        { "data.client_email": "{{user.email}}" }
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        },
+        {
+          "data.client_email": "{{user.email}}"
+        }
       ]
     },
     "update": {
       "$or": [
-        { "user_condition": { "role": "admin" } },
-        { "data.client_id": "{{client_id}}" }
+        {
+          "user_condition": {
+            "role": "admin"
+          }
+        },
+        {
+          "data.client_id": "{{client_id}}"
+        }
       ]
     },
-    "delete": { "user_condition": { "role": "admin" } }
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
   }
 }

@@ -4,6 +4,11 @@
   "title": "Stripe Webhook Event Log",
   "description": "Finding #135: Audit trail for all Stripe webhook events \u2014 event ID, type, received_at, processed_at, status, error.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "event_id": {
       "type": "string",
       "title": "Stripe Event ID"

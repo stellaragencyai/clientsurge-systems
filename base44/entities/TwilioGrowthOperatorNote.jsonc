@@ -4,6 +4,11 @@
   "title": "Twilio Growth Engine Operator Note",
   "description": "Admin-only manual observation notes attached to a capability row. Notes never override computed status or make a capability trusted.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "capability_key": {
       "type": "string",
       "title": "Capability Key",

@@ -2,6 +2,11 @@
   "name": "OptimizationAction",
   "type": "object",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "action_id": {
       "type": "string",
       "title": "Action ID",

@@ -4,6 +4,11 @@
   "title": "Setup Authorization Agreement",
   "description": "Durable record of client acceptance of the Setup Authorization Agreement. Blocks access collection until accepted.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"

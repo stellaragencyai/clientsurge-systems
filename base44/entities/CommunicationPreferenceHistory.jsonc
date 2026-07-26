@@ -2,6 +2,11 @@
   "type": "object",
   "name": "CommunicationPreferenceHistory",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "client_id": {
       "type": "string"
     },

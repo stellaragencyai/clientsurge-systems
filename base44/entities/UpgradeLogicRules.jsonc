@@ -6,6 +6,11 @@
     "reason": "Defines conditions under which a plan upgrade should be suggested. Read-only \u2014 do not modify from billing or automation flows."
   },
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "rule_key": {
       "type": "string",
       "title": "Rule Key",

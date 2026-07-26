@@ -4,6 +4,11 @@
   "title": "Waitlist Signup",
   "description": "Pre-launch founding waitlist email capture. Minimal record \u2014 first name, normalized email, optional business name, and submission timestamp.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "first_name": {
       "type": "string",
       "title": "First Name",

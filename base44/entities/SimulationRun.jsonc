@@ -4,6 +4,11 @@
   "title": "Simulation Run",
   "description": "AI Simulation Lab run containing multiple scenario results. Must pass before go-live.",
   "properties": {
+    "description": {
+      "type": "string",
+      "title": "Description",
+      "maxLength": 1000
+    },
     "order_id": {
       "type": "string",
       "title": "Order ID"
