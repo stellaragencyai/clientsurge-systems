@@ -49,6 +49,7 @@ export default function Testimonials() {
             eyebrow="Workflow Scenarios"
             title="What the Lead Experience Can Look Like"
             subtitle="Three example industry workflows. These are system previews and target outcomes, not verified customer testimonials or guaranteed results."
+            as="h1"
           />
         </div>
 
