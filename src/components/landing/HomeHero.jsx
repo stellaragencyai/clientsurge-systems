@@ -3,9 +3,7 @@ import { trackCTA } from '@/lib/analytics';
 
 /**
  * HomeHero — centered, screenshot-matched layout.
- * Small dark pill CTA above a large bold headline (one gradient word),
- * grey sub-heading, on a white background with a faint grid pattern.
- * No device mockup. Uses ClientSurge content + electric blue (#00AEEF).
+ * Token-driven: all colors, shadows, and radii derive from src/index.css.
  */
 export default function HomeHero() {
   const scrollToPricing = (event) => {
@@ -22,7 +20,7 @@ export default function HomeHero() {
 
   return (
     <section
-      className="relative isolate overflow-hidden bg-white"
+      className="relative isolate overflow-hidden bg-background"
       style={{ minHeight: 'auto' }}
       aria-label="ClientSurge Systems AI growth system hero"
     >
@@ -31,10 +29,8 @@ export default function HomeHero() {
         aria-hidden="true"
         style={{
           background:
-            'radial-gradient(circle at 50% 10%, rgba(0,174,239,0.12), transparent 28%), linear-gradient(to right, rgba(15,23,42,0.045) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.045) 1px, transparent 1px)',
+            'radial-gradient(circle at 50% 10%, hsla(199, 100%, 47%, 0.12), transparent 28%), linear-gradient(to right, hsla(215, 25%, 27%, 0.045) 1px, transparent 1px), linear-gradient(to bottom, hsla(215, 25%, 27%, 0.045) 1px, transparent 1px)',
           backgroundSize: 'auto, 48px 48px, 48px 48px',
-          backgroundImage:
-            'radial-gradient(circle at 50% 10%, rgba(0,174,239,0.12), transparent 28%), linear-gradient(to right, rgba(15,23,42,0.045) 1px, transparent 1px), linear-gradient(to bottom, rgba(15,23,42,0.045) 1px, transparent 1px)',
           maskImage: 'radial-gradient(ellipse 78% 72% at 50% 38%, #000 48%, transparent 90%)',
           WebkitMaskImage: 'radial-gradient(ellipse 78% 72% at 50% 38%, #000 48%, transparent 90%)',
         }}
@@ -50,15 +46,15 @@ export default function HomeHero() {
         <div
           className="inline-flex items-center gap-2 rounded-full"
           style={{
-            background: 'rgba(255,255,255,0.9)',
-            border: '1px solid rgba(0,107,176,0.12)',
+            background: 'hsla(0, 0%, 100%, 0.9)',
+            border: '1px solid hsl(var(--border))',
             padding: '0.55rem 1.1rem',
             fontSize: '0.82rem',
             fontWeight: 700,
             letterSpacing: '0.08em',
             textTransform: 'uppercase',
-            color: '#16324f',
-            boxShadow: '0 10px 28px rgba(15,23,42,0.08)',
+            color: 'hsl(var(--muted-foreground))',
+            boxShadow: 'var(--cs-glow-sm)',
           }}
         >
           <span
@@ -67,8 +63,8 @@ export default function HomeHero() {
               width: '0.55rem',
               height: '0.55rem',
               borderRadius: '999px',
-              background: 'linear-gradient(135deg, #0079c1 0%, #00AEEF 100%)',
-              boxShadow: '0 0 0 6px rgba(0,174,239,0.14)',
+              background: 'var(--cs-gradient)',
+              boxShadow: '0 0 0 6px hsla(199, 100%, 47%, 0.14)',
             }}
           />
           Most Trusted AI Lead System
@@ -81,21 +77,25 @@ export default function HomeHero() {
             lineHeight: 0.93,
             letterSpacing: '-0.05em',
             fontWeight: 800,
-            color: '#081a37',
+            color: 'hsl(var(--foreground))',
             margin: 0,
             textWrap: 'balance',
             maxWidth: '980px',
           }}
         >
-          AI Lead Systems That Turn <span
+          AI Lead Systems That Turn{' '}
+          <span
             style={{
-              background: 'linear-gradient(90deg, #0079c1 0%, #00AEEF 100%)',
+              background: 'var(--cs-gradient)',
               WebkitBackgroundClip: 'text',
               backgroundClip: 'text',
               color: 'transparent',
               WebkitTextFillColor: 'transparent',
             }}
-          >More Calls</span> Into Revenue
+          >
+            More Calls
+          </span>{' '}
+          Into Revenue
         </h1>
 
         <p
@@ -104,7 +104,7 @@ export default function HomeHero() {
             fontSize: 'clamp(1rem, 1.45vw, 1.18rem)',
             lineHeight: 1.72,
             fontWeight: 400,
-            color: '#666666',
+            color: 'hsl(var(--muted-foreground))',
             maxWidth: '760px',
             margin: '1.5rem auto 0',
             textWrap: 'pretty',
@@ -120,12 +120,12 @@ export default function HomeHero() {
               style={{
                 padding: '0.65rem 1rem',
                 borderRadius: '999px',
-                border: '1px solid rgba(0,107,176,0.12)',
-                background: 'rgba(255,255,255,0.82)',
-                color: '#16324f',
+                border: '1px solid hsl(var(--border))',
+                background: 'hsla(0, 0%, 100%, 0.82)',
+                color: 'hsl(var(--muted-foreground))',
                 fontSize: '0.88rem',
                 fontWeight: 600,
-                boxShadow: '0 8px 22px rgba(15,23,42,0.05)',
+                boxShadow: 'var(--cs-glow-sm)',
               }}
             >
               {item}
@@ -137,14 +137,10 @@ export default function HomeHero() {
           <a
             href="/#pricing"
             onClick={scrollToPricing}
-            className="inline-flex items-center gap-2 rounded-full text-white transition-transform duration-300 hover:-translate-y-0.5"
+            className="cs-btn-primary inline-flex items-center gap-2"
             style={{
-              background: 'linear-gradient(135deg, #003B8F 0%, #0088CC 55%, #00AEEF 100%)',
               padding: '0.95rem 1.5rem',
               fontSize: '0.98rem',
-              fontWeight: 700,
-              letterSpacing: '-0.01em',
-              boxShadow: '0 16px 34px rgba(0,107,176,0.2)',
             }}
           >
             Compare Packages Free
@@ -153,15 +149,10 @@ export default function HomeHero() {
 
           <a
             href="/automations"
-            className="inline-flex items-center gap-2 rounded-full transition-transform duration-300 hover:-translate-y-0.5"
+            className="cs-btn-outline inline-flex items-center gap-2"
             style={{
-              background: 'rgba(255,255,255,0.9)',
-              color: '#16324f',
               padding: '0.95rem 1.5rem',
               fontSize: '0.98rem',
-              fontWeight: 700,
-              border: '1px solid rgba(0,107,176,0.12)',
-              boxShadow: '0 10px 24px rgba(15,23,42,0.07)',
             }}
           >
             See Automations
@@ -169,11 +160,12 @@ export default function HomeHero() {
         </div>
 
         <div
-          className="mt-10 w-full max-w-[900px] overflow-hidden rounded-[32px]"
+          className="mt-10 w-full max-w-[900px] overflow-hidden"
           style={{
+            borderRadius: 'var(--radius)',
             background: 'linear-gradient(150deg, #0d1f3c 0%, #0a2a5e 24%, #071535 58%, #061028 100%)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            boxShadow: '0 34px 90px rgba(0,0,0,0.22), inset 0 1px 0 rgba(255,255,255,0.06)',
+            border: '1px solid hsla(0, 0%, 100%, 0.08)',
+            boxShadow: 'var(--cs-glow-lg)',
           }}
         >
           <div
@@ -204,14 +196,15 @@ export default function HomeHero() {
                   fontWeight: 800,
                   letterSpacing: '0.12em',
                   color: '#7dd3fc',
-                  background: 'rgba(0,174,239,0.16)',
-                  border: '1px solid rgba(0,174,239,0.3)',
+                  background: 'hsla(199, 100%, 47%, 0.16)',
+                  border: '1px solid hsla(199, 100%, 47%, 0.3)',
                   textTransform: 'uppercase',
                 }}
               >
                 Speed to lead
               </div>
               <h2
+                className="font-display"
                 style={{
                   margin: '1rem 0 0',
                   color: '#ffffff',
@@ -256,13 +249,13 @@ export default function HomeHero() {
 
             <div
               style={{
-                borderRadius: '24px',
+                borderRadius: 'var(--radius)',
                 padding: '1rem',
                 background: 'rgba(255,255,255,0.1)',
                 border: '1px solid rgba(255,255,255,0.14)',
                 color: '#ffffff',
                 textAlign: 'left',
-                boxShadow: '0 20px 50px rgba(0,0,0,0.18)',
+                boxShadow: 'var(--cs-glow-md)',
               }}
             >
               <div className="flex items-start justify-between">
@@ -280,7 +273,7 @@ export default function HomeHero() {
                   <div
                     key={label}
                     style={{
-                      borderRadius: '18px',
+                      borderRadius: 'var(--radius)',
                       background: 'rgba(255,255,255,0.08)',
                       padding: '0.9rem',
                     }}
@@ -300,7 +293,7 @@ export default function HomeHero() {
                         width: '0.75rem',
                         height: '0.75rem',
                         borderRadius: '999px',
-                        background: index < 2 ? '#00AEEF' : '#4ade80',
+                        background: index < 2 ? 'hsl(var(--primary))' : '#4ade80',
                       }}
                     />
                     <span style={{ fontSize: '0.9rem', fontWeight: 700, color: 'rgba(255,255,255,0.86)' }}>{label}</span>

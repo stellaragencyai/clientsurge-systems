@@ -162,8 +162,8 @@ export default function ThreeSystemsSection() {
           max-width: 1040px;
           margin: 0 auto 40px;
           padding: 20px 24px 18px;
-          border: 1px solid rgba(0,174,239,0.16);
-          border-radius: 18px;
+          border: 1px solid hsla(199, 100%, 47%, 0.16);
+          border-radius: var(--radius);
           background: rgba(255,255,255,0.76);
           box-shadow: 0 14px 42px rgba(15,23,42,0.055), inset 0 1px 0 rgba(255,255,255,0.9);
           backdrop-filter: blur(10px);
@@ -188,7 +188,7 @@ export default function ThreeSystemsSection() {
           margin-bottom: 16px;
         }
         .csp-coverage-kicker {
-          color: #53637c;
+          color: hsl(var(--muted-foreground));
           font-size: 0.7rem;
           font-weight: 800;
           letter-spacing: 0.14em;
@@ -196,7 +196,7 @@ export default function ThreeSystemsSection() {
           text-transform: uppercase;
         }
         .csp-coverage-plan {
-          color: #0079c1;
+          color: hsl(var(--primary));
           font-size: 0.78rem;
           font-weight: 800;
           line-height: 1.2;
@@ -221,7 +221,7 @@ export default function ThreeSystemsSection() {
           flex-direction: column;
           align-items: center;
           gap: 8px;
-          color: #8a97aa;
+          color: hsl(var(--muted-foreground));
           font-size: 0.69rem;
           font-weight: 700;
           line-height: 1.2;
@@ -233,7 +233,7 @@ export default function ThreeSystemsSection() {
           z-index: 2;
           width: 20px;
           height: 20px;
-          border: 2px solid rgba(96,113,143,0.24);
+          border: 2px solid hsla(215, 16%, 47%, 0.24);
           border-radius: 999px;
           background: #ffffff;
           box-shadow: 0 3px 10px rgba(15,23,42,0.07);
@@ -257,19 +257,19 @@ export default function ThreeSystemsSection() {
           width: calc(100% - 20px);
           height: 2px;
           overflow: hidden;
-          background: rgba(96,113,143,0.17);
+          background: hsla(215, 16%, 47%, 0.17);
         }
         .csp-coverage-segment::after {
           content: "";
           position: absolute;
           inset: 0;
-          background: linear-gradient(90deg, #00AEEF 0%, #0079c1 100%);
+          background: linear-gradient(90deg, hsl(var(--primary)) 0%, var(--cs-electric-navy) 100%);
           transform: scaleX(0);
           transform-origin: left center;
           transition: transform 0.44s cubic-bezier(0.16, 1, 0.3, 1);
         }
         .csp-coverage-stage.is-active {
-          color: #263a58;
+          color: hsl(var(--foreground));
         }
         .csp-coverage-stage.is-active .csp-coverage-node {
           border-color: rgba(0,174,239,0.72);
@@ -310,7 +310,7 @@ export default function ThreeSystemsSection() {
           height: 100%;
           flex-direction: column;
           overflow: hidden;
-          border-radius: 20px;
+          border-radius: var(--radius);
           font-family: 'Montserrat', 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
           transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.25s ease;
         }
@@ -326,8 +326,8 @@ export default function ThreeSystemsSection() {
         }
         .csp-title {
           margin: 0;
-          color: #06122b;
-          font-family: Georgia, 'Times New Roman', serif;
+          color: hsl(var(--foreground));
+          font-family: 'Montserrat', system-ui, sans-serif;
           font-size: clamp(1.45rem, 2vw, 1.72rem);
           font-weight: 500;
           line-height: 1.18;
@@ -335,7 +335,7 @@ export default function ThreeSystemsSection() {
         }
         .csp-popular-line {
           margin-top: 10px;
-          color: #0095d9;
+          color: hsl(var(--primary));
           font-size: 0.84rem;
           font-weight: 900;
           line-height: 1.2;
@@ -343,7 +343,7 @@ export default function ThreeSystemsSection() {
         .csp-subtitle {
           margin: 10px 0 0;
           max-width: 330px;
-          color: #53637c;
+          color: hsl(var(--muted-foreground));
           font-size: 0.9rem;
           font-weight: 500;
           line-height: 1.42;
@@ -358,7 +358,7 @@ export default function ThreeSystemsSection() {
           line-height: 1;
         }
         .csp-price {
-          color: #06122b;
+          color: hsl(var(--foreground));
           font-family: 'Montserrat', 'Inter', system-ui, sans-serif;
           font-size: clamp(2.75rem, 4.25vw, 3.35rem);
           font-weight: 700;
@@ -367,21 +367,21 @@ export default function ThreeSystemsSection() {
         }
         .csp-period {
           padding-bottom: 0.38rem;
-          color: #60718f;
+          color: hsl(var(--muted-foreground));
           font-size: 0.88rem;
           font-weight: 500;
           letter-spacing: -0.015em;
         }
         .csp-setup {
           margin-top: 9px;
-          color: #0079c1;
+          color: hsl(var(--primary));
           font-size: 0.78rem;
           font-weight: 700;
           line-height: 1.3;
         }
         .csp-contract {
           margin-top: 12px;
-          color: #61718f;
+          color: hsl(var(--muted-foreground));
           font-size: 0.78rem;
           font-weight: 500;
           line-height: 1.42;
@@ -394,14 +394,14 @@ export default function ThreeSystemsSection() {
         }
         .csp-description {
           margin: 0;
-          color: #52627a;
+          color: hsl(var(--muted-foreground));
           font-size: 0.95rem;
           font-weight: 500;
           line-height: 1.58;
         }
         .csp-feature-intro {
           margin-top: 18px;
-          color: #52627a;
+          color: hsl(var(--muted-foreground));
           font-size: 0.95rem;
           font-weight: 650;
           line-height: 1.58;
@@ -418,7 +418,7 @@ export default function ThreeSystemsSection() {
           display: flex;
           align-items: flex-start;
           gap: 12px;
-          color: #506078;
+          color: hsl(var(--muted-foreground));
           font-size: 0.91rem;
           font-weight: 500;
           line-height: 1.42;
@@ -441,7 +441,7 @@ export default function ThreeSystemsSection() {
           display: flex;
           align-items: flex-start;
           gap: 10px;
-          color: #5a6983;
+          color: hsl(var(--muted-foreground));
           font-size: 0.755rem;
           font-weight: 500;
           line-height: 1.45;
@@ -451,12 +451,12 @@ export default function ThreeSystemsSection() {
           height: 14px;
           flex: 0 0 14px;
           margin-top: 2px;
-          color: #00AEEF;
+          color: hsl(var(--primary));
         }
         .csp-cta-note {
           margin: auto 0 0;
           padding-top: 30px;
-          color: #64748b;
+          color: hsl(var(--muted-foreground));
           font-size: 0.72rem;
           font-weight: 500;
           line-height: 1.35;
@@ -503,7 +503,7 @@ export default function ThreeSystemsSection() {
           .csp-coverage-shell {
             margin-bottom: 28px;
             padding: 18px 16px 16px;
-            border-radius: 16px;
+            border-radius: var(--radius);
           }
           .csp-coverage-meta {
             align-items: flex-start;
@@ -646,9 +646,9 @@ export default function ThreeSystemsSection() {
                       <span
                         className="inline-flex items-center gap-2 rounded-full px-6 py-2 text-sm font-black whitespace-nowrap"
                         style={{
-                          background: "linear-gradient(135deg, #00AEEF 0%, #005bb8 100%)",
+                          background: "var(--cs-gradient)",
                           color: "#ffffff",
-                          boxShadow: "0 10px 28px rgba(0,121,193,0.36)",
+                          boxShadow: "var(--cs-glow-md)",
                           letterSpacing: "0.01em",
                         }}
                       >
@@ -662,14 +662,14 @@ export default function ThreeSystemsSection() {
                     data-growth={isGrowth ? "true" : "false"}
                     style={{
                       background: isGrowth
-                        ? "linear-gradient(155deg, #f0fbff 0%, #eaf8ff 46%, #f9fdff 100%)"
-                        : "linear-gradient(155deg, #ffffff 0%, #f8fcff 100%)",
+                        ? "linear-gradient(155deg, hsla(199, 100%, 47%, 0.06) 0%, hsla(199, 100%, 47%, 0.03) 46%, hsl(var(--card)) 100%)"
+                        : "linear-gradient(155deg, hsl(var(--card)) 0%, hsl(var(--secondary)) 100%)",
                       border: isGrowth
-                        ? "1.5px solid rgba(0,174,239,0.60)"
+                        ? "1.5px solid hsla(199, 100%, 47%, 0.60)"
                         : `1.5px solid ${pkg.accentBorder}`,
                       boxShadow: isGrowth
-                        ? "0 24px 72px rgba(0,174,239,0.20), 0 0 0 1px rgba(0,174,239,0.09), 0 8px 18px rgba(2,8,23,0.05)"
-                        : "0 14px 44px rgba(15,23,42,0.055), 0 2px 8px rgba(15,23,42,0.035)",
+                        ? "var(--cs-glow-lg)"
+                        : "var(--cs-glow-sm)",
                     }}
                   >
                     <div className="csp-card-inner">
@@ -698,7 +698,7 @@ export default function ThreeSystemsSection() {
                           <li key={item} className="csp-feature-row">
                             <CheckCircle2
                               aria-hidden="true"
-                              style={{ color: "#22C55E", strokeWidth: 2.6 }}
+                              style={{ color: "hsl(var(--primary))", strokeWidth: 2.6 }}
                             />
                             <span>{item}</span>
                           </li>
@@ -736,16 +736,16 @@ export default function ThreeSystemsSection() {
                         className="csp-cta"
                         style={isGrowth
                           ? {
-                              background: "linear-gradient(90deg, #0095d9 0%, #005bb8 100%)",
+                              background: "var(--cs-gradient)",
                               color: "#fff",
-                              border: "1px solid rgba(0,91,184,0.15)",
-                              boxShadow: "0 12px 28px rgba(0,92,170,0.25)",
+                              border: "1px solid hsla(199, 100%, 47%, 0.15)",
+                              boxShadow: "var(--cs-glow-md)",
                             }
                           : {
-                              background: "rgba(255,255,255,0.72)",
-                              color: "#0079c1",
-                              border: "1.5px solid rgba(0,174,239,0.35)",
-                              boxShadow: "0 6px 18px rgba(15,23,42,0.045)",
+                              background: "hsla(0, 0%, 100%, 0.72)",
+                              color: "hsl(var(--primary))",
+                              border: "1.5px solid hsla(199, 100%, 47%, 0.35)",
+                              boxShadow: "var(--cs-glow-sm)",
                             }
                         }
                         data-highlight={isGrowth ? "true" : "false"}

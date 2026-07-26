@@ -106,6 +106,24 @@ Deno.serve(async (req) => {
     if (execution_status === 'completed') {
       const deployment = await base44.asServiceRole.entities.ClientDeployment.get(client_deployment_id).catch(() => null);
       if (deployment) {
+        // Advance module_installation_status for real (non-permission-check) executions.
+        // This closes the contract gap where activated_modules listed modules as active
+        // but module_installation_status stayed 'not_started' forever.
+        const isRealExecution = trigger_event && trigger_event !== 'permission_check';
+        if (isRealExecution && module_key) {
+          const currentStatus = deployment.module_installation_status || {};
+          const existing = currentStatus[module_key];
+          const terminalStates = ['installed', 'verified', 'tested', 'ready'];
+          if (!terminalStates.includes(existing)) {
+            const updatedStatus = { ...currentStatus, [module_key]: 'installed' };
+            await base44.asServiceRole.entities.ClientDeployment.update(client_deployment_id, {
+              module_installation_status: updatedStatus
+            }).catch(err => {
+              console.warn('[logAutomationExecution] Failed to advance module_installation_status:', err.message);
+            });
+          }
+        }
+
         const analytics = deployment.analytics || {};
         const updatedAnalytics = {
           leads_generated: analytics.leads_generated || 0,
