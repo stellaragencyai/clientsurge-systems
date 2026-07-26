@@ -66,6 +66,7 @@ export default function Industries() {
           eyebrow="Vertical AI Growth Systems"
           title="Industry Systems, Not Generic Website Templates"
           subtitle="Each ClientSurge vertical combines a conversion-focused website, industry-specific AI configuration, CRM pipeline logic, and package-controlled automation modules. The industry defines the experience. The package controls which automations activate."
+          as="h1"
         />
       </section>
 
