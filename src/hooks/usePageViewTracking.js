@@ -1,6 +1,7 @@
 import { useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { base44 } from '@/api/base44Client';
+import { isPublicRoute } from '@/lib/routeSecurity';
 import { isTrustedAnalyticsEvent } from '@/lib/trustedAnalyticsFilter';
 
 export function usePageViewTracking() {
@@ -11,6 +12,10 @@ export function usePageViewTracking() {
       import.meta.env.DEV &&
       ["localhost", "127.0.0.1"].includes(window.location.hostname)
     ) {
+      return;
+    }
+
+    if (isPublicRoute(location.pathname)) {
       return;
     }
 
