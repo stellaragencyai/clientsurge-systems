@@ -18,6 +18,7 @@ export default function FAQ() {
             eyebrow="Questions"
             title="Frequently Asked Questions"
             align="center"
+            as="h1"
           />
           <p className="mt-3 md:mt-4 text-muted-foreground text-sm md:text-base text-center">
             Still unsure? <a href="/contact" className="text-primary font-semibold hover:underline">Get Help Choosing</a> or <a href="/pricing" className="text-primary font-semibold hover:underline">Compare Packages</a>
