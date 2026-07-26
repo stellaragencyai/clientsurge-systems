@@ -362,11 +362,11 @@ const AuthenticatedAppWithTenant = () => {
       <Route path="/contact" element={<LazyRoute Component={Contact} />} />
       <Route path="/automations" element={<LazyRoute Component={Automations} />} />
       <Route path="/product" element={<LazyRoute Component={ProductLanding} />} />
-      <Route path="/signup" element={<SignupForward />} />
-      <Route path="/product-signup" element={<ProductSignup />} />
-      <Route path="/product-signup/" element={<Navigate to="/product-signup" replace />} />
-      <Route path="/product-sign-up" element={<SignupForward />} />
-      <Route path="/product_signup" element={<SignupForward />} />
+      <Route path="/signup" element={<Navigate to="/store" replace />} />
+      <Route path="/product-signup" element={<Navigate to="/store" replace />} />
+      <Route path="/product-signup/" element={<Navigate to="/store" replace />} />
+      <Route path="/product-sign-up" element={<Navigate to="/store" replace />} />
+      <Route path="/product_signup" element={<Navigate to="/store" replace />} />
       <Route path="/start" element={<LazyRoute Component={Start} />} />
       <Route path="/book" element={<LazyRoute Component={Book} />} />
       <Route path="/book-demo" element={<Navigate to="/book" replace />} />
