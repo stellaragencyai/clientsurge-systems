@@ -77,9 +77,10 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    if (shouldAllowLocalAuthBypass() && isPublicRoute(currentPath)) {
+    if (isPublicRoute(currentPath)) {
       setUser(null);
       setIsAuthenticated(false);
+      setAppPublicSettings(null);
       setIsLoadingPublicSettings(false);
       setIsLoadingAuth(false);
       setAuthError(null);
