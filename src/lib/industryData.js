@@ -15,7 +15,7 @@
  * precedence for operational fields. Static JS is used for marketing copy only.
  */
 
-import { getIndustryBySlug } from '@/data/industryMarketingConfig';
+import { getIndustryBySlug as getMarketingIndustryBySlug } from '@/data/industryMarketingConfig';
 import { getMergedIndustryData } from '@/data/industryContent';
 import { getPremiumContent } from '@/data/industryPremiumContent';
 
@@ -74,7 +74,7 @@ export function getRouteSlug(dbSlug) {
  * @returns {Object|null} Merged industry data with routeSlug and dbSlug fields
  */
 export function getIndustryData(routeSlug) {
-  const marketingData = getIndustryBySlug(routeSlug);
+  const marketingData = getMarketingIndustryBySlug(routeSlug);
   if (!marketingData) return null;
 
   const merged = getMergedIndustryData(routeSlug, marketingData);
