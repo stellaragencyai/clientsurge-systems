@@ -1,5 +1,12 @@
 import { createClient } from '@base44/sdk';
+import { createAuthModule } from '@base44/sdk/dist/modules/auth.js';
+import { createEntitiesModule } from '@base44/sdk/dist/modules/entities.js';
+import { createFunctionsModule } from '@base44/sdk/dist/modules/functions.js';
+import { createIntegrationsModule } from '@base44/sdk/dist/modules/integrations.js';
+import { createAxiosClient } from '@base44/sdk/dist/utils/axios-client.js';
+import { getAccessToken } from '@base44/sdk/dist/utils/auth-utils.js';
 import { appParams } from '@/lib/app-params';
+import { isPublicRoute } from '@/lib/routeSecurity';
 
 const { appId, token, functionsVersion, appBaseUrl } = appParams;
 
@@ -66,14 +73,93 @@ function createLocalPreviewClient() {
   };
 }
 
-//Create a client with authentication required
-const sdkClient = isLocalPreview() ? createLocalPreviewClient() : createClient({
-  appId,
-  token,
-  functionsVersion,
-  serverUrl: '',
-  requiresAuth: false,
-  appBaseUrl
-});
+function createPublicRouteClient() {
+  const headers = {
+    "X-App-Id": String(appId),
+  };
+
+  const functionHeaders = functionsVersion
+    ? {
+        ...headers,
+        "Base44-Functions-Version": functionsVersion,
+      }
+    : headers;
+
+  const axiosClient = createAxiosClient({
+    baseURL: "/api",
+    headers,
+    token,
+  });
+
+  const functionsAxiosClient = createAxiosClient({
+    baseURL: "/api",
+    headers: functionHeaders,
+    token,
+    interceptResponses: false,
+  });
+
+  const auth = createAuthModule(axiosClient, functionsAxiosClient, appId, {
+    appBaseUrl,
+    serverUrl: "",
+  });
+
+  if (typeof window !== "undefined") {
+    const accessToken = token || getAccessToken();
+    if (accessToken) {
+      auth.setToken(accessToken);
+    }
+  }
+
+  return {
+    auth,
+    analytics: {
+      track: async () => null,
+      cleanup: () => {},
+    },
+    entities: createEntitiesModule({
+      axios: axiosClient,
+      appId,
+      getSocket: () => {
+        throw new Error("Realtime subscriptions are disabled on public routes.");
+      },
+    }),
+    functions: createFunctionsModule(functionsAxiosClient, appId, {
+      getAuthHeaders: () => {
+        const currentToken = token || getAccessToken();
+        return currentToken ? { Authorization: `Bearer ${currentToken}` } : {};
+      },
+      baseURL: functionsAxiosClient.defaults?.baseURL,
+    }),
+    integrations: createIntegrationsModule(axiosClient, appId),
+    setToken(newToken) {
+      auth.setToken(newToken);
+    },
+    getConfig() {
+      return {
+        serverUrl: "",
+        appId,
+        requiresAuth: false,
+      };
+    },
+  };
+}
+
+function shouldUsePublicRouteClient() {
+  if (typeof window === "undefined") return false;
+  return isPublicRoute(window.location.pathname);
+}
+
+const sdkClient = isLocalPreview()
+  ? createLocalPreviewClient()
+  : shouldUsePublicRouteClient()
+    ? createPublicRouteClient()
+    : createClient({
+        appId,
+        token,
+        functionsVersion,
+        serverUrl: '',
+        requiresAuth: false,
+        appBaseUrl
+      });
 
 export const base44 = sdkClient;
