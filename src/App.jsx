@@ -55,6 +55,7 @@ const Register = lazy(() => import("./pages/Register"));
 const ForgotPassword = lazy(() => import("./pages/ForgotPassword"));
 const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Store = lazy(() => import("./pages/Store"));
+const PrelaunchPreview = lazy(() => import("./pages/PrelaunchPreview"));
 const IndustryPageTemplate = lazy(() => import("./components/landing/IndustryPageTemplate"));
 const About = lazy(() => import("./pages/About"));
 const Automations = lazy(() => import("./pages/Automations"));
@@ -427,6 +428,7 @@ const AuthenticatedAppWithTenant = () => {
 
       <Route element={<ProtectedRoute allowedRoles={["admin", "super_admin"]} unauthenticatedElement={<AuthRedirectFallback />} unauthorizedElement={<AccessDeniedPage />} />}>
         {[
+          { route: routePath("prelaunch-preview"), element: <Suspense fallback={<RouteLoadingSkeleton />}><PrelaunchPreview /></Suspense> },
           { route: routePath("dashboard"), Component: AdminDashboard },
           { route: routePath("admin-settings"), Component: AdminDashboard },
           { route: routePath("mission-control"), element: <Navigate to="/admin" replace /> },

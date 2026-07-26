@@ -1,0 +1,46 @@
+{
+  "name": "WaitlistSignup",
+  "type": "object",
+  "title": "Waitlist Signup",
+  "description": "Pre-launch founding waitlist email capture. Minimal record \u2014 first name, normalized email, optional business name, and submission timestamp.",
+  "properties": {
+    "first_name": {
+      "type": "string",
+      "title": "First Name",
+      "maxLength": 100
+    },
+    "email": {
+      "type": "string",
+      "title": "Email Address",
+      "format": "email",
+      "maxLength": 320
+    },
+    "business_name": {
+      "type": "string",
+      "title": "Business Name",
+      "maxLength": 200
+    }
+  },
+  "required": [
+    "first_name",
+    "email"
+  ],
+  "rls": {
+    "create": {},
+    "read": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "update": {
+      "user_condition": {
+        "role": "admin"
+      }
+    },
+    "delete": {
+      "user_condition": {
+        "role": "admin"
+      }
+    }
+  }
+}

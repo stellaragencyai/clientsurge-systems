@@ -257,6 +257,7 @@ export const INTERNAL_ROUTE_PREFIXES = [
 ];
 
 export const NOINDEX_ROUTE_PREFIXES = [
+  "/prelaunch-preview",
   "/login",
   "/register",
   "/forgot-password",
@@ -297,6 +298,7 @@ export const SITEMAP_STATIC_PATHS = [...PUBLIC_DIRECTORY_PAGES];
 export const BLOG_SITEMAP_PATHS = [];
 
 export const ROBOTS_DISALLOW_PATHS = [
+  "/prelaunch-preview",
   "/_generated",
   "/_generated/",
   "/pages",
