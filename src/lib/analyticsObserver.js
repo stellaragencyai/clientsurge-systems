@@ -1,11 +1,14 @@
 import { base44 } from "@/api/base44Client";
+import { isPublicRoute } from "@/lib/routeSecurity";
 import { isTrustedAnalyticsEvent } from "@/lib/trustedAnalyticsFilter";
 
 function shouldSkipBase44Analytics() {
   if (typeof window === "undefined") return true;
+
+  const { hostname, pathname } = window.location;
+  if (isPublicRoute(pathname)) return true;
   if (!import.meta.env.DEV) return false;
 
-  const { hostname } = window.location;
   return hostname === "localhost" || hostname === "127.0.0.1" || hostname.endsWith(".local");
 }
 
