@@ -7,6 +7,7 @@
  *   subtitle   — string (body text below title)
  *   align      — 'center' | 'left' (default 'left')
  *   theme      — 'light' | 'dark' (for dark backgrounds)
+ *   as         — heading tag name (default 'h2')
  *   className  — string
  */
 export default function CSSectionHeader({
@@ -15,10 +16,12 @@ export default function CSSectionHeader({
   subtitle,
   align = 'left',
   theme = 'light',
+  as = 'h2',
   className = '',
 }) {
   const isCentered = align === 'center';
   const isDark = theme === 'dark';
+  const HeadingTag = as;
 
   return (
     <div
@@ -34,12 +37,12 @@ export default function CSSectionHeader({
 
       <div className="cs-section-title-row">
         <span className="cs-section-bar" aria-hidden="true" />
-        <h2
+        <HeadingTag
           className="cs-section-title"
           style={isDark ? { color: '#ffffff', WebkitTextFillColor: '#ffffff' } : undefined}
         >
           {title}
-        </h2>
+        </HeadingTag>
       </div>
 
       {subtitle && (
