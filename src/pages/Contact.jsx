@@ -37,12 +37,12 @@ const contactMethods = [
   {
     Icon: MapPin,
     label: "Location",
-    value: "Phoenix, Arizona · Serving businesses nationwide",
+    value: "Phoenix, Arizona",
   },
   {
     Icon: Clock3,
     label: "Business Hours",
-    value: "Monday–Friday · Replies within one business day",
+    value: "Monday–Friday · One-business-day replies",
   },
 ];
 
@@ -217,14 +217,14 @@ function Field({
 function ContactMethodCard({ Icon, label, value, href }) {
   const content = (
     <>
-      <span className="grid h-11 w-11 shrink-0 place-items-center rounded-xl bg-primary/10 text-primary transition-colors group-hover:bg-primary group-hover:text-white">
+      <span className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-primary/10 text-primary shadow-[0_10px_24px_rgba(0,174,239,0.12)] transition-colors group-hover:bg-primary group-hover:text-white">
         <Icon aria-hidden="true" className="h-5 w-5" />
       </span>
-      <span className="min-w-0">
-        <span className="block text-[0.7rem] font-bold uppercase tracking-[0.12em] text-slate-500">
+      <span className="min-w-0 flex-1">
+        <span className="block text-[0.68rem] font-bold uppercase tracking-[0.14em] text-slate-500">
           {label}
         </span>
-        <span className="mt-0.5 block text-[0.95rem] font-semibold leading-snug text-slate-900">
+        <span className="mt-1 block text-sm font-semibold leading-6 text-slate-900 sm:text-[0.95rem]">
           {value}
         </span>
       </span>
@@ -235,7 +235,7 @@ function ContactMethodCard({ Icon, label, value, href }) {
     return (
       <a
         href={href}
-        className="group flex min-h-[4rem] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4 transition-all hover:border-primary/40 hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
+        className="group flex min-h-[6.5rem] items-start gap-4 rounded-[1.4rem] border border-white/80 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.07)] backdrop-blur transition-all hover:-translate-y-0.5 hover:border-primary/30 hover:shadow-[0_22px_48px_rgba(0,107,176,0.12)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
       >
         {content}
       </a>
@@ -243,7 +243,7 @@ function ContactMethodCard({ Icon, label, value, href }) {
   }
 
   return (
-    <div className="group flex min-h-[4rem] items-center gap-4 rounded-2xl border border-slate-200 bg-white p-4">
+    <div className="group flex min-h-[6.5rem] items-start gap-4 rounded-[1.4rem] border border-white/80 bg-white/90 p-5 shadow-[0_16px_40px_rgba(15,23,42,0.07)] backdrop-blur">
       {content}
     </div>
   );
@@ -412,7 +412,7 @@ export default function Contact() {
                 "radial-gradient(circle at 50% 0%, hsla(199, 100%, 47%, 0.08), transparent 45%)",
             }}
           />
-          <div className="relative mx-auto max-w-4xl px-5 py-16 text-center sm:px-8 sm:py-20">
+          <div className="relative mx-auto max-w-5xl px-5 pt-14 pb-10 text-center sm:px-8 sm:pt-16 sm:pb-12">
             <span className="inline-flex items-center gap-2 rounded-full border border-border bg-white px-4 py-1.5 text-xs font-bold uppercase tracking-[0.12em] text-primary shadow-sm">
               <Sparkles aria-hidden="true" className="h-3.5 w-3.5" />
               We are here to help
@@ -435,9 +435,9 @@ export default function Contact() {
         </section>
 
         {/* Contact methods grid */}
-        <section className="bg-white pb-4">
-          <div className="mx-auto max-w-5xl px-5 sm:px-8">
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        <section className="relative z-10 -mt-2 bg-transparent pb-10 sm:-mt-4 sm:pb-12">
+          <div className="mx-auto max-w-6xl px-5 sm:px-8">
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
               {contactMethods.map((method) => (
                 <ContactMethodCard key={method.label} {...method} />
               ))}
@@ -446,9 +446,9 @@ export default function Contact() {
         </section>
 
         {/* Form + sidebar */}
-        <section className="bg-slate-50/70 py-16 sm:py-20">
+        <section className="bg-[linear-gradient(180deg,rgba(248,250,252,0.78)_0%,rgba(241,245,249,0.92)_100%)] py-14 sm:py-18">
           <div className="mx-auto max-w-6xl px-5 sm:px-8">
-            <div className="grid gap-8 lg:grid-cols-[1.6fr_1fr] lg:gap-12">
+            <div className="grid gap-8 lg:grid-cols-[1.5fr_1fr] lg:items-start lg:gap-10">
               {/* Form card */}
               <div className="cs-glow-card overflow-hidden bg-white p-6 sm:p-10">
                 {success ? (
@@ -691,13 +691,17 @@ export default function Contact() {
               </div>
 
               {/* Sidebar */}
-              <aside className="flex flex-col gap-5">
-                <div className="cs-glow-card bg-white p-6">
-                  <h3 className="font-display text-lg font-black tracking-[-0.02em] text-slate-900">
+              <aside className="cs-glow-card overflow-hidden bg-white lg:sticky lg:top-[calc(var(--cs-nav-height)+1.5rem)]">
+                <div className="border-b border-slate-200/80 bg-[radial-gradient(circle_at_top,rgba(0,174,239,0.12),transparent_60%)] p-6 sm:p-7">
+                  <p className="text-[0.7rem] font-bold uppercase tracking-[0.14em] text-primary">
+                    Talk Through Your Lead Flow
+                  </p>
+                  <h3 className="mt-2 font-display text-[1.65rem] font-black tracking-[-0.03em] text-slate-900">
                     Prefer to talk?
                   </h3>
-                  <p className="mt-2 text-sm leading-6 text-slate-600">
-                    Book a call and we will walk through your current lead flow and where AI can help.
+                  <p className="mt-3 text-sm leading-6 text-slate-600">
+                    Book a call and we will walk through your current lead flow, response gaps,
+                    and where AI can help first.
                   </p>
                   <a
                     href="/book"
@@ -709,17 +713,20 @@ export default function Contact() {
 
                   <a
                     href="/book#system-match-form"
-                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary px-5 py-3 text-xs font-bold uppercase tracking-[0.08em] text-primary transition-colors hover:bg-primary/5"
+                    className="mt-3 inline-flex w-full items-center justify-center gap-2 rounded-full border border-primary/25 bg-primary/5 px-5 py-3 text-xs font-bold uppercase tracking-[0.08em] text-primary transition-colors hover:bg-primary/10"
                   >
                     <Sparkles aria-hidden="true" className="h-4 w-4" />
                     AI Readiness Check
                   </a>
                 </div>
 
-                <div className="cs-glow-card bg-white p-6">
-                  <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
-                    Follow ClientSurge
-                  </h3>
+                <div className="border-b border-slate-200/80 px-6 py-5 sm:px-7">
+                  <div className="flex items-center justify-between gap-3">
+                    <h3 className="text-xs font-bold uppercase tracking-[0.12em] text-slate-500">
+                      Follow ClientSurge
+                    </h3>
+                    <span className="text-xs font-medium text-slate-400">Brand + proof links</span>
+                  </div>
                   <div className="mt-4 flex items-center gap-3">
                     {socialLinks.map(({ label, icon, href }) => (
                       <a
@@ -737,10 +744,10 @@ export default function Contact() {
                   </div>
                 </div>
 
-                <div className="cs-glow-card overflow-hidden bg-gradient-to-br from-[#001B44] to-[#061025] p-6 text-white">
-                  <h3 className="font-display text-lg font-black tracking-[-0.02em]">
+                <div className="bg-gradient-to-br from-[#001B44] via-[#05275c] to-[#07101f] px-6 py-6 text-white sm:px-7">
+                  <p className="text-[0.68rem] font-bold uppercase tracking-[0.14em] text-[#8DDCFF]">
                     Why teams choose ClientSurge
-                  </h3>
+                  </p>
                   <ul className="mt-4 space-y-3 text-sm leading-6 text-white/85">
                     <li className="flex items-start gap-2.5">
                       <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#35BDF1]" />
@@ -748,7 +755,7 @@ export default function Contact() {
                     </li>
                     <li className="flex items-start gap-2.5">
                       <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#35BDF1]" />
-                      <span>AI booking agent that books while you sleep</span>
+                      <span>AI booking agent that works after hours</span>
                     </li>
                     <li className="flex items-start gap-2.5">
                       <CheckCircle2 aria-hidden="true" className="mt-0.5 h-4 w-4 shrink-0 text-[#35BDF1]" />
