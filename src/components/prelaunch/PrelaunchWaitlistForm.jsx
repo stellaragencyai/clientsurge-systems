@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ArrowRight, Loader2, CheckCircle2, AlertCircle } from "lucide-react";
+import { Link } from "react-router-dom";
+import { AlertCircle, ArrowRight, CheckCircle2, Loader2 } from "lucide-react";
 import { base44 } from "@/api/base44Client";
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -8,6 +9,7 @@ export default function PrelaunchWaitlistForm() {
   const [firstName, setFirstName] = useState("");
   const [email, setEmail] = useState("");
   const [businessName, setBusinessName] = useState("");
+  const [website, setWebsite] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
@@ -16,8 +18,11 @@ export default function PrelaunchWaitlistForm() {
     event.preventDefault();
     setError("");
 
+    const trimmedFirstName = firstName.trim();
     const trimmedEmail = email.trim().toLowerCase();
-    if (!firstName.trim()) {
+    const trimmedBusinessName = businessName.trim();
+
+    if (!trimmedFirstName) {
       setError("Please enter your first name.");
       return;
     }
@@ -29,9 +34,10 @@ export default function PrelaunchWaitlistForm() {
     setLoading(true);
     try {
       const response = await base44.functions.invoke("submitWaitlistSignup", {
-        first_name: firstName.trim(),
+        first_name: trimmedFirstName,
         email: trimmedEmail,
-        business_name: businessName.trim() || undefined,
+        business_name: trimmedBusinessName || undefined,
+        website,
       });
       const data = response?.data || response;
       if (data?.status === "duplicate") {
@@ -56,14 +62,14 @@ export default function PrelaunchWaitlistForm() {
     return (
       <section id="waitlist" className="prelaunch-form" aria-labelledby="prelaunch-form-heading">
         <div className="prelaunch-form__inner">
-          <div className="prelaunch-form__success" role="status">
+          <div className="prelaunch-form__success" role="status" aria-live="polite">
             <CheckCircle2 size={40} aria-hidden="true" className="prelaunch-form__success-icon" />
+            <span className="prelaunch-section-kicker">Submission confirmed</span>
             <h2 id="prelaunch-form-heading" className="prelaunch-form__success-title">
-              You're on the waitlist
+              You&apos;re on the waitlist
             </h2>
             <p className="prelaunch-form__success-copy">
-              You're on the ClientSurge founding waitlist. Watch your inbox for launch updates and
-              founding-access information.
+              Watch your inbox for ClientSurge launch updates and founding-access information.
             </p>
           </div>
         </div>
@@ -74,72 +80,101 @@ export default function PrelaunchWaitlistForm() {
   return (
     <section id="waitlist" className="prelaunch-form" aria-labelledby="prelaunch-form-heading">
       <div className="prelaunch-form__inner">
+        <span className="prelaunch-section-kicker">Reserve founding access</span>
         <h2 id="prelaunch-form-heading" className="prelaunch-form__heading">
           Join the Founding Waitlist
         </h2>
         <p className="prelaunch-form__copy">
-          Reserve your founding access. We will notify you when ClientSurge launches.
+          Be among the first businesses notified when ClientSurge launches.
         </p>
 
-        {error && (
-          <div className="prelaunch-form__error" role="alert">
-            <AlertCircle size={16} aria-hidden="true" />
-            <span>{error}</span>
-          </div>
-        )}
+        <div className="prelaunch-form__message" aria-live="polite" aria-atomic="true">
+          {error && (
+            <div className="prelaunch-form__error" role="alert">
+              <AlertCircle size={16} aria-hidden="true" />
+              <span>{error}</span>
+            </div>
+          )}
+        </div>
 
-        <form onSubmit={handleSubmit} className="prelaunch-form__form" noValidate>
+        <form
+          id="prelaunch-waitlist-form"
+          onSubmit={handleSubmit}
+          className="prelaunch-form__form"
+          noValidate
+        >
+          <div className="prelaunch-form__honeypot" aria-hidden="true">
+            <label htmlFor="waitlist-website">Website</label>
+            <input
+              id="waitlist-website"
+              name="website"
+              type="text"
+              tabIndex={-1}
+              autoComplete="off"
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
+            />
+          </div>
+
           <div className="prelaunch-form__field">
             <label htmlFor="waitlist-first-name" className="prelaunch-form__label">
               First name
             </label>
             <input
               id="waitlist-first-name"
+              name="first_name"
               type="text"
               autoComplete="given-name"
               value={firstName}
-              onChange={(e) => setFirstName(e.target.value)}
+              onChange={(event) => setFirstName(event.target.value)}
               required
               maxLength={100}
               className="prelaunch-form__input"
               disabled={loading}
             />
           </div>
+
           <div className="prelaunch-form__field">
             <label htmlFor="waitlist-email" className="prelaunch-form__label">
               Business email
             </label>
             <input
               id="waitlist-email"
+              name="email"
               type="email"
+              inputMode="email"
               autoComplete="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(event) => setEmail(event.target.value)}
               required
               maxLength={320}
               className="prelaunch-form__input"
               disabled={loading}
             />
           </div>
+
           <div className="prelaunch-form__field">
             <label htmlFor="waitlist-business" className="prelaunch-form__label">
               Business name <span className="prelaunch-form__optional">(optional)</span>
             </label>
             <input
               id="waitlist-business"
+              name="business_name"
               type="text"
               autoComplete="organization"
               value={businessName}
-              onChange={(e) => setBusinessName(e.target.value)}
+              onChange={(event) => setBusinessName(event.target.value)}
               maxLength={200}
               className="prelaunch-form__input"
               disabled={loading}
             />
           </div>
+
           <button type="submit" className="prelaunch-form__submit" disabled={loading}>
             {loading ? (
               <>
-                <Loader2 size={18} className="prelaunch-form__spinner" aria-hidden="true" /> Joining...
+                <Loader2 size={18} className="prelaunch-form__spinner" aria-hidden="true" />
+                Joining…
               </>
             ) : (
               <>
@@ -147,6 +182,12 @@ export default function PrelaunchWaitlistForm() {
               </>
             )}
           </button>
+
+          <p className="prelaunch-form__consent">
+            By joining, you agree to receive ClientSurge launch and founding-access emails. You can
+            unsubscribe at any time. See our <Link to="/privacy">Privacy Policy</Link> and{" "}
+            <Link to="/terms">Terms</Link>.
+          </p>
         </form>
       </div>
     </section>
