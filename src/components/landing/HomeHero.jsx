@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef } from 'react';
-import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight, MousePointerClick, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { trackCTA } from '@/lib/analytics';
 
@@ -33,14 +33,6 @@ const FLOATING_METRICS = [
 export default function HomeHero() {
   const [demoMode, setDemoMode] = useState('speed');
   const shouldReduceMotion = useReducedMotion();
-  const heroRef = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: heroRef,
-    offset: ['start start', 'end start'],
-  });
-  const orbsY = useTransform(scrollYProgress, [0, 1], [0, 120]);
-  const contentY = useTransform(scrollYProgress, [0, 1], [0, -40]);
-  const contentOpacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
 
   const mode = DEMO_MODES[demoMode];
   const fadeUp = shouldReduceMotion
@@ -62,7 +54,6 @@ export default function HomeHero() {
 
   return (
     <section
-      ref={heroRef}
       className="relative isolate overflow-hidden bg-background"
       style={{ minHeight: 'auto', containerType: 'inline-size' }}
       aria-label="ClientSurge Systems AI growth system hero"
@@ -70,7 +61,6 @@ export default function HomeHero() {
       {/* ── ENHANCEMENT 1: Animated ambient gradient orbs ── */}
       <motion.div
         aria-hidden="true"
-        style={{ y: shouldReduceMotion ? 0 : orbsY }}
         className="pointer-events-none absolute inset-0 overflow-hidden"
       >
         <motion.div
@@ -161,8 +151,6 @@ export default function HomeHero() {
         style={{
           paddingTop: 'calc(var(--cs-nav-height, 76px) + 3.75rem)',
           paddingBottom: '5rem',
-          y: shouldReduceMotion ? 0 : contentY,
-          opacity: shouldReduceMotion ? 1 : contentOpacity,
         }}
       >
         <motion.div variants={stagger} initial="hidden" animate="show" className="w-full flex flex-col items-center">
