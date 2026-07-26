@@ -7,7 +7,7 @@ export default function PrelaunchHeader() {
   return (
     <header className="prelaunch-header">
       <div className="prelaunch-header__inner">
-        <Link to="/" className="prelaunch-header__logo" aria-label="ClientSurge Systems home">
+        <div className="prelaunch-header__logo" aria-label="ClientSurge Systems">
           <img
             src={BRAND_LOGO}
             alt="ClientSurge Systems"
@@ -16,7 +16,7 @@ export default function PrelaunchHeader() {
             loading="eager"
             decoding="async"
           />
-        </Link>
+        </div>
 
         <div className="prelaunch-header__meta">
           <span className="prelaunch-header__launch-tag">Launching September 1, 2026</span>
