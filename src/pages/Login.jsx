@@ -130,7 +130,7 @@ export default function Login() {
             width="220"
             height="55"
             decoding="async"
-            style={{ height: "clamp(48px, 6vw, 64px)", width: "auto", maxWidth: "100%", objectFit: "contain", filter: "drop-shadow(0 8px 20px rgba(0,174,239,0.25))" }}
+            style={{ height: "clamp(48px, 6vw, 64px)", width: "auto", maxWidth: "100%", objectFit: "contain", filter: "drop-shadow(0 6px 16px rgba(0,174,239,0.18))" }}
           />
         </div>
 
@@ -138,17 +138,17 @@ export default function Login() {
           <span className="cs-auth-brand-pill">
             <LockKeyhole size={14} aria-hidden="true" /> Secure client access
           </span>
-          <h2 style={{ margin: 0, color: "#eef3fa", fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.12, letterSpacing: "-0.04em", fontWeight: 700 }}>
+          <h2 style={{ margin: 0, color: "#dbe7f5", fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.22, letterSpacing: "-0.035em", fontWeight: 600 }}>
             Your ClientSurge system, in one place.
           </h2>
-          <p style={{ margin: "1.25rem 0 0", maxWidth: "42ch", color: "rgba(255,255,255,0.78)", fontSize: "1rem", lineHeight: 1.7 }}>
+          <p style={{ margin: "1rem 0 0", maxWidth: "42ch", color: "rgba(255,255,255,0.74)", fontSize: "0.95rem", lineHeight: 1.7 }}>
             Sign in to see what is active, what ClientSurge handled, what results were created, and what needs your attention — without navigating technical tools.
           </p>
 
-          <ul style={{ listStyle: "none", padding: 0, margin: "1.75rem 0 0", display: "grid", gap: "1.15rem" }}>
+          <ul className="cs-auth-benefit-list">
             {BRAND_BENEFITS.map((item) => (
-              <li key={item} style={{ display: "flex", alignItems: "center", gap: "0.85rem", color: "rgba(255,255,255,0.86)", fontSize: "0.95rem", fontWeight: 500, lineHeight: 1.4 }}>
-                <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1.5rem", height: "1.5rem", borderRadius: "0.5rem", background: "rgba(0,174,239,0.16)", border: "1px solid rgba(0,174,239,0.28)", flexShrink: 0 }}>
+              <li key={item} className="cs-auth-benefit">
+                <span className="cs-auth-benefit__icon">
                   <Sparkles size={14} aria-hidden="true" style={{ color: "var(--cs-blue-500)" }} />
                 </span>
                 {item}
@@ -331,7 +331,7 @@ export default function Login() {
                     </div>
                   )}
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", alignItems: "center", marginTop: "0.5rem" }}>
+                  <div className="cs-auth-footer-links">
                     {isLoginView ? (
                       <>
                         <button
@@ -341,7 +341,7 @@ export default function Login() {
                         >
                           <KeyRound size={14} aria-hidden="true" /> Forgot your password?
                         </button>
-                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem" }}>
+                        <div className="cs-auth-footer-links__group">
                           <p className="cs-auth-field__footer-note" style={{ margin: 0 }}>Need an account?</p>
                           <Link to="/register" className="cs-auth-inline-link">
                             Start onboarding <ArrowRight size={13} aria-hidden="true" />

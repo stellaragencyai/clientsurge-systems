@@ -9,18 +9,18 @@
   display: flex;
   flex-direction: column;
   justify-content: flex-start;
-  padding: clamp(2.5rem, 5vw, 3.5rem);
+  padding: clamp(2rem, 4vw, 2.75rem) clamp(2.5rem, 5vw, 3.5rem);
   background: linear-gradient(160deg, var(--cs-navy-950), var(--cs-navy-800));
   color: var(--cs-text-inverse);
   position: relative;
-  box-shadow: 8px 0 28px rgba(7, 15, 32, 0.07);
+  box-shadow: 1px 0 0 rgba(255, 255, 255, 0.04), 12px 0 40px rgba(7, 15, 32, 0.05);
 }
 
 .cs-auth-layout__brand-lockup {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   font-weight: 750;
   letter-spacing: -0.02em;
 }
@@ -43,11 +43,11 @@
 
 .cs-auth-layout__brand-copy h2 {
   margin: 0;
-  color: #eef3fa;
+  color: #dbe7f5;
   font-size: clamp(2rem, 4vw, 3.25rem);
-  line-height: 1.12;
-  letter-spacing: -0.04em;
-  font-weight: 700;
+  line-height: 1.22;
+  letter-spacing: -0.035em;
+  font-weight: 600;
 }
 
 .cs-auth-layout__brand-copy p {
@@ -62,7 +62,7 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 0.75rem;
+  margin-bottom: 0.5rem;
   padding: 0.4rem 0.8rem;
   border-radius: 999px;
   background: rgba(0, 174, 239, 0.12);
@@ -78,8 +78,8 @@
   align-items: center;
   gap: 0.7rem;
   margin-top: auto;
-  padding-top: 2rem;
-  color: rgba(255, 255, 255, 0.62);
+  padding-top: 2.5rem;
+  color: rgba(255, 255, 255, 0.58);
   font-size: 0.82rem;
   line-height: 1.5;
 }
@@ -97,11 +97,11 @@
 }
 
 .cs-auth-layout__panel {
-  width: min(100%, 35rem);
+  width: min(100%, 40rem);
 }
 
 .cs-auth-layout__heading {
-  margin-top: clamp(2rem, 4vw, 3.5rem);
+  margin-top: clamp(1.25rem, 2.5vw, 2rem);
   margin-bottom: 1.75rem;
 }
 
@@ -216,7 +216,7 @@
 
 .cs-auth-field__icon {
   position: absolute;
-  left: 0.95rem;
+  left: 0.9rem;
   color: var(--cs-text-muted);
   pointer-events: none;
   transition: color var(--cs-transition-base);
@@ -231,8 +231,8 @@
 
 .cs-auth-layout .cs-auth-input {
   width: 100%;
-  min-height: 2.75rem;
-  padding: 0 1rem 0 2.75rem;
+  min-height: 2.625rem;
+  padding: 0.5rem 1rem 0.5rem 2.6rem;
   border: 1px solid var(--cs-border-strong);
   border-radius: var(--cs-radius-md);
   background: var(--cs-bg-subtle);
@@ -252,7 +252,7 @@
 .cs-auth-layout .cs-auth-input:focus-visible {
   outline: none;
   border-color: var(--cs-blue-500);
-  box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.14);
+  box-shadow: 0 0 0 2px rgba(0, 174, 239, 0.20), 0 0 14px rgba(0, 174, 239, 0.10);
 }
 
 .cs-auth-field__hint {
@@ -275,17 +275,17 @@
   flex-wrap: wrap;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1rem;
-  font-size: 0.72rem;
+  gap: 0.45rem;
+  margin-top: 0.875rem;
+  font-size: 0.7rem;
   color: var(--cs-text-muted);
   font-weight: 500;
-  letter-spacing: 0.01em;
+  letter-spacing: 0.015em;
   line-height: 1.4;
 }
 
 .cs-auth-trust-signals span[aria-hidden="true"] {
-  opacity: 0.4;
+  opacity: 0.35;
 }
 
 .cs-auth-text-link,
@@ -310,6 +310,53 @@
   color: var(--cs-blue-600);
   text-decoration: underline;
   text-underline-offset: 3px;
+}
+
+/* ── Premium feature list (left panel) ── */
+.cs-auth-benefit-list {
+  list-style: none;
+  padding: 0;
+  margin: 1.5rem 0 0;
+  display: grid;
+  gap: 1.25rem;
+}
+
+.cs-auth-benefit {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+  color: rgba(255, 255, 255, 0.88);
+  font-size: 0.95rem;
+  font-weight: 500;
+  line-height: 1.45;
+}
+
+.cs-auth-benefit__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  border-radius: 0.5rem;
+  background: rgba(0, 174, 239, 0.14);
+  border: 1px solid rgba(0, 174, 239, 0.26);
+  flex-shrink: 0;
+}
+
+/* ── Footer link structure ── */
+.cs-auth-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.25rem;
+  margin-top: 0.5rem;
+}
+
+.cs-auth-footer-links__group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
 }
 
 .cs-auth-layout__role-option {
@@ -360,12 +407,12 @@
   color: #ffffff !important;
   border: none;
   border-radius: var(--cs-radius-md);
-  min-height: 3rem;
+  min-height: 2.75rem;
   margin-bottom: 1.25rem;
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  box-shadow: 0 1px 2px rgb(16 32 51 / 0.05), 0 4px 12px rgb(0 136 204 / 0.12);
+  box-shadow: 0 1px 2px rgb(16 32 51 / 0.05), 0 2px 8px rgb(0 136 204 / 0.08);
   transition: box-shadow var(--cs-transition-base), transform var(--cs-transition-base), filter var(--cs-transition-base);
   display: inline-flex;
   align-items: center;
@@ -375,7 +422,7 @@
 
 .cs-auth-layout .cs-auth-submit.cs-btn-primary:hover {
   filter: brightness(1.05);
-  box-shadow: 0 1px 3px rgb(16 32 51 / 0.08), 0 6px 16px rgb(0 136 204 / 0.18);
+  box-shadow: 0 1px 2px rgb(16 32 51 / 0.07), 0 4px 12px rgb(0 136 204 / 0.14);
   transform: translateY(-1px);
 }
 
