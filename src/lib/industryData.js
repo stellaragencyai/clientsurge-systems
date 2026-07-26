@@ -93,6 +93,10 @@ export function getIndustryData(routeSlug) {
   };
 }
 
+export function getIndustryBySlug(routeSlug) {
+  return getIndustryData(routeSlug);
+}
+
 /**
  * Get all valid route slugs.
  */
