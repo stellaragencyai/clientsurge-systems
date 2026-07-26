@@ -58,7 +58,6 @@ const ResetPassword = lazy(() => import("./pages/ResetPassword"));
 const Store = lazy(() => import("./pages/Store"));
 const PrelaunchPreview = lazy(() => import("./pages/PrelaunchPreview"));
 const IndustryPageTemplate = lazy(() => import("./components/landing/IndustryPageTemplate"));
-const IndustryTemplate = lazy(() => import("./components/landing/IndustryTemplate"));
 const About = lazy(() => import("./pages/About"));
 const Automations = lazy(() => import("./pages/Automations"));
 const Onboarding = lazy(() => import("./internal-pages/Onboarding"));
@@ -255,10 +254,13 @@ function SignupForward() {
   return <Navigate to={`/product-signup${location.search}`} replace />;
 }
 
-function IndustryAliasRedirect() {
+function IndustryBookingRedirect() {
   const { slug = "" } = useParams();
   const normalizedSlug = slug.replace(/-ai-growth-system$/i, "");
-  return <Navigate to={`/${normalizedSlug}`} replace />;
+  if (["real-estate", "personal-injury"].includes(normalizedSlug)) {
+    return <Navigate to={`/${normalizedSlug}`} replace />;
+  }
+  return <Navigate to={`/book?industry=${encodeURIComponent(normalizedSlug)}`} replace />;
 }
 
 function AdminLoadingSkeleton() {
@@ -357,8 +359,8 @@ const AuthenticatedAppWithTenant = () => {
       {LEGACY_REDIRECTS.map(({ from, to }) => <Route key={from} caseSensitive path={from} element={<Navigate to={to} replace />} />)}
       <Route path="/industries/real-estate" element={<Navigate to="/real-estate" replace />} />
       <Route path="/industries/personal-injury" element={<Navigate to="/personal-injury" replace />} />
-      {INDUSTRY_ROUTE_SLUGS.map((slug) => <Route key={`industries-${slug}`} path={`/industries/${slug}`} element={<Navigate to={`/${slug}`} replace />} />)}
-      <Route path="/industries/:slug" element={<IndustryAliasRedirect />} />
+      {INDUSTRY_ROUTE_SLUGS.map((slug) => <Route key={`industries-${slug}`} path={`/industries/${slug}`} element={<IndustryBookingRedirect />} />)}
+      <Route path="/industries/:slug" element={<IndustryBookingRedirect />} />
       <Route path={routePath("NotFound")} caseSensitive element={<PageNotFound />} />
       <Route path="/" element={<Home />} />
       <Route path="/pricing" element={<LazyRoute Component={PricingPage} />} />
@@ -405,7 +407,7 @@ const AuthenticatedAppWithTenant = () => {
       {AUTOMATION_SERVICE_ROUTES.map((path) => <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />)}
       <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
       <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
-      {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<LazyRoute Component={IndustryTemplate} />} />)}
+      {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<IndustryBookingRedirect />} />)}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => <Route key={route} path={route} element={<LazyRoute Component={Component} />} />)}
       <Route path="/review/phase-e" element={<Navigate to="/review/phase-e/onboarding" replace />} />
       <Route path="/review/phase-e/onboarding" element={<LazyRoute Component={PhaseEReviewPage} sectionId="onboarding" />} />
