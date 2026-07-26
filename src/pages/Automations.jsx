@@ -41,6 +41,7 @@ export default function Automations() {
               subtitle="Starter, Growth, and Pro include different combinations of these systems depending on how much of your lead flow you want ClientSurge to handle."
               align="center"
               variant="light"
+              as="h1"
             />
           </section>
 
