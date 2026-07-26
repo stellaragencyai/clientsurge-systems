@@ -157,7 +157,6 @@ export default function HomeHero() {
       />
 
       <motion.div
-        style={{ y: shouldReduceMotion ? 0 : contentY, opacity: shouldReduceMotion ? 1 : contentOpacity }}
         className="relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 text-center sm:px-8"
         style={{
           paddingTop: 'calc(var(--cs-nav-height, 76px) + 3.75rem)',
