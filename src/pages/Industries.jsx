@@ -13,7 +13,7 @@ const industries = [
     title: "HVAC AI Growth System",
     icon: Wrench,
     description: "The flagship vertical system for emergency HVAC calls, missed-call recovery, AI booking, tune-up nurture, and package-based automation activation.",
-    href: "/industries/hvac-ai-growth-system",
+    href: "/book?industry=hvac",
     badge: "Flagship",
   },
   {
@@ -21,7 +21,7 @@ const industries = [
     title: "Dental AI Growth System",
     icon: SmilePlus,
     description: "For new-patient inquiries, appointment routing, insurance questions, recall follow-up, reviews, and patient reactivation.",
-    href: "/dental",
+    href: "/book?industry=dental",
     badge: "Next",
   },
   {
@@ -29,16 +29,16 @@ const industries = [
     title: "Roofing AI Growth System",
     icon: Hammer,
     description: "For storm damage, leak repairs, inspection requests, insurance-claim conversations, estimate follow-up, and review automation.",
-    href: "/roofing",
+    href: "/book?industry=roofing",
     badge: "Next",
   },
-  { id: "plumbing", title: "Plumbing & Drain Services", icon: Droplets, description: "For urgent service inquiries, missed-call recovery, and dispatch-ready booking paths.", href: "/plumbing", badge: "Legacy" },
-  { id: "med-spas-clinics", title: "Med Spas & Aesthetic Clinics", icon: HeartPulse, description: "For consultation inquiries, treatment follow-up, booking handoff, and reactivation.", href: "/med-spa", badge: "Legacy" },
-  { id: "chiropractic", title: "Chiropractic & Physical Therapy", icon: Activity, description: "For new-patient inquiries, reminders, booking handoff, and patient reactivation.", href: "/chiropractic", badge: "Legacy" },
-  { id: "contractors", title: "Contractors & Trades", icon: HardHat, description: "For project inquiries, estimate follow-up, walkthrough scheduling, and reviews.", href: "/contractors", badge: "Legacy" },
+  { id: "plumbing", title: "Plumbing & Drain Services", icon: Droplets, description: "For urgent service inquiries, missed-call recovery, and dispatch-ready booking paths.", href: "/book?industry=plumbing", badge: "Legacy" },
+  { id: "med-spas-clinics", title: "Med Spas & Aesthetic Clinics", icon: HeartPulse, description: "For consultation inquiries, treatment follow-up, booking handoff, and reactivation.", href: "/book?industry=med-spa", badge: "Legacy" },
+  { id: "chiropractic", title: "Chiropractic & Physical Therapy", icon: Activity, description: "For new-patient inquiries, reminders, booking handoff, and patient reactivation.", href: "/book?industry=chiropractic", badge: "Legacy" },
+  { id: "contractors", title: "Contractors & Trades", icon: HardHat, description: "For project inquiries, estimate follow-up, walkthrough scheduling, and reviews.", href: "/book?industry=contractors", badge: "Legacy" },
   { id: "real-estate", title: "Real Estate", icon: Building2, description: "For buyer and seller inquiries, showing handoff, follow-up, and old prospect reactivation.", href: "/real-estate", badge: "Legacy" },
   { id: "personal-injury", title: "Personal Injury", icon: Scale, description: "For intake response, consultation scheduling, missed-call recovery, and follow-up.", href: "/personal-injury", badge: "Legacy" },
-  { id: "veterinary", title: "Veterinary Clinics", icon: PawPrint, description: "For appointment requests, reminders, missed-call text-back, and client reactivation.", href: "/veterinary", badge: "Legacy" },
+  { id: "veterinary", title: "Veterinary Clinics", icon: PawPrint, description: "For appointment requests, reminders, missed-call text-back, and client reactivation.", href: "/book?industry=veterinary", badge: "Legacy" },
 ];
 
 export default function Industries() {
