@@ -1,3 +1,5 @@
+import { isPublicRoute } from "@/lib/routeSecurity";
+
 /**
  * Scroll Depth Tracking Utility
  * Fires GA4 events at 25%, 50%, 75%, and 90% scroll thresholds.
@@ -31,7 +33,11 @@ function fireScrollEvent(threshold) {
   }
 
   // Also track via base44 analytics
-  if (typeof window !== "undefined" && window.base44?.analytics?.track) {
+  if (
+    typeof window !== "undefined" &&
+    !isPublicRoute(window.location.pathname) &&
+    window.base44?.analytics?.track
+  ) {
     window.base44.analytics.track({
       eventName: "scroll_depth",
       properties: {
