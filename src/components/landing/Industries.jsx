@@ -83,6 +83,7 @@ const industryPatterns = {
 const industries = [
   {
     id: "med-spa",
+    category: "Health",
     routePath: "/med-spa",
     icon: Sparkles,
     name: "Med Spas & Aesthetic Clinics",
@@ -97,6 +98,7 @@ const industries = [
   },
   {
     id: "dental",
+    category: "Health",
     routePath: "/dental",
     icon: Heart,
     name: "Dental & Orthodontics",
@@ -111,6 +113,7 @@ const industries = [
   },
   {
     id: "chiro-pt",
+    category: "Health",
     routePath: "/chiropractic",
     icon: Building2,
     name: "Chiropractic & Physical Therapy",
@@ -125,6 +128,7 @@ const industries = [
   },
   {
     id: "hvac",
+    category: "Trades",
     routePath: "/hvac",
     icon: Wrench,
     name: "HVAC, Plumbing & Home Services",
@@ -139,6 +143,7 @@ const industries = [
   },
   {
     id: "roofing",
+    category: "Property",
     routePath: "/roofing",
     icon: Home,
     name: "Roofing & Restoration",
@@ -153,6 +158,7 @@ const industries = [
   },
   {
     id: "contractors",
+    category: "Trades",
     routePath: "/contractors",
     icon: MapPin,
     name: "Contractors & Trades",
@@ -173,6 +179,12 @@ export default function Industries() {
   const [sectionVisible, setSectionVisible] = useState(false);
   const [selectedIndustryId, setSelectedIndustryId] = useState(null);
   const [hoveredIndustryId, setHoveredIndustryId] = useState("");
+  const [activeCategory, setActiveCategory] = useState("All");
+
+  const CATEGORIES = ["All", "Health", "Trades", "Property"];
+  const visibleIndustries = activeCategory === "All"
+    ? industries
+    : industries.filter((industry) => industry.category === activeCategory);
 
   useEffect(() => {
     if (typeof window === "undefined") return undefined;
@@ -235,13 +247,37 @@ export default function Industries() {
           Pick your niche to see the ClientSurge system we would lead with first, why it fits, and how the
           stack maps to the way that business actually closes jobs.
         </p>
+
+        <div className="mt-6 flex flex-wrap items-center justify-center gap-2" role="group" aria-label="Filter industries by category">
+          {CATEGORIES.map((cat) => {
+            const isActive = activeCategory === cat;
+            return (
+              <button
+                key={cat}
+                type="button"
+                onClick={() => setActiveCategory(cat)}
+                aria-pressed={isActive}
+                className="rounded-full text-xs font-bold transition-all"
+                style={{
+                  padding: "0.5rem 1rem",
+                  border: `1px solid ${isActive ? "hsl(var(--primary))" : "hsl(var(--border))"}`,
+                  background: isActive ? "hsl(var(--primary))" : "transparent",
+                  color: isActive ? "#ffffff" : "hsl(var(--muted-foreground))",
+                  boxShadow: isActive ? "var(--cs-glow-sm)" : "none",
+                }}
+              >
+                {cat === "All" ? "All industries" : cat}
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       <div
         className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 px-6 md:grid-cols-2 lg:grid-cols-3"
         style={{ overflowX: "hidden" }}
       >
-        {industries.map((industry, index) => {
+        {visibleIndustries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
           const isSelected = selectedIndustryId === industry.id;
@@ -294,7 +330,8 @@ export default function Industries() {
                 width="600"
                 height="442"
                 className="absolute inset-0 h-full w-full object-cover mix-blend-luminosity opacity-[0.22]"
-                style={{ filter: "saturate(0.8) contrast(1.02) brightness(0.8)" }}
+                style={{ filter: "grayscale(0.35) saturate(0.7) contrast(1.05) brightness(0.78)" }}
+                fetchpriority={index === 0 ? "high" : "auto"}
               />
 
               {industryPatterns[industry.id]}

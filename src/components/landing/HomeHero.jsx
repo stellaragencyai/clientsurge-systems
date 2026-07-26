@@ -1,11 +1,37 @@
+import { useState } from 'react';
+import { motion, useReducedMotion } from 'framer-motion';
 import { ArrowRight } from 'lucide-react';
 import { trackCTA } from '@/lib/analytics';
+
+const DEMO_MODES = {
+  speed: {
+    label: 'Speed to Lead',
+    stats: [['Leads', '24'], ['Booked', '18']],
+    steps: ['New lead', 'AI reply', 'Appointment booked'],
+    panelTitle: 'Lead conversion',
+    panelSub: 'Live workflow snapshot',
+  },
+  recovery: {
+    label: 'Revenue Recovered',
+    stats: [['Recovered', '12'], ['Reactivated', '7']],
+    steps: ['Old lead', 'AI re-engage', 'Follow-up sent'],
+    panelTitle: 'Lead recovery',
+    panelSub: 'Reactivation snapshot',
+  },
+};
 
 /**
  * HomeHero — centered, screenshot-matched layout.
  * Token-driven: all colors, shadows, and radii derive from src/index.css.
  */
 export default function HomeHero() {
+  const [demoMode, setDemoMode] = useState('speed');
+  const shouldReduceMotion = useReducedMotion();
+  const mode = DEMO_MODES[demoMode];
+  const fadeUp = shouldReduceMotion
+    ? {}
+    : { hidden: { opacity: 0, y: 18 }, show: { opacity: 1, y: 0, transition: { duration: 0.55, ease: [0.22, 1, 0.36, 1] } } };
+  const stagger = shouldReduceMotion ? {} : { hidden: {}, show: { transition: { staggerChildren: 0.09, delayChildren: 0.05 } } };
   const scrollToPricing = (event) => {
     trackCTA('hero_compare_packages_click', 'hero');
     event.preventDefault();
@@ -21,7 +47,7 @@ export default function HomeHero() {
   return (
     <section
       className="relative isolate overflow-hidden bg-background"
-      style={{ minHeight: 'auto' }}
+      style={{ minHeight: 'auto', containerType: 'inline-size' }}
       aria-label="ClientSurge Systems AI growth system hero"
     >
       <div
@@ -44,7 +70,7 @@ export default function HomeHero() {
         }}
       >
         <div
-          className="inline-flex items-center gap-2 rounded-full"
+          className="inline-flex items-center gap-2 rounded-full animate-fade-in-up"
           style={{
             background: 'hsla(0, 0%, 100%, 0.9)',
             border: '1px solid hsl(var(--border))',
@@ -55,6 +81,7 @@ export default function HomeHero() {
             textTransform: 'uppercase',
             color: 'hsl(var(--muted-foreground))',
             boxShadow: 'var(--cs-glow-sm)',
+            animationDelay: '0.05s',
           }}
         >
           <span
@@ -71,9 +98,10 @@ export default function HomeHero() {
         </div>
 
         <h1
-          className="mt-8 font-display"
+          className="mt-8 font-display animate-fade-in-up"
           style={{
-            fontSize: 'clamp(3.2rem, 7vw, 6.1rem)',
+            fontSize: 'clamp(2.6rem, 11cqi, 6.1rem)',
+            animationDelay: '0.15s',
             lineHeight: 0.93,
             letterSpacing: '-0.05em',
             fontWeight: 800,
@@ -99,9 +127,10 @@ export default function HomeHero() {
         </h1>
 
         <p
-          className="mt-6"
+          className="mt-6 animate-fade-in-up"
           style={{
             fontSize: 'clamp(1rem, 1.45vw, 1.18rem)',
+            animationDelay: '0.25s',
             lineHeight: 1.72,
             fontWeight: 400,
             color: 'hsl(var(--muted-foreground))',
@@ -181,7 +210,30 @@ export default function HomeHero() {
             }}
           >
             <span>ClientSurge System Preview</span>
-            <span>Lead response in motion</span>
+            <div className="flex items-center gap-1.5">
+              {Object.entries(DEMO_MODES).map(([key, m]) => (
+                <button
+                  key={key}
+                  type="button"
+                  onClick={() => setDemoMode(key)}
+                  style={{
+                    padding: '0.3rem 0.7rem',
+                    borderRadius: '999px',
+                    fontSize: '0.68rem',
+                    fontWeight: 800,
+                    letterSpacing: '0.04em',
+                    cursor: 'pointer',
+                    border: '1px solid',
+                    borderColor: demoMode === key ? 'rgba(125,211,252,0.6)' : 'rgba(255,255,255,0.16)',
+                    background: demoMode === key ? 'hsla(199, 100%, 47%, 0.22)' : 'transparent',
+                    color: demoMode === key ? '#7dd3fc' : 'rgba(255,255,255,0.6)',
+                    transition: 'all 0.2s ease',
+                  }}
+                >
+                  {m.label}
+                </button>
+              ))}
+            </div>
           </div>
 
           <div className="grid gap-5 px-5 py-5 md:grid-cols-[1.4fr_0.8fr] md:px-7 md:py-7">
@@ -201,7 +253,7 @@ export default function HomeHero() {
                   textTransform: 'uppercase',
                 }}
               >
-                Speed to lead
+                {mode.label}
               </div>
               <h2
                 className="font-display"
@@ -261,15 +313,15 @@ export default function HomeHero() {
               <div className="flex items-start justify-between">
                 <div>
                   <p style={{ margin: 0, fontSize: '0.72rem', fontWeight: 800, letterSpacing: '0.08em', textTransform: 'uppercase' }}>
-                    Lead conversion
+                    {mode.panelTitle}
                   </p>
-                  <p style={{ margin: '0.35rem 0 0', fontSize: '0.86rem', color: 'rgba(255,255,255,0.7)' }}>Live workflow snapshot</p>
+                  <p style={{ margin: '0.35rem 0 0', fontSize: '0.86rem', color: 'rgba(255,255,255,0.7)' }}>{mode.panelSub}</p>
                 </div>
                 <span style={{ color: '#4ade80', fontSize: '0.72rem', fontWeight: 800 }}>LIVE</span>
               </div>
 
               <div className="mt-4 grid grid-cols-2 gap-3">
-                {[['Leads', '24'], ['Booked', '18']].map(([label, value]) => (
+                {mode.stats.map(([label, value]) => (
                   <div
                     key={label}
                     style={{
@@ -285,7 +337,7 @@ export default function HomeHero() {
               </div>
 
               <div className="mt-4 space-y-3">
-                {['New lead', 'AI reply', 'Appointment booked'].map((label, index) => (
+                {mode.steps.map((label, index) => (
                   <div key={label} className="flex items-center gap-3">
                     <span
                       aria-hidden="true"

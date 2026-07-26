@@ -1,5 +1,6 @@
+import { useState } from "react";
 import { motion, useReducedMotion } from "framer-motion";
-import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ShoppingCart } from "lucide-react";
+import { Zap, Phone, MessageSquare, Calendar, Star, RefreshCw, ShoppingCart, ChevronDown } from "lucide-react";
 import { Link } from "react-router-dom";
 import { trackCTA } from "@/lib/analytics";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
@@ -28,6 +29,9 @@ const cardVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 
 
 export default function SixAutomationsSection() {
   const shouldReduceMotion = useReducedMotion();
+  const [showAll, setShowAll] = useState(false);
+  const visibleCards = showAll ? AUTOMATION_CARDS : AUTOMATION_CARDS.slice(0, 3);
+  const hiddenCount = AUTOMATION_CARDS.length - visibleCards.length;
 
   return (
     <section className="relative py-20 md:py-32 bg-white" style={{ background: "#ffffff" }} aria-labelledby="six-automations-title">
@@ -56,12 +60,12 @@ export default function SixAutomationsSection() {
           whileInView={shouldReduceMotion ? {} : "visible"}
           viewport={{ once: true, margin: "-100px" }}
         >
-          {AUTOMATION_CARDS.map(({ id, label, description, icon: Icon, metric, metricLabel }) => (
+          {visibleCards.map(({ id, label, description, icon: Icon, metric, metricLabel }) => (
             <motion.div
               key={id}
               id={id}
               variants={shouldReduceMotion ? {} : cardVariants}
-              className="cs-feature-card p-6 md:p-8"
+              className="cs-feature-card cs-hover-lift p-6 md:p-8"
               style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}
             >
               <div className="flex items-start justify-between mb-4">
@@ -74,7 +78,7 @@ export default function SixAutomationsSection() {
                 </div>
               </div>
               <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>
-              <p style={{ color: "rgba(10,22,40,0.7)", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
+              <p style={{ color: "#1e293b", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
               <div className="mt-4 flex items-center justify-between">
                 <Link
                   to={`/store?focus=${encodeURIComponent(id)}`}
@@ -88,6 +92,34 @@ export default function SixAutomationsSection() {
             </motion.div>
           ))}
         </motion.div>
+
+        {hiddenCount > 0 && (
+          <div className="mt-10 flex flex-col items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowAll(true)}
+              className="cs-btn-outline inline-flex items-center gap-2"
+              style={{ padding: "0.7rem 1.4rem", fontSize: "0.88rem" }}
+            >
+              Show all {AUTOMATION_CARDS.length} automations
+              <ChevronDown className="w-4 h-4" aria-hidden="true" />
+            </button>
+            <p className="text-xs font-semibold text-muted-foreground">
+              {hiddenCount} more system{hiddenCount > 1 ? "s" : ""} — reactivation, reviews &amp; booking
+            </p>
+          </div>
+        )}
+        {showAll && (
+          <div className="mt-8 text-center">
+            <button
+              type="button"
+              onClick={() => setShowAll(false)}
+              className="text-xs font-bold text-primary hover:text-primary/70 transition-colors"
+            >
+              Show less
+            </button>
+          </div>
+        )}
       </div>
     </section>
   );

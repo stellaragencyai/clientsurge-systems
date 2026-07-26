@@ -1,3 +1,4 @@
+import { useState, useEffect } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import {
   ShieldCheck,
@@ -8,6 +9,8 @@ import {
   ServerCog,
   FileCheck,
   Workflow,
+  CheckCircle2,
+  Activity,
 } from 'lucide-react';
 import { trackCTA } from '@/lib/analytics';
 import CSSectionHeader from '@/components/design-system/CSSectionHeader';
@@ -87,8 +90,31 @@ const itemVariants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.22, 1, 0.36, 1] } },
 };
 
+const STATUS_MESSAGES = [
+  'Lead capture path verified',
+  'Twilio SMS channel online',
+  'Booking handoff tested',
+  'Proof log recorded',
+  'Response flow live',
+];
+
+const PROOF_LOG_ITEMS = [
+  'Lead path tested end-to-end',
+  'Response flow verified under 60s',
+  'Booking handoff confirmed',
+  'Proof log archived before go-live',
+];
+
 export default function TrustSection() {
   const shouldReduceMotion = useReducedMotion();
+  const [statusIndex, setStatusIndex] = useState(0);
+
+  useEffect(() => {
+    const t = setInterval(() => {
+      setStatusIndex((prev) => (prev + 1) % STATUS_MESSAGES.length);
+    }, 3200);
+    return () => clearInterval(t);
+  }, []);
 
   return (
     <section
@@ -242,6 +268,66 @@ export default function TrustSection() {
               </span>
             </span>
           ))}
+        </motion.div>
+
+        {/* Live system status ticker */}
+        <div
+          className="mt-8 mx-auto flex max-w-md items-center justify-center gap-3 rounded-full px-5 py-2.5"
+          style={{
+            background: 'rgba(34, 197, 94, 0.06)',
+            border: '1px solid rgba(34, 197, 94, 0.22)',
+          }}
+          aria-label="Live system status"
+        >
+          <span className="relative flex h-2.5 w-2.5 flex-shrink-0" aria-hidden="true">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
+            <span className="relative inline-flex h-2.5 w-2.5 rounded-full bg-green-500" />
+          </span>
+          <Activity className="w-4 h-4 text-green-600" aria-hidden="true" />
+          <p
+            className="text-xs font-bold text-green-700"
+            aria-live="polite"
+            aria-atomic="true"
+            key={statusIndex}
+            style={{ transition: 'opacity 0.3s ease' }}
+          >
+            {STATUS_MESSAGES[statusIndex]}
+          </p>
+        </div>
+
+        {/* Recent verifications — proof log */}
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: '-40px' }}
+          transition={{ duration: 0.5, delay: 0.25 }}
+          className="mt-6 mx-auto max-w-2xl rounded-2xl p-5"
+          style={{
+            background: 'rgba(0,174,239,0.04)',
+            border: '1px solid rgba(0,174,239,0.16)',
+          }}
+          aria-label="Verifications completed before every launch"
+        >
+          <p className="mb-3 text-center text-[11px] font-black uppercase tracking-[0.18em] text-primary">
+            Verified before every launch
+          </p>
+          <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+            {PROOF_LOG_ITEMS.map((item) => (
+              <li key={item} className="flex items-center gap-2.5">
+                <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-green-600" aria-hidden="true" />
+                <span
+                  style={{
+                    fontFamily: "'Inter', sans-serif",
+                    fontSize: '0.82rem',
+                    fontWeight: 600,
+                    color: '#1e293b',
+                  }}
+                >
+                  {item}
+                </span>
+              </li>
+            ))}
+          </ul>
         </motion.div>
 
         {/* CTA */}
