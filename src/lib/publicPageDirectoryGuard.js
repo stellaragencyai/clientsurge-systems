@@ -334,6 +334,11 @@ export function runPublicPageDirectoryGuard() {
   if (typeof window === "undefined" || typeof document === "undefined") return false;
   if (window.location.hostname.includes("preview-sandbox")) return false;
 
+  const pathname = normalizePathname(window.location.pathname || "/");
+  if (/^\/(product-signup|product-sign-up|product_signup|signup)(\/|$)/i.test(pathname)) {
+    return false;
+  }
+
   removeBase44EditorBadge();
 
   const body = document.body;
