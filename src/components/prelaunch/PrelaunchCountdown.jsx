@@ -38,7 +38,7 @@ export default function PrelaunchCountdown() {
     <section className="prelaunch-countdown" aria-labelledby="prelaunch-countdown-heading">
       <div className="prelaunch-countdown__inner">
         <h2 id="prelaunch-countdown-heading" className="prelaunch-countdown__heading">
-          Founding launch countdown
+          Launching in
         </h2>
         <div className="prelaunch-countdown__grid" role="timer">
           {units.map((unit) => (
@@ -54,7 +54,7 @@ export default function PrelaunchCountdown() {
           ))}
         </div>
         <p className="prelaunch-countdown__date">
-          September 1, 2026 at 9:00 a.m. America/Phoenix time
+          September 1, 2026 at 9:00 a.m. Arizona time
         </p>
       </div>
     </section>
