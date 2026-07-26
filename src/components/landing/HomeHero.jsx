@@ -149,8 +149,8 @@ export default function HomeHero() {
       <motion.div
         className="relative z-10 mx-auto flex max-w-[1080px] flex-col items-center px-5 text-center sm:px-8"
         style={{
-          paddingTop: 'calc(var(--cs-nav-height, 76px) + 3.75rem)',
-          paddingBottom: '5rem',
+          paddingTop: 'calc(var(--cs-nav-height, 76px) + clamp(14px, 4vh, 64px))',
+          paddingBottom: 'clamp(80px, 10vh, 130px)',
         }}
       >
         <motion.div variants={stagger} initial="hidden" animate="show" className="w-full flex flex-col items-center">
@@ -186,61 +186,28 @@ export default function HomeHero() {
             Most Trusted AI Lead System
           </motion.div>
 
-          {/* ── ENHANCEMENT 3: Premium headline with glow aura + animated gradient shimmer ── */}
-          <div className="relative mt-8 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
-            <motion.h1
-              variants={fadeUp}
-              className="font-display relative"
-              style={{
-                fontSize: 'clamp(2.6rem, 11cqi, 6.1rem)',
-                lineHeight: 0.93,
-                letterSpacing: '-0.05em',
-                fontWeight: 800,
-                color: 'hsl(var(--foreground))',
-                margin: 0,
-                textWrap: 'balance',
-                maxWidth: '980px',
-              }}
-            >
-              <span
-                aria-hidden="true"
-                style={{
-                  position: 'absolute',
-                  inset: '-12% -8%',
-                  background: 'radial-gradient(ellipse 60% 80% at 50% 50%, hsla(199, 100%, 47%, 0.18), transparent 70%)',
-                  filter: 'blur(24px)',
-                  zIndex: -1,
-                }}
-              />
-              AI Lead Systems That Turn{' '}
-              <span
-                style={{
-                  background: 'linear-gradient(110deg, #00AEEF 0%, #0079C1 35%, #00AEEF 65%, #0088CC 100%)',
-                  backgroundSize: '220% auto',
-                  WebkitBackgroundClip: 'text',
-                  backgroundClip: 'text',
-                  color: 'transparent',
-                  WebkitTextFillColor: 'transparent',
-                  animation: shouldReduceMotion ? undefined : 'csShimmer 4.5s linear infinite',
-                }}
-              >
-                More Calls
-              </span>{' '}
+          {/* ── Premium enterprise headline — Manrope ExtraBold, two balanced lines ── */}
+          <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '0.15s' }}>
+            <motion.h1 variants={fadeUp} className="cs-hero-headline">
+              AI Lead Systems That Turn
+              <span className="cs-hero-break" />
+              <span className="cs-hero-accent">More Calls</span>{' '}
               Into Revenue
             </motion.h1>
           </div>
 
           <motion.p
-            className="mt-6 animate-fade-in-up"
+            className="animate-fade-in-up"
             variants={fadeUp}
             style={{
-              fontSize: 'clamp(1rem, 1.45vw, 1.18rem)',
+              fontSize: 'clamp(18px, 1.4vw, 23px)',
               animationDelay: '0.25s',
-              lineHeight: 1.72,
+              lineHeight: 1.35,
               fontWeight: 400,
-              color: 'hsl(var(--muted-foreground))',
+              color: '#606060',
               maxWidth: '760px',
-              margin: '1.5rem auto 0',
+              margin: '36px auto 0',
+              textAlign: 'center',
               textWrap: 'pretty',
             }}
           >
@@ -552,12 +519,7 @@ export default function HomeHero() {
         </motion.div>
       </motion.div>
 
-      <style>{`
-        @keyframes csShimmer {
-          0% { background-position: 200% center; }
-          100% { background-position: -200% center; }
-        }
-      `}</style>
+
     </section>
   );
 }
