@@ -407,7 +407,7 @@ const AuthenticatedAppWithTenant = () => {
       {AUTOMATION_SERVICE_ROUTES.map((path) => <Route key={path} path={path} element={<LazyRoute Component={AutomationServicePage} />} />)}
       <Route path="/real-estate" element={<LazyRoute Component={RealEstate} />} />
       <Route path="/personal-injury" element={<LazyRoute Component={PersonalInjury} />} />
-      {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<IndustryBookingRedirect />} />)}
+      {INDUSTRY_ROUTE_SLUGS.filter((slug) => slug !== "real-estate" && slug !== "personal-injury").map((slug) => <Route key={slug} path={`/${slug}`} element={<Navigate to={`/book?industry=${encodeURIComponent(slug)}`} replace />} />)}
       {HIDDEN_PUBLIC_ROUTES.map(({ route, Component }) => <Route key={route} path={route} element={<LazyRoute Component={Component} />} />)}
       <Route path="/review/phase-e" element={<Navigate to="/review/phase-e/onboarding" replace />} />
       <Route path="/review/phase-e/onboarding" element={<LazyRoute Component={PhaseEReviewPage} sectionId="onboarding" />} />
