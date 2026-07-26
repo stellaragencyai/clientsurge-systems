@@ -189,8 +189,10 @@ function AppInner() {
     initScrollDepthTracking();
     initPerformanceMonitoring();
 
-    const trackFormSubmits = () => {
+    const trackFormSubmits = (boundForms) => {
       document.querySelectorAll("form").forEach((form) => {
+        if (boundForms.has(form)) return;
+        boundForms.add(form);
         form.addEventListener("submit", () => {
           if (!window.gtag) return;
           const utmParams = new URLSearchParams(window.location.search);
@@ -214,8 +216,10 @@ function AppInner() {
       });
     };
 
-    const trackLinks = () => {
+    const trackLinks = (boundLinks) => {
       document.querySelectorAll("a[href]").forEach((link) => {
+        if (boundLinks.has(link)) return;
+        boundLinks.add(link);
         if (link.href.includes("http") && !link.href.includes(window.location.hostname)) {
           link.addEventListener("click", () => {
             if (window.gtag) {
@@ -230,11 +234,13 @@ function AppInner() {
       });
     };
 
-    trackFormSubmits();
-    trackLinks();
+    const boundForms = new WeakSet();
+    const boundLinks = new WeakSet();
+    trackFormSubmits(boundForms);
+    trackLinks(boundLinks);
     const observer = new MutationObserver(() => {
-      trackFormSubmits();
-      trackLinks();
+      trackFormSubmits(boundForms);
+      trackLinks(boundLinks);
     });
     observer.observe(document.body, { childList: true, subtree: true });
     return () => observer.disconnect();
