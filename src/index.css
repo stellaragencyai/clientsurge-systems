@@ -35,7 +35,7 @@
     --chart-3: 220 80% 20%;
     --chart-4: 199 80% 65%;
     --chart-5: 217 90% 55%;
-    --radius: 0.5rem;
+    --radius: 0.75rem;
     --sidebar-background: 0 0% 100%;
     --sidebar-foreground: 0 0% 0%;
     --sidebar-primary: 199 100% 47%;
@@ -784,7 +784,7 @@ h1, h2, h3, h4, h5, h6 {
   font-family: 'Montserrat', sans-serif !important;
   -webkit-font-smoothing: subpixel-antialiased;
   -moz-osx-font-smoothing: grayscale;
-  font-weight: 900 !important;
+  font-weight: 900;
 }
 
 /* Headings inside cinematic hero sections keep their white color and text shadows */
@@ -1163,7 +1163,7 @@ select:focus-visible,
    ============================================ */
 [class*="rounded-xl"],
 [class*="rounded-2xl"] {
-  --tw-shadow: 0 1px 2px rgba(0,0,0,0.03), 0 4px 6px rgba(0,0,0,0.05), 0 10px 20px rgba(0,0,0,0.07);
+  --tw-shadow: 0 1px 2px rgba(0,174,239,0.04), 0 4px 6px rgba(0,174,239,0.06), 0 10px 20px rgba(0,174,239,0.08);
 }
 
 /* ============================================
@@ -1451,9 +1451,9 @@ table tbody tr:nth-child(even) {
 
 /* Button Hierarchy */
 .btn-primary {
-  @apply inline-flex items-center justify-center rounded-lg border-none cursor-pointer text-white font-semibold px-4 py-2.5 transition-all duration-200;
+  @apply inline-flex items-center justify-center rounded-full border-none cursor-pointer text-white font-semibold px-4 py-2.5 transition-all duration-200;
   background: hsl(var(--primary));
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  box-shadow: 0 1px 2px rgba(0,174,239,0.05);
 }
 .btn-primary:hover {
   box-shadow: 0 4px 12px hsla(var(--primary), 0.3);
@@ -1464,7 +1464,7 @@ table tbody tr:nth-child(even) {
 }
 
 .btn-secondary {
-  @apply inline-flex items-center justify-center rounded-lg border cursor-pointer font-semibold px-4 py-2.5 transition-all duration-200;
+  @apply inline-flex items-center justify-center rounded-full border cursor-pointer font-semibold px-4 py-2.5 transition-all duration-200;
   border-color: hsl(var(--border));
   color: hsl(var(--foreground));
   background: transparent;
@@ -2300,7 +2300,7 @@ a[aria-disabled="true"] {
 
 /* Pulsing "Best Value" badge */
 .pricing-badge-pulse {
-  background: linear-gradient(135deg, #0079c1, #00AEEF);
+  background: linear-gradient(135deg, #0088CC, #00AEEF);
   animation: pricingBadgePulse 2.5s ease-in-out infinite;
 }
 @keyframes pricingBadgePulse {
@@ -2314,7 +2314,7 @@ a[aria-disabled="true"] {
   position: absolute;
   inset: -2px;
   border-radius: 0.875rem;
-  background: linear-gradient(135deg, #0079c1, #00AEEF, #D4AF37, #00AEEF, #0079c1);
+  background: linear-gradient(135deg, #0088CC, #00AEEF, #0088CC, #00AEEF, #0088CC);
   background-size: 300% 300%;
   animation: pricingGradientRotate 4s ease-in-out infinite;
   z-index: -1;
