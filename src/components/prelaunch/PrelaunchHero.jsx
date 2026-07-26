@@ -68,7 +68,7 @@ export default function PrelaunchHero() {
               </div>
               <span className="prelaunch-hero__system-label">ClientSurge system preview</span>
               <span className="prelaunch-hero__system-status">
-                <span aria-hidden="true" /> Active
+                <span aria-hidden="true" /> Preview
               </span>
             </div>
 
@@ -82,11 +82,11 @@ export default function PrelaunchHero() {
               <div className="prelaunch-hero__flow" aria-hidden="true">
                 {FLOW_STEPS.map(({ label, Icon }, index) => (
                   <div className="prelaunch-hero__flow-step" key={label}>
+                    <span className="prelaunch-hero__flow-index">{index + 1}</span>
                     <span className="prelaunch-hero__flow-icon">
                       <Icon size={17} />
                     </span>
                     <span>{label}</span>
-                    {index < FLOW_STEPS.length - 1 && <ArrowRight className="prelaunch-hero__flow-arrow" size={15} />}
                   </div>
                 ))}
               </div>
