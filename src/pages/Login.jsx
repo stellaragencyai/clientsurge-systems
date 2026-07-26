@@ -138,14 +138,14 @@ export default function Login() {
           <span className="cs-auth-brand-pill">
             <LockKeyhole size={14} aria-hidden="true" /> Secure client access
           </span>
-          <h2 style={{ margin: 0, color: "#ffffff", fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.03, letterSpacing: "-0.045em", fontWeight: 800 }}>
+          <h2 style={{ margin: 0, color: "#eef3fa", fontSize: "clamp(2rem, 4vw, 3.25rem)", lineHeight: 1.12, letterSpacing: "-0.04em", fontWeight: 700 }}>
             Your ClientSurge system, in one place.
           </h2>
           <p style={{ margin: "1.25rem 0 0", maxWidth: "42ch", color: "rgba(255,255,255,0.78)", fontSize: "1rem", lineHeight: 1.7 }}>
             Sign in to see what is active, what ClientSurge handled, what results were created, and what needs your attention — without navigating technical tools.
           </p>
 
-          <ul style={{ listStyle: "none", padding: 0, margin: "2rem 0 0", display: "grid", gap: "0.95rem" }}>
+          <ul style={{ listStyle: "none", padding: 0, margin: "1.75rem 0 0", display: "grid", gap: "1.15rem" }}>
             {BRAND_BENEFITS.map((item) => (
               <li key={item} style={{ display: "flex", alignItems: "center", gap: "0.85rem", color: "rgba(255,255,255,0.86)", fontSize: "0.95rem", fontWeight: 500, lineHeight: 1.4 }}>
                 <span style={{ display: "inline-flex", alignItems: "center", justifyContent: "center", width: "1.5rem", height: "1.5rem", borderRadius: "0.5rem", background: "rgba(0,174,239,0.16)", border: "1px solid rgba(0,174,239,0.28)", flexShrink: 0 }}>
@@ -321,7 +321,17 @@ export default function Login() {
                       : isLoginView ? <>Sign in <ArrowRight aria-hidden="true" /></> : <>Send reset email <Mail aria-hidden="true" /></>}
                   </CSButton>
 
-                  <div style={{ display: "flex", flexDirection: "column", gap: "0.85rem", alignItems: "center", marginTop: "0.25rem" }}>
+                  {isLoginView && (
+                    <div className="cs-auth-trust-signals" aria-label="Security guarantees">
+                      <span>Secure encrypted authentication</span>
+                      <span aria-hidden="true">·</span>
+                      <span>Enterprise-grade security</span>
+                      <span aria-hidden="true">·</span>
+                      <span>Your data is protected</span>
+                    </div>
+                  )}
+
+                  <div style={{ display: "flex", flexDirection: "column", gap: "1.25rem", alignItems: "center", marginTop: "0.5rem" }}>
                     {isLoginView ? (
                       <>
                         <button
@@ -331,10 +341,12 @@ export default function Login() {
                         >
                           <KeyRound size={14} aria-hidden="true" /> Forgot your password?
                         </button>
-                        <p className="cs-auth-field__footer-note">
-                          Do not have an account?{" "}
-                          <Link to="/register" className="cs-auth-inline-link">Start onboarding</Link>
-                        </p>
+                        <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: "0.4rem" }}>
+                          <p className="cs-auth-field__footer-note" style={{ margin: 0 }}>Need an account?</p>
+                          <Link to="/register" className="cs-auth-inline-link">
+                            Start onboarding <ArrowRight size={13} aria-hidden="true" />
+                          </Link>
+                        </div>
                       </>
                     ) : (
                       <button type="button" onClick={() => { setError(""); setNotice(""); setView("login"); }} className="cs-auth-text-link">

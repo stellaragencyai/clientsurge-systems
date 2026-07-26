@@ -8,16 +8,19 @@
 .cs-auth-layout__brand {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  padding: clamp(2rem, 5vw, 4.5rem);
-  background: linear-gradient(155deg, var(--cs-navy-950), var(--cs-navy-800));
+  justify-content: flex-start;
+  padding: clamp(2.5rem, 5vw, 3.5rem);
+  background: linear-gradient(160deg, var(--cs-navy-950), var(--cs-navy-800));
   color: var(--cs-text-inverse);
+  position: relative;
+  box-shadow: 8px 0 28px rgba(7, 15, 32, 0.07);
 }
 
 .cs-auth-layout__brand-lockup {
   display: inline-flex;
   align-items: center;
   gap: 0.75rem;
+  margin-bottom: 1.5rem;
   font-weight: 750;
   letter-spacing: -0.02em;
 }
@@ -40,17 +43,18 @@
 
 .cs-auth-layout__brand-copy h2 {
   margin: 0;
-  color: #ffffff;
-  font-size: clamp(2rem, 4vw, 3.5rem);
-  line-height: 1.03;
-  letter-spacing: -0.045em;
+  color: #eef3fa;
+  font-size: clamp(2rem, 4vw, 3.25rem);
+  line-height: 1.12;
+  letter-spacing: -0.04em;
+  font-weight: 700;
 }
 
 .cs-auth-layout__brand-copy p {
-  margin: 1.25rem 0 0;
+  margin: 1rem 0 0;
   max-width: 42ch;
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 1rem;
+  color: rgba(255, 255, 255, 0.72);
+  font-size: 0.95rem;
   line-height: 1.7;
 }
 
@@ -58,13 +62,13 @@
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  margin-bottom: 1.25rem;
-  padding: 0.45rem 0.85rem;
+  margin-bottom: 0.75rem;
+  padding: 0.4rem 0.8rem;
   border-radius: 999px;
-  background: rgba(0, 174, 239, 0.14);
-  border: 1px solid rgba(0, 174, 239, 0.38);
+  background: rgba(0, 174, 239, 0.12);
+  border: 1px solid rgba(0, 174, 239, 0.32);
   color: #c9ecfb;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 700;
   letter-spacing: 0.01em;
 }
@@ -73,10 +77,10 @@
   display: flex;
   align-items: center;
   gap: 0.7rem;
-  padding-top: 1.5rem;
-  border-top: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 255, 255, 0.78);
-  font-size: 0.9rem;
+  margin-top: auto;
+  padding-top: 2rem;
+  color: rgba(255, 255, 255, 0.62);
+  font-size: 0.82rem;
   line-height: 1.5;
 }
 
@@ -87,15 +91,17 @@
 
 .cs-auth-layout__workspace {
   display: grid;
-  place-items: center;
-  padding: clamp(1.5rem, 5vw, 5rem);
+  align-items: start;
+  justify-items: center;
+  padding: clamp(2.5rem, 5vw, 3.5rem);
 }
 
 .cs-auth-layout__panel {
-  width: min(100%, 31rem);
+  width: min(100%, 35rem);
 }
 
 .cs-auth-layout__heading {
+  margin-top: clamp(2rem, 4vw, 3.5rem);
   margin-bottom: 1.75rem;
 }
 
@@ -180,7 +186,7 @@
 .cs-auth-layout .cs-auth-input:focus-visible {
   outline: none;
   border-color: var(--cs-blue-500);
-  box-shadow: var(--cs-focus-ring);
+  box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.14);
 }
 
 .cs-auth-layout .cs-auth-submit {
@@ -225,13 +231,13 @@
 
 .cs-auth-layout .cs-auth-input {
   width: 100%;
-  min-height: 3.25rem;
-  padding: 0 1rem 0 2.85rem;
-  border: 1.5px solid var(--cs-border-strong);
+  min-height: 2.75rem;
+  padding: 0 1rem 0 2.75rem;
+  border: 1px solid var(--cs-border-strong);
   border-radius: var(--cs-radius-md);
   background: var(--cs-bg-subtle);
   color: var(--cs-text-primary);
-  font-size: 1rem;
+  font-size: 0.95rem;
   transition: border-color var(--cs-transition-base), box-shadow var(--cs-transition-base), background var(--cs-transition-base);
 }
 
@@ -246,7 +252,7 @@
 .cs-auth-layout .cs-auth-input:focus-visible {
   outline: none;
   border-color: var(--cs-blue-500);
-  box-shadow: var(--cs-focus-ring);
+  box-shadow: 0 0 0 3px rgba(0, 174, 239, 0.14);
 }
 
 .cs-auth-field__hint {
@@ -260,7 +266,26 @@
   margin: 0;
   text-align: center;
   color: var(--cs-text-secondary);
-  font-size: 0.875rem;
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.cs-auth-trust-signals {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 1rem;
+  font-size: 0.72rem;
+  color: var(--cs-text-muted);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.4;
+}
+
+.cs-auth-trust-signals span[aria-hidden="true"] {
+  opacity: 0.4;
 }
 
 .cs-auth-text-link,
@@ -340,7 +365,7 @@
   font-size: 0.95rem;
   font-weight: 700;
   letter-spacing: -0.01em;
-  box-shadow: 0 1px 2px rgb(16 32 51 / 0.08), 0 6px 16px rgb(0 136 204 / 0.18);
+  box-shadow: 0 1px 2px rgb(16 32 51 / 0.05), 0 4px 12px rgb(0 136 204 / 0.12);
   transition: box-shadow var(--cs-transition-base), transform var(--cs-transition-base), filter var(--cs-transition-base);
   display: inline-flex;
   align-items: center;
@@ -350,7 +375,7 @@
 
 .cs-auth-layout .cs-auth-submit.cs-btn-primary:hover {
   filter: brightness(1.05);
-  box-shadow: 0 2px 4px rgb(16 32 51 / 0.10), 0 10px 22px rgb(0 136 204 / 0.26);
+  box-shadow: 0 1px 3px rgb(16 32 51 / 0.08), 0 6px 16px rgb(0 136 204 / 0.18);
   transform: translateY(-1px);
 }
 
@@ -364,12 +389,12 @@
   }
 
   .cs-auth-layout__brand {
-    min-height: 14rem;
-    padding: 1.5rem;
+    min-height: auto;
+    padding: 1.75rem 1.5rem 1.5rem;
   }
 
   .cs-auth-layout__brand-copy {
-    margin-top: 2rem;
+    margin-top: 1.5rem;
   }
 
   .cs-auth-layout__brand-copy h2 {
