@@ -205,7 +205,7 @@ export default function ChatBubble() {
                   key={q}
                   onClick={() => sendMessage(q)}
                   disabled={loading || cooldown}
-                  className="text-xs font-semibold px-3 py-1.5 rounded-full border transition-all disabled:opacity-50"
+                  className="text-xs font-semibold px-3.5 py-2 rounded-full border transition-all disabled:opacity-50"
                   style={{
                     borderColor: "rgba(0,136,204,0.24)",
                     color: "#005f99",
@@ -237,7 +237,7 @@ export default function ChatBubble() {
             <button
               onClick={() => sendMessage()}
               disabled={!input.trim() || loading || cooldown}
-              className="w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
+              className="w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all disabled:opacity-40"
               style={{ background: "linear-gradient(135deg,#006BB0,#003B8F)" }}
             >
               {loading ? (
@@ -330,4 +330,3 @@ export default function ChatBubble() {
     </>
   );
 }
-

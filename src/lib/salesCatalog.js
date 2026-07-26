@@ -129,8 +129,8 @@ export const PACKAGE_DEFINITIONS = [
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
-    setup_total: 797,
-    monthly_total: 497,
+    setup_total: 399,
+    monthly_total: 249,
   },
   {
     package_key: "growth_system",
@@ -146,8 +146,8 @@ export const PACKAGE_DEFINITIONS = [
     setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
     monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
     included_service_keys: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent"],
-    setup_total: 1297,
-    monthly_total: 997,
+    setup_total: 649,
+    monthly_total: 499,
     badge: "Most Popular",
     highlight: true,
   },
@@ -166,8 +166,8 @@ export const PACKAGE_DEFINITIONS = [
     setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
     monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
     included_service_keys: ["instant_lead_response", "missed_call_text_back", "nurture_sequence_14d", "ai_booking_agent", "lead_reactivation", "review_request"],
-    setup_total: 2497,
-    monthly_total: 1997,
+    setup_total: 1249,
+    monthly_total: 999,
   },
 ];
 

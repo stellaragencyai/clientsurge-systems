@@ -1,9 +1,36 @@
+import { useState, useEffect } from "react";
 import StardustOverlay from "./StardustOverlay";
-import { ArrowRight, ShoppingCart, Shield, Zap, Phone, Clock } from "lucide-react";
+import { ArrowRight, ShoppingCart, Shield, Zap, Phone, Clock, BadgeCheck } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import CSButton from "@/components/design-system/CSButton";
 
+const LAUNCH_TOASTS = [
+  "An HVAC system just went live",
+  "A dental practice activated instant lead response",
+  "A roofing crew turned on missed-call text-back",
+  "A med-spa launched its AI booking handoff",
+  "A plumbing team started lead reactivation",
+];
+
 export default function FinalCTA() {
+  const [toastIndex, setToastIndex] = useState(0);
+  const [toastVisible, setToastVisible] = useState(false);
+
+  useEffect(() => {
+    const showTimer = setTimeout(() => setToastVisible(true), 3000);
+    const interval = setInterval(() => {
+      setToastVisible(false);
+      setTimeout(() => {
+        setToastIndex((prev) => (prev + 1) % LAUNCH_TOASTS.length);
+        setToastVisible(true);
+      }, 400);
+    }, 6000);
+    return () => {
+      clearTimeout(showTimer);
+      clearInterval(interval);
+    };
+  }, []);
+
   return (
     <section id="build-stack" className="bg-white pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
       <StardustOverlay seed={13} opacity={0.6} />
@@ -41,6 +68,17 @@ export default function FinalCTA() {
           <span className="text-xs font-bold text-[#006BB0]">Most systems installed in 3–5 business days</span>
         </div>
 
+        {/* Weekly onboarding capacity — honest scarcity, no fake countdown */}
+        <div className="mt-3 max-w-xs mx-auto">
+          <div className="flex items-center justify-between text-xs font-semibold text-foreground/70 mb-1.5">
+            <span>Weekly onboarding capacity</span>
+            <span className="text-[#006BB0]">Limited</span>
+          </div>
+          <div className="h-1.5 rounded-full bg-muted overflow-hidden" aria-hidden="true">
+            <div className="h-full rounded-full" style={{ width: "62%", background: "linear-gradient(90deg, #00AEEF, #006BB0)" }} />
+          </div>
+        </div>
+
         <p className="mt-4 text-sm text-foreground">Month-to-month · Proof checked before launch · Done-for-you setup included</p>
 
         <div className="mt-6 flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -76,7 +114,30 @@ export default function FinalCTA() {
           <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><Shield className="w-4 h-4" /> 30-day performance review included</span>
           <span className="hidden sm:block text-foreground/30">|</span>
           <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><Zap className="w-4 h-4" /> Launch path tested before go-live</span>
+          <span className="hidden sm:block text-foreground/30">|</span>
+          <span className="text-sm text-foreground font-semibold inline-flex items-center gap-1.5"><BadgeCheck className="w-4 h-4" /> Cancel anytime — no questions asked</span>
         </div>
+      </div>
+
+      {/* Just-went-live social proof toast */}
+      <div
+        className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5 rounded-full px-4 py-2.5 shadow-lg"
+        style={{
+          background: "rgba(255,255,255,0.96)",
+          border: "1px solid rgba(0,174,239,0.22)",
+          backdropFilter: "blur(8px)",
+          transition: "opacity 0.4s ease, transform 0.4s ease",
+          opacity: toastVisible ? 1 : 0,
+          transform: toastVisible ? "translateY(0)" : "translateY(12px)",
+          pointerEvents: "none",
+        }}
+        aria-live="polite"
+      >
+        <span className="relative flex h-2 w-2 flex-shrink-0" aria-hidden="true">
+          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
+          <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
+        </span>
+        <span className="text-xs font-semibold text-foreground whitespace-nowrap">{LAUNCH_TOASTS[toastIndex]}</span>
       </div>
     </section>
   );

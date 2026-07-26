@@ -169,7 +169,7 @@ export default function Footer() {
         .cs-footer-brand-glow { position: absolute; width: 280px; height: 180px; top: -52px; left: -48px; pointer-events: none; background: radial-gradient(circle, rgba(0, 174, 239, 0.16), transparent 68%); filter: blur(12px); }
         .cs-footer-logo-row { position: relative; margin-bottom: 22px; }
         .cs-footer-logo-row img { display: block; width: min(100%, 284px); height: auto; filter: drop-shadow(0 10px 24px rgba(0, 59, 143, 0.12)); }
-        .cs-footer-brand-copy { position: relative; max-width: 510px; margin: 0; color: #475569; font-size: 15px; line-height: 1.75; }
+        .cs-footer-brand-copy { position: relative; max-width: 510px; margin: 0; color: #334155; font-size: 15px; line-height: 1.75; }
 
         .cs-footer-contact-list { position: relative; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 26px; }
         .cs-footer-contact-card { min-width: 0; display: grid; grid-template-columns: auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 15px; border-radius: 12px; border: 1px solid rgba(0, 174, 239, 0.18); background: rgba(255, 255, 255, 0.72); box-shadow: 0 10px 30px rgba(15, 23, 42, 0.06), inset 0 1px 0 rgba(255,255,255,.9); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease; }
@@ -187,7 +187,7 @@ export default function Footer() {
         .cs-footer-nav-column h4 { margin: 0 0 18px; color: #0f172a; font-size: 11px; font-weight: 900; letter-spacing: .15em; text-transform: uppercase; }
         .cs-footer-nav-column ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 5px; }
         .cs-footer-nav-column li { min-width: 0; }
-        .cs-footer-nav-column a { position: relative; width: 100%; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; color: #475569; font-size: 13px; font-weight: 700; transition: color .2s ease, transform .2s ease; }
+        .cs-footer-nav-column a { position: relative; width: 100%; display: inline-flex; align-items: center; justify-content: space-between; gap: 8px; padding: 7px 0; color: #334155; font-size: 13px; font-weight: 700; transition: color .2s ease, transform .2s ease; }
         .cs-footer-nav-column a::after { content: ""; position: absolute; left: 0; right: 100%; bottom: 3px; height: 1px; background: linear-gradient(90deg, #00AEEF, #006BB0); transition: right .24s ease; }
         .cs-footer-nav-column a svg { width: 13px; height: 13px; opacity: 0; transform: translateX(-5px); transition: opacity .2s ease, transform .2s ease; }
         .cs-footer-nav-column a:hover { color: #0088CC; transform: translateX(3px); }
@@ -197,7 +197,7 @@ export default function Footer() {
         .cs-footer-bottom { grid-column: 1 / -1; display: flex; align-items: center; justify-content: space-between; gap: 22px; border-top: 1px solid rgba(15,23,42,.09); margin-top: 8px; padding-top: 22px; color: #64748b; font-size: 11px; }
         .cs-footer-legal, .cs-footer-status { display: flex; align-items: center; flex-wrap: wrap; gap: 12px; }
         .cs-footer-legal a { transition: color .2s ease; }
-        .cs-footer-legal a:hover { color: #0088CC; }
+        .cs-footer-legal a:hover { color: #0088CC; text-decoration: underline; text-underline-offset: 3px; }
         .cs-footer-legal-divider { width: 1px; height: 14px; background: rgba(15,23,42,.16); }
         .cs-footer-status { justify-content: flex-end; }
         .cs-footer-status-item { display: inline-flex; align-items: center; gap: 6px; color: #64748b; white-space: nowrap; }

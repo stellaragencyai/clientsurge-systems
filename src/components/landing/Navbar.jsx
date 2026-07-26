@@ -205,7 +205,7 @@ export default function Navbar() {
               navigateTo("/#pricing");
             }}
             className="cs-btn-primary cs-nav-cta"
-            style={{ minHeight: "unset", height: "36px", padding: "0 16px", fontSize: "0.75rem" }}
+            style={{ minHeight: "unset", height: "40px", padding: "0 16px", fontSize: "0.75rem" }}
           >
             Compare
           </button>
@@ -235,6 +235,7 @@ export default function Navbar() {
             id="mobile-nav-drawer"
             className="xl:hidden fixed z-50 overflow-hidden rounded-[1.75rem] border mobile-nav-drawer"
             style={{
+              animation: "navDrawerSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
               top: "calc(var(--cs-nav-height) + env(safe-area-inset-top) + 12px)",
               left: "max(12px, env(safe-area-inset-left))",
               right: "max(12px, env(safe-area-inset-right))",
@@ -310,6 +311,26 @@ export default function Navbar() {
                   <p className="text-[11px] font-black uppercase tracking-[0.2em] text-primary/70">Signed in</p>
                   <p className="mt-1 truncate text-sm font-bold text-slate-950">{mobileUserName}</p>
                   <p className="text-xs capitalize text-slate-500">{mobileUserRole || "client"}</p>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => { trackCTA("quick_portal", "mobile_nav"); closeAll(); navigate("/client-portal"); }}
+                      className="rounded-full px-3 py-1.5 text-xs font-bold transition-colors"
+                      style={{ background: "rgba(0,174,239,0.1)", border: "1px solid rgba(0,174,239,0.2)", color: "#006BB0", minHeight: "36px" }}
+                    >My Portal</button>
+                    <button
+                      type="button"
+                      onClick={() => { trackCTA("quick_automations", "mobile_nav"); closeAll(); navigate("/automations"); }}
+                      className="rounded-full px-3 py-1.5 text-xs font-bold transition-colors"
+                      style={{ background: "rgba(0,174,239,0.1)", border: "1px solid rgba(0,174,239,0.2)", color: "#006BB0", minHeight: "36px" }}
+                    >Automations</button>
+                    <button
+                      type="button"
+                      onClick={() => { trackCTA("quick_support", "mobile_nav"); closeAll(); navigate("/contact"); }}
+                      className="rounded-full px-3 py-1.5 text-xs font-bold transition-colors"
+                      style={{ background: "rgba(0,174,239,0.1)", border: "1px solid rgba(0,174,239,0.2)", color: "#006BB0", minHeight: "36px" }}
+                    >Support</button>
+                  </div>
                   <div className="mt-3 grid grid-cols-1 gap-2">
                     <button
                       type="button"
@@ -390,6 +411,16 @@ export default function Navbar() {
           </div>
         </>
       )}
+
+      <style>{`
+        @keyframes navDrawerSlideIn {
+          from { opacity: 0; transform: translateY(-12px) scale(0.98); }
+          to { opacity: 1; transform: translateY(0) scale(1); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          #mobile-nav-drawer { animation: none !important; }
+        }
+      `}</style>
     </nav>
   );
 }

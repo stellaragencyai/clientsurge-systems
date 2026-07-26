@@ -1,32 +1,32 @@
 {
-  "_comment": "Canonical price list. Checkout URLs intentionally route through /product-signup so Base44 creates a fresh Stripe Checkout Session and matching Order before redirecting to Stripe.",
+  "_comment": "Canonical price list. All package prices reduced by 50% from original. Checkout URLs intentionally route through /product-signup so Base44 creates a fresh Stripe Checkout Session and matching Order before redirecting to Stripe.",
   "tiers": {
     "starter": {
-      "monthly_fee": 497,
-      "setup_fee": 797,
+      "monthly_fee": 249,
+      "setup_fee": 399,
       "label": "Starter System",
       "checkout_url": "/product-signup?package=starter_system",
       "services": ["Instant Lead Response", "Missed Call Text-Back"],
       "service_count": 2
     },
     "growth": {
-      "monthly_fee": 997,
-      "setup_fee": 1297,
+      "monthly_fee": 499,
+      "setup_fee": 649,
       "label": "Growth System",
       "checkout_url": "/product-signup?package=growth_system",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking"],
       "service_count": 4
     },
     "pro": {
-      "monthly_fee": 1997,
-      "setup_fee": 2497,
+      "monthly_fee": 999,
+      "setup_fee": 1249,
       "label": "Pro System",
       "checkout_url": "/product-signup?package=pro_system",
       "services": ["Instant Lead Response", "Missed Call Text-Back", "Follow-Up Sequences", "AI Appointment Booking", "Review Request AI", "Reactivation Campaign"],
       "service_count": 6
     }
   },
-  "INVALID_PRICES_TO_PURGE": ["$97", "$297", "$197", "$397", "97/mo", "297/mo"],
-  "valid_monthly": [497, 997, 1997],
-  "valid_setup": [797, 1297, 2497]
+  "INVALID_PRICES_TO_PURGE": ["$97", "$297", "$197", "$397", "97/mo", "297/mo", "$497", "$997", "$1,997", "497/mo", "997/mo"],
+  "valid_monthly": [249, 499, 999],
+  "valid_setup": [399, 649, 1249]
 }

@@ -29,11 +29,12 @@ const PACKAGES = [
     name: "Starter",
     title: "Starter System",
     tagline: "Response Foundation",
+    bestFor: "Solo & startup teams",
     subtitle: "Best for businesses that need instant response and missed-call recovery first.",
     description: "Capture every new inquiry and missed call before leads disappear. The essential response foundation.",
     featureIntro: "Start with the two response automations that stop new leads and missed calls from going cold.",
-    price: "$497",
-    setupPrice: "$797",
+    price: "$249",
+    setupPrice: "$399",
     automationCount: 2,
     coverageCount: 2,
     websiteScope: "Connects to your existing site",
@@ -54,11 +55,12 @@ const PACKAGES = [
     name: "Growth",
     title: "Growth System",
     tagline: "Most Popular",
+    bestFor: "Growing service teams",
     subtitle: "Best for steady lead flow that needs response, recovery, nurture, and booking.",
     description: "Automated follow-up and booking handoff working together — our most popular package.",
     featureIntro: "Includes the Starter automations, then adds nurture and booking handoff.",
-    price: "$997",
-    setupPrice: "$1,297",
+    price: "$499",
+    setupPrice: "$649",
     automationCount: 4,
     coverageCount: 4,
     websiteScope: "Connects to your existing site",
@@ -81,11 +83,12 @@ const PACKAGES = [
     name: "Pro",
     title: "Pro System",
     tagline: "Full Revenue Layer",
+    bestFor: "Multi-location & crews",
     subtitle: "Best for teams that want the full response, reactivation, review, and website layer.",
     description: "The full revenue operating layer — website, reactivation, reviews, reporting, and expanded automation. Done-for-you.",
     featureIntro: "Includes the Growth automations, then adds reactivation and review automation.",
-    price: "$1,997",
-    setupPrice: "$2,497",
+    price: "$999",
+    setupPrice: "$1,249",
     automationCount: 6,
     coverageCount: 6,
     websiteScope: "Full website build & design included",
@@ -116,6 +119,7 @@ export default function ThreeSystemsSection() {
   const [activePackageId, setActivePackageId] = useState(DEFAULT_PACKAGE_ID);
   const [motionReady, setMotionReady] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
+  const [showDetails, setShowDetails] = useState(true);
 
   const activePackage = PACKAGES.find((pkg) => pkg.packageId === activePackageId) || PACKAGES[1];
 
@@ -386,6 +390,19 @@ export default function ThreeSystemsSection() {
           font-weight: 500;
           line-height: 1.42;
         }
+        .csp-best-for {
+          display: inline-flex;
+          align-items: center;
+          margin-top: 10px;
+          padding: 0.35rem 0.75rem;
+          border-radius: 999px;
+          background: hsla(199, 100%, 47%, 0.08);
+          border: 1px solid hsla(199, 100%, 47%, 0.22);
+          color: hsl(var(--primary));
+          font-size: 0.72rem;
+          font-weight: 800;
+          letter-spacing: 0.02em;
+        }
         .csp-divider {
           width: 100%;
           height: 1px;
@@ -585,6 +602,14 @@ export default function ThreeSystemsSection() {
           <p className="text-sm font-semibold text-foreground/80 max-w-3xl mx-auto leading-relaxed">
             Nothing goes live until the lead path, response flow, booking handoff, and proof logs are tested.
           </p>
+          <button
+            type="button"
+            onClick={() => setShowDetails((v) => !v)}
+            className="mt-3 text-xs font-bold text-primary underline underline-offset-4 hover:text-primary/70 transition-colors"
+            aria-expanded={showDetails}
+          >
+            {showDetails ? "Hide implementation details" : "Show implementation details"}
+          </button>
         </div>
 
         <div
@@ -680,12 +705,13 @@ export default function ThreeSystemsSection() {
                       </div>
 
                       <div className="csp-price-zone">
-                        <div className="csp-price-row" aria-label={`${pkg.price} per month`}>
+                        <div className="csp-price-row" aria-label={`${pkg.price} USD per month`}>
                           <span className="csp-price">{pkg.price}</span>
-                          <span className="csp-period">/month</span>
+                          <span className="csp-period">/mo USD</span>
                         </div>
                         <p className="csp-setup">{pkg.setupPrice} one-time setup</p>
                         <p className="csp-contract">No long-term contracts. Cancel anytime.</p>
+                        <span className="csp-best-for">Best for: {pkg.bestFor}</span>
                       </div>
 
                       <div className="csp-divider" aria-hidden="true" />
@@ -705,6 +731,7 @@ export default function ThreeSystemsSection() {
                         ))}
                       </ul>
 
+                      {showDetails && (
                       <div className="csp-ops">
                         <div className="csp-ops-row">
                           <Zap aria-hidden="true" />
@@ -723,6 +750,7 @@ export default function ThreeSystemsSection() {
                           <span><strong>QA:</strong> {pkg.qaScope}</span>
                         </div>
                       </div>
+                      )}
 
                       <p className="csp-cta-note">
                         {pkg.setupPrice} setup &middot; {pkg.price}/mo &middot; cancel anytime

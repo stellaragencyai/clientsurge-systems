@@ -4,8 +4,8 @@ const packages = [
   {
     name: 'Starter System',
     description: 'Best for small local businesses that need fast lead response and missed-call text back.',
-    setupFee: 797,
-    monthlyFee: 497,
+    setupFee: 399,
+    monthlyFee: 249,
     outcome: 'Stop losing easy leads',
     automations: [
       'Instant lead response via SMS',
@@ -19,8 +19,8 @@ const packages = [
   {
     name: 'Growth System',
     description: 'Best for businesses that want automated follow-up, booking support, and better conversion tracking.',
-    setupFee: 1297,
-    monthlyFee: 997,
+    setupFee: 649,
+    monthlyFee: 499,
     outcome: 'Turn more leads into booked appointments',
     automations: [
       'Instant lead response via SMS',
@@ -38,8 +38,8 @@ const packages = [
   {
     name: 'Pro System',
     description: 'Best for businesses that want the full automation stack, AI voice, reactivation, analytics, and optimization.',
-    setupFee: 2497,
-    monthlyFee: 1997,
+    setupFee: 1249,
+    monthlyFee: 999,
     outcome: 'Build a complete lead-to-revenue operating system',
     automations: [
       'Instant lead response via SMS',
