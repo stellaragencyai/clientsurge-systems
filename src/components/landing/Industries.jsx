@@ -275,13 +275,15 @@ export default function Industries() {
 
       <div
         className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 gap-5 px-6 md:grid-cols-2 lg:grid-cols-3"
-        style={{ overflowX: "hidden" }}
+        style={{ overflowX: "hidden", gridAutoRows: "minmax(300px, auto)" }}
       >
         {visibleIndustries.map((industry, index) => {
           const Icon = industry.icon;
           const highlighted = hoveredIndustryId === industry.id;
           const isSelected = selectedIndustryId === industry.id;
           const accent = industry.accent;
+          const isTrending = index === 0;
+          const rowSpan = index % 3 === 0 ? "span 2" : "span 1";
           const imageProps = buildResponsiveImageProps(industry.image, {
             widths: [480, 720, 960, 1200],
             sizes: "(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw",
@@ -313,6 +315,7 @@ export default function Industries() {
                 scale: highlighted ? "1.015" : isSelected ? "1.02" : "1",
                 contentVisibility: "auto",
                 containIntrinsicSize: "380px 340px",
+                gridRow: rowSpan,
               }}
             >
               <div
@@ -386,6 +389,7 @@ export default function Industries() {
                     letterSpacing: "0.08em",
                     textTransform: "uppercase",
                     backdropFilter: "blur(10px)",
+                    WebkitBackdropFilter: "blur(10px)",
                   }}
                 >
                   <span
@@ -400,9 +404,33 @@ export default function Industries() {
                   />
                   Industry System
                 </span>
+                {isTrending && (
+                  <span
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: "6px",
+                      borderRadius: "999px",
+                      padding: "6px 11px",
+                      background: "linear-gradient(135deg, rgba(212,175,55,0.28), rgba(212,175,55,0.16))",
+                      border: "1px solid rgba(212,175,55,0.42)",
+                      color: "#F5E6B8",
+                      fontSize: "10px",
+                      fontWeight: 800,
+                      letterSpacing: "0.08em",
+                      textTransform: "uppercase",
+                      boxShadow: "0 0 14px rgba(212,175,55,0.30)",
+                      backdropFilter: "blur(8px)",
+                      WebkitBackdropFilter: "blur(8px)",
+                    }}
+                  >
+                    <span aria-hidden="true" style={{ width: "6px", height: "6px", borderRadius: "999px", background: "#E5C978" }} />
+                    Trending
+                  </span>
+                )}
               </div>
 
-              <div className="absolute inset-x-0 bottom-0 px-5 pb-5 pt-12">
+              <div className="absolute inset-x-0 bottom-0 px-5 pb-5 pt-12" style={{ background: "linear-gradient(180deg, transparent 0%, rgba(5,16,34,0.35) 30%, rgba(5,16,34,0.78) 100%)", backdropFilter: "blur(6px)", WebkitBackdropFilter: "blur(6px)" }}>
                 <div
                   className="mb-3 inline-flex h-11 w-11 items-center justify-center rounded-lg border backdrop-blur-sm transition-transform duration-300"
                   style={{

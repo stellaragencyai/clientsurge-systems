@@ -65,13 +65,20 @@ export default function SixAutomationsSection() {
               key={id}
               id={id}
               variants={shouldReduceMotion ? {} : cardVariants}
-              className="cs-feature-card cs-hover-lift p-6 md:p-8"
+              whileHover={shouldReduceMotion ? {} : { y: -8, boxShadow: "0 18px 42px rgba(53,189,241,0.18), 0 0 0 1px rgba(53,189,241,0.12)" }}
+              transition={{ type: "spring", stiffness: 300, damping: 24 }}
+              className="cs-feature-card p-5 md:p-6"
               style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}
             >
               <div className="flex items-start justify-between mb-4">
-                <div className="w-12 h-12 rounded-lg flex items-center justify-center" style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}>
+                <motion.div
+                  className="w-12 h-12 rounded-lg flex items-center justify-center"
+                  style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}
+                  whileHover={shouldReduceMotion ? {} : { rotate: -6, scale: 1.12 }}
+                  transition={{ type: "spring", stiffness: 320, damping: 16 }}
+                >
                   <Icon className="w-6 h-6" style={{ color: "#35BDF1" }} aria-hidden="true" />
-                </div>
+                </motion.div>
                 <div className="text-right">
                   <p className="font-titles font-black" style={{ fontSize: "1.1rem", color: "#006BB0", lineHeight: 1 }}>{metric}</p>
                   <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">{metricLabel}</p>

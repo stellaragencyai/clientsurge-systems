@@ -99,10 +99,10 @@ const STATUS_MESSAGES = [
 ];
 
 const PROOF_LOG_ITEMS = [
-  'Lead path tested end-to-end',
-  'Response flow verified under 60s',
-  'Booking handoff confirmed',
-  'Proof log archived before go-live',
+  { label: 'Lead path tested end-to-end', tooltip: 'Full form-to-CRM submission verified with a real test lead before launch.' },
+  { label: 'Response flow verified under 60s', tooltip: 'Instant SMS/email response timed and confirmed under the 60-second SLA.' },
+  { label: 'Booking handoff confirmed', tooltip: 'Booking link shared and calendar handoff validated end-to-end.' },
+  { label: 'Proof log archived before go-live', tooltip: 'AutomationProofLog record stored with provider message IDs before go-live.' },
 ];
 
 export default function TrustSection() {
@@ -251,17 +251,17 @@ export default function TrustSection() {
               key={label}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl"
               style={{
-                background: 'rgba(0,174,239,0.06)',
-                border: '1px solid rgba(0,174,239,0.18)',
+                background: 'rgba(0,107,176,0.10)',
+                border: '1px solid rgba(0,107,176,0.32)',
               }}
             >
-              <Icon className="w-4 h-4" style={{ color: '#006BB0' }} aria-hidden="true" />
+              <Icon className="w-4 h-4" style={{ color: '#004B8D' }} aria-hidden="true" />
               <span
                 style={{
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '0.78rem',
-                  fontWeight: 700,
-                  color: '#006BB0',
+                  fontWeight: 800,
+                  color: '#003B8F',
                 }}
               >
                 {label}

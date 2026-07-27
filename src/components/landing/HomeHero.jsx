@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { motion, useReducedMotion } from 'framer-motion';
+import { useState, useEffect, useRef } from 'react';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
 import { ArrowRight, MousePointerClick, Sparkles, TrendingUp, Zap } from 'lucide-react';
 import { trackCTA } from '@/lib/analytics';
 
@@ -33,6 +33,16 @@ const FLOATING_METRICS = [
 export default function HomeHero() {
   const [demoMode, setDemoMode] = useState('speed');
   const shouldReduceMotion = useReducedMotion();
+  const sectionRef = useRef(null);
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ['start start', 'end start'],
+  });
+  const orb1Y = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? 0 : -120]);
+  const orb2Y = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? 0 : 90]);
+  const orb3Y = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? 0 : -70]);
+  const orb1X = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? 0 : 40]);
+  const orb2X = useTransform(scrollYProgress, [0, 1], [0, shouldReduceMotion ? 0 : -30]);
 
   const mode = DEMO_MODES[demoMode];
   const fadeUp = shouldReduceMotion
@@ -54,6 +64,7 @@ export default function HomeHero() {
 
   return (
     <section
+      ref={sectionRef}
       className="relative isolate overflow-hidden bg-background"
       style={{ minHeight: 'auto', containerType: 'inline-size' }}
       aria-label="ClientSurge Systems AI growth system hero"
@@ -73,12 +84,12 @@ export default function HomeHero() {
             borderRadius: '9999px',
             background: 'radial-gradient(circle, hsla(199, 100%, 47%, 0.22), transparent 68%)',
             filter: 'blur(8px)',
+            x: orb1X,
+            y: orb1Y,
           }}
           animate={shouldReduceMotion ? {} : {
             scale: [1, 1.12, 1],
             opacity: [0.7, 0.95, 0.7],
-            x: [0, 30, 0],
-            y: [0, 20, 0],
           }}
           transition={{ duration: 14, repeat: Infinity, ease: 'easeInOut' }}
         />
@@ -92,12 +103,12 @@ export default function HomeHero() {
             borderRadius: '9999px',
             background: 'radial-gradient(circle, hsla(217, 90%, 45%, 0.18), transparent 68%)',
             filter: 'blur(10px)',
+            x: orb2X,
+            y: orb2Y,
           }}
           animate={shouldReduceMotion ? {} : {
             scale: [1, 1.18, 1],
             opacity: [0.6, 0.9, 0.6],
-            x: [0, -25, 0],
-            y: [0, 15, 0],
           }}
           transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
         />
@@ -111,11 +122,11 @@ export default function HomeHero() {
             borderRadius: '9999px',
             background: 'radial-gradient(circle, hsla(199, 100%, 60%, 0.14), transparent 68%)',
             filter: 'blur(12px)',
+            y: orb3Y,
           }}
           animate={shouldReduceMotion ? {} : {
             scale: [1, 1.15, 1],
             opacity: [0.5, 0.8, 0.5],
-            x: [0, 20, 0],
           }}
           transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut', delay: 4 }}
         />
@@ -202,7 +213,7 @@ export default function HomeHero() {
             style={{
               fontSize: 'clamp(18px, 1.4vw, 23px)',
               animationDelay: '0.25s',
-              lineHeight: 1.35,
+              lineHeight: 1.7,
               fontWeight: 400,
               color: '#606060',
               maxWidth: '760px',
@@ -262,9 +273,21 @@ export default function HomeHero() {
           </motion.div>
 
           {/* ── ENHANCEMENT 4: Glassmorphic floating metric chips with parallax ── */}
+          <motion.div variants={fadeUp} className="mt-10 mb-3 inline-flex items-center gap-2" aria-hidden="false">
+            <span className="relative flex h-2 w-2 flex-shrink-0">
+              <motion.span
+                className="absolute inline-flex h-full w-full rounded-full"
+                style={{ background: 'hsl(var(--primary))' }}
+                animate={shouldReduceMotion ? {} : { opacity: [0.6, 0, 0.6], scale: [1, 2.4, 1] }}
+                transition={{ duration: 1.8, repeat: Infinity, ease: 'easeInOut' }}
+              />
+              <span className="relative inline-flex h-2 w-2 rounded-full" style={{ background: 'hsl(var(--primary))' }} />
+            </span>
+            <span className="text-[0.62rem] font-bold uppercase tracking-[0.18em] text-slate-500">Live data pulse</span>
+          </motion.div>
           <motion.div
             variants={fadeUp}
-            className="mt-12 grid w-full max-w-[640px] grid-cols-3 gap-3 sm:gap-4"
+            className="grid w-full max-w-[640px] grid-cols-3 gap-3 sm:gap-4"
             aria-hidden="false"
           >
             {FLOATING_METRICS.map((metric, index) => {
