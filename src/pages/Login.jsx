@@ -9,7 +9,7 @@ import { useAuth } from "@/lib/AuthContext";
 import { setPageMetadata } from "@/lib/seo";
 
 const BRAND_LOGO =
-  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/9d6ac5d22_989aaaff-cff8-47a2-a832-6ebc5c12db5c.png";
+  "https://media.base44.com/images/public/69dc4a79656fdba136d413d3/908ae3da9_Gemini_Generated_Image_a681cra681cra681.png";
 
 const BRAND_BENEFITS = [
   "Activation and launch progress",
@@ -127,10 +127,10 @@ export default function Login() {
           <img
             src={BRAND_LOGO}
             alt="ClientSurge Systems"
-            width="220"
-            height="55"
+            width="260"
+            height="60"
             decoding="async"
-            style={{ height: "clamp(48px, 6vw, 64px)", width: "auto", maxWidth: "100%", objectFit: "contain", filter: "drop-shadow(0 6px 16px rgba(0,174,239,0.18))" }}
+            style={{ height: "clamp(46px, 5.5vw, 58px)", width: "auto", maxWidth: "100%", objectFit: "contain", filter: "drop-shadow(0 6px 16px rgba(0,212,255,0.22))" }}
           />
         </div>
 
@@ -149,7 +149,7 @@ export default function Login() {
             {BRAND_BENEFITS.map((item) => (
               <li key={item} className="cs-auth-benefit">
                 <span className="cs-auth-benefit__icon">
-                  <Sparkles size={14} aria-hidden="true" style={{ color: "var(--cs-blue-500)" }} />
+                  <Sparkles size={14} aria-hidden="true" style={{ color: "#00D4FF" }} />
                 </span>
                 {item}
               </li>
@@ -174,7 +174,7 @@ export default function Login() {
                 </span>
                 <CSStatusBadge tone="info"><Shield size={14} aria-hidden="true" /> Admin detected</CSStatusBadge>
               </div>
-              <h1 style={{ margin: "0 0 0.35rem", color: "var(--cs-text-primary)", fontSize: "clamp(1.6rem, 3vw, 2rem)", lineHeight: 1.15, letterSpacing: "-0.03em", fontWeight: 800 }}>
+              <h1 style={{ margin: "0 0 0.35rem", color: "#002D62", fontFamily: "'Montserrat', system-ui, sans-serif", fontSize: "clamp(1.6rem, 3vw, 2rem)", lineHeight: 1.15, letterSpacing: "-0.03em", fontWeight: 800 }}>
                 Choose login role
               </h1>
               <p style={{ margin: "0 0 1.5rem", color: "var(--cs-text-secondary)", fontSize: "0.95rem", lineHeight: 1.6 }}>
@@ -190,7 +190,7 @@ export default function Login() {
                       Full access to the admin dashboard, lead management, client onboarding, and system controls.
                     </span>
                   </span>
-                  <ArrowRight aria-hidden="true" style={{ color: "var(--cs-blue-600)", flexShrink: 0 }} />
+                  <ArrowRight aria-hidden="true" style={{ color: "#0047AB", flexShrink: 0 }} />
                 </button>
 
                 <button type="button" onClick={() => handleRoleChoice("/client-portal")} className="cs-auth-layout__role-option">
@@ -201,7 +201,7 @@ export default function Login() {
                       View the client portal experience, campaign statuses, lead flow, and setup progress as a member with an active Pro package.
                     </span>
                   </span>
-                  <ArrowRight aria-hidden="true" style={{ color: "var(--cs-blue-600)", flexShrink: 0 }} />
+                  <ArrowRight aria-hidden="true" style={{ color: "#0047AB", flexShrink: 0 }} />
                 </button>
               </div>
             </div>
@@ -227,7 +227,7 @@ export default function Login() {
                 <span className="cs-auth-layout__icon" aria-hidden="true">
                   <LockKeyhole size={22} />
                 </span>
-                <h1 style={{ margin: 0, color: "var(--cs-text-primary)", fontSize: "clamp(1.8rem, 3vw, 2.35rem)", lineHeight: 1.15, letterSpacing: "-0.035em", fontWeight: 800 }}>
+                <h1 style={{ margin: 0, color: "#002D62", fontFamily: "'Montserrat', system-ui, sans-serif", fontSize: "clamp(1.8rem, 3vw, 2.35rem)", lineHeight: 1.15, letterSpacing: "-0.035em", fontWeight: 800 }}>
                   {isLoginView ? "Welcome back" : "Reset your password"}
                 </h1>
                 <p style={{ margin: "0.65rem 0 0", color: "var(--cs-text-secondary)", lineHeight: 1.65, fontSize: "0.95rem" }}>
