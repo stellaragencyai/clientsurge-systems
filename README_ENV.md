@@ -63,6 +63,15 @@ The callback logs SMS link clicks into `CommunicationEvent` with `event_type=sms
 
 - `TELEGRAM_BOT_TOKEN`
 - `TELEGRAM_CHAT_ID`
+  - Cloudflare Worker secret for website click and visitor session alerts.
+- `ALLOWED_ORIGINS`
+  - Comma-separated production origins allowed to post click/session tracking events.
+- `VISITOR_ALERT_ENABLED`
+  - Set to `false` only for an intentional pause of Telegram visitor alerts.
+- `VISITOR_ALERT_IP_ALLOWLIST`
+  - Comma-separated internal IPs ignored by the Cloudflare visitor tracking Worker.
+- `SESSION_FINALIZATION_BATCH_SIZE`
+  - Optional inactive-session cron batch size. Default is `25`; the Worker caps it at `100`.
 - `BASE44_APP_ID`
 - `HEALTHCHECK_URL`
 

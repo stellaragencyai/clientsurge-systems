@@ -61,6 +61,17 @@ test("Cloudflare security deploy entrypoint includes the Telegram tracker wrappe
   assert.match(packageJson, /"cloudflare:security:deploy": "npx wrangler deploy --config wrangler\.clientsurge-security\.toml"/);
 });
 
+test("public shell loads the same-origin session-aware tracker", () => {
+  const indexHtml = readFileSync(new URL("../index.html", import.meta.url), "utf8");
+  const fallbackTracker = readFileSync(new URL("../public/clientsurge-telegram-click-tracker.js", import.meta.url), "utf8");
+
+  assert.match(indexHtml, /script\.src = "\/clientsurge-telegram-click-tracker\.js\?v=2026-07-27-session-v1"/);
+  assert.doesNotMatch(indexHtml, /clientsurge-telegram-tracker\.nolanfstrommer\.workers\.dev/);
+  assert.match(fallbackTracker, /\/api\/analytics\/v1\/session-event/);
+  assert.match(fallbackTracker, /sendSessionEvent\("heartbeat"/);
+  assert.match(fallbackTracker, /window\.__clientsurgeSessionDurationTracker = true/);
+});
+
 test("Cloudflare Telegram tracker serves same-origin sendBeacon script", async () => {
   const response = await worker.fetch(new Request(`https://clientsurgesystems.com${TRACKER_PATH}`, {
     headers: { Origin: "https://clientsurgesystems.com" },
@@ -69,11 +80,17 @@ test("Cloudflare Telegram tracker serves same-origin sendBeacon script", async (
 
   assert.equal(response.status, 200);
   assert.match(response.headers.get("content-type") || "", /application\/javascript/);
-  assert.match(response.headers.get(TELEGRAM_EDGE_HEADER) || "", /script-2026-07-24/);
+  assert.match(response.headers.get(TELEGRAM_EDGE_HEADER) || "", /script-2026-07-27/);
   assert.match(body, /navigator\.sendBeacon/);
   assert.match(body, /window\.location\.origin \+ "\/__cs_telegram_click"/);
+  assert.match(body, /window\.location\.origin \+ "\/api\/analytics\/v1\/session-event"/);
+  assert.match(body, /HEARTBEAT_INTERVAL/);
+  assert.match(body, /visibilitychange/);
+  assert.match(body, /pushState/);
+  assert.match(body, /pagehide/);
   assert.match(body, /data-track-click/);
   assert.match(body, /website_click/);
+  assert.match(body, /sendSessionEvent\("heartbeat"/);
   assert.doesNotMatch(body, /workers\.dev/);
 });
 
@@ -89,7 +106,7 @@ test("Cloudflare Telegram wrapper injects tracker into HTML after production-saf
     const body = await response.text();
 
     assert.equal(response.status, 200);
-    assert.match(response.headers.get(TELEGRAM_EDGE_HEADER) || "", /injected-2026-07-24/);
+    assert.match(response.headers.get(TELEGRAM_EDGE_HEADER) || "", /injected-2026-07-27/);
     assert.match(body, new RegExp(`id="${TELEGRAM_TRACKER_SCRIPT_ID}"`));
     assert.match(body, new RegExp(TRACKER_PATH));
   } finally {
