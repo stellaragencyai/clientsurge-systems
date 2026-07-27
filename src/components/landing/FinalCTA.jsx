@@ -28,7 +28,7 @@ export default function FinalCTA() {
             { step: "03", title: "We install & test", body: "ClientSurge configures the workflows and checks proof before treating the system as live." },
           ].map((item) => (
             <div key={item.step} className="flex flex-col gap-2">
-              <span className="font-display text-4xl font-black" style={{ color: "rgba(0,212,255,0.25)", lineHeight: 1 }}>{item.step}</span>
+              <span className="font-display text-4xl font-black" style={{ color: "rgba(0,212,255,0.5)", lineHeight: 1 }}>{item.step}</span>
               <p className="font-semibold text-foreground text-sm">{item.title}</p>
               <p className="text-foreground text-xs leading-relaxed">{item.body}</p>
             </div>

@@ -312,8 +312,8 @@ export default function TrustSection() {
             Verified before every launch
           </p>
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
-            {PROOF_LOG_ITEMS.map((item) => (
-              <li key={item.label} className="flex items-center gap-2.5">
+            {PROOF_LOG_ITEMS.map((item, index) => (
+              <li key={item.label} className="flex items-center gap-2.5 animate-fade-in-up" style={{ animationDelay: `${0.1 + index * 0.12}s` }}>
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-green-600" aria-hidden="true" />
                 <span
                   style={{

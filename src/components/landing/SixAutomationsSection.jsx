@@ -81,52 +81,39 @@ export default function SixAutomationsSection() {
                 </motion.div>
                 <div className="text-right">
                   <p className="font-titles font-black" style={{ fontSize: "1.1rem", color: "#002D62", lineHeight: 1 }}>{metric}</p>
-                  <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">{metricLabel}</p>
+                  <p className="text-[10px] font-bold uppercase tracking-wider text-gray-500 mt-0.5">{metricLabel}</p>
                 </div>
               </div>
               <h3 className="font-titles font-black text-black mb-2" style={{ fontSize: "1.125rem", lineHeight: 1.35, letterSpacing: "-0.015em" }}>{label}</h3>
               <p style={{ color: "#1e293b", fontSize: "0.9rem", lineHeight: 1.68 }}>{description}</p>
-              <div className="mt-4 flex items-center justify-between">
-                <Link
-                  to={`/store?focus=${encodeURIComponent(id)}`}
-                  onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
-                  className="inline-flex items-center gap-1.5 text-xs font-bold text-primary hover:text-primary/80 transition-colors"
-                >
-                  <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
-                </Link>
-                <span className="text-[10px] font-semibold text-gray-300">ID: {id.replace("automation-", "")}</span>
-              </div>
+              <Link
+                to={`/store?focus=${encodeURIComponent(id)}`}
+                onClick={() => trackCTA(`automation_card_${id}`, "six_automations")}
+                className="cs-btn-outline mt-4 w-full inline-flex items-center justify-center gap-1.5"
+                style={{ padding: "0.55rem 1rem", fontSize: "0.78rem" }}
+              >
+                <ShoppingCart className="w-3.5 h-3.5" /> Add to Cart
+              </Link>
             </motion.div>
           ))}
         </motion.div>
 
-        {hiddenCount > 0 && (
-          <div className="mt-10 flex flex-col items-center gap-2">
-            <button
-              type="button"
-              onClick={() => setShowAll(true)}
-              className="cs-btn-outline inline-flex items-center gap-2"
-              style={{ padding: "0.7rem 1.4rem", fontSize: "0.88rem" }}
-            >
-              Show all {AUTOMATION_CARDS.length} automations
-              <ChevronDown className="w-4 h-4" aria-hidden="true" />
-            </button>
+        <div className="mt-10 flex flex-col items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setShowAll((v) => !v)}
+            className="cs-btn-outline inline-flex items-center gap-2"
+            style={{ padding: "0.7rem 1.4rem", fontSize: "0.88rem" }}
+          >
+            {showAll ? "Show fewer automations" : `Show all ${AUTOMATION_CARDS.length} automations`}
+            <ChevronDown className="w-4 h-4" aria-hidden="true" />
+          </button>
+          {!showAll && (
             <p className="text-xs font-semibold text-muted-foreground">
               {hiddenCount} more system{hiddenCount > 1 ? "s" : ""} — reactivation, reviews &amp; booking
             </p>
-          </div>
-        )}
-        {showAll && (
-          <div className="mt-8 text-center">
-            <button
-              type="button"
-              onClick={() => setShowAll(false)}
-              className="text-xs font-bold text-primary hover:text-primary/70 transition-colors"
-            >
-              Show less
-            </button>
-          </div>
-        )}
+          )}
+        </div>
       </div>
     </section>
   );

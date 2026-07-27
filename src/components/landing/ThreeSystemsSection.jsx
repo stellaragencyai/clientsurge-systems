@@ -105,8 +105,8 @@ const PACKAGES = [
     cta: "Add to Cart",
     packageId: "pro_system",
     highlight: false,
-    accent: "#003B8F",
-    accentBorder: "rgba(0,59,143,0.18)",
+    accent: "#002D62",
+    accentBorder: "rgba(0,45,98,0.18)",
     accentBorderHover: "rgba(0,212,255,0.55)",
   },
 ];
@@ -309,7 +309,7 @@ export default function ThreeSystemsSection() {
         .csp-card {
           position: relative;
           display: flex;
-          min-height: 890px;
+          min-height: auto;
           height: 100%;
           flex-direction: column;
           overflow: hidden;
@@ -506,7 +506,7 @@ export default function ThreeSystemsSection() {
             margin-bottom: 34px;
           }
           .csp-card {
-            min-height: 840px;
+            min-height: auto;
           }
           .csp-card-inner {
             padding: 40px 30px 28px;

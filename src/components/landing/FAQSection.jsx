@@ -87,8 +87,8 @@ export default function FAQSection() {
                 onChange={(e) => setQuery(e.target.value)}
                 placeholder="Search questions..."
                 aria-label="Search FAQ questions"
-                className="w-full rounded-xl border bg-white pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none transition-colors"
-                style={{ borderColor: "#E5E7EB" }}
+                className="w-full rounded-xl border bg-white pl-10 pr-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-[rgba(0,212,255,0.18)] transition-colors"
+                style={{ borderColor: "rgba(0,212,255,0.3)" }}
               />
             </div>
 
@@ -133,7 +133,7 @@ export default function FAQSection() {
                         transitionTimingFunction: "cubic-bezier(0.16, 1, 0.3, 1)",
                       }}
                     >
-                      <p className="px-5 pb-4 text-sm leading-relaxed text-gray-500">
+                      <p className="px-5 pb-4 text-sm leading-relaxed text-gray-700">
                         {item.a}
                       </p>
                     </div>
