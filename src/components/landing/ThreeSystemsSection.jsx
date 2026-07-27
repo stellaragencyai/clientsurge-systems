@@ -119,7 +119,6 @@ export default function ThreeSystemsSection() {
   const [activePackageId, setActivePackageId] = useState(DEFAULT_PACKAGE_ID);
   const [motionReady, setMotionReady] = useState(false);
   const [hasEntered, setHasEntered] = useState(false);
-  const [showDetails, setShowDetails] = useState(true);
 
   const activePackage = PACKAGES.find((pkg) => pkg.packageId === activePackageId) || PACKAGES[1];
 
@@ -602,14 +601,6 @@ export default function ThreeSystemsSection() {
           <p className="text-sm font-semibold text-foreground/80 max-w-3xl mx-auto leading-relaxed">
             Nothing goes live until the lead path, response flow, booking handoff, and proof logs are tested.
           </p>
-          <button
-            type="button"
-            onClick={() => setShowDetails((v) => !v)}
-            className="mt-3 text-xs font-bold text-primary underline underline-offset-4 hover:text-primary/70 transition-colors"
-            aria-expanded={showDetails}
-          >
-            {showDetails ? "Hide implementation details" : "Show implementation details"}
-          </button>
         </div>
 
         <div
@@ -731,7 +722,6 @@ export default function ThreeSystemsSection() {
                         ))}
                       </ul>
 
-                      {showDetails && (
                       <div className="csp-ops">
                         <div className="csp-ops-row">
                           <Zap aria-hidden="true" />
@@ -750,7 +740,6 @@ export default function ThreeSystemsSection() {
                           <span><strong>QA:</strong> {pkg.qaScope}</span>
                         </div>
                       </div>
-                      )}
 
                       <p className="csp-cta-note">
                         {pkg.setupPrice} setup &middot; {pkg.price}/mo &middot; cancel anytime
