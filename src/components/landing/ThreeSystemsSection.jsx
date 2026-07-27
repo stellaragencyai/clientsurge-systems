@@ -47,9 +47,9 @@ const PACKAGES = [
     cta: "Add to Cart",
     packageId: "starter_system",
     highlight: false,
-    accent: "#00AEEF",
-    accentBorder: "rgba(0,174,239,0.20)",
-    accentBorderHover: "rgba(0,174,239,0.55)",
+    accent: "#00D4FF",
+    accentBorder: "rgba(0,212,255,0.20)",
+    accentBorderHover: "rgba(0,212,255,0.55)",
   },
   {
     name: "Growth",
@@ -75,9 +75,9 @@ const PACKAGES = [
     cta: "Add to Cart",
     packageId: "growth_system",
     highlight: true,
-    accent: "#00AEEF",
-    accentBorder: "rgba(0,174,239,0.58)",
-    accentBorderHover: "rgba(0,174,239,0.58)",
+    accent: "#00D4FF",
+    accentBorder: "rgba(0,212,255,0.58)",
+    accentBorderHover: "rgba(0,212,255,0.58)",
   },
   {
     name: "Pro",
@@ -107,7 +107,7 @@ const PACKAGES = [
     highlight: false,
     accent: "#003B8F",
     accentBorder: "rgba(0,59,143,0.18)",
-    accentBorderHover: "rgba(0,174,239,0.55)",
+    accentBorderHover: "rgba(0,212,255,0.55)",
   },
 ];
 
@@ -158,7 +158,7 @@ export default function ThreeSystemsSection() {
       <style>{`
         .nebula-pricing {
           background:
-            radial-gradient(circle at 50% 15%, rgba(0,174,239,0.12), transparent 30%),
+            radial-gradient(circle at 50% 15%, rgba(0,212,255,0.12), transparent 30%),
             linear-gradient(180deg, #f8fdff 0%, #f3fbff 54%, #ffffff 100%);
         }
         .csp-coverage-shell {
@@ -247,7 +247,7 @@ export default function ThreeSystemsSection() {
           position: absolute;
           inset: 4px;
           border-radius: inherit;
-          background: #00AEEF;
+          background: #00D4FF;
           opacity: 0;
           transform: scale(0.25);
           transition: opacity 0.32s ease, transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
@@ -275,8 +275,8 @@ export default function ThreeSystemsSection() {
           color: hsl(var(--foreground));
         }
         .csp-coverage-stage.is-active .csp-coverage-node {
-          border-color: rgba(0,174,239,0.72);
-          box-shadow: 0 0 0 4px rgba(0,174,239,0.09), 0 5px 14px rgba(0,121,193,0.15);
+          border-color: rgba(0,212,255,0.72);
+          box-shadow: 0 0 0 4px rgba(0,212,255,0.09), 0 5px 14px rgba(0,121,193,0.15);
           transform: translateY(-1px);
         }
         .csp-coverage-stage.is-active .csp-coverage-node::after {
@@ -406,7 +406,7 @@ export default function ThreeSystemsSection() {
           width: 100%;
           height: 1px;
           margin: 28px 0;
-          background: rgba(0,174,239,0.14);
+          background: rgba(0,212,255,0.14);
         }
         .csp-description {
           margin: 0;
@@ -451,7 +451,7 @@ export default function ThreeSystemsSection() {
           gap: 11px;
           margin-top: 24px;
           padding-top: 22px;
-          border-top: 1px solid rgba(0,174,239,0.12);
+          border-top: 1px solid rgba(0,212,255,0.12);
         }
         .csp-ops-row {
           display: flex;
@@ -543,9 +543,9 @@ export default function ThreeSystemsSection() {
         }
         @media (pointer: fine) {
           .csp-card:hover {
-            border-color: rgba(0,174,239,0.72) !important;
+            border-color: rgba(0,212,255,0.72) !important;
             transform: translateY(-4px);
-            box-shadow: 0 18px 46px rgba(0,174,239,0.16), 0 0 0 1px rgba(0,174,239,0.10), 0 6px 14px rgba(0,0,0,0.05) !important;
+            box-shadow: 0 18px 46px rgba(0,212,255,0.16), 0 0 0 1px rgba(0,212,255,0.10), 0 6px 14px rgba(0,0,0,0.05) !important;
           }
           .csp-cta:hover {
             transform: translateY(-2px);
@@ -554,12 +554,12 @@ export default function ThreeSystemsSection() {
             transform: translateX(4px);
           }
           .csp-cta[data-highlight="false"]:hover {
-            border-color: rgba(0,174,239,0.55) !important;
-            background: rgba(0,174,239,0.055) !important;
-            box-shadow: 0 10px 24px rgba(0,174,239,0.16) !important;
+            border-color: rgba(0,212,255,0.55) !important;
+            background: rgba(0,212,255,0.055) !important;
+            box-shadow: 0 10px 24px rgba(0,212,255,0.16) !important;
           }
           .csp-cta[data-highlight="true"]:hover {
-            box-shadow: 0 16px 34px rgba(0,92,170,0.34), 0 0 0 1px rgba(0,174,239,0.10) !important;
+            box-shadow: 0 16px 34px rgba(0,92,170,0.34), 0 0 0 1px rgba(0,212,255,0.10) !important;
           }
         }
         @media (prefers-reduced-motion: reduce) {

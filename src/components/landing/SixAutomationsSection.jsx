@@ -18,11 +18,11 @@ const containerVariants = { hidden: { opacity: 0 }, visible: { opacity: 1, trans
 
 const ICON_PULSE_KEYFRAMES = `
 @keyframes csIconPulse {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); }
-  50% { box-shadow: 0 0 14px 1px rgba(53,189,241,0.25); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.15); }
+  50% { box-shadow: 0 0 14px 1px rgba(0,212,255,0.25); }
 }
 @media (prefers-reduced-motion: reduce) {
-  @keyframes csIconPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(53,189,241,0.15); } }
+  @keyframes csIconPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(0,212,255,0.15); } }
 }
 `;
 const cardVariants = { hidden: { opacity: 0, y: 20 }, visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } } };
@@ -65,7 +65,7 @@ export default function SixAutomationsSection() {
               key={id}
               id={id}
               variants={shouldReduceMotion ? {} : cardVariants}
-              whileHover={shouldReduceMotion ? {} : { y: -8, boxShadow: "0 18px 42px rgba(53,189,241,0.18), 0 0 0 1px rgba(53,189,241,0.12)" }}
+              whileHover={shouldReduceMotion ? {} : { y: -8, boxShadow: "0 18px 42px rgba(0,212,255,0.18), 0 0 0 1px rgba(0,212,255,0.12)" }}
               transition={{ type: "spring", stiffness: 300, damping: 24 }}
               className="cs-feature-card p-5 md:p-6"
               style={{ scrollMarginTop: "var(--cs-anchor-offset)" }}
@@ -73,14 +73,14 @@ export default function SixAutomationsSection() {
               <div className="flex items-start justify-between mb-4">
                 <motion.div
                   className="w-12 h-12 rounded-lg flex items-center justify-center"
-                  style={{ background: "rgba(53,189,241,0.12)", border: "1px solid rgba(53,189,241,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}
+                  style={{ background: "rgba(0,212,255,0.12)", border: "1px solid rgba(0,212,255,0.25)", animation: "csIconPulse 3s ease-in-out infinite" }}
                   whileHover={shouldReduceMotion ? {} : { rotate: -6, scale: 1.12 }}
                   transition={{ type: "spring", stiffness: 320, damping: 16 }}
                 >
-                  <Icon className="w-6 h-6" style={{ color: "#35BDF1" }} aria-hidden="true" />
+                  <Icon className="w-6 h-6" style={{ color: "#00D4FF" }} aria-hidden="true" />
                 </motion.div>
                 <div className="text-right">
-                  <p className="font-titles font-black" style={{ fontSize: "1.1rem", color: "#006BB0", lineHeight: 1 }}>{metric}</p>
+                  <p className="font-titles font-black" style={{ fontSize: "1.1rem", color: "#002D62", lineHeight: 1 }}>{metric}</p>
                   <p className="text-[9px] font-bold uppercase tracking-wider text-gray-400 mt-0.5">{metricLabel}</p>
                 </div>
               </div>

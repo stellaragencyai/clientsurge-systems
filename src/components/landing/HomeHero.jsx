@@ -169,14 +169,14 @@ export default function HomeHero() {
             className="inline-flex items-center gap-2 rounded-full animate-fade-in-up"
             variants={fadeUp}
             style={{
-              background: 'hsla(0, 0%, 100%, 0.9)',
-              border: '1px solid hsl(var(--border))',
+              background: 'rgba(0, 71, 171, 0.08)',
+              border: '1px solid rgba(0, 212, 255, 0.25)',
               padding: '0.55rem 1.1rem',
               fontSize: '0.82rem',
               fontWeight: 700,
               letterSpacing: '0.08em',
               textTransform: 'uppercase',
-              color: 'hsl(var(--muted-foreground))',
+              color: 'hsl(var(--primary))',
               boxShadow: 'var(--cs-glow-sm)',
               animationDelay: '0.05s',
               backdropFilter: 'blur(8px)',
@@ -214,8 +214,8 @@ export default function HomeHero() {
               fontSize: 'clamp(18px, 1.4vw, 23px)',
               animationDelay: '0.25s',
               lineHeight: 1.7,
-              fontWeight: 400,
-              color: '#606060',
+              fontWeight: 500,
+              color: '#3a3d47',
               maxWidth: '760px',
               margin: '36px auto 0',
               textAlign: 'center',
@@ -293,9 +293,9 @@ export default function HomeHero() {
             {FLOATING_METRICS.map((metric, index) => {
               const Icon = metric.icon;
               const toneStyles = {
-                electric: { color: '#00AEEF', bg: 'hsla(199, 100%, 47%, 0.1)', border: 'hsla(199, 100%, 47%, 0.25)' },
-                green: { color: '#059669', bg: 'hsla(160, 84%, 39%, 0.1)', border: 'hsla(160, 84%, 39%, 0.25)' },
-                gold: { color: '#D4AF37', bg: 'hsla(43, 60%, 46%, 0.1)', border: 'hsla(43, 60%, 46%, 0.25)' },
+                electric: { color: '#00D4FF', bg: 'rgba(0, 71, 171, 0.10)', border: 'rgba(0, 212, 255, 0.30)' },
+                green: { color: '#00D4FF', bg: 'rgba(0, 71, 171, 0.10)', border: 'rgba(0, 212, 255, 0.30)' },
+                gold: { color: '#00D4FF', bg: 'rgba(0, 71, 171, 0.10)', border: 'rgba(0, 212, 255, 0.30)' },
               }[metric.tone];
               return (
                 <motion.div

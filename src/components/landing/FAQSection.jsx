@@ -68,7 +68,7 @@ export default function FAQSection() {
               <a
                 href="mailto:support@clientsurgesystems.com"
                 className="font-semibold transition-colors"
-                style={{ color: "#00AEEF" }}
+                style={{ color: "#00D4FF" }}
               >
                 support@clientsurgesystems.com
               </a>
@@ -109,9 +109,9 @@ export default function FAQSection() {
                     onClick={() => toggle(item.originalIndex)}
                     style={{
                       background: "#ffffff",
-                      borderColor: isOpen ? "rgba(0,174,239,0.35)" : "#E5E7EB",
+                      borderColor: isOpen ? "rgba(0,212,255,0.35)" : "#E5E7EB",
                       boxShadow: isOpen
-                        ? "0 4px 24px rgba(0,174,239,0.12), 0 0 0 1px rgba(0,174,239,0.08)"
+                        ? "0 4px 24px rgba(0,212,255,0.12), 0 0 0 1px rgba(0,212,255,0.08)"
                         : "0 1px 3px rgba(0,0,0,0.04)",
                     }}
                   >
@@ -121,7 +121,7 @@ export default function FAQSection() {
                         className={`w-4 h-4 flex-shrink-0 ${
                           isOpen ? "rotate-180" : ""
                         }`}
-                        style={{ color: isOpen ? "#00AEEF" : "#9CA3AF", transition: "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)" }}
+                        style={{ color: isOpen ? "#00D4FF" : "#9CA3AF", transition: "transform 400ms cubic-bezier(0.16, 1, 0.3, 1)" }}
                       />
                     </div>
                     <div

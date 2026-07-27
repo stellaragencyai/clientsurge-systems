@@ -1,36 +1,9 @@
-import { useState, useEffect } from "react";
 import StardustOverlay from "./StardustOverlay";
 import { ArrowRight, ShoppingCart, Shield, Zap, Phone, Clock, BadgeCheck } from "lucide-react";
 import { trackCTA } from "@/lib/analytics";
 import CSButton from "@/components/design-system/CSButton";
 
-const LAUNCH_TOASTS = [
-  "An HVAC system just went live",
-  "A dental practice activated instant lead response",
-  "A roofing crew turned on missed-call text-back",
-  "A med-spa launched its AI booking handoff",
-  "A plumbing team started lead reactivation",
-];
-
 export default function FinalCTA() {
-  const [toastIndex, setToastIndex] = useState(0);
-  const [toastVisible, setToastVisible] = useState(false);
-
-  useEffect(() => {
-    const showTimer = setTimeout(() => setToastVisible(true), 3000);
-    const interval = setInterval(() => {
-      setToastVisible(false);
-      setTimeout(() => {
-        setToastIndex((prev) => (prev + 1) % LAUNCH_TOASTS.length);
-        setToastVisible(true);
-      }, 400);
-    }, 6000);
-    return () => {
-      clearTimeout(showTimer);
-      clearInterval(interval);
-    };
-  }, []);
-
   return (
     <section id="build-stack" className="bg-white pt-16 md:pt-20 pb-20 md:pb-28 px-6 relative overflow-hidden">
       <StardustOverlay seed={13} opacity={0.6} />
@@ -55,7 +28,7 @@ export default function FinalCTA() {
             { step: "03", title: "We install & test", body: "ClientSurge configures the workflows and checks proof before treating the system as live." },
           ].map((item) => (
             <div key={item.step} className="flex flex-col gap-2">
-              <span className="font-display text-4xl font-black" style={{ color: "rgba(0,174,239,0.25)", lineHeight: 1 }}>{item.step}</span>
+              <span className="font-display text-4xl font-black" style={{ color: "rgba(0,212,255,0.25)", lineHeight: 1 }}>{item.step}</span>
               <p className="font-semibold text-foreground text-sm">{item.title}</p>
               <p className="text-foreground text-xs leading-relaxed">{item.body}</p>
             </div>
@@ -63,19 +36,19 @@ export default function FinalCTA() {
         </div>
 
         {/* Urgency bar — time-sensitivity without fake scarcity */}
-        <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: "rgba(0,174,239,0.08)", border: "1px solid rgba(0,174,239,0.2)" }}>
-          <Clock className="w-3.5 h-3.5 text-[#00AEEF]" />
-          <span className="text-xs font-bold text-[#006BB0]">Most systems installed in 3–5 business days</span>
+        <div className="mt-8 inline-flex items-center gap-2 px-4 py-2 rounded-full" style={{ background: "rgba(0,212,255,0.08)", border: "1px solid rgba(0,212,255,0.2)" }}>
+          <Clock className="w-3.5 h-3.5 text-[#00D4FF]" />
+          <span className="text-xs font-bold text-[#002D62]">Most systems installed in 3–5 business days</span>
         </div>
 
         {/* Weekly onboarding capacity — honest scarcity, no fake countdown */}
         <div className="mt-3 max-w-xs mx-auto">
           <div className="flex items-center justify-between text-xs font-semibold text-foreground/70 mb-1.5">
             <span>Weekly onboarding capacity</span>
-            <span className="text-[#006BB0]">Limited</span>
+            <span className="text-[#002D62]">Limited</span>
           </div>
           <div className="h-1.5 rounded-full bg-muted overflow-hidden" aria-hidden="true">
-            <div className="h-full rounded-full" style={{ width: "62%", background: "linear-gradient(90deg, #00AEEF, #006BB0)" }} />
+            <div className="h-full rounded-full" style={{ width: "62%", background: "linear-gradient(90deg, #00D4FF, #002D62)" }} />
           </div>
         </div>
 
@@ -106,7 +79,7 @@ export default function FinalCTA() {
         <div className="mt-6 flex flex-col items-center gap-1">
           <p className="text-xs text-foreground/60">Prefer to talk to a human first?</p>
           <a href="tel:+16025843227" className="text-base font-bold text-foreground hover:text-primary transition-colors inline-flex items-center gap-1.5" style={{ textDecoration: "none" }}>
-            <Phone className="w-4 h-4 text-[#00AEEF]" /> (602) 584-3227
+            <Phone className="w-4 h-4 text-[#00D4FF]" /> (602) 584-3227
           </a>
         </div>
 
@@ -119,26 +92,6 @@ export default function FinalCTA() {
         </div>
       </div>
 
-      {/* Just-went-live social proof toast */}
-      <div
-        className="fixed bottom-6 left-6 z-50 flex items-center gap-2.5 rounded-full px-4 py-2.5 shadow-lg"
-        style={{
-          background: "rgba(255,255,255,0.96)",
-          border: "1px solid rgba(0,174,239,0.22)",
-          backdropFilter: "blur(8px)",
-          transition: "opacity 0.4s ease, transform 0.4s ease",
-          opacity: toastVisible ? 1 : 0,
-          transform: toastVisible ? "translateY(0)" : "translateY(12px)",
-          pointerEvents: "none",
-        }}
-        aria-live="polite"
-      >
-        <span className="relative flex h-2 w-2 flex-shrink-0" aria-hidden="true">
-          <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-green-400 opacity-60" />
-          <span className="relative inline-flex h-2 w-2 rounded-full bg-green-500" />
-        </span>
-        <span className="text-xs font-semibold text-foreground whitespace-nowrap">{LAUNCH_TOASTS[toastIndex]}</span>
-      </div>
     </section>
   );
 }

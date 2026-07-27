@@ -36,7 +36,7 @@ const TRUST_PILLARS = [
       'Stripe-secured payments',
       'Twilio-protected SMS channels',
     ],
-    accent: '#00AEEF',
+    accent: '#00D4FF',
   },
   {
     icon: ClipboardCheck,
@@ -47,7 +47,7 @@ const TRUST_PILLARS = [
       'Response flow verified',
       'Proof logs recorded',
     ],
-    accent: '#0079c1',
+    accent: '#0047AB',
   },
   {
     icon: Network,
@@ -58,7 +58,7 @@ const TRUST_PILLARS = [
       'Stripe billing',
       'Resend email delivery',
     ],
-    accent: '#003B8F',
+    accent: '#002D62',
   },
   {
     icon: Eye,
@@ -125,7 +125,7 @@ export default function TrustSection() {
       <div
         className="absolute inset-0 pointer-events-none"
         style={{
-          background: 'radial-gradient(ellipse at 50% 50%, rgba(0,174,239,0.03) 0%, transparent 60%)',
+          background: 'radial-gradient(ellipse at 50% 50%, rgba(0,212,255,0.03) 0%, transparent 60%)',
         }}
         aria-hidden="true"
       />
@@ -251,17 +251,17 @@ export default function TrustSection() {
               key={label}
               className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl"
               style={{
-                background: 'rgba(0,107,176,0.10)',
-                border: '1px solid rgba(0,107,176,0.32)',
+                background: 'rgba(0,71,171,0.10)',
+                border: '1px solid rgba(0,71,171,0.32)',
               }}
             >
-              <Icon className="w-4 h-4" style={{ color: '#004B8D' }} aria-hidden="true" />
+              <Icon className="w-4 h-4" style={{ color: '#002D62' }} aria-hidden="true" />
               <span
                 style={{
                   fontFamily: "'Inter', sans-serif",
                   fontSize: '0.78rem',
                   fontWeight: 800,
-                  color: '#003B8F',
+                  color: '#002D62',
                 }}
               >
                 {label}
@@ -303,8 +303,8 @@ export default function TrustSection() {
           transition={{ duration: 0.5, delay: 0.25 }}
           className="mt-6 mx-auto max-w-2xl rounded-2xl p-5"
           style={{
-            background: 'rgba(0,174,239,0.04)',
-            border: '1px solid rgba(0,174,239,0.16)',
+            background: 'rgba(0,212,255,0.04)',
+            border: '1px solid rgba(0,212,255,0.16)',
           }}
           aria-label="Verifications completed before every launch"
         >
@@ -313,7 +313,7 @@ export default function TrustSection() {
           </p>
           <ul className="grid grid-cols-1 gap-2 sm:grid-cols-2">
             {PROOF_LOG_ITEMS.map((item) => (
-              <li key={item} className="flex items-center gap-2.5">
+              <li key={item.label} className="flex items-center gap-2.5">
                 <CheckCircle2 className="w-4 h-4 flex-shrink-0 text-green-600" aria-hidden="true" />
                 <span
                   style={{
@@ -323,7 +323,7 @@ export default function TrustSection() {
                     color: '#1e293b',
                   }}
                 >
-                  {item}
+                  {item.label}
                 </span>
               </li>
             ))}
