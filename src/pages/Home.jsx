@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 import { useHashNavigation } from "../hooks/useHashNavigation";
 import PremiumNavbar from "../components/landing/PremiumNavbar";
 import HomeHero from "../components/landing/HomeHero.jsx";
+import TrustStrip from "../components/landing/TrustStrip.jsx";
 import SolutionSection from "../components/landing/SolutionSection.jsx";
 import TrustSection from "../components/landing/TrustSection.jsx";
 import { DemoBookingProvider } from "../components/landing/DemoBookingContext";
@@ -153,6 +154,11 @@ export default function Home() {
               <HomeHero />
             </SectionErrorBoundary>
           </HomepageSectionFrame>
+
+          {/* 1b. Trust strip — compact verification band directly below hero */}
+          <SectionErrorBoundary sectionName="trust-strip">
+            <TrustStrip />
+          </SectionErrorBoundary>
 
           {/* 4. Six Core Automations — product-style showcase */}
           <div id="automations" style={{ scrollMarginTop: "var(--cs-anchor-offset)" }} />
