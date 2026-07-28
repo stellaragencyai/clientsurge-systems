@@ -145,7 +145,7 @@ export const PACKAGE_DEFINITIONS = [
     implementation_fee: 249,
     implementation_label: "Professional AI Implementation",
     setup_total: 249,
-    monthly_total: 249,
+    monthly_total: 99,
   },
   {
     package_key: "growth_system",
@@ -164,7 +164,7 @@ export const PACKAGE_DEFINITIONS = [
     implementation_fee: 499,
     implementation_label: "Professional AI Implementation",
     setup_total: 499,
-    monthly_total: 499,
+    monthly_total: 249,
     badge: "Most Popular",
     highlight: true,
   },
@@ -186,7 +186,7 @@ export const PACKAGE_DEFINITIONS = [
     implementation_fee: 999,
     implementation_label: "Professional AI Implementation",
     setup_total: 999,
-    monthly_total: 999,
+    monthly_total: 499,
   },
 ];
 
