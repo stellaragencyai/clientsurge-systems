@@ -44,14 +44,14 @@ Approval packet for the remaining live-provider gates: `docs/live-provider-appro
   - Test and live CLI keys are available locally until `2026-08-18`.
 - Local checkout code now uses the live Stripe package products/prices:
   - Starter product `prod_UReWMpnZsCnfcL`
-    - setup `price_1TSlDWBVGjsISdG0SyoWzAm3`
-    - monthly `price_1TSlDWBVGjsISdG0Ej1O16ov`
+    - setup `price_1TyJ0sBVGjsISdG0WTYUzr4U`
+    - monthly `price_1TyJ0zBVGjsISdG05Nwwf4CR`
   - Growth product `prod_UReWhZsWks1HuA`
-    - setup `price_1TSlDXBVGjsISdG0eTWcARLM`
-    - monthly `price_1TSlDXBVGjsISdG0X9unS4Qf`
+    - setup `price_1TyJ15BVGjsISdG0kwqh9Pkk`
+    - monthly `price_1TyJ1CBVGjsISdG06Qlx3730`
   - Elite product `prod_UReW1LmsVbn4BZ`
-    - setup `price_1TSlDYBVGjsISdG0l2rHzet1`
-    - monthly `price_1TSlDXBVGjsISdG0Abdx85z3`
+    - setup `price_1TyJ1IBVGjsISdG00IO5OwMd`
+    - monthly `price_1TyJ1PBVGjsISdG0e9F1BvaO`
 - Live Stripe webhook endpoint currently points to `stripePaymentWebhook`, and local source confirms that function delegates to the canonical `stripeWebhookOrders` shared handler.
 - Test-mode Stripe now has package products, setup/monthly prices, and one enabled webhook endpoint. Safe app-path checkout proof now requires setting `STRIPE_PACKAGE_PRICE_OVERRIDES_JSON` in the staging/test Base44 environment before invoking checkout.
 
