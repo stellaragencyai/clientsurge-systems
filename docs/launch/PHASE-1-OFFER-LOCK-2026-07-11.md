@@ -25,22 +25,22 @@ These industries are the controlled launch focus. Other industries may remain vi
 
 ### Starter System
 
-- Setup and installation: **$797 one time**
-- Monthly support: **$497 per month**
+- Setup and installation: **$249 one time**
+- Monthly support: **$99 per month, beginning 30 days after checkout**
 - Stripe product: `prod_UReWMpnZsCnfcL`
-- Stripe setup price: `price_1TSlDWBVGjsISdG0SyoWzAm3`
-- Stripe monthly price: `price_1TSlDWBVGjsISdG0Ej1O16ov`
+- Stripe setup price: `price_1TyJ0sBVGjsISdG0WTYUzr4U`
+- Stripe monthly price: `price_1TyJ0zBVGjsISdG05Nwwf4CR`
 - Included automations:
   - Instant Lead Response
   - Missed Call Text-Back
 
 ### Growth System
 
-- Setup and installation: **$1,297 one time**
-- Monthly support: **$997 per month**
+- Setup and installation: **$499 one time**
+- Monthly support: **$249 per month, beginning 30 days after checkout**
 - Stripe product: `prod_UReWhZsWks1HuA`
-- Stripe setup price: `price_1TSlDXBVGjsISdG0eTWcARLM`
-- Stripe monthly price: `price_1TSlDXBVGjsISdG0X9unS4Qf`
+- Stripe setup price: `price_1TyJ15BVGjsISdG0kwqh9Pkk`
+- Stripe monthly price: `price_1TyJ1CBVGjsISdG06Qlx3730`
 - Included automations:
   - Instant Lead Response
   - Missed Call Text-Back
@@ -50,11 +50,11 @@ These industries are the controlled launch focus. Other industries may remain vi
 
 ### Pro System
 
-- Setup and installation: **$2,497 one time**
-- Monthly support: **$1,997 per month**
+- Setup and installation: **$999 one time**
+- Monthly support: **$499 per month, beginning 30 days after checkout**
 - Stripe product: `prod_UReW1LmsVbn4BZ`
-- Stripe setup price: `price_1TSlDYBVGjsISdG0l2rHzet1`
-- Stripe monthly price: `price_1TSlDXBVGjsISdG0Abdx85z3`
+- Stripe setup price: `price_1TyJ1IBVGjsISdG00IO5OwMd`
+- Stripe monthly price: `price_1TyJ1PBVGjsISdG0e9F1BvaO`
 - Included automations:
   - Instant Lead Response
   - Missed Call Text-Back
