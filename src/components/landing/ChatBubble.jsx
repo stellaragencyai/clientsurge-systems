@@ -28,16 +28,24 @@ export default function ChatBubble() {
   const [loading, setLoading] = useState(false);
   const [showBookingModal, setShowBookingModal] = useState(false);
   const [hasUnread, setHasUnread] = useState(false);
-  const [pulsed, setPulsed] = useState(false);
   const [cooldown, setCooldown] = useState(false);
+  const [showLabel, setShowLabel] = useState(false);
+  const [hovered, setHovered] = useState(false);
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
   const cooldownTimerRef = useRef(null);
+  const labelTimerRef = useRef(null);
 
-  // Pulse the bubble after 6s to draw attention
+  // Reveal the "Chat with me" label once after ~15s, then hide it after 6s.
   useEffect(() => {
-    const t = setTimeout(() => setPulsed(true), 6000);
-    return () => clearTimeout(t);
+    const reveal = setTimeout(() => {
+      setShowLabel(true);
+      labelTimerRef.current = setTimeout(() => setShowLabel(false), 6000);
+    }, 15000);
+    return () => {
+      clearTimeout(reveal);
+      clearTimeout(labelTimerRef.current);
+    };
   }, []);
 
   useEffect(() => {
@@ -265,28 +273,28 @@ export default function ChatBubble() {
         </div>
       )}
 
-      {/* Floating button */}
+      {/* Floating button — icon-only; label reveals on hover/focus or once after 15s */}
       <button
         onClick={() => setOpen((v) => !v)}
+        onMouseEnter={() => setHovered(true)}
+        onMouseLeave={() => setHovered(false)}
+        onFocus={() => setHovered(true)}
+        onBlur={() => setHovered(false)}
         aria-label="Open chat"
-        className="cs-chat-button fixed right-5 sm:right-8 z-[9991] h-14 px-4 rounded-full flex items-center gap-2.5 shadow-xl transition-all duration-300 hover:scale-105 active:scale-95"
+        className="cs-chat-button fixed right-5 sm:right-8 z-[9991] rounded-full flex items-center justify-center shadow-xl transition-colors duration-200"
         style={{
+          width: "48px",
+          height: "48px",
           background: open
             ? "linear-gradient(135deg,#006BB0,#003B8F)"
             : "linear-gradient(135deg,#00AEEF 0%,#009DFF 45%,#003B8F 100%)",
-          boxShadow: pulsed && !open
-            ? "0 0 0 0 rgba(0,174,239,0.5), 0 8px 24px rgba(0,100,200,0.35)"
-            : "0 8px 24px rgba(0,100,200,0.35)",
-          animation: pulsed && !open ? "chatPulse 2.5s ease-in-out 3" : "none",
+          boxShadow: "0 8px 24px rgba(0,100,200,0.35)",
         }}
       >
         {open ? (
-          <X className="w-6 h-6 text-white" />
+          <X className="w-5 h-5 text-white" aria-hidden="true" />
         ) : (
-          <>
-            <MessageCircle className="w-5 h-5 text-white flex-shrink-0" />
-            <span className="text-sm font-semibold text-white hidden sm:inline">Chat with me</span>
-          </>
+          <MessageCircle className="w-5 h-5 text-white flex-shrink-0" aria-hidden="true" />
         )}
         {hasUnread && !open && (
           <span className="absolute -top-1 -right-1 w-4 h-4 rounded-full bg-red-500 border-2 border-white text-white text-[9px] font-bold flex items-center justify-center">
@@ -294,6 +302,13 @@ export default function ChatBubble() {
           </span>
         )}
       </button>
+
+      {/* Revealable label pill — sits to the left of the button */}
+      {!open && (showLabel || hovered) && (
+        <span className="cs-chat-label fixed z-[9991] rounded-full bg-white text-[#003B8F] text-xs font-semibold shadow-lg border border-[rgba(0,136,204,0.18)] transition-opacity duration-200">
+          Chat with me
+        </span>
+      )}
 
       <style>{`
         @keyframes chatPulse {
@@ -303,6 +318,18 @@ export default function ChatBubble() {
         }
         .cs-chat-button {
           bottom: max(20px, calc(20px + env(safe-area-inset-bottom, 0px)));
+        }
+        .cs-chat-label {
+          right: 88px;
+          bottom: max(28px, calc(28px + env(safe-area-inset-bottom, 0px)));
+          padding: 8px 12px;
+          white-space: nowrap;
+        }
+        @media (max-width: 767px) {
+          .cs-chat-label {
+            right: 76px;
+            bottom: max(100px, calc(100px + env(safe-area-inset-bottom, 0px)));
+          }
         }
         .cs-chat-window {
           bottom: max(92px, calc(92px + env(safe-area-inset-bottom, 0px)));

@@ -9,6 +9,13 @@ import { SITE_CONFIG } from "@/lib/siteConfig";
 
 const sectionLinks = SITE_CONFIG.navigation.sections.filter((link) => link.label !== "Industries");
 
+const DESKTOP_NAV = [
+  { label: "How It Works", href: "/how-it-works" },
+  { label: "Automations", href: "/automations" },
+  { label: "Industries", href: "/industries" },
+  { label: "Pricing", href: "/pricing" },
+];
+
 function analyticsKey(label) {
   return label.toLowerCase().replace(/[^a-z0-9]+/g, "_").replace(/^_|_$/g, "");
 }
@@ -110,19 +117,17 @@ export default function Navbar() {
       }}
     >
       <div
-        className="w-full flex items-center justify-between px-4 md:px-6"
+        className="nav-container w-full flex items-center justify-between"
         style={{
           height: "var(--cs-nav-height)",
-          paddingLeft: "max(1.25rem, env(safe-area-inset-left))",
-          paddingRight: "max(1.25rem, env(safe-area-inset-right))",
         }}
       >
         <a
           href="/"
           onClick={handleLogoClick}
-          className="shrink-0 transition-transform duration-300 hover:-translate-y-0.5"
+          className="shrink-0"
           aria-label="ClientSurge Systems home"
-          style={{ display: "inline-flex", alignItems: "center", overflow: "visible" }}
+          style={{ display: "inline-flex", alignItems: "center", height: "100%" }}
         >
           <img
             src="https://media.base44.com/images/public/69dc4a79656fdba136d413d3/908ae3da9_Gemini_Generated_Image_a681cra681cra681.png"
@@ -130,12 +135,12 @@ export default function Navbar() {
             width="480"
             height="224"
             decoding="async"
-            style={{ height: "clamp(40px, 4.5vw, 56px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
+            style={{ height: "clamp(30px, 4vw, 36px)", width: "auto", maxWidth: "100%", objectFit: "contain", display: "block" }}
           />
         </a>
 
-        <div className="hidden xl:flex items-center gap-7 absolute left-1/2 -translate-x-1/2">
-          {sectionLinks.map((link) => (
+        <div className="hidden lg:flex items-center gap-6 xl:gap-8 absolute left-1/2 -translate-x-1/2">
+          {DESKTOP_NAV.map((link) => (
             <a
               key={link.href}
               href={link.href}
@@ -149,7 +154,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        <div className="hidden xl:flex items-center gap-2 shrink-0">
+        <div className="hidden lg:flex items-center gap-2 shrink-0">
           <button
             type="button"
             onClick={() => {
@@ -176,11 +181,11 @@ export default function Navbar() {
           <button
             type="button"
             onClick={() => {
-              trackCTA("compare_packages", "navbar");
+              trackCTA("get_my_lead_system", "navbar");
               closeAll();
-              navigateTo("/#pricing");
+              navigate("/store");
             }}
-            className="transition-all duration-300 hover:-translate-y-0.5"
+            className="transition-colors duration-200"
             style={{
               minHeight: "unset",
               minWidth: "unset",
@@ -193,22 +198,22 @@ export default function Navbar() {
               boxShadow: "0 6px 18px rgba(0,212,255,0.28)",
             }}
           >
-            Compare Packages
+            Get My Lead System
           </button>
         </div>
 
-        <div className="xl:hidden flex items-center gap-2">
+        <div className="lg:hidden flex items-center gap-2">
           <button
             type="button"
             onClick={() => {
-              trackCTA("compare_packages_mobile_bar", "navbar");
+              trackCTA("get_my_lead_system_mobile_bar", "navbar");
               closeAll();
-              navigateTo("/#pricing");
+              navigate("/store");
             }}
             className="cs-btn-primary cs-nav-cta"
-            style={{ minHeight: "44px", height: "44px", padding: "0 18px", fontSize: "0.75rem" }}
+            style={{ minHeight: "44px", height: "44px", padding: "0 14px", fontSize: "0.7rem" }}
           >
-            Compare
+            Get My Lead System
           </button>
           <button
             type="button"
@@ -231,10 +236,10 @@ export default function Navbar() {
 
       {open && (
         <>
-          <div className="fixed inset-0 z-40 xl:hidden bg-slate-950/35 backdrop-blur-[2px]" aria-hidden="true" onClick={() => setOpen(false)} />
+          <div className="fixed inset-0 z-40 lg:hidden bg-slate-950/35 backdrop-blur-[2px]" aria-hidden="true" onClick={() => setOpen(false)} />
           <div
             id="mobile-nav-drawer"
-            className="xl:hidden fixed z-50 overflow-hidden rounded-[1.75rem] border mobile-nav-drawer"
+            className="lg:hidden fixed z-50 overflow-hidden rounded-[1.75rem] border mobile-nav-drawer"
             style={{
               animation: "navDrawerSlideIn 0.32s cubic-bezier(0.16, 1, 0.3, 1)",
               top: "calc(var(--cs-nav-height) + env(safe-area-inset-top) + 12px)",
@@ -348,14 +353,14 @@ export default function Navbar() {
                     <button
                       type="button"
                       onClick={() => {
-                        trackCTA("compare_packages", "mobile_nav");
+                        trackCTA("get_my_lead_system", "mobile_nav");
                         closeAll();
-                        navigateTo("/#pricing");
+                        navigate("/store");
                       }}
                       className="w-full rounded-xl border bg-white text-[14px] font-black text-slate-950 transition-colors hover:bg-sky-50"
                       style={{ minHeight: "48px", borderColor: "rgba(0,212,255,0.20)" }}
                     >
-                      Compare Packages
+                      Get My Lead System
                     </button>
                   </div>
                 </>
@@ -396,24 +401,46 @@ export default function Navbar() {
             <button
               type="button"
               onClick={() => {
-                trackCTA("compare_packages", "mobile_nav_footer");
+                trackCTA("get_my_lead_system", "mobile_nav_footer");
                 closeAll();
-                navigateTo("/#pricing");
+                navigate("/store");
               }}
-              className="mt-3 flex w-full items-center justify-center rounded-2xl text-[15px] font-black text-white transition-all hover:-translate-y-0.5"
+              className="mt-3 flex w-full items-center justify-center rounded-2xl text-[15px] font-black text-white transition-colors"
               style={{
                 minHeight: "52px",
                 background: "linear-gradient(135deg,#002D62 0%,#00D4FF 100%)",
                 boxShadow: "0 16px 34px rgba(0,212,255,0.28)",
               }}
             >
-              Compare Packages
+              Get My Lead System
             </button>
           </div>
         </>
       )}
 
       <style>{`
+        .nav-container {
+          padding-left: max(1rem, env(safe-area-inset-left));
+          padding-right: max(1rem, env(safe-area-inset-right));
+        }
+        @media (min-width: 640px) {
+          .nav-container {
+            padding-left: max(1.25rem, env(safe-area-inset-left));
+            padding-right: max(1.25rem, env(safe-area-inset-right));
+          }
+        }
+        @media (min-width: 1024px) {
+          .nav-container {
+            padding-left: max(1.5rem, env(safe-area-inset-left));
+            padding-right: max(1.5rem, env(safe-area-inset-right));
+          }
+        }
+        @media (min-width: 1200px) {
+          .nav-container {
+            padding-left: max(2rem, env(safe-area-inset-left));
+            padding-right: max(2rem, env(safe-area-inset-right));
+          }
+        }
         @keyframes navDrawerSlideIn {
           from { opacity: 0; transform: translateY(-12px) scale(0.98); }
           to { opacity: 1; transform: translateY(0) scale(1); }

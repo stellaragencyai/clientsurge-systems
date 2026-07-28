@@ -50,14 +50,6 @@ function LazyHomepageSection({ children, fallback }) {
   );
 }
 
-function HomepageVisualBackdrop() {
-  return (
-    <div className="cs-home-ambient" aria-hidden="true">
-      <div className="cs-home-ambient__grid" />
-    </div>
-  );
-}
-
 function HomepageSectionDivider({ label }) {
   return (
     <div className="cs-home-section-divider" aria-hidden="true">
@@ -150,7 +142,6 @@ export default function Home() {
   return (
     <DemoBookingProvider>
       <div className="cs-home-polish min-h-screen">
-        <HomepageVisualBackdrop />
         <ScrollProgressBar />
         <LoggedOutConfirmationBanner />
         <PremiumNavbar />

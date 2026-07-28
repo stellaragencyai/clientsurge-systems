@@ -417,7 +417,7 @@ img[loading="lazy"] { content-visibility: auto; }
   --sab: env(safe-area-inset-bottom, 0px);
   --sal: env(safe-area-inset-left, 0px);
   --sar: env(safe-area-inset-right, 0px);
-  --cs-nav-height: 76px;
+  --cs-nav-height: 68px;
   --cs-announcement-height: 48px;
   --cs-anchor-offset: calc(var(--cs-nav-height) + var(--cs-announcement-height) + 24px);
   --cs-floating-bottom: max(20px, calc(20px + var(--sab)));
