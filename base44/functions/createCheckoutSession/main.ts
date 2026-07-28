@@ -386,6 +386,12 @@ Deno.serve(async (req) => {
       customer_email: normalizedEmail,
       line_items,
       subscription_data: {
+        // Charge only the one-time setup line item today. The recurring line item
+        // begins billing 30 days after checkout.
+        trial_period_days: 30,
+        trial_settings: {
+          end_behavior: { missing_payment_method: "cancel" },
+        },
         metadata: {
           order_id: order.id,
           lead_id: lead_id || crm_lead_id || "",
