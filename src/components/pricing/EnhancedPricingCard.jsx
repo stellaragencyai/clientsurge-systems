@@ -58,7 +58,7 @@ export default function EnhancedPricingCard({ pkg, index }) {
             <span className="pricing-price-mono text-4xl font-extrabold text-foreground">{pkg.monthly}</span>
             <span className="text-xs text-muted-foreground font-medium">/month</span>
           </div>
-          <p className="text-xs text-muted-foreground mt-1">{pkg.setup} one-time setup</p>
+          <p className="text-xs text-muted-foreground mt-1">{pkg.setup} one-time · Professional AI Implementation</p>
         </div>
 
         <ul className="space-y-3 mb-8 flex-1">

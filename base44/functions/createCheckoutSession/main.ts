@@ -80,6 +80,11 @@ function buildTestStripeLineItems(pricingSummary) {
     throw new Error("Test checkout currently supports package bundles only; add-on checkout is not enabled.");
   }
 
+  const implementationFee = Number(packageOffer?.implementation_fee || 0);
+  if (!implementationFee || implementationFee <= 0) {
+    throw new Error("Professional AI Implementation fee is not configured for this package.");
+  }
+
   const metadata = {
     catalog_version: "canonical_sales_catalog_v1",
     package_key: packageOffer.package_key,
@@ -92,14 +97,14 @@ function buildTestStripeLineItems(pricingSummary) {
       price_data: {
         currency: "usd",
         product_data: {
-          name: `${packageOffer.name} Setup and Installation [TEST]`,
+          name: `${packageOffer.name} — Professional AI Implementation (One-Time) [TEST]`,
           metadata: {
             ...metadata,
-            charge_type: "setup_fee",
+            charge_type: "implementation_fee",
             billing_phase: "initial",
           },
         },
-        unit_amount: toStripeAmount(pricingSummary.total_setup),
+        unit_amount: toStripeAmount(implementationFee),
       },
       quantity: 1,
     },

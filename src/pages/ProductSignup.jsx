@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useMemo } from "react";
 import { Link, useSearchParams } from "react-router-dom";
 import { appParams } from "@/lib/app-params";
-import { PACKAGE_OFFERS, normalizePackageKey } from "@/lib/salesCatalog";
+import { PACKAGE_OFFERS, normalizePackageKey, IMPLEMENTATION_INCLUSIONS } from "@/lib/salesCatalog";
 import { isValidEmail, isValidPhone, normalizeEmail, normalizePhone } from "@/lib/formSanitizers";
 
 const DEFAULT_PACKAGE = "growth_system";
@@ -125,8 +125,9 @@ export default function ProductSignup() {
 
   const currentPkg = PACKAGE_BY_KEY[selectedPackage] || PACKAGE_BY_KEY[DEFAULT_PACKAGE];
   const monthlyLabel = currency(currentPkg.monthly_total);
-  const setupLabel = currency(currentPkg.setup_total);
-  const firstPaymentLabel = currency(currentPkg.setup_total + currentPkg.monthly_total);
+  const implementationLabel = currency(currentPkg.implementation_fee || currentPkg.setup_total);
+  const dueTodayLabel = currency((currentPkg.implementation_fee || currentPkg.setup_total) + currentPkg.monthly_total);
+  const [showImplementationDetails, setShowImplementationDetails] = useState(false);
 
   const featureList = useMemo(() => {
     const features = currentPkg.features?.length
@@ -242,7 +243,7 @@ export default function ProductSignup() {
                   {(summary.recommended || pkg.highlight) && <span className="absolute -top-3 left-4 px-2 py-0.5 rounded-full text-[10px] font-black text-white uppercase tracking-wide" style={{ background: "#0088CC" }}>Recommended</span>}
                   <h3 className="font-black text-gray-900 text-lg">{pkg.name}</h3>
                   <p className="text-2xl font-black text-gray-900 mt-1">{currency(pkg.monthly_total)}<span className="text-sm font-medium text-gray-400">/mo</span></p>
-                  <p className="text-xs text-gray-500 mt-0.5">{currency(pkg.setup_total)} one-time setup</p>
+                  <p className="text-xs text-gray-500 mt-0.5">{currency(pkg.implementation_fee || pkg.setup_total)} Professional AI Implementation (one-time)</p>
                   <p className="text-xs text-gray-600 mt-2">{summary.shortDescription || pkg.description}</p>
                   {isSelected && <div className="mt-3 flex items-center gap-1.5 text-xs font-bold" style={{ color: "#0088CC" }}><span aria-hidden="true">✓</span> Selected</div>}
                 </button>
@@ -257,11 +258,38 @@ export default function ProductSignup() {
             <div className="mt-2 flex flex-wrap items-end justify-between gap-3">
               <div>
                 <p className="text-lg font-black text-gray-900">{currentPkg.name}</p>
-                <p className="text-sm text-gray-600">{setupLabel} setup + {monthlyLabel}/month</p>
+                <p className="text-sm text-gray-600">{monthlyLabel}/month recurring</p>
               </div>
-              <p className="text-sm font-bold text-gray-900">First Stripe payment: {firstPaymentLabel}</p>
             </div>
-            <p className="mt-2 text-xs text-gray-600">The first payment includes the one-time setup fee and the first month. The monthly subscription then renews at {monthlyLabel} until cancelled under the service terms.</p>
+
+            <div className="mt-4 rounded-lg bg-white border border-blue-200 p-3">
+              <div className="flex items-start justify-between gap-3">
+                <div>
+                  <p className="text-sm font-bold text-gray-900">Professional AI Implementation <span className="text-xs font-semibold text-gray-500">(One-Time · Required)</span></p>
+                  <button type="button" onClick={() => setShowImplementationDetails((v) => !v)} className="mt-1 text-xs font-semibold underline" style={{ color: "#0088CC" }}>
+                    {showImplementationDetails ? "Hide what's included" : "What's included"}
+                  </button>
+                </div>
+                <p className="text-sm font-bold text-gray-900">{implementationLabel}</p>
+              </div>
+              {showImplementationDetails && (
+                <ul className="mt-3 grid grid-cols-1 md:grid-cols-2 gap-1.5 text-xs text-gray-700">
+                  {IMPLEMENTATION_INCLUSIONS.map((item) => <li key={item} className="flex gap-2"><span aria-hidden="true" style={{ color: "#0088CC" }}>✓</span><span>{item}</span></li>)}
+                </ul>
+              )}
+            </div>
+
+            <div className="mt-4 border-t border-blue-200 pt-3 space-y-1.5">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Due Today</p>
+              <div className="flex justify-between text-xs text-gray-700"><span>Professional AI Implementation (one-time)</span><span>{implementationLabel}</span></div>
+              <div className="flex justify-between text-xs text-gray-700"><span>First month of service</span><span>{monthlyLabel}</span></div>
+              <div className="flex justify-between text-sm font-bold text-gray-900 pt-1"><span>Total due today</span><span>{dueTodayLabel}</span></div>
+            </div>
+            <div className="mt-3 rounded-lg bg-white/60 border border-blue-100 p-3">
+              <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Recurring</p>
+              <p className="mt-1 text-xs text-gray-700">Monthly subscription of <strong>{monthlyLabel}/month</strong> begins 30 days after activation and renews monthly until cancelled under the service terms.</p>
+            </div>
+
             <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
               {featureList.map((feature) => <li key={feature} className="flex gap-2"><span aria-hidden="true" style={{ color: "#0088CC" }}>✓</span><span>{feature}</span></li>)}
             </ul>

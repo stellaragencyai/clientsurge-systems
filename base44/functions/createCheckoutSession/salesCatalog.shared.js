@@ -2,6 +2,19 @@
 // checkout canonicalization, and admin visibility.
 // This file intentionally stays plain ESM so both the frontend and backend can import it.
 
+export const IMPLEMENTATION_LABEL = "Professional AI Implementation";
+export const IMPLEMENTATION_INCLUSIONS = [
+  "AI platform configuration",
+  "CRM integration",
+  "Google Business Profile integration",
+  "Calendar integration",
+  "AI receptionist deployment",
+  "SMS & email automation setup",
+  "Workflow configuration",
+  "Testing & quality assurance",
+  "Go-live support",
+];
+
 export const PUBLIC_STORE_PRODUCTS = [
   {
     product_id: "prod_UNi5RHiKNSTfQl",
@@ -293,7 +306,9 @@ const PACKAGE_DEFINITIONS = [
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
     included_service_keys: ["instant_lead_response", "missed_call_text_back"],
-    setup_total: 797,
+    implementation_fee: 249,
+    implementation_label: "Professional AI Implementation",
+    setup_total: 249,
     monthly_total: 497,
   },
   {
@@ -324,7 +339,9 @@ const PACKAGE_DEFINITIONS = [
       "nurture_sequence_14d",
       "ai_booking_agent",
     ],
-    setup_total: 1297,
+    implementation_fee: 499,
+    implementation_label: "Professional AI Implementation",
+    setup_total: 499,
     monthly_total: 997,
     badge: "Most Popular",
     highlight: true,
@@ -361,7 +378,9 @@ const PACKAGE_DEFINITIONS = [
       "lead_reactivation",
       "review_request",
     ],
-    setup_total: 2497,
+    implementation_fee: 999,
+    implementation_label: "Professional AI Implementation",
+    setup_total: 999,
     monthly_total: 1997,
   },
 ];
@@ -817,7 +836,7 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
   const addOnServiceKeys = pricingSummary?.add_on_service_keys || [];
   const packageStripeIds = resolvePackageStripeIds(packageOffer);
 
-  if (!packageStripeIds.setup_price_id || !packageStripeIds.monthly_price_id) {
+  if (!packageStripeIds.monthly_price_id) {
     throw new Error("Live checkout currently requires a Starter, Growth, or Pro package bundle.");
   }
 
@@ -825,9 +844,29 @@ export function buildStripeLineItemsForPricingSummary(pricingSummary) {
     throw new Error("Live checkout currently supports package bundles only; add-on checkout is not enabled.");
   }
 
+  const implementationFee = Number(packageOffer?.implementation_fee || 0);
+  if (!implementationFee || implementationFee <= 0) {
+    throw new Error("Professional AI Implementation fee is not configured for this package.");
+  }
+
   return [
     {
-      price: packageStripeIds.setup_price_id,
+      price_data: {
+        currency: "usd",
+        product_data: {
+          name: `${packageOffer.name} — ${IMPLEMENTATION_LABEL} (One-Time)`,
+          description:
+            "Required one-time implementation: AI platform configuration, CRM integration, Google Business Profile integration, calendar integration, AI receptionist deployment, SMS & email automation setup, workflow configuration, testing & quality assurance, and go-live support.",
+          metadata: {
+            catalog_version: "canonical_sales_catalog_v1",
+            package_key: packageOffer.package_key,
+            package_display_name: packageOffer.name,
+            charge_type: "implementation_fee",
+            billing_phase: "initial",
+          },
+        },
+        unit_amount: toCents(implementationFee),
+      },
       quantity: 1,
     },
     {

@@ -7,7 +7,7 @@ import CheckoutProgress from "@/components/checkout/CheckoutProgress";
 import ScarcityBadge from "@/components/pricing/ScarcityBadge";
 import EnhancedPricingCard from "@/components/pricing/EnhancedPricingCard";
 import { INDUSTRY_SELECTION_STORAGE_KEY } from "@/lib/industryRecommendations";
-import { PACKAGE_OFFERS } from "@/lib/salesCatalog";
+import { PACKAGE_OFFERS, IMPLEMENTATION_INCLUSIONS, IMPLEMENTATION_LABEL } from "@/lib/salesCatalog";
 
 const PACKAGE_COPY = {
   starter_system: {
@@ -112,6 +112,36 @@ export default function PricingPageContent() {
           <p className="text-sm text-muted-foreground"><strong>Not sure?</strong> <a href="/contact" onClick={() => trackCTA("guided_chooser_pricing", "pricing_page")} className="text-primary font-semibold underline underline-offset-4 hover:text-primary/80">Contact ClientSurge</a> and we will recommend the right starting point.</p>
         </div>
         <MoneyBackGuarantee />
+      </section>
+
+      <section className="px-6 pb-16 max-w-5xl mx-auto">
+        <div className="cs-glow-card p-8 md:p-10">
+          <div className="cs-section-header cs-section-header--center mb-8">
+            <p className="cs-section-eyebrow">Required with every system</p>
+            <div className="cs-section-title-row cs-section-header--center">
+              <span className="cs-section-bar" />
+              <h2 className="cs-section-title">{IMPLEMENTATION_LABEL} (One-Time)</h2>
+            </div>
+            <p className="cs-section-subtitle">
+              Every package includes a one-time Professional AI Implementation fee so our team can configure,
+              integrate, test, and launch your AI system. It is automatically added at checkout based on your
+              selected system and cannot be removed — it is not sold as a standalone product.
+            </p>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
+            {IMPLEMENTATION_INCLUSIONS.map((item) => (
+              <div key={item} className="flex items-start gap-2.5 rounded-lg border border-primary/15 bg-primary/5 px-4 py-3">
+                <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0 mt-0.5" aria-hidden="true" />
+                <span className="text-sm text-foreground/80">{item}</span>
+              </div>
+            ))}
+          </div>
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-3 text-xs text-muted-foreground">
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 font-semibold text-primary">Launch: $249 one-time</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 font-semibold text-primary">Growth: $499 one-time</span>
+            <span className="inline-flex items-center gap-1.5 rounded-full border border-primary/20 bg-primary/5 px-3 py-1.5 font-semibold text-primary">Pro: $999 one-time</span>
+          </div>
+        </div>
       </section>
 
       <section className="px-6 pb-16 max-w-5xl mx-auto">
