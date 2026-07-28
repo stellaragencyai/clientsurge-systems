@@ -20,24 +20,24 @@ const PACKAGE_DEFINITIONS = {
     stripe_product_id: "prod_UReWMpnZsCnfcL",
     setup_price_id: "price_1TSlDWBVGjsISdG0SyoWzAm3",
     monthly_price_id: "price_1TSlDWBVGjsISdG0Ej1O16ov",
-    setup_total: 399,
-    monthly_total: 249,
+    setup_total: 249,
+    monthly_total: 99,
   },
   growth_system: {
     name: "Growth System",
     stripe_product_id: "prod_UReWhZsWks1HuA",
     setup_price_id: "price_1TSlDXBVGjsISdG0eTWcARLM",
     monthly_price_id: "price_1TSlDXBVGjsISdG0X9unS4Qf",
-    setup_total: 649,
-    monthly_total: 499,
+    setup_total: 499,
+    monthly_total: 249,
   },
   pro_system: {
     name: "Pro System",
     stripe_product_id: "prod_UReW1LmsVbn4BZ",
     setup_price_id: "price_1TSlDYBVGjsISdG0l2rHzet1",
     monthly_price_id: "price_1TSlDXBVGjsISdG0Abdx85z3",
-    setup_total: 1249,
-    monthly_total: 999,
+    setup_total: 999,
+    monthly_total: 499,
   },
 };
 
@@ -283,8 +283,23 @@ Deno.serve(async (req) => {
         mode: "subscription",
         customer_email: normalizedEmail,
         line_items: [
-          { price: pkgDef.setup_price_id, quantity: 1 },
-          { price: pkgDef.monthly_price_id, quantity: 1 },
+          {
+            price_data: {
+              currency: "usd",
+              product: pkgDef.stripe_product_id,
+              unit_amount: Math.round(pkgDef.setup_total * 100),
+            },
+            quantity: 1,
+          },
+          {
+            price_data: {
+              currency: "usd",
+              product: pkgDef.stripe_product_id,
+              unit_amount: Math.round(pkgDef.monthly_total * 100),
+              recurring: { interval: "month" },
+            },
+            quantity: 1,
+          },
         ],
         success_url: redirectUrls.success_url,
         cancel_url: redirectUrls.cancel_url,
@@ -301,6 +316,10 @@ Deno.serve(async (req) => {
           request_id: requestId,
         },
         subscription_data: {
+          trial_period_days: 30,
+          trial_settings: {
+            end_behavior: { missing_payment_method: "cancel" },
+          },
           metadata: {
             base44_app_id: Deno.env.get("BASE44_APP_ID") || "",
             order_id: order.id,
