@@ -126,7 +126,7 @@ export default function ProductSignup() {
   const currentPkg = PACKAGE_BY_KEY[selectedPackage] || PACKAGE_BY_KEY[DEFAULT_PACKAGE];
   const monthlyLabel = currency(currentPkg.monthly_total);
   const implementationLabel = currency(currentPkg.implementation_fee || currentPkg.setup_total);
-  const dueTodayLabel = currency((currentPkg.implementation_fee || currentPkg.setup_total) + currentPkg.monthly_total);
+  const dueTodayLabel = currency(currentPkg.implementation_fee || currentPkg.setup_total);
   const [showImplementationDetails, setShowImplementationDetails] = useState(false);
 
   const featureList = useMemo(() => {
@@ -282,12 +282,11 @@ export default function ProductSignup() {
             <div className="mt-4 border-t border-blue-200 pt-3 space-y-1.5">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Due Today</p>
               <div className="flex justify-between text-xs text-gray-700"><span>Professional AI Implementation (one-time)</span><span>{implementationLabel}</span></div>
-              <div className="flex justify-between text-xs text-gray-700"><span>First month of service</span><span>{monthlyLabel}</span></div>
               <div className="flex justify-between text-sm font-bold text-gray-900 pt-1"><span>Total due today</span><span>{dueTodayLabel}</span></div>
             </div>
             <div className="mt-3 rounded-lg bg-white/60 border border-blue-100 p-3">
               <p className="text-xs font-bold uppercase tracking-widest text-gray-500">Recurring</p>
-              <p className="mt-1 text-xs text-gray-700">Monthly subscription of <strong>{monthlyLabel}/month</strong> begins 30 days after activation and renews monthly until cancelled under the service terms.</p>
+              <p className="mt-1 text-xs text-gray-700">Monthly subscription of <strong>{monthlyLabel}/month</strong> is first charged 30 days after today’s setup-fee payment and renews monthly until cancelled under the service terms.</p>
             </div>
 
             <ul className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
