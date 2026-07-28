@@ -99,8 +99,8 @@ test("stored pricing summary keeps package and discount visibility for admin", (
   assert.equal(stored.package_key, "pro_system");
   assert.equal(stored.package_name, "Pro System");
   assert.equal(stored.package_stripe_product_id, "prod_UReW1LmsVbn4BZ");
-  assert.equal(stored.package_setup_price_id, "price_1TSlDYBVGjsISdG0l2rHzet1");
-  assert.equal(stored.package_monthly_price_id, "price_1TSlDXBVGjsISdG0Abdx85z3");
+  assert.equal(stored.package_setup_price_id, "price_1TyJ1IBVGjsISdG00IO5OwMd");
+  assert.equal(stored.package_monthly_price_id, "price_1TyJ1PBVGjsISdG0e9F1BvaO");
   assert.equal(stored.total_setup, 2497);
   assert.equal(stored.total_monthly, 1997);
   assert.equal(stored.setup_discount_total, 0);
@@ -147,8 +147,8 @@ test("package checkout uses the live Stripe package price ids", () => {
   );
 
   assert.deepEqual(buildStripeLineItemsForPricingSummary(summary), [
-    { price: "price_1TSlDWBVGjsISdG0SyoWzAm3", quantity: 1 },
-    { price: "price_1TSlDWBVGjsISdG0Ej1O16ov", quantity: 1 },
+    { price: "price_1TyJ0sBVGjsISdG0WTYUzr4U", quantity: 1 },
+    { price: "price_1TyJ0zBVGjsISdG05Nwwf4CR", quantity: 1 },
   ]);
 });
 
