@@ -207,6 +207,47 @@ async function handleCheckoutSessionCompleted(base44, session, stripeEvent) {
   return { handled: true, order_id: orderId, fast_track: isFastTrack };
 }
 
+async function sendInvoiceEmailViaResend({ to, subject, html }) {
+  const resendKey = Deno.env.get("RESEND_API_KEY");
+  const fromEmail =
+    Deno.env.get("RESEND_FROM_EMAIL") ||
+    Deno.env.get("SYSTEM_EMAIL") ||
+    "billing@clientsurgesystems.com";
+  if (!resendKey || !to) {
+    safeError("[stripeOrderWebhook] Invoice email skipped — missing RESEND_API_KEY or recipient", {
+      has_resend_key: Boolean(resendKey),
+      has_recipient: Boolean(to),
+    });
+    return { sent: false, reason: "missing_config" };
+  }
+  try {
+    const res = await fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ from: fromEmail, to, subject, html }),
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      safeError("[stripeOrderWebhook] Invoice email send failed", {
+        status: res.status,
+        error: err?.message || String(res.status),
+      });
+      return { sent: false, reason: "resend_error" };
+    }
+    const result = await res.json();
+    return { sent: true, messageId: result?.id };
+  } catch (err) {
+    safeError("[stripeOrderWebhook] Invoice email fetch threw", { error: err.message });
+    return { sent: false, reason: "fetch_error" };
+  }
+}
+
+function formatInvoiceAmount(total, currency) {
+  const value = Number(total || 0) / 100;
+  const symbol = currency && String(currency).toUpperCase() === "USD" ? "$" : "";
+  return `${symbol}${value.toFixed(2)}`;
+}
+
 async function handleInvoicePaid(base44, invoice, stripeEvent) {
   const subscriptionId = invoice.subscription;
   const customerId = invoice.customer;
@@ -234,8 +275,9 @@ async function handleInvoicePaid(base44, invoice, stripeEvent) {
     1
   ).catch(() => []);
 
-  if (orders?.length) {
-    const order = orders[0];
+  const order = orders?.[0] || null;
+
+  if (order) {
     await base44.asServiceRole.entities.Order.update(order.id, {
       payment_status: "paid",
       billing_status: "active",
@@ -253,14 +295,60 @@ async function handleInvoicePaid(base44, invoice, stripeEvent) {
         order_id: order.id,
       });
     });
-    return { handled: true, order_id: order.id };
+  }
+
+  // ── Automated invoice emailing for every successful transaction ──
+  const recipientEmail = invoice.customer_email || order?.customer_email;
+  let invoiceEmailSent = false;
+  if (recipientEmail) {
+    const amountLabel = formatInvoiceAmount(invoice.total ?? invoice.amount_paid, invoice.currency);
+    const hostedUrl = invoice.hosted_invoice_url || "";
+    const pdfUrl = invoice.invoice_pdf || "";
+    const businessName = order?.business_name || "ClientSurge Systems";
+
+    const subject = `Your invoice from ${businessName} — ${amountLabel}`;
+    const html = `<!DOCTYPE html><html><head><meta charset="utf-8"><style>body{font-family:Arial,Helvetica,sans-serif;color:#1a1a1a;background:#f5f7fa;margin:0;padding:0}.wrap{max-width:560px;margin:24px auto;background:#fff;border-radius:12px;overflow:hidden;border:1px solid #e6eaf0}.header{background:linear-gradient(135deg,#0047AB,#002D62);color:#fff;padding:28px 32px}.header h1{margin:0;font-size:22px;font-weight:800}.body{padding:28px 32px}.amount{font-size:32px;font-weight:800;color:#002D62;margin:8px 0 20px}.btn{display:inline-block;background:linear-gradient(135deg,#0047AB,#002D62);color:#fff;text-decoration:none;padding:12px 22px;border-radius:999px;font-weight:700;margin:16px 0}.link{color:#0047AB;font-size:13px}.footer{padding:20px 32px;color:#6b7280;font-size:12px;border-top:1px solid #e6eaf0}</style></head><body><div class="wrap"><div class="header"><h1>Payment received — thank you</h1></div><div class="body"><p>Your payment of <strong>${amountLabel}</strong> to ${businessName} was successful. A copy of your invoice is linked below.</p><div class="amount">${amountLabel}</div>${hostedUrl ? `<a href="${hostedUrl}" class="btn">View invoice</a>` : ""}<br/>${pdfUrl ? `<a href="${pdfUrl}" class="link">Download PDF invoice</a>` : ""}<p style="margin-top:24px;color:#6b7280;font-size:13px">Need a receipt for your records? Use the links above. Questions? Reply to this email.</p></div><div class="footer">This is an automated invoice email sent for your successful payment. Please do not share this invoice link.</div></div></body></html>`;
+
+    const emailResult = await sendInvoiceEmailViaResend({ to: recipientEmail, subject, html });
+    invoiceEmailSent = emailResult.sent;
+
+    await base44.asServiceRole.entities.CommunicationEvent.create({
+      order_id: order?.id || undefined,
+      channel: "email",
+      direction: "outbound",
+      event_type: emailResult.sent ? "email_sent" : "email_failed",
+      provider: "resend",
+      status: emailResult.sent ? "sent" : "failed",
+      subject,
+      message_body: `Automated invoice email for Stripe invoice ${invoice.id} (${amountLabel})`,
+      provider_message_id: emailResult.messageId || undefined,
+      error_message: emailResult.sent ? undefined : emailResult.reason,
+      metadata_json: JSON.stringify({
+        stripe_event_id: stripeEvent.id,
+        stripe_invoice_id: invoice.id,
+        amount: amountLabel,
+        hosted_invoice_url: hostedUrl || null,
+        invoice_pdf: pdfUrl || null,
+        recipient: recipientEmail,
+        automated_invoice_email: true,
+      }),
+    }).catch(() => null);
+  } else {
+    safeLog("[stripeOrderWebhook] invoice.paid — no recipient email, skipping invoice email", {
+      invoice_id: invoice.id,
+      has_order: Boolean(order),
+    });
+  }
+
+  if (order) {
+    return { handled: true, order_id: order.id, invoice_email_sent: invoiceEmailSent };
   }
 
   safeLog("[stripeOrderWebhook] invoice.paid — no matching order found", {
     subscription_id: subscriptionId,
     customer_id: customerId,
   });
-  return { handled: true, warning: "no_matching_order" };
+  return { handled: true, warning: "no_matching_order", invoice_email_sent: invoiceEmailSent };
 }
 
 async function handleInvoicePaymentFailed(base44, invoice, stripeEvent) {
