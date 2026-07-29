@@ -14,7 +14,7 @@ export default function PrelaunchPreview() {
     return setPageMetadata({
       title: "ClientSurge Systems | Founding Waitlist",
       description:
-        "Join the ClientSurge Systems founding waitlist. Launching September 1, 2026.",
+        "Join the ClientSurge Systems founding waitlist. Launching September 1, 2027.",
       canonicalPath: "/prelaunch-preview",
       robots: "noindex,nofollow",
     });
