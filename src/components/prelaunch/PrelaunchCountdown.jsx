@@ -1,7 +1,7 @@
 import { useEffect, useState, useMemo } from "react";
 
-// September 1, 2027 at 9:00 a.m. America/Phoenix time (MST = UTC-7, no DST)
-const LAUNCH_TARGET = new Date("2027-09-01T16:00:00.000Z");
+// September 1, 2027 at 12:00 a.m. America/Phoenix time (MST = UTC-7, no DST)
+const LAUNCH_TARGET = new Date("2027-09-01T07:00:00.000Z");
 
 function getRemaining() {
   const diff = LAUNCH_TARGET.getTime() - Date.now();
@@ -54,7 +54,7 @@ export default function PrelaunchCountdown() {
           ))}
         </div>
         <p className="prelaunch-countdown__date">
-          September 1, 2027 at 9:00 a.m. Arizona time
+          September 1, 2027 at 12:00 a.m. Arizona time
         </p>
       </div>
     </section>
