@@ -2,7 +2,7 @@ import { CheckCircle2, Sparkles } from "lucide-react";
 
 const BENEFITS = [
   "50% off the selected eligible subscription",
-  "No setup fee",
+  "Priority access when ClientSurge Systems launches",
   "The founding discount remains while the account stays active and eligible",
 ];
 
@@ -29,8 +29,8 @@ export default function PrelaunchFoundingOffer() {
             ))}
           </ul>
           <p className="prelaunch-offer__qualification">
-            Limited to the first 1,000 eligible businesses. Package features and eligibility vary by
-            plan. Full offer terms will be provided before purchase.
+            Limited to the first 1,000 eligible businesses. Setup fees, package features, and
+            eligibility vary by plan. Full offer terms will be provided before purchase.
           </p>
         </div>
       </div>
