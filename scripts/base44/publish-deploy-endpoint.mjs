@@ -210,7 +210,15 @@ async function openBrowserContext(args) {
   });
 }
 
-async function waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs, showBrowser }) {
+async function getUsablePage(context, currentPage) {
+  if (currentPage && !currentPage.isClosed()) return currentPage;
+  const openPages = context.pages().filter((candidate) => !candidate.isClosed());
+  const base44Page = openPages.find((candidate) => candidate.url().startsWith(BASE44_ORIGIN));
+  return base44Page || openPages[0] || context.newPage();
+}
+
+async function waitForBrowserAuth({ context, page: initialPage, appId, dashboardUrl, timeoutMs, showBrowser }) {
+  let page = await getUsablePage(context, initialPage);
   await page.goto(dashboardUrl, { waitUntil: "domcontentloaded", timeout: timeoutMs });
   let access = await checkBrowserAppAccess(page, appId).catch((error) => ({ ok: false, status: 0, body: error.message }));
   if (access.ok) return access;
@@ -222,7 +230,8 @@ async function waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs, showBr
 
   const deadline = Date.now() + timeoutMs;
   while (Date.now() < deadline) {
-    await page.waitForTimeout(1500);
+    await new Promise((resolvePromise) => setTimeout(resolvePromise, 1500));
+    page = await getUsablePage(context, page);
     if (isProbablyAuthUrl(page.url()) || !page.url().startsWith(BASE44_ORIGIN)) continue;
     access = await checkBrowserAppAccess(page, appId).catch((error) => ({ ok: false, status: 0, body: error.message }));
     if (access.ok) {
@@ -250,7 +259,7 @@ async function main() {
       const context = await openBrowserContext(args);
       try {
         const page = context.pages()[0] || await context.newPage();
-        browserAuth = await waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: true });
+        browserAuth = await waitForBrowserAuth({ context, page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: true });
       } finally {
         await context.close();
       }
@@ -282,7 +291,7 @@ async function main() {
     const context = await openBrowserContext(args);
     try {
       const page = context.pages()[0] || await context.newPage();
-      await waitForBrowserAuth({ page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: args.showBrowser });
+      await waitForBrowserAuth({ context, page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: args.showBrowser });
       deployResult = await page.evaluate(async ({ deployEndpoint, token, headerName, scheme }) => {
         const headers = {};
         if (token) headers[headerName] = `${scheme} ${token}`;

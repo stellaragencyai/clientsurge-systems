@@ -63,6 +63,9 @@ test("Base44 deploy endpoint publisher targets the production app with authentic
   assert.match(publisher, /69dc4a79656fdba136d413d3/);
   assert.match(publisher, /69f959e2bc665e019e19840c/);
   assert.match(publisher, /--show-browser/);
+  assert.match(publisher, /getUsablePage/);
+  assert.match(publisher, /context\.pages\(\)/);
+  assert.match(publisher, /!currentPage\.isClosed\(\)/);
   assert.match(publisher, /accepted the deploy, but/);
   assert.match(publisher, /!verification\.changed/);
   assert.match(packageJson, /"base44:publish-api": "node scripts\/base44\/publish-deploy-endpoint\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
