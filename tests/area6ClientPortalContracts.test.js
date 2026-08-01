@@ -6,6 +6,7 @@ const files = {
   portalContextMain: readFileSync(new URL("../base44/functions/getClientPortalContext/main.ts", import.meta.url), "utf8"),
   portalContextEntry: readFileSync(new URL("../base44/functions/getClientPortalContext/entry.ts", import.meta.url), "utf8"),
   clientPortalAccess: readFileSync(new URL("../src/components/portal/ClientPortalAccess.jsx", import.meta.url), "utf8"),
+  clientPortal: readFileSync(new URL("../src/internal-pages/ClientPortal.jsx", import.meta.url), "utf8"),
   businessSetup: readFileSync(new URL("../src/internal-pages/BusinessSetup.jsx", import.meta.url), "utf8"),
   credentialsSetup: readFileSync(new URL("../src/internal-pages/CredentialsSetup.jsx", import.meta.url), "utf8"),
   setupStatus: readFileSync(new URL("../src/internal-pages/SetupStatus.jsx", import.meta.url), "utf8"),
@@ -29,11 +30,21 @@ test("Area 6 portal context distinguishes unsafe customer states instead of pret
   assert.match(files.portalContextMain, /Multiple paid businesses are linked/);
 });
 
-test("Area 6 client portal access keeps a stable dashboard and truth-labeled loading states", () => {
-  assert.match(files.clientPortalAccess, /import ClientDashboard/);
-  assert.doesNotMatch(files.clientPortalAccess, /import ClientPortal/);
+test("Area 6 client portal access renders the full portal with truth-labeled loading states", () => {
+  assert.match(files.clientPortalAccess, /import ClientPortal/);
+  assert.doesNotMatch(files.clientPortalAccess, /import ClientDashboard/);
   assert.match(files.clientPortalAccess, /not proof that your setup status changed/);
   assert.match(files.clientPortalAccess, /Portal data is private/);
+});
+
+test("Area 6 admin client mode reaches the portal dashboard without weakening client ownership checks", () => {
+  assert.match(files.clientPortal, /const canPreviewPortalWithoutProject =/);
+  assert.match(files.clientPortal, /isAdminPreview \|\|/);
+  assert.match(files.clientPortal, /userRole === "admin"/);
+  assert.match(files.clientPortal, /user\?\.role === "super_admin"/);
+  assert.match(files.clientPortal, /if \(\(notFound \|\| !project\) && !canPreviewPortalWithoutProject\)/);
+  assert.match(files.clientPortal, /canPreviewPortalWithoutProject && !project/);
+  assert.doesNotMatch(files.clientPortal, /Go to Admin Dashboard/);
 });
 
 test("Area 6 setup status never shows progress without a verified order id", () => {

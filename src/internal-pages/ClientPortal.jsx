@@ -1,7 +1,7 @@
 import { lazy, Suspense, useState, useEffect, useLayoutEffect, useCallback, useMemo } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { base44 } from "@/api/base44Client";
-import { LayoutDashboard, Eye } from "lucide-react";
+import { LayoutDashboard } from "lucide-react";
 import CSSectionHeader from "@/components/design-system/CSSectionHeader";
 import { useClientNotifications } from "../hooks/useClientNotifications";
 import PortalLoadingSkeleton from "../components/portal/PortalLoadingSkeleton";
@@ -292,41 +292,14 @@ export default function ClientPortal() {
     return <PortalLoadingSkeleton />;
   }
 
-  if (notFound || !project) {
-    // Admin preview mode — show info banner, not a confusing empty state
-    if (isAdminPreview || user?.role === "admin" || user?.role === "super_admin") {
-      return (
-        <div className="min-h-screen flex items-center justify-center px-6" style={{ background: "#F7F8FA" }}>
-          <div className="max-w-md text-center">
-            <div className="w-16 h-16 rounded-2xl flex items-center justify-center mx-auto mb-4"
-              style={{ background: "rgba(212,175,55,0.12)", border: "1px solid rgba(212,175,55,0.25)" }}>
-              <Eye className="w-8 h-8" style={{ color: "#B8941F" }} />
-            </div>
-            <h1 className="font-display text-2xl font-semibold text-foreground mb-2">Admin Preview Mode</h1>
-            <p className="text-muted-foreground text-sm leading-relaxed mb-4">
-              No client selected. You're logged in as an admin ({user?.email}), and no paid client order resolved for this account.
-            </p>
-            <div className="rounded-xl border border-border bg-muted/30 p-4 text-left mb-6">
-              <p className="text-xs font-semibold text-foreground mb-2">What this means:</p>
-              <ul className="text-xs text-muted-foreground space-y-1.5 list-disc list-inside">
-                <li>Admins see this preview state instead of an error</li>
-                <li>To view a real client dashboard, log in with that client's email</li>
-                <li>Or use the Admin Dashboard for system-level views</li>
-              </ul>
-            </div>
-            <div className="flex flex-col gap-3">
-              <a href="/admin"
-                className="inline-flex items-center justify-center gap-2 px-6 py-2.5 rounded-xl text-sm font-semibold text-white"
-                style={{ background: "linear-gradient(135deg,#0088CC,#003B8F)" }}>
-                Go to Admin Dashboard
-              </a>
-              <a href="/" className="text-sm text-muted-foreground hover:text-foreground transition-colors">Back to Home</a>
-            </div>
-          </div>
-        </div>
-      );
-    }
+  const canPreviewPortalWithoutProject =
+    isAdminPreview ||
+    userRole === "admin" ||
+    userRole === "super_admin" ||
+    user?.role === "admin" ||
+    user?.role === "super_admin";
 
+  if ((notFound || !project) && !canPreviewPortalWithoutProject) {
     return (
       <div className="min-h-screen flex items-center justify-center px-6" style={{ background: "#F7F8FA" }}>
         <div className="max-w-md text-center">
@@ -393,7 +366,7 @@ export default function ClientPortal() {
       }
     >
         {/* Admin Preview Banner */}
-        {isAdminPreview && (
+        {canPreviewPortalWithoutProject && !project && (
           <div className="px-6 pt-4">
             <PortalLazy>
               <AdminPreviewBanner userEmail={user?.email} linkStatus={portalError || "no_paid_order"} />
