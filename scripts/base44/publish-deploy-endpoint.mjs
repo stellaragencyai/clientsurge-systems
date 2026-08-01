@@ -232,7 +232,11 @@ async function waitForBrowserAuth({ context, page: initialPage, appId, dashboard
   while (Date.now() < deadline) {
     await new Promise((resolvePromise) => setTimeout(resolvePromise, 1500));
     page = await getUsablePage(context, page);
-    if (isProbablyAuthUrl(page.url()) || !page.url().startsWith(BASE44_ORIGIN)) continue;
+    if (isProbablyAuthUrl(page.url())) continue;
+    if (!page.url().startsWith(BASE44_ORIGIN)) {
+      await page.goto(dashboardUrl, { waitUntil: "domcontentloaded", timeout: timeoutMs }).catch(() => {});
+      continue;
+    }
     access = await checkBrowserAppAccess(page, appId).catch((error) => ({ ok: false, status: 0, body: error.message }));
     if (access.ok) {
       await page.goto(dashboardUrl, { waitUntil: "domcontentloaded", timeout: timeoutMs }).catch(() => {});
@@ -259,6 +263,7 @@ async function main() {
       const context = await openBrowserContext(args);
       try {
         const page = context.pages()[0] || await context.newPage();
+        await context.newPage();
         browserAuth = await waitForBrowserAuth({ context, page, appId, dashboardUrl, timeoutMs: args.timeoutMs, showBrowser: true });
       } finally {
         await context.close();
