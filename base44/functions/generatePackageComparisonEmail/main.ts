@@ -1,11 +1,40 @@
-import { secureJson } from "../_shared/response.ts";
 /**
  * generatePackageComparisonEmail — #475
  * Finds Starter/Growth clients live for ~60 days.
  * Sends them an email showing what they're missing at the next tier.
  */
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { resendFetch } from "../_shared/resendFetch.js";
+
+const RETRYABLE_RESEND_STATUSES = new Set([429, 500, 502, 503, 504]);
+
+function secureJson(data = {}, init = {}) {
+  return new Response(JSON.stringify(data), {
+    ...init,
+    headers: {
+      "Cache-Control": "no-store",
+      "X-Frame-Options": "DENY",
+      ...(init.headers || {}),
+      "Content-Type": "application/json",
+    },
+  });
+}
+
+async function resendFetch(url, init = {}, { retryDelayMs = 2000, timeoutMs = 10000 } = {}) {
+  const request = async () => {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), timeoutMs);
+    try {
+      return await fetch(url, { ...init, signal: controller.signal });
+    } finally {
+      clearTimeout(timeout);
+    }
+  };
+
+  const firstResponse = await request();
+  if (!RETRYABLE_RESEND_STATUSES.has(firstResponse.status)) return firstResponse;
+  await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+  return request();
+}
 
 const TIER_BENEFITS = {
   starter: {
@@ -78,12 +107,12 @@ Deno.serve(async (req) => {
       if (resendKey) {
         await resendFetch("https://api.resend.com/emails", {
           method: "POST",
-          headers: { Authorization: \`Bearer \${resendKey}\`, "Content-Type": "application/json" },
+          headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
           body: JSON.stringify({
             from: "system@clientsurgesystems.com",
             reply_to: "nolan@clientsurgesystems.com",
             to: order.client_email,
-            subject: \`See what you're missing — Scale to \${benefits.upgrade_to} 🚀\`,
+            subject: `See what you're missing — Scale to ${benefits.upgrade_to} 🚀`,
             html,
           }),
         }).catch(() => {});
@@ -95,14 +124,14 @@ Deno.serve(async (req) => {
     await base44.asServiceRole.entities.AgentLog.create({
       agent_name: "generatePackageComparisonEmail",
       log_type: "info",
-      summary: \`Day-60 upgrade emails sent to \${sent} clients\`,
+      summary: `Day-60 upgrade emails sent to ${sent} clients`,
       details: JSON.stringify({ eligible: eligible.length, sent }),
       service: "email_marketing",
       requires_nolan: false,
       resolved: true,
     }).catch(() => {});
 
-    console.log(\`[Day60Upgrade] Sent \${sent} upgrade emails\`);
+    console.log(`[Day60Upgrade] Sent ${sent} upgrade emails`);
     return secureJson({ success: true, eligible: eligible.length, sent });
   } catch (err) {
     return secureJson({ error: err.message }, { status: 500 });
