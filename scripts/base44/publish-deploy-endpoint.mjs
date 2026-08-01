@@ -305,6 +305,9 @@ async function main() {
     waitMs: args.verifyWaitMs,
     pollMs: args.verifyPollMs,
   });
+  if (args.verifyUrl && !verification.changed) {
+    throw new Error(`Base44 accepted the deploy, but ${args.verifyUrl} did not change assets within ${args.verifyWaitMs}ms.`);
+  }
   const afterSignal = verification.finalSignal;
   const result = { ok: true, appId, beforeSignal, deployResult, verification, afterSignal };
   const summary = buildSummary({ ...result, outputPath: args.output });

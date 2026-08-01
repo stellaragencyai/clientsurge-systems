@@ -40,8 +40,14 @@ test("Base44 publish clicker requires an explicit publish flag", () => {
   assert.match(clicker, /Refusing to click Publish without --yes/);
   assert.match(clicker, /fileURLToPath/);
   assert.match(clicker, /--dry-run/);
+  assert.match(clicker, /--status/);
+  assert.match(clicker, /pending_publish/);
+  assert.match(clicker, /expected_sync_visible/);
+  assert.match(clicker, /--expect-text/);
+  assert.match(clicker, /live_changed/);
+  assert.match(clicker, /did not change assets/);
   assert.match(clicker, /launchPersistentContext/);
-  assert.match(clicker, /getByRole\("button", \{ name: "Publish", exact: true \}\)/);
+  assert.match(clicker, /getByRole\("button", \{ name: \/\^Publish\$\/i \}\)/);
   assert.match(clicker, /https:\/\/app\.base44\.com\/apps\/\$\{appId\}\/editor\/workspace\/overview/);
 });
 
@@ -57,6 +63,8 @@ test("Base44 deploy endpoint publisher targets the production app with authentic
   assert.match(publisher, /69dc4a79656fdba136d413d3/);
   assert.match(publisher, /69f959e2bc665e019e19840c/);
   assert.match(publisher, /--show-browser/);
+  assert.match(publisher, /accepted the deploy, but/);
+  assert.match(publisher, /!verification\.changed/);
   assert.match(packageJson, /"base44:publish-api": "node scripts\/base44\/publish-deploy-endpoint\.mjs --app-id 69dc4a79656fdba136d413d3 --verify-url https:\/\/clientsurgesystems\.com"/);
 });
 
@@ -154,8 +162,7 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /\[string\]\$TargetBranch = 'main'/);
   assert.match(watcher, /69dc4a79656fdba136d413d3/);
   assert.match(watcher, /npm run build/);
-  assert.match(watcher, /npm run test:node/);
-  assert.match(watcher, /npm run test:deno/);
+  assert.match(watcher, /npm run test:release-gate:node/);
   assert.match(watcher, /npm run smoke:public-routes/);
   assert.match(watcher, /npm run verify:production-security/);
   assert.match(watcher, /\[ValidateSet\('Primary', 'Failover', 'MirrorOnly'\)\]/);
@@ -173,8 +180,28 @@ test("main publish watcher preserves build test and production-app guardrails", 
   assert.match(watcher, /check-app-access\.mjs/);
   assert.match(watcher, /Run this watcher from a clean \$TargetBranch mirror/);
   assert.match(watcher, /git merge --ff-only origin\/\$TargetBranch/);
-  assert.match(watcher, /publish-deploy-endpoint\.mjs --app-id \$AppId --verify-url \$VerifyUrl --summary/);
+  assert.match(watcher, /publish-deploy-endpoint\.mjs --app-id \$AppId --verify-url \$VerifyUrl .*--summary/);
+  assert.match(watcher, /Get-Base44PublishStatus/);
+  assert.match(watcher, /'--status', '--headless', '--app-id', \$AppId/);
+  assert.match(watcher, /--expect-text/);
+  assert.match(watcher, /commit title is not visible in Base44 sync activity yet/);
+  assert.match(watcher, /Base44 editor changes detected without a new GitHub SHA/);
+  assert.match(watcher, /has not synced it yet\. The next poll will retry/);
   assert.match(packageJson, /"base44:watch-main-publish": "pwsh -File scripts\/base44\/watch-main-publish\.ps1"/);
+});
+
+test("dedicated scheduled task polls GitHub and Base44 without using a dirty checkout", () => {
+  const installer = read("scripts/base44/install-auto-publish-task.ps1");
+  const packageJson = read("package.json");
+
+  assert.match(installer, /ClientSurge-Base44-AutoPublish/);
+  assert.match(installer, /clientsurge-publish-runner/);
+  assert.match(installer, /watch-main-publish\.ps1/);
+  assert.match(installer, /-FallbackToUiClick/);
+  assert.match(installer, /-SkipStagingMirrors/);
+  assert.match(installer, /MultipleInstances IgnoreNew/);
+  assert.match(installer, /must be clean/);
+  assert.match(packageJson, /"base44:install-auto-publish": "pwsh -File scripts\/base44\/install-auto-publish-task\.ps1"/);
 });
 
 test("GitHub release gate verifies main before automatic publish", () => {

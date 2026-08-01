@@ -29,6 +29,7 @@
     "base44:publish-ui": "node scripts/base44/publish-ui-clicker.mjs",
     "base44:auto-sync": "pwsh -File scripts/base44/watch-sync-publish.ps1",
     "base44:watch-main-publish": "pwsh -File scripts/base44/watch-main-publish.ps1",
+    "base44:install-auto-publish": "pwsh -File scripts/base44/install-auto-publish-task.ps1",
     "sync:bootstrap-machine": "pwsh -File scripts/sync/bootstrap-base44-machine.ps1",
     "sync:mirror": "pwsh -File scripts/sync/update-base44-sync-mirror.ps1",
     "sync:classify-overlap": "pwsh -File scripts/sync/classify-base44-overlap.ps1",

@@ -11,6 +11,8 @@ param(
     [switch]$FallbackToUiClick,
     [switch]$SkipGitHubChecks,
     [switch]$SkipStagingMirrors,
+    [string]$BrowserProfileDir = (Join-Path $env:USERPROFILE '.base44\publish-browser-profile'),
+    [int]$UiStatusTimeoutSeconds = 90,
     [int]$GitHubCheckTimeoutSeconds = 1800,
     [ValidateSet('Primary', 'Failover', 'MirrorOnly')]
     [string]$PublisherRole = 'Primary',
@@ -79,7 +81,31 @@ Set-Location $repoRoot
 $stateDir = Join-Path $repoRoot 'logs/base44-publish'
 New-Item -ItemType Directory -Force -Path $stateDir | Out-Null
 $statePath = Join-Path $stateDir 'last-published-main.txt'
-$base44BrowserProfileDir = Join-Path $env:USERPROFILE '.base44\publish-browser-profile'
+$base44BrowserProfileDir = $BrowserProfileDir
+$uiStatusPath = Join-Path $stateDir 'ui-publish-status.json'
+
+function Get-Base44PublishStatus {
+    param([string]$ExpectedText = '')
+    if (Test-Path $uiStatusPath) {
+        Remove-Item -LiteralPath $uiStatusPath -Force
+    }
+
+    Write-Host '> Checking Base44 editor for unpublished changes' -ForegroundColor Cyan
+    $statusArgs = @('scripts/base44/publish-ui-clicker.mjs', '--status', '--headless', '--app-id', $AppId, '--profile-dir', $base44BrowserProfileDir, '--timeout-ms', ($UiStatusTimeoutSeconds * 1000), '--output', $uiStatusPath)
+    if ($ExpectedText) { $statusArgs += @('--expect-text', $ExpectedText) }
+    $nodeOutput = & node @statusArgs 2>&1
+    $nodeExitCode = $LASTEXITCODE
+    foreach ($line in @($nodeOutput)) { Write-Host $line }
+    if ($nodeExitCode -ne 0 -or -not (Test-Path $uiStatusPath)) {
+        throw 'Could not determine whether Base44 has unpublished changes. Refresh the dedicated publisher profile.'
+    }
+
+    $status = Get-Content -LiteralPath $uiStatusPath -Raw | ConvertFrom-Json
+    if (-not $status.ok -or $null -eq $status.pending_publish) {
+        throw 'Base44 publish status proof was incomplete.'
+    }
+    return $status
+}
 
 function Get-RemoteSha {
     Invoke-Step 'git fetch origin --prune'
@@ -178,7 +204,7 @@ function Invoke-ProductionPublish {
             throw
         }
         Write-Host "Deploy endpoint failed; falling back to UI clicker: $($_.Exception.Message)" -ForegroundColor Yellow
-        Invoke-Step 'node scripts/base44/publish-ui-clicker.mjs --yes'
+        Invoke-Step "node scripts/base44/publish-ui-clicker.mjs --yes --headless --app-id $AppId --profile-dir `"$base44BrowserProfileDir`" --verify-url $VerifyUrl --output `"$(Join-Path $stateDir 'ui-publish-proof.json')`""
     }
 
     Set-Content -Path $statePath -Value $Sha -Encoding UTF8
@@ -214,12 +240,29 @@ do {
     try {
         $remoteSha = Get-RemoteSha
         $lastSha = if (Test-Path $statePath) { (Get-Content $statePath -Raw).Trim() } else { '' }
-        if ($remoteSha -and $remoteSha -ne $lastSha) {
-            Write-Host "New origin/$TargetBranch SHA detected: $remoteSha" -ForegroundColor Yellow
+        $gitChanged = $remoteSha -and $remoteSha -ne $lastSha
+        $commitTitle = if ($gitChanged) { (& git show -s --format=%s $remoteSha).Trim() } else { '' }
+        $syncMarker = if ($commitTitle.Length -gt 32) { $commitTitle.Substring(0, 32) } else { $commitTitle }
+        $base44Status = Get-Base44PublishStatus -ExpectedText $syncMarker
+        $base44Pending = [bool]$base44Status.pending_publish
+        $expectedSyncVisible = -not $gitChanged -or [bool]$base44Status.expected_sync_visible
+        if ($base44Pending -and $expectedSyncVisible) {
+            if ($gitChanged) {
+                Write-Host "New origin/$TargetBranch SHA and Base44 unpublished changes detected: $remoteSha" -ForegroundColor Yellow
+            }
+            else {
+                Write-Host 'Base44 editor changes detected without a new GitHub SHA.' -ForegroundColor Yellow
+            }
             Invoke-ProductionPublish -Sha $remoteSha
         }
+        elseif ($gitChanged -and -not $expectedSyncVisible) {
+            Write-Host "New origin/$TargetBranch SHA detected, but its commit title is not visible in Base44 sync activity yet. The next poll will retry." -ForegroundColor Yellow
+        }
+        elseif ($gitChanged) {
+            Write-Host "New origin/$TargetBranch SHA detected, but Base44 has not synced it yet. The next poll will retry." -ForegroundColor Yellow
+        }
         else {
-            Write-Host "No unpublished origin/$TargetBranch change detected."
+            Write-Host "No unpublished GitHub or Base44 change detected."
         }
     }
     catch {
