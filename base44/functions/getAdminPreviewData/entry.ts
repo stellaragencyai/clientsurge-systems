@@ -190,8 +190,9 @@ Deno.serve(async (req) => {
       return json({ error: "Authentication required" }, 401);
     }
 
-    if (!user || (user.role !== "admin" && user.role !== "super_admin")) {
-      return json({ error: "Admin access required" }, 403);
+    const isOwnerPreviewUser = String(user?.email || "").trim().toLowerCase() === "nolanfstrommer@gmail.com";
+    if (!user || ((user.role !== "admin" && user.role !== "super_admin") && !isOwnerPreviewUser)) {
+      return json({ error: "Admin or owner preview access required" }, 403);
     }
 
     const url = new URL(req.url);
