@@ -5,3 +5,12 @@ workers_dev = false
 
 # Production routes are managed in the Cloudflare dashboard. Keeping routes out of
 # this file lets the CI token deploy Worker code without mutating zone routing.
+
+[[d1_databases]]
+binding = "ANALYTICS_DB"
+database_name = "clientsurge-visitor-analytics"
+database_id = "9d0df58b-e737-4289-94d8-24c4a10747be"
+migrations_dir = "migrations"
+
+[triggers]
+crons = ["* * * * *"]
