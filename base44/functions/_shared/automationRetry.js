@@ -15,16 +15,17 @@ export function buildRetrySchedulePatch({ attempts = 0, error = "", now = new Da
 
   if (!retryable) {
     return {
-      status: "failed",
+      status: "terminal",
       attempts: Number(attempts) || 0,
       last_error: error || null,
+      terminal_reason: "max_retry_attempts_exceeded",
       processed_at: now.toISOString(),
     };
   }
 
   const scheduledFor = new Date(now.getTime() + getRetryDelayMinutes(attempts) * 60 * 1000);
   return {
-    status: "queued",
+    status: "retryable",
     attempts: nextAttempts,
     last_error: error || null,
     scheduled_for: scheduledFor.toISOString(),
@@ -32,7 +33,7 @@ export function buildRetrySchedulePatch({ attempts = 0, error = "", now = new Da
 }
 
 export function isAutomationJobDue(job = {}, now = new Date()) {
-  if (job.status !== "queued") {
+  if (!["queued", "retryable"].includes(job.status)) {
     return false;
   }
 

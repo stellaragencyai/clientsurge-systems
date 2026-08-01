@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
 
 // Keep main.ts aligned with entry.ts so alternate Base44 runtimes do not
@@ -127,7 +128,7 @@ Deno.serve(async (req) => {
 
     if (scheduled_at) payload.scheduled_at = scheduled_at;
 
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,

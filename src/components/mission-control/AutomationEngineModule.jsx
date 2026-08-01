@@ -18,8 +18,8 @@ export default function AutomationEngineModule() {
     const loadData = async () => {
       try {
         const [autoRules, ruleInsights] = await Promise.all([
-          base44.asServiceRole.entities.AutomationRule.filter({}, '-created_date', 20),
-          base44.asServiceRole.entities.AutomationRuleInsights.filter({}, '-created_date', 20),
+          base44.admin.entities.AutomationRule.filter({}, '-created_date', 20),
+          base44.admin.entities.AutomationRuleInsights.filter({}, '-created_date', 20),
         ]);
 
         setAutomations(autoRules || []);

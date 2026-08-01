@@ -18,7 +18,26 @@ function assertAdminOnlyUpdate(entityName) {
 }
 
 test("authoritative payment and activation entities are not customer-updatable", () => {
-  for (const entityName of ["Order", "Subscription", "ClientInstallationOS"]) {
+  for (const entityName of [
+    "Order",
+    "Subscription",
+    "ClientInstallationOS",
+    "ClientProject",
+    "AutomationChecklist",
+    "AutomationChecklistStep",
+  ]) {
     assertAdminOnlyUpdate(entityName);
   }
+});
+
+test("client change requests are the customer-safe path for project and checklist edits", () => {
+  const entity = readEntity("ClientChangeRequest");
+
+  assert.deepEqual(
+    entity.rls?.create,
+    { user_condition: { role: "admin" } },
+    "ClientChangeRequest records should be created through submitClientChangeRequest, not direct browser entity writes"
+  );
+  assert.equal(entity.rls?.read?.$or?.some((rule) => rule["data.requested_by_email"] === "{{user.email}}"), true);
+  assertAdminOnlyUpdate("ClientChangeRequest");
 });

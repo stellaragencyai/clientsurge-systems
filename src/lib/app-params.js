@@ -3,6 +3,8 @@ const memoryStorage = new Map();
 const PRODUCTION_APP_ID = "69dc4a79656fdba136d413d3";
 const PRODUCTION_APP_BASE_URL = "https://clientsurgesystems.com";
 const NULL_LIKE_VALUES = new Set(["", "null", "undefined"]);
+const PRODUCTION_HOSTNAMES = new Set(["clientsurgesystems.com", "www.clientsurgesystems.com"]);
+const LOCKED_PRODUCTION_CONFIG_PARAMS = new Set(["app_id", "functions_version", "app_base_url"]);
 
 const toSnakeCase = (str) => str.replace(/([A-Z])/g, "_$1").toLowerCase();
 
@@ -85,6 +87,14 @@ const getLocation = () => {
 	return window.location;
 };
 
+const isLockedProductionRuntime = () => {
+	if (!isBrowser || import.meta.env.DEV) {
+		return false;
+	}
+
+	return PRODUCTION_HOSTNAMES.has(window.location.hostname);
+};
+
 const safeReplaceUrl = (nextUrl) => {
 	if (!isBrowser) {
 		return;
@@ -97,7 +107,14 @@ const safeReplaceUrl = (nextUrl) => {
 	}
 };
 
-const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl = false } = {}) => {
+const getAppParamValue = (paramName, {
+	defaultValue = undefined,
+	removeFromUrl = false,
+	allowUrlOverride = true,
+	allowStorageOverride = true,
+	persistUrlValue = true,
+	persistDefaultValue = true,
+} = {}) => {
 	if (!isBrowser) {
 		return defaultValue ?? null;
 	}
@@ -106,6 +123,11 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 	const location = getLocation();
 	const urlParams = new URLSearchParams(location.search);
 	const searchParam = normalizeParamValue(urlParams.get(paramName));
+	const productionConfigLocked =
+		isLockedProductionRuntime() && LOCKED_PRODUCTION_CONFIG_PARAMS.has(paramName);
+	const urlOverrideAllowed = allowUrlOverride && !productionConfigLocked;
+	const storageOverrideAllowed = allowStorageOverride && !productionConfigLocked;
+	const defaultPersistenceAllowed = persistDefaultValue && !productionConfigLocked;
 
 	if (removeFromUrl && searchParam) {
 		urlParams.delete(paramName);
@@ -113,19 +135,25 @@ const getAppParamValue = (paramName, { defaultValue = undefined, removeFromUrl =
 		safeReplaceUrl(newUrl);
 	}
 
-	if (searchParam) {
-		writeStorage(storageKey, searchParam);
+	if (searchParam && urlOverrideAllowed) {
+		if (persistUrlValue) {
+			writeStorage(storageKey, searchParam);
+		}
 		return searchParam;
 	}
 
-	const storedValue = normalizeParamValue(readStorage(storageKey));
-	if (storedValue) {
-		return storedValue;
+	if (storageOverrideAllowed) {
+		const storedValue = normalizeParamValue(readStorage(storageKey));
+		if (storedValue) {
+			return storedValue;
+		}
 	}
 
 	const normalizedDefaultValue = normalizeParamValue(defaultValue);
 	if (normalizedDefaultValue !== null) {
-		writeStorage(storageKey, normalizedDefaultValue);
+		if (defaultPersistenceAllowed) {
+			writeStorage(storageKey, normalizedDefaultValue);
+		}
 		return normalizedDefaultValue;
 	}
 
@@ -139,13 +167,38 @@ const getAppParams = () => {
 	}
 
 	const location = getLocation();
+	const lockedProductionRuntime = isLockedProductionRuntime();
+	const lockedConfigOptions = lockedProductionRuntime
+		? {
+			allowUrlOverride: false,
+			allowStorageOverride: false,
+			persistDefaultValue: false,
+		}
+		: {};
+	const tokenOptions = lockedProductionRuntime
+		? {
+			removeFromUrl: true,
+			allowStorageOverride: false,
+			persistUrlValue: false,
+			persistDefaultValue: false,
+		}
+		: { removeFromUrl: true };
 
 	return {
-		appId: getAppParamValue("app_id", { defaultValue: import.meta.env.VITE_BASE44_APP_ID || PRODUCTION_APP_ID }),
-		token: getAppParamValue("access_token", { removeFromUrl: true }),
+		appId: getAppParamValue("app_id", {
+			defaultValue: import.meta.env.VITE_BASE44_APP_ID || PRODUCTION_APP_ID,
+			...lockedConfigOptions,
+		}),
+		token: getAppParamValue("access_token", tokenOptions),
 		fromUrl: getAppParamValue("from_url", { defaultValue: location.href }),
-		functionsVersion: getAppParamValue("functions_version", { defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION }),
-		appBaseUrl: getAppParamValue("app_base_url", { defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL || PRODUCTION_APP_BASE_URL }),
+		functionsVersion: getAppParamValue("functions_version", {
+			defaultValue: import.meta.env.VITE_BASE44_FUNCTIONS_VERSION,
+			...lockedConfigOptions,
+		}),
+		appBaseUrl: getAppParamValue("app_base_url", {
+			defaultValue: import.meta.env.VITE_BASE44_APP_BASE_URL || PRODUCTION_APP_BASE_URL,
+			...lockedConfigOptions,
+		}),
 	};
 };
 

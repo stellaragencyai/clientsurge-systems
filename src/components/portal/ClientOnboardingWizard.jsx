@@ -76,12 +76,18 @@ export default function ClientOnboardingWizard({ project, onComplete }) {
     const saved = await savePreferences();
     if (!saved) return;
     try {
-      await base44.entities.ClientProject.update(project.id, {
-        onboarding_wizard_completed: true,
-        booking_link: formData.booking_link || undefined,
+      await base44.functions.invoke('submitClientChangeRequest', {
+        target_entity: 'ClientProject',
+        target_id: project.id,
+        requested_changes: {
+          onboarding_wizard_completed: true,
+          booking_link: formData.booking_link || undefined,
+        },
+        request_reason: 'Client completed onboarding wizard and submitted setup details.',
+        source_route: typeof window !== 'undefined' ? window.location.pathname : '',
       });
     } catch {
-      // Non-critical — wizard completion is the main flag
+      // Preferences are already saved; an operator can still review from support context.
     }
     onComplete?.();
   };

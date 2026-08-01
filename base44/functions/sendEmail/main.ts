@@ -1,4 +1,7 @@
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
+import { AuthGuardError, requireAdminUser } from "../_shared/authGuards.js";
+import { buildResendEmailPayload } from "../_shared/emailPayload.js";
+import { resendFetch } from "../_shared/resendFetch.js";
 
 const CLIENTSURGE_DOMAIN = "clientsurgesystems.com";
 const PROOF_READY_VALUES = new Set(["verified", "passed", "production_verified"]);
@@ -38,6 +41,12 @@ function deliverabilityProofReady() {
 
 Deno.serve(async (req) => {
   try {
+    if (req.method !== "POST") {
+      return json({ error: "Method not allowed" }, 405);
+    }
+
+    const base44 = createClientFromRequest(req);
+    const user = await requireAdminUser(base44);
     const { email, subject, body, leadId } = await req.json();
 
     if (!email || !subject || !body) {
@@ -65,19 +74,19 @@ Deno.serve(async (req) => {
       }, 403);
     }
 
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${apiKey}`,
         'Content-Type': 'application/json',
       },
-      body: JSON.stringify({
+      body: JSON.stringify(buildResendEmailPayload({
         from: safeResendFrom(),
         reply_to: env("RESEND_REPLY_TO_LEADS") || env("ADMIN_EMAIL") || `nolan@${CLIENTSURGE_DOMAIN}`,
         to: email,
         subject,
         html: body,
-      }),
+      })),
     });
 
     const data = await response.json();
@@ -86,12 +95,11 @@ Deno.serve(async (req) => {
       return json({ error: 'Failed to send email', details: data }, 500);
     }
 
-    const base44 = createClientFromRequest(req);
-
     // Log CommunicationEvent for observability
     try {
       await base44.asServiceRole.entities.CommunicationEvent.create({
         lead_id: leadId || undefined,
+        created_by: user.email || null,
         channel: 'email',
         direction: 'outbound',
         event_type: 'email_sent',
@@ -122,6 +130,10 @@ Deno.serve(async (req) => {
 
     return json({ success: true, emailId: data.id });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return json({ error: error.message, code: error.code }, error.status);
+    }
+
     return json({ error: error.message }, 500);
   }
 });

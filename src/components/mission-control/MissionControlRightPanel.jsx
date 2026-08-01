@@ -12,8 +12,8 @@ export default function MissionControlRightPanel() {
     const loadData = async () => {
       try {
         const [alertList, eventList] = await Promise.all([
-          base44.asServiceRole.entities.Alert.filter({}, '-created_date', 10),
-          base44.asServiceRole.entities.CommunicationEvent.filter({}, '-created_date', 10),
+          base44.admin.entities.Alert.filter({}, '-created_date', 10),
+          base44.admin.entities.CommunicationEvent.filter({}, '-created_date', 10),
         ]);
         setAlerts(alertList || []);
         setEvents(eventList || []);

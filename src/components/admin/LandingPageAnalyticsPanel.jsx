@@ -25,7 +25,7 @@ export default function LandingPageAnalyticsPanel() {
   const loadAnalytics = async () => {
     setLoading(true);
     try {
-      const records = await base44.asServiceRole.entities.LandingPageAnalytics.filter(
+      const records = await base44.admin.entities.LandingPageAnalytics.filter(
         { date: selectedDate },
         '-created_date',
         50

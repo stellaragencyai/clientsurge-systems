@@ -50,7 +50,7 @@ export default function AuditLogPanel() {
     try {
       setLoading(true);
       setError('');
-      const data = await base44.asServiceRole.entities.AuditLog.list('-timestamp', LIMIT);
+      const data = await base44.admin.entities.AuditLog.list('-timestamp', LIMIT);
       setLogs(data || []);
     } catch (err) {
       console.error('Failed to load audit log:', err);

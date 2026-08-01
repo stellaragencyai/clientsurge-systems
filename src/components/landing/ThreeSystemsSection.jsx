@@ -33,8 +33,8 @@ const PACKAGES = [
     subtitle: "Best for businesses that need instant response and missed-call recovery first.",
     description: "Capture every new inquiry and missed call before leads disappear. The essential response foundation.",
     featureIntro: "Start with the two response automations that stop new leads and missed calls from going cold.",
-    price: "$249",
-    setupPrice: "$399",
+    price: "$99",
+    setupPrice: "$249",
     automationCount: 2,
     coverageCount: 2,
     websiteScope: "Connects to your existing site",
@@ -44,7 +44,7 @@ const PACKAGES = [
       "Instant Lead Response",
       "Missed-Call Text-Back",
     ],
-    cta: "Add to Cart",
+    cta: "Choose Starter System",
     packageId: "starter_system",
     highlight: false,
     accent: "#00D4FF",
@@ -59,8 +59,8 @@ const PACKAGES = [
     subtitle: "Best for steady lead flow that needs response, recovery, nurture, and booking.",
     description: "Automated follow-up and booking handoff working together — our most popular package.",
     featureIntro: "Includes the Starter automations, then adds nurture and booking handoff.",
-    price: "$499",
-    setupPrice: "$649",
+    price: "$249",
+    setupPrice: "$499",
     automationCount: 4,
     coverageCount: 4,
     websiteScope: "Connects to your existing site",
@@ -72,7 +72,7 @@ const PACKAGES = [
       "14-Day Nurture Sequence",
       "AI Booking Agent Handoff",
     ],
-    cta: "Add to Cart",
+    cta: "Choose Growth System",
     packageId: "growth_system",
     highlight: true,
     accent: "#00D4FF",
@@ -87,8 +87,8 @@ const PACKAGES = [
     subtitle: "Best for teams that want the full response, reactivation, review, and website layer.",
     description: "The full revenue operating layer — website, reactivation, reviews, reporting, and expanded automation. Done-for-you.",
     featureIntro: "Includes the Growth automations, then adds reactivation and review automation.",
-    price: "$999",
-    setupPrice: "$1,249",
+    price: "$499",
+    setupPrice: "$999",
     automationCount: 6,
     coverageCount: 6,
     websiteScope: "Full website build & design included",
@@ -102,7 +102,7 @@ const PACKAGES = [
       "Lead Reactivation Engine",
       "Review Request Automation",
     ],
-    cta: "Add to Cart",
+    cta: "Choose Pro System",
     packageId: "pro_system",
     highlight: false,
     accent: "#002D62",
@@ -589,9 +589,9 @@ export default function ThreeSystemsSection() {
 
       <div className="max-w-7xl mx-auto">
         <CSSectionHeader
-          eyebrow="AI Systems Storefront"
-          title="Pick Your AI System — Add to Cart and Check Out"
-          subtitle="Starter fixes response gaps. Growth adds follow-up and booking. Pro adds the full lead recovery layer. No demos, no sales calls — just add to cart and we handle the rest."
+          eyebrow="Packaged AI Systems"
+          title="Choose the System That Fixes Your Biggest Lead Flow Gap"
+          subtitle="Starter fixes response gaps. Growth adds follow-up and booking. Pro adds the full lead recovery layer. Pick a package, review scope, and continue through secure Stripe checkout."
           align="center"
         />
 
@@ -787,13 +787,13 @@ export default function ThreeSystemsSection() {
 
         <div className="text-center mt-6 space-y-4">
           <CSButton
-            to="/store"
+            to="/pricing"
             variant="primary"
             size="md"
             iconRight={ArrowRight}
-            onClick={() => trackCTA("browse_automation_store", "three_systems_section")}
+            onClick={() => trackCTA("compare_packages", "three_systems_section")}
           >
-            Browse the Automation Store
+            Compare Packages
           </CSButton>
           <div>
             <Link to="/automations" onClick={() => trackCTA("view_automations", "three_systems_section")} className="text-sm font-semibold text-primary hover:text-primary/80 transition-colors underline underline-offset-4">

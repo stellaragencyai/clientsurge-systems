@@ -6,7 +6,7 @@ export function getOrganizationSchema() {
     url: 'https://clientsurgesystems.com',
     logo: 'https://media.base44.com/images/public/69d49a29c1974b32f46e8550/aaaacb19f_generated_image.png',
     description:
-      'The Amazon of AI Services for Business — browse packaged AI automation systems, add to cart, and check out. Done-for-you setup included.',
+      'Packaged AI lead automation systems for local service businesses. Compare Starter, Growth, and Pro, then check out with done-for-you setup included.',
     email: 'support@clientsurgesystems.com',
     telephone: '+1-602-584-3227',
     address: {
@@ -25,7 +25,7 @@ export function getLocalBusinessSchema() {
     name: 'ClientSurge Systems',
     url: 'https://clientsurgesystems.com',
     description:
-      'The Amazon of AI Services for Business — browse AI automation systems including lead capture, missed-call text-back, AI follow-up, booking, reviews, and reactivation. Add to cart and check out.',
+      'Packaged AI automation systems including lead capture, missed-call text-back, AI follow-up, booking, reviews, and reactivation. Compare packages and check out with done-for-you setup included.',
     areaServed: 'United States',
     address: {
       '@type': 'PostalAddress',
@@ -53,12 +53,12 @@ export function getServiceSchema() {
     offers: {
       '@type': 'AggregateOffer',
       priceCurrency: 'USD',
-      lowPrice: '497',
-      highPrice: '1997',
+      lowPrice: '99',
+      highPrice: '499',
       offerCount: '3',
     },
     description:
-      'Done-for-you AI systems for lead capture, instant lead response, automated follow-up, missed-call recovery, appointment booking, review requests, and lead reactivation. Browse, add to cart, and check out — no demos required.',
+      'Done-for-you AI systems for lead capture, instant lead response, automated follow-up, missed-call recovery, appointment booking, review requests, and lead reactivation. Compare packages and check out — no demos required.',
   };
 }
 
@@ -77,11 +77,11 @@ export function getProductSchema() {
       {
         '@type': 'Offer',
         name: 'Starter System',
-        price: '497',
+        price: '99',
         priceCurrency: 'USD',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '497',
+          price: '99',
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
@@ -91,11 +91,11 @@ export function getProductSchema() {
       {
         '@type': 'Offer',
         name: 'Growth System',
-        price: '997',
+        price: '249',
         priceCurrency: 'USD',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '997',
+          price: '249',
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
@@ -105,11 +105,11 @@ export function getProductSchema() {
       {
         '@type': 'Offer',
         name: 'Pro System',
-        price: '1997',
+        price: '499',
         priceCurrency: 'USD',
         priceSpecification: {
           '@type': 'UnitPriceSpecification',
-          price: '1997',
+          price: '499',
           priceCurrency: 'USD',
           billingDuration: 'P1M',
         },
@@ -127,7 +127,7 @@ export function getWebsiteSchema() {
     name: 'ClientSurge Systems',
     url: 'https://clientsurgesystems.com',
     description:
-      'The Amazon of AI Services for Business — browse, add to cart, and check out packaged AI automation systems for local service businesses.',
+      'Compare packaged AI automation systems for local service businesses and check out with done-for-you setup included.',
     inLanguage: 'en-US',
     publisher: {
       '@type': 'Organization',

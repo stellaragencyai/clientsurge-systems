@@ -1,10 +1,11 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import { buildSignedSetupUrl } from '../_shared/setupLinkToken.ts';
 
 const PACKAGE_CATALOG = {
-  starter_system: { name: "Starter System", setup_total: 797, monthly_total: 497 },
-  growth_system: { name: "Growth System", setup_total: 1297, monthly_total: 997 },
-  pro_system: { name: "Pro System", setup_total: 2497, monthly_total: 1997 },
+  starter_system: { name: "Starter System", setup_total: 249, monthly_total: 99 },
+  growth_system: { name: "Growth System", setup_total: 499, monthly_total: 249 },
+  pro_system: { name: "Pro System", setup_total: 999, monthly_total: 499 },
 };
 
 function resolvePackageKey(raw) {
@@ -99,7 +100,7 @@ Deno.serve(async (req) => {
 
     const text = [`Hi ${order.customer_name || "there"},`, "", `Your ClientSurge order for ${order.business_name || "your business"} is confirmed.`, "", `Package: ${packageLabel}`, order.total_setup ? `Setup: $${formatMoney(order.total_setup)}` : "", order.total_monthly ? `Monthly: $${formatMoney(order.total_monthly)}/mo` : "", "", "Included services:", serviceListText || "- Service bundle", "", "What happens next:", tierMsg.activation_copy, tierMsg.timeline, "", `Complete Setup: ${credentialsUrl}`, `Open Client Portal: ${portalUrl}`, "", `Questions? Contact ${supportEmail}`].filter((l) => l !== null).join("\n");
 
-    const response = await fetch("https://api.resend.com/emails", {
+    const response = await resendFetch("https://api.resend.com/emails", {
       method: "POST",
       headers: { Authorization: `Bearer ${resendKey}`, "Content-Type": "application/json" },
       body: JSON.stringify({ from, reply_to: replyTo, to: customerEmail, subject: `Order confirmed — ${packageLabel} | ClientSurge`, html, text }),

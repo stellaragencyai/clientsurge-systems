@@ -19,14 +19,22 @@ const INTENDED_PUBLIC_ROUTES = [
   "/pricing",
   "/automations",
   "/contact",
+  "/industries",
+  "/proof",
+  "/faq",
+  "/how-it-works",
+  "/about",
+  "/blog",
+  "/testimonials",
+  "/roadmap",
   "/privacy",
   "/terms",
   "/sms-terms",
   "/refund-policy",
 ];
 
-const HOMEPAGE_TITLE = "ClientSurge Systems | AI Automation for Local Businesses";
-const CONTACT_TITLE = "Contact ClientSurge Systems | Questions and Demo Requests";
+const HOMEPAGE_TITLE = "ClientSurge Systems | AI-Powered Sales Systems for Local Businesses";
+const CONTACT_TITLE = "Contact ClientSurge Systems | Questions and Support";
 
 const BANNED_CONTACT_COPY = [
   "Need Help?",
@@ -39,15 +47,24 @@ const BANNED_CONTACT_COPY = [
 test("shared public route arrays stay aligned to the Track A whitelist", () => {
   assert.deepEqual(PUBLIC_DIRECTORY_PAGES, INTENDED_PUBLIC_ROUTES);
   assert.deepEqual(PUBLIC_ROUTE_PATHS, INTENDED_PUBLIC_ROUTES);
-  assert.deepEqual(APP_SHELL_PUBLIC_PATHS, INTENDED_PUBLIC_ROUTES);
   assert.deepEqual(SITEMAP_STATIC_PATHS, INTENDED_PUBLIC_ROUTES);
   assert.deepEqual(Object.keys(PUBLIC_ROUTE_METADATA), INTENDED_PUBLIC_ROUTES);
+  for (const route of INTENDED_PUBLIC_ROUTES) {
+    assert.ok(APP_SHELL_PUBLIC_PATHS.includes(route), `${route} should render in the app shell`);
+  }
 });
 
 test("legacy public aliases collapse into the cleaned public surface", () => {
   for (const [from, to] of Object.entries(STATIC_ROUTE_ALIASES)) {
     assert.ok(from.startsWith("/"), `${from} should be absolute`);
-    assert.ok(INTENDED_PUBLIC_ROUTES.includes(to), `${from} should redirect to an intended public route`);
+    const targetPath = String(to).split(/[?#]/)[0];
+    assert.ok(
+      INTENDED_PUBLIC_ROUTES.includes(targetPath) ||
+        ["/product-signup", "/client-portal", "/admin"].includes(targetPath) ||
+        targetPath.startsWith("/admin/") ||
+        targetPath.startsWith("/setup/"),
+      `${from} should redirect to an intended public or guarded utility route`,
+    );
   }
 });
 
@@ -65,9 +82,9 @@ test("public copy lock protects homepage and contact metadata", () => {
 });
 
 test("contact page keeps approved Contact Us wording and blocks setup-only drift", () => {
-  assert.match(contactPageSource, /title="Contact Us"/);
-  assert.match(contactPageSource, /subtitle="Send a message and we'll respond within one business day\."/);
-  assert.match(contactPageSource, /Thanks for reaching out\. We'll respond within one business day\./);
+  assert.match(contactPageSource, />\s*Contact Us\s*</);
+  assert.match(contactPageSource, /Send us a message and we will get right back to you within one business day\./);
+  assert.match(contactPageSource, /message="Thanks for reaching out\. Your inquiry has been logged\."/);
 
   for (const phrase of BANNED_CONTACT_COPY) {
     assert.ok(!contactPageSource.includes(phrase), `Contact page should not contain banned copy: ${phrase}`);

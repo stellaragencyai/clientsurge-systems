@@ -147,7 +147,7 @@ export default function SystemDiagramSection() {
           {SERVICE_NODES.map((node) => (
             <button
               key={node.id}
-              onClick={() => navigate(`/store`)}
+              onClick={() => navigate("/pricing")}
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -180,7 +180,7 @@ export default function SystemDiagramSection() {
         {/* Bottom CTA */}
         <div style={{ textAlign: "center", marginTop: "40px" }}>
           <button
-            onClick={() => navigate("/store")}
+            onClick={() => navigate("/pricing")}
             style={{
               display: "inline-flex",
               alignItems: "center",

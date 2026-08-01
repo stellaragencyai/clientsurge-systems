@@ -55,9 +55,13 @@
       "title": "Status",
       "enum": [
         "queued",
+        "retryable",
         "processing",
         "completed",
-        "failed"
+        "failed",
+        "terminal",
+        "dead_letter",
+        "manual_review"
       ]
     },
     "attempts": {
@@ -68,6 +72,15 @@
     "last_error": {
       "type": "string",
       "title": "Last Error"
+    },
+    "terminal_reason": {
+      "type": "string",
+      "title": "Terminal Reason"
+    },
+    "retry_after": {
+      "type": "string",
+      "title": "Retry After",
+      "format": "date-time"
     },
     "scheduled_for": {
       "type": "string",

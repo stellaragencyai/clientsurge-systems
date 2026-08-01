@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.34';
 
 const MAX_RECIPIENTS = 100;
@@ -124,7 +125,7 @@ Deno.serve(async (req) => {
 
     if (scheduled_at) payload.scheduled_at = scheduled_at;
 
-    const response = await fetch('https://api.resend.com/emails', {
+    const response = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: {
         Authorization: `Bearer ${apiKey}`,

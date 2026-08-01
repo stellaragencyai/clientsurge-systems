@@ -14,7 +14,7 @@ export default function SystemHealthModule() {
   useEffect(() => {
     const loadData = async () => {
       try {
-        const result = await base44.asServiceRole.entities.CommunicationEvent.filter(
+        const result = await base44.admin.entities.CommunicationEvent.filter(
           {},
           '-created_date',
           50
@@ -38,7 +38,7 @@ export default function SystemHealthModule() {
     loadData();
 
     // Real-time subscription
-    const unsubscribe = base44.asServiceRole.entities.CommunicationEvent.subscribe((event) => {
+    const unsubscribe = base44.admin.entities.CommunicationEvent.subscribe((event) => {
       if (event.type === 'create') {
         setEvents((prev) => [event.data, ...prev.slice(0, 49)]);
       }

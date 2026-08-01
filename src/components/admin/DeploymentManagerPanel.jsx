@@ -39,7 +39,7 @@ export default function DeploymentManagerPanel() {
   async function loadDeployments() {
     setLoading(true);
     try {
-      const result = await base44.asServiceRole.entities.ClientDeployment.list("-created_date", 100);
+      const result = await base44.admin.entities.ClientDeployment.list("-created_date", 100);
       setDeployments(result || []);
 
       // Load proof logs for each deployment in parallel
@@ -47,7 +47,7 @@ export default function DeploymentManagerPanel() {
       await Promise.all(
         (result || []).map(async (dep) => {
           try {
-            const logs = await base44.asServiceRole.entities.AutomationProofLog.filter(
+            const logs = await base44.admin.entities.AutomationProofLog.filter(
               { client_deployment_id: dep.id },
               "-tested_at",
               20
@@ -70,7 +70,7 @@ export default function DeploymentManagerPanel() {
   async function handleAction(deploymentId, action) {
     setActionLoading(`${deploymentId}_${action}`);
     try {
-      await base44.asServiceRole.entities.AuditLog.create({
+      await base44.admin.entities.AuditLog.create({
         action: `deployment_${action}`,
         entity_type: "ClientDeployment",
         entity_id: deploymentId,
@@ -79,11 +79,11 @@ export default function DeploymentManagerPanel() {
       });
 
       if (action === "pause") {
-        await base44.asServiceRole.entities.ClientDeployment.update(deploymentId, { deployment_status: DEPLOYMENT_STATUS.PAUSED });
+        await base44.admin.entities.ClientDeployment.update(deploymentId, { deployment_status: DEPLOYMENT_STATUS.PAUSED });
       } else if (action === "resume") {
-        await base44.asServiceRole.entities.ClientDeployment.update(deploymentId, { deployment_status: DEPLOYMENT_STATUS.ONBOARDING });
+        await base44.admin.entities.ClientDeployment.update(deploymentId, { deployment_status: DEPLOYMENT_STATUS.ONBOARDING });
       } else if (action === "approve") {
-        await base44.asServiceRole.entities.ClientDeployment.update(deploymentId, { deployment_status: DEPLOYMENT_STATUS.LIVE, went_live_at: new Date().toISOString() });
+        await base44.admin.entities.ClientDeployment.update(deploymentId, { deployment_status: DEPLOYMENT_STATUS.LIVE, went_live_at: new Date().toISOString() });
       }
 
       await loadDeployments();

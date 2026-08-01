@@ -1,5 +1,7 @@
 import { secureJson } from "./secureJson.js";
 import { initializePaidOrderInstallPipeline } from "./installPipeline.js";
+import { syncSubscriptionFromStripe } from "./subscriptionSync.js";
+import { createSystemAuditLog } from "./billingAudit.js";
 import { getPackageOffer, normalizePackageKey } from "../../../src/lib/salesCatalog.js";
 import { buildPaymentRecoveryEmail } from "./paymentRecoveryEmail.js";
 import { buildAppUrl } from "./appUrl.js";
@@ -101,6 +103,86 @@ async function createCommunicationEvent(base44, payload) {
   return base44.asServiceRole.entities.CommunicationEvent.create(payload).catch(
     () => null
   );
+}
+
+async function sha256Hex(value) {
+  const encoded = new TextEncoder().encode(String(value || ""));
+  const digest = await crypto.subtle.digest("SHA-256", encoded);
+  return Array.from(new Uint8Array(digest))
+    .map((byte) => byte.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+async function findIdempotencyKey(base44, idempotencyKey) {
+  const matches = await base44.asServiceRole.entities.IdempotencyKey.filter(
+    { idempotency_key: idempotencyKey },
+    "-created_date",
+    5
+  ).catch(() => []);
+
+  return (matches || [])[0] || null;
+}
+
+async function claimStripeEvent(base44, event, source) {
+  const idempotencyKey = `stripe_event:${event.id}`;
+  const now = new Date().toISOString();
+  const existing = await findIdempotencyKey(base44, idempotencyKey);
+
+  if (existing && existing.status !== "failed") {
+    return {
+      duplicate: true,
+      record: existing,
+      idempotency_key: idempotencyKey,
+    };
+  }
+
+  const payload = {
+    idempotency_key: idempotencyKey,
+    operation_type: "webhook_handling",
+    resource_type: "stripe_event",
+    resource_id: event.id,
+    status: "processing",
+    execution_count: Number(existing?.execution_count || 0) + 1,
+    first_executed_at: existing?.first_executed_at || now,
+    last_executed_at: now,
+    metadata_json: JSON.stringify({
+      source,
+      event_id: event.id,
+      event_type: event.type,
+      livemode: Boolean(event.livemode),
+    }),
+  };
+
+  if (existing?.id) {
+    const updated = await base44.asServiceRole.entities.IdempotencyKey.update(existing.id, payload);
+    return { duplicate: false, record: updated, idempotency_key: idempotencyKey };
+  }
+
+  try {
+    const created = await base44.asServiceRole.entities.IdempotencyKey.create(payload);
+    return { duplicate: false, record: created, idempotency_key: idempotencyKey };
+  } catch {
+    const raced = await findIdempotencyKey(base44, idempotencyKey);
+    if (raced && raced.status !== "failed") {
+      return { duplicate: true, record: raced, idempotency_key: idempotencyKey };
+    }
+    throw new Error("Unable to claim Stripe webhook event idempotency key");
+  }
+}
+
+async function completeStripeEventClaim(base44, claim, status, metadata = {}) {
+  if (!claim?.record?.id) {
+    return null;
+  }
+
+  const serialized = JSON.stringify(metadata || {});
+  return base44.asServiceRole.entities.IdempotencyKey.update(claim.record.id, {
+    status,
+    result_hash: await sha256Hex(serialized),
+    last_executed_at: new Date().toISOString(),
+    metadata_json: serialized,
+    error_message: status === "failed" ? cleanString(metadata.error) : "",
+  }).catch(() => null);
 }
 
 async function sendPaymentRecoveryEmail({ base44, order, invoice }) {
@@ -672,6 +754,17 @@ export async function processCheckoutSessionCompleted({
     initialized.order.id,
     orderPatch
   );
+  await createSystemAuditLog(base44, {
+    action: "stripe_checkout_paid_order_update",
+    entityName: "Order",
+    recordId: updatedOrder.id,
+    before: initialized.order,
+    after: updatedOrder,
+    source,
+    provider: "stripe",
+    providerEventId: event.id,
+    providerEventType: event.type,
+  });
   const wonLead = await markLeadWonForOrder(base44, updatedOrder, {
     eventId: event.id,
     source,
@@ -714,51 +807,47 @@ async function processSubscriptionLifecycle({
   source,
 }) {
   const subscription = event.data.object;
-  const order = await resolveOrderFromSubscription(
+  const fallbackOrderId = cleanString(subscription?.metadata?.order_id);
+  const syncResult = await syncSubscriptionFromStripe({
     base44,
-    cleanString(subscription?.id),
-    cleanString(subscription?.metadata?.order_id)
-  );
-
-  if (!order) {
-    return { success: false, reason: "order_not_found" };
-  }
-
-  const providerMessageId = `${event.id}:${order.id}`;
-  const existingEvent = await findCommunicationEvent(base44, providerMessageId);
-  if (existingEvent) {
-    return { success: true, duplicate: true, order_id: order.id };
-  }
-
-  const nextBillingStatus =
-    event.type === "customer.subscription.deleted"
-      ? "canceled"
-      : cleanString(subscription?.status) || order.billing_status;
-
-  const updatedOrder = await base44.asServiceRole.entities.Order.update(order.id, {
-    stripe_event_id: event.id,
-    ...buildBillingPatchFromSubscription(subscription),
-    billing_status: nextBillingStatus,
+    stripeSubscription: subscription,
+    eventType: event.type,
+    fallbackOrderId,
   });
 
-  await createCommunicationEvent(
-    base44,
-    buildCommunicationEvent({
-      providerMessageId,
-      subject: "Stripe subscription synchronized",
-      messageBody: `${event.type} synchronized to order ${order.id}.`,
-      order: updatedOrder,
-      metadata: {
-        source,
-        event_id: event.id,
-        event_type: event.type,
-        stripe_subscription_id: subscription?.id || "",
-        status: subscription?.status || "",
-      },
-    })
-  );
+  if (!syncResult.success) {
+    return syncResult;
+  }
 
-  return { success: true, order_id: updatedOrder.id };
+  const order = syncResult.order;
+  const subscriptionRecord = syncResult.subscription;
+  const providerMessageId = `${event.id}:${order.id}`;
+  const existingEvent = await findCommunicationEvent(base44, providerMessageId);
+  if (!existingEvent) {
+    await createCommunicationEvent(
+      base44,
+      buildCommunicationEvent({
+        providerMessageId,
+        subject: "Stripe subscription synchronized",
+        messageBody: `${event.type} synchronized to order ${order.id}.`,
+        order,
+        metadata: {
+          source,
+          event_id: event.id,
+          event_type: event.type,
+          subscription_entity_id: subscriptionRecord?.id || "",
+          stripe_subscription_id: subscription?.id || "",
+          status: subscriptionRecord?.status || subscription?.status || "",
+        },
+      })
+    );
+  }
+
+  return {
+    success: true,
+    order_id: order.id,
+    subscription_id: subscriptionRecord?.id || "",
+  };
 }
 
 async function processInvoiceEvent({ base44, event, source }) {
@@ -785,6 +874,17 @@ async function processInvoiceEvent({ base44, event, source }) {
     stripe_event_id: event.id,
     billing_status: nextBillingStatus,
     payment_status: event.type === "invoice.payment_failed" ? "payment_failed" : order.payment_status,
+  });
+  await createSystemAuditLog(base44, {
+    action: "stripe_invoice_order_update",
+    entityName: "Order",
+    recordId: updatedOrder.id,
+    before: order,
+    after: updatedOrder,
+    source,
+    provider: "stripe",
+    providerEventId: event.id,
+    providerEventType: event.type,
   });
 
   let recoveryEmail = null;
@@ -874,6 +974,17 @@ async function processPaymentIntentFailed({ base44, event, source }) {
     stripe_payment_intent_id: paymentIntent?.id || order.stripe_payment_intent_id,
     payment_status: "payment_failed",
     billing_status: "past_due",
+  });
+  await createSystemAuditLog(base44, {
+    action: "stripe_payment_intent_order_update",
+    entityName: "Order",
+    recordId: updatedOrder.id,
+    before: order,
+    after: updatedOrder,
+    source,
+    provider: "stripe",
+    providerEventId: event.id,
+    providerEventType: event.type,
   });
 
   let recoveryEmail = null;
@@ -995,6 +1106,21 @@ export async function handleCanonicalStripeWebhook(
   }
 
   const base44 = await getBase44Client(req);
+  const eventClaim = await claimStripeEvent(base44, event, source);
+
+  if (eventClaim.duplicate) {
+    return secureJson({
+      received: true,
+      source,
+      event_type: event.type,
+      duplicate: true,
+      result: {
+        success: true,
+        duplicate: true,
+        idempotency_key: eventClaim.idempotency_key,
+      },
+    });
+  }
 
   try {
     let result = { success: true, ignored: true };
@@ -1017,6 +1143,13 @@ export async function handleCanonicalStripeWebhook(
       result = await processPaymentIntentFailed({ base44, event, source });
     }
 
+    await completeStripeEventClaim(base44, eventClaim, "completed", {
+      source,
+      event_id: event.id,
+      event_type: event.type,
+      result,
+    });
+
     return secureJson({
       received: true,
       source,
@@ -1024,6 +1157,13 @@ export async function handleCanonicalStripeWebhook(
       result,
     });
   } catch (error) {
+    await completeStripeEventClaim(base44, eventClaim, "failed", {
+      source,
+      event_id: event.id,
+      event_type: event.type,
+      error: error instanceof Error ? error.message : String(error),
+    });
+
     await createCommunicationEvent(
       base44,
       buildCommunicationEvent({
@@ -1039,11 +1179,15 @@ export async function handleCanonicalStripeWebhook(
       })
     );
 
-    return secureJson({
-      received: true,
-      source,
-      event_type: event.type,
-      error: error instanceof Error ? error.message : String(error),
-    });
+    return secureJson(
+      {
+        received: true,
+        source,
+        event_type: event.type,
+        retryable: true,
+        error: error instanceof Error ? error.message : String(error),
+      },
+      { status: 500 }
+    );
   }
 }

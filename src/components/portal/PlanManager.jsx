@@ -6,20 +6,20 @@ const PLANS = [
   {
     name: "Starter",
     internalName: "Starter System",
-    monthly: "$497/mo",
+    monthly: "$99/mo",
     features: ["Instant lead response", "Missed-call text-back"],
   },
   {
     name: "Growth",
     internalName: "Growth System",
-    monthly: "$997/mo",
+    monthly: "$249/mo",
     badge: "Most Popular",
     features: ["Starter + missed-call text-back", "14-day nurture sequence"],
   },
   {
     name: "Pro",
     internalName: "Pro System",
-    monthly: "$1,997/mo",
+    monthly: "$499/mo",
     features: ["Growth + lead reactivation", "Review request automation"],
   },
 ];
@@ -56,8 +56,14 @@ export default function PlanManager({ project, subscription, onUpdated }) {
         throw new Error("Project is not linked yet.");
       }
 
-      await base44.entities.ClientProject.update(project.id, {
-        plan_change_request: requestedPlanType || "None",
+      await base44.functions.invoke("submitClientChangeRequest", {
+        target_entity: "ClientProject",
+        target_id: project.id,
+        requested_changes: {
+          plan_change_request: requestedPlanType || "None",
+        },
+        request_reason: `Client requested plan change to ${requestedPlanType || "None"}.`,
+        source_route: typeof window !== "undefined" ? window.location.pathname : "",
       });
       setSelected(null);
       setSuccess(`Plan change request to ${requestedPlanType} submitted for operator review.`);

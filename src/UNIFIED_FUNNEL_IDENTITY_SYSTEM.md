@@ -150,9 +150,9 @@ SMS Sent: "Quick question..."
   ↓ [6 hours later]
 Email Sent: "Special offer"
   ↓ [2 days later]
-Order Created: $1,297 (Growth plan)
+Order Created: $499 (Growth setup)
   ↓ [3 days later]
-Subscription Activated: $997/month
+Subscription Activated: $249/month
 ```
 
 All events in this journey are queryable via `funnel_identity_id`.

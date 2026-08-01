@@ -25,25 +25,25 @@ export default function MissionControlDashboard({ onNavigate }) {
         let conversions = [];
 
         try {
-          leads = await base44.asServiceRole.entities.Leads.list('-created_date', 1);
+          leads = await base44.admin.entities.Leads.list('-created_date', 1);
         } catch (e) {
           console.warn('Failed to load leads:', e);
         }
 
         try {
-          automations = await base44.asServiceRole.entities.AutomationRule.filter({ status: 'active' }, '-created_date', 1);
+          automations = await base44.admin.entities.AutomationRule.filter({ status: 'active' }, '-created_date', 1);
         } catch (e) {
           console.warn('Failed to load automations:', e);
         }
 
         try {
-          events = await base44.asServiceRole.entities.CommunicationEvent.list('-created_date', 1);
+          events = await base44.admin.entities.CommunicationEvent.list('-created_date', 1);
         } catch (e) {
           console.warn('Failed to load events:', e);
         }
 
         try {
-          conversions = await base44.asServiceRole.entities.ConversionFunnel.list('-created_date', 1);
+          conversions = await base44.admin.entities.ConversionFunnel.list('-created_date', 1);
         } catch (e) {
           console.warn('Failed to load conversions:', e);
         }

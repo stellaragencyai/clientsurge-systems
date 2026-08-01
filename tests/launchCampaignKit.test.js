@@ -12,9 +12,9 @@ const brochure = readFileSync(
 );
 
 test("launch campaign kit protects canonical package prices and deal boundaries", () => {
-  assert.match(launchKit, /Starter at \$797 setup and \$497\/month/);
-  assert.match(launchKit, /Growth at \$1,297 setup and \$997\/month/);
-  assert.match(launchKit, /Pro at \$2,497 setup and \$1,997\/month/);
+  assert.match(launchKit, /Starter at \$249 setup and \$99\/month/);
+  assert.match(launchKit, /Growth at \$499 setup and \$249\/month/);
+  assert.match(launchKit, /Pro at \$999 setup and \$499\/month/);
   assert.match(launchKit, /No discount is advertised unless the matching checkout\/coupon path exists/);
 });
 
@@ -27,11 +27,11 @@ test("launch campaign kit includes email deliverability and compliance guardrail
 
 test("launch brochure has the current package ladder and audit CTA", () => {
   assert.match(brochure, /Starter/);
-  assert.match(brochure, /\$797 setup \/ \$497 per month/);
+  assert.match(brochure, /\$249 setup \/ \$99 per month/);
   assert.match(brochure, /Growth/);
-  assert.match(brochure, /\$1,297 setup \/ \$997 per month/);
+  assert.match(brochure, /\$499 setup \/ \$249 per month/);
   assert.match(brochure, /Pro/);
-  assert.match(brochure, /\$2,497 setup \/ \$1,997 per month/);
+  assert.match(brochure, /\$999 setup \/ \$499 per month/);
   assert.match(brochure, /https:\/\/clientsurgesystems\.com\/book/);
 });
 

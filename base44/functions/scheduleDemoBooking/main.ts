@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
 import { validatePublicFormOrigin } from "../_shared/publicFormOriginGuard.js";
 import { assertBookingDateAvailable } from "../shared/demoBookingGuard.ts";
@@ -341,7 +342,7 @@ function escapeHtml(value: unknown) {
 async function sendEmail({ to, subject, html, replyTo }: { to: string; subject: string; html: string; replyTo?: string }) {
   const key = Deno.env.get("RESEND_API_KEY");
   if (!key) return { sent: false, reason: "missing_resend_api_key" };
-  const response = await fetch("https://api.resend.com/emails", {
+  const response = await resendFetch("https://api.resend.com/emails", {
     method: "POST",
     headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
     body: JSON.stringify({

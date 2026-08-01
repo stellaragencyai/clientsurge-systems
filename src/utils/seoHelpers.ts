@@ -33,8 +33,8 @@ export function unsplashOptimised(photoId: string, width = 800, quality = 80): {
 // Unique meta descriptions per page (#81)
 export const META_DESCRIPTIONS: Record<string, string> = {
   "/": "ClientSurge Systems builds AI-powered lead capture and automation systems for Phoenix and Scottsdale local businesses. Respond to every inquiry in under 60 seconds — automatically.",
-  "/pricing": "Simple, transparent pricing for AI automation. Starter from $497/mo — no contracts. Built for med spas, dental offices, and service businesses in Phoenix, AZ.",
-  "/store": "Browse AI automation services for local businesses. Instant lead response, missed call text-back, follow-up sequences, and more. Starting at $497/month.",
+  "/pricing": "Simple, transparent pricing for AI automation. Starter from $99/mo with $249 setup — no contracts. Built for med spas, dental offices, and service businesses in Phoenix, AZ.",
+  "/store": "Browse AI automation services for local businesses. Instant lead response, missed call text-back, follow-up sequences, and more. Packages start at $99/month.",
   "/med-spa": "AI lead capture and automation for med spas in Phoenix and Scottsdale. Respond to Botox and filler inquiries in under 60 seconds, 24/7.",
   "/dental": "AI patient communication for dental offices. Never miss a new patient inquiry — automated responses, booking, and follow-up for Arizona dental practices.",
   "/blog": "AI automation insights and guides for Phoenix and Scottsdale local business owners. Learn how to capture more leads and book more appointments.",

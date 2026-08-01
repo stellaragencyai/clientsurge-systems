@@ -104,6 +104,7 @@
             "type": "string",
             "title": "Install Status",
             "enum": [
+              "Pending Payment",
               "Paid",
               "Ready for Install",
               "Configuring",
@@ -320,6 +321,7 @@
       "type": "string",
       "title": "Install Pipeline Status",
       "enum": [
+        "Pending Payment",
         "Paid",
         "Ready for Install",
         "Configuring",

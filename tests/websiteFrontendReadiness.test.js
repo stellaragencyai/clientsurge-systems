@@ -3,6 +3,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 
 import {
+  APP_SHELL_PUBLIC_PATHS,
   ADMIN_ROUTE_PREFIXES,
   AUTHENTICATED_ROUTE_PREFIXES,
   NOINDEX_ROUTE_PREFIXES,
@@ -23,14 +24,15 @@ test("website route governance document covers expected launch routes", () => {
 });
 
 test("route security classifies public, authenticated, admin, and noindex routes", () => {
-  for (const route of ["/", "/book", "/pricing", "/automations", "/roofing", "/hvac", "/plumbing"]) {
+  for (const route of ["/", "/pricing", "/automations", "/contact", "/industries", "/proof", "/faq", "/how-it-works", "/about", "/blog", "/testimonials", "/roadmap", "/privacy", "/terms", "/sms-terms", "/refund-policy", "/roofing", "/hvac", "/plumbing"]) {
     assert.equal(classifyRoute(route), ROUTE_ACCESS.PUBLIC, `${route} should be public`);
     assert.equal(shouldNoindexRoute(route), false, `${route} should be indexable`);
   }
 
-  for (const route of ["/store", "/start", "/book-demo"]) {
+  for (const route of ["/book", "/store", "/start", "/book-demo", "/login", "/product-signup"]) {
     assert.equal(classifyRoute(route), ROUTE_ACCESS.PUBLIC, `${route} should remain reachable`);
     assert.equal(shouldNoindexRoute(route), true, `${route} should be noindex`);
+    assert.equal(APP_SHELL_PUBLIC_PATHS.includes(route), true, `${route} should render in the app shell`);
   }
 
   for (const route of AUTHENTICATED_ROUTE_PREFIXES) {
@@ -49,15 +51,13 @@ test("route security classifies public, authenticated, admin, and noindex routes
 });
 
 test("public route and sitemap sources include launch-critical pages", () => {
-  for (const route of ["/", "/book", "/contact", "/store", "/start", "/book-demo", "/pricing", "/automations", "/roofing", "/hvac", "/plumbing", "/dental", "/med-spa", "/privacy-policy", "/terms", "/login"]) {
+  for (const route of ["/", "/pricing", "/automations", "/contact", "/industries", "/proof", "/faq", "/how-it-works", "/about", "/blog", "/testimonials", "/roadmap", "/privacy", "/terms", "/sms-terms", "/refund-policy"]) {
     assert.ok(PUBLIC_ROUTE_PATHS.includes(route), `PUBLIC_ROUTE_PATHS should include ${route}`);
-  }
-
-  for (const route of ["/", "/book", "/contact", "/pricing", "/automations", "/roofing", "/hvac", "/plumbing", "/dental", "/med-spa", "/privacy-policy", "/terms"]) {
     assert.ok(SITEMAP_STATIC_PATHS.includes(route), `SITEMAP_STATIC_PATHS should include ${route}`);
   }
 
-  for (const route of ["/store", "/start", "/book-demo"]) {
+  for (const route of ["/book", "/store", "/start", "/book-demo", "/login", "/product-signup", "/privacy-policy"]) {
+    assert.equal(PUBLIC_ROUTE_PATHS.includes(route), false, `PUBLIC_ROUTE_PATHS should exclude ${route}`);
     assert.equal(SITEMAP_STATIC_PATHS.includes(route), false, `SITEMAP_STATIC_PATHS should exclude ${route}`);
   }
 });

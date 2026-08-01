@@ -46,7 +46,7 @@ export default function RevenueTrackingDashboard() {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const records = await base44.asServiceRole.entities.RevenueTracking.list('-conversion_date', 100);
+        const records = await base44.admin.entities.RevenueTracking.list('-conversion_date', 100);
         setRevenueRecords(records || []);
 
         // Compute summary metrics

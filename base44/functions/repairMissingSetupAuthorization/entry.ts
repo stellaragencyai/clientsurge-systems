@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 import { createClientFromRequest } from 'npm:@base44/sdk@0.8.31';
 import { buildSignedSetupUrl } from '../_shared/setupLinkToken.ts';
 
@@ -106,7 +107,7 @@ Deno.serve(async (req) => {
       `Questions? Contact ${supportEmail}`,
     ].join('\n');
 
-    const sendResponse = await fetch('https://api.resend.com/emails', {
+    const sendResponse = await resendFetch('https://api.resend.com/emails', {
       method: 'POST',
       headers: { Authorization: `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({

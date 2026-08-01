@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 // PL-72 — processWebsiteLeadFollowUps — VERIFIED ACTIVE
 // This function handles the 3-step follow-up: 10min SMS → 1hr email → 24hr SMS
 // Automation: runs every 10 minutes to catch follow-up windows
@@ -91,7 +92,7 @@ Deno.serve(async (req) => {
           const bookingLink = settings.booking_link_default || Deno.env.get("DEFAULT_BOOKING_LINK") || "";
 
           if (resendKey) {
-            await fetch("https://api.resend.com/emails", {
+            await resendFetch("https://api.resend.com/emails", {
               method: "POST",
               headers: { "Authorization": `Bearer ${resendKey}`, "Content-Type": "application/json" },
               body: JSON.stringify({

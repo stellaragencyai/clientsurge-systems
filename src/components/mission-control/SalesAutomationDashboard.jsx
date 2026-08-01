@@ -15,13 +15,13 @@ export default function SalesAutomationDashboard() {
       setLoading(true);
       try {
         // Fetch metrics
-        const metricsRes = await base44.asServiceRole.functions.invoke('getSalesAutomationMetrics', {
+        const metricsRes = await base44.admin.functions.invoke('getSalesAutomationMetrics', {
           period: '30d',
         });
         setMetrics(metricsRes.data?.metrics);
 
         // Fetch recent leads
-        const recentLeads = await base44.asServiceRole.entities.OutboundLead.filter(
+        const recentLeads = await base44.admin.entities.OutboundLead.filter(
           {},
           '-last_activity_at',
           20

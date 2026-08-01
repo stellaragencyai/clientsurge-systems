@@ -1,3 +1,4 @@
+import { resendFetch } from "../_shared/resendFetch.js";
 /**
  * FIX #13-15, #18: Orphaned Order Audit
  * Detects: missing funnel_identity_id, stuck pending payments (>6h unpaid), DLQ accumulation.
@@ -49,7 +50,7 @@ Deno.serve(async (req) => {
       const resendKey = Deno.env.get('RESEND_API_KEY');
       const fromEmail = Deno.env.get('RESEND_FROM_EMAIL') || 'support@clientsurgesystems.com';
       if (resendKey && adminEmail) {
-        await fetch('https://api.resend.com/emails', {
+        await resendFetch('https://api.resend.com/emails', {
           method: 'POST',
           headers: { 'Authorization': `Bearer ${resendKey}`, 'Content-Type': 'application/json' },
           body: JSON.stringify({

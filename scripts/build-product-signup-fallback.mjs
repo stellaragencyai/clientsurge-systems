@@ -2,18 +2,42 @@
 
 import { existsSync, mkdirSync, rmSync, statSync, writeFileSync } from "node:fs";
 import path from "node:path";
+import { PACKAGE_OFFERS } from "../src/lib/salesCatalog.js";
 
 const outDir = path.resolve("dist");
 const appId = "69dc4a79656fdba136d413d3";
 const checkoutFunction = "createCheckoutSession";
 const checkoutEndpoint = `/api/apps/${appId}/functions/${checkoutFunction}`;
 const fallbackPaths = ["product-signup", "product_signup", "product-sign-up"];
+const checkoutPackages = PACKAGE_OFFERS.filter((offer) => offer.checkout_enabled);
 
 if (!existsSync(outDir)) {
   throw new Error("dist directory not found. Run this script after vite build.");
 }
 
 mkdirSync(outDir, { recursive: true });
+
+function escapeHtml(value) {
+  return String(value || "")
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+function formatUsd(amount) {
+  return Number(amount || 0).toLocaleString("en-US");
+}
+
+const planOptionsHtml = checkoutPackages
+  .map((offer) => {
+    const setupTotal = offer.implementation_fee || offer.setup_total;
+    const isDefault = offer.package_key === "growth_system";
+    const services = offer.included_services.map((service) => service.name).join(", ");
+
+    return `<label class="plan"><input type="radio" name="package_key" value="${escapeHtml(offer.package_key)}" form="checkout-form"${isDefault ? " checked" : ""}> <strong>${escapeHtml(offer.name)}</strong><span class="plan-price">$${formatUsd(setupTotal)} setup + $${formatUsd(offer.monthly_total)}/mo after 30 days</span><span>${escapeHtml(services || offer.description)}</span></label>`;
+  })
+  .join("\n        ");
 
 const html = `<!doctype html>
 <html lang="en">
@@ -38,6 +62,7 @@ const html = `<!doctype html>
       .plans { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px; margin-top: 18px; }
       label.plan { display: block; min-width: 0; border: 1px solid #cbd5e1; border-radius: 8px; background: #fff; padding: 16px; cursor: pointer; }
       label.plan strong { display: block; color: #0f172a; margin-bottom: 6px; }
+      .plan-price { display: block; color: #005f91; font-weight: 900; margin-bottom: 6px; }
       form { margin-top: 24px; background: #fff; border: 1px solid #dbe5ef; border-radius: 8px; padding: 22px; box-shadow: 0 10px 30px rgba(15, 23, 42, 0.07); }
       .grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
       .full { grid-column: 1 / -1; }
@@ -63,9 +88,7 @@ const html = `<!doctype html>
         <p>The live checkout page was unavailable, so this fallback is collecting the details needed to start a fresh Stripe checkout session. Choose a system, retry checkout, or contact support if the retry fails.</p>
       </div>
       <section class="plans" aria-label="Choose Your System">
-        <label class="plan"><input type="radio" name="package_key" value="starter_system" form="checkout-form"> <strong>Starter System</strong><span>Instant lead response and missed-call text-back.</span></label>
-        <label class="plan"><input type="radio" name="package_key" value="growth_system" form="checkout-form" checked> <strong>Growth System</strong><span>Starter plus nurture and AI booking handoff.</span></label>
-        <label class="plan"><input type="radio" name="package_key" value="pro_system" form="checkout-form"> <strong>Pro System</strong><span>Growth plus reactivation and review requests.</span></label>
+        ${planOptionsHtml}
       </section>
       <form id="checkout-form" data-checkout-function="${checkoutFunction}" data-checkout-endpoint="${checkoutEndpoint}">
         <h2>Your Information</h2>

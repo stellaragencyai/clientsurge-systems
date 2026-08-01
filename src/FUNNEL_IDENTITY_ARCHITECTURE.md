@@ -211,8 +211,8 @@ SOURCE ATTRIBUTION          CONVERSION ATTRIBUTION
          │                         │
          ▼                         ▼
     Driven By:                 Order Created:
-    - Direct                   - $1,297 setup
-    - Organic Search           - $997/month
+    - Direct                   - $499 setup
+    - Organic Search           - $249/month
     - Email Campaign           - Lead: fid_123
     - Referral
          │                         │
@@ -221,8 +221,8 @@ SOURCE ATTRIBUTION          CONVERSION ATTRIBUTION
             REVENUE ATTRIBUTION
             ┌──────────────────┐
             │ fid_123 earned:  │
-            │ $1,297 + $997*12 │
-            │ = $13,261 / year │
+            │ $499 + $249*12   │
+            │ = $3,487 / year  │
             └──────────────────┘
 ```
 
@@ -247,7 +247,7 @@ AFTER (Unified via funnelId)
    ├─ Funnel fid_1
    │  ├─ Lead created: Day 1
    │  ├─ Messages: 3 SMS, 2 Email
-   │  ├─ Order: $1,297
+   │  ├─ Order: $499
    │  └─ Status: CONVERTED
    │
    ├─ Funnel fid_2

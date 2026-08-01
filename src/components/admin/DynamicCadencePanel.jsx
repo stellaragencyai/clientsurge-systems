@@ -15,7 +15,7 @@ export default function DynamicCadencePanel() {
 
   const loadSettings = async () => {
     try {
-      const records = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
+      const records = await base44.admin.entities.AdminSettings.list('-created_date', 1);
       setSettings(records?.[0] || getDefaultSettings());
     } catch (err) {
       setError('Failed to load settings');
@@ -54,13 +54,13 @@ export default function DynamicCadencePanel() {
       };
       setSettings(prev => ({ ...prev, ...validated }));
 
-      const records = await base44.asServiceRole.entities.AdminSettings.list('-created_date', 1);
+      const records = await base44.admin.entities.AdminSettings.list('-created_date', 1);
       const settingsId = records?.[0]?.id;
 
       if (settingsId) {
-        await base44.asServiceRole.entities.AdminSettings.update(settingsId, validated);
+        await base44.admin.entities.AdminSettings.update(settingsId, validated);
       } else {
-        await base44.asServiceRole.entities.AdminSettings.create(validated);
+        await base44.admin.entities.AdminSettings.create(validated);
       }
       setError('');
       setSaveSuccess(true);

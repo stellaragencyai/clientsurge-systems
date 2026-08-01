@@ -53,7 +53,7 @@ export default function InstallChecklistPanel({ orderId }) {
     try {
       setLoading(true);
       // Load order to get services
-      const order = await base44.asServiceRole.entities.Order.get(orderId);
+      const order = await base44.admin.entities.Order.get(orderId);
       if (!order?.items) return;
 
       // Load checklist records for each service
@@ -61,13 +61,13 @@ export default function InstallChecklistPanel({ orderId }) {
       const stepsMap = {};
 
       for (const serviceKey of serviceKeys) {
-        const checklists = await base44.asServiceRole.entities.AutomationChecklist.filter({
+        const checklists = await base44.admin.entities.AutomationChecklist.filter({
           order_id: orderId,
           service_key: serviceKey,
         });
 
         if (checklists?.[0]) {
-          const stepRecords = await base44.asServiceRole.entities.AutomationChecklistStep.filter({
+          const stepRecords = await base44.admin.entities.AutomationChecklistStep.filter({
             automation_checklist_id: checklists[0].id,
           });
           stepsMap[serviceKey] = stepRecords || [];
@@ -91,7 +91,7 @@ export default function InstallChecklistPanel({ orderId }) {
           ? "in_progress"
           : "complete";
 
-      await base44.asServiceRole.entities.AutomationChecklistStep.update(stepRecord.id, {
+      await base44.admin.entities.AutomationChecklistStep.update(stepRecord.id, {
         status: newStatus,
         completed_at: newStatus === "complete" ? new Date().toISOString() : null,
         completed_by: newStatus === "complete" ? (await base44.auth.me())?.email : null,

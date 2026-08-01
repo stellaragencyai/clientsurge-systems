@@ -1,5 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
-import { getStripeClient, safeStripeError } from "./stripeInit.local.js";
+import { getStripeClient, safeStripeError } from "../_shared/stripeInit.js";
 import { assertCheckoutCapacityAvailable } from "./checkoutCapacity.shared.js";
 import { buildCheckoutRedirectUrls } from "./checkoutUrls.shared.js";
 import { getTrackedServiceConfig, normalizeInstallConfiguration } from "./installPipeline.shared.js";
