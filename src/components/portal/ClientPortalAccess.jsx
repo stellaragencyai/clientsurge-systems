@@ -2,7 +2,7 @@ import { useState, useEffect, Component } from "react";
 import { Link } from "react-router-dom";
 import { useAuth } from "@/lib/AuthContext";
 import { base44 } from "@/api/base44Client";
-import ClientDashboard from "@/internal-pages/ClientDashboard";
+import ClientPortal from "@/internal-pages/ClientPortal";
 import { Loader2, LogIn, LifeBuoy, AlertTriangle, Home, RefreshCw } from "lucide-react";
 
 const LOADING_TIMEOUT_MS = 8000;
@@ -161,7 +161,7 @@ export default function ClientPortalAccess() {
 
   return (
     <PortalErrorBoundary>
-      <ClientDashboard />
+      <ClientPortal />
     </PortalErrorBoundary>
   );
 }
