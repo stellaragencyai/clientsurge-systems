@@ -149,17 +149,49 @@ function shouldUsePublicRouteClient() {
   return isPublicRoute(window.location.pathname);
 }
 
-const sdkClient = isLocalPreview()
-  ? createLocalPreviewClient()
-  : shouldUsePublicRouteClient()
-    ? createPublicRouteClient()
-    : createClient({
-        appId,
-        token,
-        functionsVersion,
-        serverUrl: '',
-        requiresAuth: false,
-        appBaseUrl
-      });
+const OWNER_PREVIEW_EMAIL = "nolanfstrommer@gmail.com";
+
+function installOwnerPortalPreviewFallback(client) {
+  const invoke = client?.functions?.invoke;
+  if (typeof invoke !== "function" || typeof client?.auth?.me !== "function") return client;
+
+  const originalInvoke = invoke.bind(client.functions);
+
+  client.functions.invoke = async (functionName, payload = {}) => {
+    const response = await originalInvoke(functionName, payload);
+    if (functionName !== "getClientPortalContext") return response;
+
+    const context = response?.data || response;
+    if (context?.project) return response;
+
+    try {
+      const user = await client.auth.me();
+      const email = String(user?.email || "").trim().toLowerCase();
+      if (email !== OWNER_PREVIEW_EMAIL) return response;
+
+      return await originalInvoke("getAdminPreviewData", { state: "live" });
+    } catch (error) {
+      console.error("[base44Client] Owner portal preview fallback failed:", error);
+      return response;
+    }
+  };
+
+  return client;
+}
+
+const sdkClient = installOwnerPortalPreviewFallback(
+  isLocalPreview()
+    ? createLocalPreviewClient()
+    : shouldUsePublicRouteClient()
+      ? createPublicRouteClient()
+      : createClient({
+          appId,
+          token,
+          functionsVersion,
+          serverUrl: '',
+          requiresAuth: false,
+          appBaseUrl
+        })
+);
 
 export const base44 = sdkClient;
