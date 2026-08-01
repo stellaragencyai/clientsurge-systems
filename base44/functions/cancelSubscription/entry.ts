@@ -7,6 +7,23 @@ import { createClientFromRequest } from "npm:@base44/sdk@0.8.25";
 import { resendFetch } from "../_shared/resendFetch.js";
 import { stripeFetch } from "../_shared/providerFetch.js";
 import { getStripeSecretKey, safeStripeError, StripeConfigurationError } from "../_shared/stripeInit.js";
+import { AuthGuardError, requireOwnerOrAdmin } from "../_shared/authGuards.js";
+
+function normalizeEmail(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function userOwnsOrder(user, order = {}) {
+  const userEmail = normalizeEmail(user?.email);
+  const userClientId = user?.client_id || user?.data?.client_id || user?.metadata?.client_id;
+  const userClientProjectId = user?.client_project_id || user?.data?.client_project_id || user?.metadata?.client_project_id;
+
+  return Boolean(
+    (userEmail && [order.customer_email, order.client_email].map(normalizeEmail).includes(userEmail)) ||
+    (userClientId && order.client_id === userClientId) ||
+    (userClientProjectId && order.client_project_id === userClientProjectId)
+  );
+}
 
 Deno.serve(async (req) => {
   const requestId = crypto.randomUUID();
@@ -17,6 +34,11 @@ Deno.serve(async (req) => {
 
     const order = await base44.asServiceRole.entities.Order.get(order_id).catch(() => null);
     if (!order) return secureJson({ error: "Order not found" }, { status: 404 });
+
+    await requireOwnerOrAdmin(base44, (user) => userOwnsOrder(user, order), {
+      message: "Order access required",
+      code: "order_access_required",
+    });
 
     let stripeCancelled = false;
 
@@ -102,6 +124,13 @@ Stripe cancel_at_period_end: ${stripeCancelled}`,
 
     return secureJson({ success: true, order_id, cancel_at_period_end: stripeCancelled });
   } catch (err: any) {
+    if (err instanceof AuthGuardError) {
+      return secureJson(
+        { error: err.message, code: err.code, request_id: requestId },
+        { status: err.status }
+      );
+    }
+
     const safeError = safeStripeError(err, "Unable to cancel the subscription. Please contact support.");
     console.error("[cancelSubscription] error", {
       requestId,

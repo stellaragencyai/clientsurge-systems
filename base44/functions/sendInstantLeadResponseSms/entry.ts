@@ -1,4 +1,5 @@
 import { createClientFromRequest } from "npm:@base44/sdk@0.8.31";
+import { AuthGuardError, requireAdminOrSignedInternalInvocation } from "../_shared/authGuards.js";
 
 function json(data, status = 200) {
   return new Response(JSON.stringify(data), {
@@ -195,6 +196,8 @@ Deno.serve(async (req) => {
     }
 
     const base44 = createClientFromRequest(req);
+    await requireAdminOrSignedInternalInvocation(base44, req);
+
     const { lead_id, order_id } = await req.json();
 
     if (!lead_id) {
@@ -440,6 +443,9 @@ Deno.serve(async (req) => {
 
     return json({ success: true, message_id: messageSid, normalized_phone: normalizedPhone });
   } catch (error) {
+    if (error instanceof AuthGuardError) {
+      return json({ error: error.message, code: error.code }, error.status);
+    }
     return json({ error: error.message }, 500);
   }
 });
