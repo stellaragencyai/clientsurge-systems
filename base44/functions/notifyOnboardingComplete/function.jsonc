@@ -1,10 +1,10 @@
 {
   "name": "notifyOnboardingComplete",
-  "entry": "main.ts",
+  "entry": "entry.ts",
   "automations": [
     {
       "name": "Onboarding Submission Complete — Notify Admin",
-      "description": null,
+      "description": "PL-58: Notifies admin when a client completes their onboarding submission form.",
       "function_args": null,
       "is_active": true,
       "type": "entity",
