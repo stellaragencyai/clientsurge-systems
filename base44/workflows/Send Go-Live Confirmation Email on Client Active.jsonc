@@ -1,0 +1,40 @@
+{
+  "name": "Send Go-Live Confirmation Email on Client Active",
+  "description": "Trigger activation email when Client status changes to 'Active'",
+  "trigger": {
+    "condition": "${ ((.trigger.data.status == \"Active\") and (.trigger.changed_fields | index(\"status\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Client"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "send_go_live_confirmation_email_on_client_active",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendOnboardingEmailSequence",
+            "args": {
+              "stage": "live",
+              "client_id": "{{id}}",
+              "email": "{{email}}",
+              "business_name": "{{business_name}}",
+              "owner_name": "{{full_name}}"
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

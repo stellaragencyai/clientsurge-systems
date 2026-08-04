@@ -1,0 +1,41 @@
+{
+  "name": "Stalled Onboarding Alert \u2014 Daily 9AM",
+  "description": "Every day at 9AM, check for clients stuck in onboarding for more than 5 days and email Nolan with the list and incomplete steps.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 16 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "stalled_onboarding_alert_daily_9am",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "stalledOnboardingAlert",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

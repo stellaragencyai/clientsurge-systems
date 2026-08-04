@@ -1,0 +1,34 @@
+{
+  "name": "Orchestrate Setup on Lifecycle Change",
+  "description": "Trigger onboarding orchestration when Client enters setup_in_progress lifecycle stage",
+  "trigger": {
+    "condition": "${ (.trigger.changed_fields | index(\"lifecycle_stage\") != null) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Client"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "orchestrate_setup_on_lifecycle_change",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "orchestrateClientOnboarding",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

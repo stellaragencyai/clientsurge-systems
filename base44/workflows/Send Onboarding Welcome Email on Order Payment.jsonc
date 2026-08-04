@@ -1,0 +1,40 @@
+{
+  "name": "Send Onboarding Welcome Email on Order Payment",
+  "description": "Trigger welcome email sequence when Order payment_status changes to 'paid'",
+  "trigger": {
+    "condition": "${ ((.trigger.data.payment_status == \"paid\") and (.trigger.changed_fields | index(\"payment_status\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Order"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "send_onboarding_welcome_email_on_order_payment",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendOnboardingEmailSequence",
+            "args": {
+              "stage": "onboarding_started",
+              "order_id": "{{id}}",
+              "email": "{{customer_email}}",
+              "business_name": "{{business_name}}",
+              "owner_name": "{{customer_name}}"
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

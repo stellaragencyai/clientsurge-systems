@@ -1,0 +1,34 @@
+{
+  "name": "Initialize Client Onboarding",
+  "description": "Automatically initialize onboarding when a new Client is created: creates ClientProject, OnboardingClient, ClientInstallationOS, and sets Client status to 'In Setup'.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Client"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "initialize_client_onboarding",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "initializeClientOnboarding",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

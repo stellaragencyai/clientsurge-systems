@@ -1,0 +1,34 @@
+{
+  "name": "Send Auto Review Request on Order Live",
+  "description": "Automatically sends SMS and email review requests when an order transitions to fully_live status. Includes 7-day duplicate prevention and intelligently selects SMS or email based on available contact data.",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"order_status\") != null) and (.trigger.data.order_status == \"fully_live\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Order"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "send_auto_review_request_on_order_live",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "triggerAutoReviewRequest",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

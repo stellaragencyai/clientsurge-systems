@@ -1,0 +1,34 @@
+{
+  "name": "Instant Lead Response \u2014 WebsiteLead Created",
+  "description": "Triggers instant SMS and confirmation email when a new WebsiteLead is created with automation_enabled not false",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "WebsiteLead"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "instant_lead_response_websitelead_created",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "processWebsiteLeadInitialResponse",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

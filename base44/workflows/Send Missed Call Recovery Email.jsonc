@@ -1,0 +1,34 @@
+{
+  "name": "Send Missed Call Recovery Email",
+  "description": "",
+  "trigger": {
+    "condition": "${ ((.trigger.data.event_type == \"sms_sent\") and (.trigger.data.subject | index(\"missed\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "CommunicationEvent"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "send_missed_call_recovery_email",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendMissedCallRecoveryEmail",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

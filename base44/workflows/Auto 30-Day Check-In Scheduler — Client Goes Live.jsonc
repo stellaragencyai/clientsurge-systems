@@ -1,0 +1,34 @@
+{
+  "name": "Auto 30-Day Check-In Scheduler \u2014 Client Goes Live",
+  "description": "When a client's status changes to Live, email the client a 30-day check-in with Calendly link and email Nolan a prep reminder with call notes.",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"status\") != null) and (.trigger.data.status == \"Live\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "OnboardingClient"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_30_day_check_in_scheduler_client_goes_live",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoSchedule30DayCheckin",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

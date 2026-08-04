@@ -1,0 +1,35 @@
+{
+  "name": "Auto-Calculate Lead Score on Update",
+  "description": "",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"status\") != null) or (.trigger.changed_fields | index(\"reply_sentiment\") != null) or (.trigger.changed_fields | index(\"last_contacted_at\") != null) or (.trigger.changed_fields | index(\"industry_tags\") != null) or (.trigger.changed_fields | index(\"social_profiles\") != null) or (.trigger.changed_fields | index(\"company_size\") != null) or (.trigger.changed_fields | index(\"website\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_calculate_lead_score_on_update",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "scoreLeads",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

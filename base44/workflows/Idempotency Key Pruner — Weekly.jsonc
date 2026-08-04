@@ -1,0 +1,41 @@
+{
+  "name": "Idempotency Key Pruner \u2014 Weekly",
+  "description": "Runs weekly on Monday at 3am. Archives IdempotencyKey records older than 90 days to prevent unbounded table growth that slows every lookup scan.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 10 * * 1",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "idempotency_key_pruner_weekly",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "pruneIdempotencyKeys",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

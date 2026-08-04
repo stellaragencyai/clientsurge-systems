@@ -1,0 +1,34 @@
+{
+  "name": "Trigger Twilio Verify on Lead Creation",
+  "description": "Auto-send Twilio verification code when a new lead is captured to validate phone number quality immediately\"",
+  "trigger": {
+    "condition": "${ ((.trigger.data.phone != null) and (.trigger.data.do_not_contact != true)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "trigger_twilio_verify_on_lead_creation",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "twilioVerify",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

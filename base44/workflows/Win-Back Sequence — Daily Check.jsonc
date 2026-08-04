@@ -1,0 +1,41 @@
+{
+  "name": "Win-Back Sequence \u2014 Daily Check",
+  "description": "Daily: scans for orders with canceled/past_due/failed payment status for 30+ days and sends a 3-step win-back email sequence (Day 30 special offer, Day 37 diagnostic call, Day 44 final CTA).",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 17 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "win_back_sequence_daily_check",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runWinBackSequence",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

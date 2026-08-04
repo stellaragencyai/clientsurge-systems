@@ -1,0 +1,46 @@
+{
+  "name": "Daily Lead Discovery & Enrichment",
+  "description": "Automatically discover and enrich new leads daily at 8 AM. Adjust niche, location, and radius in function_args to customize.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 15 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_lead_discovery_enrichment",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "discoverLeads",
+            "args": {
+              "niche": "med spa",
+              "city": "Phoenix",
+              "state": "AZ",
+              "radius": 25
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

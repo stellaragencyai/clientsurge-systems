@@ -1,0 +1,45 @@
+{
+  "name": "Dead Letter Queue Monitoring",
+  "description": "Alert admins to dead letter queue status if events accumulate",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 1,
+      "interval_unit": "hours",
+      "interval_anchor": "2026-06-15T00:04:17.609000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "dead_letter_queue_monitoring",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendEmail",
+            "args": {
+              "to": "{{ADMIN_NOTIFICATION_EMAIL}}",
+              "subject": "Scale Architecture: Dead Letter Queue Alert",
+              "body": "Check admin dashboard for events requiring manual reconciliation"
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

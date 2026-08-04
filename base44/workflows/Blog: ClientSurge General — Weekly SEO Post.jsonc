@@ -1,0 +1,48 @@
+{
+  "name": "Blog: ClientSurge General \u2014 Weekly SEO Post",
+  "description": "Every Monday 7am \u2014 generates a general SEO automation blog post for ClientSurge Systems website",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 14 * * 1",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "blog_clientsurge_general_weekly_seo_post",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "generateSocialContent",
+            "args": {
+              "industry": "general",
+              "content_types": [
+                "blog_post",
+                "linkedin",
+                "twitter"
+              ]
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

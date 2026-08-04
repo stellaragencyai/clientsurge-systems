@@ -1,0 +1,34 @@
+{
+  "name": "Auto End-to-End Test \u2014 Lead Sources Connected",
+  "description": "When step_lead_sources is marked true on a client, fire a fake test lead through their webhook, wait 90s, verify instant SMS + Day 1 follow-up queued, mark step_tested true or alert Nolan of failures.",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"step_lead_sources\") != null) and (.trigger.data.step_lead_sources == true)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "OnboardingClient"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_end_to_end_test_lead_sources_connected",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoEndToEndTest",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

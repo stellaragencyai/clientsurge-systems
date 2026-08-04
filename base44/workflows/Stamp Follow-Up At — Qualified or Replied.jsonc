@@ -1,0 +1,34 @@
+{
+  "name": "Stamp Follow-Up At \u2014 Qualified or Replied",
+  "description": "When a lead's status changes to Qualified or Replied, stamp next_follow_up_at (+24h for Qualified, +48h for Replied) so the hourly runner knows when to fire.",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"status\") != null) and (.trigger.data.status == \"Qualified\" or .trigger.data.status == \"Replied\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "stamp_follow_up_at_qualified_or_replied",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "stampFollowUpAt",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

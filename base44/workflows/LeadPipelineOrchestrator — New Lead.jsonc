@@ -1,0 +1,34 @@
+{
+  "name": "LeadPipelineOrchestrator \u2014 New Lead",
+  "description": "Triggers leadPipelineOrchestrator when a new lead is created. Handles scoring, intent, routing, follow-up.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "leadpipelineorchestrator_new_lead",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "leadPipelineOrchestrator",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

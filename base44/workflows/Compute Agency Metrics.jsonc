@@ -1,0 +1,41 @@
+{
+  "name": "Compute Agency Metrics",
+  "description": "Auto-compute aggregated metrics snapshots for all active agencies (supports agency dashboards)",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 6,
+      "interval_unit": "hours",
+      "interval_anchor": "2026-06-15T00:14:34.419000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "compute_agency_metrics",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "computeAgencyMetrics",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

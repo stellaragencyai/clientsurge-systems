@@ -1,0 +1,41 @@
+{
+  "name": "Stripe Orphan Reconciler \u2014 Hourly",
+  "description": "Runs every 60 minutes. Cross-references recent Stripe checkout.session.completed events against Orders. Auto-triggers orchestrateOrderToOnboarding for any paid orders missing a pipeline_status.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 60,
+      "interval_unit": "minutes",
+      "interval_anchor": "2026-06-15T15:47:50.149000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "stripe_orphan_reconciler_hourly",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "stripeOrphanReconciler",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "InstallOrchestrator \u2014 Order Update",
+  "description": "Triggers installOrchestrator when an order status changes. Manages pipeline progression and go-live gates.",
+  "trigger": {
+    "condition": "${ (.trigger.changed_fields | index(\"pipeline_status\") != null) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Order"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "installorchestrator_order_update",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "installOrchestrator",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

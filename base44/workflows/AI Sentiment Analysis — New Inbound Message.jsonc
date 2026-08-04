@@ -1,0 +1,34 @@
+{
+  "name": "AI Sentiment Analysis \u2014 New Inbound Message",
+  "description": "When a new inbound message is created for a lead, trigger AI sentiment analysis and save Positive/Neutral/Negative to the lead record.",
+  "trigger": {
+    "condition": "${ (.trigger.data.direction == \"inbound\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Messages"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "ai_sentiment_analysis_new_inbound_message",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "analyzeReplySentiment",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

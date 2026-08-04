@@ -1,0 +1,35 @@
+{
+  "name": "Onboarding Submission Complete \u2014 Notify Admin",
+  "description": "",
+  "trigger": {
+    "condition": "${ (.trigger.data.status == \"completed\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "OnboardingSubmission"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "onboarding_submission_complete_notify_admin",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "notifyOnboardingComplete",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

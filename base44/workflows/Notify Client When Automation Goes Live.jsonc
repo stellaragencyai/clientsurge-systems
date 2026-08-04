@@ -1,0 +1,34 @@
+{
+  "name": "Notify Client When Automation Goes Live",
+  "description": "Sends a progress update email to the client when their automation checklist status changes to 'active' (goes live).",
+  "trigger": {
+    "condition": "${ ((.trigger.data.status == \"active\") and (.trigger.changed_fields | index(\"status\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "AutomationChecklist"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "notify_client_when_automation_goes_live",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "onChecklistStatusChange",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

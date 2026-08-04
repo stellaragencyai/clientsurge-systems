@@ -1,0 +1,41 @@
+{
+  "name": "Missed-Call Follow-Up Processor \u2014 Every 5 Minutes",
+  "description": "Runs the 4-step missed-call recovery sequence (2min SMS, 10min email, 1hr SMS, 24hr email) every 5 minutes for leads in Contacted status with Hot priority",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 5,
+      "interval_unit": "minutes",
+      "interval_anchor": "2026-04-28T10:06:01.371000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "missed_call_follow_up_processor_every_5_minutes",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "processMissedCallFollowUps",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

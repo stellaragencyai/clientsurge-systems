@@ -1,0 +1,41 @@
+{
+  "name": "Qualified & Replied Follow-Up Runner \u2014 Every Hour",
+  "description": "Hourly: sends booking prompt SMS+email to Qualified leads after 24h with no progress; emails assigned rep for Replied leads after 48h with no action.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 1,
+      "interval_unit": "hours",
+      "interval_anchor": "2026-04-24T00:11:04.330000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "qualified_replied_follow_up_runner_every_hour",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "processQualifiedFollowUps",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

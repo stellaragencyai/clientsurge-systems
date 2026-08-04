@@ -1,0 +1,41 @@
+{
+  "name": "Process Resend Inbound Replies \u2014 Every 10 mins",
+  "description": "Poll Resend for incoming email replies and update lead status when they reply (high-intent signals)\"",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 10,
+      "interval_unit": "minutes",
+      "interval_anchor": "2026-06-15T18:34:09.085000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "process_resend_inbound_replies_every_10_mins",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "receiveResendInbound",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

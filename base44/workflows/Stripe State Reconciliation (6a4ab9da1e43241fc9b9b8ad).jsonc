@@ -1,0 +1,41 @@
+{
+  "name": "Stripe State Reconciliation (6a4ab9da1e43241fc9b9b8ad)",
+  "description": "Finding #126: Daily sync of order status with Stripe to catch refunds/disputes processed outside webhooks",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 10 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "stripe_state_reconciliation_6a4ab9da1e43241fc9b9b8ad",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "stripeStateReconciliation",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

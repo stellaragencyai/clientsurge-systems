@@ -1,0 +1,41 @@
+{
+  "name": "Weekly Admin Digest \u2014 Monday 7am MST",
+  "description": "AI-written executive summary of entire platform: MRR, leads, automations fired, attention items. Task #591.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 14 * * 1",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "weekly_admin_digest_monday_7am_mst",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendWeeklyAdminDigest",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

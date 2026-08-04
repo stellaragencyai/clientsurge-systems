@@ -1,0 +1,34 @@
+{
+  "name": "Auto Enrich Lead on Create",
+  "description": "When a new Leads record is created, automatically scrape the business website and web search to extract industry tags, company size, and social profiles, then write them back to the lead record.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_enrich_lead_on_create",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "enrichLead",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

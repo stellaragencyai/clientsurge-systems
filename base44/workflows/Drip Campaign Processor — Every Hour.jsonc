@@ -1,0 +1,41 @@
+{
+  "name": "Drip Campaign Processor \u2014 Every Hour",
+  "description": "Hourly runner that checks all active drip campaigns, fires overdue Day 1/3/7 steps via SMS or email, and auto-stops campaigns when leads reach Qualified/Booked/Closed.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "interval",
+      "cron_expression": null,
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": 1,
+      "interval_unit": "hours",
+      "interval_anchor": "2026-04-23T23:54:30.486000",
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "drip_campaign_processor_every_hour",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "processDripCampaigns",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

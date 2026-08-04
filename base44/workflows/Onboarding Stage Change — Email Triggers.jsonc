@@ -1,0 +1,34 @@
+{
+  "name": "Onboarding Stage Change \u2014 Email Triggers",
+  "description": "Fires client stage emails and admin go-live alerts when any ClientProject step field flips to complete.",
+  "trigger": {
+    "condition": "${ ((.trigger.data.step_onboarding == \"complete\") or (.trigger.data.step_payment == \"complete\") or (.trigger.data.step_sms == \"complete\") or (.trigger.data.step_email == \"complete\") or (.trigger.data.step_booking == \"complete\") or (.trigger.data.step_followup == \"complete\") or (.trigger.data.step_live == \"complete\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "ClientProject"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "onboarding_stage_change_email_triggers",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "onOnboardingStageChange",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

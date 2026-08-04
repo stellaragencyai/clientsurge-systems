@@ -1,0 +1,41 @@
+{
+  "name": "Daily Deployment Health Recalculation",
+  "description": "Pillar 2 audit fix: calculateDeploymentHealth was never scheduled \u2014 all deployments had stale or null health_checked_at. Runs daily at 04:00 to recompute health_status, health_summary, and health_checked_at for every active ClientDeployment.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 11 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_deployment_health_recalculation",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "calculateDeploymentHealth",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

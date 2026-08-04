@@ -1,0 +1,34 @@
+{
+  "name": "Auto-Score New Leads on Creation",
+  "description": "Fires calculateLeadScore immediately when a new Lead is created, ensuring activation_priority (Hot/High/Medium/Low) and lead_score are set before any downstream automations check them.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_score_new_leads_on_creation",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "calculateLeadScore",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

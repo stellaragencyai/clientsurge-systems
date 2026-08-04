@@ -1,0 +1,35 @@
+{
+  "name": "Auto-Enroll Nurture Tagged Leads",
+  "description": "Enrolls a lead into the 30-day nurture email sequence when their tags contain \"Nurture\"",
+  "trigger": {
+    "condition": "${ (.trigger.data.industry_tags | index(\"Nurture\") != null) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_enroll_nurture_tagged_leads",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "startNurtureCampaign",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

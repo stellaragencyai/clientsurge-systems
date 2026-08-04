@@ -1,0 +1,34 @@
+{
+  "name": "LeadPipelineOrchestrator \u2014 Website Lead",
+  "description": "Triggers leadPipelineOrchestrator when a new website form lead is captured.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "WebsiteLead"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "leadpipelineorchestrator_website_lead",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "leadPipelineOrchestrator",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

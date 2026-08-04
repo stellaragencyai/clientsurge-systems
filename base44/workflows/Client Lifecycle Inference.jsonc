@@ -1,0 +1,34 @@
+{
+  "name": "Client Lifecycle Inference",
+  "description": "Infer and update Client lifecycle stage when ClientProject status changes",
+  "trigger": {
+    "condition": "${ (.trigger.changed_fields | index(\"client_project_status\") != null) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "ClientProject"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "client_lifecycle_inference",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "manageClientLifecycle",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

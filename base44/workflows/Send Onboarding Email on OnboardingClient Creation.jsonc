@@ -1,0 +1,41 @@
+{
+  "name": "Send Onboarding Email on OnboardingClient Creation",
+  "description": "Trigger onboarding email sequence when OnboardingClient is created",
+  "trigger": {
+    "condition": "${ (.trigger.data.email != null) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "OnboardingClient"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "send_onboarding_email_on_onboardingclient_creation",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "sendOnboardingEmailSequence",
+            "args": {
+              "stage": "onboarding_started",
+              "onboarding_client_id": "{{id}}",
+              "email": "{{email}}",
+              "business_name": "{{business_name}}",
+              "owner_name": "{{owner_name}}",
+              "industry": "{{industry}}"
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

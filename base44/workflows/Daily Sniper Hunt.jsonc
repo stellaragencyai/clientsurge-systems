@@ -1,0 +1,52 @@
+{
+  "name": "Daily Sniper Hunt",
+  "description": "Runs the AI Lead Sniper every day at 6am Arizona time to find new established businesses with great reviews but bad/no websites across all 6 niches.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 13 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "daily_sniper_hunt",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "runSniperSearch",
+            "args": {
+              "cities": [
+                "Phoenix AZ",
+                "Scottsdale AZ",
+                "Mesa AZ",
+                "Chandler AZ",
+                "Tempe AZ",
+                "Las Vegas NV",
+                "Denver CO"
+              ],
+              "min_score": 40
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

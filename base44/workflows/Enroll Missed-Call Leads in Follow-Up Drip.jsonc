@@ -1,0 +1,34 @@
+{
+  "name": "Enroll Missed-Call Leads in Follow-Up Drip",
+  "description": "Auto-enrolls a missed-call lead into the 4-step follow-up drip sequence (2min SMS, 10min email, 1hr SMS, 24hr email) after initial SMS is sent",
+  "trigger": {
+    "condition": "${ ((.trigger.data.channel == \"sms\") and (.trigger.data.event_type == \"sms_sent\") and (.trigger.data.subject | index(\"missed\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "CommunicationEvent"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "enroll_missed_call_leads_in_follow_up_drip",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "enrollMissedCallDrip",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Auto Send Webhook Instructions \u2014 New Client",
+  "description": "When a new OnboardingClient is created, generate their unique webhook URL and email it to the client with friendly setup instructions.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "OnboardingClient"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_send_webhook_instructions_new_client",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "autoSendWebhookInstructions",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

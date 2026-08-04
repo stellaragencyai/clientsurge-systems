@@ -1,0 +1,34 @@
+{
+  "name": "Self-Healing: Retry Failed Messages",
+  "description": "When a CommunicationEvent fails, automatically retry via alternate channel within minutes",
+  "trigger": {
+    "condition": "${ ((.trigger.data.status == \"failed\") and (.trigger.data.direction == \"outbound\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "CommunicationEvent"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "self_healing_retry_failed_messages",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "selfHealingSequence",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

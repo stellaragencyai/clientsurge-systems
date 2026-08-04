@@ -1,0 +1,35 @@
+{
+  "name": "Stripe Activation Guarantee on Order Payment",
+  "description": "Verify and retry post-payment onboarding (Client, ClientProject, Subscription, InstallationOS creation) on every paid Order",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"payment_status\") != null) and (.trigger.data.payment_status == \"paid\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create",
+        "update"
+      ],
+      "entity_name": "Order"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "stripe_activation_guarantee_on_order_payment",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "stripeActivationGuarantee",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

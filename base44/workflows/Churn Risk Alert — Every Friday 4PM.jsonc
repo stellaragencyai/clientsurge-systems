@@ -1,0 +1,41 @@
+{
+  "name": "Churn Risk Alert \u2014 Every Friday 4PM",
+  "description": "Every Friday at 4PM, scan Live clients for churn risk (60+ days live, no bookings in 30 days) and email Nolan a detailed alert with suggested actions.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 23 * * 5",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "churn_risk_alert_every_friday_4pm",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "churnRiskAlert",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

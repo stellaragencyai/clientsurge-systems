@@ -1,0 +1,41 @@
+{
+  "name": "Nurture Campaign Processor \u2014 Daily 9 AM",
+  "description": "Runs the 8-step 30-day email nurture sequence daily, advancing enrolled leads through their campaign steps.",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 16 * * *",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "nurture_campaign_processor_daily_9_am",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "processNurtureCampaigns",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

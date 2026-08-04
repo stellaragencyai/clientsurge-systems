@@ -1,0 +1,48 @@
+{
+  "name": "Social: Dental \u2014 Weekly Content",
+  "description": "Every Wednesday 7am \u2014 generates LinkedIn, Facebook, and Blog content for dental / orthodontics industry",
+  "trigger": {
+    "condition": null,
+    "config": {
+      "trigger_type": "scheduled",
+      "events": [],
+      "schedule_mode": "recurring",
+      "cron_expression": "0 14 * * 3",
+      "one_time_date": null,
+      "timezone": "UTC",
+      "interval_value": null,
+      "interval_unit": null,
+      "interval_anchor": null,
+      "ends_type": "never",
+      "ends_on_date": null,
+      "ends_after_count": null
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "social_dental_weekly_content",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "generateSocialContent",
+            "args": {
+              "industry": "dental",
+              "content_types": [
+                "blog_post",
+                "linkedin",
+                "facebook"
+              ]
+            }
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

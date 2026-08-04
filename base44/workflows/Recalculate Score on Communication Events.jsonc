@@ -1,0 +1,34 @@
+{
+  "name": "Recalculate Score on Communication Events",
+  "description": "",
+  "trigger": {
+    "condition": "${ (.trigger.data.event_type == \"sms_received\" or .trigger.data.event_type == \"email_opened\" or .trigger.data.event_type == \"link_clicked\") }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "CommunicationEvent"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "recalculate_score_on_communication_events",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "scoreLeads",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Enroll Lead in Drip \u2014 Status \u2192 Contacted",
+  "description": "When a lead's status changes to Contacted, enroll them in the 3-step drip campaign (Day 1 / Day 3 / Day 7) if they're not already Qualified/Booked/Closed.",
+  "trigger": {
+    "condition": "${ ((.trigger.changed_fields | index(\"status\") != null) and (.trigger.data.status == \"Contacted\")) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "enroll_lead_in_drip_status_contacted",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "startDripCampaign",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "name": "Auto-Enrich Leads with Website Analysis",
+  "description": "Automatically analyzes company websites and extracts industry, tags, and insights when a new lead is created",
+  "trigger": {
+    "condition": "${ (.trigger.data.website != null) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "create"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "auto_enrich_leads_with_website_analysis",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "enrichLeadWithAI",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}

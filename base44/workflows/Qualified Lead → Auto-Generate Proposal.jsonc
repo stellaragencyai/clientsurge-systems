@@ -1,0 +1,34 @@
+{
+  "name": "Qualified Lead \u2192 Auto-Generate Proposal",
+  "description": "When a lead's status changes to Qualified, AI automatically generates and emails a personalized proposal. Task #587.",
+  "trigger": {
+    "condition": "${ ((.trigger.data.status == \"Qualified\") and (.trigger.changed_fields | index(\"status\") != null)) }",
+    "config": {
+      "trigger_type": "entity",
+      "events": [
+        "update"
+      ],
+      "entity_name": "Leads"
+    }
+  },
+  "definition": {
+    "document": {
+      "dsl": "1.0.0",
+      "name": "qualified_lead_auto_generate_proposal",
+      "version": "1.0",
+      "namespace": "base44"
+    },
+    "do": [
+      {
+        "run_function": {
+          "call": "invoke_backend_function",
+          "with": {
+            "function_name": "generateLeadProposal",
+            "args": {}
+          },
+          "then": "end"
+        }
+      }
+    ]
+  }
+}
